@@ -29,7 +29,7 @@ LAST_FAST_UPDATE_FILE = DATA_DIR / "last_fast_update.json"
 
 REMOTE_LAST_FAST_UPDATE_FILE = "data/last_fast_update.json"
 
-REPO_NAME = "dweezil78/arabsniper2"
+REPO_NAME = "arabsnipertech-bet/arabsniper2"
 
 ROME_TZ = ZoneInfo("Europe/Rome")
 
