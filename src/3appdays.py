@@ -115,7 +115,7 @@ def github_write_json(filename, payload, commit_message):
             return "MISSING_TOKEN"
 
         g = Github(token)
-        repo_name = "dweezil78/arabsniper2"   # <-- verifica che sia ESATTO
+        repo_name = "arabsnipertech-bet/arabsniper2"   # <-- verifica che sia ESATTO
         print(f"📦 Repo target: {repo_name}", flush=True)
         print(f"📄 File target: {filename}", flush=True)
 
@@ -228,7 +228,7 @@ def load_snapshot_from_github():
             return None
 
         g = Github(token)
-        repo = g.get_repo("dweezil78/arabsniper2")
+        repo = g.get_repo("arabsnipertech-bet/arabsniper2")
         contents = repo.get_contents(REMOTE_SNAPSHOT_FILE)
         raw = contents.decoded_content.decode("utf-8")
         payload = json.loads(raw)
