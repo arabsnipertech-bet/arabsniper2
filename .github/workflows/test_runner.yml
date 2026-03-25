@@ -1,0 +1,37 @@
+name: Test Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    env:
+      API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || true
+          pip install PyGithub || true
+
+      - name: Run FAST test
+        run: python src/3appdays_runner.py --fast
+
+    # - name: Run DAY2 REFRESH test
+    #   run: python src/3appdays_runner.py --day2-refresh
+
+    # - name: Run NIGHT test
+    #   run: python src/3appdays_runner.py --night
+
+    # - name: Run ROTATE test
+    #   run: python src/3appdays_runner.py --rotate-live
