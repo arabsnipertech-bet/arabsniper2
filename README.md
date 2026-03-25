@@ -1,2 +1,2 @@
 # arabsniper2
-Software di analisi partite di calcio
+Sviluppo software analisi di mercato bet
