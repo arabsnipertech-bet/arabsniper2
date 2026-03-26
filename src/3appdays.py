@@ -676,7 +676,7 @@ def upload_snapshot_day_to_github(day_num, payload):
         print(f"Snapshot day{day_num} upload error: {e}")
 
 
-def build_daily_snapshots_from_rolling():
+def ):
     """
     Crea snapshot_day1...snapshot_day5 filtrando il rolling snapshot centrale.
     NON riscrive le OPEN: usa i record già consolidati nel rolling snapshot.
@@ -2845,6 +2845,15 @@ def run_nightly_multiday_build():
         import sys
         subprocess.run([sys.executable, str(BASE_DIR / "3appdays_runner.py"), "--rotate-live"], check=True)
         print("✅ Rotazione file completata.")
+
+        print("🔄 Reload DB dopo rotazione...")
+        try:
+            load_db()
+            print("✅ DB ricaricato dopo rotazione")
+        except Exception as e:
+            print(f"❌ Errore reload DB dopo rotazione: {e}")
+            raise
+
     except Exception as e:
         print(f"❌ Errore rotazione file day: {e}")
         raise
