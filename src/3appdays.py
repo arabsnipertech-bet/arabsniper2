@@ -676,7 +676,7 @@ def upload_snapshot_day_to_github(day_num, payload):
         print(f"Snapshot day{day_num} upload error: {e}")
 
 
-def ):
+def build_daily_snapshots_from_rolling():
     """
     Crea snapshot_day1...snapshot_day5 filtrando il rolling snapshot centrale.
     NON riscrive le OPEN: usa i record già consolidati nel rolling snapshot.
@@ -2465,6 +2465,8 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                 return
 
             api_response = res.get("response", [])
+            print(f"📊 FIXTURE API TROVATE per {target_date}: {len(api_response) if isinstance(api_response, list) else 0}", flush=True)
+
             if not api_response or not isinstance(api_response, list):
                 print(f"❌ API vuota per day {use_horizon} ({target_date}) -> skip totale", flush=True)
                 if show_success:
@@ -2476,6 +2478,8 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                 if f.get("fixture", {}).get("status", {}).get("short") == "NS"
                 and not is_blacklisted_league(f.get("league", {}).get("name", ""))
             ]
+
+            print(f"📊 FIXTURE NS FILTRATE per {target_date}: {len(day_fx)}", flush=True)
 
             if not day_fx:
                 print(f"❌ Nessun fixture NS valido per day {use_horizon} ({target_date}) -> skip totale", flush=True)
@@ -2713,10 +2717,20 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
             # ==========================================
             # 4) PROTEZIONE FORTE CONTRO SALVATAGGI SPORCHI
             # ==========================================
-            existing_day_results = [
+             existing_day_results = [
                 r for r in st.session_state.scan_results
                 if r.get("Data") == target_date
             ]
+
+            if not existing_day_results:
+                try:
+                    with open(DB_FILE, "r", encoding="utf-8") as f:
+                        db_payload = json.load(f)
+                        db_rows = db_payload.get("results", []) if isinstance(db_payload, dict) else []
+                        existing_day_results = [r for r in db_rows if r.get("Data") == target_date]
+                        print(f"📦 Fallback DB file per {target_date}: {len(existing_day_results)} match esistenti", flush=True)
+                except Exception as e:
+                    print(f"⚠️ Fallback DB file fallito per {target_date}: {e}", flush=True)
 
             # Se non trova nulla, non distruggere file esistenti
             if not final_list:
@@ -2730,7 +2744,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                 return
 
             # Se ci sono già dati per quel giorno e il nuovo scan è troppo povero, non salvare
-            if existing_day_results and len(final_list) < 3:
+            if existing_day_results and len(final_list) < 5:
                 print(
                     f"⚠️ Troppi pochi match trovati ({len(final_list)}) per day {use_horizon} ({target_date}) "
                     f"con dati già esistenti -> skip salvataggio prudenziale.",
@@ -2744,7 +2758,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                 return
 
             # Se esistono dati per quel giorno e il nuovo scan è molto più piccolo del vecchio, skip
-            if existing_day_results and len(final_list) < max(3, int(len(existing_day_results) * 0.35)):
+            if existing_day_results and len(final_list) < max(5, int(len(existing_day_results) * 0.50)):
                 print(
                     f"⚠️ Nuovo scan troppo ridotto: {len(final_list)} vs vecchio {len(existing_day_results)} "
                     f"per day {use_horizon} ({target_date}) -> skip salvataggio prudenziale.",
