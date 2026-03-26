@@ -2717,7 +2717,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
             # ==========================================
             # 4) PROTEZIONE FORTE CONTRO SALVATAGGI SPORCHI
             # ==========================================
-             existing_day_results = [
+            existing_day_results = [
                 r for r in st.session_state.scan_results
                 if r.get("Data") == target_date
             ]
