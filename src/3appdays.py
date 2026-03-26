@@ -204,7 +204,27 @@ if "match_details" not in st.session_state:
 
 if "selected_fixture_for_modal" not in st.session_state:
     st.session_state.selected_fixture_for_modal = None
+# ==========================================
+# RUNTIME API CACHE + THROTTLE
+# ==========================================
+RUNTIME_ODDS_CACHE = {}
+LAST_API_CALL_TS = 0.0
+API_MIN_INTERVAL = 0.14  # ~428 req/min teorici max
 
+def reset_runtime_api_cache():
+    global RUNTIME_ODDS_CACHE, LAST_API_CALL_TS
+    RUNTIME_ODDS_CACHE = {}
+    LAST_API_CALL_TS = 0.0
+
+def api_throttle():
+    global LAST_API_CALL_TS
+    now_ts = time.time()
+    elapsed = now_ts - LAST_API_CALL_TS
+
+    if elapsed < API_MIN_INTERVAL:
+        time.sleep(API_MIN_INTERVAL - elapsed)
+
+    LAST_API_CALL_TS = time.time()
 
 def save_config():
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
@@ -327,8 +347,15 @@ def api_get(session, path, params):
     print(f"🔑 API key rilevata: {safe_key}")
     print(f"🌐 API GET path={path} params={params}")
 
-    for attempt in range(2):
+    backoff_plan = [0, 2, 5]
+
+    for attempt in range(len(backoff_plan)):
         try:
+            if backoff_plan[attempt] > 0:
+                time.sleep(backoff_plan[attempt])
+
+            api_throttle()
+
             r = session.get(
                 f"https://v3.football.api-sports.io/{path}",
                 headers=HEADERS,
@@ -338,45 +365,46 @@ def api_get(session, path, params):
 
             print(f"📡 Tentativo {attempt+1} -> status_code={r.status_code}")
 
-            if r.status_code == 200:
-                try:
-                    data = r.json()
-                except Exception as json_err:
-                    print(f"❌ JSON decode error: {json_err}")
-                    print(f"🧾 Response text preview: {r.text[:300]}")
-                    time.sleep(1)
-                    continue
-
-                if not isinstance(data, dict):
-                    print(f"❌ Risposta non dict: {type(data)}")
-                    print(f"🧾 Response preview: {str(data)[:300]}")
-                    time.sleep(1)
-                    continue
-
-                if data.get("errors"):
-                    print(f"❌ API errors: {data.get('errors')}")
-
-                if "response" not in data:
-                    print(f"❌ Chiave 'response' assente nel payload")
-                    print(f"🧾 Payload preview: {str(data)[:500]}")
-                else:
-                    try:
-                        print(f"✅ Response entries: {len(data.get('response', []))}")
-                    except Exception:
-                        print("✅ Response presente")
-
-                return data
-
-            else:
+            if r.status_code != 200:
                 print(f"❌ HTTP status non 200: {r.status_code}")
                 print(f"🧾 Response text preview: {r.text[:300]}")
-                time.sleep(1)
+                continue
+
+            try:
+                data = r.json()
+            except Exception as json_err:
+                print(f"❌ JSON decode error: {json_err}")
+                print(f"🧾 Response text preview: {r.text[:300]}")
+                continue
+
+            if not isinstance(data, dict):
+                print(f"❌ Risposta non dict: {type(data)}")
+                print(f"🧾 Response preview: {str(data)[:300]}")
+                continue
+
+            api_errors = data.get("errors") or {}
+
+            if isinstance(api_errors, dict) and api_errors.get("rateLimit"):
+                print(f"⏳ RATE LIMIT API: {api_errors}")
+                continue
+
+            if api_errors:
+                print(f"⚠️ API errors: {api_errors}")
+
+            if "response" not in data:
+                print(f"❌ Chiave 'response' assente nel payload")
+                print(f"🧾 Payload preview: {str(data)[:500]}")
+                continue
+
+            try:
+                print(f"✅ Response entries: {len(data.get('response', []))}")
+            except Exception:
+                print("✅ Response presente")
+
+            return data
 
         except Exception as e:
             print(f"❌ Exception api_get attempt {attempt+1}: {e}")
-            if attempt == 1:
-                return None
-            time.sleep(1)
 
     return None
 
@@ -406,8 +434,18 @@ def is_blacklisted_league(league_name):
 
 
 def extract_elite_markets(session, fid):
+    global RUNTIME_ODDS_CACHE
+
+    cache_key = str(fid)
+    if cache_key in RUNTIME_ODDS_CACHE:
+        cached = RUNTIME_ODDS_CACHE[cache_key]
+        if isinstance(cached, dict):
+            return dict(cached)
+        return cached
+
     res = api_get(session, "odds", {"fixture": fid})
     if not res or not res.get("response"):
+        RUNTIME_ODDS_CACHE[cache_key] = None
         return None
 
     mk = {"q1": 0.0, "qx": 0.0, "q2": 0.0, "o25": 0.0, "o05ht": 0.0, "o15ht": 0.0}
@@ -449,8 +487,10 @@ def extract_elite_markets(session, fid):
             break
 
     if (1.01 <= mk["q1"] <= 1.10) or (1.01 <= mk["q2"] <= 1.10) or (1.01 <= mk["o25"] <= 1.30):
+        RUNTIME_ODDS_CACHE[cache_key] = "SKIP"
         return "SKIP"
 
+    RUNTIME_ODDS_CACHE[cache_key] = dict(mk)
     return mk
 
 
@@ -2852,6 +2892,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
 # ==========================================
 def run_nightly_multiday_build():
     print("🚀 Avvio scan notturno multi-day...")
+    reset_runtime_api_cache()
 
     print("🔄 Rotazione file day1-day5...")
     try:
@@ -3188,18 +3229,21 @@ else:
 # ==========================================
 if __name__ == "__main__":
     if "--auto" in sys.argv:
+        reset_runtime_api_cache()
         print("🚀 Avvio Scan Automatico Notturno Multi-Day...")
         HORIZON = 1
         run_nightly_multiday_build()
         print("✅ Scan completo terminato: data.json + data_day1/2/3/4/5 + details_day1/2/3/4/5 aggiornati.")
 
     elif "--fast" in sys.argv:
+        reset_runtime_api_cache()
         HORIZON = 1
         print("⚡ Avvio Scan Veloce Automatico (solo Day 1)...")
         run_full_scan(horizon=1, snap=False, update_main_site=True, show_success=False)
         print("✅ Scan veloce terminato: data.json + data_day1 + details_day1 aggiornati.")
 
     elif "--day2-refresh" in sys.argv:
+        reset_runtime_api_cache()
         HORIZON = 2
         print("🌙 Avvio Refresh Serale Day 2...")
         run_full_scan(horizon=2, snap=False, update_main_site=False, show_success=False)
