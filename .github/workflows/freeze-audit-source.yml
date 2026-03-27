@@ -3,7 +3,8 @@ name: Freeze Audit Source
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 7 * * *'   # 08:00 Italia circa in inverno / da adattare se vuoi
+    - cron: '37 8 * * *'
+      timezone: 'Europe/Rome'
 
 jobs:
   freeze:
