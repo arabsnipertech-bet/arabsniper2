@@ -1,11 +1,14 @@
-name: Test Freeze Audit
+name: Test Auditor
 
 on:
   workflow_dispatch:
 
 jobs:
-  freeze:
+  auditor:
     runs-on: ubuntu-latest
+
+    env:
+      API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
 
     steps:
       - name: Checkout repo
@@ -16,14 +19,22 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: |
+          pip install requests
+
       - name: Run freeze script
+        run: |
+          python auditor/freeze_for_audit.py
+
+      - name: Run audit script
         run: |
           python auditor/run_audit.py
 
-      - name: Commit and push result
+      - name: Commit and push results
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add auditordata/
-          git commit -m "Test freeze audit" || echo "No changes"
+          git add auditordata/ auditarchive/
+          git commit -m "Run auditor test" || echo "No changes to commit"
           git push
