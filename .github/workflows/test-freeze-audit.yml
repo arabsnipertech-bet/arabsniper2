@@ -1,0 +1,29 @@
+name: Test Freeze Audit
+
+on:
+  workflow_dispatch:
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run freeze script
+        run: |
+          python auditor/freeze_for_audit.py
+
+      - name: Commit and push result
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add auditordata/
+          git commit -m "Test freeze audit" || echo "No changes"
+          git push
