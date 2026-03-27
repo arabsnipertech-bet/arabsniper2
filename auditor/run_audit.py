@@ -1,7 +1,9 @@
 import os
 import json
-import requests
+import argparse
 from datetime import datetime, timezone, timedelta
+
+import requests
 
 # =========================
 # CONFIG
@@ -11,7 +13,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FREEZE_DIR = os.path.join(BASE_DIR, "auditordata")
 OUTPUT_DIR = os.path.join(BASE_DIR, "auditarchive")
 
-API_KEY = os.environ.get("API_SPORTS_KEY")
+API_KEY = os.environ.get("API_SPORTS_KEY", "").strip()
 
 HEADERS = {
     "x-apisports-key": API_KEY
@@ -23,32 +25,49 @@ ITALY_TZ = timezone(timedelta(hours=1))
 # =========================
 # HELPERS
 # =========================
-def ensure_dir(path):
+def ensure_dir(path: str) -> None:
     os.makedirs(path, exist_ok=True)
 
 
-def load_latest_freeze():
-    files = [f for f in os.listdir(FREEZE_DIR) if f.startswith("freeze_for_audit_")]
-    if not files:
-        raise ValueError("Nessun file freeze trovato")
+def save_json(path: str, data) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
-    latest = sorted(files)[-1]
-    path = os.path.join(FREEZE_DIR, latest)
+
+def get_target_date(cli_date: str | None) -> str:
+    """
+    Se viene passato --date usa quello.
+    Altrimenti prende ieri.
+    """
+    if cli_date:
+        try:
+            datetime.strptime(cli_date, "%Y-%m-%d")
+            return cli_date
+        except ValueError:
+            raise ValueError("Formato data non valido. Usa YYYY-MM-DD")
+
+    now_italy = datetime.now(ITALY_TZ)
+    target = now_italy.date() - timedelta(days=1)
+    return target.isoformat()
+
+
+def load_freeze_by_date(target_date: str) -> dict:
+    filename = f"freeze_for_audit_{target_date}.json"
+    path = os.path.join(FREEZE_DIR, filename)
+
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Freeze non trovato: {path}")
 
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
-def save_json(path, data):
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-
-def fetch_fixture_result(fixture_id):
+def fetch_fixture_result(fixture_id: int | str):
     url = f"https://v3.football.api-sports.io/fixtures?id={fixture_id}"
 
     try:
-        response = requests.get(url, headers=HEADERS, timeout=10)
+        response = requests.get(url, headers=HEADERS, timeout=20)
+        response.raise_for_status()
         data = response.json()
 
         if not data.get("response"):
@@ -56,15 +75,19 @@ def fetch_fixture_result(fixture_id):
 
         fixture = data["response"][0]
 
-        goals = fixture["goals"]
-        score = fixture["score"]
+        status = fixture.get("fixture", {}).get("status", {}).get("short", "")
+
+        goals = fixture.get("goals", {}) or {}
+        score = fixture.get("score", {}) or {}
+
+        halftime = score.get("halftime", {}) or {}
 
         return {
-            "status": fixture["fixture"]["status"]["short"],
-            "ht_home": score["halftime"]["home"],
-            "ht_away": score["halftime"]["away"],
-            "ft_home": goals["home"],
-            "ft_away": goals["away"]
+            "status": status,
+            "ht_home": halftime.get("home"),
+            "ht_away": halftime.get("away"),
+            "ft_home": goals.get("home"),
+            "ft_away": goals.get("away"),
         }
 
     except Exception as e:
@@ -72,18 +95,48 @@ def fetch_fixture_result(fixture_id):
         return None
 
 
-def evaluate_tags(tags, ht_goals, ft_goals, home_ft, away_ft):
-    results = {}
+def is_finished_status(status: str) -> bool:
+    """
+    Accetta i match finiti o equivalenti.
+    """
+    if not status:
+        return False
 
+    status = str(status).upper().strip()
+
+    valid_exact = {"FT", "AET", "PEN"}
+    if status in valid_exact:
+        return True
+
+    if "FT" in status:
+        return True
+
+    return False
+
+
+def safe_int(value):
+    return 0 if value is None else int(value)
+
+
+def evaluate_tags(tags, ht_goals, ft_goals):
+    """
+    Regole auditor V1:
+    - PT = almeno 1 gol HT
+    - OVER = almeno 3 gol FT
+    - BOOST = PT + OVER
+    - GOLD = uguale a BOOST per ora
+    """
     pt = ht_goals >= 1
     over = ft_goals >= 3
     boost = pt and over
     gold = boost
 
-    results["PT"] = pt if "PT" in tags else None
-    results["OVER"] = over if "OVER" in tags else None
-    results["BOOST"] = boost if "BOOST" in tags else None
-    results["GOLD"] = gold if "GOLD" in tags else None
+    results = {
+        "PT": pt if "PT" in tags else None,
+        "OVER": over if "OVER" in tags else None,
+        "BOOST": boost if "BOOST" in tags else None,
+        "GOLD": gold if "GOLD" in tags else None,
+    }
 
     return results
 
@@ -92,11 +145,25 @@ def evaluate_tags(tags, ht_goals, ft_goals, home_ft, away_ft):
 # MAIN
 # =========================
 def main():
+    parser = argparse.ArgumentParser(description="Run auditor on frozen day file")
+    parser.add_argument(
+        "--date",
+        type=str,
+        default=None,
+        help="Data target in formato YYYY-MM-DD. Se assente usa ieri.",
+    )
+    args = parser.parse_args()
+
+    if not API_KEY:
+        raise RuntimeError("API_SPORTS_KEY non trovata nelle variabili ambiente")
+
     ensure_dir(OUTPUT_DIR)
 
-    freeze = load_latest_freeze()
-    audit_date = freeze["audit_date"]
-    matches = freeze["matches"]
+    target_date = get_target_date(args.date)
+    freeze = load_freeze_by_date(target_date)
+
+    audit_date = freeze.get("audit_date", target_date)
+    matches = freeze.get("matches", []) or []
 
     detail_rows = []
 
@@ -107,31 +174,44 @@ def main():
         "GOLD": {"total": 0, "hit": 0},
     }
 
+    counts = {
+        "freeze_matches": len(matches),
+        "api_found": 0,
+        "finished_matches": 0,
+        "analyzed_rows": 0,
+        "skipped_not_finished": 0,
+        "skipped_no_result": 0,
+    }
+
     for m in matches:
-        fixture_id = m["fixture_id"]
-        tags = m["tags"]
+        fixture_id = m.get("fixture_id")
+        tags = m.get("tags", []) or []
 
         result = fetch_fixture_result(fixture_id)
 
         if not result:
+            counts["skipped_no_result"] += 1
             continue
 
-        valid_status = result["status"]
+        counts["api_found"] += 1
 
-        if not valid_status or "FT" not in valid_status:
+        status = result.get("status", "")
+        if not is_finished_status(status):
+            counts["skipped_not_finished"] += 1
             continue
 
-        ht_home = result["ht_home"] or 0
-        ht_away = result["ht_away"] or 0
-        ft_home = result["ft_home"] or 0
-        ft_away = result["ft_away"] or 0
+        counts["finished_matches"] += 1
+
+        ht_home = safe_int(result.get("ht_home"))
+        ht_away = safe_int(result.get("ht_away"))
+        ft_home = safe_int(result.get("ft_home"))
+        ft_away = safe_int(result.get("ft_away"))
 
         ht_goals = ht_home + ht_away
         ft_goals = ft_home + ft_away
 
-        tag_results = evaluate_tags(tags, ht_goals, ft_goals, ft_home, ft_away)
+        tag_results = evaluate_tags(tags, ht_goals, ft_goals)
 
-        # aggiorna stats
         for tag, value in tag_results.items():
             if value is None:
                 continue
@@ -141,47 +221,68 @@ def main():
 
         detail_rows.append({
             "fixture_id": fixture_id,
-            "league": m["league"],
-            "match": m["match"],
+            "date": m.get("date", audit_date),
+            "league": m.get("league", ""),
+            "match": m.get("match", ""),
+            "status": status,
             "ht_score": f"{ht_home}-{ht_away}",
             "ft_score": f"{ft_home}-{ft_away}",
+            "tags": tags,
             "PT": tag_results["PT"],
             "OVER": tag_results["OVER"],
             "BOOST": tag_results["BOOST"],
-            "GOLD": tag_results["GOLD"]
+            "GOLD": tag_results["GOLD"],
         })
 
-    # calcolo percentuali
-    summary = {}
+    counts["analyzed_rows"] = len(detail_rows)
+
+    summary_stats = {}
     for tag, data in stats.items():
         total = data["total"]
         hit = data["hit"]
-        rate = round((hit / total) * 100, 2) if total > 0 else 0
+        rate = round((hit / total) * 100, 2) if total > 0 else 0.0
 
-        summary[tag] = {
+        summary_stats[tag] = {
             "total": total,
             "hit": hit,
             "rate": rate
         }
 
+    generated_at = datetime.now(ITALY_TZ).strftime("%Y-%m-%dT%H:%M:%S")
+
     details_output = {
         "audit_date": audit_date,
+        "generated_at": generated_at,
+        "rows_count": len(detail_rows),
         "rows": detail_rows
     }
 
     summary_output = {
         "audit_date": audit_date,
-        "stats": summary
+        "generated_at": generated_at,
+        "counts": counts,
+        "stats": summary_stats
     }
 
     details_path = os.path.join(OUTPUT_DIR, f"audit_{audit_date}_details.json")
     summary_path = os.path.join(OUTPUT_DIR, f"audit_{audit_date}_summary.json")
 
+    # copie "ultime" utili per HTML
+    last_details_path = os.path.join(OUTPUT_DIR, "audit_last_details.json")
+    last_summary_path = os.path.join(OUTPUT_DIR, "audit_last_summary.json")
+
     save_json(details_path, details_output)
     save_json(summary_path, summary_output)
+    save_json(last_details_path, details_output)
+    save_json(last_summary_path, summary_output)
 
     print(f"[OK] Audit completato per {audit_date}")
-    print(f"[OK] Match analizzati: {len(detail_rows)}")
+    print(f"[OK] Freeze matches: {counts['freeze_matches']}")
+    print(f"[OK] Match trovati via API: {counts['api_found']}")
+    print(f"[OK] Match finiti: {counts['finished_matches']}")
+    print(f"[OK] Match analizzati: {counts['analyzed_rows']}")
+    print(f"[OK] Match non finiti saltati: {counts['skipped_not_finished']}")
+    print(f"[OK] Match senza risultato API: {counts['skipped_no_result']}")
 
 
 if __name__ == "__main__":
