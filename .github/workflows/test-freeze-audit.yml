@@ -18,7 +18,7 @@ jobs:
 
       - name: Run freeze script
         run: |
-          python auditor/freeze_for_audit.py
+          python auditor/run_audit.py
 
       - name: Commit and push result
         run: |
