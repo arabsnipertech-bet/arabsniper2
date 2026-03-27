@@ -1,0 +1,53 @@
+name: Cleanup Auditor Temp
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 */10 * *'   # ogni 10 giorni circa
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Cleanup old freeze files
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          from datetime import datetime, timedelta
+
+          folder = "auditordata"
+          pattern = re.compile(r"freeze_for_audit_(\d{4}-\d{2}-\d{2})\.json$")
+          cutoff = datetime.utcnow().date() - timedelta(days=10)
+
+          removed = []
+
+          if os.path.isdir(folder):
+              for name in os.listdir(folder):
+                  m = pattern.match(name)
+                  if not m:
+                      continue
+                  try:
+                      file_date = datetime.strptime(m.group(1), "%Y-%m-%d").date()
+                  except ValueError:
+                      continue
+
+                  if file_date < cutoff:
+                      path = os.path.join(folder, name)
+                      os.remove(path)
+                      removed.append(name)
+
+          print("Removed files:", removed if removed else "none")
+          PY
+
+      - name: Commit and push cleanup
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add auditordata/
+          git commit -m "Cleanup auditor temp files" || echo "No changes to commit"
+          git push
