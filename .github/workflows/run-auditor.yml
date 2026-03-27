@@ -3,7 +3,8 @@ name: Run Auditor
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 22 * * *'   # 23:30 Italia circa in inverno / da adattare se vuoi
+    - cron: '47 8 * * *'
+      timezone: 'Europe/Rome'
 
 jobs:
   auditor:
