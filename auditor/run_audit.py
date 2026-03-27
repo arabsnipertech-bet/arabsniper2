@@ -116,7 +116,9 @@ def main():
         if not result:
             continue
 
-        if result["status"] not in ["FT", "AET", "PEN"]:
+        valid_status = result["status"]
+
+        if not valid_status or "FT" not in valid_status:
             continue
 
         ht_home = result["ht_home"] or 0
