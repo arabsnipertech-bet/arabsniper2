@@ -2134,25 +2134,25 @@ def should_keep_match(signal_pack):
     if has_boost and boost_score >= 5.95 and (pt_score >= 4.00 or over_score >= 4.00):
         return True
 
-    if has_ptgg and has_over and ptgg_score >= 4.00 and over_score >= 4.00:
+    if has_ptgg and has_over and ptgg_score >= 3.80 and over_score >= 3.80:
         return True
 
-    if has_pt15 and has_over and pto15_score >= 4.00 and over_score >= 4.00:
+    if has_pt15 and has_over and pto15_score >= 3.80 and over_score >= 3.80:
         return True
 
-    if has_ptgg and not has_over and ptgg_score >= 4.00:
+    if has_ptgg and not has_over and ptgg_score >= 3.80:
         return True
 
-    if has_pt15 and not has_over and pto15_score >= 4.00:
+    if has_pt15 and not has_over and pto15_score >= 3.80:
         return True
 
-    if has_over and not (has_ptgg or has_pt15) and over_score >= 4.00:
+    if has_over and not (has_ptgg or has_pt15) and over_score >= 3.80:
         return True
 
-    if has_probe_o and max_score >= 3.00:
+    if has_probe_o and max_score >= 2.85:
         return True
 
-    if has_probe_g and max_score >= 3.25:
+    if has_probe_g and max_score >= 3.05:
         return True
 
     return False
@@ -2594,12 +2594,12 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                     combined_ft_clean = (s_h["avg_total_clean"] + s_a["avg_total_clean"]) / 2
 
                     if (
-                        combined_ht_clean < 0.72
-                        and combined_ft_clean < 1.20
-                        and s_h["ht_1plus_rate"] < 0.38
-                        and s_a["ht_1plus_rate"] < 0.38
-                        and s_h["ft_2plus_rate"] < 0.38
-                        and s_a["ft_2plus_rate"] < 0.38
+                        combined_ht_clean < 0.66
+                        and combined_ft_clean < 1.10
+                        and s_h["ht_1plus_rate"] < 0.34
+                        and s_a["ht_1plus_rate"] < 0.34
+                        and s_h["ft_2plus_rate"] < 0.34
+                        and s_a["ft_2plus_rate"] < 0.34
                     ):
                         continue
 
