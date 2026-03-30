@@ -1,38 +1,21 @@
 {
-  "audit_date": "2026-03-29",
-  "generated_at": "2026-03-30T07:18:42",
-  "rows_count": 106,
+  "audit_date": "2026-03-27",
+  "generated_at": "2026-03-30T08:33:03",
+  "rows_count": 59,
   "rows": [
     {
-      "fixture_id": 1529495,
-      "date": "2026-03-29",
-      "league": "1. Liga (Latvia)",
-      "match": "Rīgas FS II - Valmiera / BSS",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "1-5",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1393187,
-      "date": "2026-03-29",
+      "fixture_id": 1393182,
+      "date": "2026-03-27",
       "league": "2. Division (Denmark)",
-      "match": "Naestved - Brabrand",
+      "match": "AB Copenhagen - Roskilde",
       "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-0",
+      "ht_score": "2-0",
+      "ft_score": "2-0",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
@@ -40,35 +23,18 @@
       "FISH_OVER": false
     },
     {
-      "fixture_id": 1441994,
-      "date": "2026-03-29",
-      "league": "2. Lig (Turkey)",
-      "match": "Aliağa FAŞ - Isparta 32 Spor",
+      "fixture_id": 1393184,
+      "date": "2026-03-27",
+      "league": "2. Division (Denmark)",
+      "match": "FC Helsingor - Vendsyssel FF",
       "status": "FT",
-      "ht_score": "0-5",
-      "ft_score": "1-5",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1441980,
-      "date": "2026-03-29",
-      "league": "2. Lig (Turkey)",
-      "match": "Beykoz Anadolu - Ankaragücü",
-      "status": "FT",
-      "ht_score": "1-1",
-      "ft_score": "1-3",
+      "ht_score": "0-3",
+      "ft_score": "0-3",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
@@ -76,26 +42,46 @@
       "FISH_OVER": true
     },
     {
-      "fixture_id": 1441983,
-      "date": "2026-03-29",
-      "league": "2. Lig (Turkey)",
-      "match": "Şanlıurfaspor - Karacabey Belediyespor",
+      "fixture_id": 1393183,
+      "date": "2026-03-27",
+      "league": "2. Division (Denmark)",
+      "match": "HIK - Fremad Amager",
       "status": "FT",
-      "ht_score": "2-2",
-      "ft_score": "2-2",
+      "ht_score": "0-0",
+      "ft_score": "0-3",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
       "FISH_GG": null,
       "FISH_OVER": true
+    },
+    {
+      "fixture_id": 1393185,
+      "date": "2026-03-27",
+      "league": "2. Division (Denmark)",
+      "match": "Thisted FC - Skive",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "1-0",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
     },
     {
       "fixture_id": 1388232,
-      "date": "2026-03-29",
+      "date": "2026-03-27",
       "league": "2. SNL (Slovenia)",
       "match": "Bistrica - Jesenice",
       "status": "FT",
@@ -104,7 +90,8 @@
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
@@ -112,53 +99,18 @@
       "FISH_OVER": false
     },
     {
-      "fixture_id": 1448426,
-      "date": "2026-03-29",
-      "league": "3. Lig - Group 1 (Turkey)",
-      "match": "Çankaya FK - Çorluspor 1947",
+      "fixture_id": 1388230,
+      "date": "2026-03-27",
+      "league": "2. SNL (Slovenia)",
+      "match": "Brinje-Grosuplje - Krka",
       "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "1-4",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1489514,
-      "date": "2026-03-29",
-      "league": "3. liga - CFL B (Czech-Republic)",
-      "match": "Varnsdorf - Sokol Zápy",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "3-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1487528,
-      "date": "2026-03-29",
-      "league": "4. liga - Divizie D (Czech-Republic)",
-      "match": "Sokol Tasovice - Velká Bíteš",
-      "status": "FT",
-      "ht_score": "0-1",
+      "ht_score": "0-0",
       "ft_score": "0-0",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
@@ -166,946 +118,20 @@
       "FISH_OVER": false
     },
     {
-      "fixture_id": 1487529,
-      "date": "2026-03-29",
-      "league": "4. liga - Divizie D (Czech-Republic)",
-      "match": "Velké Meziříčí - Pelhřimov",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "0-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1537369,
-      "date": "2026-03-29",
-      "league": "Africa Cup of Nations - Qualification (World)",
-      "match": "South Sudan - Djibouti",
+      "fixture_id": 1388235,
+      "date": "2026-03-27",
+      "league": "2. SNL (Slovenia)",
+      "match": "Triglav - Rudar",
       "status": "FT",
       "ht_score": "0-0",
-      "ft_score": "0-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1529690,
-      "date": "2026-03-29",
-      "league": "CONCACAF Series (World)",
-      "match": "Barbados - St. Vincent / Grenadines",
-      "status": "FT",
-      "ht_score": "0-2",
-      "ft_score": "2-3",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1525681,
-      "date": "2026-03-29",
-      "league": "CONCACAF Series (World)",
-      "match": "British Virgin Islands - Anguilla",
-      "status": "FT",
-      "ht_score": "3-0",
-      "ft_score": "4-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1413511,
-      "date": "2026-03-29",
-      "league": "Campeonato de Portugal Prio - Group A (Portugal)",
-      "match": "Brito - Ribeira Brava",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1537278,
-      "date": "2026-03-29",
-      "league": "Copa Norte (Brazil)",
-      "match": "Remo - Monte Roraima",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1495433,
-      "date": "2026-03-29",
-      "league": "Damallsvenskan (Sweden)",
-      "match": "Djurgården - Växjö",
-      "status": "FT",
-      "ht_score": "1-1",
-      "ft_score": "2-1",
-      "tags": [
-        "OVER",
-        "GOLD"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": true,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1495437,
-      "date": "2026-03-29",
-      "league": "Damallsvenskan (Sweden)",
-      "match": "Malmö FF W - Uppsala W",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "3-0",
-      "tags": [
-        "OVER",
-        "BOOST"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": true,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1495438,
-      "date": "2026-03-29",
-      "league": "Damallsvenskan (Sweden)",
-      "match": "Piteå W - Kristianstad",
-      "status": "FT",
-      "ht_score": "1-2",
-      "ft_score": "2-3",
-      "tags": [
-        "OVER",
-        "BOOST"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": true,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1512859,
-      "date": "2026-03-29",
-      "league": "Elite One (Cameroon)",
-      "match": "Victoria United - Stade Renard",
-      "status": "FT",
-      "ht_score": "1-1",
-      "ft_score": "2-2",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1417309,
-      "date": "2026-03-29",
-      "league": "FA WSL (England)",
-      "match": "Leicester City WFC - Brighton W",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1417304,
-      "date": "2026-03-29",
-      "league": "FA WSL (England)",
-      "match": "West Ham W - London City Lionesses",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "1-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1416942,
-      "date": "2026-03-29",
-      "league": "First Amateur Division (Belgium)",
-      "match": "Knokke - Lyra-Lierse Berlaar",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-0",
-      "tags": [
-        "OVER",
-        "BOOST"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": false,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1416940,
-      "date": "2026-03-29",
-      "league": "First Amateur Division (Belgium)",
-      "match": "Spouwen-Mopertingen - Tienen",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "0-2",
-      "tags": [
-        "OVER",
-        "BOOST"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": false,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1525564,
-      "date": "2026-03-29",
-      "league": "First Amateur Division (Belgium)",
-      "match": "Stockay-Warfusée - Union Saint-Gilloise II",
-      "status": "FT",
-      "ht_score": "1-2",
-      "ft_score": "1-3",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1531879,
-      "date": "2026-03-29",
-      "league": "First League (Russia)",
-      "match": "Chayka - Chelyabinsk",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "2-1",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1401357,
-      "date": "2026-03-29",
-      "league": "Frauen Bundesliga (Germany)",
-      "match": "SC Freiburg W - 1899 Hoffenheim W",
-      "status": "FT",
-      "ht_score": "1-2",
-      "ft_score": "1-2",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1401362,
-      "date": "2026-03-29",
-      "league": "Frauen Bundesliga (Germany)",
-      "match": "VfL Wolfsburg W - Union Berlin W",
-      "status": "FT",
-      "ht_score": "1-1",
-      "ft_score": "3-3",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1401361,
-      "date": "2026-03-29",
-      "league": "Frauen Bundesliga (Germany)",
-      "match": "Werder Bremen W - SGS Essen W",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "2-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1396631,
-      "date": "2026-03-29",
-      "league": "Frauenliga (Austria)",
-      "match": "Rheindorf Altach - Sturm Graz W",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-2",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1514832,
-      "date": "2026-03-29",
-      "league": "Friendlies (World)",
-      "match": "Armenia - Belarus",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "1-2",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1514465,
-      "date": "2026-03-29",
-      "league": "Friendlies (World)",
-      "match": "Colombia - France",
-      "status": "FT",
-      "ht_score": "0-2",
-      "ft_score": "1-3",
+      "ft_score": "2-0",
       "tags": [
         "OVER",
         "BOOST",
         "GOLD"
       ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": true,
-      "GOLD": true,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1502472,
-      "date": "2026-03-29",
-      "league": "Friendlies (World)",
-      "match": "Lithuania - Georgia",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-2",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1396028,
-      "date": "2026-03-29",
-      "league": "II Liga - East (Poland)",
-      "match": "Hutnik Kraków - Unia Skierniewice",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "1-1",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1396030,
-      "date": "2026-03-29",
-      "league": "II Liga - East (Poland)",
-      "match": "Podbeskidzie - Kalisz",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "4-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1396032,
-      "date": "2026-03-29",
-      "league": "II Liga - East (Poland)",
-      "match": "Resovia Rzeszów - Świt Skolwin",
-      "status": "FT",
-      "ht_score": "2-1",
-      "ft_score": "3-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1396035,
-      "date": "2026-03-29",
-      "league": "II Liga - East (Poland)",
-      "match": "Zaglebie Sosnowiec - Rekord Bielsko-Biała",
-      "status": "FT",
-      "ht_score": "0-3",
-      "ft_score": "0-4",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1410371,
-      "date": "2026-03-29",
-      "league": "III Liga - Group 1 (Poland)",
-      "match": "Lechia T. Mazowiecki - Wikielec",
-      "status": "FT",
-      "ht_score": "2-0",
-      "ft_score": "3-1",
-      "tags": [
-        "OVER",
-        "BOOST"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": true,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1434217,
-      "date": "2026-03-29",
-      "league": "III Liga - Group 1 (Poland)",
-      "match": "Warta Sieradz - Swit",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "3-1",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1410369,
-      "date": "2026-03-29",
-      "league": "III Liga - Group 1 (Poland)",
-      "match": "Widzew II - Troszyn",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "0-2",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1410976,
-      "date": "2026-03-29",
-      "league": "III Liga - Group 3 (Poland)",
-      "match": "Ślęza Wrocław - Lechia Zielona Góra",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1411277,
-      "date": "2026-03-29",
-      "league": "III Liga - Group 4 (Poland)",
-      "match": "Naprzód - Pogoń-Sokół Lubaczów",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1510282,
-      "date": "2026-03-29",
-      "league": "K League 2 (South-Korea)",
-      "match": "Daegu FC - Seoul E-Land FC",
-      "status": "FT",
-      "ht_score": "1-2",
-      "ft_score": "1-3",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1515009,
-      "date": "2026-03-29",
-      "league": "Liga 3 (Portugal)",
-      "match": "Amarante - Academica",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1499213,
-      "date": "2026-03-29",
-      "league": "Liga Nacional (Guatemala)",
-      "match": "Mictlán - Cobán Imperial",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1457199,
-      "date": "2026-03-29",
-      "league": "Liga Premier Serie A (Mexico)",
-      "match": "Montañeses - Celaya",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "5-1",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1476927,
-      "date": "2026-03-29",
-      "league": "Liga de Ascenso (Costa-Rica)",
-      "match": "CS Uruguay - Cariari Pococi",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "1-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1476931,
-      "date": "2026-03-29",
-      "league": "Liga de Ascenso (Costa-Rica)",
-      "match": "Quepos Cambute - ADR Jicaral",
-      "status": "FT",
-      "ht_score": "2-0",
-      "ft_score": "4-0",
-      "tags": [
-        "OVER",
-        "BOOST"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": true,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1535082,
-      "date": "2026-03-29",
-      "league": "Ligue 2 (Tunisia)",
-      "match": "ES Hammam-Sousse - US Tataouine",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "2-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1535086,
-      "date": "2026-03-29",
-      "league": "Ligue 2 (Tunisia)",
-      "match": "Kerkennah - CS Chebba",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "2-1",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1523713,
-      "date": "2026-03-29",
-      "league": "Northern NSW NPL (Australia)",
-      "match": "Weston Bears - Broadmeadow Magic",
-      "status": "FT",
-      "ht_score": "1-1",
-      "ft_score": "1-2",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1531661,
-      "date": "2026-03-29",
-      "league": "PFL (Philippines)",
-      "match": "Maharlika - Davao Aguilas",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "2-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1400567,
-      "date": "2026-03-29",
-      "league": "Persha Liga (Ukraine)",
-      "match": "Nyva Ternopil - Probiy Horodenka",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1533562,
-      "date": "2026-03-29",
-      "league": "Premier League (Jamaica)",
-      "match": "Tivoli Gardens - Harbour View",
-      "status": "FT",
-      "ht_score": "2-2",
-      "ft_score": "3-2",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1506062,
-      "date": "2026-03-29",
-      "league": "Primera A (Colombia)",
-      "match": "Internacional de Bogota - Junior",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1511530,
-      "date": "2026-03-29",
-      "league": "Primera B (Chile)",
-      "match": "Cobreloa - Union San Felipe",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "2-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1504917,
-      "date": "2026-03-29",
-      "league": "Primera Division (El-Salvador)",
-      "match": "Municipal Limeño - Hércules",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1397240,
-      "date": "2026-03-29",
-      "league": "Primera División Femenina (Spain)",
-      "match": "Athletic Club W - Atletico Madrid W",
-      "status": "FT",
-      "ht_score": "1-1",
-      "ft_score": "1-2",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1397242,
-      "date": "2026-03-29",
-      "league": "Primera División Femenina (Spain)",
-      "match": "Granad. Tenerife W - Madrid CFF W",
-      "status": "FT",
-      "ht_score": "2-0",
-      "ft_score": "2-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1451881,
-      "date": "2026-03-29",
-      "league": "Second League (Bulgaria)",
-      "match": "Marek - Spartak Pleven",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1527782,
-      "date": "2026-03-29",
-      "league": "Second League A - Division A Gold (Russia)",
-      "match": "Kaluga - Torpedo Miass",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-2",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1527786,
-      "date": "2026-03-29",
-      "league": "Second League A - Division A Gold (Russia)",
-      "match": "Volgar Astrakhan - Tekstilshchik",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "0-1",
-      "tags": [
-        "OVER",
-        "BOOST",
-        "GOLD"
-      ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": false,
       "BOOST": false,
       "GOLD": false,
@@ -1113,37 +139,96 @@
       "FISH_OVER": null
     },
     {
-      "fixture_id": 1506250,
-      "date": "2026-03-29",
-      "league": "Second NL (Croatia)",
-      "match": "Križevci - Kustosija",
+      "fixture_id": 1394907,
+      "date": "2026-03-27",
+      "league": "2. liga (Slovakia)",
+      "match": "Pohronie - Púchov",
       "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-1",
+      "ht_score": "2-0",
+      "ft_score": "3-1",
       "tags": [
-        "FISH_OVER"
+        "OVER"
       ],
-      "PT": null,
-      "OVER": null,
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": true,
       "BOOST": null,
       "GOLD": null,
       "FISH_GG": null,
-      "FISH_OVER": false
+      "FISH_OVER": null
     },
     {
-      "fixture_id": 1392114,
-      "date": "2026-03-29",
-      "league": "Segunda División (Spain)",
-      "match": "Almeria - Real Sociedad II",
+      "fixture_id": 1525680,
+      "date": "2026-03-27",
+      "league": "CONCACAF Series (World)",
+      "match": "Guyana - Dominica",
       "status": "FT",
       "ht_score": "2-0",
-      "ft_score": "5-1",
+      "ft_score": "2-0",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1499043,
+      "date": "2026-03-27",
+      "league": "Division 1 (Saudi-Arabia)",
+      "match": "Abha - Al Jubail",
+      "status": "FT",
+      "ht_score": "1-0",
+      "ft_score": "2-0",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1511253,
+      "date": "2026-03-27",
+      "league": "Division 2 - Västra Götaland (Sweden)",
+      "match": "Landvetter IS - Lindome",
+      "status": "FT",
+      "ht_score": "1-1",
+      "ft_score": "2-1",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": true,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1395764,
+      "date": "2026-03-27",
+      "league": "FAW Championship (Wales)",
+      "match": "Pontypridd Town - Trefelin",
+      "status": "FT",
+      "ht_score": "1-2",
+      "ft_score": "1-3",
       "tags": [
         "OVER",
         "BOOST",
         "GOLD"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": true,
       "BOOST": true,
       "GOLD": true,
@@ -1151,35 +236,18 @@
       "FISH_OVER": null
     },
     {
-      "fixture_id": 1392110,
-      "date": "2026-03-29",
-      "league": "Segunda División (Spain)",
-      "match": "Zaragoza - Racing Santander",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "2-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1531776,
-      "date": "2026-03-29",
-      "league": "Segunda División (Venezuela)",
-      "match": "Puerto Cabello II - Real Frontera",
+      "fixture_id": 1395765,
+      "date": "2026-03-27",
+      "league": "FAW Championship (Wales)",
+      "match": "Rhyl - Denbigh Town",
       "status": "FT",
       "ht_score": "2-0",
       "ft_score": "3-0",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
@@ -1187,17 +255,56 @@
       "FISH_OVER": true
     },
     {
-      "fixture_id": 1531777,
-      "date": "2026-03-29",
-      "league": "Segunda División (Venezuela)",
-      "match": "Urena SC - Atletico el Vigia FC",
+      "fixture_id": 1492852,
+      "date": "2026-03-27",
+      "league": "First Division (Ireland)",
+      "match": "UCD - Cobh Ramblers",
       "status": "FT",
-      "ht_score": "1-1",
+      "ht_score": "1-0",
+      "ft_score": "4-0",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": true
+    },
+    {
+      "fixture_id": 1492853,
+      "date": "2026-03-27",
+      "league": "First Division (Ireland)",
+      "match": "Wexford - Treaty United",
+      "status": "FT",
+      "ht_score": "1-0",
+      "ft_score": "3-2",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": true
+    },
+    {
+      "fixture_id": 1401359,
+      "date": "2026-03-27",
+      "league": "Frauen Bundesliga (Germany)",
+      "match": "Carl Zeiss Jena  W - RB Leipzig W",
+      "status": "FT",
+      "ht_score": "0-1",
       "ft_score": "1-1",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
@@ -1205,35 +312,18 @@
       "FISH_OVER": false
     },
     {
-      "fixture_id": 1432142,
-      "date": "2026-03-29",
-      "league": "Segunda División RFEF - Group 1 (Spain)",
-      "match": "Deportivo La Coruña II - Atlético Astorga",
+      "fixture_id": 1527859,
+      "date": "2026-03-27",
+      "league": "Friendlies (World)",
+      "match": "Algeria - Guatemala",
       "status": "FT",
-      "ht_score": "2-0",
-      "ft_score": "3-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1432143,
-      "date": "2026-03-29",
-      "league": "Segunda División RFEF - Group 1 (Spain)",
-      "match": "Gimnástica Segoviana - Real Valladolid II",
-      "status": "FT",
-      "ht_score": "1-1",
-      "ft_score": "1-2",
+      "ht_score": "3-0",
+      "ft_score": "7-0",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
@@ -1241,17 +331,18 @@
       "FISH_OVER": true
     },
     {
-      "fixture_id": 1432149,
-      "date": "2026-03-29",
-      "league": "Segunda División RFEF - Group 1 (Spain)",
-      "match": "Numancia - Sarriana",
+      "fixture_id": 1511731,
+      "date": "2026-03-27",
+      "league": "Friendlies (World)",
+      "match": "Austria - Ghana",
       "status": "FT",
       "ht_score": "1-0",
-      "ft_score": "2-2",
+      "ft_score": "5-1",
       "tags": [
         "OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": true,
       "BOOST": null,
       "GOLD": null,
@@ -1259,10 +350,473 @@
       "FISH_OVER": null
     },
     {
-      "fixture_id": 1432147,
-      "date": "2026-03-29",
-      "league": "Segunda División RFEF - Group 1 (Spain)",
-      "match": "Racing Santander II - Real Oviedo II",
+      "fixture_id": 1502470,
+      "date": "2026-03-27",
+      "league": "Friendlies (World)",
+      "match": "England - Uruguay",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "1-1",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
+    },
+    {
+      "fixture_id": 1527858,
+      "date": "2026-03-27",
+      "league": "Friendlies (World)",
+      "match": "Greece - Paraguay",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "0-1",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
+    },
+    {
+      "fixture_id": 1527854,
+      "date": "2026-03-27",
+      "league": "Friendlies (World)",
+      "match": "Iran - Nigeria",
+      "status": "FT",
+      "ht_score": "0-1",
+      "ft_score": "1-2",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": true,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1536908,
+      "date": "2026-03-27",
+      "league": "Friendlies (World)",
+      "match": "Italy U20 - England U20",
+      "status": "FT",
+      "ht_score": "0-2",
+      "ft_score": "3-3",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": true
+    },
+    {
+      "fixture_id": 1527856,
+      "date": "2026-03-27",
+      "league": "Friendlies (World)",
+      "match": "Montenegro - Andorra",
+      "status": "FT",
+      "ht_score": "1-0",
+      "ft_score": "2-0",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
+    },
+    {
+      "fixture_id": 1503005,
+      "date": "2026-03-27",
+      "league": "Friendlies (World)",
+      "match": "Netherlands - Norway",
+      "status": "FT",
+      "ht_score": "1-1",
+      "ft_score": "2-1",
+      "tags": [
+        "OVER",
+        "BOOST",
+        "GOLD"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": true,
+      "BOOST": true,
+      "GOLD": true,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1502471,
+      "date": "2026-03-27",
+      "league": "Friendlies (World)",
+      "match": "Switzerland - Germany",
+      "status": "FT",
+      "ht_score": "2-2",
+      "ft_score": "3-4",
+      "tags": [
+        "OVER",
+        "BOOST"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": true,
+      "BOOST": true,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1396029,
+      "date": "2026-03-27",
+      "league": "II Liga - East (Poland)",
+      "match": "Olimpia Grudziądz - ŁKS Łódź II",
+      "status": "FT",
+      "ht_score": "1-0",
+      "ft_score": "2-0",
+      "tags": [
+        "OVER",
+        "BOOST",
+        "GOLD"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": false,
+      "GOLD": false,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1410677,
+      "date": "2026-03-27",
+      "league": "III Liga - Group 2 (Poland)",
+      "match": "Tłuchowia - Lipno Stęszew",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "3-1",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": true
+    },
+    {
+      "fixture_id": 1383197,
+      "date": "2026-03-27",
+      "league": "League One (Scotland)",
+      "match": "Inverness CT - Queen of the South",
+      "status": "FT",
+      "ht_score": "0-1",
+      "ft_score": "1-1",
+      "tags": [
+        "OVER",
+        "BOOST",
+        "GOLD"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": false,
+      "GOLD": false,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1389971,
+      "date": "2026-03-27",
+      "league": "Liga Leumit (Israel)",
+      "match": "Hapoel Afula - Bnei Yehuda",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "0-1",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1389973,
+      "date": "2026-03-27",
+      "league": "Liga Leumit (Israel)",
+      "match": "Hapoel Nazareth Illit - Maccabi Kabilio Jaffa",
+      "status": "FT",
+      "ht_score": "0-1",
+      "ft_score": "0-1",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
+    },
+    {
+      "fixture_id": 1498187,
+      "date": "2026-03-27",
+      "league": "Liga MX U21 (Mexico)",
+      "match": "Necaxa U21 - UNAM Pumas U21",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "1-0",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
+    },
+    {
+      "fixture_id": 1446992,
+      "date": "2026-03-27",
+      "league": "Liga Premier Serie A (Mexico)",
+      "match": "Tecos - Leones Negros",
+      "status": "FT",
+      "ht_score": "0-2",
+      "ft_score": "0-2",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
+    },
+    {
+      "fixture_id": 1423039,
+      "date": "2026-03-27",
+      "league": "National 1 (France)",
+      "match": "Orleans - Villefranche",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "0-0",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
+    },
+    {
+      "fixture_id": 1423041,
+      "date": "2026-03-27",
+      "league": "National 1 (France)",
+      "match": "Sochaux - Quevilly",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "2-0",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1423043,
+      "date": "2026-03-27",
+      "league": "National 1 (France)",
+      "match": "Valenciennes - Aubagne",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "0-0",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
+    },
+    {
+      "fixture_id": 1517485,
+      "date": "2026-03-27",
+      "league": "New South Wales NPL (Australia)",
+      "match": "Sydney FC U23 - APIA Leichhardt Tigers",
+      "status": "FT",
+      "ht_score": "0-2",
+      "ft_score": "0-2",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1523708,
+      "date": "2026-03-27",
+      "league": "Northern NSW NPL (Australia)",
+      "match": "Adamstown Rosebuds - Edgeworth Eagles",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "0-0",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
+    },
+    {
+      "fixture_id": 1523709,
+      "date": "2026-03-27",
+      "league": "Northern NSW NPL (Australia)",
+      "match": "Belmont Swansea - Charlestown City Blues",
+      "status": "FT",
+      "ht_score": "1-0",
+      "ft_score": "2-0",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1530488,
+      "date": "2026-03-27",
+      "league": "Premier League Cup (England)",
+      "match": "AFC Bournemouth U21 - West Bromwich Albion U21",
+      "status": "FT",
+      "ht_score": "2-2",
+      "ft_score": "4-5",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": true,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1511534,
+      "date": "2026-03-27",
+      "league": "Primera B (Chile)",
+      "match": "Recoleta - Deportes Temuco",
+      "status": "FT",
+      "ht_score": "0-1",
+      "ft_score": "1-5",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": true,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1511927,
+      "date": "2026-03-27",
+      "league": "Primera B (Colombia)",
+      "match": "Popayan - Real Cartagena",
+      "status": "FT",
+      "ht_score": "0-1",
+      "ft_score": "1-1",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1434057,
+      "date": "2026-03-27",
+      "league": "Professional Development League (England)",
+      "match": "Barnsley U21 - Sheffield United U21",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "2-2",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": true,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1523999,
+      "date": "2026-03-27",
+      "league": "Queensland NPL (Australia)",
+      "match": "Olympic - Gold Coast Knights",
       "status": "FT",
       "ht_score": "0-0",
       "ft_score": "1-0",
@@ -1270,7 +824,8 @@
         "OVER",
         "BOOST"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": false,
       "BOOST": false,
       "GOLD": null,
@@ -1278,17 +833,75 @@
       "FISH_OVER": null
     },
     {
-      "fixture_id": 1432448,
-      "date": "2026-03-29",
-      "league": "Segunda División RFEF - Group 2 (Spain)",
-      "match": "Basconia - Alfaro",
+      "fixture_id": 1418056,
+      "date": "2026-03-27",
+      "league": "Regionalliga - Ost (Austria)",
+      "match": "Favoritner AC - Krems / Rehberg",
       "status": "FT",
-      "ht_score": "2-0",
-      "ft_score": "6-4",
+      "ht_score": "1-1",
+      "ft_score": "0-0",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1418058,
+      "date": "2026-03-27",
+      "league": "Regionalliga - Ost (Austria)",
+      "match": "Oberwart - Donau",
+      "status": "FT",
+      "ht_score": "1-1",
+      "ft_score": "0-0",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1418057,
+      "date": "2026-03-27",
+      "league": "Regionalliga - Ost (Austria)",
+      "match": "Wiener SC - Wiener Viktoria",
+      "status": "FT",
+      "ht_score": "1-0",
+      "ft_score": "0-0",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1392111,
+      "date": "2026-03-27",
+      "league": "Segunda División (Spain)",
+      "match": "Cordoba - Mirandes",
+      "status": "FT",
+      "ht_score": "1-0",
+      "ft_score": "2-2",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
@@ -1296,17 +909,75 @@
       "FISH_OVER": true
     },
     {
-      "fixture_id": 1432454,
-      "date": "2026-03-29",
-      "league": "Segunda División RFEF - Group 2 (Spain)",
-      "match": "Utebo - Real Unión",
+      "fixture_id": 1527280,
+      "date": "2026-03-27",
+      "league": "South Australia State League 1 (Australia)",
+      "match": "Adelaide Olympic - Modbury Jets",
       "status": "FT",
       "ht_score": "1-1",
-      "ft_score": "2-3",
+      "ft_score": "1-1",
       "tags": [
         "OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": false,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": null
+    },
+    {
+      "fixture_id": 1462486,
+      "date": "2026-03-27",
+      "league": "Tercera División RFEF - Group 15 (Spain)",
+      "match": "Pamplona - Aoiz",
+      "status": "FT",
+      "ht_score": "1-0",
+      "ft_score": "2-2",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": true
+    },
+    {
+      "fixture_id": 1350127,
+      "date": "2026-03-27",
+      "league": "UEFA U21 Championship - Qualification (World)",
+      "match": "Georgia U21 - Latvia U21",
+      "status": "FT",
+      "ht_score": "0-0",
+      "ft_score": "1-1",
+      "tags": [
+        "FISH_OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
+      "BOOST": null,
+      "GOLD": null,
+      "FISH_GG": null,
+      "FISH_OVER": false
+    },
+    {
+      "fixture_id": 1350117,
+      "date": "2026-03-27",
+      "league": "UEFA U21 Championship - Qualification (World)",
+      "match": "Kazakhstan U21 - Slovakia U21",
+      "status": "FT",
+      "ht_score": "0-1",
+      "ft_score": "1-3",
+      "tags": [
+        "OVER"
+      ],
+      "PTGG": null,
+      "PTO15": null,
       "OVER": true,
       "BOOST": null,
       "GOLD": null,
@@ -1314,35 +985,37 @@
       "FISH_OVER": null
     },
     {
-      "fixture_id": 1452761,
-      "date": "2026-03-29",
-      "league": "Segunda División RFEF - Group 3 (Spain)",
-      "match": "Castellón II - Porreres",
+      "fixture_id": 1350112,
+      "date": "2026-03-27",
+      "league": "UEFA U21 Championship - Qualification (World)",
+      "match": "Kosovo U21 - Romania U21",
       "status": "FT",
-      "ht_score": "1-3",
-      "ft_score": "1-3",
+      "ht_score": "0-0",
+      "ft_score": "0-1",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
       "FISH_GG": null,
-      "FISH_OVER": true
+      "FISH_OVER": false
     },
     {
-      "fixture_id": 1433367,
-      "date": "2026-03-29",
-      "league": "Segunda División RFEF - Group 5 (Spain)",
-      "match": "Las Palmas II - Intercity",
+      "fixture_id": 1350115,
+      "date": "2026-03-27",
+      "league": "UEFA U21 Championship - Qualification (World)",
+      "match": "Scotland U21 - Czech Republic U21",
       "status": "FT",
       "ht_score": "0-0",
       "ft_score": "0-0",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
@@ -1350,53 +1023,37 @@
       "FISH_OVER": false
     },
     {
-      "fixture_id": 1433370,
-      "date": "2026-03-29",
-      "league": "Segunda División RFEF - Group 5 (Spain)",
-      "match": "Rayo Vallecano II - Getafe II",
-      "status": "FT",
-      "ht_score": "0-3",
-      "ft_score": "0-4",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1433372,
-      "date": "2026-03-29",
-      "league": "Segunda División RFEF - Group 5 (Spain)",
-      "match": "Tenerife II - Orihuela",
+      "fixture_id": 1350123,
+      "date": "2026-03-27",
+      "league": "UEFA U21 Championship - Qualification (World)",
+      "match": "Sweden U21 - Montenegro U21",
       "status": "FT",
       "ht_score": "1-2",
-      "ft_score": "1-3",
+      "ft_score": "2-2",
       "tags": [
-        "OVER"
+        "FISH_OVER"
       ],
-      "PT": null,
-      "OVER": true,
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": null,
       "BOOST": null,
       "GOLD": null,
       "FISH_GG": null,
-      "FISH_OVER": null
+      "FISH_OVER": true
     },
     {
-      "fixture_id": 1398144,
-      "date": "2026-03-29",
-      "league": "Segunda Liga (Portugal)",
-      "match": "União de Leiria - Pacos Ferreira",
+      "fixture_id": 1350125,
+      "date": "2026-03-27",
+      "league": "UEFA U21 Championship - Qualification (World)",
+      "match": "Wales U21 - Belarus U21",
       "status": "FT",
-      "ht_score": "1-0",
+      "ht_score": "2-0",
       "ft_score": "2-0",
       "tags": [
         "FISH_OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": null,
       "BOOST": null,
       "GOLD": null,
@@ -1404,17 +1061,18 @@
       "FISH_OVER": false
     },
     {
-      "fixture_id": 1440072,
-      "date": "2026-03-29",
-      "league": "Serie C - Girone C (Italy)",
-      "match": "Benevento - Cosenza",
+      "fixture_id": 1522022,
+      "date": "2026-03-27",
+      "league": "Victoria NPL (Australia)",
+      "match": "Heidelberg United - Melbourne City II",
       "status": "FT",
       "ht_score": "1-1",
       "ft_score": "1-1",
       "tags": [
         "OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": false,
       "BOOST": null,
       "GOLD": null,
@@ -1422,467 +1080,18 @@
       "FISH_OVER": null
     },
     {
-      "fixture_id": 1440075,
-      "date": "2026-03-29",
-      "league": "Serie C - Girone C (Italy)",
-      "match": "Casarano - Giugliano",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "2-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1440068,
-      "date": "2026-03-29",
-      "league": "Serie C - Girone C (Italy)",
-      "match": "Crotone - Audace Cerignola",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "3-1",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1454250,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone B (Italy)",
-      "match": "Castellanzese - Scanzorosciate",
-      "status": "FT",
-      "ht_score": "1-1",
-      "ft_score": "1-2",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1454854,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone D (Italy)",
-      "match": "Lentigione - Piacenza",
-      "status": "FT",
-      "ht_score": "2-0",
-      "ft_score": "3-1",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1454855,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone D (Italy)",
-      "match": "Pro Sesto - Imolese",
-      "status": "FT",
-      "ht_score": "1-3",
-      "ft_score": "2-4",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1454858,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone D (Italy)",
-      "match": "Sant'Angelo - Pistoiese",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "1-3",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1455163,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone E (Italy)",
-      "match": "Ghivizzano Borgo Mozzano - Prato",
-      "status": "FT",
-      "ht_score": "0-3",
-      "ft_score": "0-3",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1455470,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone F (Italy)",
-      "match": "Chieti - Recanatese",
-      "status": "FT",
-      "ht_score": "2-0",
-      "ft_score": "2-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1455465,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone F (Italy)",
-      "match": "Real Giulianova - Atletico Ascoli",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1455471,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone F (Italy)",
-      "match": "Sammaurese - Ostia Mare",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1455472,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone F (Italy)",
-      "match": "Teramo - Notaresco",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "1-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1455473,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone F (Italy)",
-      "match": "Unipomezia - Castelfidardo Calcio",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "3-1",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1455466,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone F (Italy)",
-      "match": "Vigor Senigallia - Ancona",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "0-1",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1455770,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone G (Italy)",
-      "match": "Real Monterotondo - Montespaccato",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "2-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1456074,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone H (Italy)",
-      "match": "Martina Franca - Afragolese",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "2-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1456370,
-      "date": "2026-03-29",
-      "league": "Serie D - Girone I (Italy)",
-      "match": "Igea Virtus - CastrumFavara",
-      "status": "FT",
-      "ht_score": "0-2",
-      "ft_score": "3-2",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1458173,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 1 (Spain)",
-      "match": "Arosa - Somozas",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-0",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1458171,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 1 (Spain)",
-      "match": "Coruña - Viveiro",
-      "status": "FT",
-      "ht_score": "2-0",
-      "ft_score": "3-2",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1461877,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 13 (Spain)",
-      "match": "Mazarrón FC - Unión Molinense",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1462185,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 14 (Spain)",
-      "match": "Don Benito - Gévora",
-      "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "2-0",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1462489,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 15 (Spain)",
-      "match": "Beti Kozkor - Peña Sport",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-1",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1462792,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 16 (Spain)",
-      "match": "Varea - Calahorra",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "1-1",
-      "tags": [
-        "OVER"
-      ],
-      "PT": null,
-      "OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
-    },
-    {
-      "fixture_id": 1458478,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 2 (Spain)",
-      "match": "Gijón Industrial - Tuilla",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "0-2",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": false
-    },
-    {
-      "fixture_id": 1458760,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 3 (Spain)",
-      "match": "Cayón - Colindres",
-      "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "1-2",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1458756,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 3 (Spain)",
-      "match": "Noja - Laredo",
-      "status": "FT",
-      "ht_score": "0-1",
-      "ft_score": "1-3",
-      "tags": [
-        "FISH_OVER"
-      ],
-      "PT": null,
-      "OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": true
-    },
-    {
-      "fixture_id": 1458754,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 3 (Spain)",
-      "match": "Torina - Atlético Albericia",
+      "fixture_id": 1522073,
+      "date": "2026-03-27",
+      "league": "Victoria NPL 2 (Australia)",
+      "match": "Brunswick City - Bulleen Lions",
       "status": "FT",
       "ht_score": "0-0",
       "ft_score": "0-2",
       "tags": [
         "OVER"
       ],
-      "PT": null,
+      "PTGG": null,
+      "PTO15": null,
       "OVER": false,
       "BOOST": null,
       "GOLD": null,
@@ -1890,40 +1099,42 @@
       "FISH_OVER": null
     },
     {
-      "fixture_id": 1459744,
-      "date": "2026-03-29",
-      "league": "Tercera División RFEF - Group 6 (Spain)",
-      "match": "Crevillente - Castellonense",
+      "fixture_id": 1522074,
+      "date": "2026-03-27",
+      "league": "Victoria NPL 2 (Australia)",
+      "match": "Melbourne Knights - Northcote City",
       "status": "FT",
-      "ht_score": "0-0",
-      "ft_score": "0-1",
+      "ht_score": "2-0",
+      "ft_score": "3-0",
       "tags": [
         "OVER"
       ],
-      "PT": null,
-      "OVER": false,
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": true,
       "BOOST": null,
       "GOLD": null,
       "FISH_GG": null,
       "FISH_OVER": null
     },
     {
-      "fixture_id": 1493440,
-      "date": "2026-03-29",
-      "league": "USL Championship (USA)",
-      "match": "San Antonio - Lexington",
+      "fixture_id": 1535435,
+      "date": "2026-03-27",
+      "league": "Western Australia State League 1 (Australia)",
+      "match": "Floreat Athena - Joondalup City",
       "status": "FT",
-      "ht_score": "1-0",
-      "ft_score": "2-0",
+      "ht_score": "0-1",
+      "ft_score": "2-1",
       "tags": [
-        "FISH_OVER"
+        "OVER"
       ],
-      "PT": null,
-      "OVER": null,
+      "PTGG": null,
+      "PTO15": null,
+      "OVER": true,
       "BOOST": null,
       "GOLD": null,
       "FISH_GG": null,
-      "FISH_OVER": false
+      "FISH_OVER": null
     }
   ]
 }
