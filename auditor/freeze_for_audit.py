@@ -37,37 +37,41 @@ def save_json_file(path: str, data) -> None:
 
 
 def extract_tags_from_info(info_raw: str) -> list[str]:
-    """
-    Estrae i tag reali dall'Info:
-    - PTGG
-    - PTO1.5 -> PTO15
-    - OVER
-    - BOOST
-    - GOLD
-    - 🐟GG -> FISH_GG
-    - 🐟O  -> FISH_OVER
-    """
     if not info_raw or not isinstance(info_raw, str):
         return []
 
-    info = info_raw.strip()
+    info = info_raw.upper()
 
-    tag_patterns = [
-        (r"\bPTGG\b", "PTGG"),
-        (r"\bPTO1\.5\b", "PTO15"),
-        (r"\bOVER\b", "OVER"),
-        (r"\bBOOST\b", "BOOST"),
-        (r"\bGOLD\b", "GOLD"),
-        (r"🐟GG", "FISH_GG"),
-        (r"🐟O", "FISH_OVER"),
-    ]
+    found = []
 
-    found_tags = []
-    for pattern, normalized in tag_patterns:
-        if re.search(pattern, info, flags=re.IGNORECASE):
-            found_tags.append(normalized)
+    # PTGG
+    if "PTGG" in info:
+        found.append("PTGG")
 
-    return list(dict.fromkeys(found_tags))
+    # PTO1.5 (copre anche varianti)
+    if "PTO1.5" in info or "PT1.5" in info or "PT 1.5" in info:
+        found.append("PTO15")
+
+    # OVER
+    if "OVER" in info:
+        found.append("OVER")
+
+    # BOOST
+    if "BOOST" in info:
+        found.append("BOOST")
+
+    # GOLD
+    if "GOLD" in info:
+        found.append("GOLD")
+
+    # FISH
+    if "🐟" in info or "FISH" in info:
+        if "GG" in info:
+            found.append("FISH_GG")
+        if "O" in info:
+            found.append("FISH_OVER")
+
+    return list(set(found))
 
 
 def get_fixture_id(row: dict):
