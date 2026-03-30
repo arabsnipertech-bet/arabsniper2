@@ -36,42 +36,43 @@ def save_json_file(path: str, data) -> None:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-def extract_tags_from_info(info_raw: str) -> list[str]:
-    if not info_raw or not isinstance(info_raw, str):
+def extract_tags_from_info(info_raw):
+    if not info_raw:
         return []
 
     info = info_raw.upper()
-    found = []
 
-    # PTGG (funziona anche con emoji tipo 🎯PTGG)
+    tags = []
+
+    # --- PTGG ---
     if "PTGG" in info:
-        found.append("PTGG")
+        tags.append("PTGG")
 
-    # PTO1.5 (copre varianti)
-    if "PTO1.5" in info or "PT1.5" in info or "PT 1.5" in info:
-        found.append("PTO15")
+    # --- PTO1.5 ---
+    if "PT1.5" in info or "PTO1.5" in info:
+        tags.append("PTO15")
 
-    # OVER
+    # --- OVER ---
     if "OVER" in info:
-        found.append("OVER")
+        tags.append("OVER")
 
-    # BOOST
+    # --- BOOST ---
     if "BOOST" in info:
-        found.append("BOOST")
+        tags.append("BOOST")
 
-    # GOLD
+    # --- GOLD ---
     if "GOLD" in info:
-        found.append("GOLD")
+        tags.append("GOLD")
 
-    # FISH OVER (🐟O)
-    if "🐟O" in info:
-        found.append("FISH_OVER")
+    # --- FISH GG ---
+    if "🐟G" in info or "FISHG" in info or "🐟GG" in info:
+        tags.append("FISH_GG")
 
-    # FISH GG (🐟G)
-    if "🐟G" in info:
-        found.append("FISH_GG")
+    # --- FISH OVER ---
+    if "🐟O" in info or "FISHO" in info:
+        tags.append("FISH_OVER")
 
-    return list(set(found))
+    return tags
 
 
 def get_fixture_id(row: dict):
