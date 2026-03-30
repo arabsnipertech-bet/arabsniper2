@@ -1,12 +1,12 @@
 {
-  "audit_date": "2026-03-27",
-  "generated_at": "2026-03-30T08:41:56",
+  "audit_date": "2026-03-29",
+  "generated_at": "2026-03-30T08:47:14",
   "counts": {
-    "freeze_matches": 60,
-    "api_found": 60,
-    "finished_matches": 59,
-    "analyzed_rows": 59,
-    "skipped_not_finished": 1,
+    "freeze_matches": 108,
+    "api_found": 108,
+    "finished_matches": 106,
+    "analyzed_rows": 106,
+    "skipped_not_finished": 2,
     "skipped_no_result": 0
   },
   "stats": {
@@ -21,19 +21,19 @@
       "rate": 0.0
     },
     "OVER": {
-      "total": 30,
-      "hit": 13,
-      "rate": 43.33
+      "total": 49,
+      "hit": 27,
+      "rate": 55.1
     },
     "BOOST": {
-      "total": 7,
-      "hit": 3,
-      "rate": 42.86
+      "total": 10,
+      "hit": 5,
+      "rate": 50.0
     },
     "GOLD": {
-      "total": 5,
-      "hit": 2,
-      "rate": 40.0
+      "total": 4,
+      "hit": 3,
+      "rate": 75.0
     },
     "FISH_GG": {
       "total": 0,
@@ -41,9 +41,9 @@
       "rate": 0.0
     },
     "FISH_OVER": {
-      "total": 29,
-      "hit": 11,
-      "rate": 37.93
+      "total": 57,
+      "hit": 27,
+      "rate": 47.37
     }
   }
 }
