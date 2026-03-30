@@ -3,7 +3,9 @@ name: ArabSniper Night Scan
 on:
   workflow_dispatch:
   schedule:
-    - cron: "12 3 * * *"
+    - cron: "7 2 * * *"    # 02:07 (principale)
+      timezone: "Europe/Rome"
+    - cron: "31 2 * * *"   # 02:31 (backup)
       timezone: "Europe/Rome"
 
 permissions:
