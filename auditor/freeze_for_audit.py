@@ -37,14 +37,24 @@ def save_json_file(path: str, data) -> None:
 
 
 def extract_tags_from_info(info_raw: str) -> list[str]:
+    """
+    Estrae i tag reali dall'Info:
+    - PTGG
+    - PTO1.5 -> PTO15
+    - OVER
+    - BOOST
+    - GOLD
+    - 🐟GG -> FISH_GG
+    - 🐟O  -> FISH_OVER
+    """
     if not info_raw or not isinstance(info_raw, str):
         return []
 
     info = info_raw.strip()
 
     tag_patterns = [
+        (r"\bPTGG\b", "PTGG"),
         (r"\bPTO1\.5\b", "PTO15"),
-        (r"\bPT\b", "PT"),
         (r"\bOVER\b", "OVER"),
         (r"\bBOOST\b", "BOOST"),
         (r"\bGOLD\b", "GOLD"),
@@ -115,7 +125,6 @@ def main():
         if not isinstance(row, dict):
             continue
 
-        # congeliamo solo i match della data principale del day1
         if row.get("Data") != main_date:
             continue
 
@@ -123,7 +132,6 @@ def main():
         if normalized:
             matches.append(normalized)
 
-    # deduplica per fixture_id
     deduped = {}
     for item in matches:
         deduped[item["fixture_id"]] = item
