@@ -79,7 +79,6 @@ def fetch_fixture_result(fixture_id: int | str):
 
         goals = fixture.get("goals", {}) or {}
         score = fixture.get("score", {}) or {}
-
         halftime = score.get("halftime", {}) or {}
 
         return {
@@ -96,9 +95,6 @@ def fetch_fixture_result(fixture_id: int | str):
 
 
 def is_finished_status(status: str) -> bool:
-    """
-    Accetta i match finiti o equivalenti.
-    """
     if not status:
         return False
 
@@ -118,25 +114,28 @@ def safe_int(value):
     return 0 if value is None else int(value)
 
 
-def evaluate_tags(tags, ht_goals, ft_goals, ft_home, ft_away):
+def evaluate_tags(tags, ht_goals, ft_goals, ft_home, ft_away, ht_home, ht_away):
     """
-    Regole auditor V1:
-    - PT = almeno 1 gol HT
+    Regole auditor corrette:
+    - PTGG = entrambe segnano nel primo tempo
+    - PTO15 = almeno 2 gol nel primo tempo
     - OVER = almeno 3 gol FT
-    - BOOST = PT + OVER
+    - BOOST = PTO15 + OVER
     - GOLD = uguale a BOOST per ora
     - FISH_GG = entrambe segnano FT
     - FISH_OVER = almeno 3 gol FT
     """
-    pt = ht_goals >= 1
+    ptgg = ht_home >= 1 and ht_away >= 1
+    pto15 = ht_goals >= 2
     over = ft_goals >= 3
-    boost = pt and over
+    boost = pto15 and over
     gold = boost
     fish_gg = ft_home >= 1 and ft_away >= 1
     fish_over = ft_goals >= 3
 
-    results = {
-        "PT": pt if "PT" in tags else None,
+    return {
+        "PTGG": ptgg if "PTGG" in tags else None,
+        "PTO15": pto15 if "PTO15" in tags else None,
         "OVER": over if "OVER" in tags else None,
         "BOOST": boost if "BOOST" in tags else None,
         "GOLD": gold if "GOLD" in tags else None,
@@ -144,14 +143,8 @@ def evaluate_tags(tags, ht_goals, ft_goals, ft_home, ft_away):
         "FISH_OVER": fish_over if "FISH_OVER" in tags else None,
     }
 
-    return results
-
 
 def build_audit_index():
-    """
-    Costruisce audit_index.json leggendo i file audit_YYYY-MM-DD_summary.json
-    presenti in auditarchive.
-    """
     dates = []
 
     if not os.path.isdir(OUTPUT_DIR):
@@ -209,7 +202,8 @@ def main():
     detail_rows = []
 
     stats = {
-        "PT": {"total": 0, "hit": 0},
+        "PTGG": {"total": 0, "hit": 0},
+        "PTO15": {"total": 0, "hit": 0},
         "OVER": {"total": 0, "hit": 0},
         "BOOST": {"total": 0, "hit": 0},
         "GOLD": {"total": 0, "hit": 0},
@@ -253,7 +247,9 @@ def main():
         ht_goals = ht_home + ht_away
         ft_goals = ft_home + ft_away
 
-        tag_results = evaluate_tags(tags, ht_goals, ft_goals, ft_home, ft_away)
+        tag_results = evaluate_tags(
+            tags, ht_goals, ft_goals, ft_home, ft_away, ht_home, ht_away
+        )
 
         for tag, value in tag_results.items():
             if value is None:
@@ -271,7 +267,8 @@ def main():
             "ht_score": f"{ht_home}-{ht_away}",
             "ft_score": f"{ft_home}-{ft_away}",
             "tags": tags,
-            "PT": tag_results["PT"],
+            "PTGG": tag_results["PTGG"],
+            "PTO15": tag_results["PTO15"],
             "OVER": tag_results["OVER"],
             "BOOST": tag_results["BOOST"],
             "GOLD": tag_results["GOLD"],
