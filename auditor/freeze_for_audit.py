@@ -41,14 +41,13 @@ def extract_tags_from_info(info_raw: str) -> list[str]:
         return []
 
     info = info_raw.upper()
-
     found = []
 
-    # PTGG
+    # PTGG (funziona anche con emoji tipo 🎯PTGG)
     if "PTGG" in info:
         found.append("PTGG")
 
-    # PTO1.5 (copre anche varianti)
+    # PTO1.5 (copre varianti)
     if "PTO1.5" in info or "PT1.5" in info or "PT 1.5" in info:
         found.append("PTO15")
 
@@ -64,12 +63,13 @@ def extract_tags_from_info(info_raw: str) -> list[str]:
     if "GOLD" in info:
         found.append("GOLD")
 
-    # FISH
-    if "🐟" in info or "FISH" in info:
-        if "GG" in info:
-            found.append("FISH_GG")
-        if "O" in info:
-            found.append("FISH_OVER")
+    # FISH OVER (🐟O)
+    if "🐟O" in info:
+        found.append("FISH_OVER")
+
+    # FISH GG (🐟G)
+    if "🐟G" in info:
+        found.append("FISH_GG")
 
     return list(set(found))
 
