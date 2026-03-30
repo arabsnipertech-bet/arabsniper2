@@ -103,6 +103,32 @@ def safe_read_json(path: Path, default):
 def now_rome_iso() -> str:
     return datetime.now(ROME_TZ).isoformat(timespec="seconds")
 
+
+def night_already_done_today() -> bool:
+    """
+    Controlla se il night è già stato eseguito oggi (timezone Rome).
+    Usa run_state.json come riferimento.
+    """
+    state = safe_read_json(RUN_STATE_FILE, {})
+
+    if not state:
+        return False
+
+    if state.get("last_run_type") != "night":
+        return False
+
+    last_run = state.get("generated_at")
+    if not last_run:
+        return False
+
+    try:
+        last_dt = datetime.fromisoformat(last_run).astimezone(ROME_TZ)
+        now_dt = datetime.now(ROME_TZ)
+        return last_dt.date() == now_dt.date()
+    except Exception:
+        return False
+
+
 def build_empty_day_payload(day_num: int):
     return []
 
@@ -305,6 +331,10 @@ def run_engine(mode: str) -> dict:
 # =========================================================
 def run_night_workflow() -> None:
     ensure_directories()
+
+    if night_already_done_today():
+        log("⏭️ NIGHT GIÀ ESEGUITO OGGI -> SKIP")
+        return
 
     log("=====================================")
     log("NIGHT WORKFLOW START")
