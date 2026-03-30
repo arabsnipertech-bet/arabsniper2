@@ -1,6 +1,6 @@
 {
   "audit_date": "2026-03-28",
-  "generated_at": "2026-03-29T09:05:48",
+  "generated_at": "2026-03-30T08:34:51",
   "counts": {
     "freeze_matches": 235,
     "api_found": 235,
@@ -10,7 +10,12 @@
     "skipped_no_result": 0
   },
   "stats": {
-    "PT": {
+    "PTGG": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "PTO15": {
       "total": 0,
       "hit": 0,
       "rate": 0.0
@@ -22,13 +27,23 @@
     },
     "BOOST": {
       "total": 30,
-      "hit": 19,
-      "rate": 63.33
+      "hit": 8,
+      "rate": 26.67
     },
     "GOLD": {
       "total": 8,
-      "hit": 7,
-      "rate": 87.5
+      "hit": 3,
+      "rate": 37.5
+    },
+    "FISH_GG": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "FISH_OVER": {
+      "total": 110,
+      "hit": 60,
+      "rate": 54.55
     }
   }
 }
