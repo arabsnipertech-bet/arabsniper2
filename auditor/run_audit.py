@@ -118,27 +118,68 @@ def safe_int(value):
     return 0 if value is None else int(value)
 
 
-def evaluate_tags(tags, ht_goals, ft_goals):
+def evaluate_tags(tags, ht_goals, ft_goals, ft_home, ft_away):
     """
     Regole auditor V1:
     - PT = almeno 1 gol HT
     - OVER = almeno 3 gol FT
     - BOOST = PT + OVER
     - GOLD = uguale a BOOST per ora
+    - FISH_GG = entrambe segnano FT
+    - FISH_OVER = almeno 3 gol FT
     """
     pt = ht_goals >= 1
     over = ft_goals >= 3
     boost = pt and over
     gold = boost
+    fish_gg = ft_home >= 1 and ft_away >= 1
+    fish_over = ft_goals >= 3
 
     results = {
         "PT": pt if "PT" in tags else None,
         "OVER": over if "OVER" in tags else None,
         "BOOST": boost if "BOOST" in tags else None,
         "GOLD": gold if "GOLD" in tags else None,
+        "FISH_GG": fish_gg if "FISH_GG" in tags else None,
+        "FISH_OVER": fish_over if "FISH_OVER" in tags else None,
     }
 
     return results
+
+
+def build_audit_index():
+    """
+    Costruisce audit_index.json leggendo i file audit_YYYY-MM-DD_summary.json
+    presenti in auditarchive.
+    """
+    dates = []
+
+    if not os.path.isdir(OUTPUT_DIR):
+        return
+
+    for name in os.listdir(OUTPUT_DIR):
+        if not name.startswith("audit_") or not name.endswith("_summary.json"):
+            continue
+        if name == "audit_last_summary.json":
+            continue
+
+        parts = name.split("_")
+        if len(parts) >= 3:
+            date_part = parts[1]
+            try:
+                datetime.strptime(date_part, "%Y-%m-%d")
+                dates.append(date_part)
+            except ValueError:
+                continue
+
+    dates = sorted(set(dates), reverse=True)
+
+    index_data = {
+        "dates": dates
+    }
+
+    index_path = os.path.join(OUTPUT_DIR, "audit_index.json")
+    save_json(index_path, index_data)
 
 
 # =========================
@@ -172,6 +213,8 @@ def main():
         "OVER": {"total": 0, "hit": 0},
         "BOOST": {"total": 0, "hit": 0},
         "GOLD": {"total": 0, "hit": 0},
+        "FISH_GG": {"total": 0, "hit": 0},
+        "FISH_OVER": {"total": 0, "hit": 0},
     }
 
     counts = {
@@ -210,7 +253,7 @@ def main():
         ht_goals = ht_home + ht_away
         ft_goals = ft_home + ft_away
 
-        tag_results = evaluate_tags(tags, ht_goals, ft_goals)
+        tag_results = evaluate_tags(tags, ht_goals, ft_goals, ft_home, ft_away)
 
         for tag, value in tag_results.items():
             if value is None:
@@ -232,6 +275,8 @@ def main():
             "OVER": tag_results["OVER"],
             "BOOST": tag_results["BOOST"],
             "GOLD": tag_results["GOLD"],
+            "FISH_GG": tag_results["FISH_GG"],
+            "FISH_OVER": tag_results["FISH_OVER"],
         })
 
     counts["analyzed_rows"] = len(detail_rows)
@@ -267,7 +312,6 @@ def main():
     details_path = os.path.join(OUTPUT_DIR, f"audit_{audit_date}_details.json")
     summary_path = os.path.join(OUTPUT_DIR, f"audit_{audit_date}_summary.json")
 
-    # copie "ultime" utili per HTML
     last_details_path = os.path.join(OUTPUT_DIR, "audit_last_details.json")
     last_summary_path = os.path.join(OUTPUT_DIR, "audit_last_summary.json")
 
@@ -275,6 +319,7 @@ def main():
     save_json(summary_path, summary_output)
     save_json(last_details_path, details_output)
     save_json(last_summary_path, summary_output)
+    build_audit_index()
 
     print(f"[OK] Audit completato per {audit_date}")
     print(f"[OK] Freeze matches: {counts['freeze_matches']}")
