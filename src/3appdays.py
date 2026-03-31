@@ -2084,14 +2084,14 @@ def build_signal_package(fid, mk, s_h, s_a):
     one_sided_risk = calc_one_sided_risk(s_h, s_a)
 
     gold_gate_ht = (
-        combined_ht_clean >= 0.98 and
-        combined_ht_scored_clean >= 0.72
+        combined_ht_clean >= 0.94 and
+        combined_ht_scored_clean >= 0.68
     )
 
     gold_gate_ft = (
-        combined_ft_clean >= 1.70 and
-        s_h["avg_ft_scored_clean"] >= 1.05 and
-        s_a["avg_ft_scored_clean"] >= 1.05
+        combined_ft_clean >= 1.66 and
+        s_h["avg_ft_scored_clean"] >= 0.98 and
+        s_a["avg_ft_scored_clean"] >= 0.98
     )
 
     gold_gate_ft_rates = (
@@ -2107,7 +2107,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     gold_gate_balance = (
-        one_sided_risk <= 1.05
+        one_sided_risk <= 1.18
     )
 
     gold_extra_ok = (
@@ -2117,7 +2117,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     if (
-        gold_score >= 6.35
+        gold_score >= 6.10
         and gold_has_over
         and over_score >= 4.20
         and pt_score >= 3.70
