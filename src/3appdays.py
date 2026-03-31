@@ -1236,6 +1236,62 @@ def score_drop(drop_diff):
         return 0.5
     return 0.0
 
+def calc_one_sided_risk(s_h, s_a):
+    """
+    Rischio partita troppo unilaterale.
+    Più alto = più probabile match da 1-0 / 2-0 / 3-0 sporco,
+    quindi meno adatto a GOLD.
+    """
+    home_attack = safe_float(s_h.get("avg_ft_scored_clean"), 0.0)
+    away_attack = safe_float(s_a.get("avg_ft_scored_clean"), 0.0)
+
+    home_concede = safe_float(s_h.get("avg_ft_conceded_clean"), 0.0)
+    away_concede = safe_float(s_a.get("avg_ft_conceded_clean"), 0.0)
+
+    home_ht_scored = safe_float(s_h.get("avg_ht_scored_clean"), 0.0)
+    away_ht_scored = safe_float(s_a.get("avg_ht_scored_clean"), 0.0)
+
+    attack_gap = abs(home_attack - away_attack)
+    ht_gap = abs(home_ht_scored - away_ht_scored)
+
+    weaker_attack = min(home_attack, away_attack)
+    weaker_ht_attack = min(home_ht_scored, away_ht_scored)
+
+    risk = 0.0
+
+    # forte squilibrio offensivo
+    if attack_gap >= 0.90:
+        risk += 1.25
+    elif attack_gap >= 0.65:
+        risk += 0.75
+    elif attack_gap >= 0.45:
+        risk += 0.35
+
+    # squilibrio anche nel primo tempo
+    if ht_gap >= 0.60:
+        risk += 0.70
+    elif ht_gap >= 0.40:
+        risk += 0.35
+
+    # una delle due segna troppo poco
+    if weaker_attack < 0.95:
+        risk += 0.90
+    elif weaker_attack < 1.10:
+        risk += 0.45
+
+    if weaker_ht_attack < 0.45:
+        risk += 0.55
+    elif weaker_ht_attack < 0.60:
+        risk += 0.25
+
+    # una difesa troppo chiusa abbassa la qualità GOLD
+    if home_concede < 0.85:
+        risk += 0.25
+    if away_concede < 0.85:
+        risk += 0.25
+
+    return round3(risk)
+
 def score_ptgg_signal(mk, s_h, s_a, fav, drop_diff):
     """
     PTGG = candidata da almeno 1 goal nel primo tempo.
@@ -1811,95 +1867,126 @@ def score_gold_signal(mk, s_h, s_a, pt_score, over_score, fav, drop_diff, is_gol
 
     combined_ht_clean = (s_h["avg_ht_clean"] + s_a["avg_ht_clean"]) / 2
     combined_ft_clean = (s_h["avg_total_clean"] + s_a["avg_total_clean"]) / 2
+    combined_ht_scored_clean = (s_h["avg_ht_scored_clean"] + s_a["avg_ht_scored_clean"]) / 2
+
+    one_sided_risk = calc_one_sided_risk(s_h, s_a)
+
+    home_scored_clean = s_h["avg_ft_scored_clean"]
+    away_scored_clean = s_a["avg_ft_scored_clean"]
+    home_conceded_clean = s_h["avg_ft_conceded_clean"]
+    away_conceded_clean = s_a["avg_ft_conceded_clean"]
+
+    cross_home_clean = home_scored_clean + away_conceded_clean
+    cross_away_clean = away_scored_clean + home_conceded_clean
 
     # =========================
-    # BASE: eredita da PT + OVER, NON da BOOST
+    # BASE: GOLD dipende più da OVER che da PT
     # =========================
-    score += pt_score * 0.24
-    score += over_score * 0.32
+    score += over_score * 0.48
+    score += pt_score * 0.16
 
     # =========================
-    # QUOTE / ZONA GOLD
+    # ZONA QUOTA FAVORITA
     # =========================
     if is_gold_zone:
-        score += 0.95
+        score += 0.75
 
-    if 1.45 <= fav <= 1.80:
+    if 1.44 <= fav <= 1.82:
+        score += 0.35
+    elif 1.38 <= fav <= 1.90:
+        score += 0.15
+
+    # =========================
+    # STRUTTURA FT PULITA
+    # =========================
+    if cross_home_clean >= 2.20:
+        score += 0.75
+    elif cross_home_clean >= 2.08:
+        score += 0.30
+
+    if cross_away_clean >= 2.20:
+        score += 0.75
+    elif cross_away_clean >= 2.08:
+        score += 0.30
+
+    if cross_home_clean >= 2.18 and cross_away_clean >= 2.18:
+        score += 0.90
+    elif (cross_home_clean >= 2.22 and cross_away_clean >= 2.02) or \
+         (cross_away_clean >= 2.22 and cross_home_clean >= 2.02):
         score += 0.40
-    elif 1.40 <= fav <= 1.86:
+
+    # =========================
+    # ATTACCHI REALI DI ENTRAMBE
+    # =========================
+    if home_scored_clean >= 1.18:
+        score += 0.35
+    if away_scored_clean >= 1.18:
+        score += 0.35
+
+    if home_scored_clean >= 1.18 and away_scored_clean >= 1.18:
+        score += 0.45
+
+    # =========================
+    # SUPPORTO HT LEGGERO, NON DOMINANTE
+    # =========================
+    if combined_ht_clean >= 1.00:
+        score += 0.25
+    if combined_ht_scored_clean >= 0.78:
+        score += 0.25
+    if s_h["ht_1plus_rate"] >= 0.62 and s_a["ht_1plus_rate"] >= 0.62:
+        score += 0.25
+
+    # =========================
+    # MERCATO COERENTE
+    # =========================
+    if 1.58 <= mk["o25"] <= 2.12 and 1.22 <= mk["o05ht"] <= 1.37:
+        score += 0.65
+    elif 1.52 <= mk["o25"] <= 2.22 and 1.20 <= mk["o05ht"] <= 1.40:
+        score += 0.25
+
+    # =========================
+    # DROP = conferma, non traino
+    # =========================
+    if drop_diff >= 0.15:
+        score += 0.30
+    elif drop_diff >= 0.08:
+        score += 0.15
+
+    # =========================
+    # BONUS equilibrio
+    # =========================
+    if one_sided_risk <= 0.55:
+        score += 0.45
+    elif one_sided_risk <= 0.90:
         score += 0.20
 
     # =========================
-    # CONVERGENZA HT PULITA
+    # MALUS forti
     # =========================
-    if s_h["avg_ht_clean"] >= 1.00 and s_a["avg_ht_clean"] >= 1.00:
-        score += 0.75
-    elif (s_h["avg_ht_clean"] >= 1.18 and s_a["avg_ht_clean"] >= 0.92) or \
-         (s_a["avg_ht_clean"] >= 1.18 and s_h["avg_ht_clean"] >= 0.92):
-        score += 0.35
+    score -= one_sided_risk * 0.95
 
-    if s_h["ht_1plus_rate"] >= 0.75 and s_a["ht_1plus_rate"] >= 0.75:
-        score += 0.55
-    elif s_h["ht_1plus_rate"] >= 0.62 and s_a["ht_1plus_rate"] >= 0.62:
-        score += 0.25
+    if combined_ft_clean < 1.62:
+        score -= 0.80
+    elif combined_ft_clean < 1.70:
+        score -= 0.35
 
-    # =========================
-    # CONVERGENZA FT PULITA
-    # =========================
-    if s_h["avg_total_clean"] >= 1.70 and s_a["avg_total_clean"] >= 1.65:
-        score += 0.85
-    elif (s_h["avg_total_clean"] >= 1.95 and s_a["avg_total_clean"] >= 1.45) or \
-         (s_a["avg_total_clean"] >= 1.95 and s_h["avg_total_clean"] >= 1.45):
-        score += 0.40
+    if home_scored_clean < 1.00:
+        score -= 0.55
+    if away_scored_clean < 1.00:
+        score -= 0.55
 
-    if s_h["ft_2plus_rate"] >= 0.75 and s_a["ft_2plus_rate"] >= 0.75:
-        score += 0.55
-    elif s_h["ft_2plus_rate"] >= 0.62 and s_a["ft_2plus_rate"] >= 0.62:
-        score += 0.25
-
-    if s_h["ft_3plus_rate"] >= 0.50 and s_a["ft_3plus_rate"] >= 0.50:
-        score += 0.35
-
-    # =========================
-    # MERCATO CONVERGENTE
-    # =========================
-    if 1.60 <= mk["o25"] <= 2.12 and 1.22 <= mk["o05ht"] <= 1.36:
-        score += 0.70
-    elif 1.54 <= mk["o25"] <= 2.22 and 1.20 <= mk["o05ht"] <= 1.39:
-        score += 0.30
-
-    if combined_ht_clean >= 1.05:
-        score += 0.30
-    if combined_ft_clean >= 1.75:
-        score += 0.30
-
-    # =========================
-    # DROP
-    # =========================
-    score += score_drop(drop_diff) * 0.45
-
-    # =========================
-    # PENALITÀ RUMORE
-    # =========================
     if s_h["ft_low_rate"] >= 0.38:
-        score -= 0.75
+        score -= 0.55
     if s_a["ft_low_rate"] >= 0.38:
-        score -= 0.75
+        score -= 0.55
 
     if s_h["ht_zero_rate"] >= 0.38:
-        score -= 0.70
+        score -= 0.40
     if s_a["ht_zero_rate"] >= 0.38:
-        score -= 0.70
+        score -= 0.40
 
-    if s_h["avg_ht_clean"] < 0.85:
-        score -= 0.60
-    if s_a["avg_ht_clean"] < 0.85:
-        score -= 0.60
-
-    if s_h["avg_total_clean"] < 1.35:
-        score -= 0.60
-    if s_a["avg_total_clean"] < 1.35:
-        score -= 0.60
+    if mk["o25"] > 2.28 and mk["o25"] != 0:
+        score -= 0.25
 
     return round3(max(score, 0.0))
 
@@ -1989,27 +2076,22 @@ def build_signal_package(fid, mk, s_h, s_a):
         tags.append("🚀 BOOST")
 
     # =========================
-    # GOLD GATES - INDIPENDENTE
+    # GOLD GATES - V2 PIÙ STABILE
     # =========================
     gold_has_pt = ("🎯PTGG" in tags or "🔥PT1.5" in tags)
     gold_has_over = ("⚽ OVER" in tags)
 
-    gold_gate_ht = (
-        (s_h["avg_ht_clean"] >= 1.00 and s_a["avg_ht_clean"] >= 1.00) or
-        ((s_h["avg_ht_clean"] >= 1.18 and s_a["avg_ht_clean"] >= 0.92) or
-         (s_a["avg_ht_clean"] >= 1.18 and s_h["avg_ht_clean"] >= 0.92))
-    )
+    one_sided_risk = calc_one_sided_risk(s_h, s_a)
 
-    gold_gate_ht_rates = (
-        s_h["ht_1plus_rate"] >= 0.62 and
-        s_a["ht_1plus_rate"] >= 0.62 and
-        s_h["ht_zero_rate"] <= 0.38 and
-        s_a["ht_zero_rate"] <= 0.38
+    gold_gate_ht = (
+        combined_ht_clean >= 0.98 and
+        combined_ht_scored_clean >= 0.72
     )
 
     gold_gate_ft = (
-        (s_h["avg_total_clean"] >= 1.65 and s_a["avg_total_clean"] >= 1.60) or
-        (s_a["avg_total_clean"] >= 1.65 and s_h["avg_total_clean"] >= 1.60)
+        combined_ft_clean >= 1.70 and
+        s_h["avg_ft_scored_clean"] >= 1.05 and
+        s_a["avg_ft_scored_clean"] >= 1.05
     )
 
     gold_gate_ft_rates = (
@@ -2020,30 +2102,36 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     gold_gate_market = (
-        1.56 <= mk["o25"] <= 2.15 and
-        1.21 <= mk["o05ht"] <= 1.38
+        1.54 <= mk["o25"] <= 2.18 and
+        1.20 <= mk["o05ht"] <= 1.39
+    )
+
+    gold_gate_balance = (
+        one_sided_risk <= 1.05
     )
 
     gold_extra_ok = (
         drop_diff >= 0.05 or
-        (combined_ht_clean >= 1.02 and combined_ft_clean >= 1.72)
+        over_score >= 4.70 or
+        (combined_ft_clean >= 1.78 and combined_ht_scored_clean >= 0.78)
     )
 
     if (
-        gold_score >= 6.55
-        and gold_has_pt
+        gold_score >= 6.35
         and gold_has_over
-        and pt_score >= 4.05
-        and over_score >= 4.10
+        and over_score >= 4.20
+        and pt_score >= 3.70
         and is_gold_zone
-        and combined_ht_clean >= 1.00
-        and combined_ft_clean >= 1.68
         and gold_gate_ht
-        and gold_gate_ht_rates
         and gold_gate_ft
         and gold_gate_ft_rates
         and gold_gate_market
+        and gold_gate_balance
         and gold_extra_ok
+        and not (
+            s_h["avg_ft_scored_clean"] < 1.00 or
+            s_a["avg_ft_scored_clean"] < 1.00
+        )
     ):
         tags.insert(0, "⚽⭐ GOLD")
 
