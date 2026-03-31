@@ -482,23 +482,35 @@ last_snap_ts = load_db()
 # ==========================================
 # API CORE
 # ==========================================
-API_KEY = os.getenv("API_SPORTS_KEY")
+def get_api_key():
+    """
+    Recupera la API key a runtime.
+    Prima prova env, poi Streamlit secrets.
+    """
+    key = os.getenv("API_SPORTS_KEY")
+    if key:
+        return str(key).strip()
 
-if not API_KEY:
     try:
-        API_KEY = st.secrets.get("API_SPORTS_KEY", None)
+        key = st.secrets["API_SPORTS_KEY"]
+        if key:
+            return str(key).strip()
     except Exception:
         pass
 
-HEADERS = {"x-apisports-key": API_KEY} if API_KEY else {}
+    return None
 
 
 def api_get(session, path, params):
-    if not API_KEY:
+    api_key = get_api_key()
+
+    if not api_key:
         print("❌ API_KEY assente dentro api_get", flush=True)
         return None
 
-    safe_key = f"{API_KEY[:5]}***" if len(API_KEY) >= 5 else "***"
+    headers = {"x-apisports-key": api_key}
+    safe_key = f"{api_key[:5]}***" if len(api_key) >= 5 else "***"
+
     print(f"🔑 API key rilevata: {safe_key}", flush=True)
     print(f"🌐 API GET path={path} params={params}", flush=True)
 
@@ -513,7 +525,7 @@ def api_get(session, path, params):
 
             r = session.get(
                 f"https://v3.football.api-sports.io/{path}",
-                headers=HEADERS,
+                headers=headers,
                 params=params,
                 timeout=20
             )
