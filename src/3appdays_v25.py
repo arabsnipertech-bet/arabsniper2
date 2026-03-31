@@ -24,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BASE_DIR.parent
 DATA_DIR = PROJECT_ROOT / "data"
 
-DB_FILE = str(DATA_DIR / "arab_sniper_database.json")
-SNAP_FILE = str(DATA_DIR / "arab_snapshot_database.json")
+DB_FILE = str(DATA_DIR / "arab_sniper_TESTdatabase.json")
+SNAP_FILE = str(DATA_DIR / "arab_snapshot_TESTdatabase.json")
 CONFIG_FILE = str(DATA_DIR / "nazioni_config.json")
-DETAILS_FILE = str(DATA_DIR / "match_details.json")
+DETAILS_FILE = str(DATA_DIR / "match_TESTdetails.json")
 
 DEFAULT_EXCLUDED = [
     "Thailand", "Indonesia", "India", "Kenya", "Morocco",
@@ -41,31 +41,31 @@ LEAGUE_BLACKLIST = [
 
 ROLLING_SNAPSHOT_HORIZONS = [1, 2, 3, 4, 5]
 
-REMOTE_MAIN_FILE = "data/data.json"
-REMOTE_SNAPSHOT_FILE = "data/arab_snapshot_database.json"
+REMOTE_MAIN_FILE = "data/data"
+REMOTE_SNAPSHOT_FILE = "data/arab_snapshot_database"
 
 REMOTE_DAY_FILES = {
-    1: "data/data_day1.json",
-    2: "data/data_day2.json",
-    3: "data/data_day3.json",
-    4: "data/data_day4.json",
-    5: "data/data_day5.json",
+    1: "data/data_TESTday1",
+    2: "data/data_TESTday2",
+    3: "data/data_TESTday3",
+    4: "data/data_TESTday4",
+    5: "data/data_TESTday5",
 }
 
 REMOTE_DETAILS_FILES = {
-    1: "data/details_day1.json",
-    2: "data/details_day2.json",
-    3: "data/details_day3.json",
-    4: "data/details_day4.json",
-    5: "data/details_day5.json",
+    1: "data/details_TESTday1",
+    2: "data/details_TESTday2",
+    3: "data/details_TESTday3",
+    4: "data/details_TESTday4",
+    5: "data/details_TESTday5",
 }
 
 REMOTE_SNAPSHOT_DAY_FILES = {
-    1: "data/snapshot_day1.json",
-    2: "data/snapshot_day2.json",
-    3: "data/snapshot_day3.json",
-    4: "data/snapshot_day4.json",
-    5: "data/snapshot_day5.json",
+    1: "data/snapshot_TESTday1",
+    2: "data/snapshot_TESTday2",
+    3: "data/snapshot_TESTday3",
+    4: "data/snapshot_TESTday4",
+    5: "data/snapshot_TESTday5",
 }
 
 try:
@@ -243,7 +243,7 @@ def upload_snapshot_day_to_github(day_num, payload):
         github_write_json(
             REMOTE_SNAPSHOT_DAY_FILES[day_num],
             payload,
-            f"Update snapshot_day{day_num}.json"
+            f"Update snapshot_day{day_num}"
         )
     except Exception as e:
         print(f"Snapshot day{day_num} upload error: {e}", flush=True)
@@ -526,7 +526,7 @@ def api_get(session, path, params):
                 continue
 
             try:
-                data = r.json()
+                data = r()
             except Exception as json_err:
                 print(f"❌ JSON decode error: {json_err}", flush=True)
                 print(f"🧾 Response text preview: {r.text[:300]}", flush=True)
@@ -798,12 +798,12 @@ def build_daily_snapshots_from_rolling():
             "odds": day_odds,
         }
 
-        out_file = DATA_DIR / f"snapshot_day{day_num}.json"
+        out_file = DATA_DIR / f"snapshot_day{day_num}"
         with open(out_file, "w", encoding="utf-8") as f:
             json.dump(day_payload, f, indent=4, ensure_ascii=False)
 
         upload_snapshot_day_to_github(day_num, day_payload)
-        print(f"📦 snapshot_day{day_num}.json aggiornato: {len(day_odds)} match", flush=True)
+        print(f"📦 snapshot_day{day_num} aggiornato: {len(day_odds)} match", flush=True)
       # ==========================================
 # BLOCCO 2
 # TEAM MATCH HISTORY + CONTESTUAL STATS
@@ -3885,9 +3885,9 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
             if show_success:
                 if update_main_site:
                     if status_main == "SUCCESS":
-                        st.success("✅ data.json aggiornato!")
+                        st.success("✅ data aggiornato!")
                     else:
-                        st.error(f"❌ Errore data.json: {status_main}")
+                        st.error(f"❌ Errore data: {status_main}")
 
                 if status_day == "SUCCESS":
                     st.success(f"✅ {REMOTE_DAY_FILES[use_horizon]} aggiornato!")
@@ -3930,7 +3930,7 @@ def run_nightly_multiday_build():
         raise
 
     try:
-        print("📌 DAY 1: SNAPSHOT rolling + refresh quote + update data.json/data_day1/details_day1", flush=True)
+        print("📌 DAY 1: SNAPSHOT rolling + refresh quote + update data/data_day1/details_day1", flush=True)
         run_full_scan(horizon=1, snap=True, update_main_site=True, show_success=False)
 
         print("📆 DAY 2: scan statico + update data_day2/details_day2", flush=True)
