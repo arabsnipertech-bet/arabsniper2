@@ -41,31 +41,31 @@ LEAGUE_BLACKLIST = [
 
 ROLLING_SNAPSHOT_HORIZONS = [1, 2, 3, 4, 5]
 
-REMOTE_MAIN_FILE = "data/data"
-REMOTE_SNAPSHOT_FILE = "data/arab_snapshot_database"
+REMOTE_MAIN_FILE = "data/data_TEST.json"
+REMOTE_SNAPSHOT_FILE = "data/arab_snapshot_database_TEST.json"
 
 REMOTE_DAY_FILES = {
-    1: "data/data_TESTday1",
-    2: "data/data_TESTday2",
-    3: "data/data_TESTday3",
-    4: "data/data_TESTday4",
-    5: "data/data_TESTday5",
+    1: "data/data_day1_TEST.json",
+    2: "data/data_day2_TEST.json",
+    3: "data/data_day3_TEST.json",
+    4: "data/data_day4_TEST.json",
+    5: "data/data_day5_TEST.json",
 }
 
 REMOTE_DETAILS_FILES = {
-    1: "data/details_TESTday1",
-    2: "data/details_TESTday2",
-    3: "data/details_TESTday3",
-    4: "data/details_TESTday4",
-    5: "data/details_TESTday5",
+    1: "data/details_day1_TEST.json",
+    2: "data/details_day2_TEST.json",
+    3: "data/details_day3_TEST.json",
+    4: "data/details_day4_TEST.json",
+    5: "data/details_day5_TEST.json",
 }
 
 REMOTE_SNAPSHOT_DAY_FILES = {
-    1: "data/snapshot_TESTday1",
-    2: "data/snapshot_TESTday2",
-    3: "data/snapshot_TESTday3",
-    4: "data/snapshot_TESTday4",
-    5: "data/snapshot_TESTday5",
+    1: "data/snapshot_day1_TEST.json",
+    2: "data/snapshot_day2_TEST.json",
+    3: "data/snapshot_day3_TEST.json",
+    4: "data/snapshot_day4_TEST.json",
+    5: "data/snapshot_day5_TEST.json",
 }
 
 try:
@@ -538,7 +538,7 @@ def api_get(session, path, params):
                 continue
 
             try:
-                data = r()
+                data = r.json()
             except Exception as json_err:
                 print(f"❌ JSON decode error: {json_err}", flush=True)
                 print(f"🧾 Response text preview: {r.text[:300]}", flush=True)
@@ -810,7 +810,7 @@ def build_daily_snapshots_from_rolling():
             "odds": day_odds,
         }
 
-        out_file = DATA_DIR / f"snapshot_day{day_num}"
+        out_file = DATA_DIR / f"snapshot_day{day_num}_TEST.json"
         with open(out_file, "w", encoding="utf-8") as f:
             json.dump(day_payload, f, indent=4, ensure_ascii=False)
 
