@@ -2060,18 +2060,22 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     if (
-        boost_score >= 5.95
+        boost_score >= 6.05
         and boost_has_pt
         and boost_has_over
-        and pt_score >= 4.00
-        and over_score >= 4.00
-        and combined_ht_clean >= 1.02
-        and combined_ft_clean >= 1.65
+        and pt_score >= 4.05
+        and over_score >= 4.05
+        and combined_ht_clean >= 1.04
+        and combined_ft_clean >= 1.68
         and boost_gate_ht
         and boost_gate_ht_rates
         and boost_gate_ft
         and boost_gate_ft_rates
         and boost_gate_market
+        and not (
+            s_h["ft_low_rate"] > 0.30 or
+            s_a["ft_low_rate"] > 0.30
+        )
     ):
         tags.append("🚀 BOOST")
 
