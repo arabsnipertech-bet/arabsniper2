@@ -40,36 +40,50 @@ def extract_tags_from_info(info_raw):
     if not info_raw:
         return []
 
-    info = info_raw.upper()
+    raw = str(info_raw)
+    text = raw.upper()
+
+    # pulizia emoji e simboli
+    text = text.replace("⭐", " ")
+    text = text.replace("🚀", " ")
+    text = text.replace("⚽", " ")
+    text = text.replace("🔥", " ")
+    text = text.replace("🎯", " ")
+
+    text = re.sub(r"\s+", " ", text).strip()
 
     tags = []
 
     # --- PTGG ---
-    if "PTGG" in info:
+    if "PTGG" in text:
         tags.append("PTGG")
 
     # --- PTO1.5 ---
-    if "PT1.5" in info or "PTO1.5" in info:
+    if (
+        "PT1.5" in text or
+        "PTO1.5" in text or
+        "PTO15" in text
+    ):
         tags.append("PTO15")
 
     # --- OVER ---
-    if "OVER" in info:
+    if "OVER" in text:
         tags.append("OVER")
 
     # --- BOOST ---
-    if "BOOST" in info:
+    if "BOOST" in text:
         tags.append("BOOST")
 
     # --- GOLD ---
-    if "GOLD" in info:
+    if "GOLD" in text:
         tags.append("GOLD")
 
     # --- FISH GG ---
-    if "🐟G" in info or "FISHG" in info or "🐟GG" in info:
+    if "🐟G" in raw or "🐟GG" in raw or "FISHG" in text:
         tags.append("FISH_GG")
 
     # --- FISH OVER ---
-    if "🐟O" in info or "FISHO" in info:
+    if "🐟O" in raw or "FISHO" in text:
         tags.append("FISH_OVER")
 
     return tags
