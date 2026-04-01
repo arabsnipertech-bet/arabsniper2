@@ -1,154 +1,55 @@
 {
   "audit_date": "2026-04-01",
-  "created_at": "2026-04-01T11:16:51",
+  "created_at": "2026-04-01T20:53:56",
   "source_file": "data_day1.json",
-  "matches_count": 28,
+  "matches_count": 6,
+  "primary_counts": {
+    "OVER": 2,
+    "BOOST": 4
+  },
+  "tag_counts": {
+    "OVER": 6,
+    "PTGG": 6,
+    "BOOST": 4,
+    "PTO15": 2
+  },
   "matches": [
-    {
-      "fixture_id": 1393189,
-      "date": "2026-04-01",
-      "league": "2. Division (Denmark)",
-      "match": "HIK - Ishøj",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1393056,
-      "date": "2026-04-01",
-      "league": "3. Division (Denmark)",
-      "match": "Hørsholm-Usserød - Brønshøj",
-      "info_raw": "🐟O 📉-0.15",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1421115,
-      "date": "2026-04-01",
-      "league": "3. liga - CFL B (Czech-Republic)",
-      "match": "Velké Hamry - Sokol Brozany",
-      "info_raw": "🎯PTGG ⚽ OVER",
-      "tags": [
-        "PTGG",
-        "OVER"
-      ]
-    },
     {
       "fixture_id": 1422436,
       "date": "2026-04-01",
       "league": "3. liga - West (Slovakia)",
       "match": "MŠK Senec - Galanta",
-      "info_raw": "🎯PTGG ⚽ OVER 📉-0.05",
+      "info_raw": "🎯PTGG ⚽ OVER 📉-0.45",
       "tags": [
-        "PTGG",
-        "OVER"
-      ]
+        "OVER",
+        "PTGG"
+      ],
+      "primary_signal": "OVER"
     },
     {
-      "fixture_id": 1533372,
+      "fixture_id": 1379854,
       "date": "2026-04-01",
-      "league": "Gamma Ethniki - Group 6 (Greece)",
-      "match": "Giouchtas - Chaidari",
-      "info_raw": "🐟O",
+      "league": "Football League - Highland League (Scotland)",
+      "match": "Huntly - Keith",
+      "info_raw": "🎯PTGG ⚽ OVER",
       "tags": [
-        "FISH_OVER"
-      ]
+        "OVER",
+        "PTGG"
+      ],
+      "primary_signal": "OVER"
     },
     {
-      "fixture_id": 1410627,
+      "fixture_id": 1408591,
       "date": "2026-04-01",
-      "league": "III Liga - Group 2 (Poland)",
-      "match": "Polonia Środa - Flota Świnoujście",
+      "league": "Regionalliga - Bayern (Germany)",
+      "match": "Memmingen - Schwaben Augsburg",
       "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
       "tags": [
-        "PTGG",
+        "BOOST",
         "OVER",
-        "BOOST"
-      ]
-    },
-    {
-      "fixture_id": 1410931,
-      "date": "2026-04-01",
-      "league": "III Liga - Group 3 (Poland)",
-      "match": "Karkonosze Jelenia Góra - Kluczbork",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1410935,
-      "date": "2026-04-01",
-      "league": "III Liga - Group 3 (Poland)",
-      "match": "Lechia Zielona Góra - Goczałkowice Zdrój",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1410932,
-      "date": "2026-04-01",
-      "league": "III Liga - Group 3 (Poland)",
-      "match": "Polonia Nysa - Górnik Polkowice",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1504751,
-      "date": "2026-04-01",
-      "league": "J1 League (Japan)",
-      "match": "Machida Zelvia - FC Tokyo",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 📉-0.05",
-      "tags": [
-        "PTGG",
-        "PTO15",
-        "OVER"
-      ]
-    },
-    {
-      "fixture_id": 1493388,
-      "date": "2026-04-01",
-      "league": "Liga MX Femenil (Mexico)",
-      "match": "Puebla W - Querétaro W",
-      "info_raw": "🐟O 📉-0.35",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1526491,
-      "date": "2026-04-01",
-      "league": "Liga Pro Serie B (Ecuador)",
-      "match": "Ind. Juniors - San Antonio",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1425777,
-      "date": "2026-04-01",
-      "league": "National 2 - Group A (France)",
-      "match": "Avranches - Angoulême",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1504924,
-      "date": "2026-04-01",
-      "league": "Primera Division (El-Salvador)",
-      "match": "Platense - Inter",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
+        "PTGG"
+      ],
+      "primary_signal": "BOOST"
     },
     {
       "fixture_id": 1408233,
@@ -157,150 +58,39 @@
       "match": "Eintracht Norderstedt - Phönix Lübeck",
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
       "tags": [
-        "PTGG",
-        "PTO15",
+        "BOOST",
         "OVER",
-        "BOOST"
-      ]
-    },
-    {
-      "fixture_id": 1512286,
-      "date": "2026-04-01",
-      "league": "Reserve League (Argentina)",
-      "match": "San Lorenzo Res. - Atlético Tucumán Res.",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1512289,
-      "date": "2026-04-01",
-      "league": "Reserve League (Argentina)",
-      "match": "Tigre Res. - Godoy Cruz Res.",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1512290,
-      "date": "2026-04-01",
-      "league": "Reserve League (Argentina)",
-      "match": "Vélez Sársfield Res. - Unión Santa Fe Res.",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1526688,
-      "date": "2026-04-01",
-      "league": "Second League A - Division A Silver (Russia)",
-      "match": "Alaniya Vladikavkaz - Dinamo Stavropol",
-      "info_raw": "🎯PTGG ⚽ OVER",
-      "tags": [
         "PTGG",
-        "OVER"
-      ]
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
     },
     {
-      "fixture_id": 1526689,
+      "fixture_id": 1396981,
       "date": "2026-04-01",
-      "league": "Second League A - Division A Silver (Russia)",
-      "match": "Dinamo Vladivostok - Dinamo Moskva II",
-      "info_raw": "🐟O 📉-0.41",
+      "league": "Segunda División (Spain)",
+      "match": "FC Andorra - Malaga",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
       "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1526690,
-      "date": "2026-04-01",
-      "league": "Second League A - Division A Silver (Russia)",
-      "match": "Urozhay - Dinamo Bryansk",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1526692,
-      "date": "2026-04-01",
-      "league": "Second League A - Division A Silver (Russia)",
-      "match": "Zenit 2 - Amkar",
-      "info_raw": "🎯PTGG ⚽ OVER",
-      "tags": [
+        "BOOST",
+        "OVER",
         "PTGG",
-        "OVER"
-      ]
-    },
-    {
-      "fixture_id": 1461277,
-      "date": "2026-04-01",
-      "league": "Tercera División RFEF - Group 11 (Spain)",
-      "match": "Alcúdia - Rotlet Molinar",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1461274,
-      "date": "2026-04-01",
-      "league": "Tercera División RFEF - Group 11 (Spain)",
-      "match": "Constància - Santanyí",
-      "info_raw": "🐟O 🐟G",
-      "tags": [
-        "FISH_GG",
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1462495,
-      "date": "2026-04-01",
-      "league": "Tercera División RFEF - Group 15 (Spain)",
-      "match": "Valle Egüés - Avance Ezcabarte",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
     },
     {
       "fixture_id": 1459072,
       "date": "2026-04-01",
       "league": "Tercera División RFEF - Group 4 (Spain)",
       "match": "Touring - Leioa",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
+      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
       "tags": [
-        "PTGG",
-        "PTO15",
+        "BOOST",
         "OVER",
-        "BOOST"
-      ]
-    },
-    {
-      "fixture_id": 1495314,
-      "date": "2026-04-01",
-      "league": "Toppserien (Norway)",
-      "match": "LSK Kvinner W - Stabæk W",
-      "info_raw": "🐟O",
-      "tags": [
-        "FISH_OVER"
-      ]
-    },
-    {
-      "fixture_id": 1504192,
-      "date": "2026-04-01",
-      "league": "Ykkösliiga (Finland)",
-      "match": "Kooteepee - Haka",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
-      "tags": [
-        "PTGG",
-        "PTO15",
-        "OVER",
-        "BOOST"
-      ]
+        "PTGG"
+      ],
+      "primary_signal": "BOOST"
     }
   ]
 }
