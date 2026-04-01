@@ -24,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BASE_DIR.parent
 DATA_DIR = PROJECT_ROOT / "data"
 
-DB_FILE = str(DATA_DIR / "arab_sniper_TESTdatabase.json")
-SNAP_FILE = str(DATA_DIR / "arab_snapshot_TESTdatabase.json")
+DB_FILE = str(DATA_DIR / "arab_sniper_database.json")
+SNAP_FILE = str(DATA_DIR / "arab_snapshot_database.json")
 CONFIG_FILE = str(DATA_DIR / "nazioni_config.json")
-DETAILS_FILE = str(DATA_DIR / "match_TESTdetails.json")
+DETAILS_FILE = str(DATA_DIR / "match_details.json")
 
 DEFAULT_EXCLUDED = [
     "Thailand", "Indonesia", "India", "Kenya", "Morocco",
@@ -41,31 +41,31 @@ LEAGUE_BLACKLIST = [
 
 ROLLING_SNAPSHOT_HORIZONS = [1, 2, 3, 4, 5]
 
-REMOTE_MAIN_FILE = "data/data_TEST.json"
-REMOTE_SNAPSHOT_FILE = "data/arab_snapshot_database_TEST.json"
+REMOTE_MAIN_FILE = "data/data.json"
+REMOTE_SNAPSHOT_FILE = "data/arab_snapshot_database.json"
 
 REMOTE_DAY_FILES = {
-    1: "data/data_day1_TEST.json",
-    2: "data/data_day2_TEST.json",
-    3: "data/data_day3_TEST.json",
-    4: "data/data_day4_TEST.json",
-    5: "data/data_day5_TEST.json",
+    1: "data/data_day1.json",
+    2: "data/data_day2.json",
+    3: "data/data_day3.json",
+    4: "data/data_day4.json",
+    5: "data/data_day5.json",
 }
 
 REMOTE_DETAILS_FILES = {
-    1: "data/details_day1_TEST.json",
-    2: "data/details_day2_TEST.json",
-    3: "data/details_day3_TEST.json",
-    4: "data/details_day4_TEST.json",
-    5: "data/details_day5_TEST.json",
+    1: "data/details_day1.json",
+    2: "data/details_day2.json",
+    3: "data/details_day3.json",
+    4: "data/details_day4.json",
+    5: "data/details_day5.json",
 }
 
 REMOTE_SNAPSHOT_DAY_FILES = {
-    1: "data/snapshot_day1_TEST.json",
-    2: "data/snapshot_day2_TEST.json",
-    3: "data/snapshot_day3_TEST.json",
-    4: "data/snapshot_day4_TEST.json",
-    5: "data/snapshot_day5_TEST.json",
+    1: "data/snapshot_day1.json",
+    2: "data/snapshot_day2.json",
+    3: "data/snapshot_day3.json",
+    4: "data/snapshot_day4.json",
+    5: "data/snapshot_day5.json",
 }
 
 try:
@@ -810,7 +810,7 @@ def build_daily_snapshots_from_rolling():
             "odds": day_odds,
         }
 
-        out_file = DATA_DIR / f"snapshot_day{day_num}_TEST.json"
+        out_file = DATA_DIR / f"snapshot_day{day_num}.json"
         with open(out_file, "w", encoding="utf-8") as f:
             json.dump(day_payload, f, indent=4, ensure_ascii=False)
 
@@ -4446,7 +4446,7 @@ if __name__ == "__main__":
         reset_runtime_api_cache()
         print("🚀 Avvio Scan Automatico Notturno Multi-Day V25...", flush=True)
         HORIZON = 1
-        run_nightly_multiday_build()
+        run_nightly_multiday_build(show_success=False)
         print("✅ Scan completo terminato: data.json + data_day1/2/3/4/5 + details_day1/2/3/4/5 aggiornati.", flush=True)
 
     elif "--fast" in sys.argv:
