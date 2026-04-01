@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-04-01 09:48:03",
+    "updated_at": "2026-04-01 09:53:54",
     "day": 1,
     "date": "2026-04-01",
     "details": {
@@ -7152,12 +7152,12 @@
             "home_team": "Zenit 2",
             "away_team": "Amkar",
             "markets": {
-                "q1": 2.74,
-                "qx": 3.34,
-                "q2": 2.23,
-                "o25": 1.8,
-                "o05ht": 1.32,
-                "o15ht": 2.63
+                "q1": 2.89,
+                "qx": 3.2,
+                "q2": 2.2,
+                "o25": 2.06,
+                "o05ht": 1.39,
+                "o15ht": 3.04
             },
             "averages": {
                 "home_avg_ft": 3.565,
@@ -7194,20 +7194,20 @@
                 "away_ht_conceded_1plus_rate": 0.151
             },
             "flags": {
-                "fav_quote": 2.23,
+                "fav_quote": 2.2,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.03,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": false
             },
             "scores": {
-                "ptgg": 5.0,
+                "ptgg": 4.68,
                 "pto15": 3.83,
-                "pt": 5.613,
-                "over": 4.85,
-                "boost": 6.198,
-                "gold": 5.058,
-                "max": 6.198
+                "pt": 5.293,
+                "over": 4.75,
+                "boost": 5.808,
+                "gold": 4.665,
+                "max": 5.808
             },
             "tags": [
                 "🎯PTGG",
@@ -7216,8 +7216,7 @@
             "internal_labels": [
                 "ASYM",
                 "MEDIUM",
-                "COHERENT",
-                "LIGHT_GAP"
+                "PARTIAL"
             ],
             "structure": {
                 "match_profile": "asymmetric",
@@ -7231,25 +7230,23 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 1.55,
-                "fav_quote": 2.23,
+                "fav_quote": 2.2,
                 "fav_zone": "balanced"
             },
             "market_reading": {
-                "market_profile": "full_open",
-                "coherence_score": 3.1,
-                "coherence_level": "high",
-                "dislocation_score": 0.6,
-                "dislocation_level": "medium",
-                "leading_market": "none",
-                "lagging_market": "o05ht",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "market_profile": "neutral",
+                "coherence_score": 2.6,
+                "coherence_level": "medium",
+                "dislocation_score": 0.0,
+                "dislocation_level": "low",
+                "leading_market": "1x2",
+                "lagging_market": "none",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "high",
                 "positive_flags": [
-                    "ft_struct_market_aligned",
-                    "ht_struct_market_aligned",
-                    "lagged_ht_opening"
+                    "ft_struct_market_aligned"
                 ],
                 "warning_flags": []
             },
@@ -7259,14 +7256,13 @@
                     "⚽ OVER"
                 ],
                 "strong_tag_count": 2,
-                "fav_quote": 2.23,
+                "fav_quote": 2.2,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.03,
                 "internal_labels": [
                     "ASYM",
                     "MEDIUM",
-                    "COHERENT",
-                    "LIGHT_GAP"
+                    "PARTIAL"
                 ]
             },
             "home_profile": {
@@ -18096,9 +18092,9 @@
                 "q1": 3.25,
                 "qx": 3.5,
                 "q2": 2.1,
-                "o25": 1.85,
-                "o05ht": 1.4,
-                "o15ht": 2.88
+                "o25": 1.8,
+                "o05ht": 1.38,
+                "o15ht": 2.75
             },
             "averages": {
                 "home_avg_ft": 3.004,
@@ -18146,9 +18142,9 @@
                 "pto15": 0.0,
                 "pt": 1.85,
                 "over": 6.53,
-                "boost": 7.208,
-                "gold": 4.891,
-                "max": 7.208
+                "boost": 7.028,
+                "gold": 5.271,
+                "max": 7.028
             },
             "tags": [
                 "🐟O",
@@ -18177,11 +18173,11 @@
             },
             "market_reading": {
                 "market_profile": "ft_open_ht_lag",
-                "coherence_score": 3.55,
+                "coherence_score": 3.65,
                 "coherence_level": "high",
                 "dislocation_score": 0.6,
                 "dislocation_level": "medium",
-                "leading_market": "mixed",
+                "leading_market": "ht",
                 "lagging_market": "o05ht",
                 "drop_type": "structural",
                 "drop_strength": "hard",
@@ -18190,8 +18186,8 @@
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
+                    "ht_struct_market_aligned",
                     "lagged_ht_opening",
-                    "mixed_pressure_confirmation",
                     "structural_drop"
                 ],
                 "warning_flags": []
