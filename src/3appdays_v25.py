@@ -4446,7 +4446,7 @@ if __name__ == "__main__":
         reset_runtime_api_cache()
         print("🚀 Avvio Scan Automatico Notturno Multi-Day V25...", flush=True)
         HORIZON = 1
-        run_nightly_multiday_build(show_success=False)
+        run_nightly_multiday_build()
         print("✅ Scan completo terminato: data.json + data_day1/2/3/4/5 + details_day1/2/3/4/5 aggiornati.", flush=True)
 
     elif "--fast" in sys.argv:
