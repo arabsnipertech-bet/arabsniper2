@@ -1,0 +1,37 @@
+name: Test V25 FAST (manuale)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-v25-fast:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: test-v25-fast
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install streamlit requests pandas PyGithub
+
+      - name: Run V25 FAST (Day1)
+        env:
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🚀 Avvio V25 FAST (Day1)..."
+          python src/3appdays_v25.py --fast
+
+      - name: Fine esecuzione
+        run: echo "✅ V25 FAST completato"
