@@ -1,6 +1,6 @@
 {
   "audit_date": "2026-03-31",
-  "generated_at": "2026-04-01T11:17:49",
+  "generated_at": "2026-04-01T20:54:45",
   "counts": {
     "freeze_matches": 47,
     "api_found": 47,
@@ -45,5 +45,14 @@
       "hit": 15,
       "rate": 62.5
     }
+  },
+  "settlement_rules": {
+    "PTGG": "HT entrambe segnano",
+    "PTO15": "HT almeno 2 gol",
+    "OVER": "FT almeno 3 gol",
+    "BOOST": "PTO15 + OVER",
+    "GOLD": "BOOST proxy",
+    "FISH_GG": "FT entrambe segnano",
+    "FISH_OVER": "FT almeno 3 gol"
   }
 }
