@@ -1,7 +1,8 @@
 import os
 import json
 import argparse
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import requests
 
@@ -19,7 +20,7 @@ HEADERS = {
     "x-apisports-key": API_KEY
 }
 
-ITALY_TZ = timezone(timedelta(hours=1))
+ITALY_TZ = ZoneInfo("Europe/Rome")
 
 
 # =========================
@@ -116,15 +117,17 @@ def safe_int(value):
 
 def evaluate_tags(tags, ht_goals, ft_goals, ft_home, ft_away, ht_home, ht_away):
     """
-    Regole auditor corrette:
+    Settlement auditor V25:
     - PTGG = entrambe segnano nel primo tempo
     - PTO15 = almeno 2 gol nel primo tempo
     - OVER = almeno 3 gol FT
     - BOOST = PTO15 + OVER
-    - GOLD = uguale a BOOST per ora
+    - GOLD = BOOST (proxy attuale, coerente con il vecchio auditor)
     - FISH_GG = entrambe segnano FT
     - FISH_OVER = almeno 3 gol FT
     """
+    tag_set = set(tags or [])
+
     ptgg = ht_home >= 1 and ht_away >= 1
     pto15 = ht_goals >= 2
     over = ft_goals >= 3
@@ -134,13 +137,13 @@ def evaluate_tags(tags, ht_goals, ft_goals, ft_home, ft_away, ht_home, ht_away):
     fish_over = ft_goals >= 3
 
     return {
-        "PTGG": ptgg if "PTGG" in tags else None,
-        "PTO15": pto15 if "PTO15" in tags else None,
-        "OVER": over if "OVER" in tags else None,
-        "BOOST": boost if "BOOST" in tags else None,
-        "GOLD": gold if "GOLD" in tags else None,
-        "FISH_GG": fish_gg if "FISH_GG" in tags else None,
-        "FISH_OVER": fish_over if "FISH_OVER" in tags else None,
+        "PTGG": ptgg if "PTGG" in tag_set else None,
+        "PTO15": pto15 if "PTO15" in tag_set else None,
+        "OVER": over if "OVER" in tag_set else None,
+        "BOOST": boost if "BOOST" in tag_set else None,
+        "GOLD": gold if "GOLD" in tag_set else None,
+        "FISH_GG": fish_gg if "FISH_GG" in tag_set else None,
+        "FISH_OVER": fish_over if "FISH_OVER" in tag_set else None,
     }
 
 
@@ -264,6 +267,8 @@ def main():
             "league": m.get("league", ""),
             "match": m.get("match", ""),
             "status": status,
+            "primary_signal": m.get("primary_signal", ""),
+            "info_raw": m.get("info_raw", ""),
             "ht_score": f"{ht_home}-{ht_away}",
             "ft_score": f"{ft_home}-{ft_away}",
             "tags": tags,
@@ -303,7 +308,16 @@ def main():
         "audit_date": audit_date,
         "generated_at": generated_at,
         "counts": counts,
-        "stats": summary_stats
+        "stats": summary_stats,
+        "settlement_rules": {
+            "PTGG": "HT entrambe segnano",
+            "PTO15": "HT almeno 2 gol",
+            "OVER": "FT almeno 3 gol",
+            "BOOST": "PTO15 + OVER",
+            "GOLD": "BOOST proxy",
+            "FISH_GG": "FT entrambe segnano",
+            "FISH_OVER": "FT almeno 3 gol"
+        }
     }
 
     details_path = os.path.join(OUTPUT_DIR, f"audit_{audit_date}_details.json")
