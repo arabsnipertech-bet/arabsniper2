@@ -6,9 +6,17 @@ on:
     - cron: '37 8 * * *'
       timezone: 'Europe/Rome'
 
+permissions:
+  contents: write
+
+concurrency:
+  group: arabsniper-freeze-audit
+  cancel-in-progress: false
+
 jobs:
   freeze:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repo
