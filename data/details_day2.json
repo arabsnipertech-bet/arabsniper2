@@ -1,8 +1,619 @@
 {
-    "updated_at": "2026-04-03 09:38:43",
+    "updated_at": "2026-04-03 11:17:02",
     "day": 2,
     "date": "2026-04-04",
     "details": {
+        "1513021": {
+            "fixture_id": 1513021,
+            "date": "2026-04-04",
+            "time": "01:00",
+            "league": "MLS Next Pro",
+            "country": "USA",
+            "match": "Crown Legacy - Atlanta United II",
+            "home_team": "Crown Legacy",
+            "away_team": "Atlanta United II",
+            "markets": {
+                "q1": 1.8,
+                "qx": 3.7,
+                "q2": 3.3,
+                "o25": 1.33,
+                "o05ht": 1.17,
+                "o15ht": 1.85
+            },
+            "averages": {
+                "home_avg_ft": 4.216,
+                "away_avg_ft": 3.941,
+                "home_avg_ht": 1.947,
+                "away_avg_ht": 1.85,
+                "home_avg_ft_clean": 3.797,
+                "away_avg_ft_clean": 3.898,
+                "home_avg_ht_clean": 1.193,
+                "away_avg_ht_clean": 1.844,
+                "home_avg_ht_scored_clean": 0.863,
+                "away_avg_ht_scored_clean": 1.138,
+                "home_avg_ht_conceded_clean": 0.33,
+                "away_avg_ht_conceded_clean": 0.638,
+                "home_avg_ft_scored_clean": 2.73,
+                "away_avg_ft_scored_clean": 1.982,
+                "home_avg_ft_conceded_clean": 0.954,
+                "away_avg_ft_conceded_clean": 1.872,
+                "home_ft_2plus_rate": 0.781,
+                "away_ft_2plus_rate": 0.75,
+                "home_ft_3plus_rate": 0.781,
+                "away_ft_3plus_rate": 0.694,
+                "home_ft_low_rate": 0.219,
+                "away_ft_low_rate": 0.25,
+                "home_ht_1plus_rate": 0.781,
+                "away_ht_1plus_rate": 0.806,
+                "home_ht_zero_rate": 0.219,
+                "away_ht_zero_rate": 0.194,
+                "home_ht_scored_1plus_rate": 0.609,
+                "away_ht_scored_1plus_rate": 0.75,
+                "home_ht_scored_2plus_rate": 0.267,
+                "away_ht_scored_2plus_rate": 0.25,
+                "home_ht_conceded_1plus_rate": 0.391,
+                "away_ht_conceded_1plus_rate": 0.5
+            },
+            "flags": {
+                "fav_quote": 1.8,
+                "is_gold_zone": true,
+                "drop_diff": 0.0,
+                "home_last_2h_zero": false,
+                "away_last_2h_zero": true
+            },
+            "scores": {
+                "ptgg": 7.0,
+                "pto15": 5.65,
+                "pt": 7.904,
+                "over": 7.77,
+                "boost": 8.26,
+                "gold": 9.848,
+                "max": 9.848
+            },
+            "tags": [
+                "🎯PTGG",
+                "🔥PT1.5",
+                "⚽ OVER",
+                "💪 STRONG OVER"
+            ],
+            "internal_labels": [
+                "OPEN",
+                "STRONG",
+                "NOISY"
+            ],
+            "structure": {
+                "match_profile": "open_match",
+                "structure_score": 3.05,
+                "structure_grade": "high",
+                "combined_ht_clean": 1.518,
+                "combined_ft_clean": 3.848,
+                "combined_ht_scored_clean": 1.0,
+                "cross_home_clean": 4.602,
+                "cross_away_clean": 2.936,
+                "bilateral_ft": true,
+                "bilateral_ht": true,
+                "one_sided_risk": 0.4,
+                "fav_quote": 1.8,
+                "fav_zone": "gold"
+            },
+            "market_reading": {
+                "market_profile": "full_open",
+                "coherence_score": 1.5,
+                "coherence_level": "low",
+                "dislocation_score": 0.0,
+                "dislocation_level": "low",
+                "leading_market": "none",
+                "lagging_market": "none",
+                "drop_type": "none",
+                "drop_strength": "none",
+                "drop_confirmed": false,
+                "value_left": "unknown",
+                "positive_flags": [
+                    "double_cross_supported",
+                    "fav_open_match_coherent"
+                ],
+                "warning_flags": []
+            },
+            "signal_debug": {
+                "tags": [
+                    "🎯PTGG",
+                    "🔥PT1.5",
+                    "⚽ OVER",
+                    "💪 STRONG OVER"
+                ],
+                "strong_tag_count": 4,
+                "fav_quote": 1.8,
+                "is_gold_zone": true,
+                "drop_diff": 0.0,
+                "internal_labels": [
+                    "OPEN",
+                    "STRONG",
+                    "NOISY"
+                ]
+            },
+            "home_profile": {
+                "expected_side": "home",
+                "all_sample_count": 8,
+                "context_sample_count": 5,
+                "context_weight": 0.62,
+                "avg_ht_clean": 1.193,
+                "avg_total_clean": 3.797,
+                "avg_ht_scored_clean": 0.863,
+                "avg_ht_conceded_clean": 0.33,
+                "avg_ft_scored_clean": 2.73,
+                "avg_ft_conceded_clean": 0.954,
+                "ht_1plus_rate": 0.781,
+                "ht_zero_rate": 0.219,
+                "ft_2plus_rate": 0.781,
+                "ft_3plus_rate": 0.781,
+                "ft_low_rate": 0.219,
+                "ctx_avg_ht_clean": 1.0,
+                "ctx_avg_total_clean": 4.0,
+                "ctx_avg_ft_scored_clean": 2.667,
+                "ctx_avg_ft_conceded_clean": 1.0,
+                "ctx_ht_1plus_rate": 0.8,
+                "ctx_ft_2plus_rate": 0.8
+            },
+            "away_profile": {
+                "expected_side": "away",
+                "all_sample_count": 8,
+                "context_sample_count": 4,
+                "context_weight": 0.55,
+                "avg_ht_clean": 1.844,
+                "avg_total_clean": 3.898,
+                "avg_ht_scored_clean": 1.138,
+                "avg_ht_conceded_clean": 0.638,
+                "avg_ft_scored_clean": 1.982,
+                "avg_ft_conceded_clean": 1.872,
+                "ht_1plus_rate": 0.806,
+                "ht_zero_rate": 0.194,
+                "ft_2plus_rate": 0.75,
+                "ft_3plus_rate": 0.694,
+                "ft_low_rate": 0.25,
+                "ctx_avg_ht_clean": 2.0,
+                "ctx_avg_total_clean": 4.25,
+                "ctx_avg_ft_scored_clean": 2.0,
+                "ctx_avg_ft_conceded_clean": 2.25,
+                "ctx_ht_1plus_rate": 0.75,
+                "ctx_ft_2plus_rate": 0.75
+            },
+            "home_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-03-23",
+                    "league": "MLS Next Pro",
+                    "match": "Crown Legacy - Atlanta United II",
+                    "opponent": "Atlanta United II",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "3-0",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 3.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-03-16",
+                    "league": "MLS Next Pro",
+                    "match": "Crown Legacy - Inter Miami II",
+                    "opponent": "Inter Miami II",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-0",
+                    "ft": "3-0",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-03-07",
+                    "league": "MLS Next Pro",
+                    "match": "Crown Legacy - Huntsville City",
+                    "opponent": "Huntsville City",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "5-2",
+                    "ft": "7-2",
+                    "total_ht_goals": 7.0,
+                    "total_ft_goals": 9.0,
+                    "team_ht_scored": 5.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 7.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-03-01",
+                    "league": "MLS Next Pro",
+                    "match": "Chattanooga - Crown Legacy",
+                    "opponent": "Chattanooga",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-2",
+                    "ft": "1-4",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 4.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-02-07",
+                    "league": "Friendlies Clubs",
+                    "match": "Charleston Battery - Crown Legacy",
+                    "opponent": "Charleston Battery",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-3",
+                    "ft": "2-3",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 3.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 2.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 6,
+                    "date": "2025-09-26",
+                    "league": "MLS Next Pro",
+                    "match": "New England II - Crown Legacy",
+                    "opponent": "New England II",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-0",
+                    "ft": "0-1",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1
+                },
+                {
+                    "seq": 7,
+                    "date": "2025-09-21",
+                    "league": "MLS Next Pro",
+                    "match": "Crown Legacy - Atlanta United II",
+                    "opponent": "Atlanta United II",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-1",
+                    "ft": "0-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1
+                },
+                {
+                    "seq": 8,
+                    "date": "2025-09-13",
+                    "league": "MLS Next Pro",
+                    "match": "Crown Legacy - Chattanooga",
+                    "opponent": "Chattanooga",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-0",
+                    "ft": "2-4",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 6.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 4.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 4.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                }
+            ],
+            "away_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-03-23",
+                    "league": "MLS Next Pro",
+                    "match": "Crown Legacy - Atlanta United II",
+                    "opponent": "Crown Legacy",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-0",
+                    "ft": "3-0",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 3.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 3.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-03-16",
+                    "league": "MLS Next Pro",
+                    "match": "Atlanta United II - Huntsville City",
+                    "opponent": "Huntsville City",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-1",
+                    "ft": "4-1",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 4.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 3.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-03-09",
+                    "league": "MLS Next Pro",
+                    "match": "Atlanta United II - Carolina Core",
+                    "opponent": "Carolina Core",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-0",
+                    "ft": "2-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 4,
+                    "date": "2025-10-02",
+                    "league": "MLS Next Pro",
+                    "match": "Atlanta United II - Chattanooga",
+                    "opponent": "Chattanooga",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-1",
+                    "ft": "0-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1
+                },
+                {
+                    "seq": 5,
+                    "date": "2025-09-28",
+                    "league": "MLS Next Pro",
+                    "match": "Chicago Fire II - Atlanta United II",
+                    "opponent": "Chicago Fire II",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-3",
+                    "ft": "2-5",
+                    "total_ht_goals": 4.0,
+                    "total_ft_goals": 7.0,
+                    "team_ht_scored": 3.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 5.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 6,
+                    "date": "2025-09-21",
+                    "league": "MLS Next Pro",
+                    "match": "Crown Legacy - Atlanta United II",
+                    "opponent": "Crown Legacy",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-1",
+                    "ft": "0-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1
+                },
+                {
+                    "seq": 7,
+                    "date": "2025-09-14",
+                    "league": "MLS Next Pro",
+                    "match": "Carolina Core - Atlanta United II",
+                    "opponent": "Carolina Core",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "2-1",
+                    "ft": "4-2",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 6.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 4.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 2.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 8,
+                    "date": "2025-08-31",
+                    "league": "MLS Next Pro",
+                    "match": "Atlanta United II - Huntsville City",
+                    "opponent": "Huntsville City",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "2-0",
+                    "ft": "2-0",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0
+                }
+            ]
+        },
         "1506075": {
             "fixture_id": 1506075,
             "date": "2026-04-04",
@@ -13,12 +624,12 @@
             "home_team": "Fortaleza FC",
             "away_team": "Internacional de Bogota",
             "markets": {
-                "q1": 2.3,
-                "qx": 3.1,
-                "q2": 2.9,
+                "q1": 2.42,
+                "qx": 3.15,
+                "q2": 2.98,
                 "o25": 2.15,
-                "o05ht": 1.44,
-                "o15ht": 3.1
+                "o05ht": 1.42,
+                "o15ht": 2.88
             },
             "averages": {
                 "home_avg_ft": 3.127,
@@ -55,7 +666,7 @@
                 "away_ht_conceded_1plus_rate": 0.444
             },
             "flags": {
-                "fav_quote": 2.3,
+                "fav_quote": 2.42,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": true,
@@ -66,8 +677,8 @@
                 "pto15": 1.54,
                 "pt": 1.758,
                 "over": 5.33,
-                "boost": 4.623,
-                "gold": 2.005,
+                "boost": 4.873,
+                "gold": 2.225,
                 "max": 5.33
             },
             "tags": [
@@ -76,7 +687,7 @@
             "internal_labels": [
                 "ASYM",
                 "MEDIUM",
-                "PARTIAL"
+                "COHERENT"
             ],
             "structure": {
                 "match_profile": "asymmetric",
@@ -90,13 +701,13 @@
                 "bilateral_ft": false,
                 "bilateral_ht": false,
                 "one_sided_risk": 3.0,
-                "fav_quote": 2.3,
+                "fav_quote": 2.42,
                 "fav_zone": "wide"
             },
             "market_reading": {
                 "market_profile": "neutral",
-                "coherence_score": 2.7,
-                "coherence_level": "medium",
+                "coherence_score": 3.15,
+                "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
                 "leading_market": "1x2",
@@ -117,13 +728,13 @@
                     "🐟O"
                 ],
                 "strong_tag_count": 0,
-                "fav_quote": 2.3,
+                "fav_quote": 2.42,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
                     "ASYM",
                     "MEDIUM",
-                    "PARTIAL"
+                    "COHERENT"
                 ]
             },
             "home_profile": {
@@ -619,12 +1230,12 @@
             "home_team": "Blooming",
             "away_team": "Guabirá",
             "markets": {
-                "q1": 1.7,
-                "qx": 3.5,
-                "q2": 4.2,
-                "o25": 1.53,
+                "q1": 1.75,
+                "qx": 3.75,
+                "q2": 3.75,
+                "o25": 1.55,
                 "o05ht": 1.25,
-                "o15ht": 2.15
+                "o15ht": 2.2
             },
             "averages": {
                 "home_avg_ft": 4.252,
@@ -661,7 +1272,7 @@
                 "away_ht_conceded_1plus_rate": 0.935
             },
             "flags": {
-                "fav_quote": 1.7,
+                "fav_quote": 1.75,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
@@ -672,7 +1283,7 @@
                 "pto15": 4.18,
                 "pt": 8.259,
                 "over": 8.79,
-                "boost": 9.165,
+                "boost": 9.495,
                 "gold": 9.607,
                 "max": 9.607
             },
@@ -698,7 +1309,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 1.4,
-                "fav_quote": 1.7,
+                "fav_quote": 1.75,
                 "fav_zone": "gold"
             },
             "market_reading": {
@@ -710,7 +1321,7 @@
                 "leading_market": "1x2",
                 "lagging_market": "none",
                 "drop_type": "sterile",
-                "drop_strength": "medium",
+                "drop_strength": "hard",
                 "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
@@ -730,7 +1341,7 @@
                     "⚽ OVER"
                 ],
                 "strong_tag_count": 3,
-                "fav_quote": 1.7,
+                "fav_quote": 1.75,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
                 "internal_labels": [
@@ -2448,12 +3059,12 @@
             "home_team": "Correcaminos Uat",
             "away_team": "Cancún",
             "markets": {
-                "q1": 2.3,
-                "qx": 3.3,
+                "q1": 2.44,
+                "qx": 3.6,
                 "q2": 2.6,
-                "o25": 1.67,
-                "o05ht": 1.25,
-                "o15ht": 2.38
+                "o25": 1.65,
+                "o05ht": 1.3,
+                "o15ht": 2.4
             },
             "averages": {
                 "home_avg_ft": 2.974,
@@ -2490,9 +3101,9 @@
                 "away_ht_conceded_1plus_rate": 0.169
             },
             "flags": {
-                "fav_quote": 2.3,
+                "fav_quote": 2.44,
                 "is_gold_zone": false,
-                "drop_diff": 0.14,
+                "drop_diff": 0.0,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": false
             },
@@ -2500,17 +3111,17 @@
                 "ptgg": 7.27,
                 "pto15": 4.43,
                 "pt": 7.979,
-                "over": 9.23,
-                "boost": 8.865,
-                "gold": 10.737,
-                "max": 10.737
+                "over": 9.35,
+                "boost": 8.918,
+                "gold": 10.975,
+                "max": 10.975
             },
             "tags": [
                 "🎯PTGG",
                 "🔥PT1.5",
                 "⚽ OVER",
                 "💪 STRONG OVER",
-                "📉-0.14"
+                "🚀 BOOST"
             ],
             "internal_labels": [
                 "OPEN",
@@ -2529,7 +3140,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.0,
-                "fav_quote": 2.3,
+                "fav_quote": 2.44,
                 "fav_zone": "wide"
             },
             "market_reading": {
@@ -2538,20 +3149,18 @@
                 "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "1x2",
+                "leading_market": "none",
                 "lagging_market": "none",
-                "drop_type": "sterile",
-                "drop_strength": "medium",
+                "drop_type": "none",
+                "drop_strength": "none",
                 "drop_confirmed": false,
-                "value_left": "high",
+                "value_left": "unknown",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
                     "ht_struct_market_aligned"
                 ],
-                "warning_flags": [
-                    "sterile_1x2_drop"
-                ]
+                "warning_flags": []
             },
             "signal_debug": {
                 "tags": [
@@ -2559,12 +3168,12 @@
                     "🔥PT1.5",
                     "⚽ OVER",
                     "💪 STRONG OVER",
-                    "📉-0.14"
+                    "🚀 BOOST"
                 ],
-                "strong_tag_count": 4,
-                "fav_quote": 2.3,
+                "strong_tag_count": 5,
+                "fav_quote": 2.44,
                 "is_gold_zone": false,
-                "drop_diff": 0.14,
+                "drop_diff": 0.0,
                 "internal_labels": [
                     "OPEN",
                     "STRONG",
@@ -6708,7 +7317,7 @@
             "away_team": "Cerezo Osaka",
             "markets": {
                 "q1": 2.2,
-                "qx": 3.4,
+                "qx": 3.45,
                 "q2": 3.1,
                 "o25": 1.85,
                 "o05ht": 1.36,
@@ -10364,11 +10973,11 @@
             "away_team": "BC Rangers",
             "markets": {
                 "q1": 1.95,
-                "qx": 3.3,
+                "qx": 3.45,
                 "q2": 3.4,
-                "o25": 1.59,
-                "o05ht": 1.25,
-                "o15ht": 2.25
+                "o25": 1.6,
+                "o05ht": 1.3,
+                "o15ht": 2.3
             },
             "averages": {
                 "home_avg_ft": 3.301,
@@ -10972,10 +11581,10 @@
             "away_team": "Kyoto Sanga",
             "markets": {
                 "q1": 2.3,
-                "qx": 3.4,
-                "q2": 2.9,
+                "qx": 3.55,
+                "q2": 2.85,
                 "o25": 1.8,
-                "o05ht": 1.33,
+                "o05ht": 1.3,
                 "o15ht": 2.45
             },
             "averages": {
@@ -11020,13 +11629,13 @@
                 "away_last_2h_zero": false
             },
             "scores": {
-                "ptgg": 4.15,
+                "ptgg": 3.83,
                 "pto15": 2.01,
-                "pt": 4.472,
-                "over": 8.17,
-                "boost": 7.316,
-                "gold": 7.816,
-                "max": 8.17
+                "pt": 4.152,
+                "over": 8.45,
+                "boost": 7.274,
+                "gold": 7.965,
+                "max": 8.45
             },
             "tags": [
                 "🐟O"
@@ -11034,8 +11643,7 @@
             "internal_labels": [
                 "ASYM",
                 "MEDIUM",
-                "COHERENT",
-                "LIGHT_GAP"
+                "COHERENT"
             ],
             "structure": {
                 "match_profile": "asymmetric",
@@ -11053,22 +11661,22 @@
                 "fav_zone": "wide"
             },
             "market_reading": {
-                "market_profile": "ft_open_ht_lag",
-                "coherence_score": 3.1,
+                "market_profile": "full_open",
+                "coherence_score": 3.5,
                 "coherence_level": "high",
-                "dislocation_score": 0.6,
-                "dislocation_level": "medium",
-                "leading_market": "none",
-                "lagging_market": "o05ht",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "dislocation_score": 0.0,
+                "dislocation_level": "low",
+                "leading_market": "mixed",
+                "lagging_market": "none",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
                     "ht_struct_market_aligned",
-                    "lagged_ht_opening"
+                    "mixed_pressure_confirmation"
                 ],
                 "warning_flags": []
             },
@@ -11083,8 +11691,7 @@
                 "internal_labels": [
                     "ASYM",
                     "MEDIUM",
-                    "COHERENT",
-                    "LIGHT_GAP"
+                    "COHERENT"
                 ]
             },
             "home_profile": {
@@ -11580,12 +12187,12 @@
             "home_team": "Gyeongnam FC",
             "away_team": "Busan I Park",
             "markets": {
-                "q1": 3.6,
+                "q1": 3.75,
                 "qx": 3.2,
-                "q2": 1.91,
-                "o25": 2.06,
-                "o05ht": 1.4,
-                "o15ht": 2.9
+                "q2": 1.95,
+                "o25": 2.1,
+                "o05ht": 1.42,
+                "o15ht": 2.88
             },
             "averages": {
                 "home_avg_ft": 2.281,
@@ -11622,19 +12229,19 @@
                 "away_ht_conceded_1plus_rate": 0.438
             },
             "flags": {
-                "fav_quote": 1.91,
+                "fav_quote": 1.95,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": false
             },
             "scores": {
-                "ptgg": 2.13,
+                "ptgg": 1.48,
                 "pto15": 0.99,
-                "pt": 2.288,
+                "pt": 1.638,
                 "over": 7.42,
-                "boost": 4.811,
-                "gold": 6.412,
+                "boost": 4.286,
+                "gold": 6.321,
                 "max": 7.42
             },
             "tags": [
@@ -11657,7 +12264,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 1.25,
-                "fav_quote": 1.91,
+                "fav_quote": 1.95,
                 "fav_zone": "balanced"
             },
             "market_reading": {
@@ -11666,12 +12273,12 @@
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "none",
+                "leading_market": "ht",
                 "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported"
@@ -11683,7 +12290,7 @@
                     "🐟O"
                 ],
                 "strong_tag_count": 0,
-                "fav_quote": 1.91,
+                "fav_quote": 1.95,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
@@ -12789,12 +13396,12 @@
             "home_team": "Qingdao Jonoon",
             "away_team": "Henan Jianye",
             "markets": {
-                "q1": 3.8,
-                "qx": 3.7,
-                "q2": 1.8,
+                "q1": 4.0,
+                "qx": 3.6,
+                "q2": 1.78,
                 "o25": 1.62,
                 "o05ht": 1.3,
-                "o15ht": 2.45
+                "o15ht": 2.3
             },
             "averages": {
                 "home_avg_ft": 3.88,
@@ -12831,9 +13438,9 @@
                 "away_ht_conceded_1plus_rate": 0.74
             },
             "flags": {
-                "fav_quote": 1.8,
+                "fav_quote": 1.78,
                 "is_gold_zone": true,
-                "drop_diff": 0.0,
+                "drop_diff": 0.02,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": true
             },
@@ -12868,7 +13475,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.0,
-                "fav_quote": 1.8,
+                "fav_quote": 1.78,
                 "fav_zone": "gold"
             },
             "market_reading": {
@@ -12877,19 +13484,21 @@
                 "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "none",
+                "leading_market": "ht",
                 "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "drop_type": "divergent",
+                "drop_strength": "medium",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
                     "ht_struct_market_aligned",
                     "fav_open_match_coherent"
                 ],
-                "warning_flags": []
+                "warning_flags": [
+                    "goals_move_without_1x2_support"
+                ]
             },
             "signal_debug": {
                 "tags": [
@@ -12898,9 +13507,9 @@
                     "💪 STRONG OVER"
                 ],
                 "strong_tag_count": 3,
-                "fav_quote": 1.8,
+                "fav_quote": 1.78,
                 "is_gold_zone": true,
-                "drop_diff": 0.0,
+                "drop_diff": 0.02,
                 "internal_labels": [
                     "OPEN",
                     "STRONG",
@@ -13400,12 +14009,12 @@
             "home_team": "CSM Reşiţa",
             "away_team": "FC Bacau",
             "markets": {
-                "q1": 1.7,
-                "qx": 3.4,
-                "q2": 4.33,
-                "o25": 1.95,
-                "o05ht": 1.37,
-                "o15ht": 2.79
+                "q1": 1.67,
+                "qx": 3.55,
+                "q2": 4.6,
+                "o25": 1.85,
+                "o05ht": 1.35,
+                "o15ht": 2.6
             },
             "averages": {
                 "home_avg_ft": 3.694,
@@ -13442,31 +14051,33 @@
                 "away_ht_conceded_1plus_rate": 0.25
             },
             "flags": {
-                "fav_quote": 1.7,
+                "fav_quote": 1.67,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": false
             },
             "scores": {
-                "ptgg": 7.55,
+                "ptgg": 8.05,
                 "pto15": 4.43,
-                "pt": 8.259,
-                "over": 9.13,
-                "boost": 9.925,
-                "gold": 10.771,
-                "max": 10.771
+                "pt": 8.759,
+                "over": 9.43,
+                "boost": 10.657,
+                "gold": 11.535,
+                "max": 11.535
             },
             "tags": [
                 "🎯PTGG",
                 "🔥PT1.5",
                 "⚽ OVER",
-                "💪 STRONG OVER"
+                "💪 STRONG OVER",
+                "🚀 BOOST"
             ],
             "internal_labels": [
                 "OPEN",
                 "STRONG",
-                "COHERENT"
+                "COHERENT",
+                "LIGHT_GAP"
             ],
             "structure": {
                 "match_profile": "open_match",
@@ -13480,46 +14091,48 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.9,
-                "fav_quote": 1.7,
+                "fav_quote": 1.67,
                 "fav_zone": "gold"
             },
             "market_reading": {
-                "market_profile": "neutral",
-                "coherence_score": 4.2,
+                "market_profile": "ft_open_ht_lag",
+                "coherence_score": 4.75,
                 "coherence_level": "high",
-                "dislocation_score": 0.0,
-                "dislocation_level": "low",
+                "dislocation_score": 0.6,
+                "dislocation_level": "medium",
                 "leading_market": "1x2",
-                "lagging_market": "none",
-                "drop_type": "sterile",
+                "lagging_market": "o05ht",
+                "drop_type": "structural",
                 "drop_strength": "hard",
-                "drop_confirmed": false,
+                "drop_confirmed": true,
                 "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
                     "ht_struct_market_aligned",
-                    "fav_open_match_coherent"
+                    "fav_open_match_coherent",
+                    "lagged_ht_opening",
+                    "structural_drop"
                 ],
-                "warning_flags": [
-                    "sterile_1x2_drop"
-                ]
+                "warning_flags": []
             },
             "signal_debug": {
                 "tags": [
                     "🎯PTGG",
                     "🔥PT1.5",
                     "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "💪 STRONG OVER",
+                    "🚀 BOOST"
                 ],
-                "strong_tag_count": 4,
-                "fav_quote": 1.7,
+                "strong_tag_count": 5,
+                "fav_quote": 1.67,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
                 "internal_labels": [
                     "OPEN",
                     "STRONG",
-                    "COHERENT"
+                    "COHERENT",
+                    "LIGHT_GAP"
                 ]
             },
             "home_profile": {
@@ -14623,12 +15236,12 @@
             "home_team": "Corvinul Hunedoara",
             "away_team": "Sepsi OSK Sfantu Gheorghe",
             "markets": {
-                "q1": 2.1,
-                "qx": 3.2,
+                "q1": 2.05,
+                "qx": 3.35,
                 "q2": 3.1,
-                "o25": 2.0,
-                "o05ht": 1.37,
-                "o15ht": 2.77
+                "o25": 1.85,
+                "o05ht": 1.35,
+                "o15ht": 2.6
             },
             "averages": {
                 "home_avg_ft": 2.583,
@@ -14665,29 +15278,32 @@
                 "away_ht_conceded_1plus_rate": 0.225
             },
             "flags": {
-                "fav_quote": 2.1,
+                "fav_quote": 2.05,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.05,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": false
             },
             "scores": {
-                "ptgg": 4.01,
+                "ptgg": 4.33,
                 "pto15": 3.01,
-                "pt": 4.492,
+                "pt": 4.812,
                 "over": 8.27,
-                "boost": 8.416,
-                "gold": 8.991,
-                "max": 8.991
+                "boost": 8.762,
+                "gold": 9.156,
+                "max": 9.156
             },
             "tags": [
                 "⚽ OVER",
-                "💪 STRONG OVER"
+                "💪 STRONG OVER",
+                "🐟G",
+                "📉-0.05"
             ],
             "internal_labels": [
                 "OPEN",
                 "STRONG",
-                "COHERENT"
+                "COHERENT",
+                "LIGHT_GAP"
             ],
             "structure": {
                 "match_profile": "open_match",
@@ -14701,41 +15317,45 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 1.03,
-                "fav_quote": 2.1,
+                "fav_quote": 2.05,
                 "fav_zone": "balanced"
             },
             "market_reading": {
-                "market_profile": "neutral",
+                "market_profile": "ft_open_ht_lag",
                 "coherence_score": 3.65,
                 "coherence_level": "high",
-                "dislocation_score": 0.0,
-                "dislocation_level": "low",
-                "leading_market": "none",
-                "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "dislocation_score": 0.6,
+                "dislocation_level": "medium",
+                "leading_market": "1x2",
+                "lagging_market": "o05ht",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
-                    "ht_struct_market_aligned"
+                    "ht_struct_market_aligned",
+                    "lagged_ht_opening"
                 ],
                 "warning_flags": []
             },
             "signal_debug": {
                 "tags": [
                     "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "💪 STRONG OVER",
+                    "🐟G",
+                    "📉-0.05"
                 ],
                 "strong_tag_count": 2,
-                "fav_quote": 2.1,
+                "fav_quote": 2.05,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.05,
                 "internal_labels": [
                     "OPEN",
                     "STRONG",
-                    "COHERENT"
+                    "COHERENT",
+                    "LIGHT_GAP"
                 ]
             },
             "home_profile": {
@@ -18882,12 +19502,12 @@
             "home_team": "Sarıyer",
             "away_team": "Serik Spor",
             "markets": {
-                "q1": 1.67,
-                "qx": 3.6,
-                "q2": 4.75,
-                "o25": 1.8,
-                "o05ht": 1.33,
-                "o15ht": 2.5
+                "q1": 1.6,
+                "qx": 3.7,
+                "q2": 4.8,
+                "o25": 1.77,
+                "o05ht": 1.3,
+                "o15ht": 2.4
             },
             "averages": {
                 "home_avg_ft": 2.99,
@@ -18924,31 +19544,31 @@
                 "away_ht_conceded_1plus_rate": 0.306
             },
             "flags": {
-                "fav_quote": 1.67,
+                "fav_quote": 1.6,
                 "is_gold_zone": true,
-                "drop_diff": 0.0,
+                "drop_diff": 0.07,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": false
             },
             "scores": {
-                "ptgg": 6.33,
+                "ptgg": 6.19,
                 "pto15": 2.45,
-                "pt": 6.722,
-                "over": 8.97,
-                "boost": 9.643,
-                "gold": 11.847,
-                "max": 11.847
+                "pt": 6.582,
+                "over": 9.43,
+                "boost": 9.754,
+                "gold": 12.358,
+                "max": 12.358
             },
             "tags": [
+                "⚽⭐ GOLD",
                 "⚽ OVER",
                 "💪 STRONG OVER",
-                "🐟G"
+                "📉-0.07"
             ],
             "internal_labels": [
                 "OPEN",
                 "STRONG",
-                "COHERENT",
-                "LIGHT_GAP"
+                "COHERENT"
             ],
             "structure": {
                 "match_profile": "open_match",
@@ -18962,45 +19582,45 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.0,
-                "fav_quote": 1.67,
+                "fav_quote": 1.6,
                 "fav_zone": "gold"
             },
             "market_reading": {
-                "market_profile": "ft_open_ht_lag",
-                "coherence_score": 3.9,
+                "market_profile": "full_open",
+                "coherence_score": 4.45,
                 "coherence_level": "high",
-                "dislocation_score": 0.6,
-                "dislocation_level": "medium",
-                "leading_market": "none",
-                "lagging_market": "o05ht",
-                "drop_type": "none",
-                "drop_strength": "none",
-                "drop_confirmed": false,
-                "value_left": "unknown",
+                "dislocation_score": 0.0,
+                "dislocation_level": "low",
+                "leading_market": "ht",
+                "lagging_market": "none",
+                "drop_type": "structural",
+                "drop_strength": "medium",
+                "drop_confirmed": true,
+                "value_left": "medium",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
                     "ht_struct_market_aligned",
                     "fav_open_match_coherent",
-                    "lagged_ht_opening"
+                    "structural_drop"
                 ],
                 "warning_flags": []
             },
             "signal_debug": {
                 "tags": [
+                    "⚽⭐ GOLD",
                     "⚽ OVER",
                     "💪 STRONG OVER",
-                    "🐟G"
+                    "📉-0.07"
                 ],
-                "strong_tag_count": 2,
-                "fav_quote": 1.67,
+                "strong_tag_count": 3,
+                "fav_quote": 1.6,
                 "is_gold_zone": true,
-                "drop_diff": 0.0,
+                "drop_diff": 0.07,
                 "internal_labels": [
                     "OPEN",
                     "STRONG",
-                    "COHERENT",
-                    "LIGHT_GAP"
+                    "COHERENT"
                 ]
             },
             "home_profile": {
@@ -19496,12 +20116,12 @@
             "home_team": "IFK Norrkoping",
             "away_team": "IFK Varnamo",
             "markets": {
-                "q1": 2.0,
-                "qx": 3.4,
-                "q2": 3.1,
+                "q1": 2.1,
+                "qx": 3.65,
+                "q2": 3.2,
                 "o25": 1.67,
-                "o05ht": 1.3,
-                "o15ht": 2.4
+                "o05ht": 1.28,
+                "o15ht": 2.3
             },
             "averages": {
                 "home_avg_ft": 2.838,
@@ -19538,7 +20158,7 @@
                 "away_ht_conceded_1plus_rate": 0.419
             },
             "flags": {
-                "fav_quote": 2.0,
+                "fav_quote": 2.1,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
@@ -19550,7 +20170,7 @@
                 "pt": 3.002,
                 "over": 6.27,
                 "boost": 5.789,
-                "gold": 5.05,
+                "gold": 4.8,
                 "max": 6.27
             },
             "tags": [
@@ -19573,7 +20193,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 2.0,
-                "fav_quote": 2.0,
+                "fav_quote": 2.1,
                 "fav_zone": "balanced"
             },
             "market_reading": {
@@ -19585,7 +20205,7 @@
                 "leading_market": "1x2",
                 "lagging_market": "none",
                 "drop_type": "sterile",
-                "drop_strength": "hard",
+                "drop_strength": "medium",
                 "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
@@ -19601,7 +20221,7 @@
                     "🐟O"
                 ],
                 "strong_tag_count": 0,
-                "fav_quote": 2.0,
+                "fav_quote": 2.1,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
@@ -29257,7 +29877,7 @@
                 "q2": 6.0,
                 "o25": 1.7,
                 "o05ht": 1.31,
-                "o15ht": 2.47
+                "o15ht": 2.44
             },
             "averages": {
                 "home_avg_ft": 1.877,
@@ -29339,12 +29959,12 @@
                 "coherence_level": "medium",
                 "dislocation_score": 0.6,
                 "dislocation_level": "medium",
-                "leading_market": "none",
+                "leading_market": "ht",
                 "lagging_market": "o05ht",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "medium",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "ht_struct_market_aligned",
@@ -35335,9 +35955,9 @@
             "home_team": "Baník Ostrava II",
             "away_team": "Příbram",
             "markets": {
-                "q1": 1.77,
-                "qx": 3.4,
-                "q2": 3.94,
+                "q1": 1.8,
+                "qx": 3.2,
+                "q2": 4.0,
                 "o25": 1.89,
                 "o05ht": 1.37,
                 "o15ht": 2.75
@@ -35377,9 +35997,9 @@
                 "away_ht_conceded_1plus_rate": 0.637
             },
             "flags": {
-                "fav_quote": 1.77,
+                "fav_quote": 1.8,
                 "is_gold_zone": true,
-                "drop_diff": 0.08,
+                "drop_diff": 0.05,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": false
             },
@@ -35387,14 +36007,14 @@
                 "ptgg": 0.97,
                 "pto15": 0.54,
                 "pt": 1.056,
-                "over": 5.65,
-                "boost": 5.953,
-                "gold": 4.94,
-                "max": 5.953
+                "over": 5.77,
+                "boost": 6.006,
+                "gold": 5.177,
+                "max": 6.006
             },
             "tags": [
                 "🐟O",
-                "📉-0.08"
+                "📉-0.05"
             ],
             "internal_labels": [
                 "ASYM",
@@ -35413,7 +36033,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 2.0,
-                "fav_quote": 1.77,
+                "fav_quote": 1.8,
                 "fav_zone": "gold"
             },
             "market_reading": {
@@ -35424,8 +36044,8 @@
                 "dislocation_level": "low",
                 "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "sterile",
-                "drop_strength": "medium",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
@@ -35433,19 +36053,17 @@
                     "ht_struct_market_aligned",
                     "fav_open_match_coherent"
                 ],
-                "warning_flags": [
-                    "sterile_1x2_drop"
-                ]
+                "warning_flags": []
             },
             "signal_debug": {
                 "tags": [
                     "🐟O",
-                    "📉-0.08"
+                    "📉-0.05"
                 ],
                 "strong_tag_count": 0,
-                "fav_quote": 1.77,
+                "fav_quote": 1.8,
                 "is_gold_zone": true,
-                "drop_diff": 0.08,
+                "drop_diff": 0.05,
                 "internal_labels": [
                     "ASYM",
                     "MEDIUM",
@@ -63948,6 +64566,617 @@
                 }
             ]
         },
+        "1506718": {
+            "fixture_id": 1506718,
+            "date": "2026-04-04",
+            "time": "16:15",
+            "league": "Premier League",
+            "country": "Bahrain",
+            "match": "Khalidiya - Al Riffa",
+            "home_team": "Khalidiya",
+            "away_team": "Al Riffa",
+            "markets": {
+                "q1": 2.4,
+                "qx": 3.0,
+                "q2": 2.85,
+                "o25": 2.1,
+                "o05ht": 1.44,
+                "o15ht": 2.9
+            },
+            "averages": {
+                "home_avg_ft": 3.308,
+                "away_avg_ft": 3.164,
+                "home_avg_ht": 2.127,
+                "away_avg_ht": 1.232,
+                "home_avg_ft_clean": 3.185,
+                "away_avg_ft_clean": 3.118,
+                "home_avg_ht_clean": 2.034,
+                "away_avg_ht_clean": 1.0,
+                "home_avg_ht_scored_clean": 1.63,
+                "away_avg_ht_scored_clean": 0.93,
+                "home_avg_ht_conceded_clean": 0.339,
+                "away_avg_ht_conceded_clean": 0.0,
+                "home_avg_ft_scored_clean": 2.856,
+                "away_avg_ft_scored_clean": 2.413,
+                "home_avg_ft_conceded_clean": 0.339,
+                "away_avg_ft_conceded_clean": 0.709,
+                "home_ft_2plus_rate": 0.71,
+                "away_ft_2plus_rate": 0.829,
+                "home_ft_3plus_rate": 0.485,
+                "away_ft_3plus_rate": 0.734,
+                "home_ft_low_rate": 0.29,
+                "away_ft_low_rate": 0.171,
+                "home_ht_1plus_rate": 0.935,
+                "away_ht_1plus_rate": 0.781,
+                "home_ht_zero_rate": 0.065,
+                "away_ht_zero_rate": 0.219,
+                "home_ht_scored_1plus_rate": 0.71,
+                "away_ht_scored_1plus_rate": 0.734,
+                "home_ht_scored_2plus_rate": 0.355,
+                "away_ht_scored_2plus_rate": 0.219,
+                "home_ht_conceded_1plus_rate": 0.355,
+                "away_ht_conceded_1plus_rate": 0.048
+            },
+            "flags": {
+                "fav_quote": 2.4,
+                "is_gold_zone": false,
+                "drop_diff": 0.0,
+                "home_last_2h_zero": false,
+                "away_last_2h_zero": false
+            },
+            "scores": {
+                "ptgg": 5.07,
+                "pto15": 6.5,
+                "pt": 7.311,
+                "over": 7.39,
+                "boost": 8.295,
+                "gold": 8.161,
+                "max": 8.295
+            },
+            "tags": [
+                "🎯PTGG",
+                "🔥PT1.5",
+                "⚽ OVER",
+                "🚀 BOOST"
+            ],
+            "internal_labels": [
+                "OPEN",
+                "STRONG",
+                "PARTIAL"
+            ],
+            "structure": {
+                "match_profile": "open_match",
+                "structure_score": 2.25,
+                "structure_grade": "high",
+                "combined_ht_clean": 1.517,
+                "combined_ft_clean": 3.151,
+                "combined_ht_scored_clean": 1.28,
+                "cross_home_clean": 3.565,
+                "cross_away_clean": 2.752,
+                "bilateral_ft": true,
+                "bilateral_ht": true,
+                "one_sided_risk": 1.25,
+                "fav_quote": 2.4,
+                "fav_zone": "wide"
+            },
+            "market_reading": {
+                "market_profile": "neutral",
+                "coherence_score": 2.7,
+                "coherence_level": "medium",
+                "dislocation_score": 0.0,
+                "dislocation_level": "low",
+                "leading_market": "none",
+                "lagging_market": "none",
+                "drop_type": "none",
+                "drop_strength": "none",
+                "drop_confirmed": false,
+                "value_left": "unknown",
+                "positive_flags": [
+                    "ft_struct_market_aligned",
+                    "double_cross_supported"
+                ],
+                "warning_flags": []
+            },
+            "signal_debug": {
+                "tags": [
+                    "🎯PTGG",
+                    "🔥PT1.5",
+                    "⚽ OVER",
+                    "🚀 BOOST"
+                ],
+                "strong_tag_count": 4,
+                "fav_quote": 2.4,
+                "is_gold_zone": false,
+                "drop_diff": 0.0,
+                "internal_labels": [
+                    "OPEN",
+                    "STRONG",
+                    "PARTIAL"
+                ]
+            },
+            "home_profile": {
+                "expected_side": "home",
+                "all_sample_count": 8,
+                "context_sample_count": 3,
+                "context_weight": 0.48,
+                "avg_ht_clean": 2.034,
+                "avg_total_clean": 3.185,
+                "avg_ht_scored_clean": 1.63,
+                "avg_ht_conceded_clean": 0.339,
+                "avg_ft_scored_clean": 2.856,
+                "avg_ft_conceded_clean": 0.339,
+                "ht_1plus_rate": 0.935,
+                "ht_zero_rate": 0.065,
+                "ft_2plus_rate": 0.71,
+                "ft_3plus_rate": 0.485,
+                "ft_low_rate": 0.29,
+                "ctx_avg_ht_clean": 2.333,
+                "ctx_avg_total_clean": 3.333,
+                "ctx_avg_ft_scored_clean": 3.0,
+                "ctx_avg_ft_conceded_clean": 0.333,
+                "ctx_ht_1plus_rate": 1.0,
+                "ctx_ft_2plus_rate": 0.667
+            },
+            "away_profile": {
+                "expected_side": "away",
+                "all_sample_count": 8,
+                "context_sample_count": 5,
+                "context_weight": 0.62,
+                "avg_ht_clean": 1.0,
+                "avg_total_clean": 3.118,
+                "avg_ht_scored_clean": 0.93,
+                "avg_ht_conceded_clean": 0.0,
+                "avg_ft_scored_clean": 2.413,
+                "avg_ft_conceded_clean": 0.709,
+                "ht_1plus_rate": 0.781,
+                "ht_zero_rate": 0.219,
+                "ft_2plus_rate": 0.829,
+                "ft_3plus_rate": 0.734,
+                "ft_low_rate": 0.171,
+                "ctx_avg_ht_clean": 1.0,
+                "ctx_avg_total_clean": 3.333,
+                "ctx_avg_ft_scored_clean": 2.667,
+                "ctx_avg_ft_conceded_clean": 0.667,
+                "ctx_ht_1plus_rate": 0.8,
+                "ctx_ft_2plus_rate": 0.8
+            },
+            "home_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-03-18",
+                    "league": "Super Cup",
+                    "match": "Muharraq - Khalidiya",
+                    "opponent": "Muharraq",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-1",
+                    "ft": "0-3",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-03-13",
+                    "league": "Premier League",
+                    "match": "Bahrain SC - Khalidiya",
+                    "opponent": "Bahrain SC",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-2",
+                    "ft": "1-4",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 4.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-02-27",
+                    "league": "King's Cup",
+                    "match": "Khalidiya - A'Ali",
+                    "opponent": "A'Ali",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-0",
+                    "ft": "2-0",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-02-21",
+                    "league": "Premier League",
+                    "match": "Malkiya - Khalidiya",
+                    "opponent": "Malkiya",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-1",
+                    "ft": "1-2",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-02-11",
+                    "league": "Premier League",
+                    "match": "Al Shabab - Khalidiya",
+                    "opponent": "Al Shabab",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-0",
+                    "ft": "0-1",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1
+                },
+                {
+                    "seq": 6,
+                    "date": "2026-02-03",
+                    "league": "King's Cup",
+                    "match": "Khalidiya - Al Hala",
+                    "opponent": "Al Hala",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "5-0",
+                    "ft": "7-0",
+                    "total_ht_goals": 5.0,
+                    "total_ft_goals": 7.0,
+                    "team_ht_scored": 5.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 7.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 7,
+                    "date": "2026-01-26",
+                    "league": "Premier League",
+                    "match": "Khalidiya - Al Ahli",
+                    "opponent": "Al Ahli",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-1",
+                    "ft": "0-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1
+                },
+                {
+                    "seq": 8,
+                    "date": "2026-01-14",
+                    "league": "Premier League",
+                    "match": "A'Ali - Khalidiya",
+                    "opponent": "A'Ali",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-2",
+                    "ft": "0-3",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                }
+            ],
+            "away_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-03-12",
+                    "league": "Premier League",
+                    "match": "Al Riffa - Muharraq",
+                    "opponent": "Muharraq",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "1-1",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-03-07",
+                    "league": "King's Cup",
+                    "match": "Bahrain SC - Al Riffa",
+                    "opponent": "Bahrain SC",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-3",
+                    "ft": "1-4",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 3.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 4.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-02-19",
+                    "league": "Premier League",
+                    "match": "Budaiya - Al Riffa",
+                    "opponent": "Budaiya",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-1",
+                    "ft": "0-3",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-02-07",
+                    "league": "Premier League",
+                    "match": "Al Riffa - Al-Hidd",
+                    "opponent": "Al-Hidd",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-1",
+                    "ft": "0-3",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 3.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 2.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-01-28",
+                    "league": "Premier League",
+                    "match": "Sitra - Al Riffa",
+                    "opponent": "Sitra",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-1",
+                    "ft": "1-3",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 4.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 6,
+                    "date": "2026-01-13",
+                    "league": "Premier League",
+                    "match": "Al Najma - Al Riffa",
+                    "opponent": "Al Najma",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-1",
+                    "ft": "1-2",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0
+                },
+                {
+                    "seq": 7,
+                    "date": "2026-01-09",
+                    "league": "Premier League",
+                    "match": "Bahrain SC - Al Riffa",
+                    "opponent": "Bahrain SC",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-0",
+                    "ft": "0-1",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1
+                },
+                {
+                    "seq": 8,
+                    "date": "2026-01-03",
+                    "league": "Premier League",
+                    "match": "Al Riffa - Malkiya",
+                    "opponent": "Malkiya",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "2-0",
+                    "ft": "2-0",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0
+                }
+            ]
+        },
         "1381126": {
             "fixture_id": 1381126,
             "date": "2026-04-04",
@@ -74960,12 +76189,12 @@
             "home_team": "NEOM",
             "away_team": "Al-Fayha",
             "markets": {
-                "q1": 1.95,
-                "qx": 3.0,
-                "q2": 3.4,
+                "q1": 2.0,
+                "qx": 3.4,
+                "q2": 3.7,
                 "o25": 2.1,
-                "o05ht": 1.4,
-                "o15ht": 2.9
+                "o05ht": 1.42,
+                "o15ht": 2.95
             },
             "averages": {
                 "home_avg_ft": 2.332,
@@ -75002,19 +76231,19 @@
                 "away_ht_conceded_1plus_rate": 0.444
             },
             "flags": {
-                "fav_quote": 1.95,
+                "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": false
             },
             "scores": {
-                "ptgg": 1.9,
+                "ptgg": 1.25,
                 "pto15": 1.17,
-                "pt": 2.087,
+                "pt": 1.437,
                 "over": 6.5,
-                "boost": 4.346,
-                "gold": 5.147,
+                "boost": 3.821,
+                "gold": 5.056,
                 "max": 6.5
             },
             "tags": [
@@ -75037,7 +76266,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 1.18,
-                "fav_quote": 1.95,
+                "fav_quote": 2.0,
                 "fav_zone": "balanced"
             },
             "market_reading": {
@@ -75065,7 +76294,7 @@
                     "🐟O"
                 ],
                 "strong_tag_count": 0,
-                "fav_quote": 1.95,
+                "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
@@ -79228,12 +80457,12 @@
             "home_team": "Rio Ave",
             "away_team": "Alverca",
             "markets": {
-                "q1": 2.5,
-                "qx": 3.25,
-                "q2": 2.62,
+                "q1": 2.52,
+                "qx": 3.35,
+                "q2": 2.68,
                 "o25": 2.0,
-                "o05ht": 1.36,
-                "o15ht": 2.88
+                "o05ht": 1.38,
+                "o15ht": 2.75
             },
             "averages": {
                 "home_avg_ft": 2.167,
@@ -79270,9 +80499,9 @@
                 "away_ht_conceded_1plus_rate": 0.444
             },
             "flags": {
-                "fav_quote": 2.5,
+                "fav_quote": 2.52,
                 "is_gold_zone": false,
-                "drop_diff": 0.04,
+                "drop_diff": 0.02,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": false
             },
@@ -79280,10 +80509,10 @@
                 "ptgg": 0.33,
                 "pto15": 0.0,
                 "pt": 0.33,
-                "over": 5.3,
-                "boost": 4.051,
-                "gold": 3.818,
-                "max": 5.3
+                "over": 5.42,
+                "boost": 4.104,
+                "gold": 4.056,
+                "max": 5.42
             },
             "tags": [
                 "🐟O"
@@ -79305,7 +80534,7 @@
                 "bilateral_ft": false,
                 "bilateral_ht": false,
                 "one_sided_risk": 1.6,
-                "fav_quote": 2.5,
+                "fav_quote": 2.52,
                 "fav_zone": "wide"
             },
             "market_reading": {
@@ -79316,26 +80545,24 @@
                 "dislocation_level": "low",
                 "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "sterile",
-                "drop_strength": "medium",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported"
                 ],
-                "warning_flags": [
-                    "sterile_1x2_drop"
-                ]
+                "warning_flags": []
             },
             "signal_debug": {
                 "tags": [
                     "🐟O"
                 ],
                 "strong_tag_count": 0,
-                "fav_quote": 2.5,
+                "fav_quote": 2.52,
                 "is_gold_zone": false,
-                "drop_diff": 0.04,
+                "drop_diff": 0.02,
                 "internal_labels": [
                     "NEUTRAL",
                     "FRAGILE",
@@ -82268,12 +83495,12 @@
             "home_team": "Lommel United",
             "away_team": "RWDM",
             "markets": {
-                "q1": 1.73,
-                "qx": 3.5,
-                "q2": 4.0,
-                "o25": 1.65,
-                "o05ht": 1.29,
-                "o15ht": 2.38
+                "q1": 1.7,
+                "qx": 3.7,
+                "q2": 4.33,
+                "o25": 1.62,
+                "o05ht": 1.3,
+                "o15ht": 2.3
             },
             "averages": {
                 "home_avg_ft": 2.466,
@@ -82310,26 +83537,27 @@
                 "away_ht_conceded_1plus_rate": 0.444
             },
             "flags": {
-                "fav_quote": 1.73,
+                "fav_quote": 1.7,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": false
             },
             "scores": {
-                "ptgg": 5.48,
+                "ptgg": 5.66,
                 "pto15": 3.31,
-                "pt": 6.01,
-                "over": 8.68,
-                "boost": 8.032,
-                "gold": 10.698,
-                "max": 10.698
+                "pt": 6.19,
+                "over": 8.98,
+                "boost": 8.598,
+                "gold": 11.297,
+                "max": 11.297
             },
             "tags": [
                 "⚽⭐ GOLD",
                 "🎯PTGG",
                 "⚽ OVER",
-                "💪 STRONG OVER"
+                "💪 STRONG OVER",
+                "🚀 BOOST"
             ],
             "internal_labels": [
                 "OPEN",
@@ -82348,40 +83576,41 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.0,
-                "fav_quote": 1.73,
+                "fav_quote": 1.7,
                 "fav_zone": "gold"
             },
             "market_reading": {
                 "market_profile": "full_open",
-                "coherence_score": 3.9,
+                "coherence_score": 4.85,
                 "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "1x2",
+                "leading_market": "mixed",
                 "lagging_market": "none",
-                "drop_type": "sterile",
-                "drop_strength": "hard",
-                "drop_confirmed": false,
+                "drop_type": "structural",
+                "drop_strength": "soft",
+                "drop_confirmed": true,
                 "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
                     "ht_struct_market_aligned",
-                    "fav_open_match_coherent"
+                    "fav_open_match_coherent",
+                    "mixed_pressure_confirmation",
+                    "structural_drop"
                 ],
-                "warning_flags": [
-                    "sterile_1x2_drop"
-                ]
+                "warning_flags": []
             },
             "signal_debug": {
                 "tags": [
                     "⚽⭐ GOLD",
                     "🎯PTGG",
                     "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "💪 STRONG OVER",
+                    "🚀 BOOST"
                 ],
-                "strong_tag_count": 4,
-                "fav_quote": 1.73,
+                "strong_tag_count": 5,
+                "fav_quote": 1.7,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
                 "internal_labels": [
@@ -82883,12 +84112,12 @@
             "home_team": "Club Brugge II",
             "away_team": "AS Eupen",
             "markets": {
-                "q1": 3.4,
-                "qx": 3.2,
-                "q2": 1.95,
+                "q1": 3.65,
+                "qx": 3.45,
+                "q2": 1.9,
                 "o25": 1.8,
-                "o05ht": 1.3,
-                "o15ht": 2.5
+                "o05ht": 1.33,
+                "o15ht": 2.45
             },
             "averages": {
                 "home_avg_ft": 4.173,
@@ -82925,9 +84154,9 @@
                 "away_ht_conceded_1plus_rate": 0.13
             },
             "flags": {
-                "fav_quote": 1.95,
-                "is_gold_zone": false,
-                "drop_diff": 0.1,
+                "fav_quote": 1.9,
+                "is_gold_zone": true,
+                "drop_diff": 0.15,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": true
             },
@@ -82935,14 +84164,14 @@
                 "ptgg": 0.0,
                 "pto15": 0.0,
                 "pt": 0.0,
-                "over": 6.1,
-                "boost": 3.264,
-                "gold": 4.636,
-                "max": 6.1
+                "over": 5.82,
+                "boost": 3.141,
+                "gold": 4.792,
+                "max": 5.82
             },
             "tags": [
                 "🐟O",
-                "📉-0.10"
+                "📉-0.15"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -82961,24 +84190,25 @@
                 "bilateral_ft": false,
                 "bilateral_ht": false,
                 "one_sided_risk": 1.1,
-                "fav_quote": 1.95,
-                "fav_zone": "balanced"
+                "fav_quote": 1.9,
+                "fav_zone": "gold"
             },
             "market_reading": {
-                "market_profile": "full_open",
+                "market_profile": "ft_open_ht_lag",
                 "coherence_score": 2.6,
                 "coherence_level": "medium",
-                "dislocation_score": 0.0,
+                "dislocation_score": 0.4,
                 "dislocation_level": "low",
                 "leading_market": "1x2",
-                "lagging_market": "none",
+                "lagging_market": "o05ht",
                 "drop_type": "sterile",
                 "drop_strength": "medium",
                 "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
-                    "double_cross_supported"
+                    "double_cross_supported",
+                    "lagged_ht_opening"
                 ],
                 "warning_flags": [
                     "sterile_1x2_drop"
@@ -82987,12 +84217,12 @@
             "signal_debug": {
                 "tags": [
                     "🐟O",
-                    "📉-0.10"
+                    "📉-0.15"
                 ],
                 "strong_tag_count": 0,
-                "fav_quote": 1.95,
-                "is_gold_zone": false,
-                "drop_diff": 0.1,
+                "fav_quote": 1.9,
+                "is_gold_zone": true,
+                "drop_diff": 0.15,
                 "internal_labels": [
                     "NEUTRAL",
                     "STRONG",
@@ -87786,12 +89016,12 @@
             "home_team": "Independiente del Valle",
             "away_team": "Orense SC",
             "markets": {
-                "q1": 1.25,
+                "q1": 1.3,
                 "qx": 4.4,
-                "q2": 10.0,
-                "o25": 1.7,
-                "o05ht": 1.25,
-                "o15ht": 2.25
+                "q2": 8.5,
+                "o25": 1.73,
+                "o05ht": 1.35,
+                "o15ht": 2.62
             },
             "averages": {
                 "home_avg_ft": 2.825,
@@ -87828,26 +89058,25 @@
                 "away_ht_conceded_1plus_rate": 0.58
             },
             "flags": {
-                "fav_quote": 1.25,
+                "fav_quote": 1.3,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": false
             },
             "scores": {
-                "ptgg": 5.77,
-                "pto15": 2.96,
-                "pt": 6.244,
-                "over": 9.35,
-                "boost": 9.417,
-                "gold": 10.372,
-                "max": 10.372
+                "ptgg": 6.07,
+                "pto15": 3.18,
+                "pt": 6.579,
+                "over": 8.95,
+                "boost": 9.342,
+                "gold": 9.687,
+                "max": 9.687
             },
             "tags": [
                 "🎯PTGG",
                 "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "💪 STRONG OVER"
             ],
             "internal_labels": [
                 "FAV_PRESS",
@@ -87866,37 +89095,40 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 0.75,
-                "fav_quote": 1.25,
-                "fav_zone": "ultra"
+                "fav_quote": 1.3,
+                "fav_zone": "strong"
             },
             "market_reading": {
-                "market_profile": "full_open",
+                "market_profile": "ft_open_ht_lag",
                 "coherence_score": 3.65,
                 "coherence_level": "high",
-                "dislocation_score": 0.0,
+                "dislocation_score": 0.4,
                 "dislocation_level": "low",
-                "leading_market": "none",
-                "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "leading_market": "1x2",
+                "lagging_market": "o05ht",
+                "drop_type": "sterile",
+                "drop_strength": "hard",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "low",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
-                    "ht_struct_market_aligned"
+                    "ht_struct_market_aligned",
+                    "lagged_ht_opening"
                 ],
-                "warning_flags": []
+                "warning_flags": [
+                    "sterile_1x2_drop",
+                    "low_remaining_value"
+                ]
             },
             "signal_debug": {
                 "tags": [
                     "🎯PTGG",
                     "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "💪 STRONG OVER"
                 ],
-                "strong_tag_count": 4,
-                "fav_quote": 1.25,
+                "strong_tag_count": 3,
+                "fav_quote": 1.3,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
