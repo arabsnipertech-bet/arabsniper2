@@ -203,7 +203,7 @@ def get_primary_signal(tags: list[str]) -> str:
         return "PT"
     if "FISH_GG" in tags or "FISH_OVER" in tags:
         return "FISH"
-    return "STD""
+    return "STD"
 
 
 def normalize_match_row(row: dict, main_date: str) -> dict | None:
