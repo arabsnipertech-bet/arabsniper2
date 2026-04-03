@@ -1,20 +1,22 @@
 {
   "audit_date": "2026-04-03",
-  "created_at": "2026-04-03T08:09:04",
+  "created_at": "2026-04-03T10:26:28",
   "source_file": "data_day1.json",
-  "matches_count": 66,
+  "matches_count": 69,
   "primary_counts": {
-    "OVER": 33,
+    "OVER": 11,
+    "BOOST": 18,
     "GOLD": 8,
-    "BOOST": 20,
-    "PT": 5
+    "STRONG_OVER": 30,
+    "PT": 2
   },
   "tag_counts": {
-    "OVER": 61,
-    "PTGG": 61,
-    "PTO15": 26,
-    "GOLD": 8,
-    "BOOST": 20
+    "OVER": 67,
+    "PTO15": 29,
+    "BOOST": 18,
+    "STRONG_OVER": 56,
+    "PTGG": 50,
+    "GOLD": 8
   },
   "matches": [
     {
@@ -22,24 +24,37 @@
       "date": "2026-04-03",
       "league": "1. Division (Denmark)",
       "match": "B 93 - Hobro",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 📉-0.06",
+      "info_raw": "🔥PT1.5 ⚽ OVER 📉-0.06",
       "tags": [
         "OVER",
-        "PTGG",
         "PTO15"
       ],
       "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1391802,
+      "date": "2026-04-03",
+      "league": "2. Liga (Austria)",
+      "match": "SKU Amstetten - Austria Vienna (Am)",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "BOOST"
     },
     {
       "fixture_id": 1391806,
       "date": "2026-04-03",
       "league": "2. Liga (Austria)",
       "match": "Sturm Graz II - SKN ST. Polten",
-      "info_raw": "⚽⭐ GOLD 🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽⭐ GOLD ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "GOLD",
         "OVER",
-        "PTGG"
+        "STRONG_OVER"
       ],
       "primary_signal": "GOLD"
     },
@@ -48,10 +63,11 @@
       "date": "2026-04-03",
       "league": "2. Liga (Austria)",
       "match": "WSPG Wels - Austria Klagenfurt",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "BOOST"
@@ -61,50 +77,40 @@
       "date": "2026-04-03",
       "league": "3. liga - CFL A (Czech-Republic)",
       "match": "Králův Dvůr - Dukla Praha II",
-      "info_raw": "🎯PTGG ⚽ OVER",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1489521,
       "date": "2026-04-03",
       "league": "3. liga - CFL B (Czech-Republic)",
       "match": "Pardubice II - Ústí nad Orlicí",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
       "tags": [
-        "BOOST",
         "OVER",
-        "PTGG"
+        "STRONG_OVER"
       ],
-      "primary_signal": "BOOST"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1487374,
       "date": "2026-04-03",
       "league": "3. liga - MSFL (Czech-Republic)",
       "match": "Hlučín - Hodonín",
-      "info_raw": "⚽⭐ GOLD 🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽⭐ GOLD 🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "GOLD",
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
       "primary_signal": "GOLD"
-    },
-    {
-      "fixture_id": 1487378,
-      "date": "2026-04-03",
-      "league": "3. liga - MSFL (Czech-Republic)",
-      "match": "Hranice - Blansko",
-      "info_raw": "🎯PTGG 📉-0.45",
-      "tags": [
-        "PTGG"
-      ],
-      "primary_signal": "PT"
     },
     {
       "fixture_id": 1422444,
@@ -124,10 +130,11 @@
       "date": "2026-04-03",
       "league": "4. liga - Divizie D (Czech-Republic)",
       "match": "Velká Bíteš - Havlíčkův Brod",
-      "info_raw": "⚽⭐ GOLD 🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽⭐ GOLD 🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "GOLD",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "GOLD"
@@ -137,24 +144,25 @@
       "date": "2026-04-03",
       "league": "A-League (Australia)",
       "match": "Adelaide United - Auckland",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1491407,
       "date": "2026-04-03",
       "league": "Challenge League (Switzerland)",
       "match": "Neuchatel Xamax FC - FC Vaduz",
-      "info_raw": "⚽⭐ GOLD 🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽⭐ GOLD ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "GOLD",
         "OVER",
-        "PTGG"
+        "STRONG_OVER"
       ],
       "primary_signal": "GOLD"
     },
@@ -163,10 +171,11 @@
       "date": "2026-04-03",
       "league": "Challenger Pro League (Belgium)",
       "match": "KRC Genk II - Lokeren-Temse",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST 📉-0.05",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.05",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "BOOST"
@@ -176,22 +185,24 @@
       "date": "2026-04-03",
       "league": "Championship (England)",
       "match": "West Brom - Wrexham",
-      "info_raw": "🎯PTGG ⚽ OVER 📉-0.09",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 📉-0.09",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1530096,
       "date": "2026-04-03",
       "league": "Cup (Azerbaijan)",
       "match": "Qarabag - Sabah FA",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
@@ -240,10 +251,11 @@
       "date": "2026-04-03",
       "league": "Division 1 (Saudi-Arabia)",
       "match": "Al Wehda Club - Al-Raed",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
@@ -267,10 +279,11 @@
       "date": "2026-04-03",
       "league": "Division 2 - Norra Götaland (Sweden)",
       "match": "Kumla - Grebbestad",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
@@ -281,49 +294,88 @@
       "date": "2026-04-03",
       "league": "Division 2 - Norra Götaland (Sweden)",
       "match": "Lidköping - IFK Skövde",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
       "tags": [
-        "BOOST",
         "OVER",
-        "PTGG"
+        "STRONG_OVER"
       ],
-      "primary_signal": "BOOST"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1510535,
       "date": "2026-04-03",
       "league": "Division 2 - Norra Götaland (Sweden)",
       "match": "Tord - Vänersborgs IF",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
       "tags": [
-        "BOOST",
         "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1510715,
+      "date": "2026-04-03",
+      "league": "Division 2 - Norra Svealand (Sweden)",
+      "match": "Franke - Täby",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1382248,
+      "date": "2026-04-03",
+      "league": "Eerste Divisie (Netherlands)",
+      "match": "FC Eindhoven - De Graafschap",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 📉-0.08",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
-      "primary_signal": "BOOST"
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1382250,
+      "date": "2026-04-03",
+      "league": "Eerste Divisie (Netherlands)",
+      "match": "MVV - Waalwijk",
+      "info_raw": "⚽ OVER 💪 STRONG OVER 📉-0.13",
+      "tags": [
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1382252,
       "date": "2026-04-03",
       "league": "Eerste Divisie (Netherlands)",
       "match": "Vitesse - Emmen",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 📉-0.10",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 📉-0.10",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1507118,
       "date": "2026-04-03",
       "league": "Erovnuli Liga 2 (Georgia)",
       "match": "Samtredia - Odishi 1919",
-      "info_raw": "⚽⭐ GOLD 🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽⭐ GOLD 🎯PTGG ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "GOLD",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "GOLD"
@@ -333,10 +385,11 @@
       "date": "2026-04-03",
       "league": "Ettan - Norra (Sweden)",
       "match": "Arlanda - Vasalund",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST 📉-0.25",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.25",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "BOOST"
@@ -346,35 +399,38 @@
       "date": "2026-04-03",
       "league": "FAW Championship (Wales)",
       "match": "Denbigh Town - Penrhyncoch",
-      "info_raw": "🎯PTGG ⚽ OVER",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1395783,
       "date": "2026-04-03",
       "league": "FAW Championship (Wales)",
       "match": "Holywell - Airbus UK",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1395785,
       "date": "2026-04-03",
       "league": "FAW Championship (Wales)",
       "match": "Newtown AFC - Mold Alexandra",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "BOOST"
@@ -384,35 +440,38 @@
       "date": "2026-04-03",
       "league": "FNL (Czech-Republic)",
       "match": "Vlašim - Opava",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 📉-0.15",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 📉-0.15",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1384055,
       "date": "2026-04-03",
       "league": "HNL (Croatia)",
       "match": "NK Varazdin - HNK Gorica",
-      "info_raw": "🎯PTGG ⚽ OVER 📉-0.22",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 📉-0.12",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1410379,
       "date": "2026-04-03",
       "league": "III Liga - Group 1 (Poland)",
       "match": "Wikielec - Wigry Suwałki",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "BOOST"
@@ -422,44 +481,36 @@
       "date": "2026-04-03",
       "league": "III Liga - Group 2 (Poland)",
       "match": "Unia Swarzędz - Pogoń Szczecin II",
-      "info_raw": "⚽ OVER",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
       "tags": [
-        "OVER"
+        "OVER",
+        "STRONG_OVER"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1387585,
       "date": "2026-04-03",
       "league": "League One (England)",
       "match": "Burton Albion - Barnsley",
-      "info_raw": "⚽ OVER",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
       "tags": [
-        "OVER"
+        "OVER",
+        "STRONG_OVER"
       ],
-      "primary_signal": "OVER"
-    },
-    {
-      "fixture_id": 1386480,
-      "date": "2026-04-03",
-      "league": "League Two (England)",
-      "match": "Chesterfield - Cheltenham",
-      "info_raw": "🎯PTGG 🐟O 🐟G",
-      "tags": [
-        "PTGG"
-      ],
-      "primary_signal": "PT"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1386484,
       "date": "2026-04-03",
       "league": "League Two (England)",
       "match": "Salford City - Notts County",
-      "info_raw": "⚽ OVER",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
       "tags": [
-        "OVER"
+        "OVER",
+        "STRONG_OVER"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1515035,
@@ -479,37 +530,52 @@
       "date": "2026-04-03",
       "league": "Liga I (Romania)",
       "match": "FC Botosani - FCSB",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST 📉-0.13",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.13",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
       "primary_signal": "BOOST"
     },
     {
+      "fixture_id": 1513510,
+      "date": "2026-04-03",
+      "league": "Meistriliiga (Estonia)",
+      "match": "Kuressaare - Paide",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
       "fixture_id": 1423047,
       "date": "2026-04-03",
       "league": "National 1 (France)",
       "match": "Caen - Stade Briochin",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
       "tags": [
-        "BOOST",
         "OVER",
-        "PTGG"
+        "STRONG_OVER"
       ],
-      "primary_signal": "BOOST"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1423049,
       "date": "2026-04-03",
       "league": "National 1 (France)",
       "match": "Fleury 91 - Dijon",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST 📉-0.05",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.05",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "BOOST"
@@ -519,22 +585,25 @@
       "date": "2026-04-03",
       "league": "National 1 (France)",
       "match": "Versailles - Sochaux",
-      "info_raw": "🎯PTGG ⚽ OVER 📉-0.10",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.10",
       "tags": [
+        "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "BOOST"
     },
     {
       "fixture_id": 1425339,
       "date": "2026-04-03",
       "league": "National 2 - Group C (France)",
       "match": "Andrézieux - Toulon",
-      "info_raw": "⚽⭐ GOLD 🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽⭐ GOLD 🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "GOLD",
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
@@ -545,58 +614,65 @@
       "date": "2026-04-03",
       "league": "National League (England)",
       "match": "Altrincham - FC Halifax Town",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "info_raw": "🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.05",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1399893,
+      "date": "2026-04-03",
+      "league": "National League (England)",
+      "match": "Boston United - York",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 📉-0.07",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
-      "primary_signal": "OVER"
-    },
-    {
-      "fixture_id": 1399894,
-      "date": "2026-04-03",
-      "league": "National League (England)",
-      "match": "Carlisle - Gateshead",
-      "info_raw": "🎯PTGG ⚽ OVER",
-      "tags": [
-        "OVER",
-        "PTGG"
-      ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1399895,
       "date": "2026-04-03",
       "league": "National League (England)",
       "match": "Forest Green - Brackley Town",
-      "info_raw": "⚽ OVER",
-      "tags": [
-        "OVER"
-      ],
-      "primary_signal": "OVER"
-    },
-    {
-      "fixture_id": 1402535,
-      "date": "2026-04-03",
-      "league": "National League - North (England)",
-      "match": "Alfreton Town - Worksop Town",
-      "info_raw": "🎯PTGG ⚽ OVER",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
       "tags": [
         "OVER",
-        "PTGG"
+        "STRONG_OVER"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1399896,
+      "date": "2026-04-03",
+      "league": "National League (England)",
+      "match": "Rochdale - Morecambe",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1402537,
       "date": "2026-04-03",
       "league": "National League - North (England)",
       "match": "Buxton - Macclesfield",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST 📉-0.05",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.05",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "BOOST"
@@ -606,10 +682,11 @@
       "date": "2026-04-03",
       "league": "National League - North (England)",
       "match": "Chester - AFC Telford United",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
@@ -620,35 +697,37 @@
       "date": "2026-04-03",
       "league": "National League - North (England)",
       "match": "Merthyr Town - Oxford City",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1401989,
       "date": "2026-04-03",
       "league": "National League - South (England)",
       "match": "AFC Hornchurch - Dagenham & Redbridge",
-      "info_raw": "🎯PTGG ⚽ OVER",
+      "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
       "tags": [
         "OVER",
-        "PTGG"
+        "STRONG_OVER"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1401988,
       "date": "2026-04-03",
       "league": "National League - South (England)",
       "match": "Hemel Hempstead Town - Chesham United",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "BOOST"
@@ -658,12 +737,13 @@
       "date": "2026-04-03",
       "league": "Non League Premier - Isthmian (England)",
       "match": "Ramsgate - Cray Valley PM",
-      "info_raw": "🎯PTGG ⚽ OVER",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1428993,
@@ -693,10 +773,11 @@
       "date": "2026-04-03",
       "league": "Non League Premier - Southern Central (England)",
       "match": "Halesowen Town - Stamford",
-      "info_raw": "⚽⭐ GOLD 🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽⭐ GOLD 🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "GOLD",
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
@@ -714,17 +795,31 @@
       "primary_signal": "OVER"
     },
     {
+      "fixture_id": 1428111,
+      "date": "2026-04-03",
+      "league": "Non League Premier - Southern Central (England)",
+      "match": "Quorn - AFC Sudbury",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
       "fixture_id": 1428104,
       "date": "2026-04-03",
       "league": "Non League Premier - Southern Central (England)",
       "match": "Redditch United - Leiston",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1428567,
@@ -744,10 +839,11 @@
       "date": "2026-04-03",
       "league": "Non League Premier - Southern South (England)",
       "match": "Plymouth Parkway - Basingstoke Town",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST 📉-0.42",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.42",
       "tags": [
         "BOOST",
         "OVER",
+        "STRONG_OVER",
         "PTGG"
       ],
       "primary_signal": "BOOST"
@@ -757,24 +853,25 @@
       "date": "2026-04-03",
       "league": "Non League Premier - Southern South (England)",
       "match": "Taunton Town - Walton & Hersham",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
       "tags": [
         "OVER",
+        "STRONG_OVER",
         "PTGG",
         "PTO15"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1508984,
       "date": "2026-04-03",
       "league": "Premier League (Wales)",
       "match": "The New Saints - GAP Connah S Quay FC",
-      "info_raw": "⚽⭐ GOLD 🎯PTGG ⚽ OVER 🚀 BOOST 📉-0.05",
+      "info_raw": "⚽⭐ GOLD ⚽ OVER 💪 STRONG OVER 📉-0.05",
       "tags": [
         "GOLD",
         "OVER",
-        "PTGG"
+        "STRONG_OVER"
       ],
       "primary_signal": "GOLD"
     },
@@ -783,23 +880,23 @@
       "date": "2026-04-03",
       "league": "Premier League 2 Division One (England)",
       "match": "Brighton U21 - Aston Villa U21",
-      "info_raw": "🎯PTGG ⚽ OVER",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
       "tags": [
         "OVER",
-        "PTGG"
+        "STRONG_OVER"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "STRONG_OVER"
     },
     {
       "fixture_id": 1418063,
       "date": "2026-04-03",
       "league": "Regionalliga - Ost (Austria)",
       "match": "Mannsdorf-Großenzersdorf - Leobendorf",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 🚀 BOOST",
+      "info_raw": "🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "tags": [
         "BOOST",
         "OVER",
-        "PTGG",
+        "STRONG_OVER",
         "PTO15"
       ],
       "primary_signal": "BOOST"
@@ -812,18 +909,6 @@
       "info_raw": "🎯PTGG",
       "tags": [
         "PTGG"
-      ],
-      "primary_signal": "PT"
-    },
-    {
-      "fixture_id": 1418069,
-      "date": "2026-04-03",
-      "league": "Regionalliga - Ost (Austria)",
-      "match": "TWL Elektra - Gloggnitz",
-      "info_raw": "🎯PTGG 🔥PT1.5",
-      "tags": [
-        "PTGG",
-        "PTO15"
       ],
       "primary_signal": "PT"
     },
@@ -845,13 +930,12 @@
       "date": "2026-04-03",
       "league": "Super Liga (Serbia)",
       "match": "Radnicki NIS - OFK Beograd",
-      "info_raw": "🎯PTGG ⚽ OVER 🚀 BOOST",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
       "tags": [
-        "BOOST",
         "OVER",
-        "PTGG"
+        "STRONG_OVER"
       ],
-      "primary_signal": "BOOST"
+      "primary_signal": "STRONG_OVER"
     }
   ]
 }
