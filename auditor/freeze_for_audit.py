@@ -101,6 +101,7 @@ def extract_tags_from_info(info_raw):
 
     has_gold = bool(re.search(r"(^|\s)GOLD(?=\s|$)", clean))
     has_boost = bool(re.search(r"(^|\s)BOOST(?=\s|$)", clean))
+    has_strong_over = bool(re.search(r"STRONG\s+OVER", clean))
     has_over = bool(re.search(r"(^|\s)OVER(?=\s|$)", clean))
 
     has_ptgg = "PTGG" in clean or bool(re.search(r"(GG\s*PT|PT\s*GG)", clean))
@@ -133,6 +134,8 @@ def extract_tags_from_info(info_raw):
         tags.append("BOOST")
     if has_over:
         tags.append("OVER")
+    if has_strong_over:
+        tags.append("STRONG_OVER")
     if has_ptgg:
         tags.append("PTGG")
     if has_pt15:
@@ -192,13 +195,15 @@ def get_primary_signal(tags: list[str]) -> str:
         return "GOLD"
     if "BOOST" in tags:
         return "BOOST"
+    if "STRONG_OVER" in tags:
+        return "STRONG_OVER"
     if "OVER" in tags:
         return "OVER"
     if "PTGG" in tags or "PTO15" in tags or "PT" in tags:
         return "PT"
     if "FISH_GG" in tags or "FISH_OVER" in tags:
         return "FISH"
-    return "STD"
+    return "STD""
 
 
 def normalize_match_row(row: dict, main_date: str) -> dict | None:
