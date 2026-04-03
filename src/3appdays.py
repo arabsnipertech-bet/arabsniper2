@@ -2967,9 +2967,21 @@ def build_signal_package(fid, mk, s_h, s_a):
     # LAYER 2 - TAG BASE PT / OVER
     # -------------------------------------------------
     ptgg_ok = (
-        ptgg_score >= 4.00
-        and combined_ht_clean >= 0.88
+        ptgg_score >= 4.25
+        and combined_ht_clean >= 0.92
         and not has_warning(market_pack, "ht_market_ahead_of_structure")
+        and safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.44
+        and safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.44
+        and safe_float(s_h.get("ht_zero_rate", 0.0), 0.0) <= 0.44
+        and safe_float(s_a.get("ht_zero_rate", 0.0), 0.0) <= 0.44
+        and (
+            bilateral_ht
+            or (
+                combined_ht_scored_clean >= 0.78
+                and safe_float(s_h.get("ht_conceded_1plus_rate", 0.0), 0.0) >= 0.38
+                and safe_float(s_a.get("ht_conceded_1plus_rate", 0.0), 0.0) >= 0.38
+            )
+        )
     )
 
     pto15_ok = (
@@ -2985,6 +2997,16 @@ def build_signal_package(fid, mk, s_h, s_a):
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
     )
 
+    strong_over_ok = (
+        over_score >= 4.55
+        and combined_ft_clean >= 1.68
+        and structure_score >= 1.22
+        and coherence_score >= 1.45
+        and one_sided_risk <= 1.24
+        and not has_warning(market_pack, "ft_market_ahead_of_structure")
+        and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
+    )
+
     if ptgg_ok:
         tags.append("🎯PTGG")
 
@@ -2994,6 +3016,8 @@ def build_signal_package(fid, mk, s_h, s_a):
     if over_ok and combined_ht_scored_clean >= 0.64:
         tags.append("⚽ OVER")
 
+    if "⚽ OVER" in tags and strong_over_ok:
+        tags.append("💪 STRONG OVER")
     # -------------------------------------------------
     # LAYER 3 - BOOST
     # BOOST = convergenza vera PT + OVER + book leggibile
@@ -3002,22 +3026,29 @@ def build_signal_package(fid, mk, s_h, s_a):
     boost_has_over = ("⚽ OVER" in tags)
 
     boost_gate_structure = (
-        structure_score >= 1.45
+        structure_score >= 1.32
         and structure_grade in ("high", "medium")
-        and combined_ht_clean >= 0.96
-        and combined_ft_clean >= 1.66
-        and bilateral_ft
+        and combined_ht_clean >= 0.92
+        and combined_ft_clean >= 1.60
+        and (
+            bilateral_ft
+            or (
+                over_score >= 4.45
+                and combined_ft_clean >= 1.70
+                and one_sided_risk <= 1.08
+            )
+        )
     )
 
     boost_gate_market = (
-        coherence_score >= 1.75
-        and 1.50 <= safe_float(mk.get("o25"), 0.0) <= 2.20
-        and 1.22 <= safe_float(mk.get("o05ht"), 0.0) <= 1.42
+        coherence_score >= 1.55
+        and 1.48 <= safe_float(mk.get("o25"), 0.0) <= 2.26
+        and 1.20 <= safe_float(mk.get("o05ht"), 0.0) <= 1.44
         and value_left != "low"
     )
 
     boost_gate_quality = (
-        one_sided_risk <= 1.18
+        one_sided_risk <= 1.28
         and not has_warning(market_pack, "sterile_1x2_drop")
         and not has_warning(market_pack, "favorite_too_strong_for_open_ft")
         and not has_warning(market_pack, "favorite_ultra_but_ft_structure_weak")
@@ -3026,14 +3057,15 @@ def build_signal_package(fid, mk, s_h, s_a):
     boost_gate_shape = (
         match_profile in ("early_pressure", "open_match", "favorite_pressure")
         or market_profile in ("full_open", "balanced_open", "favorite_pressure_open")
+        or (combined_ht_scored_clean >= 0.78 and over_score >= 4.35)
     )
 
     if (
-        boost_score >= 6.00
+        boost_score >= 5.70
         and boost_has_pt
         and boost_has_over
-        and pt_score >= 4.00
-        and over_score >= 4.00
+        and pt_score >= 3.85
+        and over_score >= 3.95
         and boost_gate_structure
         and boost_gate_market
         and boost_gate_quality
@@ -3145,6 +3177,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         int("🎯PTGG" in tags) +
         int("🔥PT1.5" in tags) +
         int("⚽ OVER" in tags) +
+        int("💪 STRONG OVER" in tags) +
         int("🚀 BOOST" in tags) +
         int("⚽⭐ GOLD" in tags)
     )
@@ -3195,7 +3228,8 @@ def should_keep_match(signal_pack):
     has_boost = any("BOOST" in t for t in tags)
     has_ptgg = "🎯PTGG" in tags
     has_pt15 = "🔥PT1.5" in tags
-    has_over = any("OVER" in t for t in tags)
+    has_over = "⚽ OVER" in tags
+    has_strong_over = "💪 STRONG OVER" in tags
     has_probe_o = "🐟O" in tags
     has_probe_g = "🐟G" in tags
 
@@ -3208,7 +3242,7 @@ def should_keep_match(signal_pack):
     if any(w in fatal_warnings for w in warning_flags):
         return False
 
-    if value_left == "low" and not has_gold:
+    if value_left == "low" and not (has_gold or has_boost or has_strong_over):
         return False
 
     # -------------------------------------
@@ -3228,12 +3262,12 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_boost:
         return bool(
-            boost_score >= 5.95
-            and pt_score >= 3.95
-            and over_score >= 3.95
-            and coherence_score >= 1.65
-            and structure_score >= 1.35
-            and one_sided_risk <= 1.22
+            boost_score >= 5.65
+            and pt_score >= 3.80
+            and over_score >= 3.90
+            and coherence_score >= 1.50
+            and structure_score >= 1.28
+            and one_sided_risk <= 1.28
         )
 
     # -------------------------------------
@@ -3241,10 +3275,10 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_ptgg and has_over:
         return bool(
-            ptgg_score >= 3.85
+            ptgg_score >= 4.00
             and over_score >= 3.85
-            and coherence_score >= 1.25
-            and structure_score >= 1.05
+            and coherence_score >= 1.28
+            and structure_score >= 1.10
         )
 
     if has_pt15 and has_over:
@@ -3260,8 +3294,8 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_ptgg and not has_over:
         return bool(
-            ptgg_score >= 3.90
-            and coherence_score >= 1.10
+            ptgg_score >= 4.10
+            and coherence_score >= 1.18
             and match_profile in ("early_pressure", "favorite_pressure", "open_match")
         )
 
@@ -3272,12 +3306,20 @@ def should_keep_match(signal_pack):
             and dislocation_score >= 0.25
         )
 
+    if has_strong_over and not (has_ptgg or has_pt15):
+        return bool(
+            over_score >= 4.35
+            and coherence_score >= 1.35
+            and structure_score >= 1.15
+            and one_sided_risk <= 1.24
+        )
+    
     if has_over and not (has_ptgg or has_pt15):
         return bool(
-            over_score >= 3.85
-            and coherence_score >= 1.20
-            and structure_score >= 1.05
-            and one_sided_risk <= 1.28
+            over_score >= 3.78
+            and coherence_score >= 1.16
+            and structure_score >= 0.98
+            and one_sided_risk <= 1.32
         )
 
     # -------------------------------------
@@ -3607,12 +3649,12 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
 
                     # taglio rumore minimo, ma meno grezzo del vecchio
                     if (
-                        combined_ht_clean < 0.64
-                        and combined_ft_clean < 1.08
-                        and safe_float(s_h.get("ht_1plus_rate", 0.0), 0.0) < 0.34
-                        and safe_float(s_a.get("ht_1plus_rate", 0.0), 0.0) < 0.34
-                        and safe_float(s_h.get("ft_2plus_rate", 0.0), 0.0) < 0.34
-                        and safe_float(s_a.get("ft_2plus_rate", 0.0), 0.0) < 0.34
+                        combined_ht_clean < 0.60
+                        and combined_ft_clean < 1.02
+                        and safe_float(s_h.get("ht_1plus_rate", 0.0), 0.0) < 0.30
+                        and safe_float(s_a.get("ht_1plus_rate", 0.0), 0.0) < 0.30
+                        and safe_float(s_h.get("ft_2plus_rate", 0.0), 0.0) < 0.30
+                        and safe_float(s_a.get("ft_2plus_rate", 0.0), 0.0) < 0.30
                     ):
                         continue
 
