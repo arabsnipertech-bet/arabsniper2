@@ -3275,12 +3275,12 @@ def should_keep_match(signal_pack):
     # PT + OVER insieme
     # -------------------------------------
     if has_ptgg and has_over:
-    return bool(
-        ptgg_score >= 3.75
-        and over_score >= 3.70
-        and coherence_score >= 1.10
-        and structure_score >= 0.95
-    )
+        return bool(
+            ptgg_score >= 3.75
+            and over_score >= 3.70
+            and coherence_score >= 1.10
+            and structure_score >= 0.95
+        )
 
     if has_pt15 and has_over:
         return bool(
@@ -3288,7 +3288,7 @@ def should_keep_match(signal_pack):
             and over_score >= 3.65
             and coherence_score >= 1.10
             and structure_score >= 0.95
-    )
+        )
 
     # -------------------------------------
     # singoli puliti
@@ -3316,12 +3316,12 @@ def should_keep_match(signal_pack):
         )
     
     if has_over and not (has_ptgg or has_pt15):
-    return bool(
-        over_score >= 3.65
-        and coherence_score >= 1.05
-        and structure_score >= 0.95
-        and one_sided_risk <= 1.55
-    )
+        return bool(
+            over_score >= 3.65
+            and coherence_score >= 1.05
+            and structure_score >= 0.95
+            and one_sided_risk <= 1.55
+        )
 
     # -------------------------------------
     # probe
