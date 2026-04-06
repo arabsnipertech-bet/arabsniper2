@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-04-06 15:46:17",
+    "updated_at": "2026-04-06 16:16:58",
     "day": 2,
     "date": "2026-04-07",
     "details": {
@@ -20759,12 +20759,12 @@
             "home_team": "Larne",
             "away_team": "Coleraine FC",
             "markets": {
-                "q1": 2.3,
-                "qx": 3.25,
-                "q2": 2.8,
-                "o25": 1.9,
-                "o05ht": 1.36,
-                "o15ht": 2.65
+                "q1": 2.33,
+                "qx": 3.1,
+                "q2": 2.85,
+                "o25": 2.1,
+                "o05ht": 1.4,
+                "o15ht": 2.8
             },
             "averages": {
                 "home_avg_ft": 3.061,
@@ -20801,20 +20801,20 @@
                 "away_ht_conceded_1plus_rate": 0.562
             },
             "flags": {
-                "fav_quote": 2.3,
+                "fav_quote": 2.33,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": false
             },
             "scores": {
-                "ptgg": 6.18,
+                "ptgg": 6.0,
                 "pto15": 3.46,
-                "pt": 6.734,
-                "over": 8.97,
-                "boost": 9.597,
-                "gold": 10.89,
-                "max": 10.89
+                "pt": 6.554,
+                "over": 8.79,
+                "boost": 9.264,
+                "gold": 10.149,
+                "max": 10.149
             },
             "tags": [
                 "🎯PTGG",
@@ -20839,26 +20839,24 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.4,
-                "fav_quote": 2.3,
+                "fav_quote": 2.33,
                 "fav_zone": "wide"
             },
             "market_reading": {
                 "market_profile": "neutral",
-                "coherence_score": 4.2,
+                "coherence_score": 3.15,
                 "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
                 "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "structural",
-                "drop_strength": "medium",
-                "drop_confirmed": true,
+                "drop_type": "mixed",
+                "drop_strength": "soft",
+                "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
-                    "double_cross_supported",
-                    "ht_struct_market_aligned",
-                    "structural_drop"
+                    "double_cross_supported"
                 ],
                 "warning_flags": []
             },
@@ -20870,7 +20868,7 @@
                     "🚀 BOOST"
                 ],
                 "strong_tag_count": 4,
-                "fav_quote": 2.3,
+                "fav_quote": 2.33,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
