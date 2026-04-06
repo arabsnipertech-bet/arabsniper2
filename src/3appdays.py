@@ -3061,8 +3061,23 @@ def build_signal_package(fid, mk, s_h, s_a):
         or (combined_ht_scored_clean >= 0.74 and over_score >= 4.20)
     )
 
+    open_quote_count = sum(
+        1 for v in [
+            safe_float(quote_pack.get("Q1_OPEN"), 0.0),
+            safe_float(quote_pack.get("QX_OPEN"), 0.0),
+            safe_float(quote_pack.get("Q2_OPEN"), 0.0),
+            safe_float(quote_pack.get("O25_OPEN"), 0.0),
+            safe_float(quote_pack.get("O05HT_OPEN"), 0.0),
+            safe_float(quote_pack.get("O15HT_OPEN"), 0.0),
+        ]
+        if v > 0
+    )
+
+    has_minimum_open_baseline = open_quote_count >= 4
+
     if (
-        boost_score >= 5.70
+        has_minimum_open_baseline
+        and boost_score >= 5.70
         and boost_has_pt
         and boost_has_over
         and pt_score >= 3.85
