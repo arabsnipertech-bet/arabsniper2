@@ -3262,14 +3262,14 @@ def should_keep_match(signal_pack):
     # BOOST
     # -------------------------------------
     if has_boost:
-    return bool(
-        boost_score >= 5.35
-        and pt_score >= 3.55
-        and over_score >= 3.70
-        and coherence_score >= 1.20
-        and structure_score >= 1.00
-        and one_sided_risk <= 1.50
-    )
+        return bool(
+            boost_score >= 5.35
+            and pt_score >= 3.55
+            and over_score >= 3.70
+            and coherence_score >= 1.20
+            and structure_score >= 1.00
+            and one_sided_risk <= 1.50
+        )
 
     # -------------------------------------
     # PT + OVER insieme
