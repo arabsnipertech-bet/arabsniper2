@@ -1,0 +1,351 @@
+{
+  "audit_date": "2026-04-07",
+  "created_at": "2026-04-07T09:57:08",
+  "source_file": "data_day1.json",
+  "matches_count": 25,
+  "primary_counts": {
+    "STRONG_OVER": 9,
+    "BOOST": 7,
+    "GOLD": 3,
+    "OVER": 4,
+    "PT": 2
+  },
+  "tag_counts": {
+    "OVER": 23,
+    "STRONG_OVER": 19,
+    "BOOST": 7,
+    "PTGG": 14,
+    "PTO15": 12,
+    "GOLD": 3
+  },
+  "matches": [
+    {
+      "fixture_id": 1394369,
+      "date": "2026-04-07",
+      "league": "3. Liga (Germany)",
+      "match": "FC Schweinfurt 05 - Rot-Weiß Essen",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1394364,
+      "date": "2026-04-07",
+      "league": "3. Liga (Germany)",
+      "match": "MSV Duisburg - VfL Osnabrück",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1394367,
+      "date": "2026-04-07",
+      "league": "3. Liga (Germany)",
+      "match": "SSV Jahn Regensburg - Erzgebirge Aue",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1469654,
+      "date": "2026-04-07",
+      "league": "A-League (Australia)",
+      "match": "Melbourne City - Central Coast Mariners",
+      "info_raw": "⚽⭐ GOLD 🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.12",
+      "tags": [
+        "GOLD",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "GOLD"
+    },
+    {
+      "fixture_id": 1417581,
+      "date": "2026-04-07",
+      "league": "Campionato (San-Marino)",
+      "match": "La Fiorita - San Giovanni",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1491409,
+      "date": "2026-04-07",
+      "league": "Challenge League (Switzerland)",
+      "match": "FC Aarau - Étoile Carouge",
+      "info_raw": "⚽⭐ GOLD 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 📉-0.07",
+      "tags": [
+        "GOLD",
+        "OVER",
+        "STRONG_OVER",
+        "PTO15"
+      ],
+      "primary_signal": "GOLD"
+    },
+    {
+      "fixture_id": 1491412,
+      "date": "2026-04-07",
+      "league": "Challenge League (Switzerland)",
+      "match": "FC Vaduz - Bellinzona",
+      "info_raw": "⚽ OVER 💪 STRONG OVER 📉-0.07",
+      "tags": [
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1387037,
+      "date": "2026-04-07",
+      "league": "Championship (England)",
+      "match": "Wrexham - Southampton",
+      "info_raw": "🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1494619,
+      "date": "2026-04-07",
+      "league": "Eliteserien (Norway)",
+      "match": "KFUM Oslo - Sandefjord",
+      "info_raw": "🎯PTGG ⚽ OVER",
+      "tags": [
+        "OVER",
+        "PTGG"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1507123,
+      "date": "2026-04-07",
+      "league": "Erovnuli Liga 2 (Georgia)",
+      "match": "Telavi - Samtredia",
+      "info_raw": "🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1395735,
+      "date": "2026-04-07",
+      "league": "FAW Championship (Wales)",
+      "match": "Rhyl - Gresford Athletic",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1534928,
+      "date": "2026-04-07",
+      "league": "League Cup (Hong-Kong)",
+      "match": "Kitchee - Warriors",
+      "info_raw": "🔥PT1.5 ⚽ OVER",
+      "tags": [
+        "OVER",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1389975,
+      "date": "2026-04-07",
+      "league": "Liga Leumit (Israel)",
+      "match": "Hapoel Kfar Shalem - Hapoel Ramat Gan",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1498018,
+      "date": "2026-04-07",
+      "league": "Liga Revelação U23 (Portugal)",
+      "match": "Academico Viseu U23 - Famalicão U23",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "tags": [
+        "OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1498021,
+      "date": "2026-04-07",
+      "league": "Liga Revelação U23 (Portugal)",
+      "match": "Santa Clara U23 - Benfica U23",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1513515,
+      "date": "2026-04-07",
+      "league": "Meistriliiga (Estonia)",
+      "match": "Trans Narva - Tammeka",
+      "info_raw": "⚽⭐ GOLD 🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "GOLD",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "GOLD"
+    },
+    {
+      "fixture_id": 1533665,
+      "date": "2026-04-07",
+      "league": "Premier League (Egypt)",
+      "match": "Ceramica Cleopatra - Al Ahly",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.05",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1533666,
+      "date": "2026-04-07",
+      "league": "Premier League (Egypt)",
+      "match": "Smouha SC - Enppi",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 📉-0.10",
+      "tags": [
+        "OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1535935,
+      "date": "2026-04-07",
+      "league": "Premiership (Northern-Ireland)",
+      "match": "Dungannon Swifts - Linfield",
+      "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
+      "tags": [
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1535936,
+      "date": "2026-04-07",
+      "league": "Premiership (Northern-Ireland)",
+      "match": "Larne - Coleraine FC",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1445918,
+      "date": "2026-04-07",
+      "league": "Premyer Liqa (Azerbaijan)",
+      "match": "Araz - Sabah FA",
+      "info_raw": "🔥PT1.5",
+      "tags": [
+        "PTO15"
+      ],
+      "primary_signal": "PT"
+    },
+    {
+      "fixture_id": 1434062,
+      "date": "2026-04-07",
+      "league": "Professional Development League (England)",
+      "match": "Crewe Alexandra U21 - Barnsley U21",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1524000,
+      "date": "2026-04-07",
+      "league": "Queensland NPL (Australia)",
+      "match": "WDSC Wolves - Gold Coast United",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1418072,
+      "date": "2026-04-07",
+      "league": "Regionalliga - Ost (Austria)",
+      "match": "Traiskirchen - Krems / Rehberg",
+      "info_raw": "🎯PTGG 🔥PT1.5",
+      "tags": [
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "PT"
+    },
+    {
+      "fixture_id": 1534909,
+      "date": "2026-04-07",
+      "league": "UEFA Champions League (World)",
+      "match": "Real Madrid - Bayern München",
+      "info_raw": "🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTO15"
+      ],
+      "primary_signal": "STRONG_OVER"
+    }
+  ]
+}
