@@ -3373,13 +3373,11 @@ def build_signal_package(fid, mk, s_h, s_a):
         "fav_quote": round3(fav),
         "is_gold_zone": is_gold_zone,
         "strong_tag_count": strong_tag_count,
-
         "quote_pack": quote_pack,
         "market_pack": market_pack,
         "structure_pack": structure_pack,
         "internal_labels": internal_labels,
     }
-
 
 def should_keep_match(signal_pack):
     """
