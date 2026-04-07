@@ -1853,8 +1853,8 @@ def build_stat_structure_snapshot(s_h, s_a):
     home_concede = safe_float(s_h.get("avg_ft_conceded_clean"), 0.0)
     away_concede = safe_float(s_a.get("avg_ft_conceded_clean"), 0.0)
 
-    home_ht_scored = safe_float(s_h.get("avg_ht_scored"), 0.0)
-    away_ht_scored = safe_float(s_a.get("avg_ht_scored"), 0.0)
+    home_ht_scored = safe_float(s_h.get("avg_ht_scored_clean"), 0.0)
+    away_ht_scored = safe_float(s_a.get("avg_ht_scored_clean"), 0.0)
 
     combined_ft_clean = round3((safe_float(s_h.get("avg_total_clean"), 0.0) + safe_float(s_a.get("avg_total_clean"), 0.0)) / 2)
     combined_ht_clean = round3((safe_float(s_h.get("avg_ht_clean"), 0.0) + safe_float(s_a.get("avg_ht_clean"), 0.0)) / 2)
@@ -2358,8 +2358,8 @@ def score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     coherence = safe_float(market_pack.get("coherence_score", 0.0), 0.0)
     dislocation = safe_float(market_pack.get("dislocation_score", 0.0), 0.0)
 
-    home_ht_scored = safe_float(s_h.get("avg_ht_scored_clean"), 0.0)
-    away_ht_scored = safe_float(s_a.get("avg_ht_scored_clean"), 0.0)
+    home_ht_scored = safe_float(s_h.get("avg_ht_scored"), 0.0)
+    away_ht_scored = safe_float(s_a.get("avg_ht_scored"), 0.0)
     home_ft_scored = safe_float(s_h.get("avg_ft_scored_clean"), 0.0)
     away_ft_scored = safe_float(s_a.get("avg_ft_scored_clean"), 0.0)
 
@@ -2495,8 +2495,8 @@ def score_pto15_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     dislocation = safe_float(market_pack.get("dislocation_score", 0.0), 0.0)
     lagging_market = market_pack.get("lagging_market", "none")
 
-    home_ht_scored = safe_float(s_h.get("avg_ht_scored_clean"), 0.0)
-    away_ht_scored = safe_float(s_a.get("avg_ht_scored_clean"), 0.0)
+    home_ht_scored = safe_float(s_h.get("avg_ht_scored"), 0.0)
+    away_ht_scored = safe_float(s_a.get("avg_ht_scored"), 0.0)
 
     home_scored_by_ht_rate = safe_float(s_h.get("scored_by_ht_rate", 0.0), 0.0)
     away_scored_by_ht_rate = safe_float(s_a.get("scored_by_ht_rate", 0.0), 0.0)
