@@ -3121,7 +3121,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     # LAYER 2 - TAG BASE PT / OVER
     # -------------------------------------------------
     ptgg_ok = (
-        ptgg_score >= 4.20
+        ptgg_score >= 4.05
         and combined_ht_clean >= 0.90
         and not has_warning(market_pack, "ht_market_ahead_of_structure")
         and safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.44
@@ -3139,13 +3139,13 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     pto15_ok = (
-        pto15_score >= 4.05
+        pto15_score >= 3.90
         and combined_ht_scored_clean >= 0.72
         and lagging_market in ("o15ht", "none", "o05ht")
     )
 
     over_ok = (
-        over_score >= 4.00
+        over_score >= 3.85
         and combined_ft_clean >= 1.58
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
@@ -3231,7 +3231,7 @@ def build_signal_package(fid, mk, s_h, s_a):
 
     if (
         has_minimum_open_baseline
-        and boost_score >= 5.70
+        and boost_score >= 5.55
         and boost_has_pt
         and boost_has_over
         and pt_score >= 3.85
@@ -3287,8 +3287,8 @@ def build_signal_package(fid, mk, s_h, s_a):
     if (
         gold_score >= 6.10
         and gold_has_over
-        and over_score >= 4.15
-        and pt_score >= 3.55
+        and over_score >= 4.00
+        and pt_score >= 3.40
         and gold_gate_structure
         and gold_gate_attack
         and gold_gate_market
@@ -3336,12 +3336,26 @@ def build_signal_package(fid, mk, s_h, s_a):
     if probe_g_ok:
         tags.append("🐟G")
 
-    # -------------------------------------------------
-    # LAYER 6 - DROP INFO
-    # informativo, non segnale principale
-    # -------------------------------------------------
-    if drop_diff >= 0.05:
-        tags.append(f"📉-{drop_diff:.2f}")
+# -------------------------------------------------
+# LAYER 6 - DROP INFO / MARKET PUSH
+# informativo + recupero match da forte pressione mercato
+# -------------------------------------------------
+if drop_diff >= 0.05:
+    tags.append(f"📉-{drop_diff:.2f}")
+
+market_push_ok = (
+    drop_diff >= 0.18
+    and "⚽ OVER" not in tags
+    and "🚀 BOOST" not in tags
+    and "⚽⭐ GOLD" not in tags
+    and coherence_score >= 1.10
+    and structure_score >= 0.95
+    and value_left != "low"
+    and not has_warning(market_pack, "favorite_ultra_but_ft_structure_weak")
+)
+
+if market_push_ok:
+    tags.append("🔥 MARKET PUSH")
 
     strong_tag_count = (
         int("🎯PTGG" in tags) +
@@ -3402,6 +3416,7 @@ def should_keep_match(signal_pack):
     has_strong_over = "💪 STRONG OVER" in tags
     has_probe_o = "🐟O" in tags
     has_probe_g = "🐟G" in tags
+    has_market_push = "🔥 MARKET PUSH" in tags
 
     # -------------------------------------
     # STOP warning gravi
@@ -3493,6 +3508,18 @@ def should_keep_match(signal_pack):
             and one_sided_risk <= 1.55
         )
 
+    # -------------------------------------
+    # market push
+    # -------------------------------------
+    if has_market_push:
+        return bool(
+            max_score >= 3.00
+            and coherence_score >= 1.10
+            and structure_score >= 0.95
+            and one_sided_risk <= 1.60
+            and value_left != "low"
+        )
+    
     # -------------------------------------
     # probe
     # -------------------------------------
