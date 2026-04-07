@@ -3336,26 +3336,26 @@ def build_signal_package(fid, mk, s_h, s_a):
     if probe_g_ok:
         tags.append("🐟G")
 
-# -------------------------------------------------
-# LAYER 6 - DROP INFO / MARKET PUSH
-# informativo + recupero match da forte pressione mercato
-# -------------------------------------------------
-if drop_diff >= 0.05:
-    tags.append(f"📉-{drop_diff:.2f}")
+    # -------------------------------------------------
+    # LAYER 6 - DROP INFO / MARKET PUSH
+    # informativo + recupero match da forte pressione mercato
+    # -------------------------------------------------
+    if drop_diff >= 0.05:
+        tags.append(f"📉-{drop_diff:.2f}")
 
-market_push_ok = (
-    drop_diff >= 0.18
-    and "⚽ OVER" not in tags
-    and "🚀 BOOST" not in tags
-    and "⚽⭐ GOLD" not in tags
-    and coherence_score >= 1.10
-    and structure_score >= 0.95
-    and value_left != "low"
-    and not has_warning(market_pack, "favorite_ultra_but_ft_structure_weak")
-)
+    market_push_ok = (
+        drop_diff >= 0.18
+        and "⚽ OVER" not in tags
+        and "🚀 BOOST" not in tags
+        and "⚽⭐ GOLD" not in tags
+        and coherence_score >= 1.10
+        and structure_score >= 0.95
+        and value_left != "low"
+        and not has_warning(market_pack, "favorite_ultra_but_ft_structure_weak")
+    )
 
-if market_push_ok:
-    tags.append("🔥 MARKET PUSH")
+    if market_push_ok:
+        tags.append("🔥 MARKET PUSH")
 
     strong_tag_count = (
         int("🎯PTGG" in tags) +
