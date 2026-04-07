@@ -1019,6 +1019,11 @@ def get_team_last_matches(session, tid):
             "match_ft_2plus": 1 if total_ft_goals >= 2 else 0,
             "match_ft_3plus": 1 if total_ft_goals >= 3 else 0,
             "match_ft_low": 1 if total_ft_goals <= 1 else 0,
+
+            "team_scored_by_ht": 1 if team_ht_scored >= 1 else 0,
+            "team_conceded_by_ht": 1 if team_ht_conceded >= 1 else 0,
+            "match_ht_00": 1 if total_ht_goals == 0 else 0,
+            "match_ht_2plus": 1 if total_ht_goals >= 2 else 0,
         }
 
         last_matches.append(row)
@@ -1107,6 +1112,11 @@ def summarize_match_set(matches, label="all"):
     last_2h_scored = safe_float(last_match.get("team_2h_scored"), 0.0)
     last_2h_conceded = safe_float(last_match.get("team_2h_conceded"), 0.0)
 
+    scored_by_ht_list = extract_metric_list(matches, "team_scored_by_ht")
+    conceded_by_ht_list = extract_metric_list(matches, "team_conceded_by_ht")
+    ht_00_list = extract_metric_list(matches, "match_ht_00")
+    ht_2plus_list = extract_metric_list(matches, "match_ht_2plus")
+
     summary = {
         "label": label,
         "count": len(matches),
@@ -1154,6 +1164,11 @@ def summarize_match_set(matches, label="all"):
 
         "last_2h_zero": (last_2h_scored == 0),
         "last_2h_conceded_zero": (last_2h_conceded == 0),
+
+        "scored_by_ht_rate": round3(rate_at_least(scored_by_ht_list, 1)),
+        "conceded_by_ht_rate": round3(rate_at_least(conceded_by_ht_list, 1)),
+        "ht_00_rate": round3(rate_at_least(ht_00_list, 1)),
+        "early_2goal_rate": round3(rate_at_least(ht_2plus_list, 1)),
     }
 
     return summary
@@ -2193,6 +2208,18 @@ def build_match_structure_profile(mk, s_h, s_a, market_pack=None, quote_pack=Non
     cross_home_clean = round3(home_attack + away_concede)
     cross_away_clean = round3(away_attack + home_concede)
 
+    combined_ht_dirty = round3((safe_float(s_h.get("avg_ht", 0.0), 0.0) + safe_float(s_a.get("avg_ht", 0.0), 0.0)) / 2)
+    combined_ft_dirty = round3((safe_float(s_h.get("avg_total", 0.0), 0.0) + safe_float(s_a.get("avg_total", 0.0), 0.0)) / 2)
+
+    cross_home_dirty = round3(
+        safe_float(s_h.get("avg_ft_scored", 0.0), 0.0) +
+        safe_float(s_a.get("avg_ft_conceded", 0.0), 0.0)
+    )
+    cross_away_dirty = round3(
+        safe_float(s_a.get("avg_ft_scored", 0.0), 0.0) +
+        safe_float(s_h.get("avg_ft_conceded", 0.0), 0.0)
+    )
+
     bilateral_ft = bool(home_attack >= 1.00 and away_attack >= 1.00)
     bilateral_ht = bool(home_ht_attack >= 0.60 and away_ht_attack >= 0.60)
 
@@ -2228,14 +2255,64 @@ def build_match_structure_profile(mk, s_h, s_a, market_pack=None, quote_pack=Non
     structure_grade = "low"
     structure_score = 0.0
 
+    structure_grade = "low"
+    structure_score = 0.0
+
+    # 1) ingresso base: sporco
+    if combined_ft_dirty >= 1.72:
+        structure_score += 0.70
+    elif combined_ft_dirty >= 1.58:
+        structure_score += 0.35
+
+    if combined_ht_dirty >= 0.96:
+        structure_score += 0.40
+    elif combined_ht_dirty >= 0.84:
+        structure_score += 0.18
+
+    if cross_home_dirty >= 2.15:
+        structure_score += 0.40
+    elif cross_home_dirty >= 2.00:
+        structure_score += 0.18
+
+    if cross_away_dirty >= 2.15:
+        structure_score += 0.40
+    elif cross_away_dirty >= 2.00:
+        structure_score += 0.18
+
+    # 2) conferma qualità: pulito
     if combined_ft_clean >= 1.66:
-        structure_score += 0.65
+        structure_score += 0.25
+    elif combined_ft_clean < 1.48:
+        structure_score -= 0.18
+
     if combined_ht_clean >= 0.92:
-        structure_score += 0.45
+        structure_score += 0.18
+    elif combined_ht_clean < 0.76:
+        structure_score -= 0.12
+
     if cross_home_clean >= 2.08:
-        structure_score += 0.45
+        structure_score += 0.18
+    elif cross_home_clean < 1.92:
+        structure_score -= 0.10
+
     if cross_away_clean >= 2.08:
-        structure_score += 0.45
+        structure_score += 0.18
+    elif cross_away_clean < 1.92:
+        structure_score -= 0.10
+
+    if bilateral_ft:
+        structure_score += 0.40
+    if bilateral_ht:
+        structure_score += 0.20
+
+    if one_sided_risk <= 0.90:
+        structure_score += 0.35
+    elif one_sided_risk <= 1.20:
+        structure_score += 0.10
+    else:
+        structure_score -= 0.40
+
+    structure_score = round3(max(structure_score, 0.0))
     if bilateral_ft:
         structure_score += 0.40
     if bilateral_ht:
@@ -2268,6 +2345,10 @@ def build_match_structure_profile(mk, s_h, s_a, market_pack=None, quote_pack=Non
         "one_sided_risk": round3(one_sided_risk),
         "fav_quote": round3(fav),
         "fav_zone": fav_zone,
+        "combined_ht_dirty": combined_ht_dirty,
+        "combined_ft_dirty": combined_ft_dirty,
+        "cross_home_dirty": cross_home_dirty,
+        "cross_away_dirty": cross_away_dirty,
     }
 
 
@@ -2290,6 +2371,15 @@ def score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
 
     home_concede_ht = safe_float(s_h.get("ht_conceded_1plus_rate"), 0.0)
     away_concede_ht = safe_float(s_a.get("ht_conceded_1plus_rate"), 0.0)
+
+    home_scored_by_ht_rate = safe_float(s_h.get("scored_by_ht_rate", 0.0), 0.0)
+    away_scored_by_ht_rate = safe_float(s_a.get("scored_by_ht_rate", 0.0), 0.0)
+    home_conceded_by_ht_rate = safe_float(s_h.get("conceded_by_ht_rate", 0.0), 0.0)
+    away_conceded_by_ht_rate = safe_float(s_a.get("conceded_by_ht_rate", 0.0), 0.0)
+    home_ht_00_rate = safe_float(s_h.get("ht_00_rate", 0.0), 0.0)
+    away_ht_00_rate = safe_float(s_a.get("ht_00_rate", 0.0), 0.0)
+    home_early_2goal_rate = safe_float(s_h.get("early_2goal_rate", 0.0), 0.0)
+    away_early_2goal_rate = safe_float(s_a.get("early_2goal_rate", 0.0), 0.0)
 
     combined_ht_clean = safe_float(structure_pack.get("combined_ht_clean", 0.0), 0.0)
     bilateral_ht = bool(structure_pack.get("bilateral_ht", False))
@@ -2317,6 +2407,26 @@ def score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
         score += 0.38
     elif away_concede_ht >= 0.38:
         score += 0.18
+
+        if home_scored_by_ht_rate >= 0.50:
+        score += 0.28
+    if away_scored_by_ht_rate >= 0.50:
+        score += 0.28
+
+    if home_conceded_by_ht_rate >= 0.50:
+        score += 0.18
+    if away_conceded_by_ht_rate >= 0.50:
+        score += 0.18
+
+    if home_early_2goal_rate >= 0.35:
+        score += 0.18
+    if away_early_2goal_rate >= 0.35:
+        score += 0.18
+
+    if home_ht_00_rate >= 0.50:
+        score -= 0.28
+    if away_ht_00_rate >= 0.50:
+        score -= 0.28
 
     if safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.50:
         score += 0.32
@@ -2498,14 +2608,14 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     drop_type = market_pack.get("drop_type", "none")
 
     if cross_home_clean >= 2.20:
-        score += 1.05
+        score += 0.65
     elif cross_home_clean >= 2.05:
-        score += 0.42
+        score += 0.25
 
     if cross_away_clean >= 2.20:
-        score += 1.05
+        score += 0.65
     elif cross_away_clean >= 2.05:
-        score += 0.42
+        score += 0.25
 
     if cross_home_clean >= 2.15 and cross_away_clean >= 2.15:
         score += 1.20
@@ -2513,14 +2623,14 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
         score += 0.58
 
     if cross_home_dirty >= 2.35:
-        score += 0.70
+        score += 0.95
     elif cross_home_dirty >= 2.20:
-        score += 0.25
+        score += 0.38
 
     if cross_away_dirty >= 2.35:
-        score += 0.70
+        score += 0.95
     elif cross_away_dirty >= 2.20:
-        score += 0.25
+        score += 0.38
 
     if home_scored_clean >= 1.18:
         score += 0.35
@@ -2576,12 +2686,15 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     elif one_sided_risk >= 1.35:
         score -= 0.42
 
-    if combined_ft_clean < 1.58:
-        score -= 0.52
-    if home_scored_clean < 0.98:
-        score -= 0.55
-    if away_scored_clean < 0.98:
-        score -= 0.55
+    if combined_ft_clean < 1.48:
+        score -= 0.28
+    elif combined_ft_clean < 1.58:
+        score -= 0.12
+
+    if home_scored_clean < 0.92:
+        score -= 0.28
+    if away_scored_clean < 0.92:
+        score -= 0.28
 
     if away_conceded_clean < 0.88:
         score -= 0.35
@@ -2617,13 +2730,18 @@ def score_boost_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack, pt
     lagging_market = market_pack.get("lagging_market", "none")
     drop_type = market_pack.get("drop_type", "none")
 
-    score += pt_score * 0.30
-    score += over_score * 0.44
+    score += pt_score * 0.16
+    score += over_score * 0.58
+
+    if over_score < 4.40:
+        score -= 0.90
+    elif over_score < 4.80:
+        score -= 0.35
 
     if combined_ht_clean >= 1.00:
-        score += 0.65
+        score += 0.35
     elif combined_ht_clean >= 0.92:
-        score += 0.22
+        score += 0.12
 
     if combined_ft_clean >= 1.72:
         score += 0.70
@@ -2703,8 +2821,13 @@ def score_gold_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack, pt_
     home_scored_clean = safe_float(s_h.get("avg_ft_scored_clean", 0.0), 0.0)
     away_scored_clean = safe_float(s_a.get("avg_ft_scored_clean", 0.0), 0.0)
 
-    score += over_score * 0.48
-    score += pt_score * 0.14
+    score += over_score * 0.56
+    score += pt_score * 0.06
+
+    if over_score < 4.70:
+        score -= 1.10
+    elif over_score < 5.05:
+        score -= 0.45
 
     if 1.40 <= fav <= 1.90:
         score += 0.72
@@ -2734,9 +2857,9 @@ def score_gold_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack, pt_
         score += 0.38
 
     if combined_ht_clean >= 0.98:
-        score += 0.22
+        score += 0.10
     if combined_ht_scored_clean >= 0.76:
-        score += 0.22
+        score += 0.10
     if safe_float(s_h.get("ht_1plus_rate", 0.0), 0.0) >= 0.62 and safe_float(s_a.get("ht_1plus_rate", 0.0), 0.0) >= 0.62:
         score += 0.22
 
