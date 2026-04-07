@@ -2313,18 +2313,6 @@ def build_match_structure_profile(mk, s_h, s_a, market_pack=None, quote_pack=Non
         structure_score -= 0.40
 
     structure_score = round3(max(structure_score, 0.0))
-    if bilateral_ft:
-        structure_score += 0.40
-    if bilateral_ht:
-        structure_score += 0.25
-    if one_sided_risk <= 0.90:
-        structure_score += 0.40
-    elif one_sided_risk <= 1.20:
-        structure_score += 0.15
-    else:
-        structure_score -= 0.40
-
-    structure_score = round3(max(structure_score, 0.0))
 
     if structure_score >= 2.10:
         structure_grade = "high"
@@ -2408,7 +2396,7 @@ def score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     elif away_concede_ht >= 0.38:
         score += 0.18
 
-        if home_scored_by_ht_rate >= 0.50:
+    if home_scored_by_ht_rate >= 0.50:
         score += 0.28
     if away_scored_by_ht_rate >= 0.50:
         score += 0.28
