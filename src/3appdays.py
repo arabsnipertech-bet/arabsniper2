@@ -2658,14 +2658,14 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     elif home_scored_clean >= 0.90:
         score += 0.00
     else:
-        score -= 0.28
+        score -= 0.12
 
     if away_scored_clean >= 1.18:
         score += 0.35
     elif away_scored_clean >= 0.90:
         score += 0.00
     else:
-        score -= 0.28
+        score -= 0.12
 
     if bilateral_ft:
         score += 0.48
@@ -3258,8 +3258,8 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     gold_gate_attack = (
-        safe_float(s_h.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.98
-        and safe_float(s_a.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.98
+        safe_float(s_h.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.85
+        and safe_float(s_a.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.85
     )
 
     gold_gate_market = (
@@ -3412,7 +3412,8 @@ def should_keep_match(signal_pack):
     if any(w in fatal_warnings for w in warning_flags):
         return False
 
-    if value_left == "low" and not (has_gold or has_boost or has_strong_over):
+    # Se il drop è strutturale (coerente), teniamo il match anche con poco valore residuo
+    if value_left == "low" and not (has_gold or has_boost or has_strong_over or market_pack.get("drop_confirmed")):
         return False
 
     # -------------------------------------
@@ -3420,11 +3421,11 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_gold:
         return bool(
-            gold_score >= 6.05
-            and over_score >= 4.10
-            and coherence_score >= 1.90
-            and structure_score >= 1.50
-            and one_sided_risk <= 1.18
+            gold_score >= 5.80
+            and over_score >= 3.95
+            and coherence_score >= 1.65
+            and structure_score >= 1.40
+            and one_sided_risk <= 1.30
         )
 
     # -------------------------------------
