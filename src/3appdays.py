@@ -1271,6 +1271,11 @@ def get_team_performance(session, tid, expected_side=None):
         "ht_scored_2plus_rate": blend_metric("ht_scored_2plus_rate"),
         "ht_conceded_1plus_rate": blend_metric("ht_conceded_1plus_rate"),
 
+        "scored_by_ht_rate": blend_metric("scored_by_ht_rate"),
+        "conceded_by_ht_rate": blend_metric("conceded_by_ht_rate"),
+        "ht_00_rate": blend_metric("ht_00_rate"),
+        "early_2goal_rate": blend_metric("early_2goal_rate"),
+
         "ft_peak_count": int(round((safe_float(all_stats.get("ft_peak_count"), 0) * base_weight) + (safe_float(context_stats.get("ft_peak_count"), 0) * ctx_weight))),
         "last_2h_zero": bool(context_stats.get("last_2h_zero")) if context_count > 0 else bool(all_stats.get("last_2h_zero")),
         "last_2h_conceded_zero": bool(context_stats.get("last_2h_conceded_zero")) if context_count > 0 else bool(all_stats.get("last_2h_conceded_zero")),
@@ -1309,6 +1314,10 @@ def get_team_performance(session, tid, expected_side=None):
         "ctx_ht_scored_1plus_rate": context_stats.get("ht_scored_1plus_rate", 0.0),
         "ctx_ht_scored_2plus_rate": context_stats.get("ht_scored_2plus_rate", 0.0),
         "ctx_ht_conceded_1plus_rate": context_stats.get("ht_conceded_1plus_rate", 0.0),
+        "ctx_scored_by_ht_rate": context_stats.get("scored_by_ht_rate", 0.0),
+        "ctx_conceded_by_ht_rate": context_stats.get("conceded_by_ht_rate", 0.0),
+        "ctx_ht_00_rate": context_stats.get("ht_00_rate", 0.0),
+        "ctx_early_2goal_rate": context_stats.get("early_2goal_rate", 0.0),
 
         # raw blocks completi, utili per debug/details
         "all_block": all_stats,
@@ -2255,9 +2264,6 @@ def build_match_structure_profile(mk, s_h, s_a, market_pack=None, quote_pack=Non
     structure_grade = "low"
     structure_score = 0.0
 
-    structure_grade = "low"
-    structure_score = 0.0
-
     # 1) ingresso base: sporco
     if combined_ft_dirty >= 1.72:
         structure_score += 0.70
@@ -2492,6 +2498,13 @@ def score_pto15_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     home_ht_scored = safe_float(s_h.get("avg_ht_scored_clean"), 0.0)
     away_ht_scored = safe_float(s_a.get("avg_ht_scored_clean"), 0.0)
 
+    home_scored_by_ht_rate = safe_float(s_h.get("scored_by_ht_rate", 0.0), 0.0)
+    away_scored_by_ht_rate = safe_float(s_a.get("scored_by_ht_rate", 0.0), 0.0)
+    home_ht_00_rate = safe_float(s_h.get("ht_00_rate", 0.0), 0.0)
+    away_ht_00_rate = safe_float(s_a.get("ht_00_rate", 0.0), 0.0)
+    home_early_2goal_rate = safe_float(s_h.get("early_2goal_rate", 0.0), 0.0)
+    away_early_2goal_rate = safe_float(s_a.get("early_2goal_rate", 0.0), 0.0)
+
     score += band_score(combined_ht_scored, 0.92, 1.45, 0.80, 1.60, core_pts=1.55, soft_pts=0.65)
     score += band_score(combined_ht_clean, 1.00, 1.55, 0.90, 1.70, core_pts=1.15, soft_pts=0.40)
 
@@ -2522,6 +2535,21 @@ def score_pto15_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
         score += 0.25
     if safe_float(s_a.get("ht_conceded_1plus_rate", 0.0), 0.0) >= 0.50:
         score += 0.25
+
+    if home_scored_by_ht_rate >= 0.50:
+        score += 0.24
+    if away_scored_by_ht_rate >= 0.50:
+        score += 0.24
+
+    if home_early_2goal_rate >= 0.35:
+        score += 0.25
+    if away_early_2goal_rate >= 0.35:
+        score += 0.25
+
+    if home_ht_00_rate >= 0.50:
+        score -= 0.32
+    if away_ht_00_rate >= 0.50:
+        score -= 0.32
 
     score += band_score(
         safe_float(mk.get("o15ht"), 0.0),
