@@ -2153,8 +2153,8 @@ def calc_one_sided_risk(s_h, s_a):
     home_concede = safe_float(s_h.get("avg_ft_conceded_clean"), 0.0)
     away_concede = safe_float(s_a.get("avg_ft_conceded_clean"), 0.0)
 
-    home_ht_scored = safe_float(s_h.get("avg_ht_scored_clean"), 0.0)
-    away_ht_scored = safe_float(s_a.get("avg_ht_scored_clean"), 0.0)
+    home_ht_scored = safe_float(s_h.get("avg_ht_scored"), 0.0)
+    away_ht_scored = safe_float(s_a.get("avg_ht_scored"), 0.0)
 
     attack_gap = abs(home_attack - away_attack)
     ht_gap = abs(home_ht_scored - away_ht_scored)
