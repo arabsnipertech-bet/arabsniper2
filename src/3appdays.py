@@ -2655,8 +2655,18 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
 
     if home_scored_clean >= 1.18:
         score += 0.35
+    elif home_scored_clean >= 0.90:
+        score += 0.00
+    else:
+        score -= 0.28
+
     if away_scored_clean >= 1.18:
         score += 0.35
+    elif away_scored_clean >= 0.90:
+        score += 0.00
+    else:
+        score -= 0.28
+
     if bilateral_ft:
         score += 0.48
 
@@ -3244,7 +3254,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         and structure_grade in ("high", "medium")
         and combined_ft_clean >= 1.66
         and bilateral_ft
-        and one_sided_risk <= 1.18
+        and one_sided_risk <= 1.30
     )
 
     gold_gate_attack = (
