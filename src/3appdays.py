@@ -1853,8 +1853,8 @@ def build_stat_structure_snapshot(s_h, s_a):
     home_concede = safe_float(s_h.get("avg_ft_conceded_clean"), 0.0)
     away_concede = safe_float(s_a.get("avg_ft_conceded_clean"), 0.0)
 
-    home_ht_scored = safe_float(s_h.get("avg_ht_scored_clean"), 0.0)
-    away_ht_scored = safe_float(s_a.get("avg_ht_scored_clean"), 0.0)
+    home_ht_scored = safe_float(s_h.get("avg_ht_scored"), 0.0)
+    away_ht_scored = safe_float(s_a.get("avg_ht_scored"), 0.0)
 
     combined_ft_clean = round3((safe_float(s_h.get("avg_total_clean"), 0.0) + safe_float(s_a.get("avg_total_clean"), 0.0)) / 2)
     combined_ht_clean = round3((safe_float(s_h.get("avg_ht_clean"), 0.0) + safe_float(s_a.get("avg_ht_clean"), 0.0)) / 2)
@@ -2537,9 +2537,14 @@ def score_pto15_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
         score += 0.25
 
     if home_scored_by_ht_rate >= 0.50:
-        score += 0.24
+        score += 0.22
     if away_scored_by_ht_rate >= 0.50:
-        score += 0.24
+        score += 0.22
+
+    if safe_float(s_h.get("conceded_by_ht_rate", 0.0), 0.0) >= 0.50:
+        score += 0.18
+    if safe_float(s_a.get("conceded_by_ht_rate", 0.0), 0.0) >= 0.50:
+        score += 0.18
 
     if home_early_2goal_rate >= 0.35:
         score += 0.25
