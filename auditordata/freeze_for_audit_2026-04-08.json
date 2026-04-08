@@ -1,0 +1,383 @@
+{
+  "audit_date": "2026-04-08",
+  "created_at": "2026-04-08T10:00:13",
+  "source_file": "data_day1.json",
+  "matches_count": 27,
+  "primary_counts": {
+    "STRONG_OVER": 10,
+    "BOOST": 7,
+    "OVER": 8,
+    "GOLD": 2
+  },
+  "tag_counts": {
+    "OVER": 27,
+    "STRONG_OVER": 19,
+    "BOOST": 7,
+    "PTGG": 18,
+    "PTO15": 18,
+    "GOLD": 2
+  },
+  "matches": [
+    {
+      "fixture_id": 1418661,
+      "date": "2026-04-08",
+      "league": "1. Liga Promotion (Switzerland)",
+      "match": "Lugano II - Zürich II",
+      "info_raw": "⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1449508,
+      "date": "2026-04-08",
+      "league": "1st League - RS (Bosnia)",
+      "match": "Slavija - Sutjeska Foča",
+      "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
+      "tags": [
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1442021,
+      "date": "2026-04-08",
+      "league": "2. Lig (Turkey)",
+      "match": "İnegölspor - Elazığspor",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1394368,
+      "date": "2026-04-08",
+      "league": "3. Liga (Germany)",
+      "match": "FC Saarbrücken - Alemannia Aachen",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "tags": [
+        "OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1394372,
+      "date": "2026-04-08",
+      "league": "3. Liga (Germany)",
+      "match": "SV Wehen - Havelse",
+      "info_raw": "⚽⭐ GOLD ⚽ OVER 💪 STRONG OVER 📉-0.11",
+      "tags": [
+        "GOLD",
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "GOLD"
+    },
+    {
+      "fixture_id": 1394371,
+      "date": "2026-04-08",
+      "league": "3. Liga (Germany)",
+      "match": "Verl - Hansa Rostock",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 📉-0.10",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1532899,
+      "date": "2026-04-08",
+      "league": "AFC Cup (World)",
+      "match": "Gamba Osaka - Bangkok United",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1522300,
+      "date": "2026-04-08",
+      "league": "Coppa Italia Primavera (Italy)",
+      "match": "Sassuolo U20 - Atalanta U20",
+      "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
+      "tags": [
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1531962,
+      "date": "2026-04-08",
+      "league": "Cup (Croatia)",
+      "match": "HNK Gorica - Dinamo Zagreb",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 📉-0.05",
+      "tags": [
+        "OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1534929,
+      "date": "2026-04-08",
+      "league": "Cup (Russia)",
+      "match": "Dynamo - FC Krasnodar",
+      "info_raw": "🔥PT1.5 ⚽ OVER",
+      "tags": [
+        "OVER",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1535137,
+      "date": "2026-04-08",
+      "league": "Cup (Russia)",
+      "match": "Zenit - Spartak Moscow",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "tags": [
+        "OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1499060,
+      "date": "2026-04-08",
+      "league": "Division 1 (Saudi-Arabia)",
+      "match": "Al Diriyah - Al Jabalain",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1537591,
+      "date": "2026-04-08",
+      "league": "League (Jordan)",
+      "match": "Al Faisaly - Al Jazeera",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1513518,
+      "date": "2026-04-08",
+      "league": "Meistriliiga (Estonia)",
+      "match": "FC Levadia Tallinn - Vaprus",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 📉-0.05",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1513516,
+      "date": "2026-04-08",
+      "league": "Meistriliiga (Estonia)",
+      "match": "Laagri - Kalju Nomme",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "tags": [
+        "OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1517714,
+      "date": "2026-04-08",
+      "league": "New South Wales NPL 2 (Australia)",
+      "match": "Mt Druitt Town - Bulls Academy",
+      "info_raw": "🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTO15"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1436171,
+      "date": "2026-04-08",
+      "league": "Pro League (Saudi-Arabia)",
+      "match": "Al-Fayha - Al-Ahli Jeddah",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
+      "tags": [
+        "OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1512300,
+      "date": "2026-04-08",
+      "league": "Reserve League (Argentina)",
+      "match": "Gimnasia La Plata Res. - Vélez Sársfield Res.",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1497812,
+      "date": "2026-04-08",
+      "league": "Second League (Montenegro)",
+      "match": "Internacional Podgorica - Otrant-Olympic",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1497815,
+      "date": "2026-04-08",
+      "league": "Second League (Montenegro)",
+      "match": "Rudar - Grbalj",
+      "info_raw": "🔥PT1.5 ⚽ OVER",
+      "tags": [
+        "OVER",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    },
+    {
+      "fixture_id": 1439694,
+      "date": "2026-04-08",
+      "league": "Serie C - Girone B (Italy)",
+      "match": "Juventus U23 - Ternana",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1454853,
+      "date": "2026-04-08",
+      "league": "Serie D - Girone D (Italy)",
+      "match": "Coriano - Desenzano Calvina",
+      "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
+      "tags": [
+        "OVER",
+        "STRONG_OVER"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1491654,
+      "date": "2026-04-08",
+      "league": "Stars League (Qatar)",
+      "match": "Al Ahli Doha - Al-Duhail SC",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1516011,
+      "date": "2026-04-08",
+      "league": "Super League (Uzbekistan)",
+      "match": "Dinamo Samarqand - Sogdiana",
+      "info_raw": "⚽⭐ GOLD 🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
+      "tags": [
+        "GOLD",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "GOLD"
+    },
+    {
+      "fixture_id": 1537083,
+      "date": "2026-04-08",
+      "league": "Super League 1 (Greece)",
+      "match": "Atromitos - Kifisia",
+      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER",
+      "tags": [
+        "OVER",
+        "STRONG_OVER",
+        "PTGG"
+      ],
+      "primary_signal": "STRONG_OVER"
+    },
+    {
+      "fixture_id": 1385130,
+      "date": "2026-04-08",
+      "league": "Super Liga (Serbia)",
+      "match": "Vojvodina - Radnicki NIS",
+      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.14",
+      "tags": [
+        "BOOST",
+        "OVER",
+        "STRONG_OVER",
+        "PTGG",
+        "PTO15"
+      ],
+      "primary_signal": "BOOST"
+    },
+    {
+      "fixture_id": 1534908,
+      "date": "2026-04-08",
+      "league": "UEFA Champions League (World)",
+      "match": "Paris Saint Germain - Liverpool",
+      "info_raw": "🔥PT1.5 ⚽ OVER 📉-0.14",
+      "tags": [
+        "OVER",
+        "PTO15"
+      ],
+      "primary_signal": "OVER"
+    }
+  ]
+}
