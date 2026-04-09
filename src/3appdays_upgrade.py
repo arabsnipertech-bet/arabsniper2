@@ -6,6 +6,7 @@ import json
 import os
 import time
 import sys
+import math
 from pathlib import Path
 from github import Github
 
@@ -90,6 +91,43 @@ def round3(x):
     except Exception:
         return 0.0
 
+def calculate_margin_and_fair_odds(q1, qx, q2):
+    """
+    Calcola overround (aggio) e fair odds normalizzate.
+    """
+    q1 = safe_float(q1, 0.0)
+    qx = safe_float(qx, 0.0)
+    q2 = safe_float(q2, 0.0)
+
+    if q1 <= 1 or qx <= 1 or q2 <= 1:
+        return 0.0, (q1, qx, q2)
+
+    p1 = 1.0 / q1
+    px = 1.0 / qx
+    p2 = 1.0 / q2
+
+    total_implied = p1 + px + p2
+    margin = round3(total_implied - 1.0)
+
+    fair_q1 = round3(q1 * total_implied)
+    fair_qx = round3(qx * total_implied)
+    fair_q2 = round3(q2 * total_implied)
+
+    return margin, (fair_q1, fair_qx, fair_q2)
+
+
+def fair_implied_probability(odd, total_implied):
+    """
+    Probabilità implicita netta, depurata dall'aggio.
+    """
+    odd = safe_float(odd, 0.0)
+    total_implied = safe_float(total_implied, 0.0)
+
+    if odd <= 1 or total_implied <= 0:
+        return 0.0
+
+    raw_prob = 1.0 / odd
+    return round3(raw_prob / total_implied)
 
 def safe_float(x, default=0.0):
     try:
@@ -844,6 +882,18 @@ def weighted_mean(values, weights=None):
 
     return sum(v * w for v, w in usable) / den
 
+def calculate_consistency(values):
+    """
+    Deviazione standard semplice.
+    Più è bassa, più la serie è regolare.
+    """
+    vals = [safe_float(v, 0.0) for v in values]
+    if len(vals) < 2:
+        return 9.9
+
+    mean = sum(vals) / len(vals)
+    variance = sum((x - mean) ** 2 for x in vals) / len(vals)
+    return round3(math.sqrt(variance))
 
 def trimmed_mean(values):
     vals = sorted([safe_float(v, 0.0) for v in values])
@@ -1096,6 +1146,11 @@ def summarize_match_set(matches, label="all"):
 
             "last_2h_zero": False,
             "last_2h_conceded_zero": False,
+
+            "ft_stdev": 9.9,
+            "ht_stdev": 9.9,
+            "ft_scored_stdev": 9.9,
+            "scoring_regularity": 0.0,
         }
 
     weights = build_recent_weights(len(matches))
@@ -1169,6 +1224,13 @@ def summarize_match_set(matches, label="all"):
         "conceded_by_ht_rate": round3(rate_at_least(conceded_by_ht_list, 1)),
         "ht_00_rate": round3(rate_at_least(ht_00_list, 1)),
         "early_2goal_rate": round3(rate_at_least(ht_2plus_list, 1)),
+
+        "ft_stdev": round3(calculate_consistency(ft_list)),
+        "ht_stdev": round3(calculate_consistency(ht_list)),
+        "ft_scored_stdev": round3(calculate_consistency(ft_scored_list)),
+        "scoring_regularity": round3(
+            sum(1 for x in ft_scored_list if x > 0) / len(matches)
+        ) if matches else 0.0,
     }
 
     return summary
@@ -1280,6 +1342,11 @@ def get_team_performance(session, tid, expected_side=None):
         "last_2h_zero": bool(context_stats.get("last_2h_zero")) if context_count > 0 else bool(all_stats.get("last_2h_zero")),
         "last_2h_conceded_zero": bool(context_stats.get("last_2h_conceded_zero")) if context_count > 0 else bool(all_stats.get("last_2h_conceded_zero")),
 
+        "ft_stdev": blend_metric("ft_stdev"),
+        "ht_stdev": blend_metric("ht_stdev"),
+        "ft_scored_stdev": blend_metric("ft_scored_stdev"),
+        "scoring_regularity": blend_metric("scoring_regularity"),
+
         # meta
         "expected_side": expected_side if expected_side in ("home", "away") else "all",
         "all_sample_count": all_count,
@@ -1296,6 +1363,10 @@ def get_team_performance(session, tid, expected_side=None):
         "all_avg_ht_conceded_clean": all_stats.get("avg_ht_conceded_clean", 0.0),
         "all_avg_ft_scored_clean": all_stats.get("avg_ft_scored_clean", 0.0),
         "all_avg_ft_conceded_clean": all_stats.get("avg_ft_conceded_clean", 0.0),
+        "all_ft_stdev": all_stats.get("ft_stdev", 9.9),
+        "all_ht_stdev": all_stats.get("ht_stdev", 9.9),
+        "all_ft_scored_stdev": all_stats.get("ft_scored_stdev", 9.9),
+        "all_scoring_regularity": all_stats.get("scoring_regularity", 0.0),
 
         # dump contestuale
         "ctx_avg_ht": context_stats.get("avg_ht", 0.0),
@@ -1318,6 +1389,10 @@ def get_team_performance(session, tid, expected_side=None):
         "ctx_conceded_by_ht_rate": context_stats.get("conceded_by_ht_rate", 0.0),
         "ctx_ht_00_rate": context_stats.get("ht_00_rate", 0.0),
         "ctx_early_2goal_rate": context_stats.get("early_2goal_rate", 0.0),
+        "ctx_ft_stdev": context_stats.get("ft_stdev", 9.9),
+        "ctx_ht_stdev": context_stats.get("ht_stdev", 9.9),
+        "ctx_ft_scored_stdev": context_stats.get("ft_scored_stdev", 9.9),
+        "ctx_scoring_regularity": context_stats.get("scoring_regularity", 0.0),
 
         # raw blocks completi, utili per debug/details
         "all_block": all_stats,
@@ -1363,6 +1438,16 @@ def build_team_debug_summary(stats):
         "ctx_avg_ft_conceded_clean": stats.get("ctx_avg_ft_conceded_clean", 0.0),
         "ctx_ht_1plus_rate": stats.get("ctx_ht_1plus_rate", 0.0),
         "ctx_ft_2plus_rate": stats.get("ctx_ft_2plus_rate", 0.0),
+
+        "ft_stdev": stats.get("ft_stdev", 9.9),
+        "ht_stdev": stats.get("ht_stdev", 9.9),
+        "ft_scored_stdev": stats.get("ft_scored_stdev", 9.9),
+        "scoring_regularity": stats.get("scoring_regularity", 0.0),
+
+        "ctx_ft_stdev": stats.get("ctx_ft_stdev", 9.9),
+        "ctx_ht_stdev": stats.get("ctx_ht_stdev", 9.9),
+        "ctx_ft_scored_stdev": stats.get("ctx_ft_scored_stdev", 9.9),
+        "ctx_scoring_regularity": stats.get("ctx_scoring_regularity", 0.0),
     }
   # ==========================================
 # BLOCCO 3
@@ -1911,6 +1996,36 @@ def analyze_market_coherence(mk, s_h, s_a, quote_pack):
     o15 = safe_float(mk.get("o15ht"), 0.0)
     fav = safe_float(baseline.get("fav_quote", 0.0), 0.0)
 
+    q1_curr = safe_float(mk.get("q1"), 0.0)
+    qx_curr = safe_float(mk.get("qx"), 0.0)
+    q2_curr = safe_float(mk.get("q2"), 0.0)
+
+    q1_open = safe_float(quote_pack.get("Q1_OPEN", 0.0), 0.0)
+    qx_open = safe_float(quote_pack.get("QX_OPEN", 0.0), 0.0)
+    q2_open = safe_float(quote_pack.get("Q2_OPEN", 0.0), 0.0)
+
+    margin_curr, fair_odds_curr = calculate_margin_and_fair_odds(q1_curr, qx_curr, q2_curr)
+    margin_open, fair_odds_open = calculate_margin_and_fair_odds(q1_open, qx_open, q2_open)
+
+    total_implied_curr = (
+        (1 / q1_curr) + (1 / qx_curr) + (1 / q2_curr)
+        if q1_curr > 1 and qx_curr > 1 and q2_curr > 1 else 0.0
+    )
+    total_implied_open = (
+        (1 / q1_open) + (1 / qx_open) + (1 / q2_open)
+        if q1_open > 1 and qx_open > 1 and q2_open > 1 else 0.0
+    )
+
+    fav_side_curr = "1" if q1_curr > 0 and q2_curr > 0 and q1_curr <= q2_curr else "2"
+    fav_odd_curr = q1_curr if fav_side_curr == "1" else q2_curr
+    fav_odd_open = q1_open if fav_side_curr == "1" else q2_open
+
+    fav_fair_prob_curr = fair_implied_probability(fav_odd_curr, total_implied_curr)
+    fav_fair_prob_open = fair_implied_probability(fav_odd_open, total_implied_open)
+    fav_fair_prob_delta = round3(fav_fair_prob_curr - fav_fair_prob_open)
+
+    fav_fair_curr = fair_odds_curr[0] if fav_side_curr == "1" else fair_odds_curr[2]
+
     combined_ft_clean = safe_float(struct.get("combined_ft_clean", 0.0), 0.0)
     combined_ht_clean = safe_float(struct.get("combined_ht_clean", 0.0), 0.0)
     combined_ht_scored_clean = safe_float(struct.get("combined_ht_scored_clean", 0.0), 0.0)
@@ -2010,6 +2125,30 @@ def analyze_market_coherence(mk, s_h, s_a, quote_pack):
         warning_flags.append("low_remaining_value")
 
     # -------------------------
+    # FAIR VALUE / BOOKIE MARGIN
+    # -------------------------
+    if margin_curr >= 0.08:
+        warning_flags.append("high_bookie_protection")
+        coherence_score -= 0.25
+
+    if margin_open > 0 and margin_curr > margin_open + 0.015:
+        warning_flags.append("bookie_margin_rising")
+        coherence_score -= 0.20
+
+    if fav_fair_prob_delta >= 0.045:
+        positive_flags.append("true_fair_support")
+        coherence_score += 0.35
+    elif fav_fair_prob_delta >= 0.025:
+        coherence_score += 0.15
+    elif fav_fair_prob_delta <= 0.000:
+        warning_flags.append("flat_fair_move")
+        coherence_score -= 0.10
+
+    if fav_fair_curr > 0 and fav_odd_curr < (fav_fair_curr * 0.87):
+        warning_flags.append("market_value_trap")
+        coherence_score -= 0.28
+        
+    # -------------------------
     # WARNING STRUTTURALI
     # -------------------------
     if not bilateral_ft and o25 <= 1.68:
@@ -2092,6 +2231,19 @@ def analyze_market_coherence(mk, s_h, s_a, quote_pack):
         "baseline": baseline,
         "struct_snapshot": struct,
         "pressure_snapshot": pressure,
+
+        "margin_open": round3(margin_open),
+        "margin_curr": round3(margin_curr),
+        "margin_delta": round3(margin_curr - margin_open) if (margin_open or margin_curr) else 0.0,
+        "fav_fair_prob_open": fav_fair_prob_open,
+        "fav_fair_prob_curr": fav_fair_prob_curr,
+        "fav_fair_prob_delta": fav_fair_prob_delta,
+        "fav_fair_curr": round3(fav_fair_curr),
+
+        "home_ft_stdev": safe_float(s_h.get("ft_stdev", 9.9), 9.9),
+        "away_ft_stdev": safe_float(s_a.get("ft_stdev", 9.9), 9.9),
+        "home_scoring_regularity": safe_float(s_h.get("scoring_regularity", 0.0), 0.0),
+        "away_scoring_regularity": safe_float(s_a.get("scoring_regularity", 0.0), 0.0),
     }
 
 
@@ -2113,8 +2265,19 @@ def build_market_debug_summary(market_pack):
         "value_left": market_pack.get("value_left", "unknown"),
         "positive_flags": market_pack.get("positive_flags", []),
         "warning_flags": market_pack.get("warning_flags", []),
+        "margin_open": market_pack.get("margin_open", 0.0),
+        "margin_curr": market_pack.get("margin_curr", 0.0),
+        "margin_delta": market_pack.get("margin_delta", 0.0),
+        "fav_fair_prob_open": market_pack.get("fav_fair_prob_open", 0.0),
+        "fav_fair_prob_curr": market_pack.get("fav_fair_prob_curr", 0.0),
+        "fav_fair_prob_delta": market_pack.get("fav_fair_prob_delta", 0.0),
+        "fav_fair_curr": market_pack.get("fav_fair_curr", 0.0),
+        "home_ft_stdev": market_pack.get("home_ft_stdev", 9.9),
+        "away_ft_stdev": market_pack.get("away_ft_stdev", 9.9),
+        "home_scoring_regularity": market_pack.get("home_scoring_regularity", 0.0),
+        "away_scoring_regularity": market_pack.get("away_scoring_regularity", 0.0),
     }
-  # ==========================================
+# ==========================================
 # BLOCCO 4
 # MATCH STRUCTURE + ARCHETYPES + SCORING V25
 # - struttura partita
@@ -3402,6 +3565,11 @@ def should_keep_match(signal_pack):
     value_left = market_pack.get("value_left", "unknown")
     warning_flags = market_pack.get("warning_flags", []) or []
 
+    h_ft_stdev = safe_float(market_pack.get("home_ft_stdev", 9.9), 9.9)
+    a_ft_stdev = safe_float(market_pack.get("away_ft_stdev", 9.9), 9.9)
+    h_regularity = safe_float(market_pack.get("home_scoring_regularity", 0.0), 0.0)
+    a_regularity = safe_float(market_pack.get("away_scoring_regularity", 0.0), 0.0)
+
     structure_score = safe_float(structure_pack.get("structure_score", 0.0), 0.0)
     one_sided_risk = safe_float(structure_pack.get("one_sided_risk", 0.0), 0.0)
     match_profile = structure_pack.get("match_profile", "neutral")
@@ -3439,6 +3607,11 @@ def should_keep_match(signal_pack):
             and coherence_score >= 1.65
             and structure_score >= 1.40
             and one_sided_risk <= 1.30
+            and h_ft_stdev <= 1.45
+            and a_ft_stdev <= 1.45
+            and h_regularity >= 0.62
+            and a_regularity >= 0.62
+            and "market_value_trap" not in warning_flags
         )
 
     # -------------------------------------
