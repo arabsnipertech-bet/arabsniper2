@@ -1,6 +1,6 @@
 {
   "audit_date": "2026-04-08",
-  "generated_at": "2026-04-09T10:24:45",
+  "generated_at": "2026-04-09T19:41:18",
   "counts": {
     "freeze_matches": 27,
     "api_found": 27,
@@ -9,56 +9,166 @@
     "skipped_not_finished": 0,
     "skipped_no_result": 0
   },
-  "stats": {
-    "PTGG": {
-      "total": 18,
-      "hit": 1,
-      "rate": 5.56
-    },
-    "PTO15": {
-      "total": 18,
-      "hit": 3,
-      "rate": 16.67
-    },
-    "OVER": {
-      "total": 27,
-      "hit": 13,
-      "rate": 48.15
-    },
-    "STRONG_OVER": {
-      "total": 19,
-      "hit": 11,
-      "rate": 57.89
-    },
-    "BOOST": {
-      "total": 7,
-      "hit": 1,
-      "rate": 14.29
-    },
-    "GOLD": {
-      "total": 2,
-      "hit": 1,
-      "rate": 50.0
-    },
-    "FISH_GG": {
+  "canonical_stats": {
+    "gold": {
       "total": 0,
       "hit": 0,
       "rate": 0.0
     },
-    "FISH_OVER": {
+    "over_l1": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "over_l2": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "over_l3": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "pt": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "market": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "drop": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "inv": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "probe": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    }
+  },
+  "combo_stats": {
+    "gold_over": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "gold_market": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "gold_drop": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "gold_inv": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "over_market": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "pt_market": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "market_drop": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "market_inv": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "drop_inv": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "probe_market": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    }
+  },
+  "legacy_stats": {
+    "PTGG": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "PTO15": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "OVER": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "STRONG_OVER": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "BOOST": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "GOLD": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "MARKET": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "DROP": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "INV": {
+      "total": 0,
+      "hit": 0,
+      "rate": 0.0
+    },
+    "PROBE": {
       "total": 0,
       "hit": 0,
       "rate": 0.0
     }
   },
   "settlement_rules": {
-    "PTGG": "HT entrambe segnano",
-    "PTO15": "HT almeno 2 gol",
-    "OVER": "FT almeno 3 gol",
-    "STRONG_OVER": "FT almeno 3 gol",
-    "BOOST": "PTO15 + OVER",
-    "GOLD": "BOOST proxy",
-    "FISH_GG": "FT entrambe segnano",
-    "FISH_OVER": "FT almeno 3 gol"
+    "gold": "Hit se FT >= 3 gol",
+    "over_l1": "Hit se FT >= 3 gol",
+    "over_l2": "Hit se FT >= 3 gol",
+    "over_l3": "Hit se FT >= 3 gol",
+    "pt": "Hit se il sotto-segnale PT presente va a segno (PTGG oppure HT>=2; generic PT => HT>=2)",
+    "market": "Hit se FT >= 3 gol",
+    "drop": "Hit se FT >= 3 gol",
+    "inv": "Hit se FT >= 3 gol",
+    "probe": "Hit se FT >= 3 gol"
   }
 }

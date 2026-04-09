@@ -1,6 +1,6 @@
 {
   "audit_date": "2026-04-08",
-  "generated_at": "2026-04-09T10:24:45",
+  "generated_at": "2026-04-09T19:41:18",
   "rows_count": 27,
   "rows": [
     {
@@ -13,18 +13,36 @@
       "info_raw": "⚽ OVER 💪 STRONG OVER",
       "ht_score": "0-0",
       "ft_score": "0-0",
-      "tags": [
-        "OVER",
-        "STRONG_OVER"
-      ],
-      "PTGG": null,
-      "PTO15": null,
-      "OVER": false,
-      "STRONG_OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 0,
+        "ft": 0,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1449508,
@@ -36,18 +54,36 @@
       "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
       "ht_score": "1-0",
       "ft_score": "3-0",
-      "tags": [
-        "OVER",
-        "STRONG_OVER"
-      ],
-      "PTGG": null,
-      "PTO15": null,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 3,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1442021,
@@ -59,21 +95,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "ht_score": "0-1",
       "ft_score": "2-2",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": false,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 4,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1394368,
@@ -85,19 +136,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
       "ht_score": "0-1",
       "ft_score": "1-1",
-      "tags": [
-        "OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": false,
-      "STRONG_OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 2,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1394372,
@@ -109,19 +177,36 @@
       "info_raw": "⚽⭐ GOLD ⚽ OVER 💪 STRONG OVER 📉-0.11",
       "ht_score": "1-1",
       "ft_score": "1-4",
-      "tags": [
-        "GOLD",
-        "OVER",
-        "STRONG_OVER"
-      ],
-      "PTGG": null,
-      "PTO15": null,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": null,
-      "GOLD": true,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 2,
+        "ft": 5,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1394371,
@@ -133,20 +218,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 📉-0.10",
       "ht_score": "1-0",
       "ft_score": "1-2",
-      "tags": [
-        "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 3,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1532899,
@@ -158,20 +259,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
       "ht_score": "0-1",
       "ft_score": "0-1",
-      "tags": [
-        "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": false,
-      "STRONG_OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 1,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1522300,
@@ -183,18 +300,36 @@
       "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
       "ht_score": "0-1",
       "ft_score": "0-2",
-      "tags": [
-        "OVER",
-        "STRONG_OVER"
-      ],
-      "PTGG": null,
-      "PTO15": null,
-      "OVER": false,
-      "STRONG_OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 2,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1531962,
@@ -206,19 +341,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 📉-0.05",
       "ht_score": "2-2",
       "ft_score": "3-6",
-      "tags": [
-        "OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": true,
-      "PTO15": true,
-      "OVER": true,
-      "STRONG_OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 4,
+        "ft": 9,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1534929,
@@ -230,18 +382,36 @@
       "info_raw": "🔥PT1.5 ⚽ OVER",
       "ht_score": "0-0",
       "ft_score": "0-0",
-      "tags": [
-        "OVER",
-        "PTO15"
-      ],
-      "PTGG": null,
-      "PTO15": false,
-      "OVER": false,
-      "STRONG_OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 0,
+        "ft": 0,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1535137,
@@ -253,19 +423,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
       "ht_score": "0-0",
       "ft_score": "0-0",
-      "tags": [
-        "OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": false,
-      "STRONG_OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 0,
+        "ft": 0,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1499060,
@@ -277,21 +464,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "ht_score": "1-0",
       "ft_score": "3-0",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": false,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 3,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1537591,
@@ -303,21 +505,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "ht_score": "3-0",
       "ft_score": "3-0",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": true,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": true,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 3,
+        "ft": 3,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1513518,
@@ -329,20 +546,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 📉-0.05",
       "ht_score": "1-0",
       "ft_score": "2-1",
-      "tags": [
-        "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 3,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1513516,
@@ -354,19 +587,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
       "ht_score": "0-1",
       "ft_score": "0-2",
-      "tags": [
-        "OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": false,
-      "STRONG_OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 2,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1517714,
@@ -378,19 +628,36 @@
       "info_raw": "🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
       "ht_score": "0-1",
       "ft_score": "0-1",
-      "tags": [
-        "OVER",
-        "STRONG_OVER",
-        "PTO15"
-      ],
-      "PTGG": null,
-      "PTO15": false,
-      "OVER": false,
-      "STRONG_OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 1,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1436171,
@@ -402,19 +669,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
       "ht_score": "0-1",
       "ft_score": "1-1",
-      "tags": [
-        "OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": false,
-      "STRONG_OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 2,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1512300,
@@ -426,20 +710,36 @@
       "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "ht_score": "0-1",
       "ft_score": "0-1",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTGG"
-      ],
-      "PTGG": false,
-      "PTO15": null,
-      "OVER": false,
-      "STRONG_OVER": false,
-      "BOOST": false,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 1,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1497812,
@@ -451,20 +751,36 @@
       "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "ht_score": "0-1",
       "ft_score": "0-2",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTGG"
-      ],
-      "PTGG": false,
-      "PTO15": null,
-      "OVER": false,
-      "STRONG_OVER": false,
-      "BOOST": false,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 2,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1497815,
@@ -476,18 +792,36 @@
       "info_raw": "🔥PT1.5 ⚽ OVER",
       "ht_score": "1-1",
       "ft_score": "1-2",
-      "tags": [
-        "OVER",
-        "PTO15"
-      ],
-      "PTGG": null,
-      "PTO15": true,
-      "OVER": true,
-      "STRONG_OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 2,
+        "ft": 3,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1439694,
@@ -499,21 +833,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "ht_score": "1-0",
       "ft_score": "2-1",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": false,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 3,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1454853,
@@ -525,18 +874,36 @@
       "info_raw": "⚽ OVER 💪 STRONG OVER 🐟G",
       "ht_score": "0-1",
       "ft_score": "0-1",
-      "tags": [
-        "OVER",
-        "STRONG_OVER"
-      ],
-      "PTGG": null,
-      "PTO15": null,
-      "OVER": false,
-      "STRONG_OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 1,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1491654,
@@ -548,20 +915,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER",
       "ht_score": "1-0",
       "ft_score": "2-1",
-      "tags": [
-        "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 3,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1516011,
@@ -573,20 +956,36 @@
       "info_raw": "⚽⭐ GOLD 🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
       "ht_score": "0-0",
       "ft_score": "2-1",
-      "tags": [
-        "GOLD",
-        "OVER",
-        "STRONG_OVER",
-        "PTGG"
-      ],
-      "PTGG": false,
-      "PTO15": null,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": null,
-      "GOLD": false,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 0,
+        "ft": 3,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1537083,
@@ -598,19 +997,36 @@
       "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER",
       "ht_score": "0-0",
       "ft_score": "0-0",
-      "tags": [
-        "OVER",
-        "STRONG_OVER",
-        "PTGG"
-      ],
-      "PTGG": false,
-      "PTO15": null,
-      "OVER": false,
-      "STRONG_OVER": false,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 0,
+        "ft": 0,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1385130,
@@ -622,21 +1038,36 @@
       "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.14",
       "ht_score": "1-0",
       "ft_score": "3-2",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "PTGG": false,
-      "PTO15": false,
-      "OVER": true,
-      "STRONG_OVER": true,
-      "BOOST": false,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 5,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1534908,
@@ -648,18 +1079,36 @@
       "info_raw": "🔥PT1.5 ⚽ OVER 📉-0.14",
       "ht_score": "1-0",
       "ft_score": "2-0",
-      "tags": [
-        "OVER",
-        "PTO15"
-      ],
-      "PTGG": null,
-      "PTO15": false,
-      "OVER": false,
-      "STRONG_OVER": null,
-      "BOOST": null,
-      "GOLD": null,
-      "FISH_GG": null,
-      "FISH_OVER": null
+      "goals": {
+        "ht": 1,
+        "ft": 2,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [],
+      "drop_diff": null,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     }
   ]
 }
