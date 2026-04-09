@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-04-09 15:50:19",
+    "updated_at": "2026-04-09 16:03:09",
     "day": 1,
     "date": "2026-04-09",
     "details": {
@@ -2195,22 +2195,22 @@
                 "away_last_2h_zero": true
             },
             "fair_value": {
-                "margin_open": 0.0,
+                "margin_open": 0.102,
                 "margin_curr": 0.102,
-                "margin_delta": 0.102,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.703,
                 "fav_fair_prob_curr": 0.703,
-                "fav_fair_prob_delta": 0.703,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 1.422
             },
             "scores": {
                 "ptgg": 5.42,
-                "pto15": 4.03,
-                "pt": 6.065,
+                "pto15": 3.85,
+                "pt": 6.036,
                 "over": 4.31,
-                "boost": 5.62,
-                "gold": 3.218,
-                "max": 6.065
+                "boost": 5.236,
+                "gold": 2.836,
+                "max": 6.036
             },
             "tags": [
                 "PT",
@@ -2238,7 +2238,7 @@
             },
             "market_reading": {
                 "market_profile": "full_open",
-                "coherence_score": 2.5,
+                "coherence_score": 2.05,
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
@@ -2250,19 +2250,19 @@
                 "value_left": "unknown",
                 "positive_flags": [
                     "ft_struct_market_aligned",
-                    "ht_struct_market_aligned",
-                    "true_fair_support"
+                    "ht_struct_market_aligned"
                 ],
                 "warning_flags": [
                     "high_bookie_protection",
+                    "flat_fair_move",
                     "o25_too_low_for_one_sided_ft"
                 ],
-                "margin_open": 0.0,
+                "margin_open": 0.102,
                 "margin_curr": 0.102,
-                "margin_delta": 0.102,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.703,
                 "fav_fair_prob_curr": 0.703,
-                "fav_fair_prob_delta": 0.703,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 1.422,
                 "home_ft_stdev": 1.412,
                 "away_ft_stdev": 1.79,
@@ -4281,12 +4281,12 @@
             "home_team": "Fratria",
             "away_team": "Lokomotiv G. Oryahovitsa",
             "markets": {
-                "q1": 1.27,
-                "qx": 4.75,
-                "q2": 9.5,
+                "q1": 1.3,
+                "qx": 4.2,
+                "q2": 10.0,
                 "o25": 1.85,
-                "o05ht": 1.35,
-                "o15ht": 2.63
+                "o05ht": 1.33,
+                "o15ht": 2.5
             },
             "averages": {
                 "home_avg_ft": 3.428,
@@ -4323,7 +4323,7 @@
                 "away_ht_conceded_1plus_rate": 0.306
             },
             "flags": {
-                "fav_quote": 1.27,
+                "fav_quote": 1.3,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
@@ -4331,21 +4331,21 @@
             },
             "fair_value": {
                 "margin_open": 0.103,
-                "margin_curr": 0.103,
-                "margin_delta": 0.0,
+                "margin_curr": 0.107,
+                "margin_delta": 0.004,
                 "fav_fair_prob_open": 0.714,
-                "fav_fair_prob_curr": 0.714,
-                "fav_fair_prob_delta": 0.0,
-                "fav_fair_curr": 1.401
+                "fav_fair_prob_curr": 0.695,
+                "fav_fair_prob_delta": -0.019,
+                "fav_fair_curr": 1.44
             },
             "scores": {
-                "ptgg": 5.48,
-                "pto15": 3.78,
-                "pt": 6.085,
+                "ptgg": 5.78,
+                "pto15": 4.0,
+                "pt": 6.42,
                 "over": 8.15,
-                "boost": 6.861,
-                "gold": 9.011,
-                "max": 9.011
+                "boost": 6.914,
+                "gold": 8.851,
+                "max": 8.851
             },
             "tags": [
                 "PT",
@@ -4369,8 +4369,8 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.4,
-                "fav_quote": 1.27,
-                "fav_zone": "ultra"
+                "fav_quote": 1.3,
+                "fav_zone": "strong"
             },
             "market_reading": {
                 "market_profile": "ft_open_ht_lag",
@@ -4378,12 +4378,12 @@
                 "coherence_level": "high",
                 "dislocation_score": 0.6,
                 "dislocation_level": "medium",
-                "leading_market": "none",
+                "leading_market": "ht",
                 "lagging_market": "o05ht",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "drop_type": "divergent",
+                "drop_strength": "medium",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "low",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
@@ -4391,16 +4391,18 @@
                     "lagged_ht_opening"
                 ],
                 "warning_flags": [
+                    "goals_move_without_1x2_support",
+                    "low_remaining_value",
                     "high_bookie_protection",
                     "flat_fair_move"
                 ],
                 "margin_open": 0.103,
-                "margin_curr": 0.103,
-                "margin_delta": 0.0,
+                "margin_curr": 0.107,
+                "margin_delta": 0.004,
                 "fav_fair_prob_open": 0.714,
-                "fav_fair_prob_curr": 0.714,
-                "fav_fair_prob_delta": 0.0,
-                "fav_fair_curr": 1.401,
+                "fav_fair_prob_curr": 0.695,
+                "fav_fair_prob_delta": -0.019,
+                "fav_fair_curr": 1.44,
                 "home_ft_stdev": 1.18,
                 "away_ft_stdev": 2.039,
                 "home_scoring_regularity": 1.0,
@@ -4412,7 +4414,7 @@
                     "⚽ OVER"
                 ],
                 "strong_tag_count": 2,
-                "fav_quote": 1.27,
+                "fav_quote": 1.3,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
@@ -4421,7 +4423,7 @@
                     "COHERENT",
                     "LIGHT_GAP"
                 ],
-                "over_level": 3
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
