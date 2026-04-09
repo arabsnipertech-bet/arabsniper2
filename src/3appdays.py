@@ -3592,7 +3592,7 @@ def build_signal_package(fid, mk, s_h, s_a):
 
     probe_g_ok = (
         "⚽⭐ GOLD" not in tags
-        and not (("PT" in tags) and ("⚽ OVER" in tags))
+        and "⚽ OVER" not in tags
         and 1.38 <= fav <= 2.08
         and combined_ht_clean >= 0.82
         and combined_ft_clean >= 1.46
@@ -3602,9 +3602,9 @@ def build_signal_package(fid, mk, s_h, s_a):
         and coherence_score >= 1.10
         and value_left != "low"
     )
+
     if probe_o_ok or probe_g_ok:
         tags.append("PROBE")
-
     # -------------------------------------------------
     # LAYER 6 - DROP INFO / MARKET PUSH
     # informativo + recupero match da forte pressione mercato
