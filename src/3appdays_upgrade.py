@@ -1110,6 +1110,17 @@ def get_team_last_matches(session, tid):
 
         last_matches.append(row)
 
+    try:
+        last_matches = sorted(
+            last_matches,
+            key=lambda x: str(x.get("date", "")),
+            reverse=True
+        )
+        for idx, row in enumerate(last_matches):
+            row["seq"] = idx + 1
+    except Exception:
+        pass
+    
     st.session_state.team_last_matches_cache[cache_key] = last_matches
     return last_matches
 
@@ -2836,6 +2847,11 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     market_profile = market_pack.get("market_profile", "neutral")
     drop_type = market_pack.get("drop_type", "none")
 
+    home_ft_stdev = safe_float(s_h.get("ft_stdev", 9.9), 9.9)
+    away_ft_stdev = safe_float(s_a.get("ft_stdev", 9.9), 9.9)
+    home_scoring_regularity = safe_float(s_h.get("scoring_regularity", 0.0), 0.0)
+    away_scoring_regularity = safe_float(s_a.get("scoring_regularity", 0.0), 0.0)
+
     if cross_home_clean >= 2.20:
         score += 0.65
     elif cross_home_clean >= 2.05:
@@ -2925,6 +2941,37 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     elif one_sided_risk >= 1.35:
         score -= 0.42
 
+    # -------------------------
+    # REGOLARITÀ / STDEV
+    # -------------------------
+    if home_ft_stdev <= 1.15:
+        score += 0.28
+    elif home_ft_stdev <= 1.35:
+        score += 0.12
+    elif home_ft_stdev >= 1.75:
+        score -= 0.30
+
+    if away_ft_stdev <= 1.15:
+        score += 0.28
+    elif away_ft_stdev <= 1.35:
+        score += 0.12
+    elif away_ft_stdev >= 1.75:
+        score -= 0.30
+
+    if home_scoring_regularity >= 0.75:
+        score += 0.28
+    elif home_scoring_regularity >= 0.62:
+        score += 0.12
+    elif home_scoring_regularity <= 0.45:
+        score -= 0.35
+
+    if away_scoring_regularity >= 0.75:
+        score += 0.28
+    elif away_scoring_regularity >= 0.62:
+        score += 0.12
+    elif away_scoring_regularity <= 0.45:
+        score -= 0.35
+
     if combined_ft_clean < 1.48:
         score -= 0.28
     elif combined_ft_clean < 1.58:
@@ -2968,6 +3015,10 @@ def score_boost_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack, pt
     leading_market = market_pack.get("leading_market", "none")
     lagging_market = market_pack.get("lagging_market", "none")
     drop_type = market_pack.get("drop_type", "none")
+    home_ft_stdev = safe_float(s_h.get("ft_stdev", 9.9), 9.9)
+    away_ft_stdev = safe_float(s_a.get("ft_stdev", 9.9), 9.9)
+    home_scoring_regularity = safe_float(s_h.get("scoring_regularity", 0.0), 0.0)
+    away_scoring_regularity = safe_float(s_a.get("scoring_regularity", 0.0), 0.0)
 
     score += pt_score * 0.16
     score += over_score * 0.58
@@ -3012,6 +3063,22 @@ def score_boost_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack, pt
 
     if drop_type == "structural":
         score += 0.20
+
+    # -------------------------
+    # REGOLARITÀ / STDEV
+    # BOOST deve essere forte ma non sporco
+    # -------------------------
+    if home_ft_stdev <= 1.15 and away_ft_stdev <= 1.15:
+        score += 0.38
+    elif home_ft_stdev <= 1.35 and away_ft_stdev <= 1.35:
+        score += 0.18
+    elif home_ft_stdev >= 1.75 or away_ft_stdev >= 1.75:
+        score -= 0.42
+
+    if home_scoring_regularity >= 0.70 and away_scoring_regularity >= 0.70:
+        score += 0.34
+    elif home_scoring_regularity <= 0.45 or away_scoring_regularity <= 0.45:
+        score -= 0.42
 
     if safe_float(s_h.get("ft_low_rate", 0.0), 0.0) >= 0.38:
         score -= 0.70
