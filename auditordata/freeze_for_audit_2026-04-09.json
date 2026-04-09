@@ -1,207 +1,220 @@
 {
   "audit_date": "2026-04-09",
-  "created_at": "2026-04-09T10:05:06",
+  "created_at": "2026-04-09T19:40:47",
   "source_file": "data_day1.json",
-  "matches_count": 14,
+  "matches_count": 8,
   "primary_counts": {
-    "OVER": 5,
-    "STRONG_OVER": 2,
-    "BOOST": 7
+    "PROBE": 4,
+    "OVER_L1": 4
   },
-  "tag_counts": {
-    "OVER": 14,
-    "PTO15": 9,
-    "PTGG": 8,
-    "STRONG_OVER": 9,
-    "BOOST": 7
+  "canonical_counts": {
+    "probe": 4,
+    "over_l1": 4,
+    "pt": 3,
+    "drop": 1
+  },
+  "legacy_counts": {
+    "PROBE": 4,
+    "OVER": 4,
+    "PT": 3,
+    "DROP": 1
   },
   "matches": [
     {
-      "fixture_id": 1398648,
-      "date": "2026-04-09",
-      "league": "1. Lig (Turkey)",
-      "match": "Esenler Erokspor - Amed",
-      "info_raw": "🔥PT1.5 ⚽ OVER 📉-0.10",
-      "tags": [
-        "OVER",
-        "PTO15"
-      ],
-      "primary_signal": "OVER"
-    },
-    {
-      "fixture_id": 1532901,
-      "date": "2026-04-09",
-      "league": "AFC Challenge League (World)",
-      "match": "Svay Rieng - Manila Digger",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
-      "tags": [
-        "OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "primary_signal": "OVER"
-    },
-    {
-      "fixture_id": 1466952,
-      "date": "2026-04-09",
-      "league": "Birinci Dasta (Azerbaijan)",
-      "match": "Safa Baku - Səbail",
-      "info_raw": "⚽ OVER",
-      "tags": [
-        "OVER"
-      ],
-      "primary_signal": "OVER"
-    },
-    {
-      "fixture_id": 1535331,
-      "date": "2026-04-09",
-      "league": "CONCACAF Champions League (World)",
-      "match": "Toluca - Los Angeles Galaxy",
-      "info_raw": "⚽ OVER 💪 STRONG OVER 📉-0.16",
-      "tags": [
-        "OVER",
-        "STRONG_OVER"
-      ],
-      "primary_signal": "STRONG_OVER"
-    },
-    {
-      "fixture_id": 1535247,
-      "date": "2026-04-09",
-      "league": "CONMEBOL Libertadores (World)",
-      "match": "Sporting Cristal - Cerro Porteno",
-      "info_raw": "⚽ OVER 💪 STRONG OVER",
-      "tags": [
-        "OVER",
-        "STRONG_OVER"
-      ],
-      "primary_signal": "STRONG_OVER"
-    },
-    {
-      "fixture_id": 1499064,
+      "fixture_id": 1499065,
       "date": "2026-04-09",
       "league": "Division 1 (Saudi-Arabia)",
-      "match": "Al Ula - Abha",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
-      "tags": [
-        "OVER",
-        "PTGG",
-        "PTO15"
+      "match": "Al-Adalah - Al Baten",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
       ],
-      "primary_signal": "OVER"
+      "primary_signal": "PROBE",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1511853,
       "date": "2026-04-09",
       "league": "Primera B (Colombia)",
       "match": "Union Magdalena - Envigado",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
-      "tags": [
-        "BOOST",
+      "info_raw": "PT ⚽ OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": true,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
         "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
+        "PT"
       ],
-      "primary_signal": "BOOST"
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
-      "fixture_id": 1537618,
+      "fixture_id": 1512291,
       "date": "2026-04-09",
-      "league": "Primera Division (Nicaragua)",
-      "match": "H&H Export - Real Madriz",
-      "info_raw": "🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTO15"
+      "league": "Reserve League (Argentina)",
+      "match": "Aldosivi Res. - River Plate Res.",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
       ],
-      "primary_signal": "BOOST"
-    },
-    {
-      "fixture_id": 1436159,
-      "date": "2026-04-09",
-      "league": "Pro League (Saudi-Arabia)",
-      "match": "Damac - Al-Qadisiyah FC",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER",
-      "tags": [
-        "OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "primary_signal": "OVER"
-    },
-    {
-      "fixture_id": 1451899,
-      "date": "2026-04-09",
-      "league": "Second League (Bulgaria)",
-      "match": "Fratria - Lokomotiv G. Oryahovitsa",
-      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTGG"
-      ],
-      "primary_signal": "BOOST"
-    },
-    {
-      "fixture_id": 1521033,
-      "date": "2026-04-09",
-      "league": "State Cup (Israel)",
-      "match": "Hapoel Beer Sheva - Bnei Yehuda",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
-      ],
-      "primary_signal": "BOOST"
+      "primary_signal": "PROBE",
+      "drop_diff": 0.03,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1535343,
       "date": "2026-04-09",
       "league": "UEFA Europa Conference League (World)",
       "match": "FSV Mainz 05 - Strasbourg",
-      "info_raw": "🎯PTGG ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.10",
-      "tags": [
-        "BOOST",
+      "info_raw": "PT ⚽ OVER DROP",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": true,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
         "OVER",
-        "STRONG_OVER",
-        "PTGG"
+        "PT",
+        "DROP"
       ],
-      "primary_signal": "BOOST"
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.1,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535345,
+      "date": "2026-04-09",
+      "league": "UEFA Europa Conference League (World)",
+      "match": "Shakhtar Donetsk - AZ Alkmaar",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "primary_signal": "PROBE",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535335,
+      "date": "2026-04-09",
+      "league": "UEFA Europa League (World)",
+      "match": "Bologna - Aston Villa",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "primary_signal": "PROBE",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
       "fixture_id": 1535336,
       "date": "2026-04-09",
       "league": "UEFA Europa League (World)",
       "match": "FC Porto - Nottingham Forest",
-      "info_raw": "🎯PTGG 🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST",
-      "tags": [
-        "BOOST",
+      "info_raw": "PT ⚽ OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": true,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
         "OVER",
-        "STRONG_OVER",
-        "PTGG",
-        "PTO15"
+        "PT"
       ],
-      "primary_signal": "BOOST"
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     },
     {
-      "fixture_id": 1515797,
+      "fixture_id": 1535337,
       "date": "2026-04-09",
-      "league": "Virsliga (Latvia)",
-      "match": "Grobiņa - Super Nova",
-      "info_raw": "🔥PT1.5 ⚽ OVER 💪 STRONG OVER 🚀 BOOST 📉-0.23",
-      "tags": [
-        "BOOST",
-        "OVER",
-        "STRONG_OVER",
-        "PTO15"
+      "league": "UEFA Europa League (World)",
+      "match": "SC Freiburg - Celta Vigo",
+      "info_raw": "⚽ OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
       ],
-      "primary_signal": "BOOST"
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.04,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
     }
   ]
 }
