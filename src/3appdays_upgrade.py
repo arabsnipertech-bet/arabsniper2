@@ -3605,11 +3605,11 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_gold:
         return bool(
-            gold_score >= 5.80
+            gold_score >= 5.85
             and over_score >= 3.95
             and coherence_score >= 1.65
-            and structure_score >= 1.40
-            and one_sided_risk <= 1.30
+            and structure_score >= 1.35
+            and one_sided_risk <= 1.42
             and h_ft_stdev <= 1.45
             and a_ft_stdev <= 1.45
             and h_regularity >= 0.62
@@ -3622,7 +3622,7 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_boost:
         return bool(
-            boost_score >= 5.35
+            boost_score >= 5.30
             and pt_score >= 3.55
             and over_score >= 3.70
             and coherence_score >= 1.20
@@ -3676,9 +3676,9 @@ def should_keep_match(signal_pack):
     
     if has_over and not (has_ptgg or has_pt15):
         return bool(
-            over_score >= 3.45
-            and coherence_score >= 1.00
-            and structure_score >= 0.85
+            over_score >= 3.40
+            and coherence_score >= 0.98
+            and structure_score >= 0.82
             and one_sided_risk <= 1.60
         )
 
@@ -3687,11 +3687,12 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_market_push:
         return bool(
-            max_score >= 3.00
-            and coherence_score >= 1.10
-            and structure_score >= 0.95
-            and one_sided_risk <= 1.60
+            max_score >= 2.85
+            and coherence_score >= 1.00
+            and structure_score >= 0.88
+            and one_sided_risk <= 1.65
             and value_left != "low"
+            and "market_value_trap" not in warning_flags
         )
     
     # -------------------------------------
