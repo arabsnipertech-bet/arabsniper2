@@ -3448,7 +3448,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     # LAYER 3 - BOOST
     # BOOST = convergenza vera PT + OVER + book leggibile
     # -------------------------------------------------
-    boost_has_pt = ("🎯PTGG" in tags or "🔥PT1.5" in tags)
+    boost_has_pt = ("PT" in tags)
     boost_has_over = ("⚽ OVER" in tags)
 
     boost_gate_structure = (
@@ -3578,7 +3578,6 @@ def build_signal_package(fid, mk, s_h, s_a):
     # -------------------------------------------------
     probe_o_ok = (
         "⚽ OVER" not in tags
-        and "🚀 BOOST" not in tags
         and "⚽⭐ GOLD" not in tags
         and combined_ft_clean >= 1.42
         and safe_float(s_h.get("ft_2plus_rate", 0.0), 0.0) >= 0.44
@@ -3592,9 +3591,8 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     probe_g_ok = (
-        "🚀 BOOST" not in tags
-        and "⚽⭐ GOLD" not in tags
-        and not (("🎯PTGG" in tags or "🔥PT1.5" in tags) and "⚽ OVER" in tags)
+        "⚽⭐ GOLD" not in tags
+        and not (("PT" in tags) and ("⚽ OVER" in tags))
         and 1.38 <= fav <= 2.08
         and combined_ht_clean >= 0.82
         and combined_ft_clean >= 1.46
@@ -3604,7 +3602,6 @@ def build_signal_package(fid, mk, s_h, s_a):
         and coherence_score >= 1.10
         and value_left != "low"
     )
-
     if probe_o_ok or probe_g_ok:
         tags.append("PROBE")
 
