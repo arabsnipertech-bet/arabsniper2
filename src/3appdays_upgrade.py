@@ -952,23 +952,55 @@ def rate_equal(values, target):
         return 0.0
     return sum(1 for x in vals if x == target) / len(vals)
 
-
-def build_recent_weights(n):
+def days_since_match(match_date_str):
     """
-    Pesi recency semplici ma utili.
-    Ultime 2 più pesanti, poi 2 intermedie, poi base.
+    Giorni trascorsi tra la data del match storico e oggi (Rome).
+    Se parsing fallisce, ritorna 0.
     """
-    if n <= 0:
+    try:
+        if not match_date_str:
+            return 0
+        match_dt = datetime.strptime(str(match_date_str), "%Y-%m-%d").date()
+        today_dt = now_rome().date()
+        return max((today_dt - match_dt).days, 0)
+    except Exception:
+        return 0
+    
+def build_recent_weights(matches):
+    """
+    Pesi recency:
+    - peso base per ordine lista
+    - decay reale per età del match
+    """
+    matches = matches or []
+    if not matches:
         return []
 
     weights = []
-    for i in range(n):
+
+    for i, m in enumerate(matches):
         if i <= 1:
-            weights.append(1.35)
+            base_w = 1.35
         elif i <= 3:
-            weights.append(1.15)
+            base_w = 1.15
         else:
-            weights.append(1.00)
+            base_w = 1.00
+
+        age_days = days_since_match(m.get("date"))
+
+        if age_days > 21:
+            age_factor = 0.40
+        elif age_days > 14:
+            age_factor = 0.50
+        elif age_days > 10:
+            age_factor = 0.70
+        elif age_days > 7:
+            age_factor = 0.85
+        else:
+            age_factor = 1.00
+
+        weights.append(round3(base_w * age_factor))
+
     return weights
 
 
@@ -1153,7 +1185,7 @@ def summarize_match_set(matches, label="all"):
             "scoring_regularity": 0.0,
         }
 
-    weights = build_recent_weights(len(matches))
+    weights = build_recent_weights(matches)
 
     ft_list = extract_metric_list(matches, "total_ft_goals")
     ht_list = extract_metric_list(matches, "total_ht_goals")
@@ -2130,9 +2162,19 @@ def analyze_market_coherence(mk, s_h, s_a, quote_pack):
     # -------------------------
     # FAIR VALUE / BOOKIE MARGIN
     # -------------------------
+    fav_drop_now = (
+        fav_odd_open > 0
+        and fav_odd_curr > 0
+        and fav_odd_curr < fav_odd_open
+    )
+
     if margin_curr >= 0.08:
         warning_flags.append("high_bookie_protection")
         coherence_score -= 0.25
+
+        if fav_drop_now:
+            warning_flags.append("suspicious_limit")
+            coherence_score -= 0.18
 
     if margin_open > 0 and margin_curr > margin_open + 0.015:
         warning_flags.append("bookie_margin_rising")
@@ -3441,6 +3483,8 @@ def build_signal_package(fid, mk, s_h, s_a):
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
         and not has_warning(market_pack, "favorite_ultra_but_ft_structure_weak")
+        and not has_warning(market_pack, "suspicious_limit")
+        and not has_warning(market_pack, "market_value_trap")
     )
 
     gold_gate_extra = (
@@ -3628,6 +3672,8 @@ def should_keep_match(signal_pack):
             and coherence_score >= 1.20
             and structure_score >= 1.00
             and one_sided_risk <= 1.50
+            and "market_value_trap" not in warning_flags
+            and "suspicious_limit" not in warning_flags
         )
 
     # -------------------------------------
@@ -4177,6 +4223,16 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                             "away_last_2h_zero": bool(s_a.get("last_2h_zero", False)),
                         },
 
+                        "fair_value": {
+                            "margin_open": round3(safe_float(market_pack.get("margin_open", 0.0), 0.0)),
+                            "margin_curr": round3(safe_float(market_pack.get("margin_curr", 0.0), 0.0)),
+                            "margin_delta": round3(safe_float(market_pack.get("margin_delta", 0.0), 0.0)),
+                            "fav_fair_prob_open": round3(safe_float(market_pack.get("fav_fair_prob_open", 0.0), 0.0)),
+                            "fav_fair_prob_curr": round3(safe_float(market_pack.get("fav_fair_prob_curr", 0.0), 0.0)),
+                            "fav_fair_prob_delta": round3(safe_float(market_pack.get("fav_fair_prob_delta", 0.0), 0.0)),
+                            "fav_fair_curr": round3(safe_float(market_pack.get("fav_fair_curr", 0.0), 0.0)),
+                        },
+
                         "scores": scores,
                         "tags": tags,
                         "internal_labels": signal_pack.get("internal_labels", []),
@@ -4449,6 +4505,7 @@ def show_match_modal(fixture_id: str):
 
     avg = detail.get("averages", {})
     flags = detail.get("flags", {})
+    fair_value = detail.get("fair_value", {})
     scores = detail.get("scores", {})
     structure = detail.get("structure", {})
     market_reading = detail.get("market_reading", {})
@@ -4518,6 +4575,22 @@ def show_match_modal(fixture_id: str):
     st.write(f"**Positive Flags:** {', '.join(pos_flags) if pos_flags else 'Nessuna'}")
     st.write(f"**Warning Flags:** {', '.join(warn_flags) if warn_flags else 'Nessuna'}")
 
+    st.write(
+        f"**Margin Open:** {safe_float(fair_value.get('margin_open', 0), 0.0):.3f} | "
+        f"**Margin Curr:** {safe_float(fair_value.get('margin_curr', 0), 0.0):.3f} | "
+        f"**Margin Delta:** {safe_float(fair_value.get('margin_delta', 0), 0.0):.3f}"
+    )
+
+    st.write(
+        f"**Fav Fair Prob Open:** {safe_float(fair_value.get('fav_fair_prob_open', 0), 0.0):.3f} | "
+        f"**Fav Fair Prob Curr:** {safe_float(fair_value.get('fav_fair_prob_curr', 0), 0.0):.3f} | "
+        f"**Fav Fair Prob Delta:** {safe_float(fair_value.get('fav_fair_prob_delta', 0), 0.0):.3f}"
+    )
+
+    st.write(
+        f"**Fav Fair Odd Curr:** {safe_float(fair_value.get('fav_fair_curr', 0), 0.0):.3f}"
+    )
+
     st.markdown("---")
     st.subheader("🧠 Score interni V25")
     s1, s2, s3, s4, s5, s6 = st.columns(6)
@@ -4558,6 +4631,10 @@ def show_match_modal(fixture_id: str):
             f"**FT 2+ Rate:** {safe_float(home_profile.get('ft_2plus_rate', 0), 0.0):.2f}"
         )
         st.write(
+            f"**FT StDev:** {safe_float(home_profile.get('ft_stdev', 9.9), 9.9):.2f} | "
+            f"**Scoring Regularity:** {safe_float(home_profile.get('scoring_regularity', 0), 0.0):.2f}"
+        )
+        st.write(
             f"**CTX AVG FT Clean:** {safe_float(home_profile.get('ctx_avg_total_clean', 0), 0.0):.2f} | "
             f"**CTX AVG HT Clean:** {safe_float(home_profile.get('ctx_avg_ht_clean', 0), 0.0):.2f}"
         )
@@ -4579,6 +4656,10 @@ def show_match_modal(fixture_id: str):
         st.write(
             f"**HT 1+ Rate:** {safe_float(away_profile.get('ht_1plus_rate', 0), 0.0):.2f} | "
             f"**FT 2+ Rate:** {safe_float(away_profile.get('ft_2plus_rate', 0), 0.0):.2f}"
+        )
+        st.write(
+            f"**FT StDev:** {safe_float(away_profile.get('ft_stdev', 9.9), 9.9):.2f} | "
+            f"**Scoring Regularity:** {safe_float(away_profile.get('scoring_regularity', 0), 0.0):.2f}"
         )
         st.write(
             f"**CTX AVG FT Clean:** {safe_float(away_profile.get('ctx_avg_total_clean', 0), 0.0):.2f} | "
