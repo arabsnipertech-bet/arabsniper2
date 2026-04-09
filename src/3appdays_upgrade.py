@@ -4747,7 +4747,7 @@ def show_match_modal(fixture_id: str):
             st.dataframe(df_away, use_container_width=True, hide_index=True)
         else:
             st.info("Nessun dato away disponibile.")
-            
+
 if st.session_state.selected_fixture_for_modal:
     show_match_modal(st.session_state.selected_fixture_for_modal)
 
