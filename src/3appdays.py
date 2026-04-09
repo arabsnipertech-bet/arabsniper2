@@ -1661,6 +1661,7 @@ def build_quote_movement_package(fid, mk):
 def build_movement_summary(row):
     """
     Riassunto leggibile da UI.
+    Più intuitivo: priorità a inversione e 1X2, poi goal market.
     """
     parts = []
 
@@ -1669,28 +1670,26 @@ def build_movement_summary(row):
     inv_to = str(row.get("INV_TO", "")).strip()
 
     if inv and inv_from and inv_to:
-        parts.append(f"⚠️ {inv_from}→{inv_to}")
+        parts.append(f"INV {inv_from}→{inv_to}")
 
-    q1 = row.get("Q1_MOVE_DATA", {}) or {}
-    q2 = row.get("Q2_MOVE_DATA", {}) or {}
+    def add_move(label, move_data):
+        move_data = move_data or {}
+        direction = str(move_data.get("dir", "")).strip()
+        abs_diff = safe_float(move_data.get("abs_diff", 0.0), 0.0)
 
-    if str(q1.get("dir", "")) == "down" and safe_float(q1.get("abs_diff", 0.0), 0.0) >= 0.06:
-        parts.append("↓1")
+        if abs_diff < 0.06:
+            return
 
-    if str(q2.get("dir", "")) == "down" and safe_float(q2.get("abs_diff", 0.0), 0.0) >= 0.06:
-        parts.append("↓2")
+        if direction == "down":
+            parts.append(f"{label} ↓ {abs_diff:.2f}")
+        elif direction == "up":
+            parts.append(f"{label} ↑ {abs_diff:.2f}")
 
-    o25 = row.get("O25_MOVE_DATA", {}) or {}
-    o05 = row.get("O05HT_MOVE_DATA", {}) or {}
-
-    o25_label = str(o25.get("label", "")).strip()
-    o05_label = str(o05.get("label", "")).strip()
-
-    if o25_label and safe_float(o25.get("abs_diff", 0.0), 0.0) >= 0.06:
-        parts.append(f"O25 {o25_label}")
-
-    if o05_label and safe_float(o05.get("abs_diff", 0.0), 0.0) >= 0.06:
-        parts.append(f"O05HT {o05_label}")
+    add_move("1", row.get("Q1_MOVE_DATA"))
+    add_move("X", row.get("QX_MOVE_DATA"))
+    add_move("2", row.get("Q2_MOVE_DATA"))
+    add_move("O2.5", row.get("O25_MOVE_DATA"))
+    add_move("O0.5 HT", row.get("O05HT_MOVE_DATA"))
 
     return " • ".join(parts)
 
@@ -3351,6 +3350,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     value_left = market_pack.get("value_left", "unknown")
 
     drop_diff = compute_drop_diff(fid, mk)
+    over_level = 0
 
     tags = []
     internal_labels = []
@@ -3435,17 +3435,15 @@ def build_signal_package(fid, mk, s_h, s_a):
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
     )
 
-    if ptgg_ok:
-        tags.append("🎯PTGG")
-
-    if pto15_ok:
-        tags.append("🔥PT1.5")
+    if ptgg_ok or pto15_ok:
+        tags.append("PT")
 
     if over_ok and combined_ht_scored_clean >= 0.58:
+        over_level = 1
         tags.append("⚽ OVER")
 
-    if "⚽ OVER" in tags and strong_over_ok:
-        tags.append("💪 STRONG OVER")
+    if strong_over_ok:
+        over_level = max(over_level, 2)
     # -------------------------------------------------
     # LAYER 3 - BOOST
     # BOOST = convergenza vera PT + OVER + book leggibile
@@ -3516,7 +3514,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         and boost_gate_quality
         and boost_gate_shape
     ):
-        tags.append("🚀 BOOST")
+        over_level = max(over_level, 3)
 
     # -------------------------------------------------
     # LAYER 4 - GOLD
@@ -3607,23 +3605,19 @@ def build_signal_package(fid, mk, s_h, s_a):
         and value_left != "low"
     )
 
-    if probe_o_ok:
-        tags.append("🐟O")
-
-    if probe_g_ok:
-        tags.append("🐟G")
+    if probe_o_ok or probe_g_ok:
+        tags.append("PROBE")
 
     # -------------------------------------------------
     # LAYER 6 - DROP INFO / MARKET PUSH
     # informativo + recupero match da forte pressione mercato
     # -------------------------------------------------
     if drop_diff >= 0.05:
-        tags.append(f"📉-{drop_diff:.2f}")
+        tags.append("DROP")
 
     market_push_ok = (
         drop_diff >= 0.14
         and "⚽ OVER" not in tags
-        and "🚀 BOOST" not in tags
         and "⚽⭐ GOLD" not in tags
         and coherence_score >= 1.10
         and structure_score >= 0.95
@@ -3632,15 +3626,19 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     if market_push_ok:
-        tags.append("🔥 MARKET PUSH")
+        tags.append("MARKET")
 
+    if quote_pack.get("INVERSION", False):
+        tags.append("INV")    
+    
     strong_tag_count = (
-        int("🎯PTGG" in tags) +
-        int("🔥PT1.5" in tags) +
+        int("PT" in tags) +
         int("⚽ OVER" in tags) +
-        int("💪 STRONG OVER" in tags) +
-        int("🚀 BOOST" in tags) +
-        int("⚽⭐ GOLD" in tags)
+        int("⚽⭐ GOLD" in tags) +
+        int("PROBE" in tags) +
+        int("DROP" in tags) +
+        int("MARKET" in tags) +
+        int("INV" in tags)
     )
 
     return {
@@ -3654,6 +3652,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         "market_pack": market_pack,
         "structure_pack": structure_pack,
         "internal_labels": internal_labels,
+        "over_level": over_level,
     }
 
 def should_keep_match(signal_pack):
@@ -3688,15 +3687,13 @@ def should_keep_match(signal_pack):
     one_sided_risk = safe_float(structure_pack.get("one_sided_risk", 0.0), 0.0)
     match_profile = structure_pack.get("match_profile", "neutral")
 
+    over_level = int(signal_pack.get("over_level", 0) or 0)
+
     has_gold = any("GOLD" in t for t in tags)
-    has_boost = any("BOOST" in t for t in tags)
-    has_ptgg = "🎯PTGG" in tags
-    has_pt15 = "🔥PT1.5" in tags
+    has_pt = "PT" in tags
     has_over = "⚽ OVER" in tags
-    has_strong_over = "💪 STRONG OVER" in tags
-    has_probe_o = "🐟O" in tags
-    has_probe_g = "🐟G" in tags
-    has_market_push = "🔥 MARKET PUSH" in tags
+    has_probe = "PROBE" in tags
+    has_market = "MARKET" in tags
 
     # -------------------------------------
     # STOP warning gravi
@@ -3708,7 +3705,7 @@ def should_keep_match(signal_pack):
         return False
 
     # Se il drop è strutturale (coerente), teniamo il match anche con poco valore residuo
-    if value_left == "low" and not (has_gold or has_boost or has_strong_over or market_pack.get("drop_confirmed")):
+    if value_left == "low" and not (has_gold or over_level >= 2 or market_pack.get("drop_confirmed")):
         return False
 
     # -------------------------------------
@@ -3731,7 +3728,7 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     # BOOST
     # -------------------------------------
-    if has_boost:
+    if has_over and over_level == 3:
         return bool(
             boost_score >= 5.30
             and pt_score >= 3.55
@@ -3742,44 +3739,28 @@ def should_keep_match(signal_pack):
             and "market_value_trap" not in warning_flags
             and "suspicious_limit" not in warning_flags
         )
-
     # -------------------------------------
     # PT + OVER insieme
     # -------------------------------------
-    if has_ptgg and has_over:
+    if has_pt and has_over:
         return bool(
-            ptgg_score >= 3.60
-            and over_score >= 3.55
-            and coherence_score >= 1.05
-            and structure_score >= 0.88
-        )
-
-    if has_pt15 and has_over:
-        return bool(
-            pto15_score >= 3.55
+            pt_score >= 3.55
             and over_score >= 3.50
             and coherence_score >= 1.05
             and structure_score >= 0.88
         )
 
-    # -------------------------------------
-    # singoli puliti
-    # -------------------------------------
-    if has_ptgg and not has_over:
+    if has_pt and not has_over:
         return bool(
-            ptgg_score >= 4.10
-            and coherence_score >= 1.18
-            and match_profile in ("early_pressure", "favorite_pressure", "open_match")
-        )
-
-    if has_pt15 and not has_over:
-        return bool(
-            pto15_score >= 4.00
+            pt_score >= 4.00
             and coherence_score >= 1.10
-            and dislocation_score >= 0.25
+            and (
+                match_profile in ("early_pressure", "favorite_pressure", "open_match")
+                or dislocation_score >= 0.25
+            )
         )
 
-    if has_strong_over and not (has_ptgg or has_pt15):
+    if has_over and over_level == 2 and not has_pt:
         return bool(
             over_score >= 4.35
             and coherence_score >= 1.35
@@ -3787,7 +3768,7 @@ def should_keep_match(signal_pack):
             and one_sided_risk <= 1.24
         )
     
-    if has_over and not (has_ptgg or has_pt15):
+    if has_over and over_level == 1 and not has_pt:
         return bool(
             over_score >= 3.40
             and coherence_score >= 0.98
@@ -3798,7 +3779,7 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     # market push
     # -------------------------------------
-    if has_market_push:
+    if has_market:
         return bool(
             max_score >= 2.85
             and coherence_score >= 1.00
@@ -3807,11 +3788,8 @@ def should_keep_match(signal_pack):
             and value_left != "low"
             and "market_value_trap" not in warning_flags
         )
-    
-    # -------------------------------------
-    # probe
-    # -------------------------------------
-    if has_probe_o:
+
+    if has_probe:
         return bool(
             max_score >= 2.75
             and coherence_score >= 1.00
@@ -3819,16 +3797,7 @@ def should_keep_match(signal_pack):
             and value_left != "low"
         )
 
-    if has_probe_g:
-        return bool(
-            max_score >= 2.90
-            and coherence_score >= 1.00
-            and structure_score >= 0.85
-            and value_left != "low"
-        )
-
     return False
-
 
 def build_signal_debug_summary(signal_pack):
     if not signal_pack:
@@ -3841,6 +3810,7 @@ def build_signal_debug_summary(signal_pack):
         "is_gold_zone": signal_pack.get("is_gold_zone", False),
         "drop_diff": signal_pack.get("drop_diff", 0.0),
         "internal_labels": signal_pack.get("internal_labels", []),
+        "over_level": signal_pack.get("over_level", 0),
     }
   # ==========================================
 # BLOCCO 6
@@ -4170,6 +4140,9 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "AVG FT": f"{safe_float(s_h.get('avg_total', 0), 0.0):.2f}|{safe_float(s_a.get('avg_total', 0), 0.0):.2f}",
                         "AVG HT": f"{safe_float(s_h.get('avg_ht', 0), 0.0):.2f}|{safe_float(s_a.get('avg_ht', 0), 0.0):.2f}",
                         "Info": " ".join(tags),
+                        "OVER_LEVEL": signal_pack.get("over_level", 0),
+                        "DROP_DIFF": signal_pack.get("drop_diff", 0.0),
+                        "HAS_INVERSION": quote_pack["INVERSION"],
                         "Data": target_date,
                         "Fixture_ID": f.get("fixture", {}).get("id"),
 
