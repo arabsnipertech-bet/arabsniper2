@@ -2016,7 +2016,10 @@ def analyze_market_coherence(mk, s_h, s_a, quote_pack):
         if q1_open > 1 and qx_open > 1 and q2_open > 1 else 0.0
     )
 
-    fav_side_curr = "1" if q1_curr > 0 and q2_curr > 0 and q1_curr <= q2_curr else "2"
+    fav_side_curr = get_favorite_side_from_1x2({"q1": q1_curr, "q2": q2_curr}, min_gap=0.03)
+    if not fav_side_curr:
+        fav_side_curr = "1" if q1_curr <= q2_curr else "2"
+
     fav_odd_curr = q1_curr if fav_side_curr == "1" else q2_curr
     fav_odd_open = q1_open if fav_side_curr == "1" else q2_open
 
@@ -3284,11 +3287,11 @@ def build_signal_package(fid, mk, s_h, s_a):
     # LAYER 2 - TAG BASE PT / OVER
     # -------------------------------------------------
     ptgg_ok = (
-        ptgg_score >= 4.05
-        and combined_ht_clean >= 0.90
+        ptgg_score >= 3.90
+        and combined_ht_clean >= 0.86
         and not has_warning(market_pack, "ht_market_ahead_of_structure")
-        and safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.44
-        and safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.44
+        and safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.40
+        and safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.40
         and safe_float(s_h.get("ht_zero_rate", 0.0), 0.0) <= 0.44
         and safe_float(s_a.get("ht_zero_rate", 0.0), 0.0) <= 0.44
         and (
@@ -3308,8 +3311,8 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     over_ok = (
-        over_score >= 3.85
-        and combined_ft_clean >= 1.58
+        over_score >= 3.70
+        and combined_ft_clean >= 1.52
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
     )
@@ -3329,7 +3332,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     if pto15_ok:
         tags.append("🔥PT1.5")
 
-    if over_ok and combined_ht_scored_clean >= 0.64:
+    if over_ok and combined_ht_scored_clean >= 0.58:
         tags.append("⚽ OVER")
 
     if "⚽ OVER" in tags and strong_over_ok:
@@ -3394,11 +3397,11 @@ def build_signal_package(fid, mk, s_h, s_a):
 
     if (
         has_minimum_open_baseline
-        and boost_score >= 5.55
+        and boost_score >= 5.30
         and boost_has_pt
         and boost_has_over
-        and pt_score >= 3.85
-        and over_score >= 3.95
+        and pt_score >= 3.65
+        and over_score >= 3.75
         and boost_gate_structure
         and boost_gate_market
         and boost_gate_quality
@@ -3413,16 +3416,16 @@ def build_signal_package(fid, mk, s_h, s_a):
     gold_has_over = ("⚽ OVER" in tags)
 
     gold_gate_structure = (
-        structure_score >= 1.55
+        structure_score >= 1.35
         and structure_grade in ("high", "medium")
-        and combined_ft_clean >= 1.66
+        and combined_ft_clean >= 1.60
         and bilateral_ft
-        and one_sided_risk <= 1.30
+        and one_sided_risk <= 1.42
     )
 
     gold_gate_attack = (
-        safe_float(s_h.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.85
-        and safe_float(s_a.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.85
+        safe_float(s_h.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.78
+        and safe_float(s_a.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.78
     )
 
     gold_gate_market = (
@@ -3448,7 +3451,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     if (
-        gold_score >= 6.10
+        gold_score >= 5.85
         and gold_has_over
         and over_score >= 4.00
         and pt_score >= 3.40
@@ -3468,13 +3471,13 @@ def build_signal_package(fid, mk, s_h, s_a):
         "⚽ OVER" not in tags
         and "🚀 BOOST" not in tags
         and "⚽⭐ GOLD" not in tags
-        and combined_ft_clean >= 1.48
-        and safe_float(s_h.get("ft_2plus_rate", 0.0), 0.0) >= 0.50
-        and safe_float(s_a.get("ft_2plus_rate", 0.0), 0.0) >= 0.50
+        and combined_ft_clean >= 1.42
+        and safe_float(s_h.get("ft_2plus_rate", 0.0), 0.0) >= 0.44
+        and safe_float(s_a.get("ft_2plus_rate", 0.0), 0.0) >= 0.44
         and 1.55 <= safe_float(mk.get("o25"), 0.0) <= 2.32
         and safe_float(mk.get("o05ht"), 0.0) <= 1.44
-        and coherence_score >= 1.25
-        and over_score >= 3.55
+        and coherence_score >= 1.10
+        and over_score >= 3.35
         and value_left != "low"
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
     )
@@ -3484,12 +3487,12 @@ def build_signal_package(fid, mk, s_h, s_a):
         and "⚽⭐ GOLD" not in tags
         and not (("🎯PTGG" in tags or "🔥PT1.5" in tags) and "⚽ OVER" in tags)
         and 1.38 <= fav <= 2.08
-        and combined_ht_clean >= 0.88
-        and combined_ft_clean >= 1.52
+        and combined_ht_clean >= 0.82
+        and combined_ft_clean >= 1.46
         and 1.52 <= safe_float(mk.get("o25"), 0.0) <= 2.35
-        and pt_score >= 3.65
-        and over_score >= 3.65
-        and coherence_score >= 1.20
+        and pt_score >= 3.45
+        and over_score >= 3.45
+        and coherence_score >= 1.10
         and value_left != "low"
     )
 
@@ -3507,7 +3510,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         tags.append(f"📉-{drop_diff:.2f}")
 
     market_push_ok = (
-        drop_diff >= 0.18
+        drop_diff >= 0.14
         and "⚽ OVER" not in tags
         and "🚀 BOOST" not in tags
         and "⚽⭐ GOLD" not in tags
@@ -3632,18 +3635,18 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_ptgg and has_over:
         return bool(
-            ptgg_score >= 3.75
-            and over_score >= 3.70
-            and coherence_score >= 1.10
-            and structure_score >= 0.95
+            ptgg_score >= 3.60
+            and over_score >= 3.55
+            and coherence_score >= 1.05
+            and structure_score >= 0.88
         )
 
     if has_pt15 and has_over:
         return bool(
-            pto15_score >= 3.75
-            and over_score >= 3.65
-            and coherence_score >= 1.10
-            and structure_score >= 0.95
+            pto15_score >= 3.55
+            and over_score >= 3.50
+            and coherence_score >= 1.05
+            and structure_score >= 0.88
         )
 
     # -------------------------------------
@@ -3673,10 +3676,10 @@ def should_keep_match(signal_pack):
     
     if has_over and not (has_ptgg or has_pt15):
         return bool(
-            over_score >= 3.65
-            and coherence_score >= 1.05
-            and structure_score >= 0.95
-            and one_sided_risk <= 1.55
+            over_score >= 3.45
+            and coherence_score >= 1.00
+            and structure_score >= 0.85
+            and one_sided_risk <= 1.60
         )
 
     # -------------------------------------
@@ -3696,17 +3699,17 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_probe_o:
         return bool(
-            max_score >= 2.95
-            and coherence_score >= 1.10
-            and structure_score >= 0.95
+            max_score >= 2.75
+            and coherence_score >= 1.00
+            and structure_score >= 0.85
             and value_left != "low"
         )
 
     if has_probe_g:
         return bool(
-            max_score >= 3.10
-            and coherence_score >= 1.10
-            and structure_score >= 0.95
+            max_score >= 2.90
+            and coherence_score >= 1.00
+            and structure_score >= 0.85
             and value_left != "low"
         )
 
