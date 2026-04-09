@@ -4555,10 +4555,6 @@ if c1.button("📌 SNAP + SCAN"):
 if c2.button("🚀 SCAN VELOCE"):
     run_full_scan(horizon=HORIZON, snap=False, update_main_site=(HORIZON == 1))
 
-if st.session_state.selected_fixture_for_modal:
-    show_match_modal(st.session_state.selected_fixture_for_modal)
-
-
 # ------------------------------------------
 # MODAL DETTAGLI MATCH
 # ------------------------------------------
@@ -4751,7 +4747,9 @@ def show_match_modal(fixture_id: str):
             st.dataframe(df_away, use_container_width=True, hide_index=True)
         else:
             st.info("Nessun dato away disponibile.")
-
+            
+if st.session_state.selected_fixture_for_modal:
+    show_match_modal(st.session_state.selected_fixture_for_modal)
 
 # ------------------------------------------
 # VISUAL HELPERS TABELLA
