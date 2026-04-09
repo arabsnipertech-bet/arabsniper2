@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-04-09 12:14:11",
+    "updated_at": "2026-04-09 16:08:39",
     "day": 4,
     "date": "2026-04-12",
     "details": {
@@ -80,7 +80,7 @@
                 "max": 3.847
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -138,9 +138,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.46,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -149,7 +149,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -791,7 +792,7 @@
                 "max": 7.569
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -849,9 +850,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.45,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -860,7 +861,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -1502,7 +1504,7 @@
                 "max": 6.505
             },
             "tags": [
-                "🔥PT1.5",
+                "PT",
                 "⚽ OVER"
             ],
             "internal_labels": [
@@ -1559,7 +1561,7 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🔥PT1.5",
+                    "PT",
                     "⚽ OVER"
                 ],
                 "strong_tag_count": 2,
@@ -1570,7 +1572,8 @@
                     "ASYM",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -2212,9 +2215,7 @@
                 "max": 10.721
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🐟G"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -2270,11 +2271,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🐟G"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 2.05,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -2282,7 +2281,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -2924,8 +2924,7 @@
                 "max": 10.709
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -2982,10 +2981,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 1.46,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -2993,7 +2991,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -3635,7 +3634,7 @@
                 "max": 9.57
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -3692,9 +3691,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.5,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -3702,7 +3701,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -4344,9 +4344,8 @@
                 "max": 8.984
             },
             "tags": [
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "ASYM",
@@ -4404,11 +4403,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 2.2,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -4416,7 +4414,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -5058,8 +5057,7 @@
                 "max": 7.16
             },
             "tags": [
-                "🐟O",
-                "🐟G"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -5115,10 +5113,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "🐟G"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.9,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -5126,7 +5123,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -5768,8 +5766,7 @@
                 "max": 6.91
             },
             "tags": [
-                "🐟O",
-                "🐟G"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -5826,10 +5823,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "🐟G"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.02,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -5837,7 +5833,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -6479,8 +6476,7 @@
                 "max": 8.92
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -6538,10 +6534,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 2.12,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -6550,7 +6545,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -7192,8 +7188,7 @@
                 "max": 8.809
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "FAV_PRESS",
@@ -7249,10 +7244,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 1.39,
                 "is_gold_zone": false,
                 "drop_diff": 0.01,
@@ -7260,7 +7254,8 @@
                     "FAV_PRESS",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -7902,11 +7897,9 @@
                 "max": 10.859
             },
             "tags": [
-                "🔥PT1.5",
+                "PT",
                 "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST",
-                "📉-0.26"
+                "DROP"
             ],
             "internal_labels": [
                 "OPEN",
@@ -7962,13 +7955,11 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🔥PT1.5",
+                    "PT",
                     "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST",
-                    "📉-0.26"
+                    "DROP"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 3,
                 "fav_quote": 2.22,
                 "is_gold_zone": false,
                 "drop_diff": 0.26,
@@ -7976,7 +7967,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -8618,8 +8610,7 @@
                 "max": 8.5
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -8675,10 +8666,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 2.22,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -8686,7 +8676,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -9328,7 +9319,7 @@
                 "max": 10.242
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -9386,9 +9377,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.4,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -9397,7 +9388,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -10039,11 +10031,8 @@
                 "max": 10.871
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -10100,13 +10089,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 2.22,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -10114,7 +10100,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -10757,8 +10744,7 @@
             },
             "tags": [
                 "⚽ OVER",
-                "💪 STRONG OVER",
-                "📉-0.22"
+                "DROP"
             ],
             "internal_labels": [
                 "OPEN",
@@ -10817,8 +10803,7 @@
             "signal_debug": {
                 "tags": [
                     "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "📉-0.22"
+                    "DROP"
                 ],
                 "strong_tag_count": 2,
                 "fav_quote": 2.38,
@@ -10828,7 +10813,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -11470,9 +11456,9 @@
                 "max": 8.394
             },
             "tags": [
-                "🐟O",
-                "📉-0.20",
-                "🔥 MARKET PUSH"
+                "PROBE",
+                "DROP",
+                "MARKET"
             ],
             "internal_labels": [
                 "OPEN",
@@ -11530,11 +11516,11 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "📉-0.20",
-                    "🔥 MARKET PUSH"
+                    "PROBE",
+                    "DROP",
+                    "MARKET"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 3,
                 "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.2,
@@ -11542,7 +11528,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -12184,7 +12171,7 @@
                 "max": 9.369
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -12240,9 +12227,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.3,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -12251,7 +12238,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -12893,8 +12881,7 @@
                 "max": 9.577
             },
             "tags": [
-                "🐟O",
-                "🐟G"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -12952,10 +12939,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "🐟G"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.63,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -12963,7 +12949,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -13155,7 +13142,7 @@
                 {
                     "seq": 5,
                     "date": "2026-03-03",
-                    "league": "AFC Champions League",
+                    "league": "AFC Champions League Elite",
                     "match": "Melbourne City - Buriram United",
                     "opponent": "Buriram United",
                     "team_side": "home",
@@ -13248,7 +13235,7 @@
                 {
                     "seq": 8,
                     "date": "2026-02-18",
-                    "league": "AFC Champions League",
+                    "league": "AFC Champions League Elite",
                     "match": "Melbourne City - Gangwon FC",
                     "opponent": "Gangwon FC",
                     "team_side": "home",
@@ -13538,11 +13525,11 @@
             "home_team": "Melbourne City II",
             "away_team": "Sunshine Georgies",
             "markets": {
-                "q1": 2.05,
-                "qx": 3.4,
-                "q2": 2.9,
-                "o25": 1.62,
-                "o05ht": 1.25,
+                "q1": 2.2,
+                "qx": 3.3,
+                "q2": 2.75,
+                "o25": 1.7,
+                "o05ht": 1.3,
                 "o15ht": 2.3
             },
             "averages": {
@@ -13580,7 +13567,7 @@
                 "away_ht_conceded_1plus_rate": 0.306
             },
             "flags": {
-                "fav_quote": 2.05,
+                "fav_quote": 2.2,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
@@ -13588,12 +13575,12 @@
             },
             "fair_value": {
                 "margin_open": 0.126,
-                "margin_curr": 0.127,
-                "margin_delta": 0.001,
+                "margin_curr": 0.121,
+                "margin_delta": -0.005,
                 "fav_fair_prob_open": 0.48,
-                "fav_fair_prob_curr": 0.433,
-                "fav_fair_prob_delta": -0.047,
-                "fav_fair_curr": 2.31
+                "fav_fair_prob_curr": 0.405,
+                "fav_fair_prob_delta": -0.075,
+                "fav_fair_curr": 2.467
             },
             "scores": {
                 "ptgg": 7.79,
@@ -13605,11 +13592,8 @@
                 "max": 10.048
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -13628,7 +13612,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 1.05,
-                "fav_quote": 2.05,
+                "fav_quote": 2.2,
                 "fav_zone": "balanced"
             },
             "market_reading": {
@@ -13654,12 +13638,12 @@
                     "flat_fair_move"
                 ],
                 "margin_open": 0.126,
-                "margin_curr": 0.127,
-                "margin_delta": 0.001,
+                "margin_curr": 0.121,
+                "margin_delta": -0.005,
                 "fav_fair_prob_open": 0.48,
-                "fav_fair_prob_curr": 0.433,
-                "fav_fair_prob_delta": -0.047,
-                "fav_fair_curr": 2.31,
+                "fav_fair_prob_curr": 0.405,
+                "fav_fair_prob_delta": -0.075,
+                "fav_fair_curr": 2.467,
                 "home_ft_stdev": 1.936,
                 "away_ft_stdev": 1.653,
                 "home_scoring_regularity": 0.829,
@@ -13667,21 +13651,19 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
-                "fav_quote": 2.05,
+                "strong_tag_count": 2,
+                "fav_quote": 2.2,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -14323,11 +14305,8 @@
                 "max": 11.244
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -14381,13 +14360,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 2.3,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -14395,7 +14371,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -15037,7 +15014,7 @@
                 "max": 7.051
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -15092,9 +15069,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.2,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -15102,7 +15079,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -15744,10 +15722,8 @@
                 "max": 8.863
             },
             "tags": [
-                "🎯PTGG",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -15804,12 +15780,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 1.53,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -15817,7 +15791,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -16459,11 +16434,8 @@
                 "max": 9.072
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "EARLY",
@@ -16521,13 +16493,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 2.2,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -16536,7 +16505,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -17178,7 +17148,7 @@
                 "max": 3.86
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -17235,9 +17205,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -17245,7 +17215,8 @@
                     "ASYM",
                     "MEDIUM",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -17887,11 +17858,8 @@
                 "max": 10.682
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -17948,13 +17916,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 1.95,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -17962,7 +17927,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -18604,8 +18570,7 @@
                 "max": 9.144
             },
             "tags": [
-                "🐟O",
-                "🐟G"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -18661,10 +18626,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "🐟G"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.05,
                 "is_gold_zone": false,
                 "drop_diff": 0.03,
@@ -18672,7 +18636,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -19176,7 +19141,7 @@
                 {
                     "seq": 7,
                     "date": "2026-02-19",
-                    "league": "AFC Cup",
+                    "league": "AFC Champions League Two",
                     "match": "Macarthur - Bangkok United",
                     "opponent": "Bangkok United",
                     "team_side": "home",
@@ -19207,7 +19172,7 @@
                 {
                     "seq": 8,
                     "date": "2026-02-12",
-                    "league": "AFC Cup",
+                    "league": "AFC Champions League Two",
                     "match": "Bangkok United - Macarthur",
                     "opponent": "Bangkok United",
                     "team_side": "away",
@@ -19314,7 +19279,7 @@
                 "max": 6.22
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -19370,9 +19335,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -19380,7 +19345,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -20022,7 +19988,7 @@
                 "max": 7.294
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -20079,9 +20045,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.52,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -20089,7 +20055,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -20731,7 +20698,7 @@
                 "max": 9.75
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -20786,9 +20753,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.15,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -20796,7 +20763,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -21438,8 +21406,8 @@
                 "max": 4.81
             },
             "tags": [
-                "🐟O",
-                "📉-0.12"
+                "PROBE",
+                "DROP"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -21498,10 +21466,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "📉-0.12"
+                    "PROBE",
+                    "DROP"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 2,
                 "fav_quote": 1.73,
                 "is_gold_zone": true,
                 "drop_diff": 0.12,
@@ -21509,7 +21477,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -22151,9 +22120,8 @@
                 "max": 8.814
             },
             "tags": [
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -22213,11 +22181,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 1.5,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -22226,7 +22193,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -22868,11 +22836,8 @@
                 "max": 11.704
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -22931,13 +22896,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 1.78,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -22946,7 +22908,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -23588,7 +23551,7 @@
                 "max": 6.34
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -23646,9 +23609,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -23657,7 +23620,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -24300,9 +24264,7 @@
             },
             "tags": [
                 "⚽ OVER",
-                "💪 STRONG OVER",
-                "🐟G",
-                "📉-0.07"
+                "DROP"
             ],
             "internal_labels": [
                 "OPEN",
@@ -24362,9 +24324,7 @@
             "signal_debug": {
                 "tags": [
                     "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🐟G",
-                    "📉-0.07"
+                    "DROP"
                 ],
                 "strong_tag_count": 2,
                 "fav_quote": 1.87,
@@ -24374,7 +24334,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -25016,8 +24977,8 @@
                 "max": 9.879
             },
             "tags": [
-                "🐟O",
-                "📉-0.06"
+                "PROBE",
+                "DROP"
             ],
             "internal_labels": [
                 "OPEN",
@@ -25078,10 +25039,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "📉-0.06"
+                    "PROBE",
+                    "DROP"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 2,
                 "fav_quote": 2.04,
                 "is_gold_zone": false,
                 "drop_diff": 0.06,
@@ -25090,7 +25051,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -25732,8 +25694,7 @@
                 "max": 9.088
             },
             "tags": [
-                "🐟O",
-                "🐟G"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -25789,10 +25750,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "🐟G"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.83,
                 "is_gold_zone": true,
                 "drop_diff": 0.02,
@@ -25800,7 +25760,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -26442,11 +26403,8 @@
                 "max": 11.571
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -26504,13 +26462,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -26519,7 +26474,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -27161,10 +27117,8 @@
                 "max": 10.248
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -27222,12 +27176,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 1.85,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -27235,7 +27187,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -27877,7 +27830,7 @@
                 "max": 8.305
             },
             "tags": [
-                "🔥PT1.5",
+                "PT",
                 "⚽ OVER"
             ],
             "internal_labels": [
@@ -27934,7 +27887,7 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🔥PT1.5",
+                    "PT",
                     "⚽ OVER"
                 ],
                 "strong_tag_count": 2,
@@ -27945,7 +27898,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -28587,7 +28541,7 @@
                 "max": 8.727
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -28643,9 +28597,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.66,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -28653,7 +28607,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -29295,9 +29250,8 @@
                 "max": 9.283
             },
             "tags": [
-                "🎯PTGG",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -29353,11 +29307,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 2.1,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -29365,7 +29318,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -30008,9 +29962,7 @@
             },
             "tags": [
                 "⚽ OVER",
-                "💪 STRONG OVER",
-                "🐟G",
-                "📉-0.06"
+                "DROP"
             ],
             "internal_labels": [
                 "OPEN",
@@ -30069,9 +30021,7 @@
             "signal_debug": {
                 "tags": [
                     "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🐟G",
-                    "📉-0.06"
+                    "DROP"
                 ],
                 "strong_tag_count": 2,
                 "fav_quote": 1.67,
@@ -30082,7 +30032,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -30724,7 +30675,7 @@
                 "max": 4.721
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -30779,9 +30730,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.18,
                 "is_gold_zone": false,
                 "drop_diff": 0.04,
@@ -30790,7 +30741,8 @@
                     "MEDIUM",
                     "PARTIAL",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -31432,8 +31384,7 @@
                 "max": 7.32
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
+                "PT",
                 "⚽ OVER"
             ],
             "internal_labels": [
@@ -31489,11 +31440,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
+                    "PT",
                     "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 1.8,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -31501,7 +31451,8 @@
                     "ASYM",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -32143,11 +32094,8 @@
                 "max": 11.853
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -32204,13 +32152,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 2.1,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -32218,7 +32163,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -32861,8 +32807,7 @@
             },
             "tags": [
                 "⚽⭐ GOLD",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "FAV_PRESS",
@@ -32919,10 +32864,9 @@
             "signal_debug": {
                 "tags": [
                     "⚽⭐ GOLD",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 1.44,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -32930,7 +32874,8 @@
                     "FAV_PRESS",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -33495,6 +33440,718 @@
                 }
             ]
         },
+        "1407712": {
+            "fixture_id": 1407712,
+            "date": "2026-04-12",
+            "time": "14:00",
+            "league": "Regionalliga - Nordost",
+            "country": "Germany",
+            "match": "Greifswalder FC - FSV Zwickau",
+            "home_team": "Greifswalder FC",
+            "away_team": "FSV Zwickau",
+            "markets": {
+                "q1": 2.5,
+                "qx": 3.4,
+                "q2": 2.4,
+                "o25": 1.8,
+                "o05ht": 1.36,
+                "o15ht": 2.62
+            },
+            "averages": {
+                "home_avg_ft": 1.423,
+                "away_avg_ft": 4.281,
+                "home_avg_ht": 0.925,
+                "away_avg_ht": 2.297,
+                "home_avg_ft_clean": 1.64,
+                "away_avg_ft_clean": 4.06,
+                "home_avg_ht_clean": 0.923,
+                "away_avg_ht_clean": 2.325,
+                "home_avg_ht_scored_clean": 0.626,
+                "away_avg_ht_scored_clean": 0.958,
+                "home_avg_ht_conceded_clean": 0.0,
+                "away_avg_ht_conceded_clean": 1.387,
+                "home_avg_ft_scored_clean": 0.626,
+                "away_avg_ft_scored_clean": 1.275,
+                "home_avg_ft_conceded_clean": 0.717,
+                "away_avg_ft_conceded_clean": 2.732,
+                "home_ft_2plus_rate": 0.562,
+                "away_ft_2plus_rate": 0.935,
+                "home_ft_3plus_rate": 0.343,
+                "away_ft_3plus_rate": 0.87,
+                "home_ft_low_rate": 0.438,
+                "away_ft_low_rate": 0.065,
+                "home_ht_1plus_rate": 0.609,
+                "away_ht_1plus_rate": 1.0,
+                "home_ht_zero_rate": 0.391,
+                "away_ht_zero_rate": 0.0,
+                "home_ht_scored_1plus_rate": 0.609,
+                "away_ht_scored_1plus_rate": 0.775,
+                "home_ht_scored_2plus_rate": 0.171,
+                "away_ht_scored_2plus_rate": 0.225,
+                "home_ht_conceded_1plus_rate": 0.171,
+                "away_ht_conceded_1plus_rate": 0.58
+            },
+            "flags": {
+                "fav_quote": 2.4,
+                "is_gold_zone": false,
+                "drop_diff": 0.0,
+                "home_last_2h_zero": true,
+                "away_last_2h_zero": true
+            },
+            "fair_value": {
+                "margin_open": 0.111,
+                "margin_curr": 0.111,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.375,
+                "fav_fair_prob_curr": 0.375,
+                "fav_fair_prob_delta": 0.0,
+                "fav_fair_curr": 2.666
+            },
+            "scores": {
+                "ptgg": 7.06,
+                "pto15": 3.68,
+                "pt": 7.649,
+                "over": 2.8,
+                "boost": 2.908,
+                "gold": 0.659,
+                "max": 7.649
+            },
+            "tags": [
+                "PT"
+            ],
+            "internal_labels": [
+                "NEUTRAL",
+                "MEDIUM",
+                "PARTIAL",
+                "LIGHT_GAP"
+            ],
+            "structure": {
+                "match_profile": "neutral",
+                "structure_score": 2.09,
+                "structure_grade": "medium",
+                "combined_ht_clean": 1.624,
+                "combined_ft_clean": 2.85,
+                "combined_ht_scored_clean": 0.792,
+                "cross_home_clean": 3.358,
+                "cross_away_clean": 1.992,
+                "bilateral_ft": false,
+                "bilateral_ht": true,
+                "one_sided_risk": 1.65,
+                "fav_quote": 2.4,
+                "fav_zone": "wide"
+            },
+            "market_reading": {
+                "market_profile": "ft_open_ht_lag",
+                "coherence_score": 2.75,
+                "coherence_level": "medium",
+                "dislocation_score": 0.6,
+                "dislocation_level": "medium",
+                "leading_market": "none",
+                "lagging_market": "o05ht",
+                "drop_type": "none",
+                "drop_strength": "none",
+                "drop_confirmed": false,
+                "value_left": "unknown",
+                "positive_flags": [
+                    "ft_struct_market_aligned",
+                    "ht_struct_market_aligned",
+                    "lagged_ht_opening"
+                ],
+                "warning_flags": [
+                    "high_bookie_protection",
+                    "flat_fair_move"
+                ],
+                "margin_open": 0.111,
+                "margin_curr": 0.111,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.375,
+                "fav_fair_prob_curr": 0.375,
+                "fav_fair_prob_delta": 0.0,
+                "fav_fair_curr": 2.666,
+                "home_ft_stdev": 1.377,
+                "away_ft_stdev": 1.459,
+                "home_scoring_regularity": 0.609,
+                "away_scoring_regularity": 0.775
+            },
+            "signal_debug": {
+                "tags": [
+                    "PT"
+                ],
+                "strong_tag_count": 1,
+                "fav_quote": 2.4,
+                "is_gold_zone": false,
+                "drop_diff": 0.0,
+                "internal_labels": [
+                    "NEUTRAL",
+                    "MEDIUM",
+                    "PARTIAL",
+                    "LIGHT_GAP"
+                ],
+                "over_level": 0
+            },
+            "home_profile": {
+                "expected_side": "home",
+                "all_sample_count": 8,
+                "context_sample_count": 5,
+                "context_weight": 0.62,
+                "avg_ht_clean": 0.923,
+                "avg_total_clean": 1.64,
+                "avg_ht_scored_clean": 0.626,
+                "avg_ht_conceded_clean": 0.0,
+                "avg_ft_scored_clean": 0.626,
+                "avg_ft_conceded_clean": 0.717,
+                "ht_1plus_rate": 0.609,
+                "ht_zero_rate": 0.391,
+                "ft_2plus_rate": 0.562,
+                "ft_3plus_rate": 0.343,
+                "ft_low_rate": 0.438,
+                "ctx_avg_ht_clean": 1.0,
+                "ctx_avg_total_clean": 2.0,
+                "ctx_avg_ft_scored_clean": 0.667,
+                "ctx_avg_ft_conceded_clean": 1.0,
+                "ctx_ht_1plus_rate": 0.6,
+                "ctx_ft_2plus_rate": 0.6,
+                "ft_stdev": 1.377,
+                "ht_stdev": 1.103,
+                "ft_scored_stdev": 0.715,
+                "scoring_regularity": 0.609,
+                "ctx_ft_stdev": 1.414,
+                "ctx_ht_stdev": 1.166,
+                "ctx_ft_scored_stdev": 0.748,
+                "ctx_scoring_regularity": 0.6
+            },
+            "away_profile": {
+                "expected_side": "away",
+                "all_sample_count": 8,
+                "context_sample_count": 3,
+                "context_weight": 0.48,
+                "avg_ht_clean": 2.325,
+                "avg_total_clean": 4.06,
+                "avg_ht_scored_clean": 0.958,
+                "avg_ht_conceded_clean": 1.387,
+                "avg_ft_scored_clean": 1.275,
+                "avg_ft_conceded_clean": 2.732,
+                "ht_1plus_rate": 1.0,
+                "ht_zero_rate": 0.0,
+                "ft_2plus_rate": 0.935,
+                "ft_3plus_rate": 0.87,
+                "ft_low_rate": 0.065,
+                "ctx_avg_ht_clean": 2.333,
+                "ctx_avg_total_clean": 4.0,
+                "ctx_avg_ft_scored_clean": 1.0,
+                "ctx_avg_ft_conceded_clean": 3.0,
+                "ctx_ht_1plus_rate": 1.0,
+                "ctx_ft_2plus_rate": 1.0,
+                "ft_stdev": 1.459,
+                "ht_stdev": 0.632,
+                "ft_scored_stdev": 0.837,
+                "scoring_regularity": 0.775,
+                "ctx_ft_stdev": 1.414,
+                "ctx_ht_stdev": 0.471,
+                "ctx_ft_scored_stdev": 0.816,
+                "ctx_scoring_regularity": 0.667
+            },
+            "home_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-04-08",
+                    "league": "Regionalliga - Nordost",
+                    "match": "Greifswalder FC - SV Babelsberg 03",
+                    "opponent": "SV Babelsberg 03",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "0-0",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 0.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-04-05",
+                    "league": "Regionalliga - Nordost",
+                    "match": "BFC Preussen - Greifswalder FC",
+                    "opponent": "BFC Preussen",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-0",
+                    "ft": "0-0",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 0.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-03-25",
+                    "league": "Regionalliga - Nordost",
+                    "match": "Greifswalder FC - Magdeburg II",
+                    "opponent": "Magdeburg II",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-2",
+                    "ft": "1-3",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 4.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 3.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-03-21",
+                    "league": "Regionalliga - Nordost",
+                    "match": "Greifswalder FC - ZFC Meuselwitz",
+                    "opponent": "ZFC Meuselwitz",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "2-0",
+                    "ft": "2-0",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-03-14",
+                    "league": "Regionalliga - Nordost",
+                    "match": "Luckenwalde - Greifswalder FC",
+                    "opponent": "Luckenwalde",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-1",
+                    "ft": "1-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 6,
+                    "date": "2026-03-10",
+                    "league": "Regionalliga - Nordost",
+                    "match": "Hertha BSC II - Greifswalder FC",
+                    "opponent": "Hertha BSC II",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-1",
+                    "ft": "0-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 7,
+                    "date": "2026-03-07",
+                    "league": "Regionalliga - Nordost",
+                    "match": "Greifswalder FC - BFC Dynamo",
+                    "opponent": "BFC Dynamo",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "0-1",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 8,
+                    "date": "2026-03-04",
+                    "league": "Regionalliga - Nordost",
+                    "match": "Greifswalder FC - FC Rot-Weiß Erfurt",
+                    "opponent": "FC Rot-Weiß Erfurt",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-0",
+                    "ft": "1-2",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 2.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                }
+            ],
+            "away_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-04-08",
+                    "league": "Regionalliga - Nordost",
+                    "match": "FC Carl Zeiss Jena - FSV Zwickau",
+                    "opponent": "FC Carl Zeiss Jena",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "2-1",
+                    "ft": "5-1",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 6.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 5.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 3.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-04-05",
+                    "league": "Regionalliga - Nordost",
+                    "match": "FSV Zwickau - BFC Dynamo",
+                    "opponent": "BFC Dynamo",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-1",
+                    "ft": "2-2",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 4.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-03-24",
+                    "league": "Regionalliga - Nordost",
+                    "match": "FSV Zwickau - Hertha BSC II",
+                    "opponent": "Hertha BSC II",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-0",
+                    "ft": "2-0",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-03-20",
+                    "league": "Regionalliga - Nordost",
+                    "match": "Hallescher FC - FSV Zwickau",
+                    "opponent": "Hallescher FC",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "2-0",
+                    "ft": "3-0",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 3.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-03-13",
+                    "league": "Regionalliga - Nordost",
+                    "match": "FSV Zwickau - Hertha Zehlendorf",
+                    "opponent": "Hertha Zehlendorf",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-0",
+                    "ft": "1-0",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 6,
+                    "date": "2026-03-07",
+                    "league": "Regionalliga - Nordost",
+                    "match": "Magdeburg II - FSV Zwickau",
+                    "opponent": "Magdeburg II",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-2",
+                    "ft": "1-2",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 7,
+                    "date": "2026-03-03",
+                    "league": "Regionalliga - Nordost",
+                    "match": "FSV Zwickau - SV Babelsberg 03",
+                    "opponent": "SV Babelsberg 03",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-2",
+                    "ft": "3-2",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 8,
+                    "date": "2026-02-28",
+                    "league": "Regionalliga - Nordost",
+                    "match": "FSV Zwickau - Altglienicke",
+                    "opponent": "Altglienicke",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-0",
+                    "ft": "2-2",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 4.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 2.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                }
+            ]
+        },
         "1409947": {
             "fixture_id": 1409947,
             "date": "2026-04-12",
@@ -33572,8 +34229,7 @@
                 "max": 10.572
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -33632,10 +34288,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 1.91,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -33644,7 +34299,8 @@
                     "STRONG",
                     "PARTIAL",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -34286,7 +34942,7 @@
                 "max": 6.66
             },
             "tags": [
-                "🐟G"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -34344,9 +35000,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟G"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -34354,7 +35010,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -34996,7 +35653,7 @@
                 "max": 5.18
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -35051,9 +35708,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.4,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -35061,7 +35718,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -35703,7 +36361,7 @@
                 "max": 3.49
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -35760,9 +36418,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.1,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -35770,7 +36428,8 @@
                     "NEUTRAL",
                     "MEDIUM",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -36412,7 +37071,7 @@
                 "max": 9.3
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -36465,9 +37124,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.5,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -36475,7 +37134,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -37117,8 +37777,7 @@
                 "max": 9.37
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -37174,10 +37833,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 2.1,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -37185,7 +37843,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -37828,8 +38487,7 @@
             },
             "tags": [
                 "⚽ OVER",
-                "💪 STRONG OVER",
-                "📉-0.34"
+                "DROP"
             ],
             "internal_labels": [
                 "OPEN",
@@ -37888,8 +38546,7 @@
             "signal_debug": {
                 "tags": [
                     "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "📉-0.34"
+                    "DROP"
                 ],
                 "strong_tag_count": 2,
                 "fav_quote": 1.91,
@@ -37899,7 +38556,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -38541,9 +39199,7 @@
                 "max": 8.399
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🐟G"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -38599,11 +39255,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🐟G"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 1.95,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -38611,7 +39265,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -39253,7 +39908,7 @@
                 "max": 5.39
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -39309,9 +39964,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.9,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -39319,7 +39974,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -39961,10 +40617,8 @@
                 "max": 6.636
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -40021,12 +40675,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 2.25,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -40035,7 +40687,8 @@
                     "STRONG",
                     "PARTIAL",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -40677,9 +41330,9 @@
                 "max": 6.619
             },
             "tags": [
-                "🔥PT1.5",
-                "📉-0.14",
-                "🔥 MARKET PUSH"
+                "PT",
+                "DROP",
+                "MARKET"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -40735,11 +41388,11 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🔥PT1.5",
-                    "📉-0.14",
-                    "🔥 MARKET PUSH"
+                    "PT",
+                    "DROP",
+                    "MARKET"
                 ],
-                "strong_tag_count": 1,
+                "strong_tag_count": 3,
                 "fav_quote": 2.28,
                 "is_gold_zone": false,
                 "drop_diff": 0.14,
@@ -40747,7 +41400,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -41389,7 +42043,7 @@
                 "max": 3.98
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -41443,9 +42097,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.38,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -41453,7 +42107,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "NOISY"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -42095,10 +42750,8 @@
                 "max": 9.895
             },
             "tags": [
-                "🎯PTGG",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -42154,12 +42807,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 2.5,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -42167,7 +42818,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -42809,7 +43461,7 @@
                 "max": 8.405
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -42865,9 +43517,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.62,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -42875,7 +43527,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -43517,7 +44170,7 @@
                 "max": 8.35
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -43574,9 +44227,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.18,
                 "is_gold_zone": false,
                 "drop_diff": 0.02,
@@ -43584,7 +44237,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -44226,7 +44880,7 @@
                 "max": 7.005
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -44281,9 +44935,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.14,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -44291,7 +44945,8 @@
                     "ASYM",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -44933,8 +45588,7 @@
                 "max": 8.54
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
+                "PT",
                 "⚽ OVER"
             ],
             "internal_labels": [
@@ -44991,11 +45645,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
+                    "PT",
                     "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 1.61,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -45003,7 +45656,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -45645,8 +46299,8 @@
                 "max": 3.67
             },
             "tags": [
-                "🐟O",
-                "📉-0.08"
+                "PROBE",
+                "DROP"
             ],
             "internal_labels": [
                 "ASYM",
@@ -45704,10 +46358,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "📉-0.08"
+                    "PROBE",
+                    "DROP"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 2,
                 "fav_quote": 2.42,
                 "is_gold_zone": false,
                 "drop_diff": 0.08,
@@ -45715,7 +46369,8 @@
                     "ASYM",
                     "MEDIUM",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -46357,8 +47012,7 @@
                 "max": 8.27
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -46414,10 +47068,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 2.32,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -46425,7 +47078,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -47067,7 +47721,7 @@
                 "max": 6.26
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -47122,9 +47776,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.8,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -47132,7 +47786,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -47774,7 +48429,7 @@
                 "max": 8.168
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -47833,9 +48488,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.38,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -47843,7 +48498,8 @@
                     "ASYM",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -48485,7 +49141,7 @@
                 "max": 6.35
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -48541,9 +49197,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.4,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -48551,7 +49207,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -49193,8 +49850,7 @@
                 "max": 4.971
             },
             "tags": [
-                "🐟O",
-                "🐟G"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -49250,10 +49906,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "🐟G"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.57,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -49261,7 +49916,8 @@
                     "ASYM",
                     "MEDIUM",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -49903,7 +50559,7 @@
                 "max": 3.63
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -49960,9 +50616,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.52,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -49970,7 +50626,8 @@
                     "ASYM",
                     "MEDIUM",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -50612,7 +51269,7 @@
                 "max": 7.567
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -50664,9 +51321,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.52,
                 "is_gold_zone": false,
                 "drop_diff": 0.03,
@@ -50674,7 +51331,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -51316,8 +51974,7 @@
                 "max": 6.561
             },
             "tags": [
-                "🐟O",
-                "🐟G"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -51375,10 +52032,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "🐟G"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -51387,7 +52043,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -52029,10 +52686,8 @@
                 "max": 10.393
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -52087,12 +52742,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 2.35,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -52100,7 +52753,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -52742,9 +53396,7 @@
                 "max": 10.789
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🐟G"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -52801,11 +53453,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🐟G"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 2.05,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -52813,7 +53463,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -53455,8 +54106,7 @@
                 "max": 10.113
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -53513,10 +54163,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -53524,7 +54173,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -54166,10 +54816,8 @@
                 "max": 10.912
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -54225,12 +54873,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 1.61,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -54238,7 +54884,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -54880,7 +55527,7 @@
                 "max": 7.58
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -54938,9 +55585,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.25,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -54948,7 +55595,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -55590,10 +56238,8 @@
                 "max": 10.146
             },
             "tags": [
-                "🎯PTGG",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -55650,12 +56296,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 1.9,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -55663,7 +56307,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -56305,11 +56950,8 @@
                 "max": 8.782
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -56366,13 +57008,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 1.83,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -56380,7 +57019,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -57022,11 +57662,8 @@
                 "max": 9.929
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "ASYM",
@@ -57083,13 +57720,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 2.4,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -57097,7 +57731,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -57739,7 +58374,7 @@
                 "max": 7.99
             },
             "tags": [
-                "🎯PTGG",
+                "PT",
                 "⚽ OVER"
             ],
             "internal_labels": [
@@ -57796,7 +58431,7 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
+                    "PT",
                     "⚽ OVER"
                 ],
                 "strong_tag_count": 2,
@@ -57807,7 +58442,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -58449,8 +59085,7 @@
                 "max": 11.649
             },
             "tags": [
-                "🐟O",
-                "🐟G"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -58507,10 +59142,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "🐟G"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.57,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -58518,7 +59152,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -59160,7 +59795,7 @@
                 "max": 7.24
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -59218,9 +59853,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.85,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -59228,7 +59863,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -59870,7 +60506,7 @@
                 "max": 5.9
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -59929,9 +60565,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.0,
                 "is_gold_zone": false,
                 "drop_diff": 0.01,
@@ -59939,7 +60575,8 @@
                     "ASYM",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -60581,8 +61218,8 @@
                 "max": 6.96
             },
             "tags": [
-                "🐟O",
-                "📉-0.07"
+                "PROBE",
+                "DROP"
             ],
             "internal_labels": [
                 "ASYM",
@@ -60638,10 +61275,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "📉-0.07"
+                    "PROBE",
+                    "DROP"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 2,
                 "fav_quote": 2.33,
                 "is_gold_zone": false,
                 "drop_diff": 0.07,
@@ -60649,7 +61286,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -61291,7 +61929,7 @@
                 "max": 5.35
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -61348,9 +61986,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.92,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -61358,7 +61996,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -62000,10 +62639,8 @@
                 "max": 10.241
             },
             "tags": [
-                "🎯PTGG",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -62059,12 +62696,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 2.28,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -62072,7 +62707,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -62714,8 +63350,7 @@
                 "max": 8.479
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
+                "PT",
                 "⚽ OVER"
             ],
             "internal_labels": [
@@ -62773,11 +63408,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
+                    "PT",
                     "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 2.15,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -62785,7 +63419,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -63350,6 +63985,716 @@
                 }
             ]
         },
+        "1388567": {
+            "fixture_id": 1388567,
+            "date": "2026-04-12",
+            "time": "17:30",
+            "league": "Bundesliga",
+            "country": "Germany",
+            "match": "VfB Stuttgart - Hamburger SV",
+            "home_team": "VfB Stuttgart",
+            "away_team": "Hamburger SV",
+            "markets": {
+                "q1": 1.42,
+                "qx": 4.5,
+                "q2": 7.0,
+                "o25": 1.5,
+                "o05ht": 1.22,
+                "o15ht": 2.05
+            },
+            "averages": {
+                "home_avg_ft": 2.453,
+                "away_avg_ft": 3.157,
+                "home_avg_ht": 1.083,
+                "away_avg_ht": 1.622,
+                "home_avg_ft_clean": 2.189,
+                "away_avg_ft_clean": 3.135,
+                "home_avg_ht_clean": 1.389,
+                "away_avg_ht_clean": 1.625,
+                "home_avg_ht_scored_clean": 0.521,
+                "away_avg_ht_scored_clean": 1.038,
+                "home_avg_ht_conceded_clean": 0.357,
+                "away_avg_ht_conceded_clean": 0.747,
+                "home_avg_ft_scored_clean": 0.913,
+                "away_avg_ft_scored_clean": 1.506,
+                "home_avg_ft_conceded_clean": 1.51,
+                "away_avg_ft_conceded_clean": 1.552,
+                "home_ft_2plus_rate": 0.657,
+                "away_ft_2plus_rate": 0.935,
+                "home_ft_3plus_rate": 0.438,
+                "away_ft_3plus_rate": 0.58,
+                "home_ft_low_rate": 0.343,
+                "away_ft_low_rate": 0.065,
+                "home_ht_1plus_rate": 0.657,
+                "away_ht_1plus_rate": 0.935,
+                "home_ht_zero_rate": 0.343,
+                "away_ht_zero_rate": 0.065,
+                "home_ht_scored_1plus_rate": 0.391,
+                "away_ht_scored_1plus_rate": 0.645,
+                "home_ht_scored_2plus_rate": 0.219,
+                "away_ht_scored_2plus_rate": 0.29,
+                "home_ht_conceded_1plus_rate": 0.438,
+                "away_ht_conceded_1plus_rate": 0.71
+            },
+            "flags": {
+                "fav_quote": 1.42,
+                "is_gold_zone": true,
+                "drop_diff": 0.0,
+                "home_last_2h_zero": true,
+                "away_last_2h_zero": true
+            },
+            "fair_value": {
+                "margin_open": 0.069,
+                "margin_curr": 0.069,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.659,
+                "fav_fair_prob_curr": 0.659,
+                "fav_fair_prob_delta": 0.0,
+                "fav_fair_curr": 1.518
+            },
+            "scores": {
+                "ptgg": 6.23,
+                "pto15": 4.15,
+                "pt": 6.894,
+                "over": 7.54,
+                "boost": 8.276,
+                "gold": 8.208,
+                "max": 8.276
+            },
+            "tags": [
+                "PT"
+            ],
+            "internal_labels": [
+                "FAV_PRESS",
+                "STRONG",
+                "COHERENT"
+            ],
+            "structure": {
+                "match_profile": "favorite_pressure",
+                "structure_score": 3.04,
+                "structure_grade": "high",
+                "combined_ht_clean": 1.507,
+                "combined_ft_clean": 2.662,
+                "combined_ht_scored_clean": 0.78,
+                "cross_home_clean": 2.465,
+                "cross_away_clean": 3.016,
+                "bilateral_ft": false,
+                "bilateral_ht": false,
+                "one_sided_risk": 0.9,
+                "fav_quote": 1.42,
+                "fav_zone": "strong"
+            },
+            "market_reading": {
+                "market_profile": "full_open",
+                "coherence_score": 3.05,
+                "coherence_level": "high",
+                "dislocation_score": 0.0,
+                "dislocation_level": "low",
+                "leading_market": "none",
+                "lagging_market": "none",
+                "drop_type": "none",
+                "drop_strength": "none",
+                "drop_confirmed": false,
+                "value_left": "unknown",
+                "positive_flags": [
+                    "double_cross_supported",
+                    "ht_struct_market_aligned"
+                ],
+                "warning_flags": [
+                    "flat_fair_move",
+                    "o25_too_low_for_one_sided_ft",
+                    "o05ht_too_low_for_one_sided_ht"
+                ],
+                "margin_open": 0.069,
+                "margin_curr": 0.069,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.659,
+                "fav_fair_prob_curr": 0.659,
+                "fav_fair_prob_delta": 0.0,
+                "fav_fair_curr": 1.518,
+                "home_ft_stdev": 1.434,
+                "away_ft_stdev": 1.308,
+                "home_scoring_regularity": 0.609,
+                "away_scoring_regularity": 0.935
+            },
+            "signal_debug": {
+                "tags": [
+                    "PT"
+                ],
+                "strong_tag_count": 1,
+                "fav_quote": 1.42,
+                "is_gold_zone": true,
+                "drop_diff": 0.0,
+                "internal_labels": [
+                    "FAV_PRESS",
+                    "STRONG",
+                    "COHERENT"
+                ],
+                "over_level": 2
+            },
+            "home_profile": {
+                "expected_side": "home",
+                "all_sample_count": 8,
+                "context_sample_count": 5,
+                "context_weight": 0.62,
+                "avg_ht_clean": 1.389,
+                "avg_total_clean": 2.189,
+                "avg_ht_scored_clean": 0.521,
+                "avg_ht_conceded_clean": 0.357,
+                "avg_ft_scored_clean": 0.913,
+                "avg_ft_conceded_clean": 1.51,
+                "ht_1plus_rate": 0.657,
+                "ht_zero_rate": 0.343,
+                "ft_2plus_rate": 0.657,
+                "ft_3plus_rate": 0.438,
+                "ft_low_rate": 0.343,
+                "ctx_avg_ht_clean": 1.333,
+                "ctx_avg_total_clean": 2.0,
+                "ctx_avg_ft_scored_clean": 0.667,
+                "ctx_avg_ft_conceded_clean": 1.0,
+                "ctx_ht_1plus_rate": 0.6,
+                "ctx_ft_2plus_rate": 0.6,
+                "ft_stdev": 1.434,
+                "ht_stdev": 1.306,
+                "ft_scored_stdev": 1.595,
+                "scoring_regularity": 0.609,
+                "ctx_ft_stdev": 1.166,
+                "ctx_ht_stdev": 1.356,
+                "ctx_ft_scored_stdev": 1.47,
+                "ctx_scoring_regularity": 0.6
+            },
+            "away_profile": {
+                "expected_side": "away",
+                "all_sample_count": 8,
+                "context_sample_count": 3,
+                "context_weight": 0.48,
+                "avg_ht_clean": 1.625,
+                "avg_total_clean": 3.135,
+                "avg_ht_scored_clean": 1.038,
+                "avg_ht_conceded_clean": 0.747,
+                "avg_ft_scored_clean": 1.506,
+                "avg_ft_conceded_clean": 1.552,
+                "ht_1plus_rate": 0.935,
+                "ht_zero_rate": 0.065,
+                "ft_2plus_rate": 0.935,
+                "ft_3plus_rate": 0.58,
+                "ft_low_rate": 0.065,
+                "ctx_avg_ht_clean": 1.667,
+                "ctx_avg_total_clean": 3.333,
+                "ctx_avg_ft_scored_clean": 1.667,
+                "ctx_avg_ft_conceded_clean": 1.667,
+                "ctx_ht_1plus_rate": 1.0,
+                "ctx_ft_2plus_rate": 1.0,
+                "ft_stdev": 1.308,
+                "ht_stdev": 0.672,
+                "ft_scored_stdev": 0.672,
+                "scoring_regularity": 0.935,
+                "ctx_ft_stdev": 1.247,
+                "ctx_ht_stdev": 0.471,
+                "ctx_ft_scored_stdev": 0.471,
+                "ctx_scoring_regularity": 1.0
+            },
+            "home_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-04-04",
+                    "league": "Bundesliga",
+                    "match": "VfB Stuttgart - Borussia Dortmund",
+                    "opponent": "Borussia Dortmund",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "0-2",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 2.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-03-22",
+                    "league": "Bundesliga",
+                    "match": "FC Augsburg - VfB Stuttgart",
+                    "opponent": "FC Augsburg",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-3",
+                    "ft": "2-5",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 7.0,
+                    "team_ht_scored": 3.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 5.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 2.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-03-19",
+                    "league": "UEFA Europa League",
+                    "match": "FC Porto - VfB Stuttgart",
+                    "opponent": "FC Porto",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-0",
+                    "ft": "2-0",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-03-15",
+                    "league": "Bundesliga",
+                    "match": "VfB Stuttgart - RB Leipzig",
+                    "opponent": "RB Leipzig",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "1-0",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-03-12",
+                    "league": "UEFA Europa League",
+                    "match": "VfB Stuttgart - FC Porto",
+                    "opponent": "FC Porto",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-2",
+                    "ft": "1-2",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 6,
+                    "date": "2026-03-07",
+                    "league": "Bundesliga",
+                    "match": "FSV Mainz 05 - VfB Stuttgart",
+                    "opponent": "FSV Mainz 05",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-0",
+                    "ft": "2-2",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 4.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 7,
+                    "date": "2026-03-01",
+                    "league": "Bundesliga",
+                    "match": "VfB Stuttgart - VfL Wolfsburg",
+                    "opponent": "VfL Wolfsburg",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "3-0",
+                    "ft": "4-0",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 4.0,
+                    "team_ht_scored": 3.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 4.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 8,
+                    "date": "2026-02-26",
+                    "league": "UEFA Europa League",
+                    "match": "VfB Stuttgart - Celtic",
+                    "opponent": "Celtic",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-1",
+                    "ft": "0-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                }
+            ],
+            "away_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-04-04",
+                    "league": "Bundesliga",
+                    "match": "Hamburger SV - FC Augsburg",
+                    "opponent": "FC Augsburg",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-1",
+                    "ft": "1-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-03-21",
+                    "league": "Bundesliga",
+                    "match": "Borussia Dortmund - Hamburger SV",
+                    "opponent": "Borussia Dortmund",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-2",
+                    "ft": "3-2",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 3.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 3.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-03-14",
+                    "league": "Bundesliga",
+                    "match": "Hamburger SV - 1. FC Köln",
+                    "opponent": "1. FC Köln",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-1",
+                    "ft": "1-1",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-03-07",
+                    "league": "Bundesliga",
+                    "match": "VfL Wolfsburg - Hamburger SV",
+                    "opponent": "VfL Wolfsburg",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-1",
+                    "ft": "1-2",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-03-04",
+                    "league": "Bundesliga",
+                    "match": "Hamburger SV - Bayer Leverkusen",
+                    "opponent": "Bayer Leverkusen",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "0-1",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 6,
+                    "date": "2026-03-01",
+                    "league": "Bundesliga",
+                    "match": "Hamburger SV - RB Leipzig",
+                    "opponent": "RB Leipzig",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-1",
+                    "ft": "1-2",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 7,
+                    "date": "2026-02-20",
+                    "league": "Bundesliga",
+                    "match": "FSV Mainz 05 - Hamburger SV",
+                    "opponent": "FSV Mainz 05",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-0",
+                    "ft": "1-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 8,
+                    "date": "2026-02-14",
+                    "league": "Bundesliga",
+                    "match": "Hamburger SV - Union Berlin",
+                    "opponent": "Union Berlin",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "2-1",
+                    "ft": "3-2",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                }
+            ]
+        },
         "1433385": {
             "fixture_id": 1433385,
             "date": "2026-04-12",
@@ -63427,9 +64772,7 @@
                 "max": 11.315
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🐟G"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -63486,11 +64829,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🐟G"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 1.48,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -63498,7 +64839,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -64203,7 +65545,8 @@
                     "OPEN",
                     "STRONG",
                     "NOISY"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -64845,7 +66188,7 @@
                 "max": 10.07
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -64901,9 +66244,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.15,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -64911,7 +66254,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -65553,7 +66897,7 @@
                 "max": 5.56
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -65608,9 +66952,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.45,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -65618,7 +66962,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -66260,7 +67605,7 @@
                 "max": 7.22
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -66317,9 +67662,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.35,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -66327,7 +67672,8 @@
                     "ASYM",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -66969,7 +68315,7 @@
                 "max": 10.015
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "FAV_PRESS",
@@ -67026,9 +68372,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.33,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -67036,7 +68382,8 @@
                     "FAV_PRESS",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -67678,11 +69025,8 @@
                 "max": 11.193
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -67738,13 +69082,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 2.1,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -67752,7 +69093,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -68394,8 +69736,7 @@
                 "max": 4.018
             },
             "tags": [
-                "⚽ OVER",
-                "🐟G"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -68451,8 +69792,7 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "🐟G"
+                    "⚽ OVER"
                 ],
                 "strong_tag_count": 1,
                 "fav_quote": 1.9,
@@ -68462,7 +69802,8 @@
                     "NEUTRAL",
                     "MEDIUM",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -69104,8 +70445,7 @@
                 "max": 9.964
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "FAV_PRESS",
@@ -69164,10 +70504,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 1.25,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -69176,7 +70515,8 @@
                     "STRONG",
                     "PARTIAL",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -69818,7 +71158,7 @@
                 "max": 10.225
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -69875,9 +71215,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.45,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -69885,7 +71225,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -70527,9 +71868,7 @@
                 "max": 10.713
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🐟G"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -70586,11 +71925,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🐟G"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 1.9,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -70598,7 +71935,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -71240,7 +72578,7 @@
                 "max": 4.17
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -71297,9 +72635,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.42,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -71307,7 +72645,8 @@
                     "ASYM",
                     "MEDIUM",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -71950,11 +73289,8 @@
             },
             "tags": [
                 "⚽⭐ GOLD",
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -72011,13 +73347,10 @@
             "signal_debug": {
                 "tags": [
                     "⚽⭐ GOLD",
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 6,
+                "strong_tag_count": 3,
                 "fav_quote": 1.9,
                 "is_gold_zone": true,
                 "drop_diff": 0.01,
@@ -72025,7 +73358,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -72667,9 +74001,7 @@
                 "max": 9.25
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🐟G"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -72726,11 +74058,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🐟G"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 1.67,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -72738,7 +74068,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -73380,11 +74711,8 @@
                 "max": 11.98
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -73444,13 +74772,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 1.61,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -73459,7 +74784,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -74101,10 +75427,9 @@
                 "max": 8.503
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
+                "PT",
                 "⚽ OVER",
-                "📉-0.07"
+                "DROP"
             ],
             "internal_labels": [
                 "ASYM",
@@ -74162,10 +75487,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
+                    "PT",
                     "⚽ OVER",
-                    "📉-0.07"
+                    "DROP"
                 ],
                 "strong_tag_count": 3,
                 "fav_quote": 1.63,
@@ -74175,7 +75499,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -74817,11 +76142,8 @@
                 "max": 11.847
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -74878,13 +76200,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 1.66,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -74892,7 +76211,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -75534,11 +76854,8 @@
                 "max": 10.999
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -75598,13 +76915,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 2.12,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -75613,7 +76927,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -76255,8 +77570,7 @@
                 "max": 9.673
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
+                "PT",
                 "⚽ OVER"
             ],
             "internal_labels": [
@@ -76314,11 +77628,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
+                    "PT",
                     "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 1.41,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -76326,7 +77639,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -76968,9 +78282,8 @@
                 "max": 10.678
             },
             "tags": [
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "FAV_PRESS",
@@ -77029,11 +78342,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 1.4,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -77041,7 +78353,8 @@
                     "FAV_PRESS",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -77683,9 +78996,8 @@
                 "max": 6.898
             },
             "tags": [
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "ASYM",
@@ -77741,11 +79053,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 2.25,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -77753,7 +79064,8 @@
                     "ASYM",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -78395,10 +79707,8 @@
                 "max": 10.536
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -78454,12 +79764,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 1.45,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -78467,7 +79775,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -79109,8 +80418,7 @@
                 "max": 9.6
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -79168,10 +80476,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 2.2,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -79180,7 +80487,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -79822,7 +81130,7 @@
                 "max": 7.379
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -79879,9 +81187,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.2,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -79890,7 +81198,8 @@
                     "STRONG",
                     "PARTIAL",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -80532,7 +81841,7 @@
                 "max": 4.14
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -80587,9 +81896,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.05,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -80597,7 +81906,8 @@
                     "NEUTRAL",
                     "MEDIUM",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -81239,8 +82549,8 @@
                 "max": 3.728
             },
             "tags": [
-                "🐟O",
-                "📉-0.12"
+                "PROBE",
+                "DROP"
             ],
             "internal_labels": [
                 "ASYM",
@@ -81293,10 +82603,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O",
-                    "📉-0.12"
+                    "PROBE",
+                    "DROP"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 2,
                 "fav_quote": 2.34,
                 "is_gold_zone": false,
                 "drop_diff": 0.12,
@@ -81304,7 +82614,8 @@
                     "ASYM",
                     "MEDIUM",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -81946,11 +83257,8 @@
                 "max": 10.294
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -82007,13 +83315,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 2.28,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -82021,7 +83326,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -82663,8 +83969,7 @@
                 "max": 8.077
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -82721,10 +84026,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 1.73,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -82732,7 +84036,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -83374,8 +84679,7 @@
                 "max": 6.76
             },
             "tags": [
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -83427,10 +84731,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 2,
+                "strong_tag_count": 1,
                 "fav_quote": 2.2,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -83438,7 +84741,8 @@
                     "OPEN",
                     "STRONG",
                     "NOISY"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -84080,8 +85384,7 @@
                 "max": 8.838
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
+                "PT",
                 "⚽ OVER"
             ],
             "internal_labels": [
@@ -84142,11 +85445,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
+                    "PT",
                     "⚽ OVER"
                 ],
-                "strong_tag_count": 3,
+                "strong_tag_count": 2,
                 "fav_quote": 1.8,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -84155,7 +85457,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -84797,7 +86100,7 @@
                 "max": 7.12
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -84851,9 +86154,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.98,
                 "is_gold_zone": false,
                 "drop_diff": 0.02,
@@ -84861,7 +86164,8 @@
                     "NEUTRAL",
                     "STRONG",
                     "NOISY"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -85503,7 +86807,7 @@
                 "max": 4.98
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "NEUTRAL",
@@ -85557,9 +86861,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 1.69,
                 "is_gold_zone": true,
                 "drop_diff": 0.02,
@@ -85568,7 +86872,8 @@
                     "MEDIUM",
                     "NOISY",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -86210,7 +87515,7 @@
                 "max": 7.255
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "OPEN",
@@ -86268,9 +87573,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.25,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -86279,7 +87584,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -86921,11 +88227,8 @@
                 "max": 10.05
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -86981,13 +88284,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 2.28,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -86995,7 +88295,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -87637,8 +88938,7 @@
                 "max": 8.04
             },
             "tags": [
-                "⚽ OVER",
-                "🐟G"
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "ASYM",
@@ -87694,8 +88994,7 @@
             },
             "signal_debug": {
                 "tags": [
-                    "⚽ OVER",
-                    "🐟G"
+                    "⚽ OVER"
                 ],
                 "strong_tag_count": 1,
                 "fav_quote": 1.75,
@@ -87705,7 +89004,8 @@
                     "ASYM",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
@@ -88347,11 +89647,8 @@
                 "max": 11.599
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -88406,13 +89703,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 5,
+                "strong_tag_count": 2,
                 "fav_quote": 1.93,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -88420,7 +89714,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -89062,10 +90357,8 @@
                 "max": 11.559
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -89124,12 +90417,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 1.45,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -89137,7 +90428,8 @@
                     "OPEN",
                     "STRONG",
                     "COHERENT"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -89779,10 +91071,8 @@
                 "max": 9.998
             },
             "tags": [
-                "🎯PTGG",
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "OPEN",
@@ -89838,12 +91128,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🎯PTGG",
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 2.15,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
@@ -89851,7 +91139,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 2
             },
             "home_profile": {
                 "expected_side": "home",
@@ -90493,10 +91782,8 @@
                 "max": 10.015
             },
             "tags": [
-                "🔥PT1.5",
-                "⚽ OVER",
-                "💪 STRONG OVER",
-                "🚀 BOOST"
+                "PT",
+                "⚽ OVER"
             ],
             "internal_labels": [
                 "ASYM",
@@ -90555,12 +91842,10 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🔥PT1.5",
-                    "⚽ OVER",
-                    "💪 STRONG OVER",
-                    "🚀 BOOST"
+                    "PT",
+                    "⚽ OVER"
                 ],
-                "strong_tag_count": 4,
+                "strong_tag_count": 2,
                 "fav_quote": 1.44,
                 "is_gold_zone": true,
                 "drop_diff": 0.0,
@@ -90569,7 +91854,8 @@
                     "STRONG",
                     "COHERENT",
                     "LIGHT_GAP"
-                ]
+                ],
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -91211,7 +92497,7 @@
                 "max": 3.561
             },
             "tags": [
-                "🐟O"
+                "PROBE"
             ],
             "internal_labels": [
                 "ASYM",
@@ -91263,9 +92549,9 @@
             },
             "signal_debug": {
                 "tags": [
-                    "🐟O"
+                    "PROBE"
                 ],
-                "strong_tag_count": 0,
+                "strong_tag_count": 1,
                 "fav_quote": 2.48,
                 "is_gold_zone": false,
                 "drop_diff": 0.04,
@@ -91273,7 +92559,8 @@
                     "ASYM",
                     "MEDIUM",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 0
             },
             "home_profile": {
                 "expected_side": "home",
@@ -91979,7 +93266,8 @@
                     "OPEN",
                     "STRONG",
                     "PARTIAL"
-                ]
+                ],
+                "over_level": 1
             },
             "home_profile": {
                 "expected_side": "home",
