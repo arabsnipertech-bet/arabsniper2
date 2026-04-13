@@ -2358,6 +2358,21 @@ def symmetry_bonus(a, b, tight=0.22, medium=0.45):
         return 0.4
     return 0.0
 
+def get_goldilocks_multiplier(fav_quote):
+    """
+    Bonus leggero per la fascia quota favorita più fertile
+    per match dinamici ma non troppo squilibrati.
+
+    Non crea segnali: amplifica leggermente score già validi.
+    """
+    fav = safe_float(fav_quote, 0.0)
+
+    if 1.55 <= fav <= 1.83:
+        return 1.10
+    if 1.50 <= fav <= 1.90:
+        return 1.04
+    return 1.0
+
 
 def calc_one_sided_risk(s_h, s_a):
     """
@@ -2729,6 +2744,10 @@ def score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     if fav < 1.28:
         score -= 0.22
 
+    # Goldilocks più leggero sul PT base
+    multiplier = get_goldilocks_multiplier(fav)
+    score *= (1.0 + ((multiplier - 1.0) * 0.60))
+
     return round3(max(score, 0.0))
 
 
@@ -2864,6 +2883,10 @@ def score_pto15_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
 
     if fav < 1.28:
         score -= 0.18
+
+    # Goldilocks multiplier: il PT1.5 è molto sensibile a questa fascia
+    multiplier = get_goldilocks_multiplier(fav)
+    score *= multiplier
 
     return round3(max(score, 0.0))
 
@@ -3053,6 +3076,10 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
         score -= 0.55
     if cross_away_clean < 2.00:
         score -= 0.55
+
+    # Goldilocks multiplier: piccolo boost ai match nel range quota più fertile
+    multiplier = get_goldilocks_multiplier(fav)
+    score *= multiplier
 
     return round3(max(score, 0.0))
 
@@ -3445,8 +3472,15 @@ def build_signal_package(fid, mk, s_h, s_a):
     # -------------------------------------------------
     # LAYER 2 - TAG BASE PT / OVER
     # -------------------------------------------------
+    goldilocks_core = 1.55 <= fav <= 1.83
+    goldilocks_plus = goldilocks_core and drop_confirmed
+
+    ptgg_threshold = 4.00 if goldilocks_plus else 4.10
+    pto15_threshold = 4.00 if goldilocks_plus else 4.15
+    over_threshold = 3.60 if goldilocks_plus else 3.70   
+
     over_ok = (
-        over_score >= 3.70
+        over_score >= over_threshold
         and combined_ft_clean >= 1.52
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
@@ -3468,7 +3502,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     ptgg_ok = (
-        ptgg_score >= 4.10
+        ptgg_score >= ptgg_threshold
         and over_ok
         and pt_market_ok
         and combined_ht_clean >= 0.88
@@ -3479,7 +3513,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     pto15_ok = (
-        pto15_score >= 4.15
+        pto15_score >= pto15_threshold
         and over_ok
         and pt_market_ok
         and combined_ht_scored_clean >= 0.76
