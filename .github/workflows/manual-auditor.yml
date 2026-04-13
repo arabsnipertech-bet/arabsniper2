@@ -103,10 +103,12 @@ jobs:
           print("[OK] Index rigenerato:", dates)
           PY
 
-- name: Show generated files
-  run: |
-    ls -lah auditordata || true
-    ls -lah auditarchive || true
+      - name: Show generated files
+        run: |
+          ls -lah auditordata || true
+          ls -lah auditarchive || true
+          echo "----- audit_index.json -----"
+          cat auditarchive/audit_index.json || true
 
       - name: Commit and push audit results
         run: |
