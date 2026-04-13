@@ -1,6 +1,6 @@
 {
   "audit_date": "2026-04-13",
-  "created_at": "2026-04-13T09:42:52",
+  "created_at": "2026-04-13T10:00:59",
   "source_file": "data_day1.json",
   "matches_count": 32,
   "primary_counts": {
@@ -21,7 +21,9 @@
     "drop": 3
   },
   "legacy_counts": {
-    "OVER": 16,
+    "BOOST": 7,
+    "STRONG_OVER": 15,
+    "OVER": 21,
     "PT": 13,
     "PROBE": 15,
     "GOLD": 1,
@@ -44,6 +46,8 @@
         "probe": false
       },
       "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
         "OVER",
         "PT"
       ],
@@ -118,6 +122,8 @@
         "probe": false
       },
       "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
         "OVER",
         "PT"
       ],
@@ -143,6 +149,8 @@
         "probe": false
       },
       "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
         "OVER",
         "PT"
       ],
@@ -169,6 +177,8 @@
       },
       "legacy_tags": [
         "GOLD",
+        "BOOST",
+        "STRONG_OVER",
         "OVER",
         "PT"
       ],
@@ -243,6 +253,7 @@
         "probe": false
       },
       "legacy_tags": [
+        "STRONG_OVER",
         "OVER",
         "DROP"
       ],
@@ -268,6 +279,8 @@
         "probe": false
       },
       "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
         "OVER",
         "PT"
       ],
@@ -367,6 +380,8 @@
         "probe": false
       },
       "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
         "OVER",
         "PT"
       ],
@@ -392,6 +407,8 @@
         "probe": true
       },
       "legacy_tags": [
+        "STRONG_OVER",
+        "OVER",
         "PROBE"
       ],
       "primary_signal": "OVER_L2",
@@ -416,6 +433,7 @@
         "probe": false
       },
       "legacy_tags": [
+        "STRONG_OVER",
         "OVER",
         "PT"
       ],
@@ -441,6 +459,8 @@
         "probe": true
       },
       "legacy_tags": [
+        "STRONG_OVER",
+        "OVER",
         "PROBE"
       ],
       "primary_signal": "OVER_L2",
@@ -489,6 +509,7 @@
         "probe": false
       },
       "legacy_tags": [
+        "STRONG_OVER",
         "OVER"
       ],
       "primary_signal": "OVER_L2",
@@ -537,6 +558,8 @@
         "probe": true
       },
       "legacy_tags": [
+        "STRONG_OVER",
+        "OVER",
         "PROBE"
       ],
       "primary_signal": "OVER_L2",
@@ -561,6 +584,8 @@
         "probe": true
       },
       "legacy_tags": [
+        "STRONG_OVER",
+        "OVER",
         "PROBE"
       ],
       "primary_signal": "OVER_L2",
@@ -778,6 +803,8 @@
         "probe": true
       },
       "legacy_tags": [
+        "STRONG_OVER",
+        "OVER",
         "DROP",
         "PROBE"
       ],
@@ -803,6 +830,8 @@
         "probe": false
       },
       "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
         "OVER",
         "PT"
       ],
