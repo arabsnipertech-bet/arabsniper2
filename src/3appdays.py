@@ -2957,16 +2957,16 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     elif cross_away_dirty >= 2.20:
         score += 0.38
 
-    if home_scored_clean >= 1.18:
+    if home_scored_clean >= 1.10:
         score += 0.35
-    elif home_scored_clean >= 0.90:
+    elif home_scored_clean >= 0.82:
         score += 0.00
     else:
         score -= 0.12
 
-    if away_scored_clean >= 1.18:
+    if away_scored_clean >= 1.10:
         score += 0.35
-    elif away_scored_clean >= 0.90:
+    elif away_scored_clean >= 0.82:
         score += 0.00
     else:
         score -= 0.12
@@ -3479,6 +3479,17 @@ def build_signal_package(fid, mk, s_h, s_a):
     pto15_threshold = 4.00 if goldilocks_plus else 4.15
     over_threshold = 3.60 if goldilocks_plus else 3.70   
 
+    # Spinta Goldilocks V27:
+    # non crea segnali dal nulla, ma promuove i match quasi pronti
+    goldilocks_upgrade = (
+        goldilocks_core
+        and coherence_score >= 1.50
+        and structure_score >= 1.15
+        and value_left != "low"
+        and not has_warning(market_pack, "market_value_trap")
+        and not has_warning(market_pack, "favorite_ultra_but_ft_structure_weak")
+    )
+    
     over_ok = (
         over_score >= over_threshold
         and combined_ft_clean >= 1.52
@@ -3527,6 +3538,27 @@ def build_signal_package(fid, mk, s_h, s_a):
 
     if ptgg_ok or pto15_ok:
         tags.append("PT")
+
+    # Upgrade Goldilocks:
+    # se il match è nel range giusto ed è coerente,
+    # promuoviamo i quasi-segnali
+    if goldilocks_upgrade:
+        if (
+            "⚽ OVER" not in tags
+            and over_score >= 3.52
+            and combined_ft_clean >= 1.48
+        ):
+            tags.append("⚽ OVER")
+            over_level = max(over_level, 1)
+
+        if (
+            "PT" not in tags
+            and "⚽ OVER" in tags
+            and pt_score >= 3.58
+            and combined_ht_clean >= 0.84
+            and 1.20 <= safe_float(mk.get("o05ht"), 0.0) <= 1.42
+        ):
+            tags.append("PT")
 
     if strong_over_ok:
         over_level = max(over_level, 2)
@@ -3813,12 +3845,12 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_over and over_level == 3:
         return bool(
-            boost_score >= 5.30
-            and pt_score >= 3.55
-            and over_score >= 3.70
-            and coherence_score >= 1.20
-            and structure_score >= 1.00
-            and one_sided_risk <= 1.50
+            boost_score >= 5.05
+            and pt_score >= 3.45
+            and over_score >= 3.58
+            and coherence_score >= 1.10
+            and structure_score >= 0.98
+            and one_sided_risk <= 1.52
             and "market_value_trap" not in warning_flags
             and "suspicious_limit" not in warning_flags
         )
