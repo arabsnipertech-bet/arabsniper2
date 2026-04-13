@@ -1,13 +1,13 @@
 {
   "audit_date": "2026-04-11",
-  "generated_at": "2026-04-12T10:07:51",
+  "generated_at": "2026-04-13T10:02:16",
   "counts": {
     "freeze_matches": 245,
-    "api_found": 240,
-    "finished_matches": 239,
-    "analyzed_rows": 239,
+    "api_found": 245,
+    "finished_matches": 244,
+    "analyzed_rows": 244,
     "skipped_not_finished": 1,
-    "skipped_no_result": 5
+    "skipped_no_result": 0
   },
   "canonical_stats": {
     "gold": {
@@ -16,9 +16,9 @@
       "rate": 100.0
     },
     "over_l1": {
-      "total": 125,
-      "hit": 82,
-      "rate": 65.6
+      "total": 127,
+      "hit": 83,
+      "rate": 65.35
     },
     "over_l2": {
       "total": 0,
@@ -31,9 +31,9 @@
       "rate": 0.0
     },
     "pt": {
-      "total": 88,
+      "total": 89,
       "hit": 40,
-      "rate": 45.45
+      "rate": 44.94
     },
     "market": {
       "total": 10,
@@ -41,9 +41,9 @@
       "rate": 60.0
     },
     "drop": {
-      "total": 35,
-      "hit": 22,
-      "rate": 62.86
+      "total": 37,
+      "hit": 23,
+      "rate": 62.16
     },
     "inv": {
       "total": 4,
@@ -51,9 +51,9 @@
       "rate": 75.0
     },
     "probe": {
-      "total": 109,
-      "hit": 54,
-      "rate": 49.54
+      "total": 112,
+      "hit": 56,
+      "rate": 50.0
     }
   },
   "combo_stats": {
@@ -120,9 +120,9 @@
       "rate": 0.0
     },
     "OVER": {
-      "total": 125,
-      "hit": 82,
-      "rate": 65.6
+      "total": 127,
+      "hit": 83,
+      "rate": 65.35
     },
     "STRONG_OVER": {
       "total": 0,
@@ -145,9 +145,9 @@
       "rate": 60.0
     },
     "DROP": {
-      "total": 35,
-      "hit": 22,
-      "rate": 62.86
+      "total": 37,
+      "hit": 23,
+      "rate": 62.16
     },
     "INV": {
       "total": 4,
@@ -155,9 +155,9 @@
       "rate": 75.0
     },
     "PROBE": {
-      "total": 109,
-      "hit": 54,
-      "rate": 49.54
+      "total": 112,
+      "hit": 56,
+      "rate": 50.0
     }
   },
   "settlement_rules": {

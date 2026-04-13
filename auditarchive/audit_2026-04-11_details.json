@@ -1,7 +1,7 @@
 {
   "audit_date": "2026-04-11",
-  "generated_at": "2026-04-12T10:07:51",
-  "rows_count": 239,
+  "generated_at": "2026-04-13T10:02:16",
+  "rows_count": 244,
   "rows": [
     {
       "fixture_id": 1537602,
@@ -2937,7 +2937,7 @@
       "status": "FT",
       "primary_signal": "OVER_L1",
       "info_raw": "PT ⚽ OVER",
-      "ht_score": "0-1",
+      "ht_score": "1-0",
       "ft_score": "2-1",
       "goals": {
         "ht": 1,
@@ -3319,6 +3319,49 @@
       },
       "legacy_tags": [
         "OVER"
+      ],
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535806,
+      "date": "2026-04-11",
+      "league": "First League (Russia)",
+      "match": "Chelyabinsk - Ska-khabarovsk",
+      "status": "FT",
+      "primary_signal": "PROBE",
+      "info_raw": "PROBE",
+      "ht_score": "0-2",
+      "ft_score": "2-2",
+      "goals": {
+        "ht": 2,
+        "ft": 4,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": true,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [
+        "PROBE"
       ],
       "drop_diff": 0.0,
       "has_inversion": false,
@@ -6238,6 +6281,51 @@
       "inv_to": ""
     },
     {
+      "fixture_id": 1402566,
+      "date": "2026-04-11",
+      "league": "National League - North (England)",
+      "match": "Merthyr Town - Macclesfield",
+      "status": "FT",
+      "primary_signal": "OVER_L1",
+      "info_raw": "PT ⚽ OVER DROP",
+      "ht_score": "0-0",
+      "ft_score": "1-2",
+      "goals": {
+        "ht": 0,
+        "ft": 3,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": true,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": true,
+        "pt": false,
+        "market": null,
+        "drop": true,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [
+        "DROP",
+        "OVER",
+        "PT"
+      ],
+      "drop_diff": 0.13,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
       "fixture_id": 1402568,
       "date": "2026-04-11",
       "league": "National League - North (England)",
@@ -6449,6 +6537,49 @@
       "legacy_tags": [
         "OVER",
         "PT"
+      ],
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1517500,
+      "date": "2026-04-11",
+      "league": "New South Wales NPL (Australia)",
+      "match": "Sydney Olympic - Manly United",
+      "status": "FT",
+      "primary_signal": "PROBE",
+      "info_raw": "PROBE",
+      "ht_score": "0-0",
+      "ft_score": "0-1",
+      "goals": {
+        "ht": 0,
+        "ft": 1,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": false,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [
+        "PROBE"
       ],
       "drop_diff": 0.0,
       "has_inversion": false,
@@ -6758,6 +6889,49 @@
         "PROBE"
       ],
       "drop_diff": 0.05,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1429017,
+      "date": "2026-04-11",
+      "league": "Non League Premier - Northern (England)",
+      "match": "Rylands - Stocksbridge Park Steels",
+      "status": "FT",
+      "primary_signal": "PROBE",
+      "info_raw": "PROBE",
+      "ht_score": "2-1",
+      "ft_score": "3-2",
+      "goals": {
+        "ht": 3,
+        "ft": 5,
+        "btts_ft": true
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "hits": {
+        "gold": null,
+        "over": null,
+        "pt": null,
+        "market": null,
+        "drop": null,
+        "inv": null,
+        "probe": true,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -7496,6 +7670,50 @@
         "PROBE"
       ],
       "drop_diff": 0.05,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1382859,
+      "date": "2026-04-11",
+      "league": "Premiership (Scotland)",
+      "match": "Celtic - ST Mirren",
+      "status": "FT",
+      "primary_signal": "OVER_L1",
+      "info_raw": "⚽ OVER DROP",
+      "ht_score": "1-0",
+      "ft_score": "1-0",
+      "goals": {
+        "ht": 1,
+        "ft": 1,
+        "btts_ft": false
+      },
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "hits": {
+        "gold": null,
+        "over": false,
+        "pt": null,
+        "market": null,
+        "drop": false,
+        "inv": null,
+        "probe": null,
+        "ptgg": null,
+        "pto15": null
+      },
+      "legacy_tags": [
+        "DROP",
+        "OVER"
+      ],
+      "drop_diff": 0.08,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
