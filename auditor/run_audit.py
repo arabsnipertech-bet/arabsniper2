@@ -278,12 +278,14 @@ def main():
 
         if gold_flag:
             bump(canonical_stats, "gold", over_hit)
-        if over_level >= 1:
+
+        if over_level == 1:
             bump(canonical_stats, "over_l1", over_hit)
-        if over_level >= 2:
+        elif over_level == 2:
             bump(canonical_stats, "over_l2", over_hit)
-        if over_level >= 3:
+        elif over_level == 3:
             bump(canonical_stats, "over_l3", over_hit)
+
         if pt_flag:
             bump(canonical_stats, "pt", pt_hit)
         if market_flag:
