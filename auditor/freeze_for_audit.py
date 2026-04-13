@@ -163,13 +163,16 @@ def extract_signals(row: dict) -> dict:
         or "🐟" in info_raw
     )
 
-    over_level = 0
-    if has_boost:
-        over_level = 3
-    elif has_strong_over:
-        over_level = 2
-    elif has_over:
-        over_level = 1
+    row_over_level = int(parse_num(get_field_any(row, ["OVER_LEVEL", "over_level"], 0)) or 0)
+
+    over_level = row_over_level
+    if over_level <= 0:
+        if has_boost:
+            over_level = 3
+        elif has_strong_over:
+            over_level = 2
+        elif has_over:
+            over_level = 1
 
     legacy_tags = []
     if has_gold:
