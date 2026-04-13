@@ -2567,7 +2567,10 @@ def build_match_structure_profile(mk, s_h, s_a, market_pack=None, quote_pack=Non
 def score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     """
     PTGG = candidata da almeno 1 goal nel primo tempo.
-    Richiede segnali reali da entrambe o una dominante + una squadra complice.
+    Versione V26:
+    - meno dipendente dalle medie nude HT
+    - più dipendente da frequenze reali HT
+    - il mercato HT deve almeno confermare
     """
     score = 0.0
 
@@ -2575,55 +2578,67 @@ def score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     drop_type = market_pack.get("drop_type", "none")
     coherence = safe_float(market_pack.get("coherence_score", 0.0), 0.0)
     dislocation = safe_float(market_pack.get("dislocation_score", 0.0), 0.0)
+    lagging_market = market_pack.get("lagging_market", "none")
 
     home_ht_scored = safe_float(s_h.get("avg_ht_scored"), 0.0)
     away_ht_scored = safe_float(s_a.get("avg_ht_scored"), 0.0)
-    home_ft_scored = safe_float(s_h.get("avg_ft_scored_clean"), 0.0)
-    away_ft_scored = safe_float(s_a.get("avg_ft_scored_clean"), 0.0)
 
-    home_concede_ht = safe_float(s_h.get("ht_conceded_1plus_rate"), 0.0)
-    away_concede_ht = safe_float(s_a.get("ht_conceded_1plus_rate"), 0.0)
+    home_ht_scored_1plus = safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0)
+    away_ht_scored_1plus = safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0)
+    home_ht_conceded_1plus = safe_float(s_h.get("ht_conceded_1plus_rate", 0.0), 0.0)
+    away_ht_conceded_1plus = safe_float(s_a.get("ht_conceded_1plus_rate", 0.0), 0.0)
 
     home_scored_by_ht_rate = safe_float(s_h.get("scored_by_ht_rate", 0.0), 0.0)
     away_scored_by_ht_rate = safe_float(s_a.get("scored_by_ht_rate", 0.0), 0.0)
     home_conceded_by_ht_rate = safe_float(s_h.get("conceded_by_ht_rate", 0.0), 0.0)
     away_conceded_by_ht_rate = safe_float(s_a.get("conceded_by_ht_rate", 0.0), 0.0)
+
     home_ht_00_rate = safe_float(s_h.get("ht_00_rate", 0.0), 0.0)
     away_ht_00_rate = safe_float(s_a.get("ht_00_rate", 0.0), 0.0)
+
     home_early_2goal_rate = safe_float(s_h.get("early_2goal_rate", 0.0), 0.0)
     away_early_2goal_rate = safe_float(s_a.get("early_2goal_rate", 0.0), 0.0)
 
     combined_ht_clean = safe_float(structure_pack.get("combined_ht_clean", 0.0), 0.0)
+    combined_ht_scored_clean = safe_float(structure_pack.get("combined_ht_scored_clean", 0.0), 0.0)
     bilateral_ht = bool(structure_pack.get("bilateral_ht", False))
     match_profile = structure_pack.get("match_profile", "neutral")
 
-    score += band_score(home_ht_scored, 0.78, 1.35, 0.65, 1.50, core_pts=1.45, soft_pts=0.55)
-    score += band_score(away_ht_scored, 0.78, 1.35, 0.65, 1.50, core_pts=1.45, soft_pts=0.55)
+    o05 = safe_float(mk.get("o05ht"), 0.0)
+    o15 = safe_float(mk.get("o15ht"), 0.0)
 
-    if bilateral_ht:
-        score += 1.10
-    elif (home_ht_scored >= 1.00 and away_ht_scored >= 0.55) or (away_ht_scored >= 1.00 and home_ht_scored >= 0.55):
+    # -------------------------
+    # BASE REALI DI FREQUENZA
+    # -------------------------
+    if home_ht_scored_1plus >= 0.62:
+        score += 0.95
+    elif home_ht_scored_1plus >= 0.50:
+        score += 0.45
+
+    if away_ht_scored_1plus >= 0.62:
+        score += 0.95
+    elif away_ht_scored_1plus >= 0.50:
+        score += 0.45
+
+    if home_scored_by_ht_rate >= 0.62:
         score += 0.55
+    elif home_scored_by_ht_rate >= 0.50:
+        score += 0.25
 
-    if combined_ht_clean >= 0.98:
-        score += 0.70
-    elif combined_ht_clean >= 0.90:
-        score += 0.28
+    if away_scored_by_ht_rate >= 0.62:
+        score += 0.55
+    elif away_scored_by_ht_rate >= 0.50:
+        score += 0.25
 
-    if home_concede_ht >= 0.50:
-        score += 0.38
-    elif home_concede_ht >= 0.38:
-        score += 0.18
+    if home_ht_conceded_1plus >= 0.50:
+        score += 0.35
+    elif home_ht_conceded_1plus >= 0.38:
+        score += 0.15
 
-    if away_concede_ht >= 0.50:
-        score += 0.38
-    elif away_concede_ht >= 0.38:
-        score += 0.18
-
-    if home_scored_by_ht_rate >= 0.50:
-        score += 0.28
-    if away_scored_by_ht_rate >= 0.50:
-        score += 0.28
+    if away_ht_conceded_1plus >= 0.50:
+        score += 0.35
+    elif away_ht_conceded_1plus >= 0.38:
+        score += 0.15
 
     if home_conceded_by_ht_rate >= 0.50:
         score += 0.18
@@ -2635,63 +2650,84 @@ def score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     if away_early_2goal_rate >= 0.35:
         score += 0.18
 
-    if home_ht_00_rate >= 0.50:
-        score -= 0.28
-    if away_ht_00_rate >= 0.50:
-        score -= 0.28
+    # -------------------------
+    # MEDIE HT SOLO COME SUPPORTO
+    # -------------------------
+    if home_ht_scored >= 0.78:
+        score += 0.30
+    elif home_ht_scored < 0.55:
+        score -= 0.70
 
-    if safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.50:
-        score += 0.32
-    if safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.50:
-        score += 0.32
+    if away_ht_scored >= 0.78:
+        score += 0.30
+    elif away_ht_scored < 0.55:
+        score -= 0.70
 
-    if home_ft_scored >= 1.45:
-        score += 0.28
-    if away_ft_scored >= 1.45:
-        score += 0.28
+    if combined_ht_clean >= 0.96:
+        score += 0.45
+    elif combined_ht_clean >= 0.88:
+        score += 0.18
 
-    score += band_score(
-        safe_float(mk.get("o05ht"), 0.0),
-        1.20, 1.40,
-        1.15, 1.48,
-        core_pts=1.05,
-        soft_pts=0.40
-    )
+    if combined_ht_scored_clean >= 0.78:
+        score += 0.35
+    elif combined_ht_scored_clean < 0.64:
+        score -= 0.35
 
-    if match_profile == "early_pressure":
+    if bilateral_ht:
         score += 0.55
+
+    # -------------------------
+    # MERCATO HT: ORA È VERO GATE
+    # -------------------------
+    if 1.20 <= o05 <= 1.38:
+        score += 1.10
+    elif 1.38 < o05 <= 1.44:
+        score += 0.20
+    elif o05 == 0 or o05 > 1.44:
+        score -= 1.10
+
+    if 2.00 <= o15 <= 3.30:
+        score += 0.25
+    elif o15 > 4.00 and o15 != 0:
+        score -= 0.25
+
+    if lagging_market in ("o05ht", "o15ht") and dislocation >= 0.55:
+        score += 0.28
 
     if coherence >= 2.00:
         score += 0.22
 
-    if dislocation >= 0.60 and market_pack.get("lagging_market") in ("o15ht", "o05ht"):
-        score += 0.32
-
     if drop_type == "structural":
-        score += 0.18
+        score += 0.12
 
-    if safe_float(s_h.get("last_2h_zero", 0), 0.0):
-        score += 0.14
-    if safe_float(s_a.get("last_2h_zero", 0), 0.0):
-        score += 0.14
+    # -------------------------
+    # PROFILO PARTITA
+    # -------------------------
+    if match_profile == "early_pressure":
+        score += 0.45
+    elif match_profile in ("open_match", "favorite_pressure"):
+        score += 0.15
+
+    # -------------------------
+    # PENALITÀ
+    # -------------------------
+    if home_ht_00_rate >= 0.50:
+        score -= 0.55
+    elif home_ht_00_rate >= 0.38:
+        score -= 0.22
+
+    if away_ht_00_rate >= 0.50:
+        score -= 0.55
+    elif away_ht_00_rate >= 0.38:
+        score -= 0.22
+
+    if home_ht_scored_1plus < 0.40:
+        score -= 0.65
+    if away_ht_scored_1plus < 0.40:
+        score -= 0.65
 
     if fav < 1.28:
-        score -= 0.30
-
-    if home_ht_scored < 0.55:
-        score -= 0.75
-    if away_ht_scored < 0.55:
-        score -= 0.75
-
-    if safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) < 0.38:
-        score -= 0.48
-    if safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) < 0.38:
-        score -= 0.48
-
-    if safe_float(s_h.get("ht_zero_rate", 0.0), 0.0) >= 0.50:
-        score -= 0.35
-    if safe_float(s_a.get("ht_zero_rate", 0.0), 0.0) >= 0.50:
-        score -= 0.35
+        score -= 0.22
 
     return round3(max(score, 0.0))
 
@@ -2699,7 +2735,9 @@ def score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
 def score_pto15_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     """
     PT1.5 = candidata da 2+ goal nel primo tempo.
-    Più severa di PTGG.
+    Versione V26:
+    - molto più severa
+    - deve avere frequenza HT alta e mercato HT coerente
     """
     score = 0.0
 
@@ -2716,96 +2754,116 @@ def score_pto15_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     home_ht_scored = safe_float(s_h.get("avg_ht_scored"), 0.0)
     away_ht_scored = safe_float(s_a.get("avg_ht_scored"), 0.0)
 
+    home_ht_scored_1plus = safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0)
+    away_ht_scored_1plus = safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0)
+    home_ht_scored_2plus = safe_float(s_h.get("ht_scored_2plus_rate", 0.0), 0.0)
+    away_ht_scored_2plus = safe_float(s_a.get("ht_scored_2plus_rate", 0.0), 0.0)
+
+    home_ht_conceded_1plus = safe_float(s_h.get("ht_conceded_1plus_rate", 0.0), 0.0)
+    away_ht_conceded_1plus = safe_float(s_a.get("ht_conceded_1plus_rate", 0.0), 0.0)
+
     home_scored_by_ht_rate = safe_float(s_h.get("scored_by_ht_rate", 0.0), 0.0)
     away_scored_by_ht_rate = safe_float(s_a.get("scored_by_ht_rate", 0.0), 0.0)
-    home_ht_00_rate = safe_float(s_h.get("ht_00_rate", 0.0), 0.0)
-    away_ht_00_rate = safe_float(s_a.get("ht_00_rate", 0.0), 0.0)
     home_early_2goal_rate = safe_float(s_h.get("early_2goal_rate", 0.0), 0.0)
     away_early_2goal_rate = safe_float(s_a.get("early_2goal_rate", 0.0), 0.0)
+    home_ht_00_rate = safe_float(s_h.get("ht_00_rate", 0.0), 0.0)
+    away_ht_00_rate = safe_float(s_a.get("ht_00_rate", 0.0), 0.0)
 
-    score += band_score(combined_ht_scored, 0.92, 1.45, 0.80, 1.60, core_pts=1.55, soft_pts=0.65)
-    score += band_score(combined_ht_clean, 1.00, 1.55, 0.90, 1.70, core_pts=1.15, soft_pts=0.40)
+    o05 = safe_float(mk.get("o05ht"), 0.0)
+    o15 = safe_float(mk.get("o15ht"), 0.0)
 
-    if home_ht_scored >= 0.90 and away_ht_scored >= 0.90:
-        score += 1.20
-    elif (home_ht_scored >= 1.08 and away_ht_scored >= 0.58) or (away_ht_scored >= 1.08 and home_ht_scored >= 0.58):
-        score += 0.95
-
-    if bilateral_ht:
-        score += 0.35
-
-    if safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.62:
-        score += 0.40
-    elif safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.50:
+    # frequenze vere
+    if home_ht_scored_1plus >= 0.62:
+        score += 0.55
+    elif home_ht_scored_1plus >= 0.50:
         score += 0.18
 
-    if safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.62:
-        score += 0.40
-    elif safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.50:
+    if away_ht_scored_1plus >= 0.62:
+        score += 0.55
+    elif away_ht_scored_1plus >= 0.50:
         score += 0.18
 
-    if safe_float(s_h.get("ht_scored_2plus_rate", 0.0), 0.0) >= 0.25:
+    if home_ht_scored_2plus >= 0.25:
+        score += 0.55
+    elif home_ht_scored_2plus >= 0.18:
+        score += 0.20
+
+    if away_ht_scored_2plus >= 0.25:
+        score += 0.55
+    elif away_ht_scored_2plus >= 0.18:
+        score += 0.20
+
+    if home_ht_conceded_1plus >= 0.50:
         score += 0.22
-    if safe_float(s_a.get("ht_scored_2plus_rate", 0.0), 0.0) >= 0.25:
+    if away_ht_conceded_1plus >= 0.50:
         score += 0.22
 
-    if safe_float(s_h.get("ht_conceded_1plus_rate", 0.0), 0.0) >= 0.50:
-        score += 0.25
-    if safe_float(s_a.get("ht_conceded_1plus_rate", 0.0), 0.0) >= 0.50:
-        score += 0.25
-
-    if home_scored_by_ht_rate >= 0.50:
-        score += 0.22
-    if away_scored_by_ht_rate >= 0.50:
-        score += 0.22
-
-    if safe_float(s_h.get("conceded_by_ht_rate", 0.0), 0.0) >= 0.50:
-        score += 0.18
-    if safe_float(s_a.get("conceded_by_ht_rate", 0.0), 0.0) >= 0.50:
-        score += 0.18
+    if home_scored_by_ht_rate >= 0.62:
+        score += 0.28
+    if away_scored_by_ht_rate >= 0.62:
+        score += 0.28
 
     if home_early_2goal_rate >= 0.35:
-        score += 0.25
+        score += 0.30
     if away_early_2goal_rate >= 0.35:
+        score += 0.30
+
+    # medie come conferma
+    if combined_ht_scored >= 0.92:
+        score += 0.70
+    elif combined_ht_scored >= 0.82:
         score += 0.25
+    elif combined_ht_scored < 0.72:
+        score -= 0.50
 
-    if home_ht_00_rate >= 0.50:
-        score -= 0.32
-    if away_ht_00_rate >= 0.50:
-        score -= 0.32
+    if combined_ht_clean >= 1.00:
+        score += 0.42
+    elif combined_ht_clean < 0.88:
+        score -= 0.25
 
-    score += band_score(
-        safe_float(mk.get("o15ht"), 0.0),
-        2.00, 3.30,
-        1.85, 3.80,
-        core_pts=1.05,
-        soft_pts=0.38
-    )
+    if home_ht_scored >= 0.90 and away_ht_scored >= 0.90:
+        score += 0.55
+    elif home_ht_scored < 0.55 or away_ht_scored < 0.55:
+        score -= 0.75
+
+    if bilateral_ht:
+        score += 0.22
+
+    # mercato: obbligatorio
+    if 1.20 <= o05 <= 1.36:
+        score += 0.45
+    elif o05 > 1.42 and o05 != 0:
+        score -= 0.45
+
+    if 2.00 <= o15 <= 3.20:
+        score += 1.00
+    elif 3.20 < o15 <= 3.80:
+        score += 0.22
+    elif o15 == 0 or o15 > 3.80:
+        score -= 1.00
+
+    if lagging_market == "o15ht" and dislocation >= 0.70:
+        score += 0.35
+
+    if coherence >= 2.05:
+        score += 0.15
 
     if match_profile == "early_pressure":
-        score += 0.42
+        score += 0.25
 
-    if coherence >= 2.10:
-        score += 0.18
+    # penalità
+    if home_ht_00_rate >= 0.50:
+        score -= 0.50
+    if away_ht_00_rate >= 0.50:
+        score -= 0.50
 
-    if dislocation >= 0.75 and lagging_market == "o15ht":
-        score += 0.45
+    if home_ht_scored_1plus < 0.40:
+        score -= 0.55
+    if away_ht_scored_1plus < 0.40:
+        score -= 0.55
 
     if fav < 1.28:
-        score -= 0.22
-
-    if home_ht_scored < 0.55:
-        score -= 0.82
-    if away_ht_scored < 0.55:
-        score -= 0.82
-
-    if safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) < 0.38:
-        score -= 0.45
-    if safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) < 0.38:
-        score -= 0.45
-
-    if safe_float(mk.get("o15ht"), 0.0) > 4.10 and safe_float(mk.get("o15ht"), 0.0) != 0:
-        score -= 0.28
+        score -= 0.18
 
     return round3(max(score, 0.0))
 
@@ -3235,10 +3293,23 @@ def build_scoring_snapshot(mk, s_h, s_a, structure_pack, market_pack, quote_pack
     ptgg_score = score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack)
     pto15_score = score_pto15_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack)
 
-    # PT composito: guida il migliore, il secondo contribuisce leggermente
-    pt_score = round3(max(ptgg_score, pto15_score) + (min(ptgg_score, pto15_score) * 0.16))
-
     over_score = score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack)
+
+    # PT composito V26:
+    # il PT esiste ancora, ma se OVER è debole perde forza
+    base_pt_score = round3(max(ptgg_score, pto15_score) + (min(ptgg_score, pto15_score) * 0.16))
+
+    if over_score >= 4.60:
+        pt_context_factor = 1.08
+    elif over_score >= 4.10:
+        pt_context_factor = 1.00
+    elif over_score >= 3.70:
+        pt_context_factor = 0.88
+    else:
+        pt_context_factor = 0.72
+
+    pt_score = round3(base_pt_score * pt_context_factor)
+
     boost_score = score_boost_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack, pt_score, over_score)
     gold_score = score_gold_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack, pt_score, over_score)
 
@@ -3250,27 +3321,6 @@ def build_scoring_snapshot(mk, s_h, s_a, structure_pack, market_pack, quote_pack
         "boost": boost_score,
         "gold": gold_score,
         "max": round3(max(ptgg_score, pto15_score, pt_score, over_score, boost_score, gold_score))
-    }
-
-
-def build_structure_debug_summary(structure_pack):
-    if not structure_pack:
-        return {}
-
-    return {
-        "match_profile": structure_pack.get("match_profile", "neutral"),
-        "structure_score": structure_pack.get("structure_score", 0.0),
-        "structure_grade": structure_pack.get("structure_grade", "low"),
-        "combined_ht_clean": structure_pack.get("combined_ht_clean", 0.0),
-        "combined_ft_clean": structure_pack.get("combined_ft_clean", 0.0),
-        "combined_ht_scored_clean": structure_pack.get("combined_ht_scored_clean", 0.0),
-        "cross_home_clean": structure_pack.get("cross_home_clean", 0.0),
-        "cross_away_clean": structure_pack.get("cross_away_clean", 0.0),
-        "bilateral_ft": structure_pack.get("bilateral_ft", False),
-        "bilateral_ht": structure_pack.get("bilateral_ht", False),
-        "one_sided_risk": structure_pack.get("one_sided_risk", 0.0),
-        "fav_quote": structure_pack.get("fav_quote", 0.0),
-        "fav_zone": structure_pack.get("fav_zone", "unknown"),
     }
   # ==========================================
 # BLOCCO 5
@@ -3395,30 +3445,6 @@ def build_signal_package(fid, mk, s_h, s_a):
     # -------------------------------------------------
     # LAYER 2 - TAG BASE PT / OVER
     # -------------------------------------------------
-    ptgg_ok = (
-        ptgg_score >= 3.90
-        and combined_ht_clean >= 0.86
-        and not has_warning(market_pack, "ht_market_ahead_of_structure")
-        and safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.40
-        and safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.40
-        and safe_float(s_h.get("ht_zero_rate", 0.0), 0.0) <= 0.44
-        and safe_float(s_a.get("ht_zero_rate", 0.0), 0.0) <= 0.44
-        and (
-            bilateral_ht
-            or (
-                combined_ht_scored_clean >= 0.78
-                and safe_float(s_h.get("ht_conceded_1plus_rate", 0.0), 0.0) >= 0.38
-                and safe_float(s_a.get("ht_conceded_1plus_rate", 0.0), 0.0) >= 0.38
-            )
-        )
-    )
-
-    pto15_ok = (
-        pto15_score >= 3.90
-        and combined_ht_scored_clean >= 0.72
-        and lagging_market in ("o15ht", "none", "o05ht")
-    )
-
     over_ok = (
         over_score >= 3.70
         and combined_ft_clean >= 1.52
@@ -3435,12 +3461,38 @@ def build_signal_package(fid, mk, s_h, s_a):
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
     )
 
-    if ptgg_ok or pto15_ok:
-        tags.append("PT")
+    pt_market_ok = (
+        1.20 <= safe_float(mk.get("o05ht"), 0.0) <= 1.44
+        and market_profile in ("full_open", "balanced_open", "favorite_pressure_open", "ft_open_ht_lag", "ht_open_ft_lag")
+        and not has_warning(market_pack, "ht_market_ahead_of_structure")
+    )
+
+    ptgg_ok = (
+        ptgg_score >= 4.10
+        and over_ok
+        and pt_market_ok
+        and combined_ht_clean >= 0.88
+        and safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.45
+        and safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.45
+        and safe_float(s_h.get("ht_zero_rate", 0.0), 0.0) <= 0.44
+        and safe_float(s_a.get("ht_zero_rate", 0.0), 0.0) <= 0.44
+    )
+
+    pto15_ok = (
+        pto15_score >= 4.15
+        and over_ok
+        and pt_market_ok
+        and combined_ht_scored_clean >= 0.76
+        and lagging_market in ("o15ht", "o05ht", "none")
+        and safe_float(mk.get("o15ht"), 0.0) <= 3.80
+    )
 
     if over_ok and combined_ht_scored_clean >= 0.58:
         over_level = 1
         tags.append("⚽ OVER")
+
+    if ptgg_ok or pto15_ok:
+        tags.append("PT")
 
     if strong_over_ok:
         over_level = max(over_level, 2)
@@ -3749,12 +3801,12 @@ def should_keep_match(signal_pack):
 
     if has_pt and not has_over:
         return bool(
-            pt_score >= 4.00
-            and coherence_score >= 1.10
-            and (
-                match_profile in ("early_pressure", "favorite_pressure", "open_match")
-                or dislocation_score >= 0.25
-            )
+            pt_score >= 4.45
+            and coherence_score >= 1.55
+            and dislocation_score >= 0.70
+            and match_profile == "early_pressure"
+            and not has_warning(market_pack, "ht_market_ahead_of_structure")
+            and safe_float(market_pack.get("drop_confirmed", False), 0.0) == 1.0
         )
 
     if has_over and over_level == 2 and not has_pt:
