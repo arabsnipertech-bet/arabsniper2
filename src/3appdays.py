@@ -3483,8 +3483,8 @@ def build_signal_package(fid, mk, s_h, s_a):
     # non crea segnali dal nulla, ma promuove i match quasi pronti
     goldilocks_upgrade = (
         goldilocks_core
-        and coherence_score >= 1.50
-        and structure_score >= 1.15
+        and coherence_score >= 1.35
+        and structure_score >= 1.05
         and value_left != "low"
         and not has_warning(market_pack, "market_value_trap")
         and not has_warning(market_pack, "favorite_ultra_but_ft_structure_weak")
