@@ -74,10 +74,39 @@ jobs:
         run: |
           python auditor/run_audit.py --date "${{ github.event.inputs.date }}"
 
-      - name: Show generated files
+      - name: Force rebuild audit index
         run: |
-          ls -lah auditordata || true
-          ls -lah auditarchive || true
+          python - <<'PY'
+          import os
+          import json
+          from datetime import datetime
+
+          OUTPUT_DIR = "auditarchive"
+
+          dates = []
+          for name in os.listdir(OUTPUT_DIR):
+              if name.startswith("audit_") and name.endswith("_summary.json") and name != "audit_last_summary.json":
+                  parts = name.split("_")
+                  if len(parts) >= 3:
+                      date_part = parts[1]
+                      try:
+                          datetime.strptime(date_part, "%Y-%m-%d")
+                          dates.append(date_part)
+                      except ValueError:
+                          pass
+
+          dates = sorted(set(dates), reverse=True)
+
+          with open(os.path.join(OUTPUT_DIR, "audit_index.json"), "w", encoding="utf-8") as f:
+              json.dump({"dates": dates}, f, ensure_ascii=False, indent=2)
+
+          print("[OK] Index rigenerato:", dates)
+          PY
+
+- name: Show generated files
+  run: |
+    ls -lah auditordata || true
+    ls -lah auditarchive || true
 
       - name: Commit and push audit results
         run: |
