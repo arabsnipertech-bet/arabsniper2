@@ -3800,14 +3800,7 @@ def should_keep_match(signal_pack):
         )
 
     if has_pt and not has_over:
-        return bool(
-            pt_score >= 4.45
-            and coherence_score >= 1.55
-            and dislocation_score >= 0.70
-            and match_profile == "early_pressure"
-            and not has_warning(market_pack, "ht_market_ahead_of_structure")
-            and safe_float(market_pack.get("drop_confirmed", False), 0.0) == 1.0
-        )
+        return False
 
     if has_over and over_level == 2 and not has_pt:
         return bool(
