@@ -1,0 +1,88 @@
+name: Manual Auditor
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Data audit in formato YYYY-MM-DD"
+        required: true
+        default: "2026-04-12"
+      run_freeze:
+        description: "Eseguire anche il freeze prima dell'audit?"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arabsniper-manual-auditor-${{ github.event.inputs.date }}
+  cancel-in-progress: false
+
+jobs:
+  manual_auditor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Validate input date
+        run: |
+          python - <<'PY'
+          import sys
+          from datetime import datetime
+
+          date_str = "${{ github.event.inputs.date }}".strip()
+          try:
+              datetime.strptime(date_str, "%Y-%m-%d")
+              print(f"[OK] Data valida: {date_str}")
+          except ValueError:
+              print(f"[ERROR] Data non valida: {date_str}. Usa il formato YYYY-MM-DD")
+              sys.exit(1)
+          PY
+
+      - name: Run freeze script
+        if: ${{ github.event.inputs.run_freeze == 'true' }}
+        run: |
+          python auditor/freeze_for_audit.py
+
+      - name: Check freeze exists
+        run: |
+          test -f "auditordata/freeze_for_audit_${{ github.event.inputs.date }}.json" \
+            && echo "[OK] Freeze trovato per ${{ github.event.inputs.date }}" \
+            || (echo "[ERROR] Freeze non trovato: auditordata/freeze_for_audit_${{ github.event.inputs.date }}.json" && exit 1)
+
+      - name: Run audit script
+        run: |
+          python auditor/run_audit.py --date "${{ github.event.inputs.date }}"
+
+      - name: Show generated files
+        run: |
+          ls -lah auditordata || true
+          ls -lah auditarchive || true
+
+      - name: Commit and push audit results
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add auditordata/ auditarchive/
+          git commit -m "Manual auditor ${{ github.event.inputs.date }}" || echo "No changes to commit"
+          git push
