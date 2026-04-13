@@ -138,6 +138,12 @@ def extract_signals(row: dict) -> dict:
     inv_from = str(get_field_any(row, ["INV_FROM", "inv_from"], "") or "").strip()
     inv_to = str(get_field_any(row, ["INV_TO", "inv_to"], "") or "").strip()
 
+    # 👇 NUOVO: leggi prima il livello strutturato, se esiste davvero nel row
+    raw_over_level = parse_num(
+        get_field_any(row, ["OVER_LEVEL", "over_level", "Over_Level"], None)
+    )
+    raw_over_level = int(raw_over_level) if raw_over_level is not None else 0
+
     has_gold = bool(re.search(r"(^|\s)GOLD(?=\s|$)", clean))
     has_boost = bool(re.search(r"(^|\s)BOOST(?=\s|$)", clean))
     has_strong_over = bool(re.search(r"STRONG\s+OVER", clean))
@@ -163,10 +169,12 @@ def extract_signals(row: dict) -> dict:
         or "🐟" in info_raw
     )
 
-    row_over_level = int(parse_num(get_field_any(row, ["OVER_LEVEL", "over_level"], 0)) or 0)
-
-    over_level = row_over_level
-    if over_level <= 0:
+    # 👇 NUOVO: priorità al valore strutturato OVER_LEVEL
+    over_level = 0
+    if raw_over_level in (1, 2, 3):
+        over_level = raw_over_level
+    else:
+        # fallback retrocompatibile sui tag testuali
         if has_boost:
             over_level = 3
         elif has_strong_over:
@@ -175,14 +183,24 @@ def extract_signals(row: dict) -> dict:
             over_level = 1
 
     legacy_tags = []
+
     if has_gold:
         legacy_tags.append("GOLD")
-    if has_boost:
+
+    # 👇 NUOVO: popola i legacy tag anche dal livello strutturato
+    if over_level >= 3 and "BOOST" not in legacy_tags:
         legacy_tags.append("BOOST")
-    if has_strong_over:
+    elif has_boost and "BOOST" not in legacy_tags:
+        legacy_tags.append("BOOST")
+
+    if over_level >= 2 and "STRONG_OVER" not in legacy_tags:
         legacy_tags.append("STRONG_OVER")
-    if has_over:
+    elif has_strong_over and "STRONG_OVER" not in legacy_tags:
+        legacy_tags.append("STRONG_OVER")
+
+    if over_level >= 1:
         legacy_tags.append("OVER")
+
     if has_ptgg:
         legacy_tags.append("PTGG")
     if has_pt15:
@@ -197,6 +215,9 @@ def extract_signals(row: dict) -> dict:
         legacy_tags.append("INV")
     if has_probe:
         legacy_tags.append("PROBE")
+
+    # rimuove eventuali duplicati mantenendo l'ordine
+    legacy_tags = list(dict.fromkeys(legacy_tags))
 
     canonical = {
         "gold": has_gold,
