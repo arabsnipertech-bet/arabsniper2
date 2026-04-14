@@ -1,6 +1,6 @@
 {
   "audit_date": "2026-04-12",
-  "generated_at": "2026-04-13T11:07:24",
+  "generated_at": "2026-04-14T06:41:06",
   "rows_count": 189,
   "rows": [
     {
@@ -801,11 +801,11 @@
       "primary_signal": "OVER_L1",
       "info_raw": "PT ⚽ OVER",
       "ht_score": "1-1",
-      "ft_score": "0-0",
+      "ft_score": "3-2",
       "goals": {
         "ht": 2,
-        "ft": 0,
-        "btts_ft": false
+        "ft": 5,
+        "btts_ft": true
       },
       "canonical": {
         "gold": false,
@@ -818,7 +818,7 @@
       },
       "hits": {
         "gold": null,
-        "over": false,
+        "over": true,
         "pt": true,
         "market": null,
         "drop": null,
@@ -844,12 +844,12 @@
       "status": "FT",
       "primary_signal": "OVER_L1",
       "info_raw": "PT ⚽ OVER",
-      "ht_score": "2-1",
-      "ft_score": "0-0",
+      "ht_score": "1-2",
+      "ft_score": "2-5",
       "goals": {
         "ht": 3,
-        "ft": 0,
-        "btts_ft": false
+        "ft": 7,
+        "btts_ft": true
       },
       "canonical": {
         "gold": false,
@@ -862,7 +862,7 @@
       },
       "hits": {
         "gold": null,
-        "over": false,
+        "over": true,
         "pt": true,
         "market": null,
         "drop": null,
@@ -5159,11 +5159,11 @@
       "primary_signal": "OVER_L1",
       "info_raw": "⚽ OVER",
       "ht_score": "1-0",
-      "ft_score": "0-0",
+      "ft_score": "2-2",
       "goals": {
         "ht": 1,
-        "ft": 0,
-        "btts_ft": false
+        "ft": 4,
+        "btts_ft": true
       },
       "canonical": {
         "gold": false,
@@ -5176,7 +5176,7 @@
       },
       "hits": {
         "gold": null,
-        "over": false,
+        "over": true,
         "pt": null,
         "market": null,
         "drop": null,
