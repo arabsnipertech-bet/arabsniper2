@@ -4451,6 +4451,56 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                     market_pack = signal_pack["market_pack"]
                     structure_pack = signal_pack["structure_pack"]
 
+                    # ----------------------------------
+                    # EVOLUTION LAYER - MODEL PROBABILITIES + EDGE
+                    # ----------------------------------
+                    lambda_pack = estimate_match_lambdas(s_h, s_a)
+
+                    lam_home_ft = safe_float(lambda_pack.get("lam_home_ft", 0.0), 0.0)
+                    lam_away_ft = safe_float(lambda_pack.get("lam_away_ft", 0.0), 0.0)
+                    lam_home_ht = safe_float(lambda_pack.get("lam_home_ht", 0.0), 0.0)
+                    lam_away_ht = safe_float(lambda_pack.get("lam_away_ht", 0.0), 0.0)
+
+                    p_model_over25 = poisson_over25_prob(lam_home_ft, lam_away_ft)
+                    p_model_o05ht = poisson_over05ht_prob(lam_home_ht, lam_away_ht)
+                    p_model_o15ht = poisson_over15ht_prob(lam_home_ht, lam_away_ht)
+
+                    p_market_over25 = fair_prob_from_single_odd(mk.get("o25"))
+                    p_market_o05ht = fair_prob_from_single_odd(mk.get("o05ht"))
+                    p_market_o15ht = fair_prob_from_single_odd(mk.get("o15ht"))
+
+                    edge_over25 = round3(p_model_over25 - p_market_over25)
+                    edge_o05ht = round3(p_model_o05ht - p_market_o05ht)
+                    edge_o15ht = round3(p_model_o15ht - p_market_o15ht)
+
+                    edge_logit_over25 = round3(
+                        safe_logit(p_model_over25) - safe_logit(p_market_over25)
+                    ) if p_model_over25 > 0 and p_market_over25 > 0 else 0.0
+
+                    edge_logit_o05ht = round3(
+                        safe_logit(p_model_o05ht) - safe_logit(p_market_o05ht)
+                    ) if p_model_o05ht > 0 and p_market_o05ht > 0 else 0.0
+
+                    edge_logit_o15ht = round3(
+                        safe_logit(p_model_o15ht) - safe_logit(p_market_o15ht)
+                    ) if p_model_o15ht > 0 and p_market_o15ht > 0 else 0.0
+
+                    def classify_edge_level(edge_value):
+                        edge_value = safe_float(edge_value, 0.0)
+                        if edge_value >= 0.10:
+                            return "ELITE"
+                        if edge_value >= 0.07:
+                            return "STRONG"
+                        if edge_value >= 0.04:
+                            return "GOOD"
+                        if edge_value >= 0.02:
+                            return "LIGHT"
+                        return "NONE"
+
+                    edge_level_over25 = classify_edge_level(edge_over25)
+                    edge_level_o05ht = classify_edge_level(edge_o05ht)
+                    edge_level_o15ht = classify_edge_level(edge_o15ht)
+
                     fav = signal_pack["fav_quote"]
                     is_gold_zone = signal_pack["is_gold_zone"]
 
@@ -4513,6 +4563,28 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "VALUE_LEFT": market_pack.get("value_left", "unknown"),
                         "MATCH_PROFILE": structure_pack.get("match_profile", "neutral"),
                         "STRUCTURE_SCORE": structure_pack.get("structure_score", 0.0),
+                                                "LAM_HOME_FT": lam_home_ft,
+                        "LAM_AWAY_FT": lam_away_ft,
+                        "LAM_HOME_HT": lam_home_ht,
+                        "LAM_AWAY_HT": lam_away_ht,
+
+                        "P_MODEL_O25": p_model_over25,
+                        "P_MARKET_O25": p_market_over25,
+                        "EDGE_O25": edge_over25,
+                        "EDGE_LOGIT_O25": edge_logit_over25,
+                        "EDGE_LEVEL_O25": edge_level_over25,
+
+                        "P_MODEL_O05HT": p_model_o05ht,
+                        "P_MARKET_O05HT": p_market_o05ht,
+                        "EDGE_O05HT": edge_o05ht,
+                        "EDGE_LOGIT_O05HT": edge_logit_o05ht,
+                        "EDGE_LEVEL_O05HT": edge_level_o05ht,
+
+                        "P_MODEL_O15HT": p_model_o15ht,
+                        "P_MARKET_O15HT": p_market_o15ht,
+                        "EDGE_O15HT": edge_o15ht,
+                        "EDGE_LOGIT_O15HT": edge_logit_o15ht,
+                        "EDGE_LEVEL_O15HT": edge_level_o15ht,
                     }
 
                     row["MOVE_SUMMARY"] = build_movement_summary(row)
@@ -4597,6 +4669,36 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                             "fav_fair_prob_curr": round3(safe_float(market_pack.get("fav_fair_prob_curr", 0.0), 0.0)),
                             "fav_fair_prob_delta": round3(safe_float(market_pack.get("fav_fair_prob_delta", 0.0), 0.0)),
                             "fav_fair_curr": round3(safe_float(market_pack.get("fav_fair_curr", 0.0), 0.0)),
+                        },
+
+                        "model_edge": {
+                            "lam_home_ft": lam_home_ft,
+                            "lam_away_ft": lam_away_ft,
+                            "lam_home_ht": lam_home_ht,
+                            "lam_away_ht": lam_away_ht,
+
+                            "p_model_o25": p_model_over25,
+                            "p_market_o25": p_market_over25,
+                            "edge_o25": edge_over25,
+                            "edge_logit_o25": edge_logit_over25,
+                            "edge_level_o25": edge_level_over25,
+
+                            "p_model_o05ht": p_model_o05ht,
+                            "p_market_o05ht": p_market_o05ht,
+                            "edge_o05ht": edge_o05ht,
+                            "edge_logit_o05ht": edge_logit_o05ht,
+                            "edge_level_o05ht": edge_level_o05ht,
+
+                            "p_model_o15ht": p_model_o15ht,
+                            "p_market_o15ht": p_market_o15ht,
+                            "edge_o15ht": edge_o15ht,
+                            "edge_logit_o15ht": edge_logit_o15ht,
+                            "edge_level_o15ht": edge_level_o15ht,
+
+                            "ctx_avg": safe_float(lambda_pack.get("ctx_avg", 0.0), 0.0),
+                            "reg_avg": safe_float(lambda_pack.get("reg_avg", 0.0), 0.0),
+                            "ft_sd_avg": safe_float(lambda_pack.get("ft_sd_avg", 0.0), 0.0),
+                            "ht_sd_avg": safe_float(lambda_pack.get("ht_sd_avg", 0.0), 0.0),
                         },
 
                         "scores": scores,
