@@ -1572,6 +1572,144 @@ def build_team_debug_summary(stats):
         "ctx_ft_scored_stdev": stats.get("ctx_ft_scored_stdev", 9.9),
         "ctx_scoring_regularity": stats.get("ctx_scoring_regularity", 0.0),
     }
+
+def estimate_match_lambdas(s_h, s_a):
+    """
+    Stima lambda FT e HT per casa e trasferta usando i campi reali del motore V25.
+
+    Output:
+    - lam_home_ft
+    - lam_away_ft
+    - lam_home_ht
+    - lam_away_ht
+    - debug factors
+    """
+    # -------------------------
+    # BASE CLEAN CROSS
+    # -------------------------
+    home_att_ft = safe_float(s_h.get("avg_ft_scored_clean", 0.0), 0.0)
+    away_def_ft = safe_float(s_a.get("avg_ft_conceded_clean", 0.0), 0.0)
+
+    away_att_ft = safe_float(s_a.get("avg_ft_scored_clean", 0.0), 0.0)
+    home_def_ft = safe_float(s_h.get("avg_ft_conceded_clean", 0.0), 0.0)
+
+    home_att_ht = safe_float(s_h.get("avg_ht_scored_clean", 0.0), 0.0)
+    away_def_ht = safe_float(s_a.get("avg_ht_conceded_clean", 0.0), 0.0)
+
+    away_att_ht = safe_float(s_a.get("avg_ht_scored_clean", 0.0), 0.0)
+    home_def_ht = safe_float(s_h.get("avg_ht_conceded_clean", 0.0), 0.0)
+
+    # cross base
+    lam_home_ft = (home_att_ft + away_def_ft) / 2.0
+    lam_away_ft = (away_att_ft + home_def_ft) / 2.0
+
+    lam_home_ht = (home_att_ht + away_def_ht) / 2.0
+    lam_away_ht = (away_att_ht + home_def_ht) / 2.0
+
+    # -------------------------
+    # BONUS CONTESTUALE
+    # più il profilo contestuale è affidabile,
+    # più lasciamo respirare la lambda
+    # -------------------------
+    ctx_h = safe_float(s_h.get("context_weight", 0.0), 0.0)
+    ctx_a = safe_float(s_a.get("context_weight", 0.0), 0.0)
+    ctx_avg = (ctx_h + ctx_a) / 2.0
+
+    ctx_multiplier_ft = 1.0 + (ctx_avg * 0.08)
+    ctx_multiplier_ht = 1.0 + (ctx_avg * 0.06)
+
+    lam_home_ft *= ctx_multiplier_ft
+    lam_away_ft *= ctx_multiplier_ft
+    lam_home_ht *= ctx_multiplier_ht
+    lam_away_ht *= ctx_multiplier_ht
+
+    # -------------------------
+    # REGOLARITÀ
+    # squadre più regolari = lambda più credibile
+    # -------------------------
+    reg_h = safe_float(s_h.get("scoring_regularity", 0.0), 0.0)
+    reg_a = safe_float(s_a.get("scoring_regularity", 0.0), 0.0)
+    reg_avg = (reg_h + reg_a) / 2.0
+
+    if reg_avg >= 0.78:
+        reg_mult = 1.06
+    elif reg_avg >= 0.66:
+        reg_mult = 1.03
+    elif reg_avg <= 0.45:
+        reg_mult = 0.93
+    else:
+        reg_mult = 1.00
+
+    lam_home_ft *= reg_mult
+    lam_away_ft *= reg_mult
+
+    # HT più delicato: bonus più piccolo
+    if reg_avg >= 0.78:
+        reg_mult_ht = 1.04
+    elif reg_avg >= 0.66:
+        reg_mult_ht = 1.02
+    elif reg_avg <= 0.45:
+        reg_mult_ht = 0.95
+    else:
+        reg_mult_ht = 1.00
+
+    lam_home_ht *= reg_mult_ht
+    lam_away_ht *= reg_mult_ht
+
+    # -------------------------
+    # DEVIAZIONE STANDARD
+    # serie troppo sporche = riduciamo un po' la fiducia
+    # -------------------------
+    ft_sd_h = safe_float(s_h.get("ft_stdev", 9.9), 9.9)
+    ft_sd_a = safe_float(s_a.get("ft_stdev", 9.9), 9.9)
+    ht_sd_h = safe_float(s_h.get("ht_stdev", 9.9), 9.9)
+    ht_sd_a = safe_float(s_a.get("ht_stdev", 9.9), 9.9)
+
+    ft_sd_avg = (ft_sd_h + ft_sd_a) / 2.0
+    ht_sd_avg = (ht_sd_h + ht_sd_a) / 2.0
+
+    if ft_sd_avg >= 1.70:
+        ft_sd_mult = 0.92
+    elif ft_sd_avg >= 1.45:
+        ft_sd_mult = 0.96
+    elif ft_sd_avg <= 1.10:
+        ft_sd_mult = 1.04
+    else:
+        ft_sd_mult = 1.00
+
+    lam_home_ft *= ft_sd_mult
+    lam_away_ft *= ft_sd_mult
+
+    if ht_sd_avg >= 0.95:
+        ht_sd_mult = 0.94
+    elif ht_sd_avg >= 0.80:
+        ht_sd_mult = 0.97
+    elif ht_sd_avg <= 0.55:
+        ht_sd_mult = 1.03
+    else:
+        ht_sd_mult = 1.00
+
+    lam_home_ht *= ht_sd_mult
+    lam_away_ht *= ht_sd_mult
+
+    # -------------------------
+    # CLAMP FINALE
+    # -------------------------
+    lam_home_ft = round3(clamp(lam_home_ft, 0.15, 3.20))
+    lam_away_ft = round3(clamp(lam_away_ft, 0.15, 3.20))
+    lam_home_ht = round3(clamp(lam_home_ht, 0.05, 1.80))
+    lam_away_ht = round3(clamp(lam_away_ht, 0.05, 1.80))
+
+    return {
+        "lam_home_ft": lam_home_ft,
+        "lam_away_ft": lam_away_ft,
+        "lam_home_ht": lam_home_ht,
+        "lam_away_ht": lam_away_ht,
+        "ctx_avg": round3(ctx_avg),
+        "reg_avg": round3(reg_avg),
+        "ft_sd_avg": round3(ft_sd_avg),
+        "ht_sd_avg": round3(ht_sd_avg),
+    }
   # ==========================================
 # BLOCCO 3
 # QUOTE MOVEMENT + MARKET COHERENCE ENGINE
