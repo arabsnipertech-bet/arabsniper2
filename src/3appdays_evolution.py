@@ -4976,6 +4976,7 @@ def show_match_modal(fixture_id: str):
     signal_debug = detail.get("signal_debug", {})
     home_profile = detail.get("home_profile", {})
     away_profile = detail.get("away_profile", {})
+    model_edge = detail.get("model_edge", {})
 
     st.markdown(f"## {detail['match']}")
     st.write(f"**Data:** {detail['date']}  |  **Ora:** {detail['time']}")
@@ -5056,7 +5057,69 @@ def show_match_modal(fixture_id: str):
     )
 
     st.markdown("---")
-    st.subheader("🧠 Score interni V25")
+    st.subheader("🧬 Evolution Edge Model")
+
+    e1, e2, e3, e4 = st.columns(4)
+    e1.metric("λ Home FT", f"{safe_float(model_edge.get('lam_home_ft', 0), 0.0):.2f}")
+    e2.metric("λ Away FT", f"{safe_float(model_edge.get('lam_away_ft', 0), 0.0):.2f}")
+    e3.metric("λ Home HT", f"{safe_float(model_edge.get('lam_home_ht', 0), 0.0):.2f}")
+    e4.metric("λ Away HT", f"{safe_float(model_edge.get('lam_away_ht', 0), 0.0):.2f}")
+
+    st.write(
+        f"**Context Avg:** {safe_float(model_edge.get('ctx_avg', 0), 0.0):.2f} | "
+        f"**Regularity Avg:** {safe_float(model_edge.get('reg_avg', 0), 0.0):.2f} | "
+        f"**FT StDev Avg:** {safe_float(model_edge.get('ft_sd_avg', 0), 0.0):.2f} | "
+        f"**HT StDev Avg:** {safe_float(model_edge.get('ht_sd_avg', 0), 0.0):.2f}"
+    )
+
+    st.markdown("#### FT Over 2.5")
+    eo1, eo2, eo3, eo4 = st.columns(4)
+    eo1.metric("P Modello O2.5", f"{safe_float(model_edge.get('p_model_o25', 0), 0.0):.3f}")
+    eo2.metric("P Mercato O2.5", f"{safe_float(model_edge.get('p_market_o25', 0), 0.0):.3f}")
+    eo3.metric("Edge O2.5", f"{safe_float(model_edge.get('edge_o25', 0), 0.0):.3f}")
+    eo4.metric("Edge Level", f"{model_edge.get('edge_level_o25', 'NONE')}")
+
+    st.write(
+        f"**Edge Logit O2.5:** {safe_float(model_edge.get('edge_logit_o25', 0), 0.0):.3f}"
+    )
+
+    st.markdown("#### HT Over 0.5 / Over 1.5")
+    eh1, eh2, eh3 = st.columns(3)
+    eh1.metric(
+        "P Modello O0.5HT",
+        f"{safe_float(model_edge.get('p_model_o05ht', 0), 0.0):.3f}"
+    )
+    eh2.metric(
+        "P Mercato O0.5HT",
+        f"{safe_float(model_edge.get('p_market_o05ht', 0), 0.0):.3f}"
+    )
+    eh3.metric(
+        "Edge O0.5HT",
+        f"{safe_float(model_edge.get('edge_o05ht', 0), 0.0):.3f}"
+    )
+
+    eh4, eh5, eh6 = st.columns(3)
+    eh4.metric(
+        "P Modello O1.5HT",
+        f"{safe_float(model_edge.get('p_model_o15ht', 0), 0.0):.3f}"
+    )
+    eh5.metric(
+        "P Mercato O1.5HT",
+        f"{safe_float(model_edge.get('p_market_o15ht', 0), 0.0):.3f}"
+    )
+    eh6.metric(
+        "Edge O1.5HT",
+        f"{safe_float(model_edge.get('edge_o15ht', 0), 0.0):.3f}"
+    )
+
+    st.write(
+        f"**Edge Level O0.5HT:** {model_edge.get('edge_level_o05ht', 'NONE')} | "
+        f"**Edge Logit O0.5HT:** {safe_float(model_edge.get('edge_logit_o05ht', 0), 0.0):.3f}"
+    )
+    st.write(
+        f"**Edge Level O1.5HT:** {model_edge.get('edge_level_o15ht', 'NONE')} | "
+        f"**Edge Logit O1.5HT:** {safe_float(model_edge.get('edge_logit_o15ht', 0), 0.0):.3f}"
+    )
     s1, s2, s3, s4, s5, s6 = st.columns(6)
     s1.metric("PTGG", f"{safe_float(scores.get('ptgg', 0), 0.0):.2f}")
     s2.metric("PT1.5", f"{safe_float(scores.get('pto15', 0), 0.0):.2f}")
