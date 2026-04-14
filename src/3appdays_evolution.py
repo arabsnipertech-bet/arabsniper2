@@ -2796,6 +2796,30 @@ def build_match_structure_profile(mk, s_h, s_a, market_pack=None, quote_pack=Non
         "cross_away_dirty": cross_away_dirty,
     }
 
+def build_structure_debug_summary(structure_pack):
+    if not structure_pack:
+        return {}
+
+    return {
+        "match_profile": structure_pack.get("match_profile", "neutral"),
+        "structure_score": structure_pack.get("structure_score", 0.0),
+        "structure_grade": structure_pack.get("structure_grade", "low"),
+        "combined_ht_clean": structure_pack.get("combined_ht_clean", 0.0),
+        "combined_ft_clean": structure_pack.get("combined_ft_clean", 0.0),
+        "combined_ht_scored_clean": structure_pack.get("combined_ht_scored_clean", 0.0),
+        "cross_home_clean": structure_pack.get("cross_home_clean", 0.0),
+        "cross_away_clean": structure_pack.get("cross_away_clean", 0.0),
+        "bilateral_ft": structure_pack.get("bilateral_ft", False),
+        "bilateral_ht": structure_pack.get("bilateral_ht", False),
+        "one_sided_risk": structure_pack.get("one_sided_risk", 0.0),
+        "fav_quote": structure_pack.get("fav_quote", 0.0),
+        "fav_zone": structure_pack.get("fav_zone", "unknown"),
+        "combined_ht_dirty": structure_pack.get("combined_ht_dirty", 0.0),
+        "combined_ft_dirty": structure_pack.get("combined_ft_dirty", 0.0),
+        "cross_home_dirty": structure_pack.get("cross_home_dirty", 0.0),
+        "cross_away_dirty": structure_pack.get("cross_away_dirty", 0.0),
+    }
+
 def estimate_match_lambdas(s_h, s_a):
     """
     Stima lambda FT e HT per casa e trasferta usando i campi reali del motore V25.
