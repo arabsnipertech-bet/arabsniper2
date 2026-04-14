@@ -129,6 +129,86 @@ def fair_implied_probability(odd, total_implied):
     raw_prob = 1.0 / odd
     return round3(raw_prob / total_implied)
 
+def clamp(x, low, high):
+    try:
+        return max(low, min(high, float(x)))
+    except Exception:
+        return low
+
+
+def safe_logit(p):
+    p = clamp(p, 1e-6, 1 - 1e-6)
+    return math.log(p / (1.0 - p))
+
+
+def poisson_pmf(k, lam):
+    lam = max(safe_float(lam, 0.0), 0.0)
+    if k < 0:
+        return 0.0
+    try:
+        return math.exp(-lam) * (lam ** k) / math.factorial(k)
+    except Exception:
+        return 0.0
+
+
+def poisson_over25_prob(lam_home, lam_away, max_goals=8):
+    """
+    Probabilità Over 2.5 via doppia Poisson indipendente.
+    Prima versione semplice e stabile.
+    """
+    lam_home = clamp(lam_home, 0.05, 4.50)
+    lam_away = clamp(lam_away, 0.05, 4.50)
+
+    prob = 0.0
+    for gh in range(max_goals + 1):
+        p_h = poisson_pmf(gh, lam_home)
+        for ga in range(max_goals + 1):
+            if gh + ga >= 3:
+                prob += p_h * poisson_pmf(ga, lam_away)
+
+    return round3(clamp(prob, 0.0, 1.0))
+
+
+def poisson_over05ht_prob(lam_home_ht, lam_away_ht, max_goals=6):
+    """
+    Probabilità di almeno 1 goal nel primo tempo.
+    """
+    lam_home_ht = clamp(lam_home_ht, 0.01, 3.00)
+    lam_away_ht = clamp(lam_away_ht, 0.01, 3.00)
+
+    p00 = poisson_pmf(0, lam_home_ht) * poisson_pmf(0, lam_away_ht)
+    return round3(clamp(1.0 - p00, 0.0, 1.0))
+
+
+def poisson_over15ht_prob(lam_home_ht, lam_away_ht, max_goals=6):
+    """
+    Probabilità di almeno 2 goal nel primo tempo.
+    """
+    lam_home_ht = clamp(lam_home_ht, 0.01, 3.00)
+    lam_away_ht = clamp(lam_away_ht, 0.01, 3.00)
+
+    prob = 0.0
+    for gh in range(max_goals + 1):
+        p_h = poisson_pmf(gh, lam_home_ht)
+        for ga in range(max_goals + 1):
+            if gh + ga >= 2:
+                prob += p_h * poisson_pmf(ga, lam_away_ht)
+
+    return round3(clamp(prob, 0.0, 1.0))
+
+
+def fair_prob_from_single_odd(odd):
+    """
+    Prima versione minimale:
+    converte una quota singola in probabilità implicita grezza.
+    La depurazione completa dall'aggio la faremo nel prossimo step.
+    """
+    odd = safe_float(odd, 0.0)
+    if odd <= 1.0:
+        return 0.0
+    return round3(clamp(1.0 / odd, 0.0, 1.0))
+
+
 def safe_float(x, default=0.0):
     try:
         if x is None:
