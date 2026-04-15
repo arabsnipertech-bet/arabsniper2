@@ -3932,7 +3932,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
         and (
-            edge_o25 >= -0.01
+            edge_o25 >= -0.02
             or has_drop_1x2
             or has_drop_o25
         )
