@@ -248,6 +248,14 @@ def classify_edge_level(edge_value):
         return "LIGHT"
     return "NONE"
 
+def safe_edge_logit(p_model, p_market):
+    p_model = safe_float(p_model, 0.0)
+    p_market = safe_float(p_market, 0.0)
+
+    if p_model > 0 and p_market > 0:
+        return round3(safe_logit(p_model) - safe_logit(p_market))
+    return 0.0
+
 
 def safe_float(x, default=0.0):
     try:
@@ -4710,18 +4718,9 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                     edge_level_o05ht = signal_pack.get("edge_level_o05ht", "NONE")
                     edge_level_o15ht = signal_pack.get("edge_level_o15ht", "NONE")
 
-                    edge_logit_over25 = (
-                        round3(safe_logit(p_model_over25) - safe_logit(p_market_over25))
-                        if p_model_over25 > 0 and p_market_over25 > 0 else 0.0
-                    )
-                    edge_logit_o05ht = (
-                        round3(safe_logit(p_model_o05ht) - safe_logit(p_market_o05ht))
-                        if p_model_o05ht > 0 and p_market_o05ht > 0 else 0.0
-                    )
-                    edge_logit_o15ht = (
-                        round3(safe_logit(p_model_o15ht) - safe_logit(p_market_o15ht))
-                        if p_model_o15ht > 0 and p_market_o15ht > 0 else 0.0
-                    )
+                    edge_logit_over25 = safe_edge_logit(p_model_over25, p_market_over25)
+                    edge_logit_o05ht = safe_edge_logit(p_model_o05ht, p_market_o05ht)
+                    edge_logit_o15ht = safe_edge_logit(p_model_o15ht, p_market_o15ht)
 
                     fav = signal_pack["fav_quote"]
                     is_gold_zone = signal_pack["is_gold_zone"]
