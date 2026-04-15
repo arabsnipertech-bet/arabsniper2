@@ -208,6 +208,34 @@ def fair_prob_from_single_odd(odd):
         return 0.0
     return round3(clamp(1.0 / odd, 0.0, 1.0))
 
+def fair_prob_from_two_way_market(over_odd, under_odd, pick="over"):
+    """
+    Probabilità fair normalizzata su mercato binario.
+    Se manca un lato del mercato, fallback sulla quota singola.
+    """
+    over_odd = safe_float(over_odd, 0.0)
+    under_odd = safe_float(under_odd, 0.0)
+
+    if over_odd > 1.0 and under_odd > 1.0:
+        p_over_raw = 1.0 / over_odd
+        p_under_raw = 1.0 / under_odd
+        total = p_over_raw + p_under_raw
+
+        if total > 0:
+            p_over_fair = p_over_raw / total
+            p_under_fair = p_under_raw / total
+
+            if str(pick).lower() == "under":
+                return round3(clamp(p_under_fair, 0.0, 1.0))
+
+            return round3(clamp(p_over_fair, 0.0, 1.0))
+
+    # fallback prudenziale
+    if str(pick).lower() == "under":
+        return fair_prob_from_single_odd(under_odd)
+
+    return fair_prob_from_single_odd(over_odd)
+
 def classify_edge_level(edge_value):
     edge_value = safe_float(edge_value, 0.0)
     if edge_value >= 0.10:
@@ -728,9 +756,15 @@ def extract_elite_markets(session, fid):
         "q1": 0.0,
         "qx": 0.0,
         "q2": 0.0,
+
         "o25": 0.0,
+        "u25": 0.0,
+
         "o05ht": 0.0,
+        "u05ht": 0.0,
+
         "o15ht": 0.0,
+        "u15ht": 0.0,
     }
 
     for bm in res["response"][0].get("bookmakers", []):
@@ -749,22 +783,35 @@ def extract_elite_markets(session, fid):
                     elif "away" in vl:
                         mk["q2"] = odd
 
-            if bid == 5 and mk["o25"] == 0:
+            if bid == 5:
                 if any(j in name for j in ["corner", "card", "booking"]):
                     continue
-                for v in b.get("values", []):
-                    if "over 2.5" in str(v.get("value", "")).lower():
-                        mk["o25"] = safe_float(v.get("odd"), 0.0)
 
-            if _contains_ht(name) and any(k in name for k in ["total", "over/under", "ou", "goals"]):
-                if "team" in name:
-                    continue
                 for v in b.get("values", []):
                     val_txt = str(v.get("value", "")).lower().replace(",", ".")
+
+                    if "over 2.5" in val_txt and mk["o25"] == 0:
+                        mk["o25"] = safe_float(v.get("odd"), 0.0)
+
+                    elif "under 2.5" in val_txt and mk["u25"] == 0:
+                        mk["u25"] = safe_float(v.get("odd"), 0.0)
+
+             if _contains_ht(name) and any(k in name for k in ["total", "over/under", "ou", "goals"]):
+                if "team" in name:
+                    continue
+
+                for v in b.get("values", []):
+                    val_txt = str(v.get("value", "")).lower().replace(",", ".")
+
                     if "over 0.5" in val_txt and mk["o05ht"] == 0:
                         mk["o05ht"] = safe_float(v.get("odd"), 0.0)
-                    if "over 1.5" in val_txt and mk["o15ht"] == 0:
+                    elif "under 0.5" in val_txt and mk["u05ht"] == 0:
+                        mk["u05ht"] = safe_float(v.get("odd"), 0.0)
+
+                    elif "over 1.5" in val_txt and mk["o15ht"] == 0:
                         mk["o15ht"] = safe_float(v.get("odd"), 0.0)
+                    elif "under 1.5" in val_txt and mk["u15ht"] == 0:
+                        mk["u15ht"] = safe_float(v.get("odd"), 0.0)
 
         if mk["q1"] > 0 and mk["o25"] > 0 and mk["o05ht"] > 0:
             break
@@ -3646,6 +3693,39 @@ def build_signal_package(fid, mk, s_h, s_a):
         quote_pack=quote_pack
     )
 
+    # -------------------------------------------------
+    # EVOLUTION EDGE LAYER
+    # modello probabilistico vs mercato fair
+    # -------------------------------------------------
+    lambda_pack = estimate_match_lambdas(s_h, s_a)
+
+    lam_home_ft = safe_float(lambda_pack.get("lam_home_ft", 0.0), 0.0)
+    lam_away_ft = safe_float(lambda_pack.get("lam_away_ft", 0.0), 0.0)
+    lam_home_ht = safe_float(lambda_pack.get("lam_home_ht", 0.0), 0.0)
+    lam_away_ht = safe_float(lambda_pack.get("lam_away_ht", 0.0), 0.0)
+
+    p_model_o25 = poisson_over25_prob(lam_home_ft, lam_away_ft)
+    p_model_o05ht = poisson_over05ht_prob(lam_home_ht, lam_away_ht)
+    p_model_o15ht = poisson_over15ht_prob(lam_home_ht, lam_away_ht)
+
+    p_market_o25 = fair_prob_from_two_way_market(
+        mk.get("o25"), mk.get("u25"), pick="over"
+    )
+    p_market_o05ht = fair_prob_from_two_way_market(
+        mk.get("o05ht"), mk.get("u05ht"), pick="over"
+    )
+    p_market_o15ht = fair_prob_from_two_way_market(
+        mk.get("o15ht"), mk.get("u15ht"), pick="over"
+    )
+
+    edge_o25 = round3(p_model_o25 - p_market_o25)
+    edge_o05ht = round3(p_model_o05ht - p_market_o05ht)
+    edge_o15ht = round3(p_model_o15ht - p_market_o15ht)
+
+    edge_level_o25 = classify_edge_level(edge_o25)
+    edge_level_o05ht = classify_edge_level(edge_o05ht)
+    edge_level_o15ht = classify_edge_level(edge_o15ht)
+
     ptgg_score = safe_float(scores.get("ptgg"), 0.0)
     pto15_score = safe_float(scores.get("pto15"), 0.0)
     pt_score = safe_float(scores.get("pt"), 0.0)
@@ -3653,6 +3733,91 @@ def build_signal_package(fid, mk, s_h, s_a):
     boost_score = safe_float(scores.get("boost"), 0.0)
     gold_score = safe_float(scores.get("gold"), 0.0)
     max_score = safe_float(scores.get("max"), 0.0)
+
+    # -------------------------------------------------
+    # EDGE ADJUSTMENTS
+    # bonus leggeri: confermano, non comandano da soli
+    # -------------------------------------------------
+    if edge_o25 >= 0.08:
+        over_score += 0.55
+        gold_score += 0.40
+    elif edge_o25 >= 0.05:
+        over_score += 0.30
+        gold_score += 0.18
+    elif edge_o25 <= -0.03:
+        over_score -= 0.45
+        gold_score -= 0.35
+
+    if edge_o05ht >= 0.07:
+        ptgg_score += 0.45
+        pt_score += 0.35
+        boost_score += 0.18
+    elif edge_o05ht >= 0.04:
+        ptgg_score += 0.20
+        pt_score += 0.15
+    elif edge_o05ht <= -0.03:
+        ptgg_score -= 0.35
+        pt_score -= 0.28
+
+    if edge_o15ht >= 0.07:
+        pto15_score += 0.55
+        pt_score += 0.25
+        boost_score += 0.12
+    elif edge_o15ht >= 0.04:
+        pto15_score += 0.25
+    elif edge_o15ht <= -0.03:
+        pto15_score -= 0.40
+        pt_score -= 0.15
+
+    # ricostruzione PT dopo l'aggiustamento edge
+    base_pt_score = round3(max(ptgg_score, pto15_score) + (min(ptgg_score, pto15_score) * 0.16))
+
+    if over_score >= 4.60:
+        pt_context_factor = 1.08
+    elif over_score >= 4.10:
+        pt_context_factor = 1.00
+    elif over_score >= 3.70:
+        pt_context_factor = 0.88
+    else:
+        pt_context_factor = 0.72
+
+    pt_score = round3(base_pt_score * pt_context_factor)
+
+    # piccolo ri-allineamento finale
+    if edge_o25 >= 0.06 and edge_o05ht >= 0.04:
+        boost_score += 0.18
+    if edge_o25 >= 0.07 and edge_o05ht >= 0.05 and edge_o15ht >= 0.04:
+        gold_score += 0.20
+
+    ptgg_score = round3(max(ptgg_score, 0.0))
+    pto15_score = round3(max(pto15_score, 0.0))
+    pt_score = round3(max(pt_score, 0.0))
+    over_score = round3(max(over_score, 0.0))
+    boost_score = round3(max(boost_score, 0.0))
+    gold_score = round3(max(gold_score, 0.0))
+    max_score = round3(max(ptgg_score, pto15_score, pt_score, over_score, boost_score, gold_score))
+
+    scores = {
+        "ptgg": ptgg_score,
+        "pto15": pto15_score,
+        "pt": pt_score,
+        "over": over_score,
+        "boost": boost_score,
+        "gold": gold_score,
+        "max": max_score,
+        "edge_o25": edge_o25,
+        "edge_o05ht": edge_o05ht,
+        "edge_o15ht": edge_o15ht,
+        "edge_level_o25": edge_level_o25,
+        "edge_level_o05ht": edge_level_o05ht,
+        "edge_level_o15ht": edge_level_o15ht,
+        "p_model_o25": p_model_o25,
+        "p_market_o25": p_market_o25,
+        "p_model_o05ht": p_model_o05ht,
+        "p_market_o05ht": p_market_o05ht,
+        "p_model_o15ht": p_model_o15ht,
+        "p_market_o15ht": p_market_o15ht,
+    }
 
     fav = safe_float(structure_pack.get("fav_quote", 0.0), 0.0)
     is_gold_zone = bool(1.40 <= fav <= 1.90)
@@ -3746,12 +3911,14 @@ def build_signal_package(fid, mk, s_h, s_a):
     over_ok = (
         over_score >= over_threshold
         and combined_ft_clean >= 1.52
+        and edge_o25 >= -0.01
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
     )
 
     strong_over_ok = (
         over_score >= 4.40
+        and edge_o25 >= 0.03
         and combined_ft_clean >= 1.58
         and structure_score >= 1.10
         and coherence_score >= 1.25
@@ -3769,6 +3936,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         ptgg_score >= ptgg_threshold
         and over_ok
         and pt_market_ok
+        and edge_o05ht >= -0.01
         and combined_ht_clean >= 0.88
         and safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.45
         and safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.45
@@ -3780,6 +3948,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         pto15_score >= pto15_threshold
         and over_ok
         and pt_market_ok
+        and edge_o15ht >= -0.01
         and combined_ht_scored_clean >= 0.76
         and lagging_market in ("o15ht", "o05ht", "none")
         and safe_float(mk.get("o15ht"), 0.0) <= 3.80
@@ -3880,6 +4049,8 @@ def build_signal_package(fid, mk, s_h, s_a):
         and boost_has_over
         and pt_score >= 3.65
         and over_score >= 3.75
+        and edge_o25 >= 0.02
+        and (edge_o05ht >= 0.01 or edge_o15ht >= 0.01)
         and boost_gate_structure
         and boost_gate_market
         and boost_gate_quality
@@ -3935,6 +4106,8 @@ def build_signal_package(fid, mk, s_h, s_a):
         and gold_has_over
         and over_score >= 4.00
         and pt_score >= 3.40
+        and edge_o25 >= 0.03
+        and (edge_o05ht >= 0.00 or edge_o15ht >= 0.00)
         and gold_gate_structure
         and gold_gate_attack
         and gold_gate_market
@@ -4021,6 +4194,23 @@ def build_signal_package(fid, mk, s_h, s_a):
         "structure_pack": structure_pack,
         "internal_labels": internal_labels,
         "over_level": over_level,
+
+        "lambda_pack": lambda_pack,
+
+        "edge_o25": edge_o25,
+        "edge_o05ht": edge_o05ht,
+        "edge_o15ht": edge_o15ht,
+
+        "edge_level_o25": edge_level_o25,
+        "edge_level_o05ht": edge_level_o05ht,
+        "edge_level_o15ht": edge_level_o15ht,
+
+        "p_model_o25": p_model_o25,
+        "p_market_o25": p_market_o25,
+        "p_model_o05ht": p_model_o05ht,
+        "p_market_o05ht": p_market_o05ht,
+        "p_model_o15ht": p_model_o15ht,
+        "p_market_o15ht": p_market_o15ht,
     }
 
 def should_keep_match(signal_pack):
@@ -4486,43 +4676,42 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                     market_pack = signal_pack["market_pack"]
                     structure_pack = signal_pack["structure_pack"]
 
-                    # ----------------------------------
-                    # EVOLUTION LAYER - MODEL PROBABILITIES + EDGE
-                    # ----------------------------------
-                    lambda_pack = estimate_match_lambdas(s_h, s_a)
+                    lambda_pack = signal_pack.get("lambda_pack", {}) or {}
 
                     lam_home_ft = safe_float(lambda_pack.get("lam_home_ft", 0.0), 0.0)
                     lam_away_ft = safe_float(lambda_pack.get("lam_away_ft", 0.0), 0.0)
                     lam_home_ht = safe_float(lambda_pack.get("lam_home_ht", 0.0), 0.0)
                     lam_away_ht = safe_float(lambda_pack.get("lam_away_ht", 0.0), 0.0)
 
-                    p_model_over25 = poisson_over25_prob(lam_home_ft, lam_away_ft)
-                    p_model_o05ht = poisson_over05ht_prob(lam_home_ht, lam_away_ht)
-                    p_model_o15ht = poisson_over15ht_prob(lam_home_ht, lam_away_ht)
+                    p_model_over25 = safe_float(signal_pack.get("p_model_o25", 0.0), 0.0)
+                    p_market_over25 = safe_float(signal_pack.get("p_market_o25", 0.0), 0.0)
 
-                    p_market_over25 = fair_prob_from_single_odd(mk.get("o25"))
-                    p_market_o05ht = fair_prob_from_single_odd(mk.get("o05ht"))
-                    p_market_o15ht = fair_prob_from_single_odd(mk.get("o15ht"))
+                    p_model_o05ht = safe_float(signal_pack.get("p_model_o05ht", 0.0), 0.0)
+                    p_market_o05ht = safe_float(signal_pack.get("p_market_o05ht", 0.0), 0.0)
 
-                    edge_over25 = round3(p_model_over25 - p_market_over25)
-                    edge_o05ht = round3(p_model_o05ht - p_market_o05ht)
-                    edge_o15ht = round3(p_model_o15ht - p_market_o15ht)
+                    p_model_o15ht = safe_float(signal_pack.get("p_model_o15ht", 0.0), 0.0)
+                    p_market_o15ht = safe_float(signal_pack.get("p_market_o15ht", 0.0), 0.0)
 
-                    edge_logit_over25 = round3(
-                        safe_logit(p_model_over25) - safe_logit(p_market_over25)
-                    ) if p_model_over25 > 0 and p_market_over25 > 0 else 0.0
+                    edge_over25 = safe_float(signal_pack.get("edge_o25", 0.0), 0.0)
+                    edge_o05ht = safe_float(signal_pack.get("edge_o05ht", 0.0), 0.0)
+                    edge_o15ht = safe_float(signal_pack.get("edge_o15ht", 0.0), 0.0)
 
-                    edge_logit_o05ht = round3(
-                        safe_logit(p_model_o05ht) - safe_logit(p_market_o05ht)
-                    ) if p_model_o05ht > 0 and p_market_o05ht > 0 else 0.0
+                    edge_level_over25 = signal_pack.get("edge_level_o25", "NONE")
+                    edge_level_o05ht = signal_pack.get("edge_level_o05ht", "NONE")
+                    edge_level_o15ht = signal_pack.get("edge_level_o15ht", "NONE")
 
-                    edge_logit_o15ht = round3(
-                        safe_logit(p_model_o15ht) - safe_logit(p_market_o15ht)
-                    ) if p_model_o15ht > 0 and p_market_o15ht > 0 else 0.0
-
-                    edge_level_over25 = classify_edge_level(edge_over25)
-                    edge_level_o05ht = classify_edge_level(edge_o05ht)
-                    edge_level_o15ht = classify_edge_level(edge_o15ht)
+                    edge_logit_over25 = (
+                        round3(safe_logit(p_model_over25) - safe_logit(p_market_over25))
+                        if p_model_over25 > 0 and p_market_over25 > 0 else 0.0
+                    )
+                    edge_logit_o05ht = (
+                        round3(safe_logit(p_model_o05ht) - safe_logit(p_market_o05ht))
+                        if p_model_o05ht > 0 and p_market_o05ht > 0 else 0.0
+                    )
+                    edge_logit_o15ht = (
+                        round3(safe_logit(p_model_o15ht) - safe_logit(p_market_o15ht))
+                        if p_model_o15ht > 0 and p_market_o15ht > 0 else 0.0
+                    )
 
                     fav = signal_pack["fav_quote"]
                     is_gold_zone = signal_pack["is_gold_zone"]
@@ -4633,6 +4822,9 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                             "o25": safe_float(mk.get("o25"), 0.0),
                             "o05ht": safe_float(mk.get("o05ht"), 0.0),
                             "o15ht": safe_float(mk.get("o15ht"), 0.0),
+                            "u25": safe_float(mk.get("u25"), 0.0),
+                            "u05ht": safe_float(mk.get("u05ht"), 0.0),
+                            "u15ht": safe_float(mk.get("u15ht"), 0.0),
                         },
 
                         "averages": {
