@@ -3761,9 +3761,9 @@ def build_signal_package(fid, mk, s_h, s_a):
     elif edge_o25 >= 0.05:
         over_score += 0.30
         gold_score += 0.18
-    elif edge_o25 <= -0.03:
-        over_score -= 0.45
-        gold_score -= 0.35
+    elif edge_o25 <= -0.05:
+        over_score -= 0.28
+        gold_score -= 0.22
 
     if edge_o05ht >= 0.07:
         ptgg_score += 0.45
@@ -3772,9 +3772,9 @@ def build_signal_package(fid, mk, s_h, s_a):
     elif edge_o05ht >= 0.04:
         ptgg_score += 0.20
         pt_score += 0.15
-    elif edge_o05ht <= -0.03:
-        ptgg_score -= 0.35
-        pt_score -= 0.28
+    elif edge_o05ht <= -0.05:
+        ptgg_score -= 0.22
+        pt_score -= 0.18
 
     if edge_o15ht >= 0.07:
         pto15_score += 0.55
@@ -3782,9 +3782,9 @@ def build_signal_package(fid, mk, s_h, s_a):
         boost_score += 0.12
     elif edge_o15ht >= 0.04:
         pto15_score += 0.25
-    elif edge_o15ht <= -0.03:
-        pto15_score -= 0.40
-        pt_score -= 0.15
+    elif edge_o15ht <= -0.06:
+        pto15_score -= 0.24
+        pt_score -= 0.10
 
     # ricostruzione PT dopo l'aggiustamento edge
     base_pt_score = round3(max(ptgg_score, pto15_score) + (min(ptgg_score, pto15_score) * 0.16))
@@ -3928,7 +3928,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     over_ok = (
         over_score >= over_threshold
         and combined_ft_clean >= 1.52
-        and edge_o25 >= -0.01
+        and edge_o25 >= -0.03
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
     )
@@ -3953,7 +3953,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         ptgg_score >= ptgg_threshold
         and over_ok
         and pt_market_ok
-        and edge_o05ht >= -0.01
+        and edge_o05ht >= -0.04
         and combined_ht_clean >= 0.88
         and safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.45
         and safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.45
@@ -3965,7 +3965,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         pto15_score >= pto15_threshold
         and over_ok
         and pt_market_ok
-        and edge_o15ht >= -0.01
+        and edge_o15ht >= -0.05
         and combined_ht_scored_clean >= 0.76
         and lagging_market in ("o15ht", "o05ht", "none")
         and safe_float(mk.get("o15ht"), 0.0) <= 3.80
