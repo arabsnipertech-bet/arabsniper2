@@ -3864,6 +3864,21 @@ def build_signal_package(fid, mk, s_h, s_a):
     drop_diff = compute_drop_diff(fid, mk)
     over_level = 0
 
+    q1_move_data = quote_pack.get("Q1_MOVE_DATA", {}) or {}
+    q2_move_data = quote_pack.get("Q2_MOVE_DATA", {}) or {}
+    o25_move_data = quote_pack.get("O25_MOVE_DATA", {}) or {}
+
+    has_drop_1x2 = (
+        (q1_move_data.get("dir") == "down" and safe_float(q1_move_data.get("abs_diff", 0.0), 0.0) >= 0.06)
+        or
+        (q2_move_data.get("dir") == "down" and safe_float(q2_move_data.get("abs_diff", 0.0), 0.0) >= 0.06)
+    )
+
+    has_drop_o25 = (
+        o25_move_data.get("dir") == "down"
+        and safe_float(o25_move_data.get("abs_diff", 0.0), 0.0) >= 0.05
+    )
+
     tags = []
     internal_labels = []
 
