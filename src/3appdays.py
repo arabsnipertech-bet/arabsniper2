@@ -3935,6 +3935,7 @@ def build_signal_package(fid, mk, s_h, s_a):
             edge_o25 >= -0.01
             or has_drop_1x2
             or has_drop_o25
+        )
     )
 
     strong_over_ok = (
