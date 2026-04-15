@@ -78,9 +78,9 @@ except Exception:
 st.set_page_config(page_title="ARAB SNIPER V25 MULTI-DAY WEB", layout="wide")
 
 
-====================================
+#===========================
 # HELPER BASE
-====================================
+#====================================
 def now_rome():
     return datetime.now(ROME_TZ) if ROME_TZ else datetime.now()
 
@@ -318,9 +318,9 @@ def _contains_ht(text):
     ])
 
 
-====================================
+#====================================
 # GITHUB WRITE CORE
-====================================
+#====================================
 def get_github_token():
     token = os.getenv("GITHUB_TOKEN")
     if token:
@@ -415,9 +415,9 @@ def upload_snapshot_day_to_github(day_num, payload):
         print(f"Snapshot day{day_num} upload error: {e}", flush=True)
 
 
-====================================
+#====================================
 # SESSION STATE
-====================================
+#====================================
 if "config" not in st.session_state:
     if os.path.exists(CONFIG_FILE):
         try:
@@ -455,9 +455,9 @@ def save_config():
         json.dump(st.session_state.config, f, indent=4, ensure_ascii=False)
 
 
-====================================
+#====================================
 # RUNTIME API CACHE + THROTTLE
-====================================
+#====================================
 RUNTIME_ODDS_CACHE = {}
 LAST_API_CALL_TS = 0.0
 API_MIN_INTERVAL = 0.14  # ~428 req/min teorici max
@@ -480,9 +480,9 @@ def api_throttle():
     LAST_API_CALL_TS = time.time()
 
 
-====================================
+#====================================
 # SNAPSHOT / DB LOAD-SAVE
-====================================
+#====================================
 def save_snapshot_file(payload):
     with open(SNAP_FILE, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=4, ensure_ascii=False)
@@ -645,9 +645,9 @@ def load_db():
 last_snap_ts = load_db()
 
 
-====================================
+#====================================
 # API CORE
-====================================
+#====================================
 def get_api_key():
     """
     Recupera la API key a runtime.
@@ -742,9 +742,9 @@ def api_get(session, path, params):
     return None
 
 
-====================================
+#====================================
 # ESTRAZIONE MERCATI
-====================================
+#====================================
 def extract_elite_markets(session, fid):
     global RUNTIME_ODDS_CACHE
 
@@ -842,9 +842,9 @@ def extract_elite_markets(session, fid):
     return mk
 
 
-====================================
+#====================================
 # SNAPSHOT OPEN/CURRENT
-====================================
+#====================================
 def get_open_quote_pack(fid):
     odds_memory = st.session_state.get("odds_memory", {}) or {}
     rec = odds_memory.get(str(fid), {}) or {}
@@ -1007,14 +1007,14 @@ def build_daily_snapshots_from_rolling():
         upload_snapshot_day_to_github(day_num, day_payload)
         print(f"📦 snapshot_day{day_num} aggiornato: {len(day_odds)} match", flush=True)
         
-====================================
+#====================================
 # BLOCCO 2
 # TEAM MATCH HISTORY + CONTESTUAL STATS
 # - ultime partite arricchite
 # - split casa/trasferta
 # - recency weighted
 # - profilo generale + profilo contestuale
-====================================
+#====================================
 
 def weighted_mean(values, weights=None):
     vals = [safe_float(v, 0.0) for v in values]
@@ -1784,7 +1784,7 @@ def estimate_match_lambdas(s_h, s_a):
         "ht_sd_avg": round3(ht_sd_avg),
     }
     
-====================================
+#====================================
 # BLOCCO 3
 # QUOTE MOVEMENT + MARKET COHERENCE ENGINE
 # - open/current movement
@@ -1792,7 +1792,7 @@ def estimate_match_lambdas(s_h, s_a):
 # - qualità drop
 # - coerenza book
 # - disallineamento utile / trappola
-====================================
+#====================================
 
 def classify_single_quote_move(open_q, current_q):
     """
@@ -2625,14 +2625,14 @@ def build_market_debug_summary(market_pack):
         "away_scoring_regularity": market_pack.get("away_scoring_regularity", 0.0),
     }
     
-====================================
+#====================================
 # BLOCCO 4
 # MATCH STRUCTURE + ARCHETYPES + SCORING V25
 # - struttura partita
 # - rischio one-sided
 # - archetipi
 # - score PTGG / PT1.5 / OVER / BOOST / GOLD
-====================================
+#====================================
 
 def band_score(value, core_low, core_high, soft_low=None, soft_high=None, core_pts=1.0, soft_pts=0.45):
     v = safe_float(value, 0.0)
@@ -3666,14 +3666,14 @@ def build_scoring_snapshot(mk, s_h, s_a, structure_pack, market_pack, quote_pack
         "max": round3(max(ptgg_score, pto15_score, pt_score, over_score, boost_score, gold_score))
     }
     
-====================================
+#====================================
 # BLOCCO 5
 # SIGNAL PACKAGE + TAG LOGIC + KEEP FILTER
 # - build_signal_package
 # - gerarchia tag
 # - gates GOLD / BOOST / PROBE
 # - should_keep_match
-====================================
+#====================================
 
 def has_warning(market_pack, flag_name):
     warns = market_pack.get("warning_flags", []) or []
@@ -4381,7 +4381,7 @@ def build_signal_debug_summary(signal_pack):
         "over_level": signal_pack.get("over_level", 0),
     }
     
-====================================
+#====================================
 # BLOCCO 6
 # DETAILS / MERGE / SCAN CORE / NIGHT BUILD
 # - save details
@@ -4389,7 +4389,7 @@ def build_signal_debug_summary(signal_pack):
 # - merge rows
 # - run_full_scan V25
 # - nightly multiday build
-====================================
+#====================================
 
 def save_match_details_file():
     payload = {
@@ -4437,9 +4437,9 @@ def sync_day_outputs_to_github(day_num, update_main=False):
     return status_main, status_day, status_details
 
 
-====================================
+#====================================
 # MERGE HELPERS
-====================================
+#====================================
 def build_curr_pack_from_row(row: dict) -> dict:
     return {
         "Q1_CURR": safe_float(row.get("Q1", row.get("Q1_CURR", 0))),
@@ -4561,9 +4561,9 @@ def merge_day_rows(old_rows: list, new_rows: list) -> list:
     return merged_rows
 
 
-====================================
+#====================================
 # SCAN CORE V25
-====================================
+#====================================
 def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success=True):
     use_horizon = horizon if horizon is not None else HORIZON
     target_dates = get_target_dates()
@@ -4784,7 +4784,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "VALUE_LEFT": market_pack.get("value_left", "unknown"),
                         "MATCH_PROFILE": structure_pack.get("match_profile", "neutral"),
                         "STRUCTURE_SCORE": structure_pack.get("structure_score", 0.0),
-                                                "LAM_HOME_FT": lam_home_ft,
+                        "LAM_HOME_FT": lam_home_ft,
                         "LAM_AWAY_FT": lam_away_ft,
                         "LAM_HOME_HT": lam_home_ht,
                         "LAM_AWAY_HT": lam_away_ht,
@@ -5079,9 +5079,9 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                 st.rerun()
 
 
-====================================
+#====================================
 # NIGHTLY MULTI-DAY BUILD
-====================================
+#====================================
 def run_nightly_multiday_build():
     print("🚀 Avvio scan notturno multi-day...", flush=True)
     reset_runtime_api_cache()
@@ -5552,8 +5552,8 @@ if st.session_state.scan_results:
             "MOVE_SUMMARY",
 
             "MARKET_PROFILE", "COHERENCE_SCORE", "DISLOCATION_SCORE",
-            "DROP_TYPE", "VALUE_LEFT", "MATCH_PROFILE", "STRUCTURE_SCORE"
-            
+            "DROP_TYPE", "VALUE_LEFT", "MATCH_PROFILE", "STRUCTURE_SCORE",
+
             "LAM_HOME_FT", "LAM_AWAY_FT", "LAM_HOME_HT", "LAM_AWAY_HT",
 
             "P_MODEL_O25", "P_MARKET_O25", "EDGE_O25", "EDGE_LOGIT_O25", "EDGE_LEVEL_O25",
