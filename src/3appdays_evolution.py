@@ -796,7 +796,7 @@ def extract_elite_markets(session, fid):
                     elif "under 2.5" in val_txt and mk["u25"] == 0:
                         mk["u25"] = safe_float(v.get("odd"), 0.0)
 
-             if _contains_ht(name) and any(k in name for k in ["total", "over/under", "ou", "goals"]):
+            if _contains_ht(name) and any(k in name for k in ["total", "over/under", "ou", "goals"]):
                 if "team" in name:
                     continue
 
@@ -813,7 +813,12 @@ def extract_elite_markets(session, fid):
                     elif "under 1.5" in val_txt and mk["u15ht"] == 0:
                         mk["u15ht"] = safe_float(v.get("odd"), 0.0)
 
-        if mk["q1"] > 0 and mk["o25"] > 0 and mk["o05ht"] > 0:
+        has_1x2 = mk["q1"] > 0 and mk["qx"] > 0 and mk["q2"] > 0
+        has_ft_pair = mk["o25"] > 0 and mk["u25"] > 0
+        has_ht05_pair = mk["o05ht"] > 0 and mk["u05ht"] > 0
+        has_ht15_pair = mk["o15ht"] > 0 and mk["u15ht"] > 0
+
+        if has_1x2 and has_ft_pair and has_ht05_pair and has_ht15_pair:
             break
 
     # filtro quote troppo estreme / poco utili
@@ -993,7 +998,8 @@ def build_daily_snapshots_from_rolling():
 
         upload_snapshot_day_to_github(day_num, day_payload)
         print(f"📦 snapshot_day{day_num} aggiornato: {len(day_odds)} match", flush=True)
-      # ==========================================
+        
+# ==========================================
 # BLOCCO 2
 # TEAM MATCH HISTORY + CONTESTUAL STATS
 # - ultime partite arricchite
@@ -1769,6 +1775,7 @@ def estimate_match_lambdas(s_h, s_a):
         "ft_sd_avg": round3(ft_sd_avg),
         "ht_sd_avg": round3(ht_sd_avg),
     }
+    
 # ==========================================
 # BLOCCO 3
 # QUOTE MOVEMENT + MARKET COHERENCE ENGINE
@@ -2609,6 +2616,7 @@ def build_market_debug_summary(market_pack):
         "home_scoring_regularity": market_pack.get("home_scoring_regularity", 0.0),
         "away_scoring_regularity": market_pack.get("away_scoring_regularity", 0.0),
     }
+    
 # ==========================================
 # BLOCCO 4
 # MATCH STRUCTURE + ARCHETYPES + SCORING V25
@@ -3649,7 +3657,8 @@ def build_scoring_snapshot(mk, s_h, s_a, structure_pack, market_pack, quote_pack
         "gold": gold_score,
         "max": round3(max(ptgg_score, pto15_score, pt_score, over_score, boost_score, gold_score))
     }
-  # ==========================================
+    
+# ==========================================
 # BLOCCO 5
 # SIGNAL PACKAGE + TAG LOGIC + KEEP FILTER
 # - build_signal_package
@@ -4363,7 +4372,8 @@ def build_signal_debug_summary(signal_pack):
         "internal_labels": signal_pack.get("internal_labels", []),
         "over_level": signal_pack.get("over_level", 0),
     }
-  # ==========================================
+    
+# ==========================================
 # BLOCCO 6
 # DETAILS / MERGE / SCAN CORE / NIGHT BUILD
 # - save details
@@ -5117,7 +5127,8 @@ def run_nightly_multiday_build():
     except Exception as e:
         print(f"❌ Errore build multi-day: {e}", flush=True)
         raise
-      # ==========================================
+        
+# ==========================================
 # BLOCCO 7
 # UI SIDEBAR + UI MAIN + TABLE + MAIN EXEC
 # ==========================================
@@ -5543,6 +5554,12 @@ if st.session_state.scan_results:
 
             "MARKET_PROFILE", "COHERENCE_SCORE", "DISLOCATION_SCORE",
             "DROP_TYPE", "VALUE_LEFT", "MATCH_PROFILE", "STRUCTURE_SCORE"
+            
+            "LAM_HOME_FT", "LAM_AWAY_FT", "LAM_HOME_HT", "LAM_AWAY_HT",
+
+            "P_MODEL_O25", "P_MARKET_O25", "EDGE_O25", "EDGE_LOGIT_O25", "EDGE_LEVEL_O25",
+            "P_MODEL_O05HT", "P_MARKET_O05HT", "EDGE_O05HT", "EDGE_LOGIT_O05HT", "EDGE_LEVEL_O05HT",
+            "P_MODEL_O15HT", "P_MARKET_O15HT", "EDGE_O15HT", "EDGE_LOGIT_O15HT", "EDGE_LEVEL_O15HT",
         ]
         view = view.drop(columns=[c for c in cols_to_drop if c in view.columns], errors="ignore")
 
