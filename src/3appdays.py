@@ -3939,28 +3939,64 @@ def build_signal_package(fid, mk, s_h, s_a):
         and not has_warning(market_pack, "market_value_trap")
         and not has_warning(market_pack, "favorite_ultra_but_ft_structure_weak")
     )
+
+    # -------------------------------------------------
+    # MARKET RESISTANCE
+    # Se il modello vede OVER ma il mercato late va contro,
+    # declassiamo il match salvo edge davvero forte.
+    # -------------------------------------------------
+    o25_open = safe_float(quote_pack.get("O25_OPEN"), 0.0)
+    o25_curr = safe_float(quote_pack.get("O25_CURR"), 0.0)
+    o25_diff = round3(o25_curr - o25_open) if (o25_open > 0 and o25_curr > 0) else 0.0
+
+    market_resistance_soft = (
+        (
+            has_warning(market_pack, "ft_market_ahead_of_structure")
+            or market_pack.get("leading_market") == "o25"
+        )
+        and o25_diff >= 0.05
+        and edge_o25 < 0.05
+    )
+
+    market_resistance_hard = (
+        (
+            has_warning(market_pack, "ft_market_ahead_of_structure")
+            or market_pack.get("leading_market") == "o25"
+        )
+        and o25_diff >= 0.09
+        and edge_o25 < 0.08
+    )
+
+    market_resistance_extreme = (
+        (
+            has_warning(market_pack, "ft_market_ahead_of_structure")
+            or market_pack.get("leading_market") == "o25"
+        )
+        and o25_diff >= 0.14
+        and edge_o25 < 0.12
+    )
     
     over_ok = (
         over_score >= over_threshold
-        and combined_ft_clean >= 1.52
-        and edge_o25 >= -0.03
-        and not has_warning(market_pack, "ft_market_ahead_of_structure")
+        and combined_ft_clean >= 1.54
+        and edge_o25 >= -0.01
+        and not market_resistance_hard
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
         and (
-            edge_o25 >= -0.02
+            edge_o25 >= 0.00
             or has_drop_1x2
             or has_drop_o25
         )
     )
 
     strong_over_ok = (
-        over_score >= 4.40
-        and edge_o25 >= 0.03
-        and combined_ft_clean >= 1.58
-        and structure_score >= 1.10
-        and coherence_score >= 1.25
-        and one_sided_risk <= 1.45
-        and not has_warning(market_pack, "ft_market_ahead_of_structure")
+        over_score >= 4.45
+        and edge_o25 >= 0.04
+        and combined_ft_clean >= 1.60
+        and structure_score >= 1.12
+        and coherence_score >= 1.28
+        and one_sided_risk <= 1.42
+        and not market_resistance_soft
     )
 
     pt_market_ok = (
@@ -4081,17 +4117,18 @@ def build_signal_package(fid, mk, s_h, s_a):
 
     if (
         has_minimum_open_baseline
-        and boost_score >= 5.30
+        and boost_score >= 5.35
         and boost_has_pt
         and boost_has_over
-        and pt_score >= 3.65
-        and over_score >= 3.75
-        and edge_o25 >= 0.02
+        and pt_score >= 3.68
+        and over_score >= 3.82
+        and edge_o25 >= 0.03
         and (edge_o05ht >= 0.01 or edge_o15ht >= 0.01)
         and boost_gate_structure
         and boost_gate_market
         and boost_gate_quality
         and boost_gate_shape
+        and not market_resistance_soft
     ):
         over_level = max(over_level, 3)
 
@@ -4139,17 +4176,19 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     if (
-        gold_score >= 5.85
+        gold_score >= 5.90
         and gold_has_over
-        and over_score >= 4.00
-        and pt_score >= 3.40
-        and edge_o25 >= 0.03
+        and over_score >= 4.05
+        and pt_score >= 3.45
+        and edge_o25 >= 0.04
         and (edge_o05ht >= 0.00 or edge_o15ht >= 0.00)
         and gold_gate_structure
         and gold_gate_attack
         and gold_gate_market
         and gold_gate_readability
         and gold_gate_extra
+        and not market_resistance_soft
+        and not market_resistance_extreme
     ):
         tags.insert(0, "⚽⭐ GOLD")
 
@@ -4358,12 +4397,12 @@ def should_keep_match(signal_pack):
     
     if has_over and over_level == 1 and not has_pt:
         return bool(
-            over_score >= 3.40
-            and coherence_score >= 0.98
-            and structure_score >= 0.82
-            and one_sided_risk <= 1.60
+            over_score >= 3.52
+            and coherence_score >= 1.05
+            and structure_score >= 0.90
+            and one_sided_risk <= 1.48
+            and "ft_market_ahead_of_structure" not in warning_flags
         )
-
     # -------------------------------------
     # market push
     # -------------------------------------
