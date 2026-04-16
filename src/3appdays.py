@@ -3752,6 +3752,82 @@ def build_signal_package(fid, mk, s_h, s_a):
     max_score = safe_float(scores.get("max"), 0.0)
 
     # -------------------------------------------------
+    # COUNTER-MOVE PENALTY
+    # Se la Poisson vede OVER ma la quota O2.5 sale troppo,
+    # il mercato sta andando contro il nostro scenario.
+    # -------------------------------------------------
+    o25_open = safe_float(quote_pack.get("O25_OPEN", 0.0), 0.0)
+    o25_curr = safe_float(quote_pack.get("O25_CURR", 0.0), 0.0)
+
+    o25_diff = round3(o25_curr - o25_open) if (o25_open > 0 and o25_curr > 0) else 0.0
+    o25_pct_move = round3((o25_curr - o25_open) / o25_open) if (o25_open > 0 and o25_curr > 0) else 0.0
+
+    counter_move_soft = (
+        edge_o25 > 0.00
+        and o25_pct_move >= 0.05
+    )
+
+    counter_move_hard = (
+        edge_o25 > 0.00
+        and o25_pct_move >= 0.08
+    )
+
+    counter_move_extreme = (
+        edge_o25 > 0.00
+        and o25_pct_move >= 0.10
+    )
+
+    if counter_move_soft:
+        over_score -= 0.18
+        boost_score -= 0.20
+        gold_score -= 0.22
+
+    if counter_move_hard:
+        over_score -= 0.35
+        boost_score -= 0.40
+        gold_score -= 0.45
+
+    if counter_move_extreme:
+        over_score -= 0.60
+        boost_score -= 0.70
+        gold_score -= 0.75
+
+    over_score = round3(max(over_score, 0.0))
+    boost_score = round3(max(boost_score, 0.0))
+    gold_score = round3(max(gold_score, 0.0))
+
+    # -------------------------------------------------
+    # MARKET RESISTANCE
+    # Warning + movimento reale contro OVER
+    # -------------------------------------------------
+    market_resistance_soft = (
+        (
+            has_warning(market_pack, "ft_market_ahead_of_structure")
+            or market_pack.get("leading_market") == "o25"
+        )
+        and o25_diff >= 0.05
+        and edge_o25 < 0.05
+    )
+
+    market_resistance_hard = (
+        (
+            has_warning(market_pack, "ft_market_ahead_of_structure")
+            or market_pack.get("leading_market") == "o25"
+        )
+        and o25_diff >= 0.09
+        and edge_o25 < 0.08
+    )
+
+    market_resistance_extreme = (
+        (
+            has_warning(market_pack, "ft_market_ahead_of_structure")
+            or market_pack.get("leading_market") == "o25"
+        )
+        and o25_diff >= 0.14
+        and edge_o25 < 0.12
+    )
+
+    # -------------------------------------------------
     # EDGE ADJUSTMENTS
     # bonus leggeri: confermano, non comandano da soli
     # -------------------------------------------------
@@ -3981,6 +4057,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         and combined_ft_clean >= 1.54
         and edge_o25 >= -0.01
         and not market_resistance_hard
+        and not counter_move_hard
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
         and (
             edge_o25 >= 0.00
@@ -3997,6 +4074,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         and coherence_score >= 1.28
         and one_sided_risk <= 1.42
         and not market_resistance_soft
+        and not counter_move_soft
     )
 
     pt_market_ok = (
@@ -4129,6 +4207,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         and boost_gate_quality
         and boost_gate_shape
         and not market_resistance_soft
+        and not counter_move_soft
     ):
         over_level = max(over_level, 3)
 
@@ -4188,6 +4267,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         and gold_gate_readability
         and gold_gate_extra
         and not market_resistance_soft
+        and not counter_move_soft
         and not market_resistance_extreme
     ):
         tags.insert(0, "⚽⭐ GOLD")
@@ -4262,6 +4342,14 @@ def build_signal_package(fid, mk, s_h, s_a):
         "tags": tags,
         "scores": scores,
         "drop_diff": round3(drop_diff),
+        "o25_diff": o25_diff,
+        "o25_pct_move": o25_pct_move,
+        "counter_move_soft": counter_move_soft,
+        "counter_move_hard": counter_move_hard,
+        "counter_move_extreme": counter_move_extreme,
+        "market_resistance_soft": market_resistance_soft,
+        "market_resistance_hard": market_resistance_hard,
+        "market_resistance_extreme": market_resistance_extreme,
         "fav_quote": round3(fav),
         "is_gold_zone": is_gold_zone,
         "strong_tag_count": strong_tag_count,
