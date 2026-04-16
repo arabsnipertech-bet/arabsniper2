@@ -1,0 +1,614 @@
+{
+  "audit_date": "2026-04-16",
+  "created_at": "2026-04-16T09:20:55",
+  "source_file": "data_day1.json",
+  "matches_count": 23,
+  "primary_counts": {
+    "PROBE": 6,
+    "OVER_L1": 7,
+    "OVER_L3": 2,
+    "OVER_L2": 5,
+    "MARKET": 1,
+    "DROP": 2
+  },
+  "canonical_counts": {
+    "probe": 9,
+    "over_l1": 14,
+    "pt": 5,
+    "over_l2": 7,
+    "over_l3": 2,
+    "drop": 10,
+    "market": 1,
+    "inv": 1
+  },
+  "legacy_counts": {
+    "PROBE": 9,
+    "OVER": 14,
+    "PT": 5,
+    "BOOST": 2,
+    "STRONG_OVER": 7,
+    "DROP": 10,
+    "MARKET": 1,
+    "INV": 1
+  },
+  "matches": [
+    {
+      "fixture_id": 1384376,
+      "date": "2026-04-16",
+      "league": "1. SNL (Slovenia)",
+      "match": "Aluminij - Mura",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "primary_signal": "PROBE",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1532902,
+      "date": "2026-04-16",
+      "league": "AFC Challenge League (World)",
+      "match": "Manila Digger - Svay Rieng",
+      "info_raw": "⚽ OVER PT",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": true,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER",
+        "PT"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1540614,
+      "date": "2026-04-16",
+      "league": "AFC Champions League Elite (World)",
+      "match": "Al Sadd - Vissel Kobe",
+      "info_raw": "⚽ OVER PT",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": true,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "PT"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1466956,
+      "date": "2026-04-16",
+      "league": "Birinci Dasta (Azerbaijan)",
+      "match": "Baku Sportinq - Safa Baku",
+      "info_raw": "⚽ OVER DROP",
+      "canonical": {
+        "gold": false,
+        "over_level": 2,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "OVER_L2",
+      "drop_diff": 0.25,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535333,
+      "date": "2026-04-16",
+      "league": "CONCACAF Champions League (World)",
+      "match": "Seattle Sounders - Tigres UANL",
+      "info_raw": "PROBE DROP MARKET",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": true,
+        "drop": true,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "MARKET",
+        "DROP",
+        "PROBE"
+      ],
+      "primary_signal": "MARKET",
+      "drop_diff": 0.4,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535258,
+      "date": "2026-04-16",
+      "league": "CONMEBOL Libertadores (World)",
+      "match": "Independiente del Valle - UCV",
+      "info_raw": "⚽ OVER PT",
+      "canonical": {
+        "gold": false,
+        "over_level": 2,
+        "pt": true,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "STRONG_OVER",
+        "OVER",
+        "PT"
+      ],
+      "primary_signal": "OVER_L2",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535154,
+      "date": "2026-04-16",
+      "league": "CONMEBOL Sudamericana (World)",
+      "match": "America de Cali - Alianza Atletico",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "primary_signal": "PROBE",
+      "drop_diff": 0.02,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1539632,
+      "date": "2026-04-16",
+      "league": "Cup (Armenia)",
+      "match": "Ararat-Armenia - FC Noah",
+      "info_raw": "⚽ OVER DROP INV",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": true,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER",
+        "DROP",
+        "INV"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.15,
+      "has_inversion": true,
+      "inv_from": "1",
+      "inv_to": "2"
+    },
+    {
+      "fixture_id": 1519527,
+      "date": "2026-04-16",
+      "league": "Esiliiga A (Estonia)",
+      "match": "Viimsi - FC Tallinn",
+      "info_raw": "⚽ OVER DROP",
+      "canonical": {
+        "gold": false,
+        "over_level": 2,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "OVER_L2",
+      "drop_diff": 0.09,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1537597,
+      "date": "2026-04-16",
+      "league": "League (Jordan)",
+      "match": "Al Jazeera - Al Buqa'a",
+      "info_raw": "⚽ OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 2,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "OVER_L2",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1507314,
+      "date": "2026-04-16",
+      "league": "Liga 3 (Georgia)",
+      "match": "Gonio - Dinamo Tbilisi II",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "primary_signal": "PROBE",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1526502,
+      "date": "2026-04-16",
+      "league": "Liga Pro Serie B (Ecuador)",
+      "match": "Ind. Juniors - Santo Domingo",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "primary_signal": "PROBE",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1540605,
+      "date": "2026-04-16",
+      "league": "Løgmanssteypid (Faroe-Islands)",
+      "match": "Vikingur Gota - AB",
+      "info_raw": "⚽ OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1513036,
+      "date": "2026-04-16",
+      "league": "MLS Next Pro (USA)",
+      "match": "Los Angeles FC II - Portland Timbers II",
+      "info_raw": "⚽ OVER DROP",
+      "canonical": {
+        "gold": false,
+        "over_level": 2,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "OVER_L2",
+      "drop_diff": 0.14,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1428275,
+      "date": "2026-04-16",
+      "league": "Non League Premier - Southern South (England)",
+      "match": "Hanwell Town - Farnham Town",
+      "info_raw": "⚽ OVER DROP",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.07,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535351,
+      "date": "2026-04-16",
+      "league": "Premier League (Bahrain)",
+      "match": "Al Najma - Budaiya",
+      "info_raw": "PROBE DROP",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "DROP",
+        "PROBE"
+      ],
+      "primary_signal": "DROP",
+      "drop_diff": 0.05,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535350,
+      "date": "2026-04-16",
+      "league": "Premier League (Bahrain)",
+      "match": "Al-Hidd - Muharraq",
+      "info_raw": "⚽ OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535346,
+      "date": "2026-04-16",
+      "league": "UEFA Europa Conference League (World)",
+      "match": "AEK Athens FC - Rayo Vallecano",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "primary_signal": "PROBE",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535347,
+      "date": "2026-04-16",
+      "league": "UEFA Europa Conference League (World)",
+      "match": "AZ Alkmaar - Shakhtar Donetsk",
+      "info_raw": "⚽ OVER PT",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": true,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "PT"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535349,
+      "date": "2026-04-16",
+      "league": "UEFA Europa Conference League (World)",
+      "match": "Strasbourg - FSV Mainz 05",
+      "info_raw": "⚽ OVER DROP",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.13,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535339,
+      "date": "2026-04-16",
+      "league": "UEFA Europa League (World)",
+      "match": "Aston Villa - Bologna",
+      "info_raw": "⚽ OVER PT DROP",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": true,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER",
+        "PT",
+        "DROP"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.12,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535338,
+      "date": "2026-04-16",
+      "league": "UEFA Europa League (World)",
+      "match": "Celta Vigo - SC Freiburg",
+      "info_raw": "PROBE DROP",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "DROP",
+        "PROBE"
+      ],
+      "primary_signal": "DROP",
+      "drop_diff": 0.06,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1515804,
+      "date": "2026-04-16",
+      "league": "Virsliga (Latvia)",
+      "match": "BFC Daugavpils - FS Jelgava",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "primary_signal": "PROBE",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    }
+  ]
+}
