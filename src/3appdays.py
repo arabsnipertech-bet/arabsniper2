@@ -4015,42 +4015,6 @@ def build_signal_package(fid, mk, s_h, s_a):
         and not has_warning(market_pack, "market_value_trap")
         and not has_warning(market_pack, "favorite_ultra_but_ft_structure_weak")
     )
-
-    # -------------------------------------------------
-    # MARKET RESISTANCE
-    # Se il modello vede OVER ma il mercato late va contro,
-    # declassiamo il match salvo edge davvero forte.
-    # -------------------------------------------------
-    o25_open = safe_float(quote_pack.get("O25_OPEN"), 0.0)
-    o25_curr = safe_float(quote_pack.get("O25_CURR"), 0.0)
-    o25_diff = round3(o25_curr - o25_open) if (o25_open > 0 and o25_curr > 0) else 0.0
-
-    market_resistance_soft = (
-        (
-            has_warning(market_pack, "ft_market_ahead_of_structure")
-            or market_pack.get("leading_market") == "o25"
-        )
-        and o25_diff >= 0.05
-        and edge_o25 < 0.05
-    )
-
-    market_resistance_hard = (
-        (
-            has_warning(market_pack, "ft_market_ahead_of_structure")
-            or market_pack.get("leading_market") == "o25"
-        )
-        and o25_diff >= 0.09
-        and edge_o25 < 0.08
-    )
-
-    market_resistance_extreme = (
-        (
-            has_warning(market_pack, "ft_market_ahead_of_structure")
-            or market_pack.get("leading_market") == "o25"
-        )
-        and o25_diff >= 0.14
-        and edge_o25 < 0.12
-    )
     
     over_ok = (
         over_score >= over_threshold
