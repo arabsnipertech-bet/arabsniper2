@@ -1766,6 +1766,42 @@ def estimate_match_lambdas(s_h, s_a):
     lam_away_ht *= ht_sd_mult
 
     # -------------------------
+    # DEFENSIVE SUPPRESSION
+    # Difese che spengono davvero il match:
+    # alta frequenza di low-event / HT bloccati / seconda metà sterile
+    # -------------------------
+    home_ft_low = safe_float(s_h.get("ft_low_rate", 0.0), 0.0)
+    away_ft_low = safe_float(s_a.get("ft_low_rate", 0.0), 0.0)
+
+    home_ht_zero = safe_float(s_h.get("ht_zero_rate", 0.0), 0.0)
+    away_ht_zero = safe_float(s_a.get("ht_zero_rate", 0.0), 0.0)
+
+    home_last_2h_zero = bool(s_h.get("last_2h_zero", False))
+    away_last_2h_zero = bool(s_a.get("last_2h_zero", False))
+
+    # Se la squadra di casa concede struttura “bloccata”, penalizza l’attacco away
+    if home_ft_low >= 0.38 and home_ht_zero >= 0.38:
+        lam_away_ft *= 0.94
+        lam_away_ht *= 0.95
+    elif home_ft_low >= 0.30 and home_ht_zero >= 0.30:
+        lam_away_ft *= 0.97
+        lam_away_ht *= 0.98
+
+    # Se la squadra ospite concede struttura “bloccata”, penalizza l’attacco home
+    if away_ft_low >= 0.38 and away_ht_zero >= 0.38:
+        lam_home_ft *= 0.94
+        lam_home_ht *= 0.95
+    elif away_ft_low >= 0.30 and away_ht_zero >= 0.30:
+        lam_home_ft *= 0.97
+        lam_home_ht *= 0.98
+
+    # Penalità extra lieve se la squadra arriva da secondo tempo spento
+    if home_last_2h_zero:
+        lam_away_ft *= 0.985
+    if away_last_2h_zero:
+        lam_home_ft *= 0.985
+
+    # -------------------------
     # CLAMP FINALE
     # -------------------------
     lam_home_ft = round3(clamp(lam_home_ft, 0.15, 3.20))
