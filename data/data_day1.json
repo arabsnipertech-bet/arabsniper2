@@ -2374,12 +2374,12 @@
         "HAS_INVERSION": false,
         "Data": "2026-04-16",
         "Fixture_ID": 1537353,
-        "Q1_OPEN": 0.0,
-        "QX_OPEN": 0.0,
-        "Q2_OPEN": 0.0,
-        "O25_OPEN": 0.0,
-        "O05HT_OPEN": 0.0,
-        "O15HT_OPEN": 0.0,
+        "Q1_OPEN": 2.7,
+        "QX_OPEN": 3.0,
+        "Q2_OPEN": 2.45,
+        "O25_OPEN": 2.05,
+        "O05HT_OPEN": 1.4,
+        "O15HT_OPEN": 3.0,
         "Q1_CURR": 2.7,
         "QX_CURR": 3.0,
         "Q2_CURR": 2.45,
@@ -2393,7 +2393,7 @@
         "O05HT_MOVE": "",
         "O15HT_MOVE": "",
         "Q1_MOVE_DATA": {
-            "open": 0.0,
+            "open": 2.7,
             "current": 2.7,
             "diff": 0.0,
             "abs_diff": 0.0,
@@ -2403,7 +2403,7 @@
             "label": ""
         },
         "QX_MOVE_DATA": {
-            "open": 0.0,
+            "open": 3.0,
             "current": 3.0,
             "diff": 0.0,
             "abs_diff": 0.0,
@@ -2413,7 +2413,7 @@
             "label": ""
         },
         "Q2_MOVE_DATA": {
-            "open": 0.0,
+            "open": 2.45,
             "current": 2.45,
             "diff": 0.0,
             "abs_diff": 0.0,
@@ -2423,7 +2423,7 @@
             "label": ""
         },
         "O25_MOVE_DATA": {
-            "open": 0.0,
+            "open": 2.05,
             "current": 2.05,
             "diff": 0.0,
             "abs_diff": 0.0,
@@ -2433,7 +2433,7 @@
             "label": ""
         },
         "O05HT_MOVE_DATA": {
-            "open": 0.0,
+            "open": 1.4,
             "current": 1.4,
             "diff": 0.0,
             "abs_diff": 0.0,
@@ -2443,7 +2443,7 @@
             "label": ""
         },
         "O15HT_MOVE_DATA": {
-            "open": 0.0,
+            "open": 3.0,
             "current": 3.0,
             "diff": 0.0,
             "abs_diff": 0.0,
@@ -2455,10 +2455,10 @@
         "INVERSION": false,
         "INV_FROM": "",
         "INV_TO": "",
-        "FAV_OPEN": "",
+        "FAV_OPEN": "2",
         "FAV_CURRENT": "2",
         "MARKET_PROFILE": "neutral",
-        "COHERENCE_SCORE": 2.7,
+        "COHERENCE_SCORE": 2.25,
         "DISLOCATION_SCORE": 0.0,
         "DROP_TYPE": "none",
         "VALUE_LEFT": "unknown",
