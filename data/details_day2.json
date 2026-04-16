@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-04-16 10:48:19",
+    "updated_at": "2026-04-16 11:01:04",
     "day": 2,
     "date": "2026-04-17",
     "details": {
@@ -1576,12 +1576,12 @@
                 "away_last_2h_zero": false
             },
             "fair_value": {
-                "margin_open": 0.0,
+                "margin_open": 0.114,
                 "margin_curr": 0.114,
-                "margin_delta": 0.114,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.607,
                 "fav_fair_prob_curr": 0.607,
-                "fav_fair_prob_delta": 0.607,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 1.648
             },
             "model_edge": {
@@ -1636,7 +1636,7 @@
             "internal_labels": [
                 "NEUTRAL",
                 "STRONG",
-                "COHERENT",
+                "PARTIAL",
                 "LIGHT_GAP"
             ],
             "structure": {
@@ -1660,8 +1660,8 @@
             },
             "market_reading": {
                 "market_profile": "full_open",
-                "coherence_score": 3.2,
-                "coherence_level": "high",
+                "coherence_score": 2.75,
+                "coherence_level": "medium",
                 "dislocation_score": 0.6,
                 "dislocation_level": "medium",
                 "leading_market": "none",
@@ -1674,18 +1674,18 @@
                     "ft_struct_market_aligned",
                     "double_cross_supported",
                     "ht_struct_market_aligned",
-                    "lagged_ht_opening",
-                    "true_fair_support"
+                    "lagged_ht_opening"
                 ],
                 "warning_flags": [
-                    "high_bookie_protection"
+                    "high_bookie_protection",
+                    "flat_fair_move"
                 ],
-                "margin_open": 0.0,
+                "margin_open": 0.114,
                 "margin_curr": 0.114,
-                "margin_delta": 0.114,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.607,
                 "fav_fair_prob_curr": 0.607,
-                "fav_fair_prob_delta": 0.607,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 1.648,
                 "home_ft_stdev": 1.308,
                 "away_ft_stdev": 0.85,
@@ -1703,7 +1703,7 @@
                 "internal_labels": [
                     "NEUTRAL",
                     "STRONG",
-                    "COHERENT",
+                    "PARTIAL",
                     "LIGHT_GAP"
                 ],
                 "over_level": 2
@@ -15095,12 +15095,12 @@
                 "away_last_2h_zero": false
             },
             "fair_value": {
-                "margin_open": 0.0,
+                "margin_open": 0.093,
                 "margin_curr": 0.093,
-                "margin_delta": 0.093,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.688,
                 "fav_fair_prob_curr": 0.688,
-                "fav_fair_prob_delta": 0.688,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 1.454
             },
             "model_edge": {
@@ -15179,7 +15179,7 @@
             },
             "market_reading": {
                 "market_profile": "full_open",
-                "coherence_score": 3.75,
+                "coherence_score": 3.3,
                 "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
@@ -15192,18 +15192,18 @@
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
-                    "ht_struct_market_aligned",
-                    "true_fair_support"
+                    "ht_struct_market_aligned"
                 ],
                 "warning_flags": [
-                    "high_bookie_protection"
+                    "high_bookie_protection",
+                    "flat_fair_move"
                 ],
-                "margin_open": 0.0,
+                "margin_open": 0.093,
                 "margin_curr": 0.093,
-                "margin_delta": 0.093,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.688,
                 "fav_fair_prob_curr": 0.688,
-                "fav_fair_prob_delta": 0.688,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 1.454,
                 "home_ft_stdev": 1.713,
                 "away_ft_stdev": 1.445,
@@ -15224,7 +15224,7 @@
                     "STRONG",
                     "COHERENT"
                 ],
-                "over_level": 2
+                "over_level": 3
             },
             "home_profile": {
                 "expected_side": "home",
@@ -24911,12 +24911,12 @@
                 "away_last_2h_zero": true
             },
             "fair_value": {
-                "margin_open": 0.0,
+                "margin_open": 0.117,
                 "margin_curr": 0.117,
-                "margin_delta": 0.117,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.658,
                 "fav_fair_prob_curr": 0.658,
-                "fav_fair_prob_delta": 0.658,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 1.519
             },
             "model_edge": {
@@ -24950,8 +24950,8 @@
                 "pt": 0.513,
                 "over": 8.68,
                 "boost": 8.321,
-                "gold": 9.541,
-                "max": 9.541,
+                "gold": 9.161,
+                "max": 9.161,
                 "edge_o25": 0.028,
                 "edge_o05ht": -0.152,
                 "edge_o15ht": -0.173,
@@ -24994,7 +24994,7 @@
             },
             "market_reading": {
                 "market_profile": "favorite_control",
-                "coherence_score": 2.7,
+                "coherence_score": 2.25,
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
@@ -25006,18 +25006,18 @@
                 "value_left": "unknown",
                 "positive_flags": [
                     "ft_struct_market_aligned",
-                    "double_cross_supported",
-                    "true_fair_support"
+                    "double_cross_supported"
                 ],
                 "warning_flags": [
-                    "high_bookie_protection"
+                    "high_bookie_protection",
+                    "flat_fair_move"
                 ],
-                "margin_open": 0.0,
+                "margin_open": 0.117,
                 "margin_curr": 0.117,
-                "margin_delta": 0.117,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.658,
                 "fav_fair_prob_curr": 0.658,
-                "fav_fair_prob_delta": 0.658,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 1.519,
                 "home_ft_stdev": 0.902,
                 "away_ft_stdev": 0.798,
@@ -27172,12 +27172,12 @@
                 "away_last_2h_zero": true
             },
             "fair_value": {
-                "margin_open": 0.0,
+                "margin_open": 0.117,
                 "margin_curr": 0.117,
-                "margin_delta": 0.117,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.489,
                 "fav_fair_prob_curr": 0.489,
-                "fav_fair_prob_delta": 0.489,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 2.045
             },
             "model_edge": {
@@ -27256,7 +27256,7 @@
             },
             "market_reading": {
                 "market_profile": "full_open",
-                "coherence_score": 4.3,
+                "coherence_score": 3.85,
                 "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
@@ -27270,18 +27270,18 @@
                     "ft_struct_market_aligned",
                     "double_cross_supported",
                     "ht_struct_market_aligned",
-                    "fav_open_match_coherent",
-                    "true_fair_support"
+                    "fav_open_match_coherent"
                 ],
                 "warning_flags": [
-                    "high_bookie_protection"
+                    "high_bookie_protection",
+                    "flat_fair_move"
                 ],
-                "margin_open": 0.0,
+                "margin_open": 0.117,
                 "margin_curr": 0.117,
-                "margin_delta": 0.117,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.489,
                 "fav_fair_prob_curr": 0.489,
-                "fav_fair_prob_delta": 0.489,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 2.045,
                 "home_ft_stdev": 1.752,
                 "away_ft_stdev": 2.323,
