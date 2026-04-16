@@ -1,13 +1,13 @@
 {
   "audit_date": "2026-04-15",
-  "generated_at": "2026-04-16T09:21:24",
+  "generated_at": "2026-04-16T10:51:29",
   "counts": {
     "freeze_matches": 34,
-    "api_found": 34,
-    "finished_matches": 34,
-    "analyzed_rows": 34,
+    "api_found": 33,
+    "finished_matches": 33,
+    "analyzed_rows": 33,
     "skipped_not_finished": 0,
-    "skipped_no_result": 0
+    "skipped_no_result": 1
   },
   "canonical_stats": {
     "gold": {
@@ -16,9 +16,9 @@
       "rate": 0.0
     },
     "over_l1": {
-      "total": 13,
+      "total": 12,
       "hit": 5,
-      "rate": 38.46
+      "rate": 41.67
     },
     "over_l2": {
       "total": 9,
@@ -31,9 +31,9 @@
       "rate": 33.33
     },
     "pt": {
-      "total": 15,
+      "total": 14,
       "hit": 5,
-      "rate": 33.33
+      "rate": 35.71
     },
     "market": {
       "total": 1,
@@ -120,9 +120,9 @@
       "rate": 0.0
     },
     "OVER": {
-      "total": 25,
+      "total": 24,
       "hit": 12,
-      "rate": 48.0
+      "rate": 50.0
     },
     "STRONG_OVER": {
       "total": 12,

@@ -1,7 +1,7 @@
 {
   "audit_date": "2026-04-15",
-  "generated_at": "2026-04-16T09:21:24",
-  "rows_count": 34,
+  "generated_at": "2026-04-16T10:51:29",
+  "rows_count": 33,
   "rows": [
     {
       "fixture_id": 1418689,
@@ -795,50 +795,6 @@
         "PT"
       ],
       "drop_diff": 0.13,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
-    },
-    {
-      "fixture_id": 1477386,
-      "date": "2026-04-15",
-      "league": "FNL (Czech-Republic)",
-      "match": "Ústí nad Labem - Chrudim",
-      "status": "FT",
-      "primary_signal": "OVER_L1",
-      "info_raw": "⚽ OVER PT",
-      "ht_score": "0-0",
-      "ft_score": "1-0",
-      "goals": {
-        "ht": 0,
-        "ft": 1,
-        "btts_ft": false
-      },
-      "canonical": {
-        "gold": false,
-        "over_level": 1,
-        "pt": true,
-        "market": false,
-        "drop": false,
-        "inv": false,
-        "probe": false
-      },
-      "hits": {
-        "gold": null,
-        "over": false,
-        "pt": false,
-        "market": null,
-        "drop": null,
-        "inv": null,
-        "probe": null,
-        "ptgg": null,
-        "pto15": null
-      },
-      "legacy_tags": [
-        "OVER",
-        "PT"
-      ],
-      "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
