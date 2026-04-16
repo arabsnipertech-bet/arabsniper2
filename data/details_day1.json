@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-04-16 10:46:16",
+    "updated_at": "2026-04-16 10:59:47",
     "day": 1,
     "date": "2026-04-16",
     "details": {
@@ -13685,12 +13685,12 @@
                 "away_last_2h_zero": true
             },
             "fair_value": {
-                "margin_open": 0.0,
+                "margin_open": 0.112,
                 "margin_curr": 0.112,
-                "margin_delta": 0.112,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.367,
                 "fav_fair_prob_curr": 0.367,
-                "fav_fair_prob_delta": 0.367,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 2.724
             },
             "model_edge": {
@@ -13724,8 +13724,8 @@
                 "pt": 2.997,
                 "over": 9.16,
                 "boost": 7.962,
-                "gold": 10.106,
-                "max": 10.106,
+                "gold": 9.726,
+                "max": 9.726,
                 "edge_o25": 0.183,
                 "edge_o05ht": 0.056,
                 "edge_o15ht": 0.051,
@@ -13768,7 +13768,7 @@
             },
             "market_reading": {
                 "market_profile": "neutral",
-                "coherence_score": 2.7,
+                "coherence_score": 2.25,
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
@@ -13780,18 +13780,18 @@
                 "value_left": "unknown",
                 "positive_flags": [
                     "ft_struct_market_aligned",
-                    "double_cross_supported",
-                    "true_fair_support"
+                    "double_cross_supported"
                 ],
                 "warning_flags": [
-                    "high_bookie_protection"
+                    "high_bookie_protection",
+                    "flat_fair_move"
                 ],
-                "margin_open": 0.0,
+                "margin_open": 0.112,
                 "margin_curr": 0.112,
-                "margin_delta": 0.112,
-                "fav_fair_prob_open": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.367,
                 "fav_fair_prob_curr": 0.367,
-                "fav_fair_prob_delta": 0.367,
+                "fav_fair_prob_delta": 0.0,
                 "fav_fair_curr": 2.724,
                 "home_ft_stdev": 0.823,
                 "away_ft_stdev": 1.508,
