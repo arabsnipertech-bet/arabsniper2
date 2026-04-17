@@ -5223,6 +5223,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "match": f"{home_team.get('name', 'N/D')} - {away_team.get('name', 'N/D')}",
                         "home_team": home_team.get("name", "N/D"),
                         "away_team": away_team.get("name", "N/D"),
+                    }
 
                         "markets": {
                             "q1": safe_float(mk.get("q1"), 0.0),
