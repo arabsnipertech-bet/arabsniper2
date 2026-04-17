@@ -5056,6 +5056,8 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                     if not s_h or not s_a:
                         continue
 
+                    signal_pack = build_signal_package(fid, mk, s_h, s_a)
+                    
                     combined_ht_clean = round3((safe_float(s_h.get("avg_ht_clean", 0.0), 0.0) + safe_float(s_a.get("avg_ht_clean", 0.0), 0.0)) / 2)
                     combined_ft_clean = round3((safe_float(s_h.get("avg_total_clean", 0.0), 0.0) + safe_float(s_a.get("avg_total_clean", 0.0), 0.0)) / 2)
 
@@ -5069,8 +5071,6 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         and safe_float(s_a.get("ft_2plus_rate", 0.0), 0.0) < 0.30
                     ):
                         continue
-
-                    signal_pack = build_signal_package(fid, mk, s_h, s_a)
 
                     if not should_keep_match(signal_pack):
                         continue
