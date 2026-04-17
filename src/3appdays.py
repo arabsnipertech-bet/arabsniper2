@@ -1797,9 +1797,14 @@ def estimate_match_lambdas(s_h, s_a):
 
     # Penalità extra lieve se la squadra arriva da secondo tempo spento
     if home_last_2h_zero:
-        lam_away_ft *= 0.985
+        lam_away_ft *= 0.975
+        if home_ft_low >= 0.30 or home_ht_zero >= 0.30:
+            lam_away_ft *= 0.99
+
     if away_last_2h_zero:
-        lam_home_ft *= 0.985
+        lam_home_ft *= 0.975
+        if away_ft_low >= 0.30 or away_ht_zero >= 0.30:
+            lam_home_ft *= 0.99
 
     # -------------------------
     # CLAMP FINALE
@@ -2224,6 +2229,42 @@ def classify_drop_quality(quote_pack):
         "value_left": value_left
     }
 
+def classify_signal_stability(structure_pack, market_pack, signal_pack):
+    structure_score = safe_float(structure_pack.get("structure_score", 0.0), 0.0)
+    coherence_score = safe_float(market_pack.get("coherence_score", 0.0), 0.0)
+    one_sided_risk = safe_float(structure_pack.get("one_sided_risk", 0.0), 0.0)
+
+    drop_type = str(market_pack.get("drop_type", "none")).strip().lower()
+    drop_confirmed = bool(market_pack.get("drop_confirmed", False))
+    warning_flags = market_pack.get("warning_flags", []) or []
+
+    over_level = int(signal_pack.get("over_level", 0) or 0)
+
+    heavy_warning = any(w in warning_flags for w in [
+        "market_value_trap",
+        "suspicious_limit",
+        "favorite_ultra_but_ft_structure_weak",
+        "ft_market_ahead_of_structure"
+    ])
+
+    if (
+        structure_score >= 1.20
+        and coherence_score >= 1.35
+        and one_sided_risk <= 1.05
+        and not heavy_warning
+        and (drop_confirmed or drop_type == "structural" or over_level >= 2)
+    ):
+        return "Alta"
+
+    if (
+        structure_score >= 0.90
+        and coherence_score >= 1.00
+        and one_sided_risk <= 1.30
+        and not heavy_warning
+    ):
+        return "Media"
+
+    return "Speculativa"
 
 def classify_favorite_zone(fav):
     fav = safe_float(fav, 0.0)
@@ -3639,6 +3680,13 @@ def score_gold_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack, pt_
 
     score -= one_sided_risk * 0.92
 
+    if one_sided_risk >= 1.35:
+        score -= 0.42
+    elif one_sided_risk >= 1.20:
+        score -= 0.24
+    elif one_sided_risk >= 1.10:
+        score -= 0.12
+
     if combined_ft_clean < 1.62:
         score -= 0.75
     elif combined_ft_clean < 1.70:
@@ -3994,6 +4042,15 @@ def build_signal_package(fid, mk, s_h, s_a):
     tags = []
     internal_labels = []
 
+    if drop_diff >= 0.12:
+        drop_visual_level = "strong"
+    elif drop_diff >= 0.08:
+        drop_visual_level = "medium"
+    elif drop_diff >= 0.05:
+        drop_visual_level = "light"
+    else:
+        drop_visual_level = "none"
+
     # -------------------------------------------------
     # LAYER 1 - PROFILO INTERNO
     # -------------------------------------------------
@@ -4255,11 +4312,11 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     if (
-        gold_score >= 5.90
+        gold_score >= 5.70
         and gold_has_over
-        and over_score >= 4.05
-        and pt_score >= 3.45
-        and edge_o25 >= 0.04
+        and over_score >= 3.95
+        and pt_score >= 3.40
+        and edge_o25 >= 0.03
         and (edge_o05ht >= 0.00 or edge_o15ht >= 0.00)
         and gold_gate_structure
         and gold_gate_attack
@@ -4435,11 +4492,11 @@ def should_keep_match(signal_pack):
     # -------------------------------------
     if has_gold:
         return bool(
-            gold_score >= 5.85
-            and over_score >= 3.95
-            and coherence_score >= 1.65
-            and structure_score >= 1.35
-            and one_sided_risk <= 1.42
+            gold_score >= 5.65
+            and over_score >= 3.90
+            and coherence_score >= 1.55
+            and structure_score >= 1.25
+            and one_sided_risk <= 1.35
             and h_ft_stdev <= 1.45
             and a_ft_stdev <= 1.45
             and h_regularity >= 0.62
@@ -4475,13 +4532,14 @@ def should_keep_match(signal_pack):
     if has_pt and not has_over:
         return False
 
-    if has_over and over_level == 2 and not has_pt:
-        return bool(
-            over_score >= 4.35
-            and coherence_score >= 1.35
-            and structure_score >= 1.15
-            and one_sided_risk <= 1.24
-        )
+if has_over and over_level == 2 and not has_pt:
+    return bool(
+        over_score >= 4.35
+        and coherence_score >= 1.35
+        and structure_score >= 1.15
+        and one_sided_risk <= 1.20
+        and max(h_regularity, a_regularity) >= 0.75
+    )
     
     if has_over and over_level == 1 and not has_pt:
         return bool(
@@ -4953,6 +5011,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "EDGE_O15HT": edge_o15ht,
                         "EDGE_LOGIT_O15HT": edge_logit_o15ht,
                         "EDGE_LEVEL_O15HT": edge_level_o15ht,
+                        "drop_visual_level": drop_visual_level,
                     }
 
                     row["MOVE_SUMMARY"] = build_movement_summary(row)
