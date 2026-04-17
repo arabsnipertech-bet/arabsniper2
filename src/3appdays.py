@@ -4260,16 +4260,9 @@ def build_signal_package(fid, mk, s_h, s_a):
     
     over_ok = (
         over_score >= over_threshold
-        and combined_ft_clean >= 1.54
-        and edge_o25 >= -0.01
-        and not market_resistance_hard
-        and not counter_move_hard
+        and combined_ft_clean >= 1.48
         and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
-        and (
-            edge_o25 >= 0.00
-            or has_drop_1x2
-            or has_drop_o25
-        )
+        and not market_resistance_hard
     )
 
     strong_over_ok = (
@@ -4291,24 +4284,22 @@ def build_signal_package(fid, mk, s_h, s_a):
 
     ptgg_ok = (
         ptgg_score >= ptgg_threshold
-        and over_ok
         and pt_market_ok
-        and edge_o05ht >= -0.04
-        and combined_ht_clean >= 0.88
-        and safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.45
-        and safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.45
-        and safe_float(s_h.get("ht_zero_rate", 0.0), 0.0) <= 0.44
-        and safe_float(s_a.get("ht_zero_rate", 0.0), 0.0) <= 0.44
+        and edge_o05ht >= -0.05
+        and combined_ht_clean >= 0.84
+        and safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.42
+        and safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0) >= 0.42
+        and safe_float(s_h.get("ht_zero_rate", 0.0), 0.0) <= 0.48
+        and safe_float(s_a.get("ht_zero_rate", 0.0), 0.0) <= 0.48
     )
 
-    pto15_ok = (
+     pto15_ok = (
         pto15_score >= pto15_threshold
-        and over_ok
         and pt_market_ok
-        and edge_o15ht >= -0.05
-        and combined_ht_scored_clean >= 0.76
+        and edge_o15ht >= -0.06
+        and combined_ht_scored_clean >= 0.72
         and lagging_market in ("o15ht", "o05ht", "none")
-        and safe_float(mk.get("o15ht"), 0.0) <= 3.80
+        and safe_float(mk.get("o15ht"), 0.0) <= 4.00
     )
 
     if over_ok and combined_ht_scored_clean >= 0.58:
@@ -4432,8 +4423,8 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     gold_gate_attack = (
-        safe_float(s_h.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.78
-        and safe_float(s_a.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.78
+        safe_float(s_h.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.95
+        and safe_float(s_a.get("avg_ft_scored_clean", 0.0), 0.0) >= 0.95
     )
 
     gold_gate_market = (
