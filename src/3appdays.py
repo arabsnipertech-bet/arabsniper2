@@ -4437,7 +4437,7 @@ def build_signal_package(fid, mk, s_h, s_a):
             "over_level": over_level
         }
     )
-    
+
     return {
         "tags": tags,
         "scores": scores,
