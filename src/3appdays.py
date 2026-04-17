@@ -1795,16 +1795,61 @@ def estimate_match_lambdas(s_h, s_a):
         lam_home_ft *= 0.97
         lam_home_ht *= 0.98
 
-    # Penalità extra lieve se la squadra arriva da secondo tempo spento
-    if home_last_2h_zero:
-        lam_away_ft *= 0.975
-        if home_ft_low >= 0.30 or home_ht_zero >= 0.30:
-            lam_away_ft *= 0.99
+    # -----------------------------------------
+    # LAST_2H_ZERO DINAMICO
+    # - malus se conferma profilo che si spegne
+    # - bonus se è in controtendenza rispetto a media sana
+    # -----------------------------------------
+    home_ft_scored_clean = safe_float(s_h.get("avg_ft_scored_clean", 0.0), 0.0)
+    away_ft_scored_clean = safe_float(s_a.get("avg_ft_scored_clean", 0.0), 0.0)
 
+    home_ft_2plus = safe_float(s_h.get("ft_2plus_rate", 0.0), 0.0)
+    away_ft_2plus = safe_float(s_a.get("ft_2plus_rate", 0.0), 0.0)
+
+    home_regularity = safe_float(s_h.get("scoring_regularity", 0.0), 0.0)
+    away_regularity = safe_float(s_a.get("scoring_regularity", 0.0), 0.0)
+
+    # Se HOME ha fatto 0 nel 2T ultimo match:
+    # - se HOME normalmente è offensiva/regolare -> piccolo bonus per AWAY FT
+    # - se HOME è già squadra che spegne/blocca -> malus per AWAY FT
+    if home_last_2h_zero:
+        if (
+            home_ft_scored_clean >= 1.15
+            and home_ft_2plus >= 0.62
+            and home_regularity >= 0.62
+            and home_ft_low < 0.30
+            and home_ht_zero < 0.30
+        ):
+            lam_away_ft *= 1.020
+        elif (
+            home_ft_low >= 0.30
+            or home_ht_zero >= 0.30
+            or home_regularity < 0.55
+        ):
+            lam_away_ft *= 0.970
+        else:
+            lam_away_ft *= 0.985
+
+    # Se AWAY ha fatto 0 nel 2T ultimo match:
+    # - se AWAY normalmente è offensiva/regolare -> piccolo bonus per HOME FT
+    # - se AWAY è già squadra che spegne/blocca -> malus per HOME FT
     if away_last_2h_zero:
-        lam_home_ft *= 0.975
-        if away_ft_low >= 0.30 or away_ht_zero >= 0.30:
-            lam_home_ft *= 0.99
+        if (
+            away_ft_scored_clean >= 1.15
+            and away_ft_2plus >= 0.62
+            and away_regularity >= 0.62
+            and away_ft_low < 0.30
+            and away_ht_zero < 0.30
+        ):
+            lam_home_ft *= 1.020
+        elif (
+            away_ft_low >= 0.30
+            or away_ht_zero >= 0.30
+            or away_regularity < 0.55
+        ):
+            lam_home_ft *= 0.970
+        else:
+            lam_home_ft *= 0.985
 
     # -------------------------
     # CLAMP FINALE
@@ -3440,6 +3485,10 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
         score += 0.20
     elif one_sided_risk >= 1.35:
         score -= 0.42
+    elif one_sided_risk >= 1.20:
+        score -= 0.24
+    elif one_sided_risk >= 1.10:
+        score -= 0.12
 
     # -------------------------
     # REGOLARITÀ / STDEV
@@ -3448,15 +3497,19 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
         score += 0.28
     elif home_ft_stdev <= 1.35:
         score += 0.12
-    elif home_ft_stdev >= 1.75:
-        score -= 0.30
+    elif home_ft_stdev >= 1.90:
+        score -= 0.42
+    elif home_ft_stdev >= 1.70:
+        score -= 0.34
 
     if away_ft_stdev <= 1.15:
         score += 0.28
     elif away_ft_stdev <= 1.35:
         score += 0.12
-    elif away_ft_stdev >= 1.75:
-        score -= 0.30
+    elif away_ft_stdev >= 1.90:
+        score -= 0.42
+    elif away_ft_stdev >= 1.70:
+        score -= 0.34
 
     if home_scoring_regularity >= 0.75:
         score += 0.28
