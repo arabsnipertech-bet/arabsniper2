@@ -2266,6 +2266,33 @@ def classify_signal_stability(structure_pack, market_pack, signal_pack):
 
     return "Speculativa"
 
+def build_signal_summary(structure_pack, market_pack, signal_pack):
+    structure_score = safe_float(structure_pack.get("structure_score", 0.0), 0.0)
+    coherence_score = safe_float(market_pack.get("coherence_score", 0.0), 0.0)
+    one_sided_risk = safe_float(structure_pack.get("one_sided_risk", 0.0), 0.0)
+
+    drop_type = str(market_pack.get("drop_type", "none")).strip().lower()
+    drop_confirmed = bool(market_pack.get("drop_confirmed", False))
+
+    over_level = int(signal_pack.get("over_level", 0) or 0)
+
+    if drop_confirmed and drop_type == "structural":
+        return "DROP strutturale"
+
+    if over_level >= 3 and coherence_score >= 1.20:
+        return "Over molto solido"
+
+    if structure_score >= 1.20 and coherence_score >= 1.30:
+        return "Struttura + mercato allineati"
+
+    if one_sided_risk >= 1.20:
+        return "Rischio partita bloccata"
+
+    if coherence_score < 1.00:
+        return "Mercato poco convinto"
+
+    return "Segnale da monitorare"
+
 def classify_favorite_zone(fav):
     fav = safe_float(fav, 0.0)
     if fav <= 0:
@@ -4395,10 +4422,29 @@ def build_signal_package(fid, mk, s_h, s_a):
         int("INV" in tags)
     )
 
+signal_stability = classify_signal_stability(
+    structure_pack,
+    market_pack,
+    {
+        "over_level": over_level
+    }
+)
+
+signal_summary = build_signal_summary(
+    structure_pack,
+    market_pack,
+    {
+        "over_level": over_level
+    }
+)
+    
     return {
         "tags": tags,
         "scores": scores,
         "drop_diff": round3(drop_diff),
+        "drop_visual_level": drop_visual_level,
+        "signal_stability": signal_stability,
+        "signal_summary": signal_summary,
         "o25_diff": o25_diff,
         "o25_pct_move": o25_pct_move,
         "counter_move_soft": counter_move_soft,
@@ -4532,14 +4578,14 @@ def should_keep_match(signal_pack):
     if has_pt and not has_over:
         return False
 
-if has_over and over_level == 2 and not has_pt:
-    return bool(
-        over_score >= 4.35
-        and coherence_score >= 1.35
-        and structure_score >= 1.15
-        and one_sided_risk <= 1.20
-        and max(h_regularity, a_regularity) >= 0.75
-    )
+    if has_over and over_level == 2 and not has_pt:
+        return bool(
+            over_score >= 4.35
+            and coherence_score >= 1.35
+            and structure_score >= 1.15
+            and one_sided_risk <= 1.20
+            and max(h_regularity, a_regularity) >= 0.75
+        )
     
     if has_over and over_level == 1 and not has_pt:
         return bool(
@@ -4584,6 +4630,9 @@ def build_signal_debug_summary(signal_pack):
         "drop_diff": signal_pack.get("drop_diff", 0.0),
         "internal_labels": signal_pack.get("internal_labels", []),
         "over_level": signal_pack.get("over_level", 0),
+        "drop_visual_level": signal_pack.get("drop_visual_level", "none"),
+        "signal_stability": signal_pack.get("signal_stability", ""),
+        "signal_summary": signal_pack.get("signal_summary", ""),
     }
     
 #====================================
@@ -4944,6 +4993,9 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "Info": " ".join(tags),
                         "OVER_LEVEL": signal_pack.get("over_level", 0),
                         "DROP_DIFF": signal_pack.get("drop_diff", 0.0),
+                        "SIGNAL_STABILITY": signal_pack.get("signal_stability", ""),
+                        "SIGNAL_SUMMARY": signal_pack.get("signal_summary", ""),
+                        "DROP_VISUAL_LEVEL": signal_pack.get("drop_visual_level", "none"),
                         "HAS_INVERSION": quote_pack["INVERSION"],
                         "Data": target_date,
                         "Fixture_ID": f.get("fixture", {}).get("id"),
