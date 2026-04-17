@@ -5121,7 +5121,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "Ora": ora_local,
                         "Lega": f"{f.get('league', {}).get('name', 'N/D')} ({cnt})",
                         "Match": f"{home_team.get('name', 'N/D')} - {away_team.get('name', 'N/D')}",
-                        "FAV": "✅" if is_gold_zone else "❌",
+                        "FAV": "✅" if signal_pack.get("is_gold_zone") else "X",
                         "1X2": f"{safe_float(mk.get('q1'), 0):.2f}|{safe_float(mk.get('qx'), 0):.2f}|{safe_float(mk.get('q2'), 0):.2f}",
                         "O2.5": f"{safe_float(mk.get('o25'), 0):.2f}",
                         "O0.5H": f"{safe_float(mk.get('o05ht'), 0):.2f}",
