@@ -5075,46 +5075,47 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                     if not should_keep_match(signal_pack):
                         continue
 
-                    tags = signal_pack["tags"]
-                    scores = signal_pack["scores"]
-                    quote_pack = signal_pack["quote_pack"]
-                    market_pack = signal_pack["market_pack"]
-                    structure_pack = signal_pack["structure_pack"]
+                    tags = signal_pack.get("tags", [])
+                    scores = signal_pack.get("scores", {})
+                    quote_pack = signal_pack.get("quote_pack", {})
+                    market_pack = signal_pack.get("market_pack", {})
+                    structure_pack = signal_pack.get("structure_pack", {})
+                    tempo_pack = signal_pack.get("tempo_pack", {})
+                    lambda_pack = signal_pack.get("lambda_pack", {})
 
-                    lambda_pack = signal_pack.get("lambda_pack", {}) or {}
-
-                    tempo_pack = signal_pack.get("tempo_pack", {}) or {}
-                    tempo_tag = signal_pack.get("tempo_tag", "")
-                    early_index = safe_float(signal_pack.get("early_index", 0.0), 0.0)
+                    drop_diff = safe_float(signal_pack.get("drop_diff", 0.0), 0.0)
+                    drop_visual_level = signal_pack.get("drop_visual_level", "none")
+                    signal_stability = signal_pack.get("signal_stability", "")
+                    signal_summary = signal_pack.get("signal_summary", "")
+                    over_level = int(signal_pack.get("over_level", 0) or 0)
+                    strong_tag_count = int(signal_pack.get("strong_tag_count", 0) or 0)
 
                     lam_home_ft = safe_float(lambda_pack.get("lam_home_ft", 0.0), 0.0)
                     lam_away_ft = safe_float(lambda_pack.get("lam_away_ft", 0.0), 0.0)
                     lam_home_ht = safe_float(lambda_pack.get("lam_home_ht", 0.0), 0.0)
                     lam_away_ht = safe_float(lambda_pack.get("lam_away_ht", 0.0), 0.0)
 
+                    tempo_tag = signal_pack.get("tempo_tag", "")
+                    early_index = safe_float(signal_pack.get("early_index", 0.0), 0.0)
+
                     p_model_over25 = safe_float(signal_pack.get("p_model_o25", 0.0), 0.0)
                     p_market_over25 = safe_float(signal_pack.get("p_market_o25", 0.0), 0.0)
+                    edge_over25 = safe_float(signal_pack.get("edge_o25", 0.0), 0.0)
+                    edge_level_over25 = signal_pack.get("edge_level_o25", "NONE")
 
                     p_model_o05ht = safe_float(signal_pack.get("p_model_o05ht", 0.0), 0.0)
                     p_market_o05ht = safe_float(signal_pack.get("p_market_o05ht", 0.0), 0.0)
+                    edge_o05ht = safe_float(signal_pack.get("edge_o05ht", 0.0), 0.0)
+                    edge_level_o05ht = signal_pack.get("edge_level_o05ht", "NONE")
 
                     p_model_o15ht = safe_float(signal_pack.get("p_model_o15ht", 0.0), 0.0)
                     p_market_o15ht = safe_float(signal_pack.get("p_market_o15ht", 0.0), 0.0)
-
-                    edge_over25 = safe_float(signal_pack.get("edge_o25", 0.0), 0.0)
-                    edge_o05ht = safe_float(signal_pack.get("edge_o05ht", 0.0), 0.0)
                     edge_o15ht = safe_float(signal_pack.get("edge_o15ht", 0.0), 0.0)
-
-                    edge_level_over25 = signal_pack.get("edge_level_o25", "NONE")
-                    edge_level_o05ht = signal_pack.get("edge_level_o05ht", "NONE")
                     edge_level_o15ht = signal_pack.get("edge_level_o15ht", "NONE")
 
                     edge_logit_over25 = safe_edge_logit(p_model_over25, p_market_over25)
                     edge_logit_o05ht = safe_edge_logit(p_model_o05ht, p_market_o05ht)
                     edge_logit_o15ht = safe_edge_logit(p_model_o15ht, p_market_o15ht)
-
-                    fav = signal_pack["fav_quote"]
-                    is_gold_zone = signal_pack["is_gold_zone"]
 
                     row = {
                         "Ora": ora_local,
@@ -5134,7 +5135,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "SIGNAL_SUMMARY": signal_pack.get("signal_summary", ""),
                         "TEMPO_TAG": tempo_tag,
                         "EARLY_INDEX": early_index,
-                        "DROP_VISUAL_LEVEL": signal_pack.get("drop_visual_level", "none"),
+                        "DROP_VISUAL_LEVEL": drop_visual_level,
                         "HAS_INVERSION": quote_pack["INVERSION"],
                         "Data": target_date,
                         "Fixture_ID": f.get("fixture", {}).get("id"),
