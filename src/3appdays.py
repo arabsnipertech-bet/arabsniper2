@@ -5132,6 +5132,8 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "DROP_DIFF": signal_pack.get("drop_diff", 0.0),
                         "SIGNAL_STABILITY": signal_pack.get("signal_stability", ""),
                         "SIGNAL_SUMMARY": signal_pack.get("signal_summary", ""),
+                        "TEMPO_TAG": tempo_tag,
+                        "EARLY_INDEX": early_index,
                         "DROP_VISUAL_LEVEL": signal_pack.get("drop_visual_level", "none"),
                         "HAS_INVERSION": quote_pack["INVERSION"],
                         "Data": target_date,
