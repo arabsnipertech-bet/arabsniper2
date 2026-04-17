@@ -4422,21 +4422,21 @@ def build_signal_package(fid, mk, s_h, s_a):
         int("INV" in tags)
     )
 
-signal_stability = classify_signal_stability(
-    structure_pack,
-    market_pack,
-    {
-        "over_level": over_level
-    }
-)
+    signal_stability = classify_signal_stability(
+        structure_pack,
+        market_pack,
+        {
+            "over_level": over_level
+        }
+    )
 
-signal_summary = build_signal_summary(
-    structure_pack,
-    market_pack,
-    {
-        "over_level": over_level
-    }
-)
+    signal_summary = build_signal_summary(
+        structure_pack,
+        market_pack,
+        {
+            "over_level": over_level
+        }
+    )
     
     return {
         "tags": tags,
