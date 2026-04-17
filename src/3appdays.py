@@ -1869,7 +1869,75 @@ def estimate_match_lambdas(s_h, s_a):
         "ft_sd_avg": round3(ft_sd_avg),
         "ht_sd_avg": round3(ht_sd_avg),
     }
-    
+
+def classify_match_tempo(s_h, s_a):
+    """
+    Tempo di attivazione del match:
+    - FAST  = partita pronta presto
+    - BUILD = partita da sviluppo
+    - SLOW  = partita più lenta / bloccabile
+
+    Non sostituisce PT.
+    Lo completa con una lettura di ritmo iniziale.
+    """
+    home_ht_scored = safe_float(s_h.get("avg_ht_scored_clean", 0.0), 0.0)
+    away_ht_scored = safe_float(s_a.get("avg_ht_scored_clean", 0.0), 0.0)
+
+    home_ht_conceded = safe_float(s_h.get("avg_ht_conceded_clean", 0.0), 0.0)
+    away_ht_conceded = safe_float(s_a.get("avg_ht_conceded_clean", 0.0), 0.0)
+
+    home_ht1_rate = safe_float(s_h.get("ht_1plus_rate", 0.0), 0.0)
+    away_ht1_rate = safe_float(s_a.get("ht_1plus_rate", 0.0), 0.0)
+
+    home_reg = safe_float(s_h.get("scoring_regularity", 0.0), 0.0)
+    away_reg = safe_float(s_a.get("scoring_regularity", 0.0), 0.0)
+
+    # pressione offensiva reciproca nel 1T
+    early_home = home_ht_scored + away_ht_conceded
+    early_away = away_ht_scored + home_ht_conceded
+    early_total = early_home + early_away
+
+    # se una sola squadra porta quasi tutto il peso, rischio match meno pronto
+    early_balance = abs(early_home - early_away)
+
+    # se entrambe concedono nel 1T, il match tende a essere più vivo presto
+    pressure_factor = home_ht_conceded + away_ht_conceded
+
+    # conferma minima di frequenza / continuità
+    activation_factor = (
+        (home_ht1_rate + away_ht1_rate) * 0.35 +
+        (home_reg + away_reg) * 0.15
+    )
+
+    early_index = (
+        early_total * 0.60 +
+        pressure_factor * 0.30 +
+        activation_factor -
+        early_balance * 0.30
+    )
+
+    tempo_tag = "SLOW"
+    if early_index >= 2.60:
+        tempo_tag = "FAST"
+    elif early_index >= 2.20:
+        tempo_tag = "BUILD"
+
+    # guard rail: evita FAST troppo falsi su carico monolato
+    one_side_guard = abs(home_ht_scored - away_ht_scored)
+    if tempo_tag == "FAST" and one_side_guard >= 0.65 and pressure_factor < 0.95:
+        tempo_tag = "BUILD"
+
+    return {
+        "early_home": round3(early_home),
+        "early_away": round3(early_away),
+        "early_total": round3(early_total),
+        "early_balance": round3(early_balance),
+        "pressure_factor": round3(pressure_factor),
+        "activation_factor": round3(activation_factor),
+        "early_index": round3(early_index),
+        "tempo_tag": tempo_tag,
+    }
+
 #====================================
 # BLOCCO 3
 # QUOTE MOVEMENT + MARKET COHERENCE ENGINE
@@ -3879,6 +3947,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     # modello probabilistico vs mercato fair
     # -------------------------------------------------
     lambda_pack = estimate_match_lambdas(s_h, s_a)
+    tempo_pack = classify_match_tempo(s_h, s_a)
 
     lam_home_ft = safe_float(lambda_pack.get("lam_home_ft", 0.0), 0.0)
     lam_away_ft = safe_float(lambda_pack.get("lam_away_ft", 0.0), 0.0)
@@ -4517,6 +4586,10 @@ def build_signal_package(fid, mk, s_h, s_a):
 
         "lambda_pack": lambda_pack,
 
+        "tempo_pack": tempo_pack,
+        "tempo_tag": tempo_pack.get("tempo_tag", ""),
+        "early_index": tempo_pack.get("early_index", 0.0),
+
         "edge_o25": edge_o25,
         "edge_o05ht": edge_o05ht,
         "edge_o15ht": edge_o15ht,
@@ -4686,6 +4759,13 @@ def build_signal_debug_summary(signal_pack):
         "drop_visual_level": signal_pack.get("drop_visual_level", "none"),
         "signal_stability": signal_pack.get("signal_stability", ""),
         "signal_summary": signal_pack.get("signal_summary", ""),
+        "tempo_tag": signal_pack.get("tempo_tag", ""),
+        "early_index": signal_pack.get("early_index", 0.0),
+        "early_home": safe_float((signal_pack.get("tempo_pack", {}) or {}).get("early_home", 0.0), 0.0),
+        "early_away": safe_float((signal_pack.get("tempo_pack", {}) or {}).get("early_away", 0.0), 0.0),
+        "early_balance": safe_float((signal_pack.get("tempo_pack", {}) or {}).get("early_balance", 0.0), 0.0),
+        "pressure_factor": safe_float((signal_pack.get("tempo_pack", {}) or {}).get("pressure_factor", 0.0), 0.0),
+        "activation_factor": safe_float((signal_pack.get("tempo_pack", {}) or {}).get("activation_factor", 0.0), 0.0),
     }
     
 #====================================
@@ -5003,6 +5083,10 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
 
                     lambda_pack = signal_pack.get("lambda_pack", {}) or {}
 
+                    tempo_pack = signal_pack.get("tempo_pack", {}) or {}
+                    tempo_tag = signal_pack.get("tempo_tag", "")
+                    early_index = safe_float(signal_pack.get("early_index", 0.0), 0.0)
+
                     lam_home_ft = safe_float(lambda_pack.get("lam_home_ft", 0.0), 0.0)
                     lam_away_ft = safe_float(lambda_pack.get("lam_away_ft", 0.0), 0.0)
                     lam_home_ht = safe_float(lambda_pack.get("lam_home_ht", 0.0), 0.0)
@@ -5098,6 +5182,9 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "LAM_AWAY_FT": lam_away_ft,
                         "LAM_HOME_HT": lam_home_ht,
                         "LAM_AWAY_HT": lam_away_ht,
+
+                        "TEMPO_TAG": tempo_tag,
+                        "EARLY_INDEX": early_index,
 
                         "P_MODEL_O25": p_model_over25,
                         "P_MARKET_O25": p_market_over25,
