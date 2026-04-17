@@ -4564,7 +4564,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         "tags": tags,
         "scores": scores,
         "drop_diff": round3(drop_diff),
-        "drop_visual_level": signal_pack.get("drop_visual_level", "none"),
+        "drop_visual_level": drop_visual_level,
         "signal_stability": signal_stability,
         "signal_summary": signal_summary,
         "o25_diff": o25_diff,
