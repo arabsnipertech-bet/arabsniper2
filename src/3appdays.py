@@ -5275,7 +5275,8 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                             "away_ht_scored_2plus_rate": round3(safe_float(s_a.get("ht_scored_2plus_rate", 0.0), 0.0)),
                             "home_ht_conceded_1plus_rate": round3(safe_float(s_h.get("ht_conceded_1plus_rate", 0.0), 0.0)),
                             "away_ht_conceded_1plus_rate": round3(safe_float(s_a.get("ht_conceded_1plus_rate", 0.0), 0.0)),
-                       
+                        },
+
                         "flags": {
                             "fav_quote": round3(safe_float(signal_pack.get("fav_quote", 0.0), 0.0)),
                             "is_gold_zone": bool(signal_pack.get("is_gold_zone", False)),
