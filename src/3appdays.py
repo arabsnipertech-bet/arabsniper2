@@ -4293,7 +4293,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         and safe_float(s_a.get("ht_zero_rate", 0.0), 0.0) <= 0.48
     )
 
-     pto15_ok = (
+    pto15_ok = (
         pto15_score >= pto15_threshold
         and pt_market_ok
         and edge_o15ht >= -0.06
