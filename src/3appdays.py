@@ -4012,11 +4012,29 @@ def build_signal_package(fid, mk, s_h, s_a):
         or has_drop_o25
     )
 
-    if drop_diff >= 0.15:
+    drop_strength_score = 0
+
+    if drop_confirmed:
+        drop_strength_score = max(drop_strength_score, 3)
+
+    q1_drop_abs = safe_float(q1_move_data.get("abs_diff", 0.0), 0.0) if q1_move_data.get("dir") == "down" else 0.0
+    q2_drop_abs = safe_float(q2_move_data.get("abs_diff", 0.0), 0.0) if q2_move_data.get("dir") == "down" else 0.0
+    o25_drop_abs = safe_float(o25_move_data.get("abs_diff", 0.0), 0.0) if o25_move_data.get("dir") == "down" else 0.0
+
+    best_1x2_drop = max(q1_drop_abs, q2_drop_abs)
+
+    if drop_diff >= 0.15 or best_1x2_drop >= 0.15:
+        drop_strength_score = max(drop_strength_score, 3)
+    elif drop_diff >= 0.10 or best_1x2_drop >= 0.10 or o25_drop_abs >= 0.10:
+        drop_strength_score = max(drop_strength_score, 2)
+    elif drop_diff >= 0.05 or best_1x2_drop >= 0.06 or o25_drop_abs >= 0.05:
+        drop_strength_score = max(drop_strength_score, 1)
+
+    if drop_strength_score >= 3:
         drop_visual_level = "strong"
-    elif drop_diff >= 0.10:
+    elif drop_strength_score == 2:
         drop_visual_level = "medium"
-    elif drop_diff >= 0.05:
+    elif drop_strength_score == 1:
         drop_visual_level = "light"
     else:
         drop_visual_level = "none"
