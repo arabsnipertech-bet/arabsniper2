@@ -1,6 +1,6 @@
 {
   "audit_date": "2026-04-19",
-  "generated_at": "2026-04-20T06:27:20",
+  "generated_at": "2026-04-20T11:15:33",
   "rows_count": 120,
   "rows": [
     {
@@ -1154,11 +1154,11 @@
       "primary_signal": "OVER_L1",
       "info_raw": "OVER TARGET",
       "ht_score": "0-0",
-      "ft_score": "0-0",
+      "ft_score": "1-1",
       "goals": {
         "ht": 0,
-        "ft": 0,
-        "btts_ft": false
+        "ft": 2,
+        "btts_ft": true
       },
       "canonical": {
         "gold": false,
