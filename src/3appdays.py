@@ -4021,6 +4021,11 @@ def build_signal_package(fid, mk, s_h, s_a):
     else:
         drop_visual_level = "none"
 
+    inv_ok = bool(quote_pack.get("INVERSION", False))
+
+    drop_medium_or_strong = drop_visual_level in ("medium", "strong")
+    drop_strong_only = drop_visual_level == "strong"
+
     fatal_warnings = {
         "favorite_ultra_but_ft_structure_weak",
         "market_value_trap",
@@ -4075,10 +4080,9 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     gold_ok = bool(
-        (probe_ok and market_ok)
-        or (probe_ok and drop_ok)
-        or (over_ok and market_ok)
-        or (over_ok and drop_ok)
+        (over_ok and (market_ok or inv_ok or drop_medium_or_strong))
+        or
+        (probe_ok and (market_ok or inv_ok or drop_strong_only))
     )
 
     if over_score >= 5.40:
@@ -4116,14 +4120,23 @@ def build_signal_package(fid, mk, s_h, s_a):
     if has_drop_o25:
         internal_labels.append("DROP_O25")
 
-    if probe_ok and market_ok:
-        internal_labels.append("GOLD_PM")
-    if probe_ok and drop_ok:
-        internal_labels.append("GOLD_PD")
     if over_ok and market_ok:
         internal_labels.append("GOLD_OM")
-    if over_ok and drop_ok:
-        internal_labels.append("GOLD_OD")
+
+    if over_ok and inv_ok:
+        internal_labels.append("GOLD_OI")
+
+    if over_ok and drop_medium_or_strong:
+        internal_labels.append("GOLD_ODM")
+
+    if probe_ok and market_ok:
+        internal_labels.append("GOLD_PM")
+
+    if probe_ok and inv_ok:
+        internal_labels.append("GOLD_PI")
+
+    if probe_ok and drop_strong_only:
+        internal_labels.append("GOLD_PDS")
 
     strong_tag_count = len(tags)
     signal_stability = classify_signal_stability(structure_pack, market_pack, {"over_level": over_level})
