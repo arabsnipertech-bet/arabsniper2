@@ -1,0 +1,248 @@
+{
+  "audit_date": "2026-04-20",
+  "created_at": "2026-04-20T06:25:32",
+  "source_file": "data_day1.json",
+  "matches_count": 9,
+  "primary_counts": {
+    "OVER_L1": 7,
+    "GOLD": 1,
+    "OVER_L2": 1
+  },
+  "canonical_counts": {
+    "over_l1": 9,
+    "gold": 1,
+    "over_l2": 2,
+    "over_l3": 1,
+    "drop": 1
+  },
+  "legacy_counts": {
+    "OVER": 9,
+    "GOLD": 1,
+    "BOOST": 1,
+    "STRONG_OVER": 2,
+    "DROP": 1
+  },
+  "matches": [
+    {
+      "fixture_id": 1541023,
+      "date": "2026-04-20",
+      "league": "AFC Champions League Elite (World)",
+      "match": "Vissel Kobe - Al-Ahli Jeddah",
+      "info_raw": "OVER TARGET",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1499077,
+      "date": "2026-04-20",
+      "league": "Division 1 (Saudi-Arabia)",
+      "match": "Al Ula - Al Jabalain",
+      "info_raw": "GOLD SNIPER",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1499075,
+      "date": "2026-04-20",
+      "league": "Division 1 (Saudi-Arabia)",
+      "match": "Al-Adalah - Al Jandal",
+      "info_raw": "OVER TARGET",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1380639,
+      "date": "2026-04-20",
+      "league": "Ekstraklasa (Poland)",
+      "match": "Lechia Gdansk - Piast Gliwice",
+      "info_raw": "OVER TARGET",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1391598,
+      "date": "2026-04-20",
+      "league": "Premier League (Ukraine)",
+      "match": "Shakhtar Donetsk - Polessya",
+      "info_raw": "OVER TARGET",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1392155,
+      "date": "2026-04-20",
+      "league": "Segunda División (Spain)",
+      "match": "Deportivo La Coruna - Mirandes",
+      "info_raw": "OVER TARGET",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1398231,
+      "date": "2026-04-20",
+      "league": "Segunda Liga (Portugal)",
+      "match": "FC Porto B - Leixoes",
+      "info_raw": "OVER TARGET",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.02,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1497535,
+      "date": "2026-04-20",
+      "league": "Superettan (Sweden)",
+      "match": "GIF Sundsvall - IK brage",
+      "info_raw": "OVER TARGET",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1497532,
+      "date": "2026-04-20",
+      "league": "Superettan (Sweden)",
+      "match": "Oddevold - Osters IF",
+      "info_raw": "OVER TARGET",
+      "canonical": {
+        "gold": false,
+        "over_level": 2,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "OVER_L2",
+      "drop_diff": 0.1,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    }
+  ]
+}
