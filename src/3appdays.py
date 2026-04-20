@@ -3916,314 +3916,72 @@ def has_positive(market_pack, flag_name):
     pos = market_pack.get("positive_flags", []) or []
     return flag_name in pos
 
-
-def build_signal_package(fid, mk, s_h, s_a):
+def should_keep_match(signal_pack):
     """
-    Pacchetto segnali V26 SNELLO.
-
-    Gerarchia:
-    1) fatti reali (medie + quote) = dominanti
-    2) mercato = conferma
-    3) digiuno favorita = moltiplicatore
-    4) una sola etichetta finale tra:
-       - GOLD SNIPER
-       - OVER TARGET
-       - MARKET ATTACK
+    Filtro finale V27.
+    Tiene solo:
+    - GOLD
+    - OVER
+    - MARKET
+    - PROBE
     """
-    quote_pack = build_quote_movement_package(fid, mk)
-    market_pack = analyze_market_coherence(mk, s_h, s_a, quote_pack)
-    structure_pack = build_match_structure_profile(
-        mk, s_h, s_a,
-        market_pack=market_pack,
-        quote_pack=quote_pack
-    )
-    scores = build_scoring_snapshot(
-        mk, s_h, s_a,
-        structure_pack=structure_pack,
-        market_pack=market_pack,
-        quote_pack=quote_pack
-    )
+    tags = signal_pack.get("tags", []) or []
+    if not tags:
+        return False
 
-    lambda_pack = estimate_match_lambdas(s_h, s_a)
-    tempo_pack = classify_match_tempo(s_h, s_a)
+    market_pack = signal_pack.get("market_pack", {}) or {}
+    structure_pack = signal_pack.get("structure_pack", {}) or {}
+    scores = signal_pack.get("scores", {}) or {}
 
-    lam_home_ft = safe_float(lambda_pack.get("lam_home_ft", 0.0), 0.0)
-    lam_away_ft = safe_float(lambda_pack.get("lam_away_ft", 0.0), 0.0)
-    lam_home_ht = safe_float(lambda_pack.get("lam_home_ht", 0.0), 0.0)
-    lam_away_ht = safe_float(lambda_pack.get("lam_away_ht", 0.0), 0.0)
-
-    p_model_o25 = poisson_over25_prob(lam_home_ft, lam_away_ft)
-    p_model_o05ht = poisson_over05ht_prob(lam_home_ht, lam_away_ht)
-    p_model_o15ht = poisson_over15ht_prob(lam_home_ht, lam_away_ht)
-
-    p_market_o25 = fair_prob_from_two_way_market(mk.get("o25"), mk.get("u25"), pick="over")
-    p_market_o05ht = fair_prob_from_two_way_market(mk.get("o05ht"), mk.get("u05ht"), pick="over")
-    p_market_o15ht = fair_prob_from_two_way_market(mk.get("o15ht"), mk.get("u15ht"), pick="over")
-
-    edge_o25 = round3(p_model_o25 - p_market_o25)
-    edge_o05ht = round3(p_model_o05ht - p_market_o05ht)
-    edge_o15ht = round3(p_model_o15ht - p_market_o15ht)
-
-    edge_level_o25 = classify_edge_level(edge_o25)
-    edge_level_o05ht = classify_edge_level(edge_o05ht)
-    edge_level_o15ht = classify_edge_level(edge_o15ht)
-
-    ptgg_score = round3(max(safe_float(scores.get("ptgg"), 0.0), 0.0))
-    pto15_score = round3(max(safe_float(scores.get("pto15"), 0.0), 0.0))
-    pt_score = round3(max(safe_float(scores.get("pt"), 0.0), 0.0))
-    over_score = round3(max(safe_float(scores.get("over"), 0.0), 0.0))
-    boost_score = round3(max(safe_float(scores.get("boost"), 0.0), 0.0))
-    gold_score = round3(max(safe_float(scores.get("gold"), 0.0), 0.0))
-
-    fav = safe_float(structure_pack.get("fav_quote", 0.0), 0.0)
-    q1 = safe_float(mk.get("q1"), 0.0)
-    q2 = safe_float(mk.get("q2"), 0.0)
-    fav_side = "1" if (q1 > 0 and (q2 <= 0 or q1 <= q2)) else "2"
-
-    combined_ht_clean = safe_float(structure_pack.get("combined_ht_clean", 0.0), 0.0)
+    edge_o25 = safe_float(signal_pack.get("edge_o25", scores.get("edge_o25", 0.0)), 0.0)
     combined_ft_clean = safe_float(structure_pack.get("combined_ft_clean", 0.0), 0.0)
-    combined_ht_scored_clean = safe_float(structure_pack.get("combined_ht_scored_clean", 0.0), 0.0)
     structure_score = safe_float(structure_pack.get("structure_score", 0.0), 0.0)
     one_sided_risk = safe_float(structure_pack.get("one_sided_risk", 0.0), 0.0)
-    match_profile = structure_pack.get("match_profile", "neutral")
-    structure_grade = structure_pack.get("structure_grade", "low")
-    bilateral_ft = bool(structure_pack.get("bilateral_ft", False))
 
     coherence_score = safe_float(market_pack.get("coherence_score", 0.0), 0.0)
-    dislocation_score = safe_float(market_pack.get("dislocation_score", 0.0), 0.0)
-    coherence_level = market_pack.get("coherence_level", "low")
-    dislocation_level = market_pack.get("dislocation_level", "low")
-    market_profile = market_pack.get("market_profile", "neutral")
-    drop_confirmed = bool(market_pack.get("drop_confirmed", False))
     value_left = market_pack.get("value_left", "unknown")
+    warning_flags = market_pack.get("warning_flags", []) or []
 
-    drop_diff = compute_drop_diff(fid, mk)
-    q1_move_data = quote_pack.get("Q1_MOVE_DATA", {}) or {}
-    q2_move_data = quote_pack.get("Q2_MOVE_DATA", {}) or {}
-    o25_move_data = quote_pack.get("O25_MOVE_DATA", {}) or {}
+    if any(w in {"favorite_ultra_but_ft_structure_weak", "market_value_trap"} for w in warning_flags):
+        return False
 
-    has_drop_1x2 = (
-        (q1_move_data.get("dir") == "down" and safe_float(q1_move_data.get("abs_diff", 0.0), 0.0) >= 0.06)
-        or
-        (q2_move_data.get("dir") == "down" and safe_float(q2_move_data.get("abs_diff", 0.0), 0.0) >= 0.06)
-    )
-    has_drop_o25 = (
-        o25_move_data.get("dir") == "down"
-        and safe_float(o25_move_data.get("abs_diff", 0.0), 0.0) >= 0.05
-    )
+    if value_left == "low":
+        return False
 
-    if drop_diff >= 0.12:
-        drop_visual_level = "strong"
-    elif drop_diff >= 0.08:
-        drop_visual_level = "medium"
-    elif drop_diff >= 0.05:
-        drop_visual_level = "light"
-    else:
-        drop_visual_level = "none"
+    label = tags[0]
 
-    home_last_2h_zero = bool(s_h.get("last_2h_zero", False))
-    away_last_2h_zero = bool(s_a.get("last_2h_zero", False))
-    fav_digiuno = (fav_side == "1" and home_last_2h_zero) or (fav_side == "2" and away_last_2h_zero)
-
-    home_ft_scored_clean = safe_float(s_h.get("avg_ft_scored_clean", 0.0), 0.0)
-    away_ft_scored_clean = safe_float(s_a.get("avg_ft_scored_clean", 0.0), 0.0)
-    home_ft_2plus_rate = safe_float(s_h.get("ft_2plus_rate", 0.0), 0.0)
-    away_ft_2plus_rate = safe_float(s_a.get("ft_2plus_rate", 0.0), 0.0)
-    home_ht_scored_1plus_rate = safe_float(s_h.get("ht_scored_1plus_rate", 0.0), 0.0)
-    away_ht_scored_1plus_rate = safe_float(s_a.get("ht_scored_1plus_rate", 0.0), 0.0)
-    home_ht_zero_rate = safe_float(s_h.get("ht_zero_rate", 0.0), 0.0)
-    away_ht_zero_rate = safe_float(s_a.get("ht_zero_rate", 0.0), 0.0)
-
-    fatal_warnings = {
-        "favorite_ultra_but_ft_structure_weak",
-        "market_value_trap",
-    }
-    has_fatal_warning = any(w in fatal_warnings for w in (market_pack.get("warning_flags", []) or []))
-
-    fav_native_ok = 1.60 <= fav <= 1.90
-    quote_ft_ok = 1.40 <= safe_float(mk.get("o25"), 0.0) <= 2.20
-    quote_ht_ok = 1.18 <= safe_float(mk.get("o05ht"), 0.0) <= 1.45
-
-    base_ft_ok = (
-        quote_ft_ok
-        and combined_ft_clean >= 1.52
-        and min(home_ft_scored_clean, away_ft_scored_clean) >= 0.88
-        and min(home_ft_2plus_rate, away_ft_2plus_rate) >= 0.42
-        and edge_o25 >= 0.00
-        and not has_warning(market_pack, "ft_market_ahead_of_structure")
-        and not has_warning(market_pack, "o25_too_low_for_one_sided_ft")
-    )
-
-    base_ht_ok = (
-        quote_ht_ok
-        and combined_ht_clean >= 1.20
-        and combined_ht_scored_clean >= 0.68
-        and min(home_ht_scored_1plus_rate, away_ht_scored_1plus_rate) >= 0.38
-        and max(home_ht_zero_rate, away_ht_zero_rate) <= 0.56
-        and edge_o05ht >= -0.02
-        and not has_warning(market_pack, "ht_market_ahead_of_structure")
-    )
-
-    structure_ok = (
-        structure_score >= 1.00
-        and one_sided_risk <= 1.55
-        and structure_grade in ("high", "medium")
-    )
-
-    market_align_ok = (
-        coherence_score >= 1.20
-        or drop_confirmed
-        or has_drop_1x2
-        or has_drop_o25
-        or dislocation_score >= 0.50
-    )
-
-    over_target_ok = (
-        base_ft_ok
-        and structure_ok
-        and value_left != "low"
-        and not has_fatal_warning
-        and (market_align_ok or bilateral_ft or edge_o25 >= 0.04)
-    )
-
-    if fav_digiuno and over_target_ok:
-        over_score = round3(over_score + 0.35)
-        gold_score = round3(gold_score + 0.50)
-        pt_score = round3(pt_score + 0.30)
-
-    gold_sniper_ok = (
-        over_target_ok
-        and fav_native_ok
-        and base_ht_ok
-        and edge_o25 >= 0.02
-        and (edge_o05ht >= -0.01 or edge_o15ht >= 0.00)
-        and (
-            fav_digiuno
-            or drop_confirmed
-            or (has_drop_1x2 and coherence_score >= 1.25)
-            or coherence_score >= 1.80
+    if label == "GOLD":
+        return bool(
+            combined_ft_clean >= 1.40
+            and structure_score >= 0.85
+            and one_sided_risk <= 1.75
+            and coherence_score >= 0.95
         )
-    )
 
-    market_attack_ok = (
-        not gold_sniper_ok
-        and not over_target_ok
-        and fav_native_ok
-        and structure_ok
-        and combined_ft_clean >= 1.45
-        and combined_ht_clean >= 1.05
-        and value_left != "low"
-        and not has_fatal_warning
-        and (has_drop_1x2 or drop_confirmed)
-        and coherence_score >= 1.05
-        and edge_o25 >= -0.01
-    )
+    if label == "OVER":
+        return bool(
+            combined_ft_clean >= 1.52
+            and structure_score >= 0.95
+            and one_sided_risk <= 1.60
+            and edge_o25 >= 0.00
+        )
 
-    tags = []
-    if gold_sniper_ok:
-        tags = ["GOLD SNIPER"]
-        over_level = 3
-    elif over_target_ok:
-        tags = ["OVER TARGET"]
-        over_level = 2 if base_ht_ok else 1
-    elif market_attack_ok:
-        tags = ["MARKET ATTACK"]
-        over_level = 1
-    else:
-        over_level = 0
+    if label == "MARKET":
+        return bool(
+            combined_ft_clean >= 1.45
+            and structure_score >= 0.85
+            and one_sided_risk <= 1.75
+            and coherence_score >= 1.00
+        )
 
-    internal_labels = []
-    if fav_native_ok:
-        internal_labels.append("FAV_NATIVE")
-    if base_ft_ok:
-        internal_labels.append("FT_OK")
-    if base_ht_ok:
-        internal_labels.append("HT_OK")
-    if market_align_ok:
-        internal_labels.append("ALLINEATO")
-    if fav_digiuno:
-        internal_labels.append("DIGIUNO")
+    if label == "PROBE":
+        return bool(
+            combined_ft_clean >= 1.40
+            and structure_score >= 0.85
+            and one_sided_risk <= 1.75
+        )
 
-    strong_tag_count = len(tags)
-    signal_stability = classify_signal_stability(structure_pack, market_pack, {"over_level": over_level})
-    signal_summary = build_signal_summary(structure_pack, market_pack, {"over_level": over_level})
-
-    if tags:
-        if tags[0] == "GOLD SNIPER":
-            signal_summary = "Fatti + mercato + digiuno allineati"
-            signal_stability = "Alta" if fav_digiuno or drop_confirmed else signal_stability
-        elif tags[0] == "OVER TARGET":
-            signal_summary = "Struttura gol concreta"
-        elif tags[0] == "MARKET ATTACK":
-            signal_summary = "Mercato forte con base reale"
-
-    scores = {
-        "ptgg": ptgg_score,
-        "pto15": pto15_score,
-        "pt": pt_score,
-        "over": over_score,
-        "boost": boost_score,
-        "gold": gold_score,
-        "max": round3(max(ptgg_score, pto15_score, pt_score, over_score, boost_score, gold_score)),
-        "edge_o25": edge_o25,
-        "edge_o05ht": edge_o05ht,
-        "edge_o15ht": edge_o15ht,
-        "edge_level_o25": edge_level_o25,
-        "edge_level_o05ht": edge_level_o05ht,
-        "edge_level_o15ht": edge_level_o15ht,
-        "p_model_o25": p_model_o25,
-        "p_market_o25": p_market_o25,
-        "p_model_o05ht": p_model_o05ht,
-        "p_market_o05ht": p_market_o05ht,
-        "p_model_o15ht": p_model_o15ht,
-        "p_market_o15ht": p_market_o15ht,
-    }
-
-    return {
-        "tags": tags,
-        "scores": scores,
-        "drop_diff": round3(drop_diff),
-        "drop_visual_level": drop_visual_level,
-        "signal_stability": signal_stability,
-        "signal_summary": signal_summary,
-        "o25_diff": 0.0,
-        "o25_pct_move": 0.0,
-        "counter_move_soft": False,
-        "counter_move_hard": False,
-        "counter_move_extreme": False,
-        "market_resistance_soft": False,
-        "market_resistance_hard": False,
-        "market_resistance_extreme": False,
-        "fav_quote": round3(fav),
-        "is_gold_zone": fav_native_ok,
-        "strong_tag_count": strong_tag_count,
-        "quote_pack": quote_pack,
-        "market_pack": market_pack,
-        "structure_pack": structure_pack,
-        "internal_labels": internal_labels,
-        "over_level": over_level,
-        "lambda_pack": lambda_pack,
-        "tempo_pack": tempo_pack,
-        "tempo_tag": tempo_pack.get("tempo_tag", ""),
-        "early_index": tempo_pack.get("early_index", 0.0),
-        "edge_o25": edge_o25,
-        "edge_o05ht": edge_o05ht,
-        "edge_o15ht": edge_o15ht,
-        "edge_level_o25": edge_level_o25,
-        "edge_level_o05ht": edge_level_o05ht,
-        "edge_level_o15ht": edge_level_o15ht,
-        "p_model_o25": p_model_o25,
-        "p_market_o25": p_market_o25,
-        "p_model_o05ht": p_model_o05ht,
-        "p_market_o05ht": p_market_o05ht,
-        "p_model_o15ht": p_model_o15ht,
-        "p_market_o15ht": p_market_o15ht,
-        "base_ft_ok": base_ft_ok,
-        "base_ht_ok": base_ht_ok,
-        "fav_native_ok": fav_native_ok,
-        "market_align_ok": market_align_ok,
-        "fav_digiuno": fav_digiuno,
-    }
+    return False
 
 def should_keep_match(signal_pack):
     """
