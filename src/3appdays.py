@@ -4144,7 +4144,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     if over_ok and inv_ok:
         internal_labels.append("GOLD_OI")
 
-    if over_ok and drop_medium_or_strong:
+    if over_ok and drop_medium_or_strong and market_pack.get("drop_type") != "sterile":
         internal_labels.append("GOLD_ODM")
 
     if probe_ok and market_ok:
