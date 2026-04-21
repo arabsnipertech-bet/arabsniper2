@@ -4083,8 +4083,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     probe_ok = (
-        not over_ok
-        and combined_ft_clean >= 1.40
+        combined_ft_clean >= 1.40
         and structure_score >= 0.85
         and one_sided_risk <= 1.75
         and value_left != "low"
@@ -4095,12 +4094,38 @@ def build_signal_package(fid, mk, s_h, s_a):
             or has_drop_1x2
             or edge_o25 >= 0.01
         )
+        and not (
+            over_ok
+            and over_score >= 4.80
+            and coherence_score >= 1.15
+        )
     )
 
     gold_ok = bool(
-        (over_ok and (market_ok or inv_ok or drop_medium_or_strong))
+        (
+            over_ok
+            and over_score >= 4.80
+            and combined_ft_clean >= 1.58
+            and structure_score >= 1.00
+            and one_sided_risk <= 1.35
+            and (
+                market_ok
+                or inv_ok
+                or drop_medium_or_strong
+            )
+        )
         or
-        (probe_ok and (market_ok or inv_ok or drop_strong_only))
+        (
+            probe_ok
+            and over_score >= 4.35
+            and coherence_score >= 1.05
+            and one_sided_risk <= 1.25
+            and (
+                market_ok
+                or inv_ok
+                or drop_strong_only
+            )
+        )
     )
 
     if over_score >= 5.40:
@@ -4276,10 +4301,10 @@ def should_keep_match(signal_pack):
 
     if label == "GOLD":
         return bool(
-            combined_ft_clean >= 1.40
-            and structure_score >= 0.85
-            and one_sided_risk <= 1.75
-            and coherence_score >= 0.95
+            combined_ft_clean >= 1.52
+            and structure_score >= 0.95
+            and one_sided_risk <= 1.45
+            and coherence_score >= 1.00
         )
 
     if label == "OVER":
