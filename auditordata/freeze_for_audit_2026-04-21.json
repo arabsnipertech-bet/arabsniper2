@@ -1,30 +1,33 @@
 {
   "audit_date": "2026-04-21",
-  "created_at": "2026-04-21T06:28:58",
+  "created_at": "2026-04-21T10:18:22",
   "source_file": "data_day1.json",
-  "matches_count": 56,
+  "matches_count": 51,
   "primary_counts": {
-    "GOLD": 40,
+    "MARKET": 9,
+    "GOLD": 28,
     "OVER_L3": 13,
-    "PROBE": 3
+    "PROBE": 1
   },
   "canonical_counts": {
-    "gold": 40,
-    "drop": 11,
-    "over_l1": 44,
-    "over_l2": 44,
-    "over_l3": 44,
-    "probe": 3,
-    "inv": 2
+    "market": 11,
+    "drop": 14,
+    "gold": 28,
+    "over_l1": 41,
+    "over_l2": 41,
+    "over_l3": 41,
+    "inv": 3,
+    "probe": 1
   },
   "legacy_counts": {
-    "GOLD": 40,
-    "DROP": 11,
-    "BOOST": 44,
-    "STRONG_OVER": 44,
-    "OVER": 44,
-    "PROBE": 3,
-    "INV": 2
+    "MARKET": 11,
+    "DROP": 14,
+    "GOLD": 28,
+    "BOOST": 41,
+    "STRONG_OVER": 41,
+    "OVER": 41,
+    "INV": 3,
+    "PROBE": 1
   },
   "matches": [
     {
@@ -32,20 +35,20 @@
       "date": "2026-04-21",
       "league": "1. Division (Denmark)",
       "match": "AC Horsens - Esbjerg",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 0,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD"
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "MARKET",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -56,21 +59,21 @@
       "date": "2026-04-21",
       "league": "1. Division (Denmark)",
       "match": "Hvidovre - Kolding IF",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 0,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": true,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD",
+        "MARKET",
         "DROP"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "MARKET",
       "drop_diff": 0.14,
       "has_inversion": false,
       "inv_from": "",
@@ -81,9 +84,9 @@
       "date": "2026-04-21",
       "league": "1st Division (South-Africa)",
       "match": "Casric Stars - Highbury",
-      "info_raw": "OVER",
+      "info_raw": "GOLD",
       "canonical": {
-        "gold": false,
+        "gold": true,
         "over_level": 3,
         "pt": false,
         "market": false,
@@ -92,37 +95,12 @@
         "probe": false
       },
       "legacy_tags": [
+        "GOLD",
         "BOOST",
         "STRONG_OVER",
         "OVER"
       ],
-      "primary_signal": "OVER_L3",
-      "drop_diff": 0.0,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
-    },
-    {
-      "fixture_id": 1446403,
-      "date": "2026-04-21",
-      "league": "1st Division (South-Africa)",
-      "match": "Midlands Wanderers - Upington City",
-      "info_raw": "OVER",
-      "canonical": {
-        "gold": false,
-        "over_level": 3,
-        "pt": false,
-        "market": false,
-        "drop": false,
-        "inv": false,
-        "probe": false
-      },
-      "legacy_tags": [
-        "BOOST",
-        "STRONG_OVER",
-        "OVER"
-      ],
-      "primary_signal": "OVER_L3",
+      "primary_signal": "GOLD",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -274,7 +252,7 @@
         "pt": false,
         "market": false,
         "drop": true,
-        "inv": false,
+        "inv": true,
         "probe": false
       },
       "legacy_tags": [
@@ -282,13 +260,14 @@
         "BOOST",
         "STRONG_OVER",
         "OVER",
-        "DROP"
+        "DROP",
+        "INV"
       ],
       "primary_signal": "GOLD",
-      "drop_diff": 0.23,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
+      "drop_diff": 0.35,
+      "has_inversion": true,
+      "inv_from": "2",
+      "inv_to": "1"
     },
     {
       "fixture_id": 1387070,
@@ -341,7 +320,7 @@
         "DROP"
       ],
       "primary_signal": "GOLD",
-      "drop_diff": 0.36,
+      "drop_diff": 0.34,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -351,20 +330,20 @@
       "date": "2026-04-21",
       "league": "Championship (Northern-Ireland)",
       "match": "Ballinamallard United - Armagh City",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 0,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD"
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "MARKET",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -402,23 +381,23 @@
       "date": "2026-04-21",
       "league": "Coppa Italia (Italy)",
       "match": "Inter - Como",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 3,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD",
         "BOOST",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "OVER_L3",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -455,20 +434,20 @@
       "date": "2026-04-21",
       "league": "Cup (Bulgaria)",
       "match": "Ludogorets - CSKA Sofia",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 0,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD"
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "MARKET",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -524,7 +503,7 @@
         "OVER"
       ],
       "primary_signal": "GOLD",
-      "drop_diff": 0.0,
+      "drop_diff": 0.03,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -550,33 +529,6 @@
         "OVER"
       ],
       "primary_signal": "OVER_L3",
-      "drop_diff": 0.0,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
-    },
-    {
-      "fixture_id": 1499080,
-      "date": "2026-04-21",
-      "league": "Division 1 (Saudi-Arabia)",
-      "match": "Al Baten - Al Anwar",
-      "info_raw": "GOLD",
-      "canonical": {
-        "gold": true,
-        "over_level": 3,
-        "pt": false,
-        "market": false,
-        "drop": false,
-        "inv": false,
-        "probe": false
-      },
-      "legacy_tags": [
-        "GOLD",
-        "BOOST",
-        "STRONG_OVER",
-        "OVER"
-      ],
-      "primary_signal": "GOLD",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -620,41 +572,18 @@
         "over_level": 3,
         "pt": false,
         "market": false,
-        "drop": false,
+        "drop": true,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
         "BOOST",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "DROP"
       ],
       "primary_signal": "OVER_L3",
-      "drop_diff": 0.0,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
-    },
-    {
-      "fixture_id": 1509097,
-      "date": "2026-04-21",
-      "league": "Erovnuli Liga (Georgia)",
-      "match": "Torpedo Kutaisi - Samgurali",
-      "info_raw": "PROBE",
-      "canonical": {
-        "gold": false,
-        "over_level": 0,
-        "pt": false,
-        "market": false,
-        "drop": false,
-        "inv": false,
-        "probe": true
-      },
-      "legacy_tags": [
-        "PROBE"
-      ],
-      "primary_signal": "PROBE",
-      "drop_diff": 0.0,
+      "drop_diff": 0.05,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -686,48 +615,24 @@
       "inv_to": ""
     },
     {
-      "fixture_id": 1540503,
-      "date": "2026-04-21",
-      "league": "Iraqi League (Iraq)",
-      "match": "Naft Maysan - Al Najaf",
-      "info_raw": "PROBE",
-      "canonical": {
-        "gold": false,
-        "over_level": 0,
-        "pt": false,
-        "market": false,
-        "drop": false,
-        "inv": false,
-        "probe": true
-      },
-      "legacy_tags": [
-        "PROBE"
-      ],
-      "primary_signal": "PROBE",
-      "drop_diff": 0.0,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
-    },
-    {
       "fixture_id": 1536947,
       "date": "2026-04-21",
       "league": "Jupiler Pro League (Belgium)",
       "match": "Genk - Charleroi",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 0,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD"
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "MARKET",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -738,20 +643,20 @@
       "date": "2026-04-21",
       "league": "Jupiler Pro League (Belgium)",
       "match": "Standard Liege - Antwerp",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 0,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD"
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "MARKET",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -812,9 +717,9 @@
       "date": "2026-04-21",
       "league": "La Liga (Spain)",
       "match": "Athletic Club - Osasuna",
-      "info_raw": "GOLD",
+      "info_raw": "OVER",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 3,
         "pt": false,
         "market": false,
@@ -823,12 +728,11 @@
         "probe": false
       },
       "legacy_tags": [
-        "GOLD",
         "BOOST",
         "STRONG_OVER",
         "OVER"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "OVER_L3",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -856,7 +760,7 @@
         "OVER"
       ],
       "primary_signal": "GOLD",
-      "drop_diff": 0.0,
+      "drop_diff": 0.04,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -866,9 +770,9 @@
       "date": "2026-04-21",
       "league": "La Liga (Spain)",
       "match": "Mallorca - Valencia",
-      "info_raw": "OVER",
+      "info_raw": "GOLD",
       "canonical": {
-        "gold": false,
+        "gold": true,
         "over_level": 3,
         "pt": false,
         "market": false,
@@ -877,12 +781,13 @@
         "probe": false
       },
       "legacy_tags": [
+        "GOLD",
         "BOOST",
         "STRONG_OVER",
         "OVER"
       ],
-      "primary_signal": "OVER_L3",
-      "drop_diff": 0.02,
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -910,7 +815,7 @@
         "DROP"
       ],
       "primary_signal": "GOLD",
-      "drop_diff": 0.22,
+      "drop_diff": 0.2,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -973,33 +878,6 @@
       "date": "2026-04-21",
       "league": "Liga Revelação U23 (Portugal)",
       "match": "Famalicão U23 - Torreense U23",
-      "info_raw": "GOLD",
-      "canonical": {
-        "gold": true,
-        "over_level": 3,
-        "pt": false,
-        "market": false,
-        "drop": false,
-        "inv": false,
-        "probe": false
-      },
-      "legacy_tags": [
-        "GOLD",
-        "BOOST",
-        "STRONG_OVER",
-        "OVER"
-      ],
-      "primary_signal": "GOLD",
-      "drop_diff": 0.0,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
-    },
-    {
-      "fixture_id": 1498098,
-      "date": "2026-04-21",
-      "league": "Liga Revelação U23 (Portugal)",
-      "match": "Gil Vicente U23 - Marítimo U23",
       "info_raw": "GOLD",
       "canonical": {
         "gold": true,
@@ -1114,7 +992,7 @@
         "over_level": 3,
         "pt": false,
         "market": false,
-        "drop": false,
+        "drop": true,
         "inv": false,
         "probe": false
       },
@@ -1122,10 +1000,11 @@
         "GOLD",
         "BOOST",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "DROP"
       ],
       "primary_signal": "GOLD",
-      "drop_diff": 0.0,
+      "drop_diff": 0.09,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -1272,20 +1151,20 @@
       "date": "2026-04-21",
       "league": "Premier League (Russia)",
       "match": "CSKA Moscow - FC Rostov",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 0,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD"
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "MARKET",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -1302,7 +1181,7 @@
         "over_level": 3,
         "pt": false,
         "market": false,
-        "drop": false,
+        "drop": true,
         "inv": true,
         "probe": false
       },
@@ -1311,10 +1190,11 @@
         "BOOST",
         "STRONG_OVER",
         "OVER",
+        "DROP",
         "INV"
       ],
       "primary_signal": "GOLD",
-      "drop_diff": 0.0,
+      "drop_diff": 0.11,
       "has_inversion": true,
       "inv_from": "2",
       "inv_to": "1"
@@ -1350,20 +1230,20 @@
       "date": "2026-04-21",
       "league": "Super League (China)",
       "match": "SHANGHAI SIPG - Chongqing Tongliang Long",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 0,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD"
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "MARKET",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -1401,23 +1281,23 @@
       "date": "2026-04-21",
       "league": "Superettan (Sweden)",
       "match": "Orebro SK - IFK Norrkoping",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 3,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD",
         "BOOST",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "OVER_L3",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -1484,20 +1364,20 @@
       "date": "2026-04-21",
       "league": "Ykkösliiga (Finland)",
       "match": "Haka - JäPS",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 0,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD"
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "MARKET",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
