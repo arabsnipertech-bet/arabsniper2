@@ -4137,6 +4137,25 @@ def build_signal_package(fid, mk, s_h, s_a):
     else:
         over_level = 0
 
+    # -------------------------------------------------
+    # GG HT SNIPER (⚽⚽)
+    # -------------------------------------------------
+    gg_ht_sniper = bool(
+        (
+            gold_ok
+            and over_level == 3
+            and (1.60 <= fav <= 2.10 or inv_ok)
+            and combined_ht_clean >= 0.90
+            and combined_ht_scored_clean >= 0.70
+        )
+        or
+        (
+            market_ok
+            and drop_medium_or_strong
+            and (1.60 <= fav <= 2.10 or inv_ok)
+        )
+    )
+
     tags = []
     if gold_ok:
         tags = ["GOLD"]
@@ -4146,6 +4165,9 @@ def build_signal_package(fid, mk, s_h, s_a):
         tags = ["MARKET"]
     elif probe_ok:
         tags = ["PROBE"]
+
+    if gg_ht_sniper:
+        tags.append("⚽⚽")
 
     internal_labels = []
     if over_ok:
@@ -4220,6 +4242,7 @@ def build_signal_package(fid, mk, s_h, s_a):
 
     return {
         "tags": tags,
+        "gg_ht_sniper": gg_ht_sniper,
         "scores": scores,
         "drop_diff": round3(drop_diff),
         "drop_visual_level": drop_visual_level,
@@ -4645,6 +4668,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         continue
 
                     signal_pack = build_signal_package(fid, mk, s_h, s_a)
+                    gg_ht_sniper = bool(signal_pack.get("gg_ht_sniper", False))
                     
                     combined_ht_clean = round3((safe_float(s_h.get("avg_ht_clean", 0.0), 0.0) + safe_float(s_a.get("avg_ht_clean", 0.0), 0.0)) / 2)
                     combined_ft_clean = round3((safe_float(s_h.get("avg_total_clean", 0.0), 0.0) + safe_float(s_a.get("avg_total_clean", 0.0), 0.0)) / 2)
@@ -4718,6 +4742,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "AVG FT": f"{safe_float(s_h.get('avg_total', 0), 0.0):.2f}|{safe_float(s_a.get('avg_total', 0), 0.0):.2f}",
                         "AVG HT": f"{safe_float(s_h.get('avg_ht', 0), 0.0):.2f}|{safe_float(s_a.get('avg_ht', 0), 0.0):.2f}",
                         "Info": " ".join(tags),
+                        "GG_HT_SNIPER": gg_ht_sniper,
                         "OVER_LEVEL": signal_pack.get("over_level", 0),
                         "DROP_DIFF": signal_pack.get("drop_diff", 0.0),
                         "SIGNAL_STABILITY": signal_pack.get("signal_stability", ""),
@@ -4809,6 +4834,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                         "league": f.get("league", {}).get("name", "N/D"),
                         "country": cnt,
                         "match": f"{home_team.get('name', 'N/D')} - {away_team.get('name', 'N/D')}",
+                        "gg_ht_sniper": gg_ht_sniper,
                         "home_team": home_team.get("name", "N/D"),
                         "away_team": away_team.get("name", "N/D"),
 
