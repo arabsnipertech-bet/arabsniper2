@@ -4687,38 +4687,38 @@ def merge_existing_and_new_row(old_row: dict, new_row: dict) -> dict:
     merged = dict(old_row)
     merged.update(new_row)
 
-old_history = old_row.get("QUOTE_HISTORY", [])
-new_history = new_row.get("QUOTE_HISTORY", [])
+    old_history = old_row.get("QUOTE_HISTORY", [])
+    new_history = new_row.get("QUOTE_HISTORY", [])
 
-if isinstance(old_history, list) and isinstance(new_history, list):
-    combined_history = old_history + new_history
-    seen_ts = set()
-    clean_history = []
+    if isinstance(old_history, list) and isinstance(new_history, list):
+        combined_history = old_history + new_history
+        seen_ts = set()
+        clean_history = []
 
-    for h in combined_history:
-        if not isinstance(h, dict):
-            continue
-        ts = str(h.get("ts", "")).strip()
-        if not ts or ts in seen_ts:
-            continue
-        seen_ts.add(ts)
-        clean_history.append(h)
+        for h in combined_history:
+            if not isinstance(h, dict):
+                continue
+            ts = str(h.get("ts", "")).strip()
+            if not ts or ts in seen_ts:
+                continue
+            seen_ts.add(ts)
+            clean_history.append(h)
 
-    clean_history = sorted(clean_history, key=lambda x: str(x.get("ts", "")))[-12:]
+        clean_history = sorted(clean_history, key=lambda x: str(x.get("ts", "")))[-12:]
 
-    merged["QUOTE_HISTORY"] = clean_history
-    merged["QUOTE_DYNAMICS"] = analyze_quote_history(clean_history)
+        merged["QUOTE_HISTORY"] = clean_history
+        merged["QUOTE_DYNAMICS"] = analyze_quote_history(clean_history)
 
-    qd = merged.get("QUOTE_DYNAMICS", {}) or {}
-    merged["MARKET_ACCELERATION_LABEL"] = qd.get("market_acceleration_label", "NO_HISTORY")
-    merged["O25_VELOCITY"] = qd.get("o25_velocity", 0.0)
-    merged["O25_ACCELERATION"] = qd.get("o25_acceleration", 0.0)
-    merged["O05HT_VELOCITY"] = qd.get("o05ht_velocity", 0.0)
-    merged["O05HT_ACCELERATION"] = qd.get("o05ht_acceleration", 0.0)
-    merged["O15HT_VELOCITY"] = qd.get("o15ht_velocity", 0.0)
-    merged["O15HT_ACCELERATION"] = qd.get("o15ht_acceleration", 0.0)
-    merged["FAV_VELOCITY"] = qd.get("fav_velocity", 0.0)
-    merged["FAV_ACCELERATION"] = qd.get("fav_acceleration", 0.0)
+        qd = merged.get("QUOTE_DYNAMICS", {}) or {}
+        merged["MARKET_ACCELERATION_LABEL"] = qd.get("market_acceleration_label", "NO_HISTORY")
+        merged["O25_VELOCITY"] = qd.get("o25_velocity", 0.0)
+        merged["O25_ACCELERATION"] = qd.get("o25_acceleration", 0.0)
+        merged["O05HT_VELOCITY"] = qd.get("o05ht_velocity", 0.0)
+        merged["O05HT_ACCELERATION"] = qd.get("o05ht_acceleration", 0.0)
+        merged["O15HT_VELOCITY"] = qd.get("o15ht_velocity", 0.0)
+        merged["O15HT_ACCELERATION"] = qd.get("o15ht_acceleration", 0.0)
+        merged["FAV_VELOCITY"] = qd.get("fav_velocity", 0.0)
+        merged["FAV_ACCELERATION"] = qd.get("fav_acceleration", 0.0)
 
     # OPEN mai sovrascritte se presenti
     for key in ["Q1_OPEN", "QX_OPEN", "Q2_OPEN", "O25_OPEN", "O05HT_OPEN", "O15HT_OPEN"]:
