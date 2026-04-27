@@ -1,23 +1,23 @@
 {
   "audit_date": "2026-04-27",
-  "created_at": "2026-04-27T08:37:35",
+  "created_at": "2026-04-27T11:05:24",
   "source_file": "data_day1.json",
-  "matches_count": 29,
+  "matches_count": 30,
   "primary_counts": {
     "OVER_L1": 2,
-    "OVER_L3": 14,
-    "GOLD": 9,
+    "OVER_L3": 13,
+    "GOLD": 10,
     "OVER_L2": 3,
-    "PROBE": 1
+    "PROBE": 2
   },
   "canonical_counts": {
     "over_l1": 28,
     "market": 3,
     "over_l2": 26,
     "over_l3": 23,
-    "drop": 4,
+    "drop": 5,
     "inv": 1,
-    "gold": 9,
+    "gold": 10,
     "probe": 3
   },
   "legacy_counts": {
@@ -25,9 +25,9 @@
     "MARKET": 3,
     "BOOST": 23,
     "STRONG_OVER": 26,
-    "DROP": 4,
+    "DROP": 5,
     "INV": 1,
-    "GOLD": 9,
+    "GOLD": 10,
     "PROBE": 3
   },
   "matches": [
@@ -79,7 +79,7 @@
         "INV"
       ],
       "primary_signal": "OVER_L3",
-      "drop_diff": 0.35,
+      "drop_diff": 0.4,
       "has_inversion": true,
       "inv_from": "1",
       "inv_to": "2"
@@ -122,7 +122,7 @@
         "over_level": 3,
         "pt": false,
         "market": false,
-        "drop": false,
+        "drop": true,
         "inv": false,
         "probe": false
       },
@@ -130,10 +130,11 @@
         "GOLD",
         "BOOST",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "DROP"
       ],
       "primary_signal": "GOLD",
-      "drop_diff": 0.0,
+      "drop_diff": 0.08,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -195,21 +196,21 @@
       "date": "2026-04-27",
       "league": "Erovnuli Liga (Georgia)",
       "match": "Gagra - Meshakhte",
-      "info_raw": "PROBE",
+      "info_raw": "MARKET ⚽⚽",
       "canonical": {
         "gold": false,
         "over_level": 3,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
-        "probe": true
+        "probe": false
       },
       "legacy_tags": [
         "BOOST",
         "STRONG_OVER",
         "OVER",
-        "PROBE"
+        "MARKET"
       ],
       "primary_signal": "OVER_L3",
       "drop_diff": 0.0,
@@ -222,32 +223,6 @@
       "date": "2026-04-27",
       "league": "Esiliiga A (Estonia)",
       "match": "FC Tallinn - FCI Levadia II",
-      "info_raw": "OVER",
-      "canonical": {
-        "gold": false,
-        "over_level": 3,
-        "pt": false,
-        "market": false,
-        "drop": false,
-        "inv": false,
-        "probe": false
-      },
-      "legacy_tags": [
-        "BOOST",
-        "STRONG_OVER",
-        "OVER"
-      ],
-      "primary_signal": "OVER_L3",
-      "drop_diff": 0.0,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
-    },
-    {
-      "fixture_id": 1531726,
-      "date": "2026-04-27",
-      "league": "First League (Macedonia)",
-      "match": "Struga - Sileks",
       "info_raw": "OVER",
       "canonical": {
         "gold": false,
@@ -288,6 +263,58 @@
         "PROBE"
       ],
       "primary_signal": "PROBE",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1541772,
+      "date": "2026-04-27",
+      "league": "Iraqi League (Iraq)",
+      "match": "Al Quwa Al Jawiya - Newroz",
+      "info_raw": "OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1541775,
+      "date": "2026-04-27",
+      "league": "Iraqi League (Iraq)",
+      "match": "Al Talaba - Erbil",
+      "info_raw": "OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "OVER_L3",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -374,33 +401,6 @@
       "inv_to": ""
     },
     {
-      "fixture_id": 1535120,
-      "date": "2026-04-27",
-      "league": "Liga Nacional (Honduras)",
-      "match": "Juticalpa - Lobos Upnfm",
-      "info_raw": "MARKET",
-      "canonical": {
-        "gold": false,
-        "over_level": 3,
-        "pt": false,
-        "market": true,
-        "drop": false,
-        "inv": false,
-        "probe": false
-      },
-      "legacy_tags": [
-        "BOOST",
-        "STRONG_OVER",
-        "OVER",
-        "MARKET"
-      ],
-      "primary_signal": "OVER_L3",
-      "drop_diff": 0.0,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
-    },
-    {
       "fixture_id": 1526508,
       "date": "2026-04-27",
       "league": "Liga Pro Serie B (Ecuador)",
@@ -445,7 +445,58 @@
         "OVER"
       ],
       "primary_signal": "OVER_L1",
-      "drop_diff": 0.02,
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1394026,
+      "date": "2026-04-27",
+      "league": "NB II (Hungary)",
+      "match": "Budapest Honved - Soroksar",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "primary_signal": "PROBE",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535357,
+      "date": "2026-04-27",
+      "league": "Premier League (Bahrain)",
+      "match": "Muharraq - Budaiya",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -498,7 +549,7 @@
         "DROP"
       ],
       "primary_signal": "OVER_L2",
-      "drop_diff": 0.08,
+      "drop_diff": 0.12,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -658,32 +709,6 @@
         "OVER"
       ],
       "primary_signal": "GOLD",
-      "drop_diff": 0.0,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
-    },
-    {
-      "fixture_id": 1516045,
-      "date": "2026-04-27",
-      "league": "Super League (Uzbekistan)",
-      "match": "Olmaliq - Lokomotiv",
-      "info_raw": "OVER",
-      "canonical": {
-        "gold": false,
-        "over_level": 3,
-        "pt": false,
-        "market": false,
-        "drop": false,
-        "inv": false,
-        "probe": false
-      },
-      "legacy_tags": [
-        "BOOST",
-        "STRONG_OVER",
-        "OVER"
-      ],
-      "primary_signal": "OVER_L3",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
