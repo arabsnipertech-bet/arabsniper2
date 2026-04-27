@@ -4744,8 +4744,15 @@ if isinstance(old_history, list) and isinstance(new_history, list):
 
 def mark_row_as_stale(row: dict) -> dict:
     stale = dict(row or {})
-    stale["status"] = "stale"
-    stale["missing_count"] = int(stale.get("missing_count", 0)) + 1
+
+    old_status = str(stale.get("status", "active")).lower()
+    old_missing = int(stale.get("missing_count", 0))
+
+    stale["status"] = "live_hold" if old_status == "active" else "stale"
+    stale["missing_count"] = old_missing + 1
+
+    stale["LIVE_HOLD"] = True
+    stale["SIGNAL_SUMMARY"] = str(stale.get("SIGNAL_SUMMARY", "")) + " | Live hold: match iniziato/non aggiornabile"
 
     if "fixture_id" not in stale and "Fixture_ID" in stale:
         stale["fixture_id"] = stale["Fixture_ID"]
