@@ -368,6 +368,62 @@ def github_write_json(filename, payload, commit_message):
         print(f"❌ GitHub write error su {filename}: {e}", flush=True)
         return f"GITHUB_ERROR: {e}"
 
+def github_read_json(filename, default=None):
+    """
+    Legge un JSON dal repository GitHub.
+    Serve nei fast scan per recuperare il data_day già online
+    e mantenere QUOTE_HISTORY tra uno scan e l'altro.
+    """
+    try:
+        token = get_github_token()
+        if not token:
+            print("⚠️ GITHUB_TOKEN mancante: impossibile leggere da GitHub", flush=True)
+            return default if default is not None else []
+
+        repo_name = "arabsnipertech-bet/arabsniper2"
+        g = Github(token)
+        repo = g.get_repo(repo_name)
+
+        contents = repo.get_contents(filename)
+        raw = contents.decoded_content.decode("utf-8")
+        payload = json.loads(raw)
+
+        print(f"✅ GitHub read OK: {filename}", flush=True)
+        return payload
+
+    except Exception as e:
+        print(f"⚠️ GitHub read fallito su {filename}: {e}", flush=True)
+        return default if default is not None else []
+
+
+def load_existing_day_results_from_github(day_num):
+    """
+    Carica data_dayX.json già online.
+    Questo è fondamentale per sommare:
+    vecchia QUOTE_HISTORY + nuovo punto fast.
+    """
+    try:
+        filename = REMOTE_DAY_FILES.get(day_num)
+        if not filename:
+            return []
+
+        payload = github_read_json(filename, default=[])
+
+        if isinstance(payload, list):
+            print(f"📥 Vecchio day{day_num} caricato da GitHub: {len(payload)} righe", flush=True)
+            return payload
+
+        if isinstance(payload, dict):
+            rows = payload.get("results", [])
+            if isinstance(rows, list):
+                print(f"📥 Vecchio day{day_num} caricato da GitHub dict: {len(rows)} righe", flush=True)
+                return rows
+
+        return []
+
+    except Exception as e:
+        print(f"⚠️ load_existing_day_results_from_github fallito day{day_num}: {e}", flush=True)
+        return []
 
 def upload_to_github_main(results):
     return github_write_json(
@@ -2032,15 +2088,23 @@ def parse_rome_ts(ts_value):
 
 def get_existing_quote_history(fid):
     """
-    Recupera la timeline quote già salvata nel data_day corrente.
-    Serve ai fast scan per distinguere movimento lineare e accelerazione.
+    Recupera la timeline quote già salvata.
+    Prima prova st.session_state, poi una cache GitHub caricata nel fast.
     """
     fid = str(fid)
+
     for row in st.session_state.get("scan_results", []) or []:
         row_fid = str(row.get("Fixture_ID", row.get("fixture_id", "")))
         if row_fid == fid:
             hist = row.get("QUOTE_HISTORY", [])
             return hist if isinstance(hist, list) else []
+
+    for row in st.session_state.get("existing_day_results_cache", []) or []:
+        row_fid = str(row.get("Fixture_ID", row.get("fixture_id", "")))
+        if row_fid == fid:
+            hist = row.get("QUOTE_HISTORY", [])
+            return hist if isinstance(hist, list) else []
+
     return []
 
 
@@ -5219,10 +5283,15 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
             # --------------------------------------
             # 4) PROTEZIONI SALVATAGGIO
             # --------------------------------------
-            existing_day_results = [
-                r for r in st.session_state.scan_results
-                if r.get("Data") == target_date
-            ]
+            existing_day_results = load_existing_day_results_from_github(use_horizon)
+
+            if not existing_day_results:
+                existing_day_results = [
+                    r for r in st.session_state.scan_results
+                    if r.get("Data") == target_date
+                ]
+
+            st.session_state.existing_day_results_cache = existing_day_results
 
             if not existing_day_results:
                 try:
