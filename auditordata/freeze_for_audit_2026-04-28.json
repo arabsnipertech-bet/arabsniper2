@@ -1,0 +1,685 @@
+{
+  "audit_date": "2026-04-28",
+  "created_at": "2026-04-28T11:03:57",
+  "source_file": "data_day1.json",
+  "matches_count": 25,
+  "primary_counts": {
+    "GOLD": 10,
+    "OVER_L3": 7,
+    "MARKET": 6,
+    "OVER_L1": 2
+  },
+  "canonical_counts": {
+    "gold": 10,
+    "over_l1": 19,
+    "over_l2": 17,
+    "over_l3": 13,
+    "drop": 7,
+    "market": 11,
+    "probe": 1
+  },
+  "legacy_counts": {
+    "GOLD": 10,
+    "BOOST": 13,
+    "STRONG_OVER": 17,
+    "OVER": 19,
+    "DROP": 7,
+    "MARKET": 11,
+    "PROBE": 1
+  },
+  "matches": [
+    {
+      "fixture_id": 1387028,
+      "date": "2026-04-28",
+      "league": "Championship (England)",
+      "match": "Southampton - Ipswich",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1542765,
+      "date": "2026-04-28",
+      "league": "Eredivisie (Netherlands)",
+      "match": "Roda - Waalwijk",
+      "info_raw": "OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.16,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1521587,
+      "date": "2026-04-28",
+      "league": "Esiliiga B (Estonia)",
+      "match": "Levadia U19 - Tartu Kalev",
+      "info_raw": "OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1541776,
+      "date": "2026-04-28",
+      "league": "Iraqi League (Iraq)",
+      "match": "Gharraf - Al Minaa Basra",
+      "info_raw": "MARKET",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "MARKET"
+      ],
+      "primary_signal": "MARKET",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1387576,
+      "date": "2026-04-28",
+      "league": "League One (England)",
+      "match": "Northampton - Barnsley",
+      "info_raw": "MARKET",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": true,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "MARKET",
+        "DROP"
+      ],
+      "primary_signal": "MARKET",
+      "drop_diff": 0.53,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1387577,
+      "date": "2026-04-28",
+      "league": "League One (England)",
+      "match": "Peterborough - Mansfield Town",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 2,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1498030,
+      "date": "2026-04-28",
+      "league": "Liga Revelação U23 (Portugal)",
+      "match": "Academico Viseu U23 - Leixões U23",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 2,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1498031,
+      "date": "2026-04-28",
+      "league": "Liga Revelação U23 (Portugal)",
+      "match": "Benfica U23 - Famalicão U23",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1498102,
+      "date": "2026-04-28",
+      "league": "Liga Revelação U23 (Portugal)",
+      "match": "Estoril U23 - Gil Vicente U23",
+      "info_raw": "MARKET",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": true,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "MARKET",
+        "DROP"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.05,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1498105,
+      "date": "2026-04-28",
+      "league": "Liga Revelação U23 (Portugal)",
+      "match": "Portimonense U23 - Farense U23",
+      "info_raw": "MARKET",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "MARKET"
+      ],
+      "primary_signal": "MARKET",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1498033,
+      "date": "2026-04-28",
+      "league": "Liga Revelação U23 (Portugal)",
+      "match": "Santa Clara U23 - Sporting CP U23",
+      "info_raw": "MARKET",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "MARKET"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1498032,
+      "date": "2026-04-28",
+      "league": "Liga Revelação U23 (Portugal)",
+      "match": "Torreense U23 - Sporting Braga U23",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 2,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.08,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1498103,
+      "date": "2026-04-28",
+      "league": "Liga Revelação U23 (Portugal)",
+      "match": "União Leiria U23 - Rio Ave U23",
+      "info_raw": "MARKET",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "MARKET"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1540710,
+      "date": "2026-04-28",
+      "league": "Ligat Ha'al (Israel)",
+      "match": "Maccabi Tel Aviv - Hapoel Beer Sheva",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1542792,
+      "date": "2026-04-28",
+      "league": "National League - South (England)",
+      "match": "Hemel Hempstead Town - Weston-super-Mare",
+      "info_raw": "MARKET",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "MARKET"
+      ],
+      "primary_signal": "MARKET",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1542239,
+      "date": "2026-04-28",
+      "league": "Non League Premier - Northern (England)",
+      "match": "United of Manchester - Rylands",
+      "info_raw": "MARKET ⚽⚽",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER",
+        "MARKET"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1535360,
+      "date": "2026-04-28",
+      "league": "Premier League (Bahrain)",
+      "match": "Al Shabab - Bahrain SC",
+      "info_raw": "MARKET ⚽⚽",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "MARKET"
+      ],
+      "primary_signal": "MARKET",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1533617,
+      "date": "2026-04-28",
+      "league": "Premier League (Egypt)",
+      "match": "El Mokawloon - Ghazl El Mehalla",
+      "info_raw": "OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1533618,
+      "date": "2026-04-28",
+      "league": "Premier League (Egypt)",
+      "match": "Kahraba Ismailia - National Bank of Egypt",
+      "info_raw": "MARKET ⚽⚽",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "MARKET"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.04,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1436175,
+      "date": "2026-04-28",
+      "league": "Pro League (Saudi-Arabia)",
+      "match": "Al Khaleej Saihat - Al Najma",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1436178,
+      "date": "2026-04-28",
+      "league": "Pro League (Saudi-Arabia)",
+      "match": "NEOM - Al-Hazm",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.07,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1512354,
+      "date": "2026-04-28",
+      "league": "Reserve League (Argentina)",
+      "match": "Gimnasia La Plata Res. - Tigre Res.",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "DROP",
+        "PROBE"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.05,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1512359,
+      "date": "2026-04-28",
+      "league": "Reserve League (Argentina)",
+      "match": "Newell's Old Boys Res. - Central Córdoba SdE Res.",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 2,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.05,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1512361,
+      "date": "2026-04-28",
+      "league": "Reserve League (Argentina)",
+      "match": "Sarmiento Res. - River Plate Res.",
+      "info_raw": "MARKET ⚽⚽",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "MARKET"
+      ],
+      "primary_signal": "MARKET",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1542211,
+      "date": "2026-04-28",
+      "league": "Suomen Cup (Finland)",
+      "match": "SalPa - Turku PS",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    }
+  ]
+}
