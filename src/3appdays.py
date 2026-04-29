@@ -4435,10 +4435,10 @@ def build_signal_package(fid, mk, s_h, s_a):
     tags = []
     if gold_ok:
         tags = ["GOLD"]
-    elif pt_ok:
-        tags = ["PT"]
     elif over_ok:
         tags = ["OVER"]
+    elif pt_ok:
+        tags = ["PT"]
     elif market_ok:
         tags = ["MARKET"]
     elif probe_ok:
