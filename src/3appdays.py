@@ -4360,29 +4360,45 @@ def build_signal_package(fid, mk, s_h, s_a):
         )
     )
 
+# --- NUOVO: Filtro Deviazione Standard per blindare il GOLD ---
+    ft_sd_avg = safe_float(lambda_pack.get("ft_sd_avg", 9.9), 9.9)
+
+# --- NUOVO: Gate indipendente per il PT ---
+    pt_ok = bool(
+        pt_score >= 4.50
+        and combined_ht_clean >= 0.90
+        and structure_score >= 0.85
+        and one_sided_risk <= 1.40
+        and not has_fatal_warning
+        and (edge_o05ht >= 0.00 or drop_confirmed)
+    )
+
     gold_ok = bool(
-        (
-            over_ok
-            and over_score >= 4.80
-            and combined_ft_clean >= 1.58
-            and structure_score >= 1.00
-            and one_sided_risk <= 1.35
-            and (
-                market_ok
-                or inv_ok
-                or drop_medium_or_strong
+        ft_sd_avg <= 1.65  # PROTEZIONE: Esclude le squadre irregolari
+        and (
+            (
+                over_ok
+                and over_score >= 4.80
+                and combined_ft_clean >= 1.58
+                and structure_score >= 1.00
+                and one_sided_risk <= 1.20  # ERA 1.35: Tolleranza ridotta
+                and (
+                    market_ok
+                    or inv_ok
+                    or drop_medium_or_strong
+                )
             )
-        )
-        or
-        (
-            probe_ok
-            and over_score >= 4.35
-            and coherence_score >= 1.05
-            and one_sided_risk <= 1.25
-            and (
-                market_ok
-                or inv_ok
-                or drop_strong_only
+            or
+            (
+                probe_ok
+                and over_score >= 4.35
+                and coherence_score >= 1.05
+                and one_sided_risk <= 1.10  # ERA 1.25: Tolleranza ridotta
+                and (
+                    market_ok
+                    or inv_ok
+                    or drop_strong_only
+                )
             )
         )
     )
@@ -4415,11 +4431,14 @@ def build_signal_package(fid, mk, s_h, s_a):
         )
     )
 
+    # --- AGGIORNATO: Gerarchia con il PT in chiaro ---
     tags = []
     if gold_ok:
         tags = ["GOLD"]
     elif over_ok:
         tags = ["OVER"]
+    elif pt_ok:
+        tags = ["PT"]
     elif market_ok:
         tags = ["MARKET"]
     elif probe_ok:
@@ -4588,7 +4607,7 @@ def should_keep_match(signal_pack):
         return bool(
             combined_ft_clean >= 1.52
             and structure_score >= 0.95
-            and one_sided_risk <= 1.45
+            and one_sided_risk <= 1.20  # ERA 1.45: Nessun match asimmetrico passa come oro
             and coherence_score >= 1.00
         )
 
@@ -4596,8 +4615,16 @@ def should_keep_match(signal_pack):
         return bool(
             combined_ft_clean >= 1.52
             and structure_score >= 0.95
-            and one_sided_risk <= 1.60
+            and one_sided_risk <= 1.50  # ERA 1.60: Lieve stretta
             and edge_o25 >= 0.00
+        )
+
+    # --- NUOVO: La dogana accetta il PT ---
+    if label == "PT":
+        return bool(
+            safe_float(scores.get("pt", 0.0), 0.0) >= 4.50
+            and combined_ft_clean >= 1.45  # Serve comunque un paracadute di liquidità FT
+            and one_sided_risk <= 1.50
         )
 
     if label == "MARKET":
