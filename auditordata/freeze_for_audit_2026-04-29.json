@@ -1,37 +1,67 @@
 {
   "audit_date": "2026-04-29",
-  "created_at": "2026-04-29T08:09:44",
+  "created_at": "2026-04-29T10:38:37",
   "source_file": "data_day1.json",
-  "matches_count": 58,
+  "matches_count": 68,
   "primary_counts": {
-    "OVER_L3": 17,
-    "GOLD": 20,
-    "OVER_L1": 12,
-    "OVER_L2": 2,
-    "PROBE": 4,
-    "MARKET": 3
+    "GOLD": 19,
+    "OVER_L3": 24,
+    "OVER_L1": 13,
+    "OVER_L2": 3,
+    "MARKET": 4,
+    "PROBE": 5
   },
   "canonical_counts": {
-    "over_l1": 51,
-    "over_l2": 37,
-    "over_l3": 33,
-    "market": 7,
-    "gold": 20,
-    "drop": 11,
-    "probe": 4,
-    "inv": 1
+    "gold": 19,
+    "over_l1": 59,
+    "over_l2": 44,
+    "over_l3": 40,
+    "drop": 19,
+    "market": 12,
+    "inv": 3,
+    "probe": 5,
+    "pt": 2
   },
   "legacy_counts": {
-    "BOOST": 33,
-    "STRONG_OVER": 37,
-    "OVER": 51,
-    "MARKET": 7,
-    "GOLD": 20,
-    "DROP": 11,
-    "PROBE": 4,
-    "INV": 1
+    "GOLD": 19,
+    "BOOST": 40,
+    "STRONG_OVER": 44,
+    "OVER": 59,
+    "DROP": 19,
+    "MARKET": 12,
+    "INV": 3,
+    "PROBE": 5,
+    "PT": 2
   },
   "matches": [
+    {
+      "fixture_id": 1388270,
+      "date": "2026-04-29",
+      "league": "2. SNL (Slovenia)",
+      "match": "Dekani - Brinje-Grosuplje",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.13,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
     {
       "fixture_id": 1487475,
       "date": "2026-04-29",
@@ -43,7 +73,7 @@
         "over_level": 3,
         "pt": false,
         "market": true,
-        "drop": false,
+        "drop": true,
         "inv": false,
         "probe": false
       },
@@ -51,10 +81,11 @@
         "BOOST",
         "STRONG_OVER",
         "OVER",
-        "MARKET"
+        "MARKET",
+        "DROP"
       ],
       "primary_signal": "OVER_L3",
-      "drop_diff": 0.0,
+      "drop_diff": 0.1,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -83,6 +114,31 @@
       ],
       "primary_signal": "GOLD",
       "drop_diff": 0.12,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1487479,
+      "date": "2026-04-29",
+      "league": "3. liga - MSFL (Czech-Republic)",
+      "match": "Start Brno - Frýdek-Místek",
+      "info_raw": "MARKET ⚽⚽",
+      "canonical": {
+        "gold": false,
+        "over_level": 1,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "OVER",
+        "MARKET"
+      ],
+      "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -212,7 +268,7 @@
         "DROP"
       ],
       "primary_signal": "OVER_L1",
-      "drop_diff": 0.43,
+      "drop_diff": 0.42,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -222,49 +278,53 @@
       "date": "2026-04-29",
       "league": "Coppa Italia Primavera (Italy)",
       "match": "Atalanta U20 - Juventus U20",
-      "info_raw": "GOLD",
+      "info_raw": "GOLD ⚽⚽",
       "canonical": {
         "gold": true,
         "over_level": 2,
         "pt": false,
         "market": false,
-        "drop": false,
-        "inv": false,
+        "drop": true,
+        "inv": true,
         "probe": false
       },
       "legacy_tags": [
         "GOLD",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "DROP",
+        "INV"
       ],
       "primary_signal": "GOLD",
-      "drop_diff": 0.0,
-      "has_inversion": false,
-      "inv_from": "",
-      "inv_to": ""
+      "drop_diff": 0.27,
+      "has_inversion": true,
+      "inv_from": "2",
+      "inv_to": "1"
     },
     {
       "fixture_id": 1539634,
       "date": "2026-04-29",
       "league": "Cup (Armenia)",
       "match": "FC Noah - Ararat-Armenia",
-      "info_raw": "OVER",
+      "info_raw": "GOLD",
       "canonical": {
-        "gold": false,
+        "gold": true,
         "over_level": 3,
         "pt": false,
         "market": false,
-        "drop": false,
+        "drop": true,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
+        "GOLD",
         "BOOST",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "DROP"
       ],
-      "primary_signal": "OVER_L3",
-      "drop_diff": 0.0,
+      "primary_signal": "GOLD",
+      "drop_diff": 0.2,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -393,6 +453,59 @@
       ],
       "primary_signal": "OVER_L1",
       "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1542766,
+      "date": "2026-04-29",
+      "league": "Eredivisie (Netherlands)",
+      "match": "Den Bosch - Almere City FC",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.08,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1542626,
+      "date": "2026-04-29",
+      "league": "Gamma Ethniki - Promotion Group (Greece)",
+      "match": "Aris Petroupolis - Zakynthos",
+      "info_raw": "MARKET",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": true,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "MARKET",
+        "DROP"
+      ],
+      "primary_signal": "MARKET",
+      "drop_diff": 0.12,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -863,9 +976,9 @@
       "date": "2026-04-29",
       "league": "Ligat Ha'al (Israel)",
       "match": "Hapoel Haifa - Ironi Tiberias",
-      "info_raw": "GOLD",
+      "info_raw": "OVER",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 3,
         "pt": false,
         "market": false,
@@ -874,12 +987,11 @@
         "probe": false
       },
       "legacy_tags": [
-        "GOLD",
         "BOOST",
         "STRONG_OVER",
         "OVER"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "OVER_L3",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -969,22 +1081,22 @@
       "date": "2026-04-29",
       "league": "National League (England)",
       "match": "Boreham Wood - Forest Green",
-      "info_raw": "GOLD",
+      "info_raw": "MARKET",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 2,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "OVER_L2",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -1040,28 +1152,55 @@
       "inv_to": ""
     },
     {
-      "fixture_id": 1543038,
+      "fixture_id": 1543037,
       "date": "2026-04-29",
       "league": "Non League Premier - Isthmian (England)",
-      "match": "Billericay Town - Chatham Town",
-      "info_raw": "GOLD",
+      "match": "Aveley - Brentwood Town",
+      "info_raw": "MARKET ⚽⚽",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 3,
         "pt": false,
-        "market": false,
+        "market": true,
         "drop": false,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
-        "GOLD",
         "BOOST",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "MARKET"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "OVER_L3",
       "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1543038,
+      "date": "2026-04-29",
+      "league": "Non League Premier - Isthmian (England)",
+      "match": "Billericay Town - Chatham Town",
+      "info_raw": "OVER ⚽⚽",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": true,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "DROP"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.1,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -1071,7 +1210,7 @@
       "date": "2026-04-29",
       "league": "Non League Premier - Southern Central (England)",
       "match": "Real Bedford - Kettering Town",
-      "info_raw": "MARKET",
+      "info_raw": "MARKET ⚽⚽",
       "canonical": {
         "gold": false,
         "over_level": 3,
@@ -1118,13 +1257,67 @@
       "inv_to": ""
     },
     {
+      "fixture_id": 1542797,
+      "date": "2026-04-29",
+      "league": "Non League Premier - Southern South (England)",
+      "match": "Gloucester City - Poole Town",
+      "info_raw": "PT ⚽⚽",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": true,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "PT"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1531664,
+      "date": "2026-04-29",
+      "league": "PFL (Philippines)",
+      "match": "Taguig - Manila Digger",
+      "info_raw": "OVER",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": true,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "INV"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.0,
+      "has_inversion": true,
+      "inv_from": "1",
+      "inv_to": "2"
+    },
+    {
       "fixture_id": 1535357,
       "date": "2026-04-29",
       "league": "Premier League (Bahrain)",
       "match": "Muharraq - Budaiya",
-      "info_raw": "GOLD",
+      "info_raw": "OVER",
       "canonical": {
-        "gold": true,
+        "gold": false,
         "over_level": 3,
         "pt": false,
         "market": false,
@@ -1133,12 +1326,35 @@
         "probe": false
       },
       "legacy_tags": [
-        "GOLD",
         "BOOST",
         "STRONG_OVER",
         "OVER"
       ],
-      "primary_signal": "GOLD",
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.03,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1533619,
+      "date": "2026-04-29",
+      "league": "Premier League (Egypt)",
+      "match": "El Gouna FC - Haras El Hodood",
+      "info_raw": "PROBE",
+      "canonical": {
+        "gold": false,
+        "over_level": 0,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": true
+      },
+      "legacy_tags": [
+        "PROBE"
+      ],
+      "primary_signal": "PROBE",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -1193,10 +1409,10 @@
       "inv_to": ""
     },
     {
-      "fixture_id": 1516323,
+      "fixture_id": 1516324,
       "date": "2026-04-29",
       "league": "Premier League (Uganda)",
-      "match": "Police - UPDF",
+      "match": "KCCA - Vipers",
       "info_raw": "OVER",
       "canonical": {
         "gold": false,
@@ -1211,6 +1427,33 @@
         "OVER"
       ],
       "primary_signal": "OVER_L1",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1516323,
+      "date": "2026-04-29",
+      "league": "Premier League (Uganda)",
+      "match": "Police - UPDF",
+      "info_raw": "MARKET ⚽⚽",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": false,
+        "market": true,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "MARKET"
+      ],
+      "primary_signal": "OVER_L3",
       "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
@@ -1288,6 +1531,33 @@
         "BOOST",
         "STRONG_OVER",
         "OVER"
+      ],
+      "primary_signal": "OVER_L3",
+      "drop_diff": 0.0,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1409921,
+      "date": "2026-04-29",
+      "league": "Regionalliga - West (Germany)",
+      "match": "Sportfreunde Lotte - FC Bocholt",
+      "info_raw": "PT",
+      "canonical": {
+        "gold": false,
+        "over_level": 3,
+        "pt": true,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "BOOST",
+        "STRONG_OVER",
+        "OVER",
+        "PT"
       ],
       "primary_signal": "OVER_L3",
       "drop_diff": 0.0,
@@ -1408,17 +1678,18 @@
         "over_level": 3,
         "pt": false,
         "market": false,
-        "drop": false,
+        "drop": true,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
         "BOOST",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "DROP"
       ],
       "primary_signal": "OVER_L3",
-      "drop_diff": 0.0,
+      "drop_diff": 0.15,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -1472,7 +1743,7 @@
         "DROP"
       ],
       "primary_signal": "OVER_L3",
-      "drop_diff": 0.08,
+      "drop_diff": 0.26,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
