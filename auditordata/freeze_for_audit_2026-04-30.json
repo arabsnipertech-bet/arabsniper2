@@ -1,6 +1,6 @@
 {
   "audit_date": "2026-04-30",
-  "created_at": "2026-04-30T10:39:18",
+  "created_at": "2026-04-30T11:02:03",
   "source_file": "data_day1.json",
   "matches_count": 32,
   "primary_counts": {
@@ -16,7 +16,7 @@
     "over_l1": 23,
     "over_l2": 23,
     "over_l3": 21,
-    "drop": 10,
+    "drop": 11,
     "inv": 2,
     "gold": 8,
     "market": 2,
@@ -27,7 +27,7 @@
     "BOOST": 21,
     "STRONG_OVER": 23,
     "OVER": 23,
-    "DROP": 10,
+    "DROP": 11,
     "INV": 2,
     "GOLD": 8,
     "MARKET": 2,
@@ -320,7 +320,7 @@
         "DROP"
       ],
       "primary_signal": "OVER_L3",
-      "drop_diff": 0.05,
+      "drop_diff": 0.1,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -673,17 +673,18 @@
         "over_level": 3,
         "pt": false,
         "market": false,
-        "drop": false,
+        "drop": true,
         "inv": false,
         "probe": false
       },
       "legacy_tags": [
         "BOOST",
         "STRONG_OVER",
-        "OVER"
+        "OVER",
+        "DROP"
       ],
       "primary_signal": "OVER_L3",
-      "drop_diff": 0.0,
+      "drop_diff": 0.1,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
