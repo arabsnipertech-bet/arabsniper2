@@ -4692,7 +4692,27 @@ def save_match_details_file():
 
 def build_day_results(day_num):
     target_date = get_target_dates()[day_num - 1]
-    results = [r for r in st.session_state.scan_results if r.get("Data") == target_date]
+
+    results = []
+
+    for r in st.session_state.scan_results:
+        if str(r.get("Data", "")).strip() != target_date:
+            continue
+
+        status = str(r.get("status", "")).lower().strip()
+        missing_count = int(r.get("missing_count", 0) or 0)
+        live_hold = bool(r.get("LIVE_HOLD", False))
+
+        # FIX DEFINITIVO:
+        # non mandare in HTML partite vecchie/stale/non aggiornabili
+        if status == "stale":
+            continue
+
+        if live_hold and missing_count >= 2:
+            continue
+
+        results.append(r)
+
     results.sort(key=lambda x: x.get("Ora", "99:99"))
     return results
 
