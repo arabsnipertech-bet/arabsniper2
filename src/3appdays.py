@@ -5412,6 +5412,19 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
 
             merged_day_results = merge_day_rows(old_day_results, final_list)
 
+            # FIX ANTI-STORICO DAY1:
+            # dopo il merge, eliminiamo qualunque riga vecchia/stale/live hold
+            # prima che finisca in data_dayX.json e data.json
+            merged_day_results = [
+                r for r in merged_day_results
+                if str(r.get("Data", "")).strip() == target_date
+                and str(r.get("status", "")).lower().strip() != "stale"
+                and not (
+                    bool(r.get("LIVE_HOLD", False))
+                    and int(r.get("missing_count", 0) or 0) >= 2
+                )
+            ]
+
             other_days_results = [
                 r for r in st.session_state.scan_results
                 if r.get("Data") != target_date
