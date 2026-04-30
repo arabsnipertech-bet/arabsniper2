@@ -4855,11 +4855,28 @@ def merge_day_rows(old_rows: list, new_rows: list) -> list:
     old_rows = old_rows or []
     new_rows = new_rows or []
 
+    # FIX CHIRURGICO:
+    # il giorno valido viene preso dai nuovi risultati reali dello scan.
+    # Serve a non trascinare partite di ieri dentro il nuovo Day1.
+    target_date = ""
+    for r in new_rows:
+        d = str(r.get("Data", "")).strip()
+        if d:
+            target_date = d
+            break
+
     old_map = {}
     for row in old_rows:
         fid = row.get("Fixture_ID", row.get("fixture_id"))
-        if fid is not None:
-            old_map[str(fid)] = dict(row)
+        if fid is None:
+            continue
+
+        # Se la vecchia riga non è della data che stiamo aggiornando,
+        # NON va preservata. Questo elimina Giappone/Asia del giorno prima.
+        if target_date and str(row.get("Data", "")).strip() != target_date:
+            continue
+
+        old_map[str(fid)] = dict(row)
 
     new_map = {}
     for row in new_rows:
@@ -4888,7 +4905,6 @@ def merge_day_rows(old_rows: list, new_rows: list) -> list:
         )
     )
     return merged_rows
-
 
 #====================================
 # SCAN CORE V25
