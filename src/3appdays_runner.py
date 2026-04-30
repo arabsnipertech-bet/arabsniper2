@@ -4,7 +4,7 @@ import json
 import argparse
 import subprocess
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -270,6 +270,72 @@ def update_last_fast_update(mode: str, command: str, returncode: int) -> dict:
 
     return payload
 
+def sanitize_day_output(day_num: int, update_main: bool = False) -> None:
+    """
+    Pulizia finale anti-partite vecchie/stale/live_hold.
+    Non usa API. Pulisce solo i JSON già generati e li ripubblica su GitHub.
+    """
+    target_date = (datetime.now(ROME_TZ).date() + timedelta(days=day_num - 1)).strftime("%Y-%m-%d")
+
+    data_path = PROJECT_ROOT / DAY_FILES[day_num]["data"]
+    rows = safe_read_json(data_path, [])
+
+    if not isinstance(rows, list):
+        rows = []
+
+    clean_rows = []
+
+    for r in rows:
+        if not isinstance(r, dict):
+            continue
+
+        row_date = str(r.get("Data", "")).strip()
+        status = str(r.get("status", "")).lower().strip()
+        live_hold = bool(r.get("LIVE_HOLD", False))
+
+        try:
+            missing_count = int(r.get("missing_count", 0) or 0)
+        except Exception:
+            missing_count = 0
+
+        if row_date != target_date:
+            continue
+
+        if status in ("stale", "live_hold"):
+            continue
+
+        if live_hold:
+            continue
+
+        if missing_count > 0:
+            continue
+
+        clean_rows.append(r)
+
+    clean_rows.sort(key=lambda x: (x.get("Ora", "99:99"), x.get("Match", "")))
+
+    safe_write_json(data_path, clean_rows)
+
+    gh_day = github_write_json(
+        DAY_FILES[day_num]["data"],
+        clean_rows,
+        f"Sanitize ArabSniper Day {day_num}"
+    )
+
+    log(f"🧹 SANITIZE DAY{day_num}: {len(rows)} -> {len(clean_rows)} | GitHub={gh_day}")
+
+    if update_main:
+        main_path = PROJECT_ROOT / "data/data.json"
+        safe_write_json(main_path, clean_rows)
+
+        gh_main = github_write_json(
+            REMOTE_MAIN_FILE,
+            clean_rows,
+            "Sanitize ArabSniper Main Data"
+        )
+
+        log(f"🧹 SANITIZE data.json: {len(clean_rows)} righe | GitHub={gh_main}")
+
 
 # =========================================================
 # ENGINE EXECUTION
@@ -355,10 +421,12 @@ def run_night_workflow() -> None:
     })
 
     if report["returncode"] != 0:
-        log("NIGHT WORKFLOW END -> ERRORE")
+        log("FAST WORKFLOW END -> ERRORE")
         raise SystemExit(1)
 
-    log("NIGHT WORKFLOW END -> OK")
+    sanitize_day_output(1, update_main=True)
+
+    log("FAST WORKFLOW END -> OK")
     log("=====================================")
 
 
@@ -462,6 +530,9 @@ def run_fast_pair_workflow() -> None:
         "last_fast_update": last_update_payload,
     })
 
+    sanitize_day_output(1, update_main=True)
+    sanitize_day_output(2, update_main=False)
+    
     log("FAST PAIR WORKFLOW END -> OK")
     log("=====================================")
 
