@@ -1,35 +1,35 @@
 {
   "audit_date": "2026-05-04",
-  "created_at": "2026-05-04T09:26:38",
+  "created_at": "2026-05-04T11:03:35",
   "source_file": "data_day1.json",
-  "matches_count": 34,
+  "matches_count": 35,
   "primary_counts": {
     "OVER_L3": 15,
     "MARKET": 4,
-    "GOLD": 6,
+    "GOLD": 7,
     "OVER_L2": 3,
     "PROBE": 3,
     "OVER_L1": 3
   },
   "canonical_counts": {
-    "over_l1": 27,
-    "over_l2": 23,
-    "over_l3": 20,
-    "market": 6,
-    "gold": 6,
-    "drop": 10,
-    "probe": 5,
+    "over_l1": 28,
+    "over_l2": 24,
+    "over_l3": 21,
+    "market": 7,
+    "gold": 7,
+    "drop": 11,
+    "probe": 4,
     "inv": 2,
     "pt": 2
   },
   "legacy_counts": {
-    "BOOST": 20,
-    "STRONG_OVER": 23,
-    "OVER": 27,
-    "MARKET": 6,
-    "GOLD": 6,
-    "DROP": 10,
-    "PROBE": 5,
+    "BOOST": 21,
+    "STRONG_OVER": 24,
+    "OVER": 28,
+    "MARKET": 7,
+    "GOLD": 7,
+    "DROP": 11,
+    "PROBE": 4,
     "INV": 2,
     "PT": 2
   },
@@ -506,23 +506,24 @@
       "date": "2026-05-04",
       "league": "Ligat Ha'al (Israel)",
       "match": "Bnei Sakhnin - Maccabi Bnei Raina",
-      "info_raw": "PROBE",
+      "info_raw": "MARKET",
       "canonical": {
         "gold": false,
         "over_level": 2,
         "pt": false,
-        "market": false,
-        "drop": false,
+        "market": true,
+        "drop": true,
         "inv": false,
-        "probe": true
+        "probe": false
       },
       "legacy_tags": [
         "STRONG_OVER",
         "OVER",
-        "PROBE"
+        "MARKET",
+        "DROP"
       ],
       "primary_signal": "OVER_L2",
-      "drop_diff": 0.0,
+      "drop_diff": 0.07,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -680,7 +681,7 @@
         "OVER"
       ],
       "primary_signal": "OVER_L3",
-      "drop_diff": 0.0,
+      "drop_diff": 0.03,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
@@ -769,7 +770,7 @@
       "date": "2026-05-04",
       "league": "Segunda Liga (Portugal)",
       "match": "Torreense - Penafiel",
-      "info_raw": "OVER",
+      "info_raw": "OVER ⚽⚽",
       "canonical": {
         "gold": false,
         "over_level": 1,
@@ -860,6 +861,33 @@
       ],
       "primary_signal": "OVER_L1",
       "drop_diff": 0.12,
+      "has_inversion": false,
+      "inv_from": "",
+      "inv_to": ""
+    },
+    {
+      "fixture_id": 1522312,
+      "date": "2026-05-04",
+      "league": "Super Liga (Moldova)",
+      "match": "Politehnica UTM - Spartanii Selemet",
+      "info_raw": "GOLD",
+      "canonical": {
+        "gold": true,
+        "over_level": 3,
+        "pt": false,
+        "market": false,
+        "drop": false,
+        "inv": false,
+        "probe": false
+      },
+      "legacy_tags": [
+        "GOLD",
+        "BOOST",
+        "STRONG_OVER",
+        "OVER"
+      ],
+      "primary_signal": "GOLD",
+      "drop_diff": 0.0,
       "has_inversion": false,
       "inv_from": "",
       "inv_to": ""
