@@ -4595,6 +4595,16 @@ def should_keep_match(signal_pack):
     value_left = market_pack.get("value_left", "unknown")
     warning_flags = market_pack.get("warning_flags", []) or []
 
+    # --- INIZIO FIX: OVERRIDE ASSOLUTO DIAMOND SNIPER ---
+    edge_level = signal_pack.get("edge_level_o25", "NONE")
+    market_is_pushing = "MARKET" in tags
+    
+    # Se ha un edge matematico fortissimo e i volumi di mercato confermano, 
+    # salta i filtri restrittivi e tienila per la valutazione finale Elite
+    if edge_level in ("ELITE", "STRONG") and market_is_pushing:
+        return True
+    # --- FINE FIX ---
+
     if any(w in {"favorite_ultra_but_ft_structure_weak", "market_value_trap"} for w in warning_flags):
         return False
 
@@ -4947,17 +4957,43 @@ def refine_arabsniper_signal(row):
     if flags["pt"]:
         tags.append("PT")
 
-    if over_level >= 2 and flags["market"] and (flags["ball2"] or flags["inv"] or drop["drop_class"] in ("soft", "mid")):
+    # --- INIZIO FIX: NUOVA LOGICA SNIPER ELITE (DIAMOND) ---
+    # Recuperiamo l'edge matematico
+    edge_level = str(row.get("EDGE_LEVEL_O25", "NONE")).upper()
+
+    # Rileviamo se c'è una trappola dei bookmaker in corso
+    is_drop_trap = drop["drop_class"] in ("big", "hard") and not flags["market"] and not flags["inv"]
+
+    # Condizione stringente per il cecchino: 
+    # Alta probabilità matematica + Score FT solido + Pressione di mercato reale + Nessuna trappola
+    is_sniper_elite = (
+        edge_level in ("ELITE", "STRONG")
+        and ft_score >= 2.0
+        and flags["market"]
+        and not is_drop_trap
+    )
+
+    if is_sniper_elite:
+        elite = True
+        tier = "SNIPER_ELITE"
+        priority = 100  # Priorità massima assoluta, sarà sempre il primo match
+        badges.append("💎 DIAMOND SNIPER")
+        if "DIAMOND" not in tags:
+            tags.insert(0, "DIAMOND")
+            
+    # --- FINE FIX LOGICA ELITE ---
+
+    elif over_level >= 2 and flags["market"] and (flags["ball2"] or flags["inv"] or drop["drop_class"] in ("soft", "mid")):
         elite = True
         tier = "ELITE_MARKET_OVER"
         priority = 95
-        badges.append("💎 ELITE")
+        badges.append("🔥 ELITE MARKET")
 
     elif flags["gold"] and over_level >= 3 and (flags["market"] or flags["inv"]):
         elite = True
         tier = "ELITE_GOLD_CONFIRMED"
         priority = 90
-        badges.append("💎 GOLD+")
+        badges.append("🟡 GOLD+")
 
     elif over_level >= 2 and flags["market"]:
         tier = "STRONG_MARKET_OVER"
