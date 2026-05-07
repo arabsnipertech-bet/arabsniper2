@@ -1,13 +1,13 @@
 {
   "audit_date": "2026-05-06",
-  "generated_at": "2026-05-07T11:43:04",
+  "generated_at": "2026-05-07T11:46:41",
   "counts": {
     "freeze_matches": 41,
-    "api_found": 39,
-    "finished_matches": 39,
-    "analyzed_rows": 39,
+    "api_found": 41,
+    "finished_matches": 41,
+    "analyzed_rows": 41,
     "skipped_not_finished": 0,
-    "skipped_no_result": 2
+    "skipped_no_result": 0
   },
   "canonical_stats": {
     "gold": {
@@ -16,9 +16,9 @@
       "rate": 87.5
     },
     "over_l1": {
-      "total": 5,
-      "hit": 1,
-      "rate": 20.0
+      "total": 6,
+      "hit": 2,
+      "rate": 33.33
     },
     "over_l2": {
       "total": 1,
@@ -31,24 +31,24 @@
       "rate": 69.23
     },
     "pt": {
-      "total": 11,
-      "hit": 7,
-      "rate": 63.64
+      "total": 13,
+      "hit": 8,
+      "rate": 61.54
     },
     "market": {
-      "total": 11,
-      "hit": 6,
-      "rate": 54.55
+      "total": 13,
+      "hit": 8,
+      "rate": 61.54
     },
     "drop": {
-      "total": 39,
-      "hit": 23,
-      "rate": 58.97
+      "total": 41,
+      "hit": 25,
+      "rate": 60.98
     },
     "inv": {
-      "total": 0,
-      "hit": 0,
-      "rate": 0.0
+      "total": 1,
+      "hit": 1,
+      "rate": 100.0
     },
     "probe": {
       "total": 3,
@@ -78,29 +78,29 @@
       "rate": 0.0
     },
     "over_market": {
-      "total": 8,
-      "hit": 5,
-      "rate": 62.5
+      "total": 9,
+      "hit": 6,
+      "rate": 66.67
     },
     "pt_market": {
-      "total": 7,
-      "hit": 4,
-      "rate": 57.14
+      "total": 9,
+      "hit": 5,
+      "rate": 55.56
     },
     "market_drop": {
-      "total": 11,
-      "hit": 6,
-      "rate": 54.55
+      "total": 13,
+      "hit": 8,
+      "rate": 61.54
     },
     "market_inv": {
-      "total": 0,
-      "hit": 0,
-      "rate": 0.0
+      "total": 1,
+      "hit": 1,
+      "rate": 100.0
     },
     "drop_inv": {
-      "total": 0,
-      "hit": 0,
-      "rate": 0.0
+      "total": 1,
+      "hit": 1,
+      "rate": 100.0
     },
     "probe_market": {
       "total": 0,
@@ -120,9 +120,9 @@
       "rate": 0.0
     },
     "OVER": {
-      "total": 32,
-      "hit": 20,
-      "rate": 62.5
+      "total": 33,
+      "hit": 21,
+      "rate": 63.64
     },
     "STRONG_OVER": {
       "total": 27,
@@ -140,19 +140,19 @@
       "rate": 87.5
     },
     "MARKET": {
-      "total": 11,
-      "hit": 6,
-      "rate": 54.55
+      "total": 13,
+      "hit": 8,
+      "rate": 61.54
     },
     "DROP": {
-      "total": 39,
-      "hit": 23,
-      "rate": 58.97
+      "total": 41,
+      "hit": 25,
+      "rate": 60.98
     },
     "INV": {
-      "total": 0,
-      "hit": 0,
-      "rate": 0.0
+      "total": 1,
+      "hit": 1,
+      "rate": 100.0
     },
     "PROBE": {
       "total": 3,
@@ -167,9 +167,9 @@
       "rate": 100.0
     },
     "market_validator": {
-      "total": 11,
-      "hit": 6,
-      "rate": 54.55
+      "total": 13,
+      "hit": 8,
+      "rate": 61.54
     },
     "ft_ball2": {
       "total": 4,
@@ -177,23 +177,23 @@
       "rate": 100.0
     },
     "ft_over_plus": {
-      "total": 17,
-      "hit": 13,
-      "rate": 76.47
+      "total": 18,
+      "hit": 14,
+      "rate": 77.78
     },
     "ft_monitor": {
-      "total": 11,
-      "hit": 5,
-      "rate": 45.45
+      "total": 12,
+      "hit": 6,
+      "rate": 50.0
     },
     "ht_watch": {
-      "total": 10,
-      "hit": 6,
-      "rate": 60.0
+      "total": 12,
+      "hit": 7,
+      "rate": 58.33
     },
     "ht_pt": {
-      "total": 5,
-      "hit": 5,
+      "total": 6,
+      "hit": 6,
       "rate": 100.0
     },
     "drop_trap": {
@@ -247,9 +247,9 @@
       "rate": 66.67
     },
     "drop_hard": {
-      "total": 4,
-      "hit": 3,
-      "rate": 75.0
+      "total": 6,
+      "hit": 5,
+      "rate": 83.33
     }
   },
   "settlement_rules": {
