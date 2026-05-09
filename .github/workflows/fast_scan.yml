@@ -40,5 +40,5 @@ jobs:
           pip install -r requirements.txt || true
           pip install streamlit requests pandas PyGithub || true
 
-      - name: Run fast pair workflow
-        run: python src/3appdays_runner.py --fast-pair
+      - name: Run fast scan
+        run: python src/3appdays.py --fast
