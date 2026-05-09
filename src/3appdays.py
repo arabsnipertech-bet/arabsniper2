@@ -4315,6 +4315,46 @@ def build_signal_package(fid, mk, s_h, s_a):
         and structure_grade in ("high", "medium")
     )
 
+    # -------------------------------------------------
+    # AUDIT FIX — Anti falsi positivi GOLD/OVER/DROP TRAP
+    # Va qui perché over_ok/probe_ok/gold_ok lo usano dopo.
+    # -------------------------------------------------
+    tempo_tag = str(tempo_pack.get("tempo_tag", "")).upper()
+
+    slow_edge_risk = bool(
+        tempo_tag == "SLOW"
+        and edge_o25 < 0.02
+        and not inv_ok
+    )
+
+    negative_edge_risk = bool(
+        edge_o25 < 0.00
+        and not inv_ok
+        and not drop_confirmed
+    )
+
+    weak_gold_context = bool(
+        tempo_tag == "SLOW"
+        and edge_o25 < 0.04
+        and coherence_score < 1.35
+        and not inv_ok
+    )
+
+    drop_trap_context = bool(
+        drop_medium_or_strong
+        and not inv_ok
+        and not drop_confirmed
+        and edge_o25 < 0.04
+    )
+
+    drop_trap_blacklist = bool(
+        drop_strong_only
+        and not inv_ok
+        and not drop_confirmed
+        and edge_o25 <= 0.00
+        and coherence_score < 1.15
+    )
+
     over_ok = (
         combined_ft_clean >= 1.52
         and structure_ok
@@ -4363,49 +4403,6 @@ def build_signal_package(fid, mk, s_h, s_a):
         )
     )
 
-    # -------------------------------------------------
-    # AUDIT FIX 1 — Anti falsi positivi GOLD/OVER
-    # Non uccide tutti gli SLOW: blocca solo SLOW + edge debole/negativo
-    # -------------------------------------------------
-    tempo_tag = str(tempo_pack.get("tempo_tag", "")).upper()
-
-    slow_edge_risk = bool(
-        tempo_tag == "SLOW"
-        and edge_o25 < 0.02
-        and not market_ok
-        and not inv_ok
-    )
-
-    negative_edge_risk = bool(
-        edge_o25 < 0.00
-        and not market_ok
-        and not inv_ok
-        and not drop_confirmed
-    )
-
-    weak_gold_context = bool(
-        tempo_tag == "SLOW"
-        and edge_o25 < 0.04
-        and coherence_score < 1.35
-        and not inv_ok
-    )
-
-    drop_trap_context = bool(
-        drop_medium_or_strong
-        and not market_ok
-        and not inv_ok
-        and not drop_confirmed
-        and edge_o25 < 0.04
-    )
-
-    drop_trap_blacklist = bool(
-        drop_strong_only
-        and not market_ok
-        and not inv_ok
-        and not drop_confirmed
-        and edge_o25 <= 0.00
-        and coherence_score < 1.15
-    )
 
 # --- NUOVO: Filtro Deviazione Standard per blindare il GOLD ---
     ft_sd_avg = safe_float(lambda_pack.get("ft_sd_avg", 9.9), 9.9)
