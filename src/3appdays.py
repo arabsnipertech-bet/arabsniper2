@@ -4319,6 +4319,8 @@ def build_signal_package(fid, mk, s_h, s_a):
         combined_ft_clean >= 1.52
         and structure_ok
         and edge_o25 >= 0.00
+        and not negative_edge_risk
+        and not drop_trap_blacklist
         and value_left != "low"
         and not has_fatal_warning
         and not has_warning(market_pack, "ft_market_ahead_of_structure")
@@ -4347,6 +4349,7 @@ def build_signal_package(fid, mk, s_h, s_a):
         and one_sided_risk <= 1.75
         and value_left != "low"
         and not has_fatal_warning
+        and not drop_trap_blacklist
         and (
             coherence_score >= 0.95
             or drop_confirmed
@@ -4358,6 +4361,50 @@ def build_signal_package(fid, mk, s_h, s_a):
             and over_score >= 4.80
             and coherence_score >= 1.15
         )
+    )
+
+    # -------------------------------------------------
+    # AUDIT FIX 1 — Anti falsi positivi GOLD/OVER
+    # Non uccide tutti gli SLOW: blocca solo SLOW + edge debole/negativo
+    # -------------------------------------------------
+    tempo_tag = str(tempo_pack.get("tempo_tag", "")).upper()
+
+    slow_edge_risk = bool(
+        tempo_tag == "SLOW"
+        and edge_o25 < 0.02
+        and not market_ok
+        and not inv_ok
+    )
+
+    negative_edge_risk = bool(
+        edge_o25 < 0.00
+        and not market_ok
+        and not inv_ok
+        and not drop_confirmed
+    )
+
+    weak_gold_context = bool(
+        tempo_tag == "SLOW"
+        and edge_o25 < 0.04
+        and coherence_score < 1.35
+        and not inv_ok
+    )
+
+    drop_trap_context = bool(
+        drop_medium_or_strong
+        and not market_ok
+        and not inv_ok
+        and not drop_confirmed
+        and edge_o25 < 0.04
+    )
+
+    drop_trap_blacklist = bool(
+        drop_strong_only
+        and not market_ok
+        and not inv_ok
+        and not drop_confirmed
+        and edge_o25 <= 0.00
+        and coherence_score < 1.15
     )
 
 # --- NUOVO: Filtro Deviazione Standard per blindare il GOLD ---
@@ -4375,6 +4422,11 @@ def build_signal_package(fid, mk, s_h, s_a):
 
     gold_ok = bool(
         ft_sd_avg <= 1.65  # PROTEZIONE: Esclude le squadre irregolari
+        and not slow_edge_risk
+        and not negative_edge_risk
+        and not weak_gold_context
+        and not drop_trap_context
+        and not drop_trap_blacklist
         and (
             (
                 over_ok
@@ -4594,6 +4646,21 @@ def should_keep_match(signal_pack):
     coherence_score = safe_float(market_pack.get("coherence_score", 0.0), 0.0)
     value_left = market_pack.get("value_left", "unknown")
     warning_flags = market_pack.get("warning_flags", []) or []
+
+    drop_visual_level = str(signal_pack.get("drop_visual_level", "none")).lower()
+    market_align_ok = bool(signal_pack.get("market_align_ok", False))
+    inv_present = bool((signal_pack.get("quote_pack", {}) or {}).get("INVERSION", False))
+
+    drop_trap_blacklist = bool(
+        drop_visual_level == "strong"
+        and not market_align_ok
+        and not inv_present
+        and edge_o25 <= 0.00
+        and coherence_score < 1.15
+    )
+
+    if drop_trap_blacklist:
+        return False
 
     # --- INIZIO FIX: OVERRIDE ASSOLUTO DIAMOND SNIPER ---
     edge_level = signal_pack.get("edge_level_o25", "NONE")
@@ -5011,14 +5078,19 @@ def refine_arabsniper_signal(row):
         badges.append("🟢 MARKET")
 
     elif flags["probe"]:
-        tier = "PROBE_HT_ONLY"
-        priority = 52
-        badges.append("🐟 PROBE HT")
+        tier = "PROBE_MONITOR"
+        priority = 38
+        badges.append("🐟 PROBE")
 
     elif over_level >= 3:
         tier = "OVER_BASE"
         priority = 50
         badges.append("OVER BASE")
+
+    elif over_level == 1:
+        tier = "OVER_L1_MONITOR"
+        priority = 30
+        badges.append("OVER L1 MONITOR")
 
     drop_warning = False
     if drop["drop_class"] in ("big", "hard") and not flags["market"] and not flags["inv"]:
@@ -5028,7 +5100,11 @@ def refine_arabsniper_signal(row):
             priority -= 15
 
     ft_tag = ""
-    if ft_score >= 2.50:
+
+    # OVER_L1 non deve spingere tag forti se non ha vera conferma mercato
+    if over_level == 1 and not flags["market"] and not flags["inv"]:
+        ft_tag = ""
+    elif ft_score >= 2.50:
         ft_tag = "⚽⚽ FT"
     elif ft_score >= 1.80:
         ft_tag = "FT OVER+"
