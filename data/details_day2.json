@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-05-10 21:19:27",
+    "updated_at": "2026-05-10 22:58:18",
     "day": 2,
     "date": "2026-05-11",
     "details": {
@@ -13,8 +13,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:06",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:16",
+                    "hhmm": "22:57",
                     "q1": 1.85,
                     "qx": 3.25,
                     "q2": 3.9,
@@ -837,8 +837,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:07",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:17",
+                    "hhmm": "22:57",
                     "q1": 1.95,
                     "qx": 3.6,
                     "q2": 3.1,
@@ -1658,8 +1658,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:08",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:17",
+                    "hhmm": "22:57",
                     "q1": 1.5,
                     "qx": 4.2,
                     "q2": 4.8,
@@ -2483,8 +2483,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:08",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:18",
+                    "hhmm": "22:57",
                     "q1": 1.36,
                     "qx": 4.4,
                     "q2": 7.2,
@@ -3300,8 +3300,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:09",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:19",
+                    "hhmm": "22:57",
                     "q1": 1.85,
                     "qx": 3.1,
                     "q2": 3.85,
@@ -4119,14 +4119,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:11",
-                    "hhmm": "21:18",
-                    "q1": 2.75,
-                    "qx": 3.1,
-                    "q2": 2.35,
+                    "ts": "2026-05-10 22:57:20",
+                    "hhmm": "22:57",
+                    "q1": 3.1,
+                    "qx": 2.75,
+                    "q2": 2.25,
                     "o25": 2.2,
-                    "o05ht": 1.42,
-                    "o15ht": 3.12
+                    "o05ht": 1.44,
+                    "o15ht": 3.2
                 }
             ],
             "quote_dynamics": {
@@ -4153,15 +4153,15 @@
             "home_team": "Racing United",
             "away_team": "Portmore United",
             "markets": {
-                "q1": 2.75,
-                "qx": 3.1,
-                "q2": 2.35,
+                "q1": 3.1,
+                "qx": 2.75,
+                "q2": 2.25,
                 "o25": 2.2,
-                "o05ht": 1.42,
-                "o15ht": 3.12,
+                "o05ht": 1.44,
+                "o15ht": 3.2,
                 "u25": 1.65,
-                "u05ht": 2.53,
-                "u15ht": 1.28
+                "u05ht": 2.5,
+                "u15ht": 1.3
             },
             "averages": {
                 "home_avg_ft": 2.085,
@@ -4198,9 +4198,9 @@
                 "away_ht_conceded_1plus_rate": 0.095
             },
             "flags": {
-                "fav_quote": 2.35,
+                "fav_quote": 2.25,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.1,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
@@ -4242,10 +4242,10 @@
                 "ptgg": 3.2,
                 "pto15": 0.0,
                 "pt": 3.2,
-                "over": 4.4,
-                "boost": 3.878,
-                "gold": 3.343,
-                "max": 4.4,
+                "over": 5.03,
+                "boost": 4.585,
+                "gold": 4.322,
+                "max": 5.03,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -4263,7 +4263,9 @@
                 "OVER"
             ],
             "internal_labels": [
-                "ENGINE_V24_CLASSIC"
+                "ENGINE_V24_CLASSIC",
+                "MARKET_OK",
+                "DROP_1X2"
             ],
             "structure": {
                 "match_profile": "v24_classic",
@@ -4277,8 +4279,8 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 1.0,
-                "fav_quote": 2.35,
-                "fav_zone": "wide",
+                "fav_quote": 2.25,
+                "fav_zone": "balanced",
                 "combined_ht_dirty": 0.726,
                 "combined_ft_dirty": 1.902,
                 "cross_home_dirty": 0.958,
@@ -4286,19 +4288,19 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 1.1,
+                "coherence_score": 1.0,
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "ht",
+                "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "mixed",
-                "drop_strength": "soft",
+                "drop_type": "sterile",
+                "drop_strength": "medium",
                 "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
                     "classic_o25_range",
-                    "classic_ht_market_range"
+                    "classic_market_pressure"
                 ],
                 "warning_flags": [],
                 "margin_open": 0.0,
@@ -4319,14 +4321,16 @@
                     "OVER"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.35,
+                "fav_quote": 2.25,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.1,
                 "internal_labels": [
-                    "ENGINE_V24_CLASSIC"
+                    "ENGINE_V24_CLASSIC",
+                    "MARKET_OK",
+                    "DROP_1X2"
                 ],
-                "over_level": 2,
-                "drop_visual_level": "none",
+                "over_level": 3,
+                "drop_visual_level": "medium",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
                 "tempo_tag": "SLOW",
@@ -4931,8 +4935,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:12",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:20",
+                    "hhmm": "22:57",
                     "q1": 4.0,
                     "qx": 3.4,
                     "q2": 1.9,
@@ -5747,8 +5751,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:13",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:21",
+                    "hhmm": "22:57",
                     "q1": 1.73,
                     "qx": 3.75,
                     "q2": 4.45,
@@ -6566,8 +6570,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:13",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:21",
+                    "hhmm": "22:57",
                     "q1": 1.81,
                     "qx": 3.3,
                     "q2": 4.65,
@@ -7379,8 +7383,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:15",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:22",
+                    "hhmm": "22:57",
                     "q1": 1.83,
                     "qx": 3.1,
                     "q2": 4.33,
@@ -8192,8 +8196,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:16",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:23",
+                    "hhmm": "22:57",
                     "q1": 1.36,
                     "qx": 4.4,
                     "q2": 7.7,
@@ -9004,8 +9008,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:17",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:24",
+                    "hhmm": "22:57",
                     "q1": 1.67,
                     "qx": 3.95,
                     "q2": 4.65,
@@ -9824,14 +9828,14 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:17",
-                    "hhmm": "21:18",
-                    "q1": 3.3,
-                    "qx": 3.15,
-                    "q2": 2.14,
-                    "o25": 2.2,
+                    "ts": "2026-05-10 22:57:24",
+                    "hhmm": "22:57",
+                    "q1": 3.05,
+                    "qx": 3.1,
+                    "q2": 2.3,
+                    "o25": 2.15,
                     "o05ht": 1.42,
-                    "o15ht": 2.95
+                    "o15ht": 2.9
                 }
             ],
             "quote_dynamics": {
@@ -9858,15 +9862,15 @@
             "home_team": "Sportivo Luqueno",
             "away_team": "Libertad Asuncion",
             "markets": {
-                "q1": 3.3,
-                "qx": 3.15,
-                "q2": 2.14,
-                "o25": 2.2,
+                "q1": 3.05,
+                "qx": 3.1,
+                "q2": 2.3,
+                "o25": 2.15,
                 "o05ht": 1.42,
-                "o15ht": 2.95,
-                "u25": 1.62,
+                "o15ht": 2.9,
+                "u25": 1.65,
                 "u05ht": 2.65,
-                "u15ht": 1.35
+                "u15ht": 1.36
             },
             "averages": {
                 "home_avg_ft": 2.876,
@@ -9903,7 +9907,7 @@
                 "away_ht_conceded_1plus_rate": 0.515
             },
             "flags": {
-                "fav_quote": 2.14,
+                "fav_quote": 2.3,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
@@ -9947,10 +9951,10 @@
                 "ptgg": 5.9,
                 "pto15": 0.0,
                 "pt": 5.9,
-                "over": 6.2,
-                "boost": 6.668,
-                "gold": 5.875,
-                "max": 6.668,
+                "over": 5.8,
+                "boost": 6.476,
+                "gold": 5.69,
+                "max": 6.476,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -9986,8 +9990,8 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 1.47,
-                "fav_quote": 2.14,
-                "fav_zone": "balanced",
+                "fav_quote": 2.3,
+                "fav_zone": "wide",
                 "combined_ht_dirty": 1.594,
                 "combined_ft_dirty": 2.812,
                 "cross_home_dirty": 3.415,
@@ -9999,10 +10003,10 @@
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "ht",
+                "leading_market": "1x2",
                 "lagging_market": "none",
                 "drop_type": "structural",
-                "drop_strength": "medium",
+                "drop_strength": "hard",
                 "drop_confirmed": true,
                 "value_left": "high",
                 "positive_flags": [
@@ -10030,7 +10034,7 @@
                     "⚽⚽"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.14,
+                "fav_quote": 2.3,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
@@ -10645,8 +10649,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:18",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:25",
+                    "hhmm": "22:57",
                     "q1": 1.53,
                     "qx": 4.1,
                     "q2": 4.6,
@@ -11468,8 +11472,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:19",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:25",
+                    "hhmm": "22:57",
                     "q1": 3.15,
                     "qx": 3.6,
                     "q2": 2.1,
@@ -12280,8 +12284,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:20",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:26",
+                    "hhmm": "22:57",
                     "q1": 2.78,
                     "qx": 3.05,
                     "q2": 2.6,
@@ -13095,8 +13099,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:21",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:27",
+                    "hhmm": "22:57",
                     "q1": 2.12,
                     "qx": 3.45,
                     "q2": 3.25,
@@ -13908,8 +13912,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:22",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:27",
+                    "hhmm": "22:57",
                     "q1": 1.92,
                     "qx": 3.35,
                     "q2": 3.95,
@@ -14720,8 +14724,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:23",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:28",
+                    "hhmm": "22:57",
                     "q1": 3.2,
                     "qx": 4.0,
                     "q2": 1.85,
@@ -15542,12 +15546,12 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:23",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:29",
+                    "hhmm": "22:57",
                     "q1": 2.1,
                     "qx": 3.6,
                     "q2": 2.75,
-                    "o25": 1.44,
+                    "o25": 1.5,
                     "o05ht": 1.2,
                     "o15ht": 1.95
                 }
@@ -15579,10 +15583,10 @@
                 "q1": 2.1,
                 "qx": 3.6,
                 "q2": 2.75,
-                "o25": 1.44,
+                "o25": 1.5,
                 "o05ht": 1.2,
                 "o15ht": 1.95,
-                "u25": 2.62,
+                "u25": 2.5,
                 "u05ht": 3.8,
                 "u15ht": 1.65
             },
@@ -15713,8 +15717,8 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 0.8,
-                "coherence_level": "low",
+                "coherence_score": 1.45,
+                "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
                 "leading_market": "1x2",
@@ -15722,8 +15726,9 @@
                 "drop_type": "structural",
                 "drop_strength": "hard",
                 "drop_confirmed": true,
-                "value_left": "low",
+                "value_left": "high",
                 "positive_flags": [
+                    "classic_o25_range",
                     "classic_ht_market_range",
                     "classic_market_pressure"
                 ],
@@ -16362,8 +16367,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:24",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:29",
+                    "hhmm": "22:57",
                     "q1": 1.91,
                     "qx": 3.1,
                     "q2": 3.8,
@@ -17173,8 +17178,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:25",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:30",
+                    "hhmm": "22:57",
                     "q1": 4.2,
                     "qx": 4.2,
                     "q2": 1.57,
@@ -17991,8 +17996,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:26",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:30",
+                    "hhmm": "22:57",
                     "q1": 2.25,
                     "qx": 3.2,
                     "q2": 2.88,
@@ -18803,8 +18808,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:26",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:31",
+                    "hhmm": "22:57",
                     "q1": 2.28,
                     "qx": 3.7,
                     "q2": 2.76,
@@ -19615,8 +19620,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:27",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:32",
+                    "hhmm": "22:57",
                     "q1": 1.95,
                     "qx": 3.4,
                     "q2": 3.2,
@@ -20432,8 +20437,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:28",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:32",
+                    "hhmm": "22:57",
                     "q1": 1.83,
                     "qx": 3.3,
                     "q2": 4.55,
@@ -21245,8 +21250,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:29",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:33",
+                    "hhmm": "22:57",
                     "q1": 2.45,
                     "qx": 3.1,
                     "q2": 2.6,
@@ -22056,8 +22061,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:29",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:33",
+                    "hhmm": "22:57",
                     "q1": 1.58,
                     "qx": 3.95,
                     "q2": 5.5,
@@ -22872,8 +22877,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:30",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:34",
+                    "hhmm": "22:57",
                     "q1": 1.8,
                     "qx": 3.25,
                     "q2": 4.2,
@@ -23691,8 +23696,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:31",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:35",
+                    "hhmm": "22:57",
                     "q1": 2.64,
                     "qx": 3.5,
                     "q2": 2.46,
@@ -24508,8 +24513,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:35",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:38",
+                    "hhmm": "22:57",
                     "q1": 1.73,
                     "qx": 3.65,
                     "q2": 4.2,
@@ -25331,8 +25336,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:35",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:38",
+                    "hhmm": "22:57",
                     "q1": 2.4,
                     "qx": 3.2,
                     "q2": 2.6,
@@ -26143,8 +26148,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:37",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:39",
+                    "hhmm": "22:57",
                     "q1": 2.35,
                     "qx": 3.25,
                     "q2": 2.7,
@@ -26960,8 +26965,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:37",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:40",
+                    "hhmm": "22:57",
                     "q1": 1.91,
                     "qx": 3.25,
                     "q2": 3.5,
@@ -27772,8 +27777,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:38",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:40",
+                    "hhmm": "22:57",
                     "q1": 2.55,
                     "qx": 3.2,
                     "q2": 2.55,
@@ -28591,8 +28596,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:39",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:41",
+                    "hhmm": "22:57",
                     "q1": 2.1,
                     "qx": 3.6,
                     "q2": 2.8,
@@ -29381,8 +29386,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:39",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:41",
+                    "hhmm": "22:57",
                     "q1": 6.2,
                     "qx": 3.95,
                     "q2": 1.48,
@@ -30193,8 +30198,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:40",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:42",
+                    "hhmm": "22:57",
                     "q1": 1.87,
                     "qx": 3.2,
                     "q2": 4.14,
@@ -31007,8 +31012,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:41",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:43",
+                    "hhmm": "22:57",
                     "q1": 2.36,
                     "qx": 3.0,
                     "q2": 3.04,
@@ -31819,8 +31824,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:42",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:44",
+                    "hhmm": "22:57",
                     "q1": 2.1,
                     "qx": 3.0,
                     "q2": 3.3,
@@ -32628,8 +32633,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:43",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:45",
+                    "hhmm": "22:57",
                     "q1": 2.15,
                     "qx": 3.1,
                     "q2": 2.95,
@@ -33439,8 +33444,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:44",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:45",
+                    "hhmm": "22:57",
                     "q1": 5.0,
                     "qx": 4.0,
                     "q2": 1.55,
@@ -34262,11 +34267,11 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:45",
-                    "hhmm": "21:18",
-                    "q1": 3.4,
-                    "qx": 3.2,
-                    "q2": 1.91,
+                    "ts": "2026-05-10 22:57:46",
+                    "hhmm": "22:57",
+                    "q1": 3.5,
+                    "qx": 3.3,
+                    "q2": 1.83,
                     "o25": 1.7,
                     "o05ht": 1.25,
                     "o15ht": 2.3
@@ -34296,9 +34301,9 @@
             "home_team": "Malmö FF W",
             "away_team": "Häcken W",
             "markets": {
-                "q1": 3.4,
-                "qx": 3.2,
-                "q2": 1.91,
+                "q1": 3.5,
+                "qx": 3.3,
+                "q2": 1.83,
                 "o25": 1.7,
                 "o05ht": 1.25,
                 "o15ht": 2.3,
@@ -34341,9 +34346,9 @@
                 "away_ht_conceded_1plus_rate": 0.195
             },
             "flags": {
-                "fav_quote": 1.91,
-                "is_gold_zone": false,
-                "drop_diff": 0.36,
+                "fav_quote": 1.83,
+                "is_gold_zone": true,
+                "drop_diff": 0.44,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
@@ -34387,7 +34392,7 @@
                 "pt": 6.2,
                 "over": 6.64,
                 "boost": 8.083,
-                "gold": 7.104,
+                "gold": 7.954,
                 "max": 8.083,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
@@ -34403,18 +34408,22 @@
                 "p_market_o15ht": 0.0
             },
             "tags": [
-                "BOOST",
+                "GOLD",
+                "CLASSIC",
                 "⚽⚽"
             ],
             "internal_labels": [
                 "ENGINE_V24_CLASSIC",
+                "CLASSIC_BASE",
+                "CLASSIC_CORE",
+                "FAV_FERTILE",
                 "MARKET_OK",
                 "DROP_1X2",
                 "DROP_CONFIRMED"
             ],
             "structure": {
                 "match_profile": "classic_fast_over",
-                "structure_score": 1.9,
+                "structure_score": 2.25,
                 "structure_grade": "high",
                 "combined_ht_clean": 1.242,
                 "combined_ft_clean": 3.103,
@@ -34424,8 +34433,8 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.22,
-                "fav_quote": 1.91,
-                "fav_zone": "balanced",
+                "fav_quote": 1.83,
+                "fav_zone": "gold",
                 "combined_ht_dirty": 1.317,
                 "combined_ft_dirty": 2.904,
                 "cross_home_dirty": 2.812,
@@ -34433,8 +34442,8 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 1.45,
-                "coherence_level": "medium",
+                "coherence_score": 2.2,
+                "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
                 "leading_market": "1x2",
@@ -34444,6 +34453,7 @@
                 "drop_confirmed": true,
                 "value_left": "high",
                 "positive_flags": [
+                    "classic_fav_fertile",
                     "classic_o25_range",
                     "classic_ht_market_range",
                     "classic_market_pressure"
@@ -34464,15 +34474,19 @@
             "signal_debug": {
                 "engine": "V24_CLASSIC_ON_V25_SHELL",
                 "tags": [
-                    "BOOST",
+                    "GOLD",
+                    "CLASSIC",
                     "⚽⚽"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 1.91,
-                "is_gold_zone": false,
-                "drop_diff": 0.36,
+                "fav_quote": 1.83,
+                "is_gold_zone": true,
+                "drop_diff": 0.44,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC",
+                    "CLASSIC_BASE",
+                    "CLASSIC_CORE",
+                    "FAV_FERTILE",
                     "MARKET_OK",
                     "DROP_1X2",
                     "DROP_CONFIRMED"
@@ -34480,7 +34494,7 @@
                 "over_level": 3,
                 "drop_visual_level": "strong",
                 "signal_stability": "Alta",
-                "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
+                "signal_summary": "GOLD CLASSIC: favorita fertile + base goal/HT",
                 "tempo_tag": "FAST",
                 "early_index": 2.631,
                 "early_home": 1.131,
@@ -35083,8 +35097,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:46",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:47",
+                    "hhmm": "22:57",
                     "q1": 1.54,
                     "qx": 4.6,
                     "q2": 4.5,
@@ -35896,8 +35910,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:47",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:48",
+                    "hhmm": "22:57",
                     "q1": 2.5,
                     "qx": 3.35,
                     "q2": 2.5,
@@ -36713,8 +36727,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:47",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:48",
+                    "hhmm": "22:57",
                     "q1": 1.77,
                     "qx": 3.6,
                     "q2": 3.85,
@@ -37541,8 +37555,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:48",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:49",
+                    "hhmm": "22:57",
                     "q1": 2.3,
                     "qx": 3.0,
                     "q2": 3.0,
@@ -38350,8 +38364,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:49",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:50",
+                    "hhmm": "22:57",
                     "q1": 2.7,
                     "qx": 3.0,
                     "q2": 2.5,
@@ -39161,8 +39175,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:49",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:50",
+                    "hhmm": "22:57",
                     "q1": 2.38,
                     "qx": 3.0,
                     "q2": 2.85,
@@ -39972,8 +39986,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:50",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:51",
+                    "hhmm": "22:57",
                     "q1": 5.2,
                     "qx": 3.65,
                     "q2": 1.57,
@@ -40793,8 +40807,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:51",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:51",
+                    "hhmm": "22:57",
                     "q1": 2.1,
                     "qx": 3.2,
                     "q2": 3.1,
@@ -41610,8 +41624,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:52",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:52",
+                    "hhmm": "22:57",
                     "q1": 1.91,
                     "qx": 3.4,
                     "q2": 3.4,
@@ -42433,8 +42447,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:53",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:53",
+                    "hhmm": "22:57",
                     "q1": 2.4,
                     "qx": 3.55,
                     "q2": 2.56,
@@ -43245,8 +43259,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:53",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:53",
+                    "hhmm": "22:57",
                     "q1": 4.7,
                     "qx": 3.85,
                     "q2": 1.62,
@@ -44064,8 +44078,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:54",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:54",
+                    "hhmm": "22:57",
                     "q1": 2.25,
                     "qx": 3.6,
                     "q2": 2.88,
@@ -44876,8 +44890,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:55",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:55",
+                    "hhmm": "22:57",
                     "q1": 1.97,
                     "qx": 3.5,
                     "q2": 3.65,
@@ -45693,8 +45707,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:56",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:55",
+                    "hhmm": "22:57",
                     "q1": 2.2,
                     "qx": 3.4,
                     "q2": 2.85,
@@ -46505,8 +46519,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:56",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:56",
+                    "hhmm": "22:57",
                     "q1": 1.25,
                     "qx": 5.6,
                     "q2": 12.0,
@@ -47316,8 +47330,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:57",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:56",
+                    "hhmm": "22:57",
                     "q1": 2.2,
                     "qx": 3.5,
                     "q2": 2.8,
@@ -48139,8 +48153,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:58",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:58",
+                    "hhmm": "22:57",
                     "q1": 2.4,
                     "qx": 3.2,
                     "q2": 2.6,
@@ -48951,8 +48965,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:18:59",
-                    "hhmm": "21:18",
+                    "ts": "2026-05-10 22:57:58",
+                    "hhmm": "22:57",
                     "q1": 2.2,
                     "qx": 3.35,
                     "q2": 2.88,
@@ -49774,8 +49788,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:00",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:57:59",
+                    "hhmm": "22:57",
                     "q1": 2.2,
                     "qx": 3.55,
                     "q2": 3.0,
@@ -50586,8 +50600,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:01",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:57:59",
+                    "hhmm": "22:57",
                     "q1": 1.83,
                     "qx": 3.25,
                     "q2": 3.8,
@@ -51399,8 +51413,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:02",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:00",
+                    "hhmm": "22:58",
                     "q1": 2.88,
                     "qx": 3.4,
                     "q2": 2.15,
@@ -52220,8 +52234,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:03",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:01",
+                    "hhmm": "22:58",
                     "q1": 4.2,
                     "qx": 3.75,
                     "q2": 1.77,
@@ -53048,8 +53062,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:04",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:02",
+                    "hhmm": "22:58",
                     "q1": 1.71,
                     "qx": 3.45,
                     "q2": 5.1,
@@ -53861,8 +53875,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:05",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:02",
+                    "hhmm": "22:58",
                     "q1": 1.22,
                     "qx": 5.4,
                     "q2": 11.5,
@@ -54680,8 +54694,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:06",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:03",
+                    "hhmm": "22:58",
                     "q1": 3.35,
                     "qx": 3.75,
                     "q2": 1.85,
@@ -55499,8 +55513,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:06",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:04",
+                    "hhmm": "22:58",
                     "q1": 2.1,
                     "qx": 3.65,
                     "q2": 2.85,
@@ -56311,8 +56325,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:07",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:04",
+                    "hhmm": "22:58",
                     "q1": 2.9,
                     "qx": 3.1,
                     "q2": 2.25,
@@ -57124,8 +57138,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:08",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:05",
+                    "hhmm": "22:58",
                     "q1": 3.25,
                     "qx": 3.4,
                     "q2": 1.95,
@@ -57937,8 +57951,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:09",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:05",
+                    "hhmm": "22:58",
                     "q1": 2.5,
                     "qx": 3.3,
                     "q2": 2.4,
@@ -58756,8 +58770,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:10",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:06",
+                    "hhmm": "22:58",
                     "q1": 2.15,
                     "qx": 3.3,
                     "q2": 2.9,
@@ -59577,8 +59591,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:10",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:06",
+                    "hhmm": "22:58",
                     "q1": 1.62,
                     "qx": 3.8,
                     "q2": 4.33,
@@ -60405,8 +60419,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:11",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:07",
+                    "hhmm": "22:58",
                     "q1": 1.76,
                     "qx": 3.6,
                     "q2": 4.45,
@@ -61229,8 +61243,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:13",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:08",
+                    "hhmm": "22:58",
                     "q1": 1.52,
                     "qx": 4.0,
                     "q2": 6.0,
@@ -62051,8 +62065,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:14",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:09",
+                    "hhmm": "22:58",
                     "q1": 1.87,
                     "qx": 3.75,
                     "q2": 3.75,
@@ -62871,8 +62885,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:15",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:09",
+                    "hhmm": "22:58",
                     "q1": 2.32,
                     "qx": 3.35,
                     "q2": 2.95,
@@ -63684,8 +63698,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:15",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:10",
+                    "hhmm": "22:58",
                     "q1": 1.95,
                     "qx": 3.8,
                     "q2": 3.0,
@@ -64496,8 +64510,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:16",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:10",
+                    "hhmm": "22:58",
                     "q1": 1.73,
                     "qx": 3.6,
                     "q2": 4.65,
@@ -65324,8 +65338,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:17",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:11",
+                    "hhmm": "22:58",
                     "q1": 1.42,
                     "qx": 4.45,
                     "q2": 7.2,
@@ -66141,8 +66155,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:18",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:12",
+                    "hhmm": "22:58",
                     "q1": 3.6,
                     "qx": 3.45,
                     "q2": 1.99,
@@ -66958,8 +66972,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:19",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:12",
+                    "hhmm": "22:58",
                     "q1": 1.66,
                     "qx": 3.75,
                     "q2": 4.9,
@@ -67774,8 +67788,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:20",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:13",
+                    "hhmm": "22:58",
                     "q1": 11.5,
                     "qx": 5.7,
                     "q2": 1.24,
@@ -68592,8 +68606,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:21",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:13",
+                    "hhmm": "22:58",
                     "q1": 2.12,
                     "qx": 3.25,
                     "q2": 3.45,
@@ -69405,8 +69419,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:21",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:14",
+                    "hhmm": "22:58",
                     "q1": 1.87,
                     "qx": 3.55,
                     "q2": 3.95,
@@ -70233,8 +70247,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:22",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:15",
+                    "hhmm": "22:58",
                     "q1": 1.7,
                     "qx": 3.8,
                     "q2": 4.6,
@@ -71061,8 +71075,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:23",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:15",
+                    "hhmm": "22:58",
                     "q1": 1.83,
                     "qx": 3.3,
                     "q2": 3.8,
@@ -71876,8 +71890,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:24",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:16",
+                    "hhmm": "22:58",
                     "q1": 1.82,
                     "qx": 3.3,
                     "q2": 4.2,
@@ -72704,8 +72718,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:25",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:17",
+                    "hhmm": "22:58",
                     "q1": 1.6,
                     "qx": 3.5,
                     "q2": 5.0,
@@ -73527,8 +73541,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-10 21:19:26",
-                    "hhmm": "21:19",
+                    "ts": "2026-05-10 22:58:17",
+                    "hhmm": "22:58",
                     "q1": 2.12,
                     "qx": 3.25,
                     "q2": 3.25,
