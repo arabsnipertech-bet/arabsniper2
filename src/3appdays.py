@@ -4953,11 +4953,11 @@ def asr_score_ft(row, flags, drop, odds):
 
     fav_band = odds.get("fav_band")
     if fav_band == "goldilocks":
-        score += 0.25
+        score += 0.45
     elif fav_band == "ultra_fav":
         score -= 0.15
     elif fav_band == "balanced":
-        score += 0.10
+        score += 0.05
 
     o25 = safe_float(odds.get("o25_curr"), 0)
     if o25:
