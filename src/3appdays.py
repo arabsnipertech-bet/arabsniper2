@@ -32,12 +32,16 @@ DETAILS_FILE = str(DATA_DIR / "match_details.json")
 
 DEFAULT_EXCLUDED = [
     "Thailand", "Indonesia", "India", "Kenya", "Morocco",
-    "Rwanda", "Nigeria", "Oman", "Algeria", "UAE"
+    "Rwanda", "Nigeria", "Oman", "Algeria", "UAE",
+    "Russia", "South-Africa", "Ethiopia", "Iran", "Bangladesh",
+    "Vietnam", "Uganda", "Tanzania", "Zambia", "Egypt", "Myanmar"
 ]
 
 LEAGUE_BLACKLIST = [
-    "u19", "u20", "youth", "women", "friendly",
-    "carioca", "paulista", "mineiro"
+    "u19", "u20", "u21", "u23", "youth", "women", "friendly",
+    "carioca", "paulista", "mineiro", "gaucho",
+    "reserve", "amateur", "second league", "division a", 
+    "national 2", "national 3", "npl"
 ]
 
 ROLLING_SNAPSHOT_HORIZONS = [1, 2, 3, 4, 5]
@@ -4369,10 +4373,10 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     market_ok = (
-        combined_ft_clean >= 1.45
-        and structure_score >= 0.85
-        and one_sided_risk <= 1.75
-        and coherence_score >= 1.00
+        combined_ft_clean >= 1.35  # Abbassato da 1.45
+        and structure_score >= 0.75  # Abbassato da 0.85
+        and one_sided_risk <= 1.85  # Alzato (più tolleranza)
+        and coherence_score >= 0.90  # Abbassato da 1.00
         and value_left != "low"
         and not has_fatal_warning
         and (
@@ -4384,14 +4388,14 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     probe_ok = (
-        combined_ft_clean >= 1.40
-        and structure_score >= 0.85
-        and one_sided_risk <= 1.75
+        combined_ft_clean >= 1.30  # Abbassato da 1.40
+        and structure_score >= 0.75  # Abbassato da 0.85
+        and one_sided_risk <= 1.85  # Alzato (più tolleranza)
         and value_left != "low"
         and not has_fatal_warning
         and not drop_trap_blacklist
         and (
-            coherence_score >= 0.95
+            coherence_score >= 0.85  # Abbassato da 0.95
             or drop_confirmed
             or has_drop_1x2
             or edge_o25 >= 0.01
@@ -4402,7 +4406,6 @@ def build_signal_package(fid, mk, s_h, s_a):
             and coherence_score >= 1.15
         )
     )
-
 
 # --- NUOVO: Filtro Deviazione Standard per blindare il GOLD ---
     ft_sd_avg = safe_float(lambda_pack.get("ft_sd_avg", 9.9), 9.9)
@@ -4727,17 +4730,17 @@ def should_keep_match(signal_pack):
 
     if label == "MARKET":
         return bool(
-            combined_ft_clean >= 1.45
-            and structure_score >= 0.85
-            and one_sided_risk <= 1.75
-            and coherence_score >= 1.00
+            combined_ft_clean >= 1.35
+            and structure_score >= 0.75
+            and one_sided_risk <= 1.85
+            and coherence_score >= 0.90
         )
 
     if label == "PROBE":
         return bool(
-            combined_ft_clean >= 1.40
-            and structure_score >= 0.85
-            and one_sided_risk <= 1.75
+            combined_ft_clean >= 1.30
+            and structure_score >= 0.75
+            and one_sided_risk <= 1.85
         )
 
     return False
