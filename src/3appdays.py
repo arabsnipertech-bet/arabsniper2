@@ -4407,6 +4407,13 @@ def build_signal_package(fid, mk, s_h, s_a):
 # --- NUOVO: Filtro Deviazione Standard per blindare il GOLD ---
     ft_sd_avg = safe_float(lambda_pack.get("ft_sd_avg", 9.9), 9.9)
 
+    favorite_fertile = bool(1.50 <= fav <= 1.87)
+    favorite_core = bool(1.55 <= fav <= 1.83)
+
+    gold_risk_limit = 1.42 if favorite_fertile else 1.25
+    probe_risk_limit = 1.32 if favorite_fertile else 1.15
+    over_risk_limit = 1.62 if favorite_fertile else 1.50
+    
 # --- NUOVO: Gate indipendente per il PT ---
     pt_ok = bool(
         pt_score >= 4.50
@@ -4418,7 +4425,7 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     gold_ok = bool(
-        ft_sd_avg <= 1.65  # PROTEZIONE: Esclude le squadre irregolari
+        ft_sd_avg <= 1.65
         and not slow_edge_risk
         and not negative_edge_risk
         and not weak_gold_context
@@ -4427,26 +4434,28 @@ def build_signal_package(fid, mk, s_h, s_a):
         and (
             (
                 over_ok
-                and over_score >= 4.80
+                and over_score >= (4.65 if favorite_core else 4.80)
                 and combined_ft_clean >= 1.58
                 and structure_score >= 1.00
-                and one_sided_risk <= 1.20  # ERA 1.35: Tolleranza ridotta
+                and one_sided_risk <= gold_risk_limit
                 and (
                     market_ok
                     or inv_ok
                     or drop_medium_or_strong
+                    or favorite_core
                 )
             )
             or
             (
                 probe_ok
-                and over_score >= 4.35
+                and over_score >= (4.25 if favorite_core else 4.35)
                 and coherence_score >= 1.05
-                and one_sided_risk <= 1.10  # ERA 1.25: Tolleranza ridotta
+                and one_sided_risk <= probe_risk_limit
                 and (
                     market_ok
                     or inv_ok
                     or drop_strong_only
+                    or favorite_core
                 )
             )
         )
@@ -4584,7 +4593,9 @@ def build_signal_package(fid, mk, s_h, s_a):
         "market_resistance_hard": False,
         "market_resistance_extreme": False,
         "fav_quote": round3(fav),
-        "is_gold_zone": bool(gold_ok),
+        "is_gold_zone": bool(1.50 <= fav <= 1.87),
+        "is_gold_signal": bool(gold_ok),
+        "fav_fertile_zone": bool(1.50 <= fav <= 1.87),
         "strong_tag_count": strong_tag_count,
         "quote_pack": quote_pack,
         "market_pack": market_pack,
@@ -4640,6 +4651,13 @@ def should_keep_match(signal_pack):
     structure_score = safe_float(structure_pack.get("structure_score", 0.0), 0.0)
     one_sided_risk = safe_float(structure_pack.get("one_sided_risk", 0.0), 0.0)
 
+    fav_quote = safe_float(signal_pack.get("fav_quote", 0.0), 0.0)
+    favorite_fertile = bool(1.50 <= fav_quote <= 1.87)
+    favorite_core = bool(1.55 <= fav_quote <= 1.83)
+
+    gold_keep_risk = 1.42 if favorite_fertile else 1.20
+    over_keep_risk = 1.62 if favorite_fertile else 1.50
+
     coherence_score = safe_float(market_pack.get("coherence_score", 0.0), 0.0)
     value_left = market_pack.get("value_left", "unknown")
     warning_flags = market_pack.get("warning_flags", []) or []
@@ -4681,16 +4699,22 @@ def should_keep_match(signal_pack):
         return bool(
             combined_ft_clean >= 1.52
             and structure_score >= 0.95
-            and one_sided_risk <= 1.20  # ERA 1.45: Nessun match asimmetrico passa come oro
-            and coherence_score >= 1.00
+            and one_sided_risk <= gold_keep_risk
+            and (
+                coherence_score >= 1.00
+                or favorite_core
+            )
         )
 
     if label == "OVER":
         return bool(
             combined_ft_clean >= 1.52
             and structure_score >= 0.95
-            and one_sided_risk <= 1.50  # ERA 1.60: Lieve stretta
-            and edge_o25 >= 0.00
+            and one_sided_risk <= over_keep_risk
+            and (
+                edge_o25 >= 0.00
+                or favorite_core
+            )
         )
 
     # --- NUOVO: La dogana accetta il PT ---
