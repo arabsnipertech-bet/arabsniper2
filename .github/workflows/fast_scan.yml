@@ -41,4 +41,4 @@ jobs:
           pip install streamlit requests pandas PyGithub || true
 
       - name: Run fast pair workflow
-        run: python src/3appdays_runner.py --fast
+        run: python src/3appdays_runner.py --fast-pair
