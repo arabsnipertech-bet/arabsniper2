@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-05-11 04:02:32",
+    "updated_at": "2026-05-11 08:18:00",
     "day": 2,
     "date": "2026-05-12",
     "details": {
@@ -13,8 +13,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:08",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:30",
+                    "hhmm": "08:17",
                     "q1": 1.95,
                     "qx": 2.7,
                     "q2": 4.6,
@@ -225,6 +225,7 @@
                     "DROP_O25"
                 ],
                 "over_level": 0,
+                "visual_over_tier": 0,
                 "drop_visual_level": "light",
                 "signal_stability": "Media",
                 "signal_summary": "Market/Drop da monitorare",
@@ -830,8 +831,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:08",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:31",
+                    "hhmm": "08:17",
                     "q1": 3.0,
                     "qx": 2.8,
                     "q2": 2.25,
@@ -1036,6 +1037,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -1641,8 +1643,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:09",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:31",
+                    "hhmm": "08:17",
                     "q1": 1.85,
                     "qx": 2.95,
                     "q2": 4.5,
@@ -1860,6 +1862,7 @@
                     "DROP_CONFIRMED"
                 ],
                 "over_level": 0,
+                "visual_over_tier": 0,
                 "drop_visual_level": "strong",
                 "signal_stability": "Media",
                 "signal_summary": "Market/Drop da monitorare",
@@ -2465,8 +2468,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:09",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:32",
+                    "hhmm": "08:17",
                     "q1": 2.1,
                     "qx": 3.1,
                     "q2": 3.1,
@@ -2672,6 +2675,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -3274,11 +3278,11 @@
             "league": "Division Profesional - Apertura",
             "country": "Paraguay",
             "match": "Cerro Porteno - Club Guarani",
-            "gg_ht_sniper": false,
+            "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:10",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:33",
+                    "hhmm": "08:17",
                     "q1": 1.82,
                     "qx": 3.35,
                     "q2": 4.2,
@@ -3418,7 +3422,8 @@
                 "p_market_o15ht": 0.0
             },
             "tags": [
-                "OVER"
+                "OVER",
+                "⚽⚽"
             ],
             "internal_labels": [
                 "ENGINE_V24_CLASSIC",
@@ -3480,7 +3485,8 @@
             "signal_debug": {
                 "engine": "V24_CLASSIC_ON_V25_SHELL",
                 "tags": [
-                    "OVER"
+                    "OVER",
+                    "⚽⚽"
                 ],
                 "strong_tag_count": 1,
                 "fav_quote": 1.82,
@@ -3494,9 +3500,10 @@
                     "DROP_CONFIRMED"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 2,
                 "drop_visual_level": "strong",
-                "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_stability": "Alta",
+                "signal_summary": "ELITE VISIVA: struttura + mercato confermati",
                 "tempo_tag": "SLOW",
                 "early_index": 1.581,
                 "early_home": 0.669,
@@ -4096,11 +4103,11 @@
             "league": "Serie C",
             "country": "Brazil",
             "match": "Maringá - Guarani Campinas",
-            "gg_ht_sniper": false,
+            "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:10",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:33",
+                    "hhmm": "08:17",
                     "q1": 2.1,
                     "qx": 3.1,
                     "q2": 3.3,
@@ -4240,7 +4247,8 @@
                 "p_market_o15ht": 0.0
             },
             "tags": [
-                "OVER"
+                "OVER",
+                "⚽⚽"
             ],
             "internal_labels": [
                 "ENGINE_V24_CLASSIC",
@@ -4299,7 +4307,8 @@
             "signal_debug": {
                 "engine": "V24_CLASSIC_ON_V25_SHELL",
                 "tags": [
-                    "OVER"
+                    "OVER",
+                    "⚽⚽"
                 ],
                 "strong_tag_count": 1,
                 "fav_quote": 2.1,
@@ -4311,9 +4320,10 @@
                     "DROP_O25"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 2,
                 "drop_visual_level": "light",
-                "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_stability": "Alta",
+                "signal_summary": "ELITE VISIVA: struttura + mercato confermati",
                 "tempo_tag": "FAST",
                 "early_index": 2.731,
                 "early_home": 1.242,
@@ -4916,8 +4926,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:11",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:34",
+                    "hhmm": "08:17",
                     "q1": 5.1,
                     "qx": 3.5,
                     "q2": 1.65,
@@ -5143,9 +5153,10 @@
                     "DROP_CONFIRMED"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 2,
                 "drop_visual_level": "strong",
                 "signal_stability": "Alta",
-                "signal_summary": "GOLD CLASSIC: favorita fertile + base goal/HT",
+                "signal_summary": "ELITE VISIVA: struttura + mercato confermati",
                 "tempo_tag": "BUILD",
                 "early_index": 2.483,
                 "early_home": 1.459,
@@ -5748,8 +5759,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:11",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:34",
+                    "hhmm": "08:17",
                     "q1": 2.5,
                     "qx": 3.1,
                     "q2": 2.65,
@@ -5966,9 +5977,10 @@
                     "DROP_CONFIRMED"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "strong",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "SLOW",
                 "early_index": 1.625,
                 "early_home": 0.537,
@@ -6571,14 +6583,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:12",
-                    "hhmm": "04:02",
-                    "q1": 2.58,
-                    "qx": 3.35,
-                    "q2": 2.58,
-                    "o25": 2.0,
+                    "ts": "2026-05-11 08:17:35",
+                    "hhmm": "08:17",
+                    "q1": 2.75,
+                    "qx": 3.3,
+                    "q2": 2.46,
+                    "o25": 2.1,
                     "o05ht": 1.38,
-                    "o15ht": 2.75
+                    "o15ht": 2.8
                 }
             ],
             "quote_dynamics": {
@@ -6605,15 +6617,15 @@
             "home_team": "Mushuc Runa SC",
             "away_team": "LDU de Quito",
             "markets": {
-                "q1": 2.58,
-                "qx": 3.35,
-                "q2": 2.58,
-                "o25": 2.0,
+                "q1": 2.75,
+                "qx": 3.3,
+                "q2": 2.46,
+                "o25": 2.1,
                 "o05ht": 1.38,
-                "o15ht": 2.75,
-                "u25": 1.8,
+                "o15ht": 2.8,
+                "u25": 1.7,
                 "u05ht": 2.8,
-                "u15ht": 1.4
+                "u15ht": 1.38
             },
             "averages": {
                 "home_avg_ft": 2.526,
@@ -6650,9 +6662,9 @@
                 "away_ht_conceded_1plus_rate": 0.171
             },
             "flags": {
-                "fav_quote": 2.58,
+                "fav_quote": 2.46,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.24,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
@@ -6694,10 +6706,10 @@
                 "ptgg": 3.7,
                 "pto15": 0.0,
                 "pt": 3.7,
-                "over": 2.8,
-                "boost": 3.2,
-                "gold": 2.742,
-                "max": 3.7,
+                "over": 3.64,
+                "boost": 4.143,
+                "gold": 3.865,
+                "max": 4.143,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -6717,7 +6729,8 @@
             "internal_labels": [
                 "ENGINE_V24_CLASSIC",
                 "MARKET_OK",
-                "DROP_1X2"
+                "DROP_1X2",
+                "INV_OK"
             ],
             "structure": {
                 "match_profile": "classic_one_sided_watch",
@@ -6731,7 +6744,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 2.2,
-                "fav_quote": 2.58,
+                "fav_quote": 2.46,
                 "fav_zone": "wide",
                 "combined_ht_dirty": 0.838,
                 "combined_ft_dirty": 1.97,
@@ -6747,7 +6760,7 @@
                 "leading_market": "1x2",
                 "lagging_market": "none",
                 "drop_type": "sterile",
-                "drop_strength": "medium",
+                "drop_strength": "hard",
                 "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
@@ -6774,16 +6787,18 @@
                     "MARKET"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.58,
+                "fav_quote": 2.46,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.24,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC",
                     "MARKET_OK",
-                    "DROP_1X2"
+                    "DROP_1X2",
+                    "INV_OK"
                 ],
                 "over_level": 0,
-                "drop_visual_level": "light",
+                "visual_over_tier": 0,
+                "drop_visual_level": "strong",
                 "signal_stability": "Media",
                 "signal_summary": "Market/Drop da monitorare",
                 "tempo_tag": "SLOW",
@@ -7388,11 +7403,11 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:12",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:35",
+                    "hhmm": "08:17",
                     "q1": 2.4,
-                    "qx": 3.2,
-                    "q2": 2.7,
+                    "qx": 3.25,
+                    "q2": 2.65,
                     "o25": 1.95,
                     "o05ht": 1.38,
                     "o15ht": 2.75
@@ -7423,8 +7438,8 @@
             "away_team": "Deportes Limache",
             "markets": {
                 "q1": 2.4,
-                "qx": 3.2,
-                "q2": 2.7,
+                "qx": 3.25,
+                "q2": 2.65,
                 "o25": 1.95,
                 "o05ht": 1.38,
                 "o15ht": 2.75,
@@ -7602,6 +7617,7 @@
                     "INV_OK"
                 ],
                 "over_level": 0,
+                "visual_over_tier": 0,
                 "drop_visual_level": "strong",
                 "signal_stability": "Media",
                 "signal_summary": "Market/Drop da monitorare",
@@ -8207,8 +8223,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:12",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:36",
+                    "hhmm": "08:17",
                     "q1": 2.05,
                     "qx": 3.25,
                     "q2": 3.1,
@@ -8414,6 +8430,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
@@ -9019,8 +9036,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:13",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:36",
+                    "hhmm": "08:17",
                     "q1": 1.38,
                     "qx": 3.9,
                     "q2": 8.9,
@@ -9226,9 +9243,10 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "SLOW",
                 "early_index": 1.246,
                 "early_home": 0.666,
@@ -9831,8 +9849,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:13",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:37",
+                    "hhmm": "08:17",
                     "q1": 3.95,
                     "qx": 3.3,
                     "q2": 1.94,
@@ -10044,6 +10062,7 @@
                     "DROP_1X2"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "medium",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -10639,6 +10658,819 @@
                 }
             ]
         },
+        "1542457": {
+            "fixture_id": 1542457,
+            "date": "2026-05-12",
+            "time": "05:00",
+            "league": "OFC Pro League",
+            "country": "World",
+            "match": "South Melbourne - Bula",
+            "gg_ht_sniper": false,
+            "quote_history": [
+                {
+                    "ts": "2026-05-11 08:17:37",
+                    "hhmm": "08:17",
+                    "q1": 1.25,
+                    "qx": 5.0,
+                    "q2": 8.0,
+                    "o25": 1.6,
+                    "o05ht": 1.25,
+                    "o15ht": 2.1
+                }
+            ],
+            "quote_dynamics": {
+                "history_count": 1,
+                "o25_velocity": 0.0,
+                "o25_prev_velocity": 0.0,
+                "o25_acceleration": 0.0,
+                "o25_movement_type": "none",
+                "o05ht_velocity": 0.0,
+                "o05ht_prev_velocity": 0.0,
+                "o05ht_acceleration": 0.0,
+                "o05ht_movement_type": "none",
+                "o15ht_velocity": 0.0,
+                "o15ht_prev_velocity": 0.0,
+                "o15ht_acceleration": 0.0,
+                "o15ht_movement_type": "none",
+                "fav_velocity": 0.0,
+                "fav_prev_velocity": 0.0,
+                "fav_acceleration": 0.0,
+                "fav_movement_type": "none",
+                "market_acceleration_label": "NO_HISTORY"
+            },
+            "market_acceleration_label": "NO_HISTORY",
+            "home_team": "South Melbourne",
+            "away_team": "Bula",
+            "markets": {
+                "q1": 1.25,
+                "qx": 5.0,
+                "q2": 8.0,
+                "o25": 1.6,
+                "o05ht": 1.25,
+                "o15ht": 2.1,
+                "u25": 2.3,
+                "u05ht": 3.75,
+                "u15ht": 1.67
+            },
+            "averages": {
+                "home_avg_ft": 4.693,
+                "away_avg_ft": 2.193,
+                "home_avg_ht": 3.281,
+                "away_avg_ht": 1.538,
+                "home_avg_ft_clean": 4.587,
+                "away_avg_ft_clean": 2.13,
+                "home_avg_ht_clean": 3.17,
+                "away_avg_ht_clean": 1.634,
+                "home_avg_ht_scored_clean": 2.131,
+                "away_avg_ht_scored_clean": 0.0,
+                "home_avg_ht_conceded_clean": 0.96,
+                "away_avg_ht_conceded_clean": 1.572,
+                "home_avg_ft_scored_clean": 2.368,
+                "away_avg_ft_scored_clean": 0.599,
+                "home_avg_ft_conceded_clean": 1.9,
+                "away_avg_ft_conceded_clean": 1.599,
+                "home_ft_2plus_rate": 1.0,
+                "away_ft_2plus_rate": 0.805,
+                "home_ft_3plus_rate": 1.0,
+                "away_ft_3plus_rate": 0.29,
+                "home_ft_low_rate": 0.0,
+                "away_ft_low_rate": 0.195,
+                "home_ht_1plus_rate": 1.0,
+                "away_ht_1plus_rate": 0.74,
+                "home_ht_zero_rate": 0.0,
+                "away_ht_zero_rate": 0.26,
+                "home_ht_scored_1plus_rate": 0.609,
+                "away_ht_scored_1plus_rate": 0.065,
+                "home_ht_scored_2plus_rate": 0.391,
+                "away_ht_scored_2plus_rate": 0.065,
+                "home_ht_conceded_1plus_rate": 0.781,
+                "away_ht_conceded_1plus_rate": 0.74
+            },
+            "flags": {
+                "fav_quote": 1.25,
+                "is_gold_zone": false,
+                "drop_diff": 0.0,
+                "home_last_2h_zero": true,
+                "away_last_2h_zero": true
+            },
+            "fair_value": {
+                "margin_open": 0.0,
+                "margin_curr": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.0,
+                "fav_fair_prob_curr": 0.0,
+                "fav_fair_prob_delta": 0.0,
+                "fav_fair_curr": 0.0
+            },
+            "model_edge": {
+                "lam_home_ft": 1.848,
+                "lam_away_ft": 1.224,
+                "lam_home_ht": 1.798,
+                "lam_away_ht": 0.466,
+                "p_model_o25": 0.0,
+                "p_market_o25": 0.0,
+                "edge_o25": 0.0,
+                "edge_logit_o25": 0.0,
+                "edge_level_o25": "CLASSIC",
+                "p_model_o05ht": 0.0,
+                "p_market_o05ht": 0.0,
+                "edge_o05ht": 0.0,
+                "edge_logit_o05ht": 0.0,
+                "edge_level_o05ht": "CLASSIC",
+                "p_model_o15ht": 0.0,
+                "p_market_o15ht": 0.0,
+                "edge_o15ht": 0.0,
+                "edge_logit_o15ht": 0.0,
+                "edge_level_o15ht": "CLASSIC",
+                "ctx_avg": 0.55,
+                "reg_avg": 0.601,
+                "ft_sd_avg": 1.83,
+                "ht_sd_avg": 1.292
+            },
+            "scores": {
+                "ptgg": 5.3,
+                "pto15": 0.0,
+                "pt": 5.3,
+                "over": 5.0,
+                "boost": 6.414,
+                "gold": 5.297,
+                "max": 6.414,
+                "edge_o25": 0.0,
+                "edge_o05ht": 0.0,
+                "edge_o15ht": 0.0,
+                "edge_level_o25": "CLASSIC",
+                "edge_level_o05ht": "CLASSIC",
+                "edge_level_o15ht": "CLASSIC",
+                "p_model_o25": 0.0,
+                "p_market_o25": 0.0,
+                "p_model_o05ht": 0.0,
+                "p_market_o05ht": 0.0,
+                "p_model_o15ht": 0.0,
+                "p_market_o15ht": 0.0
+            },
+            "tags": [
+                "BOOST"
+            ],
+            "internal_labels": [
+                "ENGINE_V24_CLASSIC"
+            ],
+            "structure": {
+                "match_profile": "classic_fast_over",
+                "structure_score": 1.9,
+                "structure_grade": "high",
+                "combined_ht_clean": 2.402,
+                "combined_ft_clean": 3.358,
+                "combined_ht_scored_clean": 1.065,
+                "cross_home_clean": 3.967,
+                "cross_away_clean": 2.499,
+                "bilateral_ft": true,
+                "bilateral_ht": true,
+                "one_sided_risk": 2.2,
+                "fav_quote": 1.25,
+                "fav_zone": "ultra",
+                "combined_ht_dirty": 2.409,
+                "combined_ft_dirty": 3.443,
+                "cross_home_dirty": 3.967,
+                "cross_away_dirty": 2.499
+            },
+            "market_reading": {
+                "market_profile": "classic_market",
+                "coherence_score": 1.1,
+                "coherence_level": "medium",
+                "dislocation_score": 0.0,
+                "dislocation_level": "low",
+                "leading_market": "none",
+                "lagging_market": "none",
+                "drop_type": "none",
+                "drop_strength": "none",
+                "drop_confirmed": false,
+                "value_left": "unknown",
+                "positive_flags": [
+                    "classic_o25_range",
+                    "classic_ht_market_range"
+                ],
+                "warning_flags": [],
+                "margin_open": 0.0,
+                "margin_curr": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.0,
+                "fav_fair_prob_curr": 0.0,
+                "fav_fair_prob_delta": 0.0,
+                "fav_fair_curr": 0.0,
+                "home_ft_stdev": 0.0,
+                "away_ft_stdev": 0.0,
+                "home_scoring_regularity": 0.0,
+                "away_scoring_regularity": 0.0
+            },
+            "signal_debug": {
+                "engine": "V24_CLASSIC_ON_V25_SHELL",
+                "tags": [
+                    "BOOST"
+                ],
+                "strong_tag_count": 1,
+                "fav_quote": 1.25,
+                "is_gold_zone": false,
+                "drop_diff": 0.0,
+                "internal_labels": [
+                    "ENGINE_V24_CLASSIC"
+                ],
+                "over_level": 3,
+                "visual_over_tier": 0,
+                "drop_visual_level": "none",
+                "signal_stability": "Alta",
+                "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
+                "tempo_tag": "FAST",
+                "early_index": 3.524,
+                "early_home": 3.703,
+                "early_away": 0.96,
+                "early_balance": 2.743,
+                "pressure_factor": 2.532,
+                "activation_factor": 0.789,
+                "market_acceleration_label": "NO_HISTORY",
+                "quote_dynamics": {
+                    "history_count": 1,
+                    "o25_velocity": 0.0,
+                    "o25_prev_velocity": 0.0,
+                    "o25_acceleration": 0.0,
+                    "o25_movement_type": "none",
+                    "o05ht_velocity": 0.0,
+                    "o05ht_prev_velocity": 0.0,
+                    "o05ht_acceleration": 0.0,
+                    "o05ht_movement_type": "none",
+                    "o15ht_velocity": 0.0,
+                    "o15ht_prev_velocity": 0.0,
+                    "o15ht_acceleration": 0.0,
+                    "o15ht_movement_type": "none",
+                    "fav_velocity": 0.0,
+                    "fav_prev_velocity": 0.0,
+                    "fav_acceleration": 0.0,
+                    "fav_movement_type": "none",
+                    "market_acceleration_label": "NO_HISTORY"
+                }
+            },
+            "home_profile": {
+                "expected_side": "home",
+                "all_sample_count": 8,
+                "context_sample_count": 5,
+                "context_weight": 0.62,
+                "avg_ht_clean": 3.17,
+                "avg_total_clean": 4.587,
+                "avg_ht_scored_clean": 2.131,
+                "avg_ht_conceded_clean": 0.96,
+                "avg_ft_scored_clean": 2.368,
+                "avg_ft_conceded_clean": 1.9,
+                "ht_1plus_rate": 1.0,
+                "ht_zero_rate": 0.0,
+                "ft_2plus_rate": 1.0,
+                "ft_3plus_rate": 1.0,
+                "ft_low_rate": 0.0,
+                "ctx_avg_ht_clean": 2.667,
+                "ctx_avg_total_clean": 4.0,
+                "ctx_avg_ft_scored_clean": 2.0,
+                "ctx_avg_ft_conceded_clean": 2.0,
+                "ctx_ht_1plus_rate": 1.0,
+                "ctx_ft_2plus_rate": 1.0,
+                "ft_stdev": 2.246,
+                "ht_stdev": 1.979,
+                "ft_scored_stdev": 2.783,
+                "scoring_regularity": 0.781,
+                "ctx_ft_stdev": 2.4,
+                "ctx_ht_stdev": 2.098,
+                "ctx_ft_scored_stdev": 2.926,
+                "ctx_scoring_regularity": 0.8
+            },
+            "away_profile": {
+                "expected_side": "away",
+                "all_sample_count": 8,
+                "context_sample_count": 3,
+                "context_weight": 0.48,
+                "avg_ht_clean": 1.634,
+                "avg_total_clean": 2.13,
+                "avg_ht_scored_clean": 0.0,
+                "avg_ht_conceded_clean": 1.572,
+                "avg_ft_scored_clean": 0.599,
+                "avg_ft_conceded_clean": 1.599,
+                "ht_1plus_rate": 0.74,
+                "ht_zero_rate": 0.26,
+                "ft_2plus_rate": 0.805,
+                "ft_3plus_rate": 0.29,
+                "ft_low_rate": 0.195,
+                "ctx_avg_ht_clean": 2.0,
+                "ctx_avg_total_clean": 3.0,
+                "ctx_avg_ft_scored_clean": 1.0,
+                "ctx_avg_ft_conceded_clean": 2.0,
+                "ctx_ht_1plus_rate": 1.0,
+                "ctx_ft_2plus_rate": 1.0,
+                "ft_stdev": 1.414,
+                "ht_stdev": 0.606,
+                "ft_scored_stdev": 1.26,
+                "scoring_regularity": 0.42,
+                "ctx_ft_stdev": 1.414,
+                "ctx_ht_stdev": 0.0,
+                "ctx_ft_scored_stdev": 1.414,
+                "ctx_scoring_regularity": 0.333
+            },
+            "home_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-05-09",
+                    "league": "OFC Pro League",
+                    "match": "South Melbourne - South Island United",
+                    "opponent": "South Island United",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "4-1",
+                    "ft": "4-2",
+                    "total_ht_goals": 5.0,
+                    "total_ft_goals": 6.0,
+                    "team_ht_scored": 4.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 4.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-05-08",
+                    "league": "Victoria NPL",
+                    "match": "Heidelberg United - South Melbourne",
+                    "opponent": "Heidelberg United",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "3-0",
+                    "ft": "4-0",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 4.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 3.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 4.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-05-06",
+                    "league": "OFC Pro League",
+                    "match": "Auckland FC 2 - South Melbourne",
+                    "opponent": "Auckland FC 2",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-2",
+                    "ft": "1-2",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-05-01",
+                    "league": "Victoria NPL",
+                    "match": "South Melbourne - Melbourne City II",
+                    "opponent": "Melbourne City II",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-1",
+                    "ft": "1-2",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-04-24",
+                    "league": "Victoria NPL",
+                    "match": "St. Albans Saints - South Melbourne",
+                    "opponent": "St. Albans Saints",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-1",
+                    "ft": "0-4",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 4.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 4.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 3.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 6,
+                    "date": "2026-04-21",
+                    "league": "OFC Pro League",
+                    "match": "South Melbourne - Tahiti United",
+                    "opponent": "Tahiti United",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "6-0",
+                    "ft": "8-1",
+                    "total_ht_goals": 6.0,
+                    "total_ft_goals": 9.0,
+                    "team_ht_scored": 6.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 8.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 7,
+                    "date": "2026-04-19",
+                    "league": "Victoria NPL",
+                    "match": "South Melbourne - Oakleigh Cannons",
+                    "opponent": "Oakleigh Cannons",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-1",
+                    "ft": "0-3",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 3.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 2.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 8,
+                    "date": "2026-04-18",
+                    "league": "OFC Pro League",
+                    "match": "South Melbourne - Hekari United",
+                    "opponent": "Hekari United",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-1",
+                    "ft": "1-2",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                }
+            ],
+            "away_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-05-09",
+                    "league": "OFC Pro League",
+                    "match": "Auckland FC 2 - Bula",
+                    "opponent": "Auckland FC 2",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "2-0",
+                    "ft": "2-0",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-05-06",
+                    "league": "OFC Pro League",
+                    "match": "Bula - South Island United",
+                    "opponent": "South Island United",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "0-1",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-04-18",
+                    "league": "OFC Pro League",
+                    "match": "Bula - Auckland FC 2",
+                    "opponent": "Auckland FC 2",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "2-1",
+                    "ft": "2-1",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-04-15",
+                    "league": "OFC Pro League",
+                    "match": "South Melbourne - Bula",
+                    "opponent": "South Melbourne",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "2-0",
+                    "ft": "2-0",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-04-12",
+                    "league": "OFC Pro League",
+                    "match": "Bula - Hekari United",
+                    "opponent": "Hekari United",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "1-0",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 6,
+                    "date": "2026-03-19",
+                    "league": "OFC Pro League",
+                    "match": "South Island United - Bula",
+                    "opponent": "South Island United",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "2-0",
+                    "ft": "2-3",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 3.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 7,
+                    "date": "2026-03-15",
+                    "league": "OFC Pro League",
+                    "match": "Bula - Tahiti United",
+                    "opponent": "Tahiti United",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "2-0",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 8,
+                    "date": "2026-03-03",
+                    "league": "OFC Pro League",
+                    "match": "Bula - South Island United",
+                    "opponent": "South Island United",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "0-0",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 0.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                }
+            ]
+        },
         "1391614": {
             "fixture_id": 1391614,
             "date": "2026-05-12",
@@ -10649,8 +11481,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:14",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:38",
+                    "hhmm": "08:17",
                     "q1": 3.9,
                     "qx": 3.3,
                     "q2": 1.85,
@@ -10872,6 +11704,7 @@
                     "DROP_CONFIRMED"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "strong",
                 "signal_stability": "Alta",
                 "signal_summary": "GOLD CLASSIC: favorita fertile + base goal/HT",
@@ -11477,8 +12310,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:14",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:38",
+                    "hhmm": "08:17",
                     "q1": 2.2,
                     "qx": 3.2,
                     "q2": 3.3,
@@ -11684,9 +12517,10 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 2,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "SLOW",
                 "early_index": 1.942,
                 "early_home": 0.615,
@@ -12289,8 +13123,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:15",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:39",
+                    "hhmm": "08:17",
                     "q1": 9.2,
                     "qx": 4.2,
                     "q2": 1.4,
@@ -12496,6 +13330,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -13101,8 +13936,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:15",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:39",
+                    "hhmm": "08:17",
                     "q1": 2.5,
                     "qx": 3.1,
                     "q2": 2.95,
@@ -13305,6 +14140,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 2,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
@@ -13910,8 +14746,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:15",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:40",
+                    "hhmm": "08:17",
                     "q1": 7.0,
                     "qx": 4.0,
                     "q2": 1.4,
@@ -14128,6 +14964,7 @@
                     "DROP_CONFIRMED"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "strong",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
@@ -14733,14 +15570,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:16",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:40",
+                    "hhmm": "08:17",
                     "q1": 1.91,
                     "qx": 3.2,
-                    "q2": 3.7,
-                    "o25": 2.15,
-                    "o05ht": 1.42,
-                    "o15ht": 2.9
+                    "q2": 3.75,
+                    "o25": 2.2,
+                    "o05ht": 1.48,
+                    "o15ht": 3.2
                 }
             ],
             "quote_dynamics": {
@@ -14769,13 +15606,13 @@
             "markets": {
                 "q1": 1.91,
                 "qx": 3.2,
-                "q2": 3.7,
-                "o25": 2.15,
-                "o05ht": 1.42,
-                "o15ht": 2.9,
-                "u25": 1.65,
-                "u05ht": 2.62,
-                "u15ht": 1.35
+                "q2": 3.75,
+                "o25": 2.2,
+                "o05ht": 1.48,
+                "o15ht": 3.2,
+                "u25": 1.62,
+                "u05ht": 2.4,
+                "u15ht": 1.28
             },
             "averages": {
                 "home_avg_ft": 2.13,
@@ -14879,9 +15716,7 @@
             "internal_labels": [
                 "ENGINE_V24_CLASSIC",
                 "MARKET_OK",
-                "DROP_1X2",
-                "DROP_O25",
-                "DROP_CONFIRMED"
+                "DROP_1X2"
             ],
             "structure": {
                 "match_profile": "v24_classic",
@@ -14904,19 +15739,18 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 1.45,
+                "coherence_score": 1.0,
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
                 "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "structural",
+                "drop_type": "sterile",
                 "drop_strength": "hard",
-                "drop_confirmed": true,
+                "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
                     "classic_o25_range",
-                    "classic_ht_market_range",
                     "classic_market_pressure"
                 ],
                 "warning_flags": [],
@@ -14944,14 +15778,13 @@
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC",
                     "MARKET_OK",
-                    "DROP_1X2",
-                    "DROP_O25",
-                    "DROP_CONFIRMED"
+                    "DROP_1X2"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "strong",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "SLOW",
                 "early_index": 1.647,
                 "early_home": 0.602,
@@ -15554,8 +16387,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:16",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:41",
+                    "hhmm": "08:17",
                     "q1": 1.95,
                     "qx": 3.1,
                     "q2": 3.9,
@@ -15760,6 +16593,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
@@ -16365,8 +17199,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:17",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:41",
+                    "hhmm": "08:17",
                     "q1": 2.85,
                     "qx": 3.35,
                     "q2": 2.25,
@@ -16572,9 +17406,10 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "FAST",
                 "early_index": 2.999,
                 "early_home": 1.203,
@@ -17177,8 +18012,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:17",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:42",
+                    "hhmm": "08:17",
                     "q1": 2.38,
                     "qx": 3.35,
                     "q2": 2.55,
@@ -17392,9 +18227,10 @@
                     "INV_OK"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "strong",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "SLOW",
                 "early_index": 2.176,
                 "early_home": 1.242,
@@ -17997,8 +18833,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:18",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:42",
+                    "hhmm": "08:17",
                     "q1": 1.38,
                     "qx": 4.35,
                     "q2": 6.4,
@@ -18203,6 +19039,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
@@ -18808,14 +19645,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:18",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:43",
+                    "hhmm": "08:17",
                     "q1": 2.0,
-                    "qx": 3.5,
-                    "q2": 3.3,
+                    "qx": 3.55,
+                    "q2": 3.25,
                     "o25": 1.8,
                     "o05ht": 1.36,
-                    "o15ht": 2.65
+                    "o15ht": 2.75
                 }
             ],
             "quote_dynamics": {
@@ -18843,14 +19680,14 @@
             "away_team": "Dukla Praha",
             "markets": {
                 "q1": 2.0,
-                "qx": 3.5,
-                "q2": 3.3,
+                "qx": 3.55,
+                "q2": 3.25,
                 "o25": 1.8,
                 "o05ht": 1.36,
-                "o15ht": 2.65,
-                "u25": 1.95,
-                "u05ht": 2.9,
-                "u15ht": 1.42
+                "o15ht": 2.75,
+                "u25": 1.93,
+                "u05ht": 2.88,
+                "u15ht": 1.4
             },
             "averages": {
                 "home_avg_ft": 1.864,
@@ -18975,19 +19812,20 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 1.1,
+                "coherence_score": 1.45,
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "none",
+                "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "high",
                 "positive_flags": [
                     "classic_o25_range",
-                    "classic_ht_market_range"
+                    "classic_ht_market_range",
+                    "classic_market_pressure"
                 ],
                 "warning_flags": [],
                 "margin_open": 0.0,
@@ -19015,9 +19853,10 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "BUILD",
                 "early_index": 2.321,
                 "early_home": 1.186,
@@ -19620,8 +20459,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:18",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:43",
+                    "hhmm": "08:17",
                     "q1": 2.66,
                     "qx": 3.05,
                     "q2": 2.58,
@@ -19826,6 +20665,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -20431,8 +21271,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:19",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:44",
+                    "hhmm": "08:17",
                     "q1": 2.74,
                     "qx": 3.0,
                     "q2": 2.54,
@@ -20635,6 +21475,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -21240,8 +22081,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:19",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:44",
+                    "hhmm": "08:17",
                     "q1": 1.37,
                     "qx": 4.4,
                     "q2": 6.5,
@@ -21446,6 +22287,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -22051,14 +22893,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:20",
-                    "hhmm": "04:02",
-                    "q1": 2.25,
-                    "qx": 3.0,
+                    "ts": "2026-05-11 08:17:45",
+                    "hhmm": "08:17",
+                    "q1": 2.24,
+                    "qx": 3.05,
                     "q2": 3.2,
-                    "o25": 2.17,
-                    "o05ht": 1.4,
-                    "o15ht": 3.0
+                    "o25": 2.15,
+                    "o05ht": 1.42,
+                    "o15ht": 2.88
                 }
             ],
             "quote_dynamics": {
@@ -22085,15 +22927,15 @@
             "home_team": "Kifisia",
             "away_team": "Atromitos",
             "markets": {
-                "q1": 2.25,
-                "qx": 3.0,
+                "q1": 2.24,
+                "qx": 3.05,
                 "q2": 3.2,
-                "o25": 2.17,
-                "o05ht": 1.4,
-                "o15ht": 3.0,
-                "u25": 1.67,
-                "u05ht": 2.7,
-                "u15ht": 1.35
+                "o25": 2.15,
+                "o05ht": 1.42,
+                "o15ht": 2.88,
+                "u25": 1.65,
+                "u05ht": 2.65,
+                "u15ht": 1.36
             },
             "averages": {
                 "home_avg_ft": 1.262,
@@ -22130,9 +22972,9 @@
                 "away_ht_conceded_1plus_rate": 0.444
             },
             "flags": {
-                "fav_quote": 2.25,
+                "fav_quote": 2.24,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.01,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": false
             },
@@ -22171,13 +23013,13 @@
                 "ht_sd_avg": 1.131
             },
             "scores": {
-                "ptgg": 5.2,
+                "ptgg": 4.3,
                 "pto15": 0.0,
-                "pt": 5.2,
+                "pt": 4.3,
                 "over": 3.8,
-                "boost": 4.15,
-                "gold": 3.695,
-                "max": 5.2,
+                "boost": 3.808,
+                "gold": 3.381,
+                "max": 4.3,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -22209,7 +23051,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 2.2,
-                "fav_quote": 2.25,
+                "fav_quote": 2.24,
                 "fav_zone": "balanced",
                 "combined_ht_dirty": 1.318,
                 "combined_ft_dirty": 2.509,
@@ -22222,12 +23064,12 @@
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "none",
+                "leading_market": "ht",
                 "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "drop_type": "divergent",
+                "drop_strength": "medium",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "high",
                 "positive_flags": [
                     "classic_o25_range",
                     "classic_ht_market_range"
@@ -22251,13 +23093,14 @@
                     "PT"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.25,
+                "fav_quote": 2.24,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.01,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 1,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
                 "signal_summary": "PT CLASSIC: pressione primo tempo",
@@ -22863,8 +23706,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:20",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:45",
+                    "hhmm": "08:17",
                     "q1": 1.78,
                     "qx": 3.35,
                     "q2": 4.4,
@@ -23086,9 +23929,10 @@
                     "DROP_1X2"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 2,
                 "drop_visual_level": "light",
                 "signal_stability": "Alta",
-                "signal_summary": "GOLD CLASSIC: favorita fertile + base goal/HT",
+                "signal_summary": "ELITE VISIVA: struttura + mercato confermati",
                 "tempo_tag": "FAST",
                 "early_index": 2.668,
                 "early_home": 1.464,
@@ -23691,14 +24535,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:21",
-                    "hhmm": "04:02",
-                    "q1": 2.3,
-                    "qx": 2.9,
+                    "ts": "2026-05-11 08:17:46",
+                    "hhmm": "08:17",
+                    "q1": 2.26,
+                    "qx": 3.05,
                     "q2": 3.1,
-                    "o25": 2.26,
+                    "o25": 2.2,
                     "o05ht": 1.44,
-                    "o15ht": 3.1
+                    "o15ht": 2.95
                 }
             ],
             "quote_dynamics": {
@@ -23725,15 +24569,15 @@
             "home_team": "Panetolikos",
             "away_team": "Larisa",
             "markets": {
-                "q1": 2.3,
-                "qx": 2.9,
+                "q1": 2.26,
+                "qx": 3.05,
                 "q2": 3.1,
-                "o25": 2.26,
+                "o25": 2.2,
                 "o05ht": 1.44,
-                "o15ht": 3.1,
+                "o15ht": 2.95,
                 "u25": 1.62,
                 "u05ht": 2.6,
-                "u15ht": 1.3
+                "u15ht": 1.35
             },
             "averages": {
                 "home_avg_ft": 1.943,
@@ -23770,7 +24614,7 @@
                 "away_ht_conceded_1plus_rate": 0.556
             },
             "flags": {
-                "fav_quote": 2.3,
+                "fav_quote": 2.26,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": true,
@@ -23837,7 +24681,8 @@
             "internal_labels": [
                 "ENGINE_V24_CLASSIC",
                 "MARKET_OK",
-                "DROP_1X2"
+                "DROP_1X2",
+                "DROP_CONFIRMED"
             ],
             "structure": {
                 "match_profile": "v24_classic",
@@ -23851,7 +24696,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.25,
-                "fav_quote": 2.3,
+                "fav_quote": 2.26,
                 "fav_zone": "wide",
                 "combined_ht_dirty": 0.858,
                 "combined_ft_dirty": 2.186,
@@ -23860,17 +24705,18 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 0.35,
-                "coherence_level": "low",
+                "coherence_score": 1.0,
+                "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
                 "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "sterile",
+                "drop_type": "structural",
                 "drop_strength": "hard",
-                "drop_confirmed": false,
+                "drop_confirmed": true,
                 "value_left": "high",
                 "positive_flags": [
+                    "classic_o25_range",
                     "classic_market_pressure"
                 ],
                 "warning_flags": [],
@@ -23892,18 +24738,20 @@
                     "OVER"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.3,
+                "fav_quote": 2.26,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC",
                     "MARKET_OK",
-                    "DROP_1X2"
+                    "DROP_1X2",
+                    "DROP_CONFIRMED"
                 ],
                 "over_level": 2,
-                "drop_visual_level": "light",
+                "visual_over_tier": 1,
+                "drop_visual_level": "strong",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "SLOW",
                 "early_index": 1.718,
                 "early_home": 1.158,
@@ -24506,8 +25354,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:21",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:46",
+                    "hhmm": "08:17",
                     "q1": 1.65,
                     "qx": 4.0,
                     "q2": 4.75,
@@ -24724,6 +25572,7 @@
                     "FAV_FERTILE"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "GOLD CLASSIC: favorita fertile + base goal/HT",
@@ -25329,8 +26178,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:22",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:47",
+                    "hhmm": "08:17",
                     "q1": 2.16,
                     "qx": 3.0,
                     "q2": 3.65,
@@ -25533,6 +26382,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
@@ -26138,8 +26988,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:22",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:47",
+                    "hhmm": "08:17",
                     "q1": 1.69,
                     "qx": 3.8,
                     "q2": 4.6,
@@ -26357,6 +27207,7 @@
                     "FAV_FERTILE"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "GOLD CLASSIC: favorita fertile + base goal/HT",
@@ -26962,8 +27813,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:22",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:48",
+                    "hhmm": "08:17",
                     "q1": 5.3,
                     "qx": 4.1,
                     "q2": 1.47,
@@ -27168,6 +28019,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 2,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
@@ -27773,8 +28625,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:23",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:48",
+                    "hhmm": "08:17",
                     "q1": 2.2,
                     "qx": 3.5,
                     "q2": 3.1,
@@ -27980,6 +28832,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -28585,14 +29438,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:24",
-                    "hhmm": "04:02",
-                    "q1": 2.54,
-                    "qx": 3.14,
-                    "q2": 2.73,
-                    "o25": 2.27,
-                    "o05ht": 1.46,
-                    "o15ht": 3.28
+                    "ts": "2026-05-11 08:17:49",
+                    "hhmm": "08:17",
+                    "q1": 2.55,
+                    "qx": 3.0,
+                    "q2": 2.7,
+                    "o25": 2.2,
+                    "o05ht": 1.45,
+                    "o15ht": 3.1
                 }
             ],
             "quote_dynamics": {
@@ -28619,15 +29472,15 @@
             "home_team": "FC Voluntari",
             "away_team": "Sepsi OSK Sfantu Gheorghe",
             "markets": {
-                "q1": 2.54,
-                "qx": 3.14,
-                "q2": 2.73,
-                "o25": 2.27,
-                "o05ht": 1.46,
-                "o15ht": 3.28,
-                "u25": 1.6,
+                "q1": 2.55,
+                "qx": 3.0,
+                "q2": 2.7,
+                "o25": 2.2,
+                "o05ht": 1.45,
+                "o15ht": 3.1,
+                "u25": 1.62,
                 "u05ht": 2.5,
-                "u15ht": 1.28
+                "u15ht": 1.3
             },
             "averages": {
                 "home_avg_ft": 2.78,
@@ -28664,7 +29517,7 @@
                 "away_ht_conceded_1plus_rate": 0.25
             },
             "flags": {
-                "fav_quote": 2.54,
+                "fav_quote": 2.55,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
@@ -28729,7 +29582,9 @@
                 "OVER"
             ],
             "internal_labels": [
-                "ENGINE_V24_CLASSIC"
+                "ENGINE_V24_CLASSIC",
+                "MARKET_OK",
+                "DROP_O25"
             ],
             "structure": {
                 "match_profile": "classic_fast_over",
@@ -28743,7 +29598,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.0,
-                "fav_quote": 2.54,
+                "fav_quote": 2.55,
                 "fav_zone": "wide",
                 "combined_ht_dirty": 1.104,
                 "combined_ft_dirty": 2.582,
@@ -28752,17 +29607,18 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 0.35,
-                "coherence_level": "low",
+                "coherence_score": 1.0,
+                "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
                 "leading_market": "mixed",
                 "lagging_market": "none",
-                "drop_type": "mixed",
-                "drop_strength": "soft",
+                "drop_type": "divergent",
+                "drop_strength": "medium",
                 "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
+                    "classic_o25_range",
                     "classic_market_pressure"
                 ],
                 "warning_flags": [],
@@ -28784,16 +29640,19 @@
                     "OVER"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.54,
+                "fav_quote": 2.55,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
-                    "ENGINE_V24_CLASSIC"
+                    "ENGINE_V24_CLASSIC",
+                    "MARKET_OK",
+                    "DROP_O25"
                 ],
                 "over_level": 3,
-                "drop_visual_level": "none",
+                "visual_over_tier": 1,
+                "drop_visual_level": "light",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "SLOW",
                 "early_index": 1.661,
                 "early_home": 1.031,
@@ -29396,14 +30255,14 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:24",
-                    "hhmm": "04:02",
-                    "q1": 1.4,
-                    "qx": 4.33,
-                    "q2": 5.5,
-                    "o25": 1.61,
+                    "ts": "2026-05-11 08:17:50",
+                    "hhmm": "08:17",
+                    "q1": 1.42,
+                    "qx": 4.2,
+                    "q2": 6.6,
+                    "o25": 1.57,
                     "o05ht": 1.3,
-                    "o15ht": 2.38
+                    "o15ht": 2.3
                 }
             ],
             "quote_dynamics": {
@@ -29430,15 +30289,15 @@
             "home_team": "Hapoel Tel Aviv",
             "away_team": "Hapoel Petah Tikva",
             "markets": {
-                "q1": 1.4,
-                "qx": 4.33,
-                "q2": 5.5,
-                "o25": 1.61,
+                "q1": 1.42,
+                "qx": 4.2,
+                "q2": 6.6,
+                "o25": 1.57,
                 "o05ht": 1.3,
-                "o15ht": 2.38,
-                "u25": 2.25,
-                "u05ht": 3.4,
-                "u15ht": 1.53
+                "o15ht": 2.3,
+                "u25": 2.3,
+                "u05ht": 3.25,
+                "u15ht": 1.55
             },
             "averages": {
                 "home_avg_ft": 1.931,
@@ -29475,9 +30334,9 @@
                 "away_ht_conceded_1plus_rate": 0.831
             },
             "flags": {
-                "fav_quote": 1.4,
+                "fav_quote": 1.42,
                 "is_gold_zone": false,
-                "drop_diff": 0.21,
+                "drop_diff": 0.19,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
@@ -29520,9 +30379,9 @@
                 "pto15": 0.0,
                 "pt": 5.2,
                 "over": 6.24,
-                "boost": 6.961,
-                "gold": 7.233,
-                "max": 7.233,
+                "boost": 6.611,
+                "gold": 7.464,
+                "max": 7.464,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -29557,7 +30416,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.9,
-                "fav_quote": 1.4,
+                "fav_quote": 1.42,
                 "fav_zone": "strong",
                 "combined_ht_dirty": 1.315,
                 "combined_ft_dirty": 2.753,
@@ -29601,15 +30460,16 @@
                     "⚽⚽"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 1.4,
+                "fav_quote": 1.42,
                 "is_gold_zone": false,
-                "drop_diff": 0.21,
+                "drop_diff": 0.19,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC",
                     "MARKET_OK",
                     "DROP_1X2"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "strong",
                 "signal_stability": "Alta",
                 "signal_summary": "GOLD CLASSIC: favorita fertile + base goal/HT",
@@ -30215,8 +31075,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:24",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:50",
+                    "hhmm": "08:17",
                     "q1": 2.1,
                     "qx": 3.1,
                     "q2": 3.3,
@@ -30426,6 +31286,7 @@
                     "DROP_O25"
                 ],
                 "over_level": 2,
+                "visual_over_tier": 0,
                 "drop_visual_level": "light",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
@@ -31028,17 +31889,17 @@
             "league": "Ligat Ha'al",
             "country": "Israel",
             "match": "Beitar Jerusalem - Hapoel Beer Sheva",
-            "gg_ht_sniper": false,
+            "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:25",
-                    "hhmm": "04:02",
-                    "q1": 2.5,
-                    "qx": 3.4,
-                    "q2": 2.38,
-                    "o25": 1.58,
-                    "o05ht": 1.29,
-                    "o15ht": 2.25
+                    "ts": "2026-05-11 08:17:51",
+                    "hhmm": "08:17",
+                    "q1": 2.54,
+                    "qx": 3.45,
+                    "q2": 2.45,
+                    "o25": 1.62,
+                    "o05ht": 1.3,
+                    "o15ht": 2.35
                 }
             ],
             "quote_dynamics": {
@@ -31065,15 +31926,15 @@
             "home_team": "Beitar Jerusalem",
             "away_team": "Hapoel Beer Sheva",
             "markets": {
-                "q1": 2.5,
-                "qx": 3.4,
-                "q2": 2.38,
-                "o25": 1.58,
-                "o05ht": 1.29,
-                "o15ht": 2.25,
-                "u25": 2.31,
-                "u05ht": 3.5,
-                "u15ht": 1.6
+                "q1": 2.54,
+                "qx": 3.45,
+                "q2": 2.45,
+                "o25": 1.62,
+                "o05ht": 1.3,
+                "o15ht": 2.35,
+                "u25": 2.2,
+                "u05ht": 3.2,
+                "u15ht": 1.53
             },
             "averages": {
                 "home_avg_ft": 4.11,
@@ -31110,7 +31971,7 @@
                 "away_ht_conceded_1plus_rate": 0.0
             },
             "flags": {
-                "fav_quote": 2.38,
+                "fav_quote": 2.45,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
@@ -31155,9 +32016,9 @@
                 "pto15": 0.0,
                 "pt": 5.3,
                 "over": 5.0,
-                "boost": 6.064,
-                "gold": 5.178,
-                "max": 6.064,
+                "boost": 6.414,
+                "gold": 5.297,
+                "max": 6.414,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -31172,7 +32033,8 @@
                 "p_market_o15ht": 0.0
             },
             "tags": [
-                "BOOST"
+                "BOOST",
+                "⚽⚽"
             ],
             "internal_labels": [
                 "ENGINE_V24_CLASSIC",
@@ -31191,7 +32053,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.92,
-                "fav_quote": 2.38,
+                "fav_quote": 2.45,
                 "fav_zone": "wide",
                 "combined_ht_dirty": 1.857,
                 "combined_ft_dirty": 3.542,
@@ -31231,10 +32093,11 @@
             "signal_debug": {
                 "engine": "V24_CLASSIC_ON_V25_SHELL",
                 "tags": [
-                    "BOOST"
+                    "BOOST",
+                    "⚽⚽"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.38,
+                "fav_quote": 2.45,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
@@ -31243,9 +32106,10 @@
                     "DROP_1X2"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 2,
                 "drop_visual_level": "light",
                 "signal_stability": "Alta",
-                "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
+                "signal_summary": "ELITE VISIVA: struttura + mercato confermati",
                 "tempo_tag": "FAST",
                 "early_index": 3.156,
                 "early_home": 1.543,
@@ -31848,8 +32712,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:25",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:51",
+                    "hhmm": "08:17",
                     "q1": 1.67,
                     "qx": 4.0,
                     "q2": 4.5,
@@ -32071,9 +32935,10 @@
                     "DROP_1X2"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 2,
                 "drop_visual_level": "light",
                 "signal_stability": "Alta",
-                "signal_summary": "GOLD CLASSIC: favorita fertile + base goal/HT",
+                "signal_summary": "ELITE VISIVA: struttura + mercato confermati",
                 "tempo_tag": "FAST",
                 "early_index": 2.727,
                 "early_home": 2.048,
@@ -32676,8 +33541,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:26",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:52",
+                    "hhmm": "08:17",
                     "q1": 2.25,
                     "qx": 3.75,
                     "q2": 2.75,
@@ -32883,9 +33748,10 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 1,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "FAST",
                 "early_index": 3.417,
                 "early_home": 2.014,
@@ -33485,11 +34351,11 @@
             "league": "Czech Liga",
             "country": "Czech-Republic",
             "match": "Sparta Praha - Plzen",
-            "gg_ht_sniper": false,
+            "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:26",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:52",
+                    "hhmm": "08:17",
                     "q1": 2.04,
                     "qx": 3.35,
                     "q2": 3.35,
@@ -33629,7 +34495,8 @@
                 "p_market_o15ht": 0.0
             },
             "tags": [
-                "OVER"
+                "OVER",
+                "⚽⚽"
             ],
             "internal_labels": [
                 "ENGINE_V24_CLASSIC",
@@ -33688,7 +34555,8 @@
             "signal_debug": {
                 "engine": "V24_CLASSIC_ON_V25_SHELL",
                 "tags": [
-                    "OVER"
+                    "OVER",
+                    "⚽⚽"
                 ],
                 "strong_tag_count": 1,
                 "fav_quote": 2.04,
@@ -33700,9 +34568,10 @@
                     "DROP_1X2"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 2,
                 "drop_visual_level": "light",
-                "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_stability": "Alta",
+                "signal_summary": "ELITE VISIVA: struttura + mercato confermati",
                 "tempo_tag": "BUILD",
                 "early_index": 2.37,
                 "early_home": 1.117,
@@ -34305,8 +35174,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:27",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:53",
+                    "hhmm": "08:17",
                     "q1": 1.8,
                     "qx": 3.85,
                     "q2": 3.95,
@@ -34528,6 +35397,7 @@
                     "DROP_1X2"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "light",
                 "signal_stability": "Alta",
                 "signal_summary": "GOLD CLASSIC: favorita fertile + base goal/HT",
@@ -35133,8 +36003,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:27",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:53",
+                    "hhmm": "08:17",
                     "q1": 1.5,
                     "qx": 4.6,
                     "q2": 5.4,
@@ -35353,6 +36223,7 @@
                     "DROP_CONFIRMED"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "strong",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -35958,12 +36829,12 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:28",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:54",
+                    "hhmm": "08:17",
                     "q1": 1.85,
                     "qx": 3.9,
                     "q2": 3.7,
-                    "o25": 1.5,
+                    "o25": 1.53,
                     "o05ht": 1.25,
                     "o15ht": 2.15
                 }
@@ -35995,10 +36866,10 @@
                 "q1": 1.85,
                 "qx": 3.9,
                 "q2": 3.7,
-                "o25": 1.5,
+                "o25": 1.53,
                 "o05ht": 1.25,
                 "o15ht": 2.15,
-                "u25": 2.55,
+                "u25": 2.45,
                 "u05ht": 3.55,
                 "u15ht": 1.62
             },
@@ -36081,10 +36952,10 @@
                 "ptgg": 5.3,
                 "pto15": 0.0,
                 "pt": 5.3,
-                "over": 4.4,
-                "boost": 5.576,
-                "gold": 5.682,
-                "max": 5.682,
+                "over": 5.4,
+                "boost": 6.056,
+                "gold": 6.145,
+                "max": 6.145,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -36099,7 +36970,7 @@
                 "p_market_o15ht": 0.0
             },
             "tags": [
-                "OVER",
+                "BOOST",
                 "CLASSIC"
             ],
             "internal_labels": [
@@ -36160,7 +37031,7 @@
             "signal_debug": {
                 "engine": "V24_CLASSIC_ON_V25_SHELL",
                 "tags": [
-                    "OVER",
+                    "BOOST",
                     "CLASSIC"
                 ],
                 "strong_tag_count": 1,
@@ -36172,10 +37043,11 @@
                     "CLASSIC_BASE",
                     "FAV_FERTILE"
                 ],
-                "over_level": 2,
+                "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
-                "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_stability": "Alta",
+                "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
                 "tempo_tag": "FAST",
                 "early_index": 2.748,
                 "early_home": 2.78,
@@ -36778,8 +37650,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:28",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:54",
+                    "hhmm": "08:17",
                     "q1": 2.28,
                     "qx": 3.4,
                     "q2": 2.95,
@@ -36986,6 +37858,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 2,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
@@ -37588,11 +38461,11 @@
             "league": "Premiership",
             "country": "Scotland",
             "match": "Dundee Utd - Livingston",
-            "gg_ht_sniper": false,
+            "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:28",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:55",
+                    "hhmm": "08:17",
                     "q1": 1.67,
                     "qx": 3.95,
                     "q2": 4.65,
@@ -37732,7 +38605,8 @@
                 "p_market_o15ht": 0.0
             },
             "tags": [
-                "OVER"
+                "OVER",
+                "⚽⚽"
             ],
             "internal_labels": [
                 "ENGINE_V24_CLASSIC",
@@ -37794,7 +38668,8 @@
             "signal_debug": {
                 "engine": "V24_CLASSIC_ON_V25_SHELL",
                 "tags": [
-                    "OVER"
+                    "OVER",
+                    "⚽⚽"
                 ],
                 "strong_tag_count": 1,
                 "fav_quote": 1.67,
@@ -37808,9 +38683,10 @@
                     "DROP_CONFIRMED"
                 ],
                 "over_level": 2,
+                "visual_over_tier": 2,
                 "drop_visual_level": "strong",
-                "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_stability": "Alta",
+                "signal_summary": "ELITE VISIVA: struttura + mercato confermati",
                 "tempo_tag": "SLOW",
                 "early_index": 1.857,
                 "early_home": 1.419,
@@ -38413,8 +39289,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:29",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:55",
+                    "hhmm": "08:17",
                     "q1": 2.02,
                     "qx": 3.55,
                     "q2": 3.4,
@@ -38629,6 +39505,7 @@
                     "DROP_CONFIRMED"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "strong",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -39234,14 +40111,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:29",
-                    "hhmm": "04:02",
-                    "q1": 2.75,
-                    "qx": 3.5,
-                    "q2": 2.2,
-                    "o25": 1.6,
+                    "ts": "2026-05-11 08:17:56",
+                    "hhmm": "08:17",
+                    "q1": 2.95,
+                    "qx": 3.45,
+                    "q2": 2.15,
+                    "o25": 1.65,
                     "o05ht": 1.28,
-                    "o15ht": 2.25
+                    "o15ht": 2.3
                 }
             ],
             "quote_dynamics": {
@@ -39268,15 +40145,15 @@
             "home_team": "Clyde",
             "away_team": "Hamilton Academical",
             "markets": {
-                "q1": 2.75,
-                "qx": 3.5,
-                "q2": 2.2,
-                "o25": 1.6,
+                "q1": 2.95,
+                "qx": 3.45,
+                "q2": 2.15,
+                "o25": 1.65,
                 "o05ht": 1.28,
-                "o15ht": 2.25,
-                "u25": 2.3,
-                "u05ht": 3.5,
-                "u15ht": 1.57
+                "o15ht": 2.3,
+                "u25": 2.15,
+                "u05ht": 3.2,
+                "u15ht": 1.53
             },
             "averages": {
                 "home_avg_ft": 2.799,
@@ -39313,9 +40190,9 @@
                 "away_ht_conceded_1plus_rate": 0.444
             },
             "flags": {
-                "fav_quote": 2.2,
+                "fav_quote": 2.15,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.05,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": false
             },
@@ -39357,10 +40234,10 @@
                 "ptgg": 6.8,
                 "pto15": 0.0,
                 "pt": 6.8,
-                "over": 5.8,
-                "boost": 7.368,
-                "gold": 6.191,
-                "max": 7.368,
+                "over": 6.15,
+                "boost": 7.761,
+                "gold": 6.68,
+                "max": 7.761,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -39392,7 +40269,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.22,
-                "fav_quote": 2.2,
+                "fav_quote": 2.15,
                 "fav_zone": "balanced",
                 "combined_ht_dirty": 1.349,
                 "combined_ft_dirty": 2.999,
@@ -39401,19 +40278,20 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 1.1,
+                "coherence_score": 1.45,
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "none",
+                "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "high",
                 "positive_flags": [
                     "classic_o25_range",
-                    "classic_ht_market_range"
+                    "classic_ht_market_range",
+                    "classic_market_pressure"
                 ],
                 "warning_flags": [],
                 "margin_open": 0.0,
@@ -39434,14 +40312,15 @@
                     "BOOST"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.2,
+                "fav_quote": 2.15,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.05,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
-                "drop_visual_level": "none",
+                "visual_over_tier": 1,
+                "drop_visual_level": "light",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
                 "tempo_tag": "BUILD",
@@ -40046,12 +40925,12 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:30",
-                    "hhmm": "04:02",
-                    "q1": 1.44,
-                    "qx": 4.6,
-                    "q2": 5.5,
-                    "o25": 1.47,
+                    "ts": "2026-05-11 08:17:57",
+                    "hhmm": "08:17",
+                    "q1": 1.4,
+                    "qx": 4.4,
+                    "q2": 6.0,
+                    "o25": 1.48,
                     "o05ht": 1.22,
                     "o15ht": 2.1
                 }
@@ -40080,14 +40959,14 @@
             "home_team": "Linfield",
             "away_team": "Dungannon Swifts",
             "markets": {
-                "q1": 1.44,
-                "qx": 4.6,
-                "q2": 5.5,
-                "o25": 1.47,
+                "q1": 1.4,
+                "qx": 4.4,
+                "q2": 6.0,
+                "o25": 1.48,
                 "o05ht": 1.22,
                 "o15ht": 2.1,
-                "u25": 2.66,
-                "u05ht": 3.8,
+                "u25": 2.55,
+                "u05ht": 3.7,
                 "u15ht": 1.67
             },
             "averages": {
@@ -40125,9 +41004,9 @@
                 "away_ht_conceded_1plus_rate": 0.806
             },
             "flags": {
-                "fav_quote": 1.44,
+                "fav_quote": 1.4,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.04,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": false
             },
@@ -40171,8 +41050,8 @@
                 "pt": 6.1,
                 "over": 4.4,
                 "boost": 5.88,
-                "gold": 6.311,
-                "max": 6.311,
+                "gold": 5.961,
+                "max": 6.1,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -40204,7 +41083,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.25,
-                "fav_quote": 1.44,
+                "fav_quote": 1.4,
                 "fav_zone": "strong",
                 "combined_ht_dirty": 1.933,
                 "combined_ft_dirty": 3.52,
@@ -40213,19 +41092,20 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 1.1,
+                "coherence_score": 1.45,
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "none",
+                "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "low",
                 "positive_flags": [
                     "classic_o25_range",
-                    "classic_ht_market_range"
+                    "classic_ht_market_range",
+                    "classic_market_pressure"
                 ],
                 "warning_flags": [],
                 "margin_open": 0.0,
@@ -40246,13 +41126,14 @@
                     "BOOST"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 1.44,
+                "fav_quote": 1.4,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.04,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -40858,8 +41739,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:30",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:57",
+                    "hhmm": "08:17",
                     "q1": 2.16,
                     "qx": 3.6,
                     "q2": 3.0,
@@ -41065,6 +41946,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 1,
                 "drop_visual_level": "none",
                 "signal_stability": "Alta",
                 "signal_summary": "BOOST CLASSIC: PT + OVER allineati",
@@ -41670,8 +42552,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:31",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:58",
+                    "hhmm": "08:17",
                     "q1": 2.14,
                     "qx": 3.3,
                     "q2": 3.4,
@@ -41877,6 +42759,7 @@
                     "ENGINE_V24_CLASSIC"
                 ],
                 "over_level": 3,
+                "visual_over_tier": 0,
                 "drop_visual_level": "none",
                 "signal_stability": "Media",
                 "signal_summary": "OVER CLASSIC: base FT concreta",
@@ -42482,8 +43365,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:31",
-                    "hhmm": "04:02",
+                    "ts": "2026-05-11 08:17:58",
+                    "hhmm": "08:17",
                     "q1": 2.48,
                     "qx": 3.5,
                     "q2": 2.64,
@@ -42696,9 +43579,10 @@
                     "DROP_1X2"
                 ],
                 "over_level": 2,
+                "visual_over_tier": 1,
                 "drop_visual_level": "medium",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "BUILD",
                 "early_index": 2.32,
                 "early_home": 1.198,
@@ -43301,14 +44185,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-11 04:02:31",
-                    "hhmm": "04:02",
-                    "q1": 1.95,
-                    "qx": 3.25,
-                    "q2": 3.6,
-                    "o25": 2.15,
-                    "o05ht": 1.43,
-                    "o15ht": 3.02
+                    "ts": "2026-05-11 08:17:59",
+                    "hhmm": "08:17",
+                    "q1": 1.91,
+                    "qx": 3.2,
+                    "q2": 3.7,
+                    "o25": 2.0,
+                    "o05ht": 1.4,
+                    "o15ht": 2.75
                 }
             ],
             "quote_dynamics": {
@@ -43335,15 +44219,15 @@
             "home_team": "Union Magdalena",
             "away_team": "Real Cartagena",
             "markets": {
-                "q1": 1.95,
-                "qx": 3.25,
-                "q2": 3.6,
-                "o25": 2.15,
-                "o05ht": 1.43,
-                "o15ht": 3.02,
-                "u25": 1.67,
-                "u05ht": 2.53,
-                "u15ht": 1.31
+                "q1": 1.91,
+                "qx": 3.2,
+                "q2": 3.7,
+                "o25": 2.0,
+                "o05ht": 1.4,
+                "o15ht": 2.75,
+                "u25": 1.75,
+                "u05ht": 2.65,
+                "u15ht": 1.38
             },
             "averages": {
                 "home_avg_ft": 2.673,
@@ -43380,9 +44264,9 @@
                 "away_ht_conceded_1plus_rate": 0.26
             },
             "flags": {
-                "fav_quote": 1.95,
+                "fav_quote": 1.91,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.04,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
@@ -43421,13 +44305,13 @@
                 "ht_sd_avg": 0.776
             },
             "scores": {
-                "ptgg": 5.3,
+                "ptgg": 6.2,
                 "pto15": 0.0,
-                "pt": 5.3,
+                "pt": 6.2,
                 "over": 4.6,
-                "boost": 5.372,
-                "gold": 4.822,
-                "max": 5.372,
+                "boost": 5.714,
+                "gold": 5.137,
+                "max": 6.2,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -43445,7 +44329,9 @@
                 "OVER"
             ],
             "internal_labels": [
-                "ENGINE_V24_CLASSIC"
+                "ENGINE_V24_CLASSIC",
+                "MARKET_OK",
+                "DROP_O25"
             ],
             "structure": {
                 "match_profile": "classic_fast_over",
@@ -43459,7 +44345,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.95,
-                "fav_quote": 1.95,
+                "fav_quote": 1.91,
                 "fav_zone": "balanced",
                 "combined_ht_dirty": 1.358,
                 "combined_ft_dirty": 2.088,
@@ -43468,18 +44354,19 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 0.65,
-                "coherence_level": "low",
+                "coherence_score": 1.1,
+                "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "none",
+                "leading_market": "ht",
                 "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "drop_type": "mixed",
+                "drop_strength": "hard",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "high",
                 "positive_flags": [
-                    "classic_o25_range"
+                    "classic_o25_range",
+                    "classic_ht_market_range"
                 ],
                 "warning_flags": [],
                 "margin_open": 0.0,
@@ -43500,16 +44387,19 @@
                     "OVER"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 1.95,
+                "fav_quote": 1.91,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.04,
                 "internal_labels": [
-                    "ENGINE_V24_CLASSIC"
+                    "ENGINE_V24_CLASSIC",
+                    "MARKET_OK",
+                    "DROP_O25"
                 ],
                 "over_level": 2,
-                "drop_visual_level": "none",
+                "visual_over_tier": 1,
+                "drop_visual_level": "light",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "FAST",
                 "early_index": 2.717,
                 "early_home": 1.286,
