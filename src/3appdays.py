@@ -5105,7 +5105,9 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                     st.warning(f"⚠️ Nessun match valido per {target_date}. File esistenti mantenuti.")
                 return
 
-            if existing_day_results and len(final_list) < 5:
+            is_fast_day1 = ("--fast" in sys.argv and use_horizon == 1)
+
+            if existing_day_results and len(final_list) < 5 and not is_fast_day1:
                 print(
                     f"⚠️ Troppi pochi match trovati ({len(final_list)}) per day {use_horizon} ({target_date}) "
                     f"con dati già esistenti -> skip salvataggio prudenziale.",
@@ -5118,7 +5120,7 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                     )
                 return
 
-            if existing_day_results and len(final_list) < max(5, int(len(existing_day_results) * 0.50)):
+            if existing_day_results and len(final_list) < max(5, int(len(existing_day_results) * 0.50)) and not is_fast_day1:
                 print(
                     f"⚠️ Nuovo scan troppo ridotto: {len(final_list)} vs vecchio {len(existing_day_results)} "
                     f"per day {use_horizon} ({target_date}) -> skip salvataggio prudenziale.",
