@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-05-12 08:44:02",
+    "updated_at": "2026-05-12 11:47:51",
     "day": 2,
     "date": "2026-05-13",
     "details": {
@@ -13,14 +13,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:43",
-                    "hhmm": "08:42",
-                    "q1": 2.28,
+                    "ts": "2026-05-12 11:46:32",
+                    "hhmm": "11:46",
+                    "q1": 2.22,
                     "qx": 3.05,
-                    "q2": 3.3,
-                    "o25": 2.25,
-                    "o05ht": 1.48,
-                    "o15ht": 3.2
+                    "q2": 3.4,
+                    "o25": 2.1,
+                    "o05ht": 1.42,
+                    "o15ht": 2.88
                 }
             ],
             "quote_dynamics": {
@@ -47,15 +47,15 @@
             "home_team": "Londrina",
             "away_team": "São Bernardo",
             "markets": {
-                "q1": 2.28,
+                "q1": 2.22,
                 "qx": 3.05,
-                "q2": 3.3,
-                "o25": 2.25,
-                "o05ht": 1.48,
-                "o15ht": 3.2,
-                "u25": 1.62,
-                "u05ht": 2.45,
-                "u15ht": 1.3
+                "q2": 3.4,
+                "o25": 2.1,
+                "o05ht": 1.42,
+                "o15ht": 2.88,
+                "u25": 1.7,
+                "u05ht": 2.65,
+                "u15ht": 1.36
             },
             "averages": {
                 "home_avg_ft": 2.145,
@@ -92,9 +92,9 @@
                 "away_ht_conceded_1plus_rate": 0.0
             },
             "flags": {
-                "fav_quote": 2.28,
+                "fav_quote": 2.22,
                 "is_gold_zone": false,
-                "drop_diff": 0.12,
+                "drop_diff": 0.18,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": false
             },
@@ -136,10 +136,10 @@
                 "ptgg": 2.8,
                 "pto15": 0.0,
                 "pt": 2.8,
-                "over": 5.03,
-                "boost": 4.433,
-                "gold": 4.182,
-                "max": 5.03,
+                "over": 5.24,
+                "boost": 4.669,
+                "gold": 4.325,
+                "max": 5.24,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -160,6 +160,7 @@
                 "ENGINE_V24_CLASSIC",
                 "MARKET_OK",
                 "DROP_1X2",
+                "DROP_O25",
                 "DROP_CONFIRMED"
             ],
             "structure": {
@@ -174,8 +175,8 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 1.25,
-                "fav_quote": 2.28,
-                "fav_zone": "wide",
+                "fav_quote": 2.22,
+                "fav_zone": "balanced",
                 "combined_ht_dirty": 0.579,
                 "combined_ft_dirty": 2.381,
                 "cross_home_dirty": 1.625,
@@ -183,8 +184,8 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 0.35,
-                "coherence_level": "low",
+                "coherence_score": 1.45,
+                "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
                 "leading_market": "ht",
@@ -194,6 +195,8 @@
                 "drop_confirmed": true,
                 "value_left": "high",
                 "positive_flags": [
+                    "classic_o25_range",
+                    "classic_ht_market_range",
                     "classic_market_pressure"
                 ],
                 "warning_flags": [],
@@ -215,20 +218,21 @@
                     "OVER"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.28,
+                "fav_quote": 2.22,
                 "is_gold_zone": false,
-                "drop_diff": 0.12,
+                "drop_diff": 0.18,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC",
                     "MARKET_OK",
                     "DROP_1X2",
+                    "DROP_O25",
                     "DROP_CONFIRMED"
                 ],
                 "over_level": 3,
-                "visual_over_tier": 0,
+                "visual_over_tier": 1,
                 "drop_visual_level": "strong",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "SLOW",
                 "early_index": 1.105,
                 "early_home": 0.339,
@@ -831,12 +835,12 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:44",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:33",
+                    "hhmm": "11:46",
                     "q1": 1.28,
-                    "qx": 4.75,
+                    "qx": 4.8,
                     "q2": 12.5,
-                    "o25": 1.95,
+                    "o25": 1.93,
                     "o05ht": 1.36,
                     "o15ht": 2.65
                 }
@@ -866,12 +870,12 @@
             "away_team": "Athletic Club",
             "markets": {
                 "q1": 1.28,
-                "qx": 4.75,
+                "qx": 4.8,
                 "q2": 12.5,
-                "o25": 1.95,
+                "o25": 1.93,
                 "o05ht": 1.36,
                 "o15ht": 2.65,
-                "u25": 1.83,
+                "u25": 1.85,
                 "u05ht": 2.88,
                 "u15ht": 1.42
             },
@@ -1644,11 +1648,11 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:45",
-                    "hhmm": "08:42",
-                    "q1": 2.9,
-                    "qx": 3.2,
-                    "q2": 2.2,
+                    "ts": "2026-05-12 11:46:34",
+                    "hhmm": "11:46",
+                    "q1": 3.5,
+                    "qx": 3.25,
+                    "q2": 2.0,
                     "o25": 2.25,
                     "o05ht": 1.44,
                     "o15ht": 3.2
@@ -1678,9 +1682,9 @@
             "home_team": "Nação",
             "away_team": "Tubarao",
             "markets": {
-                "q1": 2.9,
-                "qx": 3.2,
-                "q2": 2.2,
+                "q1": 3.5,
+                "qx": 3.25,
+                "q2": 2.0,
                 "o25": 2.25,
                 "o05ht": 1.44,
                 "o15ht": 3.2,
@@ -1723,9 +1727,9 @@
                 "away_ht_conceded_1plus_rate": 0.194
             },
             "flags": {
-                "fav_quote": 2.2,
+                "fav_quote": 2.0,
                 "is_gold_zone": false,
-                "drop_diff": 0.25,
+                "drop_diff": 0.45,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
@@ -1804,7 +1808,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 0.55,
-                "fav_quote": 2.2,
+                "fav_quote": 2.0,
                 "fav_zone": "balanced",
                 "combined_ht_dirty": 0.751,
                 "combined_ft_dirty": 2.042,
@@ -1845,9 +1849,9 @@
                     "OVER"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.2,
+                "fav_quote": 2.0,
                 "is_gold_zone": false,
-                "drop_diff": 0.25,
+                "drop_diff": 0.45,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC",
                     "MARKET_OK",
@@ -2460,8 +2464,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:45",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:35",
+                    "hhmm": "11:46",
                     "q1": 5.0,
                     "qx": 3.4,
                     "q2": 1.65,
@@ -3098,8 +3102,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:46",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:35",
+                    "hhmm": "11:46",
                     "q1": 1.4,
                     "qx": 4.5,
                     "q2": 7.5,
@@ -3902,6 +3906,826 @@
                 }
             ]
         },
+        "1543199": {
+            "fixture_id": 1543199,
+            "date": "2026-05-13",
+            "time": "01:30",
+            "league": "Primera División",
+            "country": "Venezuela",
+            "match": "UCV - Deportivo La Guaira",
+            "gg_ht_sniper": true,
+            "quote_history": [
+                {
+                    "ts": "2026-05-12 11:46:36",
+                    "hhmm": "11:46",
+                    "q1": 2.62,
+                    "qx": 3.0,
+                    "q2": 2.55,
+                    "o25": 2.2,
+                    "o05ht": 1.42,
+                    "o15ht": 2.88
+                }
+            ],
+            "quote_dynamics": {
+                "history_count": 1,
+                "o25_velocity": 0.0,
+                "o25_prev_velocity": 0.0,
+                "o25_acceleration": 0.0,
+                "o25_movement_type": "none",
+                "o05ht_velocity": 0.0,
+                "o05ht_prev_velocity": 0.0,
+                "o05ht_acceleration": 0.0,
+                "o05ht_movement_type": "none",
+                "o15ht_velocity": 0.0,
+                "o15ht_prev_velocity": 0.0,
+                "o15ht_acceleration": 0.0,
+                "o15ht_movement_type": "none",
+                "fav_velocity": 0.0,
+                "fav_prev_velocity": 0.0,
+                "fav_acceleration": 0.0,
+                "fav_movement_type": "none",
+                "market_acceleration_label": "NO_HISTORY"
+            },
+            "market_acceleration_label": "NO_HISTORY",
+            "home_team": "UCV",
+            "away_team": "Deportivo La Guaira",
+            "markets": {
+                "q1": 2.62,
+                "qx": 3.0,
+                "q2": 2.55,
+                "o25": 2.2,
+                "o05ht": 1.42,
+                "o15ht": 2.88,
+                "u25": 1.62,
+                "u05ht": 2.62,
+                "u15ht": 1.35
+            },
+            "averages": {
+                "home_avg_ft": 2.952,
+                "away_avg_ft": 2.736,
+                "home_avg_ht": 1.089,
+                "away_avg_ht": 1.317,
+                "home_avg_ft_clean": 2.974,
+                "away_avg_ft_clean": 2.824,
+                "home_avg_ht_clean": 1.165,
+                "away_avg_ht_clean": 0.874,
+                "home_avg_ht_scored_clean": 0.365,
+                "away_avg_ht_scored_clean": 0.655,
+                "home_avg_ht_conceded_clean": 0.8,
+                "away_avg_ht_conceded_clean": 0.334,
+                "home_avg_ft_scored_clean": 1.589,
+                "away_avg_ft_scored_clean": 1.0,
+                "home_avg_ft_conceded_clean": 1.382,
+                "away_avg_ft_conceded_clean": 1.116,
+                "home_ft_2plus_rate": 1.0,
+                "away_ft_2plus_rate": 0.781,
+                "home_ft_3plus_rate": 0.556,
+                "away_ft_3plus_rate": 0.343,
+                "home_ft_low_rate": 0.0,
+                "away_ft_low_rate": 0.219,
+                "home_ht_1plus_rate": 0.613,
+                "away_ht_1plus_rate": 0.609,
+                "home_ht_zero_rate": 0.388,
+                "away_ht_zero_rate": 0.391,
+                "home_ht_scored_1plus_rate": 0.306,
+                "away_ht_scored_1plus_rate": 0.562,
+                "home_ht_scored_2plus_rate": 0.056,
+                "away_ht_scored_2plus_rate": 0.0,
+                "home_ht_conceded_1plus_rate": 0.613,
+                "away_ht_conceded_1plus_rate": 0.391
+            },
+            "flags": {
+                "fav_quote": 2.55,
+                "is_gold_zone": false,
+                "drop_diff": 0.0,
+                "home_last_2h_zero": false,
+                "away_last_2h_zero": false
+            },
+            "fair_value": {
+                "margin_open": 0.0,
+                "margin_curr": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.0,
+                "fav_fair_prob_curr": 0.0,
+                "fav_fair_prob_delta": 0.0,
+                "fav_fair_curr": 0.0
+            },
+            "model_edge": {
+                "lam_home_ft": 1.501,
+                "lam_away_ft": 1.322,
+                "lam_home_ht": 0.354,
+                "lam_away_ht": 0.736,
+                "p_model_o25": 0.0,
+                "p_market_o25": 0.0,
+                "edge_o25": 0.0,
+                "edge_logit_o25": 0.0,
+                "edge_level_o25": "CLASSIC",
+                "p_model_o05ht": 0.0,
+                "p_market_o05ht": 0.0,
+                "edge_o05ht": 0.0,
+                "edge_logit_o05ht": 0.0,
+                "edge_level_o05ht": "CLASSIC",
+                "p_model_o15ht": 0.0,
+                "p_market_o15ht": 0.0,
+                "edge_o15ht": 0.0,
+                "edge_logit_o15ht": 0.0,
+                "edge_level_o15ht": "CLASSIC",
+                "ctx_avg": 0.585,
+                "reg_avg": 0.851,
+                "ft_sd_avg": 1.353,
+                "ht_sd_avg": 1.229
+            },
+            "scores": {
+                "ptgg": 4.9,
+                "pto15": 0.0,
+                "pt": 4.9,
+                "over": 5.8,
+                "boost": 6.096,
+                "gold": 5.341,
+                "max": 6.096,
+                "edge_o25": 0.0,
+                "edge_o05ht": 0.0,
+                "edge_o15ht": 0.0,
+                "edge_level_o25": "CLASSIC",
+                "edge_level_o05ht": "CLASSIC",
+                "edge_level_o15ht": "CLASSIC",
+                "p_model_o25": 0.0,
+                "p_market_o25": 0.0,
+                "p_model_o05ht": 0.0,
+                "p_market_o05ht": 0.0,
+                "p_model_o15ht": 0.0,
+                "p_market_o15ht": 0.0
+            },
+            "tags": [
+                "BOOST",
+                "⚽⚽"
+            ],
+            "internal_labels": [
+                "ENGINE_V24_CLASSIC",
+                "MARKET_OK",
+                "DROP_1X2"
+            ],
+            "structure": {
+                "match_profile": "v24_classic",
+                "structure_score": 1.9,
+                "structure_grade": "high",
+                "combined_ht_clean": 1.02,
+                "combined_ft_clean": 2.899,
+                "combined_ht_scored_clean": 0.51,
+                "cross_home_clean": 2.705,
+                "cross_away_clean": 2.382,
+                "bilateral_ft": true,
+                "bilateral_ht": true,
+                "one_sided_risk": 0.35,
+                "fav_quote": 2.55,
+                "fav_zone": "wide",
+                "combined_ht_dirty": 1.203,
+                "combined_ft_dirty": 2.844,
+                "cross_home_dirty": 2.705,
+                "cross_away_dirty": 2.382
+            },
+            "market_reading": {
+                "market_profile": "classic_market",
+                "coherence_score": 1.45,
+                "coherence_level": "medium",
+                "dislocation_score": 0.0,
+                "dislocation_level": "low",
+                "leading_market": "1x2",
+                "lagging_market": "none",
+                "drop_type": "sterile",
+                "drop_strength": "hard",
+                "drop_confirmed": false,
+                "value_left": "high",
+                "positive_flags": [
+                    "classic_o25_range",
+                    "classic_ht_market_range",
+                    "classic_market_pressure"
+                ],
+                "warning_flags": [],
+                "margin_open": 0.0,
+                "margin_curr": 0.0,
+                "margin_delta": 0.0,
+                "fav_fair_prob_open": 0.0,
+                "fav_fair_prob_curr": 0.0,
+                "fav_fair_prob_delta": 0.0,
+                "fav_fair_curr": 0.0,
+                "home_ft_stdev": 0.0,
+                "away_ft_stdev": 0.0,
+                "home_scoring_regularity": 0.0,
+                "away_scoring_regularity": 0.0
+            },
+            "signal_debug": {
+                "engine": "V24_CLASSIC_ON_V25_SHELL",
+                "tags": [
+                    "BOOST",
+                    "⚽⚽"
+                ],
+                "strong_tag_count": 1,
+                "fav_quote": 2.55,
+                "is_gold_zone": false,
+                "drop_diff": 0.0,
+                "internal_labels": [
+                    "ENGINE_V24_CLASSIC",
+                    "MARKET_OK",
+                    "DROP_1X2"
+                ],
+                "over_level": 3,
+                "visual_over_tier": 2,
+                "drop_visual_level": "light",
+                "signal_stability": "Alta",
+                "signal_summary": "ELITE VISIVA: struttura + mercato confermati",
+                "tempo_tag": "SLOW",
+                "early_index": 2.089,
+                "early_home": 0.699,
+                "early_away": 1.455,
+                "early_balance": 0.756,
+                "pressure_factor": 1.134,
+                "activation_factor": 0.683,
+                "market_acceleration_label": "NO_HISTORY",
+                "quote_dynamics": {
+                    "history_count": 1,
+                    "o25_velocity": 0.0,
+                    "o25_prev_velocity": 0.0,
+                    "o25_acceleration": 0.0,
+                    "o25_movement_type": "none",
+                    "o05ht_velocity": 0.0,
+                    "o05ht_prev_velocity": 0.0,
+                    "o05ht_acceleration": 0.0,
+                    "o05ht_movement_type": "none",
+                    "o15ht_velocity": 0.0,
+                    "o15ht_prev_velocity": 0.0,
+                    "o15ht_acceleration": 0.0,
+                    "o15ht_movement_type": "none",
+                    "fav_velocity": 0.0,
+                    "fav_prev_velocity": 0.0,
+                    "fav_acceleration": 0.0,
+                    "fav_movement_type": "none",
+                    "market_acceleration_label": "NO_HISTORY"
+                }
+            },
+            "home_profile": {
+                "expected_side": "home",
+                "all_sample_count": 8,
+                "context_sample_count": 4,
+                "context_weight": 0.55,
+                "avg_ht_clean": 1.165,
+                "avg_total_clean": 2.974,
+                "avg_ht_scored_clean": 0.365,
+                "avg_ht_conceded_clean": 0.8,
+                "avg_ft_scored_clean": 1.589,
+                "avg_ft_conceded_clean": 1.382,
+                "ht_1plus_rate": 0.613,
+                "ht_zero_rate": 0.388,
+                "ft_2plus_rate": 1.0,
+                "ft_3plus_rate": 0.556,
+                "ft_low_rate": 0.0,
+                "ctx_avg_ht_clean": 0.75,
+                "ctx_avg_total_clean": 2.75,
+                "ctx_avg_ft_scored_clean": 1.5,
+                "ctx_avg_ft_conceded_clean": 1.25,
+                "ctx_ht_1plus_rate": 0.5,
+                "ctx_ft_2plus_rate": 1.0,
+                "ft_stdev": 1.04,
+                "ht_stdev": 1.049,
+                "ft_scored_stdev": 1.05,
+                "scoring_regularity": 0.75,
+                "ctx_ft_stdev": 0.829,
+                "ctx_ht_stdev": 0.829,
+                "ctx_ft_scored_stdev": 1.118,
+                "ctx_scoring_regularity": 0.75
+            },
+            "away_profile": {
+                "expected_side": "away",
+                "all_sample_count": 8,
+                "context_sample_count": 5,
+                "context_weight": 0.62,
+                "avg_ht_clean": 0.874,
+                "avg_total_clean": 2.824,
+                "avg_ht_scored_clean": 0.655,
+                "avg_ht_conceded_clean": 0.334,
+                "avg_ft_scored_clean": 1.0,
+                "avg_ft_conceded_clean": 1.116,
+                "ht_1plus_rate": 0.609,
+                "ht_zero_rate": 0.391,
+                "ft_2plus_rate": 0.781,
+                "ft_3plus_rate": 0.343,
+                "ft_low_rate": 0.219,
+                "ctx_avg_ht_clean": 1.0,
+                "ctx_avg_total_clean": 3.0,
+                "ctx_avg_ft_scored_clean": 1.0,
+                "ctx_avg_ft_conceded_clean": 1.333,
+                "ctx_ht_1plus_rate": 0.6,
+                "ctx_ft_2plus_rate": 0.8,
+                "ft_stdev": 1.666,
+                "ht_stdev": 1.41,
+                "ft_scored_stdev": 0.793,
+                "scoring_regularity": 0.953,
+                "ctx_ft_stdev": 1.673,
+                "ctx_ht_stdev": 1.497,
+                "ctx_ft_scored_stdev": 0.8,
+                "ctx_scoring_regularity": 1.0
+            },
+            "home_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-05-10",
+                    "league": "Primera División",
+                    "match": "UCV - Puerto Cabello",
+                    "opponent": "Puerto Cabello",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-1",
+                    "ft": "3-1",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 4.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-05-06",
+                    "league": "CONMEBOL Libertadores",
+                    "match": "UCV - Independiente del Valle",
+                    "opponent": "Independiente del Valle",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "2-0",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-05-03",
+                    "league": "Primera División",
+                    "match": "Portuguesa FC - UCV",
+                    "opponent": "Portuguesa FC",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-0",
+                    "ft": "1-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-04-29",
+                    "league": "CONMEBOL Libertadores",
+                    "match": "UCV - Rosario Central",
+                    "opponent": "Rosario Central",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-1",
+                    "ft": "0-3",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 3.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 2.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-04-25",
+                    "league": "Primera División",
+                    "match": "Portuguesa FC - UCV",
+                    "opponent": "Portuguesa FC",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "2-0",
+                    "ft": "3-0",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 3.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 3.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 6,
+                    "date": "2026-04-20",
+                    "league": "Primera División",
+                    "match": "UCV - Deportivo Tachira FC",
+                    "opponent": "Deportivo Tachira FC",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "1-1",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 7,
+                    "date": "2026-04-16",
+                    "league": "CONMEBOL Libertadores",
+                    "match": "Independiente del Valle - UCV",
+                    "opponent": "Independiente del Valle",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "2-1",
+                    "ft": "3-1",
+                    "total_ht_goals": 3.0,
+                    "total_ft_goals": 4.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 3.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 8,
+                    "date": "2026-04-12",
+                    "league": "Primera División",
+                    "match": "Carabobo FC - UCV",
+                    "opponent": "Carabobo FC",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "2-2",
+                    "ft": "4-2",
+                    "total_ht_goals": 4.0,
+                    "total_ft_goals": 6.0,
+                    "team_ht_scored": 2.0,
+                    "team_ht_conceded": 2.0,
+                    "team_ft_scored": 2.0,
+                    "team_ft_conceded": 4.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 2.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 1,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                }
+            ],
+            "away_last_8": [
+                {
+                    "seq": 1,
+                    "date": "2026-05-09",
+                    "league": "Primera División",
+                    "match": "Deportivo La Guaira - Portuguesa FC",
+                    "opponent": "Portuguesa FC",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-1",
+                    "ft": "1-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 2,
+                    "date": "2026-05-07",
+                    "league": "CONMEBOL Libertadores",
+                    "match": "Deportivo La Guaira - Bolívar",
+                    "opponent": "Bolívar",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "1-0",
+                    "ft": "1-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 3,
+                    "date": "2026-05-03",
+                    "league": "Primera División",
+                    "match": "Puerto Cabello - Deportivo La Guaira",
+                    "opponent": "Puerto Cabello",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-0",
+                    "ft": "1-1",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 4,
+                    "date": "2026-05-01",
+                    "league": "CONMEBOL Libertadores",
+                    "match": "Independ. Rivadavia - Deportivo La Guaira",
+                    "opponent": "Independ. Rivadavia",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "3-1",
+                    "ft": "4-1",
+                    "total_ht_goals": 4.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 3.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 4.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                },
+                {
+                    "seq": 5,
+                    "date": "2026-04-25",
+                    "league": "Primera División",
+                    "match": "Trujillanos FC - Deportivo La Guaira",
+                    "opponent": "Trujillanos FC",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-0",
+                    "ft": "0-1",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 1.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 1.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 6,
+                    "date": "2026-04-21",
+                    "league": "Primera División",
+                    "match": "Deportivo La Guaira - Portuguesa FC",
+                    "opponent": "Portuguesa FC",
+                    "team_side": "home",
+                    "is_home": true,
+                    "is_away": false,
+                    "ht": "0-0",
+                    "ft": "0-0",
+                    "total_ht_goals": 0.0,
+                    "total_ft_goals": 0.0,
+                    "team_ht_scored": 0.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 0.0,
+                    "team_ft_conceded": 0.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 0.0,
+                    "team_ht_scored_1plus": 0,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 0,
+                    "match_ft_2plus": 0,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 1,
+                    "team_scored_by_ht": 0,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 1,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 7,
+                    "date": "2026-04-15",
+                    "league": "CONMEBOL Libertadores",
+                    "match": "Bolívar - Deportivo La Guaira",
+                    "opponent": "Bolívar",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "0-1",
+                    "ft": "1-1",
+                    "total_ht_goals": 1.0,
+                    "total_ft_goals": 2.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 0.0,
+                    "team_ft_scored": 1.0,
+                    "team_ft_conceded": 1.0,
+                    "team_2h_scored": 0.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 0,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 0,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 0,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 0
+                },
+                {
+                    "seq": 8,
+                    "date": "2026-04-11",
+                    "league": "Primera División",
+                    "match": "Deportivo Tachira FC - Deportivo La Guaira",
+                    "opponent": "Deportivo Tachira FC",
+                    "team_side": "away",
+                    "is_home": false,
+                    "is_away": true,
+                    "ht": "1-1",
+                    "ft": "2-3",
+                    "total_ht_goals": 2.0,
+                    "total_ft_goals": 5.0,
+                    "team_ht_scored": 1.0,
+                    "team_ht_conceded": 1.0,
+                    "team_ft_scored": 3.0,
+                    "team_ft_conceded": 2.0,
+                    "team_2h_scored": 2.0,
+                    "team_2h_conceded": 1.0,
+                    "team_ht_scored_1plus": 1,
+                    "team_ht_scored_2plus": 0,
+                    "team_ht_conceded_1plus": 1,
+                    "match_ht_1plus": 1,
+                    "match_ft_2plus": 1,
+                    "match_ft_3plus": 1,
+                    "match_ft_low": 0,
+                    "team_scored_by_ht": 1,
+                    "team_conceded_by_ht": 1,
+                    "match_ht_00": 0,
+                    "match_ht_2plus": 1
+                }
+            ]
+        },
         "1538375": {
             "fixture_id": 1538375,
             "date": "2026-05-13",
@@ -3912,8 +4736,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:47",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:36",
+                    "hhmm": "11:46",
                     "q1": 1.44,
                     "qx": 4.4,
                     "q2": 5.6,
@@ -4725,8 +5549,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:47",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:37",
+                    "hhmm": "11:46",
                     "q1": 2.62,
                     "qx": 3.4,
                     "q2": 2.35,
@@ -5551,13 +6375,13 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:48",
-                    "hhmm": "08:42",
-                    "q1": 2.1,
-                    "qx": 2.6,
-                    "q2": 4.2,
-                    "o25": 3.0,
-                    "o05ht": 1.7,
+                    "ts": "2026-05-12 11:46:38",
+                    "hhmm": "11:46",
+                    "q1": 2.33,
+                    "qx": 2.5,
+                    "q2": 3.75,
+                    "o25": 3.1,
+                    "o05ht": 1.73,
                     "o15ht": 4.33
                 }
             ],
@@ -5585,14 +6409,14 @@
             "home_team": "San Martin Tucuman",
             "away_team": "Gimnasia Jujuy",
             "markets": {
-                "q1": 2.1,
-                "qx": 2.6,
-                "q2": 4.2,
-                "o25": 3.0,
-                "o05ht": 1.7,
+                "q1": 2.33,
+                "qx": 2.5,
+                "q2": 3.75,
+                "o25": 3.1,
+                "o05ht": 1.73,
                 "o15ht": 4.33,
-                "u25": 1.35,
-                "u05ht": 2.0,
+                "u25": 1.33,
+                "u05ht": 1.95,
                 "u15ht": 1.17
             },
             "averages": {
@@ -5630,9 +6454,9 @@
                 "away_ht_conceded_1plus_rate": 0.5
             },
             "flags": {
-                "fav_quote": 2.1,
+                "fav_quote": 2.33,
                 "is_gold_zone": false,
-                "drop_diff": 0.05,
+                "drop_diff": 0.0,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
@@ -5674,10 +6498,10 @@
                 "ptgg": 4.2,
                 "pto15": 0.0,
                 "pt": 4.2,
-                "over": 4.45,
-                "boost": 4.857,
-                "gold": 4.61,
-                "max": 4.857,
+                "over": 3.7,
+                "boost": 4.272,
+                "gold": 3.936,
+                "max": 4.272,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -5692,12 +6516,12 @@
                 "p_market_o15ht": 0.0
             },
             "tags": [
-                "OVER"
+                "PT"
             ],
             "internal_labels": [
                 "ENGINE_V24_CLASSIC",
                 "MARKET_OK",
-                "DROP_O25"
+                "DROP_1X2"
             ],
             "structure": {
                 "match_profile": "classic_fast_over",
@@ -5711,8 +6535,8 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.0,
-                "fav_quote": 2.1,
-                "fav_zone": "balanced",
+                "fav_quote": 2.33,
+                "fav_zone": "wide",
                 "combined_ht_dirty": 1.185,
                 "combined_ft_dirty": 2.168,
                 "cross_home_dirty": 2.391,
@@ -5724,10 +6548,10 @@
                 "coherence_level": "low",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "o25",
+                "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "mixed",
-                "drop_strength": "medium",
+                "drop_type": "sterile",
+                "drop_strength": "hard",
                 "drop_confirmed": false,
                 "value_left": "high",
                 "positive_flags": [
@@ -5751,22 +6575,22 @@
             "signal_debug": {
                 "engine": "V24_CLASSIC_ON_V25_SHELL",
                 "tags": [
-                    "OVER"
+                    "PT"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.1,
+                "fav_quote": 2.33,
                 "is_gold_zone": false,
-                "drop_diff": 0.05,
+                "drop_diff": 0.0,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC",
                     "MARKET_OK",
-                    "DROP_O25"
+                    "DROP_1X2"
                 ],
-                "over_level": 2,
+                "over_level": 0,
                 "visual_over_tier": 0,
                 "drop_visual_level": "light",
                 "signal_stability": "Media",
-                "signal_summary": "OVER CLASSIC: base FT concreta",
+                "signal_summary": "PT CLASSIC: pressione primo tempo",
                 "tempo_tag": "BUILD",
                 "early_index": 2.402,
                 "early_home": 1.399,
@@ -6369,11 +7193,11 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:49",
-                    "hhmm": "08:42",
-                    "q1": 1.37,
-                    "qx": 4.33,
-                    "q2": 9.0,
+                    "ts": "2026-05-12 11:46:38",
+                    "hhmm": "11:46",
+                    "q1": 1.38,
+                    "qx": 4.3,
+                    "q2": 9.1,
                     "o25": 1.95,
                     "o05ht": 1.38,
                     "o15ht": 2.75
@@ -6403,9 +7227,9 @@
             "home_team": "Fluminense",
             "away_team": "Operario-PR",
             "markets": {
-                "q1": 1.37,
-                "qx": 4.33,
-                "q2": 9.0,
+                "q1": 1.38,
+                "qx": 4.3,
+                "q2": 9.1,
                 "o25": 1.95,
                 "o05ht": 1.38,
                 "o15ht": 2.75,
@@ -6448,9 +7272,9 @@
                 "away_ht_conceded_1plus_rate": 0.515
             },
             "flags": {
-                "fav_quote": 1.37,
+                "fav_quote": 1.38,
                 "is_gold_zone": false,
-                "drop_diff": 0.04,
+                "drop_diff": 0.03,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
@@ -6529,7 +7353,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.6,
-                "fav_quote": 1.37,
+                "fav_quote": 1.38,
                 "fav_zone": "strong",
                 "combined_ht_dirty": 1.068,
                 "combined_ft_dirty": 2.887,
@@ -6572,9 +7396,9 @@
                     "OVER"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 1.37,
+                "fav_quote": 1.38,
                 "is_gold_zone": false,
-                "drop_diff": 0.04,
+                "drop_diff": 0.03,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC",
                     "MARKET_OK",
@@ -7187,13 +8011,13 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:50",
-                    "hhmm": "08:42",
-                    "q1": 1.4,
-                    "qx": 4.2,
-                    "q2": 8.5,
-                    "o25": 2.05,
-                    "o05ht": 1.36,
+                    "ts": "2026-05-12 11:46:39",
+                    "hhmm": "11:46",
+                    "q1": 1.33,
+                    "qx": 4.75,
+                    "q2": 9.2,
+                    "o25": 1.95,
+                    "o05ht": 1.4,
                     "o15ht": 2.75
                 }
             ],
@@ -7221,14 +8045,14 @@
             "home_team": "Cruzeiro",
             "away_team": "Goias",
             "markets": {
-                "q1": 1.4,
-                "qx": 4.2,
-                "q2": 8.5,
-                "o25": 2.05,
-                "o05ht": 1.36,
+                "q1": 1.33,
+                "qx": 4.75,
+                "q2": 9.2,
+                "o25": 1.95,
+                "o05ht": 1.4,
                 "o15ht": 2.75,
-                "u25": 1.75,
-                "u05ht": 2.85,
+                "u25": 1.83,
+                "u05ht": 2.75,
                 "u15ht": 1.4
             },
             "averages": {
@@ -7266,9 +8090,9 @@
                 "away_ht_conceded_1plus_rate": 0.444
             },
             "flags": {
-                "fav_quote": 1.4,
+                "fav_quote": 1.33,
                 "is_gold_zone": false,
-                "drop_diff": 0.03,
+                "drop_diff": 0.1,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
@@ -7310,10 +8134,10 @@
                 "ptgg": 4.5,
                 "pto15": 0.0,
                 "pt": 4.5,
-                "over": 4.4,
-                "boost": 4.922,
-                "gold": 4.833,
-                "max": 4.922,
+                "over": 4.63,
+                "boost": 4.887,
+                "gold": 4.591,
+                "max": 4.887,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -7331,7 +8155,11 @@
                 "OVER"
             ],
             "internal_labels": [
-                "ENGINE_V24_CLASSIC"
+                "ENGINE_V24_CLASSIC",
+                "MARKET_OK",
+                "DROP_1X2",
+                "DROP_O25",
+                "DROP_CONFIRMED"
             ],
             "structure": {
                 "match_profile": "v24_classic",
@@ -7345,7 +8173,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.55,
-                "fav_quote": 1.4,
+                "fav_quote": 1.33,
                 "fav_zone": "strong",
                 "combined_ht_dirty": 0.889,
                 "combined_ft_dirty": 2.691,
@@ -7358,12 +8186,12 @@
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "mixed",
+                "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "mixed",
-                "drop_strength": "soft",
-                "drop_confirmed": false,
-                "value_left": "medium",
+                "drop_type": "structural",
+                "drop_strength": "medium",
+                "drop_confirmed": true,
+                "value_left": "low",
                 "positive_flags": [
                     "classic_o25_range",
                     "classic_ht_market_range",
@@ -7388,15 +8216,19 @@
                     "OVER"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 1.4,
+                "fav_quote": 1.33,
                 "is_gold_zone": false,
-                "drop_diff": 0.03,
+                "drop_diff": 0.1,
                 "internal_labels": [
-                    "ENGINE_V24_CLASSIC"
+                    "ENGINE_V24_CLASSIC",
+                    "MARKET_OK",
+                    "DROP_1X2",
+                    "DROP_O25",
+                    "DROP_CONFIRMED"
                 ],
                 "over_level": 2,
                 "visual_over_tier": 1,
-                "drop_visual_level": "none",
+                "drop_visual_level": "strong",
                 "signal_stability": "Media",
                 "signal_summary": "STRONG VISIVO: base Over valida",
                 "tempo_tag": "SLOW",
@@ -8001,8 +8833,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:51",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:40",
+                    "hhmm": "11:46",
                     "q1": 2.16,
                     "qx": 3.2,
                     "q2": 3.35,
@@ -8822,8 +9654,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:51",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:41",
+                    "hhmm": "11:46",
                     "q1": 1.67,
                     "qx": 3.6,
                     "q2": 4.5,
@@ -9646,8 +10478,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:52",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:42",
+                    "hhmm": "11:46",
                     "q1": 2.2,
                     "qx": 3.1,
                     "q2": 3.1,
@@ -10468,8 +11300,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:53",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:42",
+                    "hhmm": "11:46",
                     "q1": 1.9,
                     "qx": 3.1,
                     "q2": 4.6,
@@ -11286,8 +12118,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:54",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:43",
+                    "hhmm": "11:46",
                     "q1": 1.73,
                     "qx": 3.55,
                     "q2": 4.8,
@@ -12110,8 +12942,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:55",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:44",
+                    "hhmm": "11:46",
                     "q1": 2.5,
                     "qx": 3.2,
                     "q2": 2.8,
@@ -12923,8 +13755,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:55",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:44",
+                    "hhmm": "11:46",
                     "q1": 4.6,
                     "qx": 3.35,
                     "q2": 1.8,
@@ -13739,8 +14571,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:56",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:45",
+                    "hhmm": "11:46",
                     "q1": 1.85,
                     "qx": 3.4,
                     "q2": 4.2,
@@ -14556,8 +15388,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:58",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:47",
+                    "hhmm": "11:46",
                     "q1": 2.8,
                     "qx": 3.2,
                     "q2": 2.3,
@@ -15380,14 +16212,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:42:59",
-                    "hhmm": "08:42",
+                    "ts": "2026-05-12 11:46:48",
+                    "hhmm": "11:46",
                     "q1": 1.36,
-                    "qx": 4.0,
-                    "q2": 7.8,
+                    "qx": 4.2,
+                    "q2": 8.0,
                     "o25": 1.8,
-                    "o05ht": 1.36,
-                    "o15ht": 2.62
+                    "o05ht": 1.35,
+                    "o15ht": 2.55
                 }
             ],
             "quote_dynamics": {
@@ -15415,14 +16247,14 @@
             "away_team": "Kolos Kovalivka",
             "markets": {
                 "q1": 1.36,
-                "qx": 4.0,
-                "q2": 7.8,
+                "qx": 4.2,
+                "q2": 8.0,
                 "o25": 1.8,
-                "o05ht": 1.36,
-                "o15ht": 2.62,
+                "o05ht": 1.35,
+                "o15ht": 2.55,
                 "u25": 1.95,
-                "u05ht": 2.88,
-                "u15ht": 1.42
+                "u05ht": 2.95,
+                "u15ht": 1.45
             },
             "averages": {
                 "home_avg_ft": 2.93,
@@ -15547,20 +16379,19 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 1.45,
+                "coherence_score": 1.1,
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "mixed",
+                "leading_market": "ht",
                 "lagging_market": "none",
-                "drop_type": "mixed",
-                "drop_strength": "soft",
+                "drop_type": "divergent",
+                "drop_strength": "medium",
                 "drop_confirmed": false,
                 "value_left": "medium",
                 "positive_flags": [
                     "classic_o25_range",
-                    "classic_ht_market_range",
-                    "classic_market_pressure"
+                    "classic_ht_market_range"
                 ],
                 "warning_flags": [],
                 "margin_open": 0.0,
@@ -16194,8 +17025,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:05",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:46:54",
+                    "hhmm": "11:46",
                     "q1": 1.64,
                     "qx": 3.85,
                     "q2": 4.55,
@@ -17025,8 +17856,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:05",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:46:55",
+                    "hhmm": "11:46",
                     "q1": 3.8,
                     "qx": 3.35,
                     "q2": 1.9,
@@ -17843,8 +18674,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:06",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:46:55",
+                    "hhmm": "11:46",
                     "q1": 2.47,
                     "qx": 3.22,
                     "q2": 2.53,
@@ -18657,10 +19488,10 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:07",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:46:57",
+                    "hhmm": "11:46",
                     "q1": 1.18,
-                    "qx": 5.5,
+                    "qx": 5.6,
                     "q2": 14.0,
                     "o25": 1.42,
                     "o05ht": 1.22,
@@ -18692,7 +19523,7 @@
             "away_team": "Obolon'-Brovar",
             "markets": {
                 "q1": 1.18,
-                "qx": 5.5,
+                "qx": 5.6,
                 "q2": 14.0,
                 "o25": 1.42,
                 "o05ht": 1.22,
@@ -19471,14 +20302,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:12",
-                    "hhmm": "08:43",
-                    "q1": 6.25,
-                    "qx": 4.1,
-                    "q2": 1.42,
-                    "o25": 1.64,
-                    "o05ht": 0.0,
-                    "o15ht": 0.0
+                    "ts": "2026-05-12 11:47:01",
+                    "hhmm": "11:47",
+                    "q1": 7.4,
+                    "qx": 4.2,
+                    "q2": 1.4,
+                    "o25": 1.65,
+                    "o05ht": 1.3,
+                    "o15ht": 2.38
                 }
             ],
             "quote_dynamics": {
@@ -19505,15 +20336,15 @@
             "home_team": "BFC Daugavpils",
             "away_team": "Rīgas FS",
             "markets": {
-                "q1": 6.25,
-                "qx": 4.1,
-                "q2": 1.42,
-                "o25": 1.64,
-                "o05ht": 0.0,
-                "o15ht": 0.0,
-                "u25": 2.04,
-                "u05ht": 0.0,
-                "u15ht": 0.0
+                "q1": 7.4,
+                "qx": 4.2,
+                "q2": 1.4,
+                "o25": 1.65,
+                "o05ht": 1.3,
+                "o15ht": 2.38,
+                "u25": 2.15,
+                "u05ht": 3.1,
+                "u15ht": 1.5
             },
             "averages": {
                 "home_avg_ft": 2.616,
@@ -19550,9 +20381,9 @@
                 "away_ht_conceded_1plus_rate": 0.306
             },
             "flags": {
-                "fav_quote": 1.42,
+                "fav_quote": 1.4,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.02,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": false
             },
@@ -19591,13 +20422,13 @@
                 "ht_sd_avg": 1.261
             },
             "scores": {
-                "ptgg": 2.0,
+                "ptgg": 4.4,
                 "pto15": 0.0,
-                "pt": 2.0,
+                "pt": 4.4,
                 "over": 5.4,
-                "boost": 4.252,
-                "gold": 5.156,
-                "max": 5.4,
+                "boost": 5.714,
+                "gold": 5.831,
+                "max": 5.831,
                 "edge_o25": 0.0,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": 0.0,
@@ -19629,7 +20460,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 1.65,
-                "fav_quote": 1.42,
+                "fav_quote": 1.4,
                 "fav_zone": "strong",
                 "combined_ht_dirty": 1.572,
                 "combined_ft_dirty": 3.309,
@@ -19638,18 +20469,20 @@
             },
             "market_reading": {
                 "market_profile": "classic_market",
-                "coherence_score": 0.65,
-                "coherence_level": "low",
+                "coherence_score": 1.45,
+                "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "none",
+                "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
+                "drop_type": "mixed",
+                "drop_strength": "soft",
                 "drop_confirmed": false,
-                "value_left": "unknown",
+                "value_left": "medium",
                 "positive_flags": [
-                    "classic_o25_range"
+                    "classic_o25_range",
+                    "classic_ht_market_range",
+                    "classic_market_pressure"
                 ],
                 "warning_flags": [],
                 "margin_open": 0.0,
@@ -19670,9 +20503,9 @@
                     "OVER"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 1.42,
+                "fav_quote": 1.4,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.02,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC"
                 ],
@@ -20283,8 +21116,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:13",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:02",
+                    "hhmm": "11:47",
                     "q1": 1.53,
                     "qx": 4.0,
                     "q2": 5.0,
@@ -21010,8 +21843,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:14",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:03",
+                    "hhmm": "11:47",
                     "q1": 2.43,
                     "qx": 3.14,
                     "q2": 2.63,
@@ -21823,8 +22656,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:14",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:04",
+                    "hhmm": "11:47",
                     "q1": 1.41,
                     "qx": 3.85,
                     "q2": 7.1,
@@ -22641,12 +23474,12 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:17",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:06",
+                    "hhmm": "11:47",
                     "q1": 2.34,
-                    "qx": 3.15,
+                    "qx": 3.1,
                     "q2": 2.92,
-                    "o25": 1.95,
+                    "o25": 2.0,
                     "o05ht": 1.36,
                     "o15ht": 2.55
                 }
@@ -22676,12 +23509,12 @@
             "away_team": "Slovan Liberec",
             "markets": {
                 "q1": 2.34,
-                "qx": 3.15,
+                "qx": 3.1,
                 "q2": 2.92,
-                "o25": 1.95,
+                "o25": 2.0,
                 "o05ht": 1.36,
                 "o15ht": 2.55,
-                "u25": 1.8,
+                "u25": 1.75,
                 "u05ht": 2.9,
                 "u15ht": 1.45
             },
@@ -23463,8 +24296,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:18",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:07",
+                    "hhmm": "11:47",
                     "q1": 3.45,
                     "qx": 3.35,
                     "q2": 2.08,
@@ -24283,8 +25116,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:20",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:09",
+                    "hhmm": "11:47",
                     "q1": 1.64,
                     "qx": 3.7,
                     "q2": 4.6,
@@ -25104,8 +25937,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:20",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:10",
+                    "hhmm": "11:47",
                     "q1": 1.67,
                     "qx": 3.94,
                     "q2": 4.45,
@@ -25928,8 +26761,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:23",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:12",
+                    "hhmm": "11:47",
                     "q1": 1.37,
                     "qx": 4.1,
                     "q2": 8.6,
@@ -26742,11 +27575,11 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:23",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:13",
+                    "hhmm": "11:47",
                     "q1": 1.67,
                     "qx": 3.55,
-                    "q2": 4.75,
+                    "q2": 4.8,
                     "o25": 1.93,
                     "o05ht": 1.4,
                     "o15ht": 2.8
@@ -26778,7 +27611,7 @@
             "markets": {
                 "q1": 1.67,
                 "qx": 3.55,
-                "q2": 4.75,
+                "q2": 4.8,
                 "o25": 1.93,
                 "o05ht": 1.4,
                 "o15ht": 2.8,
@@ -27569,8 +28402,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:24",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:13",
+                    "hhmm": "11:47",
                     "q1": 2.82,
                     "qx": 3.18,
                     "q2": 2.27,
@@ -28387,8 +29220,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:25",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:15",
+                    "hhmm": "11:47",
                     "q1": 2.17,
                     "qx": 3.6,
                     "q2": 3.1,
@@ -29200,8 +30033,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:26",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:15",
+                    "hhmm": "11:47",
                     "q1": 2.62,
                     "qx": 3.6,
                     "q2": 2.45,
@@ -30024,8 +30857,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:26",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:16",
+                    "hhmm": "11:47",
                     "q1": 2.58,
                     "qx": 3.2,
                     "q2": 2.7,
@@ -30844,10 +31677,10 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:27",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:17",
+                    "hhmm": "11:47",
                     "q1": 2.08,
-                    "qx": 3.3,
+                    "qx": 3.35,
                     "q2": 3.45,
                     "o25": 1.83,
                     "o05ht": 1.38,
@@ -30879,7 +31712,7 @@
             "away_team": "Sevilla",
             "markets": {
                 "q1": 2.08,
-                "qx": 3.3,
+                "qx": 3.35,
                 "q2": 3.45,
                 "o25": 1.83,
                 "o05ht": 1.38,
@@ -31662,8 +32495,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:28",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:17",
+                    "hhmm": "11:47",
                     "q1": 1.64,
                     "qx": 4.2,
                     "q2": 4.12,
@@ -32477,8 +33310,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:29",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:19",
+                    "hhmm": "11:47",
                     "q1": 2.15,
                     "qx": 3.4,
                     "q2": 3.2,
@@ -33290,8 +34123,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:30",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:19",
+                    "hhmm": "11:47",
                     "q1": 2.6,
                     "qx": 3.4,
                     "q2": 2.6,
@@ -34108,8 +34941,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:30",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:20",
+                    "hhmm": "11:47",
                     "q1": 2.45,
                     "qx": 3.5,
                     "q2": 2.65,
@@ -34925,8 +35758,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:31",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:21",
+                    "hhmm": "11:47",
                     "q1": 1.73,
                     "qx": 3.9,
                     "q2": 4.33,
@@ -35754,8 +36587,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:32",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:21",
+                    "hhmm": "11:47",
                     "q1": 1.95,
                     "qx": 3.65,
                     "q2": 3.5,
@@ -36574,8 +37407,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:32",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:22",
+                    "hhmm": "11:47",
                     "q1": 1.91,
                     "qx": 3.65,
                     "q2": 3.25,
@@ -37388,8 +38221,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:33",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:22",
+                    "hhmm": "11:47",
                     "q1": 2.55,
                     "qx": 3.5,
                     "q2": 2.38,
@@ -38201,8 +39034,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:33",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:23",
+                    "hhmm": "11:47",
                     "q1": 3.0,
                     "qx": 3.32,
                     "q2": 2.1,
@@ -39014,8 +39847,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:34",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:24",
+                    "hhmm": "11:47",
                     "q1": 2.05,
                     "qx": 3.65,
                     "q2": 3.0,
@@ -39832,8 +40665,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:35",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:24",
+                    "hhmm": "11:47",
                     "q1": 4.0,
                     "qx": 3.85,
                     "q2": 1.67,
@@ -40652,8 +41485,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:35",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:25",
+                    "hhmm": "11:47",
                     "q1": 1.48,
                     "qx": 3.95,
                     "q2": 5.5,
@@ -41465,8 +42298,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:36",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:25",
+                    "hhmm": "11:47",
                     "q1": 1.73,
                     "qx": 3.55,
                     "q2": 3.6,
@@ -42280,8 +43113,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:37",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:26",
+                    "hhmm": "11:47",
                     "q1": 2.27,
                     "qx": 3.34,
                     "q2": 2.7,
@@ -43093,8 +43926,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:37",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:27",
+                    "hhmm": "11:47",
                     "q1": 2.38,
                     "qx": 3.14,
                     "q2": 2.69,
@@ -43907,8 +44740,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:38",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:27",
+                    "hhmm": "11:47",
                     "q1": 1.33,
                     "qx": 4.85,
                     "q2": 8.1,
@@ -44727,8 +45560,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:39",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:28",
+                    "hhmm": "11:47",
                     "q1": 3.12,
                     "qx": 3.28,
                     "q2": 2.2,
@@ -45540,8 +46373,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:39",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:29",
+                    "hhmm": "11:47",
                     "q1": 1.88,
                     "qx": 3.4,
                     "q2": 3.75,
@@ -46354,8 +47187,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:40",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:29",
+                    "hhmm": "11:47",
                     "q1": 2.38,
                     "qx": 3.55,
                     "q2": 2.58,
@@ -47172,8 +48005,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:40",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:30",
+                    "hhmm": "11:47",
                     "q1": 2.84,
                     "qx": 2.98,
                     "q2": 2.48,
@@ -47990,8 +48823,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:43",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:32",
+                    "hhmm": "11:47",
                     "q1": 1.73,
                     "qx": 3.45,
                     "q2": 4.2,
@@ -48815,8 +49648,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:44",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:33",
+                    "hhmm": "11:47",
                     "q1": 2.1,
                     "qx": 3.45,
                     "q2": 2.9,
@@ -49628,8 +50461,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:45",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:34",
+                    "hhmm": "11:47",
                     "q1": 2.55,
                     "qx": 3.6,
                     "q2": 2.3,
@@ -50442,8 +51275,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:46",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:35",
+                    "hhmm": "11:47",
                     "q1": 1.65,
                     "qx": 4.0,
                     "q2": 4.2,
@@ -51268,8 +52101,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:46",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:35",
+                    "hhmm": "11:47",
                     "q1": 4.85,
                     "qx": 3.8,
                     "q2": 1.66,
@@ -52092,14 +52925,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:48",
-                    "hhmm": "08:43",
-                    "q1": 1.36,
-                    "qx": 4.4,
-                    "q2": 7.8,
-                    "o25": 1.57,
-                    "o05ht": 1.3,
-                    "o15ht": 2.35
+                    "ts": "2026-05-12 11:47:37",
+                    "hhmm": "11:47",
+                    "q1": 1.39,
+                    "qx": 4.45,
+                    "q2": 6.8,
+                    "o25": 1.55,
+                    "o05ht": 1.28,
+                    "o15ht": 2.3
                 }
             ],
             "quote_dynamics": {
@@ -52126,15 +52959,15 @@
             "home_team": "Slavia Praha",
             "away_team": "FK Jablonec",
             "markets": {
-                "q1": 1.36,
-                "qx": 4.4,
-                "q2": 7.8,
-                "o25": 1.57,
-                "o05ht": 1.3,
-                "o15ht": 2.35,
-                "u25": 2.3,
-                "u05ht": 3.2,
-                "u15ht": 1.53
+                "q1": 1.39,
+                "qx": 4.45,
+                "q2": 6.8,
+                "o25": 1.55,
+                "o05ht": 1.28,
+                "o15ht": 2.3,
+                "u25": 2.35,
+                "u05ht": 3.3,
+                "u15ht": 1.55
             },
             "averages": {
                 "home_avg_ft": 2.502,
@@ -52171,9 +53004,9 @@
                 "away_ht_conceded_1plus_rate": 0.556
             },
             "flags": {
-                "fav_quote": 1.36,
+                "fav_quote": 1.39,
                 "is_gold_zone": false,
-                "drop_diff": 0.04,
+                "drop_diff": 0.01,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
@@ -52250,7 +53083,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.7,
-                "fav_quote": 1.36,
+                "fav_quote": 1.39,
                 "fav_zone": "strong",
                 "combined_ht_dirty": 1.222,
                 "combined_ft_dirty": 2.516,
@@ -52293,9 +53126,9 @@
                     "BOOST"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 1.36,
+                "fav_quote": 1.39,
                 "is_gold_zone": false,
-                "drop_diff": 0.04,
+                "drop_diff": 0.01,
                 "internal_labels": [
                     "ENGINE_V24_CLASSIC"
                 ],
@@ -52906,8 +53739,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:48",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:38",
+                    "hhmm": "11:47",
                     "q1": 1.4,
                     "qx": 4.4,
                     "q2": 7.5,
@@ -53719,8 +54552,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:50",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:39",
+                    "hhmm": "11:47",
                     "q1": 1.91,
                     "qx": 3.3,
                     "q2": 3.8,
@@ -54529,8 +55362,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:51",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:40",
+                    "hhmm": "11:47",
                     "q1": 2.5,
                     "qx": 3.25,
                     "q2": 2.6,
@@ -55342,8 +56175,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:51",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:40",
+                    "hhmm": "11:47",
                     "q1": 2.1,
                     "qx": 3.5,
                     "q2": 3.2,
@@ -56155,8 +56988,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:52",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:41",
+                    "hhmm": "11:47",
                     "q1": 2.36,
                     "qx": 3.5,
                     "q2": 2.62,
@@ -56979,8 +57812,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:53",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:42",
+                    "hhmm": "11:47",
                     "q1": 1.2,
                     "qx": 6.75,
                     "q2": 11.5,
@@ -57797,8 +58630,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:54",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:43",
+                    "hhmm": "11:47",
                     "q1": 3.25,
                     "qx": 3.95,
                     "q2": 1.95,
@@ -58611,8 +59444,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:55",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:43",
+                    "hhmm": "11:47",
                     "q1": 1.42,
                     "qx": 4.4,
                     "q2": 7.3,
@@ -59435,8 +60268,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:55",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:44",
+                    "hhmm": "11:47",
                     "q1": 4.4,
                     "qx": 4.1,
                     "q2": 1.67,
@@ -60266,8 +61099,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:56",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:45",
+                    "hhmm": "11:47",
                     "q1": 1.52,
                     "qx": 4.4,
                     "q2": 5.4,
@@ -61093,8 +61926,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:56",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:45",
+                    "hhmm": "11:47",
                     "q1": 4.5,
                     "qx": 4.1,
                     "q2": 1.66,
@@ -61918,8 +62751,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:57",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:46",
+                    "hhmm": "11:47",
                     "q1": 1.9,
                     "qx": 3.45,
                     "q2": 3.9,
@@ -62736,8 +63569,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:58",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:47",
+                    "hhmm": "11:47",
                     "q1": 1.8,
                     "qx": 3.15,
                     "q2": 5.0,
@@ -63552,8 +64385,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:43:59",
-                    "hhmm": "08:43",
+                    "ts": "2026-05-12 11:47:48",
+                    "hhmm": "11:47",
                     "q1": 3.1,
                     "qx": 3.7,
                     "q2": 2.1,
@@ -64372,8 +65205,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:44:00",
-                    "hhmm": "08:44",
+                    "ts": "2026-05-12 11:47:49",
+                    "hhmm": "11:47",
                     "q1": 2.16,
                     "qx": 3.1,
                     "q2": 3.5,
@@ -65192,8 +66025,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:44:01",
-                    "hhmm": "08:44",
+                    "ts": "2026-05-12 11:47:49",
+                    "hhmm": "11:47",
                     "q1": 2.55,
                     "qx": 2.97,
                     "q2": 2.6,
@@ -66004,8 +66837,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-05-12 08:44:01",
-                    "hhmm": "08:44",
+                    "ts": "2026-05-12 11:47:50",
+                    "hhmm": "11:47",
                     "q1": 1.83,
                     "qx": 3.3,
                     "q2": 4.0,
