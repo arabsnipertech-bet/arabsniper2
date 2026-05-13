@@ -4348,7 +4348,7 @@ def save_match_details_file():
 # =========================================================
 # DAY PUBLISH / LIVE HOLD POLICY
 # =========================================================
-LIVE_HOLD_MINUTES = 150   # tiene la partita visibile durante live + recupero prudenziale
+LIVE_HOLD_MINUTES = 120   # tiene la partita visibile durante live + recupero prudenziale
 PRE_KICKOFF_GRACE_MINUTES = 10
 
 
