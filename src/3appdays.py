@@ -4216,9 +4216,9 @@ def refine_arabsniper_signal(row):
         badges.append("🟡 GOLD+")
 
     elif (
-        over_level >= 1
+        over_level >= 2
         and flags["market"]
-        and ft_score >= 1.55
+        and ft_score >= 1.65
     ):
         tier = "STRONG_MARKET_OVER"
         priority = 82
