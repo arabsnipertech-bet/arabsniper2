@@ -520,7 +520,7 @@ def save_config():
 #====================================
 RUNTIME_ODDS_CACHE = {}
 LAST_API_CALL_TS = 0.0
-API_MIN_INTERVAL = 0.14  # ~428 req/min teorici max
+API_MIN_INTERVAL = 0.20  # ~428 req/min teorici max
 
 
 def reset_runtime_api_cache():
