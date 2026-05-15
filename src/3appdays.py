@@ -40,8 +40,20 @@ DEFAULT_EXCLUDED = [
 LEAGUE_BLACKLIST = [
     "u19", "u20", "u21", "u23", "youth", "women", "friendly",
     "carioca", "paulista", "mineiro", "gaucho",
-    "reserve", "amateur", "second league", "division a", 
-    "national 2", "national 3", "npl"
+    "reserve", "amateur", "second league", "division a",
+    "national 2", "national 3", "npl",
+
+    # Blacklist manuale qualità mercato
+    "liga panameña de fútbol",
+    "3. liga - cfl a",
+    "regionalliga - bayern",
+    "regionalliga - nordost",
+    "regionalliga - southwest",
+    "regionalliga - sudwest",
+    "ettan - norra",
+    "division 2 - östra götaland",
+    "division 2 - norrland",
+    "fa wsl"
 ]
 
 ROLLING_SNAPSHOT_HORIZONS = [1, 2, 3, 4, 5]
@@ -4373,10 +4385,10 @@ def build_signal_package(fid, mk, s_h, s_a):
     )
 
     market_ok = (
-        combined_ft_clean >= 1.35  # Abbassato da 1.45
-        and structure_score >= 0.75  # Abbassato da 0.85
-        and one_sided_risk <= 1.85  # Alzato (più tolleranza)
-        and coherence_score >= 0.90  # Abbassato da 1.00
+        combined_ft_clean >= 1.32
+        and structure_score >= 0.70
+        and one_sided_risk <= 1.95
+        and coherence_score >= 0.82
         and value_left != "low"
         and not has_fatal_warning
         and (
@@ -4413,9 +4425,9 @@ def build_signal_package(fid, mk, s_h, s_a):
     favorite_fertile = bool(1.50 <= fav <= 1.87)
     favorite_core = bool(1.55 <= fav <= 1.83)
 
-    gold_risk_limit = 1.42 if favorite_fertile else 1.25
-    probe_risk_limit = 1.32 if favorite_fertile else 1.15
-    over_risk_limit = 1.62 if favorite_fertile else 1.50
+    gold_risk_limit = 1.55 if favorite_fertile else 1.32
+    probe_risk_limit = 1.42 if favorite_fertile else 1.22
+    over_risk_limit = 1.72 if favorite_fertile else 1.55
     
 # --- NUOVO: Gate indipendente per il PT ---
     pt_ok = bool(
@@ -4658,8 +4670,8 @@ def should_keep_match(signal_pack):
     favorite_fertile = bool(1.50 <= fav_quote <= 1.87)
     favorite_core = bool(1.55 <= fav_quote <= 1.83)
 
-    gold_keep_risk = 1.42 if favorite_fertile else 1.20
-    over_keep_risk = 1.62 if favorite_fertile else 1.50
+    gold_keep_risk = 1.55 if favorite_fertile else 1.32
+    over_keep_risk = 1.72 if favorite_fertile else 1.55
 
     coherence_score = safe_float(market_pack.get("coherence_score", 0.0), 0.0)
     value_left = market_pack.get("value_left", "unknown")
