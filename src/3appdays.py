@@ -1987,6 +1987,7 @@ def classify_match_tempo(s_h, s_a):
         activation_factor -
         early_balance * 0.30
     )
+    early_index = round3(clamp(early_index, 0.0, 5.0))  # <-- RIGA AGGIUNTA
 
     tempo_tag = "SLOW"
     if early_index >= 2.60:
@@ -2444,16 +2445,6 @@ def compute_drop_diff(fid, mk):
     if old_q > 0 and fav_now > 0 and old_q > fav_now:
         return round3(old_q - fav_now)
 
-    return 0.0
-
-
-def score_drop(drop_diff):
-    if drop_diff >= 0.15:
-        return 1.2
-    if drop_diff >= 0.10:
-        return 0.9
-    if drop_diff >= 0.05:
-        return 0.5
     return 0.0
 
 
@@ -3145,17 +3136,15 @@ def symmetry_bonus(a, b, tight=0.22, medium=0.45):
 
 def get_goldilocks_multiplier(fav_quote):
     """
-    Bonus leggero per la fascia quota favorita più fertile
-    per match dinamici ma non troppo squilibrati.
-
-    Non crea segnali: amplifica leggermente score già validi.
+    Bonus per la fascia quota favorita più fertile (1.55 - 1.87).
+    Se siamo qui, diamo maggiore respiro ai segnali matematici.
     """
     fav = safe_float(fav_quote, 0.0)
 
-    if 1.55 <= fav <= 1.83:
-        return 1.10
-    if 1.50 <= fav <= 1.90:
-        return 1.04
+    if 1.55 <= fav <= 1.87:
+        return 1.15  # Boost forte: piena zona utile
+    if 1.48 <= fav <= 1.95:
+        return 1.06  # Boost leggero: zona di tolleranza
     return 1.0
 
 
@@ -3641,7 +3630,7 @@ def score_pto15_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     elif combined_ht_scored >= 0.82:
         score += 0.25
     elif combined_ht_scored < 0.72:
-        score -= 0.50
+        score -= 0.35
 
     if combined_ht_clean >= 1.00:
         score += 0.42
@@ -3651,7 +3640,7 @@ def score_pto15_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     if home_ht_scored >= 0.90 and away_ht_scored >= 0.90:
         score += 0.55
     elif home_ht_scored < 0.55 or away_ht_scored < 0.55:
-        score -= 0.75
+        score -= 0.50
 
     if bilateral_ht:
         score += 0.22
@@ -3836,23 +3825,26 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     # -------------------------
     # REGOLARITÀ / STDEV
     # -------------------------
+    # -------------------------
+    # REGOLARITÀ / STDEV
+    # -------------------------
     if home_ft_stdev <= 1.15:
         score += 0.28
     elif home_ft_stdev <= 1.35:
         score += 0.12
     elif home_ft_stdev >= 1.90:
-        score -= 0.42
+        score -= 0.25  # <-- Modificato da 0.42 a 0.25
     elif home_ft_stdev >= 1.70:
-        score -= 0.34
+        score -= 0.18  # <-- Modificato da 0.34 a 0.18 proporzionalmente
 
     if away_ft_stdev <= 1.15:
         score += 0.28
     elif away_ft_stdev <= 1.35:
         score += 0.12
     elif away_ft_stdev >= 1.90:
-        score -= 0.42
+        score -= 0.25  # <-- Modificato da 0.42 a 0.25
     elif away_ft_stdev >= 1.70:
-        score -= 0.34
+        score -= 0.18  # <-- Modificato da 0.34 a 0.18 proporzionalmente
 
     if home_scoring_regularity >= 0.75:
         score += 0.28
@@ -3884,9 +3876,9 @@ def score_over_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
         score -= 0.35
 
     if safe_float(s_h.get("ft_low_rate", 0.0), 0.0) >= 0.38:
-        score -= 0.60
+        score -= 0.40  # <-- Modificato da 0.60 a 0.40
     if safe_float(s_a.get("ft_low_rate", 0.0), 0.0) >= 0.38:
-        score -= 0.60
+        score -= 0.40  # <-- Modificato da 0.60 a 0.40
 
     if cross_home_clean < 2.00:
         score -= 0.55
@@ -4696,9 +4688,9 @@ def should_keep_match(signal_pack):
     edge_level = signal_pack.get("edge_level_o25", "NONE")
     market_is_pushing = "MARKET" in tags
     
-    # Se ha un edge matematico fortissimo e i volumi di mercato confermano, 
+    # Se ha un edge matematico fortissimo E (il mercato spinge OPPURE siamo nella zona aurea), 
     # salta i filtri restrittivi e tienila per la valutazione finale Elite
-    if edge_level in ("ELITE", "STRONG") and market_is_pushing:
+    if edge_level in ("ELITE", "STRONG") and (market_is_pushing or favorite_fertile):
         return True
     # --- FINE FIX ---
 
@@ -4710,10 +4702,15 @@ def should_keep_match(signal_pack):
 
     label = tags[0]
 
+    # Sostituisci il blocco delle logiche GOLD e OVER con questo:
+    
+    # Se la quota è perfetta, abbassiamo la richiesta statistica minima da 1.52 a 1.48
+    min_ft_clean = 1.48 if favorite_fertile else 1.52
+
     if label == "GOLD":
         return bool(
-            combined_ft_clean >= 1.52
-            and structure_score >= 0.95
+            combined_ft_clean >= min_ft_clean
+            and structure_score >= 0.90  # Abbassato da 0.95
             and one_sided_risk <= gold_keep_risk
             and (
                 coherence_score >= 1.00
@@ -4723,8 +4720,8 @@ def should_keep_match(signal_pack):
 
     if label == "OVER":
         return bool(
-            combined_ft_clean >= 1.52
-            and structure_score >= 0.95
+            combined_ft_clean >= min_ft_clean
+            and structure_score >= 0.90  # Abbassato da 0.95
             and one_sided_risk <= over_keep_risk
             and (
                 edge_o25 >= 0.00
