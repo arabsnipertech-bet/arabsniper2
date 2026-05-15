@@ -4317,9 +4317,14 @@ def build_signal_package(fid, mk, s_h, s_a):
     }
     has_fatal_warning = any(w in fatal_warnings for w in (market_pack.get("warning_flags", []) or []))
 
+    # Limite dinamico per non penalizzare troppo le favorite fertili
+    favorite_fertile_precheck = bool(1.50 <= safe_float(structure_pack.get("fav_quote", 0.0), 0.0) <= 1.87)
+
+    structure_risk_limit = 1.72 if favorite_fertile_precheck else 1.55
+
     structure_ok = (
         structure_score >= 0.95
-        and one_sided_risk <= 1.60
+        and one_sided_risk <= structure_risk_limit
         and structure_grade in ("high", "medium")
     )
 
