@@ -3412,6 +3412,10 @@ def score_ptgg_signal(mk, s_h, s_a, structure_pack, market_pack, quote_pack):
     away_early_2goal_rate = safe_float(s_a.get("early_2goal_rate", 0.0), 0.0)
 
     combined_ht_clean = safe_float(structure_pack.get("combined_ht_clean", 0.0), 0.0)
+    combined_ht_scored_clean = safe_float(
+        structure_pack.get("combined_ht_scored_clean", 0.0),
+    0.0
+    )
     combined_ht_scored_clean = safe_float(structure_pack.get("combined_ht_scored_clean", 0.0), 0.0)
     bilateral_ht = bool(structure_pack.get("bilateral_ht", False))
     match_profile = structure_pack.get("match_profile", "neutral")
