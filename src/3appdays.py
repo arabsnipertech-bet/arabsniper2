@@ -4643,13 +4643,20 @@ def build_signal_package(fid, mk, s_h, s_a):
 
 def should_keep_match(signal_pack):
     """
-    Filtro finale V27.
-    Tiene solo:
-    - GOLD
-    - OVER
-    - MARKET
-    - PROBE
+    Filtro finale V28 — BASELINE UNICA ARAB SNIPER.
+
+    Nuova filosofia:
+    - non decide più GOLD / MARKET / ELITE / DIAMOND;
+    - decide solo se una partita merita di entrare nella lista;
+    - i tag successivi saranno solo descrittivi.
+
+    Obiettivo:
+    - più chiarezza;
+    - meno gerarchie fasulle;
+    - più spazio alla fascia favorita 1.50-1.87;
+    - MARKET non deve entrare da solo se manca struttura.
     """
+
     tags = signal_pack.get("tags", []) or []
     if not tags:
         return False
@@ -4657,27 +4664,55 @@ def should_keep_match(signal_pack):
     market_pack = signal_pack.get("market_pack", {}) or {}
     structure_pack = signal_pack.get("structure_pack", {}) or {}
     scores = signal_pack.get("scores", {}) or {}
+    quote_pack = signal_pack.get("quote_pack", {}) or {}
 
-    edge_o25 = safe_float(signal_pack.get("edge_o25", scores.get("edge_o25", 0.0)), 0.0)
+    # =========================
+    # VALORI BASE
+    # =========================
     combined_ft_clean = safe_float(structure_pack.get("combined_ft_clean", 0.0), 0.0)
     structure_score = safe_float(structure_pack.get("structure_score", 0.0), 0.0)
     one_sided_risk = safe_float(structure_pack.get("one_sided_risk", 0.0), 0.0)
 
     fav_quote = safe_float(signal_pack.get("fav_quote", 0.0), 0.0)
+
+    edge_o25 = safe_float(
+        signal_pack.get("edge_o25", scores.get("edge_o25", 0.0)),
+        0.0
+    )
+
+    edge_level = str(signal_pack.get("edge_level_o25", "NONE") or "NONE").upper()
+
+    coherence_score = safe_float(market_pack.get("coherence_score", 0.0), 0.0)
+    value_left = str(market_pack.get("value_left", "unknown") or "unknown").lower()
+    warning_flags = market_pack.get("warning_flags", []) or []
+
+    market_align_ok = bool(signal_pack.get("market_align_ok", False))
+    inv_present = bool(quote_pack.get("INVERSION", False))
+
+    drop_visual_level = str(signal_pack.get("drop_visual_level", "none") or "none").lower()
+
+    # =========================
+    # FASCE QUOTA FAVORITA
+    # =========================
     favorite_fertile = bool(1.50 <= fav_quote <= 1.87)
     favorite_core = bool(1.55 <= fav_quote <= 1.83)
 
-    gold_keep_risk = 1.55 if favorite_fertile else 1.32
-    over_keep_risk = 1.72 if favorite_fertile else 1.55
+    # =========================
+    # FATAL WARNING
+    # =========================
+    fatal_warnings = {
+        "market_value_trap",
+        "favorite_ultra_but_ft_structure_weak",
+    }
 
-    coherence_score = safe_float(market_pack.get("coherence_score", 0.0), 0.0)
-    value_left = market_pack.get("value_left", "unknown")
-    warning_flags = market_pack.get("warning_flags", []) or []
+    if any(w in fatal_warnings for w in warning_flags):
+        return False
 
-    drop_visual_level = str(signal_pack.get("drop_visual_level", "none")).lower()
-    market_align_ok = bool(signal_pack.get("market_align_ok", False))
-    inv_present = bool((signal_pack.get("quote_pack", {}) or {}).get("INVERSION", False))
+    if value_left == "low":
+        return False
 
+    # DROP forte senza appoggio mercato/edge = possibile trappola.
+    # Non lo trattiamo più come categoria, ma come motivo di esclusione se è sporco.
     drop_trap_blacklist = bool(
         drop_visual_level == "strong"
         and not market_align_ok
@@ -4689,75 +4724,84 @@ def should_keep_match(signal_pack):
     if drop_trap_blacklist:
         return False
 
-    # --- INIZIO FIX: OVERRIDE ASSOLUTO DIAMOND SNIPER ---
-    edge_level = signal_pack.get("edge_level_o25", "NONE")
-    market_is_pushing = "MARKET" in tags
-    
-    # Se ha un edge matematico fortissimo E (il mercato spinge OPPURE siamo nella zona aurea), 
-    # salta i filtri restrittivi e tienila per la valutazione finale Elite
-    if edge_level in ("ELITE", "STRONG") and (market_is_pushing or favorite_fertile):
-        return True
-    # --- FINE FIX ---
+    # =========================
+    # BASELINE UNICA
+    # =========================
+    base_structural_ok = bool(
+        combined_ft_clean >= 1.45
+        and structure_score >= 0.85
+        and one_sided_risk <= 1.55
+    )
 
-    if any(w in {"favorite_ultra_but_ft_structure_weak", "market_value_trap"} for w in warning_flags):
-        return False
+    # Fascia favorita: tolleranza controllata.
+    # Una partita con quota 1.50-1.87 non deve morire per micro-scarti.
+    favorite_baseline_ok = bool(
+        favorite_fertile
+        and combined_ft_clean >= 1.40
+        and structure_score >= 0.80
+        and one_sided_risk <= 1.72
+    )
 
-    if value_left == "low":
-        return False
+    # Over forte: entra se la struttura è concreta anche fuori dalla fascia aurea.
+    over_baseline_ok = bool(
+        "OVER" in tags
+        and combined_ft_clean >= 1.48
+        and structure_score >= 0.82
+        and one_sided_risk <= 1.72
+    )
 
-    label = tags[0]
+    # Market non deve più comandare da solo:
+    # entra solo se conferma una base già buona.
+    market_confirmed_ok = bool(
+        "MARKET" in tags
+        and combined_ft_clean >= 1.45
+        and structure_score >= 0.82
+        and one_sided_risk <= 1.65
+        and coherence_score >= 0.95
+    )
 
-    # Sostituisci il blocco delle logiche GOLD e OVER con questo:
-    
-    # Se la quota è perfetta, abbassiamo la richiesta statistica minima da 1.52 a 1.48
-    min_ft_clean = 1.48 if favorite_fertile else 1.52
-
-    if label == "GOLD":
-        return bool(
-            combined_ft_clean >= min_ft_clean
-            and structure_score >= 0.90  # Abbassato da 0.95
-            and one_sided_risk <= gold_keep_risk
-            and (
-                coherence_score >= 1.00
-                or favorite_core
-            )
+    # Edge matematico: accettiamo solo se non è completamente isolato.
+    edge_confirmed_ok = bool(
+        edge_level in ("ELITE", "STRONG", "GOOD")
+        and combined_ft_clean >= 1.38
+        and structure_score >= 0.78
+        and one_sided_risk <= 1.75
+        and (
+            favorite_fertile
+            or "OVER" in tags
+            or "MARKET" in tags
+            or market_align_ok
         )
+    )
 
-    if label == "OVER":
-        return bool(
-            combined_ft_clean >= min_ft_clean
-            and structure_score >= 0.90  # Abbassato da 0.95
-            and one_sided_risk <= over_keep_risk
-            and (
-                edge_o25 >= 0.00
-                or favorite_core
-            )
-        )
+    # PT/HT: non deve aprire una porta separata troppo larga.
+    # Entra solo se ha anche paracadute FT.
+    pt_confirmed_ok = bool(
+        "PT" in tags
+        and safe_float(scores.get("pt", 0.0), 0.0) >= 4.50
+        and combined_ft_clean >= 1.45
+        and structure_score >= 0.80
+        and one_sided_risk <= 1.60
+    )
 
-    # --- NUOVO: La dogana accetta il PT ---
-    if label == "PT":
-        return bool(
-            safe_float(scores.get("pt", 0.0), 0.0) >= 4.50
-            and combined_ft_clean >= 1.45  # Serve comunque un paracadute di liquidità FT
-            and one_sided_risk <= 1.50
-        )
+    # PROBE: rimane osservazione, non segnale forte.
+    # Entra solo se è quasi già una partita buona.
+    probe_confirmed_ok = bool(
+        "PROBE" in tags
+        and combined_ft_clean >= 1.42
+        and structure_score >= 0.82
+        and one_sided_risk <= 1.60
+    )
 
-    if label == "MARKET":
-        return bool(
-            combined_ft_clean >= 1.35
-            and structure_score >= 0.75
-            and one_sided_risk <= 1.85
-            and coherence_score >= 0.90
-        )
-
-    if label == "PROBE":
-        return bool(
-            combined_ft_clean >= 1.30
-            and structure_score >= 0.75
-            and one_sided_risk <= 1.85
-        )
-
-    return False
+    return bool(
+        base_structural_ok
+        or favorite_baseline_ok
+        or over_baseline_ok
+        or market_confirmed_ok
+        or edge_confirmed_ok
+        or pt_confirmed_ok
+        or probe_confirmed_ok
+    )
 
 def build_signal_debug_summary(signal_pack):
     if not signal_pack:
@@ -5033,6 +5077,15 @@ def asr_score_ht(row, flags, drop, odds):
     return round3(max(score, 0.0))
 
 def refine_arabsniper_signal(row):
+    """
+    REFINE V28 — SELEZIONE PIATTA + BADGE DESCRITTIVI.
+
+    Nuova logica:
+    - niente più gerarchie fuorvianti tipo DIAMOND / ELITE / GOLD come livelli assoluti;
+    - tutte le partite arrivate qui sono già SELECTED da should_keep_match;
+    - i badge spiegano il PERCHÉ, non creano una classifica parallela.
+    """
+
     flags = asr_flags(row)
     drop = asr_classify_drop(row)
     odds = asr_odds_context(row)
@@ -5041,16 +5094,37 @@ def refine_arabsniper_signal(row):
     ft_score = asr_score_ft(row, flags, drop, odds)
     ht_score = asr_score_ht(row, flags, drop, odds)
 
-    tier = "MONITOR"
-    priority = 40
-    elite = False
-    tags = []
-    badges = []
+    # =========================
+    # VALORI BASE
+    # =========================
+    fav_band = str(row.get("fav_band", "") or "").lower()
+    edge_level = str(row.get("EDGE_LEVEL_O25", "NONE") or "NONE").upper()
+    edge_o25 = safe_float(row.get("EDGE_O25", 0.0), 0.0)
 
-    if flags["gold"]:
-        tags.append("GOLD")
+    signal_stability = str(row.get("SIGNAL_STABILITY", "") or "")
+    tempo_tag = str(row.get("TEMPO_TAG", "") or "")
+
+    # =========================
+    # TIER UNICO
+    # =========================
+    tier = "SELECTED"
+    elite = False
+
+    # Priorità non è più “forza del nome”.
+    # Serve solo per ordinare meglio:
+    # più conferme reali = più in alto.
+    priority = 50
+
+    tags = ["SELECTED"]
+    badges = ["✅ SELECTED"]
+
+    # =========================
+    # TAG TECNICI INTERNI
+    # =========================
     if over_level:
         tags.append(f"OVER_L{over_level}")
+    if flags["gold"]:
+        tags.append("GOLD_BASE")
     if flags["market"]:
         tags.append("MARKET")
     if flags["drop"]:
@@ -5062,133 +5136,216 @@ def refine_arabsniper_signal(row):
     if flags["pt"]:
         tags.append("PT")
 
-    # --- INIZIO FIX: NUOVA LOGICA SNIPER ELITE (DIAMOND) ---
-    # Recuperiamo l'edge matematico
-    edge_level = str(row.get("EDGE_LEVEL_O25", "NONE")).upper()
+    # =========================
+    # BADGE DESCRITTIVI
+    # =========================
 
-    # Rileviamo se c'è una trappola dei bookmaker in corso
-    is_drop_trap = drop["drop_class"] in ("big", "hard") and not flags["market"] and not flags["inv"]
+    # Fascia quota favorita
+    if fav_band == "goldilocks":
+        badges.append("🟡 QUOTA AUREA")
+        priority += 12
+    elif fav_band == "open_fav":
+        badges.append("🟠 FAV APERTA")
+        priority += 7
+    elif fav_band == "strong_fav":
+        badges.append("🔵 FAV FORTE")
+        priority += 5
+    elif fav_band == "ultra_fav":
+        badges.append("⚪ ULTRA FAV")
+        priority -= 4
 
-    # Condizione stringente per il cecchino: 
-    # Alta probabilità matematica + Score FT solido + Pressione di mercato reale + Nessuna trappola
-    is_sniper_elite = (
-        edge_level in ("ELITE", "STRONG")
-        and ft_score >= 2.0
-        and flags["market"]
-        and not is_drop_trap
-    )
-
-    if is_sniper_elite:
-        elite = True
-        tier = "SNIPER_ELITE"
-        priority = 100  # Priorità massima assoluta, sarà sempre il primo match
-        badges.append("💎 DIAMOND SNIPER")
-        if "DIAMOND" not in tags:
-            tags.insert(0, "DIAMOND")
-            
-    # --- FINE FIX LOGICA ELITE ---
-
-    elif over_level >= 2 and flags["market"] and (flags["ball2"] or flags["inv"] or drop["drop_class"] in ("soft", "mid")):
-        elite = True
-        tier = "ELITE_MARKET_OVER"
-        priority = 95
-        badges.append("🔥 ELITE MARKET")
-
-    elif flags["gold"] and over_level >= 3 and (flags["market"] or flags["inv"]):
-        elite = True
-        tier = "ELITE_GOLD_CONFIRMED"
-        priority = 90
-        badges.append("🟡 GOLD+")
-
-    elif over_level >= 2 and flags["market"]:
-        tier = "STRONG_MARKET_OVER"
-        priority = 82
-        badges.append("🔥 MARKET+OVER")
-
-    elif flags["gold"] and not flags["market"] and not flags["inv"]:
-        tier = "GOLD_MONITOR"
-        priority = 70
-        badges.append("🟡 GOLD MONITOR")
-
-    elif flags["market"]:
-        tier = "MARKET_MONITOR"
-        priority = 68
-        badges.append("🟢 MARKET")
-
-    elif flags["probe"]:
-        tier = "PROBE_MONITOR"
-        priority = 38
-        badges.append("🐟 PROBE")
-
-    elif over_level >= 3:
-        tier = "OVER_BASE"
-        priority = 50
-        badges.append("OVER BASE")
-
+    # Over strutturale
+    if over_level >= 3:
+        badges.append("🔥 OVER L3")
+        priority += 14
+    elif over_level == 2:
+        badges.append("🔥 OVER L2")
+        priority += 8
     elif over_level == 1:
-        tier = "OVER_L1_MONITOR"
-        priority = 30
-        badges.append("OVER L1 MONITOR")
+        badges.append("OVER L1")
+        priority += 2
 
+    # Market: ora è conferma, non categoria autonoma
+    if flags["market"]:
+        badges.append("📊 MARKET OK")
+        priority += 8
+
+    # Inversione quota
+    if flags["inv"]:
+        badges.append("🔁 INV")
+        priority += 7
+
+    # Edge matematico
+    if edge_level == "ELITE":
+        badges.append("📐 EDGE ELITE")
+        priority += 10
+    elif edge_level == "STRONG":
+        badges.append("📐 EDGE STRONG")
+        priority += 8
+    elif edge_level == "GOOD":
+        badges.append("📐 EDGE +")
+        priority += 5
+    elif edge_level == "LIGHT":
+        badges.append("📐 EDGE LIGHT")
+        priority += 2
+
+    # Drop: descrittivo, non promozionale
     drop_warning = False
-    if drop["drop_class"] in ("big", "hard") and not flags["market"] and not flags["inv"]:
-        drop_warning = True
-        badges.append("⚠️ DROP TRAP")
-        if tier in ("GOLD_MONITOR", "OVER_BASE", "MONITOR"):
+
+    if drop["drop_class"] in ("soft", "mid"):
+        badges.append("📉 DROP OK")
+        priority += 3
+    elif drop["drop_class"] in ("big", "hard"):
+        if flags["market"] or flags["inv"] or edge_o25 > 0:
+            badges.append("📉 DROP FORTE")
+            priority += 2
+        else:
+            badges.append("⚠️ DROP TRAP")
+            drop_warning = True
             priority -= 15
 
-    ft_tag = ""
+    # Due palloni: resta informazione, non livello superiore
+    if flags["ball2"]:
+        badges.append("⚽⚽ GOAL MOOD")
+        priority += 5
 
-    # OVER_L1 non deve spingere tag forti se non ha vera conferma mercato
-    if over_level == 1 and not flags["market"] and not flags["inv"]:
-        ft_tag = ""
-    elif ft_score >= 2.50:
+    # PT / HT
+    ft_tag = ""
+    ht_tag = ""
+
+    if ft_score >= 2.50:
         ft_tag = "⚽⚽ FT"
+        priority += 8
     elif ft_score >= 1.80:
         ft_tag = "FT OVER+"
+        priority += 5
     elif ft_score >= 1.20:
         ft_tag = "FT MONITOR"
+        priority += 1
 
-    ht_tag = ""
     if ht_score >= 1.35:
         ht_tag = "⚽PT"
+        priority += 6
     elif ht_score >= 0.95:
         ht_tag = "HT WATCH"
+        priority += 3
 
     if ft_tag:
         badges.append(ft_tag)
     if ht_tag:
         badges.append(ht_tag)
 
+    # Tempo partita
+    if tempo_tag == "FAST":
+        badges.append("⚡ FAST")
+        priority += 3
+    elif tempo_tag == "BUILD":
+        badges.append("⏳ BUILD")
+        priority += 1
+    elif tempo_tag == "SLOW":
+        badges.append("🐢 SLOW")
+        priority -= 2
+
+    # Stabilità: solo avviso/lettura
+    if signal_stability.lower() == "alta":
+        badges.append("🧱 STABILE")
+        priority += 3
+    elif signal_stability.lower() == "speculativa":
+        badges.append("🎲 SPEC")
+        priority -= 4
+
+    # Probe: non deve comandare
+    if flags["probe"]:
+        badges.append("🐟 PROBE")
+        priority -= 3
+
+    # =========================
+    # MICRO-LIVELLO OPERATIVO
+    # =========================
+    # Non è una nuova gerarchia colorata.
+    # Serve solo per ordinamento e lettura rapida.
+    confirm_count = 0
+
+    if over_level >= 3:
+        confirm_count += 1
+    if fav_band in ("goldilocks", "open_fav", "strong_fav"):
+        confirm_count += 1
+    if flags["market"]:
+        confirm_count += 1
+    if edge_level in ("ELITE", "STRONG", "GOOD"):
+        confirm_count += 1
+    if ft_score >= 1.80:
+        confirm_count += 1
+    if ht_score >= 0.95:
+        confirm_count += 1
+    if flags["ball2"]:
+        confirm_count += 1
+    if flags["inv"]:
+        confirm_count += 1
+
+    if drop_warning:
+        confirm_count = max(0, confirm_count - 1)
+
+    if confirm_count >= 5 and not drop_warning:
+        tier = "SELECTED_TOP"
+        badges.insert(1, "⭐ TOP")
+        priority += 8
+    elif confirm_count >= 3 and not drop_warning:
+        tier = "SELECTED_PLUS"
+        badges.insert(1, "➕ PLUS")
+        priority += 4
+    else:
+        tier = "SELECTED_BASE"
+
+    # Compatibilità con HTML/Audit:
+    # elite_signal resta, ma non viene più usato come promessa “Elite”.
+    elite = bool(tier == "SELECTED_TOP")
+
+    priority = max(0, min(100, int(priority)))
+
     refined = {
         "elite_signal": elite,
         "ELITE_SIGNAL": elite,
+
         "signal_tier": tier,
         "SIGNAL_TIER": tier,
-        "html_priority": max(0, min(100, int(priority))),
-        "HTML_PRIORITY": max(0, min(100, int(priority))),
+
+        "html_priority": priority,
+        "HTML_PRIORITY": priority,
+
         "refined_tags": tags,
         "REFINED_TAGS": tags,
+
         "refined_badges": badges,
         "REFINED_BADGES": badges,
+
         "refined_info": " ".join(badges),
         "REFINED_INFO": " ".join(badges),
+
         "html_badge_text": " | ".join(badges),
         "HTML_BADGE_TEXT": " | ".join(badges),
+
         "ft_over_score": ft_score,
         "FT_OVER_SCORE": ft_score,
+
         "ht_pressure_score": ht_score,
         "HT_PRESSURE_SCORE": ht_score,
+
         "ft_tag": ft_tag,
         "FT_TAG": ft_tag,
+
         "ht_tag": ht_tag,
         "HT_TAG": ht_tag,
+
         "drop_warning": drop_warning,
         "DROP_WARNING": drop_warning,
+
         "market_validator": flags["market"],
         "MARKET_VALIDATOR": flags["market"],
+
         "over_level_refined": over_level,
         "OVER_LEVEL_REFINED": over_level,
+
         "gold_refined": flags["gold"],
         "market_refined": flags["market"],
         "drop_refined": flags["drop"],
@@ -5196,14 +5353,20 @@ def refine_arabsniper_signal(row):
         "probe_refined": flags["probe"],
         "pt_refined": flags["pt"],
         "ball2_original": flags["ball2"],
+
+        "confirm_count": confirm_count,
+        "CONFIRM_COUNT": confirm_count,
     }
+
     refined.update(drop)
     refined.update({
         "DROP_VALUE": drop["drop_value"],
         "DROP_CLASS": drop["drop_class"],
         "DROP_LABEL": drop["drop_label"],
     })
+
     refined.update(odds)
+
     return refined
 
 #====================================
