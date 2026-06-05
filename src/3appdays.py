@@ -6157,29 +6157,65 @@ def run_full_scan(horizon=None, snap=False, update_main_site=False, show_success
                     st.warning(f"⚠️ Nessun match valido per {target_date}. File esistenti mantenuti.")
                 return
 
-            if existing_day_results and len(final_list) < 5:
+            # -------------------------------------------------
+            # FIX 2026-06-05 — Protezione salvataggio intelligente
+            # Blocca solo se il vecchio file è davvero dello stesso giorno.
+            # Se il vecchio file contiene date vecchie/stale, forziamo il refresh.
+            # -------------------------------------------------
+            existing_dates = set()
+
+            try:
+                for r in existing_day_results or []:
+                    d = str(
+                        r.get("Data")
+                        or r.get("date")
+                        or r.get("match_date")
+                        or r.get("fixture_date")
+                        or ""
+                    ).strip()
+
+                    if len(d) >= 10:
+                        existing_dates.add(d[:10])
+                except Exception:
+                existing_dates = set()
+
+            existing_is_same_target_date = bool(target_date in existing_dates)
+
+            if existing_day_results and not existing_is_same_target_date:
+                print(
+                    f"♻️ Vecchio day{use_horizon} non coerente con {target_date}: "
+                    f"date trovate={sorted(existing_dates)} -> forzo salvataggio nuovo scan.",
+                    flush=True
+                )
+
+            if existing_day_results and existing_is_same_target_date and len(final_list) < 5:
                 print(
                     f"⚠️ Troppi pochi match trovati ({len(final_list)}) per day {use_horizon} ({target_date}) "
-                    f"con dati già esistenti -> skip salvataggio prudenziale.",
+                    f"con dati già esistenti dello stesso giorno -> skip salvataggio prudenziale.",
                     flush=True
                 )
                 if show_success:
                     st.warning(
                         f"⚠️ Trovati solo {len(final_list)} match validi per {target_date}. "
-                        f"Per sicurezza non aggiorno i file esistenti."
+                        f"Per sicurezza non aggiorno i file esistenti dello stesso giorno."
                     )
                 return
 
-            if existing_day_results and len(final_list) < max(5, int(len(existing_day_results) * 0.50)):
+            if (
+                existing_day_results
+                and existing_is_same_target_date
+                and len(final_list) < max(5, int(len(existing_day_results) * 0.50))
+            ):
                 print(
                     f"⚠️ Nuovo scan troppo ridotto: {len(final_list)} vs vecchio {len(existing_day_results)} "
-                    f"per day {use_horizon} ({target_date}) -> skip salvataggio prudenziale.",
+                    f"per day {use_horizon} ({target_date}) con vecchio file dello stesso giorno "
+                    f"-> skip salvataggio prudenziale.",
                     flush=True
                 )
                 if show_success:
                     st.warning(
                         f"⚠️ Nuovo scan anomalo per {target_date}: {len(final_list)} match contro "
-                        f"{len(existing_day_results)} esistenti. Nessun aggiornamento eseguito."
+                        f"{len(existing_day_results)} esistenti dello stesso giorno. Nessun aggiornamento eseguito."
                     )
                 return
 
