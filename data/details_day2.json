@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-06-07 12:36:42",
+    "updated_at": "2026-06-07 14:25:52",
     "day": 2,
     "date": "2026-06-08",
     "details": {
@@ -10,17 +10,17 @@
             "league": "MLS Next Pro",
             "country": "USA",
             "match": "FC Cincinnati II - New England II",
-            "gg_ht_sniper": false,
+            "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:23",
-                    "hhmm": "12:36",
-                    "q1": 3.4,
-                    "qx": 3.2,
+                    "ts": "2026-06-07 14:25:29",
+                    "hhmm": "14:25",
+                    "q1": 3.2,
+                    "qx": 3.5,
                     "q2": 1.91,
-                    "o25": 1.73,
+                    "o25": 1.65,
                     "o05ht": 1.3,
-                    "o15ht": 2.45
+                    "o15ht": 2.35
                 }
             ],
             "quote_dynamics": {
@@ -47,13 +47,13 @@
             "home_team": "FC Cincinnati II",
             "away_team": "New England II",
             "markets": {
-                "q1": 3.4,
-                "qx": 3.2,
+                "q1": 3.2,
+                "qx": 3.5,
                 "q2": 1.91,
-                "o25": 1.73,
+                "o25": 1.65,
                 "o05ht": 1.3,
-                "o15ht": 2.45,
-                "u25": 2.08,
+                "o15ht": 2.35,
+                "u25": 1.95,
                 "u05ht": 3.2,
                 "u15ht": 1.44
             },
@@ -100,12 +100,12 @@
             },
             "fair_value": {
                 "margin_open": 0.13,
-                "margin_curr": 0.13,
-                "margin_delta": 0.0,
+                "margin_curr": 0.122,
+                "margin_delta": -0.008,
                 "fav_fair_prob_open": 0.463,
-                "fav_fair_prob_curr": 0.463,
-                "fav_fair_prob_delta": 0.0,
-                "fav_fair_curr": 2.159
+                "fav_fair_prob_curr": 0.467,
+                "fav_fair_prob_delta": 0.004,
+                "fav_fair_curr": 2.143
             },
             "model_edge": {
                 "lam_home_ft": 1.55,
@@ -113,9 +113,9 @@
                 "lam_home_ht": 0.703,
                 "lam_away_ht": 0.971,
                 "p_model_o25": 0.64,
-                "p_market_o25": 0.546,
-                "edge_o25": 0.094,
-                "edge_logit_o25": 0.391,
+                "p_market_o25": 0.542,
+                "edge_o25": 0.098,
+                "edge_logit_o25": 0.407,
                 "edge_level_o25": "STRONG",
                 "p_model_o05ht": 0.813,
                 "p_market_o05ht": 0.711,
@@ -123,9 +123,9 @@
                 "edge_logit_o05ht": 0.569,
                 "edge_level_o05ht": "ELITE",
                 "p_model_o15ht": 0.499,
-                "p_market_o15ht": 0.37,
-                "edge_o15ht": 0.129,
-                "edge_logit_o15ht": 0.528,
+                "p_market_o15ht": 0.38,
+                "edge_o15ht": 0.119,
+                "edge_logit_o15ht": 0.486,
                 "edge_level_o15ht": "ELITE",
                 "ctx_avg": 0.515,
                 "reg_avg": 0.915,
@@ -133,33 +133,39 @@
                 "ht_sd_avg": 2.188
             },
             "scores": {
-                "ptgg": 1.927,
+                "ptgg": 2.051,
                 "pto15": 1.654,
-                "pt": 2.367,
-                "over": 9.222,
-                "boost": 8.497,
-                "gold": 8.914,
-                "max": 9.222,
-                "edge_o25": 0.094,
+                "pt": 2.501,
+                "over": 9.413,
+                "boost": 8.83,
+                "gold": 9.279,
+                "max": 9.413,
+                "edge_o25": 0.098,
                 "edge_o05ht": 0.102,
-                "edge_o15ht": 0.129,
+                "edge_o15ht": 0.119,
                 "edge_level_o25": "STRONG",
                 "edge_level_o05ht": "ELITE",
                 "edge_level_o15ht": "ELITE",
                 "p_model_o25": 0.64,
-                "p_market_o25": 0.546,
+                "p_market_o25": 0.542,
                 "p_model_o05ht": 0.813,
                 "p_market_o05ht": 0.711,
                 "p_model_o15ht": 0.499,
-                "p_market_o15ht": 0.37
+                "p_market_o15ht": 0.38
             },
             "tags": [
-                "OVER"
+                "OVER",
+                "⚽⚽"
             ],
             "internal_labels": [
                 "OVER_OK",
                 "MARKET_OK",
-                "GOLD_OM"
+                "DROP_OK",
+                "DROP_CONFIRMED",
+                "DROP_1X2",
+                "DROP_O25",
+                "GOLD_OM",
+                "GOLD_ODM"
             ],
             "structure": {
                 "match_profile": "asymmetric",
@@ -182,32 +188,32 @@
             },
             "market_reading": {
                 "market_profile": "full_open",
-                "coherence_score": 2.75,
-                "coherence_level": "medium",
+                "coherence_score": 3.4,
+                "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "none",
+                "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
-                "drop_confirmed": false,
-                "value_left": "unknown",
+                "drop_type": "structural",
+                "drop_strength": "hard",
+                "drop_confirmed": true,
+                "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
-                    "ht_struct_market_aligned"
+                    "ht_struct_market_aligned",
+                    "structural_drop"
                 ],
                 "warning_flags": [
-                    "high_bookie_protection",
-                    "flat_fair_move"
+                    "high_bookie_protection"
                 ],
                 "margin_open": 0.13,
-                "margin_curr": 0.13,
-                "margin_delta": 0.0,
+                "margin_curr": 0.122,
+                "margin_delta": -0.008,
                 "fav_fair_prob_open": 0.463,
-                "fav_fair_prob_curr": 0.463,
-                "fav_fair_prob_delta": 0.0,
-                "fav_fair_curr": 2.159,
+                "fav_fair_prob_curr": 0.467,
+                "fav_fair_prob_delta": 0.004,
+                "fav_fair_curr": 2.143,
                 "home_ft_stdev": 1.385,
                 "away_ft_stdev": 2.903,
                 "home_scoring_regularity": 0.831,
@@ -215,19 +221,25 @@
             },
             "signal_debug": {
                 "tags": [
-                    "OVER"
+                    "OVER",
+                    "⚽⚽"
                 ],
-                "strong_tag_count": 1,
+                "strong_tag_count": 2,
                 "fav_quote": 1.91,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
                     "OVER_OK",
                     "MARKET_OK",
-                    "GOLD_OM"
+                    "DROP_OK",
+                    "DROP_CONFIRMED",
+                    "DROP_1X2",
+                    "DROP_O25",
+                    "GOLD_OM",
+                    "GOLD_ODM"
                 ],
                 "over_level": 3,
-                "drop_visual_level": "none",
+                "drop_visual_level": "strong",
                 "signal_stability": "Speculativa",
                 "signal_summary": "Base FT concreta",
                 "tempo_tag": "FAST",
@@ -832,14 +844,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:25",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:31",
+                    "hhmm": "14:25",
                     "q1": 2.25,
-                    "qx": 3.25,
-                    "q2": 2.85,
-                    "o25": 1.85,
-                    "o05ht": 1.35,
-                    "o15ht": 2.62
+                    "qx": 3.3,
+                    "q2": 2.8,
+                    "o25": 1.7,
+                    "o05ht": 1.33,
+                    "o15ht": 2.4
                 }
             ],
             "quote_dynamics": {
@@ -867,14 +879,14 @@
             "away_team": "Everton de Vina",
             "markets": {
                 "q1": 2.25,
-                "qx": 3.25,
-                "q2": 2.85,
-                "o25": 1.85,
-                "o05ht": 1.35,
-                "o15ht": 2.62,
-                "u25": 1.85,
-                "u05ht": 2.85,
-                "u15ht": 1.42
+                "qx": 3.3,
+                "q2": 2.8,
+                "o25": 1.7,
+                "o05ht": 1.33,
+                "o15ht": 2.4,
+                "u25": 2.05,
+                "u05ht": 3.0,
+                "u15ht": 1.48
             },
             "averages": {
                 "home_avg_ft": 3.67,
@@ -919,12 +931,12 @@
             },
             "fair_value": {
                 "margin_open": 0.0,
-                "margin_curr": 0.103,
-                "margin_delta": 0.103,
+                "margin_curr": 0.105,
+                "margin_delta": 0.105,
                 "fav_fair_prob_open": 0.0,
-                "fav_fair_prob_curr": 0.403,
-                "fav_fair_prob_delta": 0.403,
-                "fav_fair_curr": 2.482
+                "fav_fair_prob_curr": 0.402,
+                "fav_fair_prob_delta": 0.402,
+                "fav_fair_curr": 2.485
             },
             "model_edge": {
                 "lam_home_ft": 1.553,
@@ -932,20 +944,20 @@
                 "lam_home_ht": 0.605,
                 "lam_away_ht": 0.941,
                 "p_model_o25": 0.719,
-                "p_market_o25": 0.5,
-                "edge_o25": 0.219,
-                "edge_logit_o25": 0.94,
+                "p_market_o25": 0.547,
+                "edge_o25": 0.172,
+                "edge_logit_o25": 0.751,
                 "edge_level_o25": "ELITE",
                 "p_model_o05ht": 0.787,
-                "p_market_o05ht": 0.679,
-                "edge_o05ht": 0.108,
-                "edge_logit_o05ht": 0.558,
-                "edge_level_o05ht": "ELITE",
+                "p_market_o05ht": 0.693,
+                "edge_o05ht": 0.094,
+                "edge_logit_o05ht": 0.493,
+                "edge_level_o05ht": "STRONG",
                 "p_model_o15ht": 0.457,
-                "p_market_o15ht": 0.351,
-                "edge_o15ht": 0.106,
-                "edge_logit_o15ht": 0.442,
-                "edge_level_o15ht": "ELITE",
+                "p_market_o15ht": 0.381,
+                "edge_o15ht": 0.076,
+                "edge_logit_o15ht": 0.313,
+                "edge_level_o15ht": "STRONG",
                 "ctx_avg": 0.55,
                 "reg_avg": 0.75,
                 "ft_sd_avg": 1.435,
@@ -959,18 +971,18 @@
                 "boost": 10.402,
                 "gold": 11.382,
                 "max": 11.382,
-                "edge_o25": 0.219,
-                "edge_o05ht": 0.108,
-                "edge_o15ht": 0.106,
+                "edge_o25": 0.172,
+                "edge_o05ht": 0.094,
+                "edge_o15ht": 0.076,
                 "edge_level_o25": "ELITE",
-                "edge_level_o05ht": "ELITE",
-                "edge_level_o15ht": "ELITE",
+                "edge_level_o05ht": "STRONG",
+                "edge_level_o15ht": "STRONG",
                 "p_model_o25": 0.719,
-                "p_market_o25": 0.5,
+                "p_market_o25": 0.547,
                 "p_model_o05ht": 0.787,
-                "p_market_o05ht": 0.679,
+                "p_market_o05ht": 0.693,
                 "p_model_o15ht": 0.457,
-                "p_market_o15ht": 0.351
+                "p_market_o15ht": 0.381
             },
             "tags": [
                 "GOLD"
@@ -1022,12 +1034,12 @@
                     "high_bookie_protection"
                 ],
                 "margin_open": 0.0,
-                "margin_curr": 0.103,
-                "margin_delta": 0.103,
+                "margin_curr": 0.105,
+                "margin_delta": 0.105,
                 "fav_fair_prob_open": 0.0,
-                "fav_fair_prob_curr": 0.403,
-                "fav_fair_prob_delta": 0.403,
-                "fav_fair_curr": 2.482,
+                "fav_fair_prob_curr": 0.402,
+                "fav_fair_prob_delta": 0.402,
+                "fav_fair_curr": 2.485,
                 "home_ft_stdev": 1.347,
                 "away_ft_stdev": 1.523,
                 "home_scoring_regularity": 0.75,
@@ -1652,12 +1664,12 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:25",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:32",
+                    "hhmm": "14:25",
                     "q1": 2.15,
                     "qx": 3.4,
                     "q2": 2.95,
-                    "o25": 1.7,
+                    "o25": 1.77,
                     "o05ht": 1.3,
                     "o15ht": 2.4
                 }
@@ -1689,10 +1701,10 @@
                 "q1": 2.15,
                 "qx": 3.4,
                 "q2": 2.95,
-                "o25": 1.7,
+                "o25": 1.77,
                 "o05ht": 1.3,
                 "o15ht": 2.4,
-                "u25": 2.05,
+                "u25": 1.95,
                 "u05ht": 3.1,
                 "u15ht": 1.48
             },
@@ -1752,9 +1764,9 @@
                 "lam_home_ht": 0.663,
                 "lam_away_ht": 0.937,
                 "p_model_o25": 0.484,
-                "p_market_o25": 0.547,
-                "edge_o25": -0.063,
-                "edge_logit_o25": -0.253,
+                "p_market_o25": 0.524,
+                "edge_o25": -0.04,
+                "edge_logit_o25": -0.16,
                 "edge_level_o25": "NONE",
                 "p_model_o05ht": 0.798,
                 "p_market_o05ht": 0.705,
@@ -1779,14 +1791,14 @@
                 "boost": 9.386,
                 "gold": 11.314,
                 "max": 11.314,
-                "edge_o25": -0.063,
+                "edge_o25": -0.04,
                 "edge_o05ht": 0.093,
                 "edge_o15ht": 0.094,
                 "edge_level_o25": "NONE",
                 "edge_level_o05ht": "STRONG",
                 "edge_level_o15ht": "STRONG",
                 "p_model_o25": 0.484,
-                "p_market_o25": 0.547,
+                "p_market_o25": 0.524,
                 "p_model_o05ht": 0.798,
                 "p_market_o05ht": 0.705,
                 "p_model_o15ht": 0.475,
@@ -1801,7 +1813,6 @@
                 "DROP_OK",
                 "DROP_CONFIRMED",
                 "DROP_1X2",
-                "DROP_O25",
                 "GOLD_PM",
                 "GOLD_PDS"
             ],
@@ -1873,7 +1884,6 @@
                     "DROP_OK",
                     "DROP_CONFIRMED",
                     "DROP_1X2",
-                    "DROP_O25",
                     "GOLD_PM",
                     "GOLD_PDS"
                 ],
@@ -2483,8 +2493,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:26",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:33",
+                    "hhmm": "14:25",
                     "q1": 1.9,
                     "qx": 3.0,
                     "q2": 4.2,
@@ -3299,8 +3309,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:27",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:34",
+                    "hhmm": "14:25",
                     "q1": 1.19,
                     "qx": 6.8,
                     "q2": 12.5,
@@ -3339,7 +3349,7 @@
                 "o25": 1.57,
                 "o05ht": 1.25,
                 "o15ht": 2.2,
-                "u25": 2.35,
+                "u25": 2.38,
                 "u05ht": 3.45,
                 "u15ht": 1.6
             },
@@ -3399,9 +3409,9 @@
                 "lam_home_ht": 0.919,
                 "lam_away_ht": 0.8,
                 "p_model_o25": 0.743,
-                "p_market_o25": 0.599,
-                "edge_o25": 0.144,
-                "edge_logit_o25": 0.66,
+                "p_market_o25": 0.603,
+                "edge_o25": 0.14,
+                "edge_logit_o25": 0.644,
                 "edge_level_o25": "ELITE",
                 "p_model_o05ht": 0.821,
                 "p_market_o05ht": 0.734,
@@ -3426,14 +3436,14 @@
                 "boost": 9.732,
                 "gold": 9.799,
                 "max": 9.799,
-                "edge_o25": 0.144,
+                "edge_o25": 0.14,
                 "edge_o05ht": 0.087,
                 "edge_o15ht": 0.092,
                 "edge_level_o25": "ELITE",
                 "edge_level_o05ht": "STRONG",
                 "edge_level_o15ht": "STRONG",
                 "p_model_o25": 0.743,
-                "p_market_o25": 0.599,
+                "p_market_o25": 0.603,
                 "p_model_o05ht": 0.821,
                 "p_market_o05ht": 0.734,
                 "p_model_o15ht": 0.513,
@@ -4115,8 +4125,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:28",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:36",
+                    "hhmm": "14:25",
                     "q1": 1.95,
                     "qx": 3.3,
                     "q2": 3.2,
@@ -4943,8 +4953,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:30",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:37",
+                    "hhmm": "14:25",
                     "q1": 1.53,
                     "qx": 3.8,
                     "q2": 4.8,
@@ -5763,8 +5773,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:31",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:39",
+                    "hhmm": "14:25",
                     "q1": 1.91,
                     "qx": 3.35,
                     "q2": 3.5,
@@ -6396,8 +6406,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:32",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:40",
+                    "hhmm": "14:25",
                     "q1": 2.35,
                     "qx": 3.25,
                     "q2": 2.6,
@@ -7210,8 +7220,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:35",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:43",
+                    "hhmm": "14:25",
                     "q1": 1.95,
                     "qx": 3.3,
                     "q2": 3.45,
@@ -8023,8 +8033,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:36",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:44",
+                    "hhmm": "14:25",
                     "q1": 2.3,
                     "qx": 3.5,
                     "q2": 2.55,
@@ -8847,8 +8857,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:37",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:46",
+                    "hhmm": "14:25",
                     "q1": 2.2,
                     "qx": 3.6,
                     "q2": 2.75,
@@ -9673,8 +9683,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:39",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:48",
+                    "hhmm": "14:25",
                     "q1": 1.5,
                     "qx": 3.5,
                     "q2": 6.75,
@@ -10489,8 +10499,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:40",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:49",
+                    "hhmm": "14:25",
                     "q1": 1.29,
                     "qx": 5.5,
                     "q2": 9.0,
@@ -11306,8 +11316,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-07 12:36:41",
-                    "hhmm": "12:36",
+                    "ts": "2026-06-07 14:25:51",
+                    "hhmm": "14:25",
                     "q1": 2.65,
                     "qx": 3.3,
                     "q2": 2.38,
