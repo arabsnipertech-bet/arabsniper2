@@ -78,10 +78,20 @@
                 "o25": 1.77,
                 "o05ht": 1.3,
                 "o15ht": 2.4
+            },
+            {
+                "ts": "2026-06-13 23:22:09",
+                "hhmm": "23:22",
+                "q1": 3.0,
+                "qx": 3.4,
+                "q2": 2.15,
+                "o25": 1.77,
+                "o05ht": 1.3,
+                "o15ht": 2.4
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 6,
+            "history_count": 7,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -95,8 +105,8 @@
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
-            "fav_prev_velocity": -0.078,
-            "fav_acceleration": 0.078,
+            "fav_prev_velocity": 0.0,
+            "fav_acceleration": 0.0,
             "fav_movement_type": "flat",
             "market_acceleration_label": "FLAT"
         },
@@ -108,7 +118,7 @@
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
-        "FAV_ACCELERATION": 0.078,
+        "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1493536,
@@ -394,10 +404,20 @@
                 "o25": 1.85,
                 "o05ht": 1.35,
                 "o15ht": 2.62
+            },
+            {
+                "ts": "2026-06-13 23:22:11",
+                "hhmm": "23:22",
+                "q1": 2.65,
+                "qx": 3.3,
+                "q2": 2.38,
+                "o25": 1.85,
+                "o05ht": 1.35,
+                "o15ht": 2.62
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -716,10 +736,20 @@
                 "o25": 1.5,
                 "o05ht": 1.25,
                 "o15ht": 2.1
+            },
+            {
+                "ts": "2026-06-13 23:22:15",
+                "hhmm": "23:22",
+                "q1": 1.85,
+                "qx": 3.6,
+                "q2": 3.3,
+                "o25": 1.5,
+                "o05ht": 1.25,
+                "o15ht": 2.1
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -1040,10 +1070,20 @@
                 "o25": 2.35,
                 "o05ht": 1.48,
                 "o15ht": 3.1
+            },
+            {
+                "ts": "2026-06-13 23:22:14",
+                "hhmm": "23:22",
+                "q1": 1.9,
+                "qx": 3.1,
+                "q2": 4.0,
+                "o25": 2.35,
+                "o05ht": 1.48,
+                "o15ht": 3.1
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -1052,25 +1092,25 @@
             "o05ht_prev_velocity": 0.0,
             "o05ht_acceleration": 0.0,
             "o05ht_movement_type": "flat",
-            "o15ht_velocity": 0.047,
-            "o15ht_prev_velocity": 0.0,
-            "o15ht_acceleration": 0.047,
-            "o15ht_movement_type": "accelerating",
-            "fav_velocity": 0.005,
-            "fav_prev_velocity": 0.0,
-            "fav_acceleration": 0.005,
+            "o15ht_velocity": 0.0,
+            "o15ht_prev_velocity": 0.047,
+            "o15ht_acceleration": -0.047,
+            "o15ht_movement_type": "flat",
+            "fav_velocity": 0.0,
+            "fav_prev_velocity": 0.005,
+            "fav_acceleration": -0.005,
             "fav_movement_type": "flat",
-            "market_acceleration_label": "ACCEL_O15HT"
+            "market_acceleration_label": "FLAT"
         },
-        "MARKET_ACCELERATION_LABEL": "ACCEL_O15HT",
+        "MARKET_ACCELERATION_LABEL": "FLAT",
         "O25_VELOCITY": 0.0,
         "O25_ACCELERATION": 0.0,
         "O05HT_VELOCITY": 0.0,
         "O05HT_ACCELERATION": 0.0,
-        "O15HT_VELOCITY": 0.047,
-        "O15HT_ACCELERATION": 0.047,
-        "FAV_VELOCITY": 0.005,
-        "FAV_ACCELERATION": 0.005,
+        "O15HT_VELOCITY": 0.0,
+        "O15HT_ACCELERATION": -0.047,
+        "FAV_VELOCITY": 0.0,
+        "FAV_ACCELERATION": -0.005,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1498606,
@@ -1362,10 +1402,20 @@
                 "o25": 1.85,
                 "o05ht": 1.35,
                 "o15ht": 2.62
+            },
+            {
+                "ts": "2026-06-13 23:22:12",
+                "hhmm": "23:22",
+                "q1": 1.95,
+                "qx": 3.35,
+                "q2": 3.4,
+                "o25": 1.85,
+                "o05ht": 1.35,
+                "o15ht": 2.62
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -1379,8 +1429,8 @@
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
-            "fav_prev_velocity": 0.039,
-            "fav_acceleration": -0.039,
+            "fav_prev_velocity": 0.0,
+            "fav_acceleration": 0.0,
             "fav_movement_type": "flat",
             "market_acceleration_label": "FLAT"
         },
@@ -1392,7 +1442,7 @@
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
-        "FAV_ACCELERATION": -0.039,
+        "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1493535,
@@ -1684,10 +1734,20 @@
                 "o25": 1.85,
                 "o05ht": 1.36,
                 "o15ht": 2.62
+            },
+            {
+                "ts": "2026-06-13 23:22:12",
+                "hhmm": "23:22",
+                "q1": 1.8,
+                "qx": 3.4,
+                "q2": 3.95,
+                "o25": 1.85,
+                "o05ht": 1.36,
+                "o15ht": 2.62
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -1701,8 +1761,8 @@
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
-            "fav_prev_velocity": 0.019,
-            "fav_acceleration": -0.019,
+            "fav_prev_velocity": 0.0,
+            "fav_acceleration": 0.0,
             "fav_movement_type": "flat",
             "market_acceleration_label": "FLAT"
         },
@@ -1714,7 +1774,7 @@
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
-        "FAV_ACCELERATION": -0.019,
+        "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1493540,
@@ -1974,10 +2034,20 @@
                 "o25": 1.65,
                 "o05ht": 1.29,
                 "o15ht": 2.3
+            },
+            {
+                "ts": "2026-06-13 23:22:17",
+                "hhmm": "23:22",
+                "q1": 2.1,
+                "qx": 3.4,
+                "q2": 2.88,
+                "o25": 1.65,
+                "o05ht": 1.29,
+                "o15ht": 2.3
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 3,
+            "history_count": 4,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -2300,37 +2370,47 @@
                 "o25": 1.85,
                 "o05ht": 1.4,
                 "o15ht": 2.88
+            },
+            {
+                "ts": "2026-06-13 23:22:22",
+                "hhmm": "23:22",
+                "q1": 2.62,
+                "qx": 3.35,
+                "q2": 2.38,
+                "o25": 1.85,
+                "o05ht": 1.4,
+                "o15ht": 2.88
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
-            "o25_prev_velocity": 0.031,
-            "o25_acceleration": -0.031,
+            "o25_prev_velocity": 0.0,
+            "o25_acceleration": 0.0,
             "o25_movement_type": "flat",
             "o05ht_velocity": 0.0,
             "o05ht_prev_velocity": 0.0,
             "o05ht_acceleration": 0.0,
             "o05ht_movement_type": "flat",
             "o15ht_velocity": 0.0,
-            "o15ht_prev_velocity": 0.027,
-            "o15ht_acceleration": -0.027,
+            "o15ht_prev_velocity": 0.0,
+            "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
-            "fav_velocity": 0.033,
-            "fav_prev_velocity": -0.097,
-            "fav_acceleration": 0.13,
-            "fav_movement_type": "accelerating",
-            "market_acceleration_label": "ACCEL_FAV"
+            "fav_velocity": 0.0,
+            "fav_prev_velocity": 0.033,
+            "fav_acceleration": -0.033,
+            "fav_movement_type": "flat",
+            "market_acceleration_label": "FLAT"
         },
-        "MARKET_ACCELERATION_LABEL": "ACCEL_FAV",
+        "MARKET_ACCELERATION_LABEL": "FLAT",
         "O25_VELOCITY": 0.0,
-        "O25_ACCELERATION": -0.031,
+        "O25_ACCELERATION": 0.0,
         "O05HT_VELOCITY": 0.0,
         "O05HT_ACCELERATION": 0.0,
         "O15HT_VELOCITY": 0.0,
-        "O15HT_ACCELERATION": -0.027,
-        "FAV_VELOCITY": 0.033,
-        "FAV_ACCELERATION": 0.13,
+        "O15HT_ACCELERATION": 0.0,
+        "FAV_VELOCITY": 0.0,
+        "FAV_ACCELERATION": -0.033,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1553042,
@@ -2622,10 +2702,20 @@
                 "o25": 2.6,
                 "o05ht": 1.5,
                 "o15ht": 3.45
+            },
+            {
+                "ts": "2026-06-13 23:22:22",
+                "hhmm": "23:22",
+                "q1": 2.7,
+                "qx": 2.95,
+                "q2": 2.55,
+                "o25": 2.6,
+                "o05ht": 1.5,
+                "o15ht": 3.45
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -2894,10 +2984,20 @@
                 "o25": 1.77,
                 "o05ht": 1.3,
                 "o15ht": 2.4
+            },
+            {
+                "ts": "2026-06-13 23:22:20",
+                "hhmm": "23:22",
+                "q1": 2.95,
+                "qx": 3.4,
+                "q2": 2.15,
+                "o25": 1.77,
+                "o05ht": 1.3,
+                "o15ht": 2.4
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 3,
+            "history_count": 4,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -2910,21 +3010,21 @@
             "o15ht_prev_velocity": 0.0,
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
-            "fav_velocity": 0.047,
-            "fav_prev_velocity": 0.0,
-            "fav_acceleration": 0.047,
-            "fav_movement_type": "accelerating",
-            "market_acceleration_label": "ACCEL_FAV"
+            "fav_velocity": 0.0,
+            "fav_prev_velocity": 0.047,
+            "fav_acceleration": -0.047,
+            "fav_movement_type": "flat",
+            "market_acceleration_label": "FLAT"
         },
-        "MARKET_ACCELERATION_LABEL": "ACCEL_FAV",
+        "MARKET_ACCELERATION_LABEL": "FLAT",
         "O25_VELOCITY": 0.0,
         "O25_ACCELERATION": 0.0,
         "O05HT_VELOCITY": 0.0,
         "O05HT_ACCELERATION": 0.0,
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
-        "FAV_VELOCITY": 0.047,
-        "FAV_ACCELERATION": 0.047,
+        "FAV_VELOCITY": 0.0,
+        "FAV_ACCELERATION": -0.047,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1493864,
@@ -3216,10 +3316,20 @@
                 "o25": 1.8,
                 "o05ht": 1.35,
                 "o15ht": 2.62
+            },
+            {
+                "ts": "2026-06-13 23:22:19",
+                "hhmm": "23:22",
+                "q1": 1.45,
+                "qx": 3.9,
+                "q2": 6.4,
+                "o25": 1.8,
+                "o05ht": 1.35,
+                "o15ht": 2.62
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -3540,17 +3650,27 @@
                 "o25": 1.8,
                 "o05ht": 1.36,
                 "o15ht": 2.62
+            },
+            {
+                "ts": "2026-06-13 23:22:24",
+                "hhmm": "23:22",
+                "q1": 2.85,
+                "qx": 3.3,
+                "q2": 2.25,
+                "o25": 1.8,
+                "o05ht": 1.36,
+                "o15ht": 2.62
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
-            "o25_prev_velocity": 0.019,
-            "o25_acceleration": -0.019,
+            "o25_prev_velocity": 0.0,
+            "o25_acceleration": 0.0,
             "o25_movement_type": "flat",
             "o05ht_velocity": 0.0,
-            "o05ht_prev_velocity": -0.004,
-            "o05ht_acceleration": 0.004,
+            "o05ht_prev_velocity": 0.0,
+            "o05ht_acceleration": 0.0,
             "o05ht_movement_type": "flat",
             "o15ht_velocity": 0.0,
             "o15ht_prev_velocity": 0.0,
@@ -3564,9 +3684,9 @@
         },
         "MARKET_ACCELERATION_LABEL": "FLAT",
         "O25_VELOCITY": 0.0,
-        "O25_ACCELERATION": -0.019,
+        "O25_ACCELERATION": 0.0,
         "O05HT_VELOCITY": 0.0,
-        "O05HT_ACCELERATION": 0.004,
+        "O05HT_ACCELERATION": 0.0,
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
@@ -3860,10 +3980,20 @@
                 "o25": 1.95,
                 "o05ht": 1.38,
                 "o15ht": 2.75
+            },
+            {
+                "ts": "2026-06-13 23:22:27",
+                "hhmm": "23:22",
+                "q1": 1.91,
+                "qx": 3.3,
+                "q2": 3.6,
+                "o25": 1.95,
+                "o05ht": 1.38,
+                "o15ht": 2.75
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -4180,10 +4310,20 @@
                 "o25": 1.62,
                 "o05ht": 1.25,
                 "o15ht": 2.2
+            },
+            {
+                "ts": "2026-06-13 23:22:31",
+                "hhmm": "23:22",
+                "q1": 1.55,
+                "qx": 4.0,
+                "q2": 5.0,
+                "o25": 1.62,
+                "o05ht": 1.25,
+                "o15ht": 2.2
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -4508,10 +4648,20 @@
                 "o25": 1.44,
                 "o05ht": 1.2,
                 "o15ht": 2.02
+            },
+            {
+                "ts": "2026-06-13 23:22:32",
+                "hhmm": "23:22",
+                "q1": 1.42,
+                "qx": 4.5,
+                "q2": 5.25,
+                "o25": 1.44,
+                "o05ht": 1.2,
+                "o15ht": 2.02
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -4826,10 +4976,20 @@
                 "o25": 1.42,
                 "o05ht": 1.25,
                 "o15ht": 2.05
+            },
+            {
+                "ts": "2026-06-13 23:22:39",
+                "hhmm": "23:22",
+                "q1": 3.25,
+                "qx": 3.7,
+                "q2": 1.91,
+                "o25": 1.42,
+                "o05ht": 1.25,
+                "o15ht": 2.05
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -5142,10 +5302,20 @@
                 "o25": 2.0,
                 "o05ht": 1.45,
                 "o15ht": 3.1
+            },
+            {
+                "ts": "2026-06-13 23:22:41",
+                "hhmm": "23:22",
+                "q1": 2.25,
+                "qx": 3.1,
+                "q2": 3.0,
+                "o25": 2.0,
+                "o05ht": 1.45,
+                "o15ht": 3.1
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -5460,10 +5630,20 @@
                 "o25": 1.65,
                 "o05ht": 1.28,
                 "o15ht": 2.3
+            },
+            {
+                "ts": "2026-06-13 23:22:36",
+                "hhmm": "23:22",
+                "q1": 1.91,
+                "qx": 3.65,
+                "q2": 3.25,
+                "o25": 1.65,
+                "o05ht": 1.28,
+                "o15ht": 2.3
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -5477,8 +5657,8 @@
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
-            "fav_prev_velocity": -0.09,
-            "fav_acceleration": 0.09,
+            "fav_prev_velocity": 0.0,
+            "fav_acceleration": 0.0,
             "fav_movement_type": "flat",
             "market_acceleration_label": "FLAT"
         },
@@ -5490,7 +5670,7 @@
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
-        "FAV_ACCELERATION": 0.09,
+        "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1496082,
@@ -5788,10 +5968,20 @@
                 "o25": 1.48,
                 "o05ht": 1.25,
                 "o15ht": 2.15
+            },
+            {
+                "ts": "2026-06-13 23:22:39",
+                "hhmm": "23:22",
+                "q1": 2.15,
+                "qx": 3.65,
+                "q2": 2.75,
+                "o25": 1.48,
+                "o05ht": 1.25,
+                "o15ht": 2.15
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -6108,10 +6298,20 @@
                 "o25": 1.8,
                 "o05ht": 1.33,
                 "o15ht": 2.6
+            },
+            {
+                "ts": "2026-06-13 23:22:43",
+                "hhmm": "23:22",
+                "q1": 6.0,
+                "qx": 3.8,
+                "q2": 1.44,
+                "o25": 1.8,
+                "o05ht": 1.33,
+                "o15ht": 2.6
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -6434,10 +6634,20 @@
                 "o25": 2.0,
                 "o05ht": 1.42,
                 "o15ht": 2.8
+            },
+            {
+                "ts": "2026-06-13 23:22:44",
+                "hhmm": "23:22",
+                "q1": 3.0,
+                "qx": 3.1,
+                "q2": 2.25,
+                "o25": 2.0,
+                "o05ht": 1.42,
+                "o15ht": 2.8
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -6752,10 +6962,20 @@
                 "o25": 1.73,
                 "o05ht": 1.33,
                 "o15ht": 2.45
+            },
+            {
+                "ts": "2026-06-13 23:22:43",
+                "hhmm": "23:22",
+                "q1": 1.75,
+                "qx": 3.5,
+                "q2": 3.9,
+                "o25": 1.73,
+                "o05ht": 1.33,
+                "o15ht": 2.45
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -7072,10 +7292,20 @@
                 "o25": 2.5,
                 "o05ht": 1.5,
                 "o15ht": 3.4
+            },
+            {
+                "ts": "2026-06-13 23:22:45",
+                "hhmm": "23:22",
+                "q1": 2.1,
+                "qx": 2.7,
+                "q2": 3.6,
+                "o25": 2.5,
+                "o05ht": 1.5,
+                "o15ht": 3.4
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 6,
+            "history_count": 7,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -7358,10 +7588,20 @@
                 "o25": 1.4,
                 "o05ht": 1.19,
                 "o15ht": 1.92
+            },
+            {
+                "ts": "2026-06-13 23:22:47",
+                "hhmm": "23:22",
+                "q1": 4.33,
+                "qx": 4.33,
+                "q2": 1.53,
+                "o25": 1.4,
+                "o05ht": 1.19,
+                "o15ht": 1.92
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 4,
+            "history_count": 5,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -7652,21 +7892,31 @@
                 "o25": 1.53,
                 "o05ht": 1.22,
                 "o15ht": 2.18
+            },
+            {
+                "ts": "2026-06-13 23:22:48",
+                "hhmm": "23:22",
+                "q1": 2.55,
+                "qx": 3.6,
+                "q2": 2.25,
+                "o25": 1.53,
+                "o05ht": 1.22,
+                "o15ht": 2.18
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 4,
+            "history_count": 5,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
             "o25_movement_type": "flat",
             "o05ht_velocity": 0.0,
-            "o05ht_prev_velocity": 0.004,
-            "o05ht_acceleration": -0.004,
+            "o05ht_prev_velocity": 0.0,
+            "o05ht_acceleration": 0.0,
             "o05ht_movement_type": "flat",
             "o15ht_velocity": 0.0,
-            "o15ht_prev_velocity": -0.008,
-            "o15ht_acceleration": 0.008,
+            "o15ht_prev_velocity": 0.0,
+            "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
             "fav_prev_velocity": 0.0,
@@ -7678,9 +7928,9 @@
         "O25_VELOCITY": 0.0,
         "O25_ACCELERATION": 0.0,
         "O05HT_VELOCITY": 0.0,
-        "O05HT_ACCELERATION": -0.004,
+        "O05HT_ACCELERATION": 0.0,
         "O15HT_VELOCITY": 0.0,
-        "O15HT_ACCELERATION": 0.008,
+        "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
         "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
@@ -7976,10 +8226,20 @@
                 "o25": 1.55,
                 "o05ht": 1.25,
                 "o15ht": 2.2
+            },
+            {
+                "ts": "2026-06-13 23:22:46",
+                "hhmm": "23:22",
+                "q1": 2.05,
+                "qx": 3.65,
+                "q2": 3.0,
+                "o25": 1.55,
+                "o05ht": 1.25,
+                "o15ht": 2.2
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -7993,8 +8253,8 @@
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
-            "fav_prev_velocity": 0.019,
-            "fav_acceleration": -0.019,
+            "fav_prev_velocity": 0.0,
+            "fav_acceleration": 0.0,
             "fav_movement_type": "flat",
             "market_acceleration_label": "FLAT"
         },
@@ -8006,7 +8266,7 @@
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
-        "FAV_ACCELERATION": -0.019,
+        "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1496263,
@@ -8300,10 +8560,20 @@
                 "o25": 2.35,
                 "o05ht": 1.48,
                 "o15ht": 3.2
+            },
+            {
+                "ts": "2026-06-13 23:22:48",
+                "hhmm": "23:22",
+                "q1": 2.3,
+                "qx": 3.0,
+                "q2": 3.0,
+                "o25": 2.35,
+                "o05ht": 1.48,
+                "o15ht": 3.2
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -8574,10 +8844,20 @@
                 "o25": 1.53,
                 "o05ht": 1.25,
                 "o15ht": 2.1
+            },
+            {
+                "ts": "2026-06-13 23:22:50",
+                "hhmm": "23:22",
+                "q1": 2.2,
+                "qx": 3.65,
+                "q2": 2.75,
+                "o25": 1.53,
+                "o05ht": 1.25,
+                "o15ht": 2.1
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 2,
+            "history_count": 3,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -8896,10 +9176,20 @@
                 "o25": 1.8,
                 "o05ht": 1.33,
                 "o15ht": 2.5
+            },
+            {
+                "ts": "2026-06-13 23:22:52",
+                "hhmm": "23:22",
+                "q1": 1.85,
+                "qx": 3.6,
+                "q2": 3.9,
+                "o25": 1.8,
+                "o05ht": 1.33,
+                "o15ht": 2.5
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -8913,8 +9203,8 @@
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
-            "fav_prev_velocity": 0.019,
-            "fav_acceleration": -0.019,
+            "fav_prev_velocity": 0.0,
+            "fav_acceleration": 0.0,
             "fav_movement_type": "flat",
             "market_acceleration_label": "FLAT"
         },
@@ -8926,7 +9216,7 @@
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
-        "FAV_ACCELERATION": -0.019,
+        "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1497601,
@@ -9222,10 +9512,20 @@
                 "o25": 1.75,
                 "o05ht": 1.33,
                 "o15ht": 2.45
+            },
+            {
+                "ts": "2026-06-13 23:22:52",
+                "hhmm": "23:22",
+                "q1": 2.25,
+                "qx": 3.55,
+                "q2": 2.88,
+                "o25": 1.75,
+                "o05ht": 1.33,
+                "o15ht": 2.45
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -9546,10 +9846,20 @@
                 "o25": 1.5,
                 "o05ht": 1.25,
                 "o15ht": 2.2
+            },
+            {
+                "ts": "2026-06-13 23:22:56",
+                "hhmm": "23:22",
+                "q1": 3.5,
+                "qx": 3.75,
+                "q2": 1.83,
+                "o25": 1.5,
+                "o05ht": 1.25,
+                "o15ht": 2.2
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -9870,10 +10180,20 @@
                 "o25": 2.15,
                 "o05ht": 1.42,
                 "o15ht": 2.9
+            },
+            {
+                "ts": "2026-06-13 23:23:02",
+                "hhmm": "23:23",
+                "q1": 1.52,
+                "qx": 3.7,
+                "q2": 7.0,
+                "o25": 2.15,
+                "o05ht": 1.42,
+                "o15ht": 2.9
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -9887,8 +10207,8 @@
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
-            "fav_prev_velocity": 0.008,
-            "fav_acceleration": -0.008,
+            "fav_prev_velocity": 0.0,
+            "fav_acceleration": 0.0,
             "fav_movement_type": "flat",
             "market_acceleration_label": "FLAT"
         },
@@ -9900,7 +10220,7 @@
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
-        "FAV_ACCELERATION": -0.008,
+        "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1520726,
@@ -10186,10 +10506,20 @@
                 "o25": 1.65,
                 "o05ht": 1.28,
                 "o15ht": 2.3
+            },
+            {
+                "ts": "2026-06-13 23:23:00",
+                "hhmm": "23:23",
+                "q1": 1.48,
+                "qx": 4.1,
+                "q2": 5.5,
+                "o25": 1.65,
+                "o05ht": 1.28,
+                "o15ht": 2.3
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -10512,13 +10842,23 @@
                 "o25": 1.62,
                 "o05ht": 1.28,
                 "o15ht": 2.3
+            },
+            {
+                "ts": "2026-06-13 23:22:58",
+                "hhmm": "23:22",
+                "q1": 1.85,
+                "qx": 3.6,
+                "q2": 3.55,
+                "o25": 1.62,
+                "o05ht": 1.28,
+                "o15ht": 2.3
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
-            "o25_prev_velocity": -0.008,
-            "o25_acceleration": 0.008,
+            "o25_prev_velocity": 0.0,
+            "o25_acceleration": 0.0,
             "o25_movement_type": "flat",
             "o05ht_velocity": 0.0,
             "o05ht_prev_velocity": 0.0,
@@ -10529,20 +10869,20 @@
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
-            "fav_prev_velocity": -0.031,
-            "fav_acceleration": 0.031,
+            "fav_prev_velocity": 0.0,
+            "fav_acceleration": 0.0,
             "fav_movement_type": "flat",
             "market_acceleration_label": "FLAT"
         },
         "MARKET_ACCELERATION_LABEL": "FLAT",
         "O25_VELOCITY": 0.0,
-        "O25_ACCELERATION": 0.008,
+        "O25_ACCELERATION": 0.0,
         "O05HT_VELOCITY": 0.0,
         "O05HT_ACCELERATION": 0.0,
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
-        "FAV_ACCELERATION": 0.031,
+        "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1495859,
@@ -10834,10 +11174,20 @@
                 "o25": 2.15,
                 "o05ht": 1.42,
                 "o15ht": 2.88
+            },
+            {
+                "ts": "2026-06-13 23:23:03",
+                "hhmm": "23:23",
+                "q1": 2.38,
+                "qx": 3.15,
+                "q2": 3.05,
+                "o25": 2.15,
+                "o05ht": 1.42,
+                "o15ht": 2.88
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -11156,13 +11506,23 @@
                 "o25": 1.85,
                 "o05ht": 1.35,
                 "o15ht": 2.65
+            },
+            {
+                "ts": "2026-06-13 23:23:04",
+                "hhmm": "23:23",
+                "q1": 2.55,
+                "qx": 3.35,
+                "q2": 2.4,
+                "o25": 1.85,
+                "o05ht": 1.35,
+                "o15ht": 2.65
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
-            "o25_velocity": -0.024,
-            "o25_prev_velocity": 0.0,
-            "o25_acceleration": -0.024,
+            "history_count": 8,
+            "o25_velocity": 0.0,
+            "o25_prev_velocity": -0.024,
+            "o25_acceleration": 0.024,
             "o25_movement_type": "flat",
             "o05ht_velocity": 0.0,
             "o05ht_prev_velocity": 0.0,
@@ -11172,21 +11532,21 @@
             "o15ht_prev_velocity": 0.0,
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
-            "fav_velocity": 0.047,
-            "fav_prev_velocity": 0.0,
-            "fav_acceleration": 0.047,
-            "fav_movement_type": "accelerating",
-            "market_acceleration_label": "ACCEL_FAV"
+            "fav_velocity": 0.0,
+            "fav_prev_velocity": 0.047,
+            "fav_acceleration": -0.047,
+            "fav_movement_type": "flat",
+            "market_acceleration_label": "FLAT"
         },
-        "MARKET_ACCELERATION_LABEL": "ACCEL_FAV",
-        "O25_VELOCITY": -0.024,
-        "O25_ACCELERATION": -0.024,
+        "MARKET_ACCELERATION_LABEL": "FLAT",
+        "O25_VELOCITY": 0.0,
+        "O25_ACCELERATION": 0.024,
         "O05HT_VELOCITY": 0.0,
         "O05HT_ACCELERATION": 0.0,
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
-        "FAV_VELOCITY": 0.047,
-        "FAV_ACCELERATION": 0.047,
+        "FAV_VELOCITY": 0.0,
+        "FAV_ACCELERATION": -0.047,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1527994,
@@ -11442,10 +11802,20 @@
                 "o25": 1.95,
                 "o05ht": 1.36,
                 "o15ht": 2.75
+            },
+            {
+                "ts": "2026-06-13 23:23:10",
+                "hhmm": "23:23",
+                "q1": 2.15,
+                "qx": 3.1,
+                "q2": 3.0,
+                "o25": 1.95,
+                "o05ht": 1.36,
+                "o15ht": 2.75
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 4,
+            "history_count": 5,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -11768,10 +12138,20 @@
                 "o25": 2.2,
                 "o05ht": 1.42,
                 "o15ht": 2.95
+            },
+            {
+                "ts": "2026-06-13 23:23:11",
+                "hhmm": "23:23",
+                "q1": 2.3,
+                "qx": 3.1,
+                "q2": 2.95,
+                "o25": 2.2,
+                "o05ht": 1.42,
+                "o15ht": 2.95
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -11784,21 +12164,21 @@
             "o15ht_prev_velocity": 0.0,
             "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
-            "fav_velocity": 0.047,
-            "fav_prev_velocity": 0.0,
-            "fav_acceleration": 0.047,
-            "fav_movement_type": "accelerating",
-            "market_acceleration_label": "ACCEL_FAV"
+            "fav_velocity": 0.0,
+            "fav_prev_velocity": 0.047,
+            "fav_acceleration": -0.047,
+            "fav_movement_type": "flat",
+            "market_acceleration_label": "FLAT"
         },
-        "MARKET_ACCELERATION_LABEL": "ACCEL_FAV",
+        "MARKET_ACCELERATION_LABEL": "FLAT",
         "O25_VELOCITY": 0.0,
         "O25_ACCELERATION": 0.0,
         "O05HT_VELOCITY": 0.0,
         "O05HT_ACCELERATION": 0.0,
         "O15HT_VELOCITY": 0.0,
         "O15HT_ACCELERATION": 0.0,
-        "FAV_VELOCITY": 0.047,
-        "FAV_ACCELERATION": 0.047,
+        "FAV_VELOCITY": 0.0,
+        "FAV_ACCELERATION": -0.047,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1527991,
@@ -12086,10 +12466,20 @@
                 "o25": 1.67,
                 "o05ht": 1.3,
                 "o15ht": 2.38
+            },
+            {
+                "ts": "2026-06-13 23:23:08",
+                "hhmm": "23:23",
+                "q1": 2.25,
+                "qx": 3.6,
+                "q2": 2.88,
+                "o25": 1.67,
+                "o05ht": 1.3,
+                "o15ht": 2.38
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -12412,10 +12802,20 @@
                 "o25": 1.37,
                 "o05ht": 0.0,
                 "o15ht": 0.0
+            },
+            {
+                "ts": "2026-06-13 23:23:09",
+                "hhmm": "23:23",
+                "q1": 3.0,
+                "qx": 3.55,
+                "q2": 1.92,
+                "o25": 1.37,
+                "o05ht": 0.0,
+                "o15ht": 0.0
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -12678,21 +13078,31 @@
                 "o25": 1.93,
                 "o05ht": 1.35,
                 "o15ht": 2.65
+            },
+            {
+                "ts": "2026-06-13 23:23:15",
+                "hhmm": "23:23",
+                "q1": 2.5,
+                "qx": 3.3,
+                "q2": 2.5,
+                "o25": 1.93,
+                "o05ht": 1.35,
+                "o15ht": 2.65
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 2,
-            "o25_velocity": -0.038,
-            "o25_prev_velocity": 0.0,
-            "o25_acceleration": -0.038,
+            "history_count": 3,
+            "o25_velocity": 0.0,
+            "o25_prev_velocity": -0.038,
+            "o25_acceleration": 0.038,
             "o25_movement_type": "flat",
             "o05ht_velocity": 0.0,
             "o05ht_prev_velocity": 0.0,
             "o05ht_acceleration": 0.0,
             "o05ht_movement_type": "flat",
-            "o15ht_velocity": -0.024,
-            "o15ht_prev_velocity": 0.0,
-            "o15ht_acceleration": -0.024,
+            "o15ht_velocity": 0.0,
+            "o15ht_prev_velocity": -0.024,
+            "o15ht_acceleration": 0.024,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
             "fav_prev_velocity": 0.0,
@@ -12701,12 +13111,12 @@
             "market_acceleration_label": "FLAT"
         },
         "MARKET_ACCELERATION_LABEL": "FLAT",
-        "O25_VELOCITY": -0.038,
-        "O25_ACCELERATION": -0.038,
+        "O25_VELOCITY": 0.0,
+        "O25_ACCELERATION": 0.038,
         "O05HT_VELOCITY": 0.0,
         "O05HT_ACCELERATION": 0.0,
-        "O15HT_VELOCITY": -0.024,
-        "O15HT_ACCELERATION": -0.024,
+        "O15HT_VELOCITY": 0.0,
+        "O15HT_ACCELERATION": 0.024,
         "FAV_VELOCITY": 0.0,
         "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
@@ -12992,10 +13402,20 @@
                 "o25": 1.4,
                 "o05ht": 1.17,
                 "o15ht": 2.0
+            },
+            {
+                "ts": "2026-06-13 23:23:13",
+                "hhmm": "23:23",
+                "q1": 5.0,
+                "qx": 4.5,
+                "q2": 1.44,
+                "o25": 1.4,
+                "o05ht": 1.17,
+                "o15ht": 2.0
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -13310,10 +13730,20 @@
                 "o25": 1.7,
                 "o05ht": 1.33,
                 "o15ht": 2.45
+            },
+            {
+                "ts": "2026-06-13 23:23:17",
+                "hhmm": "23:23",
+                "q1": 2.78,
+                "qx": 3.5,
+                "q2": 2.26,
+                "o25": 1.7,
+                "o05ht": 1.33,
+                "o15ht": 2.45
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -13632,10 +14062,20 @@
                 "o25": 2.95,
                 "o05ht": 1.57,
                 "o15ht": 3.75
+            },
+            {
+                "ts": "2026-06-13 23:23:18",
+                "hhmm": "23:23",
+                "q1": 2.2,
+                "qx": 2.85,
+                "q2": 3.4,
+                "o25": 2.95,
+                "o05ht": 1.57,
+                "o15ht": 3.75
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -13894,10 +14334,20 @@
                 "o25": 2.15,
                 "o05ht": 1.42,
                 "o15ht": 3.04
+            },
+            {
+                "ts": "2026-06-13 23:23:31",
+                "hhmm": "23:23",
+                "q1": 2.75,
+                "qx": 3.0,
+                "q2": 2.38,
+                "o25": 2.15,
+                "o05ht": 1.42,
+                "o15ht": 3.04
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 2,
+            "history_count": 3,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -14170,10 +14620,20 @@
                 "o25": 2.08,
                 "o05ht": 1.42,
                 "o15ht": 2.92
+            },
+            {
+                "ts": "2026-06-13 23:23:39",
+                "hhmm": "23:23",
+                "q1": 6.0,
+                "qx": 3.5,
+                "q2": 1.5,
+                "o25": 2.08,
+                "o05ht": 1.42,
+                "o15ht": 2.92
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 3,
+            "history_count": 4,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -14488,25 +14948,35 @@
                 "o25": 1.85,
                 "o05ht": 1.45,
                 "o15ht": 2.95
+            },
+            {
+                "ts": "2026-06-13 23:23:44",
+                "hhmm": "23:23",
+                "q1": 2.22,
+                "qx": 3.15,
+                "q2": 3.3,
+                "o25": 1.85,
+                "o05ht": 1.45,
+                "o15ht": 2.95
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
             "o25_movement_type": "flat",
             "o05ht_velocity": 0.0,
-            "o05ht_prev_velocity": -0.012,
-            "o05ht_acceleration": 0.012,
+            "o05ht_prev_velocity": 0.0,
+            "o05ht_acceleration": 0.0,
             "o05ht_movement_type": "flat",
             "o15ht_velocity": 0.0,
-            "o15ht_prev_velocity": -0.039,
-            "o15ht_acceleration": 0.039,
+            "o15ht_prev_velocity": 0.0,
+            "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
-            "fav_prev_velocity": -0.016,
-            "fav_acceleration": 0.016,
+            "fav_prev_velocity": 0.0,
+            "fav_acceleration": 0.0,
             "fav_movement_type": "flat",
             "market_acceleration_label": "FLAT"
         },
@@ -14514,11 +14984,11 @@
         "O25_VELOCITY": 0.0,
         "O25_ACCELERATION": 0.0,
         "O05HT_VELOCITY": 0.0,
-        "O05HT_ACCELERATION": 0.012,
+        "O05HT_ACCELERATION": 0.0,
         "O15HT_VELOCITY": 0.0,
-        "O15HT_ACCELERATION": 0.039,
+        "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
-        "FAV_ACCELERATION": 0.016,
+        "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
         "Data": "2026-06-14",
         "Fixture_ID": 1551271,
@@ -14770,10 +15240,20 @@
                 "o25": 2.08,
                 "o05ht": 1.42,
                 "o15ht": 2.92
+            },
+            {
+                "ts": "2026-06-13 23:23:41",
+                "hhmm": "23:23",
+                "q1": 1.7,
+                "qx": 3.3,
+                "q2": 4.5,
+                "o25": 2.08,
+                "o05ht": 1.42,
+                "o15ht": 2.92
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 3,
+            "history_count": 4,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -15062,10 +15542,20 @@
                 "o25": 1.73,
                 "o05ht": 1.29,
                 "o15ht": 2.4
+            },
+            {
+                "ts": "2026-06-13 23:23:34",
+                "hhmm": "23:23",
+                "q1": 2.8,
+                "qx": 3.1,
+                "q2": 2.25,
+                "o25": 1.73,
+                "o05ht": 1.29,
+                "o15ht": 2.4
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 5,
+            "history_count": 6,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -15338,10 +15828,20 @@
                 "o25": 2.15,
                 "o05ht": 1.44,
                 "o15ht": 3.12
+            },
+            {
+                "ts": "2026-06-13 23:23:42",
+                "hhmm": "23:23",
+                "q1": 2.15,
+                "qx": 3.0,
+                "q2": 3.2,
+                "o25": 2.15,
+                "o05ht": 1.44,
+                "o15ht": 3.12
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 3,
+            "history_count": 4,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -15351,8 +15851,8 @@
             "o05ht_acceleration": 0.0,
             "o05ht_movement_type": "flat",
             "o15ht_velocity": 0.0,
-            "o15ht_prev_velocity": -0.016,
-            "o15ht_acceleration": 0.016,
+            "o15ht_prev_velocity": 0.0,
+            "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
             "fav_prev_velocity": 0.0,
@@ -15366,7 +15866,7 @@
         "O05HT_VELOCITY": 0.0,
         "O05HT_ACCELERATION": 0.0,
         "O15HT_VELOCITY": 0.0,
-        "O15HT_ACCELERATION": 0.016,
+        "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
         "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
@@ -15616,10 +16116,20 @@
                 "o25": 2.38,
                 "o05ht": 1.49,
                 "o15ht": 3.34
+            },
+            {
+                "ts": "2026-06-13 23:23:42",
+                "hhmm": "23:23",
+                "q1": 2.0,
+                "qx": 2.9,
+                "q2": 3.6,
+                "o25": 2.38,
+                "o05ht": 1.49,
+                "o15ht": 3.34
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 3,
+            "history_count": 4,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -15892,10 +16402,20 @@
                 "o25": 2.15,
                 "o05ht": 1.44,
                 "o15ht": 3.04
+            },
+            {
+                "ts": "2026-06-13 23:23:43",
+                "hhmm": "23:23",
+                "q1": 1.6,
+                "qx": 3.4,
+                "q2": 5.25,
+                "o25": 2.15,
+                "o05ht": 1.44,
+                "o15ht": 3.04
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 3,
+            "history_count": 4,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -16156,10 +16676,20 @@
                 "o25": 2.15,
                 "o05ht": 1.42,
                 "o15ht": 2.95
+            },
+            {
+                "ts": "2026-06-13 23:23:34",
+                "hhmm": "23:23",
+                "q1": 3.4,
+                "qx": 3.2,
+                "q2": 2.06,
+                "o25": 2.15,
+                "o05ht": 1.42,
+                "o15ht": 2.95
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 2,
+            "history_count": 3,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -16474,10 +17004,20 @@
                 "o25": 2.15,
                 "o05ht": 1.42,
                 "o15ht": 2.9
+            },
+            {
+                "ts": "2026-06-13 23:23:45",
+                "hhmm": "23:23",
+                "q1": 3.2,
+                "qx": 3.1,
+                "q2": 2.15,
+                "o25": 2.15,
+                "o05ht": 1.42,
+                "o15ht": 2.9
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -16768,10 +17308,20 @@
                 "o25": 1.33,
                 "o05ht": 1.17,
                 "o15ht": 1.83
+            },
+            {
+                "ts": "2026-06-13 23:23:46",
+                "hhmm": "23:23",
+                "q1": 1.44,
+                "qx": 4.4,
+                "q2": 5.0,
+                "o25": 1.33,
+                "o05ht": 1.17,
+                "o15ht": 1.83
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 3,
+            "history_count": 4,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -17044,10 +17594,20 @@
                 "o25": 2.05,
                 "o05ht": 1.41,
                 "o15ht": 2.88
+            },
+            {
+                "ts": "2026-06-13 23:23:48",
+                "hhmm": "23:23",
+                "q1": 1.55,
+                "qx": 3.5,
+                "q2": 5.5,
+                "o25": 2.05,
+                "o05ht": 1.41,
+                "o15ht": 2.88
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 3,
+            "history_count": 4,
             "o25_velocity": 0.0,
             "o25_prev_velocity": 0.0,
             "o25_acceleration": 0.0,
@@ -17364,21 +17924,31 @@
                 "o25": 1.8,
                 "o05ht": 1.36,
                 "o15ht": 2.62
+            },
+            {
+                "ts": "2026-06-13 23:23:50",
+                "hhmm": "23:23",
+                "q1": 1.36,
+                "qx": 4.1,
+                "q2": 8.0,
+                "o25": 1.8,
+                "o05ht": 1.36,
+                "o15ht": 2.62
             }
         ],
         "QUOTE_DYNAMICS": {
-            "history_count": 7,
+            "history_count": 8,
             "o25_velocity": 0.0,
-            "o25_prev_velocity": 0.012,
-            "o25_acceleration": -0.012,
+            "o25_prev_velocity": 0.0,
+            "o25_acceleration": 0.0,
             "o25_movement_type": "flat",
             "o05ht_velocity": 0.0,
-            "o05ht_prev_velocity": 0.016,
-            "o05ht_acceleration": -0.016,
+            "o05ht_prev_velocity": 0.0,
+            "o05ht_acceleration": 0.0,
             "o05ht_movement_type": "flat",
             "o15ht_velocity": 0.0,
-            "o15ht_prev_velocity": 0.07,
-            "o15ht_acceleration": -0.07,
+            "o15ht_prev_velocity": 0.0,
+            "o15ht_acceleration": 0.0,
             "o15ht_movement_type": "flat",
             "fav_velocity": 0.0,
             "fav_prev_velocity": 0.0,
@@ -17388,11 +17958,11 @@
         },
         "MARKET_ACCELERATION_LABEL": "FLAT",
         "O25_VELOCITY": 0.0,
-        "O25_ACCELERATION": -0.012,
+        "O25_ACCELERATION": 0.0,
         "O05HT_VELOCITY": 0.0,
-        "O05HT_ACCELERATION": -0.016,
+        "O05HT_ACCELERATION": 0.0,
         "O15HT_VELOCITY": 0.0,
-        "O15HT_ACCELERATION": -0.07,
+        "O15HT_ACCELERATION": 0.0,
         "FAV_VELOCITY": 0.0,
         "FAV_ACCELERATION": 0.0,
         "HAS_INVERSION": false,
