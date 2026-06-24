@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-06-24 20:55:32",
+    "updated_at": "2026-06-24 22:51:27",
     "day": 2,
     "date": "2026-06-25",
     "details": {
@@ -13,8 +13,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:02",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:50:56",
+                    "hhmm": "22:50",
                     "q1": 8.9,
                     "qx": 5.3,
                     "q2": 1.3,
@@ -829,12 +829,12 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:10",
-                    "hhmm": "20:55",
-                    "q1": 2.5,
+                    "ts": "2026-06-24 22:51:05",
+                    "hhmm": "22:51",
+                    "q1": 2.4,
                     "qx": 3.4,
-                    "q2": 2.5,
-                    "o25": 1.77,
+                    "q2": 2.55,
+                    "o25": 1.7,
                     "o05ht": 1.3,
                     "o15ht": 2.4
                 }
@@ -863,13 +863,13 @@
             "home_team": "Concepción",
             "away_team": "Huachipato",
             "markets": {
-                "q1": 2.5,
+                "q1": 2.4,
                 "qx": 3.4,
-                "q2": 2.5,
-                "o25": 1.77,
+                "q2": 2.55,
+                "o25": 1.7,
                 "o05ht": 1.3,
                 "o15ht": 2.4,
-                "u25": 1.95,
+                "u25": 2.05,
                 "u05ht": 3.1,
                 "u15ht": 1.48
             },
@@ -908,20 +908,20 @@
                 "away_ht_conceded_1plus_rate": 0.637
             },
             "flags": {
-                "fav_quote": 2.5,
+                "fav_quote": 2.4,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.1,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": true
             },
             "fair_value": {
                 "margin_open": 0.094,
-                "margin_curr": 0.094,
-                "margin_delta": 0.0,
+                "margin_curr": 0.103,
+                "margin_delta": 0.009,
                 "fav_fair_prob_open": 0.366,
-                "fav_fair_prob_curr": 0.366,
-                "fav_fair_prob_delta": 0.0,
-                "fav_fair_curr": 2.735
+                "fav_fair_prob_curr": 0.378,
+                "fav_fair_prob_delta": 0.012,
+                "fav_fair_curr": 2.647
             },
             "model_edge": {
                 "lam_home_ft": 1.411,
@@ -929,9 +929,9 @@
                 "lam_home_ht": 0.731,
                 "lam_away_ht": 0.489,
                 "p_model_o25": 0.589,
-                "p_market_o25": 0.524,
-                "edge_o25": 0.065,
-                "edge_logit_o25": 0.264,
+                "p_market_o25": 0.547,
+                "edge_o25": 0.042,
+                "edge_logit_o25": 0.171,
                 "edge_level_o25": "GOOD",
                 "p_model_o05ht": 0.705,
                 "p_market_o05ht": 0.705,
@@ -949,21 +949,21 @@
                 "ht_sd_avg": 0.885
             },
             "scores": {
-                "ptgg": 3.73,
+                "ptgg": 3.85,
                 "pto15": 2.61,
-                "pt": 4.48,
-                "over": 9.18,
-                "boost": 9.351,
-                "gold": 9.87,
-                "max": 9.87,
-                "edge_o25": 0.065,
+                "pt": 4.609,
+                "over": 9.36,
+                "boost": 9.856,
+                "gold": 10.228,
+                "max": 10.228,
+                "edge_o25": 0.042,
                 "edge_o05ht": 0.0,
                 "edge_o15ht": -0.036,
                 "edge_level_o25": "GOOD",
                 "edge_level_o05ht": "NONE",
                 "edge_level_o15ht": "NONE",
                 "p_model_o25": 0.589,
-                "p_market_o25": 0.524,
+                "p_market_o25": 0.547,
                 "p_model_o05ht": 0.705,
                 "p_market_o05ht": 0.705,
                 "p_model_o15ht": 0.345,
@@ -975,7 +975,12 @@
             "internal_labels": [
                 "OVER_OK",
                 "MARKET_OK",
-                "GOLD_OM"
+                "DROP_OK",
+                "DROP_CONFIRMED",
+                "DROP_1X2",
+                "DROP_O25",
+                "GOLD_OM",
+                "GOLD_ODM"
             ],
             "structure": {
                 "match_profile": "open_match",
@@ -989,7 +994,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.5,
-                "fav_quote": 2.5,
+                "fav_quote": 2.4,
                 "fav_zone": "wide",
                 "combined_ht_dirty": 1.264,
                 "combined_ft_dirty": 2.986,
@@ -998,32 +1003,34 @@
             },
             "market_reading": {
                 "market_profile": "full_open",
-                "coherence_score": 3.0,
+                "coherence_score": 3.87,
                 "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "none",
+                "leading_market": "mixed",
                 "lagging_market": "none",
-                "drop_type": "none",
-                "drop_strength": "none",
-                "drop_confirmed": false,
-                "value_left": "unknown",
+                "drop_type": "structural",
+                "drop_strength": "medium",
+                "drop_confirmed": true,
+                "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
-                    "ht_struct_market_aligned"
+                    "ht_struct_market_aligned",
+                    "mixed_pressure_confirmation",
+                    "structural_drop"
                 ],
                 "warning_flags": [
                     "high_bookie_protection",
-                    "flat_fair_move"
+                    "suspicious_limit"
                 ],
                 "margin_open": 0.094,
-                "margin_curr": 0.094,
-                "margin_delta": 0.0,
+                "margin_curr": 0.103,
+                "margin_delta": 0.009,
                 "fav_fair_prob_open": 0.366,
-                "fav_fair_prob_curr": 0.366,
-                "fav_fair_prob_delta": 0.0,
-                "fav_fair_curr": 2.735,
+                "fav_fair_prob_curr": 0.378,
+                "fav_fair_prob_delta": 0.012,
+                "fav_fair_curr": 2.647,
                 "home_ft_stdev": 1.296,
                 "away_ft_stdev": 1.263,
                 "home_scoring_regularity": 0.657,
@@ -1034,16 +1041,21 @@
                     "GOLD"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.5,
+                "fav_quote": 2.4,
                 "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "drop_diff": 0.1,
                 "internal_labels": [
                     "OVER_OK",
                     "MARKET_OK",
-                    "GOLD_OM"
+                    "DROP_OK",
+                    "DROP_CONFIRMED",
+                    "DROP_1X2",
+                    "DROP_O25",
+                    "GOLD_OM",
+                    "GOLD_ODM"
                 ],
                 "over_level": 3,
-                "drop_visual_level": "none",
+                "drop_visual_level": "strong",
                 "signal_stability": "Alta",
                 "signal_summary": "Combo forte tra base e mercato",
                 "tempo_tag": "BUILD",
@@ -1648,8 +1660,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:11",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:06",
+                    "hhmm": "22:51",
                     "q1": 3.1,
                     "qx": 3.4,
                     "q2": 2.05,
@@ -2474,14 +2486,14 @@
             "league": "USL League Two",
             "country": "USA",
             "match": "Evergreen - Hill City",
-            "gg_ht_sniper": false,
+            "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:11",
-                    "hhmm": "20:55",
-                    "q1": 2.05,
-                    "qx": 3.6,
-                    "q2": 2.8,
+                    "ts": "2026-06-24 22:51:06",
+                    "hhmm": "22:51",
+                    "q1": 1.64,
+                    "qx": 4.0,
+                    "q2": 3.9,
                     "o25": 1.53,
                     "o05ht": 1.22,
                     "o15ht": 2.0
@@ -2511,9 +2523,9 @@
             "home_team": "Evergreen",
             "away_team": "Hill City",
             "markets": {
-                "q1": 2.05,
-                "qx": 3.6,
-                "q2": 2.8,
+                "q1": 1.64,
+                "qx": 4.0,
+                "q2": 3.9,
                 "o25": 1.53,
                 "o05ht": 1.22,
                 "o15ht": 2.0,
@@ -2556,20 +2568,20 @@
                 "away_ht_conceded_1plus_rate": 0.5
             },
             "flags": {
-                "fav_quote": 2.05,
-                "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "fav_quote": 1.64,
+                "is_gold_zone": true,
+                "drop_diff": 0.41,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": true
             },
             "fair_value": {
                 "margin_open": 0.115,
-                "margin_curr": 0.123,
-                "margin_delta": 0.008,
+                "margin_curr": 0.116,
+                "margin_delta": 0.001,
                 "fav_fair_prob_open": 0.437,
-                "fav_fair_prob_curr": 0.434,
-                "fav_fair_prob_delta": -0.003,
-                "fav_fair_curr": 2.302
+                "fav_fair_prob_curr": 0.546,
+                "fav_fair_prob_delta": 0.109,
+                "fav_fair_curr": 1.831
             },
             "model_edge": {
                 "lam_home_ft": 2.837,
@@ -2597,13 +2609,13 @@
                 "ht_sd_avg": 1.71
             },
             "scores": {
-                "ptgg": 7.29,
-                "pto15": 6.64,
-                "pt": 9.02,
-                "over": 8.91,
-                "boost": 8.991,
-                "gold": 10.483,
-                "max": 10.483,
+                "ptgg": 8.077,
+                "pto15": 7.636,
+                "pt": 10.043,
+                "over": 10.453,
+                "boost": 10.25,
+                "gold": 12.378,
+                "max": 12.378,
                 "edge_o25": 0.225,
                 "edge_o05ht": 0.192,
                 "edge_o15ht": 0.319,
@@ -2618,12 +2630,17 @@
                 "p_market_o15ht": 0.448
             },
             "tags": [
-                "OVER"
+                "OVER",
+                "⚽⚽"
             ],
             "internal_labels": [
                 "OVER_OK",
                 "MARKET_OK",
-                "GOLD_OM"
+                "DROP_OK",
+                "DROP_CONFIRMED",
+                "DROP_1X2",
+                "GOLD_OM",
+                "GOLD_ODM"
             ],
             "structure": {
                 "match_profile": "open_match",
@@ -2637,8 +2654,8 @@
                 "bilateral_ft": true,
                 "bilateral_ht": true,
                 "one_sided_risk": 0.4,
-                "fav_quote": 2.05,
-                "fav_zone": "balanced",
+                "fav_quote": 1.64,
+                "fav_zone": "gold",
                 "combined_ht_dirty": 2.744,
                 "combined_ft_dirty": 4.592,
                 "cross_home_dirty": 5.526,
@@ -2646,33 +2663,35 @@
             },
             "market_reading": {
                 "market_profile": "full_open",
-                "coherence_score": 3.3,
+                "coherence_score": 4.67,
                 "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "ht",
+                "leading_market": "1x2",
                 "lagging_market": "none",
-                "drop_type": "divergent",
-                "drop_strength": "medium",
-                "drop_confirmed": false,
-                "value_left": "high",
+                "drop_type": "structural",
+                "drop_strength": "hard",
+                "drop_confirmed": true,
+                "value_left": "medium",
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
-                    "ht_struct_market_aligned"
+                    "ht_struct_market_aligned",
+                    "fav_open_match_coherent",
+                    "structural_drop",
+                    "true_fair_support"
                 ],
                 "warning_flags": [
-                    "goals_move_without_1x2_support",
                     "high_bookie_protection",
-                    "flat_fair_move"
+                    "suspicious_limit"
                 ],
                 "margin_open": 0.115,
-                "margin_curr": 0.123,
-                "margin_delta": 0.008,
+                "margin_curr": 0.116,
+                "margin_delta": 0.001,
                 "fav_fair_prob_open": 0.437,
-                "fav_fair_prob_curr": 0.434,
-                "fav_fair_prob_delta": -0.003,
-                "fav_fair_curr": 2.302,
+                "fav_fair_prob_curr": 0.546,
+                "fav_fair_prob_delta": 0.109,
+                "fav_fair_curr": 1.831,
                 "home_ft_stdev": 2.434,
                 "away_ft_stdev": 2.377,
                 "home_scoring_regularity": 0.663,
@@ -2680,20 +2699,25 @@
             },
             "signal_debug": {
                 "tags": [
-                    "OVER"
+                    "OVER",
+                    "⚽⚽"
                 ],
-                "strong_tag_count": 1,
-                "fav_quote": 2.05,
-                "is_gold_zone": false,
-                "drop_diff": 0.0,
+                "strong_tag_count": 2,
+                "fav_quote": 1.64,
+                "is_gold_zone": true,
+                "drop_diff": 0.41,
                 "internal_labels": [
                     "OVER_OK",
                     "MARKET_OK",
-                    "GOLD_OM"
+                    "DROP_OK",
+                    "DROP_CONFIRMED",
+                    "DROP_1X2",
+                    "GOLD_OM",
+                    "GOLD_ODM"
                 ],
                 "over_level": 3,
-                "drop_visual_level": "none",
-                "signal_stability": "Alta",
+                "drop_visual_level": "strong",
+                "signal_stability": "Speculativa",
                 "signal_summary": "Base FT concreta",
                 "tempo_tag": "FAST",
                 "early_index": 5.0,
@@ -3297,8 +3321,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:12",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:07",
+                    "hhmm": "22:51",
                     "q1": 1.62,
                     "qx": 3.65,
                     "q2": 4.75,
@@ -4122,8 +4146,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:15",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:10",
+                    "hhmm": "22:51",
                     "q1": 1.95,
                     "qx": 3.5,
                     "q2": 3.25,
@@ -4949,8 +4973,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:17",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:12",
+                    "hhmm": "22:51",
                     "q1": 3.7,
                     "qx": 3.7,
                     "q2": 1.88,
@@ -5778,8 +5802,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:21",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:16",
+                    "hhmm": "22:51",
                     "q1": 5.25,
                     "qx": 3.75,
                     "q2": 1.55,
@@ -6602,8 +6626,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:23",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:18",
+                    "hhmm": "22:51",
                     "q1": 7.2,
                     "qx": 4.0,
                     "q2": 1.36,
@@ -7425,8 +7449,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:24",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:19",
+                    "hhmm": "22:51",
                     "q1": 5.6,
                     "qx": 3.95,
                     "q2": 1.52,
@@ -8243,8 +8267,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:25",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:20",
+                    "hhmm": "22:51",
                     "q1": 1.4,
                     "qx": 4.5,
                     "q2": 6.4,
@@ -9063,8 +9087,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:27",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:22",
+                    "hhmm": "22:51",
                     "q1": 2.3,
                     "qx": 3.3,
                     "q2": 2.8,
@@ -9887,8 +9911,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:28",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:23",
+                    "hhmm": "22:51",
                     "q1": 2.15,
                     "qx": 3.6,
                     "q2": 2.7,
@@ -10706,8 +10730,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:28",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:24",
+                    "hhmm": "22:51",
                     "q1": 1.4,
                     "qx": 4.45,
                     "q2": 6.6,
@@ -11526,11 +11550,11 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:30",
-                    "hhmm": "20:55",
-                    "q1": 3.6,
-                    "qx": 3.35,
-                    "q2": 1.94,
+                    "ts": "2026-06-24 22:51:25",
+                    "hhmm": "22:51",
+                    "q1": 3.85,
+                    "qx": 3.4,
+                    "q2": 1.86,
                     "o25": 1.93,
                     "o05ht": 1.36,
                     "o15ht": 2.65
@@ -11560,9 +11584,9 @@
             "home_team": "Al Salmiyah",
             "away_team": "Al Arabi",
             "markets": {
-                "q1": 3.6,
-                "qx": 3.35,
-                "q2": 1.94,
+                "q1": 3.85,
+                "qx": 3.4,
+                "q2": 1.86,
                 "o25": 1.93,
                 "o05ht": 1.36,
                 "o15ht": 2.65,
@@ -11605,20 +11629,20 @@
                 "away_ht_conceded_1plus_rate": 0.29
             },
             "flags": {
-                "fav_quote": 1.94,
-                "is_gold_zone": false,
+                "fav_quote": 1.86,
+                "is_gold_zone": true,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
                 "away_last_2h_zero": false
             },
             "fair_value": {
                 "margin_open": 0.0,
-                "margin_curr": 0.092,
-                "margin_delta": 0.092,
+                "margin_curr": 0.091,
+                "margin_delta": 0.091,
                 "fav_fair_prob_open": 0.0,
-                "fav_fair_prob_curr": 0.472,
-                "fav_fair_prob_delta": 0.472,
-                "fav_fair_curr": 2.118
+                "fav_fair_prob_curr": 0.493,
+                "fav_fair_prob_delta": 0.493,
+                "fav_fair_curr": 2.03
             },
             "model_edge": {
                 "lam_home_ft": 1.673,
@@ -11646,13 +11670,13 @@
                 "ht_sd_avg": 0.974
             },
             "scores": {
-                "ptgg": 1.005,
-                "pto15": 0.297,
-                "pt": 1.137,
-                "over": 8.989,
-                "boost": 6.576,
-                "gold": 9.464,
-                "max": 9.464,
+                "ptgg": 1.057,
+                "pto15": 0.322,
+                "pt": 1.198,
+                "over": 9.752,
+                "boost": 7.028,
+                "gold": 10.745,
+                "max": 10.745,
                 "edge_o25": 0.116,
                 "edge_o05ht": -0.1,
                 "edge_o15ht": -0.134,
@@ -11684,8 +11708,8 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 0.28,
-                "fav_quote": 1.94,
-                "fav_zone": "balanced",
+                "fav_quote": 1.86,
+                "fav_zone": "gold",
                 "combined_ht_dirty": 0.938,
                 "combined_ft_dirty": 3.101,
                 "cross_home_dirty": 3.111,
@@ -11693,8 +11717,8 @@
             },
             "market_reading": {
                 "market_profile": "neutral",
-                "coherence_score": 2.25,
-                "coherence_level": "medium",
+                "coherence_score": 2.8,
+                "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
                 "leading_market": "none",
@@ -11706,18 +11730,19 @@
                 "positive_flags": [
                     "ft_struct_market_aligned",
                     "double_cross_supported",
+                    "fav_open_match_coherent",
                     "true_fair_support"
                 ],
                 "warning_flags": [
                     "high_bookie_protection"
                 ],
                 "margin_open": 0.0,
-                "margin_curr": 0.092,
-                "margin_delta": 0.092,
+                "margin_curr": 0.091,
+                "margin_delta": 0.091,
                 "fav_fair_prob_open": 0.0,
-                "fav_fair_prob_curr": 0.472,
-                "fav_fair_prob_delta": 0.472,
-                "fav_fair_curr": 2.118,
+                "fav_fair_prob_curr": 0.493,
+                "fav_fair_prob_delta": 0.493,
+                "fav_fair_curr": 2.03,
                 "home_ft_stdev": 1.973,
                 "away_ft_stdev": 1.364,
                 "home_scoring_regularity": 0.829,
@@ -11728,8 +11753,8 @@
                     "OVER"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 1.94,
-                "is_gold_zone": false,
+                "fav_quote": 1.86,
+                "is_gold_zone": true,
                 "drop_diff": 0.0,
                 "internal_labels": [
                     "OVER_OK"
@@ -12340,8 +12365,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-06-24 20:55:31",
-                    "hhmm": "20:55",
+                    "ts": "2026-06-24 22:51:26",
+                    "hhmm": "22:51",
                     "q1": 17.5,
                     "qx": 6.6,
                     "q2": 1.16,
