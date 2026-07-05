@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-07-05 20:10:36",
+    "updated_at": "2026-07-05 22:18:59",
     "day": 2,
     "date": "2026-07-06",
     "details": {
@@ -13,13 +13,13 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:18",
-                    "hhmm": "20:10",
-                    "q1": 1.53,
+                    "ts": "2026-07-05 22:18:41",
+                    "hhmm": "22:18",
+                    "q1": 1.48,
                     "qx": 4.1,
-                    "q2": 4.6,
-                    "o25": 1.53,
-                    "o05ht": 1.25,
+                    "q2": 5.0,
+                    "o25": 1.5,
+                    "o05ht": 1.22,
                     "o15ht": 2.05
                 }
             ],
@@ -47,14 +47,14 @@
             "home_team": "Connecticut FC",
             "away_team": "Carolina Core",
             "markets": {
-                "q1": 1.53,
+                "q1": 1.48,
                 "qx": 4.1,
-                "q2": 4.6,
-                "o25": 1.53,
-                "o05ht": 1.25,
+                "q2": 5.0,
+                "o25": 1.5,
+                "o05ht": 1.22,
                 "o15ht": 2.05,
-                "u25": 2.38,
-                "u05ht": 3.5,
+                "u25": 2.5,
+                "u05ht": 3.75,
                 "u15ht": 1.57
             },
             "averages": {
@@ -92,20 +92,20 @@
                 "away_ht_conceded_1plus_rate": 0.694
             },
             "flags": {
-                "fav_quote": 1.53,
-                "is_gold_zone": true,
+                "fav_quote": 1.48,
+                "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": true,
                 "away_last_2h_zero": false
             },
             "fair_value": {
                 "margin_open": 0.0,
-                "margin_curr": 0.115,
-                "margin_delta": 0.115,
+                "margin_curr": 0.12,
+                "margin_delta": 0.12,
                 "fav_fair_prob_open": 0.0,
-                "fav_fair_prob_curr": 0.586,
-                "fav_fair_prob_delta": 0.586,
-                "fav_fair_curr": 1.706
+                "fav_fair_prob_curr": 0.604,
+                "fav_fair_prob_delta": 0.604,
+                "fav_fair_curr": 1.657
             },
             "model_edge": {
                 "lam_home_ft": 2.079,
@@ -113,14 +113,14 @@
                 "lam_home_ht": 0.984,
                 "lam_away_ht": 0.616,
                 "p_model_o25": 0.749,
-                "p_market_o25": 0.609,
-                "edge_o25": 0.14,
-                "edge_logit_o25": 0.65,
+                "p_market_o25": 0.625,
+                "edge_o25": 0.124,
+                "edge_logit_o25": 0.582,
                 "edge_level_o25": "ELITE",
                 "p_model_o05ht": 0.798,
-                "p_market_o05ht": 0.737,
-                "edge_o05ht": 0.061,
-                "edge_logit_o05ht": 0.343,
+                "p_market_o05ht": 0.755,
+                "edge_o05ht": 0.043,
+                "edge_logit_o05ht": 0.248,
                 "edge_level_o05ht": "GOOD",
                 "p_model_o15ht": 0.475,
                 "p_market_o15ht": 0.434,
@@ -136,20 +136,20 @@
                 "ptgg": 4.693,
                 "pto15": 4.049,
                 "pt": 5.768,
-                "over": 10.208,
-                "boost": 9.644,
-                "gold": 11.173,
-                "max": 11.173,
-                "edge_o25": 0.14,
-                "edge_o05ht": 0.061,
+                "over": 9.402,
+                "boost": 9.176,
+                "gold": 10.501,
+                "max": 10.501,
+                "edge_o25": 0.124,
+                "edge_o05ht": 0.043,
                 "edge_o15ht": 0.041,
                 "edge_level_o25": "ELITE",
                 "edge_level_o05ht": "GOOD",
                 "edge_level_o15ht": "GOOD",
                 "p_model_o25": 0.749,
-                "p_market_o25": 0.609,
+                "p_market_o25": 0.625,
                 "p_model_o05ht": 0.798,
-                "p_market_o05ht": 0.737,
+                "p_market_o05ht": 0.755,
                 "p_model_o15ht": 0.475,
                 "p_market_o15ht": 0.434
             },
@@ -173,7 +173,7 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 0.75,
-                "fav_quote": 1.53,
+                "fav_quote": 1.48,
                 "fav_zone": "gold",
                 "combined_ht_dirty": 1.728,
                 "combined_ft_dirty": 3.596,
@@ -182,7 +182,7 @@
             },
             "market_reading": {
                 "market_profile": "full_open",
-                "coherence_score": 4.3,
+                "coherence_score": 3.8,
                 "coherence_level": "high",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
@@ -193,22 +193,22 @@
                 "drop_confirmed": false,
                 "value_left": "unknown",
                 "positive_flags": [
-                    "ft_struct_market_aligned",
                     "double_cross_supported",
                     "ht_struct_market_aligned",
                     "fav_open_match_coherent",
                     "true_fair_support"
                 ],
                 "warning_flags": [
-                    "high_bookie_protection"
+                    "high_bookie_protection",
+                    "o05ht_too_low_for_one_sided_ht"
                 ],
                 "margin_open": 0.0,
-                "margin_curr": 0.115,
-                "margin_delta": 0.115,
+                "margin_curr": 0.12,
+                "margin_delta": 0.12,
                 "fav_fair_prob_open": 0.0,
-                "fav_fair_prob_curr": 0.586,
-                "fav_fair_prob_delta": 0.586,
-                "fav_fair_curr": 1.706,
+                "fav_fair_prob_curr": 0.604,
+                "fav_fair_prob_delta": 0.604,
+                "fav_fair_curr": 1.657,
                 "home_ft_stdev": 1.154,
                 "away_ft_stdev": 1.565,
                 "home_scoring_regularity": 0.806,
@@ -219,8 +219,8 @@
                     "GOLD"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 1.53,
-                "is_gold_zone": true,
+                "fav_quote": 1.48,
+                "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
                     "OVER_OK",
@@ -833,8 +833,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:22",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:45",
+                    "hhmm": "22:18",
                     "q1": 2.28,
                     "qx": 3.0,
                     "q2": 3.35,
@@ -1643,8 +1643,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:24",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:47",
+                    "hhmm": "22:18",
                     "q1": 2.38,
                     "qx": 3.2,
                     "q2": 2.75,
@@ -2457,8 +2457,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:24",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:47",
+                    "hhmm": "22:18",
                     "q1": 1.5,
                     "qx": 4.1,
                     "q2": 5.25,
@@ -3276,13 +3276,13 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:25",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:48",
+                    "hhmm": "22:18",
                     "q1": 8.25,
                     "qx": 4.5,
                     "q2": 1.28,
                     "o25": 1.44,
-                    "o05ht": 1.22,
+                    "o05ht": 1.2,
                     "o15ht": 2.1
                 }
             ],
@@ -3314,10 +3314,10 @@
                 "qx": 4.5,
                 "q2": 1.28,
                 "o25": 1.44,
-                "o05ht": 1.22,
+                "o05ht": 1.2,
                 "o15ht": 2.1,
                 "u25": 2.62,
-                "u05ht": 3.9,
+                "u05ht": 4.0,
                 "u15ht": 1.64
             },
             "averages": {
@@ -3381,9 +3381,9 @@
                 "edge_logit_o25": 0.284,
                 "edge_level_o25": "GOOD",
                 "p_model_o05ht": 0.714,
-                "p_market_o05ht": 0.762,
-                "edge_o05ht": -0.048,
-                "edge_logit_o05ht": -0.249,
+                "p_market_o05ht": 0.769,
+                "edge_o05ht": -0.055,
+                "edge_logit_o05ht": -0.288,
                 "edge_level_o05ht": "NONE",
                 "p_model_o15ht": 0.356,
                 "p_market_o15ht": 0.439,
@@ -3404,7 +3404,7 @@
                 "gold": 7.736,
                 "max": 8.25,
                 "edge_o25": 0.062,
-                "edge_o05ht": -0.048,
+                "edge_o05ht": -0.055,
                 "edge_o15ht": -0.083,
                 "edge_level_o25": "GOOD",
                 "edge_level_o05ht": "NONE",
@@ -3412,7 +3412,7 @@
                 "p_model_o25": 0.707,
                 "p_market_o25": 0.645,
                 "p_model_o05ht": 0.714,
-                "p_market_o05ht": 0.762,
+                "p_market_o05ht": 0.769,
                 "p_model_o15ht": 0.356,
                 "p_market_o15ht": 0.439
             },
@@ -4095,14 +4095,14 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:27",
-                    "hhmm": "20:10",
-                    "q1": 2.3,
-                    "qx": 3.3,
+                    "ts": "2026-07-05 22:18:50",
+                    "hhmm": "22:18",
+                    "q1": 2.25,
+                    "qx": 3.65,
                     "q2": 2.5,
                     "o25": 1.53,
                     "o05ht": 1.22,
-                    "o15ht": 2.15
+                    "o15ht": 1.95
                 }
             ],
             "quote_dynamics": {
@@ -4129,15 +4129,15 @@
             "home_team": "Tacoma Defiance",
             "away_team": "Portland Timbers II",
             "markets": {
-                "q1": 2.3,
-                "qx": 3.3,
+                "q1": 2.25,
+                "qx": 3.65,
                 "q2": 2.5,
                 "o25": 1.53,
                 "o05ht": 1.22,
-                "o15ht": 2.15,
+                "o15ht": 1.95,
                 "u25": 2.38,
                 "u05ht": 3.7,
-                "u15ht": 1.62
+                "u15ht": 1.65
             },
             "averages": {
                 "home_avg_ft": 2.296,
@@ -4174,7 +4174,7 @@
                 "away_ht_conceded_1plus_rate": 0.306
             },
             "flags": {
-                "fav_quote": 2.3,
+                "fav_quote": 2.25,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "home_last_2h_zero": false,
@@ -4182,12 +4182,12 @@
             },
             "fair_value": {
                 "margin_open": 0.133,
-                "margin_curr": 0.138,
-                "margin_delta": 0.005,
+                "margin_curr": 0.118,
+                "margin_delta": -0.015,
                 "fav_fair_prob_open": 0.411,
-                "fav_fair_prob_curr": 0.382,
-                "fav_fair_prob_delta": -0.029,
-                "fav_fair_curr": 2.617
+                "fav_fair_prob_curr": 0.397,
+                "fav_fair_prob_delta": -0.014,
+                "fav_fair_curr": 2.516
             },
             "model_edge": {
                 "lam_home_ft": 1.278,
@@ -4205,9 +4205,9 @@
                 "edge_logit_o05ht": -0.925,
                 "edge_level_o05ht": "NONE",
                 "p_model_o15ht": 0.187,
-                "p_market_o15ht": 0.43,
-                "edge_o15ht": -0.243,
-                "edge_logit_o15ht": -1.188,
+                "p_market_o15ht": 0.458,
+                "edge_o15ht": -0.271,
+                "edge_logit_o15ht": -1.301,
                 "edge_level_o15ht": "NONE",
                 "ctx_avg": 0.585,
                 "reg_avg": 0.924,
@@ -4218,13 +4218,13 @@
                 "ptgg": 0.0,
                 "pto15": 0.0,
                 "pt": 0.0,
-                "over": 6.11,
-                "boost": 2.614,
-                "gold": 5.05,
-                "max": 6.11,
+                "over": 6.61,
+                "boost": 3.484,
+                "gold": 6.44,
+                "max": 6.61,
                 "edge_o25": -0.163,
                 "edge_o05ht": -0.206,
-                "edge_o15ht": -0.243,
+                "edge_o15ht": -0.271,
                 "edge_level_o25": "NONE",
                 "edge_level_o05ht": "NONE",
                 "edge_level_o15ht": "NONE",
@@ -4233,7 +4233,7 @@
                 "p_model_o05ht": 0.546,
                 "p_market_o05ht": 0.752,
                 "p_model_o15ht": 0.187,
-                "p_market_o15ht": 0.43
+                "p_market_o15ht": 0.458
             },
             "tags": [
                 "MARKET"
@@ -4242,8 +4242,10 @@
                 "MARKET_OK",
                 "PROBE_OK",
                 "DROP_OK",
+                "DROP_CONFIRMED",
                 "DROP_1X2",
-                "GOLD_PM"
+                "GOLD_PM",
+                "GOLD_PDS"
             ],
             "structure": {
                 "match_profile": "open_match",
@@ -4257,8 +4259,8 @@
                 "bilateral_ft": true,
                 "bilateral_ht": false,
                 "one_sided_risk": 0.85,
-                "fav_quote": 2.3,
-                "fav_zone": "wide",
+                "fav_quote": 2.25,
+                "fav_zone": "balanced",
                 "combined_ht_dirty": 0.84,
                 "combined_ft_dirty": 2.441,
                 "cross_home_dirty": 2.728,
@@ -4266,34 +4268,34 @@
             },
             "market_reading": {
                 "market_profile": "full_open",
-                "coherence_score": 1.8,
+                "coherence_score": 2.35,
                 "coherence_level": "medium",
                 "dislocation_score": 0.0,
                 "dislocation_level": "low",
-                "leading_market": "1x2",
+                "leading_market": "ht",
                 "lagging_market": "none",
-                "drop_type": "sterile",
-                "drop_strength": "medium",
-                "drop_confirmed": false,
+                "drop_type": "structural",
+                "drop_strength": "hard",
+                "drop_confirmed": true,
                 "value_left": "high",
                 "positive_flags": [
                     "ft_struct_market_aligned",
-                    "double_cross_supported"
+                    "double_cross_supported",
+                    "structural_drop"
                 ],
                 "warning_flags": [
-                    "sterile_1x2_drop",
                     "high_bookie_protection",
                     "flat_fair_move",
                     "o05ht_too_low_for_one_sided_ht",
                     "ht_market_ahead_of_structure"
                 ],
                 "margin_open": 0.133,
-                "margin_curr": 0.138,
-                "margin_delta": 0.005,
+                "margin_curr": 0.118,
+                "margin_delta": -0.015,
                 "fav_fair_prob_open": 0.411,
-                "fav_fair_prob_curr": 0.382,
-                "fav_fair_prob_delta": -0.029,
-                "fav_fair_curr": 2.617,
+                "fav_fair_prob_curr": 0.397,
+                "fav_fair_prob_delta": -0.014,
+                "fav_fair_curr": 2.516,
                 "home_ft_stdev": 1.429,
                 "away_ft_stdev": 1.611,
                 "home_scoring_regularity": 0.905,
@@ -4304,18 +4306,20 @@
                     "MARKET"
                 ],
                 "strong_tag_count": 1,
-                "fav_quote": 2.3,
+                "fav_quote": 2.25,
                 "is_gold_zone": false,
                 "drop_diff": 0.0,
                 "internal_labels": [
                     "MARKET_OK",
                     "PROBE_OK",
                     "DROP_OK",
+                    "DROP_CONFIRMED",
                     "DROP_1X2",
-                    "GOLD_PM"
+                    "GOLD_PM",
+                    "GOLD_PDS"
                 ],
                 "over_level": 3,
-                "drop_visual_level": "medium",
+                "drop_visual_level": "strong",
                 "signal_stability": "Alta",
                 "signal_summary": "Pressione mercato autonoma",
                 "tempo_tag": "SLOW",
@@ -4920,8 +4924,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:28",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:51",
+                    "hhmm": "22:18",
                     "q1": 1.91,
                     "qx": 4.0,
                     "q2": 2.9,
@@ -5737,8 +5741,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:29",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:53",
+                    "hhmm": "22:18",
                     "q1": 1.67,
                     "qx": 3.6,
                     "q2": 4.5,
@@ -6571,8 +6575,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:30",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:53",
+                    "hhmm": "22:18",
                     "q1": 3.1,
                     "qx": 3.45,
                     "q2": 2.2,
@@ -7389,8 +7393,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:31",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:54",
+                    "hhmm": "22:18",
                     "q1": 2.45,
                     "qx": 3.7,
                     "q2": 2.55,
@@ -8207,8 +8211,8 @@
             "gg_ht_sniper": true,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:32",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:55",
+                    "hhmm": "22:18",
                     "q1": 3.8,
                     "qx": 3.55,
                     "q2": 1.9,
@@ -9039,8 +9043,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:33",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:56",
+                    "hhmm": "22:18",
                     "q1": 2.62,
                     "qx": 3.0,
                     "q2": 2.5,
@@ -9852,8 +9856,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:34",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:57",
+                    "hhmm": "22:18",
                     "q1": 2.38,
                     "qx": 3.3,
                     "q2": 2.65,
@@ -10676,8 +10680,8 @@
             "gg_ht_sniper": false,
             "quote_history": [
                 {
-                    "ts": "2026-07-05 20:10:35",
-                    "hhmm": "20:10",
+                    "ts": "2026-07-05 22:18:58",
+                    "hhmm": "22:18",
                     "q1": 1.54,
                     "qx": 4.2,
                     "q2": 5.4,
