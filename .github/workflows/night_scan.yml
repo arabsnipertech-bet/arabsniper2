@@ -36,5 +36,5 @@ jobs:
           pip install -r requirements.txt || true
           pip install streamlit requests pandas PyGithub || true
 
-      - name: Run night workflow
-        run: python src/3appdays_runner.py --night
+      - name: Run ArabSniper quote night scan
+        run: python src/3appdays_runner.py --night --days 5 --github
