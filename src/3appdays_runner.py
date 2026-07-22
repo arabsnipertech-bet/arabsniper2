@@ -30,7 +30,7 @@ except Exception:  # pragma: no cover
 SRC_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SRC_DIR.parent if SRC_DIR.name.lower() == "src" else SRC_DIR
 DATA_DIR = PROJECT_ROOT / "data"
-ENGINE_FILE = SRC_DIR / "arab_quote_engine.py"
+ENGINE_FILE = SRC_DIR / "3appdays.py"
 RUN_STATE_FILE = DATA_DIR / "arab_quote_run_state.json"
 
 
