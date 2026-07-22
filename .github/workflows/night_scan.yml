@@ -2,15 +2,16 @@ name: ArabSniper Night Scan
 
 on:
   workflow_dispatch:
+
   schedule:
-    - cron: "55 1 * * *"   # 01:55 Europe/Rome
+    - cron: "55 1 * * *"
       timezone: "Europe/Rome"
 
 permissions:
   contents: write
 
 concurrency:
-  group: arabsniper-night-scan
+  group: arabsniper-quote-engine
   cancel-in-progress: false
 
 jobs:
@@ -20,21 +21,59 @@ jobs:
 
     env:
       API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt || true
-          pip install streamlit requests pandas PyGithub || true
+          python -m pip install --upgrade pip
+          pip install requests PyGithub
 
-      - name: Run ArabSniper quote night scan
-        run: python src/3appdays_runner.py --night --days 5 --github
+      - name: Create market catalog if missing
+        run: |
+          if [ ! -f data/arab_bet_catalog.json ]; then
+            python src/3appdays_runner.py --catalog
+          else
+            echo "Catalogo mercati già presente"
+          fi
+
+      - name: Run ArabSniper night scan
+        run: |
+          python src/3appdays_runner.py --night --days 5
+
+      - name: Verify generated files
+        run: |
+          echo "File ArabSniper prodotti:"
+          ls -lh data/arab_quote_*.json
+
+          test -f data/arab_quote_dashboard.json
+          test -f data/arab_quote_state.json
+          test -f data/arab_quote_day1.json
+          test -f data/arab_quote_day2.json
+          test -f data/arab_quote_day3.json
+          test -f data/arab_quote_day4.json
+          test -f data/arab_quote_day5.json
+
+      - name: Publish generated JSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/arab_quote_*.json
+
+          if git diff --cached --quiet; then
+            echo "Nessuna variazione da pubblicare"
+          else
+            git commit -m "Update ArabSniper night quote data"
+            git push
+          fi
