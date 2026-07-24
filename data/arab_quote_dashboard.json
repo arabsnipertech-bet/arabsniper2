@@ -1,38 +1,63 @@
 {
   "engine": "ArabSniper Quote Engine",
-  "version": "1.1.0",
-  "generated_at": "2026-07-24T16:14:04+02:00",
+  "version": "1.1.1",
+  "generated_at": "2026-07-24T16:34:12+02:00",
   "timezone": "Europe/Rome",
   "days": [
     {
       "day": 1,
       "date": "2026-07-24",
-      "updated_at": "2026-07-24T16:14:03+02:00",
-      "matches": []
+      "updated_at": "2026-07-24T16:34:11+02:00",
+      "matches": [],
+      "refresh_status": "ok",
+      "fresh_matches": 0,
+      "preserved_matches": 0,
+      "prematch_fixtures_found": 0,
+      "api_fixtures_found": 0
     },
     {
       "day": 2,
       "date": "2026-07-25",
-      "updated_at": "2026-07-24T16:14:03+02:00",
-      "matches": []
+      "updated_at": "2026-07-24T16:34:12+02:00",
+      "matches": [],
+      "refresh_status": "ok",
+      "fresh_matches": 0,
+      "preserved_matches": 0,
+      "prematch_fixtures_found": 0,
+      "api_fixtures_found": 0
     },
     {
       "day": 3,
       "date": "2026-07-26",
-      "updated_at": "2026-07-24T16:14:03+02:00",
-      "matches": []
+      "updated_at": "2026-07-24T16:34:12+02:00",
+      "matches": [],
+      "refresh_status": "ok",
+      "fresh_matches": 0,
+      "preserved_matches": 0,
+      "prematch_fixtures_found": 0,
+      "api_fixtures_found": 0
     },
     {
       "day": 4,
       "date": "2026-07-27",
-      "updated_at": "2026-07-24T16:14:03+02:00",
-      "matches": []
+      "updated_at": "2026-07-24T16:34:12+02:00",
+      "matches": [],
+      "refresh_status": "ok",
+      "fresh_matches": 0,
+      "preserved_matches": 0,
+      "prematch_fixtures_found": 0,
+      "api_fixtures_found": 0
     },
     {
       "day": 5,
       "date": "2026-07-28",
-      "updated_at": "2026-07-24T16:14:03+02:00",
-      "matches": []
+      "updated_at": "2026-07-24T16:34:12+02:00",
+      "matches": [],
+      "refresh_status": "ok",
+      "fresh_matches": 0,
+      "preserved_matches": 0,
+      "prematch_fixtures_found": 0,
+      "api_fixtures_found": 0
     }
   ],
   "method": {
@@ -41,6 +66,7 @@
     "calibration": "probabilita calibrata con book 0-12%; marker e concordanza basati sul modello puro",
     "markets": "1X2 bet_id 1; Over 2.5 FT bet_id 5; O1.5 PT e GG PT verificati da odds/bets",
     "markers": "cerchio ArabSniper puro, quadrato book, doppio bordo concordanza",
+    "retention": "le partite analizzate restano visibili dopo il calcio d'inizio; errori API non svuotano i JSON",
     "legacy_labels_removed": [
       "GOLD",
       "MARKET",
