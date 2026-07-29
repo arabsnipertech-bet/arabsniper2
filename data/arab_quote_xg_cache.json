@@ -1,5 +1,5 @@
 {
-  "version": "1.1.2",
+  "version": "1.1.3",
   "fixtures": {
     "1560687": {
       "fixture_id": "1560687",
@@ -3414,8 +3414,272 @@
       "source": "api_no_xg",
       "checked_at": "2026-07-29T03:25:31+02:00",
       "raw_team_types": {}
+    },
+    "1510391": {
+      "fixture_id": "1510391",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:38+02:00",
+      "stats_schema": 2
+    },
+    "1510380": {
+      "fixture_id": "1510380",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:38+02:00",
+      "stats_schema": 2
+    },
+    "1557966": {
+      "fixture_id": "1557966",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:38+02:00",
+      "stats_schema": 2
+    },
+    "1510377": {
+      "fixture_id": "1510377",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:38+02:00",
+      "stats_schema": 2
+    },
+    "1520525": {
+      "fixture_id": "1520525",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:38+02:00",
+      "stats_schema": 2
+    },
+    "1581358": {
+      "fixture_id": "1581358",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:39+02:00",
+      "stats_schema": 2
+    },
+    "1520519": {
+      "fixture_id": "1520519",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:39+02:00",
+      "stats_schema": 2
+    },
+    "1520512": {
+      "fixture_id": "1520512",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:39+02:00",
+      "stats_schema": 2
+    },
+    "1507014": {
+      "fixture_id": "1507014",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:40+02:00",
+      "stats_schema": 2
+    },
+    "1507007": {
+      "fixture_id": "1507007",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:40+02:00",
+      "stats_schema": 2
+    },
+    "1507003": {
+      "fixture_id": "1507003",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:40+02:00",
+      "stats_schema": 2
+    },
+    "1506992": {
+      "fixture_id": "1506992",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.97,
+      "away_xg": 1.35,
+      "home_stats": {
+        "team_id": 2768,
+        "team_name": "Gimcheon Sangmu FC",
+        "xg": 1.97,
+        "shots_on_target": 5.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2745,
+        "team_name": "Bucheon FC 1995",
+        "xg": 1.35,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:40+02:00",
+      "stats_schema": 2
+    },
+    "1510394": {
+      "fixture_id": "1510394",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:40+02:00",
+      "stats_schema": 2
+    },
+    "1510385": {
+      "fixture_id": "1510385",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:40+02:00",
+      "stats_schema": 2
+    },
+    "1581360": {
+      "fixture_id": "1581360",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:41+02:00",
+      "stats_schema": 2
+    },
+    "1510375": {
+      "fixture_id": "1510375",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:41+02:00",
+      "stats_schema": 2
+    },
+    "1510389": {
+      "fixture_id": "1510389",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:41+02:00",
+      "stats_schema": 2
+    },
+    "1510381": {
+      "fixture_id": "1510381",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:41+02:00",
+      "stats_schema": 2
+    },
+    "1589346": {
+      "fixture_id": "1589346",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:42+02:00",
+      "stats_schema": 2
+    },
+    "1510378": {
+      "fixture_id": "1510378",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-29T10:08:42+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-07-29T03:40:56+02:00",
+  "updated_at": "2026-07-29T10:13:55+02:00",
   "runtime_calls_last_run": 20
 }

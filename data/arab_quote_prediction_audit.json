@@ -1,0 +1,143 @@
+{
+  "version": "1.1.3",
+  "created_at": "2026-07-29T10:13:57+02:00",
+  "updated_at": "2026-07-29T10:13:57+02:00",
+  "fixtures": {
+    "1545518": {
+      "fixture_id": "1545518",
+      "date": "2026-07-29",
+      "time": "03:30",
+      "match": "Tigres FC - Atletico Nacional",
+      "league": "Copa Colombia",
+      "country": "Colombia",
+      "competition_quality_score": null,
+      "competition_tier": null,
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-07-29T10:09:12+02:00",
+        "home_ft": 0,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 1.455,
+        "probability_pct": 47.53,
+        "probability_raw_pct": 45.8,
+        "expected_value_pct": -30.844,
+        "relation": "confirmed",
+        "ranking_score": 81.157,
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-07-29T10:09:12+02:00"
+    },
+    "1548338": {
+      "fixture_id": "1548338",
+      "date": "2026-07-29",
+      "time": "04:00",
+      "match": "CD Olimpia - Mixco",
+      "league": "CONCACAF Central American Cup",
+      "country": "World",
+      "competition_quality_score": null,
+      "competition_tier": null,
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-07-29T10:09:12+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.45,
+        "probability_pct": 79.59,
+        "probability_raw_pct": 81.08,
+        "expected_value_pct": 15.406,
+        "relation": "model_only",
+        "ranking_score": 109.406,
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-07-29T10:09:12+02:00"
+    },
+    "1548337": {
+      "fixture_id": "1548337",
+      "date": "2026-07-29",
+      "time": "04:00",
+      "match": "Diriangén - Plaza Amador",
+      "league": "CONCACAF Central American Cup",
+      "country": "World",
+      "competition_quality_score": null,
+      "competition_tier": null,
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-07-29T10:09:12+02:00",
+        "home_ft": 4,
+        "away_ft": 2,
+        "home_ht": 3,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.45,
+        "probability_pct": 54.32,
+        "probability_raw_pct": 56.29,
+        "expected_value_pct": 33.084,
+        "relation": "confirmed",
+        "ranking_score": 121.63,
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-07-29T10:09:12+02:00"
+    }
+  },
+  "summary": {
+    "settled_primary": 3,
+    "wins": 2,
+    "losses": 1,
+    "win_rate_pct": 66.667,
+    "by_market": {
+      "1x2_ft": {
+        "settled": 3,
+        "wins": 2,
+        "losses": 1,
+        "win_rate_pct": 66.667
+      }
+    },
+    "by_grade": {
+      "N/D": {
+        "settled": 3,
+        "wins": 2,
+        "losses": 1,
+        "win_rate_pct": 66.667
+      }
+    }
+  }
+}
