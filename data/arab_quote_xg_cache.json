@@ -3678,8 +3678,488 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-07-29T10:08:42+02:00",
       "stats_schema": 2
+    },
+    "1526642": {
+      "fixture_id": "1526642",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.6,
+      "away_xg": 0.8,
+      "home_stats": {
+        "team_id": 822,
+        "team_name": "LD Alajuelense",
+        "xg": 1.6,
+        "shots_on_target": 4.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1616,
+        "team_name": "Los Angeles FC",
+        "xg": 0.8,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:17+02:00",
+      "stats_schema": 2
+    },
+    "1526640": {
+      "fixture_id": "1526640",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 3.32,
+      "away_xg": 0.17,
+      "home_stats": {
+        "team_id": 1616,
+        "team_name": "Los Angeles FC",
+        "xg": 3.32,
+        "shots_on_target": 11.0,
+        "total_shots": 28.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 822,
+        "team_name": "LD Alajuelense",
+        "xg": 0.17,
+        "shots_on_target": 3.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:17+02:00",
+      "stats_schema": 2
+    },
+    "1545803": {
+      "fixture_id": "1545803",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:18+02:00",
+      "stats_schema": 2
+    },
+    "1545423": {
+      "fixture_id": "1545423",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:18+02:00",
+      "stats_schema": 2
+    },
+    "1542457": {
+      "fixture_id": "1542457",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:18+02:00",
+      "stats_schema": 2
+    },
+    "1542454": {
+      "fixture_id": "1542454",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:18+02:00",
+      "stats_schema": 2
+    },
+    "1543792": {
+      "fixture_id": "1543792",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.35,
+      "away_xg": 2.03,
+      "home_stats": {
+        "team_id": 948,
+        "team_name": "Adelaide United",
+        "xg": 1.35,
+        "shots_on_target": 1.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 24608,
+        "team_name": "Auckland",
+        "xg": 2.03,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:18+02:00",
+      "stats_schema": 2
+    },
+    "1543790": {
+      "fixture_id": "1543790",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.85,
+      "away_xg": 1.34,
+      "home_stats": {
+        "team_id": 24608,
+        "team_name": "Auckland",
+        "xg": 0.85,
+        "shots_on_target": 5.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 948,
+        "team_name": "Adelaide United",
+        "xg": 1.34,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:18+02:00",
+      "stats_schema": 2
+    },
+    "1469711": {
+      "fixture_id": "1469711",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.61,
+      "away_xg": 2.29,
+      "home_stats": {
+        "team_id": 945,
+        "team_name": "Melbourne City",
+        "xg": 0.61,
+        "shots_on_target": 2.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 948,
+        "team_name": "Adelaide United",
+        "xg": 2.29,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:19+02:00",
+      "stats_schema": 2
+    },
+    "1469705": {
+      "fixture_id": "1469705",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.87,
+      "away_xg": 0.93,
+      "home_stats": {
+        "team_id": 948,
+        "team_name": "Adelaide United",
+        "xg": 1.87,
+        "shots_on_target": 11.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 15550,
+        "team_name": "Macarthur",
+        "xg": 0.93,
+        "shots_on_target": 1.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:19+02:00",
+      "stats_schema": 2
+    },
+    "1469709": {
+      "fixture_id": "1469709",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.93,
+      "away_xg": 1.52,
+      "home_stats": {
+        "team_id": 940,
+        "team_name": "Perth Glory",
+        "xg": 1.93,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 947,
+        "team_name": "Brisbane Roar",
+        "xg": 1.52,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:20+02:00",
+      "stats_schema": 2
+    },
+    "1469702": {
+      "fixture_id": "1469702",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.09,
+      "away_xg": 2.28,
+      "home_stats": {
+        "team_id": 947,
+        "team_name": "Brisbane Roar",
+        "xg": 1.09,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 945,
+        "team_name": "Melbourne City",
+        "xg": 2.28,
+        "shots_on_target": 6.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:20+02:00",
+      "stats_schema": 2
+    },
+    "1469694": {
+      "fixture_id": "1469694",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.36,
+      "away_xg": 1.5,
+      "home_stats": {
+        "team_id": 941,
+        "team_name": "Central Coast Mariners",
+        "xg": 0.36,
+        "shots_on_target": 4.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 947,
+        "team_name": "Brisbane Roar",
+        "xg": 1.5,
+        "shots_on_target": 6.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:20+02:00",
+      "stats_schema": 2
+    },
+    "1469691": {
+      "fixture_id": "1469691",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.67,
+      "away_xg": 0.02,
+      "home_stats": {
+        "team_id": 947,
+        "team_name": "Brisbane Roar",
+        "xg": 1.67,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 943,
+        "team_name": "Sydney",
+        "xg": 0.02,
+        "shots_on_target": 1.0,
+        "total_shots": 1.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:20+02:00",
+      "stats_schema": 2
+    },
+    "1556511": {
+      "fixture_id": "1556511",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:20+02:00",
+      "stats_schema": 2
+    },
+    "1504270": {
+      "fixture_id": "1504270",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:21+02:00",
+      "stats_schema": 2
+    },
+    "1504261": {
+      "fixture_id": "1504261",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:21+02:00",
+      "stats_schema": 2
+    },
+    "1504260": {
+      "fixture_id": "1504260",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:21+02:00",
+      "stats_schema": 2
+    },
+    "1504253": {
+      "fixture_id": "1504253",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:22+02:00",
+      "stats_schema": 2
+    },
+    "1504268": {
+      "fixture_id": "1504268",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-07-30T03:18:22+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-07-29T10:13:55+02:00",
+  "updated_at": "2026-07-30T03:23:25+02:00",
   "runtime_calls_last_run": 20
 }
