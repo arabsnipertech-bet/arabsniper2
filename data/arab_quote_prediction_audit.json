@@ -1,7 +1,7 @@
 {
   "version": "1.1.3",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-07-31T03:50:37+02:00",
+  "updated_at": "2026-07-31T08:51:11+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -987,24 +987,289 @@
         "outcome": "lost"
       },
       "settled_at": "2026-07-30T22:18:24+02:00"
+    },
+    "1493024": {
+      "fixture_id": "1493024",
+      "date": "2026-07-31",
+      "time": "02:15",
+      "match": "Independiente - Newells Old Boys",
+      "league": "Liga Profesional Argentina",
+      "country": "Argentina",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-07-31T08:51:09+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.62,
+        "probability_pct": 61.53,
+        "probability_raw_pct": 62.0,
+        "expected_value_pct": -0.321,
+        "relation": "confirmed",
+        "ranking_score": 86.702,
+        "recommendation_score": 80.702,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 80.702,
+          "grade": "A",
+          "reasons": [],
+          "threshold_probability_pct": 44.5,
+          "probability_pct": 61.53,
+          "raw_probability_pct": 62.0,
+          "expected_value_pct": -0.321,
+          "book_disagreement_pp": 3.93,
+          "competition_quality_score": 84,
+          "bookmakers": 13
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "won"
+      },
+      "settled_at": "2026-07-31T08:51:09+02:00"
+    },
+    "1547782": {
+      "fixture_id": "1547782",
+      "date": "2026-07-31",
+      "time": "02:30",
+      "match": "Caracas FC - Santa Fe",
+      "league": "CONMEBOL Sudamericana",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-07-31T08:51:09+02:00",
+        "home_ft": 0,
+        "away_ft": 3,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.3,
+        "probability_pct": 46.08,
+        "probability_raw_pct": 46.68,
+        "expected_value_pct": 5.984,
+        "relation": "confirmed",
+        "ranking_score": 77.863,
+        "recommendation_score": 71.863,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 71.863,
+          "grade": "B",
+          "reasons": [],
+          "threshold_probability_pct": 44.5,
+          "probability_pct": 46.08,
+          "raw_probability_pct": 46.68,
+          "expected_value_pct": 5.984,
+          "book_disagreement_pp": 5.48,
+          "competition_quality_score": 88,
+          "bookmakers": 13
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-07-31T08:51:09+02:00"
+    },
+    "1492314": {
+      "fixture_id": "1492314",
+      "date": "2026-07-31",
+      "time": "02:30",
+      "match": "Coritiba - Cruzeiro",
+      "league": "Serie A",
+      "country": "Brazil",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-07-31T08:51:09+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.25,
+        "probability_pct": 55.32,
+        "probability_raw_pct": 56.98,
+        "expected_value_pct": 24.47,
+        "relation": "confirmed",
+        "ranking_score": 97.62,
+        "recommendation_score": 91.62,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 91.62,
+          "grade": "A",
+          "reasons": [],
+          "threshold_probability_pct": 44.5,
+          "probability_pct": 55.32,
+          "raw_probability_pct": 56.98,
+          "expected_value_pct": 24.47,
+          "book_disagreement_pp": 15.05,
+          "competition_quality_score": 84,
+          "bookmakers": 13
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-07-31T08:51:09+02:00"
+    },
+    "1581374": {
+      "fixture_id": "1581374",
+      "date": "2026-07-31",
+      "time": "03:00",
+      "match": "Alebrijes de Oaxaca - Dorados",
+      "league": "Liga de Expansión MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-07-31T08:51:09+02:00",
+        "home_ft": 0,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.88,
+        "probability_pct": 65.83,
+        "probability_raw_pct": 67.46,
+        "expected_value_pct": 23.76,
+        "relation": "confirmed",
+        "ranking_score": 88.875,
+        "recommendation_score": 82.875,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 82.875,
+          "grade": "A",
+          "reasons": [],
+          "threshold_probability_pct": 55.5,
+          "probability_pct": 65.83,
+          "raw_probability_pct": 67.46,
+          "expected_value_pct": 23.76,
+          "book_disagreement_pp": 18.13,
+          "competition_quality_score": 84,
+          "bookmakers": 11
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-07-31T08:51:09+02:00"
+    },
+    "1549695": {
+      "fixture_id": "1549695",
+      "date": "2026-07-31",
+      "time": "03:00",
+      "match": "Bucaramanga - Llaneros",
+      "league": "Primera A",
+      "country": "Colombia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-07-31T08:51:09+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.7,
+        "probability_pct": 64.72,
+        "probability_raw_pct": 65.9,
+        "expected_value_pct": 10.024,
+        "relation": "contrast",
+        "ranking_score": 68.713,
+        "recommendation_score": 68.713,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 68.713,
+          "grade": "B",
+          "reasons": [],
+          "threshold_probability_pct": 61.0,
+          "probability_pct": 64.72,
+          "raw_probability_pct": 65.9,
+          "expected_value_pct": 10.024,
+          "book_disagreement_pp": 10.7,
+          "competition_quality_score": 68,
+          "bookmakers": 10
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-07-31T08:51:09+02:00"
     }
   },
   "summary": {
-    "settled_primary": 20,
-    "wins": 11,
-    "losses": 9,
-    "win_rate_pct": 55.0,
+    "settled_primary": 25,
+    "wins": 15,
+    "losses": 10,
+    "win_rate_pct": 60.0,
     "by_market": {
       "1x2_ft": {
-        "settled": 8,
-        "wins": 5,
+        "settled": 11,
+        "wins": 8,
         "losses": 3,
-        "win_rate_pct": 62.5
+        "win_rate_pct": 72.727
       },
       "over25_ft": {
-        "settled": 12,
-        "wins": 6,
-        "losses": 6,
+        "settled": 14,
+        "wins": 7,
+        "losses": 7,
         "win_rate_pct": 50.0
       }
     },
@@ -1016,16 +1281,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 7,
-        "wins": 4,
+        "settled": 9,
+        "wins": 6,
         "losses": 3,
-        "win_rate_pct": 57.143
+        "win_rate_pct": 66.667
       },
       "A": {
-        "settled": 4,
-        "wins": 1,
-        "losses": 3,
-        "win_rate_pct": 25.0
+        "settled": 7,
+        "wins": 3,
+        "losses": 4,
+        "win_rate_pct": 42.857
       },
       "C": {
         "settled": 4,
