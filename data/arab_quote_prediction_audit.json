@@ -1,7 +1,7 @@
 {
   "version": "1.1.3",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-01T13:25:17+02:00",
+  "updated_at": "2026-08-01T15:43:43+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -2324,7 +2324,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-01T13:25:13+02:00",
+        "settled_at": "2026-08-01T15:43:38+02:00",
         "home_ft": 0,
         "away_ft": 0,
         "home_ht": 0,
@@ -2364,7 +2364,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "won"
       },
-      "settled_at": "2026-08-01T13:25:13+02:00"
+      "settled_at": "2026-08-01T15:43:38+02:00"
     },
     "1550914": {
       "fixture_id": "1550914",
@@ -2377,7 +2377,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-01T13:25:13+02:00",
+        "settled_at": "2026-08-01T15:43:38+02:00",
         "home_ft": 1,
         "away_ft": 5,
         "home_ht": 1,
@@ -2417,7 +2417,7 @@
         "market_calibration_weight": 0.07,
         "outcome": "won"
       },
-      "settled_at": "2026-08-01T13:25:13+02:00"
+      "settled_at": "2026-08-01T15:43:38+02:00"
     },
     "1602414": {
       "fixture_id": "1602414",
@@ -2430,7 +2430,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-01T13:25:13+02:00",
+        "settled_at": "2026-08-01T15:43:38+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 1,
@@ -2470,26 +2470,503 @@
         "market_calibration_weight": 0.08,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-01T13:25:13+02:00"
+      "settled_at": "2026-08-01T15:43:38+02:00"
+    },
+    "1568116": {
+      "fixture_id": "1568116",
+      "date": "2026-08-01",
+      "time": "12:00",
+      "match": "Wisła Kraków II - Star Starachowice",
+      "league": "III Liga - Group 4",
+      "country": "Poland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-01T15:43:38+02:00",
+        "home_ft": 4,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.505,
+        "probability_pct": 72.31,
+        "probability_raw_pct": 73.32,
+        "expected_value_pct": 8.827,
+        "relation": "contrast",
+        "ranking_score": 63.936,
+        "recommendation_score": 63.936,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 63.936,
+          "grade": "C",
+          "reasons": [],
+          "threshold_probability_pct": 57.0,
+          "probability_pct": 72.31,
+          "raw_probability_pct": 73.32,
+          "expected_value_pct": 8.827,
+          "book_disagreement_pp": 12.67,
+          "competition_quality_score": 68,
+          "bookmakers": 8
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-01T15:43:38+02:00"
+    },
+    "1496471": {
+      "fixture_id": "1496471",
+      "date": "2026-08-01",
+      "time": "12:30",
+      "match": "Frigg - Ullern",
+      "league": "3. Division - Girone 1",
+      "country": "Norway",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-01T15:43:38+02:00",
+        "home_ft": 2,
+        "away_ft": 2,
+        "home_ht": 2,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.53,
+        "probability_pct": 66.38,
+        "probability_raw_pct": 67.01,
+        "expected_value_pct": 1.561,
+        "relation": "model_only",
+        "ranking_score": 70.983,
+        "recommendation_score": 70.983,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.983,
+          "grade": "B",
+          "reasons": [],
+          "threshold_probability_pct": 46.0,
+          "probability_pct": 66.38,
+          "raw_probability_pct": 67.01,
+          "expected_value_pct": 1.561,
+          "book_disagreement_pp": 7.84,
+          "competition_quality_score": 68,
+          "bookmakers": 12
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-01T15:43:38+02:00"
+    },
+    "1510398": {
+      "fixture_id": "1510398",
+      "date": "2026-08-01",
+      "time": "12:30",
+      "match": "Hwaseong - Daegu FC",
+      "league": "K League 2",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-01T15:43:38+02:00",
+        "home_ft": 5,
+        "away_ft": 1,
+        "home_ht": 3,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.73,
+        "probability_pct": 68.67,
+        "probability_raw_pct": 69.96,
+        "expected_value_pct": 18.799,
+        "relation": "contrast",
+        "ranking_score": 72.929,
+        "recommendation_score": 72.929,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 72.929,
+          "grade": "B",
+          "reasons": [],
+          "threshold_probability_pct": 57.0,
+          "probability_pct": 68.67,
+          "raw_probability_pct": 69.96,
+          "expected_value_pct": 18.799,
+          "book_disagreement_pp": 16.09,
+          "competition_quality_score": 64,
+          "bookmakers": 11
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "orange",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-01T15:43:38+02:00"
+    },
+    "1507018": {
+      "fixture_id": "1507018",
+      "date": "2026-08-01",
+      "time": "12:30",
+      "match": "Pohang Steelers - Gimcheon Sangmu FC",
+      "league": "K League 1",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-01T15:43:39+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.665,
+        "probability_pct": 62.53,
+        "probability_raw_pct": 63.29,
+        "expected_value_pct": 4.112,
+        "relation": "confirmed",
+        "ranking_score": 73.062,
+        "recommendation_score": 67.062,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 67.062,
+          "grade": "C",
+          "reasons": [],
+          "threshold_probability_pct": 59.5,
+          "probability_pct": 62.53,
+          "raw_probability_pct": 63.29,
+          "expected_value_pct": 4.112,
+          "book_disagreement_pp": 6.93,
+          "competition_quality_score": 64,
+          "bookmakers": 10
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-01T15:43:39+02:00"
+    },
+    "1504483": {
+      "fixture_id": "1504483",
+      "date": "2026-08-01",
+      "time": "13:00",
+      "match": "Angelholms FF - AFC Malmo",
+      "league": "Ettan - Södra",
+      "country": "Sweden",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-01T15:43:39+02:00",
+        "home_ft": 2,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.2,
+        "probability_pct": 53.42,
+        "probability_raw_pct": 54.61,
+        "expected_value_pct": 17.524,
+        "relation": "contrast",
+        "ranking_score": 72.366,
+        "recommendation_score": 72.366,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 72.366,
+          "grade": "B",
+          "reasons": [],
+          "threshold_probability_pct": 46.0,
+          "probability_pct": 53.42,
+          "raw_probability_pct": 54.61,
+          "expected_value_pct": 17.524,
+          "book_disagreement_pp": 13.19,
+          "competition_quality_score": 68,
+          "bookmakers": 13
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-01T15:43:39+02:00"
+    },
+    "1577740": {
+      "fixture_id": "1577740",
+      "date": "2026-08-01",
+      "time": "13:00",
+      "match": "Holbæk B&I - Frem",
+      "league": "3. Division",
+      "country": "Denmark",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-01T15:43:39+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.605,
+        "probability_pct": 66.19,
+        "probability_raw_pct": 67.14,
+        "expected_value_pct": 6.235,
+        "relation": "contrast",
+        "ranking_score": 68.015,
+        "recommendation_score": 68.015,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 68.015,
+          "grade": "B",
+          "reasons": [],
+          "threshold_probability_pct": 46.0,
+          "probability_pct": 66.19,
+          "raw_probability_pct": 67.14,
+          "expected_value_pct": 6.235,
+          "book_disagreement_pp": 10.53,
+          "competition_quality_score": 68,
+          "bookmakers": 12
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-01T15:43:39+02:00"
+    },
+    "1496108": {
+      "fixture_id": "1496108",
+      "date": "2026-08-01",
+      "time": "13:00",
+      "match": "Pors Grenland - Brattvåg",
+      "league": "2. Division - Group 1",
+      "country": "Norway",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-01T15:43:39+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.0,
+        "probability_pct": 54.27,
+        "probability_raw_pct": 55.01,
+        "expected_value_pct": 8.54,
+        "relation": "confirmed",
+        "ranking_score": 91.517,
+        "recommendation_score": 85.517,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 85.517,
+          "grade": "A",
+          "reasons": [],
+          "threshold_probability_pct": 44.5,
+          "probability_pct": 54.27,
+          "raw_probability_pct": 55.01,
+          "expected_value_pct": 8.54,
+          "book_disagreement_pp": 9.31,
+          "competition_quality_score": 68,
+          "bookmakers": 11
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-01T15:43:39+02:00"
+    },
+    "1541723": {
+      "fixture_id": "1541723",
+      "date": "2026-08-01",
+      "time": "13:00",
+      "match": "SJK-juniorit - GBK",
+      "league": "Kakkonen - Lohko C",
+      "country": "Finland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-01T15:43:39+02:00",
+        "home_ft": 2,
+        "away_ft": 4,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 1.965,
+        "probability_pct": 62.21,
+        "probability_raw_pct": 63.83,
+        "expected_value_pct": 22.243,
+        "relation": "contrast",
+        "ranking_score": 72.852,
+        "recommendation_score": 72.852,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 72.852,
+          "grade": "B",
+          "reasons": [],
+          "threshold_probability_pct": 46.0,
+          "probability_pct": 62.21,
+          "raw_probability_pct": 63.83,
+          "expected_value_pct": 22.243,
+          "book_disagreement_pp": 17.89,
+          "competition_quality_score": 68,
+          "bookmakers": 12
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-01T15:43:39+02:00"
+    },
+    "1504490": {
+      "fixture_id": "1504490",
+      "date": "2026-08-01",
+      "time": "13:00",
+      "match": "Tvååker - Utsikten",
+      "league": "Ettan - Södra",
+      "country": "Sweden",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-01T15:43:39+02:00",
+        "home_ft": 2,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.57,
+        "probability_pct": 68.66,
+        "probability_raw_pct": 69.81,
+        "expected_value_pct": 7.796,
+        "relation": "contrast",
+        "ranking_score": 75.09,
+        "recommendation_score": 75.09,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 75.09,
+          "grade": "B",
+          "reasons": [],
+          "threshold_probability_pct": 57.0,
+          "probability_pct": 68.66,
+          "raw_probability_pct": 69.81,
+          "expected_value_pct": 7.796,
+          "book_disagreement_pp": 11.45,
+          "competition_quality_score": 68,
+          "bookmakers": 9
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-01T15:43:39+02:00"
     }
   },
   "summary": {
-    "settled_primary": 48,
-    "wins": 30,
-    "losses": 18,
-    "win_rate_pct": 62.5,
+    "settled_primary": 57,
+    "wins": 36,
+    "losses": 21,
+    "win_rate_pct": 63.158,
     "by_market": {
       "1x2_ft": {
-        "settled": 19,
-        "wins": 13,
-        "losses": 6,
-        "win_rate_pct": 68.421
+        "settled": 24,
+        "wins": 15,
+        "losses": 9,
+        "win_rate_pct": 62.5
       },
       "over25_ft": {
-        "settled": 27,
-        "wins": 15,
+        "settled": 31,
+        "wins": 19,
         "losses": 12,
-        "win_rate_pct": 55.556
+        "win_rate_pct": 61.29
       },
       "over15_ht": {
         "settled": 1,
@@ -2512,22 +2989,22 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 22,
-        "wins": 15,
-        "losses": 7,
-        "win_rate_pct": 68.182
+        "settled": 28,
+        "wins": 19,
+        "losses": 9,
+        "win_rate_pct": 67.857
       },
       "A": {
-        "settled": 12,
+        "settled": 13,
         "wins": 6,
-        "losses": 6,
-        "win_rate_pct": 50.0
+        "losses": 7,
+        "win_rate_pct": 46.154
       },
       "C": {
-        "settled": 9,
-        "wins": 5,
+        "settled": 11,
+        "wins": 7,
         "losses": 4,
-        "win_rate_pct": 55.556
+        "win_rate_pct": 63.636
       }
     }
   }
