@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-03T19:13:43+02:00",
+  "updated_at": "2026-08-03T21:46:23+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -8154,7 +8154,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-03T19:13:41+02:00",
+        "settled_at": "2026-08-03T21:46:22+02:00",
         "home_ft": 0,
         "away_ft": 3,
         "home_ht": 0,
@@ -8197,7 +8197,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "won"
       },
-      "settled_at": "2026-08-03T19:13:41+02:00"
+      "settled_at": "2026-08-03T21:46:22+02:00"
     },
     "1497201": {
       "fixture_id": "1497201",
@@ -8210,7 +8210,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-03T19:13:41+02:00",
+        "settled_at": "2026-08-03T21:46:22+02:00",
         "home_ft": 4,
         "away_ft": 5,
         "home_ht": 1,
@@ -8253,26 +8253,866 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-03T19:13:41+02:00"
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1565205": {
+      "fixture_id": "1565205",
+      "date": "2026-08-03",
+      "time": "17:30",
+      "match": "Universitatea Cluj - FC Botosani",
+      "league": "Liga I",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.855,
+        "probability_pct": 56.35,
+        "probability_raw_pct": 57.13,
+        "expected_value_pct": 4.529,
+        "relation": "confirmed",
+        "ranking_score": 76.216,
+        "recommendation_score": 70.216,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.216,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 53.908,
+          "probability_pct": 56.35,
+          "raw_probability_pct": 57.13,
+          "expected_value_pct": 4.529,
+          "edge_over_break_even_pp": 2.442,
+          "book_disagreement_pp": 6.47,
+          "competition_quality_score": 68,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1571495": {
+      "fixture_id": "1571495",
+      "date": "2026-08-03",
+      "time": "17:45",
+      "match": "Etar Veliko Tarnovo - Yantra 2019",
+      "league": "Second League",
+      "country": "Bulgaria",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.83,
+        "probability_pct": 60.4,
+        "probability_raw_pct": 61.55,
+        "expected_value_pct": 10.532,
+        "relation": "contrast",
+        "ranking_score": 64.61,
+        "recommendation_score": 64.61,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 64.61,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 54.645,
+          "probability_pct": 60.4,
+          "raw_probability_pct": 61.55,
+          "expected_value_pct": 10.532,
+          "edge_over_break_even_pp": 5.755,
+          "book_disagreement_pp": 11.48,
+          "competition_quality_score": 68,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1497380": {
+      "fixture_id": "1497380",
+      "date": "2026-08-03",
+      "time": "18:00",
+      "match": "Brumunddal - Lyn II",
+      "league": "3. Division - Girone 6",
+      "country": "Norway",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 1,
+        "away_ft": 9,
+        "home_ht": 1,
+        "away_ht": 3
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 1.55,
+        "probability_pct": 75.08,
+        "probability_raw_pct": 76.96,
+        "expected_value_pct": 16.374,
+        "relation": "confirmed",
+        "ranking_score": 91.671,
+        "recommendation_score": 85.671,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 85.671,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 64.516,
+          "probability_pct": 75.08,
+          "raw_probability_pct": 76.96,
+          "expected_value_pct": 16.374,
+          "edge_over_break_even_pp": 10.564,
+          "book_disagreement_pp": 18.87,
+          "competition_quality_score": 68,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1492946": {
+      "fixture_id": "1492946",
+      "date": "2026-08-03",
+      "time": "18:00",
+      "match": "Kerry - Cobh Ramblers",
+      "league": "First Division",
+      "country": "Ireland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 3,
+        "away_ft": 0,
+        "home_ht": 3,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.13,
+        "probability_pct": 58.94,
+        "probability_raw_pct": 60.78,
+        "expected_value_pct": 25.542,
+        "relation": "confirmed",
+        "ranking_score": 92.126,
+        "recommendation_score": 86.126,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 86.126,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 46.948,
+          "probability_pct": 58.94,
+          "raw_probability_pct": 60.78,
+          "expected_value_pct": 25.542,
+          "edge_over_break_even_pp": 11.992,
+          "book_disagreement_pp": 18.48,
+          "competition_quality_score": 68,
+          "bookmakers": 14,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1492947": {
+      "fixture_id": "1492947",
+      "date": "2026-08-03",
+      "time": "18:00",
+      "match": "Longford Town - Finn Harps",
+      "league": "First Division",
+      "country": "Ireland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 5,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.62,
+        "probability_pct": 63.27,
+        "probability_raw_pct": 64.04,
+        "expected_value_pct": 2.497,
+        "relation": "confirmed",
+        "ranking_score": 79.576,
+        "recommendation_score": 73.576,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 73.576,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 61.728,
+          "probability_pct": 63.27,
+          "raw_probability_pct": 64.04,
+          "expected_value_pct": 2.497,
+          "edge_over_break_even_pp": 1.542,
+          "book_disagreement_pp": 7.66,
+          "competition_quality_score": 68,
+          "bookmakers": 14,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1497383": {
+      "fixture_id": "1497383",
+      "date": "2026-08-03",
+      "time": "18:00",
+      "match": "Oppsal - Sarpsborg 08 II",
+      "league": "3. Division - Girone 6",
+      "country": "Norway",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 2,
+        "away_ft": 2,
+        "home_ht": 2,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.78,
+        "probability_pct": 61.61,
+        "probability_raw_pct": 62.55,
+        "expected_value_pct": 9.666,
+        "relation": "contrast",
+        "ranking_score": 74.7,
+        "recommendation_score": 74.7,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 74.7,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 56.18,
+          "probability_pct": 61.61,
+          "raw_probability_pct": 62.55,
+          "expected_value_pct": 9.666,
+          "edge_over_break_even_pp": 5.43,
+          "book_disagreement_pp": 11.81,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1495750": {
+      "fixture_id": "1495750",
+      "date": "2026-08-03",
+      "time": "18:00",
+      "match": "SJK - HJK Helsinki",
+      "league": "Veikkausliiga",
+      "country": "Finland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 3,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.5,
+        "probability_pct": 75.24,
+        "probability_raw_pct": 76.6,
+        "expected_value_pct": 12.86,
+        "relation": "contrast",
+        "ranking_score": 78.116,
+        "recommendation_score": 78.116,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 78.116,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 66.667,
+          "probability_pct": 75.24,
+          "raw_probability_pct": 76.6,
+          "expected_value_pct": 12.86,
+          "edge_over_break_even_pp": 8.573,
+          "book_disagreement_pp": 15.06,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "orange",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1497022": {
+      "fixture_id": "1497022",
+      "date": "2026-08-03",
+      "time": "18:00",
+      "match": "Vindbjart - Odd II",
+      "league": "3. Division - Girone 4",
+      "country": "Norway",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.625,
+        "probability_pct": 68.38,
+        "probability_raw_pct": 69.81,
+        "expected_value_pct": 11.118,
+        "relation": "contrast",
+        "ranking_score": 76.745,
+        "recommendation_score": 76.745,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 76.745,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 61.538,
+          "probability_pct": 68.38,
+          "raw_probability_pct": 69.81,
+          "expected_value_pct": 11.118,
+          "edge_over_break_even_pp": 6.842,
+          "book_disagreement_pp": 14.33,
+          "competition_quality_score": 68,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1492949": {
+      "fixture_id": "1492949",
+      "date": "2026-08-03",
+      "time": "18:00",
+      "match": "Wexford - Bray Wanderers",
+      "league": "First Division",
+      "country": "Ireland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 2,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.28,
+        "probability_pct": 56.46,
+        "probability_raw_pct": 58.13,
+        "expected_value_pct": 28.729,
+        "relation": "contrast",
+        "ranking_score": 73.997,
+        "recommendation_score": 73.997,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 73.997,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 43.86,
+          "probability_pct": 56.46,
+          "raw_probability_pct": 58.13,
+          "expected_value_pct": 28.729,
+          "edge_over_break_even_pp": 12.6,
+          "book_disagreement_pp": 18.59,
+          "competition_quality_score": 68,
+          "bookmakers": 14,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1494232": {
+      "fixture_id": "1494232",
+      "date": "2026-08-03",
+      "time": "19:00",
+      "match": "Halmstad - Sirius",
+      "league": "Allsvenskan",
+      "country": "Sweden",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 0,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 1.36,
+        "probability_pct": 80.05,
+        "probability_raw_pct": 81.59,
+        "expected_value_pct": 8.868,
+        "relation": "confirmed",
+        "ranking_score": 95.389,
+        "recommendation_score": 89.389,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 89.389,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 73.529,
+          "probability_pct": 80.05,
+          "raw_probability_pct": 81.59,
+          "expected_value_pct": 8.868,
+          "edge_over_break_even_pp": 6.521,
+          "book_disagreement_pp": 12.85,
+          "competition_quality_score": 68,
+          "bookmakers": 14,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1571498": {
+      "fixture_id": "1571498",
+      "date": "2026-08-03",
+      "time": "19:00",
+      "match": "Ludogorets II - Lokomotiv G. Oryahovitsa",
+      "league": "Second League",
+      "country": "Bulgaria",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 2,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.645,
+        "probability_pct": 72.61,
+        "probability_raw_pct": 74.58,
+        "expected_value_pct": 19.443,
+        "relation": "confirmed",
+        "ranking_score": 82.812,
+        "recommendation_score": 76.812,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 76.812,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 60.79,
+          "probability_pct": 72.61,
+          "raw_probability_pct": 74.58,
+          "expected_value_pct": 19.443,
+          "edge_over_break_even_pp": 11.82,
+          "book_disagreement_pp": 19.66,
+          "competition_quality_score": 68,
+          "bookmakers": 14,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1548985": {
+      "fixture_id": "1548985",
+      "date": "2026-08-03",
+      "time": "19:00",
+      "match": "Odense - Sonderjyske",
+      "league": "Superliga",
+      "country": "Denmark",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.15,
+        "probability_pct": 53.55,
+        "probability_raw_pct": 54.79,
+        "expected_value_pct": 15.132,
+        "relation": "contrast",
+        "ranking_score": 70.528,
+        "recommendation_score": 70.528,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.528,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 46.512,
+          "probability_pct": 53.55,
+          "raw_probability_pct": 54.79,
+          "expected_value_pct": 15.132,
+          "edge_over_break_even_pp": 7.038,
+          "book_disagreement_pp": 11.25,
+          "competition_quality_score": 68,
+          "bookmakers": 14,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1495901": {
+      "fixture_id": "1495901",
+      "date": "2026-08-03",
+      "time": "19:00",
+      "match": "Ranheim - Haugesund",
+      "league": "1. Division",
+      "country": "Norway",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 3,
+        "away_ft": 4,
+        "home_ht": 1,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.22,
+        "probability_pct": 87.01,
+        "probability_raw_pct": 88.42,
+        "expected_value_pct": 6.152,
+        "relation": "confirmed",
+        "ranking_score": 91.393,
+        "recommendation_score": 85.393,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 85.393,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 81.967,
+          "probability_pct": 87.01,
+          "raw_probability_pct": 88.42,
+          "expected_value_pct": 6.152,
+          "edge_over_break_even_pp": 5.043,
+          "book_disagreement_pp": 11.79,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1495515": {
+      "fixture_id": "1495515",
+      "date": "2026-08-03",
+      "time": "19:00",
+      "match": "Vittsjö W - Rosengård W",
+      "league": "Damallsvenskan",
+      "country": "Sweden",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.12,
+        "probability_pct": 57.23,
+        "probability_raw_pct": 58.4,
+        "expected_value_pct": 21.328,
+        "relation": "contrast",
+        "ranking_score": 71.405,
+        "recommendation_score": 71.405,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 71.405,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 47.17,
+          "probability_pct": 57.23,
+          "raw_probability_pct": 58.4,
+          "expected_value_pct": 21.328,
+          "edge_over_break_even_pp": 10.06,
+          "book_disagreement_pp": 14.63,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
+    },
+    "1497645": {
+      "fixture_id": "1497645",
+      "date": "2026-08-03",
+      "time": "19:05",
+      "match": "Orebro SK - IFK Varnamo",
+      "league": "Superettan",
+      "country": "Sweden",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T21:46:22+02:00",
+        "home_ft": 1,
+        "away_ft": 3,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.0,
+        "probability_pct": 57.71,
+        "probability_raw_pct": 59.06,
+        "expected_value_pct": 15.42,
+        "relation": "confirmed",
+        "ranking_score": 92.782,
+        "recommendation_score": 86.782,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 86.782,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 50.0,
+          "probability_pct": 57.71,
+          "raw_probability_pct": 59.06,
+          "expected_value_pct": 15.42,
+          "edge_over_break_even_pp": 7.71,
+          "book_disagreement_pp": 12.25,
+          "competition_quality_score": 68,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-03T21:46:22+02:00"
     }
   },
   "summary": {
-    "settled_primary": 157,
-    "wins": 90,
-    "losses": 67,
-    "win_rate_pct": 57.325,
+    "settled_primary": 172,
+    "wins": 101,
+    "losses": 71,
+    "win_rate_pct": 58.721,
     "by_market": {
       "1x2_ft": {
-        "settled": 67,
-        "wins": 36,
-        "losses": 31,
-        "win_rate_pct": 53.731
+        "settled": 76,
+        "wins": 43,
+        "losses": 33,
+        "win_rate_pct": 56.579
       },
       "over25_ft": {
-        "settled": 84,
-        "wins": 52,
-        "losses": 32,
-        "win_rate_pct": 61.905
+        "settled": 90,
+        "wins": 56,
+        "losses": 34,
+        "win_rate_pct": 62.222
       },
       "over15_ht": {
         "settled": 3,
@@ -8295,22 +9135,22 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 78,
-        "wins": 47,
-        "losses": 31,
-        "win_rate_pct": 60.256
+        "settled": 87,
+        "wins": 54,
+        "losses": 33,
+        "win_rate_pct": 62.069
       },
       "A": {
-        "settled": 46,
-        "wins": 24,
-        "losses": 22,
-        "win_rate_pct": 52.174
+        "settled": 51,
+        "wins": 28,
+        "losses": 23,
+        "win_rate_pct": 54.902
       },
       "C": {
-        "settled": 28,
+        "settled": 29,
         "wins": 15,
-        "losses": 13,
-        "win_rate_pct": 53.571
+        "losses": 14,
+        "win_rate_pct": 51.724
       }
     }
   }
