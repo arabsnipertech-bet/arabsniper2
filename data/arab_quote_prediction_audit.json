@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-03T16:54:47+02:00",
+  "updated_at": "2026-08-03T19:13:43+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -8142,25 +8142,137 @@
         "outcome": "lost"
       },
       "settled_at": "2026-08-02T23:01:57+02:00"
+    },
+    "1548097": {
+      "fixture_id": "1548097",
+      "date": "2026-08-03",
+      "time": "15:30",
+      "match": "Indonesia - Vietnam",
+      "league": "ASEAN Championship",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T19:13:41+02:00",
+        "home_ft": 0,
+        "away_ft": 3,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.985,
+        "probability_pct": 58.56,
+        "probability_raw_pct": 59.92,
+        "expected_value_pct": 16.242,
+        "relation": "contrast",
+        "ranking_score": 76.953,
+        "recommendation_score": 76.953,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 76.953,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 50.378,
+          "probability_pct": 58.56,
+          "raw_probability_pct": 59.92,
+          "expected_value_pct": 16.242,
+          "edge_over_break_even_pp": 8.182,
+          "book_disagreement_pp": 13.57,
+          "competition_quality_score": 88,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-03T19:13:41+02:00"
+    },
+    "1497201": {
+      "fixture_id": "1497201",
+      "date": "2026-08-03",
+      "time": "16:00",
+      "match": "Lillestrøm II - Kongsvinger II",
+      "league": "3. Division - Girone 5",
+      "country": "Norway",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-03T19:13:41+02:00",
+        "home_ft": 4,
+        "away_ft": 5,
+        "home_ht": 1,
+        "away_ht": 3
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.88,
+        "probability_pct": 60.96,
+        "probability_raw_pct": 62.39,
+        "expected_value_pct": 14.605,
+        "relation": "contrast",
+        "ranking_score": 79.049,
+        "recommendation_score": 79.049,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 79.049,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 53.191,
+          "probability_pct": 60.96,
+          "raw_probability_pct": 62.39,
+          "expected_value_pct": 14.605,
+          "edge_over_break_even_pp": 7.769,
+          "book_disagreement_pp": 14.26,
+          "competition_quality_score": 68,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-03T19:13:41+02:00"
     }
   },
   "summary": {
-    "settled_primary": 155,
-    "wins": 89,
-    "losses": 66,
-    "win_rate_pct": 57.419,
+    "settled_primary": 157,
+    "wins": 90,
+    "losses": 67,
+    "win_rate_pct": 57.325,
     "by_market": {
       "1x2_ft": {
-        "settled": 66,
+        "settled": 67,
         "wins": 36,
-        "losses": 30,
-        "win_rate_pct": 54.545
+        "losses": 31,
+        "win_rate_pct": 53.731
       },
       "over25_ft": {
-        "settled": 83,
-        "wins": 51,
+        "settled": 84,
+        "wins": 52,
         "losses": 32,
-        "win_rate_pct": 61.446
+        "win_rate_pct": 61.905
       },
       "over15_ht": {
         "settled": 3,
@@ -8183,16 +8295,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 77,
-        "wins": 46,
+        "settled": 78,
+        "wins": 47,
         "losses": 31,
-        "win_rate_pct": 59.74
+        "win_rate_pct": 60.256
       },
       "A": {
-        "settled": 45,
+        "settled": 46,
         "wins": 24,
-        "losses": 21,
-        "win_rate_pct": 53.333
+        "losses": 22,
+        "win_rate_pct": 52.174
       },
       "C": {
         "settled": 28,
