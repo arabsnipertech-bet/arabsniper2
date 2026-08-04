@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-04T14:05:46+02:00",
+  "updated_at": "2026-08-04T17:28:27+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -9262,13 +9262,69 @@
         "outcome": "lost"
       },
       "settled_at": "2026-08-03T23:11:18+02:00"
+    },
+    "1548098": {
+      "fixture_id": "1548098",
+      "date": "2026-08-04",
+      "time": "15:00",
+      "match": "Philippines - Thailand",
+      "league": "ASEAN Championship",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-04T17:28:25+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.54,
+        "probability_pct": 71.44,
+        "probability_raw_pct": 72.78,
+        "expected_value_pct": 10.018,
+        "relation": "confirmed",
+        "ranking_score": 95.824,
+        "recommendation_score": 89.824,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 89.824,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 64.935,
+          "probability_pct": 71.44,
+          "raw_probability_pct": 72.78,
+          "expected_value_pct": 10.018,
+          "edge_over_break_even_pp": 6.505,
+          "book_disagreement_pp": 13.41,
+          "competition_quality_score": 88,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-04T17:28:25+02:00"
     }
   },
   "summary": {
-    "settled_primary": 175,
+    "settled_primary": 176,
     "wins": 103,
-    "losses": 72,
-    "win_rate_pct": 58.857,
+    "losses": 73,
+    "win_rate_pct": 58.523,
     "by_market": {
       "1x2_ft": {
         "settled": 78,
@@ -9277,10 +9333,10 @@
         "win_rate_pct": 56.41
       },
       "over25_ft": {
-        "settled": 91,
+        "settled": 92,
         "wins": 57,
-        "losses": 34,
-        "win_rate_pct": 62.637
+        "losses": 35,
+        "win_rate_pct": 61.957
       },
       "over15_ht": {
         "settled": 3,
@@ -9309,10 +9365,10 @@
         "win_rate_pct": 62.222
       },
       "A": {
-        "settled": 51,
+        "settled": 52,
         "wins": 28,
-        "losses": 23,
-        "win_rate_pct": 54.902
+        "losses": 24,
+        "win_rate_pct": 53.846
       },
       "C": {
         "settled": 29,
