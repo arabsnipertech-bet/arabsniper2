@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-05T17:20:02+02:00",
+  "updated_at": "2026-08-05T19:47:10+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -9890,7 +9890,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-05T17:20:01+02:00",
+        "settled_at": "2026-08-05T19:47:08+02:00",
         "home_ft": 0,
         "away_ft": 1,
         "home_ht": 0,
@@ -9933,26 +9933,306 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-05T17:20:01+02:00"
+      "settled_at": "2026-08-05T19:47:08+02:00"
+    },
+    "1547834": {
+      "fixture_id": "1547834",
+      "date": "2026-08-05",
+      "time": "16:00",
+      "match": "Śląsk Wrocław II - Stal Stalowa Wola",
+      "league": "Cup",
+      "country": "Poland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-05T19:47:08+02:00",
+        "home_ft": 3,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.3,
+        "probability_pct": 55.85,
+        "probability_raw_pct": 57.29,
+        "expected_value_pct": 28.455,
+        "relation": "contrast",
+        "ranking_score": 66.916,
+        "recommendation_score": 66.916,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 66.916,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 43.478,
+          "probability_pct": 55.85,
+          "raw_probability_pct": 57.29,
+          "expected_value_pct": 28.455,
+          "edge_over_break_even_pp": 12.372,
+          "book_disagreement_pp": 18.04,
+          "competition_quality_score": 68,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-05T19:47:08+02:00"
+    },
+    "1610551": {
+      "fixture_id": "1610551",
+      "date": "2026-08-05",
+      "time": "16:30",
+      "match": "Metalurgistul Cugir - Jiul Petroşani",
+      "league": "Cupa României",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-05T19:47:08+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.95,
+        "probability_pct": 65.17,
+        "probability_raw_pct": 67.12,
+        "expected_value_pct": 27.081,
+        "relation": "confirmed",
+        "ranking_score": 90.889,
+        "recommendation_score": 84.889,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 84.889,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 51.282,
+          "probability_pct": 65.17,
+          "raw_probability_pct": 67.12,
+          "expected_value_pct": 27.081,
+          "edge_over_break_even_pp": 13.888,
+          "book_disagreement_pp": 19.54,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-05T19:47:08+02:00"
+    },
+    "1547831": {
+      "fixture_id": "1547831",
+      "date": "2026-08-05",
+      "time": "16:30",
+      "match": "Podhale Nowy Targ - Chojniczanka Chojnice",
+      "league": "Cup",
+      "country": "Poland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-05T19:47:08+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.9,
+        "probability_pct": 59.44,
+        "probability_raw_pct": 60.72,
+        "expected_value_pct": 12.936,
+        "relation": "confirmed",
+        "ranking_score": 83.848,
+        "recommendation_score": 77.848,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 77.848,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 52.632,
+          "probability_pct": 59.44,
+          "raw_probability_pct": 60.72,
+          "expected_value_pct": 12.936,
+          "edge_over_break_even_pp": 6.808,
+          "book_disagreement_pp": 12.87,
+          "competition_quality_score": 68,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-05T19:47:08+02:00"
+    },
+    "1547829": {
+      "fixture_id": "1547829",
+      "date": "2026-08-05",
+      "time": "17:00",
+      "match": "Olimpia Grudziądz - Świt Skolwin",
+      "league": "Cup",
+      "country": "Poland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "AET",
+        "settled_at": "2026-08-05T19:47:08+02:00",
+        "home_ft": 3,
+        "away_ft": 3,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.15,
+        "probability_pct": 56.55,
+        "probability_raw_pct": 57.77,
+        "expected_value_pct": 21.582,
+        "relation": "model_only",
+        "ranking_score": 69.312,
+        "recommendation_score": 69.312,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 69.312,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 46.512,
+          "probability_pct": 56.55,
+          "raw_probability_pct": 57.77,
+          "expected_value_pct": 21.582,
+          "edge_over_break_even_pp": 10.038,
+          "book_disagreement_pp": 15.33,
+          "competition_quality_score": 68,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-05T19:47:08+02:00"
+    },
+    "1517234": {
+      "fixture_id": "1517234",
+      "date": "2026-08-05",
+      "time": "17:30",
+      "match": "SalPa - JJK",
+      "league": "Ykkönen",
+      "country": "Finland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-05T19:47:08+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.96,
+        "probability_pct": 59.99,
+        "probability_raw_pct": 61.49,
+        "expected_value_pct": 17.58,
+        "relation": "contrast",
+        "ranking_score": 78.162,
+        "recommendation_score": 78.162,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 78.162,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 51.02,
+          "probability_pct": 59.99,
+          "raw_probability_pct": 61.49,
+          "expected_value_pct": 17.58,
+          "edge_over_break_even_pp": 8.97,
+          "book_disagreement_pp": 15.02,
+          "competition_quality_score": 68,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-05T19:47:08+02:00"
     }
   },
   "summary": {
-    "settled_primary": 187,
-    "wins": 110,
-    "losses": 77,
-    "win_rate_pct": 58.824,
+    "settled_primary": 192,
+    "wins": 113,
+    "losses": 79,
+    "win_rate_pct": 58.854,
     "by_market": {
       "1x2_ft": {
-        "settled": 80,
-        "wins": 45,
-        "losses": 35,
-        "win_rate_pct": 56.25
+        "settled": 84,
+        "wins": 47,
+        "losses": 37,
+        "win_rate_pct": 55.952
       },
       "over25_ft": {
-        "settled": 100,
-        "wins": 63,
+        "settled": 101,
+        "wins": 64,
         "losses": 37,
-        "win_rate_pct": 63.0
+        "win_rate_pct": 63.366
       },
       "over15_ht": {
         "settled": 3,
@@ -9975,22 +10255,22 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 93,
-        "wins": 59,
-        "losses": 34,
-        "win_rate_pct": 63.441
+        "settled": 96,
+        "wins": 61,
+        "losses": 35,
+        "win_rate_pct": 63.542
       },
       "A": {
-        "settled": 57,
-        "wins": 30,
+        "settled": 58,
+        "wins": 31,
         "losses": 27,
-        "win_rate_pct": 52.632
+        "win_rate_pct": 53.448
       },
       "C": {
-        "settled": 32,
+        "settled": 33,
         "wins": 17,
-        "losses": 15,
-        "win_rate_pct": 53.125
+        "losses": 16,
+        "win_rate_pct": 51.515
       }
     }
   }
