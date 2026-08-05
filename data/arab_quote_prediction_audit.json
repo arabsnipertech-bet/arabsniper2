@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-05T03:36:48+02:00",
+  "updated_at": "2026-08-05T08:34:43+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -9878,13 +9878,69 @@
         "outcome": "won"
       },
       "settled_at": "2026-08-04T23:18:17+02:00"
+    },
+    "1530112": {
+      "fixture_id": "1530112",
+      "date": "2026-08-05",
+      "time": "04:30",
+      "match": "Vancouver Whitecaps - Atlante FC",
+      "league": "Leagues Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-05T08:34:41+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "gg_ht",
+        "selection": "yes",
+        "odd": 4.25,
+        "probability_pct": 25.11,
+        "probability_raw_pct": 25.45,
+        "expected_value_pct": 6.717,
+        "relation": "contrast",
+        "ranking_score": 68.547,
+        "recommendation_score": 63.547,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 63.547,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 12.0,
+          "market_break_even_pct": 23.529,
+          "probability_pct": 25.11,
+          "raw_probability_pct": 25.45,
+          "expected_value_pct": 6.717,
+          "edge_over_break_even_pp": 1.581,
+          "book_disagreement_pp": 3.43,
+          "competition_quality_score": 88,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "orange",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-05T08:34:41+02:00"
     }
   },
   "summary": {
-    "settled_primary": 186,
+    "settled_primary": 187,
     "wins": 110,
-    "losses": 76,
-    "win_rate_pct": 59.14,
+    "losses": 77,
+    "win_rate_pct": 58.824,
     "by_market": {
       "1x2_ft": {
         "settled": 80,
@@ -9905,10 +9961,10 @@
         "win_rate_pct": 33.333
       },
       "gg_ht": {
-        "settled": 3,
+        "settled": 4,
         "wins": 1,
-        "losses": 2,
-        "win_rate_pct": 33.333
+        "losses": 3,
+        "win_rate_pct": 25.0
       }
     },
     "by_grade": {
@@ -9931,10 +9987,10 @@
         "win_rate_pct": 52.632
       },
       "C": {
-        "settled": 31,
+        "settled": 32,
         "wins": 17,
-        "losses": 14,
-        "win_rate_pct": 54.839
+        "losses": 15,
+        "win_rate_pct": 53.125
       }
     }
   }
