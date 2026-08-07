@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-07T04:11:03+02:00",
+  "updated_at": "2026-08-07T07:47:03+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -10886,13 +10886,237 @@
         "outcome": "won"
       },
       "settled_at": "2026-08-06T17:20:34+02:00"
+    },
+    "1530121": {
+      "fixture_id": "1530121",
+      "date": "2026-08-07",
+      "time": "02:00",
+      "match": "Cruz Azul - Philadelphia Union",
+      "league": "Leagues Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-07T07:47:00+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.61,
+        "probability_pct": 75.56,
+        "probability_raw_pct": 77.69,
+        "expected_value_pct": 21.652,
+        "relation": "contrast",
+        "ranking_score": 77.599,
+        "recommendation_score": 77.599,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 77.599,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 62.112,
+          "probability_pct": 75.56,
+          "raw_probability_pct": 77.69,
+          "expected_value_pct": 21.652,
+          "edge_over_break_even_pp": 13.448,
+          "book_disagreement_pp": 19.4,
+          "competition_quality_score": 88,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "orange",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-07T07:47:00+02:00"
+    },
+    "1530120": {
+      "fixture_id": "1530120",
+      "date": "2026-08-07",
+      "time": "02:30",
+      "match": "Chicago Fire - Necaxa",
+      "league": "Leagues Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-07T07:47:00+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.5,
+        "probability_pct": 67.33,
+        "probability_raw_pct": 67.99,
+        "expected_value_pct": 0.995,
+        "relation": "confirmed",
+        "ranking_score": 78.096,
+        "recommendation_score": 72.096,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 72.096,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 66.667,
+          "probability_pct": 67.33,
+          "raw_probability_pct": 67.99,
+          "expected_value_pct": 0.995,
+          "edge_over_break_even_pp": 0.663,
+          "book_disagreement_pp": 5.49,
+          "competition_quality_score": 88,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-07T07:47:00+02:00"
+    },
+    "1530119": {
+      "fixture_id": "1530119",
+      "date": "2026-08-07",
+      "time": "03:00",
+      "match": "Austin - Club Tijuana",
+      "league": "Leagues Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-07T07:47:00+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 2,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.05,
+        "probability_pct": 55.97,
+        "probability_raw_pct": 57.2,
+        "expected_value_pct": 14.738,
+        "relation": "confirmed",
+        "ranking_score": 92.545,
+        "recommendation_score": 86.545,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 86.545,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 48.78,
+          "probability_pct": 55.97,
+          "raw_probability_pct": 57.2,
+          "expected_value_pct": 14.738,
+          "edge_over_break_even_pp": 7.19,
+          "book_disagreement_pp": 11.15,
+          "competition_quality_score": 88,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-07T07:47:00+02:00"
+    },
+    "1530123": {
+      "fixture_id": "1530123",
+      "date": "2026-08-07",
+      "time": "04:30",
+      "match": "Portland Timbers - Puebla",
+      "league": "Leagues Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-07T07:47:00+02:00",
+        "home_ft": 5,
+        "away_ft": 2,
+        "home_ht": 4,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "gg_ht",
+        "selection": "yes",
+        "odd": 3.2,
+        "probability_pct": 33.51,
+        "probability_raw_pct": 33.83,
+        "expected_value_pct": 7.232,
+        "relation": "confirmed",
+        "ranking_score": 92.065,
+        "recommendation_score": 81.065,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 81.065,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 12.0,
+          "market_break_even_pct": 31.25,
+          "probability_pct": 33.51,
+          "raw_probability_pct": 33.83,
+          "expected_value_pct": 7.232,
+          "edge_over_break_even_pp": 2.26,
+          "book_disagreement_pp": 4.63,
+          "competition_quality_score": 88,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.07,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-07T07:47:00+02:00"
     }
   },
   "summary": {
-    "settled_primary": 204,
-    "wins": 118,
-    "losses": 86,
-    "win_rate_pct": 57.843,
+    "settled_primary": 208,
+    "wins": 120,
+    "losses": 88,
+    "win_rate_pct": 57.692,
     "by_market": {
       "1x2_ft": {
         "settled": 87,
@@ -10901,10 +11125,10 @@
         "win_rate_pct": 56.322
       },
       "over25_ft": {
-        "settled": 106,
-        "wins": 66,
-        "losses": 40,
-        "win_rate_pct": 62.264
+        "settled": 109,
+        "wins": 67,
+        "losses": 42,
+        "win_rate_pct": 61.468
       },
       "over15_ht": {
         "settled": 6,
@@ -10913,10 +11137,10 @@
         "win_rate_pct": 33.333
       },
       "gg_ht": {
-        "settled": 5,
-        "wins": 1,
+        "settled": 6,
+        "wins": 2,
         "losses": 4,
-        "win_rate_pct": 20.0
+        "win_rate_pct": 33.333
       }
     },
     "by_grade": {
@@ -10927,16 +11151,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 99,
+        "settled": 101,
         "wins": 62,
-        "losses": 37,
-        "win_rate_pct": 62.626
+        "losses": 39,
+        "win_rate_pct": 61.386
       },
       "A": {
-        "settled": 66,
-        "wins": 34,
+        "settled": 68,
+        "wins": 36,
         "losses": 32,
-        "win_rate_pct": 51.515
+        "win_rate_pct": 52.941
       },
       "C": {
         "settled": 34,
