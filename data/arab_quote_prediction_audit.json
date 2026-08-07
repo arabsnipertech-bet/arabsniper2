@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-07T13:53:48+02:00",
+  "updated_at": "2026-08-07T15:18:48+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -10898,7 +10898,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-07T13:53:46+02:00",
+        "settled_at": "2026-08-07T15:18:44+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 1,
@@ -10941,7 +10941,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-07T13:53:46+02:00"
+      "settled_at": "2026-08-07T15:18:44+02:00"
     },
     "1530120": {
       "fixture_id": "1530120",
@@ -10954,7 +10954,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-07T13:53:46+02:00",
+        "settled_at": "2026-08-07T15:18:44+02:00",
         "home_ft": 2,
         "away_ft": 0,
         "home_ht": 1,
@@ -10997,7 +10997,7 @@
         "market_calibration_weight": 0.12,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-07T13:53:46+02:00"
+      "settled_at": "2026-08-07T15:18:44+02:00"
     },
     "1530119": {
       "fixture_id": "1530119",
@@ -11010,7 +11010,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-07T13:53:46+02:00",
+        "settled_at": "2026-08-07T15:18:44+02:00",
         "home_ft": 2,
         "away_ft": 0,
         "home_ht": 2,
@@ -11053,7 +11053,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-08-07T13:53:46+02:00"
+      "settled_at": "2026-08-07T15:18:44+02:00"
     },
     "1530123": {
       "fixture_id": "1530123",
@@ -11066,7 +11066,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-07T13:53:46+02:00",
+        "settled_at": "2026-08-07T15:18:45+02:00",
         "home_ft": 5,
         "away_ft": 2,
         "home_ht": 4,
@@ -11109,26 +11109,362 @@
         "market_calibration_weight": 0.07,
         "outcome": "won"
       },
-      "settled_at": "2026-08-07T13:53:46+02:00"
+      "settled_at": "2026-08-07T15:18:45+02:00"
+    },
+    "1533758": {
+      "fixture_id": "1533758",
+      "date": "2026-08-07",
+      "time": "12:00",
+      "match": "Incheon Red Angels W - Gumi Sportstoto W",
+      "league": "WK-League",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-07T15:18:45+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.7,
+        "probability_pct": 63.39,
+        "probability_raw_pct": 63.98,
+        "expected_value_pct": 7.763,
+        "relation": "model_only",
+        "ranking_score": 71.799,
+        "recommendation_score": 71.799,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 71.799,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 58.824,
+          "probability_pct": 63.39,
+          "raw_probability_pct": 63.98,
+          "expected_value_pct": 7.763,
+          "edge_over_break_even_pp": 4.566,
+          "book_disagreement_pp": 9.8,
+          "competition_quality_score": 64,
+          "bookmakers": 6,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-07T15:18:45+02:00"
+    },
+    "1510403": {
+      "fixture_id": "1510403",
+      "date": "2026-08-07",
+      "time": "13:00",
+      "match": "Asan Mugunghwa - Ansan Greeners",
+      "league": "K League 2",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-07T15:18:45+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.5,
+        "probability_pct": 66.72,
+        "probability_raw_pct": 67.29,
+        "expected_value_pct": 0.08,
+        "relation": "confirmed",
+        "ranking_score": 73.068,
+        "recommendation_score": 67.068,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 67.068,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 66.667,
+          "probability_pct": 66.72,
+          "raw_probability_pct": 67.29,
+          "expected_value_pct": 0.08,
+          "edge_over_break_even_pp": 0.053,
+          "book_disagreement_pp": 6.42,
+          "competition_quality_score": 64,
+          "bookmakers": 14,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-07T15:18:45+02:00"
+    },
+    "1510404": {
+      "fixture_id": "1510404",
+      "date": "2026-08-07",
+      "time": "13:00",
+      "match": "Gimpo Citizen - Cheongju",
+      "league": "K League 2",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-07T15:18:45+02:00",
+        "home_ft": 3,
+        "away_ft": 0,
+        "home_ht": 2,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.7,
+        "probability_pct": 66.53,
+        "probability_raw_pct": 67.7,
+        "expected_value_pct": 13.101,
+        "relation": "confirmed",
+        "ranking_score": 96.998,
+        "recommendation_score": 90.998,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 90.998,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 58.824,
+          "probability_pct": 66.53,
+          "raw_probability_pct": 67.7,
+          "expected_value_pct": 13.101,
+          "edge_over_break_even_pp": 7.706,
+          "book_disagreement_pp": 13.03,
+          "competition_quality_score": 64,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-07T15:18:45+02:00"
+    },
+    "1510405": {
+      "fixture_id": "1510405",
+      "date": "2026-08-07",
+      "time": "13:00",
+      "match": "Gyeongnam FC - Daegu FC",
+      "league": "K League 2",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-07T15:18:45+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.71,
+        "probability_pct": 66.96,
+        "probability_raw_pct": 68.23,
+        "expected_value_pct": 14.502,
+        "relation": "confirmed",
+        "ranking_score": 95.785,
+        "recommendation_score": 89.785,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 89.785,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 58.48,
+          "probability_pct": 66.96,
+          "raw_probability_pct": 68.23,
+          "expected_value_pct": 14.502,
+          "edge_over_break_even_pp": 8.48,
+          "book_disagreement_pp": 14.07,
+          "competition_quality_score": 64,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-07T15:18:45+02:00"
+    },
+    "1510406": {
+      "fixture_id": "1510406",
+      "date": "2026-08-07",
+      "time": "13:00",
+      "match": "Hwaseong - Seoul E-Land FC",
+      "league": "K League 2",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-07T15:18:45+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.7,
+        "probability_pct": 70.83,
+        "probability_raw_pct": 72.61,
+        "expected_value_pct": 20.411,
+        "relation": "confirmed",
+        "ranking_score": 91.41,
+        "recommendation_score": 85.41,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 85.41,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 58.824,
+          "probability_pct": 70.83,
+          "raw_probability_pct": 72.61,
+          "expected_value_pct": 20.411,
+          "edge_over_break_even_pp": 12.006,
+          "book_disagreement_pp": 17.82,
+          "competition_quality_score": 64,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-07T15:18:45+02:00"
+    },
+    "1510407": {
+      "fixture_id": "1510407",
+      "date": "2026-08-07",
+      "time": "13:00",
+      "match": "Suwon Bluewings - Gimhae City",
+      "league": "K League 2",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-07T15:18:45+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.15,
+        "probability_pct": 59.87,
+        "probability_raw_pct": 61.5,
+        "expected_value_pct": 28.72,
+        "relation": "confirmed",
+        "ranking_score": 87.194,
+        "recommendation_score": 81.194,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 81.194,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 46.512,
+          "probability_pct": 59.87,
+          "raw_probability_pct": 61.5,
+          "expected_value_pct": 28.72,
+          "edge_over_break_even_pp": 13.358,
+          "book_disagreement_pp": 18.08,
+          "competition_quality_score": 64,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-07T15:18:45+02:00"
     }
   },
   "summary": {
-    "settled_primary": 208,
-    "wins": 120,
-    "losses": 88,
-    "win_rate_pct": 57.692,
+    "settled_primary": 214,
+    "wins": 122,
+    "losses": 92,
+    "win_rate_pct": 57.009,
     "by_market": {
       "1x2_ft": {
-        "settled": 87,
+        "settled": 88,
         "wins": 49,
-        "losses": 38,
-        "win_rate_pct": 56.322
+        "losses": 39,
+        "win_rate_pct": 55.682
       },
       "over25_ft": {
-        "settled": 109,
-        "wins": 67,
-        "losses": 42,
-        "win_rate_pct": 61.468
+        "settled": 114,
+        "wins": 69,
+        "losses": 45,
+        "win_rate_pct": 60.526
       },
       "over15_ht": {
         "settled": 6,
@@ -11151,22 +11487,22 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 101,
-        "wins": 62,
+        "settled": 102,
+        "wins": 63,
         "losses": 39,
-        "win_rate_pct": 61.386
+        "win_rate_pct": 61.765
       },
       "A": {
-        "settled": 68,
-        "wins": 36,
-        "losses": 32,
-        "win_rate_pct": 52.941
+        "settled": 72,
+        "wins": 37,
+        "losses": 35,
+        "win_rate_pct": 51.389
       },
       "C": {
-        "settled": 34,
+        "settled": 35,
         "wins": 18,
-        "losses": 16,
-        "win_rate_pct": 52.941
+        "losses": 17,
+        "win_rate_pct": 51.429
       }
     }
   }
