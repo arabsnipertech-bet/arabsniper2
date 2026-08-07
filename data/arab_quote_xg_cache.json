@@ -3310,20 +3310,26 @@
     "1549570": {
       "fixture_id": "1549570",
       "available": false,
+      "shots_available": false,
       "home_xg": null,
       "away_xg": null,
-      "source": "api_no_xg",
-      "checked_at": "2026-07-29T03:25:23+02:00",
-      "raw_team_types": {}
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:15+02:00",
+      "stats_schema": 2
     },
     "1545505": {
       "fixture_id": "1545505",
       "available": false,
+      "shots_available": false,
       "home_xg": null,
       "away_xg": null,
-      "source": "api_no_xg",
-      "checked_at": "2026-07-29T03:25:23+02:00",
-      "raw_team_types": {}
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:16+02:00",
+      "stats_schema": 2
     },
     "1545290": {
       "fixture_id": "1545290",
@@ -6648,8 +6654,488 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-08-06T03:24:44+02:00",
       "stats_schema": 2
+    },
+    "1549578": {
+      "fixture_id": "1549578",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:14+02:00",
+      "stats_schema": 2
+    },
+    "1549567": {
+      "fixture_id": "1549567",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:15+02:00",
+      "stats_schema": 2
+    },
+    "1544278": {
+      "fixture_id": "1544278",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:15+02:00",
+      "stats_schema": 2
+    },
+    "1544273": {
+      "fixture_id": "1544273",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:15+02:00",
+      "stats_schema": 2
+    },
+    "1549572": {
+      "fixture_id": "1549572",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:15+02:00",
+      "stats_schema": 2
+    },
+    "1545518": {
+      "fixture_id": "1545518",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:15+02:00",
+      "stats_schema": 2
+    },
+    "1550919": {
+      "fixture_id": "1550919",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.7,
+      "away_xg": 1.72,
+      "home_stats": {
+        "team_id": 2287,
+        "team_name": "Club America",
+        "xg": 1.7,
+        "shots_on_target": 6.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2285,
+        "team_name": "Santos Laguna",
+        "xg": 1.72,
+        "shots_on_target": 6.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:16+02:00",
+      "stats_schema": 2
+    },
+    "1550902": {
+      "fixture_id": "1550902",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.93,
+      "away_xg": 1.73,
+      "home_stats": {
+        "team_id": 2290,
+        "team_name": "Club Queretaro",
+        "xg": 0.93,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2287,
+        "team_name": "Club America",
+        "xg": 1.73,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:16+02:00",
+      "stats_schema": 2
+    },
+    "1542919": {
+      "fixture_id": "1542919",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.26,
+      "away_xg": 2.41,
+      "home_stats": {
+        "team_id": 2286,
+        "team_name": "U.N.A.M. - Pumas",
+        "xg": 1.26,
+        "shots_on_target": 5.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2287,
+        "team_name": "Club America",
+        "xg": 2.41,
+        "shots_on_target": 6.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:17+02:00",
+      "stats_schema": 2
+    },
+    "1490370": {
+      "fixture_id": "1490370",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.92,
+      "away_xg": 1.47,
+      "home_stats": {
+        "team_id": 1612,
+        "team_name": "Minnesota United FC",
+        "xg": 0.92,
+        "shots_on_target": 8.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 25484,
+        "team_name": "San Diego",
+        "xg": 1.47,
+        "shots_on_target": 2.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:17+02:00",
+      "stats_schema": 2
+    },
+    "1490357": {
+      "fixture_id": "1490357",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.29,
+      "away_xg": 0.48,
+      "home_stats": {
+        "team_id": 25484,
+        "team_name": "San Diego",
+        "xg": 1.29,
+        "shots_on_target": 8.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1597,
+        "team_name": "FC Dallas",
+        "xg": 0.48,
+        "shots_on_target": 1.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:17+02:00",
+      "stats_schema": 2
+    },
+    "1490341": {
+      "fixture_id": "1490341",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.47,
+      "away_xg": 0.78,
+      "home_stats": {
+        "team_id": 1610,
+        "team_name": "Colorado Rapids",
+        "xg": 0.47,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 25484,
+        "team_name": "San Diego",
+        "xg": 0.78,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:17+02:00",
+      "stats_schema": 2
+    },
+    "1490345": {
+      "fixture_id": "1490345",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.4,
+      "away_xg": 1.01,
+      "home_stats": {
+        "team_id": 1617,
+        "team_name": "Portland Timbers",
+        "xg": 2.4,
+        "shots_on_target": 4.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1597,
+        "team_name": "FC Dallas",
+        "xg": 1.01,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:18+02:00",
+      "stats_schema": 2
+    },
+    "1550912": {
+      "fixture_id": "1550912",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.59,
+      "away_xg": 1.86,
+      "home_stats": {
+        "team_id": 2291,
+        "team_name": "Puebla",
+        "xg": 0.59,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2278,
+        "team_name": "Guadalajara Chivas",
+        "xg": 1.86,
+        "shots_on_target": 8.0,
+        "total_shots": 24.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:18+02:00",
+      "stats_schema": 2
+    },
+    "1550903": {
+      "fixture_id": "1550903",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.38,
+      "away_xg": 0.9,
+      "home_stats": {
+        "team_id": 2295,
+        "team_name": "Cruz Azul",
+        "xg": 1.38,
+        "shots_on_target": 7.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2291,
+        "team_name": "Puebla",
+        "xg": 0.9,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:18+02:00",
+      "stats_schema": 2
+    },
+    "1550898": {
+      "fixture_id": "1550898",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.86,
+      "away_xg": 1.22,
+      "home_stats": {
+        "team_id": 2298,
+        "team_name": "FC Juarez",
+        "xg": 0.86,
+        "shots_on_target": 1.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2291,
+        "team_name": "Puebla",
+        "xg": 1.22,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:18+02:00",
+      "stats_schema": 2
+    },
+    "1492607": {
+      "fixture_id": "1492607",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.87,
+      "away_xg": 2.95,
+      "home_stats": {
+        "team_id": 2291,
+        "team_name": "Puebla",
+        "xg": 0.87,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2290,
+        "team_name": "Club Queretaro",
+        "xg": 2.95,
+        "shots_on_target": 6.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:19+02:00",
+      "stats_schema": 2
+    },
+    "1548336": {
+      "fixture_id": "1548336",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-07T04:04:19+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-08-06T03:31:09+02:00",
+  "updated_at": "2026-08-07T04:10:59+02:00",
   "runtime_calls_last_run": 20
 }
