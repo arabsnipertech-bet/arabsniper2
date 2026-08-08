@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-08T11:47:02+02:00",
+  "updated_at": "2026-08-08T12:43:06+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -13698,7 +13698,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-08T11:46:57+02:00",
+        "settled_at": "2026-08-08T12:43:00+02:00",
         "home_ft": 0,
         "away_ft": 5,
         "home_ht": 0,
@@ -13741,7 +13741,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-08T11:46:57+02:00"
+      "settled_at": "2026-08-08T12:43:00+02:00"
     },
     "1530127": {
       "fixture_id": "1530127",
@@ -13754,7 +13754,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "PEN",
-        "settled_at": "2026-08-08T11:46:57+02:00",
+        "settled_at": "2026-08-08T12:43:00+02:00",
         "home_ft": 0,
         "away_ft": 0,
         "home_ht": 0,
@@ -13797,7 +13797,7 @@
         "market_calibration_weight": 0.07,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-08T11:46:57+02:00"
+      "settled_at": "2026-08-08T12:43:00+02:00"
     },
     "1603309": {
       "fixture_id": "1603309",
@@ -13810,7 +13810,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-08T11:46:57+02:00",
+        "settled_at": "2026-08-08T12:43:00+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 1,
@@ -13853,14 +13853,238 @@
         "market_calibration_weight": 0.04,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-08T11:46:57+02:00"
+      "settled_at": "2026-08-08T12:43:00+02:00"
+    },
+    "1602423": {
+      "fixture_id": "1602423",
+      "date": "2026-08-08",
+      "time": "10:00",
+      "match": "ASA Targu Mures - Cetatea Suceava",
+      "league": "Liga II",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-08T12:43:00+02:00",
+        "home_ft": 0,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.54,
+        "probability_pct": 79.06,
+        "probability_raw_pct": 81.19,
+        "expected_value_pct": 21.752,
+        "relation": "confirmed",
+        "ranking_score": 81.253,
+        "recommendation_score": 75.253,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 75.253,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 64.935,
+          "probability_pct": 79.06,
+          "raw_probability_pct": 81.19,
+          "expected_value_pct": 21.752,
+          "edge_over_break_even_pp": 14.125,
+          "book_disagreement_pp": 21.29,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-08T12:43:00+02:00"
+    },
+    "1610562": {
+      "fixture_id": "1610562",
+      "date": "2026-08-08",
+      "time": "10:00",
+      "match": "CSM Satu Mare - CSM Reşiţa",
+      "league": "Liga II",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-08T12:43:00+02:00",
+        "home_ft": 0,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.93,
+        "probability_pct": 60.9,
+        "probability_raw_pct": 62.32,
+        "expected_value_pct": 17.537,
+        "relation": "contrast",
+        "ranking_score": 76.29,
+        "recommendation_score": 76.29,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 76.29,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 51.813,
+          "probability_pct": 60.9,
+          "raw_probability_pct": 62.32,
+          "expected_value_pct": 17.537,
+          "edge_over_break_even_pp": 9.087,
+          "book_disagreement_pp": 14.2,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-08T12:43:00+02:00"
+    },
+    "1602421": {
+      "fixture_id": "1602421",
+      "date": "2026-08-08",
+      "time": "10:00",
+      "match": "Concordia - Bihor Oradea",
+      "league": "Liga II",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-08T12:43:00+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.85,
+        "probability_pct": 59.72,
+        "probability_raw_pct": 60.8,
+        "expected_value_pct": 10.482,
+        "relation": "confirmed",
+        "ranking_score": 89.21,
+        "recommendation_score": 83.21,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 83.21,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 54.054,
+          "probability_pct": 59.72,
+          "raw_probability_pct": 60.8,
+          "expected_value_pct": 10.482,
+          "edge_over_break_even_pp": 5.666,
+          "book_disagreement_pp": 10.8,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-08T12:43:00+02:00"
+    },
+    "1579069": {
+      "fixture_id": "1579069",
+      "date": "2026-08-08",
+      "time": "10:15",
+      "match": "Kuřim - Chotebor",
+      "league": "4. liga - Divizie D",
+      "country": "Czech-Republic",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-08T12:43:00+02:00",
+        "home_ft": 8,
+        "away_ft": 1,
+        "home_ht": 3,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.535,
+        "probability_pct": 71.39,
+        "probability_raw_pct": 72.12,
+        "expected_value_pct": 9.584,
+        "relation": "model_only",
+        "ranking_score": 71.32,
+        "recommendation_score": 71.32,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 71.32,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 65.147,
+          "probability_pct": 71.39,
+          "raw_probability_pct": 72.12,
+          "expected_value_pct": 9.584,
+          "edge_over_break_even_pp": 6.243,
+          "book_disagreement_pp": 12.15,
+          "competition_quality_score": 68,
+          "bookmakers": 4,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-08T12:43:00+02:00"
     }
   },
   "summary": {
-    "settled_primary": 257,
-    "wins": 146,
-    "losses": 111,
-    "win_rate_pct": 56.809,
+    "settled_primary": 261,
+    "wins": 147,
+    "losses": 114,
+    "win_rate_pct": 56.322,
     "by_market": {
       "1x2_ft": {
         "settled": 104,
@@ -13869,10 +14093,10 @@
         "win_rate_pct": 51.923
       },
       "over25_ft": {
-        "settled": 139,
-        "wins": 88,
-        "losses": 51,
-        "win_rate_pct": 63.309
+        "settled": 143,
+        "wins": 89,
+        "losses": 54,
+        "win_rate_pct": 62.238
       },
       "over15_ht": {
         "settled": 6,
@@ -13895,16 +14119,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 127,
-        "wins": 75,
-        "losses": 52,
-        "win_rate_pct": 59.055
+        "settled": 130,
+        "wins": 76,
+        "losses": 54,
+        "win_rate_pct": 58.462
       },
       "A": {
-        "settled": 81,
+        "settled": 82,
         "wins": 42,
-        "losses": 39,
-        "win_rate_pct": 51.852
+        "losses": 40,
+        "win_rate_pct": 51.22
       },
       "C": {
         "settled": 44,
