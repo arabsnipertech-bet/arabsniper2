@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-08T02:56:14+02:00",
+  "updated_at": "2026-08-08T07:07:54+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -13686,19 +13686,187 @@
         "outcome": "lost"
       },
       "settled_at": "2026-08-07T23:46:05+02:00"
+    },
+    "1581385": {
+      "fixture_id": "1581385",
+      "date": "2026-08-08",
+      "time": "03:00",
+      "match": "Tepatitlán - CA La Paz",
+      "league": "Liga de Expansión MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-08T07:07:49+02:00",
+        "home_ft": 0,
+        "away_ft": 5,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.1,
+        "probability_pct": 61.98,
+        "probability_raw_pct": 64.03,
+        "expected_value_pct": 30.158,
+        "relation": "contrast",
+        "ranking_score": 76.087,
+        "recommendation_score": 76.087,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 76.087,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 47.619,
+          "probability_pct": 61.98,
+          "raw_probability_pct": 64.03,
+          "expected_value_pct": 30.158,
+          "edge_over_break_even_pp": 14.361,
+          "book_disagreement_pp": 20.46,
+          "competition_quality_score": 84,
+          "bookmakers": 14,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-08T07:07:49+02:00"
+    },
+    "1530127": {
+      "fixture_id": "1530127",
+      "date": "2026-08-08",
+      "time": "03:00",
+      "match": "Tigres UANL - Minnesota United FC",
+      "league": "Leagues Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "PEN",
+        "settled_at": "2026-08-08T07:07:49+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "gg_ht",
+        "selection": "yes",
+        "odd": 3.9,
+        "probability_pct": 32.12,
+        "probability_raw_pct": 32.74,
+        "expected_value_pct": 25.268,
+        "relation": "contrast",
+        "ranking_score": 88.304,
+        "recommendation_score": 83.304,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 83.304,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 12.0,
+          "market_break_even_pct": 25.641,
+          "probability_pct": 32.12,
+          "raw_probability_pct": 32.74,
+          "expected_value_pct": 25.268,
+          "edge_over_break_even_pp": 6.479,
+          "book_disagreement_pp": 8.91,
+          "competition_quality_score": 88,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.07,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-08T07:07:49+02:00"
+    },
+    "1603309": {
+      "fixture_id": "1603309",
+      "date": "2026-08-08",
+      "time": "03:06",
+      "match": "Atlas W - Pachuca W",
+      "league": "Liga MX Femenil",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-08T07:07:49+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "gg_ht",
+        "selection": "yes",
+        "odd": 4.0,
+        "probability_pct": 31.97,
+        "probability_raw_pct": 32.34,
+        "expected_value_pct": 27.88,
+        "relation": "contrast",
+        "ranking_score": 81.183,
+        "recommendation_score": 76.183,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 76.183,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 12.0,
+          "market_break_even_pct": 25.0,
+          "probability_pct": 31.97,
+          "raw_probability_pct": 32.34,
+          "expected_value_pct": 27.88,
+          "edge_over_break_even_pp": 6.97,
+          "book_disagreement_pp": 9.26,
+          "competition_quality_score": 84,
+          "bookmakers": 3,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.04,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-08T07:07:49+02:00"
     }
   },
   "summary": {
-    "settled_primary": 254,
+    "settled_primary": 257,
     "wins": 146,
-    "losses": 108,
-    "win_rate_pct": 57.48,
+    "losses": 111,
+    "win_rate_pct": 56.809,
     "by_market": {
       "1x2_ft": {
-        "settled": 103,
+        "settled": 104,
         "wins": 54,
-        "losses": 49,
-        "win_rate_pct": 52.427
+        "losses": 50,
+        "win_rate_pct": 51.923
       },
       "over25_ft": {
         "settled": 139,
@@ -13713,10 +13881,10 @@
         "win_rate_pct": 33.333
       },
       "gg_ht": {
-        "settled": 6,
+        "settled": 8,
         "wins": 2,
-        "losses": 4,
-        "win_rate_pct": 33.333
+        "losses": 6,
+        "win_rate_pct": 25.0
       }
     },
     "by_grade": {
@@ -13727,16 +13895,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 125,
+        "settled": 127,
         "wins": 75,
-        "losses": 50,
-        "win_rate_pct": 60.0
+        "losses": 52,
+        "win_rate_pct": 59.055
       },
       "A": {
-        "settled": 80,
+        "settled": 81,
         "wins": 42,
-        "losses": 38,
-        "win_rate_pct": 52.5
+        "losses": 39,
+        "win_rate_pct": 51.852
       },
       "C": {
         "settled": 44,
