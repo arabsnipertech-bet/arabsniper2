@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-11T13:49:36+02:00",
+  "updated_at": "2026-08-11T15:19:55+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -25334,13 +25334,69 @@
         "outcome": "lost"
       },
       "settled_at": "2026-08-10T23:49:30+02:00"
+    },
+    "1567328": {
+      "fixture_id": "1567328",
+      "date": "2026-08-11",
+      "time": "12:30",
+      "match": "Gangwon FC - Gamba Osaka",
+      "league": "AFC Champions League Elite",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "AET",
+        "settled_at": "2026-08-11T15:19:53+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 2.1,
+        "probability_pct": 54.14,
+        "probability_raw_pct": 55.3,
+        "expected_value_pct": 13.694,
+        "relation": "contrast",
+        "ranking_score": 67.589,
+        "recommendation_score": 67.589,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 67.589,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 47.619,
+          "probability_pct": 54.14,
+          "raw_probability_pct": 55.3,
+          "expected_value_pct": 13.694,
+          "edge_over_break_even_pp": 6.521,
+          "book_disagreement_pp": 10.56,
+          "competition_quality_score": 88,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-11T15:19:53+02:00"
     }
   },
   "summary": {
-    "settled_primary": 462,
+    "settled_primary": 463,
     "wins": 249,
-    "losses": 213,
-    "win_rate_pct": 53.896,
+    "losses": 214,
+    "win_rate_pct": 53.78,
     "by_market": {
       "1x2_ft": {
         "settled": 178,
@@ -25349,10 +25405,10 @@
         "win_rate_pct": 52.247
       },
       "over25_ft": {
-        "settled": 266,
+        "settled": 267,
         "wins": 150,
-        "losses": 116,
-        "win_rate_pct": 56.391
+        "losses": 117,
+        "win_rate_pct": 56.18
       },
       "over15_ht": {
         "settled": 10,
@@ -25387,10 +25443,10 @@
         "win_rate_pct": 54.422
       },
       "C": {
-        "settled": 101,
+        "settled": 102,
         "wins": 46,
-        "losses": 55,
-        "win_rate_pct": 45.545
+        "losses": 56,
+        "win_rate_pct": 45.098
       }
     }
   }
