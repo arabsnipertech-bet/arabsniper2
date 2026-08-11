@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-11T17:04:55+02:00",
+  "updated_at": "2026-08-11T19:03:32+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -25346,7 +25346,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "AET",
-        "settled_at": "2026-08-11T17:04:54+02:00",
+        "settled_at": "2026-08-11T19:03:31+02:00",
         "home_ft": 0,
         "away_ft": 0,
         "home_ht": 0,
@@ -25389,26 +25389,194 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-11T17:04:54+02:00"
+      "settled_at": "2026-08-11T19:03:31+02:00"
+    },
+    "1571503": {
+      "fixture_id": "1571503",
+      "date": "2026-08-11",
+      "time": "17:00",
+      "match": "CSKA Sofia II - Hebar 1918",
+      "league": "Second League",
+      "country": "Bulgaria",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-11T19:03:31+02:00",
+        "home_ft": 4,
+        "away_ft": 3,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.86,
+        "probability_pct": 59.33,
+        "probability_raw_pct": 60.43,
+        "expected_value_pct": 10.354,
+        "relation": "contrast",
+        "ranking_score": 71.955,
+        "recommendation_score": 71.955,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 71.955,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 53.763,
+          "probability_pct": 59.33,
+          "raw_probability_pct": 60.43,
+          "expected_value_pct": 10.354,
+          "edge_over_break_even_pp": 5.567,
+          "book_disagreement_pp": 12.26,
+          "competition_quality_score": 68,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-11T19:03:31+02:00"
+    },
+    "1513279": {
+      "fixture_id": "1513279",
+      "date": "2026-08-11",
+      "time": "17:00",
+      "match": "New York City II - Orlando City II",
+      "league": "MLS Next Pro",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-11T19:03:31+02:00",
+        "home_ft": 3,
+        "away_ft": 0,
+        "home_ht": 2,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.365,
+        "probability_pct": 76.53,
+        "probability_raw_pct": 77.22,
+        "expected_value_pct": 4.463,
+        "relation": "confirmed",
+        "ranking_score": 88.852,
+        "recommendation_score": 82.852,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 82.852,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 73.26,
+          "probability_pct": 76.53,
+          "raw_probability_pct": 77.22,
+          "expected_value_pct": 4.463,
+          "edge_over_break_even_pp": 3.27,
+          "book_disagreement_pp": 9.91,
+          "competition_quality_score": 84,
+          "bookmakers": 6,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.07,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-11T19:03:31+02:00"
+    },
+    "1610812": {
+      "fixture_id": "1610812",
+      "date": "2026-08-11",
+      "time": "17:00",
+      "match": "Trikala - Larisa",
+      "league": "Cup",
+      "country": "Greece",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-11T19:03:31+02:00",
+        "home_ft": 0,
+        "away_ft": 4,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.85,
+        "probability_pct": 65.07,
+        "probability_raw_pct": 66.56,
+        "expected_value_pct": 20.379,
+        "relation": "confirmed",
+        "ranking_score": 89.223,
+        "recommendation_score": 83.223,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 83.223,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 54.054,
+          "probability_pct": 65.07,
+          "raw_probability_pct": 66.56,
+          "expected_value_pct": 20.379,
+          "edge_over_break_even_pp": 11.016,
+          "book_disagreement_pp": 16.56,
+          "competition_quality_score": 68,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-11T19:03:31+02:00"
     }
   },
   "summary": {
-    "settled_primary": 463,
-    "wins": 249,
-    "losses": 214,
-    "win_rate_pct": 53.78,
+    "settled_primary": 466,
+    "wins": 251,
+    "losses": 215,
+    "win_rate_pct": 53.863,
     "by_market": {
       "1x2_ft": {
-        "settled": 178,
-        "wins": 93,
+        "settled": 179,
+        "wins": 94,
         "losses": 85,
-        "win_rate_pct": 52.247
+        "win_rate_pct": 52.514
       },
       "over25_ft": {
-        "settled": 267,
-        "wins": 150,
-        "losses": 117,
-        "win_rate_pct": 56.18
+        "settled": 269,
+        "wins": 151,
+        "losses": 118,
+        "win_rate_pct": 56.134
       },
       "over15_ht": {
         "settled": 10,
@@ -25431,16 +25599,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 209,
-        "wins": 119,
+        "settled": 210,
+        "wins": 120,
         "losses": 90,
-        "win_rate_pct": 56.938
+        "win_rate_pct": 57.143
       },
       "A": {
-        "settled": 147,
-        "wins": 80,
-        "losses": 67,
-        "win_rate_pct": 54.422
+        "settled": 149,
+        "wins": 81,
+        "losses": 68,
+        "win_rate_pct": 54.362
       },
       "C": {
         "settled": 102,
