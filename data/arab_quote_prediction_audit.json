@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-12T03:10:51+02:00",
+  "updated_at": "2026-08-12T07:42:28+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -26118,13 +26118,125 @@
         "outcome": "won"
       },
       "settled_at": "2026-08-11T23:55:39+02:00"
+    },
+    "1530146": {
+      "fixture_id": "1530146",
+      "date": "2026-08-12",
+      "time": "03:30",
+      "match": "Real Salt Lake - FC Juarez",
+      "league": "Leagues Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-12T07:42:27+02:00",
+        "home_ft": 3,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.19,
+        "probability_pct": 46.99,
+        "probability_raw_pct": 47.42,
+        "expected_value_pct": 2.908,
+        "relation": "confirmed",
+        "ranking_score": 90.169,
+        "recommendation_score": 79.169,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 79.169,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 45.662,
+          "probability_pct": 46.99,
+          "raw_probability_pct": 47.42,
+          "expected_value_pct": 2.908,
+          "edge_over_break_even_pp": 1.328,
+          "book_disagreement_pp": 4.75,
+          "competition_quality_score": 88,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-12T07:42:27+02:00"
+    },
+    "1530147": {
+      "fixture_id": "1530147",
+      "date": "2026-08-12",
+      "time": "04:00",
+      "match": "Tigres UANL - Vancouver Whitecaps",
+      "league": "Leagues Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "PEN",
+        "settled_at": "2026-08-12T07:42:27+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.25,
+        "probability_pct": 49.3,
+        "probability_raw_pct": 50.08,
+        "expected_value_pct": 10.925,
+        "relation": "confirmed",
+        "ranking_score": 102.075,
+        "recommendation_score": 91.075,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 91.075,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 44.444,
+          "probability_pct": 49.3,
+          "raw_probability_pct": 50.08,
+          "expected_value_pct": 10.925,
+          "edge_over_break_even_pp": 4.856,
+          "book_disagreement_pp": 8.67,
+          "competition_quality_score": 88,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-12T07:42:27+02:00"
     }
   },
   "summary": {
-    "settled_primary": 476,
+    "settled_primary": 478,
     "wins": 258,
-    "losses": 218,
-    "win_rate_pct": 54.202,
+    "losses": 220,
+    "win_rate_pct": 53.975,
     "by_market": {
       "1x2_ft": {
         "settled": 182,
@@ -26139,10 +26251,10 @@
         "win_rate_pct": 56.884
       },
       "over15_ht": {
-        "settled": 10,
+        "settled": 12,
         "wins": 4,
-        "losses": 6,
-        "win_rate_pct": 40.0
+        "losses": 8,
+        "win_rate_pct": 33.333
       },
       "gg_ht": {
         "settled": 8,
@@ -26165,10 +26277,10 @@
         "win_rate_pct": 57.477
       },
       "A": {
-        "settled": 154,
+        "settled": 156,
         "wins": 84,
-        "losses": 70,
-        "win_rate_pct": 54.545
+        "losses": 72,
+        "win_rate_pct": 53.846
       },
       "C": {
         "settled": 103,
