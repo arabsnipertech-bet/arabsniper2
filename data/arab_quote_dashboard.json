@@ -1,13 +1,13 @@
 {
   "engine": "ArabSniper Quote Engine",
   "version": "1.1.4",
-  "generated_at": "2026-08-12T17:03:46+02:00",
+  "generated_at": "2026-08-12T19:02:19+02:00",
   "timezone": "Europe/Rome",
   "days": [
     {
       "day": 1,
       "date": "2026-08-12",
-      "updated_at": "2026-08-12T17:03:45+02:00",
+      "updated_at": "2026-08-12T19:02:18+02:00",
       "matches": [
         {
           "fixture": {
@@ -33,7 +33,7 @@
             "competition_reason": "major_international",
             "data_freshness": "preserved",
             "preserved_reason": "fixture_pst",
-            "preserved_at": "2026-08-12T17:03:45+02:00"
+            "preserved_at": "2026-08-12T19:02:18+02:00"
           },
           "display": {
             "primary_choice": null,
@@ -4582,10 +4582,10 @@
             "competition_reason": "major_international",
             "data_freshness": "preserved",
             "preserved_reason": "fixture_ft",
-            "preserved_at": "2026-08-12T17:03:45+02:00",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
             "result": {
               "status": "FT",
-              "settled_at": "2026-08-12T17:03:45+02:00",
+              "settled_at": "2026-08-12T19:02:18+02:00",
               "home_ft": 3,
               "away_ft": 0,
               "home_ht": 1,
@@ -9097,7 +9097,7 @@
           "prediction_audit": {
             "result": {
               "status": "FT",
-              "settled_at": "2026-08-12T17:03:45+02:00",
+              "settled_at": "2026-08-12T19:02:18+02:00",
               "home_ft": 3,
               "away_ft": 0,
               "home_ht": 1,
@@ -9242,10 +9242,10 @@
             "competition_reason": "major_international",
             "data_freshness": "preserved",
             "preserved_reason": "fixture_pen",
-            "preserved_at": "2026-08-12T17:03:45+02:00",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
             "result": {
               "status": "PEN",
-              "settled_at": "2026-08-12T17:03:45+02:00",
+              "settled_at": "2026-08-12T19:02:18+02:00",
               "home_ft": 1,
               "away_ft": 1,
               "home_ht": 1,
@@ -13930,7 +13930,7 @@
           "prediction_audit": {
             "result": {
               "status": "PEN",
-              "settled_at": "2026-08-12T17:03:45+02:00",
+              "settled_at": "2026-08-12T19:02:18+02:00",
               "home_ft": 1,
               "away_ft": 1,
               "home_ht": 1,
@@ -14062,9 +14062,9 @@
             "country": "Romania",
             "season": 2026,
             "round": "Semi-finals",
-            "status_short": "1H",
-            "status_long": "First Half",
-            "elapsed": 35,
+            "status_short": "FT",
+            "status_long": "Match Finished",
+            "elapsed": 90,
             "home_id": 6841,
             "home": "Agricola Borcea",
             "away_id": 6916,
@@ -14074,8 +14074,16 @@
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
             "data_freshness": "preserved",
-            "preserved_reason": "fixture_1h",
-            "preserved_at": "2026-08-12T17:03:45+02:00"
+            "preserved_reason": "fixture_ft",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 1,
+              "away_ft": 4,
+              "home_ht": 1,
+              "away_ht": 1
+            }
           },
           "display": {
             "primary_choice": null,
@@ -17961,6 +17969,18 @@
             "accepted_sources": [],
             "maximum_model_weight": 0.05,
             "policy": "solo fonti con almeno 100 pronostici e Brier <= 0.24"
+          },
+          "prediction_audit": {
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 1,
+              "away_ft": 4,
+              "home_ht": 1,
+              "away_ht": 1
+            },
+            "primary": null,
+            "ranked": []
           }
         },
         {
@@ -17974,9 +17994,9 @@
             "country": "Romania",
             "season": 2026,
             "round": "Semi-finals",
-            "status_short": "1H",
-            "status_long": "First Half",
-            "elapsed": 15,
+            "status_short": "FT",
+            "status_long": "Match Finished",
+            "elapsed": 90,
             "home_id": 24839,
             "home": "Baicoi",
             "away_id": 6875,
@@ -17986,8 +18006,16 @@
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
             "data_freshness": "preserved",
-            "preserved_reason": "fixture_1h",
-            "preserved_at": "2026-08-12T17:03:45+02:00"
+            "preserved_reason": "fixture_ft",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 2,
+              "away_ft": 4,
+              "home_ht": 1,
+              "away_ht": 2
+            }
           },
           "display": {
             "primary_choice": null,
@@ -21932,6 +21960,18 @@
             "accepted_sources": [],
             "maximum_model_weight": 0.05,
             "policy": "solo fonti con almeno 100 pronostici e Brier <= 0.24"
+          },
+          "prediction_audit": {
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 2,
+              "away_ft": 4,
+              "home_ht": 1,
+              "away_ht": 2
+            },
+            "primary": null,
+            "ranked": []
           }
         },
         {
@@ -21945,9 +21985,9 @@
             "country": "Romania",
             "season": 2026,
             "round": "Semi-finals",
-            "status_short": "1H",
-            "status_long": "First Half",
-            "elapsed": 33,
+            "status_short": "FT",
+            "status_long": "Match Finished",
+            "elapsed": 90,
             "home_id": 21665,
             "home": "CSM Adjud",
             "away_id": 6899,
@@ -21957,8 +21997,16 @@
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
             "data_freshness": "preserved",
-            "preserved_reason": "fixture_1h",
-            "preserved_at": "2026-08-12T17:03:45+02:00"
+            "preserved_reason": "fixture_ft",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 2,
+              "away_ft": 4,
+              "home_ht": 0,
+              "away_ht": 2
+            }
           },
           "display": {
             "primary_choice": null,
@@ -26009,6 +26057,18 @@
             "accepted_sources": [],
             "maximum_model_weight": 0.05,
             "policy": "solo fonti con almeno 100 pronostici e Brier <= 0.24"
+          },
+          "prediction_audit": {
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 2,
+              "away_ft": 4,
+              "home_ht": 0,
+              "away_ht": 2
+            },
+            "primary": null,
+            "ranked": []
           }
         },
         {
@@ -26022,9 +26082,9 @@
             "country": "Romania",
             "season": 2026,
             "round": "Semi-finals",
-            "status_short": "NS",
-            "status_long": "Not Started",
-            "elapsed": null,
+            "status_short": "FT",
+            "status_long": "Match Finished",
+            "elapsed": 90,
             "home_id": 14582,
             "home": "Dunărea 2020 Giurgiu",
             "away_id": 7466,
@@ -26033,7 +26093,17 @@
             "competition_quality_score": 68,
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_ft",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 0,
+              "away_ft": 3,
+              "home_ht": 0,
+              "away_ht": 2
+            }
           },
           "display": {
             "primary_choice": null,
@@ -29731,6 +29801,18 @@
             "accepted_sources": [],
             "maximum_model_weight": 0.05,
             "policy": "solo fonti con almeno 100 pronostici e Brier <= 0.24"
+          },
+          "prediction_audit": {
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 0,
+              "away_ft": 3,
+              "home_ht": 0,
+              "away_ht": 2
+            },
+            "primary": null,
+            "ranked": []
           }
         },
         {
@@ -29744,9 +29826,9 @@
             "country": "Romania",
             "season": 2026,
             "round": "Semi-finals",
-            "status_short": "1H",
-            "status_long": "First Half",
-            "elapsed": 34,
+            "status_short": "FT",
+            "status_long": "Match Finished",
+            "elapsed": 90,
             "home_id": 24842,
             "home": "Timişul Şag",
             "away_id": 6229,
@@ -29756,8 +29838,16 @@
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
             "data_freshness": "preserved",
-            "preserved_reason": "fixture_1h",
-            "preserved_at": "2026-08-12T17:03:45+02:00"
+            "preserved_reason": "fixture_ft",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 1,
+              "away_ft": 3,
+              "home_ht": 1,
+              "away_ht": 1
+            }
           },
           "display": {
             "primary_choice": null,
@@ -33758,6 +33848,18 @@
             "accepted_sources": [],
             "maximum_model_weight": 0.05,
             "policy": "solo fonti con almeno 100 pronostici e Brier <= 0.24"
+          },
+          "prediction_audit": {
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 1,
+              "away_ft": 3,
+              "home_ht": 1,
+              "away_ht": 1
+            },
+            "primary": null,
+            "ranked": []
           }
         },
         {
@@ -33771,9 +33873,9 @@
             "country": "Romania",
             "season": 2026,
             "round": "Semi-finals",
-            "status_short": "1H",
-            "status_long": "First Half",
-            "elapsed": 32,
+            "status_short": "FT",
+            "status_long": "Match Finished",
+            "elapsed": 90,
             "home_id": 21678,
             "home": "USV Iaşi",
             "away_id": 26674,
@@ -33783,8 +33885,16 @@
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
             "data_freshness": "preserved",
-            "preserved_reason": "fixture_1h",
-            "preserved_at": "2026-08-12T17:03:45+02:00"
+            "preserved_reason": "fixture_ft",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 1,
+              "away_ft": 0,
+              "home_ht": 1,
+              "away_ht": 0
+            }
           },
           "display": {
             "primary_choice": null,
@@ -37851,6 +37961,18 @@
             "accepted_sources": [],
             "maximum_model_weight": 0.05,
             "policy": "solo fonti con almeno 100 pronostici e Brier <= 0.24"
+          },
+          "prediction_audit": {
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 1,
+              "away_ft": 0,
+              "home_ht": 1,
+              "away_ht": 0
+            },
+            "primary": null,
+            "ranked": []
           }
         },
         {
@@ -37864,9 +37986,9 @@
             "country": "Czech-Republic",
             "season": 2026,
             "round": "Round of 128",
-            "status_short": "1H",
-            "status_long": "First Half",
-            "elapsed": 2,
+            "status_short": "FT",
+            "status_long": "Match Finished",
+            "elapsed": 90,
             "home_id": 7279,
             "home": "Brumov",
             "away_id": 3716,
@@ -37876,8 +37998,16 @@
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
             "data_freshness": "preserved",
-            "preserved_reason": "fixture_1h",
-            "preserved_at": "2026-08-12T17:03:45+02:00"
+            "preserved_reason": "fixture_ft",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 0,
+              "away_ft": 4,
+              "home_ht": 0,
+              "away_ht": 1
+            }
           },
           "display": {
             "primary_choice": null,
@@ -41910,6 +42040,18 @@
             "accepted_sources": [],
             "maximum_model_weight": 0.05,
             "policy": "solo fonti con almeno 100 pronostici e Brier <= 0.24"
+          },
+          "prediction_audit": {
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 0,
+              "away_ft": 4,
+              "home_ht": 0,
+              "away_ht": 1
+            },
+            "primary": null,
+            "ranked": []
           }
         },
         {
@@ -41923,8 +42065,8 @@
             "country": "Czech-Republic",
             "season": 2026,
             "round": "Round of 128",
-            "status_short": "NS",
-            "status_long": "Not Started",
+            "status_short": "P",
+            "status_long": "Penalty in progress",
             "elapsed": null,
             "home_id": 19421,
             "home": "Břidličná",
@@ -41934,7 +42076,9 @@
             "competition_quality_score": 68,
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_p",
+            "preserved_at": "2026-08-12T19:02:18+02:00"
           },
           "display": {
             "primary_choice": null,
@@ -44853,9 +44997,9 @@
             "country": "Czech-Republic",
             "season": 2026,
             "round": "Round of 128",
-            "status_short": "1H",
-            "status_long": "First Half",
-            "elapsed": 3,
+            "status_short": "FT",
+            "status_long": "Match Finished",
+            "elapsed": 90,
             "home_id": 7292,
             "home": "Havlíčkův Brod",
             "away_id": 3731,
@@ -44865,8 +45009,16 @@
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
             "data_freshness": "preserved",
-            "preserved_reason": "fixture_1h",
-            "preserved_at": "2026-08-12T17:03:45+02:00"
+            "preserved_reason": "fixture_ft",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 1,
+              "away_ft": 5,
+              "home_ht": 1,
+              "away_ht": 4
+            }
           },
           "display": {
             "primary_choice": null,
@@ -47650,6 +47802,18 @@
             "accepted_sources": [],
             "maximum_model_weight": 0.05,
             "policy": "solo fonti con almeno 100 pronostici e Brier <= 0.24"
+          },
+          "prediction_audit": {
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 1,
+              "away_ft": 5,
+              "home_ht": 1,
+              "away_ht": 4
+            },
+            "primary": null,
+            "ranked": []
           }
         },
         {
@@ -47663,9 +47827,9 @@
             "country": "Czech-Republic",
             "season": 2026,
             "round": "Round of 128",
-            "status_short": "1H",
-            "status_long": "First Half",
-            "elapsed": 4,
+            "status_short": "FT",
+            "status_long": "Match Finished",
+            "elapsed": 90,
             "home_id": 26228,
             "home": "Křimice",
             "away_id": 3736,
@@ -47675,8 +47839,16 @@
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
             "data_freshness": "preserved",
-            "preserved_reason": "fixture_1h",
-            "preserved_at": "2026-08-12T17:03:45+02:00"
+            "preserved_reason": "fixture_ft",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 2,
+              "away_ft": 0,
+              "home_ht": 1,
+              "away_ht": 0
+            }
           },
           "display": {
             "primary_choice": null,
@@ -51790,6 +51962,18 @@
             "accepted_sources": [],
             "maximum_model_weight": 0.05,
             "policy": "solo fonti con almeno 100 pronostici e Brier <= 0.24"
+          },
+          "prediction_audit": {
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 2,
+              "away_ft": 0,
+              "home_ht": 1,
+              "away_ht": 0
+            },
+            "primary": null,
+            "ranked": []
           }
         },
         {
@@ -51803,9 +51987,9 @@
             "country": "Czech-Republic",
             "season": 2026,
             "round": "Round of 128",
-            "status_short": "NS",
-            "status_long": "Not Started",
-            "elapsed": null,
+            "status_short": "FT",
+            "status_long": "Match Finished",
+            "elapsed": 90,
             "home_id": 7355,
             "home": "Sokol Tasovice",
             "away_id": 8624,
@@ -51814,7 +51998,17 @@
             "competition_quality_score": 68,
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_ft",
+            "preserved_at": "2026-08-12T19:02:18+02:00",
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 2,
+              "away_ft": 3,
+              "home_ht": 1,
+              "away_ht": 3
+            }
           },
           "display": {
             "primary_choice": null,
@@ -55873,6 +56067,18 @@
             "accepted_sources": [],
             "maximum_model_weight": 0.05,
             "policy": "solo fonti con almeno 100 pronostici e Brier <= 0.24"
+          },
+          "prediction_audit": {
+            "result": {
+              "status": "FT",
+              "settled_at": "2026-08-12T19:02:18+02:00",
+              "home_ft": 2,
+              "away_ft": 3,
+              "home_ht": 1,
+              "away_ht": 3
+            },
+            "primary": null,
+            "ranked": []
           }
         },
         {
@@ -55886,9 +56092,9 @@
             "country": "Hungary",
             "season": 2026,
             "round": "Southeast - 2",
-            "status_short": "NS",
-            "status_long": "Not Started",
-            "elapsed": null,
+            "status_short": "2H",
+            "status_long": "Second Half",
+            "elapsed": 74,
             "home_id": 5070,
             "home": "BKV Előre",
             "away_id": 11729,
@@ -55897,7 +56103,9 @@
             "competition_quality_score": 68,
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_2h",
+            "preserved_at": "2026-08-12T19:02:18+02:00"
           },
           "display": {
             "primary_choice": null,
@@ -59926,9 +60134,9 @@
             "country": "Hungary",
             "season": 2026,
             "round": "Southwest - 2",
-            "status_short": "NS",
-            "status_long": "Not Started",
-            "elapsed": null,
+            "status_short": "2H",
+            "status_long": "Second Half",
+            "elapsed": 73,
             "home_id": 10162,
             "home": "Budaörs",
             "away_id": 5104,
@@ -59937,7 +60145,9 @@
             "competition_quality_score": 68,
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_2h",
+            "preserved_at": "2026-08-12T19:02:18+02:00"
           },
           "display": {
             "primary_choice": {
@@ -63952,9 +64162,9 @@
             "country": "Hungary",
             "season": 2026,
             "round": "Northwest - 2",
-            "status_short": "NS",
-            "status_long": "Not Started",
-            "elapsed": null,
+            "status_short": "2H",
+            "status_long": "Second Half",
+            "elapsed": 75,
             "home_id": 7557,
             "home": "SC Sopron",
             "away_id": 11851,
@@ -63963,7 +64173,9 @@
             "competition_quality_score": 68,
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_2h",
+            "preserved_at": "2026-08-12T19:02:18+02:00"
           },
           "display": {
             "primary_choice": null,
@@ -68086,9 +68298,9 @@
             "country": "Hungary",
             "season": 2026,
             "round": "Northwest - 2",
-            "status_short": "NS",
-            "status_long": "Not Started",
-            "elapsed": null,
+            "status_short": "2H",
+            "status_long": "Second Half",
+            "elapsed": 74,
             "home_id": 5145,
             "home": "Tatabánya",
             "away_id": 7536,
@@ -68097,7 +68309,9 @@
             "competition_quality_score": 68,
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_2h",
+            "preserved_at": "2026-08-12T19:02:18+02:00"
           },
           "display": {
             "primary_choice": {
@@ -72152,9 +72366,9 @@
             "country": "World",
             "season": 2026,
             "round": "3rd Qualifying Round",
-            "status_short": "NS",
-            "status_long": "Not Started",
-            "elapsed": null,
+            "status_short": "HT",
+            "status_long": "Halftime",
+            "elapsed": 45,
             "home_id": 400,
             "home": "FC Copenhagen",
             "away_id": 2392,
@@ -72163,7 +72377,9 @@
             "competition_quality_score": 88,
             "competition_tier": "international_major",
             "competition_reason": "major_international",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_ht",
+            "preserved_at": "2026-08-12T19:02:18+02:00"
           },
           "display": {
             "primary_choice": {
@@ -76472,9 +76688,9 @@
             "country": "World",
             "season": 2026,
             "round": "3rd Qualifying Round",
-            "status_short": "NS",
-            "status_long": "Not Started",
-            "elapsed": null,
+            "status_short": "HT",
+            "status_long": "Halftime",
+            "elapsed": 45,
             "home_id": 3484,
             "home": "GKS Katowice",
             "away_id": 4501,
@@ -76483,7 +76699,9 @@
             "competition_quality_score": 88,
             "competition_tier": "international_major",
             "competition_reason": "major_international",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_ht",
+            "preserved_at": "2026-08-12T19:02:18+02:00"
           },
           "display": {
             "primary_choice": {
@@ -80718,9 +80936,9 @@
             "country": "World",
             "season": 2026,
             "round": "3rd Qualifying Round",
-            "status_short": "NS",
-            "status_long": "Not Started",
-            "elapsed": null,
+            "status_short": "2H",
+            "status_long": "Second Half",
+            "elapsed": 46,
             "home_id": 781,
             "home": "Rapid Vienna",
             "away_id": 3528,
@@ -80729,7 +80947,9 @@
             "competition_quality_score": 88,
             "competition_tier": "international_major",
             "competition_reason": "major_international",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_2h",
+            "preserved_at": "2026-08-12T19:02:18+02:00"
           },
           "display": {
             "primary_choice": null,
@@ -84727,9 +84947,9 @@
             "country": "Greece",
             "season": 2027,
             "round": "Final",
-            "status_short": "NS",
-            "status_long": "Not Started",
-            "elapsed": null,
+            "status_short": "1H",
+            "status_long": "First Half",
+            "elapsed": 2,
             "home_id": 575,
             "home": "AEK Athens FC",
             "away_id": 1124,
@@ -84738,7 +84958,9 @@
             "competition_quality_score": 68,
             "competition_tier": "secondary_top_tier",
             "competition_reason": "secondary_country",
-            "data_freshness": "fresh"
+            "data_freshness": "preserved",
+            "preserved_reason": "fixture_1h",
+            "preserved_at": "2026-08-12T19:02:18+02:00"
           },
           "display": {
             "primary_choice": null,
@@ -89024,7 +89246,7 @@
                     "delta_fair_pp": 1.09,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": 56.42,
+                    "oci_as": 56.356,
                     "marker": {
                       "shape": "square",
                       "color": "orange",
@@ -89043,7 +89265,7 @@
                     "delta_fair_pp": -0.85,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": -58.905,
+                    "oci_as": -58.855,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -89062,7 +89284,7 @@
                     "delta_fair_pp": -0.24,
                     "movement_color": "gray",
                     "movement_level": "stable",
-                    "oci_as": -43.942,
+                    "oci_as": -43.928,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -89204,7 +89426,7 @@
                     "delta_fair_pp": 3.28,
                     "movement_color": "red",
                     "movement_level": "strong",
-                    "oci_as": 77.221,
+                    "oci_as": 77.027,
                     "marker": {
                       "shape": "square",
                       "color": "red",
@@ -89223,7 +89445,7 @@
                     "delta_fair_pp": -3.28,
                     "movement_color": "red",
                     "movement_level": "strong",
-                    "oci_as": -77.221,
+                    "oci_as": -77.027,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -89364,7 +89586,7 @@
                     "delta_fair_pp": 2.27,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": 73.782,
+                    "oci_as": 73.648,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -89383,7 +89605,7 @@
                     "delta_fair_pp": -2.27,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": -73.782,
+                    "oci_as": -73.648,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -89522,7 +89744,7 @@
                     "delta_fair_pp": 1.59,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": 62.908,
+                    "oci_as": 62.814,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -89541,7 +89763,7 @@
                     "delta_fair_pp": -1.59,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": -62.908,
+                    "oci_as": -62.814,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -89650,7 +89872,7 @@
                     "delta_fair_pp": 0.65,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": 53.06,
+                    "oci_as": 53.021,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -89669,7 +89891,7 @@
                     "delta_fair_pp": -0.65,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": -53.06,
+                    "oci_as": -53.021,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -90050,7 +90272,7 @@
                 },
                 "book": {
                   "pick": "1",
-                  "score": 56.42,
+                  "score": 56.356,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -90098,7 +90320,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 77.221,
+                  "score": 77.027,
                   "strength": "strong",
                   "color": "red",
                   "marker_shape": "square",
@@ -90313,8 +90535,8 @@
               "favorite_conceded_ht_rate_pct": 0.0,
               "underdog_scored_ht_rate_pct": 53.21,
               "favorite_scored_ht_rate_pct": 69.91,
-              "favorite_oci": 56.42,
-              "underdog_oci": -43.942,
+              "favorite_oci": 56.356,
+              "underdog_oci": -43.928,
               "underdog_book_consensus": 0.8571,
               "statistical_confirmation": false,
               "interpretation": "L'inversione o il drift non bastano: il correttivo PT si attiva solo con vulnerabilità statistica della favorita e capacità dell'outsider di segnare presto."
@@ -90416,14 +90638,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 56.42,
-                      "absolute": 56.42,
+                      "value": 56.356,
+                      "absolute": 56.356,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.078,
+                      "velocity_pp_per_hour": 0.068,
                       "components": {
                         "magnitude": 10.9,
                         "consensus": 25.0,
-                        "velocity": 0.52,
+                        "velocity": 0.455,
                         "persistence": 10.0,
                         "coverage": 10.0
                       }
@@ -90449,14 +90671,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -58.905,
-                      "absolute": 58.905,
+                      "value": -58.855,
+                      "absolute": 58.855,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.061,
+                      "velocity_pp_per_hour": 0.053,
                       "components": {
                         "magnitude": 8.5,
                         "consensus": 25.0,
-                        "velocity": 0.405,
+                        "velocity": 0.355,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -90482,14 +90704,14 @@
                       "ratio": 0.8571
                     },
                     "oci_as": {
-                      "value": -43.942,
-                      "absolute": 43.942,
+                      "value": -43.928,
+                      "absolute": 43.928,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.017,
+                      "velocity_pp_per_hour": 0.015,
                       "components": {
                         "magnitude": 2.4,
                         "consensus": 21.427,
-                        "velocity": 0.114,
+                        "velocity": 0.1,
                         "persistence": 10.0,
                         "coverage": 10.0
                       }
@@ -90508,7 +90730,7 @@
                 },
                 "book": {
                   "pick": "1",
-                  "score": 56.42,
+                  "score": 56.356,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -90684,14 +90906,14 @@
                       "ratio": 0.7143
                     },
                     "oci_as": {
-                      "value": 77.221,
-                      "absolute": 77.221,
+                      "value": 77.027,
+                      "absolute": 77.027,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.234,
+                      "velocity_pp_per_hour": 0.205,
                       "components": {
                         "magnitude": 32.8,
                         "consensus": 17.858,
-                        "velocity": 1.563,
+                        "velocity": 1.37,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -90717,14 +90939,14 @@
                       "ratio": 0.7143
                     },
                     "oci_as": {
-                      "value": -77.221,
-                      "absolute": 77.221,
+                      "value": -77.027,
+                      "absolute": 77.027,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.234,
+                      "velocity_pp_per_hour": 0.205,
                       "components": {
                         "magnitude": 32.8,
                         "consensus": 17.858,
-                        "velocity": 1.563,
+                        "velocity": 1.37,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -90743,7 +90965,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 77.221,
+                  "score": 77.027,
                   "strength": "strong",
                   "color": "red",
                   "marker_shape": "square",
@@ -90914,14 +91136,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 73.782,
-                      "absolute": 73.782,
+                      "value": 73.648,
+                      "absolute": 73.648,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.162,
+                      "velocity_pp_per_hour": 0.142,
                       "components": {
                         "magnitude": 22.7,
                         "consensus": 25.0,
-                        "velocity": 1.082,
+                        "velocity": 0.948,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -90947,14 +91169,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -73.782,
-                      "absolute": 73.782,
+                      "value": -73.648,
+                      "absolute": 73.648,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.162,
+                      "velocity_pp_per_hour": 0.142,
                       "components": {
                         "magnitude": 22.7,
                         "consensus": 25.0,
-                        "velocity": 1.082,
+                        "velocity": 0.948,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -90973,7 +91195,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 73.782,
+                  "score": 73.648,
                   "strength": "strong",
                   "color": "red",
                   "marker_shape": "square",
@@ -91137,14 +91359,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 62.908,
-                      "absolute": 62.908,
+                      "value": 62.814,
+                      "absolute": 62.814,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.114,
+                      "velocity_pp_per_hour": 0.1,
                       "components": {
                         "magnitude": 15.9,
                         "consensus": 25.0,
-                        "velocity": 0.758,
+                        "velocity": 0.664,
                         "persistence": 15.0,
                         "coverage": 6.25
                       }
@@ -91170,14 +91392,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -62.908,
-                      "absolute": 62.908,
+                      "value": -62.814,
+                      "absolute": 62.814,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.114,
+                      "velocity_pp_per_hour": 0.1,
                       "components": {
                         "magnitude": 15.9,
                         "consensus": 25.0,
-                        "velocity": 0.758,
+                        "velocity": 0.664,
                         "persistence": 15.0,
                         "coverage": 6.25
                       }
@@ -91196,7 +91418,7 @@
                 },
                 "book": {
                   "pick": "yes",
-                  "score": 62.908,
+                  "score": 62.814,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -91330,14 +91552,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 53.06,
-                      "absolute": 53.06,
+                      "value": 53.021,
+                      "absolute": 53.021,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.046,
+                      "velocity_pp_per_hour": 0.041,
                       "components": {
                         "magnitude": 6.5,
                         "consensus": 25.0,
-                        "velocity": 0.31,
+                        "velocity": 0.271,
                         "persistence": 15.0,
                         "coverage": 6.25
                       }
@@ -91363,14 +91585,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -53.06,
-                      "absolute": 53.06,
+                      "value": -53.021,
+                      "absolute": 53.021,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.046,
+                      "velocity_pp_per_hour": 0.041,
                       "components": {
                         "magnitude": 6.5,
                         "consensus": 25.0,
-                        "velocity": 0.31,
+                        "velocity": 0.271,
                         "persistence": 15.0,
                         "coverage": 6.25
                       }
@@ -91389,7 +91611,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 53.06,
+                  "score": 53.021,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -91791,24 +92013,24 @@
               "context_weight": 0.2,
               "expected_side": "home",
               "metrics": {
-                "xg_for_ft": 0.0,
-                "goals_conceded_ht": 0.0,
-                "gg_ht_rate": 0.0,
-                "xg_against_ft": 0.0,
-                "over15ht_rate": 0.5009,
+                "total_ft": 3.004,
+                "scored_ht_rate": 0.6991,
                 "goals_scored_ht": 1.2,
                 "goals_conceded_2h": 0.301,
-                "scored_ht_rate": 0.6991,
-                "goals_scored_2h": 1.503,
-                "total_ht": 1.2,
-                "clean_sheet_rate": 0.733,
                 "over25_rate": 0.467,
-                "points_per_game": 2.097,
+                "xg_against_ft": 0.0,
+                "gg_ht_rate": 0.0,
+                "xg_for_ft": 0.0,
+                "goals_scored_2h": 1.503,
                 "goals_conceded_ft": 0.301,
+                "clean_sheet_rate": 0.733,
                 "xg_sample": 0.0,
-                "total_ft": 3.004,
-                "conceded_ht_rate": 0.0,
+                "goals_conceded_ht": 0.0,
+                "total_ht": 1.2,
+                "over15ht_rate": 0.5009,
+                "points_per_game": 2.097,
                 "goals_scored_ft": 2.703,
+                "conceded_ht_rate": 0.0,
                 "shots_on_target_for": 0.0,
                 "shots_on_target_against": 0.0,
                 "total_shots_for": 0.0,
@@ -92071,24 +92293,24 @@
               "context_weight": 0.62,
               "expected_side": "away",
               "metrics": {
-                "xg_for_ft": 0.0,
-                "goals_conceded_ht": 1.204,
-                "gg_ht_rate": 0.4702,
-                "xg_against_ft": 0.0,
-                "over15ht_rate": 0.6235,
+                "total_ft": 5.443,
+                "scored_ht_rate": 0.5321,
                 "goals_scored_ht": 1.602,
                 "goals_conceded_2h": 1.394,
-                "scored_ht_rate": 0.5321,
-                "goals_scored_2h": 1.243,
-                "total_ht": 2.805,
-                "clean_sheet_rate": 0.029,
                 "over25_rate": 0.971,
-                "points_per_game": 1.152,
+                "xg_against_ft": 0.0,
+                "gg_ht_rate": 0.4702,
+                "xg_for_ft": 0.0,
+                "goals_scored_2h": 1.243,
                 "goals_conceded_ft": 2.598,
+                "clean_sheet_rate": 0.029,
                 "xg_sample": 0.0,
-                "total_ft": 5.443,
-                "conceded_ht_rate": 0.7392,
+                "goals_conceded_ht": 1.204,
+                "total_ht": 2.805,
+                "over15ht_rate": 0.6235,
+                "points_per_game": 1.152,
                 "goals_scored_ft": 2.844,
+                "conceded_ht_rate": 0.7392,
                 "shots_on_target_for": 0.0,
                 "shots_on_target_against": 0.0,
                 "total_shots_for": 0.0,
@@ -92811,8 +93033,8 @@
               "favorite_conceded_ht_rate_pct": 0.0,
               "underdog_scored_ht_rate_pct": 53.21,
               "favorite_scored_ht_rate_pct": 69.91,
-              "favorite_oci": 56.42,
-              "underdog_oci": -43.942,
+              "favorite_oci": 56.356,
+              "underdog_oci": -43.928,
               "underdog_book_consensus": 0.8571,
               "statistical_confirmation": false,
               "interpretation": "L'inversione o il drift non bastano: il correttivo PT si attiva solo con vulnerabilità statistica della favorita e capacità dell'outsider di segnare presto."
@@ -92973,7 +93195,7 @@
                     "delta_fair_pp": 9.29,
                     "movement_color": "red",
                     "movement_level": "strong",
-                    "oci_as": 94.428,
+                    "oci_as": 93.88,
                     "marker": {
                       "shape": "square",
                       "color": "red",
@@ -92992,7 +93214,7 @@
                     "delta_fair_pp": -1.75,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": -68.334,
+                    "oci_as": -68.231,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -93011,7 +93233,7 @@
                     "delta_fair_pp": -7.54,
                     "movement_color": "red",
                     "movement_level": "strong",
-                    "oci_as": -93.594,
+                    "oci_as": -93.149,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -93158,7 +93380,7 @@
                     "delta_fair_pp": 3.35,
                     "movement_color": "red",
                     "movement_level": "strong",
-                    "oci_as": 80.097,
+                    "oci_as": 79.9,
                     "marker": {
                       "shape": "circle_square",
                       "color": "orange",
@@ -93177,7 +93399,7 @@
                     "delta_fair_pp": -3.35,
                     "movement_color": "red",
                     "movement_level": "strong",
-                    "oci_as": -80.097,
+                    "oci_as": -79.9,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -93315,7 +93537,7 @@
                     "delta_fair_pp": 1.97,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": 65.639,
+                    "oci_as": 65.523,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -93334,7 +93556,7 @@
                     "delta_fair_pp": -1.97,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": -65.639,
+                    "oci_as": -65.523,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -93485,7 +93707,7 @@
                     "delta_fair_pp": 0.53,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": 45.553,
+                    "oci_as": 45.521,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -93504,7 +93726,7 @@
                     "delta_fair_pp": -0.53,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": -45.553,
+                    "oci_as": -45.521,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -93618,7 +93840,7 @@
                     "delta_fair_pp": 1.69,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": 62.706,
+                    "oci_as": 62.606,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -93637,7 +93859,7 @@
                     "delta_fair_pp": -1.69,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": -62.706,
+                    "oci_as": -62.606,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -94014,7 +94236,7 @@
                 },
                 "book": {
                   "pick": "1",
-                  "score": 94.428,
+                  "score": 93.88,
                   "strength": "strong",
                   "color": "red",
                   "marker_shape": "square",
@@ -94062,7 +94284,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 80.097,
+                  "score": 79.9,
                   "strength": "strong",
                   "color": "red",
                   "marker_shape": "square",
@@ -94277,8 +94499,8 @@
               "favorite_conceded_ht_rate_pct": 63.32,
               "underdog_scored_ht_rate_pct": 43.35,
               "favorite_scored_ht_rate_pct": 64.07,
-              "favorite_oci": 94.428,
-              "underdog_oci": -93.594,
+              "favorite_oci": 93.88,
+              "underdog_oci": -93.149,
               "underdog_book_consensus": 1.0,
               "statistical_confirmation": true,
               "interpretation": "L'inversione o il drift non bastano: il correttivo PT si attiva solo con vulnerabilità statistica della favorita e capacità dell'outsider di segnare presto."
@@ -94380,14 +94602,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 94.428,
-                      "absolute": 94.428,
+                      "value": 93.88,
+                      "absolute": 93.88,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.664,
+                      "velocity_pp_per_hour": 0.582,
                       "components": {
                         "magnitude": 40.0,
                         "consensus": 25.0,
-                        "velocity": 4.428,
+                        "velocity": 3.88,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -94413,14 +94635,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -68.334,
-                      "absolute": 68.334,
+                      "value": -68.231,
+                      "absolute": 68.231,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.125,
+                      "velocity_pp_per_hour": 0.11,
                       "components": {
                         "magnitude": 17.5,
                         "consensus": 25.0,
-                        "velocity": 0.834,
+                        "velocity": 0.731,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -94446,14 +94668,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -93.594,
-                      "absolute": 93.594,
+                      "value": -93.149,
+                      "absolute": 93.149,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.539,
+                      "velocity_pp_per_hour": 0.472,
                       "components": {
                         "magnitude": 40.0,
                         "consensus": 25.0,
-                        "velocity": 3.594,
+                        "velocity": 3.149,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -94472,7 +94694,7 @@
                 },
                 "book": {
                   "pick": "1",
-                  "score": 94.428,
+                  "score": 93.88,
                   "strength": "strong",
                   "color": "red",
                   "marker_shape": "square",
@@ -94654,14 +94876,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 80.097,
-                      "absolute": 80.097,
+                      "value": 79.9,
+                      "absolute": 79.9,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.239,
+                      "velocity_pp_per_hour": 0.21,
                       "components": {
                         "magnitude": 33.5,
                         "consensus": 25.0,
-                        "velocity": 1.597,
+                        "velocity": 1.399,
                         "persistence": 10.0,
                         "coverage": 10.0
                       }
@@ -94687,14 +94909,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -80.097,
-                      "absolute": 80.097,
+                      "value": -79.9,
+                      "absolute": 79.9,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.239,
+                      "velocity_pp_per_hour": 0.21,
                       "components": {
                         "magnitude": 33.5,
                         "consensus": 25.0,
-                        "velocity": 1.597,
+                        "velocity": 1.399,
                         "persistence": 10.0,
                         "coverage": 10.0
                       }
@@ -94713,7 +94935,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 80.097,
+                  "score": 79.9,
                   "strength": "strong",
                   "color": "red",
                   "marker_shape": "square",
@@ -94883,14 +95105,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 65.639,
-                      "absolute": 65.639,
+                      "value": 65.523,
+                      "absolute": 65.523,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.141,
+                      "velocity_pp_per_hour": 0.123,
                       "components": {
                         "magnitude": 19.7,
                         "consensus": 25.0,
-                        "velocity": 0.939,
+                        "velocity": 0.823,
                         "persistence": 10.0,
                         "coverage": 10.0
                       }
@@ -94916,14 +95138,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -65.639,
-                      "absolute": 65.639,
+                      "value": -65.523,
+                      "absolute": 65.523,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.141,
+                      "velocity_pp_per_hour": 0.123,
                       "components": {
                         "magnitude": 19.7,
                         "consensus": 25.0,
-                        "velocity": 0.939,
+                        "velocity": 0.823,
                         "persistence": 10.0,
                         "coverage": 10.0
                       }
@@ -94942,7 +95164,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 65.639,
+                  "score": 65.523,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -95119,14 +95341,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 45.553,
-                      "absolute": 45.553,
+                      "value": 45.521,
+                      "absolute": 45.521,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.038,
+                      "velocity_pp_per_hour": 0.033,
                       "components": {
                         "magnitude": 5.3,
                         "consensus": 25.0,
-                        "velocity": 0.253,
+                        "velocity": 0.221,
                         "persistence": 7.5,
                         "coverage": 7.5
                       }
@@ -95152,14 +95374,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -45.553,
-                      "absolute": 45.553,
+                      "value": -45.521,
+                      "absolute": 45.521,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.038,
+                      "velocity_pp_per_hour": 0.033,
                       "components": {
                         "magnitude": 5.3,
                         "consensus": 25.0,
-                        "velocity": 0.253,
+                        "velocity": 0.221,
                         "persistence": 7.5,
                         "coverage": 7.5
                       }
@@ -95178,7 +95400,7 @@
                 },
                 "book": {
                   "pick": "yes",
-                  "score": 45.553,
+                  "score": 45.521,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -95318,14 +95540,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 62.706,
-                      "absolute": 62.706,
+                      "value": 62.606,
+                      "absolute": 62.606,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.121,
+                      "velocity_pp_per_hour": 0.106,
                       "components": {
                         "magnitude": 16.9,
                         "consensus": 25.0,
-                        "velocity": 0.805,
+                        "velocity": 0.706,
                         "persistence": 10.0,
                         "coverage": 10.0
                       }
@@ -95351,14 +95573,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -62.706,
-                      "absolute": 62.706,
+                      "value": -62.606,
+                      "absolute": 62.606,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.121,
+                      "velocity_pp_per_hour": 0.106,
                       "components": {
                         "magnitude": 16.9,
                         "consensus": 25.0,
-                        "velocity": 0.805,
+                        "velocity": 0.706,
                         "persistence": 10.0,
                         "coverage": 10.0
                       }
@@ -95377,7 +95599,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 62.706,
+                  "score": 62.606,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -95851,24 +96073,24 @@
               "context_weight": 0.62,
               "expected_side": "home",
               "metrics": {
-                "xg_for_ft": 0.0,
-                "goals_conceded_ht": 0.889,
-                "gg_ht_rate": 0.4422,
-                "xg_against_ft": 0.0,
-                "over15ht_rate": 0.6929,
+                "total_ft": 3.997,
+                "scored_ht_rate": 0.6407,
                 "goals_scored_ht": 1.059,
                 "goals_conceded_2h": 1.165,
-                "scored_ht_rate": 0.6407,
-                "goals_scored_2h": 0.883,
-                "total_ht": 1.948,
-                "clean_sheet_rate": 0.054,
                 "over25_rate": 0.761,
-                "points_per_game": 1.485,
+                "xg_against_ft": 0.0,
+                "gg_ht_rate": 0.4422,
+                "xg_for_ft": 0.0,
+                "goals_scored_2h": 0.883,
                 "goals_conceded_ft": 2.055,
+                "clean_sheet_rate": 0.054,
                 "xg_sample": 0.0,
-                "total_ft": 3.997,
-                "conceded_ht_rate": 0.6332,
+                "goals_conceded_ht": 0.889,
+                "total_ht": 1.948,
+                "over15ht_rate": 0.6929,
+                "points_per_game": 1.485,
                 "goals_scored_ft": 1.942,
+                "conceded_ht_rate": 0.6332,
                 "shots_on_target_for": 0.0,
                 "shots_on_target_against": 0.0,
                 "total_shots_for": 0.0,
@@ -96454,24 +96676,24 @@
               "context_weight": 0.62,
               "expected_side": "away",
               "metrics": {
-                "xg_for_ft": 0.0,
-                "goals_conceded_ht": 0.79,
-                "gg_ht_rate": 0.3793,
-                "xg_against_ft": 0.0,
-                "over15ht_rate": 0.5458,
+                "total_ft": 2.679,
+                "scored_ht_rate": 0.4335,
                 "goals_scored_ht": 0.526,
                 "goals_conceded_2h": 0.619,
-                "scored_ht_rate": 0.4335,
-                "goals_scored_2h": 0.744,
-                "total_ht": 1.316,
-                "clean_sheet_rate": 0.239,
                 "over25_rate": 0.603,
-                "points_per_game": 1.119,
+                "xg_against_ft": 0.0,
+                "gg_ht_rate": 0.3793,
+                "xg_for_ft": 0.0,
+                "goals_scored_2h": 0.744,
                 "goals_conceded_ft": 1.409,
+                "clean_sheet_rate": 0.239,
                 "xg_sample": 0.0,
-                "total_ft": 2.679,
-                "conceded_ht_rate": 0.5096,
+                "goals_conceded_ht": 0.79,
+                "total_ht": 1.316,
+                "over15ht_rate": 0.5458,
+                "points_per_game": 1.119,
                 "goals_scored_ft": 1.27,
+                "conceded_ht_rate": 0.5096,
                 "shots_on_target_for": 0.0,
                 "shots_on_target_against": 0.0,
                 "total_shots_for": 0.0,
@@ -97329,8 +97551,8 @@
               "favorite_conceded_ht_rate_pct": 63.32,
               "underdog_scored_ht_rate_pct": 43.35,
               "favorite_scored_ht_rate_pct": 64.07,
-              "favorite_oci": 94.428,
-              "underdog_oci": -93.594,
+              "favorite_oci": 93.88,
+              "underdog_oci": -93.149,
               "underdog_book_consensus": 1.0,
               "statistical_confirmation": true,
               "interpretation": "L'inversione o il drift non bastano: il correttivo PT si attiva solo con vulnerabilità statistica della favorita e capacità dell'outsider di segnare presto."
@@ -97483,15 +97705,15 @@
                 "selections": {
                   "1": {
                     "open_odd": 1.77,
-                    "current_odd": 1.725,
-                    "model_probability_pct": 47.77,
+                    "current_odd": 1.72,
+                    "model_probability_pct": 47.78,
                     "model_probability_raw_pct": 46.87,
-                    "book_fair_probability_pct": 55.03,
-                    "delta_odd": -0.045,
-                    "delta_fair_pp": 1.68,
+                    "book_fair_probability_pct": 55.1,
+                    "delta_odd": -0.05,
+                    "delta_fair_pp": 1.75,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": 57.479,
+                    "oci_as": 65.682,
                     "marker": {
                       "shape": "square",
                       "color": "orange",
@@ -97503,14 +97725,14 @@
                   "x": {
                     "open_odd": 3.8,
                     "current_odd": 3.9,
-                    "model_probability_pct": 21.96,
+                    "model_probability_pct": 21.95,
                     "model_probability_raw_pct": 21.66,
-                    "book_fair_probability_pct": 24.34,
+                    "book_fair_probability_pct": 24.3,
                     "delta_odd": 0.1,
-                    "delta_fair_pp": -0.51,
+                    "delta_fair_pp": -0.55,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": -38.048,
+                    "oci_as": -38.45,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -97524,12 +97746,12 @@
                     "current_odd": 4.6,
                     "model_probability_pct": 30.27,
                     "model_probability_raw_pct": 31.46,
-                    "book_fair_probability_pct": 20.63,
+                    "book_fair_probability_pct": 20.6,
                     "delta_odd": 0.27,
-                    "delta_fair_pp": -1.18,
+                    "delta_fair_pp": -1.21,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": -54.371,
+                    "oci_as": -62.172,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -97542,7 +97764,7 @@
                 "model_pick": null,
                 "book_pick": "1",
                 "relation": "book_only",
-                "aggio_pct": 5.351,
+                "aggio_pct": 5.52,
                 "aggio_status": "normal",
                 "protection_pick": null,
                 "market_validation": {
@@ -97647,18 +97869,18 @@
                 "market_calibration_weight": 0.11,
                 "recommendation_gate": {
                   "eligible": false,
-                  "score": 56.634,
+                  "score": 56.646,
                   "grade": "NO",
                   "reasons": [
                     "nessun_valore_sulla_quota"
                   ],
                   "absolute_probability_floor_pct": 44.0,
-                  "market_break_even_pct": 57.971,
-                  "probability_pct": 47.77,
+                  "market_break_even_pct": 58.14,
+                  "probability_pct": 47.78,
                   "raw_probability_pct": 46.87,
-                  "expected_value_pct": -17.597,
-                  "edge_over_break_even_pp": -10.201,
-                  "book_disagreement_pp": 8.16,
+                  "expected_value_pct": -17.818,
+                  "edge_over_break_even_pp": -10.36,
+                  "book_disagreement_pp": 8.23,
                   "competition_quality_score": 88,
                   "bookmakers": 14,
                   "policy": "probability_floor_plus_price_edge"
@@ -97682,7 +97904,7 @@
                     "delta_fair_pp": 1.62,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": 64.026,
+                    "oci_as": 64.024,
                     "marker": {
                       "shape": "circle_square",
                       "color": "yellow",
@@ -97701,7 +97923,7 @@
                     "delta_fair_pp": -1.62,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": -64.026,
+                    "oci_as": -64.024,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -97845,7 +98067,7 @@
                     "delta_fair_pp": 1.53,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": 65.393,
+                    "oci_as": 65.391,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -97864,7 +98086,7 @@
                     "delta_fair_pp": -1.53,
                     "movement_color": "orange",
                     "movement_level": "medium",
-                    "oci_as": -65.393,
+                    "oci_as": -65.391,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -98027,7 +98249,7 @@
                     "delta_fair_pp": 0.93,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": 53.107,
+                    "oci_as": 53.106,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -98046,7 +98268,7 @@
                     "delta_fair_pp": -0.93,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": -53.107,
+                    "oci_as": -53.106,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -98166,7 +98388,7 @@
                     "delta_fair_pp": 1.16,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": 54.171,
+                    "oci_as": 54.169,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -98185,7 +98407,7 @@
                     "delta_fair_pp": -1.16,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": -54.171,
+                    "oci_as": -54.169,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -98337,18 +98559,18 @@
                 "selection": "1",
                 "gate": {
                   "eligible": false,
-                  "score": 56.634,
+                  "score": 56.646,
                   "grade": "NO",
                   "reasons": [
                     "nessun_valore_sulla_quota"
                   ],
                   "absolute_probability_floor_pct": 44.0,
-                  "market_break_even_pct": 57.971,
-                  "probability_pct": 47.77,
+                  "market_break_even_pct": 58.14,
+                  "probability_pct": 47.78,
                   "raw_probability_pct": 46.87,
-                  "expected_value_pct": -17.597,
-                  "edge_over_break_even_pp": -10.201,
-                  "book_disagreement_pp": 8.16,
+                  "expected_value_pct": -17.818,
+                  "edge_over_break_even_pp": -10.36,
+                  "book_disagreement_pp": 8.23,
                   "competition_quality_score": 88,
                   "bookmakers": 14,
                   "policy": "probability_floor_plus_price_edge"
@@ -98507,8 +98729,8 @@
             },
             "probabilities_calibrated": {
               "1x2_ft": {
-                "1": 0.4777,
-                "x": 0.2196,
+                "1": 0.4778,
+                "x": 0.2195,
                 "2": 0.3027
               },
               "over25_ft": {
@@ -98534,8 +98756,8 @@
             },
             "probabilities": {
               "1x2_ft": {
-                "1": 0.4777,
-                "x": 0.2196,
+                "1": 0.4778,
+                "x": 0.2195,
                 "2": 0.3027
               },
               "over25_ft": {
@@ -98572,9 +98794,9 @@
                   "pick": null,
                   "probability": 0.4687,
                   "probability_pct": 46.87,
-                  "market_fair_probability": 0.5503,
-                  "market_fair_probability_pct": 55.03,
-                  "edge_pp": -8.16,
+                  "market_fair_probability": 0.551,
+                  "market_fair_probability_pct": 55.1,
+                  "edge_pp": -8.23,
                   "score": 74.212,
                   "strength": "none",
                   "color": "none",
@@ -98584,7 +98806,7 @@
                 },
                 "book": {
                   "pick": "1",
-                  "score": 57.479,
+                  "score": 65.682,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -98632,7 +98854,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 64.026,
+                  "score": 64.024,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -98831,7 +99053,7 @@
             "selection_policy": "Solo segnali che superano validazione mercato, affidabilità, qualità competizione, probabilità, EV e coerenza storica.",
             "favorite_trap_pattern": {
               "available": true,
-              "score": 42.557,
+              "score": 42.597,
               "classification": "neutral",
               "experimental": true,
               "opening_favorite": "1",
@@ -98839,16 +99061,16 @@
               "favorite_changed": false,
               "favorite_team": "Paris Saint Germain",
               "underdog_team": "Aston Villa",
-              "current_favorite_probability_pct": 55.03,
-              "favorite_drift_odd": -0.045,
+              "current_favorite_probability_pct": 55.1,
+              "favorite_drift_odd": -0.05,
               "underdog_steam_odd": -0.27,
-              "favorite_fair_delta_pp": 1.68,
-              "underdog_fair_delta_pp": -1.18,
+              "favorite_fair_delta_pp": 1.75,
+              "underdog_fair_delta_pp": -1.21,
               "favorite_conceded_ht_rate_pct": 47.45,
               "underdog_scored_ht_rate_pct": 46.77,
               "favorite_scored_ht_rate_pct": 68.19,
-              "favorite_oci": 57.479,
-              "underdog_oci": -54.371,
+              "favorite_oci": 65.682,
+              "underdog_oci": -62.172,
               "underdog_book_consensus": 1.0,
               "statistical_confirmation": true,
               "interpretation": "L'inversione o il drift non bastano: il correttivo PT si attiva solo con vulnerabilità statistica della favorita e capacità dell'outsider di segnare presto."
@@ -98895,51 +99117,51 @@
                 },
                 "current": {
                   "odds": {
-                    "1": 1.725,
+                    "1": 1.72,
                     "x": 3.9,
                     "2": 4.6
                   },
                   "math": {
                     "raw_probabilities": {
-                      "1": 0.5797,
+                      "1": 0.5814,
                       "x": 0.2564,
                       "2": 0.2174
                     },
                     "fair_probabilities": {
-                      "1": 0.5503,
-                      "x": 0.2434,
-                      "2": 0.2063
+                      "1": 0.551,
+                      "x": 0.243,
+                      "2": 0.206
                     },
-                    "overround": 0.0535,
-                    "overround_pct": 5.351,
-                    "payout": 0.9492,
-                    "payout_pct": 94.921,
+                    "overround": 0.0552,
+                    "overround_pct": 5.52,
+                    "payout": 0.9477,
+                    "payout_pct": 94.769,
                     "margin_load_pp": {
-                      "1": 2.945,
-                      "x": 1.302,
-                      "2": 1.104
+                      "1": 3.041,
+                      "x": 1.341,
+                      "2": 1.137
                     },
                     "margin_load_share": {
-                      "1": 0.5503,
-                      "x": 0.2434,
-                      "2": 0.2063
+                      "1": 0.551,
+                      "x": 0.243,
+                      "2": 0.206
                     }
                   },
                   "bookmakers_count": 14,
                   "dispersion": {
                     "1": 0.041,
-                    "x": 0.135,
-                    "2": 0.182
+                    "x": 0.145,
+                    "2": 0.181
                   }
                 },
                 "selections": {
                   "1": {
                     "open_odd": 1.77,
-                    "current_odd": 1.725,
-                    "delta_odd": -0.045,
+                    "current_odd": 1.72,
+                    "delta_odd": -0.05,
                     "open_fair_probability": 0.5335,
-                    "current_fair_probability": 0.5503,
-                    "delta_fair_pp": 1.68,
+                    "current_fair_probability": 0.551,
+                    "delta_fair_pp": 1.75,
                     "movement": {
                       "level": "medium",
                       "color": "orange"
@@ -98950,29 +99172,29 @@
                       "ratio": 0.9231
                     },
                     "oci_as": {
-                      "value": 57.479,
-                      "absolute": 57.479,
+                      "value": 65.682,
+                      "absolute": 65.682,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.015,
+                      "velocity_pp_per_hour": 0.016,
                       "components": {
-                        "magnitude": 16.8,
+                        "magnitude": 17.5,
                         "consensus": 23.078,
-                        "velocity": 0.102,
-                        "persistence": 7.5,
+                        "velocity": 0.104,
+                        "persistence": 15.0,
                         "coverage": 10.0
                       }
                     },
                     "margin_load_open_pp": 3.151,
-                    "margin_load_current_pp": 2.945,
-                    "margin_load_delta_pp": -0.206
+                    "margin_load_current_pp": 3.041,
+                    "margin_load_delta_pp": -0.11
                   },
                   "x": {
                     "open_odd": 3.8,
                     "current_odd": 3.9,
                     "delta_odd": 0.1,
                     "open_fair_probability": 0.2485,
-                    "current_fair_probability": 0.2434,
-                    "delta_fair_pp": -0.51,
+                    "current_fair_probability": 0.243,
+                    "delta_fair_pp": -0.55,
                     "movement": {
                       "level": "low",
                       "color": "yellow"
@@ -98983,29 +99205,29 @@
                       "ratio": 0.9167
                     },
                     "oci_as": {
-                      "value": -38.048,
-                      "absolute": 38.048,
+                      "value": -38.45,
+                      "absolute": 38.45,
                       "direction": "away",
                       "velocity_pp_per_hour": 0.005,
                       "components": {
-                        "magnitude": 5.1,
+                        "magnitude": 5.5,
                         "consensus": 22.918,
-                        "velocity": 0.031,
+                        "velocity": 0.033,
                         "persistence": 0.0,
                         "coverage": 10.0
                       }
                     },
                     "margin_load_open_pp": 1.468,
-                    "margin_load_current_pp": 1.302,
-                    "margin_load_delta_pp": -0.166
+                    "margin_load_current_pp": 1.341,
+                    "margin_load_delta_pp": -0.127
                   },
                   "2": {
                     "open_odd": 4.33,
                     "current_odd": 4.6,
                     "delta_odd": 0.27,
                     "open_fair_probability": 0.2181,
-                    "current_fair_probability": 0.2063,
-                    "delta_fair_pp": -1.18,
+                    "current_fair_probability": 0.206,
+                    "delta_fair_pp": -1.21,
                     "movement": {
                       "level": "low",
                       "color": "yellow"
@@ -99016,33 +99238,33 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -54.371,
-                      "absolute": 54.371,
+                      "value": -62.172,
+                      "absolute": 62.172,
                       "direction": "away",
                       "velocity_pp_per_hour": 0.011,
                       "components": {
-                        "magnitude": 11.8,
+                        "magnitude": 12.1,
                         "consensus": 25.0,
-                        "velocity": 0.071,
-                        "persistence": 7.5,
+                        "velocity": 0.072,
+                        "persistence": 15.0,
                         "coverage": 10.0
                       }
                     },
                     "margin_load_open_pp": 1.288,
-                    "margin_load_current_pp": 1.104,
-                    "margin_load_delta_pp": -0.184
+                    "margin_load_current_pp": 1.137,
+                    "margin_load_delta_pp": -0.151
                   }
                 },
                 "aggio": {
                   "open_pct": 5.908,
-                  "current_pct": 5.351,
-                  "delta_pp": -0.557,
+                  "current_pct": 5.52,
+                  "delta_pp": -0.388,
                   "status": "normal",
-                  "payout_pct": 94.921
+                  "payout_pct": 94.769
                 },
                 "book": {
                   "pick": "1",
-                  "score": 57.479,
+                  "score": 65.682,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -99208,8 +99430,8 @@
                   },
                   "bookmakers_count": 12,
                   "dispersion": {
-                    "over": 0.036,
-                    "under": 0.041
+                    "over": 0.038,
+                    "under": 0.034
                   }
                 },
                 "selections": {
@@ -99230,14 +99452,14 @@
                       "ratio": 0.9091
                     },
                     "oci_as": {
-                      "value": 64.026,
-                      "absolute": 64.026,
+                      "value": 64.024,
+                      "absolute": 64.024,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.015,
+                      "velocity_pp_per_hour": 0.014,
                       "components": {
                         "magnitude": 16.2,
                         "consensus": 22.727,
-                        "velocity": 0.098,
+                        "velocity": 0.096,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -99263,14 +99485,14 @@
                       "ratio": 0.9091
                     },
                     "oci_as": {
-                      "value": -64.026,
-                      "absolute": 64.026,
+                      "value": -64.024,
+                      "absolute": 64.024,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.015,
+                      "velocity_pp_per_hour": 0.014,
                       "components": {
                         "magnitude": 16.2,
                         "consensus": 22.727,
-                        "velocity": 0.098,
+                        "velocity": 0.096,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -99289,7 +99511,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 64.026,
+                  "score": 64.024,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -99465,14 +99687,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 65.393,
-                      "absolute": 65.393,
+                      "value": 65.391,
+                      "absolute": 65.391,
                       "direction": "toward",
                       "velocity_pp_per_hour": 0.014,
                       "components": {
                         "magnitude": 15.3,
                         "consensus": 25.0,
-                        "velocity": 0.093,
+                        "velocity": 0.091,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -99498,14 +99720,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -65.393,
-                      "absolute": 65.393,
+                      "value": -65.391,
+                      "absolute": 65.391,
                       "direction": "away",
                       "velocity_pp_per_hour": 0.014,
                       "components": {
                         "magnitude": 15.3,
                         "consensus": 25.0,
-                        "velocity": 0.093,
+                        "velocity": 0.091,
                         "persistence": 15.0,
                         "coverage": 10.0
                       }
@@ -99524,7 +99746,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 65.393,
+                  "score": 65.391,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -99691,8 +99913,8 @@
                   },
                   "bookmakers_count": 7,
                   "dispersion": {
-                    "yes": 0.153,
-                    "no": 0.01
+                    "yes": 0.156,
+                    "no": 0.013
                   }
                 },
                 "selections": {
@@ -99713,14 +99935,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 53.107,
-                      "absolute": 53.107,
+                      "value": 53.106,
+                      "absolute": 53.106,
                       "direction": "toward",
                       "velocity_pp_per_hour": 0.008,
                       "components": {
                         "magnitude": 9.3,
                         "consensus": 25.0,
-                        "velocity": 0.056,
+                        "velocity": 0.055,
                         "persistence": 10.0,
                         "coverage": 8.75
                       }
@@ -99746,14 +99968,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -53.107,
-                      "absolute": 53.107,
+                      "value": -53.106,
+                      "absolute": 53.106,
                       "direction": "away",
                       "velocity_pp_per_hour": 0.008,
                       "components": {
                         "magnitude": 9.3,
                         "consensus": 25.0,
-                        "velocity": 0.056,
+                        "velocity": 0.055,
                         "persistence": 10.0,
                         "coverage": 8.75
                       }
@@ -99772,7 +99994,7 @@
                 },
                 "book": {
                   "pick": "yes",
-                  "score": 53.107,
+                  "score": 53.106,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -99918,14 +100140,14 @@
                       "ratio": 0.9
                     },
                     "oci_as": {
-                      "value": 54.171,
-                      "absolute": 54.171,
+                      "value": 54.169,
+                      "absolute": 54.169,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.011,
+                      "velocity_pp_per_hour": 0.01,
                       "components": {
                         "magnitude": 11.6,
                         "consensus": 22.5,
-                        "velocity": 0.07,
+                        "velocity": 0.069,
                         "persistence": 10.0,
                         "coverage": 10.0
                       }
@@ -99951,14 +100173,14 @@
                       "ratio": 0.9
                     },
                     "oci_as": {
-                      "value": -54.171,
-                      "absolute": 54.171,
+                      "value": -54.169,
+                      "absolute": 54.169,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.011,
+                      "velocity_pp_per_hour": 0.01,
                       "components": {
                         "magnitude": 11.6,
                         "consensus": 22.5,
-                        "velocity": 0.07,
+                        "velocity": 0.069,
                         "persistence": 10.0,
                         "coverage": 10.0
                       }
@@ -99977,7 +100199,7 @@
                 },
                 "book": {
                   "pick": "over",
-                  "score": 54.171,
+                  "score": 54.169,
                   "strength": "medium",
                   "color": "orange",
                   "marker_shape": "square",
@@ -100525,24 +100747,24 @@
               "context_weight": 0.62,
               "expected_side": "home",
               "metrics": {
-                "xg_for_ft": 0.0,
-                "goals_conceded_ht": 0.708,
-                "gg_ht_rate": 0.3578,
-                "xg_against_ft": 0.0,
-                "over15ht_rate": 0.6203,
+                "total_ft": 3.465,
+                "scored_ht_rate": 0.6819,
                 "goals_scored_ht": 1.168,
                 "goals_conceded_2h": 0.476,
-                "scored_ht_rate": 0.6819,
-                "goals_scored_2h": 1.113,
-                "total_ht": 1.875,
-                "clean_sheet_rate": 0.456,
                 "over25_rate": 0.665,
-                "points_per_game": 2.202,
+                "xg_against_ft": 0.0,
+                "gg_ht_rate": 0.3578,
+                "xg_for_ft": 0.0,
+                "goals_scored_2h": 1.113,
                 "goals_conceded_ft": 1.184,
+                "clean_sheet_rate": 0.456,
                 "xg_sample": 0.0,
-                "total_ft": 3.465,
-                "conceded_ht_rate": 0.4745,
+                "goals_conceded_ht": 0.708,
+                "total_ht": 1.875,
+                "over15ht_rate": 0.6203,
+                "points_per_game": 2.202,
                 "goals_scored_ft": 2.281,
+                "conceded_ht_rate": 0.4745,
                 "shots_on_target_for": 0.0,
                 "shots_on_target_against": 0.0,
                 "total_shots_for": 0.0,
@@ -101070,24 +101292,24 @@
               "context_weight": 0.62,
               "expected_side": "away",
               "metrics": {
-                "xg_for_ft": 0.0,
-                "goals_conceded_ht": 0.613,
-                "gg_ht_rate": 0.1974,
-                "xg_against_ft": 0.0,
-                "over15ht_rate": 0.4204,
+                "total_ft": 2.864,
+                "scored_ht_rate": 0.4677,
                 "goals_scored_ht": 0.691,
                 "goals_conceded_2h": 0.476,
-                "scored_ht_rate": 0.4677,
-                "goals_scored_2h": 1.085,
-                "total_ht": 1.304,
-                "clean_sheet_rate": 0.208,
                 "over25_rate": 0.668,
-                "points_per_game": 1.639,
+                "xg_against_ft": 0.0,
+                "gg_ht_rate": 0.1974,
+                "xg_for_ft": 0.0,
+                "goals_scored_2h": 1.085,
                 "goals_conceded_ft": 1.089,
+                "clean_sheet_rate": 0.208,
                 "xg_sample": 0.0,
-                "total_ft": 2.864,
-                "conceded_ht_rate": 0.5751,
+                "goals_conceded_ht": 0.613,
+                "total_ht": 1.304,
+                "over15ht_rate": 0.4204,
+                "points_per_game": 1.639,
                 "goals_scored_ft": 1.775,
+                "conceded_ht_rate": 0.5751,
                 "shots_on_target_for": 0.0,
                 "shots_on_target_against": 0.0,
                 "total_shots_for": 0.0,
@@ -101723,7 +101945,7 @@
             },
             "favorite_trap": {
               "available": true,
-              "score": 42.557,
+              "score": 42.597,
               "classification": "neutral",
               "experimental": true,
               "opening_favorite": "1",
@@ -101731,16 +101953,16 @@
               "favorite_changed": false,
               "favorite_team": "Paris Saint Germain",
               "underdog_team": "Aston Villa",
-              "current_favorite_probability_pct": 55.03,
-              "favorite_drift_odd": -0.045,
+              "current_favorite_probability_pct": 55.1,
+              "favorite_drift_odd": -0.05,
               "underdog_steam_odd": -0.27,
-              "favorite_fair_delta_pp": 1.68,
-              "underdog_fair_delta_pp": -1.18,
+              "favorite_fair_delta_pp": 1.75,
+              "underdog_fair_delta_pp": -1.21,
               "favorite_conceded_ht_rate_pct": 47.45,
               "underdog_scored_ht_rate_pct": 46.77,
               "favorite_scored_ht_rate_pct": 68.19,
-              "favorite_oci": 57.479,
-              "underdog_oci": -54.371,
+              "favorite_oci": 65.682,
+              "underdog_oci": -62.172,
               "underdog_book_consensus": 1.0,
               "statistical_confirmation": true,
               "interpretation": "L'inversione o il drift non bastano: il correttivo PT si attiva solo con vulnerabilità statistica della favorita e capacità dell'outsider di segnare presto."
@@ -101829,7 +102051,7 @@
                     "delta_fair_pp": 0.52,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": 41.068,
+                    "oci_as": 40.781,
                     "marker": {
                       "shape": "square",
                       "color": "yellow",
@@ -101848,7 +102070,7 @@
                     "delta_fair_pp": 0.29,
                     "movement_color": "gray",
                     "movement_level": "stable",
-                    "oci_as": 38.384,
+                    "oci_as": 38.224,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -101867,7 +102089,7 @@
                     "delta_fair_pp": -0.81,
                     "movement_color": "yellow",
                     "movement_level": "low",
-                    "oci_as": -44.452,
+                    "oci_as": -44.004,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -102008,7 +102230,7 @@
                     "delta_fair_pp": -0.13,
                     "movement_color": "gray",
                     "movement_level": "stable",
-                    "oci_as": -28.184,
+                    "oci_as": -28.113,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -102027,7 +102249,7 @@
                     "delta_fair_pp": 0.13,
                     "movement_color": "gray",
                     "movement_level": "stable",
-                    "oci_as": 28.184,
+                    "oci_as": 28.113,
                     "marker": {
                       "shape": "square",
                       "color": "yellow",
@@ -102309,7 +102531,7 @@
                     "delta_fair_pp": -0.27,
                     "movement_color": "gray",
                     "movement_level": "stable",
-                    "oci_as": -34.401,
+                    "oci_as": -34.251,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -102328,7 +102550,7 @@
                     "delta_fair_pp": 0.27,
                     "movement_color": "gray",
                     "movement_level": "stable",
-                    "oci_as": 34.401,
+                    "oci_as": 34.251,
                     "marker": {
                       "shape": "none",
                       "color": "none",
@@ -102829,7 +103051,7 @@
                 },
                 "book": {
                   "pick": "1",
-                  "score": 41.068,
+                  "score": 40.781,
                   "strength": "low",
                   "color": "yellow",
                   "marker_shape": "square",
@@ -102877,7 +103099,7 @@
                 },
                 "book": {
                   "pick": "under",
-                  "score": 28.184,
+                  "score": 28.113,
                   "strength": "low",
                   "color": "yellow",
                   "marker_shape": "square",
@@ -103076,7 +103298,7 @@
             "selection_policy": "Solo segnali che superano validazione mercato, affidabilità, qualità competizione, probabilità, EV e coerenza storica.",
             "favorite_trap_pattern": {
               "available": true,
-              "score": 31.541,
+              "score": 31.514,
               "classification": "neutral",
               "experimental": true,
               "opening_favorite": "2",
@@ -103092,8 +103314,8 @@
               "favorite_conceded_ht_rate_pct": 37.72,
               "underdog_scored_ht_rate_pct": 0.0,
               "favorite_scored_ht_rate_pct": 63.78,
-              "favorite_oci": -44.452,
-              "underdog_oci": 41.068,
+              "favorite_oci": -44.004,
+              "underdog_oci": 40.781,
               "underdog_book_consensus": 1.0,
               "statistical_confirmation": false,
               "interpretation": "L'inversione o il drift non bastano: il correttivo PT si attiva solo con vulnerabilità statistica della favorita e capacità dell'outsider di segnare presto."
@@ -103195,14 +103417,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 41.068,
-                      "absolute": 41.068,
+                      "value": 40.781,
+                      "absolute": 40.781,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.13,
+                      "velocity_pp_per_hour": 0.087,
                       "components": {
                         "magnitude": 5.2,
                         "consensus": 25.0,
-                        "velocity": 0.868,
+                        "velocity": 0.581,
                         "persistence": 0.0,
                         "coverage": 10.0
                       }
@@ -103228,14 +103450,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 38.384,
-                      "absolute": 38.384,
+                      "value": 38.224,
+                      "absolute": 38.224,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.073,
+                      "velocity_pp_per_hour": 0.049,
                       "components": {
                         "magnitude": 2.9,
                         "consensus": 25.0,
-                        "velocity": 0.484,
+                        "velocity": 0.324,
                         "persistence": 0.0,
                         "coverage": 10.0
                       }
@@ -103261,14 +103483,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -44.452,
-                      "absolute": 44.452,
+                      "value": -44.004,
+                      "absolute": 44.004,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.203,
+                      "velocity_pp_per_hour": 0.136,
                       "components": {
                         "magnitude": 8.1,
                         "consensus": 25.0,
-                        "velocity": 1.352,
+                        "velocity": 0.904,
                         "persistence": 0.0,
                         "coverage": 10.0
                       }
@@ -103287,7 +103509,7 @@
                 },
                 "book": {
                   "pick": "1",
-                  "score": 41.068,
+                  "score": 40.781,
                   "strength": "low",
                   "color": "yellow",
                   "marker_shape": "square",
@@ -103463,14 +103685,14 @@
                       "ratio": 0.6667
                     },
                     "oci_as": {
-                      "value": -28.184,
-                      "absolute": 28.184,
+                      "value": -28.113,
+                      "absolute": 28.113,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.033,
+                      "velocity_pp_per_hour": 0.022,
                       "components": {
                         "magnitude": 1.3,
                         "consensus": 16.668,
-                        "velocity": 0.217,
+                        "velocity": 0.145,
                         "persistence": 0.0,
                         "coverage": 10.0
                       }
@@ -103496,14 +103718,14 @@
                       "ratio": 0.6667
                     },
                     "oci_as": {
-                      "value": 28.184,
-                      "absolute": 28.184,
+                      "value": 28.113,
+                      "absolute": 28.113,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.033,
+                      "velocity_pp_per_hour": 0.022,
                       "components": {
                         "magnitude": 1.3,
                         "consensus": 16.668,
-                        "velocity": 0.217,
+                        "velocity": 0.145,
                         "persistence": 0.0,
                         "coverage": 10.0
                       }
@@ -103522,7 +103744,7 @@
                 },
                 "book": {
                   "pick": "under",
-                  "score": 28.184,
+                  "score": 28.113,
                   "strength": "low",
                   "color": "yellow",
                   "marker_shape": "square",
@@ -103908,14 +104130,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": -34.401,
-                      "absolute": 34.401,
+                      "value": -34.251,
+                      "absolute": 34.251,
                       "direction": "away",
-                      "velocity_pp_per_hour": 0.068,
+                      "velocity_pp_per_hour": 0.045,
                       "components": {
                         "magnitude": 2.7,
                         "consensus": 25.0,
-                        "velocity": 0.451,
+                        "velocity": 0.301,
                         "persistence": 0.0,
                         "coverage": 6.25
                       }
@@ -103941,14 +104163,14 @@
                       "ratio": 1.0
                     },
                     "oci_as": {
-                      "value": 34.401,
-                      "absolute": 34.401,
+                      "value": 34.251,
+                      "absolute": 34.251,
                       "direction": "toward",
-                      "velocity_pp_per_hour": 0.068,
+                      "velocity_pp_per_hour": 0.045,
                       "components": {
                         "magnitude": 2.7,
                         "consensus": 25.0,
-                        "velocity": 0.451,
+                        "velocity": 0.301,
                         "persistence": 0.0,
                         "coverage": 6.25
                       }
@@ -103967,7 +104189,7 @@
                 },
                 "book": {
                   "pick": "no",
-                  "score": 34.401,
+                  "score": 34.251,
                   "strength": "low",
                   "color": "yellow",
                   "marker_shape": "square",
@@ -104602,24 +104824,24 @@
               "context_weight": 0.46,
               "expected_side": "home",
               "metrics": {
-                "xg_for_ft": 0.0,
-                "goals_conceded_ht": 0.0,
-                "gg_ht_rate": 0.0,
-                "xg_against_ft": 0.0,
-                "over15ht_rate": 0.0,
+                "total_ft": 2.875,
+                "scored_ht_rate": 0.0,
                 "goals_scored_ht": 0.0,
                 "goals_conceded_2h": 1.181,
-                "scored_ht_rate": 0.0,
-                "goals_scored_2h": 1.694,
-                "total_ht": 0.0,
-                "clean_sheet_rate": 0.423,
                 "over25_rate": 0.577,
-                "points_per_game": 2.083,
+                "xg_against_ft": 0.0,
+                "gg_ht_rate": 0.0,
+                "xg_for_ft": 0.0,
+                "goals_scored_2h": 1.694,
                 "goals_conceded_ft": 1.181,
+                "clean_sheet_rate": 0.423,
                 "xg_sample": 0.0,
-                "total_ft": 2.875,
-                "conceded_ht_rate": 0.0,
+                "goals_conceded_ht": 0.0,
+                "total_ht": 0.0,
+                "over15ht_rate": 0.0,
+                "points_per_game": 2.083,
                 "goals_scored_ft": 1.694,
+                "conceded_ht_rate": 0.0,
                 "shots_on_target_for": 0.0,
                 "shots_on_target_against": 0.0,
                 "total_shots_for": 0.0,
@@ -104915,24 +105137,24 @@
               "context_weight": 0.62,
               "expected_side": "away",
               "metrics": {
-                "xg_for_ft": 0.0,
-                "goals_conceded_ht": 0.409,
-                "gg_ht_rate": 0.2188,
-                "xg_against_ft": 0.0,
-                "over15ht_rate": 0.3616,
+                "total_ft": 2.306,
+                "scored_ht_rate": 0.6378,
                 "goals_scored_ht": 0.766,
                 "goals_conceded_2h": 0.541,
-                "scored_ht_rate": 0.6378,
-                "goals_scored_2h": 0.59,
-                "total_ht": 1.175,
-                "clean_sheet_rate": 0.578,
                 "over25_rate": 0.554,
-                "points_per_game": 1.829,
+                "xg_against_ft": 0.0,
+                "gg_ht_rate": 0.2188,
+                "xg_for_ft": 0.0,
+                "goals_scored_2h": 0.59,
                 "goals_conceded_ft": 0.95,
+                "clean_sheet_rate": 0.578,
                 "xg_sample": 0.0,
-                "total_ft": 2.306,
-                "conceded_ht_rate": 0.3772,
+                "goals_conceded_ht": 0.409,
+                "total_ht": 1.175,
+                "over15ht_rate": 0.3616,
+                "points_per_game": 1.829,
                 "goals_scored_ft": 1.356,
+                "conceded_ht_rate": 0.3772,
                 "shots_on_target_for": 0.0,
                 "shots_on_target_against": 0.0,
                 "total_shots_for": 0.0,
@@ -105668,7 +105890,7 @@
             },
             "favorite_trap": {
               "available": true,
-              "score": 31.541,
+              "score": 31.514,
               "classification": "neutral",
               "experimental": true,
               "opening_favorite": "2",
@@ -105684,8 +105906,8 @@
               "favorite_conceded_ht_rate_pct": 37.72,
               "underdog_scored_ht_rate_pct": 0.0,
               "favorite_scored_ht_rate_pct": 63.78,
-              "favorite_oci": -44.452,
-              "underdog_oci": 41.068,
+              "favorite_oci": -44.004,
+              "underdog_oci": 40.781,
               "underdog_book_consensus": 1.0,
               "statistical_confirmation": false,
               "interpretation": "L'inversione o il drift non bastano: il correttivo PT si attiva solo con vulnerabilità statistica della favorita e capacità dell'outsider di segnare presto."
@@ -105730,9 +105952,9 @@
         }
       ],
       "refresh_status": "ok",
-      "fresh_matches": 15,
-      "preserved_matches": 11,
-      "prematch_fixtures_found": 75,
+      "fresh_matches": 4,
+      "preserved_matches": 22,
+      "prematch_fixtures_found": 40,
       "api_fixtures_found": 272
     }
   ],
@@ -105760,7 +105982,7 @@
     "tipsters": "hook opzionale arab_external_signals.json; peso massimo 5% solo con almeno 100 pronostici e Brier <= 0.24"
   },
   "api_health": {
-    "requests_this_run": 132,
+    "requests_this_run": 57,
     "last_error": null,
     "total_api_fixtures": 272,
     "total_output_matches": 26,
@@ -105826,6 +106048,6 @@
         }
       }
     },
-    "updated_at": "2026-08-12T17:03:46+02:00"
+    "updated_at": "2026-08-12T19:02:19+02:00"
   }
 }
