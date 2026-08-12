@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-12T19:02:19+02:00",
+  "updated_at": "2026-08-12T21:09:41+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -26130,7 +26130,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-12T19:02:18+02:00",
+        "settled_at": "2026-08-12T21:09:39+02:00",
         "home_ft": 3,
         "away_ft": 0,
         "home_ht": 1,
@@ -26173,7 +26173,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-12T19:02:18+02:00"
+      "settled_at": "2026-08-12T21:09:39+02:00"
     },
     "1530147": {
       "fixture_id": "1530147",
@@ -26186,7 +26186,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "PEN",
-        "settled_at": "2026-08-12T19:02:18+02:00",
+        "settled_at": "2026-08-12T21:09:39+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 1,
@@ -26229,14 +26229,238 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-12T19:02:18+02:00"
+      "settled_at": "2026-08-12T21:09:39+02:00"
+    },
+    "1594566": {
+      "fixture_id": "1594566",
+      "date": "2026-08-12",
+      "time": "17:30",
+      "match": "Budaörs - Iváncsa",
+      "league": "NB III - Southwest",
+      "country": "Hungary",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-12T21:09:39+02:00",
+        "home_ft": 3,
+        "away_ft": 1,
+        "home_ht": 2,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.445,
+        "probability_pct": 76.44,
+        "probability_raw_pct": 77.94,
+        "expected_value_pct": 10.456,
+        "relation": "confirmed",
+        "ranking_score": 92.805,
+        "recommendation_score": 86.805,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 86.805,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 69.204,
+          "probability_pct": 76.44,
+          "raw_probability_pct": 77.94,
+          "expected_value_pct": 10.456,
+          "edge_over_break_even_pp": 7.236,
+          "book_disagreement_pp": 15.04,
+          "competition_quality_score": 68,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-12T21:09:39+02:00"
+    },
+    "1594087": {
+      "fixture_id": "1594087",
+      "date": "2026-08-12",
+      "time": "17:30",
+      "match": "Tatabánya - Bicskei",
+      "league": "NB III - Northwest",
+      "country": "Hungary",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-12T21:09:39+02:00",
+        "home_ft": 3,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.42,
+        "probability_pct": 79.9,
+        "probability_raw_pct": 81.09,
+        "expected_value_pct": 13.458,
+        "relation": "confirmed",
+        "ranking_score": 86.668,
+        "recommendation_score": 80.668,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 80.668,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 70.423,
+          "probability_pct": 79.9,
+          "raw_probability_pct": 81.09,
+          "expected_value_pct": 13.458,
+          "edge_over_break_even_pp": 9.477,
+          "book_disagreement_pp": 17.04,
+          "competition_quality_score": 68,
+          "bookmakers": 6,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.07,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-12T21:09:39+02:00"
+    },
+    "1607607": {
+      "fixture_id": "1607607",
+      "date": "2026-08-12",
+      "time": "18:00",
+      "match": "FC Copenhagen - Debreceni VSC",
+      "league": "UEFA Europa Conference League",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-12T21:09:39+02:00",
+        "home_ft": 5,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.5,
+        "probability_pct": 67.82,
+        "probability_raw_pct": 68.46,
+        "expected_value_pct": 1.73,
+        "relation": "confirmed",
+        "ranking_score": 84.58,
+        "recommendation_score": 78.58,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 78.58,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 66.667,
+          "probability_pct": 67.82,
+          "raw_probability_pct": 68.46,
+          "expected_value_pct": 1.73,
+          "edge_over_break_even_pp": 1.153,
+          "book_disagreement_pp": 6.43,
+          "competition_quality_score": 88,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-12T21:09:39+02:00"
+    },
+    "1607609": {
+      "fixture_id": "1607609",
+      "date": "2026-08-12",
+      "time": "18:00",
+      "match": "GKS Katowice - Hapoel Tel Aviv",
+      "league": "UEFA Europa Conference League",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-12T21:09:39+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 2.0,
+        "probability_pct": 57.73,
+        "probability_raw_pct": 58.96,
+        "expected_value_pct": 15.46,
+        "relation": "contrast",
+        "ranking_score": 78.72,
+        "recommendation_score": 78.72,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 78.72,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 50.0,
+          "probability_pct": 57.73,
+          "raw_probability_pct": 58.96,
+          "expected_value_pct": 15.46,
+          "edge_over_break_even_pp": 7.73,
+          "book_disagreement_pp": 12.29,
+          "competition_quality_score": 88,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-12T21:09:39+02:00"
     }
   },
   "summary": {
-    "settled_primary": 478,
-    "wins": 258,
+    "settled_primary": 482,
+    "wins": 262,
     "losses": 220,
-    "win_rate_pct": 53.975,
+    "win_rate_pct": 54.357,
     "by_market": {
       "1x2_ft": {
         "settled": 182,
@@ -26245,10 +26469,10 @@
         "win_rate_pct": 52.198
       },
       "over25_ft": {
-        "settled": 276,
-        "wins": 157,
+        "settled": 280,
+        "wins": 161,
         "losses": 119,
-        "win_rate_pct": 56.884
+        "win_rate_pct": 57.5
       },
       "over15_ht": {
         "settled": 12,
@@ -26271,16 +26495,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 214,
-        "wins": 123,
+        "settled": 216,
+        "wins": 125,
         "losses": 91,
-        "win_rate_pct": 57.477
+        "win_rate_pct": 57.87
       },
       "A": {
-        "settled": 156,
-        "wins": 84,
+        "settled": 158,
+        "wins": 86,
         "losses": 72,
-        "win_rate_pct": 53.846
+        "win_rate_pct": 54.43
       },
       "C": {
         "settled": 103,
