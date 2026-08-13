@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-13T19:02:36+02:00",
+  "updated_at": "2026-08-13T21:10:33+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -26578,7 +26578,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-13T19:02:35+02:00",
+        "settled_at": "2026-08-13T21:10:31+02:00",
         "home_ft": 3,
         "away_ft": 2,
         "home_ht": 1,
@@ -26621,7 +26621,7 @@
         "market_calibration_weight": 0.08,
         "outcome": "won"
       },
-      "settled_at": "2026-08-13T19:02:35+02:00"
+      "settled_at": "2026-08-13T21:10:31+02:00"
     },
     "1530153": {
       "fixture_id": "1530153",
@@ -26634,7 +26634,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-13T19:02:35+02:00",
+        "settled_at": "2026-08-13T21:10:31+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 1,
@@ -26677,14 +26677,238 @@
         "market_calibration_weight": 0.08,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-13T19:02:35+02:00"
+      "settled_at": "2026-08-13T21:10:31+02:00"
+    },
+    "1607613": {
+      "fixture_id": "1607613",
+      "date": "2026-08-13",
+      "time": "18:00",
+      "match": "Ilves - HNK Rijeka",
+      "league": "UEFA Europa Conference League",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-13T21:10:31+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.7,
+        "probability_pct": 63.84,
+        "probability_raw_pct": 65.01,
+        "expected_value_pct": 8.528,
+        "relation": "confirmed",
+        "ranking_score": 96.881,
+        "recommendation_score": 90.881,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 90.881,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 58.824,
+          "probability_pct": 63.84,
+          "raw_probability_pct": 65.01,
+          "expected_value_pct": 8.528,
+          "edge_over_break_even_pp": 5.016,
+          "book_disagreement_pp": 9.75,
+          "competition_quality_score": 88,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-13T21:10:31+02:00"
+    },
+    "1607569": {
+      "fixture_id": "1607569",
+      "date": "2026-08-13",
+      "time": "19:00",
+      "match": "Gornik Zabrze - Ferencvarosi TC",
+      "league": "UEFA Europa League",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-13T21:10:31+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.91,
+        "probability_pct": 62.39,
+        "probability_raw_pct": 64.16,
+        "expected_value_pct": 19.165,
+        "relation": "contrast",
+        "ranking_score": 80.734,
+        "recommendation_score": 80.734,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 80.734,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 52.356,
+          "probability_pct": 62.39,
+          "raw_probability_pct": 64.16,
+          "expected_value_pct": 19.165,
+          "edge_over_break_even_pp": 10.034,
+          "book_disagreement_pp": 14.76,
+          "competition_quality_score": 88,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-13T21:10:31+02:00"
+    },
+    "1607612": {
+      "fixture_id": "1607612",
+      "date": "2026-08-13",
+      "time": "19:00",
+      "match": "Hammarby FF - Raków Częstochowa",
+      "league": "UEFA Europa Conference League",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-13T21:10:31+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.75,
+        "probability_pct": 57.66,
+        "probability_raw_pct": 58.23,
+        "expected_value_pct": 0.905,
+        "relation": "confirmed",
+        "ranking_score": 76.712,
+        "recommendation_score": 70.712,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.712,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 57.143,
+          "probability_pct": 57.66,
+          "raw_probability_pct": 58.23,
+          "expected_value_pct": 0.905,
+          "edge_over_break_even_pp": 0.517,
+          "book_disagreement_pp": 4.77,
+          "competition_quality_score": 88,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-13T21:10:31+02:00"
+    },
+    "1607183": {
+      "fixture_id": "1607183",
+      "date": "2026-08-13",
+      "time": "19:00",
+      "match": "Universitatea Craiova - KuPS",
+      "league": "UEFA Europa League",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-13T21:10:31+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.95,
+        "probability_pct": 61.36,
+        "probability_raw_pct": 63.01,
+        "expected_value_pct": 19.652,
+        "relation": "contrast",
+        "ranking_score": 82.438,
+        "recommendation_score": 82.438,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 82.438,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 51.282,
+          "probability_pct": 61.36,
+          "raw_probability_pct": 63.01,
+          "expected_value_pct": 19.652,
+          "edge_over_break_even_pp": 10.078,
+          "book_disagreement_pp": 15.01,
+          "competition_quality_score": 88,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-13T21:10:31+02:00"
     }
   },
   "summary": {
-    "settled_primary": 486,
-    "wins": 265,
-    "losses": 221,
-    "win_rate_pct": 54.527,
+    "settled_primary": 490,
+    "wins": 266,
+    "losses": 224,
+    "win_rate_pct": 54.286,
     "by_market": {
       "1x2_ft": {
         "settled": 182,
@@ -26693,10 +26917,10 @@
         "win_rate_pct": 52.198
       },
       "over25_ft": {
-        "settled": 282,
-        "wins": 163,
-        "losses": 119,
-        "win_rate_pct": 57.801
+        "settled": 286,
+        "wins": 164,
+        "losses": 122,
+        "win_rate_pct": 57.343
       },
       "over15_ht": {
         "settled": 14,
@@ -26719,16 +26943,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 217,
+        "settled": 218,
         "wins": 125,
-        "losses": 92,
-        "win_rate_pct": 57.604
+        "losses": 93,
+        "win_rate_pct": 57.339
       },
       "A": {
-        "settled": 161,
-        "wins": 89,
-        "losses": 72,
-        "win_rate_pct": 55.28
+        "settled": 164,
+        "wins": 90,
+        "losses": 74,
+        "win_rate_pct": 54.878
       },
       "C": {
         "settled": 103,
