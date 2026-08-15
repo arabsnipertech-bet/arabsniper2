@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-15T11:36:11+02:00",
+  "updated_at": "2026-08-15T12:32:11+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -30050,7 +30050,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-15T11:36:04+02:00",
+        "settled_at": "2026-08-15T12:32:04+02:00",
         "home_ft": 2,
         "away_ft": 3,
         "home_ht": 2,
@@ -30093,7 +30093,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "won"
       },
-      "settled_at": "2026-08-15T11:36:04+02:00"
+      "settled_at": "2026-08-15T12:32:04+02:00"
     },
     "1581391": {
       "fixture_id": "1581391",
@@ -30106,7 +30106,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-15T11:36:04+02:00",
+        "settled_at": "2026-08-15T12:32:04+02:00",
         "home_ft": 5,
         "away_ft": 1,
         "home_ht": 2,
@@ -30149,7 +30149,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "won"
       },
-      "settled_at": "2026-08-15T11:36:04+02:00"
+      "settled_at": "2026-08-15T12:32:04+02:00"
     },
     "1581473": {
       "fixture_id": "1581473",
@@ -30162,7 +30162,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-15T11:36:04+02:00",
+        "settled_at": "2026-08-15T12:32:04+02:00",
         "home_ft": 2,
         "away_ft": 0,
         "home_ht": 2,
@@ -30205,7 +30205,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-08-15T11:36:04+02:00"
+      "settled_at": "2026-08-15T12:32:04+02:00"
     },
     "1524232": {
       "fixture_id": "1524232",
@@ -30218,7 +30218,7 @@
       "competition_tier": "elite_asia_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-15T11:36:04+02:00",
+        "settled_at": "2026-08-15T12:32:04+02:00",
         "home_ft": 2,
         "away_ft": 1,
         "home_ht": 2,
@@ -30261,7 +30261,7 @@
         "market_calibration_weight": 0.08,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-15T11:36:04+02:00"
+      "settled_at": "2026-08-15T12:32:04+02:00"
     },
     "1524188": {
       "fixture_id": "1524188",
@@ -30274,7 +30274,7 @@
       "competition_tier": "elite_asia_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-15T11:36:04+02:00",
+        "settled_at": "2026-08-15T12:32:04+02:00",
         "home_ft": 1,
         "away_ft": 6,
         "home_ht": 0,
@@ -30317,26 +30317,306 @@
         "market_calibration_weight": 0.1,
         "outcome": "won"
       },
-      "settled_at": "2026-08-15T11:36:04+02:00"
+      "settled_at": "2026-08-15T12:32:04+02:00"
+    },
+    "1602441": {
+      "fixture_id": "1602441",
+      "date": "2026-08-15",
+      "time": "10:00",
+      "match": "CSM Ramnicu Valcea - Slatina",
+      "league": "Liga II",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-15T12:32:04+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.26,
+        "probability_pct": 53.73,
+        "probability_raw_pct": 54.91,
+        "expected_value_pct": 21.43,
+        "relation": "model_only",
+        "ranking_score": 78.44,
+        "recommendation_score": 78.44,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 78.44,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 44.248,
+          "probability_pct": 53.73,
+          "raw_probability_pct": 54.91,
+          "expected_value_pct": 21.43,
+          "edge_over_break_even_pp": 9.482,
+          "book_disagreement_pp": 14.83,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-15T12:32:04+02:00"
+    },
+    "1610563": {
+      "fixture_id": "1610563",
+      "date": "2026-08-15",
+      "time": "10:00",
+      "match": "Cetatea Suceava - CSM Satu Mare",
+      "league": "Liga II",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-15T12:32:04+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.765,
+        "probability_pct": 70.45,
+        "probability_raw_pct": 72.11,
+        "expected_value_pct": 24.344,
+        "relation": "model_only",
+        "ranking_score": 74.531,
+        "recommendation_score": 74.531,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 74.531,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 56.657,
+          "probability_pct": 70.45,
+          "raw_probability_pct": 72.11,
+          "expected_value_pct": 24.344,
+          "edge_over_break_even_pp": 13.793,
+          "book_disagreement_pp": 20.79,
+          "competition_quality_score": 68,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-15T12:32:04+02:00"
+    },
+    "1602438": {
+      "fixture_id": "1602438",
+      "date": "2026-08-15",
+      "time": "10:00",
+      "match": "Gloria Bistriţa - Concordia",
+      "league": "Liga II",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-15T12:32:04+02:00",
+        "home_ft": 1,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.88,
+        "probability_pct": 49.24,
+        "probability_raw_pct": 50.75,
+        "expected_value_pct": 41.811,
+        "relation": "model_only",
+        "ranking_score": 68.09,
+        "recommendation_score": 68.09,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 68.09,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 34.722,
+          "probability_pct": 49.24,
+          "raw_probability_pct": 50.75,
+          "expected_value_pct": 41.811,
+          "edge_over_break_even_pp": 14.518,
+          "book_disagreement_pp": 18.89,
+          "competition_quality_score": 68,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-15T12:32:04+02:00"
+    },
+    "1602439": {
+      "fixture_id": "1602439",
+      "date": "2026-08-15",
+      "time": "10:00",
+      "match": "Metaloglobus - Viitorul Şelimbăr",
+      "league": "Liga II",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-15T12:32:04+02:00",
+        "home_ft": 3,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.735,
+        "probability_pct": 66.55,
+        "probability_raw_pct": 67.69,
+        "expected_value_pct": 15.464,
+        "relation": "contrast",
+        "ranking_score": 78.219,
+        "recommendation_score": 78.219,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 78.219,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 57.637,
+          "probability_pct": 66.55,
+          "raw_probability_pct": 67.69,
+          "expected_value_pct": 15.464,
+          "edge_over_break_even_pp": 8.913,
+          "book_disagreement_pp": 14.2,
+          "competition_quality_score": 68,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-15T12:32:04+02:00"
+    },
+    "1579074": {
+      "fixture_id": "1579074",
+      "date": "2026-08-15",
+      "time": "10:15",
+      "match": "Tatran Bohunice - Ždírec nad Doubravou",
+      "league": "4. liga - Divizie D",
+      "country": "Czech-Republic",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-15T12:32:04+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.33,
+        "probability_pct": 77.05,
+        "probability_raw_pct": 77.85,
+        "expected_value_pct": 2.476,
+        "relation": "confirmed",
+        "ranking_score": 75.808,
+        "recommendation_score": 69.808,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 69.808,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 75.188,
+          "probability_pct": 77.05,
+          "raw_probability_pct": 77.85,
+          "expected_value_pct": 2.476,
+          "edge_over_break_even_pp": 1.862,
+          "book_disagreement_pp": 10.0,
+          "competition_quality_score": 68,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-15T12:32:04+02:00"
     }
   },
   "summary": {
-    "settled_primary": 551,
-    "wins": 295,
-    "losses": 256,
-    "win_rate_pct": 53.539,
+    "settled_primary": 556,
+    "wins": 298,
+    "losses": 258,
+    "win_rate_pct": 53.597,
     "by_market": {
       "1x2_ft": {
-        "settled": 201,
-        "wins": 104,
-        "losses": 97,
-        "win_rate_pct": 51.741
+        "settled": 205,
+        "wins": 107,
+        "losses": 98,
+        "win_rate_pct": 52.195
       },
       "over25_ft": {
-        "settled": 324,
+        "settled": 325,
         "wins": 181,
-        "losses": 143,
-        "win_rate_pct": 55.864
+        "losses": 144,
+        "win_rate_pct": 55.692
       },
       "over15_ht": {
         "settled": 16,
@@ -30365,10 +30645,10 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 244,
-        "wins": 137,
-        "losses": 107,
-        "win_rate_pct": 56.148
+        "settled": 248,
+        "wins": 139,
+        "losses": 109,
+        "win_rate_pct": 56.048
       },
       "A": {
         "settled": 187,
@@ -30377,10 +30657,10 @@
         "win_rate_pct": 55.08
       },
       "C": {
-        "settled": 115,
-        "wins": 51,
+        "settled": 116,
+        "wins": 52,
         "losses": 64,
-        "win_rate_pct": 44.348
+        "win_rate_pct": 44.828
       }
     }
   }
