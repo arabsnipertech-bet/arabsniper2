@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-15T02:51:31+02:00",
+  "updated_at": "2026-08-15T06:42:21+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -30038,13 +30038,125 @@
         "outcome": "won"
       },
       "settled_at": "2026-08-14T23:30:27+02:00"
+    },
+    "1581389": {
+      "fixture_id": "1581389",
+      "date": "2026-08-15",
+      "time": "03:00",
+      "match": "Correcaminos Uat - Tapatío",
+      "league": "Liga de Expansión MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-15T06:42:15+02:00",
+        "home_ft": 2,
+        "away_ft": 3,
+        "home_ht": 2,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over05_ht",
+        "selection": "over",
+        "odd": 1.29,
+        "probability_pct": 83.67,
+        "probability_raw_pct": 84.9,
+        "expected_value_pct": 7.934,
+        "relation": "confirmed",
+        "ranking_score": 103.623,
+        "recommendation_score": 92.623,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 92.623,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 62.0,
+          "market_break_even_pct": 77.519,
+          "probability_pct": 83.67,
+          "raw_probability_pct": 84.9,
+          "expected_value_pct": 7.934,
+          "edge_over_break_even_pp": 6.151,
+          "book_disagreement_pp": 13.66,
+          "competition_quality_score": 84,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-15T06:42:15+02:00"
+    },
+    "1581391": {
+      "fixture_id": "1581391",
+      "date": "2026-08-15",
+      "time": "03:00",
+      "match": "Mineros de Zacatecas - Venados FC",
+      "league": "Liga de Expansión MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-15T06:42:15+02:00",
+        "home_ft": 5,
+        "away_ft": 1,
+        "home_ht": 2,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.28,
+        "probability_pct": 50.68,
+        "probability_raw_pct": 51.82,
+        "expected_value_pct": 15.55,
+        "relation": "confirmed",
+        "ranking_score": 107.092,
+        "recommendation_score": 96.092,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 96.092,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 43.86,
+          "probability_pct": 50.68,
+          "raw_probability_pct": 51.82,
+          "expected_value_pct": 15.55,
+          "edge_over_break_even_pp": 6.82,
+          "book_disagreement_pp": 11.43,
+          "competition_quality_score": 84,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-15T06:42:15+02:00"
     }
   },
   "summary": {
-    "settled_primary": 546,
-    "wins": 291,
+    "settled_primary": 548,
+    "wins": 293,
     "losses": 255,
-    "win_rate_pct": 53.297,
+    "win_rate_pct": 53.467,
     "by_market": {
       "1x2_ft": {
         "settled": 199,
@@ -30059,16 +30171,22 @@
         "win_rate_pct": 55.728
       },
       "over15_ht": {
-        "settled": 15,
-        "wins": 6,
+        "settled": 16,
+        "wins": 7,
         "losses": 9,
-        "win_rate_pct": 40.0
+        "win_rate_pct": 43.75
       },
       "gg_ht": {
         "settled": 9,
         "wins": 2,
         "losses": 7,
         "win_rate_pct": 22.222
+      },
+      "over05_ht": {
+        "settled": 1,
+        "wins": 1,
+        "losses": 0,
+        "win_rate_pct": 100.0
       }
     },
     "by_grade": {
@@ -30085,10 +30203,10 @@
         "win_rate_pct": 56.379
       },
       "A": {
-        "settled": 183,
-        "wins": 99,
+        "settled": 185,
+        "wins": 101,
         "losses": 84,
-        "win_rate_pct": 54.098
+        "win_rate_pct": 54.595
       },
       "C": {
         "settled": 115,
