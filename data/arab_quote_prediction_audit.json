@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-16T02:51:45+02:00",
+  "updated_at": "2026-08-16T06:44:48+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -37990,37 +37990,709 @@
         "outcome": "won"
       },
       "settled_at": "2026-08-15T23:27:12+02:00"
+    },
+    "1513286": {
+      "fixture_id": "1513286",
+      "date": "2026-08-16",
+      "time": "02:45",
+      "match": "North Texas - Portland Timbers II",
+      "league": "MLS Next Pro",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 0,
+        "away_ft": 3,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.15,
+        "probability_pct": 52.63,
+        "probability_raw_pct": 53.79,
+        "expected_value_pct": 13.155,
+        "relation": "contrast",
+        "ranking_score": 80.003,
+        "recommendation_score": 80.003,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 80.003,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 46.512,
+          "probability_pct": 52.63,
+          "raw_probability_pct": 53.79,
+          "expected_value_pct": 13.155,
+          "edge_over_break_even_pp": 6.118,
+          "book_disagreement_pp": 11.63,
+          "competition_quality_score": 84,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1493627": {
+      "fixture_id": "1493627",
+      "date": "2026-08-16",
+      "time": "03:00",
+      "match": "Colorado Springs - Birmingham Legion",
+      "league": "USL Championship",
+      "country": "USA",
+      "competition_quality_score": 72,
+      "competition_tier": "major_second_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 3,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.3,
+        "probability_pct": 53.84,
+        "probability_raw_pct": 55.35,
+        "expected_value_pct": 23.832,
+        "relation": "contrast",
+        "ranking_score": 68.116,
+        "recommendation_score": 68.116,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 68.116,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 43.478,
+          "probability_pct": 53.84,
+          "raw_probability_pct": 55.35,
+          "expected_value_pct": 23.832,
+          "edge_over_break_even_pp": 10.362,
+          "book_disagreement_pp": 15.09,
+          "competition_quality_score": 72,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1581390": {
+      "fixture_id": "1581390",
+      "date": "2026-08-16",
+      "time": "03:00",
+      "match": "Dorados - Tlaxcala",
+      "league": "Liga de Expansión MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 2,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.75,
+        "probability_pct": 58.11,
+        "probability_raw_pct": 58.68,
+        "expected_value_pct": 1.692,
+        "relation": "confirmed",
+        "ranking_score": 77.468,
+        "recommendation_score": 71.468,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 71.468,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 57.143,
+          "probability_pct": 58.11,
+          "raw_probability_pct": 58.68,
+          "expected_value_pct": 1.692,
+          "edge_over_break_even_pp": 0.967,
+          "book_disagreement_pp": 5.72,
+          "competition_quality_score": 84,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1493636": {
+      "fixture_id": "1493636",
+      "date": "2026-08-16",
+      "time": "03:00",
+      "match": "San Antonio - El Paso Locomotive",
+      "league": "USL Championship",
+      "country": "USA",
+      "competition_quality_score": 72,
+      "competition_tier": "major_second_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 0,
+        "away_ft": 3,
+        "home_ht": 0,
+        "away_ht": 3
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.875,
+        "probability_pct": 58.89,
+        "probability_raw_pct": 59.8,
+        "expected_value_pct": 10.419,
+        "relation": "contrast",
+        "ranking_score": 70.009,
+        "recommendation_score": 70.009,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.009,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 53.333,
+          "probability_pct": 58.89,
+          "raw_probability_pct": 59.8,
+          "expected_value_pct": 10.419,
+          "edge_over_break_even_pp": 5.557,
+          "book_disagreement_pp": 10.14,
+          "competition_quality_score": 72,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1550922": {
+      "fixture_id": "1550922",
+      "date": "2026-08-16",
+      "time": "03:10",
+      "match": "Monterrey - FC Juarez",
+      "league": "Liga MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 6,
+        "away_ft": 1,
+        "home_ht": 4,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "gg_ht",
+        "selection": "yes",
+        "odd": 3.6,
+        "probability_pct": 35.68,
+        "probability_raw_pct": 36.31,
+        "expected_value_pct": 28.448,
+        "relation": "confirmed",
+        "ranking_score": 105.968,
+        "recommendation_score": 94.968,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 94.968,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 12.0,
+          "market_break_even_pct": 27.778,
+          "probability_pct": 35.68,
+          "raw_probability_pct": 36.31,
+          "expected_value_pct": 28.448,
+          "edge_over_break_even_pp": 7.902,
+          "book_disagreement_pp": 10.54,
+          "competition_quality_score": 84,
+          "bookmakers": 5,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1490385": {
+      "fixture_id": "1490385",
+      "date": "2026-08-16",
+      "time": "03:30",
+      "match": "Colorado Rapids - Sporting Kansas City",
+      "league": "Major League Soccer",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.45,
+        "probability_pct": 71.31,
+        "probability_raw_pct": 72.19,
+        "expected_value_pct": 3.399,
+        "relation": "confirmed",
+        "ranking_score": 88.229,
+        "recommendation_score": 82.229,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 82.229,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 68.966,
+          "probability_pct": 71.31,
+          "raw_probability_pct": 72.19,
+          "expected_value_pct": 3.399,
+          "edge_over_break_even_pp": 2.344,
+          "book_disagreement_pp": 7.9,
+          "competition_quality_score": 84,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1493631": {
+      "fixture_id": "1493631",
+      "date": "2026-08-16",
+      "time": "03:30",
+      "match": "New Mexico United - FC Tulsa",
+      "league": "USL Championship",
+      "country": "USA",
+      "competition_quality_score": 72,
+      "competition_tier": "major_second_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.135,
+        "probability_pct": 50.33,
+        "probability_raw_pct": 51.11,
+        "expected_value_pct": 7.455,
+        "relation": "confirmed",
+        "ranking_score": 80.34,
+        "recommendation_score": 74.34,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 74.34,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 46.838,
+          "probability_pct": 50.33,
+          "raw_probability_pct": 51.11,
+          "expected_value_pct": 7.455,
+          "edge_over_break_even_pp": 3.492,
+          "book_disagreement_pp": 8.71,
+          "competition_quality_score": 72,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1490384": {
+      "fixture_id": "1490384",
+      "date": "2026-08-16",
+      "time": "03:30",
+      "match": "Real Salt Lake - Minnesota United FC",
+      "league": "Major League Soccer",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.8,
+        "probability_pct": 65.56,
+        "probability_raw_pct": 67.19,
+        "expected_value_pct": 18.008,
+        "relation": "contrast",
+        "ranking_score": 84.339,
+        "recommendation_score": 84.339,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 84.339,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 55.556,
+          "probability_pct": 65.56,
+          "raw_probability_pct": 67.19,
+          "expected_value_pct": 18.008,
+          "edge_over_break_even_pp": 10.004,
+          "book_disagreement_pp": 14.82,
+          "competition_quality_score": 84,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1493632": {
+      "fixture_id": "1493632",
+      "date": "2026-08-16",
+      "time": "04:00",
+      "match": "Oakland Roots - Monterey Bay",
+      "league": "USL Championship",
+      "country": "USA",
+      "competition_quality_score": 72,
+      "competition_tier": "major_second_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.1,
+        "probability_pct": 57.58,
+        "probability_raw_pct": 59.19,
+        "expected_value_pct": 20.918,
+        "relation": "contrast",
+        "ranking_score": 73.363,
+        "recommendation_score": 73.363,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 73.363,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 47.619,
+          "probability_pct": 57.58,
+          "raw_probability_pct": 59.19,
+          "expected_value_pct": 20.918,
+          "edge_over_break_even_pp": 9.961,
+          "book_disagreement_pp": 14.6,
+          "competition_quality_score": 72,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1493630": {
+      "fixture_id": "1493630",
+      "date": "2026-08-16",
+      "time": "04:30",
+      "match": "Las Vegas Lights - Brooklyn",
+      "league": "USL Championship",
+      "country": "USA",
+      "competition_quality_score": 72,
+      "competition_tier": "major_second_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.3,
+        "probability_pct": 49.15,
+        "probability_raw_pct": 50.06,
+        "expected_value_pct": 13.045,
+        "relation": "confirmed",
+        "ranking_score": 100.001,
+        "recommendation_score": 89.001,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 89.001,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 43.478,
+          "probability_pct": 49.15,
+          "raw_probability_pct": 50.06,
+          "expected_value_pct": 13.045,
+          "edge_over_break_even_pp": 5.672,
+          "book_disagreement_pp": 10.11,
+          "competition_quality_score": 72,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1490386": {
+      "fixture_id": "1490386",
+      "date": "2026-08-16",
+      "time": "04:30",
+      "match": "Los Angeles FC - San Diego",
+      "league": "Major League Soccer",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.08,
+        "probability_pct": 51.59,
+        "probability_raw_pct": 52.32,
+        "expected_value_pct": 7.307,
+        "relation": "confirmed",
+        "ranking_score": 97.173,
+        "recommendation_score": 86.173,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 86.173,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 48.077,
+          "probability_pct": 51.59,
+          "raw_probability_pct": 52.32,
+          "expected_value_pct": 7.307,
+          "edge_over_break_even_pp": 3.513,
+          "book_disagreement_pp": 7.35,
+          "competition_quality_score": 84,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
+    },
+    "1490387": {
+      "fixture_id": "1490387",
+      "date": "2026-08-16",
+      "time": "04:30",
+      "match": "San Jose Earthquakes - St. Louis City",
+      "league": "Major League Soccer",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-16T06:44:42+02:00",
+        "home_ft": 1,
+        "away_ft": 3,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.48,
+        "probability_pct": 70.6,
+        "probability_raw_pct": 71.39,
+        "expected_value_pct": 4.488,
+        "relation": "model_only",
+        "ranking_score": 76.551,
+        "recommendation_score": 76.551,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 76.551,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 67.568,
+          "probability_pct": 70.6,
+          "raw_probability_pct": 71.39,
+          "expected_value_pct": 4.488,
+          "edge_over_break_even_pp": 3.032,
+          "book_disagreement_pp": 7.93,
+          "competition_quality_score": 84,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "orange",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-16T06:44:42+02:00"
     }
   },
   "summary": {
-    "settled_primary": 688,
-    "wins": 371,
-    "losses": 317,
-    "win_rate_pct": 53.924,
+    "settled_primary": 700,
+    "wins": 377,
+    "losses": 323,
+    "win_rate_pct": 53.857,
     "by_market": {
       "1x2_ft": {
-        "settled": 249,
-        "wins": 128,
-        "losses": 121,
-        "win_rate_pct": 51.406
+        "settled": 253,
+        "wins": 131,
+        "losses": 122,
+        "win_rate_pct": 51.779
       },
       "over25_ft": {
-        "settled": 413,
-        "wins": 233,
-        "losses": 180,
-        "win_rate_pct": 56.416
+        "settled": 418,
+        "wins": 235,
+        "losses": 183,
+        "win_rate_pct": 56.22
       },
       "over15_ht": {
-        "settled": 16,
+        "settled": 18,
         "wins": 7,
-        "losses": 9,
-        "win_rate_pct": 43.75
+        "losses": 11,
+        "win_rate_pct": 38.889
       },
       "gg_ht": {
-        "settled": 9,
-        "wins": 2,
+        "settled": 10,
+        "wins": 3,
         "losses": 7,
-        "win_rate_pct": 22.222
+        "win_rate_pct": 30.0
       },
       "over05_ht": {
         "settled": 1,
@@ -38037,22 +38709,22 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 299,
-        "wins": 172,
-        "losses": 127,
-        "win_rate_pct": 57.525
+        "settled": 304,
+        "wins": 175,
+        "losses": 129,
+        "win_rate_pct": 57.566
       },
       "A": {
-        "settled": 234,
-        "wins": 128,
-        "losses": 106,
-        "win_rate_pct": 54.701
+        "settled": 240,
+        "wins": 131,
+        "losses": 109,
+        "win_rate_pct": 54.583
       },
       "C": {
-        "settled": 150,
+        "settled": 151,
         "wins": 67,
-        "losses": 83,
-        "win_rate_pct": 44.667
+        "losses": 84,
+        "win_rate_pct": 44.371
       }
     }
   }
