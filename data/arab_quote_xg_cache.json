@@ -2929,20 +2929,26 @@
     "1513232": {
       "fixture_id": "1513232",
       "available": false,
+      "shots_available": false,
       "home_xg": null,
       "away_xg": null,
-      "source": "api_no_xg",
-      "checked_at": "2026-07-27T03:50:52+02:00",
-      "raw_team_types": {}
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:53+02:00",
+      "stats_schema": 2
     },
     "1513216": {
       "fixture_id": "1513216",
       "available": false,
+      "shots_available": false,
       "home_xg": null,
       "away_xg": null,
-      "source": "api_no_xg",
-      "checked_at": "2026-07-27T03:50:52+02:00",
-      "raw_team_types": {}
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:54+02:00",
+      "stats_schema": 2
     },
     "1513205": {
       "fixture_id": "1513205",
@@ -10270,8 +10276,334 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-08-16T02:45:22+02:00",
       "stats_schema": 2
+    },
+    "1530158": {
+      "fixture_id": "1530158",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1599,
+        "team_name": "Philadelphia Union",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2285,
+        "team_name": "Santos Laguna",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:51+02:00",
+      "stats_schema": 2
+    },
+    "1530122": {
+      "fixture_id": "1530122",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1604,
+        "team_name": "New York City FC",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2285,
+        "team_name": "Santos Laguna",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:51+02:00",
+      "stats_schema": 2
+    },
+    "1530153": {
+      "fixture_id": "1530153",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1595,
+        "team_name": "Seattle Sounders",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2278,
+        "team_name": "Guadalajara Chivas",
+        "xg": null,
+        "shots_on_target": 11.0,
+        "total_shots": 25.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:52+02:00",
+      "stats_schema": 2
+    },
+    "1513261": {
+      "fixture_id": "1513261",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:53+02:00",
+      "stats_schema": 2
+    },
+    "1513197": {
+      "fixture_id": "1513197",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:54+02:00",
+      "stats_schema": 2
+    },
+    "1530159": {
+      "fixture_id": "1530159",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1617,
+        "team_name": "Portland Timbers",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2280,
+        "team_name": "Club Tijuana",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:55+02:00",
+      "stats_schema": 2
+    },
+    "1530156": {
+      "fixture_id": "1530156",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2295,
+        "team_name": "Cruz Azul",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1607,
+        "team_name": "Chicago Fire",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:55+02:00",
+      "stats_schema": 2
+    },
+    "1496661": {
+      "fixture_id": "1496661",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:56+02:00",
+      "stats_schema": 2
+    },
+    "1496655": {
+      "fixture_id": "1496655",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:56+02:00",
+      "stats_schema": 2
+    },
+    "1496647": {
+      "fixture_id": "1496647",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:56+02:00",
+      "stats_schema": 2
+    },
+    "1496641": {
+      "fixture_id": "1496641",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:56+02:00",
+      "stats_schema": 2
+    },
+    "1496663": {
+      "fixture_id": "1496663",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:56+02:00",
+      "stats_schema": 2
+    },
+    "1496656": {
+      "fixture_id": "1496656",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:57+02:00",
+      "stats_schema": 2
+    },
+    "1496649": {
+      "fixture_id": "1496649",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:57+02:00",
+      "stats_schema": 2
+    },
+    "1496643": {
+      "fixture_id": "1496643",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:57+02:00",
+      "stats_schema": 2
+    },
+    "1516999": {
+      "fixture_id": "1516999",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:58+02:00",
+      "stats_schema": 2
+    },
+    "1516994": {
+      "fixture_id": "1516994",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:58+02:00",
+      "stats_schema": 2
+    },
+    "1516987": {
+      "fixture_id": "1516987",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-17T02:45:58+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-08-16T02:51:43+02:00",
+  "updated_at": "2026-08-17T02:49:13+02:00",
   "runtime_calls_last_run": 20
 }
