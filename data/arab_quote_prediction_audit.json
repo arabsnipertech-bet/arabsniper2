@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-17T18:35:19+02:00",
+  "updated_at": "2026-08-17T19:32:51+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -44106,7 +44106,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-17T18:35:17+02:00",
+        "settled_at": "2026-08-17T19:32:49+02:00",
         "home_ft": 0,
         "away_ft": 1,
         "home_ht": 0,
@@ -44149,7 +44149,7 @@
         "market_calibration_weight": 0.08,
         "outcome": "won"
       },
-      "settled_at": "2026-08-17T18:35:17+02:00"
+      "settled_at": "2026-08-17T19:32:49+02:00"
     },
     "1490390": {
       "fixture_id": "1490390",
@@ -44162,7 +44162,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-17T18:35:17+02:00",
+        "settled_at": "2026-08-17T19:32:49+02:00",
         "home_ft": 0,
         "away_ft": 2,
         "home_ht": 0,
@@ -44205,7 +44205,7 @@
         "market_calibration_weight": 0.08,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-17T18:35:17+02:00"
+      "settled_at": "2026-08-17T19:32:49+02:00"
     },
     "1513288": {
       "fixture_id": "1513288",
@@ -44218,7 +44218,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-17T18:35:17+02:00",
+        "settled_at": "2026-08-17T19:32:49+02:00",
         "home_ft": 0,
         "away_ft": 2,
         "home_ht": 0,
@@ -44261,7 +44261,7 @@
         "market_calibration_weight": 0.06,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-17T18:35:17+02:00"
+      "settled_at": "2026-08-17T19:32:49+02:00"
     },
     "1550927": {
       "fixture_id": "1550927",
@@ -44274,7 +44274,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-17T18:35:17+02:00",
+        "settled_at": "2026-08-17T19:32:49+02:00",
         "home_ft": 2,
         "away_ft": 1,
         "home_ht": 1,
@@ -44317,26 +44317,306 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-08-17T18:35:17+02:00"
+      "settled_at": "2026-08-17T19:32:49+02:00"
+    },
+    "1571511": {
+      "fixture_id": "1571511",
+      "date": "2026-08-17",
+      "time": "17:00",
+      "match": "Chernomorets 1919 Burgas - CSKA Sofia II",
+      "league": "Second League",
+      "country": "Bulgaria",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-17T19:32:49+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.65,
+        "probability_pct": 67.62,
+        "probability_raw_pct": 68.84,
+        "expected_value_pct": 11.573,
+        "relation": "contrast",
+        "ranking_score": 78.225,
+        "recommendation_score": 78.225,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 78.225,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 60.606,
+          "probability_pct": 67.62,
+          "raw_probability_pct": 68.84,
+          "expected_value_pct": 11.573,
+          "edge_over_break_even_pp": 7.014,
+          "book_disagreement_pp": 13.56,
+          "competition_quality_score": 68,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-17T19:32:49+02:00"
+    },
+    "1495762": {
+      "fixture_id": "1495762",
+      "date": "2026-08-17",
+      "time": "17:00",
+      "match": "Gnistan - Ilves",
+      "league": "Veikkausliiga",
+      "country": "Finland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-17T19:32:49+02:00",
+        "home_ft": 3,
+        "away_ft": 2,
+        "home_ht": 2,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.63,
+        "probability_pct": 47.32,
+        "probability_raw_pct": 48.67,
+        "expected_value_pct": 24.452,
+        "relation": "contrast",
+        "ranking_score": 70.277,
+        "recommendation_score": 70.277,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.277,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 38.023,
+          "probability_pct": 47.32,
+          "raw_probability_pct": 48.67,
+          "expected_value_pct": 24.452,
+          "edge_over_break_even_pp": 9.297,
+          "book_disagreement_pp": 13.55,
+          "competition_quality_score": 68,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-17T19:32:49+02:00"
+    },
+    "1561100": {
+      "fixture_id": "1561100",
+      "date": "2026-08-17",
+      "time": "17:00",
+      "match": "Slovan Bratislava II - Humenné",
+      "league": "2. liga",
+      "country": "Slovakia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-17T19:32:49+02:00",
+        "home_ft": 3,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.71,
+        "probability_pct": 62.57,
+        "probability_raw_pct": 63.43,
+        "expected_value_pct": 6.995,
+        "relation": "confirmed",
+        "ranking_score": 77.632,
+        "recommendation_score": 71.632,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 71.632,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 58.48,
+          "probability_pct": 62.57,
+          "raw_probability_pct": 63.43,
+          "expected_value_pct": 6.995,
+          "edge_over_break_even_pp": 4.09,
+          "book_disagreement_pp": 9.52,
+          "competition_quality_score": 68,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-17T19:32:49+02:00"
+    },
+    "1565222": {
+      "fixture_id": "1565222",
+      "date": "2026-08-17",
+      "time": "17:30",
+      "match": "Universitatea Cluj - Uta Arad",
+      "league": "Liga I",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-17T19:32:49+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.77,
+        "probability_pct": 61.1,
+        "probability_raw_pct": 61.99,
+        "expected_value_pct": 8.147,
+        "relation": "confirmed",
+        "ranking_score": 87.533,
+        "recommendation_score": 81.533,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 81.533,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 56.497,
+          "probability_pct": 61.1,
+          "raw_probability_pct": 61.99,
+          "expected_value_pct": 8.147,
+          "edge_over_break_even_pp": 4.603,
+          "book_disagreement_pp": 8.94,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-17T19:32:49+02:00"
+    },
+    "1560224": {
+      "fixture_id": "1560224",
+      "date": "2026-08-17",
+      "time": "17:30",
+      "match": "Zalaegerszegi TE - Ferencvarosi TC",
+      "league": "NB I",
+      "country": "Hungary",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-17T19:32:49+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.57,
+        "probability_pct": 73.05,
+        "probability_raw_pct": 74.4,
+        "expected_value_pct": 14.689,
+        "relation": "confirmed",
+        "ranking_score": 90.555,
+        "recommendation_score": 84.555,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 84.555,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 63.694,
+          "probability_pct": 73.05,
+          "raw_probability_pct": 74.4,
+          "expected_value_pct": 14.689,
+          "edge_over_break_even_pp": 9.356,
+          "book_disagreement_pp": 14.97,
+          "competition_quality_score": 68,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-17T19:32:49+02:00"
     }
   },
   "summary": {
-    "settled_primary": 801,
-    "wins": 433,
-    "losses": 368,
-    "win_rate_pct": 54.057,
+    "settled_primary": 806,
+    "wins": 436,
+    "losses": 370,
+    "win_rate_pct": 54.094,
     "by_market": {
       "1x2_ft": {
-        "settled": 285,
-        "wins": 147,
+        "settled": 286,
+        "wins": 148,
         "losses": 138,
-        "win_rate_pct": 51.579
+        "win_rate_pct": 51.748
       },
       "over25_ft": {
-        "settled": 485,
-        "wins": 275,
-        "losses": 210,
-        "win_rate_pct": 56.701
+        "settled": 489,
+        "wins": 277,
+        "losses": 212,
+        "win_rate_pct": 56.646
       },
       "over15_ht": {
         "settled": 20,
@@ -44365,16 +44645,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 349,
-        "wins": 202,
+        "settled": 352,
+        "wins": 205,
         "losses": 147,
-        "win_rate_pct": 57.88
+        "win_rate_pct": 58.239
       },
       "A": {
-        "settled": 274,
+        "settled": 276,
         "wins": 151,
-        "losses": 123,
-        "win_rate_pct": 55.109
+        "losses": 125,
+        "win_rate_pct": 54.71
       },
       "C": {
         "settled": 173,
