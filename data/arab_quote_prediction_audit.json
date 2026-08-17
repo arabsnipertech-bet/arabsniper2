@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-17T02:49:14+02:00",
+  "updated_at": "2026-08-17T06:51:42+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -44094,13 +44094,181 @@
         "outcome": "lost"
       },
       "settled_at": "2026-08-16T23:26:07+02:00"
+    },
+    "1550926": {
+      "fixture_id": "1550926",
+      "date": "2026-08-17",
+      "time": "03:10",
+      "match": "Santos Laguna - Guadalajara Chivas",
+      "league": "Liga MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-17T06:51:39+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.375,
+        "probability_pct": 54.7,
+        "probability_raw_pct": 56.04,
+        "expected_value_pct": 29.913,
+        "relation": "model_only",
+        "ranking_score": 75.379,
+        "recommendation_score": 75.379,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 75.379,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 42.105,
+          "probability_pct": 54.7,
+          "raw_probability_pct": 56.04,
+          "expected_value_pct": 29.913,
+          "edge_over_break_even_pp": 12.595,
+          "book_disagreement_pp": 16.78,
+          "competition_quality_score": 84,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-17T06:51:39+02:00"
+    },
+    "1490390": {
+      "fixture_id": "1490390",
+      "date": "2026-08-17",
+      "time": "04:30",
+      "match": "Seattle Sounders - Vancouver Whitecaps",
+      "league": "Major League Soccer",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-17T06:51:39+02:00",
+        "home_ft": 0,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.27,
+        "probability_pct": 47.8,
+        "probability_raw_pct": 48.39,
+        "expected_value_pct": 8.506,
+        "relation": "confirmed",
+        "ranking_score": 97.963,
+        "recommendation_score": 86.963,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 86.963,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 44.053,
+          "probability_pct": 47.8,
+          "raw_probability_pct": 48.39,
+          "expected_value_pct": 8.506,
+          "edge_over_break_even_pp": 3.747,
+          "book_disagreement_pp": 7.43,
+          "competition_quality_score": 84,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-17T06:51:39+02:00"
+    },
+    "1513288": {
+      "fixture_id": "1513288",
+      "date": "2026-08-17",
+      "time": "04:30",
+      "match": "The Town - St. Louis City II",
+      "league": "MLS Next Pro",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-17T06:51:39+02:00",
+        "home_ft": 0,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.59,
+        "probability_pct": 71.34,
+        "probability_raw_pct": 72.2,
+        "expected_value_pct": 13.431,
+        "relation": "contrast",
+        "ranking_score": 81.242,
+        "recommendation_score": 81.242,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 81.242,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 62.893,
+          "probability_pct": 71.34,
+          "raw_probability_pct": 72.2,
+          "expected_value_pct": 13.431,
+          "edge_over_break_even_pp": 8.447,
+          "book_disagreement_pp": 14.26,
+          "competition_quality_score": 84,
+          "bookmakers": 5,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "orange",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-17T06:51:39+02:00"
     }
   },
   "summary": {
-    "settled_primary": 797,
-    "wins": 431,
-    "losses": 366,
-    "win_rate_pct": 54.078,
+    "settled_primary": 800,
+    "wins": 432,
+    "losses": 368,
+    "win_rate_pct": 54.0,
     "by_market": {
       "1x2_ft": {
         "settled": 285,
@@ -44109,16 +44277,16 @@
         "win_rate_pct": 51.579
       },
       "over25_ft": {
-        "settled": 482,
-        "wins": 273,
-        "losses": 209,
-        "win_rate_pct": 56.639
+        "settled": 484,
+        "wins": 274,
+        "losses": 210,
+        "win_rate_pct": 56.612
       },
       "over15_ht": {
-        "settled": 19,
+        "settled": 20,
         "wins": 7,
-        "losses": 12,
-        "win_rate_pct": 36.842
+        "losses": 13,
+        "win_rate_pct": 35.0
       },
       "gg_ht": {
         "settled": 10,
@@ -44141,16 +44309,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 347,
-        "wins": 200,
+        "settled": 348,
+        "wins": 201,
         "losses": 147,
-        "win_rate_pct": 57.637
+        "win_rate_pct": 57.759
       },
       "A": {
-        "settled": 272,
+        "settled": 274,
         "wins": 151,
-        "losses": 121,
-        "win_rate_pct": 55.515
+        "losses": 123,
+        "win_rate_pct": 55.109
       },
       "C": {
         "settled": 173,
