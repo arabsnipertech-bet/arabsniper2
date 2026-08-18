@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-18T16:39:38+02:00",
+  "updated_at": "2026-08-18T17:37:51+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -45730,7 +45730,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-18T16:39:37+02:00",
+        "settled_at": "2026-08-18T17:37:49+02:00",
         "home_ft": 1,
         "away_ft": 4,
         "home_ht": 0,
@@ -45773,7 +45773,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "won"
       },
-      "settled_at": "2026-08-18T16:39:37+02:00"
+      "settled_at": "2026-08-18T17:37:49+02:00"
     },
     "1550929": {
       "fixture_id": "1550929",
@@ -45786,7 +45786,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-18T16:39:37+02:00",
+        "settled_at": "2026-08-18T17:37:49+02:00",
         "home_ft": 2,
         "away_ft": 3,
         "home_ht": 1,
@@ -45829,14 +45829,70 @@
         "market_calibration_weight": 0.06,
         "outcome": "won"
       },
-      "settled_at": "2026-08-18T16:39:37+02:00"
+      "settled_at": "2026-08-18T17:37:49+02:00"
+    },
+    "1619318": {
+      "fixture_id": "1619318",
+      "date": "2026-08-18",
+      "time": "15:00",
+      "match": "Thailand - Singapore",
+      "league": "ASEAN Championship",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-18T17:37:49+02:00",
+        "home_ft": 1,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.97,
+        "probability_pct": 54.95,
+        "probability_raw_pct": 55.85,
+        "expected_value_pct": 8.251,
+        "relation": "confirmed",
+        "ranking_score": 79.481,
+        "recommendation_score": 73.481,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 73.481,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 50.761,
+          "probability_pct": 54.95,
+          "raw_probability_pct": 55.85,
+          "expected_value_pct": 8.251,
+          "edge_over_break_even_pp": 4.189,
+          "book_disagreement_pp": 9.02,
+          "competition_quality_score": 88,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-18T17:37:49+02:00"
     }
   },
   "summary": {
-    "settled_primary": 828,
+    "settled_primary": 829,
     "wins": 446,
-    "losses": 382,
-    "win_rate_pct": 53.865,
+    "losses": 383,
+    "win_rate_pct": 53.8,
     "by_market": {
       "1x2_ft": {
         "settled": 294,
@@ -45845,10 +45901,10 @@
         "win_rate_pct": 51.02
       },
       "over25_ft": {
-        "settled": 501,
+        "settled": 502,
         "wins": 283,
-        "losses": 218,
-        "win_rate_pct": 56.487
+        "losses": 219,
+        "win_rate_pct": 56.375
       },
       "over15_ht": {
         "settled": 21,
@@ -45877,10 +45933,10 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 363,
+        "settled": 364,
         "wins": 209,
-        "losses": 154,
-        "win_rate_pct": 57.576
+        "losses": 155,
+        "win_rate_pct": 57.418
       },
       "A": {
         "settled": 282,
