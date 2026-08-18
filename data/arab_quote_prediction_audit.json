@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-18T18:38:12+02:00",
+  "updated_at": "2026-08-18T19:32:51+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -45730,7 +45730,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-18T18:38:10+02:00",
+        "settled_at": "2026-08-18T19:32:49+02:00",
         "home_ft": 1,
         "away_ft": 4,
         "home_ht": 0,
@@ -45773,7 +45773,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "won"
       },
-      "settled_at": "2026-08-18T18:38:10+02:00"
+      "settled_at": "2026-08-18T19:32:49+02:00"
     },
     "1550929": {
       "fixture_id": "1550929",
@@ -45786,7 +45786,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-18T18:38:10+02:00",
+        "settled_at": "2026-08-18T19:32:49+02:00",
         "home_ft": 2,
         "away_ft": 3,
         "home_ht": 1,
@@ -45829,7 +45829,7 @@
         "market_calibration_weight": 0.06,
         "outcome": "won"
       },
-      "settled_at": "2026-08-18T18:38:10+02:00"
+      "settled_at": "2026-08-18T19:32:49+02:00"
     },
     "1619318": {
       "fixture_id": "1619318",
@@ -45842,7 +45842,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-18T18:38:10+02:00",
+        "settled_at": "2026-08-18T19:32:49+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 0,
@@ -45885,26 +45885,138 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-18T18:38:10+02:00"
+      "settled_at": "2026-08-18T19:32:49+02:00"
+    },
+    "1627507": {
+      "fixture_id": "1627507",
+      "date": "2026-08-18",
+      "time": "16:30",
+      "match": "CSM Reşiţa - Petrolul Ploiesti",
+      "league": "Cupa României",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "AET",
+        "settled_at": "2026-08-18T19:32:49+02:00",
+        "home_ft": 2,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.05,
+        "probability_pct": 52.68,
+        "probability_raw_pct": 53.68,
+        "expected_value_pct": 7.994,
+        "relation": "confirmed",
+        "ranking_score": 82.44,
+        "recommendation_score": 76.44,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 76.44,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 48.78,
+          "probability_pct": 52.68,
+          "raw_probability_pct": 53.68,
+          "expected_value_pct": 7.994,
+          "edge_over_break_even_pp": 3.9,
+          "book_disagreement_pp": 9.94,
+          "competition_quality_score": 68,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-18T19:32:49+02:00"
+    },
+    "1571517": {
+      "fixture_id": "1571517",
+      "date": "2026-08-18",
+      "time": "17:30",
+      "match": "Pirin Blagoevgrad - Hebar 1918",
+      "league": "Second League",
+      "country": "Bulgaria",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-18T19:32:49+02:00",
+        "home_ft": 2,
+        "away_ft": 3,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.81,
+        "probability_pct": 58.48,
+        "probability_raw_pct": 59.36,
+        "expected_value_pct": 5.849,
+        "relation": "confirmed",
+        "ranking_score": 84.629,
+        "recommendation_score": 78.629,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 78.629,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 55.249,
+          "probability_pct": 58.48,
+          "raw_probability_pct": 59.36,
+          "expected_value_pct": 5.849,
+          "edge_over_break_even_pp": 3.231,
+          "book_disagreement_pp": 8.81,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-18T19:32:49+02:00"
     }
   },
   "summary": {
-    "settled_primary": 829,
-    "wins": 446,
-    "losses": 383,
-    "win_rate_pct": 53.8,
+    "settled_primary": 831,
+    "wins": 447,
+    "losses": 384,
+    "win_rate_pct": 53.791,
     "by_market": {
       "1x2_ft": {
-        "settled": 294,
+        "settled": 295,
         "wins": 150,
-        "losses": 144,
-        "win_rate_pct": 51.02
+        "losses": 145,
+        "win_rate_pct": 50.847
       },
       "over25_ft": {
-        "settled": 502,
-        "wins": 283,
+        "settled": 503,
+        "wins": 284,
         "losses": 219,
-        "win_rate_pct": 56.375
+        "win_rate_pct": 56.461
       },
       "over15_ht": {
         "settled": 21,
@@ -45933,10 +46045,10 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 364,
-        "wins": 209,
-        "losses": 155,
-        "win_rate_pct": 57.418
+        "settled": 366,
+        "wins": 210,
+        "losses": 156,
+        "win_rate_pct": 57.377
       },
       "A": {
         "settled": 282,
