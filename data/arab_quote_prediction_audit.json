@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-18T02:52:45+02:00",
+  "updated_at": "2026-08-18T06:41:47+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -45718,13 +45718,69 @@
         "outcome": "won"
       },
       "settled_at": "2026-08-17T23:31:01+02:00"
+    },
+    "1603326": {
+      "fixture_id": "1603326",
+      "date": "2026-08-18",
+      "time": "03:06",
+      "match": "Santos Laguna W - Monterrey W",
+      "league": "Liga MX Femenil",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-18T06:41:46+02:00",
+        "home_ft": 1,
+        "away_ft": 4,
+        "home_ht": 0,
+        "away_ht": 3
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.08,
+        "probability_pct": 50.68,
+        "probability_raw_pct": 51.32,
+        "expected_value_pct": 5.414,
+        "relation": "contrast",
+        "ranking_score": 75.587,
+        "recommendation_score": 70.587,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.587,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 48.077,
+          "probability_pct": 50.68,
+          "raw_probability_pct": 51.32,
+          "expected_value_pct": 5.414,
+          "edge_over_break_even_pp": 2.603,
+          "book_disagreement_pp": 7.08,
+          "competition_quality_score": 84,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-18T06:41:46+02:00"
     }
   },
   "summary": {
-    "settled_primary": 826,
-    "wins": 444,
+    "settled_primary": 827,
+    "wins": 445,
     "losses": 382,
-    "win_rate_pct": 53.753,
+    "win_rate_pct": 53.809,
     "by_market": {
       "1x2_ft": {
         "settled": 294,
@@ -45739,10 +45795,10 @@
         "win_rate_pct": 56.487
       },
       "over15_ht": {
-        "settled": 20,
-        "wins": 7,
+        "settled": 21,
+        "wins": 8,
         "losses": 13,
-        "win_rate_pct": 35.0
+        "win_rate_pct": 38.095
       },
       "gg_ht": {
         "settled": 10,
@@ -45765,10 +45821,10 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 362,
-        "wins": 208,
+        "settled": 363,
+        "wins": 209,
         "losses": 154,
-        "win_rate_pct": 57.459
+        "win_rate_pct": 57.576
       },
       "A": {
         "settled": 281,
