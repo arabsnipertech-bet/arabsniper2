@@ -3310,14 +3310,38 @@
     "1469708": {
       "fixture_id": "1469708",
       "available": true,
+      "shots_available": true,
       "home_xg": 1.4,
       "away_xg": 1.52,
+      "home_stats": {
+        "team_id": 939,
+        "team_name": "Western Sydney Wanderers",
+        "xg": 1.4,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 944,
+        "team_name": "Melbourne Victory",
+        "xg": 1.52,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
       "source": "api_fixture_statistics",
-      "checked_at": "2026-07-28T03:24:52+02:00",
-      "raw_team_types": {
-        "939": "expected_goals",
-        "944": "expected_goals"
-      }
+      "checked_at": "2026-08-19T02:47:36+02:00",
+      "stats_schema": 2
     },
     "1549570": {
       "fixture_id": "1549570",
@@ -11066,8 +11090,284 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-08-18T02:47:03+02:00",
       "stats_schema": 2
+    },
+    "1548353": {
+      "fixture_id": "1548353",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:32+02:00",
+      "stats_schema": 2
+    },
+    "1548352": {
+      "fixture_id": "1548352",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:32+02:00",
+      "stats_schema": 2
+    },
+    "1548359": {
+      "fixture_id": "1548359",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:33+02:00",
+      "stats_schema": 2
+    },
+    "1374569": {
+      "fixture_id": "1374569",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:34+02:00",
+      "stats_schema": 2
+    },
+    "1200470": {
+      "fixture_id": "1200470",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:34+02:00",
+      "stats_schema": 2
+    },
+    "1028486": {
+      "fixture_id": "1028486",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:34+02:00",
+      "stats_schema": 2
+    },
+    "1027950": {
+      "fixture_id": "1027950",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:34+02:00",
+      "stats_schema": 2
+    },
+    "1200451": {
+      "fixture_id": "1200451",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:35+02:00",
+      "stats_schema": 2
+    },
+    "704543": {
+      "fixture_id": "704543",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:35+02:00",
+      "stats_schema": 2
+    },
+    "1560861": {
+      "fixture_id": "1560861",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:36+02:00",
+      "stats_schema": 2
+    },
+    "1542880": {
+      "fixture_id": "1542880",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.28,
+      "away_xg": 0.75,
+      "home_stats": {
+        "team_id": 944,
+        "team_name": "Melbourne Victory",
+        "xg": 1.28,
+        "shots_on_target": 6.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 943,
+        "team_name": "Sydney",
+        "xg": 0.75,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:36+02:00",
+      "stats_schema": 2
+    },
+    "1469700": {
+      "fixture_id": "1469700",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.18,
+      "away_xg": 2.16,
+      "home_stats": {
+        "team_id": 944,
+        "team_name": "Melbourne Victory",
+        "xg": 2.18,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 946,
+        "team_name": "Newcastle Jets",
+        "xg": 2.16,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:36+02:00",
+      "stats_schema": 2
+    },
+    "1568740": {
+      "fixture_id": "1568740",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:37+02:00",
+      "stats_schema": 2
+    },
+    "1568733": {
+      "fixture_id": "1568733",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:37+02:00",
+      "stats_schema": 2
+    },
+    "1568729": {
+      "fixture_id": "1568729",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:37+02:00",
+      "stats_schema": 2
+    },
+    "1410759": {
+      "fixture_id": "1410759",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:37+02:00",
+      "stats_schema": 2
+    },
+    "1568745": {
+      "fixture_id": "1568745",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:37+02:00",
+      "stats_schema": 2
+    },
+    "1568738": {
+      "fixture_id": "1568738",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:38+02:00",
+      "stats_schema": 2
+    },
+    "1568724": {
+      "fixture_id": "1568724",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-19T02:47:38+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-08-18T02:52:43+02:00",
+  "updated_at": "2026-08-19T02:55:17+02:00",
   "runtime_calls_last_run": 20
 }
