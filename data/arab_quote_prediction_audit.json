@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-20T17:40:19+02:00",
+  "updated_at": "2026-08-20T18:41:49+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -49258,7 +49258,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T17:40:17+02:00",
+        "settled_at": "2026-08-20T18:41:47+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 1,
@@ -49301,7 +49301,7 @@
         "market_calibration_weight": 0.12,
         "outcome": "won"
       },
-      "settled_at": "2026-08-20T17:40:17+02:00"
+      "settled_at": "2026-08-20T18:41:47+02:00"
     },
     "1493639": {
       "fixture_id": "1493639",
@@ -49314,7 +49314,7 @@
       "competition_tier": "major_second_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T17:40:17+02:00",
+        "settled_at": "2026-08-20T18:41:47+02:00",
         "home_ft": 3,
         "away_ft": 1,
         "home_ht": 1,
@@ -49357,7 +49357,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-20T17:40:17+02:00"
+      "settled_at": "2026-08-20T18:41:47+02:00"
     },
     "1490403": {
       "fixture_id": "1490403",
@@ -49370,7 +49370,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T17:40:17+02:00",
+        "settled_at": "2026-08-20T18:41:47+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 0,
@@ -49413,7 +49413,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-20T17:40:17+02:00"
+      "settled_at": "2026-08-20T18:41:47+02:00"
     },
     "1490405": {
       "fixture_id": "1490405",
@@ -49426,7 +49426,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T17:40:17+02:00",
+        "settled_at": "2026-08-20T18:41:47+02:00",
         "home_ft": 3,
         "away_ft": 1,
         "home_ht": 1,
@@ -49469,7 +49469,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-08-20T17:40:17+02:00"
+      "settled_at": "2026-08-20T18:41:47+02:00"
     },
     "1490404": {
       "fixture_id": "1490404",
@@ -49482,7 +49482,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T17:40:17+02:00",
+        "settled_at": "2026-08-20T18:41:47+02:00",
         "home_ft": 0,
         "away_ft": 1,
         "home_ht": 0,
@@ -49525,14 +49525,70 @@
         "market_calibration_weight": 0.12,
         "outcome": "won"
       },
-      "settled_at": "2026-08-20T17:40:17+02:00"
+      "settled_at": "2026-08-20T18:41:47+02:00"
+    },
+    "1597908": {
+      "fixture_id": "1597908",
+      "date": "2026-08-20",
+      "time": "16:15",
+      "match": "Al Wakrah - Qatar SC",
+      "league": "Stars League",
+      "country": "Qatar",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-20T18:41:47+02:00",
+        "home_ft": 2,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.62,
+        "probability_pct": 70.3,
+        "probability_raw_pct": 71.44,
+        "expected_value_pct": 13.886,
+        "relation": "contrast",
+        "ranking_score": 70.917,
+        "recommendation_score": 70.917,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.917,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 61.728,
+          "probability_pct": 70.3,
+          "raw_probability_pct": 71.44,
+          "expected_value_pct": 13.886,
+          "edge_over_break_even_pp": 8.572,
+          "book_disagreement_pp": 14.3,
+          "competition_quality_score": 64,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-20T18:41:47+02:00"
     }
   },
   "summary": {
-    "settled_primary": 894,
-    "wins": 472,
+    "settled_primary": 895,
+    "wins": 473,
     "losses": 422,
-    "win_rate_pct": 52.796,
+    "win_rate_pct": 52.849,
     "by_market": {
       "1x2_ft": {
         "settled": 311,
@@ -49541,10 +49597,10 @@
         "win_rate_pct": 49.839
       },
       "over25_ft": {
-        "settled": 549,
-        "wins": 304,
+        "settled": 550,
+        "wins": 305,
         "losses": 245,
-        "win_rate_pct": 55.373
+        "win_rate_pct": 55.455
       },
       "over15_ht": {
         "settled": 22,
@@ -49573,10 +49629,10 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 391,
-        "wins": 218,
+        "settled": 392,
+        "wins": 219,
         "losses": 173,
-        "win_rate_pct": 55.754
+        "win_rate_pct": 55.867
       },
       "A": {
         "settled": 312,
