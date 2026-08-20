@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-20T18:41:49+02:00",
+  "updated_at": "2026-08-20T19:36:14+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -49258,7 +49258,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T18:41:47+02:00",
+        "settled_at": "2026-08-20T19:36:11+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 1,
@@ -49301,7 +49301,7 @@
         "market_calibration_weight": 0.12,
         "outcome": "won"
       },
-      "settled_at": "2026-08-20T18:41:47+02:00"
+      "settled_at": "2026-08-20T19:36:11+02:00"
     },
     "1493639": {
       "fixture_id": "1493639",
@@ -49314,7 +49314,7 @@
       "competition_tier": "major_second_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T18:41:47+02:00",
+        "settled_at": "2026-08-20T19:36:11+02:00",
         "home_ft": 3,
         "away_ft": 1,
         "home_ht": 1,
@@ -49357,7 +49357,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-20T18:41:47+02:00"
+      "settled_at": "2026-08-20T19:36:11+02:00"
     },
     "1490403": {
       "fixture_id": "1490403",
@@ -49370,7 +49370,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T18:41:47+02:00",
+        "settled_at": "2026-08-20T19:36:11+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 0,
@@ -49413,7 +49413,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-20T18:41:47+02:00"
+      "settled_at": "2026-08-20T19:36:11+02:00"
     },
     "1490405": {
       "fixture_id": "1490405",
@@ -49426,7 +49426,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T18:41:47+02:00",
+        "settled_at": "2026-08-20T19:36:11+02:00",
         "home_ft": 3,
         "away_ft": 1,
         "home_ht": 1,
@@ -49469,7 +49469,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-08-20T18:41:47+02:00"
+      "settled_at": "2026-08-20T19:36:11+02:00"
     },
     "1490404": {
       "fixture_id": "1490404",
@@ -49482,7 +49482,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T18:41:47+02:00",
+        "settled_at": "2026-08-20T19:36:11+02:00",
         "home_ft": 0,
         "away_ft": 1,
         "home_ht": 0,
@@ -49525,7 +49525,7 @@
         "market_calibration_weight": 0.12,
         "outcome": "won"
       },
-      "settled_at": "2026-08-20T18:41:47+02:00"
+      "settled_at": "2026-08-20T19:36:11+02:00"
     },
     "1597908": {
       "fixture_id": "1597908",
@@ -49538,7 +49538,7 @@
       "competition_tier": "elite_asia_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-20T18:41:47+02:00",
+        "settled_at": "2026-08-20T19:36:11+02:00",
         "home_ft": 2,
         "away_ft": 2,
         "home_ht": 1,
@@ -49581,14 +49581,70 @@
         "market_calibration_weight": 0.08,
         "outcome": "won"
       },
-      "settled_at": "2026-08-20T18:41:47+02:00"
+      "settled_at": "2026-08-20T19:36:11+02:00"
+    },
+    "1623435": {
+      "fixture_id": "1623435",
+      "date": "2026-08-20",
+      "time": "17:00",
+      "match": "Kairat Almaty - Anderlecht",
+      "league": "UEFA Europa League",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-20T19:36:11+02:00",
+        "home_ft": 0,
+        "away_ft": 3,
+        "home_ht": 0,
+        "away_ht": 3
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.685,
+        "probability_pct": 61.4,
+        "probability_raw_pct": 62.11,
+        "expected_value_pct": 3.459,
+        "relation": "confirmed",
+        "ranking_score": 76.076,
+        "recommendation_score": 70.076,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.076,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 59.347,
+          "probability_pct": 61.4,
+          "raw_probability_pct": 62.11,
+          "expected_value_pct": 3.459,
+          "edge_over_break_even_pp": 2.053,
+          "book_disagreement_pp": 5.88,
+          "competition_quality_score": 88,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-20T19:36:11+02:00"
     }
   },
   "summary": {
-    "settled_primary": 895,
+    "settled_primary": 896,
     "wins": 473,
-    "losses": 422,
-    "win_rate_pct": 52.849,
+    "losses": 423,
+    "win_rate_pct": 52.79,
     "by_market": {
       "1x2_ft": {
         "settled": 311,
@@ -49597,10 +49653,10 @@
         "win_rate_pct": 49.839
       },
       "over25_ft": {
-        "settled": 550,
+        "settled": 551,
         "wins": 305,
-        "losses": 245,
-        "win_rate_pct": 55.455
+        "losses": 246,
+        "win_rate_pct": 55.354
       },
       "over15_ht": {
         "settled": 22,
@@ -49629,10 +49685,10 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 392,
+        "settled": 393,
         "wins": 219,
-        "losses": 173,
-        "win_rate_pct": 55.867
+        "losses": 174,
+        "win_rate_pct": 55.725
       },
       "A": {
         "settled": 312,
