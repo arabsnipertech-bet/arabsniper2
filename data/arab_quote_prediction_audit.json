@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-21T02:46:56+02:00",
+  "updated_at": "2026-08-21T06:47:58+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -51150,31 +51150,199 @@
         "outcome": "lost"
       },
       "settled_at": "2026-08-20T23:34:01+02:00"
+    },
+    "1581396": {
+      "fixture_id": "1581396",
+      "date": "2026-08-21",
+      "time": "03:00",
+      "match": "Monarcas - Correcaminos Uat",
+      "league": "Liga de Expansión MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-21T06:47:55+02:00",
+        "home_ft": 1,
+        "away_ft": 3,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.2,
+        "probability_pct": 56.4,
+        "probability_raw_pct": 57.82,
+        "expected_value_pct": 24.08,
+        "relation": "confirmed",
+        "ranking_score": 106.207,
+        "recommendation_score": 95.207,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 95.207,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 45.455,
+          "probability_pct": 56.4,
+          "raw_probability_pct": 57.82,
+          "expected_value_pct": 24.08,
+          "edge_over_break_even_pp": 10.945,
+          "book_disagreement_pp": 15.79,
+          "competition_quality_score": 84,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-21T06:47:55+02:00"
+    },
+    "1581398": {
+      "fixture_id": "1581398",
+      "date": "2026-08-21",
+      "time": "03:00",
+      "match": "Tepatitlán - Tlaxcala",
+      "league": "Liga de Expansión MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-21T06:47:55+02:00",
+        "home_ft": 3,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.74,
+        "probability_pct": 63.81,
+        "probability_raw_pct": 64.98,
+        "expected_value_pct": 11.029,
+        "relation": "contrast",
+        "ranking_score": 83.709,
+        "recommendation_score": 83.709,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 83.709,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 57.471,
+          "probability_pct": 63.81,
+          "raw_probability_pct": 64.98,
+          "expected_value_pct": 11.029,
+          "edge_over_break_even_pp": 6.339,
+          "book_disagreement_pp": 11.75,
+          "competition_quality_score": 84,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-21T06:47:55+02:00"
+    },
+    "1513301": {
+      "fixture_id": "1513301",
+      "date": "2026-08-21",
+      "time": "04:00",
+      "match": "Los Angeles FC II - Sporting KC II",
+      "league": "MLS Next Pro",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-21T06:47:55+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 2,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.55,
+        "probability_pct": 69.54,
+        "probability_raw_pct": 70.48,
+        "expected_value_pct": 7.787,
+        "relation": "contrast",
+        "ranking_score": 79.272,
+        "recommendation_score": 79.272,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 79.272,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 64.516,
+          "probability_pct": 69.54,
+          "raw_probability_pct": 70.48,
+          "expected_value_pct": 7.787,
+          "edge_over_break_even_pp": 5.024,
+          "book_disagreement_pp": 11.87,
+          "competition_quality_score": 84,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-21T06:47:55+02:00"
     }
   },
   "summary": {
-    "settled_primary": 923,
-    "wins": 490,
-    "losses": 433,
-    "win_rate_pct": 53.088,
+    "settled_primary": 926,
+    "wins": 491,
+    "losses": 435,
+    "win_rate_pct": 53.024,
     "by_market": {
       "1x2_ft": {
-        "settled": 317,
-        "wins": 159,
+        "settled": 318,
+        "wins": 160,
         "losses": 158,
-        "win_rate_pct": 50.158
+        "win_rate_pct": 50.314
       },
       "over25_ft": {
-        "settled": 572,
+        "settled": 573,
         "wins": 318,
-        "losses": 254,
-        "win_rate_pct": 55.594
+        "losses": 255,
+        "win_rate_pct": 55.497
       },
       "over15_ht": {
-        "settled": 22,
+        "settled": 23,
         "wins": 8,
-        "losses": 14,
-        "win_rate_pct": 36.364
+        "losses": 15,
+        "win_rate_pct": 34.783
       },
       "gg_ht": {
         "settled": 11,
@@ -51203,10 +51371,10 @@
         "win_rate_pct": 55.721
       },
       "A": {
-        "settled": 327,
-        "wins": 176,
-        "losses": 151,
-        "win_rate_pct": 53.823
+        "settled": 330,
+        "wins": 177,
+        "losses": 153,
+        "win_rate_pct": 53.636
       },
       "C": {
         "settled": 189,
