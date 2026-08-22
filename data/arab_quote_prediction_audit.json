@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-22T11:37:48+02:00",
+  "updated_at": "2026-08-22T12:34:47+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -54466,7 +54466,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-22T11:37:41+02:00",
+        "settled_at": "2026-08-22T12:34:39+02:00",
         "home_ft": 2,
         "away_ft": 0,
         "home_ht": 0,
@@ -54509,7 +54509,7 @@
         "market_calibration_weight": 0.06,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-22T11:37:41+02:00"
+      "settled_at": "2026-08-22T12:34:39+02:00"
     },
     "1550933": {
       "fixture_id": "1550933",
@@ -54522,7 +54522,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-22T11:37:41+02:00",
+        "settled_at": "2026-08-22T12:34:39+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 0,
@@ -54565,7 +54565,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-22T11:37:41+02:00"
+      "settled_at": "2026-08-22T12:34:39+02:00"
     },
     "1603328": {
       "fixture_id": "1603328",
@@ -54578,7 +54578,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-22T11:37:41+02:00",
+        "settled_at": "2026-08-22T12:34:39+02:00",
         "home_ft": 2,
         "away_ft": 3,
         "home_ht": 1,
@@ -54621,7 +54621,7 @@
         "market_calibration_weight": 0.03,
         "outcome": "won"
       },
-      "settled_at": "2026-08-22T11:37:41+02:00"
+      "settled_at": "2026-08-22T12:34:39+02:00"
     },
     "1550931": {
       "fixture_id": "1550931",
@@ -54634,7 +54634,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-22T11:37:41+02:00",
+        "settled_at": "2026-08-22T12:34:39+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 1,
@@ -54677,7 +54677,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-08-22T11:37:41+02:00"
+      "settled_at": "2026-08-22T12:34:39+02:00"
     },
     "1606616": {
       "fixture_id": "1606616",
@@ -54690,7 +54690,7 @@
       "competition_tier": "elite_asia_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-22T11:37:41+02:00",
+        "settled_at": "2026-08-22T12:34:39+02:00",
         "home_ft": 1,
         "away_ft": 4,
         "home_ht": 0,
@@ -54733,14 +54733,238 @@
         "market_calibration_weight": 0.06,
         "outcome": "won"
       },
-      "settled_at": "2026-08-22T11:37:41+02:00"
+      "settled_at": "2026-08-22T12:34:39+02:00"
+    },
+    "1602448": {
+      "fixture_id": "1602448",
+      "date": "2026-08-22",
+      "time": "10:00",
+      "match": "CSM Ramnicu Valcea - FC Bacau",
+      "league": "Liga II",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-22T12:34:39+02:00",
+        "home_ft": 2,
+        "away_ft": 2,
+        "home_ht": 2,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.775,
+        "probability_pct": 59.39,
+        "probability_raw_pct": 60.15,
+        "expected_value_pct": 5.417,
+        "relation": "confirmed",
+        "ranking_score": 83.173,
+        "recommendation_score": 77.173,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 77.173,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 56.338,
+          "probability_pct": 59.39,
+          "raw_probability_pct": 60.15,
+          "expected_value_pct": 5.417,
+          "edge_over_break_even_pp": 3.052,
+          "book_disagreement_pp": 7.55,
+          "competition_quality_score": 68,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-22T12:34:39+02:00"
+    },
+    "1610564": {
+      "fixture_id": "1610564",
+      "date": "2026-08-22",
+      "time": "10:00",
+      "match": "CSM Satu Mare - Bihor Oradea",
+      "league": "Liga II",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-22T12:34:39+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.83,
+        "probability_pct": 56.5,
+        "probability_raw_pct": 57.05,
+        "expected_value_pct": 3.395,
+        "relation": "confirmed",
+        "ranking_score": 76.344,
+        "recommendation_score": 70.344,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.344,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 54.645,
+          "probability_pct": 56.5,
+          "raw_probability_pct": 57.05,
+          "expected_value_pct": 3.395,
+          "edge_over_break_even_pp": 1.855,
+          "book_disagreement_pp": 6.11,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-22T12:34:39+02:00"
+    },
+    "1569823": {
+      "fixture_id": "1569823",
+      "date": "2026-08-22",
+      "time": "10:00",
+      "match": "Jungnang Chorus Mustang - Namyangju",
+      "league": "K4 League",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-22T12:34:39+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.67,
+        "probability_pct": 65.42,
+        "probability_raw_pct": 66.07,
+        "expected_value_pct": 9.251,
+        "relation": "model_only",
+        "ranking_score": 75.084,
+        "recommendation_score": 75.084,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 75.084,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 59.88,
+          "probability_pct": 65.42,
+          "raw_probability_pct": 66.07,
+          "expected_value_pct": 9.251,
+          "edge_over_break_even_pp": 5.54,
+          "book_disagreement_pp": 10.84,
+          "competition_quality_score": 64,
+          "bookmakers": 6,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-22T12:34:39+02:00"
+    },
+    "1579082": {
+      "fixture_id": "1579082",
+      "date": "2026-08-22",
+      "time": "10:30",
+      "match": "Sparta Brno - Chotebor",
+      "league": "4. liga - Divizie D",
+      "country": "Czech-Republic",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-22T12:34:39+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.45,
+        "probability_pct": 78.47,
+        "probability_raw_pct": 79.46,
+        "expected_value_pct": 13.781,
+        "relation": "confirmed",
+        "ranking_score": 87.525,
+        "recommendation_score": 81.525,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 81.525,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 68.966,
+          "probability_pct": 78.47,
+          "raw_probability_pct": 79.46,
+          "expected_value_pct": 13.781,
+          "edge_over_break_even_pp": 9.504,
+          "book_disagreement_pp": 16.54,
+          "competition_quality_score": 68,
+          "bookmakers": 4,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-22T12:34:39+02:00"
     }
   },
   "summary": {
-    "settled_primary": 987,
-    "wins": 518,
-    "losses": 469,
-    "win_rate_pct": 52.482,
+    "settled_primary": 991,
+    "wins": 519,
+    "losses": 472,
+    "win_rate_pct": 52.371,
     "by_market": {
       "1x2_ft": {
         "settled": 338,
@@ -54749,10 +54973,10 @@
         "win_rate_pct": 48.817
       },
       "over25_ft": {
-        "settled": 612,
-        "wins": 339,
-        "losses": 273,
-        "win_rate_pct": 55.392
+        "settled": 616,
+        "wins": 340,
+        "losses": 276,
+        "win_rate_pct": 55.195
       },
       "over15_ht": {
         "settled": 23,
@@ -54781,16 +55005,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 427,
-        "wins": 233,
-        "losses": 194,
-        "win_rate_pct": 54.567
+        "settled": 430,
+        "wins": 234,
+        "losses": 196,
+        "win_rate_pct": 54.419
       },
       "A": {
-        "settled": 350,
+        "settled": 351,
         "wins": 184,
-        "losses": 166,
-        "win_rate_pct": 52.571
+        "losses": 167,
+        "win_rate_pct": 52.422
       },
       "C": {
         "settled": 205,
