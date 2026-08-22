@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-22T02:42:35+02:00",
+  "updated_at": "2026-08-22T06:43:37+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -54454,13 +54454,125 @@
         "outcome": "lost"
       },
       "settled_at": "2026-08-21T23:30:39+02:00"
+    },
+    "1550936": {
+      "fixture_id": "1550936",
+      "date": "2026-08-22",
+      "time": "03:00",
+      "match": "Tigres UANL - Atlante FC",
+      "league": "Liga MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-22T06:43:29+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "gg_ht",
+        "selection": "yes",
+        "odd": 4.225,
+        "probability_pct": 25.2,
+        "probability_raw_pct": 25.41,
+        "expected_value_pct": 6.47,
+        "relation": "confirmed",
+        "ranking_score": 87.984,
+        "recommendation_score": 76.984,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 76.984,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 12.0,
+          "market_break_even_pct": 23.669,
+          "probability_pct": 25.2,
+          "raw_probability_pct": 25.41,
+          "expected_value_pct": 6.47,
+          "edge_over_break_even_pp": 1.531,
+          "book_disagreement_pp": 3.58,
+          "competition_quality_score": 84,
+          "bookmakers": 6,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-22T06:43:29+02:00"
+    },
+    "1550933": {
+      "fixture_id": "1550933",
+      "date": "2026-08-22",
+      "time": "05:10",
+      "match": "Club Queretaro - Toluca",
+      "league": "Liga MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-22T06:43:29+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.3,
+        "probability_pct": 52.82,
+        "probability_raw_pct": 54.31,
+        "expected_value_pct": 21.486,
+        "relation": "confirmed",
+        "ranking_score": 91.049,
+        "recommendation_score": 85.049,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 85.049,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 43.478,
+          "probability_pct": 52.82,
+          "raw_probability_pct": 54.31,
+          "expected_value_pct": 21.486,
+          "edge_over_break_even_pp": 9.342,
+          "book_disagreement_pp": 13.59,
+          "competition_quality_score": 84,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-22T06:43:29+02:00"
     }
   },
   "summary": {
-    "settled_primary": 982,
-    "wins": 515,
-    "losses": 467,
-    "win_rate_pct": 52.444,
+    "settled_primary": 984,
+    "wins": 516,
+    "losses": 468,
+    "win_rate_pct": 52.439,
     "by_market": {
       "1x2_ft": {
         "settled": 337,
@@ -54469,10 +54581,10 @@
         "win_rate_pct": 48.665
       },
       "over25_ft": {
-        "settled": 610,
-        "wins": 338,
+        "settled": 611,
+        "wins": 339,
         "losses": 272,
-        "win_rate_pct": 55.41
+        "win_rate_pct": 55.483
       },
       "over15_ht": {
         "settled": 23,
@@ -54481,10 +54593,10 @@
         "win_rate_pct": 34.783
       },
       "gg_ht": {
-        "settled": 11,
+        "settled": 12,
         "wins": 4,
-        "losses": 7,
-        "win_rate_pct": 36.364
+        "losses": 8,
+        "win_rate_pct": 33.333
       },
       "over05_ht": {
         "settled": 1,
@@ -54501,16 +54613,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 425,
+        "settled": 426,
         "wins": 232,
-        "losses": 193,
-        "win_rate_pct": 54.588
+        "losses": 194,
+        "win_rate_pct": 54.46
       },
       "A": {
-        "settled": 349,
-        "wins": 184,
+        "settled": 350,
+        "wins": 185,
         "losses": 165,
-        "win_rate_pct": 52.722
+        "win_rate_pct": 52.857
       },
       "C": {
         "settled": 203,
