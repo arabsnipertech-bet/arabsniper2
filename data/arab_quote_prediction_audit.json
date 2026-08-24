@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-24T02:42:03+02:00",
+  "updated_at": "2026-08-24T06:52:58+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -68678,25 +68678,137 @@
         "outcome": "lost"
       },
       "settled_at": "2026-08-23T23:27:14+02:00"
+    },
+    "1513305": {
+      "fixture_id": "1513305",
+      "date": "2026-08-24",
+      "time": "02:38",
+      "match": "Colorado Rapids II - Real Monarchs",
+      "league": "MLS Next Pro",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T06:52:56+02:00",
+        "home_ft": 4,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "x",
+        "odd": 3.6,
+        "probability_pct": 36.35,
+        "probability_raw_pct": 37.45,
+        "expected_value_pct": 30.86,
+        "relation": "contrast",
+        "ranking_score": 84.118,
+        "recommendation_score": 84.118,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 84.118,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 28.0,
+          "market_break_even_pct": 27.778,
+          "probability_pct": 36.35,
+          "raw_probability_pct": 37.45,
+          "expected_value_pct": 30.86,
+          "edge_over_break_even_pp": 8.572,
+          "book_disagreement_pp": 12.17,
+          "competition_quality_score": 84,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "orange",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-24T06:52:56+02:00"
+    },
+    "1549741": {
+      "fixture_id": "1549741",
+      "date": "2026-08-24",
+      "time": "03:15",
+      "match": "Junior - Once Caldas",
+      "league": "Primera A",
+      "country": "Colombia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T06:52:56+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.89,
+        "probability_pct": 61.06,
+        "probability_raw_pct": 62.46,
+        "expected_value_pct": 15.403,
+        "relation": "contrast",
+        "ranking_score": 80.834,
+        "recommendation_score": 80.834,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 80.834,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 52.91,
+          "probability_pct": 61.06,
+          "raw_probability_pct": 62.46,
+          "expected_value_pct": 15.403,
+          "edge_over_break_even_pp": 8.15,
+          "book_disagreement_pp": 12.73,
+          "competition_quality_score": 68,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-24T06:52:56+02:00"
     }
   },
   "summary": {
-    "settled_primary": 1236,
+    "settled_primary": 1238,
     "wins": 641,
-    "losses": 595,
-    "win_rate_pct": 51.861,
+    "losses": 597,
+    "win_rate_pct": 51.777,
     "by_market": {
       "1x2_ft": {
-        "settled": 415,
+        "settled": 416,
         "wins": 199,
-        "losses": 216,
-        "win_rate_pct": 47.952
+        "losses": 217,
+        "win_rate_pct": 47.837
       },
       "over25_ft": {
-        "settled": 780,
+        "settled": 781,
         "wins": 427,
-        "losses": 353,
-        "win_rate_pct": 54.744
+        "losses": 354,
+        "win_rate_pct": 54.673
       },
       "over15_ht": {
         "settled": 27,
@@ -68731,10 +68843,10 @@
         "win_rate_pct": 53.05
       },
       "A": {
-        "settled": 435,
+        "settled": 437,
         "wins": 226,
-        "losses": 209,
-        "win_rate_pct": 51.954
+        "losses": 211,
+        "win_rate_pct": 51.716
       },
       "C": {
         "settled": 255,
