@@ -13181,8 +13181,362 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-08-23T02:38:17+02:00",
       "stats_schema": 2
+    },
+    "1513272": {
+      "fixture_id": "1513272",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:00+02:00",
+      "stats_schema": 2
+    },
+    "1530126": {
+      "fixture_id": "1530126",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2242,
+        "team_name": "FC Cincinnati",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2286,
+        "team_name": "U.N.A.M. - Pumas",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:01+02:00",
+      "stats_schema": 2
+    },
+    "1530107": {
+      "fixture_id": "1530107",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 18310,
+        "team_name": "Charlotte",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2286,
+        "team_name": "U.N.A.M. - Pumas",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:01+02:00",
+      "stats_schema": 2
+    },
+    "1581391": {
+      "fixture_id": "1581391",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:02+02:00",
+      "stats_schema": 2
+    },
+    "1549701": {
+      "fixture_id": "1549701",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.36,
+      "away_xg": 0.55,
+      "home_stats": {
+        "team_id": 1135,
+        "team_name": "Junior",
+        "xg": 0.36,
+        "shots_on_target": 1.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1125,
+        "team_name": "Millonarios",
+        "xg": 0.55,
+        "shots_on_target": 3.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:03+02:00",
+      "stats_schema": 2
+    },
+    "1549687": {
+      "fixture_id": "1549687",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1142,
+        "team_name": "Deportes Tolima",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1135,
+        "team_name": "Junior",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:03+02:00",
+      "stats_schema": 2
+    },
+    "1545509": {
+      "fixture_id": "1545509",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:04+02:00",
+      "stats_schema": 2
+    },
+    "1549720": {
+      "fixture_id": "1549720",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.55,
+      "away_xg": 1.75,
+      "home_stats": {
+        "team_id": 1133,
+        "team_name": "Jaguares",
+        "xg": 0.55,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1136,
+        "team_name": "Once Caldas",
+        "xg": 1.75,
+        "shots_on_target": 5.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:04+02:00",
+      "stats_schema": 2
+    },
+    "1513282": {
+      "fixture_id": "1513282",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:05+02:00",
+      "stats_schema": 2
+    },
+    "1517003": {
+      "fixture_id": "1517003",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:06+02:00",
+      "stats_schema": 2
+    },
+    "1516989": {
+      "fixture_id": "1516989",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:06+02:00",
+      "stats_schema": 2
+    },
+    "1516985": {
+      "fixture_id": "1516985",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:06+02:00",
+      "stats_schema": 2
+    },
+    "1517026": {
+      "fixture_id": "1517026",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:06+02:00",
+      "stats_schema": 2
+    },
+    "1517024": {
+      "fixture_id": "1517024",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:06+02:00",
+      "stats_schema": 2
+    },
+    "1517019": {
+      "fixture_id": "1517019",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:07+02:00",
+      "stats_schema": 2
+    },
+    "1517014": {
+      "fixture_id": "1517014",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:07+02:00",
+      "stats_schema": 2
+    },
+    "1554120": {
+      "fixture_id": "1554120",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:08+02:00",
+      "stats_schema": 2
+    },
+    "1554116": {
+      "fixture_id": "1554116",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:08+02:00",
+      "stats_schema": 2
+    },
+    "1554112": {
+      "fixture_id": "1554112",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:08+02:00",
+      "stats_schema": 2
+    },
+    "1554101": {
+      "fixture_id": "1554101",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-24T02:38:08+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-08-23T02:43:26+02:00",
+  "updated_at": "2026-08-24T02:42:02+02:00",
   "runtime_calls_last_run": 20
 }
