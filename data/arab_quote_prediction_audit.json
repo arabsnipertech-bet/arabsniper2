@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-24T18:45:55+02:00",
+  "updated_at": "2026-08-24T19:36:17+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -68690,7 +68690,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-24T18:45:52+02:00",
+        "settled_at": "2026-08-24T19:36:15+02:00",
         "home_ft": 4,
         "away_ft": 1,
         "home_ht": 1,
@@ -68733,7 +68733,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-24T18:45:52+02:00"
+      "settled_at": "2026-08-24T19:36:15+02:00"
     },
     "1549741": {
       "fixture_id": "1549741",
@@ -68746,7 +68746,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-24T18:45:52+02:00",
+        "settled_at": "2026-08-24T19:36:15+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 0,
@@ -68789,26 +68789,250 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-24T18:45:52+02:00"
+      "settled_at": "2026-08-24T19:36:15+02:00"
+    },
+    "1561106": {
+      "fixture_id": "1561106",
+      "date": "2026-08-24",
+      "time": "17:00",
+      "match": "Lokomotíva Zvolen - Petržalka",
+      "league": "2. liga",
+      "country": "Slovakia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T19:36:15+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.15,
+        "probability_pct": 60.93,
+        "probability_raw_pct": 63.0,
+        "expected_value_pct": 30.999,
+        "relation": "contrast",
+        "ranking_score": 69.125,
+        "recommendation_score": 69.125,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 69.125,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 46.512,
+          "probability_pct": 60.93,
+          "raw_probability_pct": 63.0,
+          "expected_value_pct": 30.999,
+          "edge_over_break_even_pp": 14.418,
+          "book_disagreement_pp": 20.72,
+          "competition_quality_score": 68,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-24T19:36:15+02:00"
+    },
+    "1554129": {
+      "fixture_id": "1554129",
+      "date": "2026-08-24",
+      "time": "17:00",
+      "match": "Naftagas - Grafičar",
+      "league": "Prva Liga",
+      "country": "Serbia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T19:36:15+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 2.23,
+        "probability_pct": 51.99,
+        "probability_raw_pct": 52.92,
+        "expected_value_pct": 15.938,
+        "relation": "confirmed",
+        "ranking_score": 89.732,
+        "recommendation_score": 83.732,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 83.732,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 44.843,
+          "probability_pct": 51.99,
+          "raw_probability_pct": 52.92,
+          "expected_value_pct": 15.938,
+          "edge_over_break_even_pp": 7.147,
+          "book_disagreement_pp": 11.6,
+          "competition_quality_score": 68,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-24T19:36:15+02:00"
+    },
+    "1554131": {
+      "fixture_id": "1554131",
+      "date": "2026-08-24",
+      "time": "17:00",
+      "match": "Semendrija 1924 - Teleoptik",
+      "league": "Prva Liga",
+      "country": "Serbia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T19:36:15+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.55,
+        "probability_pct": 78.56,
+        "probability_raw_pct": 80.5,
+        "expected_value_pct": 21.768,
+        "relation": "contrast",
+        "ranking_score": 70.591,
+        "recommendation_score": 70.591,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.591,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 64.516,
+          "probability_pct": 78.56,
+          "raw_probability_pct": 80.5,
+          "expected_value_pct": 21.768,
+          "edge_over_break_even_pp": 14.044,
+          "book_disagreement_pp": 21.51,
+          "competition_quality_score": 68,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "orange",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-24T19:36:15+02:00"
+    },
+    "1565225": {
+      "fixture_id": "1565225",
+      "date": "2026-08-24",
+      "time": "17:30",
+      "match": "FC Botosani - Csikszereda",
+      "league": "Liga I",
+      "country": "Romania",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T19:36:15+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.02,
+        "probability_pct": 65.7,
+        "probability_raw_pct": 68.08,
+        "expected_value_pct": 32.714,
+        "relation": "contrast",
+        "ranking_score": 68.221,
+        "recommendation_score": 68.221,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 68.221,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 49.505,
+          "probability_pct": 65.7,
+          "raw_probability_pct": 68.08,
+          "expected_value_pct": 32.714,
+          "edge_over_break_even_pp": 16.195,
+          "book_disagreement_pp": 21.66,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-24T19:36:15+02:00"
     }
   },
   "summary": {
-    "settled_primary": 1238,
-    "wins": 641,
-    "losses": 597,
-    "win_rate_pct": 51.777,
+    "settled_primary": 1242,
+    "wins": 644,
+    "losses": 598,
+    "win_rate_pct": 51.852,
     "by_market": {
       "1x2_ft": {
-        "settled": 416,
-        "wins": 199,
+        "settled": 417,
+        "wins": 200,
         "losses": 217,
-        "win_rate_pct": 47.837
+        "win_rate_pct": 47.962
       },
       "over25_ft": {
-        "settled": 781,
-        "wins": 427,
-        "losses": 354,
-        "win_rate_pct": 54.673
+        "settled": 784,
+        "wins": 429,
+        "losses": 355,
+        "win_rate_pct": 54.719
       },
       "over15_ht": {
         "settled": 27,
@@ -68837,22 +69061,22 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 541,
-        "wins": 287,
-        "losses": 254,
-        "win_rate_pct": 53.05
+        "settled": 543,
+        "wins": 288,
+        "losses": 255,
+        "win_rate_pct": 53.039
       },
       "A": {
-        "settled": 437,
-        "wins": 226,
+        "settled": 438,
+        "wins": 227,
         "losses": 211,
-        "win_rate_pct": 51.716
+        "win_rate_pct": 51.826
       },
       "C": {
-        "settled": 255,
-        "wins": 124,
+        "settled": 256,
+        "wins": 125,
         "losses": 131,
-        "win_rate_pct": 48.627
+        "win_rate_pct": 48.828
       }
     }
   }
