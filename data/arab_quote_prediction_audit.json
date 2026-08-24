@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-24T19:36:17+02:00",
+  "updated_at": "2026-08-24T20:49:42+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -68690,7 +68690,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-24T19:36:15+02:00",
+        "settled_at": "2026-08-24T20:49:41+02:00",
         "home_ft": 4,
         "away_ft": 1,
         "home_ht": 1,
@@ -68733,7 +68733,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-24T19:36:15+02:00"
+      "settled_at": "2026-08-24T20:49:41+02:00"
     },
     "1549741": {
       "fixture_id": "1549741",
@@ -68746,7 +68746,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-24T19:36:15+02:00",
+        "settled_at": "2026-08-24T20:49:41+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 0,
@@ -68789,7 +68789,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-24T19:36:15+02:00"
+      "settled_at": "2026-08-24T20:49:41+02:00"
     },
     "1561106": {
       "fixture_id": "1561106",
@@ -68802,7 +68802,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-24T19:36:15+02:00",
+        "settled_at": "2026-08-24T20:49:41+02:00",
         "home_ft": 0,
         "away_ft": 1,
         "home_ht": 0,
@@ -68845,7 +68845,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "won"
       },
-      "settled_at": "2026-08-24T19:36:15+02:00"
+      "settled_at": "2026-08-24T20:49:41+02:00"
     },
     "1554129": {
       "fixture_id": "1554129",
@@ -68858,7 +68858,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-24T19:36:15+02:00",
+        "settled_at": "2026-08-24T20:49:41+02:00",
         "home_ft": 2,
         "away_ft": 1,
         "home_ht": 0,
@@ -68901,7 +68901,7 @@
         "market_calibration_weight": 0.08,
         "outcome": "won"
       },
-      "settled_at": "2026-08-24T19:36:15+02:00"
+      "settled_at": "2026-08-24T20:49:41+02:00"
     },
     "1554131": {
       "fixture_id": "1554131",
@@ -68914,7 +68914,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-24T19:36:15+02:00",
+        "settled_at": "2026-08-24T20:49:41+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 1,
@@ -68957,7 +68957,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-24T19:36:15+02:00"
+      "settled_at": "2026-08-24T20:49:41+02:00"
     },
     "1565225": {
       "fixture_id": "1565225",
@@ -68970,7 +68970,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-24T19:36:15+02:00",
+        "settled_at": "2026-08-24T20:49:41+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 0,
@@ -69013,26 +69013,362 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-08-24T19:36:15+02:00"
+      "settled_at": "2026-08-24T20:49:41+02:00"
+    },
+    "1610815": {
+      "fixture_id": "1610815",
+      "date": "2026-08-24",
+      "time": "16:30",
+      "match": "Ellas Syros - Marko",
+      "league": "Cup",
+      "country": "Greece",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "PEN",
+        "settled_at": "2026-08-24T20:49:41+02:00",
+        "home_ft": 1,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.67,
+        "probability_pct": 72.51,
+        "probability_raw_pct": 74.0,
+        "expected_value_pct": 21.092,
+        "relation": "contrast",
+        "ranking_score": 66.963,
+        "recommendation_score": 66.963,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 66.963,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 59.88,
+          "probability_pct": 72.51,
+          "raw_probability_pct": 74.0,
+          "expected_value_pct": 21.092,
+          "edge_over_break_even_pp": 12.63,
+          "book_disagreement_pp": 18.65,
+          "competition_quality_score": 68,
+          "bookmakers": 5,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "orange",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-24T20:49:41+02:00"
+    },
+    "1551082": {
+      "fixture_id": "1551082",
+      "date": "2026-08-24",
+      "time": "18:00",
+      "match": "Botev Vratsa - Botev Plovdiv",
+      "league": "First League",
+      "country": "Bulgaria",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T20:49:41+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 2.055,
+        "probability_pct": 58.35,
+        "probability_raw_pct": 59.64,
+        "expected_value_pct": 19.909,
+        "relation": "contrast",
+        "ranking_score": 71.491,
+        "recommendation_score": 71.491,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 71.491,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 48.662,
+          "probability_pct": 58.35,
+          "raw_probability_pct": 59.64,
+          "expected_value_pct": 19.909,
+          "edge_over_break_even_pp": 9.688,
+          "book_disagreement_pp": 14.37,
+          "competition_quality_score": 68,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-24T20:49:41+02:00"
+    },
+    "1555120": {
+      "fixture_id": "1555120",
+      "date": "2026-08-24",
+      "time": "18:00",
+      "match": "Maccabi Ahi Nazareth - Hapoel Afula",
+      "league": "Liga Leumit",
+      "country": "Israel",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T20:49:41+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 2.0,
+        "probability_pct": 56.37,
+        "probability_raw_pct": 57.26,
+        "expected_value_pct": 12.74,
+        "relation": "contrast",
+        "ranking_score": 71.949,
+        "recommendation_score": 71.949,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 71.949,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 50.0,
+          "probability_pct": 56.37,
+          "raw_probability_pct": 57.26,
+          "expected_value_pct": 12.74,
+          "edge_over_break_even_pp": 6.37,
+          "book_disagreement_pp": 11.17,
+          "competition_quality_score": 68,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-24T20:49:41+02:00"
+    },
+    "1555117": {
+      "fixture_id": "1555117",
+      "date": "2026-08-24",
+      "time": "18:00",
+      "match": "Maccabi Kiryat Gat - Hapoel Rishon LeZion",
+      "league": "Liga Leumit",
+      "country": "Israel",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T20:49:41+02:00",
+        "home_ft": 1,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.88,
+        "probability_pct": 58.82,
+        "probability_raw_pct": 59.77,
+        "expected_value_pct": 10.582,
+        "relation": "confirmed",
+        "ranking_score": 90.509,
+        "recommendation_score": 84.509,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 84.509,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 53.191,
+          "probability_pct": 58.82,
+          "raw_probability_pct": 59.77,
+          "expected_value_pct": 10.582,
+          "edge_over_break_even_pp": 5.629,
+          "book_disagreement_pp": 10.58,
+          "competition_quality_score": 68,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-24T20:49:41+02:00"
+    },
+    "1593112": {
+      "fixture_id": "1593112",
+      "date": "2026-08-24",
+      "time": "18:00",
+      "match": "Mainz 05 W - Werder Bremen W",
+      "league": "Frauen Bundesliga",
+      "country": "Germany",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T20:49:41+02:00",
+        "home_ft": 1,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.61,
+        "probability_pct": 68.96,
+        "probability_raw_pct": 70.13,
+        "expected_value_pct": 11.026,
+        "relation": "confirmed",
+        "ranking_score": 98.335,
+        "recommendation_score": 92.335,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 92.335,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 62.112,
+          "probability_pct": 68.96,
+          "raw_probability_pct": 70.13,
+          "expected_value_pct": 11.026,
+          "edge_over_break_even_pp": 6.848,
+          "book_disagreement_pp": 12.95,
+          "competition_quality_score": 84,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-24T20:49:41+02:00"
+    },
+    "1602990": {
+      "fixture_id": "1602990",
+      "date": "2026-08-24",
+      "time": "18:40",
+      "match": "NEOM - Al-Qadisiyah FC",
+      "league": "Pro League",
+      "country": "Saudi-Arabia",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-24T20:49:41+02:00",
+        "home_ft": 0,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 1.565,
+        "probability_pct": 67.15,
+        "probability_raw_pct": 67.95,
+        "expected_value_pct": 5.09,
+        "relation": "confirmed",
+        "ranking_score": 78.155,
+        "recommendation_score": 72.155,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 72.155,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 63.898,
+          "probability_pct": 67.15,
+          "raw_probability_pct": 67.95,
+          "expected_value_pct": 5.09,
+          "edge_over_break_even_pp": 3.252,
+          "book_disagreement_pp": 8.89,
+          "competition_quality_score": 64,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-24T20:49:41+02:00"
     }
   },
   "summary": {
-    "settled_primary": 1242,
-    "wins": 644,
-    "losses": 598,
-    "win_rate_pct": 51.852,
+    "settled_primary": 1248,
+    "wins": 647,
+    "losses": 601,
+    "win_rate_pct": 51.843,
     "by_market": {
       "1x2_ft": {
-        "settled": 417,
-        "wins": 200,
+        "settled": 418,
+        "wins": 201,
         "losses": 217,
-        "win_rate_pct": 47.962
+        "win_rate_pct": 48.086
       },
       "over25_ft": {
-        "settled": 784,
-        "wins": 429,
-        "losses": 355,
-        "win_rate_pct": 54.719
+        "settled": 789,
+        "wins": 431,
+        "losses": 358,
+        "win_rate_pct": 54.626
       },
       "over15_ht": {
         "settled": 27,
@@ -69061,22 +69397,22 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 543,
-        "wins": 288,
-        "losses": 255,
-        "win_rate_pct": 53.039
+        "settled": 546,
+        "wins": 289,
+        "losses": 257,
+        "win_rate_pct": 52.93
       },
       "A": {
-        "settled": 438,
-        "wins": 227,
+        "settled": 440,
+        "wins": 229,
         "losses": 211,
-        "win_rate_pct": 51.826
+        "win_rate_pct": 52.045
       },
       "C": {
-        "settled": 256,
+        "settled": 257,
         "wins": 125,
-        "losses": 131,
-        "win_rate_pct": 48.828
+        "losses": 132,
+        "win_rate_pct": 48.638
       }
     }
   }
