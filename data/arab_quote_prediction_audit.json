@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-25T02:42:45+02:00",
+  "updated_at": "2026-08-25T06:45:58+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -70358,31 +70358,199 @@
         "outcome": "won"
       },
       "settled_at": "2026-08-24T23:35:12+02:00"
+    },
+    "1549604": {
+      "fixture_id": "1549604",
+      "date": "2026-08-25",
+      "time": "02:45",
+      "match": "Internacional Palmira - Barranquilla",
+      "league": "Primera B",
+      "country": "Colombia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-25T06:45:56+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.21,
+        "probability_pct": 52.49,
+        "probability_raw_pct": 53.67,
+        "expected_value_pct": 16.003,
+        "relation": "contrast",
+        "ranking_score": 67.675,
+        "recommendation_score": 67.675,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 67.675,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 45.249,
+          "probability_pct": 52.49,
+          "raw_probability_pct": 53.67,
+          "expected_value_pct": 16.003,
+          "edge_over_break_even_pp": 7.241,
+          "book_disagreement_pp": 11.83,
+          "competition_quality_score": 68,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-25T06:45:56+02:00"
+    },
+    "1603335": {
+      "fixture_id": "1603335",
+      "date": "2026-08-25",
+      "time": "03:00",
+      "match": "Atlas W - Tijuana W",
+      "league": "Liga MX Femenil",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-25T06:45:56+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.2,
+        "probability_pct": 55.2,
+        "probability_raw_pct": 56.64,
+        "expected_value_pct": 21.44,
+        "relation": "confirmed",
+        "ranking_score": 101.009,
+        "recommendation_score": 95.009,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 95.009,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 45.455,
+          "probability_pct": 55.2,
+          "raw_probability_pct": 56.64,
+          "expected_value_pct": 21.44,
+          "edge_over_break_even_pp": 9.745,
+          "book_disagreement_pp": 15.96,
+          "competition_quality_score": 84,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-25T06:45:56+02:00"
+    },
+    "1513315": {
+      "fixture_id": "1513315",
+      "date": "2026-08-25",
+      "time": "04:00",
+      "match": "Tacoma Defiance - Sporting KC II",
+      "league": "MLS Next Pro",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-25T06:45:56+02:00",
+        "home_ft": 4,
+        "away_ft": 0,
+        "home_ht": 3,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.0,
+        "probability_pct": 51.92,
+        "probability_raw_pct": 52.45,
+        "expected_value_pct": 3.84,
+        "relation": "model_only",
+        "ranking_score": 77.796,
+        "recommendation_score": 72.796,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 72.796,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 50.0,
+          "probability_pct": 51.92,
+          "raw_probability_pct": 52.45,
+          "expected_value_pct": 3.84,
+          "edge_over_break_even_pp": 1.92,
+          "book_disagreement_pp": 6.65,
+          "competition_quality_score": 84,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-25T06:45:56+02:00"
     }
   },
   "summary": {
-    "settled_primary": 1266,
-    "wins": 660,
-    "losses": 606,
-    "win_rate_pct": 52.133,
+    "settled_primary": 1269,
+    "wins": 662,
+    "losses": 607,
+    "win_rate_pct": 52.167,
     "by_market": {
       "1x2_ft": {
-        "settled": 426,
+        "settled": 427,
         "wins": 206,
-        "losses": 220,
-        "win_rate_pct": 48.357
+        "losses": 221,
+        "win_rate_pct": 48.244
       },
       "over25_ft": {
-        "settled": 799,
-        "wins": 439,
+        "settled": 800,
+        "wins": 440,
         "losses": 360,
-        "win_rate_pct": 54.944
+        "win_rate_pct": 55.0
       },
       "over15_ht": {
-        "settled": 27,
-        "wins": 9,
+        "settled": 28,
+        "wins": 10,
         "losses": 18,
-        "win_rate_pct": 33.333
+        "win_rate_pct": 35.714
       },
       "gg_ht": {
         "settled": 13,
@@ -70405,22 +70573,22 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 556,
-        "wins": 296,
+        "settled": 557,
+        "wins": 297,
         "losses": 260,
-        "win_rate_pct": 53.237
+        "win_rate_pct": 53.321
       },
       "A": {
-        "settled": 446,
+        "settled": 447,
         "wins": 233,
-        "losses": 213,
-        "win_rate_pct": 52.242
+        "losses": 214,
+        "win_rate_pct": 52.125
       },
       "C": {
-        "settled": 259,
-        "wins": 127,
+        "settled": 260,
+        "wins": 128,
         "losses": 132,
-        "win_rate_pct": 49.035
+        "win_rate_pct": 49.231
       }
     }
   }
