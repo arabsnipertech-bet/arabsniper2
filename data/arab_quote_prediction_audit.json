@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-25T13:34:38+02:00",
+  "updated_at": "2026-08-25T14:58:56+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -70370,7 +70370,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-25T13:34:36+02:00",
+        "settled_at": "2026-08-25T14:58:53+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 1,
@@ -70413,7 +70413,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "won"
       },
-      "settled_at": "2026-08-25T13:34:36+02:00"
+      "settled_at": "2026-08-25T14:58:53+02:00"
     },
     "1603335": {
       "fixture_id": "1603335",
@@ -70426,7 +70426,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-25T13:34:36+02:00",
+        "settled_at": "2026-08-25T14:58:53+02:00",
         "home_ft": 2,
         "away_ft": 0,
         "home_ht": 1,
@@ -70469,7 +70469,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-25T13:34:36+02:00"
+      "settled_at": "2026-08-25T14:58:53+02:00"
     },
     "1513315": {
       "fixture_id": "1513315",
@@ -70482,7 +70482,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-25T13:34:36+02:00",
+        "settled_at": "2026-08-25T14:58:53+02:00",
         "home_ft": 4,
         "away_ft": 0,
         "home_ht": 3,
@@ -70525,26 +70525,138 @@
         "market_calibration_weight": 0.08,
         "outcome": "won"
       },
-      "settled_at": "2026-08-25T13:34:36+02:00"
+      "settled_at": "2026-08-25T14:58:53+02:00"
+    },
+    "1507040": {
+      "fixture_id": "1507040",
+      "date": "2026-08-25",
+      "time": "12:30",
+      "match": "Gimcheon Sangmu FC - Jeonbuk Motors",
+      "league": "K League 1",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-25T14:58:53+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.8,
+        "probability_pct": 59.29,
+        "probability_raw_pct": 60.16,
+        "expected_value_pct": 6.722,
+        "relation": "confirmed",
+        "ranking_score": 80.854,
+        "recommendation_score": 74.854,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 74.854,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 55.556,
+          "probability_pct": 59.29,
+          "raw_probability_pct": 60.16,
+          "expected_value_pct": 6.722,
+          "edge_over_break_even_pp": 3.734,
+          "book_disagreement_pp": 7.91,
+          "competition_quality_score": 64,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-25T14:58:53+02:00"
+    },
+    "1507041": {
+      "fixture_id": "1507041",
+      "date": "2026-08-25",
+      "time": "12:30",
+      "match": "Jeju United FC - Pohang Steelers",
+      "league": "K League 1",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-25T14:58:53+02:00",
+        "home_ft": 1,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.32,
+        "probability_pct": 56.87,
+        "probability_raw_pct": 58.55,
+        "expected_value_pct": 31.938,
+        "relation": "confirmed",
+        "ranking_score": 90.395,
+        "recommendation_score": 84.395,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 84.395,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 43.103,
+          "probability_pct": 56.87,
+          "raw_probability_pct": 58.55,
+          "expected_value_pct": 31.938,
+          "edge_over_break_even_pp": 13.767,
+          "book_disagreement_pp": 18.69,
+          "competition_quality_score": 64,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-25T14:58:53+02:00"
     }
   },
   "summary": {
-    "settled_primary": 1269,
-    "wins": 662,
-    "losses": 607,
-    "win_rate_pct": 52.167,
+    "settled_primary": 1271,
+    "wins": 663,
+    "losses": 608,
+    "win_rate_pct": 52.164,
     "by_market": {
       "1x2_ft": {
-        "settled": 427,
+        "settled": 428,
         "wins": 206,
-        "losses": 221,
-        "win_rate_pct": 48.244
+        "losses": 222,
+        "win_rate_pct": 48.131
       },
       "over25_ft": {
-        "settled": 800,
-        "wins": 440,
+        "settled": 801,
+        "wins": 441,
         "losses": 360,
-        "win_rate_pct": 55.0
+        "win_rate_pct": 55.056
       },
       "over15_ht": {
         "settled": 28,
@@ -70573,16 +70685,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 557,
-        "wins": 297,
+        "settled": 558,
+        "wins": 298,
         "losses": 260,
-        "win_rate_pct": 53.321
+        "win_rate_pct": 53.405
       },
       "A": {
-        "settled": 447,
+        "settled": 448,
         "wins": 233,
-        "losses": 214,
-        "win_rate_pct": 52.125
+        "losses": 215,
+        "win_rate_pct": 52.009
       },
       "C": {
         "settled": 260,
