@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-26T13:36:16+02:00",
+  "updated_at": "2026-08-26T15:04:57+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -71882,7 +71882,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-26T13:36:14+02:00",
+        "settled_at": "2026-08-26T15:04:54+02:00",
         "home_ft": 2,
         "away_ft": 1,
         "home_ht": 1,
@@ -71925,7 +71925,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-26T13:36:14+02:00"
+      "settled_at": "2026-08-26T15:04:54+02:00"
     },
     "1549747": {
       "fixture_id": "1549747",
@@ -71938,7 +71938,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-26T13:36:14+02:00",
+        "settled_at": "2026-08-26T15:04:54+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 0,
@@ -71981,7 +71981,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-08-26T13:36:14+02:00"
+      "settled_at": "2026-08-26T15:04:54+02:00"
     },
     "1627559": {
       "fixture_id": "1627559",
@@ -71994,7 +71994,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-26T13:36:14+02:00",
+        "settled_at": "2026-08-26T15:04:54+02:00",
         "home_ft": 3,
         "away_ft": 0,
         "home_ht": 1,
@@ -72037,26 +72037,698 @@
         "market_calibration_weight": 0.12,
         "outcome": "won"
       },
-      "settled_at": "2026-08-26T13:36:14+02:00"
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1630749": {
+      "fixture_id": "1630749",
+      "date": "2026-08-26",
+      "time": "11:30",
+      "match": "Cerezo Osaka - FC Gifu",
+      "league": "Emperor Cup",
+      "country": "Japan",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 3,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.325,
+        "probability_pct": 58.63,
+        "probability_raw_pct": 60.29,
+        "expected_value_pct": 36.315,
+        "relation": "contrast",
+        "ranking_score": 63.039,
+        "recommendation_score": 63.039,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 63.039,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 43.011,
+          "probability_pct": 58.63,
+          "raw_probability_pct": 60.29,
+          "expected_value_pct": 36.315,
+          "edge_over_break_even_pp": 15.619,
+          "book_disagreement_pp": 20.76,
+          "competition_quality_score": 64,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1630756": {
+      "fixture_id": "1630756",
+      "date": "2026-08-26",
+      "time": "12:00",
+      "match": "Albirex Niigata - Kagoshima United",
+      "league": "Emperor Cup",
+      "country": "Japan",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 0,
+        "away_ft": 4,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.77,
+        "probability_pct": 69.62,
+        "probability_raw_pct": 71.12,
+        "expected_value_pct": 23.227,
+        "relation": "confirmed",
+        "ranking_score": 88.905,
+        "recommendation_score": 82.905,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 82.905,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 56.497,
+          "probability_pct": 69.62,
+          "raw_probability_pct": 71.12,
+          "expected_value_pct": 23.227,
+          "edge_over_break_even_pp": 13.123,
+          "book_disagreement_pp": 18.7,
+          "competition_quality_score": 64,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1623340": {
+      "fixture_id": "1623340",
+      "date": "2026-08-26",
+      "time": "12:00",
+      "match": "Consadole Sapporo - Ventforet Kofu",
+      "league": "Emperor Cup",
+      "country": "Japan",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 1,
+        "away_ft": 3,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.64,
+        "probability_pct": 64.3,
+        "probability_raw_pct": 65.07,
+        "expected_value_pct": 5.452,
+        "relation": "contrast",
+        "ranking_score": 64.629,
+        "recommendation_score": 64.629,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 64.629,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 60.976,
+          "probability_pct": 64.3,
+          "raw_probability_pct": 65.07,
+          "expected_value_pct": 5.452,
+          "edge_over_break_even_pp": 3.324,
+          "book_disagreement_pp": 8.57,
+          "competition_quality_score": 64,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1623341": {
+      "fixture_id": "1623341",
+      "date": "2026-08-26",
+      "time": "12:00",
+      "match": "Imabari - Blaublitz Akita",
+      "league": "Emperor Cup",
+      "country": "Japan",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 4,
+        "away_ft": 1,
+        "home_ht": 2,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 2.2,
+        "probability_pct": 51.37,
+        "probability_raw_pct": 52.26,
+        "expected_value_pct": 13.014,
+        "relation": "confirmed",
+        "ranking_score": 79.985,
+        "recommendation_score": 73.985,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 73.985,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 45.455,
+          "probability_pct": 51.37,
+          "raw_probability_pct": 52.26,
+          "expected_value_pct": 13.014,
+          "edge_over_break_even_pp": 5.915,
+          "book_disagreement_pp": 9.85,
+          "competition_quality_score": 64,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1623342": {
+      "fixture_id": "1623342",
+      "date": "2026-08-26",
+      "time": "12:00",
+      "match": "Iwaki - Oita Trinita",
+      "league": "Emperor Cup",
+      "country": "Japan",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "AET",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.795,
+        "probability_pct": 65.53,
+        "probability_raw_pct": 66.55,
+        "expected_value_pct": 17.626,
+        "relation": "contrast",
+        "ranking_score": 73.258,
+        "recommendation_score": 73.258,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 73.258,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 55.71,
+          "probability_pct": 65.53,
+          "raw_probability_pct": 66.55,
+          "expected_value_pct": 17.626,
+          "edge_over_break_even_pp": 9.82,
+          "book_disagreement_pp": 14.54,
+          "competition_quality_score": 64,
+          "bookmakers": 6,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.07,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1623343": {
+      "fixture_id": "1623343",
+      "date": "2026-08-26",
+      "time": "12:00",
+      "match": "Jubilo Iwata - Tegevajaro Miyazaki",
+      "league": "Emperor Cup",
+      "country": "Japan",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "AET",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.62,
+        "probability_pct": 62.57,
+        "probability_raw_pct": 63.11,
+        "expected_value_pct": 1.363,
+        "relation": "confirmed",
+        "ranking_score": 73.712,
+        "recommendation_score": 67.712,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 67.712,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 61.728,
+          "probability_pct": 62.57,
+          "raw_probability_pct": 63.11,
+          "expected_value_pct": 1.363,
+          "edge_over_break_even_pp": 0.842,
+          "book_disagreement_pp": 5.97,
+          "competition_quality_score": 64,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1623344": {
+      "fixture_id": "1623344",
+      "date": "2026-08-26",
+      "time": "12:00",
+      "match": "Montedio Yamagata - Fujieda MYFC",
+      "league": "Emperor Cup",
+      "country": "Japan",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "AET",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 3,
+        "away_ft": 3,
+        "home_ht": 3,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.65,
+        "probability_pct": 69.17,
+        "probability_raw_pct": 70.31,
+        "expected_value_pct": 14.131,
+        "relation": "model_only",
+        "ranking_score": 80.026,
+        "recommendation_score": 80.026,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 80.026,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 60.606,
+          "probability_pct": 69.17,
+          "raw_probability_pct": 70.31,
+          "expected_value_pct": 14.131,
+          "edge_over_break_even_pp": 8.564,
+          "book_disagreement_pp": 14.31,
+          "competition_quality_score": 64,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1623345": {
+      "fixture_id": "1623345",
+      "date": "2026-08-26",
+      "time": "12:00",
+      "match": "Omiya Ardija - Vanraure Hachinohe",
+      "league": "Emperor Cup",
+      "country": "Japan",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.965,
+        "probability_pct": 64.55,
+        "probability_raw_pct": 66.25,
+        "expected_value_pct": 26.841,
+        "relation": "confirmed",
+        "ranking_score": 88.718,
+        "recommendation_score": 82.718,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 82.718,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 50.891,
+          "probability_pct": 64.55,
+          "raw_probability_pct": 66.25,
+          "expected_value_pct": 26.841,
+          "edge_over_break_even_pp": 13.659,
+          "book_disagreement_pp": 18.86,
+          "competition_quality_score": 64,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1623346": {
+      "fixture_id": "1623346",
+      "date": "2026-08-26",
+      "time": "12:00",
+      "match": "Sagan Tosu - Kataller Toyama",
+      "league": "Emperor Cup",
+      "country": "Japan",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 4,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.56,
+        "probability_pct": 52.51,
+        "probability_raw_pct": 54.23,
+        "expected_value_pct": 34.426,
+        "relation": "confirmed",
+        "ranking_score": 85.279,
+        "recommendation_score": 79.279,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 79.279,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 39.062,
+          "probability_pct": 52.51,
+          "raw_probability_pct": 54.23,
+          "expected_value_pct": 34.426,
+          "edge_over_break_even_pp": 13.448,
+          "book_disagreement_pp": 19.14,
+          "competition_quality_score": 64,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1507044": {
+      "fixture_id": "1507044",
+      "date": "2026-08-26",
+      "time": "12:30",
+      "match": "Daejeon Citizen - Ulsan Hyundai FC",
+      "league": "K League 1",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.27,
+        "probability_pct": 50.66,
+        "probability_raw_pct": 51.73,
+        "expected_value_pct": 14.998,
+        "relation": "confirmed",
+        "ranking_score": 89.762,
+        "recommendation_score": 83.762,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 83.762,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 44.053,
+          "probability_pct": 50.66,
+          "raw_probability_pct": 51.73,
+          "expected_value_pct": 14.998,
+          "edge_over_break_even_pp": 6.607,
+          "book_disagreement_pp": 10.74,
+          "competition_quality_score": 64,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1507043": {
+      "fixture_id": "1507043",
+      "date": "2026-08-26",
+      "time": "12:30",
+      "match": "FC Anyang - Incheon United",
+      "league": "K League 1",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 2.1,
+        "probability_pct": 57.57,
+        "probability_raw_pct": 58.87,
+        "expected_value_pct": 20.897,
+        "relation": "confirmed",
+        "ranking_score": 93.578,
+        "recommendation_score": 87.578,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 87.578,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 47.619,
+          "probability_pct": 57.57,
+          "raw_probability_pct": 58.87,
+          "expected_value_pct": 20.897,
+          "edge_over_break_even_pp": 9.951,
+          "book_disagreement_pp": 14.43,
+          "competition_quality_score": 64,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
+    },
+    "1507045": {
+      "fixture_id": "1507045",
+      "date": "2026-08-26",
+      "time": "12:30",
+      "match": "Gangwon FC - Gwangju FC",
+      "league": "K League 1",
+      "country": "South-Korea",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-26T15:04:54+02:00",
+        "home_ft": 2,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.7,
+        "probability_pct": 69.34,
+        "probability_raw_pct": 71.07,
+        "expected_value_pct": 17.878,
+        "relation": "confirmed",
+        "ranking_score": 93.895,
+        "recommendation_score": 87.895,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 87.895,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 58.824,
+          "probability_pct": 69.34,
+          "raw_probability_pct": 71.07,
+          "expected_value_pct": 17.878,
+          "edge_over_break_even_pp": 10.516,
+          "book_disagreement_pp": 15.69,
+          "competition_quality_score": 64,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-26T15:04:54+02:00"
     }
   },
   "summary": {
-    "settled_primary": 1296,
-    "wins": 680,
-    "losses": 616,
-    "win_rate_pct": 52.469,
+    "settled_primary": 1308,
+    "wins": 685,
+    "losses": 623,
+    "win_rate_pct": 52.37,
     "by_market": {
       "1x2_ft": {
-        "settled": 434,
-        "wins": 210,
-        "losses": 224,
-        "win_rate_pct": 48.387
+        "settled": 436,
+        "wins": 211,
+        "losses": 225,
+        "win_rate_pct": 48.394
       },
       "over25_ft": {
-        "settled": 819,
-        "wins": 454,
-        "losses": 365,
-        "win_rate_pct": 55.433
+        "settled": 829,
+        "wins": 458,
+        "losses": 371,
+        "win_rate_pct": 55.247
       },
       "over15_ht": {
         "settled": 29,
@@ -72085,22 +72757,22 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 568,
-        "wins": 304,
+        "settled": 570,
+        "wins": 306,
         "losses": 264,
-        "win_rate_pct": 53.521
+        "win_rate_pct": 53.684
       },
       "A": {
-        "settled": 458,
-        "wins": 241,
-        "losses": 217,
-        "win_rate_pct": 52.62
+        "settled": 465,
+        "wins": 243,
+        "losses": 222,
+        "win_rate_pct": 52.258
       },
       "C": {
-        "settled": 265,
-        "wins": 131,
-        "losses": 134,
-        "win_rate_pct": 49.434
+        "settled": 268,
+        "wins": 132,
+        "losses": 136,
+        "win_rate_pct": 49.254
       }
     }
   }
