@@ -1,7 +1,7 @@
 {
   "version": "1.1.4",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-27T01:13:41+02:00",
+  "updated_at": "2026-08-27T07:43:35+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -73270,25 +73270,473 @@
         "outcome": "lost"
       },
       "settled_at": "2026-08-26T21:09:11+02:00"
+    },
+    "1549743": {
+      "fixture_id": "1549743",
+      "date": "2026-08-27",
+      "time": "01:20",
+      "match": "America de Cali - Junior",
+      "league": "Primera A",
+      "country": "Colombia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-27T07:35:23+02:00",
+        "home_ft": 4,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.6,
+        "probability_pct": 71.5,
+        "probability_raw_pct": 73.33,
+        "expected_value_pct": 14.4,
+        "relation": "confirmed",
+        "ranking_score": 95.847,
+        "recommendation_score": 89.847,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 89.847,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 62.5,
+          "probability_pct": 71.5,
+          "raw_probability_pct": 73.33,
+          "expected_value_pct": 14.4,
+          "edge_over_break_even_pp": 9.0,
+          "book_disagreement_pp": 15.29,
+          "competition_quality_score": 68,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-27T07:35:23+02:00"
+    },
+    "1607652": {
+      "fixture_id": "1607652",
+      "date": "2026-08-27",
+      "time": "02:30",
+      "match": "River Plate - Santa Fe",
+      "league": "CONMEBOL Sudamericana",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "PEN",
+        "settled_at": "2026-08-27T07:35:23+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.685,
+        "probability_pct": 61.1,
+        "probability_raw_pct": 61.65,
+        "expected_value_pct": 2.954,
+        "relation": "model_only",
+        "ranking_score": 70.228,
+        "recommendation_score": 70.228,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.228,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 59.347,
+          "probability_pct": 61.1,
+          "raw_probability_pct": 61.65,
+          "expected_value_pct": 2.954,
+          "edge_over_break_even_pp": 1.753,
+          "book_disagreement_pp": 5.53,
+          "competition_quality_score": 88,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-27T07:35:23+02:00"
+    },
+    "1623072": {
+      "fixture_id": "1623072",
+      "date": "2026-08-27",
+      "time": "02:30",
+      "match": "Vasco DA Gama - Vitoria",
+      "league": "Copa Do Brasil",
+      "country": "Brazil",
+      "competition_quality_score": 76,
+      "competition_tier": "major_cup",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-27T07:35:23+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.63,
+        "probability_pct": 71.45,
+        "probability_raw_pct": 73.28,
+        "expected_value_pct": 16.463,
+        "relation": "confirmed",
+        "ranking_score": 98.819,
+        "recommendation_score": 92.819,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 92.819,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 61.35,
+          "probability_pct": 71.45,
+          "raw_probability_pct": 73.28,
+          "expected_value_pct": 16.463,
+          "edge_over_break_even_pp": 10.1,
+          "book_disagreement_pp": 15.29,
+          "competition_quality_score": 76,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.12,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-27T07:35:23+02:00"
+    },
+    "1493652": {
+      "fixture_id": "1493652",
+      "date": "2026-08-27",
+      "time": "03:00",
+      "match": "El Paso Locomotive - Pittsburgh Riverhounds",
+      "league": "USL Championship",
+      "country": "USA",
+      "competition_quality_score": 72,
+      "competition_tier": "major_second_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-27T07:35:23+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.6,
+        "probability_pct": 77.18,
+        "probability_raw_pct": 79.05,
+        "expected_value_pct": 23.488,
+        "relation": "confirmed",
+        "ranking_score": 90.87,
+        "recommendation_score": 84.87,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 84.87,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 62.5,
+          "probability_pct": 77.18,
+          "raw_probability_pct": 79.05,
+          "expected_value_pct": 23.488,
+          "edge_over_break_even_pp": 14.68,
+          "book_disagreement_pp": 20.83,
+          "competition_quality_score": 72,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-27T07:35:23+02:00"
+    },
+    "1513316": {
+      "fixture_id": "1513316",
+      "date": "2026-08-27",
+      "time": "03:00",
+      "match": "Vancouver Whitecaps II - Los Angeles FC II",
+      "league": "MLS Next Pro",
+      "country": "USA",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-27T07:35:23+02:00",
+        "home_ft": 4,
+        "away_ft": 1,
+        "home_ht": 2,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 1.78,
+        "probability_pct": 58.23,
+        "probability_raw_pct": 58.88,
+        "expected_value_pct": 3.649,
+        "relation": "model_only",
+        "ranking_score": 73.236,
+        "recommendation_score": 73.236,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 73.236,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 56.18,
+          "probability_pct": 58.23,
+          "raw_probability_pct": 58.88,
+          "expected_value_pct": 3.649,
+          "edge_over_break_even_pp": 2.05,
+          "book_disagreement_pp": 8.08,
+          "competition_quality_score": 84,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-27T07:35:23+02:00"
+    },
+    "1549744": {
+      "fixture_id": "1549744",
+      "date": "2026-08-27",
+      "time": "03:30",
+      "match": "Atletico Nacional - Deportivo Cali",
+      "league": "Primera A",
+      "country": "Colombia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-27T07:35:23+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.8,
+        "probability_pct": 59.91,
+        "probability_raw_pct": 60.81,
+        "expected_value_pct": 7.838,
+        "relation": "contrast",
+        "ranking_score": 67.207,
+        "recommendation_score": 67.207,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 67.207,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 55.556,
+          "probability_pct": 59.91,
+          "raw_probability_pct": 60.81,
+          "expected_value_pct": 7.838,
+          "edge_over_break_even_pp": 4.354,
+          "book_disagreement_pp": 8.18,
+          "competition_quality_score": 68,
+          "bookmakers": 10,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-27T07:35:23+02:00"
+    },
+    "1493653": {
+      "fixture_id": "1493653",
+      "date": "2026-08-27",
+      "time": "03:30",
+      "match": "New Mexico United - Lexington",
+      "league": "USL Championship",
+      "country": "USA",
+      "competition_quality_score": 72,
+      "competition_tier": "major_second_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-27T07:35:23+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 2.0,
+        "probability_pct": 64.47,
+        "probability_raw_pct": 66.27,
+        "expected_value_pct": 28.94,
+        "relation": "contrast",
+        "ranking_score": 73.803,
+        "recommendation_score": 73.803,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 73.803,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 50.0,
+          "probability_pct": 64.47,
+          "raw_probability_pct": 66.27,
+          "expected_value_pct": 28.94,
+          "edge_over_break_even_pp": 14.47,
+          "book_disagreement_pp": 20.03,
+          "competition_quality_score": 72,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-27T07:35:23+02:00"
+    },
+    "1627561": {
+      "fixture_id": "1627561",
+      "date": "2026-08-27",
+      "time": "04:45",
+      "match": "Club America - Columbus Crew",
+      "league": "Leagues Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-27T07:35:23+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 2,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.81,
+        "probability_pct": 69.59,
+        "probability_raw_pct": 71.82,
+        "expected_value_pct": 25.958,
+        "relation": "contrast",
+        "ranking_score": 78.258,
+        "recommendation_score": 78.258,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 78.258,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 55.249,
+          "probability_pct": 69.59,
+          "raw_probability_pct": 71.82,
+          "expected_value_pct": 25.958,
+          "edge_over_break_even_pp": 14.341,
+          "book_disagreement_pp": 20.35,
+          "competition_quality_score": 88,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.11,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-27T07:35:23+02:00"
     }
   },
   "summary": {
-    "settled_primary": 1318,
-    "wins": 692,
-    "losses": 626,
-    "win_rate_pct": 52.504,
+    "settled_primary": 1326,
+    "wins": 696,
+    "losses": 630,
+    "win_rate_pct": 52.489,
     "by_market": {
       "1x2_ft": {
-        "settled": 436,
-        "wins": 211,
-        "losses": 225,
-        "win_rate_pct": 48.394
+        "settled": 439,
+        "wins": 213,
+        "losses": 226,
+        "win_rate_pct": 48.519
       },
       "over25_ft": {
-        "settled": 839,
-        "wins": 465,
-        "losses": 374,
-        "win_rate_pct": 55.423
+        "settled": 844,
+        "wins": 467,
+        "losses": 377,
+        "win_rate_pct": 55.332
       },
       "over15_ht": {
         "settled": 29,
@@ -73317,22 +73765,22 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 576,
-        "wins": 311,
-        "losses": 265,
-        "win_rate_pct": 53.993
+        "settled": 580,
+        "wins": 313,
+        "losses": 267,
+        "win_rate_pct": 53.966
       },
       "A": {
-        "settled": 469,
-        "wins": 245,
-        "losses": 224,
-        "win_rate_pct": 52.239
+        "settled": 472,
+        "wins": 247,
+        "losses": 225,
+        "win_rate_pct": 52.331
       },
       "C": {
-        "settled": 268,
+        "settled": 269,
         "wins": 132,
-        "losses": 136,
-        "win_rate_pct": 49.254
+        "losses": 137,
+        "win_rate_pct": 49.071
       }
     }
   }

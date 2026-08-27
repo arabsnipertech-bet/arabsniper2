@@ -14301,8 +14301,532 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-08-26T02:37:38+02:00",
       "stats_schema": 2
+    },
+    "1495767": {
+      "fixture_id": "1495767",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:51+02:00",
+      "stats_schema": 2
+    },
+    "1623404": {
+      "fixture_id": "1623404",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 652,
+        "team_name": "Shamrock Rovers",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "away_stats": {
+        "team_id": 1165,
+        "team_name": "KuPS",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:51+02:00",
+      "stats_schema": 2
+    },
+    "1495758": {
+      "fixture_id": "1495758",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:52+02:00",
+      "stats_schema": 2
+    },
+    "1607183": {
+      "fixture_id": "1607183",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:52+02:00",
+      "stats_schema": 2
+    },
+    "1606353": {
+      "fixture_id": "1606353",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:52+02:00",
+      "stats_schema": 2
+    },
+    "1492750": {
+      "fixture_id": "1492750",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.66,
+      "away_xg": 1.72,
+      "home_stats": {
+        "team_id": 652,
+        "team_name": "Shamrock Rovers",
+        "xg": 2.66,
+        "shots_on_target": 8.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 584,
+        "team_name": "Dundalk",
+        "xg": 1.72,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:52+02:00",
+      "stats_schema": 2
+    },
+    "1606352": {
+      "fixture_id": "1606352",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 652,
+        "team_name": "Shamrock Rovers",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "away_stats": {
+        "team_id": 3327,
+        "team_name": "Egnatia Rrogozhinë",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:52+02:00",
+      "stats_schema": 2
+    },
+    "1494250": {
+      "fixture_id": "1494250",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.05,
+      "away_xg": 1.08,
+      "home_stats": {
+        "team_id": 371,
+        "team_name": "IF Brommapojkarna",
+        "xg": 2.05,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2172,
+        "team_name": "Degerfors IF",
+        "xg": 1.08,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:53+02:00",
+      "stats_schema": 2
+    },
+    "1494241": {
+      "fixture_id": "1494241",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 3.4,
+      "away_xg": 1.29,
+      "home_stats": {
+        "team_id": 371,
+        "team_name": "IF Brommapojkarna",
+        "xg": 3.4,
+        "shots_on_target": 4.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2166,
+        "team_name": "Orgryte IS",
+        "xg": 1.29,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:53+02:00",
+      "stats_schema": 2
+    },
+    "1494239": {
+      "fixture_id": "1494239",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 370,
+        "team_name": "Sirius",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 371,
+        "team_name": "IF Brommapojkarna",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:53+02:00",
+      "stats_schema": 2
+    },
+    "1494226": {
+      "fixture_id": "1494226",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 371,
+        "team_name": "IF Brommapojkarna",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 375,
+        "team_name": "Malmo FF",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:53+02:00",
+      "stats_schema": 2
+    },
+    "1623403": {
+      "fixture_id": "1623403",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 257,
+        "team_name": "Rangers",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1122,
+        "team_name": "FK Jablonec",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:54+02:00",
+      "stats_schema": 2
+    },
+    "1607621": {
+      "fixture_id": "1607621",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 4160,
+        "team_name": "Rīgas FS",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "away_stats": {
+        "team_id": 1122,
+        "team_name": "FK Jablonec",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:54+02:00",
+      "stats_schema": 2
+    },
+    "1559979": {
+      "fixture_id": "1559979",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.36,
+      "away_xg": 0.58,
+      "home_stats": {
+        "team_id": 1122,
+        "team_name": "FK Jablonec",
+        "xg": 0.36,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3719,
+        "team_name": "Slovácko",
+        "xg": 0.58,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:54+02:00",
+      "stats_schema": 2
+    },
+    "1607588": {
+      "fixture_id": "1607588",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1122,
+        "team_name": "FK Jablonec",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "away_stats": {
+        "team_id": 4160,
+        "team_name": "Rīgas FS",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:54+02:00",
+      "stats_schema": 2
+    },
+    "1603962": {
+      "fixture_id": "1603962",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:55+02:00",
+      "stats_schema": 2
+    },
+    "1598831": {
+      "fixture_id": "1598831",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:55+02:00",
+      "stats_schema": 2
+    },
+    "1556639": {
+      "fixture_id": "1556639",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.05,
+      "away_xg": 1.74,
+      "home_stats": {
+        "team_id": 257,
+        "team_name": "Rangers",
+        "xg": 2.05,
+        "shots_on_target": 9.0,
+        "total_shots": 25.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 249,
+        "team_name": "Hibernian",
+        "xg": 1.74,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:55+02:00",
+      "stats_schema": 2
+    },
+    "1555479": {
+      "fixture_id": "1555479",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:55+02:00",
+      "stats_schema": 2
+    },
+    "1623397": {
+      "fixture_id": "1623397",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 606,
+        "team_name": "FC Lugano",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 604,
+        "team_name": "Maccabi Tel Aviv",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-27T07:34:56+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-08-26T02:46:03+02:00",
+  "updated_at": "2026-08-27T07:43:30+02:00",
   "runtime_calls_last_run": 20
 }
