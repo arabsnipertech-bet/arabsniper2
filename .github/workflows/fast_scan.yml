@@ -1,0 +1,111 @@
+name: ArabSniper Fast Scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6-23 * * *"
+      timezone: "Europe/Rome"
+
+permissions:
+  contents: write
+
+# Stesso gruppo del Night Scan: mai due writer sui JSON contemporaneamente.
+concurrency:
+  group: arabsniper-quote-data-writer
+  cancel-in-progress: false
+
+jobs:
+  fast-scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+
+    env:
+      API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests PyGithub
+
+      - name: Create market catalog if missing
+        run: |
+          if [ ! -f data/arab_bet_catalog.json ]; then
+            python src/3appdays_runner.py --catalog
+          else
+            echo "Catalogo mercati già presente"
+          fi
+
+      - name: Run Fast Scan
+        run: python src/3appdays_runner.py --fast
+
+      - name: Validate generated files
+        run: |
+          echo "File ArabSniper prodotti:"
+          ls -lh data/arab_quote_*.json
+          test -f data/arab_quote_dashboard.json
+          test -f data/arab_quote_state.json
+          test -f data/arab_quote_day1.json
+
+      - name: Publish Fast Scan safely
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          rm -rf /tmp/arabsniper-publish
+          mkdir -p /tmp/arabsniper-publish
+          cp data/arab_quote_*.json /tmp/arabsniper-publish/
+          if [ -f data/arab_bet_catalog.json ]; then
+            cp data/arab_bet_catalog.json /tmp/arabsniper-publish/
+          fi
+
+          publish_attempt() {
+            git fetch origin main
+            git reset --hard origin/main
+
+            mkdir -p data
+            cp /tmp/arabsniper-publish/arab_quote_*.json data/
+            if [ -f /tmp/arabsniper-publish/arab_bet_catalog.json ]; then
+              cp /tmp/arabsniper-publish/arab_bet_catalog.json data/
+            fi
+
+            git add data/arab_quote_*.json
+            if [ -f data/arab_bet_catalog.json ]; then
+              git add data/arab_bet_catalog.json
+            fi
+
+            if git diff --cached --quiet; then
+              echo "Nessuna variazione da pubblicare"
+              return 0
+            fi
+
+            git commit -m "Update ArabSniper fast quote data"
+            git push origin HEAD:main
+          }
+
+          for attempt in 1 2 3; do
+            echo "Tentativo pubblicazione $attempt/3"
+            if publish_attempt; then
+              echo "Pubblicazione Fast Scan completata"
+              exit 0
+            fi
+            echo "Push concorrente rilevato: risincronizzo con main"
+            sleep $((attempt * 2))
+          done
+
+          echo "Errore: impossibile pubblicare dopo 3 tentativi"
+          exit 1
