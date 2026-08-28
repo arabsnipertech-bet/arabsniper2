@@ -1,0 +1,1695 @@
+{
+  "updated_at": "2026-08-28T10:08:33+02:00",
+  "bets": [
+    {
+      "id": 1,
+      "name": "Match Winner",
+      "normalized_name": "match winner"
+    },
+    {
+      "id": 2,
+      "name": "Home/Away",
+      "normalized_name": "home/away"
+    },
+    {
+      "id": 3,
+      "name": "Second Half Winner",
+      "normalized_name": "second half winner"
+    },
+    {
+      "id": 4,
+      "name": "Asian Handicap",
+      "normalized_name": "asian handicap"
+    },
+    {
+      "id": 5,
+      "name": "Goals Over/Under",
+      "normalized_name": "goals over/under"
+    },
+    {
+      "id": 6,
+      "name": "Goals Over/Under First Half",
+      "normalized_name": "goals over/under first half"
+    },
+    {
+      "id": 7,
+      "name": "HT/FT Double",
+      "normalized_name": "ht/ft double"
+    },
+    {
+      "id": 8,
+      "name": "Both Teams Score",
+      "normalized_name": "both teams score"
+    },
+    {
+      "id": 9,
+      "name": "Handicap Result",
+      "normalized_name": "handicap result"
+    },
+    {
+      "id": 10,
+      "name": "Exact Score",
+      "normalized_name": "exact score"
+    },
+    {
+      "id": 11,
+      "name": "Highest Scoring Half",
+      "normalized_name": "highest scoring half"
+    },
+    {
+      "id": 12,
+      "name": "Double Chance",
+      "normalized_name": "double chance"
+    },
+    {
+      "id": 13,
+      "name": "First Half Winner",
+      "normalized_name": "first half winner"
+    },
+    {
+      "id": 14,
+      "name": "Team To Score First",
+      "normalized_name": "team to score first"
+    },
+    {
+      "id": 15,
+      "name": "Team To Score Last",
+      "normalized_name": "team to score last"
+    },
+    {
+      "id": 16,
+      "name": "Total - Home",
+      "normalized_name": "total home"
+    },
+    {
+      "id": 17,
+      "name": "Total - Away",
+      "normalized_name": "total away"
+    },
+    {
+      "id": 18,
+      "name": "Handicap Result - First Half",
+      "normalized_name": "handicap result first half"
+    },
+    {
+      "id": 19,
+      "name": "Asian Handicap First Half",
+      "normalized_name": "asian handicap first half"
+    },
+    {
+      "id": 20,
+      "name": "Double Chance - First Half",
+      "normalized_name": "double chance first half"
+    },
+    {
+      "id": 21,
+      "name": "Odd/Even",
+      "normalized_name": "odd/even"
+    },
+    {
+      "id": 22,
+      "name": "Odd/Even - First Half",
+      "normalized_name": "odd/even first half"
+    },
+    {
+      "id": 23,
+      "name": "Home Odd/Even",
+      "normalized_name": "home odd/even"
+    },
+    {
+      "id": 24,
+      "name": "Results/Both Teams Score",
+      "normalized_name": "results/both teams score"
+    },
+    {
+      "id": 25,
+      "name": "Result/Total Goals",
+      "normalized_name": "result/total goals"
+    },
+    {
+      "id": 26,
+      "name": "Goals Over/Under - Second Half",
+      "normalized_name": "goals over/under second half"
+    },
+    {
+      "id": 27,
+      "name": "Clean Sheet - Home",
+      "normalized_name": "clean sheet home"
+    },
+    {
+      "id": 28,
+      "name": "Clean Sheet - Away",
+      "normalized_name": "clean sheet away"
+    },
+    {
+      "id": 29,
+      "name": "Win to Nil - Home",
+      "normalized_name": "win to nil home"
+    },
+    {
+      "id": 30,
+      "name": "Win to Nil - Away",
+      "normalized_name": "win to nil away"
+    },
+    {
+      "id": 31,
+      "name": "Correct Score - First Half",
+      "normalized_name": "correct score first half"
+    },
+    {
+      "id": 32,
+      "name": "Win Both Halves",
+      "normalized_name": "win both halves"
+    },
+    {
+      "id": 33,
+      "name": "Double Chance - Second Half",
+      "normalized_name": "double chance second half"
+    },
+    {
+      "id": 34,
+      "name": "Both Teams Score - First Half",
+      "normalized_name": "both teams score first half"
+    },
+    {
+      "id": 35,
+      "name": "Both Teams To Score - Second Half",
+      "normalized_name": "both teams to score second half"
+    },
+    {
+      "id": 36,
+      "name": "Win To Nil",
+      "normalized_name": "win to nil"
+    },
+    {
+      "id": 37,
+      "name": "Home win both halves",
+      "normalized_name": "home win both halves"
+    },
+    {
+      "id": 38,
+      "name": "Exact Goals Number",
+      "normalized_name": "exact goals number"
+    },
+    {
+      "id": 39,
+      "name": "To Win Either Half",
+      "normalized_name": "to win either half"
+    },
+    {
+      "id": 40,
+      "name": "Home Team Exact Goals Number",
+      "normalized_name": "home team exact goals number"
+    },
+    {
+      "id": 41,
+      "name": "Away Team Exact Goals Number",
+      "normalized_name": "away team exact goals number"
+    },
+    {
+      "id": 42,
+      "name": "Second Half Exact Goals Number",
+      "normalized_name": "second half exact goals number"
+    },
+    {
+      "id": 43,
+      "name": "Home Team Score a Goal",
+      "normalized_name": "home team score a goal"
+    },
+    {
+      "id": 44,
+      "name": "Away Team Score a Goal",
+      "normalized_name": "away team score a goal"
+    },
+    {
+      "id": 45,
+      "name": "Corners Over Under",
+      "normalized_name": "corners over under"
+    },
+    {
+      "id": 46,
+      "name": "Exact Goals Number - First Half",
+      "normalized_name": "exact goals number first half"
+    },
+    {
+      "id": 47,
+      "name": "Winning Margin",
+      "normalized_name": "winning margin"
+    },
+    {
+      "id": 48,
+      "name": "To Score In Both Halves By Teams",
+      "normalized_name": "to score in both halves by teams"
+    },
+    {
+      "id": 49,
+      "name": "Total Goals/Both Teams To Score",
+      "normalized_name": "total goals/both teams to score"
+    },
+    {
+      "id": 50,
+      "name": "Goal Line",
+      "normalized_name": "goal line"
+    },
+    {
+      "id": 51,
+      "name": "Halftime Result/Total Goals",
+      "normalized_name": "halftime result/total goals"
+    },
+    {
+      "id": 52,
+      "name": "Halftime Result/Both Teams Score",
+      "normalized_name": "halftime result/both teams score"
+    },
+    {
+      "id": 53,
+      "name": "Away win both halves",
+      "normalized_name": "away win both halves"
+    },
+    {
+      "id": 54,
+      "name": "First 10 min Winner",
+      "normalized_name": "first 10 min winner"
+    },
+    {
+      "id": 55,
+      "name": "Corners 1x2",
+      "normalized_name": "corners 1x2"
+    },
+    {
+      "id": 56,
+      "name": "Corners Asian Handicap",
+      "normalized_name": "corners asian handicap"
+    },
+    {
+      "id": 57,
+      "name": "Home Corners Over/Under",
+      "normalized_name": "home corners over/under"
+    },
+    {
+      "id": 58,
+      "name": "Away Corners Over/Under",
+      "normalized_name": "away corners over/under"
+    },
+    {
+      "id": 59,
+      "name": "Own Goal",
+      "normalized_name": "own goal"
+    },
+    {
+      "id": 60,
+      "name": "Away Odd/Even",
+      "normalized_name": "away odd/even"
+    },
+    {
+      "id": 61,
+      "name": "To Qualify",
+      "normalized_name": "to qualify"
+    },
+    {
+      "id": 62,
+      "name": "Correct Score - Second Half",
+      "normalized_name": "correct score second half"
+    },
+    {
+      "id": 63,
+      "name": "Odd/Even - Second Half",
+      "normalized_name": "odd/even second half"
+    },
+    {
+      "id": 72,
+      "name": "Goal Line (1st Half)",
+      "normalized_name": "goal line (1st half)"
+    },
+    {
+      "id": 73,
+      "name": "Both Teams to Score 1st Half - 2nd Half",
+      "normalized_name": "both teams to score 1st half 2nd half"
+    },
+    {
+      "id": 74,
+      "name": "10 Over/Under",
+      "normalized_name": "10 over/under"
+    },
+    {
+      "id": 75,
+      "name": "Last Corner",
+      "normalized_name": "last corner"
+    },
+    {
+      "id": 76,
+      "name": "First Corner",
+      "normalized_name": "first corner"
+    },
+    {
+      "id": 77,
+      "name": "Total Corners (1st Half)",
+      "normalized_name": "total corners (1st half)"
+    },
+    {
+      "id": 78,
+      "name": "RTG_H1",
+      "normalized_name": "rtg_h1"
+    },
+    {
+      "id": 79,
+      "name": "Cards European Handicap",
+      "normalized_name": "cards european handicap"
+    },
+    {
+      "id": 80,
+      "name": "Cards Over/Under",
+      "normalized_name": "cards over/under"
+    },
+    {
+      "id": 81,
+      "name": "Cards Asian Handicap",
+      "normalized_name": "cards asian handicap"
+    },
+    {
+      "id": 82,
+      "name": "Home Team Total Cards",
+      "normalized_name": "home team total cards"
+    },
+    {
+      "id": 83,
+      "name": "Away Team Total Cards",
+      "normalized_name": "away team total cards"
+    },
+    {
+      "id": 84,
+      "name": "Total Corners (3 way) (1st Half)",
+      "normalized_name": "total corners (3 way) (1st half)"
+    },
+    {
+      "id": 85,
+      "name": "Total Corners (3 way)",
+      "normalized_name": "total corners (3 way)"
+    },
+    {
+      "id": 86,
+      "name": "RCARD",
+      "normalized_name": "rcard"
+    },
+    {
+      "id": 87,
+      "name": "Total ShotOnGoal",
+      "normalized_name": "total shotongoal"
+    },
+    {
+      "id": 88,
+      "name": "Home Total ShotOnGoal",
+      "normalized_name": "home total shotongoal"
+    },
+    {
+      "id": 89,
+      "name": "Away Total ShotOnGoal",
+      "normalized_name": "away total shotongoal"
+    },
+    {
+      "id": 91,
+      "name": "Total Goals (3 way)",
+      "normalized_name": "total goals (3 way)"
+    },
+    {
+      "id": 92,
+      "name": "Anytime Goal Scorer",
+      "normalized_name": "anytime goal scorer"
+    },
+    {
+      "id": 93,
+      "name": "First Goal Scorer",
+      "normalized_name": "first goal scorer"
+    },
+    {
+      "id": 94,
+      "name": "Last Goal Scorer",
+      "normalized_name": "last goal scorer"
+    },
+    {
+      "id": 95,
+      "name": "To Score Two or More Goals",
+      "normalized_name": "to score two or more goals"
+    },
+    {
+      "id": 96,
+      "name": "Last Goal Scorer",
+      "normalized_name": "last goal scorer"
+    },
+    {
+      "id": 97,
+      "name": "First Goal Method",
+      "normalized_name": "first goal method"
+    },
+    {
+      "id": 99,
+      "name": "To Score A Penalty",
+      "normalized_name": "to score a penalty"
+    },
+    {
+      "id": 100,
+      "name": "To Miss A Penalty",
+      "normalized_name": "to miss a penalty"
+    },
+    {
+      "id": 102,
+      "name": "Player to be booked",
+      "normalized_name": "player to be booked"
+    },
+    {
+      "id": 103,
+      "name": "Player to be Sent Off",
+      "normalized_name": "player to be sent off"
+    },
+    {
+      "id": 104,
+      "name": "Asian Handicap (2nd Half)",
+      "normalized_name": "asian handicap (2nd half)"
+    },
+    {
+      "id": 105,
+      "name": "Home Team Total Goals(1st Half)",
+      "normalized_name": "home team total goals(1st half)"
+    },
+    {
+      "id": 106,
+      "name": "Away Team Total Goals(1st Half)",
+      "normalized_name": "away team total goals(1st half)"
+    },
+    {
+      "id": 107,
+      "name": "Home Team Total Goals(2nd Half)",
+      "normalized_name": "home team total goals(2nd half)"
+    },
+    {
+      "id": 108,
+      "name": "Away Team Total Goals(2nd Half)",
+      "normalized_name": "away team total goals(2nd half)"
+    },
+    {
+      "id": 109,
+      "name": "Draw No Bet (1st Half)",
+      "normalized_name": "draw no bet (1st half)"
+    },
+    {
+      "id": 110,
+      "name": "Scoring Draw",
+      "normalized_name": "scoring draw"
+    },
+    {
+      "id": 111,
+      "name": "Home team will score in both halves",
+      "normalized_name": "home team will score in both halves"
+    },
+    {
+      "id": 112,
+      "name": "Away team will score in both halves",
+      "normalized_name": "away team will score in both halves"
+    },
+    {
+      "id": 113,
+      "name": "Both Teams To Score in Both Halves",
+      "normalized_name": "both teams to score in both halves"
+    },
+    {
+      "id": 114,
+      "name": "Home Team Score a Goal (1st Half)",
+      "normalized_name": "home team score a goal (1st half)"
+    },
+    {
+      "id": 115,
+      "name": "Home Team Score a Goal (2nd Half)",
+      "normalized_name": "home team score a goal (2nd half)"
+    },
+    {
+      "id": 116,
+      "name": "Away Team Score a Goal (1st Half)",
+      "normalized_name": "away team score a goal (1st half)"
+    },
+    {
+      "id": 117,
+      "name": "Away Team Score a Goal (2nd Half)",
+      "normalized_name": "away team score a goal (2nd half)"
+    },
+    {
+      "id": 118,
+      "name": "Home Win/Over",
+      "normalized_name": "home win/over"
+    },
+    {
+      "id": 119,
+      "name": "Home Win/Under",
+      "normalized_name": "home win/under"
+    },
+    {
+      "id": 120,
+      "name": "Away Win/Over",
+      "normalized_name": "away win/over"
+    },
+    {
+      "id": 121,
+      "name": "Away Win/Under",
+      "normalized_name": "away win/under"
+    },
+    {
+      "id": 122,
+      "name": "Home team will win either half",
+      "normalized_name": "home team will win either half"
+    },
+    {
+      "id": 123,
+      "name": "Away team will win either half",
+      "normalized_name": "away team will win either half"
+    },
+    {
+      "id": 124,
+      "name": "Home Come From Behind and Win",
+      "normalized_name": "home come from behind and win"
+    },
+    {
+      "id": 125,
+      "name": "Corners Asian Handicap (1st Half)",
+      "normalized_name": "corners asian handicap (1st half)"
+    },
+    {
+      "id": 126,
+      "name": "Corners Asian Handicap (2nd Half)",
+      "normalized_name": "corners asian handicap (2nd half)"
+    },
+    {
+      "id": 127,
+      "name": "Total Corners (2nd Half)",
+      "normalized_name": "total corners (2nd half)"
+    },
+    {
+      "id": 128,
+      "name": "Total Corners (3 way) (2nd Half)",
+      "normalized_name": "total corners (3 way) (2nd half)"
+    },
+    {
+      "id": 129,
+      "name": "Away Come From Behind and Win",
+      "normalized_name": "away come from behind and win"
+    },
+    {
+      "id": 130,
+      "name": "Corners 1x2 (1st Half)",
+      "normalized_name": "corners 1x2 (1st half)"
+    },
+    {
+      "id": 131,
+      "name": "Corners 1x2 (2nd Half)",
+      "normalized_name": "corners 1x2 (2nd half)"
+    },
+    {
+      "id": 132,
+      "name": "Home Total Corners (1st Half)",
+      "normalized_name": "home total corners (1st half)"
+    },
+    {
+      "id": 133,
+      "name": "Home Total Corners (2nd Half)",
+      "normalized_name": "home total corners (2nd half)"
+    },
+    {
+      "id": 134,
+      "name": "Away Total Corners (1st Half)",
+      "normalized_name": "away total corners (1st half)"
+    },
+    {
+      "id": 135,
+      "name": "Away Total Corners (2nd Half)",
+      "normalized_name": "away total corners (2nd half)"
+    },
+    {
+      "id": 136,
+      "name": "1x2 - 15 minutes",
+      "normalized_name": "1x2 15 minutes"
+    },
+    {
+      "id": 137,
+      "name": "1x2 - 60 minutes",
+      "normalized_name": "1x2 60 minutes"
+    },
+    {
+      "id": 138,
+      "name": "1x2 - 75 minutes",
+      "normalized_name": "1x2 75 minutes"
+    },
+    {
+      "id": 139,
+      "name": "1x2 - 30 minutes",
+      "normalized_name": "1x2 30 minutes"
+    },
+    {
+      "id": 140,
+      "name": "DC - 30 minutes",
+      "normalized_name": "dc 30 minutes"
+    },
+    {
+      "id": 141,
+      "name": "DC - 15 minutes",
+      "normalized_name": "dc 15 minutes"
+    },
+    {
+      "id": 142,
+      "name": "DC - 60 minutes",
+      "normalized_name": "dc 60 minutes"
+    },
+    {
+      "id": 143,
+      "name": "DC - 75 minutes",
+      "normalized_name": "dc 75 minutes"
+    },
+    {
+      "id": 144,
+      "name": "Goal in 1-15 minutes",
+      "normalized_name": "goal in 1 15 minutes"
+    },
+    {
+      "id": 145,
+      "name": "Goal in 16-30 minutes",
+      "normalized_name": "goal in 16 30 minutes"
+    },
+    {
+      "id": 146,
+      "name": "Goal in 31-45 minutes",
+      "normalized_name": "goal in 31 45 minutes"
+    },
+    {
+      "id": 147,
+      "name": "Goal in 46-60 minutes",
+      "normalized_name": "goal in 46 60 minutes"
+    },
+    {
+      "id": 148,
+      "name": "Goal in 61-75 minutes",
+      "normalized_name": "goal in 61 75 minutes"
+    },
+    {
+      "id": 149,
+      "name": "Goal in 76-90 minutes",
+      "normalized_name": "goal in 76 90 minutes"
+    },
+    {
+      "id": 150,
+      "name": "Home Team Yellow Cards",
+      "normalized_name": "home team yellow cards"
+    },
+    {
+      "id": 151,
+      "name": "Away Team Yellow Cards",
+      "normalized_name": "away team yellow cards"
+    },
+    {
+      "id": 152,
+      "name": "Yellow Asian Handicap",
+      "normalized_name": "yellow asian handicap"
+    },
+    {
+      "id": 153,
+      "name": "Yellow Over/Under",
+      "normalized_name": "yellow over/under"
+    },
+    {
+      "id": 154,
+      "name": "Yellow Double Chance",
+      "normalized_name": "yellow double chance"
+    },
+    {
+      "id": 155,
+      "name": "Yellow Over/Under (1st Half)",
+      "normalized_name": "yellow over/under (1st half)"
+    },
+    {
+      "id": 156,
+      "name": "Yellow Over/Under (2nd Half)",
+      "normalized_name": "yellow over/under (2nd half)"
+    },
+    {
+      "id": 157,
+      "name": "Yellow Odd/Even",
+      "normalized_name": "yellow odd/even"
+    },
+    {
+      "id": 158,
+      "name": "Yellow Cards 1x2",
+      "normalized_name": "yellow cards 1x2"
+    },
+    {
+      "id": 159,
+      "name": "Yellow Asian Handicap (1st Half)",
+      "normalized_name": "yellow asian handicap (1st half)"
+    },
+    {
+      "id": 160,
+      "name": "Yellow Asian Handicap (2nd Half)",
+      "normalized_name": "yellow asian handicap (2nd half)"
+    },
+    {
+      "id": 161,
+      "name": "Yellow Cards 1x2 (1st Half)",
+      "normalized_name": "yellow cards 1x2 (1st half)"
+    },
+    {
+      "id": 162,
+      "name": "Yellow Cards 1x2 (2nd Half)",
+      "normalized_name": "yellow cards 1x2 (2nd half)"
+    },
+    {
+      "id": 163,
+      "name": "Penalty Awarded",
+      "normalized_name": "penalty awarded"
+    },
+    {
+      "id": 164,
+      "name": "Offsides Total",
+      "normalized_name": "offsides total"
+    },
+    {
+      "id": 165,
+      "name": "Offsides 1x2",
+      "normalized_name": "offsides 1x2"
+    },
+    {
+      "id": 166,
+      "name": "Offsides Handicap",
+      "normalized_name": "offsides handicap"
+    },
+    {
+      "id": 167,
+      "name": "Offsides Home Total",
+      "normalized_name": "offsides home total"
+    },
+    {
+      "id": 168,
+      "name": "Offsides Away Total",
+      "normalized_name": "offsides away total"
+    },
+    {
+      "id": 169,
+      "name": "Offsides Double Chance",
+      "normalized_name": "offsides double chance"
+    },
+    {
+      "id": 170,
+      "name": "Fouls. Away Total",
+      "normalized_name": "fouls. away total"
+    },
+    {
+      "id": 171,
+      "name": "Fouls. Home Total",
+      "normalized_name": "fouls. home total"
+    },
+    {
+      "id": 172,
+      "name": "Fouls. Double Chance",
+      "normalized_name": "fouls. double chance"
+    },
+    {
+      "id": 173,
+      "name": "Fouls. Total",
+      "normalized_name": "fouls. total"
+    },
+    {
+      "id": 174,
+      "name": "Fouls. Handicap",
+      "normalized_name": "fouls. handicap"
+    },
+    {
+      "id": 175,
+      "name": "Fouls. 1x2",
+      "normalized_name": "fouls. 1x2"
+    },
+    {
+      "id": 176,
+      "name": "ShotOnTarget 1x2",
+      "normalized_name": "shotontarget 1x2"
+    },
+    {
+      "id": 177,
+      "name": "ShotOnTarget Handicap",
+      "normalized_name": "shotontarget handicap"
+    },
+    {
+      "id": 178,
+      "name": "ShotOnTarget Double Chance",
+      "normalized_name": "shotontarget double chance"
+    },
+    {
+      "id": 179,
+      "name": "First Team to Score",
+      "normalized_name": "first team to score"
+    },
+    {
+      "id": 180,
+      "name": "Last Team to Score",
+      "normalized_name": "last team to score"
+    },
+    {
+      "id": 181,
+      "name": "European Handicap (2nd Half)",
+      "normalized_name": "european handicap (2nd half)"
+    },
+    {
+      "id": 182,
+      "name": "Draw No Bet (2nd Half)",
+      "normalized_name": "draw no bet (2nd half)"
+    },
+    {
+      "id": 183,
+      "name": "Double Chance/Total",
+      "normalized_name": "double chance/total"
+    },
+    {
+      "id": 184,
+      "name": "To Score in Both Halves",
+      "normalized_name": "to score in both halves"
+    },
+    {
+      "id": 185,
+      "name": "First Team to Score (3 way) 1st Half",
+      "normalized_name": "first team to score (3 way) 1st half"
+    },
+    {
+      "id": 186,
+      "name": "Total Goals Number By Ranges",
+      "normalized_name": "total goals number by ranges"
+    },
+    {
+      "id": 187,
+      "name": "Total Goals By Ranges (1st Half)",
+      "normalized_name": "total goals by ranges (1st half)"
+    },
+    {
+      "id": 188,
+      "name": "Clean Sheet",
+      "normalized_name": "clean sheet"
+    },
+    {
+      "id": 189,
+      "name": "To Advance Handicap",
+      "normalized_name": "to advance handicap"
+    },
+    {
+      "id": 190,
+      "name": "Home Exact Goals Number (1st Half)",
+      "normalized_name": "home exact goals number (1st half)"
+    },
+    {
+      "id": 191,
+      "name": "Away Exact Goals Number (1st Half)",
+      "normalized_name": "away exact goals number (1st half)"
+    },
+    {
+      "id": 192,
+      "name": "Home Highest Scoring Half",
+      "normalized_name": "home highest scoring half"
+    },
+    {
+      "id": 193,
+      "name": "Away Highest Scoring Half",
+      "normalized_name": "away highest scoring half"
+    },
+    {
+      "id": 194,
+      "name": "Result/Total Goals (2nd Half)",
+      "normalized_name": "result/total goals (2nd half)"
+    },
+    {
+      "id": 195,
+      "name": "Either Team Wins By 1 Goals",
+      "normalized_name": "either team wins by 1 goals"
+    },
+    {
+      "id": 196,
+      "name": "Either Team Wins By 2 Goals",
+      "normalized_name": "either team wins by 2 goals"
+    },
+    {
+      "id": 197,
+      "name": "Over/Under 15m-30m",
+      "normalized_name": "over/under 15m 30m"
+    },
+    {
+      "id": 198,
+      "name": "Over/Under 30m-45m",
+      "normalized_name": "over/under 30m 45m"
+    },
+    {
+      "id": 199,
+      "name": "Home Win To Nill (1st Half)",
+      "normalized_name": "home win to nill (1st half)"
+    },
+    {
+      "id": 200,
+      "name": "Home Win To Nill (2nd Half)",
+      "normalized_name": "home win to nill (2nd half)"
+    },
+    {
+      "id": 201,
+      "name": "To Score In 1st Half",
+      "normalized_name": "to score in 1st half"
+    },
+    {
+      "id": 202,
+      "name": "To Score In 2nd Half",
+      "normalized_name": "to score in 2nd half"
+    },
+    {
+      "id": 203,
+      "name": "Yellow Cards. Odd/Even (1st Half)",
+      "normalized_name": "yellow cards. odd/even (1st half)"
+    },
+    {
+      "id": 204,
+      "name": "Yellow Cards. Odd/Even (2nd Half)",
+      "normalized_name": "yellow cards. odd/even (2nd half)"
+    },
+    {
+      "id": 205,
+      "name": "First Team to Score (3 way) 2nd Half",
+      "normalized_name": "first team to score (3 way) 2nd half"
+    },
+    {
+      "id": 206,
+      "name": "Home No Bet",
+      "normalized_name": "home no bet"
+    },
+    {
+      "id": 207,
+      "name": "Away No Bet",
+      "normalized_name": "away no bet"
+    },
+    {
+      "id": 208,
+      "name": "Corners. First Corner (3 way)",
+      "normalized_name": "corners. first corner (3 way)"
+    },
+    {
+      "id": 209,
+      "name": "Home Come From Behind and Draw",
+      "normalized_name": "home come from behind and draw"
+    },
+    {
+      "id": 210,
+      "name": "Away Come From Behind and Draw",
+      "normalized_name": "away come from behind and draw"
+    },
+    {
+      "id": 211,
+      "name": "Total Shots",
+      "normalized_name": "total shots"
+    },
+    {
+      "id": 212,
+      "name": "Player Assists",
+      "normalized_name": "player assists"
+    },
+    {
+      "id": 213,
+      "name": "Player Triples",
+      "normalized_name": "player triples"
+    },
+    {
+      "id": 214,
+      "name": "Player Points",
+      "normalized_name": "player points"
+    },
+    {
+      "id": 215,
+      "name": "Player Singles",
+      "normalized_name": "player singles"
+    },
+    {
+      "id": 216,
+      "name": "Multi Touchdown Scorer (2 or More)",
+      "normalized_name": "multi touchdown scorer (2 or more)"
+    },
+    {
+      "id": 217,
+      "name": "Multi Touchdown Scorer (3 or More)",
+      "normalized_name": "multi touchdown scorer (3 or more)"
+    },
+    {
+      "id": 218,
+      "name": "Away Anytime Goal Scorer",
+      "normalized_name": "away anytime goal scorer"
+    },
+    {
+      "id": 219,
+      "name": "Away First Goal Scorer",
+      "normalized_name": "away first goal scorer"
+    },
+    {
+      "id": 220,
+      "name": "Shots. Away Total",
+      "normalized_name": "shots. away total"
+    },
+    {
+      "id": 221,
+      "name": "Shots. Home Total",
+      "normalized_name": "shots. home total"
+    },
+    {
+      "id": 222,
+      "name": "To Win From Behind",
+      "normalized_name": "to win from behind"
+    },
+    {
+      "id": 223,
+      "name": "Number of Goals In Match (Range)",
+      "normalized_name": "number of goals in match (range)"
+    },
+    {
+      "id": 224,
+      "name": "Game Decided After Penalties",
+      "normalized_name": "game decided after penalties"
+    },
+    {
+      "id": 225,
+      "name": "Game Decided in Extra Time",
+      "normalized_name": "game decided in extra time"
+    },
+    {
+      "id": 226,
+      "name": "Away Last Goal Scorer",
+      "normalized_name": "away last goal scorer"
+    },
+    {
+      "id": 227,
+      "name": "Goal Method Header",
+      "normalized_name": "goal method header"
+    },
+    {
+      "id": 228,
+      "name": "Home Goal Method Header",
+      "normalized_name": "home goal method header"
+    },
+    {
+      "id": 229,
+      "name": "Goal Method Outside the Box",
+      "normalized_name": "goal method outside the box"
+    },
+    {
+      "id": 230,
+      "name": "Home Goal Method Outside the Box",
+      "normalized_name": "home goal method outside the box"
+    },
+    {
+      "id": 231,
+      "name": "Home Anytime Goal Scorer",
+      "normalized_name": "home anytime goal scorer"
+    },
+    {
+      "id": 232,
+      "name": "Home First Goal Scorer",
+      "normalized_name": "home first goal scorer"
+    },
+    {
+      "id": 233,
+      "name": "Home Last Goal Scorer",
+      "normalized_name": "home last goal scorer"
+    },
+    {
+      "id": 234,
+      "name": "Home To Score Three or More Goals",
+      "normalized_name": "home to score three or more goals"
+    },
+    {
+      "id": 235,
+      "name": "Away To Score Three or More Goals",
+      "normalized_name": "away to score three or more goals"
+    },
+    {
+      "id": 236,
+      "name": "Away To Score Two or More Goals",
+      "normalized_name": "away to score two or more goals"
+    },
+    {
+      "id": 237,
+      "name": "Home To Score Two or More Goals",
+      "normalized_name": "home to score two or more goals"
+    },
+    {
+      "id": 238,
+      "name": "Home Team Goalscorers First",
+      "normalized_name": "home team goalscorers first"
+    },
+    {
+      "id": 239,
+      "name": "Corners. European Handicap",
+      "normalized_name": "corners. european handicap"
+    },
+    {
+      "id": 240,
+      "name": "Home Player Shots",
+      "normalized_name": "home player shots"
+    },
+    {
+      "id": 241,
+      "name": "Away Player Shots",
+      "normalized_name": "away player shots"
+    },
+    {
+      "id": 242,
+      "name": "Player Shots On Target",
+      "normalized_name": "player shots on target"
+    },
+    {
+      "id": 243,
+      "name": "Home Shots On Target",
+      "normalized_name": "home shots on target"
+    },
+    {
+      "id": 244,
+      "name": "Away Shots On Target",
+      "normalized_name": "away shots on target"
+    },
+    {
+      "id": 245,
+      "name": "Away Goal Method Header",
+      "normalized_name": "away goal method header"
+    },
+    {
+      "id": 246,
+      "name": "Away Goal Method Outside the Box",
+      "normalized_name": "away goal method outside the box"
+    },
+    {
+      "id": 247,
+      "name": "Corners Race To",
+      "normalized_name": "corners race to"
+    },
+    {
+      "id": 248,
+      "name": "Time Of 1st Score",
+      "normalized_name": "time of 1st score"
+    },
+    {
+      "id": 249,
+      "name": "Multicorners",
+      "normalized_name": "multicorners"
+    },
+    {
+      "id": 250,
+      "name": "First Card Received (3 way)",
+      "normalized_name": "first card received (3 way)"
+    },
+    {
+      "id": 251,
+      "name": "Player to be booked",
+      "normalized_name": "player to be booked"
+    },
+    {
+      "id": 252,
+      "name": "Both Teams to Receive a Card",
+      "normalized_name": "both teams to receive a card"
+    },
+    {
+      "id": 253,
+      "name": "Time Of 1st Score",
+      "normalized_name": "time of 1st score"
+    },
+    {
+      "id": 254,
+      "name": "Team Performances (Range)",
+      "normalized_name": "team performances (range)"
+    },
+    {
+      "id": 255,
+      "name": "Home Player Assists",
+      "normalized_name": "home player assists"
+    },
+    {
+      "id": 256,
+      "name": "Away Player Assists",
+      "normalized_name": "away player assists"
+    },
+    {
+      "id": 257,
+      "name": "Player to Score or Assist",
+      "normalized_name": "player to score or assist"
+    },
+    {
+      "id": 258,
+      "name": "Home Player to Score or Assist",
+      "normalized_name": "home player to score or assist"
+    },
+    {
+      "id": 259,
+      "name": "Away Player to Score or Assist",
+      "normalized_name": "away player to score or assist"
+    },
+    {
+      "id": 260,
+      "name": "Team Time Of 1st Score",
+      "normalized_name": "team time of 1st score"
+    },
+    {
+      "id": 261,
+      "name": "Total Goal Minutes (Range)",
+      "normalized_name": "total goal minutes (range)"
+    },
+    {
+      "id": 262,
+      "name": "Late Goal (Range)",
+      "normalized_name": "late goal (range)"
+    },
+    {
+      "id": 263,
+      "name": "Early Goal (Range)",
+      "normalized_name": "early goal (range)"
+    },
+    {
+      "id": 264,
+      "name": "Player Shots On Target Total",
+      "normalized_name": "player shots on target total"
+    },
+    {
+      "id": 265,
+      "name": "Player Shots Total",
+      "normalized_name": "player shots total"
+    },
+    {
+      "id": 266,
+      "name": "Player Fouls Committed",
+      "normalized_name": "player fouls committed"
+    },
+    {
+      "id": 267,
+      "name": "Goalkeeper Saves",
+      "normalized_name": "goalkeeper saves"
+    },
+    {
+      "id": 268,
+      "name": "Home Goalkeeper Saves",
+      "normalized_name": "home goalkeeper saves"
+    },
+    {
+      "id": 269,
+      "name": "Home Player Shots On Target Total",
+      "normalized_name": "home player shots on target total"
+    },
+    {
+      "id": 270,
+      "name": "Home Player Shots Total",
+      "normalized_name": "home player shots total"
+    },
+    {
+      "id": 271,
+      "name": "Home Player Fouls Committed",
+      "normalized_name": "home player fouls committed"
+    },
+    {
+      "id": 272,
+      "name": "Home Player Tackles",
+      "normalized_name": "home player tackles"
+    },
+    {
+      "id": 273,
+      "name": "Home Player Passes",
+      "normalized_name": "home player passes"
+    },
+    {
+      "id": 274,
+      "name": "Away Goalkeeper Saves",
+      "normalized_name": "away goalkeeper saves"
+    },
+    {
+      "id": 275,
+      "name": "Away Player Shots On Target Total",
+      "normalized_name": "away player shots on target total"
+    },
+    {
+      "id": 276,
+      "name": "Away Player Shots Total",
+      "normalized_name": "away player shots total"
+    },
+    {
+      "id": 277,
+      "name": "Away Player Fouls Committed",
+      "normalized_name": "away player fouls committed"
+    },
+    {
+      "id": 278,
+      "name": "Away Player Tackles",
+      "normalized_name": "away player tackles"
+    },
+    {
+      "id": 279,
+      "name": "Away Player Passes",
+      "normalized_name": "away player passes"
+    },
+    {
+      "id": 280,
+      "name": "First Set Piece 5 Minutes",
+      "normalized_name": "first set piece 5 minutes"
+    },
+    {
+      "id": 281,
+      "name": "Total Tackles",
+      "normalized_name": "total tackles"
+    },
+    {
+      "id": 282,
+      "name": "Double Chance/Both Teams To Score",
+      "normalized_name": "double chance/both teams to score"
+    },
+    {
+      "id": 283,
+      "name": "Away Win To Nill (1st Half)",
+      "normalized_name": "away win to nill (1st half)"
+    },
+    {
+      "id": 284,
+      "name": "Away Win To Nill (2nd Half)",
+      "normalized_name": "away win to nill (2nd half)"
+    },
+    {
+      "id": 285,
+      "name": "Team To Score (Goals)",
+      "normalized_name": "team to score (goals)"
+    },
+    {
+      "id": 286,
+      "name": "Team Goalscorers First",
+      "normalized_name": "team goalscorers first"
+    },
+    {
+      "id": 287,
+      "name": "Team Goalscorers Last",
+      "normalized_name": "team goalscorers last"
+    },
+    {
+      "id": 288,
+      "name": "Home Team Goalscorers Last",
+      "normalized_name": "home team goalscorers last"
+    },
+    {
+      "id": 289,
+      "name": "Away Team Goalscorers First",
+      "normalized_name": "away team goalscorers first"
+    },
+    {
+      "id": 290,
+      "name": "Away Team Goalscorers Last",
+      "normalized_name": "away team goalscorers last"
+    },
+    {
+      "id": 291,
+      "name": "Time of First Goal Brackets (Range)",
+      "normalized_name": "time of first goal brackets (range)"
+    },
+    {
+      "id": 292,
+      "name": "Over/Under between 0 and 10m",
+      "normalized_name": "over/under between 0 and 10m"
+    },
+    {
+      "id": 293,
+      "name": "Double Chance 0-15m",
+      "normalized_name": "double chance 0 15m"
+    },
+    {
+      "id": 294,
+      "name": "Double Chance 15-30m",
+      "normalized_name": "double chance 15 30m"
+    },
+    {
+      "id": 295,
+      "name": "Corners. Total (Range)",
+      "normalized_name": "corners. total (range)"
+    },
+    {
+      "id": 296,
+      "name": "Double Chance 30-45m",
+      "normalized_name": "double chance 30 45m"
+    },
+    {
+      "id": 297,
+      "name": "Corners. total between 0 and 10m",
+      "normalized_name": "corners. total between 0 and 10m"
+    },
+    {
+      "id": 298,
+      "name": "Method of Victory",
+      "normalized_name": "method of victory"
+    },
+    {
+      "id": 299,
+      "name": "Cards over/under between 0 and 10 m",
+      "normalized_name": "cards over/under between 0 and 10 m"
+    },
+    {
+      "id": 300,
+      "name": "Both Teams to Receive 2+ Cards",
+      "normalized_name": "both teams to receive 2+ cards"
+    },
+    {
+      "id": 301,
+      "name": "Tackles. Away Total",
+      "normalized_name": "tackles. away total"
+    },
+    {
+      "id": 302,
+      "name": "Tackles. Home Total",
+      "normalized_name": "tackles. home total"
+    },
+    {
+      "id": 303,
+      "name": "Over/Under between 0 and 10 m",
+      "normalized_name": "over/under between 0 and 10 m"
+    },
+    {
+      "id": 304,
+      "name": "Over/Under between  0 and 10 m",
+      "normalized_name": "over/under between 0 and 10 m"
+    },
+    {
+      "id": 305,
+      "name": "Race to the 2nd goal?",
+      "normalized_name": "race to the 2nd goal?"
+    },
+    {
+      "id": 306,
+      "name": "Race to the 3rd goal?",
+      "normalized_name": "race to the 3rd goal?"
+    },
+    {
+      "id": 307,
+      "name": "Corners. Double Chance",
+      "normalized_name": "corners. double chance"
+    },
+    {
+      "id": 308,
+      "name": "Race To",
+      "normalized_name": "race to"
+    },
+    {
+      "id": 309,
+      "name": "Yellow Cards. Home Total (1st Half)",
+      "normalized_name": "yellow cards. home total (1st half)"
+    },
+    {
+      "id": 310,
+      "name": "Yellow Cards Away Total (1st Half)",
+      "normalized_name": "yellow cards away total (1st half)"
+    },
+    {
+      "id": 311,
+      "name": "Which team will score the 1st goal?",
+      "normalized_name": "which team will score the 1st goal?"
+    },
+    {
+      "id": 312,
+      "name": "1x2 - 20 minutes",
+      "normalized_name": "1x2 20 minutes"
+    },
+    {
+      "id": 313,
+      "name": "Offsides Odd/Even",
+      "normalized_name": "offsides odd/even"
+    },
+    {
+      "id": 314,
+      "name": "Fouls Odd/Even",
+      "normalized_name": "fouls odd/even"
+    },
+    {
+      "id": 315,
+      "name": "Saves Total",
+      "normalized_name": "saves total"
+    },
+    {
+      "id": 316,
+      "name": "Saves 1x2",
+      "normalized_name": "saves 1x2"
+    },
+    {
+      "id": 317,
+      "name": "Saves Asian H",
+      "normalized_name": "saves asian h"
+    },
+    {
+      "id": 318,
+      "name": "Saves O/U Home",
+      "normalized_name": "saves o/u home"
+    },
+    {
+      "id": 319,
+      "name": "Saves O/U Away",
+      "normalized_name": "saves o/u away"
+    },
+    {
+      "id": 320,
+      "name": "Saves Double Chance",
+      "normalized_name": "saves double chance"
+    },
+    {
+      "id": 321,
+      "name": "Penalty Awarded (1st Half)",
+      "normalized_name": "penalty awarded (1st half)"
+    },
+    {
+      "id": 322,
+      "name": "Penalty Awarded (2nd Half)",
+      "normalized_name": "penalty awarded (2nd half)"
+    },
+    {
+      "id": 323,
+      "name": "Saves Odd/Even",
+      "normalized_name": "saves odd/even"
+    },
+    {
+      "id": 324,
+      "name": "Corner in 1-15 minutes",
+      "normalized_name": "corner in 1 15 minutes"
+    },
+    {
+      "id": 325,
+      "name": "Corner in 16-30 minutes",
+      "normalized_name": "corner in 16 30 minutes"
+    },
+    {
+      "id": 326,
+      "name": "Corner in 31-45 minutes",
+      "normalized_name": "corner in 31 45 minutes"
+    },
+    {
+      "id": 327,
+      "name": "Corner in 45-60 minutes",
+      "normalized_name": "corner in 45 60 minutes"
+    },
+    {
+      "id": 328,
+      "name": "Corner in 60-75 minutes",
+      "normalized_name": "corner in 60 75 minutes"
+    },
+    {
+      "id": 329,
+      "name": "Corner in 75-90 minutes",
+      "normalized_name": "corner in 75 90 minutes"
+    },
+    {
+      "id": 330,
+      "name": "Home Not lose/Over",
+      "normalized_name": "home not lose/over"
+    },
+    {
+      "id": 331,
+      "name": "Home Not lose/Under",
+      "normalized_name": "home not lose/under"
+    },
+    {
+      "id": 332,
+      "name": "Away Not lose/Over",
+      "normalized_name": "away not lose/over"
+    },
+    {
+      "id": 333,
+      "name": "Away Not lose/Under",
+      "normalized_name": "away not lose/under"
+    },
+    {
+      "id": 334,
+      "name": "1x2 - 70 minutes",
+      "normalized_name": "1x2 70 minutes"
+    },
+    {
+      "id": 335,
+      "name": "Red Cards Over/Under",
+      "normalized_name": "red cards over/under"
+    },
+    {
+      "id": 336,
+      "name": "Goal Line",
+      "normalized_name": "goal line"
+    },
+    {
+      "id": 337,
+      "name": "Asian Handicap (Sets)",
+      "normalized_name": "asian handicap (sets)"
+    },
+    {
+      "id": 338,
+      "name": "Corners. Odd/Even",
+      "normalized_name": "corners. odd/even"
+    },
+    {
+      "id": 339,
+      "name": "Corners. Double Chance",
+      "normalized_name": "corners. double chance"
+    },
+    {
+      "id": 340,
+      "name": "Shots.1x2",
+      "normalized_name": "shots.1x2"
+    },
+    {
+      "id": 341,
+      "name": null,
+      "normalized_name": ""
+    },
+    {
+      "id": 342,
+      "name": "Red Card In The Match (1st Half)",
+      "normalized_name": "red card in the match (1st half)"
+    },
+    {
+      "id": 343,
+      "name": "Fouls. Odd/Even",
+      "normalized_name": "fouls. odd/even"
+    },
+    {
+      "id": 344,
+      "name": "Odd/Even (1st Set)",
+      "normalized_name": "odd/even (1st set)"
+    },
+    {
+      "id": 345,
+      "name": "Set Betting",
+      "normalized_name": "set betting"
+    },
+    {
+      "id": 346,
+      "name": "Extra Point (1st Set)",
+      "normalized_name": "extra point (1st set)"
+    },
+    {
+      "id": 347,
+      "name": "Home Winning Margin (1st Set)",
+      "normalized_name": "home winning margin (1st set)"
+    },
+    {
+      "id": 348,
+      "name": "Away Winning Margin (1st Set)",
+      "normalized_name": "away winning margin (1st set)"
+    },
+    {
+      "id": 349,
+      "name": "Number Of Goals In Match",
+      "normalized_name": "number of goals in match"
+    }
+  ]
+}

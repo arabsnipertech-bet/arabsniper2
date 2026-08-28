@@ -1,5 +1,5 @@
 {
-  "version": "1.1.4",
+  "version": "1.1.7",
   "fixtures": {
     "1560687": {
       "fixture_id": "1560687",
@@ -14825,8 +14825,382 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-08-27T07:34:56+02:00",
       "stats_schema": 2
+    },
+    "1611342": {
+      "fixture_id": "1611342",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:35+02:00",
+      "stats_schema": 2
+    },
+    "1565449": {
+      "fixture_id": "1565449",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:35+02:00",
+      "stats_schema": 2
+    },
+    "1565438": {
+      "fixture_id": "1565438",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:35+02:00",
+      "stats_schema": 2
+    },
+    "1396821": {
+      "fixture_id": "1396821",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:35+02:00",
+      "stats_schema": 2
+    },
+    "1611341": {
+      "fixture_id": "1611341",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:36+02:00",
+      "stats_schema": 2
+    },
+    "1565454": {
+      "fixture_id": "1565454",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:36+02:00",
+      "stats_schema": 2
+    },
+    "1565441": {
+      "fixture_id": "1565441",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:36+02:00",
+      "stats_schema": 2
+    },
+    "1565436": {
+      "fixture_id": "1565436",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:36+02:00",
+      "stats_schema": 2
+    },
+    "1597913": {
+      "fixture_id": "1597913",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:37+02:00",
+      "stats_schema": 2
+    },
+    "1497481": {
+      "fixture_id": "1497481",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2899,
+        "team_name": "UMM Salal",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2896,
+        "team_name": "Al Ahli Doha",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:37+02:00",
+      "stats_schema": 2
+    },
+    "1491654": {
+      "fixture_id": "1491654",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2896,
+        "team_name": "Al Ahli Doha",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2904,
+        "team_name": "Al-Duhail SC",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:37+02:00",
+      "stats_schema": 2
+    },
+    "1491650": {
+      "fixture_id": "1491650",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:37+02:00",
+      "stats_schema": 2
+    },
+    "1597909": {
+      "fixture_id": "1597909",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:37+02:00",
+      "stats_schema": 2
+    },
+    "1450967": {
+      "fixture_id": "1450967",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:38+02:00",
+      "stats_schema": 2
+    },
+    "1503724": {
+      "fixture_id": "1503724",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:38+02:00",
+      "stats_schema": 2
+    },
+    "1565229": {
+      "fixture_id": "1565229",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 4.58,
+      "away_xg": 0.87,
+      "home_stats": {
+        "team_id": 632,
+        "team_name": "Universitatea Craiova",
+        "xg": 4.58,
+        "shots_on_target": 11.0,
+        "total_shots": 24.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2578,
+        "team_name": "FC Voluntari",
+        "xg": 0.87,
+        "shots_on_target": 1.0,
+        "total_shots": 3.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:38+02:00",
+      "stats_schema": 2
+    },
+    "1627509": {
+      "fixture_id": "1627509",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:39+02:00",
+      "stats_schema": 2
+    },
+    "1565220": {
+      "fixture_id": "1565220",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2578,
+        "team_name": "FC Voluntari",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2598,
+        "team_name": "Petrolul Ploiesti",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:39+02:00",
+      "stats_schema": 2
+    },
+    "1565208": {
+      "fixture_id": "1565208",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 635,
+        "team_name": "Dinamo Bucuresti",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2578,
+        "team_name": "FC Voluntari",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:39+02:00",
+      "stats_schema": 2
+    },
+    "1565226": {
+      "fixture_id": "1565226",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 6886,
+        "team_name": "Oţelul",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2592,
+        "team_name": "Arges Pitesti",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-28T10:08:39+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-08-27T07:43:30+02:00",
+  "updated_at": "2026-08-28T10:14:07+02:00",
   "runtime_calls_last_run": 20
 }
