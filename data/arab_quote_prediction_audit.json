@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-29T07:09:54+02:00",
+  "updated_at": "2026-08-29T12:58:05+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -80032,7 +80032,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-29T07:06:37+02:00",
+        "settled_at": "2026-08-29T12:58:01+02:00",
         "home_ft": 2,
         "away_ft": 0,
         "home_ht": 0,
@@ -80078,7 +80078,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-29T07:06:37+02:00",
+      "settled_at": "2026-08-29T12:58:01+02:00",
       "market_pattern": {
         "available": true,
         "score": 21.853,
@@ -80143,19 +80143,142 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1627587": {
+      "fixture_id": "1627587",
+      "date": "2026-08-29",
+      "time": "10:00",
+      "match": "Brisbane Strikers - Broadbeach United",
+      "league": "Queensland Premier League",
+      "country": "Australia",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-29T12:58:01+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.06,
+        "probability_pct": 63.62,
+        "probability_raw_pct": 65.55,
+        "expected_value_pct": 31.057,
+        "relation": "contrast",
+        "ranking_score": 72.28,
+        "recommendation_score": 72.28,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 72.28,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 48.544,
+          "probability_pct": 63.62,
+          "raw_probability_pct": 65.55,
+          "expected_value_pct": 31.057,
+          "edge_over_break_even_pp": 15.076,
+          "book_disagreement_pp": 21.36,
+          "competition_quality_score": 64,
+          "bookmakers": 12,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 69.28,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-08-29T12:58:01+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 26.092,
+        "market_score": 10.356,
+        "early_stats_score": 40.478,
+        "two_goal_stats_score": 57.617,
+        "ft_goal_score": 73.63,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.1,
+        "favorite_team": "Brisbane Strikers",
+        "underdog_team": "Broadbeach United",
+        "favorite_open_odd": 2.015,
+        "favorite_current_odd": 2.06,
+        "underdog_open_odd": 2.98,
+        "underdog_current_odd": 2.965,
+        "favorite_shortening_odd": -0.045,
+        "favorite_drift_odd": 0.045,
+        "underdog_steam_odd": 0.015,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": -1.06,
+        "underdog_fair_delta_pp": 0.1,
+        "favorite_oci": -53.249,
+        "underdog_oci": 43.514,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "x",
+        "book_square_underdog": false,
+        "book_square_favorite": false,
+        "protection_pick": "x",
+        "favorite_margin_delta_pp": -0.022,
+        "underdog_margin_delta_pp": 0.066,
+        "margin_shift_favorite_vs_underdog_pp": -0.088,
+        "favorite_conceded_ht_rate_pct": 32.48,
+        "underdog_scored_ht_rate_pct": 39.46,
+        "favorite_scored_ht_rate_pct": 71.79,
+        "underdog_conceded_ht_rate_pct": 28.22,
+        "pair_goal_ht_rate_pct": 61.87,
+        "pair_over15_ht_rate_pct": 38.735,
+        "pair_gg_ht_rate_pct": 24.1,
+        "pair_over25_ft_rate_pct": 68.1,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 1363,
-    "wins": 716,
+    "settled_primary": 1364,
+    "wins": 717,
     "losses": 647,
-    "win_rate_pct": 52.531,
+    "win_rate_pct": 52.566,
     "by_market": {
       "1x2_ft": {
-        "settled": 445,
-        "wins": 216,
+        "settled": 446,
+        "wins": 217,
         "losses": 229,
-        "win_rate_pct": 48.539
+        "win_rate_pct": 48.655
       },
       "over25_ft": {
         "settled": 862,
@@ -80190,10 +80313,10 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 595,
-        "wins": 321,
+        "settled": 596,
+        "wins": 322,
         "losses": 274,
-        "win_rate_pct": 53.95
+        "win_rate_pct": 54.027
       },
       "A": {
         "settled": 488,
@@ -80222,16 +80345,16 @@
         "over25_ft_rate_pct": 0.0
       },
       "neutral": {
-        "settled": 40,
+        "settled": 41,
         "goal_ht": 31,
         "over15_ht": 20,
         "gg_ht": 9,
         "over25_ft": 26,
-        "avg_pattern_score": 23.489,
-        "goal_ht_rate_pct": 77.5,
-        "over15_ht_rate_pct": 50.0,
-        "gg_ht_rate_pct": 22.5,
-        "over25_ft_rate_pct": 65.0
+        "avg_pattern_score": 23.552,
+        "goal_ht_rate_pct": 75.61,
+        "over15_ht_rate_pct": 48.78,
+        "gg_ht_rate_pct": 21.951,
+        "over25_ft_rate_pct": 63.415
       },
       "favorite_steam_only": {
         "settled": 3,
