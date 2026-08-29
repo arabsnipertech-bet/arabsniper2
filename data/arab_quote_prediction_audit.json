@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-29T12:58:05+02:00",
+  "updated_at": "2026-08-29T13:02:53+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -80032,7 +80032,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-29T12:58:01+02:00",
+        "settled_at": "2026-08-29T13:02:48+02:00",
         "home_ft": 2,
         "away_ft": 0,
         "home_ht": 0,
@@ -80078,7 +80078,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-08-29T12:58:01+02:00",
+      "settled_at": "2026-08-29T13:02:48+02:00",
       "market_pattern": {
         "available": true,
         "score": 21.853,
@@ -80155,7 +80155,7 @@
       "competition_tier": "elite_asia_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-08-29T12:58:01+02:00",
+        "settled_at": "2026-08-29T13:02:48+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 0,
@@ -80201,7 +80201,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "won"
       },
-      "settled_at": "2026-08-29T12:58:01+02:00",
+      "settled_at": "2026-08-29T13:02:48+02:00",
       "market_pattern": {
         "available": true,
         "score": 26.092,
@@ -80266,13 +80266,136 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1556031": {
+      "fixture_id": "1556031",
+      "date": "2026-08-29",
+      "time": "11:00",
+      "match": "Gamba Osaka - Sanfrecce Hiroshima",
+      "league": "J1 League",
+      "country": "Japan",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-29T13:02:48+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "gg_ht",
+        "selection": "yes",
+        "odd": 3.74,
+        "probability_pct": 31.54,
+        "probability_raw_pct": 32.05,
+        "expected_value_pct": 17.96,
+        "relation": "confirmed",
+        "ranking_score": 94.266,
+        "recommendation_score": 83.266,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 83.266,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 12.0,
+          "market_break_even_pct": 26.738,
+          "probability_pct": 31.54,
+          "raw_probability_pct": 32.05,
+          "expected_value_pct": 17.96,
+          "edge_over_break_even_pp": 4.802,
+          "book_disagreement_pp": 7.3,
+          "competition_quality_score": 64,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 81.266,
+          "price_preference_adjustment": 2.0,
+          "price_profile": "high_return_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.07,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-29T13:02:48+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 37.234,
+        "market_score": 0.0,
+        "early_stats_score": 80.141,
+        "two_goal_stats_score": 100.0,
+        "ft_goal_score": 62.03,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "2",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.48,
+        "favorite_team": "Sanfrecce Hiroshima",
+        "underdog_team": "Gamba Osaka",
+        "favorite_open_odd": 1.62,
+        "favorite_current_odd": 1.61,
+        "underdog_open_odd": 4.75,
+        "underdog_current_odd": 4.91,
+        "favorite_shortening_odd": 0.01,
+        "favorite_drift_odd": -0.01,
+        "underdog_steam_odd": -0.16,
+        "medium_favorite_band": true,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 0.84,
+        "underdog_fair_delta_pp": -0.48,
+        "favorite_oci": 58.456,
+        "underdog_oci": -54.832,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "2",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": -0.457,
+        "underdog_margin_delta_pp": -0.204,
+        "margin_shift_favorite_vs_underdog_pp": -0.253,
+        "favorite_conceded_ht_rate_pct": 41.92,
+        "underdog_scored_ht_rate_pct": 79.38,
+        "favorite_scored_ht_rate_pct": 75.09,
+        "underdog_conceded_ht_rate_pct": 39.63,
+        "pair_goal_ht_rate_pct": 82.335,
+        "pair_over15_ht_rate_pct": 55.575,
+        "pair_gg_ht_rate_pct": 35.665,
+        "pair_over25_ft_rate_pct": 53.31,
+        "underdog_xg_for": 0.866,
+        "favorite_xg_against": 0.43,
+        "underdog_sot_for": 7.49,
+        "favorite_sot_against": 1.947,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 1364,
+    "settled_primary": 1365,
     "wins": 717,
-    "losses": 647,
-    "win_rate_pct": 52.566,
+    "losses": 648,
+    "win_rate_pct": 52.527,
     "by_market": {
       "1x2_ft": {
         "settled": 446,
@@ -80293,10 +80416,10 @@
         "win_rate_pct": 37.5
       },
       "gg_ht": {
-        "settled": 15,
+        "settled": 16,
         "wins": 5,
-        "losses": 10,
-        "win_rate_pct": 33.333
+        "losses": 11,
+        "win_rate_pct": 31.25
       },
       "over05_ht": {
         "settled": 1,
@@ -80319,10 +80442,10 @@
         "win_rate_pct": 54.027
       },
       "A": {
-        "settled": 488,
+        "settled": 489,
         "wins": 255,
-        "losses": 233,
-        "win_rate_pct": 52.254
+        "losses": 234,
+        "win_rate_pct": 52.147
       },
       "C": {
         "settled": 275,
@@ -80345,16 +80468,16 @@
         "over25_ft_rate_pct": 0.0
       },
       "neutral": {
-        "settled": 41,
+        "settled": 42,
         "goal_ht": 31,
         "over15_ht": 20,
         "gg_ht": 9,
         "over25_ft": 26,
-        "avg_pattern_score": 23.552,
-        "goal_ht_rate_pct": 75.61,
-        "over15_ht_rate_pct": 48.78,
-        "gg_ht_rate_pct": 21.951,
-        "over25_ft_rate_pct": 63.415
+        "avg_pattern_score": 23.878,
+        "goal_ht_rate_pct": 73.81,
+        "over15_ht_rate_pct": 47.619,
+        "gg_ht_rate_pct": 21.429,
+        "over25_ft_rate_pct": 61.905
       },
       "favorite_steam_only": {
         "settled": 3,
