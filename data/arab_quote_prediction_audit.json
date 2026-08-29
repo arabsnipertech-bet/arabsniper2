@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-29T06:28:04+02:00",
+  "updated_at": "2026-08-29T07:09:54+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -80020,13 +80020,136 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1550941": {
+      "fixture_id": "1550941",
+      "date": "2026-08-29",
+      "time": "05:10",
+      "match": "Club Tijuana - U.N.A.M. - Pumas",
+      "league": "Liga MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-29T07:06:37+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.67,
+        "probability_pct": 41.36,
+        "probability_raw_pct": 42.02,
+        "expected_value_pct": 10.431,
+        "relation": "confirmed",
+        "ranking_score": 101.502,
+        "recommendation_score": 90.502,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 90.502,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 37.453,
+          "probability_pct": 41.36,
+          "raw_probability_pct": 42.02,
+          "expected_value_pct": 10.431,
+          "edge_over_break_even_pp": 3.907,
+          "book_disagreement_pp": 7.3,
+          "competition_quality_score": 84,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 87.502,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-29T07:06:37+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 21.853,
+        "market_score": 0.0,
+        "early_stats_score": 60.104,
+        "two_goal_stats_score": 41.266,
+        "ft_goal_score": 51.806,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 6.0,
+        "favorite_team": "Club Tijuana",
+        "underdog_team": "U.N.A.M. - Pumas",
+        "favorite_open_odd": 2.4,
+        "favorite_current_odd": 2.1,
+        "underdog_open_odd": 2.72,
+        "underdog_current_odd": 3.36,
+        "favorite_shortening_odd": 0.3,
+        "favorite_drift_odd": -0.3,
+        "underdog_steam_odd": -0.64,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 6.21,
+        "underdog_fair_delta_pp": -6.0,
+        "favorite_oci": 90.42,
+        "underdog_oci": -90.406,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "1",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": -0.254,
+        "underdog_margin_delta_pp": -1.003,
+        "margin_shift_favorite_vs_underdog_pp": 0.749,
+        "favorite_conceded_ht_rate_pct": 49.43,
+        "underdog_scored_ht_rate_pct": 20.0,
+        "favorite_scored_ht_rate_pct": 61.58,
+        "underdog_conceded_ht_rate_pct": 76.89,
+        "pair_goal_ht_rate_pct": 77.85,
+        "pair_over15_ht_rate_pct": 38.035,
+        "pair_gg_ht_rate_pct": 26.1,
+        "pair_over25_ft_rate_pct": 57.467,
+        "underdog_xg_for": 0.251,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 4.846,
+        "favorite_sot_against": 5.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": false,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 1362,
+    "settled_primary": 1363,
     "wins": 716,
-    "losses": 646,
-    "win_rate_pct": 52.57,
+    "losses": 647,
+    "win_rate_pct": 52.531,
     "by_market": {
       "1x2_ft": {
         "settled": 445,
@@ -80041,10 +80164,10 @@
         "win_rate_pct": 55.568
       },
       "over15_ht": {
-        "settled": 39,
+        "settled": 40,
         "wins": 15,
-        "losses": 24,
-        "win_rate_pct": 38.462
+        "losses": 25,
+        "win_rate_pct": 37.5
       },
       "gg_ht": {
         "settled": 15,
@@ -80073,10 +80196,10 @@
         "win_rate_pct": 53.95
       },
       "A": {
-        "settled": 487,
+        "settled": 488,
         "wins": 255,
-        "losses": 232,
-        "win_rate_pct": 52.361
+        "losses": 233,
+        "win_rate_pct": 52.254
       },
       "C": {
         "settled": 275,
@@ -80099,16 +80222,16 @@
         "over25_ft_rate_pct": 0.0
       },
       "neutral": {
-        "settled": 39,
+        "settled": 40,
         "goal_ht": 31,
         "over15_ht": 20,
         "gg_ht": 9,
         "over25_ft": 26,
-        "avg_pattern_score": 23.531,
-        "goal_ht_rate_pct": 79.487,
-        "over15_ht_rate_pct": 51.282,
-        "gg_ht_rate_pct": 23.077,
-        "over25_ft_rate_pct": 66.667
+        "avg_pattern_score": 23.489,
+        "goal_ht_rate_pct": 77.5,
+        "over15_ht_rate_pct": 50.0,
+        "gg_ht_rate_pct": 22.5,
+        "over25_ft_rate_pct": 65.0
       },
       "favorite_steam_only": {
         "settled": 3,

@@ -15665,8 +15665,548 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-08-29T06:22:33+02:00",
       "stats_schema": 2
+    },
+    "1556025": {
+      "fixture_id": "1556025",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 291,
+        "team_name": "Cerezo Osaka",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 283,
+        "team_name": "Shimizu S-pulse",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:40+02:00",
+      "stats_schema": 2
+    },
+    "1554014": {
+      "fixture_id": "1554014",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.38,
+      "away_xg": 0.91,
+      "home_stats": {
+        "team_id": 283,
+        "team_name": "Shimizu S-pulse",
+        "xg": 1.38,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 296,
+        "team_name": "Yokohama F. Marinos",
+        "xg": 0.91,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:40+02:00",
+      "stats_schema": 2
+    },
+    "1554005": {
+      "fixture_id": "1554005",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 288,
+        "team_name": "Nagoya Grampus",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 283,
+        "team_name": "Shimizu S-pulse",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:41+02:00",
+      "stats_schema": 2
+    },
+    "1546405": {
+      "fixture_id": "1546405",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 296,
+        "team_name": "Yokohama F. Marinos",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 283,
+        "team_name": "Shimizu S-pulse",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:41+02:00",
+      "stats_schema": 2
+    },
+    "1630762": {
+      "fixture_id": "1630762",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:41+02:00",
+      "stats_schema": 2
+    },
+    "1556024": {
+      "fixture_id": "1556024",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.26,
+      "away_xg": 0.6,
+      "home_stats": {
+        "team_id": 281,
+        "team_name": "Kashiwa Reysol",
+        "xg": 1.26,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 285,
+        "team_name": "V-varen Nagasaki",
+        "xg": 0.6,
+        "shots_on_target": 4.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:41+02:00",
+      "stats_schema": 2
+    },
+    "1630771": {
+      "fixture_id": "1630771",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:42+02:00",
+      "stats_schema": 2
+    },
+    "1630759": {
+      "fixture_id": "1630759",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:42+02:00",
+      "stats_schema": 2
+    },
+    "1556023": {
+      "fixture_id": "1556023",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.25,
+      "away_xg": 0.67,
+      "home_stats": {
+        "team_id": 292,
+        "team_name": "FC Tokyo",
+        "xg": 2.25,
+        "shots_on_target": 5.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 301,
+        "team_name": "JEF United Chiba",
+        "xg": 0.67,
+        "shots_on_target": 1.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:42+02:00",
+      "stats_schema": 2
+    },
+    "1554016": {
+      "fixture_id": "1554016",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.47,
+      "away_xg": 1.8,
+      "home_stats": {
+        "team_id": 289,
+        "team_name": "Vissel Kobe",
+        "xg": 1.47,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 292,
+        "team_name": "FC Tokyo",
+        "xg": 1.8,
+        "shots_on_target": 4.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:42+02:00",
+      "stats_schema": 2
+    },
+    "1630763": {
+      "fixture_id": "1630763",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:43+02:00",
+      "stats_schema": 2
+    },
+    "1554011": {
+      "fixture_id": "1554011",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.67,
+      "away_xg": 1.07,
+      "home_stats": {
+        "team_id": 294,
+        "team_name": "Kawasaki Frontale",
+        "xg": 2.67,
+        "shots_on_target": 7.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 302,
+        "team_name": "Kyoto Sanga",
+        "xg": 1.07,
+        "shots_on_target": 6.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:43+02:00",
+      "stats_schema": 2
+    },
+    "1546316": {
+      "fixture_id": "1546316",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 301,
+        "team_name": "JEF United Chiba",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 316,
+        "team_name": "Avispa Fukuoka",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:43+02:00",
+      "stats_schema": 2
+    },
+    "1630764": {
+      "fixture_id": "1630764",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:44+02:00",
+      "stats_schema": 2
+    },
+    "1556026": {
+      "fixture_id": "1556026",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 290,
+        "team_name": "Kashima",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 316,
+        "team_name": "Avispa Fukuoka",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:44+02:00",
+      "stats_schema": 2
+    },
+    "1556022": {
+      "fixture_id": "1556022",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.2,
+      "away_xg": 0.45,
+      "home_stats": {
+        "team_id": 316,
+        "team_name": "Avispa Fukuoka",
+        "xg": 1.2,
+        "shots_on_target": 6.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 291,
+        "team_name": "Cerezo Osaka",
+        "xg": 0.45,
+        "shots_on_target": 1.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:44+02:00",
+      "stats_schema": 2
+    },
+    "1554000": {
+      "fixture_id": "1554000",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 316,
+        "team_name": "Avispa Fukuoka",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 289,
+        "team_name": "Vissel Kobe",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:44+02:00",
+      "stats_schema": 2
+    },
+    "1630751": {
+      "fixture_id": "1630751",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:45+02:00",
+      "stats_schema": 2
+    },
+    "1554010": {
+      "fixture_id": "1554010",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.31,
+      "away_xg": 1.39,
+      "home_stats": {
+        "team_id": 290,
+        "team_name": "Kashima",
+        "xg": 2.31,
+        "shots_on_target": 6.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 288,
+        "team_name": "Nagoya Grampus",
+        "xg": 1.39,
+        "shots_on_target": 1.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:45+02:00",
+      "stats_schema": 2
+    },
+    "1630766": {
+      "fixture_id": "1630766",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-29T07:04:45+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-08-29T06:28:01+02:00",
+  "updated_at": "2026-08-29T07:09:51+02:00",
   "runtime_calls_last_run": 20
 }
