@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-08-31T04:49:46+02:00",
+  "updated_at": "2026-08-31T12:41:46+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -111763,13 +111763,136 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1550947": {
+      "fixture_id": "1550947",
+      "date": "2026-08-31",
+      "time": "04:10",
+      "match": "Monterrey - Atletico San Luis",
+      "league": "Liga MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-08-31T12:41:44+02:00",
+        "home_ft": 1,
+        "away_ft": 3,
+        "home_ht": 0,
+        "away_ht": 2
+      },
+      "primary": {
+        "market": "gg_ht",
+        "selection": "yes",
+        "odd": 3.745,
+        "probability_pct": 39.55,
+        "probability_raw_pct": 40.5,
+        "expected_value_pct": 48.115,
+        "relation": "confirmed",
+        "ranking_score": 105.637,
+        "recommendation_score": 94.637,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 94.637,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 12.0,
+          "market_break_even_pct": 26.702,
+          "probability_pct": 39.55,
+          "raw_probability_pct": 40.5,
+          "expected_value_pct": 48.115,
+          "edge_over_break_even_pp": 12.848,
+          "book_disagreement_pp": 15.85,
+          "competition_quality_score": 84,
+          "bookmakers": 6,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 92.637,
+          "price_preference_adjustment": 2.0,
+          "price_profile": "high_return_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-08-31T12:41:44+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 54.412,
+        "market_score": 30.584,
+        "early_stats_score": 86.978,
+        "two_goal_stats_score": 87.772,
+        "ft_goal_score": 94.338,
+        "classification": "underdog_book_square",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 2.54,
+        "favorite_team": "Monterrey",
+        "underdog_team": "Atletico San Luis",
+        "favorite_open_odd": 1.455,
+        "favorite_current_odd": 1.55,
+        "underdog_open_odd": 6.0,
+        "underdog_current_odd": 5.2,
+        "favorite_shortening_odd": -0.095,
+        "favorite_drift_odd": 0.095,
+        "underdog_steam_odd": 0.8,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": -3.35,
+        "underdog_fair_delta_pp": 2.54,
+        "favorite_oci": -81.66,
+        "underdog_oci": 73.502,
+        "underdog_book_consensus": 0.9167,
+        "book_pick_1x2": "2",
+        "book_square_underdog": true,
+        "book_square_favorite": false,
+        "protection_pick": "2",
+        "favorite_margin_delta_pp": -0.866,
+        "underdog_margin_delta_pp": 0.025,
+        "margin_shift_favorite_vs_underdog_pp": -0.891,
+        "favorite_conceded_ht_rate_pct": 69.13,
+        "underdog_scored_ht_rate_pct": 58.52,
+        "favorite_scored_ht_rate_pct": 60.14,
+        "underdog_conceded_ht_rate_pct": 84.29,
+        "pair_goal_ht_rate_pct": 90.885,
+        "pair_over15_ht_rate_pct": 46.025,
+        "pair_gg_ht_rate_pct": 45.155,
+        "pair_over25_ft_rate_pct": 76.833,
+        "underdog_xg_for": 1.074,
+        "favorite_xg_against": 0.633,
+        "underdog_sot_for": 4.463,
+        "favorite_sot_against": 2.138,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": true,
+        "gg_ht": false,
+        "over25_ft": true
+      }
     }
   },
   "summary": {
-    "settled_primary": 1547,
+    "settled_primary": 1548,
     "wins": 799,
-    "losses": 748,
-    "win_rate_pct": 51.648,
+    "losses": 749,
+    "win_rate_pct": 51.615,
     "by_market": {
       "1x2_ft": {
         "settled": 488,
@@ -111790,10 +111913,10 @@
         "win_rate_pct": 41.935
       },
       "gg_ht": {
-        "settled": 40,
+        "settled": 41,
         "wins": 13,
-        "losses": 27,
-        "win_rate_pct": 32.5
+        "losses": 28,
+        "win_rate_pct": 31.707
       },
       "over05_ht": {
         "settled": 1,
@@ -111816,10 +111939,10 @@
         "win_rate_pct": 52.816
       },
       "A": {
-        "settled": 587,
+        "settled": 588,
         "wins": 297,
-        "losses": 290,
-        "win_rate_pct": 50.596
+        "losses": 291,
+        "win_rate_pct": 50.51
       },
       "C": {
         "settled": 298,
@@ -111878,16 +112001,16 @@
         "over25_ft_rate_pct": 40.0
       },
       "underdog_book_square": {
-        "settled": 60,
-        "goal_ht": 43,
-        "over15_ht": 25,
+        "settled": 61,
+        "goal_ht": 44,
+        "over15_ht": 26,
         "gg_ht": 20,
-        "over25_ft": 35,
-        "avg_pattern_score": 42.74,
-        "goal_ht_rate_pct": 71.667,
-        "over15_ht_rate_pct": 41.667,
-        "gg_ht_rate_pct": 33.333,
-        "over25_ft_rate_pct": 58.333
+        "over25_ft": 36,
+        "avg_pattern_score": 42.932,
+        "goal_ht_rate_pct": 72.131,
+        "over15_ht_rate_pct": 42.623,
+        "gg_ht_rate_pct": 32.787,
+        "over25_ft_rate_pct": 59.016
       },
       "favorite_steam_vulnerable": {
         "settled": 20,
