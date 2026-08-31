@@ -17149,8 +17149,338 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-08-30T04:54:17+02:00",
       "stats_schema": 2
+    },
+    "1627558": {
+      "fixture_id": "1627558",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2282,
+        "team_name": "Monterrey",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1607,
+        "team_name": "Chicago Fire",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:02+02:00",
+      "stats_schema": 2
+    },
+    "1550937": {
+      "fixture_id": "1550937",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.71,
+      "away_xg": 0.99,
+      "home_stats": {
+        "team_id": 2314,
+        "team_name": "Atletico San Luis",
+        "xg": 2.71,
+        "shots_on_target": 7.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2292,
+        "team_name": "CF Pachuca",
+        "xg": 0.99,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:03+02:00",
+      "stats_schema": 2
+    },
+    "1530139": {
+      "fixture_id": "1530139",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 9569,
+        "team_name": "Nashville SC",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2314,
+        "team_name": "Atletico San Luis",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:03+02:00",
+      "stats_schema": 2
+    },
+    "1530114": {
+      "fixture_id": "1530114",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 9568,
+        "team_name": "Inter Miami",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2314,
+        "team_name": "Atletico San Luis",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:03+02:00",
+      "stats_schema": 2
+    },
+    "1575916": {
+      "fixture_id": "1575916",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:04+02:00",
+      "stats_schema": 2
+    },
+    "1575910": {
+      "fixture_id": "1575910",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:04+02:00",
+      "stats_schema": 2
+    },
+    "1575900": {
+      "fixture_id": "1575900",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:04+02:00",
+      "stats_schema": 2
+    },
+    "1575892": {
+      "fixture_id": "1575892",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:04+02:00",
+      "stats_schema": 2
+    },
+    "1575919": {
+      "fixture_id": "1575919",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:04+02:00",
+      "stats_schema": 2
+    },
+    "1575913": {
+      "fixture_id": "1575913",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:05+02:00",
+      "stats_schema": 2
+    },
+    "1575906": {
+      "fixture_id": "1575906",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:05+02:00",
+      "stats_schema": 2
+    },
+    "1575897": {
+      "fixture_id": "1575897",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:05+02:00",
+      "stats_schema": 2
+    },
+    "1575923": {
+      "fixture_id": "1575923",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:05+02:00",
+      "stats_schema": 2
+    },
+    "1575908": {
+      "fixture_id": "1575908",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:06+02:00",
+      "stats_schema": 2
+    },
+    "1575893": {
+      "fixture_id": "1575893",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:06+02:00",
+      "stats_schema": 2
+    },
+    "1575917": {
+      "fixture_id": "1575917",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:06+02:00",
+      "stats_schema": 2
+    },
+    "1575909": {
+      "fixture_id": "1575909",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:06+02:00",
+      "stats_schema": 2
+    },
+    "1575901": {
+      "fixture_id": "1575901",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:06+02:00",
+      "stats_schema": 2
+    },
+    "1575911": {
+      "fixture_id": "1575911",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:07+02:00",
+      "stats_schema": 2
+    },
+    "1575907": {
+      "fixture_id": "1575907",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-08-31T03:43:07+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-08-30T04:58:32+02:00",
+  "updated_at": "2026-08-31T03:45:18+02:00",
   "runtime_calls_last_run": 20
 }
