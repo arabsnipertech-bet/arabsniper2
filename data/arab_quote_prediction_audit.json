@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-01T05:04:05+02:00",
+  "updated_at": "2026-09-01T11:17:45+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -113509,7 +113509,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-01T04:59:12+02:00",
+        "settled_at": "2026-09-01T11:17:43+02:00",
         "home_ft": 2,
         "away_ft": 3,
         "home_ht": 0,
@@ -113555,7 +113555,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-01T04:59:12+02:00",
+      "settled_at": "2026-09-01T11:17:43+02:00",
       "market_pattern": {
         "available": true,
         "score": 21.654,
@@ -113800,7 +113800,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-01T04:59:12+02:00",
+        "settled_at": "2026-09-01T11:17:43+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 0,
@@ -113846,7 +113846,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-09-01T04:59:12+02:00",
+      "settled_at": "2026-09-01T11:17:43+02:00",
       "market_pattern": {
         "available": true,
         "score": 1.944,
@@ -113923,7 +113923,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-01T04:59:12+02:00",
+        "settled_at": "2026-09-01T11:17:43+02:00",
         "home_ft": 0,
         "away_ft": 0,
         "home_ht": 0,
@@ -113969,7 +113969,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-01T04:59:12+02:00",
+      "settled_at": "2026-09-01T11:17:43+02:00",
       "market_pattern": {
         "available": true,
         "score": 2.99,
@@ -114034,13 +114034,136 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1549756": {
+      "fixture_id": "1549756",
+      "date": "2026-09-01",
+      "time": "03:05",
+      "match": "Deportes Tolima - Cucuta",
+      "league": "Primera A",
+      "country": "Colombia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-01T11:17:43+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.97,
+        "probability_pct": 60.3,
+        "probability_raw_pct": 61.69,
+        "expected_value_pct": 18.791,
+        "relation": "confirmed",
+        "ranking_score": 97.047,
+        "recommendation_score": 91.047,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 91.047,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 50.761,
+          "probability_pct": 60.3,
+          "raw_probability_pct": 61.69,
+          "expected_value_pct": 18.791,
+          "edge_over_break_even_pp": 9.539,
+          "book_disagreement_pp": 13.94,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 88.047,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-09-01T11:17:43+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 33.86,
+        "market_score": 27.744,
+        "early_stats_score": 50.16,
+        "two_goal_stats_score": 31.834,
+        "ft_goal_score": 17.99,
+        "classification": "underdog_book_square",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.79,
+        "favorite_team": "Deportes Tolima",
+        "underdog_team": "Cucuta",
+        "favorite_open_odd": 1.4,
+        "favorite_current_odd": 1.43,
+        "underdog_open_odd": 7.6,
+        "underdog_current_odd": 7.2,
+        "favorite_shortening_odd": -0.03,
+        "favorite_drift_odd": 0.03,
+        "underdog_steam_odd": 0.4,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": -0.82,
+        "underdog_fair_delta_pp": 0.79,
+        "favorite_oci": -48.738,
+        "underdog_oci": 45.934,
+        "underdog_book_consensus": 0.8182,
+        "book_pick_1x2": "2",
+        "book_square_underdog": true,
+        "book_square_favorite": false,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": -0.672,
+        "underdog_margin_delta_pp": -0.059,
+        "margin_shift_favorite_vs_underdog_pp": -0.613,
+        "favorite_conceded_ht_rate_pct": 40.67,
+        "underdog_scored_ht_rate_pct": 52.73,
+        "favorite_scored_ht_rate_pct": 31.13,
+        "underdog_conceded_ht_rate_pct": 54.06,
+        "pair_goal_ht_rate_pct": 71.88,
+        "pair_over15_ht_rate_pct": 32.105,
+        "pair_gg_ht_rate_pct": 17.42,
+        "pair_over25_ft_rate_pct": 40.7,
+        "underdog_xg_for": 1.315,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 4.616,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": false,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": true
+      }
     }
   },
   "summary": {
-    "settled_primary": 1560,
+    "settled_primary": 1561,
     "wins": 807,
-    "losses": 753,
-    "win_rate_pct": 51.731,
+    "losses": 754,
+    "win_rate_pct": 51.698,
     "by_market": {
       "1x2_ft": {
         "settled": 490,
@@ -114049,10 +114172,10 @@
         "win_rate_pct": 47.959
       },
       "over25_ft": {
-        "settled": 933,
+        "settled": 934,
         "wins": 518,
-        "losses": 415,
-        "win_rate_pct": 55.52
+        "losses": 416,
+        "win_rate_pct": 55.46
       },
       "over15_ht": {
         "settled": 95,
@@ -114087,10 +114210,10 @@
         "win_rate_pct": 52.879
       },
       "A": {
-        "settled": 596,
+        "settled": 597,
         "wins": 302,
-        "losses": 294,
-        "win_rate_pct": 50.671
+        "losses": 295,
+        "win_rate_pct": 50.586
       },
       "C": {
         "settled": 299,
@@ -114149,16 +114272,16 @@
         "over25_ft_rate_pct": 40.0
       },
       "underdog_book_square": {
-        "settled": 64,
+        "settled": 65,
         "goal_ht": 45,
         "over15_ht": 27,
         "gg_ht": 21,
-        "over25_ft": 37,
-        "avg_pattern_score": 42.857,
-        "goal_ht_rate_pct": 70.312,
-        "over15_ht_rate_pct": 42.188,
-        "gg_ht_rate_pct": 32.812,
-        "over25_ft_rate_pct": 57.812
+        "over25_ft": 38,
+        "avg_pattern_score": 42.719,
+        "goal_ht_rate_pct": 69.231,
+        "over15_ht_rate_pct": 41.538,
+        "gg_ht_rate_pct": 32.308,
+        "over25_ft_rate_pct": 58.462
       },
       "favorite_steam_vulnerable": {
         "settled": 21,
