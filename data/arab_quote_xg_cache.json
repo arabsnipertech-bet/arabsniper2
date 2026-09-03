@@ -20165,8 +20165,634 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-02T04:18:41+02:00",
       "stats_schema": 2
+    },
+    "1550944": {
+      "fixture_id": "1550944",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.81,
+      "away_xg": 0.8,
+      "home_stats": {
+        "team_id": 2287,
+        "team_name": "Club America",
+        "xg": 0.81,
+        "shots_on_target": 6.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2291,
+        "team_name": "Puebla",
+        "xg": 0.8,
+        "shots_on_target": 6.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:11+02:00",
+      "stats_schema": 2
+    },
+    "1627561": {
+      "fixture_id": "1627561",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2287,
+        "team_name": "Club America",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1613,
+        "team_name": "Columbus Crew",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:11+02:00",
+      "stats_schema": 2
+    },
+    "1550931": {
+      "fixture_id": "1550931",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.38,
+      "away_xg": 1.88,
+      "home_stats": {
+        "team_id": 2298,
+        "team_name": "FC Juarez",
+        "xg": 1.38,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2287,
+        "team_name": "Club America",
+        "xg": 1.88,
+        "shots_on_target": 10.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:11+02:00",
+      "stats_schema": 2
+    },
+    "1550947": {
+      "fixture_id": "1550947",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.26,
+      "away_xg": 1.33,
+      "home_stats": {
+        "team_id": 2282,
+        "team_name": "Monterrey",
+        "xg": 2.26,
+        "shots_on_target": 8.0,
+        "total_shots": 26.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2314,
+        "team_name": "Atletico San Luis",
+        "xg": 1.33,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:12+02:00",
+      "stats_schema": 2
+    },
+    "1553152": {
+      "fixture_id": "1553152",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.64,
+      "away_xg": 1.38,
+      "home_stats": {
+        "team_id": 338,
+        "team_name": "Wisla Krakow",
+        "xg": 1.64,
+        "shots_on_target": 7.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 17115,
+        "team_name": "Wieczysta Kraków",
+        "xg": 1.38,
+        "shots_on_target": 4.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:13+02:00",
+      "stats_schema": 2
+    },
+    "1553137": {
+      "fixture_id": "1553137",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.08,
+      "away_xg": 1.98,
+      "home_stats": {
+        "team_id": 350,
+        "team_name": "Cracovia Krakow",
+        "xg": 2.08,
+        "shots_on_target": 6.0,
+        "total_shots": 24.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 17115,
+        "team_name": "Wieczysta Kraków",
+        "xg": 1.98,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:13+02:00",
+      "stats_schema": 2
+    },
+    "1553117": {
+      "fixture_id": "1553117",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.99,
+      "away_xg": 1.63,
+      "home_stats": {
+        "team_id": 17115,
+        "team_name": "Wieczysta Kraków",
+        "xg": 0.99,
+        "shots_on_target": 2.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 347,
+        "team_name": "Lech Poznan",
+        "xg": 1.63,
+        "shots_on_target": 7.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:13+02:00",
+      "stats_schema": 2
+    },
+    "1585721": {
+      "fixture_id": "1585721",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 7402,
+        "team_name": "Esenler Erokspor",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 17259,
+        "team_name": "Iğdır FK",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:14+02:00",
+      "stats_schema": 2
+    },
+    "1585713": {
+      "fixture_id": "1585713",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 17259,
+        "team_name": "Iğdır FK",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1001,
+        "team_name": "Kayserispor",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:14+02:00",
+      "stats_schema": 2
+    },
+    "1585700": {
+      "fixture_id": "1585700",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1003,
+        "team_name": "Bursaspor",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 17259,
+        "team_name": "Iğdır FK",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:14+02:00",
+      "stats_schema": 2
+    },
+    "1585693": {
+      "fixture_id": "1585693",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 17259,
+        "team_name": "Iğdır FK",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3589,
+        "team_name": "Fatih Karagümrük",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:14+02:00",
+      "stats_schema": 2
+    },
+    "1585725": {
+      "fixture_id": "1585725",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3597,
+        "team_name": "Manisa F.K.",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3583,
+        "team_name": "Bodrum FK",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:14+02:00",
+      "stats_schema": 2
+    },
+    "1585716": {
+      "fixture_id": "1585716",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1002,
+        "team_name": "Sivasspor",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3597,
+        "team_name": "Manisa F.K.",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:15+02:00",
+      "stats_schema": 2
+    },
+    "1585706": {
+      "fixture_id": "1585706",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3597,
+        "team_name": "Manisa F.K.",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 6342,
+        "team_name": "Vanspor FK",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:15+02:00",
+      "stats_schema": 2
+    },
+    "1585692": {
+      "fixture_id": "1585692",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3569,
+        "team_name": "Boluspor",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3597,
+        "team_name": "Manisa F.K.",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:15+02:00",
+      "stats_schema": 2
+    },
+    "1597916": {
+      "fixture_id": "1597916",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:16+02:00",
+      "stats_schema": 2
+    },
+    "1597917": {
+      "fixture_id": "1597917",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:16+02:00",
+      "stats_schema": 2
+    },
+    "1597908": {
+      "fixture_id": "1597908",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:16+02:00",
+      "stats_schema": 2
+    },
+    "1497480": {
+      "fixture_id": "1497480",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2907,
+        "team_name": "Qatar SC",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2904,
+        "team_name": "Al-Duhail SC",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:16+02:00",
+      "stats_schema": 2
+    },
+    "1491635": {
+      "fixture_id": "1491635",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2916,
+        "team_name": "Al Shamal",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 25.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2907,
+        "team_name": "Qatar SC",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-03T03:34:17+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-02T04:24:10+02:00",
+  "updated_at": "2026-09-03T03:40:54+02:00",
   "runtime_calls_last_run": 20
 }
