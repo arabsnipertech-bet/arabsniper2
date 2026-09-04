@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-04T03:35:24+02:00",
+  "updated_at": "2026-09-04T04:28:21+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -126433,19 +126433,142 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1519477": {
+      "fixture_id": "1519477",
+      "date": "2026-09-04",
+      "time": "02:00",
+      "match": "Libertad - Emelec",
+      "league": "Liga Pro",
+      "country": "Ecuador",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-04T04:22:03+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.26,
+        "probability_pct": 54.09,
+        "probability_raw_pct": 55.57,
+        "expected_value_pct": 22.243,
+        "relation": "confirmed",
+        "ranking_score": 98.27,
+        "recommendation_score": 92.27,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 92.27,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 44.248,
+          "probability_pct": 54.09,
+          "raw_probability_pct": 55.57,
+          "expected_value_pct": 22.243,
+          "edge_over_break_even_pp": 9.842,
+          "book_disagreement_pp": 14.81,
+          "competition_quality_score": 68,
+          "bookmakers": 13,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 89.27,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-09-04T04:22:03+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 32.025,
+        "market_score": 40.0,
+        "early_stats_score": 29.453,
+        "two_goal_stats_score": 9.755,
+        "ft_goal_score": 8.329,
+        "classification": "odds_cross_reversal",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "1",
+        "favorite_changed": true,
+        "cross_strength_pp": 6.61,
+        "favorite_team": "Libertad",
+        "underdog_team": "Emelec",
+        "favorite_open_odd": 2.675,
+        "favorite_current_odd": 2.26,
+        "underdog_open_odd": 2.5,
+        "underdog_current_odd": 3.12,
+        "favorite_shortening_odd": 0.415,
+        "favorite_drift_odd": -0.415,
+        "underdog_steam_odd": -0.62,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 7.0,
+        "underdog_fair_delta_pp": -6.61,
+        "favorite_oci": 90.676,
+        "underdog_oci": -90.638,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "1",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": -0.13,
+        "underdog_margin_delta_pp": -1.346,
+        "margin_shift_favorite_vs_underdog_pp": 1.216,
+        "favorite_conceded_ht_rate_pct": 9.15,
+        "underdog_scored_ht_rate_pct": 22.44,
+        "favorite_scored_ht_rate_pct": 58.33,
+        "underdog_conceded_ht_rate_pct": 56.25,
+        "pair_goal_ht_rate_pct": 67.36,
+        "pair_over15_ht_rate_pct": 30.075,
+        "pair_gg_ht_rate_pct": 5.73,
+        "pair_over25_ft_rate_pct": 40.5,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": false,
+        "two_way_confirmation": false,
+        "over15_confirmation": true,
+        "over25_confirmation": false,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 1641,
+    "settled_primary": 1642,
     "wins": 833,
-    "losses": 808,
-    "win_rate_pct": 50.762,
+    "losses": 809,
+    "win_rate_pct": 50.731,
     "by_market": {
       "1x2_ft": {
-        "settled": 504,
+        "settled": 505,
         "wins": 241,
-        "losses": 263,
-        "win_rate_pct": 47.817
+        "losses": 264,
+        "win_rate_pct": 47.723
       },
       "over25_ft": {
         "settled": 961,
@@ -126486,10 +126609,10 @@
         "win_rate_pct": 51.971
       },
       "A": {
-        "settled": 646,
+        "settled": 647,
         "wins": 320,
-        "losses": 326,
-        "win_rate_pct": 49.536
+        "losses": 327,
+        "win_rate_pct": 49.459
       },
       "C": {
         "settled": 305,
@@ -126536,16 +126659,16 @@
         "over25_ft_rate_pct": 62.5
       },
       "odds_cross_reversal": {
-        "settled": 22,
-        "goal_ht": 14,
+        "settled": 23,
+        "goal_ht": 15,
         "over15_ht": 4,
         "gg_ht": 3,
         "over25_ft": 9,
-        "avg_pattern_score": 44.569,
-        "goal_ht_rate_pct": 63.636,
-        "over15_ht_rate_pct": 18.182,
-        "gg_ht_rate_pct": 13.636,
-        "over25_ft_rate_pct": 40.909
+        "avg_pattern_score": 44.023,
+        "goal_ht_rate_pct": 65.217,
+        "over15_ht_rate_pct": 17.391,
+        "gg_ht_rate_pct": 13.043,
+        "over25_ft_rate_pct": 39.13
       },
       "underdog_book_square": {
         "settled": 82,
