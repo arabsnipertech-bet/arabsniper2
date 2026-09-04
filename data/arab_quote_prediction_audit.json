@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-04T10:47:43+02:00",
+  "updated_at": "2026-09-04T15:19:29+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -126445,7 +126445,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-04T10:47:41+02:00",
+        "settled_at": "2026-09-04T15:19:27+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 1,
@@ -126491,7 +126491,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-04T10:47:41+02:00",
+      "settled_at": "2026-09-04T15:19:27+02:00",
       "market_pattern": {
         "available": true,
         "score": 32.025,
@@ -126568,7 +126568,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-04T10:47:41+02:00",
+        "settled_at": "2026-09-04T15:19:27+02:00",
         "home_ft": 0,
         "away_ft": 3,
         "home_ht": 0,
@@ -126614,7 +126614,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-04T10:47:41+02:00",
+      "settled_at": "2026-09-04T15:19:27+02:00",
       "market_pattern": {
         "available": true,
         "score": 30.203,
@@ -126691,7 +126691,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-04T10:47:41+02:00",
+        "settled_at": "2026-09-04T15:19:27+02:00",
         "home_ft": 1,
         "away_ft": 4,
         "home_ht": 1,
@@ -126737,7 +126737,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-09-04T10:47:41+02:00",
+      "settled_at": "2026-09-04T15:19:27+02:00",
       "market_pattern": {
         "available": true,
         "score": 39.553,
@@ -126801,6 +126801,90 @@
         "over15_ht": true,
         "gg_ht": true,
         "over25_ft": true
+      }
+    },
+    "1565465": {
+      "fixture_id": "1565465",
+      "date": "2026-09-04",
+      "time": "12:00",
+      "match": "Chornomorets - Livyi Bereh",
+      "league": "Premier League",
+      "country": "Ukraine",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-04T15:19:27+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": null,
+      "settled_at": "2026-09-04T15:19:27+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 10.94,
+        "market_score": 0.0,
+        "early_stats_score": 34.699,
+        "two_goal_stats_score": 14.51,
+        "ft_goal_score": 10.567,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "2",
+        "favorite_changed": false,
+        "cross_strength_pp": 2.41,
+        "favorite_team": "Livyi Bereh",
+        "underdog_team": "Chornomorets",
+        "favorite_open_odd": 2.5,
+        "favorite_current_odd": 2.34,
+        "underdog_open_odd": 2.82,
+        "underdog_current_odd": 3.2,
+        "favorite_shortening_odd": 0.16,
+        "favorite_drift_odd": -0.16,
+        "underdog_steam_odd": -0.38,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 2.41,
+        "underdog_fair_delta_pp": -3.98,
+        "favorite_oci": 74.615,
+        "underdog_oci": -85.651,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "2",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": "2",
+        "favorite_margin_delta_pp": 0.332,
+        "underdog_margin_delta_pp": -0.231,
+        "margin_shift_favorite_vs_underdog_pp": 0.563,
+        "favorite_conceded_ht_rate_pct": 39.32,
+        "underdog_scored_ht_rate_pct": 24.4,
+        "favorite_scored_ht_rate_pct": 38.4,
+        "underdog_conceded_ht_rate_pct": 59.65,
+        "pair_goal_ht_rate_pct": 68.685,
+        "pair_over15_ht_rate_pct": 28.91,
+        "pair_gg_ht_rate_pct": 12.2,
+        "pair_over25_ft_rate_pct": 34.757,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": false,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
       }
     }
   },
@@ -126881,16 +126965,16 @@
         "over25_ft_rate_pct": 37.5
       },
       "neutral": {
-        "settled": 312,
+        "settled": 313,
         "goal_ht": 219,
         "over15_ht": 121,
         "gg_ht": 78,
         "over25_ft": 178,
-        "avg_pattern_score": 22.991,
-        "goal_ht_rate_pct": 70.192,
-        "over15_ht_rate_pct": 38.782,
-        "gg_ht_rate_pct": 25.0,
-        "over25_ft_rate_pct": 57.051
+        "avg_pattern_score": 22.952,
+        "goal_ht_rate_pct": 69.968,
+        "over15_ht_rate_pct": 38.658,
+        "gg_ht_rate_pct": 24.92,
+        "over25_ft_rate_pct": 56.869
       },
       "favorite_steam_only": {
         "settled": 25,
