@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-04T15:26:11+02:00",
+  "updated_at": "2026-09-04T19:29:15+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -126445,7 +126445,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-04T15:26:08+02:00",
+        "settled_at": "2026-09-04T19:29:14+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 1,
@@ -126491,7 +126491,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-04T15:26:08+02:00",
+      "settled_at": "2026-09-04T19:29:14+02:00",
       "market_pattern": {
         "available": true,
         "score": 32.025,
@@ -126568,7 +126568,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-04T15:26:08+02:00",
+        "settled_at": "2026-09-04T19:29:14+02:00",
         "home_ft": 0,
         "away_ft": 3,
         "home_ht": 0,
@@ -126614,7 +126614,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-04T15:26:08+02:00",
+      "settled_at": "2026-09-04T19:29:14+02:00",
       "market_pattern": {
         "available": true,
         "score": 30.203,
@@ -126691,7 +126691,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-04T15:26:08+02:00",
+        "settled_at": "2026-09-04T19:29:14+02:00",
         "home_ft": 1,
         "away_ft": 4,
         "home_ht": 1,
@@ -126737,7 +126737,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-09-04T15:26:08+02:00",
+      "settled_at": "2026-09-04T19:29:14+02:00",
       "market_pattern": {
         "available": true,
         "score": 39.553,
@@ -126886,13 +126886,259 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1597922": {
+      "fixture_id": "1597922",
+      "date": "2026-09-04",
+      "time": "16:00",
+      "match": "Al Shamal - Al Shahaniya",
+      "league": "Stars League",
+      "country": "Qatar",
+      "competition_quality_score": 64,
+      "competition_tier": "elite_asia_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-04T19:29:14+02:00",
+        "home_ft": 4,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.3,
+        "probability_pct": 45.92,
+        "probability_raw_pct": 46.48,
+        "expected_value_pct": 5.616,
+        "relation": "confirmed",
+        "ranking_score": 86.686,
+        "recommendation_score": 75.686,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 75.686,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 43.478,
+          "probability_pct": 45.92,
+          "raw_probability_pct": 46.48,
+          "expected_value_pct": 5.616,
+          "edge_over_break_even_pp": 2.442,
+          "book_disagreement_pp": 6.22,
+          "competition_quality_score": 64,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 72.686,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-09-04T19:29:14+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 51.381,
+        "market_score": 34.0,
+        "early_stats_score": 65.189,
+        "two_goal_stats_score": 88.978,
+        "ft_goal_score": 89.393,
+        "classification": "favorite_steam_vulnerable",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 1.8,
+        "favorite_team": "Al Shamal",
+        "underdog_team": "Al Shahaniya",
+        "favorite_open_odd": 1.8,
+        "favorite_current_odd": 1.72,
+        "underdog_open_odd": 3.7,
+        "underdog_current_odd": 4.0,
+        "favorite_shortening_odd": 0.08,
+        "favorite_drift_odd": -0.08,
+        "underdog_steam_odd": -0.3,
+        "medium_favorite_band": true,
+        "focal_170_180_band": true,
+        "favorite_steam": true,
+        "favorite_steam_band": true,
+        "favorite_fair_delta_pp": 2.44,
+        "underdog_fair_delta_pp": -1.8,
+        "favorite_oci": 67.172,
+        "underdog_oci": -60.7,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "1",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": "1",
+        "favorite_margin_delta_pp": 0.151,
+        "underdog_margin_delta_pp": -0.219,
+        "margin_shift_favorite_vs_underdog_pp": 0.37,
+        "favorite_conceded_ht_rate_pct": 44.37,
+        "underdog_scored_ht_rate_pct": 44.55,
+        "favorite_scored_ht_rate_pct": 52.24,
+        "underdog_conceded_ht_rate_pct": 67.11,
+        "pair_goal_ht_rate_pct": 75.275,
+        "pair_over15_ht_rate_pct": 52.485,
+        "pair_gg_ht_rate_pct": 28.855,
+        "pair_over25_ft_rate_pct": 69.563,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 6.796,
+        "favorite_sot_against": 5.279,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": true,
+        "gg_ht": true,
+        "over25_ft": true
+      }
+    },
+    "1504297": {
+      "fixture_id": "1504297",
+      "date": "2026-09-04",
+      "time": "17:30",
+      "match": "JIPPO - Kooteepee",
+      "league": "Ykkösliiga",
+      "country": "Finland",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-04T19:29:14+02:00",
+        "home_ft": 0,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.88,
+        "probability_pct": 59.19,
+        "probability_raw_pct": 60.3,
+        "expected_value_pct": 11.277,
+        "relation": "confirmed",
+        "ranking_score": 92.856,
+        "recommendation_score": 86.856,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 86.856,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 53.191,
+          "probability_pct": 59.19,
+          "raw_probability_pct": 60.3,
+          "expected_value_pct": 11.277,
+          "edge_over_break_even_pp": 5.999,
+          "book_disagreement_pp": 11.11,
+          "competition_quality_score": 68,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 83.856,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "won"
+      },
+      "settled_at": "2026-09-04T19:29:14+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 28.136,
+        "market_score": 33.3,
+        "early_stats_score": 26.788,
+        "two_goal_stats_score": 13.294,
+        "ft_goal_score": 13.095,
+        "classification": "odds_inversion_only",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "1",
+        "favorite_changed": true,
+        "cross_strength_pp": 0.99,
+        "favorite_team": "JIPPO",
+        "underdog_team": "Kooteepee",
+        "favorite_open_odd": 2.6,
+        "favorite_current_odd": 2.5,
+        "underdog_open_odd": 2.45,
+        "underdog_current_odd": 2.5,
+        "favorite_shortening_odd": 0.1,
+        "favorite_drift_odd": -0.1,
+        "underdog_steam_odd": -0.05,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 1.16,
+        "underdog_fair_delta_pp": -0.99,
+        "favorite_oci": 61.693,
+        "underdog_oci": -59.979,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "1",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": "1",
+        "favorite_margin_delta_pp": 0.373,
+        "underdog_margin_delta_pp": 0.167,
+        "margin_shift_favorite_vs_underdog_pp": 0.206,
+        "favorite_conceded_ht_rate_pct": 14.01,
+        "underdog_scored_ht_rate_pct": 68.81,
+        "favorite_scored_ht_rate_pct": 27.27,
+        "underdog_conceded_ht_rate_pct": 33.17,
+        "pair_goal_ht_rate_pct": 56.275,
+        "pair_over15_ht_rate_pct": 23.155,
+        "pair_gg_ht_rate_pct": 15.355,
+        "pair_over25_ft_rate_pct": 45.167,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": false,
+        "underdog_threat_confirmation": false,
+        "two_way_confirmation": true,
+        "over15_confirmation": false,
+        "over25_confirmation": false,
+        "statistical_confirmation": false,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 1644,
-    "wins": 834,
+    "settled_primary": 1646,
+    "wins": 836,
     "losses": 810,
-    "win_rate_pct": 50.73,
+    "win_rate_pct": 50.79,
     "by_market": {
       "1x2_ft": {
         "settled": 505,
@@ -126901,16 +127147,16 @@
         "win_rate_pct": 47.723
       },
       "over25_ft": {
-        "settled": 963,
-        "wins": 527,
+        "settled": 964,
+        "wins": 528,
         "losses": 436,
-        "win_rate_pct": 54.725
+        "win_rate_pct": 54.772
       },
       "over15_ht": {
-        "settled": 123,
-        "wins": 48,
+        "settled": 124,
+        "wins": 49,
         "losses": 75,
-        "win_rate_pct": 39.024
+        "win_rate_pct": 39.516
       },
       "gg_ht": {
         "settled": 52,
@@ -126933,16 +127179,16 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 686,
-        "wins": 357,
+        "settled": 687,
+        "wins": 358,
         "losses": 329,
-        "win_rate_pct": 52.041
+        "win_rate_pct": 52.111
       },
       "A": {
-        "settled": 648,
-        "wins": 320,
+        "settled": 649,
+        "wins": 321,
         "losses": 328,
-        "win_rate_pct": 49.383
+        "win_rate_pct": 49.461
       },
       "C": {
         "settled": 305,
@@ -126953,16 +127199,16 @@
     },
     "by_market_pattern": {
       "odds_inversion_only": {
-        "settled": 8,
-        "goal_ht": 6,
+        "settled": 9,
+        "goal_ht": 7,
         "over15_ht": 2,
         "gg_ht": 0,
         "over25_ft": 3,
-        "avg_pattern_score": 30.211,
-        "goal_ht_rate_pct": 75.0,
-        "over15_ht_rate_pct": 25.0,
+        "avg_pattern_score": 29.98,
+        "goal_ht_rate_pct": 77.778,
+        "over15_ht_rate_pct": 22.222,
         "gg_ht_rate_pct": 0.0,
-        "over25_ft_rate_pct": 37.5
+        "over25_ft_rate_pct": 33.333
       },
       "neutral": {
         "settled": 313,
@@ -127013,16 +127259,16 @@
         "over25_ft_rate_pct": 57.831
       },
       "favorite_steam_vulnerable": {
-        "settled": 35,
-        "goal_ht": 25,
-        "over15_ht": 14,
-        "gg_ht": 8,
-        "over25_ft": 18,
-        "avg_pattern_score": 43.299,
-        "goal_ht_rate_pct": 71.429,
-        "over15_ht_rate_pct": 40.0,
-        "gg_ht_rate_pct": 22.857,
-        "over25_ft_rate_pct": 51.429
+        "settled": 36,
+        "goal_ht": 26,
+        "over15_ht": 15,
+        "gg_ht": 9,
+        "over25_ft": 19,
+        "avg_pattern_score": 43.523,
+        "goal_ht_rate_pct": 72.222,
+        "over15_ht_rate_pct": 41.667,
+        "gg_ht_rate_pct": 25.0,
+        "over25_ft_rate_pct": 52.778
       }
     }
   }
