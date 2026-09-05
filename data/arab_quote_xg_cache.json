@@ -21909,8 +21909,342 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-04T04:21:13+02:00",
       "stats_schema": 2
+    },
+    "1550929": {
+      "fixture_id": "1550929",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.25,
+      "away_xg": 2.27,
+      "home_stats": {
+        "team_id": 2292,
+        "team_name": "CF Pachuca",
+        "xg": 2.25,
+        "shots_on_target": 4.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2291,
+        "team_name": "Puebla",
+        "xg": 2.27,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:14+02:00",
+      "stats_schema": 2
+    },
+    "1635863": {
+      "fixture_id": "1635863",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 4.09,
+      "away_xg": 1.2,
+      "home_stats": {
+        "team_id": 2281,
+        "team_name": "Toluca",
+        "xg": 4.09,
+        "shots_on_target": 7.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2289,
+        "team_name": "Leon",
+        "xg": 1.2,
+        "shots_on_target": 1.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:15+02:00",
+      "stats_schema": 2
+    },
+    "1550946": {
+      "fixture_id": "1550946",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:15+02:00",
+      "stats_schema": 2
+    },
+    "1550933": {
+      "fixture_id": "1550933",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.7,
+      "away_xg": 1.47,
+      "home_stats": {
+        "team_id": 2290,
+        "team_name": "Club Queretaro",
+        "xg": 1.7,
+        "shots_on_target": 3.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2281,
+        "team_name": "Toluca",
+        "xg": 1.47,
+        "shots_on_target": 3.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:15+02:00",
+      "stats_schema": 2
+    },
+    "1550943": {
+      "fixture_id": "1550943",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2292,
+        "team_name": "CF Pachuca",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2278,
+        "team_name": "Guadalajara Chivas",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:16+02:00",
+      "stats_schema": 2
+    },
+    "1581403": {
+      "fixture_id": "1581403",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:17+02:00",
+      "stats_schema": 2
+    },
+    "1581399": {
+      "fixture_id": "1581399",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:17+02:00",
+      "stats_schema": 2
+    },
+    "1581473": {
+      "fixture_id": "1581473",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:17+02:00",
+      "stats_schema": 2
+    },
+    "1581406": {
+      "fixture_id": "1581406",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:17+02:00",
+      "stats_schema": 2
+    },
+    "1581393": {
+      "fixture_id": "1581393",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:17+02:00",
+      "stats_schema": 2
+    },
+    "1627587": {
+      "fixture_id": "1627587",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:18+02:00",
+      "stats_schema": 2
+    },
+    "1628893": {
+      "fixture_id": "1628893",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:18+02:00",
+      "stats_schema": 2
+    },
+    "1524188": {
+      "fixture_id": "1524188",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:18+02:00",
+      "stats_schema": 2
+    },
+    "1524179": {
+      "fixture_id": "1524179",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:19+02:00",
+      "stats_schema": 2
+    },
+    "1579092": {
+      "fixture_id": "1579092",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:20+02:00",
+      "stats_schema": 2
+    },
+    "1579086": {
+      "fixture_id": "1579086",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:20+02:00",
+      "stats_schema": 2
+    },
+    "1579081": {
+      "fixture_id": "1579081",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:20+02:00",
+      "stats_schema": 2
+    },
+    "1603450": {
+      "fixture_id": "1603450",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:20+02:00",
+      "stats_schema": 2
+    },
+    "1579094": {
+      "fixture_id": "1579094",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:21+02:00",
+      "stats_schema": 2
+    },
+    "1579089": {
+      "fixture_id": "1579089",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-05T03:29:21+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-04T04:28:18+02:00",
+  "updated_at": "2026-09-05T03:35:30+02:00",
   "runtime_calls_last_run": 20
 }
