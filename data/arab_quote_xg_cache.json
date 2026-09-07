@@ -23581,8 +23581,614 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-06T04:17:39+02:00",
       "stats_schema": 2
+    },
+    "1585730": {
+      "fixture_id": "1585730",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3583,
+        "team_name": "Bodrum FK",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 7402,
+        "team_name": "Esenler Erokspor",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:04+02:00",
+      "stats_schema": 2
+    },
+    "1585701": {
+      "fixture_id": "1585701",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 7402,
+        "team_name": "Esenler Erokspor",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3605,
+        "team_name": "Sarıyer",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:04+02:00",
+      "stats_schema": 2
+    },
+    "1585734": {
+      "fixture_id": "1585734",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3589,
+        "team_name": "Fatih Karagümrük",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1001,
+        "team_name": "Kayserispor",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:05+02:00",
+      "stats_schema": 2
+    },
+    "1585723": {
+      "fixture_id": "1585723",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.75,
+      "away_xg": 1.24,
+      "home_stats": {
+        "team_id": 1001,
+        "team_name": "Kayserispor",
+        "xg": 1.75,
+        "shots_on_target": 2.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1003,
+        "team_name": "Bursaspor",
+        "xg": 1.24,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:05+02:00",
+      "stats_schema": 2
+    },
+    "1585704": {
+      "fixture_id": "1585704",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.23,
+      "away_xg": 1.88,
+      "home_stats": {
+        "team_id": 1001,
+        "team_name": "Kayserispor",
+        "xg": 2.23,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1002,
+        "team_name": "Sivasspor",
+        "xg": 1.88,
+        "shots_on_target": 2.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:05+02:00",
+      "stats_schema": 2
+    },
+    "1585732": {
+      "fixture_id": "1585732",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1003,
+        "team_name": "Bursaspor",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3578,
+        "team_name": "İstanbulspor",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:06+02:00",
+      "stats_schema": 2
+    },
+    "1585722": {
+      "fixture_id": "1585722",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.73,
+      "away_xg": 1.1,
+      "home_stats": {
+        "team_id": 3578,
+        "team_name": "İstanbulspor",
+        "xg": 0.73,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3589,
+        "team_name": "Fatih Karagümrük",
+        "xg": 1.1,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:06+02:00",
+      "stats_schema": 2
+    },
+    "1585718": {
+      "fixture_id": "1585718",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 6342,
+        "team_name": "Vanspor FK",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3578,
+        "team_name": "İstanbulspor",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:06+02:00",
+      "stats_schema": 2
+    },
+    "1585702": {
+      "fixture_id": "1585702",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3578,
+        "team_name": "İstanbulspor",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3583,
+        "team_name": "Bodrum FK",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:06+02:00",
+      "stats_schema": 2
+    },
+    "1585733": {
+      "fixture_id": "1585733",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 17259,
+        "team_name": "Iğdır FK",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3597,
+        "team_name": "Manisa F.K.",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:07+02:00",
+      "stats_schema": 2
+    },
+    "1632255": {
+      "fixture_id": "1632255",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:07+02:00",
+      "stats_schema": 2
+    },
+    "1565237": {
+      "fixture_id": "1565237",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2578,
+        "team_name": "FC Voluntari",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 6886,
+        "team_name": "Oţelul",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:08+02:00",
+      "stats_schema": 2
+    },
+    "1632257": {
+      "fixture_id": "1632257",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:08+02:00",
+      "stats_schema": 2
+    },
+    "1565217": {
+      "fixture_id": "1565217",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2592,
+        "team_name": "Arges Pitesti",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2596,
+        "team_name": "Farul Constanta",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:08+02:00",
+      "stats_schema": 2
+    },
+    "1593297": {
+      "fixture_id": "1593297",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.83,
+      "away_xg": 1.7,
+      "home_stats": {
+        "team_id": 955,
+        "team_name": "Asteras Tripolis",
+        "xg": 0.83,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 553,
+        "team_name": "Olympiakos Piraeus",
+        "xg": 1.7,
+        "shots_on_target": 7.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:09+02:00",
+      "stats_schema": 2
+    },
+    "1593294": {
+      "fixture_id": "1593294",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.5,
+      "away_xg": 1.19,
+      "home_stats": {
+        "team_id": 949,
+        "team_name": "Panetolikos",
+        "xg": 0.5,
+        "shots_on_target": 4.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 955,
+        "team_name": "Asteras Tripolis",
+        "xg": 1.19,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:09+02:00",
+      "stats_schema": 2
+    },
+    "1610819": {
+      "fixture_id": "1610819",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:09+02:00",
+      "stats_schema": 2
+    },
+    "1537106": {
+      "fixture_id": "1537106",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.23,
+      "away_xg": 1.86,
+      "home_stats": {
+        "team_id": 949,
+        "team_name": "Panetolikos",
+        "xg": 2.23,
+        "shots_on_target": 7.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 955,
+        "team_name": "Asteras Tripolis",
+        "xg": 1.86,
+        "shots_on_target": 6.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:10+02:00",
+      "stats_schema": 2
+    },
+    "1593289": {
+      "fixture_id": "1593289",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.06,
+      "away_xg": 0.38,
+      "home_stats": {
+        "team_id": 575,
+        "team_name": "AEK Athens FC",
+        "xg": 2.06,
+        "shots_on_target": 11.0,
+        "total_shots": 24.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 17991,
+        "team_name": "Iraklis 1908",
+        "xg": 0.38,
+        "shots_on_target": 1.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:10+02:00",
+      "stats_schema": 2
+    },
+    "1610816": {
+      "fixture_id": "1610816",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T03:23:10+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-06T04:22:38+02:00",
+  "updated_at": "2026-09-07T03:26:03+02:00",
   "runtime_calls_last_run": 20
 }
