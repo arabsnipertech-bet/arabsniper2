@@ -24187,8 +24187,480 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-07T03:23:10+02:00",
       "stats_schema": 2
+    },
+    "1603009": {
+      "fixture_id": "1603009",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 10513,
+        "team_name": "NEOM",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2928,
+        "team_name": "Al Khaleej Saihat",
+        "xg": null,
+        "shots_on_target": 0.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:04+02:00",
+      "stats_schema": 2
+    },
+    "1603000": {
+      "fixture_id": "1603000",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.45,
+      "away_xg": 3.94,
+      "home_stats": {
+        "team_id": 2928,
+        "team_name": "Al Khaleej Saihat",
+        "xg": 1.45,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2932,
+        "team_name": "Al-Hilal Saudi FC",
+        "xg": 3.94,
+        "shots_on_target": 7.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:04+02:00",
+      "stats_schema": 2
+    },
+    "1602992": {
+      "fixture_id": "1602992",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.97,
+      "away_xg": 0.97,
+      "home_stats": {
+        "team_id": 2951,
+        "team_name": "Abha",
+        "xg": 0.97,
+        "shots_on_target": 4.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2928,
+        "team_name": "Al Khaleej Saihat",
+        "xg": 0.97,
+        "shots_on_target": 1.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:04+02:00",
+      "stats_schema": 2
+    },
+    "1602989": {
+      "fixture_id": "1602989",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.55,
+      "away_xg": 1.14,
+      "home_stats": {
+        "team_id": 2928,
+        "team_name": "Al Khaleej Saihat",
+        "xg": 0.55,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2940,
+        "team_name": "Al Shabab",
+        "xg": 1.14,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:04+02:00",
+      "stats_schema": 2
+    },
+    "1603012": {
+      "fixture_id": "1603012",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2929,
+        "team_name": "Al-Ahli Jeddah",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 10511,
+        "team_name": "Al Riyadh",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:04+02:00",
+      "stats_schema": 2
+    },
+    "1602998": {
+      "fixture_id": "1602998",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.81,
+      "away_xg": 0.88,
+      "home_stats": {
+        "team_id": 10511,
+        "team_name": "Al Riyadh",
+        "xg": 0.81,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 10513,
+        "team_name": "NEOM",
+        "xg": 0.88,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:05+02:00",
+      "stats_schema": 2
+    },
+    "1602995": {
+      "fixture_id": "1602995",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.87,
+      "away_xg": 1.21,
+      "home_stats": {
+        "team_id": 2940,
+        "team_name": "Al Shabab",
+        "xg": 2.87,
+        "shots_on_target": 9.0,
+        "total_shots": 25.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 10511,
+        "team_name": "Al Riyadh",
+        "xg": 1.21,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:05+02:00",
+      "stats_schema": 2
+    },
+    "1602982": {
+      "fixture_id": "1602982",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.59,
+      "away_xg": 2.02,
+      "home_stats": {
+        "team_id": 10511,
+        "team_name": "Al Riyadh",
+        "xg": 0.59,
+        "shots_on_target": 1.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2939,
+        "team_name": "Al-Nassr",
+        "xg": 2.02,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:05+02:00",
+      "stats_schema": 2
+    },
+    "1504296": {
+      "fixture_id": "1504296",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:06+02:00",
+      "stats_schema": 2
+    },
+    "1504291": {
+      "fixture_id": "1504291",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:06+02:00",
+      "stats_schema": 2
+    },
+    "1504292": {
+      "fixture_id": "1504292",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:06+02:00",
+      "stats_schema": 2
+    },
+    "1612606": {
+      "fixture_id": "1612606",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:07+02:00",
+      "stats_schema": 2
+    },
+    "1612623": {
+      "fixture_id": "1612623",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:07+02:00",
+      "stats_schema": 2
+    },
+    "1607531": {
+      "fixture_id": "1607531",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:08+02:00",
+      "stats_schema": 2
+    },
+    "1603546": {
+      "fixture_id": "1603546",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:08+02:00",
+      "stats_schema": 2
+    },
+    "1623388": {
+      "fixture_id": "1623388",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3326,
+        "team_name": "Dinamo Tirana",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "away_stats": {
+        "team_id": 3403,
+        "team_name": "Pafos",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:08+02:00",
+      "stats_schema": 2
+    },
+    "1607571": {
+      "fixture_id": "1607571",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:08+02:00",
+      "stats_schema": 2
+    },
+    "1603548": {
+      "fixture_id": "1603548",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:08+02:00",
+      "stats_schema": 2
+    },
+    "1544594": {
+      "fixture_id": "1544594",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:09+02:00",
+      "stats_schema": 2
+    },
+    "1543773": {
+      "fixture_id": "1543773",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.12,
+      "away_xg": 0.97,
+      "home_stats": {
+        "team_id": 3396,
+        "team_name": "AEL",
+        "xg": 1.12,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3415,
+        "team_name": "Olympiakos",
+        "xg": 0.97,
+        "shots_on_target": 6.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-07T04:15:09+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-07T03:26:03+02:00",
+  "updated_at": "2026-09-07T04:17:25+02:00",
   "runtime_calls_last_run": 20
 }
