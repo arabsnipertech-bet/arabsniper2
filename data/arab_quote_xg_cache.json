@@ -24987,8 +24987,412 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-08T03:31:42+02:00",
       "stats_schema": 2
+    },
+    "1552148": {
+      "fixture_id": "1552148",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.3,
+      "away_xg": 3.58,
+      "home_stats": {
+        "team_id": 207,
+        "team_name": "Utrecht",
+        "xg": 0.3,
+        "shots_on_target": 1.0,
+        "total_shots": 1.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 197,
+        "team_name": "PSV Eindhoven",
+        "xg": 3.58,
+        "shots_on_target": 14.0,
+        "total_shots": 30.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:13+02:00",
+      "stats_schema": 2
+    },
+    "1552123": {
+      "fixture_id": "1552123",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.55,
+      "away_xg": 2.27,
+      "home_stats": {
+        "team_id": 202,
+        "team_name": "Groningen",
+        "xg": 1.55,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 207,
+        "team_name": "Utrecht",
+        "xg": 2.27,
+        "shots_on_target": 7.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:13+02:00",
+      "stats_schema": 2
+    },
+    "1552146": {
+      "fixture_id": "1552146",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.37,
+      "away_xg": 1.66,
+      "home_stats": {
+        "team_id": 201,
+        "team_name": "AZ Alkmaar",
+        "xg": 2.37,
+        "shots_on_target": 8.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 410,
+        "team_name": "GO Ahead Eagles",
+        "xg": 1.66,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:14+02:00",
+      "stats_schema": 2
+    },
+    "1552139": {
+      "fixture_id": "1552139",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.85,
+      "away_xg": 0.83,
+      "home_stats": {
+        "team_id": 410,
+        "team_name": "GO Ahead Eagles",
+        "xg": 0.85,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 198,
+        "team_name": "ADO Den Haag",
+        "xg": 0.83,
+        "shots_on_target": 3.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:14+02:00",
+      "stats_schema": 2
+    },
+    "1552132": {
+      "fixture_id": "1552132",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.89,
+      "away_xg": 1.51,
+      "home_stats": {
+        "team_id": 209,
+        "team_name": "Feyenoord",
+        "xg": 2.89,
+        "shots_on_target": 6.0,
+        "total_shots": 27.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 410,
+        "team_name": "GO Ahead Eagles",
+        "xg": 1.51,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:14+02:00",
+      "stats_schema": 2
+    },
+    "1381168": {
+      "fixture_id": "1381168",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 4.44,
+      "away_xg": 0.32,
+      "home_stats": {
+        "team_id": 413,
+        "team_name": "NEC Nijmegen",
+        "xg": 4.44,
+        "shots_on_target": 12.0,
+        "total_shots": 37.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 410,
+        "team_name": "GO Ahead Eagles",
+        "xg": 0.32,
+        "shots_on_target": 1.0,
+        "total_shots": 3.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:14+02:00",
+      "stats_schema": 2
+    },
+    "1611009": {
+      "fixture_id": "1611009",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:16+02:00",
+      "stats_schema": 2
+    },
+    "1495771": {
+      "fixture_id": "1495771",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:17+02:00",
+      "stats_schema": 2
+    },
+    "1495765": {
+      "fixture_id": "1495765",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:17+02:00",
+      "stats_schema": 2
+    },
+    "1495762": {
+      "fixture_id": "1495762",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:17+02:00",
+      "stats_schema": 2
+    },
+    "1607613": {
+      "fixture_id": "1607613",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1163,
+        "team_name": "Ilves",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "away_stats": {
+        "team_id": 561,
+        "team_name": "HNK Rijeka",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:17+02:00",
+      "stats_schema": 2
+    },
+    "1495773": {
+      "fixture_id": "1495773",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:17+02:00",
+      "stats_schema": 2
+    },
+    "1495766": {
+      "fixture_id": "1495766",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:18+02:00",
+      "stats_schema": 2
+    },
+    "1495761": {
+      "fixture_id": "1495761",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:18+02:00",
+      "stats_schema": 2
+    },
+    "1495756": {
+      "fixture_id": "1495756",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:18+02:00",
+      "stats_schema": 2
+    },
+    "1495774": {
+      "fixture_id": "1495774",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:19+02:00",
+      "stats_schema": 2
+    },
+    "1495763": {
+      "fixture_id": "1495763",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:19+02:00",
+      "stats_schema": 2
+    },
+    "1495754": {
+      "fixture_id": "1495754",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:19+02:00",
+      "stats_schema": 2
+    },
+    "1495760": {
+      "fixture_id": "1495760",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:19+02:00",
+      "stats_schema": 2
+    },
+    "1495753": {
+      "fixture_id": "1495753",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-08T04:27:19+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-08T03:35:33+02:00",
+  "updated_at": "2026-09-08T04:31:15+02:00",
   "runtime_calls_last_run": 20
 }
