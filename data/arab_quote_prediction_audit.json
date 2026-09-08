@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-08T04:31:16+02:00",
+  "updated_at": "2026-09-08T10:44:58+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -168772,7 +168772,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-08T04:27:47+02:00",
+        "settled_at": "2026-09-08T10:44:57+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 1,
@@ -168818,7 +168818,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-08T04:27:47+02:00",
+      "settled_at": "2026-09-08T10:44:57+02:00",
       "market_pattern": {
         "available": true,
         "score": 32.137,
@@ -168895,7 +168895,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-08T04:27:47+02:00",
+        "settled_at": "2026-09-08T10:44:57+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 0,
@@ -168941,7 +168941,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-09-08T04:27:47+02:00",
+      "settled_at": "2026-09-08T10:44:57+02:00",
       "market_pattern": {
         "available": true,
         "score": 8.141,
@@ -169018,7 +169018,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-08T04:27:47+02:00",
+        "settled_at": "2026-09-08T10:44:57+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 0,
@@ -169064,7 +169064,7 @@
         "market_calibration_weight": 0.07,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-08T04:27:47+02:00",
+      "settled_at": "2026-09-08T10:44:57+02:00",
       "market_pattern": {
         "available": true,
         "score": 49.538,
@@ -169141,7 +169141,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-08T04:27:47+02:00",
+        "settled_at": "2026-09-08T10:44:57+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 1,
@@ -169187,7 +169187,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "won"
       },
-      "settled_at": "2026-09-08T04:27:47+02:00",
+      "settled_at": "2026-09-08T10:44:57+02:00",
       "market_pattern": {
         "available": true,
         "score": 33.959,
@@ -169264,7 +169264,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-08T04:27:47+02:00",
+        "settled_at": "2026-09-08T10:44:57+02:00",
         "home_ft": 3,
         "away_ft": 2,
         "home_ht": 1,
@@ -169310,7 +169310,7 @@
         "market_calibration_weight": 0.12,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-08T04:27:47+02:00",
+      "settled_at": "2026-09-08T10:44:57+02:00",
       "market_pattern": {
         "available": true,
         "score": 28.719,
@@ -169459,6 +169459,90 @@
         "gg_ht": true,
         "over25_ft": true
       }
+    },
+    "1607188": {
+      "fixture_id": "1607188",
+      "date": "2026-09-08",
+      "time": "03:15",
+      "match": "Atletico Nacional - Deportivo Cali",
+      "league": "Copa Colombia",
+      "country": "Colombia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-08T10:44:57+02:00",
+        "home_ft": 3,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": null,
+      "settled_at": "2026-09-08T10:44:57+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 15.635,
+        "market_score": 0.0,
+        "early_stats_score": 44.593,
+        "two_goal_stats_score": 27.406,
+        "ft_goal_score": 27.924,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.07,
+        "favorite_team": "Atletico Nacional",
+        "underdog_team": "Deportivo Cali",
+        "favorite_open_odd": 1.5,
+        "favorite_current_odd": 1.46,
+        "underdog_open_odd": 6.5,
+        "underdog_current_odd": 6.5,
+        "favorite_shortening_odd": 0.04,
+        "favorite_drift_odd": -0.04,
+        "underdog_steam_odd": 0.0,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 0.07,
+        "underdog_fair_delta_pp": -0.37,
+        "favorite_oci": 0.0,
+        "underdog_oci": -41.584,
+        "underdog_book_consensus": 0.7143,
+        "book_pick_1x2": "x",
+        "book_square_underdog": false,
+        "book_square_favorite": false,
+        "protection_pick": "1",
+        "favorite_margin_delta_pp": 1.752,
+        "underdog_margin_delta_pp": 0.367,
+        "margin_shift_favorite_vs_underdog_pp": 1.385,
+        "favorite_conceded_ht_rate_pct": 23.37,
+        "underdog_scored_ht_rate_pct": 41.57,
+        "favorite_scored_ht_rate_pct": 67.67,
+        "underdog_conceded_ht_rate_pct": 32.9,
+        "pair_goal_ht_rate_pct": 71.95,
+        "pair_over15_ht_rate_pct": 27.115,
+        "pair_gg_ht_rate_pct": 10.805,
+        "pair_over25_ft_rate_pct": 48.967,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": false,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": true
+      }
     }
   },
   "summary": {
@@ -169538,16 +169622,16 @@
         "over25_ft_rate_pct": 43.75
       },
       "neutral": {
-        "settled": 570,
-        "goal_ht": 411,
+        "settled": 571,
+        "goal_ht": 412,
         "over15_ht": 221,
         "gg_ht": 134,
-        "over25_ft": 331,
-        "avg_pattern_score": 22.913,
-        "goal_ht_rate_pct": 72.105,
-        "over15_ht_rate_pct": 38.772,
-        "gg_ht_rate_pct": 23.509,
-        "over25_ft_rate_pct": 58.07
+        "over25_ft": 332,
+        "avg_pattern_score": 22.9,
+        "goal_ht_rate_pct": 72.154,
+        "over15_ht_rate_pct": 38.704,
+        "gg_ht_rate_pct": 23.468,
+        "over25_ft_rate_pct": 58.144
       },
       "favorite_steam_only": {
         "settled": 44,
