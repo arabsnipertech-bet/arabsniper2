@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-09T01:22:30+02:00",
+  "updated_at": "2026-09-09T03:46:18+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -173308,13 +173308,136 @@
         "gg_ht": false,
         "over25_ft": true
       }
+    },
+    "1520864": {
+      "fixture_id": "1520864",
+      "date": "2026-09-09",
+      "time": "01:30",
+      "match": "Cuiaba - Athletic Club",
+      "league": "Serie B",
+      "country": "Brazil",
+      "competition_quality_score": 72,
+      "competition_tier": "major_second_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-09T03:40:26+02:00",
+        "home_ft": 3,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "under",
+        "odd": 1.44,
+        "probability_pct": 70.66,
+        "probability_raw_pct": 71.26,
+        "expected_value_pct": 1.75,
+        "relation": "confirmed",
+        "ranking_score": 74.961,
+        "recommendation_score": 68.961,
+        "grade": "C",
+        "gate": {
+          "eligible": true,
+          "score": 68.961,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 52.0,
+          "market_break_even_pct": 69.444,
+          "probability_pct": 70.66,
+          "raw_probability_pct": 71.26,
+          "expected_value_pct": 1.75,
+          "edge_over_break_even_pp": 1.216,
+          "book_disagreement_pp": 6.64,
+          "competition_quality_score": 72,
+          "bookmakers": 11,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 73.961,
+          "price_preference_adjustment": -5.0,
+          "price_profile": "low_price"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-09-09T03:40:26+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 13.749,
+        "market_score": 12.182,
+        "early_stats_score": 27.848,
+        "two_goal_stats_score": 0.0,
+        "ft_goal_score": 5.57,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 1.57,
+        "favorite_team": "Cuiaba",
+        "underdog_team": "Athletic Club",
+        "favorite_open_odd": 1.79,
+        "favorite_current_odd": 1.875,
+        "underdog_open_odd": 5.0,
+        "underdog_current_odd": 4.6,
+        "favorite_shortening_odd": -0.085,
+        "favorite_drift_odd": 0.085,
+        "underdog_steam_odd": 0.4,
+        "medium_favorite_band": true,
+        "focal_170_180_band": true,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": -2.49,
+        "underdog_fair_delta_pp": 1.57,
+        "favorite_oci": -70.138,
+        "underdog_oci": 58.35,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "x",
+        "book_square_underdog": false,
+        "book_square_favorite": false,
+        "protection_pick": "2",
+        "favorite_margin_delta_pp": -0.043,
+        "underdog_margin_delta_pp": 0.171,
+        "margin_shift_favorite_vs_underdog_pp": -0.214,
+        "favorite_conceded_ht_rate_pct": 35.12,
+        "underdog_scored_ht_rate_pct": 47.14,
+        "favorite_scored_ht_rate_pct": 17.05,
+        "underdog_conceded_ht_rate_pct": 22.18,
+        "pair_goal_ht_rate_pct": 58.39,
+        "pair_over15_ht_rate_pct": 8.265,
+        "pair_gg_ht_rate_pct": 2.35,
+        "pair_over25_ft_rate_pct": 33.3,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": false,
+        "over15_confirmation": false,
+        "over25_confirmation": false,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": true
+      }
     }
   },
   "summary": {
-    "settled_primary": 1906,
+    "settled_primary": 1907,
     "wins": 952,
-    "losses": 954,
-    "win_rate_pct": 49.948,
+    "losses": 955,
+    "win_rate_pct": 49.921,
     "by_market": {
       "1x2_ft": {
         "settled": 558,
@@ -173323,10 +173446,10 @@
         "win_rate_pct": 48.029
       },
       "over25_ft": {
-        "settled": 1062,
+        "settled": 1063,
         "wins": 584,
-        "losses": 478,
-        "win_rate_pct": 54.991
+        "losses": 479,
+        "win_rate_pct": 54.939
       },
       "over15_ht": {
         "settled": 199,
@@ -173367,10 +173490,10 @@
         "win_rate_pct": 48.631
       },
       "C": {
-        "settled": 346,
+        "settled": 347,
         "wins": 172,
-        "losses": 174,
-        "win_rate_pct": 49.711
+        "losses": 175,
+        "win_rate_pct": 49.568
       }
     },
     "by_market_pattern": {
@@ -173387,16 +173510,16 @@
         "over25_ft_rate_pct": 43.75
       },
       "neutral": {
-        "settled": 589,
-        "goal_ht": 427,
+        "settled": 590,
+        "goal_ht": 428,
         "over15_ht": 226,
         "gg_ht": 138,
-        "over25_ft": 342,
-        "avg_pattern_score": 23.007,
-        "goal_ht_rate_pct": 72.496,
-        "over15_ht_rate_pct": 38.37,
-        "gg_ht_rate_pct": 23.43,
-        "over25_ft_rate_pct": 58.065
+        "over25_ft": 343,
+        "avg_pattern_score": 22.991,
+        "goal_ht_rate_pct": 72.542,
+        "over15_ht_rate_pct": 38.305,
+        "gg_ht_rate_pct": 23.39,
+        "over25_ft_rate_pct": 58.136
       },
       "favorite_steam_only": {
         "settled": 45,
