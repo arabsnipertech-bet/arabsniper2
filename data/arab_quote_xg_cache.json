@@ -26293,8 +26293,598 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-09T04:29:59+02:00",
       "stats_schema": 2
+    },
+    "1490447": {
+      "fixture_id": "1490447",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.83,
+      "away_xg": 2.6,
+      "home_stats": {
+        "team_id": 1606,
+        "team_name": "Real Salt Lake",
+        "xg": 2.83,
+        "shots_on_target": 9.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1616,
+        "team_name": "Los Angeles FC",
+        "xg": 2.6,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:50+02:00",
+      "stats_schema": 2
+    },
+    "1490444": {
+      "fixture_id": "1490444",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.25,
+      "away_xg": 0.86,
+      "home_stats": {
+        "team_id": 1595,
+        "team_name": "Seattle Sounders",
+        "xg": 1.25,
+        "shots_on_target": 6.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1602,
+        "team_name": "New York Red Bulls",
+        "xg": 0.86,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:51+02:00",
+      "stats_schema": 2
+    },
+    "1490424": {
+      "fixture_id": "1490424",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.05,
+      "away_xg": 2.53,
+      "home_stats": {
+        "team_id": 1602,
+        "team_name": "New York Red Bulls",
+        "xg": 2.05,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1599,
+        "team_name": "Philadelphia Union",
+        "xg": 2.53,
+        "shots_on_target": 7.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:51+02:00",
+      "stats_schema": 2
+    },
+    "1490394": {
+      "fixture_id": "1490394",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.63,
+      "away_xg": 1.34,
+      "home_stats": {
+        "team_id": 1602,
+        "team_name": "New York Red Bulls",
+        "xg": 1.63,
+        "shots_on_target": 1.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 9569,
+        "team_name": "Nashville SC",
+        "xg": 1.34,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:51+02:00",
+      "stats_schema": 2
+    },
+    "1490449": {
+      "fixture_id": "1490449",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1603,
+        "team_name": "Vancouver Whitecaps",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 20787,
+        "team_name": "St. Louis City",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:52+02:00",
+      "stats_schema": 2
+    },
+    "1490448": {
+      "fixture_id": "1490448",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1605,
+        "team_name": "Los Angeles Galaxy",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1609,
+        "team_name": "New England Revolution",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 24.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:53+02:00",
+      "stats_schema": 2
+    },
+    "1490440": {
+      "fixture_id": "1490440",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.27,
+      "away_xg": 0.5,
+      "home_stats": {
+        "team_id": 1598,
+        "team_name": "Orlando City SC",
+        "xg": 2.27,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 25484,
+        "team_name": "San Diego",
+        "xg": 0.5,
+        "shots_on_target": 2.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:53+02:00",
+      "stats_schema": 2
+    },
+    "1490446": {
+      "fixture_id": "1490446",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.15,
+      "away_xg": 0.55,
+      "home_stats": {
+        "team_id": 16489,
+        "team_name": "Austin",
+        "xg": 1.15,
+        "shots_on_target": 3.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1596,
+        "team_name": "San Jose Earthquakes",
+        "xg": 0.55,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:54+02:00",
+      "stats_schema": 2
+    },
+    "1490431": {
+      "fixture_id": "1490431",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.7,
+      "away_xg": 1.33,
+      "home_stats": {
+        "team_id": 1600,
+        "team_name": "Houston Dynamo",
+        "xg": 0.7,
+        "shots_on_target": 0.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1596,
+        "team_name": "San Jose Earthquakes",
+        "xg": 1.33,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:54+02:00",
+      "stats_schema": 2
+    },
+    "1490450": {
+      "fixture_id": "1490450",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.54,
+      "away_xg": 2.41,
+      "home_stats": {
+        "team_id": 1617,
+        "team_name": "Portland Timbers",
+        "xg": 2.54,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1612,
+        "team_name": "Minnesota United FC",
+        "xg": 2.41,
+        "shots_on_target": 8.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:55+02:00",
+      "stats_schema": 2
+    },
+    "1548369": {
+      "fixture_id": "1548369",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:56+02:00",
+      "stats_schema": 2
+    },
+    "1548364": {
+      "fixture_id": "1548364",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:56+02:00",
+      "stats_schema": 2
+    },
+    "1597922": {
+      "fixture_id": "1597922",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2916,
+        "team_name": "Al Shamal",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2893,
+        "team_name": "Al Shahaniya",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:57+02:00",
+      "stats_schema": 2
+    },
+    "1597923": {
+      "fixture_id": "1597923",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 7527,
+        "team_name": "Lusail City",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2900,
+        "team_name": "Al Wakrah",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:58+02:00",
+      "stats_schema": 2
+    },
+    "1597915": {
+      "fixture_id": "1597915",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:58+02:00",
+      "stats_schema": 2
+    },
+    "1540915": {
+      "fixture_id": "1540915",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:58+02:00",
+      "stats_schema": 2
+    },
+    "1593305": {
+      "fixture_id": "1593305",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 955,
+        "team_name": "Asteras Tripolis",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 17991,
+        "team_name": "Iraklis 1908",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:33:59+02:00",
+      "stats_schema": 2
+    },
+    "1593303": {
+      "fixture_id": "1593303",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 3.53,
+      "away_xg": 0.4,
+      "home_stats": {
+        "team_id": 575,
+        "team_name": "AEK Athens FC",
+        "xg": 3.53,
+        "shots_on_target": 10.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1123,
+        "team_name": "Aris Thessalonikis",
+        "xg": 0.4,
+        "shots_on_target": 2.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:34:00+02:00",
+      "stats_schema": 2
+    },
+    "1593290": {
+      "fixture_id": "1593290",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.41,
+      "away_xg": 2.69,
+      "home_stats": {
+        "team_id": 5046,
+        "team_name": "Kalamata",
+        "xg": 1.41,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1123,
+        "team_name": "Aris Thessalonikis",
+        "xg": 2.69,
+        "shots_on_target": 7.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:34:00+02:00",
+      "stats_schema": 2
+    },
+    "1610818": {
+      "fixture_id": "1610818",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T03:34:00+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-09T04:37:03+02:00",
+  "updated_at": "2026-09-10T03:41:37+02:00",
   "runtime_calls_last_run": 20
 }
