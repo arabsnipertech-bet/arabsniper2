@@ -26883,8 +26883,646 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-10T03:34:00+02:00",
       "stats_schema": 2
+    },
+    "1583700": {
+      "fixture_id": "1583700",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:20+02:00",
+      "stats_schema": 2
+    },
+    "1549015": {
+      "fixture_id": "1549015",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.88,
+      "away_xg": 2.1,
+      "home_stats": {
+        "team_id": 397,
+        "team_name": "FC Midtjylland",
+        "xg": 1.88,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 398,
+        "team_name": "FC Nordsjaelland",
+        "xg": 2.1,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:21+02:00",
+      "stats_schema": 2
+    },
+    "1549008": {
+      "fixture_id": "1549008",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.21,
+      "away_xg": 1.71,
+      "home_stats": {
+        "team_id": 406,
+        "team_name": "Aarhus",
+        "xg": 1.21,
+        "shots_on_target": 3.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 397,
+        "team_name": "FC Midtjylland",
+        "xg": 1.71,
+        "shots_on_target": 7.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:21+02:00",
+      "stats_schema": 2
+    },
+    "1549004": {
+      "fixture_id": "1549004",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.37,
+      "away_xg": 2.56,
+      "home_stats": {
+        "team_id": 2073,
+        "team_name": "Silkeborg",
+        "xg": 1.37,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 397,
+        "team_name": "FC Midtjylland",
+        "xg": 2.56,
+        "shots_on_target": 4.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:21+02:00",
+      "stats_schema": 2
+    },
+    "1623428": {
+      "fixture_id": "1623428",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 561,
+        "team_name": "HNK Rijeka",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 397,
+        "team_name": "FC Midtjylland",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:21+02:00",
+      "stats_schema": 2
+    },
+    "1597921": {
+      "fixture_id": "1597921",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2898,
+        "team_name": "Al-Sailiya",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2905,
+        "team_name": "Al-Arabi SC",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:22+02:00",
+      "stats_schema": 2
+    },
+    "1597912": {
+      "fixture_id": "1597912",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:22+02:00",
+      "stats_schema": 2
+    },
+    "1497479": {
+      "fixture_id": "1497479",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2900,
+        "team_name": "Al Wakrah",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2898,
+        "team_name": "Al-Sailiya",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:22+02:00",
+      "stats_schema": 2
+    },
+    "1597925": {
+      "fixture_id": "1597925",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2895,
+        "team_name": "Al Sadd",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2903,
+        "team_name": "Al-Gharafa",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:23+02:00",
+      "stats_schema": 2
+    },
+    "1635604": {
+      "fixture_id": "1635604",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:23+02:00",
+      "stats_schema": 2
+    },
+    "1584397": {
+      "fixture_id": "1584397",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.59,
+      "away_xg": 1.75,
+      "home_stats": {
+        "team_id": 611,
+        "team_name": "Fenerbahçe",
+        "xg": 0.59,
+        "shots_on_target": 2.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 549,
+        "team_name": "Beşiktaş",
+        "xg": 1.75,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:24+02:00",
+      "stats_schema": 2
+    },
+    "1584393": {
+      "fixture_id": "1584393",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.46,
+      "away_xg": 1.56,
+      "home_stats": {
+        "team_id": 3603,
+        "team_name": "Samsunspor",
+        "xg": 0.46,
+        "shots_on_target": 0.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 611,
+        "team_name": "Fenerbahçe",
+        "xg": 1.56,
+        "shots_on_target": 7.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:24+02:00",
+      "stats_schema": 2
+    },
+    "1622630": {
+      "fixture_id": "1622630",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 80,
+        "team_name": "Lyon",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 611,
+        "team_name": "Fenerbahçe",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:24+02:00",
+      "stats_schema": 2
+    },
+    "1584380": {
+      "fixture_id": "1584380",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.36,
+      "away_xg": 2.15,
+      "home_stats": {
+        "team_id": 611,
+        "team_name": "Fenerbahçe",
+        "xg": 2.36,
+        "shots_on_target": 9.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 607,
+        "team_name": "Konyaspor",
+        "xg": 2.15,
+        "shots_on_target": 8.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:24+02:00",
+      "stats_schema": 2
+    },
+    "1550107": {
+      "fixture_id": "1550107",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.97,
+      "away_xg": 0.7,
+      "home_stats": {
+        "team_id": 497,
+        "team_name": "AS Roma",
+        "xg": 2.97,
+        "shots_on_target": 10.0,
+        "total_shots": 39.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 499,
+        "team_name": "Atalanta",
+        "xg": 0.7,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:24+02:00",
+      "stats_schema": 2
+    },
+    "1550103": {
+      "fixture_id": "1550103",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.8,
+      "away_xg": 3.27,
+      "home_stats": {
+        "team_id": 867,
+        "team_name": "Lecce",
+        "xg": 0.8,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 497,
+        "team_name": "AS Roma",
+        "xg": 3.27,
+        "shots_on_target": 8.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:25+02:00",
+      "stats_schema": 2
+    },
+    "1550087": {
+      "fixture_id": "1550087",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 3.07,
+      "away_xg": 0.35,
+      "home_stats": {
+        "team_id": 497,
+        "team_name": "AS Roma",
+        "xg": 3.07,
+        "shots_on_target": 8.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 502,
+        "team_name": "Fiorentina",
+        "xg": 0.35,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:25+02:00",
+      "stats_schema": 2
+    },
+    "1378243": {
+      "fixture_id": "1378243",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.84,
+      "away_xg": 3.39,
+      "home_stats": {
+        "team_id": 504,
+        "team_name": "Hellas Verona",
+        "xg": 0.84,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 497,
+        "team_name": "AS Roma",
+        "xg": 3.39,
+        "shots_on_target": 7.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:25+02:00",
+      "stats_schema": 2
+    },
+    "1552156": {
+      "fixture_id": "1552156",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.99,
+      "away_xg": 2.55,
+      "home_stats": {
+        "team_id": 194,
+        "team_name": "Ajax",
+        "xg": 1.99,
+        "shots_on_target": 6.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 197,
+        "team_name": "PSV Eindhoven",
+        "xg": 2.55,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:26+02:00",
+      "stats_schema": 2
+    },
+    "1552140": {
+      "fixture_id": "1552140",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 4.4,
+      "away_xg": 1.09,
+      "home_stats": {
+        "team_id": 197,
+        "team_name": "PSV Eindhoven",
+        "xg": 4.4,
+        "shots_on_target": 12.0,
+        "total_shots": 24.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 202,
+        "team_name": "Groningen",
+        "xg": 1.09,
+        "shots_on_target": 4.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-10T04:30:26+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-10T03:41:37+02:00",
+  "updated_at": "2026-09-10T04:37:17+02:00",
   "runtime_calls_last_run": 20
 }
