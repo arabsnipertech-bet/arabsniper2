@@ -27965,8 +27965,486 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-11T03:32:48+02:00",
       "stats_schema": 2
+    },
+    "1440208": {
+      "fixture_id": "1440208",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:53+02:00",
+      "stats_schema": 2
+    },
+    "1440206": {
+      "fixture_id": "1440206",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:54+02:00",
+      "stats_schema": 2
+    },
+    "1565239": {
+      "fixture_id": "1565239",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2246,
+        "team_name": "CFR 1907 Cluj",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2596,
+        "team_name": "Farul Constanta",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:55+02:00",
+      "stats_schema": 2
+    },
+    "1565246": {
+      "fixture_id": "1565246",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.92,
+      "away_xg": 1.37,
+      "home_stats": {
+        "team_id": 2589,
+        "team_name": "Uta Arad",
+        "xg": 2.92,
+        "shots_on_target": 6.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 6230,
+        "team_name": "Csikszereda",
+        "xg": 1.37,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:55+02:00",
+      "stats_schema": 2
+    },
+    "1632261": {
+      "fixture_id": "1632261",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:55+02:00",
+      "stats_schema": 2
+    },
+    "1635941": {
+      "fixture_id": "1635941",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:56+02:00",
+      "stats_schema": 2
+    },
+    "1635950": {
+      "fixture_id": "1635950",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:56+02:00",
+      "stats_schema": 2
+    },
+    "1635943": {
+      "fixture_id": "1635943",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:56+02:00",
+      "stats_schema": 2
+    },
+    "1603022": {
+      "fixture_id": "1603022",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.55,
+      "away_xg": 1.26,
+      "home_stats": {
+        "team_id": 2933,
+        "team_name": "Al-Qadisiyah FC",
+        "xg": 2.55,
+        "shots_on_target": 7.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2929,
+        "team_name": "Al-Ahli Jeddah",
+        "xg": 1.26,
+        "shots_on_target": 5.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:57+02:00",
+      "stats_schema": 2
+    },
+    "1603010": {
+      "fixture_id": "1603010",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.01,
+      "away_xg": 1.17,
+      "home_stats": {
+        "team_id": 26738,
+        "team_name": "Al Diriyah",
+        "xg": 1.01,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2933,
+        "team_name": "Al-Qadisiyah FC",
+        "xg": 1.17,
+        "shots_on_target": 4.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:57+02:00",
+      "stats_schema": 2
+    },
+    "1603006": {
+      "fixture_id": "1603006",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.46,
+      "away_xg": 0.71,
+      "home_stats": {
+        "team_id": 2933,
+        "team_name": "Al-Qadisiyah FC",
+        "xg": 2.46,
+        "shots_on_target": 9.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2930,
+        "team_name": "Al-Faisaly FC",
+        "xg": 0.71,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:57+02:00",
+      "stats_schema": 2
+    },
+    "1602990": {
+      "fixture_id": "1602990",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.26,
+      "away_xg": 2.09,
+      "home_stats": {
+        "team_id": 10513,
+        "team_name": "NEOM",
+        "xg": 1.26,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2933,
+        "team_name": "Al-Qadisiyah FC",
+        "xg": 2.09,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:57+02:00",
+      "stats_schema": 2
+    },
+    "1603019": {
+      "fixture_id": "1603019",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.72,
+      "away_xg": 0.11,
+      "home_stats": {
+        "team_id": 2934,
+        "team_name": "Al-Ettifaq",
+        "xg": 0.72,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2930,
+        "team_name": "Al-Faisaly FC",
+        "xg": 0.11,
+        "shots_on_target": 1.0,
+        "total_shots": 3.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:58+02:00",
+      "stats_schema": 2
+    },
+    "1603011": {
+      "fixture_id": "1603011",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.51,
+      "away_xg": 1.09,
+      "home_stats": {
+        "team_id": 2951,
+        "team_name": "Abha",
+        "xg": 0.51,
+        "shots_on_target": 0.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2934,
+        "team_name": "Al-Ettifaq",
+        "xg": 1.09,
+        "shots_on_target": 1.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:58+02:00",
+      "stats_schema": 2
+    },
+    "1603003": {
+      "fixture_id": "1603003",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.35,
+      "away_xg": 2.33,
+      "home_stats": {
+        "team_id": 2934,
+        "team_name": "Al-Ettifaq",
+        "xg": 1.35,
+        "shots_on_target": 7.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 26738,
+        "team_name": "Al Diriyah",
+        "xg": 2.33,
+        "shots_on_target": 7.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:58+02:00",
+      "stats_schema": 2
+    },
+    "1602994": {
+      "fixture_id": "1602994",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.72,
+      "away_xg": 2.0,
+      "home_stats": {
+        "team_id": 2934,
+        "team_name": "Al-Ettifaq",
+        "xg": 0.72,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2939,
+        "team_name": "Al-Nassr",
+        "xg": 2.0,
+        "shots_on_target": 9.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:58+02:00",
+      "stats_schema": 2
+    },
+    "1504297": {
+      "fixture_id": "1504297",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:59+02:00",
+      "stats_schema": 2
+    },
+    "1504300": {
+      "fixture_id": "1504300",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:59+02:00",
+      "stats_schema": 2
+    },
+    "1504282": {
+      "fixture_id": "1504282",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:24:59+02:00",
+      "stats_schema": 2
+    },
+    "1517254": {
+      "fixture_id": "1517254",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-11T04:25:00+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-11T03:38:32+02:00",
+  "updated_at": "2026-09-11T04:30:43+02:00",
   "runtime_calls_last_run": 20
 }
