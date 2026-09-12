@@ -28443,8 +28443,470 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-11T04:25:00+02:00",
       "stats_schema": 2
+    },
+    "1493667": {
+      "fixture_id": "1493667",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:36+02:00",
+      "stats_schema": 2
+    },
+    "1493659": {
+      "fixture_id": "1493659",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:36+02:00",
+      "stats_schema": 2
+    },
+    "1493643": {
+      "fixture_id": "1493643",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:36+02:00",
+      "stats_schema": 2
+    },
+    "1493675": {
+      "fixture_id": "1493675",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:37+02:00",
+      "stats_schema": 2
+    },
+    "1493651": {
+      "fixture_id": "1493651",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:37+02:00",
+      "stats_schema": 2
+    },
+    "1550954": {
+      "fixture_id": "1550954",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2283,
+        "team_name": "Atlas",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2312,
+        "team_name": "Atlante FC",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:38+02:00",
+      "stats_schema": 2
+    },
+    "1550949": {
+      "fixture_id": "1550949",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2298,
+        "team_name": "FC Juarez",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2292,
+        "team_name": "CF Pachuca",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:38+02:00",
+      "stats_schema": 2
+    },
+    "1550932": {
+      "fixture_id": "1550932",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2278,
+        "team_name": "Guadalajara Chivas",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2280,
+        "team_name": "Club Tijuana",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:39+02:00",
+      "stats_schema": 2
+    },
+    "1550927": {
+      "fixture_id": "1550927",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.81,
+      "away_xg": 1.3,
+      "home_stats": {
+        "team_id": 2280,
+        "team_name": "Club Tijuana",
+        "xg": 1.81,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2295,
+        "team_name": "Cruz Azul",
+        "xg": 1.3,
+        "shots_on_target": 6.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:39+02:00",
+      "stats_schema": 2
+    },
+    "1507058": {
+      "fixture_id": "1507058",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2763,
+        "team_name": "Incheon United",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2745,
+        "team_name": "Bucheon FC 1995",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:39+02:00",
+      "stats_schema": 2
+    },
+    "1507062": {
+      "fixture_id": "1507062",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2759,
+        "team_name": "Gwangju FC",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2761,
+        "team_name": "Jeju United FC",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:40+02:00",
+      "stats_schema": 2
+    },
+    "1507061": {
+      "fixture_id": "1507061",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2746,
+        "team_name": "Gangwon FC",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2762,
+        "team_name": "Jeonbuk Motors",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:40+02:00",
+      "stats_schema": 2
+    },
+    "1507059": {
+      "fixture_id": "1507059",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2767,
+        "team_name": "Ulsan Hyundai FC",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2766,
+        "team_name": "FC Seoul",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:41+02:00",
+      "stats_schema": 2
+    },
+    "1579099": {
+      "fixture_id": "1579099",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:43+02:00",
+      "stats_schema": 2
+    },
+    "1579090": {
+      "fixture_id": "1579090",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:43+02:00",
+      "stats_schema": 2
+    },
+    "1579087": {
+      "fixture_id": "1579087",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:43+02:00",
+      "stats_schema": 2
+    },
+    "1579074": {
+      "fixture_id": "1579074",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:43+02:00",
+      "stats_schema": 2
+    },
+    "1579102": {
+      "fixture_id": "1579102",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:43+02:00",
+      "stats_schema": 2
+    },
+    "1556060": {
+      "fixture_id": "1556060",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 294,
+        "team_name": "Kawasaki Frontale",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 25.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 283,
+        "team_name": "Shimizu S-pulse",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:44+02:00",
+      "stats_schema": 2
+    },
+    "1556044": {
+      "fixture_id": "1556044",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 303,
+        "team_name": "Machida Zelvia",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 294,
+        "team_name": "Kawasaki Frontale",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-12T03:39:45+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-11T04:30:43+02:00",
+  "updated_at": "2026-09-12T03:45:17+02:00",
   "runtime_calls_last_run": 20
 }

@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-12T01:13:17+02:00",
+  "updated_at": "2026-09-12T03:45:21+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -186157,13 +186157,136 @@
         "gg_ht": false,
         "over25_ft": true
       }
+    },
+    "1549779": {
+      "fixture_id": "1549779",
+      "date": "2026-09-12",
+      "time": "01:15",
+      "match": "Jaguares - Fortaleza FC",
+      "league": "Primera A",
+      "country": "Colombia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-12T03:41:52+02:00",
+        "home_ft": 2,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 3.3,
+        "probability_pct": 43.2,
+        "probability_raw_pct": 44.16,
+        "expected_value_pct": 42.56,
+        "relation": "model_only",
+        "ranking_score": 87.699,
+        "recommendation_score": 82.699,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 82.699,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 30.303,
+          "probability_pct": 43.2,
+          "raw_probability_pct": 44.16,
+          "expected_value_pct": 42.56,
+          "edge_over_break_even_pp": 12.897,
+          "book_disagreement_pp": 16.06,
+          "competition_quality_score": 68,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 79.699,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-09-12T03:41:52+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 24.414,
+        "market_score": 0.0,
+        "early_stats_score": 53.341,
+        "two_goal_stats_score": 64.513,
+        "ft_goal_score": 31.414,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.0,
+        "favorite_team": "Jaguares",
+        "underdog_team": "Fortaleza FC",
+        "favorite_open_odd": 2.38,
+        "favorite_current_odd": 2.38,
+        "underdog_open_odd": 3.1,
+        "underdog_current_odd": 3.1,
+        "favorite_shortening_odd": 0.0,
+        "favorite_drift_odd": -0.0,
+        "underdog_steam_odd": 0.0,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 0.0,
+        "underdog_fair_delta_pp": 0.0,
+        "favorite_oci": 0.0,
+        "underdog_oci": 0.0,
+        "underdog_book_consensus": 0.0,
+        "book_pick_1x2": null,
+        "book_square_underdog": false,
+        "book_square_favorite": false,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": 0.0,
+        "underdog_margin_delta_pp": 0.0,
+        "margin_shift_favorite_vs_underdog_pp": 0.0,
+        "favorite_conceded_ht_rate_pct": 50.25,
+        "underdog_scored_ht_rate_pct": 37.06,
+        "favorite_scored_ht_rate_pct": 56.14,
+        "underdog_conceded_ht_rate_pct": 45.14,
+        "pair_goal_ht_rate_pct": 69.735,
+        "pair_over15_ht_rate_pct": 44.47,
+        "pair_gg_ht_rate_pct": 24.56,
+        "pair_over25_ft_rate_pct": 45.267,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 1.759,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 6.012,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": false,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": true
+      }
     }
   },
   "summary": {
-    "settled_primary": 1977,
+    "settled_primary": 1978,
     "wins": 990,
-    "losses": 987,
-    "win_rate_pct": 50.076,
+    "losses": 988,
+    "win_rate_pct": 50.051,
     "by_market": {
       "1x2_ft": {
         "settled": 575,
@@ -186178,10 +186301,10 @@
         "win_rate_pct": 55.249
       },
       "over15_ht": {
-        "settled": 218,
+        "settled": 219,
         "wins": 86,
-        "losses": 132,
-        "win_rate_pct": 39.45
+        "losses": 133,
+        "win_rate_pct": 39.269
       },
       "gg_ht": {
         "settled": 96,
@@ -186210,10 +186333,10 @@
         "win_rate_pct": 51.177
       },
       "A": {
-        "settled": 807,
+        "settled": 808,
         "wins": 393,
-        "losses": 414,
-        "win_rate_pct": 48.699
+        "losses": 415,
+        "win_rate_pct": 48.639
       },
       "C": {
         "settled": 358,
@@ -186236,16 +186359,16 @@
         "over25_ft_rate_pct": 47.059
       },
       "neutral": {
-        "settled": 667,
-        "goal_ht": 484,
+        "settled": 668,
+        "goal_ht": 485,
         "over15_ht": 258,
         "gg_ht": 150,
-        "over25_ft": 383,
-        "avg_pattern_score": 23.022,
-        "goal_ht_rate_pct": 72.564,
-        "over15_ht_rate_pct": 38.681,
-        "gg_ht_rate_pct": 22.489,
-        "over25_ft_rate_pct": 57.421
+        "over25_ft": 384,
+        "avg_pattern_score": 23.024,
+        "goal_ht_rate_pct": 72.605,
+        "over15_ht_rate_pct": 38.623,
+        "gg_ht_rate_pct": 22.455,
+        "over25_ft_rate_pct": 57.485
       },
       "favorite_steam_only": {
         "settled": 53,
