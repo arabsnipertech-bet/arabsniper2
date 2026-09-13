@@ -29353,8 +29353,458 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-12T04:32:00+02:00",
       "stats_schema": 2
+    },
+    "1490460": {
+      "fixture_id": "1490460",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1600,
+        "team_name": "Houston Dynamo",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1606,
+        "team_name": "Real Salt Lake",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:44+02:00",
+      "stats_schema": 2
+    },
+    "1490455": {
+      "fixture_id": "1490455",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1604,
+        "team_name": "New York City FC",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1609,
+        "team_name": "New England Revolution",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:44+02:00",
+      "stats_schema": 2
+    },
+    "1490436": {
+      "fixture_id": "1490436",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.99,
+      "away_xg": 1.61,
+      "home_stats": {
+        "team_id": 1604,
+        "team_name": "New York City FC",
+        "xg": 0.99,
+        "shots_on_target": 1.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 9569,
+        "team_name": "Nashville SC",
+        "xg": 1.61,
+        "shots_on_target": 2.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:45+02:00",
+      "stats_schema": 2
+    },
+    "1490425": {
+      "fixture_id": "1490425",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.76,
+      "away_xg": 0.39,
+      "home_stats": {
+        "team_id": 1601,
+        "team_name": "Toronto FC",
+        "xg": 0.76,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1604,
+        "team_name": "New York City FC",
+        "xg": 0.39,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:45+02:00",
+      "stats_schema": 2
+    },
+    "1490459": {
+      "fixture_id": "1490459",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 16489,
+        "team_name": "Austin",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1610,
+        "team_name": "Colorado Rapids",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:45+02:00",
+      "stats_schema": 2
+    },
+    "1490441": {
+      "fixture_id": "1490441",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.06,
+      "away_xg": 0.58,
+      "home_stats": {
+        "team_id": 1613,
+        "team_name": "Columbus Crew",
+        "xg": 2.06,
+        "shots_on_target": 6.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1610,
+        "team_name": "Colorado Rapids",
+        "xg": 0.58,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:46+02:00",
+      "stats_schema": 2
+    },
+    "1490456": {
+      "fixture_id": "1490456",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.29,
+      "away_xg": 1.31,
+      "home_stats": {
+        "team_id": 1614,
+        "team_name": "CF Montreal",
+        "xg": 1.29,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 18310,
+        "team_name": "Charlotte",
+        "xg": 1.31,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:46+02:00",
+      "stats_schema": 2
+    },
+    "1490438": {
+      "fixture_id": "1490438",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.93,
+      "away_xg": 1.21,
+      "home_stats": {
+        "team_id": 1599,
+        "team_name": "Philadelphia Union",
+        "xg": 2.93,
+        "shots_on_target": 8.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1614,
+        "team_name": "CF Montreal",
+        "xg": 1.21,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:46+02:00",
+      "stats_schema": 2
+    },
+    "1490422": {
+      "fixture_id": "1490422",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 3.04,
+      "away_xg": 0.92,
+      "home_stats": {
+        "team_id": 9568,
+        "team_name": "Inter Miami",
+        "xg": 3.04,
+        "shots_on_target": 11.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1614,
+        "team_name": "CF Montreal",
+        "xg": 0.92,
+        "shots_on_target": 5.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:46+02:00",
+      "stats_schema": 2
+    },
+    "1493663": {
+      "fixture_id": "1493663",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:47+02:00",
+      "stats_schema": 2
+    },
+    "1493676": {
+      "fixture_id": "1493676",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:47+02:00",
+      "stats_schema": 2
+    },
+    "1493673": {
+      "fixture_id": "1493673",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:48+02:00",
+      "stats_schema": 2
+    },
+    "1493648": {
+      "fixture_id": "1493648",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:48+02:00",
+      "stats_schema": 2
+    },
+    "1493633": {
+      "fixture_id": "1493633",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:48+02:00",
+      "stats_schema": 2
+    },
+    "1493670": {
+      "fixture_id": "1493670",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:48+02:00",
+      "stats_schema": 2
+    },
+    "1493672": {
+      "fixture_id": "1493672",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:49+02:00",
+      "stats_schema": 2
+    },
+    "1493656": {
+      "fixture_id": "1493656",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:49+02:00",
+      "stats_schema": 2
+    },
+    "1493668": {
+      "fixture_id": "1493668",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:50+02:00",
+      "stats_schema": 2
+    },
+    "1493660": {
+      "fixture_id": "1493660",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:50+02:00",
+      "stats_schema": 2
+    },
+    "1493644": {
+      "fixture_id": "1493644",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-13T03:29:50+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-12T04:38:46+02:00",
+  "updated_at": "2026-09-13T03:33:53+02:00",
   "runtime_calls_last_run": 20
 }
