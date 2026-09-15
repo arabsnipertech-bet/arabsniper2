@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-15T11:22:22+02:00",
+  "updated_at": "2026-09-15T16:44:32+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -224395,7 +224395,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-15T11:22:20+02:00",
+        "settled_at": "2026-09-15T16:44:30+02:00",
         "home_ft": 2,
         "away_ft": 1,
         "home_ht": 2,
@@ -224441,7 +224441,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "won"
       },
-      "settled_at": "2026-09-15T11:22:20+02:00",
+      "settled_at": "2026-09-15T16:44:30+02:00",
       "market_pattern": {
         "available": true,
         "score": 16.551,
@@ -224518,7 +224518,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-15T11:22:20+02:00",
+        "settled_at": "2026-09-15T16:44:30+02:00",
         "home_ft": 2,
         "away_ft": 1,
         "home_ht": 0,
@@ -224564,7 +224564,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-15T11:22:20+02:00",
+      "settled_at": "2026-09-15T16:44:30+02:00",
       "market_pattern": {
         "available": true,
         "score": 22.022,
@@ -224641,7 +224641,7 @@
       "competition_tier": "major_second_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-15T11:22:20+02:00",
+        "settled_at": "2026-09-15T16:44:30+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 1,
@@ -224687,7 +224687,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-15T11:22:20+02:00",
+      "settled_at": "2026-09-15T16:44:30+02:00",
       "market_pattern": {
         "available": true,
         "score": 13.587,
@@ -224764,7 +224764,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-15T11:22:20+02:00",
+        "settled_at": "2026-09-15T16:44:30+02:00",
         "home_ft": 0,
         "away_ft": 1,
         "home_ht": 0,
@@ -224810,7 +224810,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-15T11:22:20+02:00",
+      "settled_at": "2026-09-15T16:44:30+02:00",
       "market_pattern": {
         "available": true,
         "score": 36.867,
@@ -224887,7 +224887,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-15T11:22:20+02:00",
+        "settled_at": "2026-09-15T16:44:30+02:00",
         "home_ft": 2,
         "away_ft": 0,
         "home_ht": 0,
@@ -224933,7 +224933,7 @@
         "market_calibration_weight": 0.12,
         "outcome": "won"
       },
-      "settled_at": "2026-09-15T11:22:20+02:00",
+      "settled_at": "2026-09-15T16:44:30+02:00",
       "market_pattern": {
         "available": true,
         "score": 47.584,
@@ -224998,13 +224998,220 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1629917": {
+      "fixture_id": "1629917",
+      "date": "2026-09-15",
+      "time": "12:00",
+      "match": "Daejeon Citizen - Kyoto Sanga",
+      "league": "AFC Champions League Elite",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-15T16:44:30+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 1.94,
+        "probability_pct": 60.6,
+        "probability_raw_pct": 61.96,
+        "expected_value_pct": 17.564,
+        "relation": "confirmed",
+        "ranking_score": 103.773,
+        "recommendation_score": 97.773,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 97.773,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 51.546,
+          "probability_pct": 60.6,
+          "raw_probability_pct": 61.96,
+          "expected_value_pct": 17.564,
+          "edge_over_break_even_pp": 9.054,
+          "book_disagreement_pp": 13.56,
+          "competition_quality_score": 88,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 94.773,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-09-15T16:44:30+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 25.812,
+        "market_score": 40.0,
+        "early_stats_score": 10.882,
+        "two_goal_stats_score": 0.0,
+        "ft_goal_score": 28.006,
+        "classification": "odds_inversion_only",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "1",
+        "favorite_changed": true,
+        "cross_strength_pp": 8.22,
+        "favorite_team": "Daejeon Citizen",
+        "underdog_team": "Kyoto Sanga",
+        "favorite_open_odd": 2.5,
+        "favorite_current_odd": 2.1,
+        "underdog_open_odd": 2.45,
+        "underdog_current_odd": 3.3,
+        "favorite_shortening_odd": 0.4,
+        "favorite_drift_odd": -0.4,
+        "underdog_steam_odd": -0.85,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 8.22,
+        "underdog_fair_delta_pp": -8.59,
+        "favorite_oci": 85.982,
+        "underdog_oci": -86.026,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "1",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": -0.605,
+        "underdog_margin_delta_pp": -1.922,
+        "margin_shift_favorite_vs_underdog_pp": 1.317,
+        "favorite_conceded_ht_rate_pct": 34.88,
+        "underdog_scored_ht_rate_pct": 10.24,
+        "favorite_scored_ht_rate_pct": 21.73,
+        "underdog_conceded_ht_rate_pct": 29.58,
+        "pair_goal_ht_rate_pct": 40.44,
+        "pair_over15_ht_rate_pct": 20.47,
+        "pair_gg_ht_rate_pct": 7.78,
+        "pair_over25_ft_rate_pct": 55.68,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 4.415,
+        "favorite_sot_against": 3.414,
+        "early_goal_confirmation": false,
+        "underdog_threat_confirmation": false,
+        "two_way_confirmation": false,
+        "over15_confirmation": false,
+        "over25_confirmation": true,
+        "statistical_confirmation": false,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
+    },
+    "1629919": {
+      "fixture_id": "1629919",
+      "date": "2026-09-15",
+      "time": "12:00",
+      "match": "Kashima - Newcastle Jets",
+      "league": "AFC Champions League Elite",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-15T16:44:30+02:00",
+        "home_ft": 7,
+        "away_ft": 1,
+        "home_ht": 5,
+        "away_ht": 0
+      },
+      "primary": null,
+      "settled_at": "2026-09-15T16:44:30+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 18.223,
+        "market_score": 0.0,
+        "early_stats_score": 50.554,
+        "two_goal_stats_score": 33.831,
+        "ft_goal_score": 51.053,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 3.8,
+        "favorite_team": "Kashima",
+        "underdog_team": "Newcastle Jets",
+        "favorite_open_odd": 1.375,
+        "favorite_current_odd": 1.27,
+        "underdog_open_odd": 6.75,
+        "underdog_current_odd": 9.45,
+        "favorite_shortening_odd": 0.105,
+        "favorite_drift_odd": -0.105,
+        "underdog_steam_odd": -2.7,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 6.42,
+        "underdog_fair_delta_pp": -3.8,
+        "favorite_oci": 91.357,
+        "underdog_oci": -88.803,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "1",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": -0.415,
+        "underdog_margin_delta_pp": -0.431,
+        "margin_shift_favorite_vs_underdog_pp": 0.016,
+        "favorite_conceded_ht_rate_pct": 42.01,
+        "underdog_scored_ht_rate_pct": 71.8,
+        "favorite_scored_ht_rate_pct": 32.44,
+        "underdog_conceded_ht_rate_pct": 24.64,
+        "pair_goal_ht_rate_pct": 66.125,
+        "pair_over15_ht_rate_pct": 31.205,
+        "pair_gg_ht_rate_pct": 19.315,
+        "pair_over25_ft_rate_pct": 58.947,
+        "underdog_xg_for": 1.441,
+        "favorite_xg_against": 0.612,
+        "underdog_sot_for": 4.833,
+        "favorite_sot_against": 3.027,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": true,
+        "gg_ht": false,
+        "over25_ft": true
+      }
     }
   },
   "summary": {
-    "settled_primary": 2204,
+    "settled_primary": 2205,
     "wins": 1087,
-    "losses": 1117,
-    "win_rate_pct": 49.319,
+    "losses": 1118,
+    "win_rate_pct": 49.297,
     "by_market": {
       "1x2_ft": {
         "settled": 616,
@@ -225013,10 +225220,10 @@
         "win_rate_pct": 47.89
       },
       "over25_ft": {
-        "settled": 1186,
+        "settled": 1187,
         "wins": 650,
-        "losses": 536,
-        "win_rate_pct": 54.806
+        "losses": 537,
+        "win_rate_pct": 54.76
       },
       "over15_ht": {
         "settled": 283,
@@ -225051,10 +225258,10 @@
         "win_rate_pct": 50.056
       },
       "A": {
-        "settled": 929,
+        "settled": 930,
         "wins": 450,
-        "losses": 479,
-        "win_rate_pct": 48.439
+        "losses": 480,
+        "win_rate_pct": 48.387
       },
       "C": {
         "settled": 383,
@@ -225065,28 +225272,28 @@
     },
     "by_market_pattern": {
       "odds_inversion_only": {
-        "settled": 21,
+        "settled": 22,
         "goal_ht": 16,
         "over15_ht": 5,
         "gg_ht": 1,
         "over25_ft": 10,
-        "avg_pattern_score": 30.667,
-        "goal_ht_rate_pct": 76.19,
-        "over15_ht_rate_pct": 23.81,
-        "gg_ht_rate_pct": 4.762,
-        "over25_ft_rate_pct": 47.619
+        "avg_pattern_score": 30.446,
+        "goal_ht_rate_pct": 72.727,
+        "over15_ht_rate_pct": 22.727,
+        "gg_ht_rate_pct": 4.545,
+        "over25_ft_rate_pct": 45.455
       },
       "neutral": {
-        "settled": 906,
-        "goal_ht": 659,
-        "over15_ht": 336,
+        "settled": 907,
+        "goal_ht": 660,
+        "over15_ht": 337,
         "gg_ht": 192,
-        "over25_ft": 517,
-        "avg_pattern_score": 22.996,
-        "goal_ht_rate_pct": 72.737,
-        "over15_ht_rate_pct": 37.086,
-        "gg_ht_rate_pct": 21.192,
-        "over25_ft_rate_pct": 57.064
+        "over25_ft": 518,
+        "avg_pattern_score": 22.991,
+        "goal_ht_rate_pct": 72.767,
+        "over15_ht_rate_pct": 37.155,
+        "gg_ht_rate_pct": 21.169,
+        "over25_ft_rate_pct": 57.111
       },
       "favorite_steam_only": {
         "settled": 67,
