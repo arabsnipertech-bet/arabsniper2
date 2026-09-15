@@ -31871,8 +31871,692 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-15T03:58:07+02:00",
       "stats_schema": 2
+    },
+    "1610963": {
+      "fixture_id": "1610963",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:37+02:00",
+      "stats_schema": 2
+    },
+    "1560010": {
+      "fixture_id": "1560010",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.47,
+      "away_xg": 0.32,
+      "home_stats": {
+        "team_id": 1122,
+        "team_name": "FK Jablonec",
+        "xg": 2.47,
+        "shots_on_target": 7.0,
+        "total_shots": 26.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 782,
+        "team_name": "Slovan Liberec",
+        "xg": 0.32,
+        "shots_on_target": 3.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:38+02:00",
+      "stats_schema": 2
+    },
+    "1560004": {
+      "fixture_id": "1560004",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.19,
+      "away_xg": 0.36,
+      "home_stats": {
+        "team_id": 782,
+        "team_name": "Slovan Liberec",
+        "xg": 2.19,
+        "shots_on_target": 6.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3723,
+        "team_name": "Hradec Králové",
+        "xg": 0.36,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:38+02:00",
+      "stats_schema": 2
+    },
+    "1553168": {
+      "fixture_id": "1553168",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3491,
+        "team_name": "Raków Częstochowa",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 14562,
+        "team_name": "Motor Lublin",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:38+02:00",
+      "stats_schema": 2
+    },
+    "1553158": {
+      "fixture_id": "1553158",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 347,
+        "team_name": "Lech Poznan",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 28.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3491,
+        "team_name": "Raków Częstochowa",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:39+02:00",
+      "stats_schema": 2
+    },
+    "1553144": {
+      "fixture_id": "1553144",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.84,
+      "away_xg": 2.22,
+      "home_stats": {
+        "team_id": 3491,
+        "team_name": "Raków Częstochowa",
+        "xg": 0.84,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 340,
+        "team_name": "Gornik Zabrze",
+        "xg": 2.22,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:39+02:00",
+      "stats_schema": 2
+    },
+    "1553150": {
+      "fixture_id": "1553150",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.29,
+      "away_xg": 4.44,
+      "home_stats": {
+        "team_id": 3491,
+        "team_name": "Raków Częstochowa",
+        "xg": 1.29,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 336,
+        "team_name": "Jagiellonia",
+        "xg": 4.44,
+        "shots_on_target": 10.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:39+02:00",
+      "stats_schema": 2
+    },
+    "1553172": {
+      "fixture_id": "1553172",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 345,
+        "team_name": "Zaglebie Lubin",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3484,
+        "team_name": "GKS Katowice",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:39+02:00",
+      "stats_schema": 2
+    },
+    "1553163": {
+      "fixture_id": "1553163",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 17115,
+        "team_name": "Wieczysta Kraków",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 345,
+        "team_name": "Zaglebie Lubin",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:39+02:00",
+      "stats_schema": 2
+    },
+    "1550119": {
+      "fixture_id": "1550119",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.88,
+      "away_xg": 1.93,
+      "home_stats": {
+        "team_id": 495,
+        "team_name": "Genoa",
+        "xg": 1.88,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 512,
+        "team_name": "Frosinone",
+        "xg": 1.93,
+        "shots_on_target": 6.0,
+        "total_shots": 26.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:40+02:00",
+      "stats_schema": 2
+    },
+    "1550102": {
+      "fixture_id": "1550102",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.62,
+      "away_xg": 0.42,
+      "home_stats": {
+        "team_id": 487,
+        "team_name": "Lazio",
+        "xg": 1.62,
+        "shots_on_target": 2.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 495,
+        "team_name": "Genoa",
+        "xg": 0.42,
+        "shots_on_target": 1.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:40+02:00",
+      "stats_schema": 2
+    },
+    "1550091": {
+      "fixture_id": "1550091",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.67,
+      "away_xg": 0.77,
+      "home_stats": {
+        "team_id": 495,
+        "team_name": "Genoa",
+        "xg": 0.67,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 492,
+        "team_name": "Napoli",
+        "xg": 0.77,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:40+02:00",
+      "stats_schema": 2
+    },
+    "1601532": {
+      "fixture_id": "1601532",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1578,
+        "team_name": "Sudtirol",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 899,
+        "team_name": "Modena",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:41+02:00",
+      "stats_schema": 2
+    },
+    "1601521": {
+      "fixture_id": "1601521",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.41,
+      "away_xg": 0.61,
+      "home_stats": {
+        "team_id": 1578,
+        "team_name": "Sudtirol",
+        "xg": 0.41,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1687,
+        "team_name": "Catanzaro",
+        "xg": 0.61,
+        "shots_on_target": 2.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:41+02:00",
+      "stats_schema": 2
+    },
+    "1601506": {
+      "fixture_id": "1601506",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.23,
+      "away_xg": 0.56,
+      "home_stats": {
+        "team_id": 506,
+        "team_name": "Benevento",
+        "xg": 2.23,
+        "shots_on_target": 5.0,
+        "total_shots": 24.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1578,
+        "team_name": "Sudtirol",
+        "xg": 0.56,
+        "shots_on_target": 2.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:41+02:00",
+      "stats_schema": 2
+    },
+    "1601501": {
+      "fixture_id": "1601501",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.97,
+      "away_xg": 0.56,
+      "home_stats": {
+        "team_id": 1578,
+        "team_name": "Sudtirol",
+        "xg": 0.97,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 527,
+        "team_name": "Virtus Entella",
+        "xg": 0.56,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:41+02:00",
+      "stats_schema": 2
+    },
+    "1603029": {
+      "fixture_id": "1603029",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2928,
+        "team_name": "Al Khaleej Saihat",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2939,
+        "team_name": "Al-Nassr",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:42+02:00",
+      "stats_schema": 2
+    },
+    "1603025": {
+      "fixture_id": "1603025",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.34,
+      "away_xg": 0.26,
+      "home_stats": {
+        "team_id": 2939,
+        "team_name": "Al-Nassr",
+        "xg": 1.34,
+        "shots_on_target": 6.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2951,
+        "team_name": "Abha",
+        "xg": 0.26,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:42+02:00",
+      "stats_schema": 2
+    },
+    "1603016": {
+      "fixture_id": "1603016",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.84,
+      "away_xg": 1.65,
+      "home_stats": {
+        "team_id": 2938,
+        "team_name": "Al-Ittihad FC",
+        "xg": 1.84,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2939,
+        "team_name": "Al-Nassr",
+        "xg": 1.65,
+        "shots_on_target": 8.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:42+02:00",
+      "stats_schema": 2
+    },
+    "1603001": {
+      "fixture_id": "1603001",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.0,
+      "away_xg": 0.8,
+      "home_stats": {
+        "team_id": 2939,
+        "team_name": "Al-Nassr",
+        "xg": 2.0,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2936,
+        "team_name": "Al Taawon",
+        "xg": 0.8,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-15T04:50:42+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-15T04:04:30+02:00",
+  "updated_at": "2026-09-15T04:54:55+02:00",
   "runtime_calls_last_run": 20
 }
