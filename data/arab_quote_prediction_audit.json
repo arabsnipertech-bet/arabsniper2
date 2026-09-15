@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-15T01:50:35+02:00",
+  "updated_at": "2026-09-15T04:04:32+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -224383,19 +224383,142 @@
         "gg_ht": true,
         "over25_ft": true
       }
+    },
+    "1519495": {
+      "fixture_id": "1519495",
+      "date": "2026-09-15",
+      "time": "02:00",
+      "match": "Universidad Catolica - Orense SC",
+      "league": "Liga Pro",
+      "country": "Ecuador",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-15T03:58:47+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 2,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 1.4,
+        "probability_pct": 80.13,
+        "probability_raw_pct": 81.57,
+        "expected_value_pct": 12.182,
+        "relation": "confirmed",
+        "ranking_score": 95.112,
+        "recommendation_score": 89.112,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 89.112,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 71.429,
+          "probability_pct": 80.13,
+          "raw_probability_pct": 81.57,
+          "expected_value_pct": 12.182,
+          "edge_over_break_even_pp": 8.701,
+          "book_disagreement_pp": 15.92,
+          "competition_quality_score": 68,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 89.112,
+          "price_preference_adjustment": 0.0,
+          "price_profile": "low_price"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "orange",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.09,
+        "outcome": "won"
+      },
+      "settled_at": "2026-09-15T03:58:47+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 16.551,
+        "market_score": 0.0,
+        "early_stats_score": 40.848,
+        "two_goal_stats_score": 37.485,
+        "ft_goal_score": 36.825,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.33,
+        "favorite_team": "Universidad Catolica",
+        "underdog_team": "Orense SC",
+        "favorite_open_odd": 1.41,
+        "favorite_current_odd": 1.4,
+        "underdog_open_odd": 6.765,
+        "underdog_current_odd": 7.0,
+        "favorite_shortening_odd": 0.01,
+        "favorite_drift_odd": -0.01,
+        "underdog_steam_odd": -0.235,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 1.06,
+        "underdog_fair_delta_pp": -0.33,
+        "favorite_oci": 60.701,
+        "underdog_oci": -53.331,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "1",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": -0.547,
+        "underdog_margin_delta_pp": -0.162,
+        "margin_shift_favorite_vs_underdog_pp": -0.385,
+        "favorite_conceded_ht_rate_pct": 24.81,
+        "underdog_scored_ht_rate_pct": 17.45,
+        "favorite_scored_ht_rate_pct": 74.97,
+        "underdog_conceded_ht_rate_pct": 69.05,
+        "pair_goal_ht_rate_pct": 73.865,
+        "pair_over15_ht_rate_pct": 40.425,
+        "pair_gg_ht_rate_pct": 19.275,
+        "pair_over25_ft_rate_pct": 52.467,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": false,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": true,
+        "gg_ht": true,
+        "over25_ft": true
+      }
     }
   },
   "summary": {
-    "settled_primary": 2199,
-    "wins": 1085,
+    "settled_primary": 2200,
+    "wins": 1086,
     "losses": 1114,
-    "win_rate_pct": 49.341,
+    "win_rate_pct": 49.364,
     "by_market": {
       "1x2_ft": {
-        "settled": 612,
-        "wins": 293,
+        "settled": 613,
+        "wins": 294,
         "losses": 319,
-        "win_rate_pct": 47.876
+        "win_rate_pct": 47.961
       },
       "over25_ft": {
         "settled": 1185,
@@ -224436,10 +224559,10 @@
         "win_rate_pct": 50.113
       },
       "A": {
-        "settled": 925,
-        "wins": 448,
+        "settled": 926,
+        "wins": 449,
         "losses": 477,
-        "win_rate_pct": 48.432
+        "win_rate_pct": 48.488
       },
       "C": {
         "settled": 383,
@@ -224462,16 +224585,16 @@
         "over25_ft_rate_pct": 47.619
       },
       "neutral": {
-        "settled": 902,
-        "goal_ht": 657,
-        "over15_ht": 334,
-        "gg_ht": 190,
-        "over25_ft": 515,
-        "avg_pattern_score": 22.999,
-        "goal_ht_rate_pct": 72.838,
-        "over15_ht_rate_pct": 37.029,
-        "gg_ht_rate_pct": 21.064,
-        "over25_ft_rate_pct": 57.095
+        "settled": 903,
+        "goal_ht": 658,
+        "over15_ht": 335,
+        "gg_ht": 191,
+        "over25_ft": 516,
+        "avg_pattern_score": 22.992,
+        "goal_ht_rate_pct": 72.868,
+        "over15_ht_rate_pct": 37.099,
+        "gg_ht_rate_pct": 21.152,
+        "over25_ft_rate_pct": 57.143
       },
       "favorite_steam_only": {
         "settled": 66,
