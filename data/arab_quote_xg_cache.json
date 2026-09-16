@@ -32931,8 +32931,480 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-16T03:48:15+02:00",
       "stats_schema": 2
+    },
+    "1487841": {
+      "fixture_id": "1487841",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:30+02:00",
+      "stats_schema": 2
+    },
+    "1487830": {
+      "fixture_id": "1487830",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:30+02:00",
+      "stats_schema": 2
+    },
+    "1560024": {
+      "fixture_id": "1560024",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 603,
+        "team_name": "Zlin",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3723,
+        "team_name": "Hradec Králové",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:30+02:00",
+      "stats_schema": 2
+    },
+    "1560016": {
+      "fixture_id": "1560016",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.96,
+      "away_xg": 1.35,
+      "home_stats": {
+        "team_id": 603,
+        "team_name": "Zlin",
+        "xg": 0.96,
+        "shots_on_target": 2.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3720,
+        "team_name": "Teplice",
+        "xg": 1.35,
+        "shots_on_target": 7.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:30+02:00",
+      "stats_schema": 2
+    },
+    "1560002": {
+      "fixture_id": "1560002",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.02,
+      "away_xg": 0.9,
+      "home_stats": {
+        "team_id": 3733,
+        "team_name": "Zbrojovka Brno",
+        "xg": 1.02,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 603,
+        "team_name": "Zlin",
+        "xg": 0.9,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:30+02:00",
+      "stats_schema": 2
+    },
+    "1627579": {
+      "fixture_id": "1627579",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:30+02:00",
+      "stats_schema": 2
+    },
+    "1627570": {
+      "fixture_id": "1627570",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:31+02:00",
+      "stats_schema": 2
+    },
+    "1610609": {
+      "fixture_id": "1610609",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:31+02:00",
+      "stats_schema": 2
+    },
+    "1560018": {
+      "fixture_id": "1560018",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3733,
+        "team_name": "Zbrojovka Brno",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 4257,
+        "team_name": "Artis",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:31+02:00",
+      "stats_schema": 2
+    },
+    "1560014": {
+      "fixture_id": "1560014",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 4.33,
+      "away_xg": 0.79,
+      "home_stats": {
+        "team_id": 560,
+        "team_name": "Slavia Praha",
+        "xg": 4.33,
+        "shots_on_target": 6.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3733,
+        "team_name": "Zbrojovka Brno",
+        "xg": 0.79,
+        "shots_on_target": 0.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:32+02:00",
+      "stats_schema": 2
+    },
+    "1559986": {
+      "fixture_id": "1559986",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.48,
+      "away_xg": 0.53,
+      "home_stats": {
+        "team_id": 3733,
+        "team_name": "Zbrojovka Brno",
+        "xg": 1.48,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3723,
+        "team_name": "Hradec Králové",
+        "xg": 0.53,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:32+02:00",
+      "stats_schema": 2
+    },
+    "1610616": {
+      "fixture_id": "1610616",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:32+02:00",
+      "stats_schema": 2
+    },
+    "1582744": {
+      "fixture_id": "1582744",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:32+02:00",
+      "stats_schema": 2
+    },
+    "1560017": {
+      "fixture_id": "1560017",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3714,
+        "team_name": "Bohemians 1905",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3719,
+        "team_name": "Slovácko",
+        "xg": null,
+        "shots_on_target": 0.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:33+02:00",
+      "stats_schema": 2
+    },
+    "1560006": {
+      "fixture_id": "1560006",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.28,
+      "away_xg": 0.41,
+      "home_stats": {
+        "team_id": 567,
+        "team_name": "Plzen",
+        "xg": 1.28,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3719,
+        "team_name": "Slovácko",
+        "xg": 0.41,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:33+02:00",
+      "stats_schema": 2
+    },
+    "1627581": {
+      "fixture_id": "1627581",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:33+02:00",
+      "stats_schema": 2
+    },
+    "1610620": {
+      "fixture_id": "1610620",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:33+02:00",
+      "stats_schema": 2
+    },
+    "1559993": {
+      "fixture_id": "1559993",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3723,
+        "team_name": "Hradec Králové",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 567,
+        "team_name": "Plzen",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:34+02:00",
+      "stats_schema": 2
+    },
+    "1560009": {
+      "fixture_id": "1560009",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.14,
+      "away_xg": 1.18,
+      "home_stats": {
+        "team_id": 3723,
+        "team_name": "Hradec Králové",
+        "xg": 1.14,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 628,
+        "team_name": "Sparta Praha",
+        "xg": 1.18,
+        "shots_on_target": 6.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:34+02:00",
+      "stats_schema": 2
+    },
+    "1627562": {
+      "fixture_id": "1627562",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-16T04:45:34+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-16T03:53:57+02:00",
+  "updated_at": "2026-09-16T04:51:14+02:00",
   "runtime_calls_last_run": 20
 }
