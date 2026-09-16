@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-16T11:15:35+02:00",
+  "updated_at": "2026-09-16T16:43:39+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -229648,7 +229648,7 @@
       "competition_tier": "major_second_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T11:15:33+02:00",
+        "settled_at": "2026-09-16T16:43:36+02:00",
         "home_ft": 6,
         "away_ft": 0,
         "home_ht": 3,
@@ -229694,7 +229694,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-16T11:15:33+02:00",
+      "settled_at": "2026-09-16T16:43:36+02:00",
       "market_pattern": {
         "available": true,
         "score": 30.666,
@@ -229771,7 +229771,7 @@
       "competition_tier": "major_second_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T11:15:33+02:00",
+        "settled_at": "2026-09-16T16:43:36+02:00",
         "home_ft": 3,
         "away_ft": 3,
         "home_ht": 1,
@@ -229817,7 +229817,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-16T11:15:33+02:00",
+      "settled_at": "2026-09-16T16:43:36+02:00",
       "market_pattern": {
         "available": true,
         "score": 37.933,
@@ -229894,7 +229894,7 @@
       "competition_tier": "major_second_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T11:15:33+02:00",
+        "settled_at": "2026-09-16T16:43:36+02:00",
         "home_ft": 4,
         "away_ft": 0,
         "home_ht": 3,
@@ -229940,7 +229940,7 @@
         "market_calibration_weight": 0.08,
         "outcome": "won"
       },
-      "settled_at": "2026-09-16T11:15:33+02:00",
+      "settled_at": "2026-09-16T16:43:36+02:00",
       "market_pattern": {
         "available": true,
         "score": 18.453,
@@ -230017,7 +230017,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T11:15:33+02:00",
+        "settled_at": "2026-09-16T16:43:36+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 1,
@@ -230063,7 +230063,7 @@
         "market_calibration_weight": 0.12,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-16T11:15:33+02:00",
+      "settled_at": "2026-09-16T16:43:36+02:00",
       "market_pattern": {
         "available": true,
         "score": 33.0,
@@ -230140,7 +230140,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T11:15:33+02:00",
+        "settled_at": "2026-09-16T16:43:36+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 0,
@@ -230186,7 +230186,7 @@
         "market_calibration_weight": 0.07,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-16T11:15:33+02:00",
+      "settled_at": "2026-09-16T16:43:36+02:00",
       "market_pattern": {
         "available": true,
         "score": 25.778,
@@ -230347,7 +230347,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T11:15:33+02:00",
+        "settled_at": "2026-09-16T16:43:36+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 1,
@@ -230393,7 +230393,7 @@
         "market_calibration_weight": 0.07,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-16T11:15:33+02:00",
+      "settled_at": "2026-09-16T16:43:36+02:00",
       "market_pattern": {
         "available": true,
         "score": 56.93,
@@ -230542,19 +230542,142 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1629925": {
+      "fixture_id": "1629925",
+      "date": "2026-09-16",
+      "time": "12:00",
+      "match": "Jeonbuk Motors - Kashiwa Reysol",
+      "league": "AFC Champions League Elite",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-16T16:43:36+02:00",
+        "home_ft": 2,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "1x2_ft",
+        "selection": "2",
+        "odd": 2.05,
+        "probability_pct": 53.45,
+        "probability_raw_pct": 54.39,
+        "expected_value_pct": 9.572,
+        "relation": "confirmed",
+        "ranking_score": 95.645,
+        "recommendation_score": 89.645,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 89.645,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 48.78,
+          "probability_pct": 53.45,
+          "raw_probability_pct": 54.39,
+          "expected_value_pct": 9.572,
+          "edge_over_break_even_pp": 4.67,
+          "book_disagreement_pp": 9.43,
+          "competition_quality_score": 88,
+          "bookmakers": 9,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 86.645,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "red",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-09-16T16:43:36+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 14.967,
+        "market_score": 0.0,
+        "early_stats_score": 40.394,
+        "two_goal_stats_score": 29.294,
+        "ft_goal_score": 28.928,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "2",
+        "favorite_changed": false,
+        "cross_strength_pp": 1.97,
+        "favorite_team": "Kashiwa Reysol",
+        "underdog_team": "Jeonbuk Motors",
+        "favorite_open_odd": 2.155,
+        "favorite_current_odd": 2.05,
+        "underdog_open_odd": 3.18,
+        "underdog_current_odd": 3.4,
+        "favorite_shortening_odd": 0.105,
+        "favorite_drift_odd": -0.105,
+        "underdog_steam_odd": -0.22,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 2.05,
+        "underdog_fair_delta_pp": -1.97,
+        "favorite_oci": 70.937,
+        "underdog_oci": -70.12,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "2",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": "2",
+        "favorite_margin_delta_pp": 0.322,
+        "underdog_margin_delta_pp": -0.068,
+        "margin_shift_favorite_vs_underdog_pp": 0.39,
+        "favorite_conceded_ht_rate_pct": 64.51,
+        "underdog_scored_ht_rate_pct": 25.67,
+        "favorite_scored_ht_rate_pct": 36.08,
+        "underdog_conceded_ht_rate_pct": 37.62,
+        "pair_goal_ht_rate_pct": 63.045,
+        "pair_over15_ht_rate_pct": 32.96,
+        "pair_gg_ht_rate_pct": 18.895,
+        "pair_over25_ft_rate_pct": 49.64,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 3.982,
+        "favorite_sot_against": 3.04,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": true
+      }
     }
   },
   "summary": {
-    "settled_primary": 2232,
+    "settled_primary": 2233,
     "wins": 1099,
-    "losses": 1133,
-    "win_rate_pct": 49.238,
+    "losses": 1134,
+    "win_rate_pct": 49.216,
     "by_market": {
       "1x2_ft": {
-        "settled": 620,
+        "settled": 621,
         "wins": 296,
-        "losses": 324,
-        "win_rate_pct": 47.742
+        "losses": 325,
+        "win_rate_pct": 47.665
       },
       "over25_ft": {
         "settled": 1199,
@@ -230595,10 +230718,10 @@
         "win_rate_pct": 50.111
       },
       "A": {
-        "settled": 941,
+        "settled": 942,
         "wins": 453,
-        "losses": 488,
-        "win_rate_pct": 48.14
+        "losses": 489,
+        "win_rate_pct": 48.089
       },
       "C": {
         "settled": 388,
@@ -230621,16 +230744,16 @@
         "over25_ft_rate_pct": 45.455
       },
       "neutral": {
-        "settled": 936,
-        "goal_ht": 682,
+        "settled": 937,
+        "goal_ht": 683,
         "over15_ht": 347,
         "gg_ht": 193,
-        "over25_ft": 538,
-        "avg_pattern_score": 22.946,
-        "goal_ht_rate_pct": 72.863,
-        "over15_ht_rate_pct": 37.073,
-        "gg_ht_rate_pct": 20.62,
-        "over25_ft_rate_pct": 57.479
+        "over25_ft": 539,
+        "avg_pattern_score": 22.938,
+        "goal_ht_rate_pct": 72.892,
+        "over15_ht_rate_pct": 37.033,
+        "gg_ht_rate_pct": 20.598,
+        "over25_ft_rate_pct": 57.524
       },
       "favorite_steam_only": {
         "settled": 72,
