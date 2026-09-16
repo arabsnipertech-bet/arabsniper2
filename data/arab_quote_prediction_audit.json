@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-16T04:51:18+02:00",
+  "updated_at": "2026-09-16T11:11:48+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -229648,7 +229648,7 @@
       "competition_tier": "major_second_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T04:46:09+02:00",
+        "settled_at": "2026-09-16T11:11:46+02:00",
         "home_ft": 6,
         "away_ft": 0,
         "home_ht": 3,
@@ -229694,7 +229694,7 @@
         "market_calibration_weight": 0.1,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-16T04:46:09+02:00",
+      "settled_at": "2026-09-16T11:11:46+02:00",
       "market_pattern": {
         "available": true,
         "score": 30.666,
@@ -229771,7 +229771,7 @@
       "competition_tier": "major_second_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T04:46:09+02:00",
+        "settled_at": "2026-09-16T11:11:46+02:00",
         "home_ft": 3,
         "away_ft": 3,
         "home_ht": 1,
@@ -229817,7 +229817,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-16T04:46:09+02:00",
+      "settled_at": "2026-09-16T11:11:46+02:00",
       "market_pattern": {
         "available": true,
         "score": 37.933,
@@ -229894,7 +229894,7 @@
       "competition_tier": "major_second_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T04:46:09+02:00",
+        "settled_at": "2026-09-16T11:11:46+02:00",
         "home_ft": 4,
         "away_ft": 0,
         "home_ht": 3,
@@ -229940,7 +229940,7 @@
         "market_calibration_weight": 0.08,
         "outcome": "won"
       },
-      "settled_at": "2026-09-16T04:46:09+02:00",
+      "settled_at": "2026-09-16T11:11:46+02:00",
       "market_pattern": {
         "available": true,
         "score": 18.453,
@@ -230017,7 +230017,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T04:46:09+02:00",
+        "settled_at": "2026-09-16T11:11:46+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 1,
@@ -230063,7 +230063,7 @@
         "market_calibration_weight": 0.12,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-16T04:46:09+02:00",
+      "settled_at": "2026-09-16T11:11:46+02:00",
       "market_pattern": {
         "available": true,
         "score": 33.0,
@@ -230140,7 +230140,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-16T04:46:09+02:00",
+        "settled_at": "2026-09-16T11:11:46+02:00",
         "home_ft": 1,
         "away_ft": 1,
         "home_ht": 0,
@@ -230186,7 +230186,7 @@
         "market_calibration_weight": 0.07,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-16T04:46:09+02:00",
+      "settled_at": "2026-09-16T11:11:46+02:00",
       "market_pattern": {
         "available": true,
         "score": 25.778,
@@ -230335,13 +230335,220 @@
         "gg_ht": false,
         "over25_ft": true
       }
+    },
+    "1581369": {
+      "fixture_id": "1581369",
+      "date": "2026-09-16",
+      "time": "03:00",
+      "match": "Dorados - Cancún",
+      "league": "Liga de Expansión MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-16T11:11:46+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.48,
+        "probability_pct": 49.03,
+        "probability_raw_pct": 49.96,
+        "expected_value_pct": 21.594,
+        "relation": "confirmed",
+        "ranking_score": 110.944,
+        "recommendation_score": 99.944,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 99.944,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 40.323,
+          "probability_pct": 49.03,
+          "raw_probability_pct": 49.96,
+          "expected_value_pct": 21.594,
+          "edge_over_break_even_pp": 8.707,
+          "book_disagreement_pp": 13.23,
+          "competition_quality_score": 84,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 96.944,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.07,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-09-16T11:11:46+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 56.93,
+        "market_score": 35.0,
+        "early_stats_score": 81.759,
+        "two_goal_stats_score": 94.488,
+        "ft_goal_score": 79.017,
+        "classification": "odds_cross_reversal",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "1",
+        "favorite_changed": true,
+        "cross_strength_pp": 1.5,
+        "favorite_team": "Dorados",
+        "underdog_team": "Cancún",
+        "favorite_open_odd": 2.5,
+        "favorite_current_odd": 2.4,
+        "underdog_open_odd": 2.45,
+        "underdog_current_odd": 2.56,
+        "favorite_shortening_odd": 0.1,
+        "favorite_drift_odd": -0.1,
+        "underdog_steam_odd": -0.11,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 1.6,
+        "underdog_fair_delta_pp": -1.5,
+        "favorite_oci": 58.741,
+        "underdog_oci": -57.726,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "1",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": "1",
+        "favorite_margin_delta_pp": 0.067,
+        "underdog_margin_delta_pp": -0.249,
+        "margin_shift_favorite_vs_underdog_pp": 0.316,
+        "favorite_conceded_ht_rate_pct": 72.08,
+        "underdog_scored_ht_rate_pct": 73.5,
+        "favorite_scored_ht_rate_pct": 55.4,
+        "underdog_conceded_ht_rate_pct": 46.56,
+        "pair_goal_ht_rate_pct": 88.64,
+        "pair_over15_ht_rate_pct": 50.405,
+        "pair_gg_ht_rate_pct": 35.13,
+        "pair_over25_ft_rate_pct": 62.167,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
+    },
+    "1550948": {
+      "fixture_id": "1550948",
+      "date": "2026-09-16",
+      "time": "03:00",
+      "match": "Puebla - Toluca",
+      "league": "Liga MX",
+      "country": "Mexico",
+      "competition_quality_score": 84,
+      "competition_tier": "major_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-16T11:11:46+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": null,
+      "settled_at": "2026-09-16T11:11:46+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 41.88,
+        "market_score": 29.0,
+        "early_stats_score": 54.593,
+        "two_goal_stats_score": 66.43,
+        "ft_goal_score": 50.748,
+        "classification": "favorite_steam_only",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "2",
+        "favorite_changed": false,
+        "cross_strength_pp": 2.71,
+        "favorite_team": "Toluca",
+        "underdog_team": "Puebla",
+        "favorite_open_odd": 1.62,
+        "favorite_current_odd": 1.53,
+        "underdog_open_odd": 4.6,
+        "underdog_current_odd": 5.32,
+        "favorite_shortening_odd": 0.09,
+        "favorite_drift_odd": -0.09,
+        "underdog_steam_odd": -0.72,
+        "medium_favorite_band": true,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": true,
+        "favorite_fair_delta_pp": 3.46,
+        "underdog_fair_delta_pp": -2.71,
+        "favorite_oci": 77.35,
+        "underdog_oci": -77.296,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "2",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": "2",
+        "favorite_margin_delta_pp": 0.169,
+        "underdog_margin_delta_pp": -0.232,
+        "margin_shift_favorite_vs_underdog_pp": 0.401,
+        "favorite_conceded_ht_rate_pct": 9.02,
+        "underdog_scored_ht_rate_pct": 81.12,
+        "favorite_scored_ht_rate_pct": 52.15,
+        "underdog_conceded_ht_rate_pct": 55.86,
+        "pair_goal_ht_rate_pct": 72.055,
+        "pair_over15_ht_rate_pct": 34.23,
+        "pair_gg_ht_rate_pct": 27.015,
+        "pair_over25_ft_rate_pct": 54.4,
+        "underdog_xg_for": 1.19,
+        "favorite_xg_against": 0.648,
+        "underdog_sot_for": 6.46,
+        "favorite_sot_against": 1.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": false,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 2231,
+    "settled_primary": 2232,
     "wins": 1099,
-    "losses": 1132,
-    "win_rate_pct": 49.26,
+    "losses": 1133,
+    "win_rate_pct": 49.238,
     "by_market": {
       "1x2_ft": {
         "settled": 620,
@@ -230356,10 +230563,10 @@
         "win_rate_pct": 54.712
       },
       "over15_ht": {
-        "settled": 292,
+        "settled": 293,
         "wins": 115,
-        "losses": 177,
-        "win_rate_pct": 39.384
+        "losses": 178,
+        "win_rate_pct": 39.249
       },
       "gg_ht": {
         "settled": 116,
@@ -230388,10 +230595,10 @@
         "win_rate_pct": 50.111
       },
       "A": {
-        "settled": 940,
+        "settled": 941,
         "wins": 453,
-        "losses": 487,
-        "win_rate_pct": 48.191
+        "losses": 488,
+        "win_rate_pct": 48.14
       },
       "C": {
         "settled": 388,
@@ -230426,28 +230633,28 @@
         "over25_ft_rate_pct": 57.479
       },
       "favorite_steam_only": {
-        "settled": 71,
+        "settled": 72,
         "goal_ht": 54,
         "over15_ht": 32,
         "gg_ht": 16,
         "over25_ft": 45,
-        "avg_pattern_score": 32.747,
-        "goal_ht_rate_pct": 76.056,
-        "over15_ht_rate_pct": 45.07,
-        "gg_ht_rate_pct": 22.535,
-        "over25_ft_rate_pct": 63.38
+        "avg_pattern_score": 32.874,
+        "goal_ht_rate_pct": 75.0,
+        "over15_ht_rate_pct": 44.444,
+        "gg_ht_rate_pct": 22.222,
+        "over25_ft_rate_pct": 62.5
       },
       "odds_cross_reversal": {
-        "settled": 63,
-        "goal_ht": 41,
+        "settled": 64,
+        "goal_ht": 42,
         "over15_ht": 15,
         "gg_ht": 7,
         "over25_ft": 30,
-        "avg_pattern_score": 43.565,
-        "goal_ht_rate_pct": 65.079,
-        "over15_ht_rate_pct": 23.81,
-        "gg_ht_rate_pct": 11.111,
-        "over25_ft_rate_pct": 47.619
+        "avg_pattern_score": 43.774,
+        "goal_ht_rate_pct": 65.625,
+        "over15_ht_rate_pct": 23.438,
+        "gg_ht_rate_pct": 10.938,
+        "over25_ft_rate_pct": 46.875
       },
       "underdog_book_square": {
         "settled": 258,
