@@ -33403,8 +33403,708 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-16T04:45:34+02:00",
       "stats_schema": 2
+    },
+    "1519490": {
+      "fixture_id": "1519490",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1158,
+        "team_name": "LDU de Quito",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1154,
+        "team_name": "Deportivo Cuenca",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:45+02:00",
+      "stats_schema": 2
+    },
+    "1631507": {
+      "fixture_id": "1631507",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 121,
+        "team_name": "Palmeiras",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 28.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1158,
+        "team_name": "LDU de Quito",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:45+02:00",
+      "stats_schema": 2
+    },
+    "1519487": {
+      "fixture_id": "1519487",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.45,
+      "away_xg": 1.72,
+      "home_stats": {
+        "team_id": 1151,
+        "team_name": "Tecnico Universitario",
+        "xg": 0.45,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1158,
+        "team_name": "LDU de Quito",
+        "xg": 1.72,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:45+02:00",
+      "stats_schema": 2
+    },
+    "1519475": {
+      "fixture_id": "1519475",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1158,
+        "team_name": "LDU de Quito",
+        "xg": null,
+        "shots_on_target": 0.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "total_shots": "Total Shots",
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "away_stats": {
+        "team_id": 1162,
+        "team_name": "Mushuc Runa SC",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "total_shots": "Total Shots",
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:45+02:00",
+      "stats_schema": 2
+    },
+    "1492378": {
+      "fixture_id": "1492378",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 121,
+        "team_name": "Palmeiras",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 126,
+        "team_name": "Sao Paulo",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:45+02:00",
+      "stats_schema": 2
+    },
+    "1492360": {
+      "fixture_id": "1492360",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.1,
+      "away_xg": 1.11,
+      "home_stats": {
+        "team_id": 120,
+        "team_name": "Botafogo",
+        "xg": 1.1,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 121,
+        "team_name": "Palmeiras",
+        "xg": 1.11,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:46+02:00",
+      "stats_schema": 2
+    },
+    "1623075": {
+      "fixture_id": "1623075",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 128,
+        "team_name": "Santos",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 121,
+        "team_name": "Palmeiras",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:46+02:00",
+      "stats_schema": 2
+    },
+    "1492370": {
+      "fixture_id": "1492370",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.9,
+      "away_xg": 0.55,
+      "home_stats": {
+        "team_id": 1062,
+        "team_name": "Atletico-MG",
+        "xg": 1.9,
+        "shots_on_target": 7.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 124,
+        "team_name": "Fluminense",
+        "xg": 0.55,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:47+02:00",
+      "stats_schema": 2
+    },
+    "1631510": {
+      "fixture_id": "1631510",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 128,
+        "team_name": "Santos",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1062,
+        "team_name": "Atletico-MG",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:47+02:00",
+      "stats_schema": 2
+    },
+    "1492368": {
+      "fixture_id": "1492368",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.78,
+      "away_xg": 0.65,
+      "home_stats": {
+        "team_id": 126,
+        "team_name": "Sao Paulo",
+        "xg": 1.78,
+        "shots_on_target": 5.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1062,
+        "team_name": "Atletico-MG",
+        "xg": 0.65,
+        "shots_on_target": 0.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:47+02:00",
+      "stats_schema": 2
+    },
+    "1623073": {
+      "fixture_id": "1623073",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1062,
+        "team_name": "Atletico-MG",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 28.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 135,
+        "team_name": "Cruzeiro",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:47+02:00",
+      "stats_schema": 2
+    },
+    "1492379": {
+      "fixture_id": "1492379",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 128,
+        "team_name": "Santos",
+        "xg": null,
+        "shots_on_target": 10.0,
+        "total_shots": 32.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 135,
+        "team_name": "Cruzeiro",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:47+02:00",
+      "stats_schema": 2
+    },
+    "1492366": {
+      "fixture_id": "1492366",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.29,
+      "away_xg": 1.36,
+      "home_stats": {
+        "team_id": 119,
+        "team_name": "Internacional",
+        "xg": 1.29,
+        "shots_on_target": 6.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 128,
+        "team_name": "Santos",
+        "xg": 1.36,
+        "shots_on_target": 3.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:48+02:00",
+      "stats_schema": 2
+    },
+    "1492372": {
+      "fixture_id": "1492372",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.39,
+      "away_xg": 0.8,
+      "home_stats": {
+        "team_id": 120,
+        "team_name": "Botafogo",
+        "xg": 1.39,
+        "shots_on_target": 6.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 794,
+        "team_name": "RB Bragantino",
+        "xg": 0.8,
+        "shots_on_target": 8.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:49+02:00",
+      "stats_schema": 2
+    },
+    "1492354": {
+      "fixture_id": "1492354",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.7,
+      "away_xg": 0.79,
+      "home_stats": {
+        "team_id": 127,
+        "team_name": "Flamengo",
+        "xg": 1.7,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 120,
+        "team_name": "Botafogo",
+        "xg": 0.79,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:49+02:00",
+      "stats_schema": 2
+    },
+    "1492340": {
+      "fixture_id": "1492340",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.75,
+      "away_xg": 0.83,
+      "home_stats": {
+        "team_id": 120,
+        "team_name": "Botafogo",
+        "xg": 2.75,
+        "shots_on_target": 8.0,
+        "total_shots": 32.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 134,
+        "team_name": "Atletico Paranaense",
+        "xg": 0.83,
+        "shots_on_target": 6.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:49+02:00",
+      "stats_schema": 2
+    },
+    "1492376": {
+      "fixture_id": "1492376",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.68,
+      "away_xg": 1.52,
+      "home_stats": {
+        "team_id": 130,
+        "team_name": "Gremio",
+        "xg": 0.68,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 133,
+        "team_name": "Vasco DA Gama",
+        "xg": 1.52,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:49+02:00",
+      "stats_schema": 2
+    },
+    "1492369": {
+      "fixture_id": "1492369",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 136,
+        "team_name": "Vitoria",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 130,
+        "team_name": "Gremio",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:49+02:00",
+      "stats_schema": 2
+    },
+    "1623074": {
+      "fixture_id": "1623074",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 130,
+        "team_name": "Gremio",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 119,
+        "team_name": "Internacional",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:50+02:00",
+      "stats_schema": 2
+    },
+    "1492355": {
+      "fixture_id": "1492355",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.67,
+      "away_xg": 2.81,
+      "home_stats": {
+        "team_id": 130,
+        "team_name": "Gremio",
+        "xg": 0.67,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 132,
+        "team_name": "Chapecoense-sc",
+        "xg": 2.81,
+        "shots_on_target": 9.0,
+        "total_shots": 32.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T03:51:50+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-16T04:51:14+02:00",
+  "updated_at": "2026-09-17T03:58:28+02:00",
   "runtime_calls_last_run": 20
 }
