@@ -34103,8 +34103,478 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-17T03:51:50+02:00",
       "stats_schema": 2
+    },
+    "1636685": {
+      "fixture_id": "1636685",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:08+02:00",
+      "stats_schema": 2
+    },
+    "1593312": {
+      "fixture_id": "1593312",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 5046,
+        "team_name": "Kalamata",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2110,
+        "team_name": "Volos NFC",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:09+02:00",
+      "stats_schema": 2
+    },
+    "1593304": {
+      "fixture_id": "1593304",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 12260,
+        "team_name": "Atromitos",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 5046,
+        "team_name": "Kalamata",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:09+02:00",
+      "stats_schema": 2
+    },
+    "1635494": {
+      "fixture_id": "1635494",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:09+02:00",
+      "stats_schema": 2
+    },
+    "1593301": {
+      "fixture_id": "1593301",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 949,
+        "team_name": "Panetolikos",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 5046,
+        "team_name": "Kalamata",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:09+02:00",
+      "stats_schema": 2
+    },
+    "1635488": {
+      "fixture_id": "1635488",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:10+02:00",
+      "stats_schema": 2
+    },
+    "1623379": {
+      "fixture_id": "1623379",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:10+02:00",
+      "stats_schema": 2
+    },
+    "1610812": {
+      "fixture_id": "1610812",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:10+02:00",
+      "stats_schema": 2
+    },
+    "1537107": {
+      "fixture_id": "1537107",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.83,
+      "away_xg": 1.95,
+      "home_stats": {
+        "team_id": 5050,
+        "team_name": "Kifisia",
+        "xg": 1.83,
+        "shots_on_target": 10.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 953,
+        "team_name": "Larisa",
+        "xg": 1.95,
+        "shots_on_target": 4.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:10+02:00",
+      "stats_schema": 2
+    },
+    "1635609": {
+      "fixture_id": "1635609",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.71,
+      "away_xg": 0.72,
+      "home_stats": {
+        "team_id": 575,
+        "team_name": "AEK Athens FC",
+        "xg": 1.71,
+        "shots_on_target": 4.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1026,
+        "team_name": "Lask Linz",
+        "xg": 0.72,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:11+02:00",
+      "stats_schema": 2
+    },
+    "1635492": {
+      "fixture_id": "1635492",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:11+02:00",
+      "stats_schema": 2
+    },
+    "1610821": {
+      "fixture_id": "1610821",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:11+02:00",
+      "stats_schema": 2
+    },
+    "1537108": {
+      "fixture_id": "1537108",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.71,
+      "away_xg": 0.29,
+      "home_stats": {
+        "team_id": 12260,
+        "team_name": "Atromitos",
+        "xg": 2.71,
+        "shots_on_target": 9.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2099,
+        "team_name": "Panserraikos",
+        "xg": 0.29,
+        "shots_on_target": 0.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:11+02:00",
+      "stats_schema": 2
+    },
+    "1537105": {
+      "fixture_id": "1537105",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.14,
+      "away_xg": 1.42,
+      "home_stats": {
+        "team_id": 2099,
+        "team_name": "Panserraikos",
+        "xg": 1.14,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 949,
+        "team_name": "Panetolikos",
+        "xg": 1.42,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:12+02:00",
+      "stats_schema": 2
+    },
+    "1629835": {
+      "fixture_id": "1629835",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:12+02:00",
+      "stats_schema": 2
+    },
+    "1494760": {
+      "fixture_id": "1494760",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 321,
+        "team_name": "Lillestrom",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 326,
+        "team_name": "Valerenga",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:13+02:00",
+      "stats_schema": 2
+    },
+    "1494755": {
+      "fixture_id": "1494755",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 333,
+        "team_name": "Sarpsborg 08 FF",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 326,
+        "team_name": "Valerenga",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:13+02:00",
+      "stats_schema": 2
+    },
+    "1494746": {
+      "fixture_id": "1494746",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.82,
+      "away_xg": 1.73,
+      "home_stats": {
+        "team_id": 326,
+        "team_name": "Valerenga",
+        "xg": 1.82,
+        "shots_on_target": 5.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 329,
+        "team_name": "Molde",
+        "xg": 1.73,
+        "shots_on_target": 9.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:13+02:00",
+      "stats_schema": 2
+    },
+    "1629890": {
+      "fixture_id": "1629890",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:13+02:00",
+      "stats_schema": 2
+    },
+    "1608263": {
+      "fixture_id": "1608263",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-17T04:49:13+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-17T03:58:28+02:00",
+  "updated_at": "2026-09-17T04:54:58+02:00",
   "runtime_calls_last_run": 20
 }
