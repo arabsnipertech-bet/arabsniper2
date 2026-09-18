@@ -34573,8 +34573,542 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-17T04:49:13+02:00",
       "stats_schema": 2
+    },
+    "1636687": {
+      "fixture_id": "1636687",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:33+02:00",
+      "stats_schema": 2
+    },
+    "1565479": {
+      "fixture_id": "1565479",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:34+02:00",
+      "stats_schema": 2
+    },
+    "1565477": {
+      "fixture_id": "1565477",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:35+02:00",
+      "stats_schema": 2
+    },
+    "1635878": {
+      "fixture_id": "1635878",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:35+02:00",
+      "stats_schema": 2
+    },
+    "1565471": {
+      "fixture_id": "1565471",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:35+02:00",
+      "stats_schema": 2
+    },
+    "1555506": {
+      "fixture_id": "1555506",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 604,
+        "team_name": "Maccabi Tel Aviv",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 4501,
+        "team_name": "Hapoel Tel Aviv",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:36+02:00",
+      "stats_schema": 2
+    },
+    "1555494": {
+      "fixture_id": "1555494",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 4501,
+        "team_name": "Hapoel Tel Aviv",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 28.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 4489,
+        "team_name": "Hapoel Ramat Gan",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:36+02:00",
+      "stats_schema": 2
+    },
+    "1555480": {
+      "fixture_id": "1555480",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 4501,
+        "team_name": "Hapoel Tel Aviv",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 657,
+        "team_name": "Beitar Jerusalem",
+        "xg": null,
+        "shots_on_target": 0.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:36+02:00",
+      "stats_schema": 2
+    },
+    "1555487": {
+      "fixture_id": "1555487",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2253,
+        "team_name": "Hapoel Haifa",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 4501,
+        "team_name": "Hapoel Tel Aviv",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:36+02:00",
+      "stats_schema": 2
+    },
+    "1555502": {
+      "fixture_id": "1555502",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 4488,
+        "team_name": "Hapoel Petah Tikva",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 563,
+        "team_name": "Hapoel Beer Sheva",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:37+02:00",
+      "stats_schema": 2
+    },
+    "1555496": {
+      "fixture_id": "1555496",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 4195,
+        "team_name": "Maccabi Haifa",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 4488,
+        "team_name": "Hapoel Petah Tikva",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:37+02:00",
+      "stats_schema": 2
+    },
+    "1555488": {
+      "fixture_id": "1555488",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 4488,
+        "team_name": "Hapoel Petah Tikva",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 4486,
+        "team_name": "Hapoel Katamon",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:37+02:00",
+      "stats_schema": 2
+    },
+    "1555482": {
+      "fixture_id": "1555482",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:37+02:00",
+      "stats_schema": 2
+    },
+    "1585755": {
+      "fixture_id": "1585755",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.8,
+      "away_xg": 2.56,
+      "home_stats": {
+        "team_id": 3605,
+        "team_name": "Sarıyer",
+        "xg": 1.8,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3584,
+        "team_name": "Bandırmaspor",
+        "xg": 2.56,
+        "shots_on_target": 6.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:38+02:00",
+      "stats_schema": 2
+    },
+    "1585740": {
+      "fixture_id": "1585740",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3584,
+        "team_name": "Bandırmaspor",
+        "xg": null,
+        "shots_on_target": 13.0,
+        "total_shots": 27.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3569,
+        "team_name": "Boluspor",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:38+02:00",
+      "stats_schema": 2
+    },
+    "1585729": {
+      "fixture_id": "1585729",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.73,
+      "away_xg": 1.45,
+      "home_stats": {
+        "team_id": 3584,
+        "team_name": "Bandırmaspor",
+        "xg": 0.73,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1005,
+        "team_name": "Antalyaspor",
+        "xg": 1.45,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:38+02:00",
+      "stats_schema": 2
+    },
+    "1585757": {
+      "fixture_id": "1585757",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.66,
+      "away_xg": 1.34,
+      "home_stats": {
+        "team_id": 3577,
+        "team_name": "Ümraniyespor",
+        "xg": 0.66,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1005,
+        "team_name": "Antalyaspor",
+        "xg": 1.34,
+        "shots_on_target": 5.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:38+02:00",
+      "stats_schema": 2
+    },
+    "1585748": {
+      "fixture_id": "1585748",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3601,
+        "team_name": "Pendikspor",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3577,
+        "team_name": "Ümraniyespor",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:39+02:00",
+      "stats_schema": 2
+    },
+    "1585737": {
+      "fixture_id": "1585737",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.62,
+      "away_xg": 1.11,
+      "home_stats": {
+        "team_id": 3577,
+        "team_name": "Ümraniyespor",
+        "xg": 1.62,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 7414,
+        "team_name": "Muğlaspor",
+        "xg": 1.11,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:39+02:00",
+      "stats_schema": 2
+    },
+    "1579229": {
+      "fixture_id": "1579229",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-18T03:39:39+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-17T04:54:58+02:00",
+  "updated_at": "2026-09-18T03:45:18+02:00",
   "runtime_calls_last_run": 20
 }
