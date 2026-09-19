@@ -35551,8 +35551,504 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-18T04:36:12+02:00",
       "stats_schema": 2
+    },
+    "1635962": {
+      "fixture_id": "1635962",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:23+02:00",
+      "stats_schema": 2
+    },
+    "1635955": {
+      "fixture_id": "1635955",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:23+02:00",
+      "stats_schema": 2
+    },
+    "1635963": {
+      "fixture_id": "1635963",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:24+02:00",
+      "stats_schema": 2
+    },
+    "1550964": {
+      "fixture_id": "1550964",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 3.31,
+      "away_xg": 1.63,
+      "home_stats": {
+        "team_id": 2285,
+        "team_name": "Santos Laguna",
+        "xg": 3.31,
+        "shots_on_target": 10.0,
+        "total_shots": 25.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2298,
+        "team_name": "FC Juarez",
+        "xg": 1.63,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:24+02:00",
+      "stats_schema": 2
+    },
+    "1550965": {
+      "fixture_id": "1550965",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.1,
+      "away_xg": 0.14,
+      "home_stats": {
+        "team_id": 2282,
+        "team_name": "Monterrey",
+        "xg": 1.1,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2279,
+        "team_name": "Tigres UANL",
+        "xg": 0.14,
+        "shots_on_target": 3.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:24+02:00",
+      "stats_schema": 2
+    },
+    "1550953": {
+      "fixture_id": "1550953",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2279,
+        "team_name": "Tigres UANL",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2288,
+        "team_name": "Necaxa",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:24+02:00",
+      "stats_schema": 2
+    },
+    "1550945": {
+      "fixture_id": "1550945",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.89,
+      "away_xg": 1.26,
+      "home_stats": {
+        "team_id": 2285,
+        "team_name": "Santos Laguna",
+        "xg": 0.89,
+        "shots_on_target": 4.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2279,
+        "team_name": "Tigres UANL",
+        "xg": 1.26,
+        "shots_on_target": 2.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:25+02:00",
+      "stats_schema": 2
+    },
+    "1581420": {
+      "fixture_id": "1581420",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:25+02:00",
+      "stats_schema": 2
+    },
+    "1581413": {
+      "fixture_id": "1581413",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:25+02:00",
+      "stats_schema": 2
+    },
+    "1581417": {
+      "fixture_id": "1581417",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:26+02:00",
+      "stats_schema": 2
+    },
+    "1581476": {
+      "fixture_id": "1581476",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:26+02:00",
+      "stats_schema": 2
+    },
+    "1581404": {
+      "fixture_id": "1581404",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:26+02:00",
+      "stats_schema": 2
+    },
+    "1581396": {
+      "fixture_id": "1581396",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:26+02:00",
+      "stats_schema": 2
+    },
+    "1507064": {
+      "fixture_id": "1507064",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2745,
+        "team_name": "Bucheon FC 1995",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2761,
+        "team_name": "Jeju United FC",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:27+02:00",
+      "stats_schema": 2
+    },
+    "1507068": {
+      "fixture_id": "1507068",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2768,
+        "team_name": "Gimcheon Sangmu FC",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2746,
+        "team_name": "Gangwon FC",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:27+02:00",
+      "stats_schema": 2
+    },
+    "1556066": {
+      "fixture_id": "1556066",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.89,
+      "away_xg": 0.68,
+      "home_stats": {
+        "team_id": 283,
+        "team_name": "Shimizu S-pulse",
+        "xg": 1.89,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 316,
+        "team_name": "Avispa Fukuoka",
+        "xg": 0.68,
+        "shots_on_target": 1.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:29+02:00",
+      "stats_schema": 2
+    },
+    "1556065": {
+      "fixture_id": "1556065",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 4.28,
+      "away_xg": 0.74,
+      "home_stats": {
+        "team_id": 282,
+        "team_name": "Sanfrecce Hiroshima",
+        "xg": 4.28,
+        "shots_on_target": 11.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 291,
+        "team_name": "Cerezo Osaka",
+        "xg": 0.74,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:29+02:00",
+      "stats_schema": 2
+    },
+    "1556064": {
+      "fixture_id": "1556064",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.39,
+      "away_xg": 2.98,
+      "home_stats": {
+        "team_id": 305,
+        "team_name": "Mito Hollyhock",
+        "xg": 0.39,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 294,
+        "team_name": "Kawasaki Frontale",
+        "xg": 2.98,
+        "shots_on_target": 9.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:30+02:00",
+      "stats_schema": 2
+    },
+    "1629919": {
+      "fixture_id": "1629919",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 290,
+        "team_name": "Kashima",
+        "xg": null,
+        "shots_on_target": 10.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 946,
+        "team_name": "Newcastle Jets",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:30+02:00",
+      "stats_schema": 2
+    },
+    "1556068": {
+      "fixture_id": "1556068",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.35,
+      "away_xg": 1.51,
+      "home_stats": {
+        "team_id": 306,
+        "team_name": "Tokyo Verdy",
+        "xg": 2.35,
+        "shots_on_target": 6.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 301,
+        "team_name": "JEF United Chiba",
+        "xg": 1.51,
+        "shots_on_target": 5.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T03:43:31+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-18T04:41:56+02:00",
+  "updated_at": "2026-09-19T03:48:46+02:00",
   "runtime_calls_last_run": 20
 }
