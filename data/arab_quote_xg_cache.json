@@ -36047,8 +36047,662 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-19T03:43:31+02:00",
       "stats_schema": 2
+    },
+    "1556067": {
+      "fixture_id": "1556067",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.07,
+      "away_xg": 1.96,
+      "home_stats": {
+        "team_id": 287,
+        "team_name": "Urawa",
+        "xg": 1.07,
+        "shots_on_target": 2.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 310,
+        "team_name": "Fagiano Okayama",
+        "xg": 1.96,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:34:58+02:00",
+      "stats_schema": 2
+    },
+    "1556070": {
+      "fixture_id": "1556070",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.1,
+      "away_xg": 0.8,
+      "home_stats": {
+        "team_id": 285,
+        "team_name": "V-varen Nagasaki",
+        "xg": 2.1,
+        "shots_on_target": 9.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 288,
+        "team_name": "Nagoya Grampus",
+        "xg": 0.8,
+        "shots_on_target": 2.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:34:59+02:00",
+      "stats_schema": 2
+    },
+    "1507069": {
+      "fixture_id": "1507069",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2759,
+        "team_name": "Gwangju FC",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2748,
+        "team_name": "FC Anyang",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:00+02:00",
+      "stats_schema": 2
+    },
+    "1507066": {
+      "fixture_id": "1507066",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2767,
+        "team_name": "Ulsan Hyundai FC",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2763,
+        "team_name": "Incheon United",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:00+02:00",
+      "stats_schema": 2
+    },
+    "1629917": {
+      "fixture_id": "1629917",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2750,
+        "team_name": "Daejeon Citizen",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 302,
+        "team_name": "Kyoto Sanga",
+        "xg": null,
+        "shots_on_target": 0.0,
+        "total_shots": 1.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:01+02:00",
+      "stats_schema": 2
+    },
+    "1635880": {
+      "fixture_id": "1635880",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:02+02:00",
+      "stats_schema": 2
+    },
+    "1556063": {
+      "fixture_id": "1556063",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 303,
+        "team_name": "Machida Zelvia",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 296,
+        "team_name": "Yokohama F. Marinos",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:03+02:00",
+      "stats_schema": 2
+    },
+    "1551106": {
+      "fixture_id": "1551106",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1426,
+        "team_name": "CSKA 1948",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 683,
+        "team_name": "Dunav Ruse",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:03+02:00",
+      "stats_schema": 2
+    },
+    "1551097": {
+      "fixture_id": "1551097",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 683,
+        "team_name": "Dunav Ruse",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 854,
+        "team_name": "Slavia Sofia",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:04+02:00",
+      "stats_schema": 2
+    },
+    "1551093": {
+      "fixture_id": "1551093",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 683,
+        "team_name": "Dunav Ruse",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "away_stats": {
+        "team_id": 1416,
+        "team_name": "Lokomotiv Sofia",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:04+02:00",
+      "stats_schema": 2
+    },
+    "1551083": {
+      "fixture_id": "1551083",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 851,
+        "team_name": "Cherno More Varna",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "away_stats": {
+        "team_id": 683,
+        "team_name": "Dunav Ruse",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:04+02:00",
+      "stats_schema": 2
+    },
+    "1551104": {
+      "fixture_id": "1551104",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 859,
+        "team_name": "Botev Vratsa",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 646,
+        "team_name": "Levski Sofia",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:04+02:00",
+      "stats_schema": 2
+    },
+    "1551101": {
+      "fixture_id": "1551101",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 856,
+        "team_name": "Septemvri Sofia",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "away_stats": {
+        "team_id": 859,
+        "team_name": "Botev Vratsa",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:04+02:00",
+      "stats_schema": 2
+    },
+    "1576173": {
+      "fixture_id": "1576173",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.33,
+      "away_xg": 0.8,
+      "home_stats": {
+        "team_id": 180,
+        "team_name": "1. FC Heidenheim",
+        "xg": 2.33,
+        "shots_on_target": 4.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 191,
+        "team_name": "Holstein Kiel",
+        "xg": 0.8,
+        "shots_on_target": 2.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:05+02:00",
+      "stats_schema": 2
+    },
+    "1576165": {
+      "fixture_id": "1576165",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.68,
+      "away_xg": 1.84,
+      "home_stats": {
+        "team_id": 191,
+        "team_name": "Holstein Kiel",
+        "xg": 0.68,
+        "shots_on_target": 3.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 171,
+        "team_name": "1. FC Nürnberg",
+        "xg": 1.84,
+        "shots_on_target": 7.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:05+02:00",
+      "stats_schema": 2
+    },
+    "1576158": {
+      "fixture_id": "1576158",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.83,
+      "away_xg": 2.11,
+      "home_stats": {
+        "team_id": 179,
+        "team_name": "1. FC Magdeburg",
+        "xg": 0.83,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 191,
+        "team_name": "Holstein Kiel",
+        "xg": 2.11,
+        "shots_on_target": 2.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:05+02:00",
+      "stats_schema": 2
+    },
+    "1550692": {
+      "fixture_id": "1550692",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 786,
+        "team_name": "TSV 1860 München",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 191,
+        "team_name": "Holstein Kiel",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:05+02:00",
+      "stats_schema": 2
+    },
+    "1576178": {
+      "fixture_id": "1576178",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.73,
+      "away_xg": 2.14,
+      "home_stats": {
+        "team_id": 1324,
+        "team_name": "VfL Osnabrück",
+        "xg": 1.73,
+        "shots_on_target": 7.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 159,
+        "team_name": "Hertha BSC",
+        "xg": 2.14,
+        "shots_on_target": 7.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:06+02:00",
+      "stats_schema": 2
+    },
+    "1576168": {
+      "fixture_id": "1576168",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.57,
+      "away_xg": 2.01,
+      "home_stats": {
+        "team_id": 1324,
+        "team_name": "VfL Osnabrück",
+        "xg": 2.57,
+        "shots_on_target": 8.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 744,
+        "team_name": "Eintracht Braunschweig",
+        "xg": 2.01,
+        "shots_on_target": 12.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:06+02:00",
+      "stats_schema": 2
+    },
+    "1550705": {
+      "fixture_id": "1550705",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1324,
+        "team_name": "VfL Osnabrück",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 157,
+        "team_name": "Bayern München",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-19T04:35:06+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-19T03:48:46+02:00",
+  "updated_at": "2026-09-19T04:40:26+02:00",
   "runtime_calls_last_run": 20
 }
