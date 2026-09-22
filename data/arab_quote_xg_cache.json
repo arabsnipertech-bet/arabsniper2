@@ -38411,8 +38411,430 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-21T04:44:07+02:00",
       "stats_schema": 2
+    },
+    "1520871": {
+      "fixture_id": "1520871",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 144,
+        "team_name": "Atletico Goianiense",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 140,
+        "team_name": "Criciuma",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:18+02:00",
+      "stats_schema": 2
+    },
+    "1520863": {
+      "fixture_id": "1520863",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 140,
+        "team_name": "Criciuma",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 152,
+        "team_name": "Juventude",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:18+02:00",
+      "stats_schema": 2
+    },
+    "1520853": {
+      "fixture_id": "1520853",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.25,
+      "away_xg": 1.08,
+      "home_stats": {
+        "team_id": 140,
+        "team_name": "Criciuma",
+        "xg": 0.25,
+        "shots_on_target": 1.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1193,
+        "team_name": "Cuiaba",
+        "xg": 1.08,
+        "shots_on_target": 0.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:18+02:00",
+      "stats_schema": 2
+    },
+    "1520843": {
+      "fixture_id": "1520843",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.3,
+      "away_xg": 2.43,
+      "home_stats": {
+        "team_id": 146,
+        "team_name": "CRB",
+        "xg": 1.3,
+        "shots_on_target": 10.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 140,
+        "team_name": "Criciuma",
+        "xg": 2.43,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:19+02:00",
+      "stats_schema": 2
+    },
+    "1520878": {
+      "fixture_id": "1520878",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 755,
+        "team_name": "Nautico Recife",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1223,
+        "team_name": "Operario-PR",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:19+02:00",
+      "stats_schema": 2
+    },
+    "1520866": {
+      "fixture_id": "1520866",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1223,
+        "team_name": "Operario-PR",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 146,
+        "team_name": "CRB",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:19+02:00",
+      "stats_schema": 2
+    },
+    "1520856": {
+      "fixture_id": "1520856",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 148,
+        "team_name": "Londrina",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1223,
+        "team_name": "Operario-PR",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:19+02:00",
+      "stats_schema": 2
+    },
+    "1520844": {
+      "fixture_id": "1520844",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.7,
+      "away_xg": 0.85,
+      "home_stats": {
+        "team_id": 154,
+        "team_name": "Fortaleza EC",
+        "xg": 2.7,
+        "shots_on_target": 7.0,
+        "total_shots": 31.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1223,
+        "team_name": "Operario-PR",
+        "xg": 0.85,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:19+02:00",
+      "stats_schema": 2
+    },
+    "1635958": {
+      "fixture_id": "1635958",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:20+02:00",
+      "stats_schema": 2
+    },
+    "1635949": {
+      "fixture_id": "1635949",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:20+02:00",
+      "stats_schema": 2
+    },
+    "1635952": {
+      "fixture_id": "1635952",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:21+02:00",
+      "stats_schema": 2
+    },
+    "1512111": {
+      "fixture_id": "1512111",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:22+02:00",
+      "stats_schema": 2
+    },
+    "1450968": {
+      "fixture_id": "1450968",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:22+02:00",
+      "stats_schema": 2
+    },
+    "1503722": {
+      "fixture_id": "1503722",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:22+02:00",
+      "stats_schema": 2
+    },
+    "1514497": {
+      "fixture_id": "1514497",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:22+02:00",
+      "stats_schema": 2
+    },
+    "1511481": {
+      "fixture_id": "1511481",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:23+02:00",
+      "stats_schema": 2
+    },
+    "1450966": {
+      "fixture_id": "1450966",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:23+02:00",
+      "stats_schema": 2
+    },
+    "1538413": {
+      "fixture_id": "1538413",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:24+02:00",
+      "stats_schema": 2
+    },
+    "1514893": {
+      "fixture_id": "1514893",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:24+02:00",
+      "stats_schema": 2
+    },
+    "1512109": {
+      "fixture_id": "1512109",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-22T03:58:24+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-21T04:45:03+02:00",
+  "updated_at": "2026-09-22T04:00:36+02:00",
   "runtime_calls_last_run": 20
 }
