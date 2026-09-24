@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-24T03:46:56+02:00",
+  "updated_at": "2026-09-24T04:38:36+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -288115,7 +288115,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-09-24T03:43:22+02:00",
+        "settled_at": "2026-09-24T04:35:07+02:00",
         "home_ft": 1,
         "away_ft": 0,
         "home_ht": 0,
@@ -288161,7 +288161,7 @@
         "market_calibration_weight": 0.08,
         "outcome": "lost"
       },
-      "settled_at": "2026-09-24T03:43:22+02:00",
+      "settled_at": "2026-09-24T04:35:07+02:00",
       "market_pattern": {
         "available": true,
         "score": 37.359,
@@ -288394,13 +288394,136 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1549793": {
+      "fixture_id": "1549793",
+      "date": "2026-09-24",
+      "time": "02:30",
+      "match": "America de Cali - Águilas Doradas",
+      "league": "Primera A",
+      "country": "Colombia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-24T04:35:07+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.7,
+        "probability_pct": 44.12,
+        "probability_raw_pct": 44.87,
+        "expected_value_pct": 19.124,
+        "relation": "confirmed",
+        "ranking_score": 105.028,
+        "recommendation_score": 94.028,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 94.028,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 37.037,
+          "probability_pct": 44.12,
+          "raw_probability_pct": 44.87,
+          "expected_value_pct": 19.124,
+          "edge_over_break_even_pp": 7.083,
+          "book_disagreement_pp": 10.72,
+          "competition_quality_score": 68,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 91.028,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.07,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-09-24T04:35:07+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 48.759,
+        "market_score": 29.0,
+        "early_stats_score": 60.622,
+        "two_goal_stats_score": 96.611,
+        "ft_goal_score": 85.777,
+        "classification": "favorite_steam_vulnerable",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.71,
+        "favorite_team": "America de Cali",
+        "underdog_team": "Águilas Doradas",
+        "favorite_open_odd": 1.65,
+        "favorite_current_odd": 1.6,
+        "underdog_open_odd": 5.19,
+        "underdog_current_odd": 5.4,
+        "favorite_shortening_odd": 0.05,
+        "favorite_drift_odd": -0.05,
+        "underdog_steam_odd": -0.21,
+        "medium_favorite_band": true,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": true,
+        "favorite_fair_delta_pp": 1.7,
+        "underdog_fair_delta_pp": -0.71,
+        "favorite_oci": 52.256,
+        "underdog_oci": -39.082,
+        "underdog_book_consensus": 0.875,
+        "book_pick_1x2": "1",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": "1",
+        "favorite_margin_delta_pp": 0.191,
+        "underdog_margin_delta_pp": -0.037,
+        "margin_shift_favorite_vs_underdog_pp": 0.228,
+        "favorite_conceded_ht_rate_pct": 39.16,
+        "underdog_scored_ht_rate_pct": 53.99,
+        "favorite_scored_ht_rate_pct": 66.45,
+        "underdog_conceded_ht_rate_pct": 55.88,
+        "pair_goal_ht_rate_pct": 68.43,
+        "pair_over15_ht_rate_pct": 51.79,
+        "pair_gg_ht_rate_pct": 39.305,
+        "pair_over25_ft_rate_pct": 67.3,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 2576,
+    "settled_primary": 2577,
     "wins": 1236,
-    "losses": 1340,
-    "win_rate_pct": 47.981,
+    "losses": 1341,
+    "win_rate_pct": 47.963,
     "by_market": {
       "1x2_ft": {
         "settled": 698,
@@ -288415,10 +288538,10 @@
         "win_rate_pct": 53.956
       },
       "over15_ht": {
-        "settled": 400,
+        "settled": 401,
         "wins": 150,
-        "losses": 250,
-        "win_rate_pct": 37.5
+        "losses": 251,
+        "win_rate_pct": 37.406
       },
       "gg_ht": {
         "settled": 146,
@@ -288447,10 +288570,10 @@
         "win_rate_pct": 49.402
       },
       "A": {
-        "settled": 1137,
+        "settled": 1138,
         "wins": 527,
-        "losses": 610,
-        "win_rate_pct": 46.35
+        "losses": 611,
+        "win_rate_pct": 46.309
       },
       "C": {
         "settled": 430,
@@ -288521,16 +288644,16 @@
         "over25_ft_rate_pct": 54.749
       },
       "favorite_steam_vulnerable": {
-        "settled": 139,
-        "goal_ht": 92,
+        "settled": 140,
+        "goal_ht": 93,
         "over15_ht": 54,
         "gg_ht": 29,
         "over25_ft": 79,
-        "avg_pattern_score": 42.417,
-        "goal_ht_rate_pct": 66.187,
-        "over15_ht_rate_pct": 38.849,
-        "gg_ht_rate_pct": 20.863,
-        "over25_ft_rate_pct": 56.835
+        "avg_pattern_score": 42.462,
+        "goal_ht_rate_pct": 66.429,
+        "over15_ht_rate_pct": 38.571,
+        "gg_ht_rate_pct": 20.714,
+        "over25_ft_rate_pct": 56.429
       }
     }
   }
