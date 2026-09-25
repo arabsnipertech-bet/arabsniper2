@@ -41223,8 +41223,626 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-24T04:34:52+02:00",
       "stats_schema": 2
+    },
+    "1397471": {
+      "fixture_id": "1397471",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 29,
+        "team_name": "Costa Rica",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 4672,
+        "team_name": "Honduras",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:07+02:00",
+      "stats_schema": 2
+    },
+    "1446022": {
+      "fixture_id": "1446022",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2386,
+        "team_name": "Haiti",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 29,
+        "team_name": "Costa Rica",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:07+02:00",
+      "stats_schema": 2
+    },
+    "1397459": {
+      "fixture_id": "1397459",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 29,
+        "team_name": "Costa Rica",
+        "xg": null,
+        "shots_on_target": 10.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 5164,
+        "team_name": "Nicaragua",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:08+02:00",
+      "stats_schema": 2
+    },
+    "1397453": {
+      "fixture_id": "1397453",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 4672,
+        "team_name": "Honduras",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 29,
+        "team_name": "Costa Rica",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:09+02:00",
+      "stats_schema": 2
+    },
+    "1489409": {
+      "fixture_id": "1489409",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.5,
+      "away_xg": 1.31,
+      "home_stats": {
+        "team_id": 5530,
+        "team_name": "Curaçao",
+        "xg": 0.5,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1501,
+        "team_name": "Ivory Coast",
+        "xg": 1.31,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:10+02:00",
+      "stats_schema": 2
+    },
+    "1489392": {
+      "fixture_id": "1489392",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.84,
+      "away_xg": 0.5,
+      "home_stats": {
+        "team_id": 2382,
+        "team_name": "Ecuador",
+        "xg": 2.84,
+        "shots_on_target": 15.0,
+        "total_shots": 27.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 5530,
+        "team_name": "Curaçao",
+        "xg": 0.5,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:11+02:00",
+      "stats_schema": 2
+    },
+    "1489374": {
+      "fixture_id": "1489374",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 4.22,
+      "away_xg": 0.41,
+      "home_stats": {
+        "team_id": 25,
+        "team_name": "Germany",
+        "xg": 4.22,
+        "shots_on_target": 12.0,
+        "total_shots": 26.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 5530,
+        "team_name": "Curaçao",
+        "xg": 0.41,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:12+02:00",
+      "stats_schema": 2
+    },
+    "1537256": {
+      "fixture_id": "1537256",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:13+02:00",
+      "stats_schema": 2
+    },
+    "1501839": {
+      "fixture_id": "1501839",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 19,
+        "team_name": "Nigeria",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1512,
+        "team_name": "Mozambique",
+        "xg": null,
+        "shots_on_target": 0.0,
+        "total_shots": 2.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:16+02:00",
+      "stats_schema": 2
+    },
+    "1347274": {
+      "fixture_id": "1347274",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1512,
+        "team_name": "Mozambique",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1530,
+        "team_name": "Cameroon",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:16+02:00",
+      "stats_schema": 2
+    },
+    "1347262": {
+      "fixture_id": "1347262",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1503,
+        "team_name": "Gabon",
+        "xg": null,
+        "shots_on_target": 10.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1512,
+        "team_name": "Mozambique",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:16+02:00",
+      "stats_schema": 2
+    },
+    "1347249": {
+      "fixture_id": "1347249",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1501,
+        "team_name": "Ivory Coast",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1512,
+        "team_name": "Mozambique",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:17+02:00",
+      "stats_schema": 2
+    },
+    "1489401": {
+      "fixture_id": "1489401",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.2,
+      "away_xg": 1.72,
+      "home_stats": {
+        "team_id": 1090,
+        "team_name": "Norway",
+        "xg": 2.2,
+        "shots_on_target": 7.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 13,
+        "team_name": "Senegal",
+        "xg": 1.72,
+        "shots_on_target": 4.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:18+02:00",
+      "stats_schema": 2
+    },
+    "1489383": {
+      "fixture_id": "1489383",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.79,
+      "away_xg": 0.53,
+      "home_stats": {
+        "team_id": 2,
+        "team_name": "France",
+        "xg": 1.79,
+        "shots_on_target": 8.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 13,
+        "team_name": "Senegal",
+        "xg": 0.53,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:19+02:00",
+      "stats_schema": 2
+    },
+    "1505616": {
+      "fixture_id": "1505616",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 13,
+        "team_name": "Senegal",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 32,
+        "team_name": "Egypt",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 3.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:20+02:00",
+      "stats_schema": 2
+    },
+    "1537576": {
+      "fixture_id": "1537576",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:21+02:00",
+      "stats_schema": 2
+    },
+    "1537258": {
+      "fixture_id": "1537258",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:22+02:00",
+      "stats_schema": 2
+    },
+    "1501836": {
+      "fixture_id": "1501836",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 31,
+        "team_name": "Morocco",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1489,
+        "team_name": "Tanzania",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:22+02:00",
+      "stats_schema": 2
+    },
+    "1347268": {
+      "fixture_id": "1347268",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1489,
+        "team_name": "Tanzania",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 28,
+        "team_name": "Tunisia",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:22+02:00",
+      "stats_schema": 2
+    },
+    "1126091": {
+      "fixture_id": "1126091",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 32,
+        "team_name": "Egypt",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "away_stats": {
+        "team_id": 1513,
+        "team_name": "Guinea-Bissau",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-25T04:00:22+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-24T04:38:34+02:00",
+  "updated_at": "2026-09-25T04:04:32+02:00",
   "runtime_calls_last_run": 20
 }
