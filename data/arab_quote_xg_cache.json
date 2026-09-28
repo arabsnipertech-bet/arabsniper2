@@ -1210,11 +1210,14 @@
     "1321356": {
       "fixture_id": "1321356",
       "available": false,
+      "shots_available": false,
       "home_xg": null,
       "away_xg": null,
-      "source": "api_no_xg",
-      "checked_at": "2026-07-24T11:25:30+02:00",
-      "raw_team_types": {}
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:22+02:00",
+      "stats_schema": 2
     },
     "1321346": {
       "fixture_id": "1321346",
@@ -43531,8 +43534,440 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-09-27T04:57:47+02:00",
       "stats_schema": 2
+    },
+    "1550969": {
+      "fixture_id": "1550969",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2314,
+        "team_name": "Atletico San Luis",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2288,
+        "team_name": "Necaxa",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:20+02:00",
+      "stats_schema": 2
+    },
+    "1550971": {
+      "fixture_id": "1550971",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2287,
+        "team_name": "Club America",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2278,
+        "team_name": "Guadalajara Chivas",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:21+02:00",
+      "stats_schema": 2
+    },
+    "1641703": {
+      "fixture_id": "1641703",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1571,
+        "team_name": "Indonesia",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1546,
+        "team_name": "Singapore",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:21+02:00",
+      "stats_schema": 2
+    },
+    "1548100": {
+      "fixture_id": "1548100",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:21+02:00",
+      "stats_schema": 2
+    },
+    "1641702": {
+      "fixture_id": "1641702",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1560,
+        "team_name": "Bangladesh",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1538,
+        "team_name": "Malaysia",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:22+02:00",
+      "stats_schema": 2
+    },
+    "1321345": {
+      "fixture_id": "1321345",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:22+02:00",
+      "stats_schema": 2
+    },
+    "1321335": {
+      "fixture_id": "1321335",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:22+02:00",
+      "stats_schema": 2
+    },
+    "1548097": {
+      "fixture_id": "1548097",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:23+02:00",
+      "stats_schema": 2
+    },
+    "1619319": {
+      "fixture_id": "1619319",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:23+02:00",
+      "stats_schema": 2
+    },
+    "1619317": {
+      "fixture_id": "1619317",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:23+02:00",
+      "stats_schema": 2
+    },
+    "1548102": {
+      "fixture_id": "1548102",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:23+02:00",
+      "stats_schema": 2
+    },
+    "1639133": {
+      "fixture_id": "1639133",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:24+02:00",
+      "stats_schema": 2
+    },
+    "1511485": {
+      "fixture_id": "1511485",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:24+02:00",
+      "stats_schema": 2
+    },
+    "1639130": {
+      "fixture_id": "1639130",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:24+02:00",
+      "stats_schema": 2
+    },
+    "1597931": {
+      "fixture_id": "1597931",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2916,
+        "team_name": "Al Shamal",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2900,
+        "team_name": "Al Wakrah",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:24+02:00",
+      "stats_schema": 2
+    },
+    "1528881": {
+      "fixture_id": "1528881",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1104,
+        "team_name": "Georgia",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 771,
+        "team_name": "Northern Ireland",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:25+02:00",
+      "stats_schema": 2
+    },
+    "1323370": {
+      "fixture_id": "1323370",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.78,
+      "away_xg": 1.49,
+      "home_stats": {
+        "team_id": 1103,
+        "team_name": "Bulgaria",
+        "xg": 0.78,
+        "shots_on_target": 3.0,
+        "total_shots": 3.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1104,
+        "team_name": "Georgia",
+        "xg": 1.49,
+        "shots_on_target": 3.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:25+02:00",
+      "stats_schema": 2
+    },
+    "1366317": {
+      "fixture_id": "1366317",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.45,
+      "away_xg": 3.32,
+      "home_stats": {
+        "team_id": 1104,
+        "team_name": "Georgia",
+        "xg": 0.45,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 9,
+        "team_name": "Spain",
+        "xg": 3.32,
+        "shots_on_target": 7.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:26+02:00",
+      "stats_schema": 2
+    },
+    "1323338": {
+      "fixture_id": "1323338",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.24,
+      "away_xg": 0.85,
+      "home_stats": {
+        "team_id": 777,
+        "team_name": "Türkiye",
+        "xg": 1.24,
+        "shots_on_target": 6.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1104,
+        "team_name": "Georgia",
+        "xg": 0.85,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-09-28T04:02:26+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-09-27T04:59:52+02:00",
+  "updated_at": "2026-09-28T04:03:23+02:00",
   "runtime_calls_last_run": 20
 }
