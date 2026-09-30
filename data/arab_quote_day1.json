@@ -1,7 +1,7 @@
 {
   "day": 1,
   "date": "2026-09-30",
-  "updated_at": "2026-09-30T04:30:00+02:00",
+  "updated_at": "2026-09-30T05:24:35+02:00",
   "matches": [
     {
       "fixture": {
@@ -127,7 +127,7 @@
                 "delta_fair_pp": 5.88,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": 76.657,
+                "oci_as": 76.596,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -146,7 +146,7 @@
                 "delta_fair_pp": 6.46,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": 76.821,
+                "oci_as": 76.753,
                 "marker": {
                   "shape": "square",
                   "color": "red",
@@ -165,7 +165,7 @@
                 "delta_fair_pp": -12.33,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": -78.475,
+                "oci_as": -78.346,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -286,7 +286,7 @@
                 "delta_fair_pp": -9.37,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": -76.391,
+                "oci_as": -76.293,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -305,7 +305,7 @@
                 "delta_fair_pp": 9.37,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": 76.391,
+                "oci_as": 76.293,
                 "marker": {
                   "shape": "circle_square",
                   "color": "yellow",
@@ -423,7 +423,7 @@
                 "delta_fair_pp": -7.86,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": -77.215,
+                "oci_as": -77.133,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -442,7 +442,7 @@
                 "delta_fair_pp": 7.86,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": 77.215,
+                "oci_as": 77.133,
                 "marker": {
                   "shape": "square",
                   "color": "red",
@@ -701,7 +701,7 @@
                 "delta_fair_pp": -4.29,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": -73.709,
+                "oci_as": -73.664,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -720,7 +720,7 @@
                 "delta_fair_pp": 4.29,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": 73.709,
+                "oci_as": 73.664,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -1064,7 +1064,7 @@
             },
             "book": {
               "pick": "x",
-              "score": 76.821,
+              "score": 76.753,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -1112,7 +1112,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 76.391,
+              "score": 76.293,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -1153,7 +1153,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 77.215,
+              "score": 77.133,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -1351,8 +1351,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -12.33,
           "underdog_fair_delta_pp": 5.88,
-          "favorite_oci": -78.475,
-          "underdog_oci": 76.657,
+          "favorite_oci": -78.346,
+          "underdog_oci": 76.596,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "x",
           "book_square_underdog": false,
@@ -1478,14 +1478,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 76.657,
-                  "absolute": 76.657,
+                  "value": 76.596,
+                  "absolute": 76.596,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.249,
+                  "velocity_pp_per_hour": 0.239,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 1.657,
+                    "velocity": 1.596,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -1511,14 +1511,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 76.821,
-                  "absolute": 76.821,
+                  "value": 76.753,
+                  "absolute": 76.753,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.273,
+                  "velocity_pp_per_hour": 0.263,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 1.821,
+                    "velocity": 1.753,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -1544,14 +1544,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -78.475,
-                  "absolute": 78.475,
+                  "value": -78.346,
+                  "absolute": 78.346,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.521,
+                  "velocity_pp_per_hour": 0.502,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 3.475,
+                    "velocity": 3.346,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -1570,7 +1570,7 @@
             },
             "book": {
               "pick": "x",
-              "score": 76.821,
+              "score": 76.753,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -1722,14 +1722,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -76.391,
-                  "absolute": 76.391,
+                  "value": -76.293,
+                  "absolute": 76.293,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.396,
+                  "velocity_pp_per_hour": 0.381,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 2.641,
+                    "velocity": 2.543,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -1755,14 +1755,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 76.391,
-                  "absolute": 76.391,
+                  "value": 76.293,
+                  "absolute": 76.293,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.396,
+                  "velocity_pp_per_hour": 0.381,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 2.641,
+                    "velocity": 2.543,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -1781,7 +1781,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 76.391,
+              "score": 76.293,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -1927,14 +1927,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -77.215,
-                  "absolute": 77.215,
+                  "value": -77.133,
+                  "absolute": 77.133,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.332,
+                  "velocity_pp_per_hour": 0.32,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 2.215,
+                    "velocity": 2.133,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -1960,14 +1960,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 77.215,
-                  "absolute": 77.215,
+                  "value": 77.133,
+                  "absolute": 77.133,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.332,
+                  "velocity_pp_per_hour": 0.32,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 2.215,
+                    "velocity": 2.133,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -1986,7 +1986,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 77.215,
+              "score": 77.133,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -2342,14 +2342,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -73.709,
-                  "absolute": 73.709,
+                  "value": -73.664,
+                  "absolute": 73.664,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.181,
+                  "velocity_pp_per_hour": 0.175,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 1.209,
+                    "velocity": 1.164,
                     "persistence": 0.0,
                     "coverage": 7.5
                   }
@@ -2375,14 +2375,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 73.709,
-                  "absolute": 73.709,
+                  "value": 73.664,
+                  "absolute": 73.664,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.181,
+                  "velocity_pp_per_hour": 0.175,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 1.209,
+                    "velocity": 1.164,
                     "persistence": 0.0,
                     "coverage": 7.5
                   }
@@ -2401,7 +2401,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 73.709,
+              "score": 73.664,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -2796,24 +2796,24 @@
           "context_weight": 0.46,
           "expected_side": "home",
           "metrics": {
-            "over25_rate": 0.423,
-            "gg_ht_rate": 0.0371,
-            "conceded_ht_rate": 0.0743,
             "xg_against_ft": 0.0,
-            "total_ht": 0.255,
-            "clean_sheet_rate": 0.333,
-            "over15ht_rate": 0.0371,
-            "points_per_game": 1.243,
-            "goals_scored_2h": 0.992,
-            "goals_conceded_ft": 1.254,
-            "goals_conceded_2h": 1.143,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.136,
-            "goals_conceded_ht": 0.111,
-            "goals_scored_ht": 0.144,
             "scored_ht_rate": 0.1443,
+            "over25_rate": 0.423,
+            "over15ht_rate": 0.0371,
+            "goals_scored_2h": 0.992,
+            "goals_conceded_2h": 1.143,
+            "total_ht": 0.255,
+            "goals_conceded_ht": 0.111,
+            "goals_scored_ft": 1.136,
             "xg_for_ft": 0.0,
             "total_ft": 2.39,
+            "conceded_ht_rate": 0.0743,
+            "goals_conceded_ft": 1.254,
+            "clean_sheet_rate": 0.333,
+            "xg_sample": 0.0,
+            "goals_scored_ht": 0.144,
+            "gg_ht_rate": 0.0371,
+            "points_per_game": 1.243,
             "shots_on_target_for": 6.0,
             "shots_on_target_against": 6.0,
             "total_shots_for": 10.0,
@@ -3345,24 +3345,24 @@
           "context_weight": 0.55,
           "expected_side": "away",
           "metrics": {
-            "over25_rate": 0.337,
-            "gg_ht_rate": 0.2052,
-            "conceded_ht_rate": 0.7931,
             "xg_against_ft": 1.052,
-            "total_ht": 1.111,
-            "clean_sheet_rate": 0.05,
-            "over15ht_rate": 0.2052,
-            "points_per_game": 1.276,
-            "goals_scored_2h": 0.758,
-            "goals_conceded_ft": 1.353,
-            "goals_conceded_2h": 0.56,
-            "xg_sample": 3.0,
-            "goals_scored_ft": 1.076,
-            "goals_conceded_ht": 0.793,
-            "goals_scored_ht": 0.318,
             "scored_ht_rate": 0.3178,
+            "over25_rate": 0.337,
+            "over15ht_rate": 0.2052,
+            "goals_scored_2h": 0.758,
+            "goals_conceded_2h": 0.56,
+            "total_ht": 1.111,
+            "goals_conceded_ht": 0.793,
+            "goals_scored_ft": 1.076,
             "xg_for_ft": 1.142,
             "total_ft": 2.429,
+            "conceded_ht_rate": 0.7931,
+            "goals_conceded_ft": 1.353,
+            "clean_sheet_rate": 0.05,
+            "xg_sample": 3.0,
+            "goals_scored_ht": 0.318,
+            "gg_ht_rate": 0.2052,
+            "points_per_game": 1.276,
             "shots_on_target_for": 3.929,
             "shots_on_target_against": 3.162,
             "total_shots_for": 16.697,
@@ -3891,7 +3891,7 @@
             "xg_against_ft": 1.052,
             "source": "api_fixture_statistics"
           },
-          "api_calls_used": 12,
+          "api_calls_used": 0,
           "api_call_budget": 20
         },
         "notes": {
@@ -4001,8 +4001,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -12.33,
           "underdog_fair_delta_pp": 5.88,
-          "favorite_oci": -78.475,
-          "underdog_oci": 76.657,
+          "favorite_oci": -78.346,
+          "underdog_oci": 76.596,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "x",
           "book_square_underdog": false,
@@ -6882,24 +6882,24 @@
           "context_weight": 0.55,
           "expected_side": "home",
           "metrics": {
-            "over25_rate": 0.67,
-            "gg_ht_rate": 0.1411,
-            "conceded_ht_rate": 0.5502,
             "xg_against_ft": 0.0,
-            "total_ht": 1.312,
-            "clean_sheet_rate": 0.202,
-            "over15ht_rate": 0.1863,
-            "points_per_game": 0.878,
-            "goals_scored_2h": 0.358,
-            "goals_conceded_ft": 2.318,
-            "goals_conceded_2h": 1.44,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 0.792,
-            "goals_conceded_ht": 0.878,
-            "goals_scored_ht": 0.434,
             "scored_ht_rate": 0.4337,
+            "over25_rate": 0.67,
+            "over15ht_rate": 0.1863,
+            "goals_scored_2h": 0.358,
+            "goals_conceded_2h": 1.44,
+            "total_ht": 1.312,
+            "goals_conceded_ht": 0.878,
+            "goals_scored_ft": 0.792,
             "xg_for_ft": 0.0,
             "total_ft": 3.11,
+            "conceded_ht_rate": 0.5502,
+            "goals_conceded_ft": 2.318,
+            "clean_sheet_rate": 0.202,
+            "xg_sample": 0.0,
+            "goals_scored_ht": 0.434,
+            "gg_ht_rate": 0.1411,
+            "points_per_game": 0.878,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -7108,7 +7108,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1488419,
@@ -7282,24 +7282,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "over25_rate": 0.379,
-            "gg_ht_rate": 0.0251,
-            "conceded_ht_rate": 0.3071,
             "xg_against_ft": 0.0,
-            "total_ht": 1.381,
-            "clean_sheet_rate": 0.483,
-            "over15ht_rate": 0.4697,
-            "points_per_game": 1.305,
-            "goals_scored_2h": 0.66,
-            "goals_conceded_ft": 1.508,
-            "goals_conceded_2h": 0.637,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.17,
-            "goals_conceded_ht": 0.871,
-            "goals_scored_ht": 0.51,
             "scored_ht_rate": 0.294,
+            "over25_rate": 0.379,
+            "over15ht_rate": 0.4697,
+            "goals_scored_2h": 0.66,
+            "goals_conceded_2h": 0.637,
+            "total_ht": 1.381,
+            "goals_conceded_ht": 0.871,
+            "goals_scored_ft": 1.17,
             "xg_for_ft": 0.0,
             "total_ft": 2.678,
+            "conceded_ht_rate": 0.3071,
+            "goals_conceded_ft": 1.508,
+            "clean_sheet_rate": 0.483,
+            "xg_sample": 0.0,
+            "goals_scored_ht": 0.51,
+            "gg_ht_rate": 0.0251,
+            "points_per_game": 1.305,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -7970,7 +7970,7 @@
             "xg_against_ft": 0.0,
             "source": "goals_fallback"
           },
-          "api_calls_used": 20,
+          "api_calls_used": 1,
           "api_call_budget": 20
         },
         "notes": {
@@ -8177,81 +8177,81 @@
         "primary_choice": {
           "market": "1x2_ft",
           "selection": "1",
-          "odd": 1.8,
-          "probability_pct": 67.84,
+          "odd": 1.75,
+          "probability_pct": 67.76,
           "probability_raw_pct": 69.33,
-          "expected_value_pct": 22.112,
-          "relation": "model_only",
-          "ranking_score": 83.511,
-          "recommendation_score": 83.511,
+          "expected_value_pct": 18.58,
+          "relation": "confirmed",
+          "ranking_score": 99.005,
+          "recommendation_score": 93.005,
           "grade": "A",
           "gate": {
             "eligible": true,
-            "score": 83.511,
+            "score": 93.005,
             "grade": "A",
             "reasons": [],
             "absolute_probability_floor_pct": 44.0,
-            "market_break_even_pct": 55.556,
-            "probability_pct": 67.84,
+            "market_break_even_pct": 57.143,
+            "probability_pct": 67.76,
             "raw_probability_pct": 69.33,
-            "expected_value_pct": 22.112,
-            "edge_over_break_even_pp": 12.284,
-            "book_disagreement_pp": 18.67,
+            "expected_value_pct": 18.58,
+            "edge_over_break_even_pp": 10.617,
+            "book_disagreement_pp": 17.39,
             "competition_quality_score": 88,
             "bookmakers": 9,
             "policy": "probability_floor_plus_price_edge",
-            "analytical_score_before_price_preference": 80.511,
+            "analytical_score_before_price_preference": 90.005,
             "price_preference_adjustment": 3.0,
             "price_profile": "preferred_value_band"
           },
           "marker": {
-            "shape": "circle",
-            "color": "red",
+            "shape": "circle_square",
+            "color": "orange",
             "model": true,
-            "book": false,
-            "agreement": false
+            "book": true,
+            "agreement": true
           },
-          "market_calibration_weight": 0.08
+          "market_calibration_weight": 0.09
         },
         "ranked_choices": [
           {
             "market": "1x2_ft",
             "selection": "1",
-            "odd": 1.8,
-            "probability_pct": 67.84,
+            "odd": 1.75,
+            "probability_pct": 67.76,
             "probability_raw_pct": 69.33,
-            "expected_value_pct": 22.112,
-            "relation": "model_only",
-            "ranking_score": 83.511,
-            "recommendation_score": 83.511,
+            "expected_value_pct": 18.58,
+            "relation": "confirmed",
+            "ranking_score": 99.005,
+            "recommendation_score": 93.005,
             "grade": "A",
             "gate": {
               "eligible": true,
-              "score": 83.511,
+              "score": 93.005,
               "grade": "A",
               "reasons": [],
               "absolute_probability_floor_pct": 44.0,
-              "market_break_even_pct": 55.556,
-              "probability_pct": 67.84,
+              "market_break_even_pct": 57.143,
+              "probability_pct": 67.76,
               "raw_probability_pct": 69.33,
-              "expected_value_pct": 22.112,
-              "edge_over_break_even_pp": 12.284,
-              "book_disagreement_pp": 18.67,
+              "expected_value_pct": 18.58,
+              "edge_over_break_even_pp": 10.617,
+              "book_disagreement_pp": 17.39,
               "competition_quality_score": 88,
               "bookmakers": 9,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 80.511,
+              "analytical_score_before_price_preference": 90.005,
               "price_preference_adjustment": 3.0,
               "price_profile": "preferred_value_band"
             },
             "marker": {
-              "shape": "circle",
-              "color": "red",
+              "shape": "circle_square",
+              "color": "orange",
               "model": true,
-              "book": false,
-              "agreement": false
+              "book": true,
+              "agreement": true
             },
-            "market_calibration_weight": 0.08
+            "market_calibration_weight": 0.09
           },
           {
             "market": "over15_ht",
@@ -8304,34 +8304,34 @@
             "selections": {
               "1": {
                 "open_odd": 1.8,
-                "current_odd": 1.8,
-                "model_probability_pct": 67.84,
+                "current_odd": 1.75,
+                "model_probability_pct": 67.76,
                 "model_probability_raw_pct": 69.33,
-                "book_fair_probability_pct": 50.66,
-                "delta_odd": 0.0,
-                "delta_fair_pp": 0.0,
-                "movement_color": "gray",
-                "movement_level": "stable",
-                "oci_as": 0.0,
+                "book_fair_probability_pct": 51.94,
+                "delta_odd": -0.05,
+                "delta_fair_pp": 1.28,
+                "movement_color": "yellow",
+                "movement_level": "low",
+                "oci_as": 57.186,
                 "marker": {
-                  "shape": "circle",
-                  "color": "red",
+                  "shape": "circle_square",
+                  "color": "orange",
                   "model": true,
-                  "book": false,
-                  "agreement": false
+                  "book": true,
+                  "agreement": true
                 }
               },
               "x": {
                 "open_odd": 3.4,
-                "current_odd": 3.4,
-                "model_probability_pct": 20.18,
+                "current_odd": 3.44,
+                "model_probability_pct": 20.21,
                 "model_probability_raw_pct": 19.6,
-                "book_fair_probability_pct": 26.82,
-                "delta_odd": 0.0,
-                "delta_fair_pp": 0.0,
+                "book_fair_probability_pct": 26.42,
+                "delta_odd": 0.04,
+                "delta_fair_pp": -0.4,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 0.0,
+                "oci_as": -41.933,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -8342,15 +8342,15 @@
               },
               "2": {
                 "open_odd": 4.05,
-                "current_odd": 4.05,
-                "model_probability_pct": 11.99,
+                "current_odd": 4.2,
+                "model_probability_pct": 12.02,
                 "model_probability_raw_pct": 11.07,
-                "book_fair_probability_pct": 22.52,
-                "delta_odd": 0.0,
-                "delta_fair_pp": 0.0,
-                "movement_color": "gray",
-                "movement_level": "stable",
-                "oci_as": 0.0,
+                "book_fair_probability_pct": 21.64,
+                "delta_odd": 0.15,
+                "delta_fair_pp": -0.88,
+                "movement_color": "yellow",
+                "movement_level": "low",
+                "oci_as": -50.253,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -8361,11 +8361,11 @@
               }
             },
             "model_pick": "1",
-            "book_pick": null,
-            "relation": "model_only",
-            "aggio_pct": 9.659,
+            "book_pick": "1",
+            "relation": "confirmed",
+            "aggio_pct": 10.022,
             "aggio_status": "high",
-            "protection_pick": null,
+            "protection_pick": "1",
             "market_validation": {
               "accepted": [
                 {
@@ -8435,23 +8435,23 @@
               "usable_for_signals": true,
               "minimum_books_required": 2
             },
-            "market_calibration_weight": 0.08,
+            "market_calibration_weight": 0.09,
             "recommendation_gate": {
               "eligible": true,
-              "score": 83.511,
+              "score": 93.005,
               "grade": "A",
               "reasons": [],
               "absolute_probability_floor_pct": 44.0,
-              "market_break_even_pct": 55.556,
-              "probability_pct": 67.84,
+              "market_break_even_pct": 57.143,
+              "probability_pct": 67.76,
               "raw_probability_pct": 69.33,
-              "expected_value_pct": 22.112,
-              "edge_over_break_even_pp": 12.284,
-              "book_disagreement_pp": 18.67,
+              "expected_value_pct": 18.58,
+              "edge_over_break_even_pp": 10.617,
+              "book_disagreement_pp": 17.39,
               "competition_quality_score": 88,
               "bookmakers": 9,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 80.511,
+              "analytical_score_before_price_preference": 90.005,
               "price_preference_adjustment": 3.0,
               "price_profile": "preferred_value_band"
             },
@@ -8772,15 +8772,15 @@
             "selections": {
               "yes": {
                 "open_odd": 4.75,
-                "current_odd": 4.75,
-                "model_probability_pct": 11.84,
+                "current_odd": 4.8,
+                "model_probability_pct": 11.83,
                 "model_probability_raw_pct": 11.36,
-                "book_fair_probability_pct": 19.42,
-                "delta_odd": 0.0,
-                "delta_fair_pp": 0.0,
+                "book_fair_probability_pct": 19.26,
+                "delta_odd": 0.05,
+                "delta_fair_pp": -0.16,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 0.0,
+                "oci_as": -32.773,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -8792,27 +8792,27 @@
               "no": {
                 "open_odd": 1.145,
                 "current_odd": 1.145,
-                "model_probability_pct": 88.16,
+                "model_probability_pct": 88.17,
                 "model_probability_raw_pct": 88.64,
-                "book_fair_probability_pct": 80.58,
+                "book_fair_probability_pct": 80.74,
                 "delta_odd": 0.0,
-                "delta_fair_pp": 0.0,
+                "delta_fair_pp": 0.16,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 0.0,
+                "oci_as": 32.773,
                 "marker": {
-                  "shape": "none",
-                  "color": "none",
+                  "shape": "square",
+                  "color": "yellow",
                   "model": false,
-                  "book": false,
+                  "book": true,
                   "agreement": false
                 }
               }
             },
             "model_pick": null,
-            "book_pick": null,
-            "relation": "neutral",
-            "aggio_pct": 8.389,
+            "book_pick": "no",
+            "relation": "book_only",
+            "aggio_pct": 8.17,
             "aggio_status": "high",
             "protection_pick": null,
             "market_validation": {
@@ -8857,7 +8857,7 @@
             "market_calibration_weight": 0.06,
             "recommendation_gate": {
               "eligible": false,
-              "score": 42.343,
+              "score": 38.331,
               "grade": "NO",
               "reasons": [
                 "probabilita_assoluta_insufficiente",
@@ -8865,16 +8865,16 @@
                 "storico_gg_pt_non_conferma"
               ],
               "absolute_probability_floor_pct": 12.0,
-              "market_break_even_pct": 21.053,
-              "probability_pct": 11.84,
+              "market_break_even_pct": 20.833,
+              "probability_pct": 11.83,
               "raw_probability_pct": 11.36,
-              "expected_value_pct": -43.76,
-              "edge_over_break_even_pp": -9.213,
-              "book_disagreement_pp": 8.06,
+              "expected_value_pct": -43.216,
+              "edge_over_break_even_pp": -9.003,
+              "book_disagreement_pp": 7.9,
               "competition_quality_score": 88,
               "bookmakers": 4,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 42.343,
+              "analytical_score_before_price_preference": 38.331,
               "price_preference_adjustment": 0.0,
               "price_profile": "high_return_band"
             },
@@ -9074,7 +9074,7 @@
             "selection": "yes",
             "gate": {
               "eligible": false,
-              "score": 42.343,
+              "score": 38.331,
               "grade": "NO",
               "reasons": [
                 "probabilita_assoluta_insufficiente",
@@ -9082,20 +9082,20 @@
                 "storico_gg_pt_non_conferma"
               ],
               "absolute_probability_floor_pct": 12.0,
-              "market_break_even_pct": 21.053,
-              "probability_pct": 11.84,
+              "market_break_even_pct": 20.833,
+              "probability_pct": 11.83,
               "raw_probability_pct": 11.36,
-              "expected_value_pct": -43.76,
-              "edge_over_break_even_pp": -9.213,
-              "book_disagreement_pp": 8.06,
+              "expected_value_pct": -43.216,
+              "edge_over_break_even_pp": -9.003,
+              "book_disagreement_pp": 7.9,
               "competition_quality_score": 88,
               "bookmakers": 4,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 42.343,
+              "analytical_score_before_price_preference": 38.331,
               "price_preference_adjustment": 0.0,
               "price_profile": "high_return_band"
             },
-            "relation": "neutral"
+            "relation": "book_only"
           },
           {
             "market": "over05_ht",
@@ -9247,9 +9247,9 @@
         },
         "probabilities_calibrated": {
           "1x2_ft": {
-            "1": 0.6784,
-            "x": 0.2018,
-            "2": 0.1199
+            "1": 0.6776,
+            "x": 0.2021,
+            "2": 0.1202
           },
           "over25_ft": {
             "over": 0.4954,
@@ -9260,8 +9260,8 @@
             "under": 0.6185
           },
           "gg_ht": {
-            "yes": 0.1184,
-            "no": 0.8816
+            "yes": 0.1183,
+            "no": 0.8817
           },
           "over05_ht": {
             "over": 0.6674,
@@ -9274,9 +9274,9 @@
         },
         "probabilities": {
           "1x2_ft": {
-            "1": 0.6784,
-            "x": 0.2018,
-            "2": 0.1199
+            "1": 0.6776,
+            "x": 0.2021,
+            "2": 0.1202
           },
           "over25_ft": {
             "over": 0.4954,
@@ -9287,8 +9287,8 @@
             "under": 0.6185
           },
           "gg_ht": {
-            "yes": 0.1184,
-            "no": 0.8816
+            "yes": 0.1183,
+            "no": 0.8817
           },
           "over05_ht": {
             "over": 0.6674,
@@ -9300,7 +9300,7 @@
           }
         },
         "market_calibration_weights": {
-          "1x2_ft": 0.08,
+          "1x2_ft": 0.09,
           "over25_ft": 0.06,
           "over15_ht": 0.06,
           "gg_ht": 0.06,
@@ -9312,9 +9312,9 @@
               "pick": "1",
               "probability": 0.6933,
               "probability_pct": 69.33,
-              "market_fair_probability": 0.5066,
-              "market_fair_probability_pct": 50.66,
-              "edge_pp": 18.67,
+              "market_fair_probability": 0.5194,
+              "market_fair_probability_pct": 51.94,
+              "edge_pp": 17.39,
               "score": 94.558,
               "strength": "strong",
               "color": "red",
@@ -9323,21 +9323,21 @@
               "basis": "arabsniper_raw"
             },
             "book": {
-              "pick": null,
-              "score": 0.0,
-              "strength": "none",
-              "color": "gray",
-              "marker_shape": "none",
-              "protection_pick": null
+              "pick": "1",
+              "score": 57.186,
+              "strength": "medium",
+              "color": "orange",
+              "marker_shape": "square",
+              "protection_pick": "1"
             },
-            "relation": "model_only",
+            "relation": "confirmed",
             "selections": {
               "1": {
-                "shape": "circle",
-                "color": "red",
+                "shape": "circle_square",
+                "color": "orange",
                 "model": true,
-                "book": false,
-                "agreement": false
+                "book": true,
+                "agreement": true
               },
               "x": {
                 "shape": "none",
@@ -9442,9 +9442,9 @@
               "pick": null,
               "probability": 0.1136,
               "probability_pct": 11.36,
-              "market_fair_probability": 0.1942,
-              "market_fair_probability_pct": 19.42,
-              "edge_pp": -8.06,
+              "market_fair_probability": 0.1926,
+              "market_fair_probability_pct": 19.26,
+              "edge_pp": -7.9,
               "score": 71.381,
               "strength": "none",
               "color": "none",
@@ -9453,14 +9453,14 @@
               "basis": "arabsniper_raw"
             },
             "book": {
-              "pick": null,
-              "score": 0.0,
-              "strength": "none",
-              "color": "gray",
-              "marker_shape": "none",
+              "pick": "no",
+              "score": 32.773,
+              "strength": "low",
+              "color": "yellow",
+              "marker_shape": "square",
               "protection_pick": null
             },
-            "relation": "neutral",
+            "relation": "book_only",
             "selections": {
               "yes": {
                 "shape": "none",
@@ -9470,10 +9470,10 @@
                 "agreement": false
               },
               "no": {
-                "shape": "none",
-                "color": "none",
+                "shape": "square",
+                "color": "yellow",
                 "model": false,
-                "book": false,
+                "book": true,
                 "agreement": false
               }
             }
@@ -9592,42 +9592,42 @@
         "selection_policy": "Solo segnali che superano validazione mercato, affidabilità, qualità competizione, probabilità, EV e coerenza storica.",
         "favorite_trap_pattern": {
           "available": true,
-          "score": 8.384,
-          "market_score": 0.0,
+          "score": 28.104,
+          "market_score": 34.0,
           "early_stats_score": 15.374,
           "two_goal_stats_score": 26.076,
           "ft_goal_score": 21.341,
-          "classification": "neutral",
+          "classification": "favorite_steam_only",
           "experimental": true,
           "opening_favorite": "1",
           "current_favorite": "1",
           "favorite_changed": false,
-          "cross_strength_pp": 0.0,
+          "cross_strength_pp": 0.88,
           "favorite_team": "United Arab Emirates",
           "underdog_team": "Qatar",
           "favorite_open_odd": 1.8,
-          "favorite_current_odd": 1.8,
+          "favorite_current_odd": 1.75,
           "underdog_open_odd": 4.05,
-          "underdog_current_odd": 4.05,
-          "favorite_shortening_odd": 0.0,
-          "favorite_drift_odd": -0.0,
-          "underdog_steam_odd": 0.0,
+          "underdog_current_odd": 4.2,
+          "favorite_shortening_odd": 0.05,
+          "favorite_drift_odd": -0.05,
+          "underdog_steam_odd": -0.15,
           "medium_favorite_band": true,
           "focal_170_180_band": true,
-          "favorite_steam": false,
-          "favorite_steam_band": false,
-          "favorite_fair_delta_pp": 0.0,
-          "underdog_fair_delta_pp": 0.0,
-          "favorite_oci": 0.0,
-          "underdog_oci": 0.0,
-          "underdog_book_consensus": 0.0,
-          "book_pick_1x2": null,
+          "favorite_steam": true,
+          "favorite_steam_band": true,
+          "favorite_fair_delta_pp": 1.28,
+          "underdog_fair_delta_pp": -0.88,
+          "favorite_oci": 57.186,
+          "underdog_oci": -50.253,
+          "underdog_book_consensus": 1.0,
+          "book_pick_1x2": "1",
           "book_square_underdog": false,
-          "book_square_favorite": false,
-          "protection_pick": null,
-          "favorite_margin_delta_pp": 0.0,
-          "underdog_margin_delta_pp": 0.0,
-          "margin_shift_favorite_vs_underdog_pp": 0.0,
+          "book_square_favorite": true,
+          "protection_pick": "1",
+          "favorite_margin_delta_pp": 0.312,
+          "underdog_margin_delta_pp": -0.006,
+          "margin_shift_favorite_vs_underdog_pp": 0.318,
           "favorite_conceded_ht_rate_pct": 25.95,
           "underdog_scored_ht_rate_pct": 13.69,
           "favorite_scored_ht_rate_pct": 59.46,
@@ -9690,155 +9690,158 @@
             },
             "current": {
               "odds": {
-                "1": 1.8,
-                "x": 3.4,
-                "2": 4.05
+                "1": 1.75,
+                "x": 3.44,
+                "2": 4.2
               },
               "math": {
                 "raw_probabilities": {
-                  "1": 0.5556,
-                  "x": 0.2941,
-                  "2": 0.2469
+                  "1": 0.5714,
+                  "x": 0.2907,
+                  "2": 0.2381
                 },
                 "fair_probabilities": {
-                  "1": 0.5066,
-                  "x": 0.2682,
-                  "2": 0.2252
+                  "1": 0.5194,
+                  "x": 0.2642,
+                  "2": 0.2164
                 },
-                "overround": 0.0966,
-                "overround_pct": 9.659,
-                "payout": 0.9119,
-                "payout_pct": 91.192,
+                "overround": 0.1002,
+                "overround_pct": 10.022,
+                "payout": 0.9089,
+                "payout_pct": 90.891,
                 "margin_load_pp": {
-                  "1": 4.893,
-                  "x": 2.591,
-                  "2": 2.175
+                  "1": 5.205,
+                  "x": 2.648,
+                  "2": 2.169
                 },
                 "margin_load_share": {
-                  "1": 0.5066,
-                  "x": 0.2682,
-                  "2": 0.2252
+                  "1": 0.5194,
+                  "x": 0.2642,
+                  "2": 0.2164
                 }
               },
               "bookmakers_count": 9,
               "dispersion": {
-                "1": 0.036,
-                "x": 0.225,
-                "2": 0.299
+                "1": 0.042,
+                "x": 0.224,
+                "2": 0.336
               }
             },
             "selections": {
               "1": {
                 "open_odd": 1.8,
-                "current_odd": 1.8,
-                "delta_odd": 0.0,
+                "current_odd": 1.75,
+                "delta_odd": -0.05,
                 "open_fair_probability": 0.5066,
-                "current_fair_probability": 0.5066,
-                "delta_fair_pp": 0.0,
+                "current_fair_probability": 0.5194,
+                "delta_fair_pp": 1.28,
                 "movement": {
-                  "level": "stable",
-                  "color": "gray"
+                  "level": "low",
+                  "color": "yellow"
                 },
                 "bookmaker_consensus": {
-                  "concordant": 0,
-                  "considered": 0,
-                  "ratio": 0.0
+                  "concordant": 5,
+                  "considered": 5,
+                  "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 0.0,
-                  "absolute": 0.0,
-                  "direction": "stable",
+                  "value": 57.186,
+                  "absolute": 57.186,
+                  "direction": "toward",
+                  "velocity_pp_per_hour": 1.408,
                   "components": {
-                    "magnitude": 0.0,
-                    "consensus": 0.0,
-                    "velocity": 0.0,
+                    "magnitude": 12.8,
+                    "consensus": 25.0,
+                    "velocity": 9.386,
                     "persistence": 0.0,
-                    "coverage": 0.0
+                    "coverage": 10.0
                   }
                 },
                 "margin_load_open_pp": 4.893,
-                "margin_load_current_pp": 4.893,
-                "margin_load_delta_pp": 0.0
+                "margin_load_current_pp": 5.205,
+                "margin_load_delta_pp": 0.312
               },
               "x": {
                 "open_odd": 3.4,
-                "current_odd": 3.4,
-                "delta_odd": 0.0,
+                "current_odd": 3.44,
+                "delta_odd": 0.04,
                 "open_fair_probability": 0.2682,
-                "current_fair_probability": 0.2682,
-                "delta_fair_pp": 0.0,
+                "current_fair_probability": 0.2642,
+                "delta_fair_pp": -0.4,
                 "movement": {
                   "level": "stable",
                   "color": "gray"
                 },
                 "bookmaker_consensus": {
-                  "concordant": 0,
-                  "considered": 0,
-                  "ratio": 0.0
+                  "concordant": 4,
+                  "considered": 4,
+                  "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 0.0,
-                  "absolute": 0.0,
-                  "direction": "stable",
+                  "value": -41.933,
+                  "absolute": 41.933,
+                  "direction": "away",
+                  "velocity_pp_per_hour": 0.44,
                   "components": {
-                    "magnitude": 0.0,
-                    "consensus": 0.0,
-                    "velocity": 0.0,
+                    "magnitude": 4.0,
+                    "consensus": 25.0,
+                    "velocity": 2.933,
                     "persistence": 0.0,
-                    "coverage": 0.0
+                    "coverage": 10.0
                   }
                 },
                 "margin_load_open_pp": 2.591,
-                "margin_load_current_pp": 2.591,
-                "margin_load_delta_pp": 0.0
+                "margin_load_current_pp": 2.648,
+                "margin_load_delta_pp": 0.057
               },
               "2": {
                 "open_odd": 4.05,
-                "current_odd": 4.05,
-                "delta_odd": 0.0,
+                "current_odd": 4.2,
+                "delta_odd": 0.15,
                 "open_fair_probability": 0.2252,
-                "current_fair_probability": 0.2252,
-                "delta_fair_pp": 0.0,
+                "current_fair_probability": 0.2164,
+                "delta_fair_pp": -0.88,
                 "movement": {
-                  "level": "stable",
-                  "color": "gray"
+                  "level": "low",
+                  "color": "yellow"
                 },
                 "bookmaker_consensus": {
-                  "concordant": 0,
-                  "considered": 0,
-                  "ratio": 0.0
+                  "concordant": 5,
+                  "considered": 5,
+                  "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 0.0,
-                  "absolute": 0.0,
-                  "direction": "stable",
+                  "value": -50.253,
+                  "absolute": 50.253,
+                  "direction": "away",
+                  "velocity_pp_per_hour": 0.968,
                   "components": {
-                    "magnitude": 0.0,
-                    "consensus": 0.0,
-                    "velocity": 0.0,
+                    "magnitude": 8.8,
+                    "consensus": 25.0,
+                    "velocity": 6.453,
                     "persistence": 0.0,
-                    "coverage": 0.0
+                    "coverage": 10.0
                   }
                 },
                 "margin_load_open_pp": 2.175,
-                "margin_load_current_pp": 2.175,
-                "margin_load_delta_pp": 0.0
+                "margin_load_current_pp": 2.169,
+                "margin_load_delta_pp": -0.006
               }
             },
             "aggio": {
               "open_pct": 9.659,
-              "current_pct": 9.659,
-              "delta_pp": 0.0,
+              "current_pct": 10.022,
+              "delta_pp": 0.363,
               "status": "high",
-              "payout_pct": 91.192
+              "payout_pct": 90.891
             },
             "book": {
-              "pick": null,
-              "score": 0.0,
-              "strength": "none",
-              "color": "gray",
-              "marker_shape": "none",
-              "protection_pick": null
+              "pick": "1",
+              "score": 57.186,
+              "strength": "medium",
+              "color": "orange",
+              "marker_shape": "square",
+              "protection_pick": "1"
             },
             "validation": {
               "accepted": [
@@ -9970,8 +9973,8 @@
               },
               "bookmakers_count": 7,
               "dispersion": {
-                "over": 0.047,
-                "under": 0.044
+                "over": 0.042,
+                "under": 0.041
               }
             },
             "selections": {
@@ -9988,7 +9991,7 @@
                 },
                 "bookmaker_consensus": {
                   "concordant": 0,
-                  "considered": 0,
+                  "considered": 1,
                   "ratio": 0.0
                 },
                 "oci_as": {
@@ -10020,7 +10023,7 @@
                 },
                 "bookmaker_consensus": {
                   "concordant": 0,
-                  "considered": 0,
+                  "considered": 1,
                   "ratio": 0.0
                 },
                 "oci_as": {
@@ -10180,7 +10183,7 @@
               },
               "bookmakers_count": 7,
               "dispersion": {
-                "over": 0.108,
+                "over": 0.111,
                 "under": 0.027
               }
             },
@@ -10375,116 +10378,118 @@
             },
             "current": {
               "odds": {
-                "yes": 4.75,
+                "yes": 4.8,
                 "no": 1.145
               },
               "math": {
                 "raw_probabilities": {
-                  "yes": 0.2105,
+                  "yes": 0.2083,
                   "no": 0.8734
                 },
                 "fair_probabilities": {
-                  "yes": 0.1942,
-                  "no": 0.8058
+                  "yes": 0.1926,
+                  "no": 0.8074
                 },
-                "overround": 0.0839,
-                "overround_pct": 8.389,
-                "payout": 0.9226,
-                "payout_pct": 92.26,
+                "overround": 0.0817,
+                "overround_pct": 8.17,
+                "payout": 0.9245,
+                "payout_pct": 92.447,
                 "margin_load_pp": {
-                  "yes": 1.629,
-                  "no": 6.759
+                  "yes": 1.573,
+                  "no": 6.596
                 },
                 "margin_load_share": {
-                  "yes": 0.1942,
-                  "no": 0.8058
+                  "yes": 0.1926,
+                  "no": 0.8074
                 }
               },
               "bookmakers_count": 4,
               "dispersion": {
-                "yes": 0.096,
+                "yes": 0.108,
                 "no": 0.011
               }
             },
             "selections": {
               "yes": {
                 "open_odd": 4.75,
-                "current_odd": 4.75,
-                "delta_odd": 0.0,
+                "current_odd": 4.8,
+                "delta_odd": 0.05,
                 "open_fair_probability": 0.1942,
-                "current_fair_probability": 0.1942,
-                "delta_fair_pp": 0.0,
+                "current_fair_probability": 0.1926,
+                "delta_fair_pp": -0.16,
                 "movement": {
                   "level": "stable",
                   "color": "gray"
                 },
                 "bookmaker_consensus": {
-                  "concordant": 0,
-                  "considered": 0,
-                  "ratio": 0.0
+                  "concordant": 2,
+                  "considered": 2,
+                  "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 0.0,
-                  "absolute": 0.0,
-                  "direction": "stable",
+                  "value": -32.773,
+                  "absolute": 32.773,
+                  "direction": "away",
+                  "velocity_pp_per_hour": 0.176,
                   "components": {
-                    "magnitude": 0.0,
-                    "consensus": 0.0,
-                    "velocity": 0.0,
+                    "magnitude": 1.6,
+                    "consensus": 25.0,
+                    "velocity": 1.173,
                     "persistence": 0.0,
-                    "coverage": 0.0
+                    "coverage": 5.0
                   }
                 },
                 "margin_load_open_pp": 1.629,
-                "margin_load_current_pp": 1.629,
-                "margin_load_delta_pp": 0.0
+                "margin_load_current_pp": 1.573,
+                "margin_load_delta_pp": -0.056
               },
               "no": {
                 "open_odd": 1.145,
                 "current_odd": 1.145,
                 "delta_odd": 0.0,
                 "open_fair_probability": 0.8058,
-                "current_fair_probability": 0.8058,
-                "delta_fair_pp": 0.0,
+                "current_fair_probability": 0.8074,
+                "delta_fair_pp": 0.16,
                 "movement": {
                   "level": "stable",
                   "color": "gray"
                 },
                 "bookmaker_consensus": {
-                  "concordant": 0,
-                  "considered": 0,
-                  "ratio": 0.0
+                  "concordant": 2,
+                  "considered": 2,
+                  "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 0.0,
-                  "absolute": 0.0,
-                  "direction": "stable",
+                  "value": 32.773,
+                  "absolute": 32.773,
+                  "direction": "toward",
+                  "velocity_pp_per_hour": 0.176,
                   "components": {
-                    "magnitude": 0.0,
-                    "consensus": 0.0,
-                    "velocity": 0.0,
+                    "magnitude": 1.6,
+                    "consensus": 25.0,
+                    "velocity": 1.173,
                     "persistence": 0.0,
-                    "coverage": 0.0
+                    "coverage": 5.0
                   }
                 },
                 "margin_load_open_pp": 6.759,
-                "margin_load_current_pp": 6.759,
-                "margin_load_delta_pp": 0.0
+                "margin_load_current_pp": 6.596,
+                "margin_load_delta_pp": -0.163
               }
             },
             "aggio": {
               "open_pct": 8.389,
-              "current_pct": 8.389,
-              "delta_pp": 0.0,
+              "current_pct": 8.17,
+              "delta_pp": -0.219,
               "status": "high",
-              "payout_pct": 92.26
+              "payout_pct": 92.447
             },
             "book": {
-              "pick": null,
-              "score": 0.0,
-              "strength": "none",
-              "color": "gray",
-              "marker_shape": "none",
+              "pick": "no",
+              "score": 32.773,
+              "strength": "low",
+              "color": "yellow",
+              "marker_shape": "square",
               "protection_pick": null
             },
             "validation": {
@@ -10588,7 +10593,7 @@
               "bookmakers_count": 7,
               "dispersion": {
                 "over": 0.036,
-                "under": 0.127
+                "under": 0.128
               }
             },
             "selections": {
@@ -11064,24 +11069,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "over25_rate": 0.563,
-            "gg_ht_rate": 0.1048,
-            "conceded_ht_rate": 0.2595,
             "xg_against_ft": 0.0,
-            "total_ht": 1.53,
-            "clean_sheet_rate": 0.302,
-            "over15ht_rate": 0.503,
-            "points_per_game": 2.045,
-            "goals_scored_2h": 0.922,
-            "goals_conceded_ft": 0.682,
-            "goals_conceded_2h": 0.422,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 2.192,
-            "goals_conceded_ht": 0.259,
-            "goals_scored_ht": 1.27,
             "scored_ht_rate": 0.5946,
+            "over25_rate": 0.563,
+            "over15ht_rate": 0.503,
+            "goals_scored_2h": 0.922,
+            "goals_conceded_2h": 0.422,
+            "total_ht": 1.53,
+            "goals_conceded_ht": 0.259,
+            "goals_scored_ft": 2.192,
             "xg_for_ft": 0.0,
             "total_ft": 2.874,
+            "conceded_ht_rate": 0.2595,
+            "goals_conceded_ft": 0.682,
+            "clean_sheet_rate": 0.302,
+            "xg_sample": 0.0,
+            "goals_scored_ht": 1.27,
+            "gg_ht_rate": 0.1048,
+            "points_per_game": 2.045,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -11609,24 +11614,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "over25_rate": 0.4,
-            "gg_ht_rate": 0.1369,
-            "conceded_ht_rate": 0.316,
             "xg_against_ft": 2.55,
-            "total_ht": 0.834,
-            "clean_sheet_rate": 0.362,
-            "over15ht_rate": 0.259,
-            "points_per_game": 1.526,
-            "goals_scored_2h": 0.673,
-            "goals_conceded_ft": 1.427,
-            "goals_conceded_2h": 0.73,
-            "xg_sample": 2.0,
-            "goals_scored_ft": 0.81,
-            "goals_conceded_ht": 0.697,
-            "goals_scored_ht": 0.137,
             "scored_ht_rate": 0.1369,
+            "over25_rate": 0.4,
+            "over15ht_rate": 0.259,
+            "goals_scored_2h": 0.673,
+            "goals_conceded_2h": 0.73,
+            "total_ht": 0.834,
+            "goals_conceded_ht": 0.697,
+            "goals_scored_ft": 0.81,
             "xg_for_ft": 0.508,
             "total_ft": 2.236,
+            "conceded_ht_rate": 0.316,
+            "goals_conceded_ft": 1.427,
+            "clean_sheet_rate": 0.362,
+            "xg_sample": 2.0,
+            "goals_scored_ht": 0.137,
+            "gg_ht_rate": 0.1369,
+            "points_per_game": 1.526,
             "shots_on_target_for": 1.569,
             "shots_on_target_against": 7.385,
             "total_shots_for": 5.661,
@@ -12280,7 +12285,7 @@
             "xg_against_ft": 2.55,
             "source": "api_fixture_statistics"
           },
-          "api_calls_used": 19,
+          "api_calls_used": 0,
           "api_call_budget": 20
         },
         "notes": {
@@ -12352,7 +12357,7 @@
         },
         "gg_first_half": {
           "raw_probability_pct": 11.36,
-          "calibrated_probability_pct": 11.84,
+          "calibrated_probability_pct": 11.83,
           "empirical_probability_pct": 8.46,
           "market": "gg_ht"
         },
@@ -12364,42 +12369,42 @@
         },
         "favorite_trap": {
           "available": true,
-          "score": 8.384,
-          "market_score": 0.0,
+          "score": 28.104,
+          "market_score": 34.0,
           "early_stats_score": 15.374,
           "two_goal_stats_score": 26.076,
           "ft_goal_score": 21.341,
-          "classification": "neutral",
+          "classification": "favorite_steam_only",
           "experimental": true,
           "opening_favorite": "1",
           "current_favorite": "1",
           "favorite_changed": false,
-          "cross_strength_pp": 0.0,
+          "cross_strength_pp": 0.88,
           "favorite_team": "United Arab Emirates",
           "underdog_team": "Qatar",
           "favorite_open_odd": 1.8,
-          "favorite_current_odd": 1.8,
+          "favorite_current_odd": 1.75,
           "underdog_open_odd": 4.05,
-          "underdog_current_odd": 4.05,
-          "favorite_shortening_odd": 0.0,
-          "favorite_drift_odd": -0.0,
-          "underdog_steam_odd": 0.0,
+          "underdog_current_odd": 4.2,
+          "favorite_shortening_odd": 0.05,
+          "favorite_drift_odd": -0.05,
+          "underdog_steam_odd": -0.15,
           "medium_favorite_band": true,
           "focal_170_180_band": true,
-          "favorite_steam": false,
-          "favorite_steam_band": false,
-          "favorite_fair_delta_pp": 0.0,
-          "underdog_fair_delta_pp": 0.0,
-          "favorite_oci": 0.0,
-          "underdog_oci": 0.0,
-          "underdog_book_consensus": 0.0,
-          "book_pick_1x2": null,
+          "favorite_steam": true,
+          "favorite_steam_band": true,
+          "favorite_fair_delta_pp": 1.28,
+          "underdog_fair_delta_pp": -0.88,
+          "favorite_oci": 57.186,
+          "underdog_oci": -50.253,
+          "underdog_book_consensus": 1.0,
+          "book_pick_1x2": "1",
           "book_square_underdog": false,
-          "book_square_favorite": false,
-          "protection_pick": null,
-          "favorite_margin_delta_pp": 0.0,
-          "underdog_margin_delta_pp": 0.0,
-          "margin_shift_favorite_vs_underdog_pp": 0.0,
+          "book_square_favorite": true,
+          "protection_pick": "1",
+          "favorite_margin_delta_pp": 0.312,
+          "underdog_margin_delta_pp": -0.006,
+          "margin_shift_favorite_vs_underdog_pp": 0.318,
           "favorite_conceded_ht_rate_pct": 25.95,
           "underdog_scored_ht_rate_pct": 13.69,
           "favorite_scored_ht_rate_pct": 59.46,
@@ -14957,24 +14962,24 @@
           "context_weight": 0.46,
           "expected_side": "home",
           "metrics": {
-            "over25_rate": 0.423,
-            "gg_ht_rate": 0.0,
-            "conceded_ht_rate": 0.688,
             "xg_against_ft": 0.0,
-            "total_ht": 0.893,
-            "clean_sheet_rate": 0.221,
-            "over15ht_rate": 0.0,
-            "points_per_game": 0.782,
-            "goals_scored_2h": 0.436,
-            "goals_conceded_ft": 1.282,
-            "goals_conceded_2h": 0.594,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 0.641,
-            "goals_conceded_ht": 0.688,
-            "goals_scored_ht": 0.205,
             "scored_ht_rate": 0.205,
+            "over25_rate": 0.423,
+            "over15ht_rate": 0.0,
+            "goals_scored_2h": 0.436,
+            "goals_conceded_2h": 0.594,
+            "total_ht": 0.893,
+            "goals_conceded_ht": 0.688,
+            "goals_scored_ft": 0.641,
             "xg_for_ft": 0.0,
             "total_ft": 1.924,
+            "conceded_ht_rate": 0.688,
+            "goals_conceded_ft": 1.282,
+            "clean_sheet_rate": 0.221,
+            "xg_sample": 0.0,
+            "goals_scored_ht": 0.205,
+            "gg_ht_rate": 0.0,
+            "points_per_game": 0.782,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -15084,7 +15089,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1574337,
@@ -15117,7 +15122,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1574329,
@@ -15150,7 +15155,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1574319,
@@ -15183,7 +15188,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1574315,
@@ -15386,24 +15391,24 @@
           "context_weight": 0.46,
           "expected_side": "away",
           "metrics": {
-            "over25_rate": 0.538,
-            "gg_ht_rate": 0.0623,
-            "conceded_ht_rate": 0.4632,
             "xg_against_ft": 0.0,
-            "total_ht": 0.698,
-            "clean_sheet_rate": 0.461,
-            "over15ht_rate": 0.0623,
-            "points_per_game": 0.983,
-            "goals_scored_2h": 1.449,
-            "goals_conceded_ft": 1.061,
-            "goals_conceded_2h": 0.598,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.683,
-            "goals_conceded_ht": 0.463,
-            "goals_scored_ht": 0.235,
             "scored_ht_rate": 0.2346,
+            "over25_rate": 0.538,
+            "over15ht_rate": 0.0623,
+            "goals_scored_2h": 1.449,
+            "goals_conceded_2h": 0.598,
+            "total_ht": 0.698,
+            "goals_conceded_ht": 0.463,
+            "goals_scored_ft": 1.683,
             "xg_for_ft": 0.0,
             "total_ft": 2.744,
+            "conceded_ht_rate": 0.4632,
+            "goals_conceded_ft": 1.061,
+            "clean_sheet_rate": 0.461,
+            "xg_sample": 0.0,
+            "goals_scored_ht": 0.235,
+            "gg_ht_rate": 0.0623,
+            "points_per_game": 0.983,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -15513,7 +15518,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1574346,
@@ -15546,7 +15551,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1574336,
@@ -15579,7 +15584,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1574318,
@@ -15612,7 +15617,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1574311,
@@ -15895,7 +15900,7 @@
             "xg_against_ft": 0.0,
             "source": "goals_fallback"
           },
-          "api_calls_used": 20,
+          "api_calls_used": 9,
           "api_call_budget": 20
         },
         "notes": {
@@ -18384,24 +18389,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "over25_rate": 0.669,
-            "gg_ht_rate": 0.1013,
-            "conceded_ht_rate": 0.4707,
             "xg_against_ft": 0.0,
-            "total_ht": 1.101,
-            "clean_sheet_rate": 0.297,
-            "over15ht_rate": 0.533,
-            "points_per_game": 1.063,
-            "goals_scored_2h": 1.059,
-            "goals_conceded_ft": 1.849,
-            "goals_conceded_2h": 1.009,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.32,
-            "goals_conceded_ht": 0.84,
-            "goals_scored_ht": 0.261,
             "scored_ht_rate": 0.1985,
+            "over25_rate": 0.669,
+            "over15ht_rate": 0.533,
+            "goals_scored_2h": 1.059,
+            "goals_conceded_2h": 1.009,
+            "total_ht": 1.101,
+            "goals_conceded_ht": 0.84,
+            "goals_scored_ft": 1.32,
             "xg_for_ft": 0.0,
             "total_ft": 3.168,
+            "conceded_ht_rate": 0.4707,
+            "goals_conceded_ft": 1.849,
+            "clean_sheet_rate": 0.297,
+            "xg_sample": 0.0,
+            "goals_scored_ht": 0.261,
+            "gg_ht_rate": 0.1013,
+            "points_per_game": 1.063,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -18511,7 +18516,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1637519,
@@ -18544,7 +18549,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1630307,
@@ -18577,7 +18582,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1630300,
@@ -18610,7 +18615,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1627588,
@@ -18900,24 +18905,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "over25_rate": 0.544,
-            "gg_ht_rate": 0.0757,
-            "conceded_ht_rate": 0.2182,
             "xg_against_ft": 0.0,
-            "total_ht": 0.634,
-            "clean_sheet_rate": 0.231,
-            "over15ht_rate": 0.1594,
-            "points_per_game": 1.414,
-            "goals_scored_2h": 0.839,
-            "goals_conceded_ft": 1.374,
-            "goals_conceded_2h": 0.988,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.087,
-            "goals_conceded_ht": 0.386,
-            "goals_scored_ht": 0.248,
             "scored_ht_rate": 0.2481,
+            "over25_rate": 0.544,
+            "over15ht_rate": 0.1594,
+            "goals_scored_2h": 0.839,
+            "goals_conceded_2h": 0.988,
+            "total_ht": 0.634,
+            "goals_conceded_ht": 0.386,
+            "goals_scored_ft": 1.087,
             "xg_for_ft": 0.0,
             "total_ft": 2.461,
+            "conceded_ht_rate": 0.2182,
+            "goals_conceded_ft": 1.374,
+            "clean_sheet_rate": 0.231,
+            "xg_sample": 0.0,
+            "goals_scored_ht": 0.248,
+            "gg_ht_rate": 0.0757,
+            "points_per_game": 1.414,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -19027,7 +19032,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1630313,
@@ -19060,7 +19065,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1630306,
@@ -19093,7 +19098,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1630299,
@@ -19126,7 +19131,7 @@
               "home_xg": null,
               "away_xg": null,
               "xg_available": false,
-              "xg_source": "run_budget_exhausted"
+              "xg_source": "api_fixture_statistics"
             },
             {
               "fixture_id": 1544588,
@@ -19569,7 +19574,7 @@
             "xg_against_ft": 0.0,
             "source": "goals_fallback"
           },
-          "api_calls_used": 20,
+          "api_calls_used": 17,
           "api_call_budget": 20
         },
         "notes": {
