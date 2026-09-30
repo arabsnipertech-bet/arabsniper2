@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-09-30T12:25:50+02:00",
+  "updated_at": "2026-09-30T18:44:23+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -316219,13 +316219,136 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1641713": {
+      "fixture_id": "1641713",
+      "date": "2026-09-30",
+      "time": "14:00",
+      "match": "Hong Kong - Brunei",
+      "league": "FIFA Asean Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-09-30T18:44:22+02:00",
+        "home_ft": 2,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "gg_ht",
+        "selection": "yes",
+        "odd": 10.0,
+        "probability_pct": 25.31,
+        "probability_raw_pct": 26.15,
+        "expected_value_pct": 153.1,
+        "relation": "model_only",
+        "ranking_score": 75.649,
+        "recommendation_score": 70.649,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 70.649,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 12.0,
+          "market_break_even_pct": 10.0,
+          "probability_pct": 25.31,
+          "raw_probability_pct": 26.15,
+          "expected_value_pct": 153.1,
+          "edge_over_break_even_pp": 15.31,
+          "book_disagreement_pp": 16.77,
+          "competition_quality_score": 88,
+          "bookmakers": 2,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 74.649,
+          "price_preference_adjustment": -4.0,
+          "price_profile": "very_high_price"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "orange",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.05,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-09-30T18:44:22+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 32.837,
+        "market_score": 0.0,
+        "early_stats_score": 70.05,
+        "two_goal_stats_score": 89.031,
+        "ft_goal_score": 67.55,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.0,
+        "favorite_team": "Hong Kong",
+        "underdog_team": "Brunei",
+        "favorite_open_odd": 1.02,
+        "favorite_current_odd": 1.02,
+        "underdog_open_odd": 46.0,
+        "underdog_current_odd": 46.0,
+        "favorite_shortening_odd": 0.0,
+        "favorite_drift_odd": -0.0,
+        "underdog_steam_odd": 0.0,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 0.0,
+        "underdog_fair_delta_pp": 0.0,
+        "favorite_oci": 0.0,
+        "underdog_oci": 0.0,
+        "underdog_book_consensus": 0.0,
+        "book_pick_1x2": null,
+        "book_square_underdog": false,
+        "book_square_favorite": false,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": 0.0,
+        "underdog_margin_delta_pp": 0.0,
+        "margin_shift_favorite_vs_underdog_pp": 0.0,
+        "favorite_conceded_ht_rate_pct": 25.61,
+        "underdog_scored_ht_rate_pct": 60.05,
+        "favorite_scored_ht_rate_pct": 74.75,
+        "underdog_conceded_ht_rate_pct": 64.73,
+        "pair_goal_ht_rate_pct": 92.625,
+        "pair_over15_ht_rate_pct": 57.925,
+        "pair_gg_ht_rate_pct": 19.945,
+        "pair_over25_ft_rate_pct": 58.357,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": false,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 2723,
+    "settled_primary": 2724,
     "wins": 1309,
-    "losses": 1414,
-    "win_rate_pct": 48.072,
+    "losses": 1415,
+    "win_rate_pct": 48.054,
     "by_market": {
       "1x2_ft": {
         "settled": 731,
@@ -316246,10 +316369,10 @@
         "win_rate_pct": 38.479
       },
       "gg_ht": {
-        "settled": 163,
+        "settled": 164,
         "wins": 39,
-        "losses": 124,
-        "win_rate_pct": 23.926
+        "losses": 125,
+        "win_rate_pct": 23.78
       },
       "over05_ht": {
         "settled": 5,
@@ -316266,10 +316389,10 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 1060,
+        "settled": 1061,
         "wins": 525,
-        "losses": 535,
-        "win_rate_pct": 49.528
+        "losses": 536,
+        "win_rate_pct": 49.482
       },
       "A": {
         "settled": 1207,
@@ -316298,16 +316421,16 @@
         "over25_ft_rate_pct": 46.154
       },
       "neutral": {
-        "settled": 1450,
+        "settled": 1451,
         "goal_ht": 1076,
         "over15_ht": 551,
         "gg_ht": 294,
         "over25_ft": 825,
-        "avg_pattern_score": 22.624,
-        "goal_ht_rate_pct": 74.207,
-        "over15_ht_rate_pct": 38.0,
-        "gg_ht_rate_pct": 20.276,
-        "over25_ft_rate_pct": 56.897
+        "avg_pattern_score": 22.631,
+        "goal_ht_rate_pct": 74.156,
+        "over15_ht_rate_pct": 37.974,
+        "gg_ht_rate_pct": 20.262,
+        "over25_ft_rate_pct": 56.857
       },
       "favorite_steam_only": {
         "settled": 127,
