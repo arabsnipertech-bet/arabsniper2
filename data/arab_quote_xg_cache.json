@@ -46786,8 +46786,594 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-01T04:32:33+02:00",
       "stats_schema": 2
+    },
+    "1494754": {
+      "fixture_id": "1494754",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.62,
+      "away_xg": 2.16,
+      "home_stats": {
+        "team_id": 332,
+        "team_name": "Sandefjord",
+        "xg": 0.62,
+        "shots_on_target": 1.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 759,
+        "team_name": "Viking",
+        "xg": 2.16,
+        "shots_on_target": 4.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:32+02:00",
+      "stats_schema": 2
+    },
+    "1639132": {
+      "fixture_id": "1639132",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:33+02:00",
+      "stats_schema": 2
+    },
+    "1597926": {
+      "fixture_id": "1597926",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2905,
+        "team_name": "Al-Arabi SC",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2907,
+        "team_name": "Qatar SC",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:33+02:00",
+      "stats_schema": 2
+    },
+    "1597920": {
+      "fixture_id": "1597920",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2896,
+        "team_name": "Al Ahli Doha",
+        "xg": null,
+        "shots_on_target": 12.0,
+        "total_shots": 28.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2907,
+        "team_name": "Qatar SC",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:33+02:00",
+      "stats_schema": 2
+    },
+    "1639136": {
+      "fixture_id": "1639136",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:33+02:00",
+      "stats_schema": 2
+    },
+    "1514892": {
+      "fixture_id": "1514892",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:33+02:00",
+      "stats_schema": 2
+    },
+    "1512113": {
+      "fixture_id": "1512113",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:33+02:00",
+      "stats_schema": 2
+    },
+    "1629914": {
+      "fixture_id": "1629914",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2916,
+        "team_name": "Al Shamal",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2938,
+        "team_name": "Al-Ittihad FC",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:34+02:00",
+      "stats_schema": 2
+    },
+    "1639138": {
+      "fixture_id": "1639138",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:34+02:00",
+      "stats_schema": 2
+    },
+    "1528899": {
+      "fixture_id": "1528899",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 25,
+        "team_name": "Germany",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1117,
+        "team_name": "Greece",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:35+02:00",
+      "stats_schema": 2
+    },
+    "1528862": {
+      "fixture_id": "1528862",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1118,
+        "team_name": "Netherlands",
+        "xg": null,
+        "shots_on_target": 10.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 25,
+        "team_name": "Germany",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:35+02:00",
+      "stats_schema": 2
+    },
+    "1489410": {
+      "fixture_id": "1489410",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.27,
+      "away_xg": 0.65,
+      "home_stats": {
+        "team_id": 2382,
+        "team_name": "Ecuador",
+        "xg": 1.27,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 25,
+        "team_name": "Germany",
+        "xg": 0.65,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:35+02:00",
+      "stats_schema": 2
+    },
+    "1489393": {
+      "fixture_id": "1489393",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.89,
+      "away_xg": 1.22,
+      "home_stats": {
+        "team_id": 25,
+        "team_name": "Germany",
+        "xg": 1.89,
+        "shots_on_target": 7.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1501,
+        "team_name": "Ivory Coast",
+        "xg": 1.22,
+        "shots_on_target": 2.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:35+02:00",
+      "stats_schema": 2
+    },
+    "1528896": {
+      "fixture_id": "1528896",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 14,
+        "team_name": "Serbia",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1118,
+        "team_name": "Netherlands",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 25.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:36+02:00",
+      "stats_schema": 2
+    },
+    "1528863": {
+      "fixture_id": "1528863",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 14,
+        "team_name": "Serbia",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1117,
+        "team_name": "Greece",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 26.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:36+02:00",
+      "stats_schema": 2
+    },
+    "1323362": {
+      "fixture_id": "1323362",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.99,
+      "away_xg": 1.5,
+      "home_stats": {
+        "team_id": 14,
+        "team_name": "Serbia",
+        "xg": 1.99,
+        "shots_on_target": 7.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1092,
+        "team_name": "Latvia",
+        "xg": 1.5,
+        "shots_on_target": 4.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:36+02:00",
+      "stats_schema": 2
+    },
+    "1323347": {
+      "fixture_id": "1323347",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.93,
+      "away_xg": 1.06,
+      "home_stats": {
+        "team_id": 10,
+        "team_name": "England",
+        "xg": 0.93,
+        "shots_on_target": 6.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 14,
+        "team_name": "Serbia",
+        "xg": 1.06,
+        "shots_on_target": 1.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:36+02:00",
+      "stats_schema": 2
+    },
+    "1323369": {
+      "fixture_id": "1323369",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.4,
+      "away_xg": 1.16,
+      "home_stats": {
+        "team_id": 1100,
+        "team_name": "Belarus",
+        "xg": 0.4,
+        "shots_on_target": 1.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1117,
+        "team_name": "Greece",
+        "xg": 1.16,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:37+02:00",
+      "stats_schema": 2
+    },
+    "1323357": {
+      "fixture_id": "1323357",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.78,
+      "away_xg": 1.47,
+      "home_stats": {
+        "team_id": 1117,
+        "team_name": "Greece",
+        "xg": 2.78,
+        "shots_on_target": 10.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1108,
+        "team_name": "Scotland",
+        "xg": 1.47,
+        "shots_on_target": 6.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:37+02:00",
+      "stats_schema": 2
+    },
+    "1489412": {
+      "fixture_id": "1489412",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.62,
+      "away_xg": 1.85,
+      "home_stats": {
+        "team_id": 28,
+        "team_name": "Tunisia",
+        "xg": 0.62,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1118,
+        "team_name": "Netherlands",
+        "xg": 1.85,
+        "shots_on_target": 7.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-01T05:29:37+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-01T04:35:14+02:00",
+  "updated_at": "2026-10-01T05:32:29+02:00",
   "runtime_calls_last_run": 20
 }
