@@ -1,7 +1,7 @@
 {
   "day": 5,
   "date": "2026-10-07",
-  "updated_at": "2026-10-03T04:28:29+02:00",
+  "updated_at": "2026-10-03T05:16:51+02:00",
   "matches": [
     {
       "fixture": {
@@ -32,29 +32,29 @@
           "market": "gg_ht",
           "selection": "yes",
           "odd": 4.55,
-          "probability_pct": 23.95,
-          "probability_raw_pct": 24.17,
-          "expected_value_pct": 8.972,
+          "probability_pct": 24.04,
+          "probability_raw_pct": 24.27,
+          "expected_value_pct": 9.382,
           "relation": "model_only",
-          "ranking_score": 71.764,
-          "recommendation_score": 66.764,
+          "ranking_score": 72.068,
+          "recommendation_score": 67.068,
           "grade": "C",
           "gate": {
             "eligible": true,
-            "score": 66.764,
+            "score": 67.068,
             "grade": "C",
             "reasons": [],
             "absolute_probability_floor_pct": 12.0,
             "market_break_even_pct": 21.978,
-            "probability_pct": 23.95,
-            "raw_probability_pct": 24.17,
-            "expected_value_pct": 8.972,
-            "edge_over_break_even_pp": 1.972,
-            "book_disagreement_pp": 3.72,
+            "probability_pct": 24.04,
+            "raw_probability_pct": 24.27,
+            "expected_value_pct": 9.382,
+            "edge_over_break_even_pp": 2.062,
+            "book_disagreement_pp": 3.82,
             "competition_quality_score": 72,
             "bookmakers": 5,
             "policy": "probability_floor_plus_price_edge",
-            "analytical_score_before_price_preference": 64.764,
+            "analytical_score_before_price_preference": 65.068,
             "price_preference_adjustment": 2.0,
             "price_profile": "high_return_band"
           },
@@ -72,29 +72,29 @@
             "market": "gg_ht",
             "selection": "yes",
             "odd": 4.55,
-            "probability_pct": 23.95,
-            "probability_raw_pct": 24.17,
-            "expected_value_pct": 8.972,
+            "probability_pct": 24.04,
+            "probability_raw_pct": 24.27,
+            "expected_value_pct": 9.382,
             "relation": "model_only",
-            "ranking_score": 71.764,
-            "recommendation_score": 66.764,
+            "ranking_score": 72.068,
+            "recommendation_score": 67.068,
             "grade": "C",
             "gate": {
               "eligible": true,
-              "score": 66.764,
+              "score": 67.068,
               "grade": "C",
               "reasons": [],
               "absolute_probability_floor_pct": 12.0,
               "market_break_even_pct": 21.978,
-              "probability_pct": 23.95,
-              "raw_probability_pct": 24.17,
-              "expected_value_pct": 8.972,
-              "edge_over_break_even_pp": 1.972,
-              "book_disagreement_pp": 3.72,
+              "probability_pct": 24.04,
+              "raw_probability_pct": 24.27,
+              "expected_value_pct": 9.382,
+              "edge_over_break_even_pp": 2.062,
+              "book_disagreement_pp": 3.82,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 64.764,
+              "analytical_score_before_price_preference": 65.068,
               "price_preference_adjustment": 2.0,
               "price_profile": "high_return_band"
             },
@@ -120,8 +120,8 @@
               "1": {
                 "open_odd": 1.85,
                 "current_odd": 1.85,
-                "model_probability_pct": 28.56,
-                "model_probability_raw_pct": 26.15,
+                "model_probability_pct": 28.84,
+                "model_probability_raw_pct": 26.46,
                 "book_fair_probability_pct": 50.23,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -139,8 +139,8 @@
               "x": {
                 "open_odd": 3.525,
                 "current_odd": 3.525,
-                "model_probability_pct": 28.3,
-                "model_probability_raw_pct": 28.51,
+                "model_probability_pct": 28.26,
+                "model_probability_raw_pct": 28.47,
                 "book_fair_probability_pct": 26.36,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -158,8 +158,8 @@
               "2": {
                 "open_odd": 3.97,
                 "current_odd": 3.97,
-                "model_probability_pct": 43.15,
-                "model_probability_raw_pct": 45.34,
+                "model_probability_pct": 42.9,
+                "model_probability_raw_pct": 45.07,
                 "book_fair_probability_pct": 23.41,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -247,22 +247,22 @@
             "market_calibration_weight": 0.1,
             "recommendation_gate": {
               "eligible": false,
-              "score": 62.774,
+              "score": 62.776,
               "grade": "NO",
               "reasons": [
                 "probabilita_assoluta_insufficiente"
               ],
               "absolute_probability_floor_pct": 44.0,
               "market_break_even_pct": 25.189,
-              "probability_pct": 43.15,
-              "raw_probability_pct": 45.34,
-              "expected_value_pct": 71.305,
-              "edge_over_break_even_pp": 17.961,
-              "book_disagreement_pp": 21.93,
+              "probability_pct": 42.9,
+              "raw_probability_pct": 45.07,
+              "expected_value_pct": 70.313,
+              "edge_over_break_even_pp": 17.711,
+              "book_disagreement_pp": 21.66,
               "competition_quality_score": 72,
               "bookmakers": 8,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 60.774,
+              "analytical_score_before_price_preference": 60.776,
               "price_preference_adjustment": 2.0,
               "price_profile": "high_return_band"
             },
@@ -278,8 +278,8 @@
               "over": {
                 "open_odd": 1.87,
                 "current_odd": 1.87,
-                "model_probability_pct": 43.91,
-                "model_probability_raw_pct": 43.55,
+                "model_probability_pct": 43.88,
+                "model_probability_raw_pct": 43.52,
                 "book_fair_probability_pct": 49.6,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -297,8 +297,8 @@
               "under": {
                 "open_odd": 1.84,
                 "current_odd": 1.84,
-                "model_probability_pct": 56.09,
-                "model_probability_raw_pct": 56.45,
+                "model_probability_pct": 56.12,
+                "model_probability_raw_pct": 56.48,
                 "book_fair_probability_pct": 50.4,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -374,28 +374,28 @@
             "market_calibration_weight": 0.06,
             "recommendation_gate": {
               "eligible": false,
-              "score": 59.601,
+              "score": 59.74,
               "grade": "NO",
               "reasons": [],
               "absolute_probability_floor_pct": 52.0,
               "market_break_even_pct": 54.348,
-              "probability_pct": 56.09,
-              "raw_probability_pct": 56.45,
-              "expected_value_pct": 3.206,
-              "edge_over_break_even_pp": 1.742,
-              "book_disagreement_pp": 6.05,
+              "probability_pct": 56.12,
+              "raw_probability_pct": 56.48,
+              "expected_value_pct": 3.261,
+              "edge_over_break_even_pp": 1.772,
+              "book_disagreement_pp": 6.08,
               "competition_quality_score": 72,
               "bookmakers": 6,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 56.601,
+              "analytical_score_before_price_preference": 56.74,
               "price_preference_adjustment": 3.0,
               "price_profile": "preferred_value_band"
             },
             "empirical_layer": {
-              "poisson_positive": 0.3743,
-              "empirical_positive": 0.5655,
+              "poisson_positive": 0.3773,
+              "empirical_positive": 0.5581,
               "blend_weight": 0.32,
-              "blended_positive": 0.4355
+              "blended_positive": 0.4352
             },
             "favorite_trap_adjustment_pp": 0.0
           },
@@ -409,8 +409,8 @@
               "over": {
                 "open_odd": 2.715,
                 "current_odd": 2.715,
-                "model_probability_pct": 36.45,
-                "model_probability_raw_pct": 36.65,
+                "model_probability_pct": 36.6,
+                "model_probability_raw_pct": 36.82,
                 "book_fair_probability_pct": 34.1,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -428,8 +428,8 @@
               "under": {
                 "open_odd": 1.405,
                 "current_odd": 1.405,
-                "model_probability_pct": 63.55,
-                "model_probability_raw_pct": 63.35,
+                "model_probability_pct": 63.4,
+                "model_probability_raw_pct": 63.18,
                 "book_fair_probability_pct": 65.9,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -536,33 +536,33 @@
             "market_calibration_weight": 0.08,
             "recommendation_gate": {
               "eligible": false,
-              "score": 58.631,
+              "score": 59.325,
               "grade": "NO",
               "reasons": [
                 "nessun_valore_sulla_quota"
               ],
               "absolute_probability_floor_pct": 27.0,
               "market_break_even_pct": 36.832,
-              "probability_pct": 36.45,
-              "raw_probability_pct": 36.65,
-              "expected_value_pct": -1.038,
-              "edge_over_break_even_pp": -0.382,
-              "book_disagreement_pp": 2.55,
+              "probability_pct": 36.6,
+              "raw_probability_pct": 36.82,
+              "expected_value_pct": -0.631,
+              "edge_over_break_even_pp": -0.232,
+              "book_disagreement_pp": 2.72,
               "competition_quality_score": 72,
               "bookmakers": 8,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 58.631,
+              "analytical_score_before_price_preference": 59.325,
               "price_preference_adjustment": 0.0,
               "price_profile": "preferred_value_band"
             },
             "empirical_layer": {
-              "poisson_positive": 0.3247,
+              "poisson_positive": 0.3276,
               "empirical_positive": 0.4394,
-              "team_interaction_positive": 0.3097,
+              "team_interaction_positive": 0.3119,
               "poisson_weight": 0.5,
               "empirical_weight": 0.38,
               "interaction_weight": 0.12,
-              "blended_positive": 0.3665
+              "blended_positive": 0.3682
             },
             "favorite_trap_adjustment_pp": 0.0
           },
@@ -576,8 +576,8 @@
               "yes": {
                 "open_odd": 4.55,
                 "current_odd": 4.55,
-                "model_probability_pct": 23.95,
-                "model_probability_raw_pct": 24.17,
+                "model_probability_pct": 24.04,
+                "model_probability_raw_pct": 24.27,
                 "book_fair_probability_pct": 20.45,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -595,8 +595,8 @@
               "no": {
                 "open_odd": 1.17,
                 "current_odd": 1.17,
-                "model_probability_pct": 76.05,
-                "model_probability_raw_pct": 75.83,
+                "model_probability_pct": 75.96,
+                "model_probability_raw_pct": 75.73,
                 "book_fair_probability_pct": 79.55,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -666,31 +666,31 @@
             "market_calibration_weight": 0.06,
             "recommendation_gate": {
               "eligible": true,
-              "score": 66.764,
+              "score": 67.068,
               "grade": "C",
               "reasons": [],
               "absolute_probability_floor_pct": 12.0,
               "market_break_even_pct": 21.978,
-              "probability_pct": 23.95,
-              "raw_probability_pct": 24.17,
-              "expected_value_pct": 8.972,
-              "edge_over_break_even_pp": 1.972,
-              "book_disagreement_pp": 3.72,
+              "probability_pct": 24.04,
+              "raw_probability_pct": 24.27,
+              "expected_value_pct": 9.382,
+              "edge_over_break_even_pp": 2.062,
+              "book_disagreement_pp": 3.82,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 64.764,
+              "analytical_score_before_price_preference": 65.068,
               "price_preference_adjustment": 2.0,
               "price_profile": "high_return_band"
             },
             "empirical_layer": {
-              "poisson_positive": 0.1949,
+              "poisson_positive": 0.1969,
               "empirical_positive": 0.2959,
               "team_interaction_positive": 0.2646,
               "poisson_weight": 0.5,
               "empirical_weight": 0.38,
               "interaction_weight": 0.12,
-              "blended_positive": 0.2417
+              "blended_positive": 0.2427
             },
             "favorite_trap_adjustment_pp": 0.0
           },
@@ -704,8 +704,8 @@
               "over": {
                 "open_odd": 1.375,
                 "current_odd": 1.375,
-                "model_probability_pct": 70.63,
-                "model_probability_raw_pct": 70.63,
+                "model_probability_pct": 70.6,
+                "model_probability_raw_pct": 70.6,
                 "book_fair_probability_pct": 67.69,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -723,8 +723,8 @@
               "under": {
                 "open_odd": 2.88,
                 "current_odd": 2.88,
-                "model_probability_pct": 29.37,
-                "model_probability_raw_pct": 29.37,
+                "model_probability_pct": 29.4,
+                "model_probability_raw_pct": 29.4,
                 "book_fair_probability_pct": 32.31,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -820,7 +820,7 @@
             "market_calibration_weight": 0.0,
             "recommendation_gate": {
               "eligible": false,
-              "score": 52.209,
+              "score": 52.171,
               "grade": "NO",
               "reasons": [
                 "mercato_non_validato",
@@ -828,26 +828,26 @@
               ],
               "absolute_probability_floor_pct": 62.0,
               "market_break_even_pct": 72.727,
-              "probability_pct": 70.63,
-              "raw_probability_pct": 70.63,
-              "expected_value_pct": -2.884,
-              "edge_over_break_even_pp": -2.097,
-              "book_disagreement_pp": 2.94,
+              "probability_pct": 70.6,
+              "raw_probability_pct": 70.6,
+              "expected_value_pct": -2.925,
+              "edge_over_break_even_pp": -2.127,
+              "book_disagreement_pp": 2.91,
               "competition_quality_score": 72,
               "bookmakers": 8,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 57.209,
+              "analytical_score_before_price_preference": 57.171,
               "price_preference_adjustment": -5.0,
               "price_profile": "low_price"
             },
             "empirical_layer": {
-              "poisson_positive": 0.6881,
-              "empirical_positive": 0.7116,
+              "poisson_positive": 0.6906,
+              "empirical_positive": 0.7074,
               "team_interaction_positive": 0.7654,
               "poisson_weight": 0.5,
               "empirical_weight": 0.38,
               "interaction_weight": 0.12,
-              "blended_positive": 0.7063
+              "blended_positive": 0.706
             },
             "favorite_trap_adjustment_pp": 0.0
           }
@@ -866,22 +866,22 @@
             "selection": "2",
             "gate": {
               "eligible": false,
-              "score": 62.774,
+              "score": 62.776,
               "grade": "NO",
               "reasons": [
                 "probabilita_assoluta_insufficiente"
               ],
               "absolute_probability_floor_pct": 44.0,
               "market_break_even_pct": 25.189,
-              "probability_pct": 43.15,
-              "raw_probability_pct": 45.34,
-              "expected_value_pct": 71.305,
-              "edge_over_break_even_pp": 17.961,
-              "book_disagreement_pp": 21.93,
+              "probability_pct": 42.9,
+              "raw_probability_pct": 45.07,
+              "expected_value_pct": 70.313,
+              "edge_over_break_even_pp": 17.711,
+              "book_disagreement_pp": 21.66,
               "competition_quality_score": 72,
               "bookmakers": 8,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 60.774,
+              "analytical_score_before_price_preference": 60.776,
               "price_preference_adjustment": 2.0,
               "price_profile": "high_return_band"
             },
@@ -892,20 +892,20 @@
             "selection": "under",
             "gate": {
               "eligible": false,
-              "score": 59.601,
+              "score": 59.74,
               "grade": "NO",
               "reasons": [],
               "absolute_probability_floor_pct": 52.0,
               "market_break_even_pct": 54.348,
-              "probability_pct": 56.09,
-              "raw_probability_pct": 56.45,
-              "expected_value_pct": 3.206,
-              "edge_over_break_even_pp": 1.742,
-              "book_disagreement_pp": 6.05,
+              "probability_pct": 56.12,
+              "raw_probability_pct": 56.48,
+              "expected_value_pct": 3.261,
+              "edge_over_break_even_pp": 1.772,
+              "book_disagreement_pp": 6.08,
               "competition_quality_score": 72,
               "bookmakers": 6,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 56.601,
+              "analytical_score_before_price_preference": 56.74,
               "price_preference_adjustment": 3.0,
               "price_profile": "preferred_value_band"
             },
@@ -916,22 +916,22 @@
             "selection": "over",
             "gate": {
               "eligible": false,
-              "score": 58.631,
+              "score": 59.325,
               "grade": "NO",
               "reasons": [
                 "nessun_valore_sulla_quota"
               ],
               "absolute_probability_floor_pct": 27.0,
               "market_break_even_pct": 36.832,
-              "probability_pct": 36.45,
-              "raw_probability_pct": 36.65,
-              "expected_value_pct": -1.038,
-              "edge_over_break_even_pp": -0.382,
-              "book_disagreement_pp": 2.55,
+              "probability_pct": 36.6,
+              "raw_probability_pct": 36.82,
+              "expected_value_pct": -0.631,
+              "edge_over_break_even_pp": -0.232,
+              "book_disagreement_pp": 2.72,
               "competition_quality_score": 72,
               "bookmakers": 8,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 58.631,
+              "analytical_score_before_price_preference": 59.325,
               "price_preference_adjustment": 0.0,
               "price_profile": "preferred_value_band"
             },
@@ -942,7 +942,7 @@
             "selection": "over",
             "gate": {
               "eligible": false,
-              "score": 52.209,
+              "score": 52.171,
               "grade": "NO",
               "reasons": [
                 "mercato_non_validato",
@@ -950,15 +950,15 @@
               ],
               "absolute_probability_floor_pct": 62.0,
               "market_break_even_pct": 72.727,
-              "probability_pct": 70.63,
-              "raw_probability_pct": 70.63,
-              "expected_value_pct": -2.884,
-              "edge_over_break_even_pp": -2.097,
-              "book_disagreement_pp": 2.94,
+              "probability_pct": 70.6,
+              "raw_probability_pct": 70.6,
+              "expected_value_pct": -2.925,
+              "edge_over_break_even_pp": -2.127,
+              "book_disagreement_pp": 2.91,
               "competition_quality_score": 72,
               "bookmakers": 8,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 57.209,
+              "analytical_score_before_price_preference": 57.171,
               "price_preference_adjustment": -5.0,
               "price_profile": "low_price"
             },
@@ -970,29 +970,29 @@
             "market": "gg_ht",
             "selection": "yes",
             "odd": 4.55,
-            "probability_pct": 23.95,
-            "probability_raw_pct": 24.17,
-            "expected_value_pct": 8.972,
+            "probability_pct": 24.04,
+            "probability_raw_pct": 24.27,
+            "expected_value_pct": 9.382,
             "relation": "model_only",
-            "ranking_score": 71.764,
-            "recommendation_score": 66.764,
+            "ranking_score": 72.068,
+            "recommendation_score": 67.068,
             "grade": "C",
             "gate": {
               "eligible": true,
-              "score": 66.764,
+              "score": 67.068,
               "grade": "C",
               "reasons": [],
               "absolute_probability_floor_pct": 12.0,
               "market_break_even_pct": 21.978,
-              "probability_pct": 23.95,
-              "raw_probability_pct": 24.17,
-              "expected_value_pct": 8.972,
-              "edge_over_break_even_pp": 1.972,
-              "book_disagreement_pp": 3.72,
+              "probability_pct": 24.04,
+              "raw_probability_pct": 24.27,
+              "expected_value_pct": 9.382,
+              "edge_over_break_even_pp": 2.062,
+              "book_disagreement_pp": 3.82,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 64.764,
+              "analytical_score_before_price_preference": 65.068,
               "price_preference_adjustment": 2.0,
               "price_profile": "high_return_band"
             },
@@ -1010,21 +1010,21 @@
       "model": {
         "reliability_pct": 85.0,
         "lambdas": {
-          "home_ft": 0.903,
+          "home_ft": 0.914,
           "away_ft": 1.286,
-          "total_ft": 2.189,
-          "home_ht": 0.581,
+          "total_ft": 2.2,
+          "home_ht": 0.589,
           "away_ht": 0.584,
-          "total_ht": 1.165,
+          "total_ht": 1.173,
           "goals_only": {
-            "home_ft": 0.903,
+            "home_ft": 0.914,
             "away_ft": 1.286,
-            "home_ht": 0.478,
+            "home_ht": 0.49,
             "away_ht": 0.535
           },
           "xg_only": {
             "available": false,
-            "home_ft": 0.903,
+            "home_ft": 0.914,
             "away_ft": 1.286,
             "sample_pair": 0,
             "weight": 0.0
@@ -1041,7 +1041,7 @@
             "available": false,
             "sample_pair": 0,
             "weight": 0.0,
-            "home_ft": 0.903,
+            "home_ft": 0.914,
             "away_ft": 1.286,
             "conversion_assumption_goal_per_sot": 0.3
           },
@@ -1050,7 +1050,7 @@
             "away_score_probability_input": 0.4899,
             "home_event_lambda": 0.777,
             "away_event_lambda": 0.673,
-            "base_home_ht": 0.478,
+            "base_home_ht": 0.49,
             "base_away_ht": 0.535,
             "event_weight": 0.34,
             "trend_factor": 1.003,
@@ -1060,83 +1060,83 @@
         },
         "probabilities_raw": {
           "1x2_ft": {
-            "1": 0.2615,
-            "x": 0.2851,
-            "2": 0.4534
+            "1": 0.2646,
+            "x": 0.2847,
+            "2": 0.4507
           },
           "over25_ft": {
-            "over": 0.4355,
-            "under": 0.5645
+            "over": 0.4352,
+            "under": 0.5648
           },
           "over15_ht": {
-            "over": 0.3665,
-            "under": 0.6335
+            "over": 0.3682,
+            "under": 0.6318
           },
           "gg_ht": {
-            "yes": 0.2417,
-            "no": 0.7583
+            "yes": 0.2427,
+            "no": 0.7573
           },
           "over15_ft_extra": {
-            "over": 0.6427,
-            "under": 0.3573
+            "over": 0.6454,
+            "under": 0.3546
           },
           "over05_ht": {
-            "over": 0.7063,
-            "under": 0.2937
+            "over": 0.706,
+            "under": 0.294
           }
         },
         "probabilities_calibrated": {
           "1x2_ft": {
-            "1": 0.2856,
-            "x": 0.283,
-            "2": 0.4315
+            "1": 0.2884,
+            "x": 0.2826,
+            "2": 0.429
           },
           "over25_ft": {
-            "over": 0.4391,
-            "under": 0.5609
+            "over": 0.4388,
+            "under": 0.5612
           },
           "over15_ht": {
-            "over": 0.3645,
-            "under": 0.6355
+            "over": 0.366,
+            "under": 0.634
           },
           "gg_ht": {
-            "yes": 0.2395,
-            "no": 0.7605
+            "yes": 0.2404,
+            "no": 0.7596
           },
           "over05_ht": {
-            "over": 0.7063,
-            "under": 0.2937
+            "over": 0.706,
+            "under": 0.294
           },
           "over15_ft_extra": {
-            "over": 0.6427,
-            "under": 0.3573
+            "over": 0.6454,
+            "under": 0.3546
           }
         },
         "probabilities": {
           "1x2_ft": {
-            "1": 0.2856,
-            "x": 0.283,
-            "2": 0.4315
+            "1": 0.2884,
+            "x": 0.2826,
+            "2": 0.429
           },
           "over25_ft": {
-            "over": 0.4391,
-            "under": 0.5609
+            "over": 0.4388,
+            "under": 0.5612
           },
           "over15_ht": {
-            "over": 0.3645,
-            "under": 0.6355
+            "over": 0.366,
+            "under": 0.634
           },
           "gg_ht": {
-            "yes": 0.2395,
-            "no": 0.7605
+            "yes": 0.2404,
+            "no": 0.7596
           },
           "over05_ht": {
-            "over": 0.7063,
-            "under": 0.2937
+            "over": 0.706,
+            "under": 0.294
           },
           "over15_ft_extra": {
-            "over": 0.6427,
-            "under": 0.3573
+            "over": 0.6454,
+            "under": 0.3546
           }
         },
         "market_calibration_weights": {
@@ -1150,16 +1150,16 @@
           "1x2_ft": {
             "model": {
               "pick": null,
-              "probability": 0.4534,
-              "probability_pct": 45.34,
+              "probability": 0.4507,
+              "probability_pct": 45.07,
               "market_fair_probability": 0.2341,
               "market_fair_probability_pct": 23.41,
-              "edge_pp": 21.93,
-              "score": 78.74,
+              "edge_pp": 21.66,
+              "score": 78.192,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.1683,
+              "probability_gap": 0.166,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -1198,16 +1198,16 @@
           "over25_ft": {
             "model": {
               "pick": null,
-              "probability": 0.5645,
-              "probability_pct": 56.45,
+              "probability": 0.5648,
+              "probability_pct": 56.48,
               "market_fair_probability": 0.504,
               "market_fair_probability_pct": 50.4,
-              "edge_pp": 6.05,
-              "score": 30.674,
+              "edge_pp": 6.08,
+              "score": 30.738,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.129,
+              "probability_gap": 0.1296,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -1239,16 +1239,16 @@
           "over15_ht": {
             "model": {
               "pick": null,
-              "probability": 0.3665,
-              "probability_pct": 36.65,
+              "probability": 0.3682,
+              "probability_pct": 36.82,
               "market_fair_probability": 0.341,
               "market_fair_probability_pct": 34.1,
-              "edge_pp": 2.55,
-              "score": 44.486,
+              "edge_pp": 2.72,
+              "score": 44.289,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.267,
+              "probability_gap": 0.2636,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -1280,16 +1280,16 @@
           "gg_ht": {
             "model": {
               "pick": "yes",
-              "probability": 0.2417,
-              "probability_pct": 24.17,
+              "probability": 0.2427,
+              "probability_pct": 24.27,
               "market_fair_probability": 0.2045,
               "market_fair_probability_pct": 20.45,
-              "edge_pp": 3.72,
-              "score": 58.963,
+              "edge_pp": 3.82,
+              "score": 58.847,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "circle",
-              "probability_gap": 0.5166,
+              "probability_gap": 0.5146,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -1321,16 +1321,16 @@
           "over05_ht": {
             "model": {
               "pick": null,
-              "probability": 0.7063,
-              "probability_pct": 70.63,
+              "probability": 0.706,
+              "probability_pct": 70.6,
               "market_fair_probability": 0.0,
               "market_fair_probability_pct": 0.0,
               "edge_pp": 0.0,
-              "score": 52.931,
+              "score": 52.896,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.4126,
+              "probability_gap": 0.412,
               "basis": "arabsniper_raw"
             },
             "book": {},
@@ -1356,64 +1356,64 @@
         "calibration_note": "Il cerchio e la relazione usano il modello puro; la percentuale principale integra il book fino al 12%.",
         "probabilities_poisson": {
           "1x2_ft": {
-            "1": 0.2615,
-            "x": 0.2851,
-            "2": 0.4534
+            "1": 0.2646,
+            "x": 0.2847,
+            "2": 0.4507
           },
           "over25_ft": {
-            "over": 0.3743,
-            "under": 0.6257
+            "over": 0.3773,
+            "under": 0.6227
           },
           "over15_ht": {
-            "over": 0.3247,
-            "under": 0.6753
+            "over": 0.3276,
+            "under": 0.6724
           },
           "gg_ht": {
-            "yes": 0.1949,
-            "no": 0.8051
+            "yes": 0.1969,
+            "no": 0.8031
           },
           "over15_ft_extra": {
-            "over": 0.6427,
-            "under": 0.3573
+            "over": 0.6454,
+            "under": 0.3546
           },
           "over05_ht": {
-            "over": 0.6881,
-            "under": 0.3119
+            "over": 0.6906,
+            "under": 0.3094
           }
         },
         "empirical_layer": {
           "over25_ft": {
-            "poisson_positive": 0.3743,
-            "empirical_positive": 0.5655,
+            "poisson_positive": 0.3773,
+            "empirical_positive": 0.5581,
             "blend_weight": 0.32,
-            "blended_positive": 0.4355
+            "blended_positive": 0.4352
           },
           "over15_ht": {
-            "poisson_positive": 0.3247,
+            "poisson_positive": 0.3276,
             "empirical_positive": 0.4394,
-            "team_interaction_positive": 0.3097,
+            "team_interaction_positive": 0.3119,
             "poisson_weight": 0.5,
             "empirical_weight": 0.38,
             "interaction_weight": 0.12,
-            "blended_positive": 0.3665
+            "blended_positive": 0.3682
           },
           "gg_ht": {
-            "poisson_positive": 0.1949,
+            "poisson_positive": 0.1969,
             "empirical_positive": 0.2959,
             "team_interaction_positive": 0.2646,
             "poisson_weight": 0.5,
             "empirical_weight": 0.38,
             "interaction_weight": 0.12,
-            "blended_positive": 0.2417
+            "blended_positive": 0.2427
           },
           "over05_ht": {
-            "poisson_positive": 0.6881,
-            "empirical_positive": 0.7116,
+            "poisson_positive": 0.6906,
+            "empirical_positive": 0.7074,
             "team_interaction_positive": 0.7654,
             "poisson_weight": 0.5,
             "empirical_weight": 0.38,
             "interaction_weight": 0.12,
-            "blended_positive": 0.7063
+            "blended_positive": 0.706
           },
           "team_scoring_ht": {
             "home_scores_ht": 0.5401,
@@ -1429,7 +1429,7 @@
           "market_score": 0.0,
           "early_stats_score": 63.028,
           "two_goal_stats_score": 80.524,
-          "ft_goal_score": 60.169,
+          "ft_goal_score": 58.811,
           "classification": "neutral",
           "experimental": true,
           "opening_favorite": "1",
@@ -1468,7 +1468,7 @@
           "pair_goal_ht_rate_pct": 70.555,
           "pair_over15_ht_rate_pct": 46.235,
           "pair_gg_ht_rate_pct": 31.69,
-          "pair_over25_ft_rate_pct": 56.467,
+          "pair_over25_ft_rate_pct": 55.8,
           "underdog_xg_for": 0.0,
           "favorite_xg_against": 0.0,
           "underdog_sot_for": 0.0,
@@ -2911,24 +2911,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "over15ht_rate": 0.7308,
-            "total_ht": 1.76,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.685,
-            "total_ft": 2.803,
-            "scored_ht_rate": 0.7686,
-            "conceded_ht_rate": 0.5394,
-            "goals_scored_ft": 1.847,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 1.22,
-            "gg_ht_rate": 0.4399,
-            "goals_scored_2h": 0.627,
-            "goals_conceded_ft": 0.956,
-            "goals_conceded_2h": 0.416,
-            "goals_conceded_ht": 0.539,
-            "points_per_game": 2.209,
             "clean_sheet_rate": 0.288,
+            "goals_scored_ht": 1.22,
+            "goals_scored_ft": 1.847,
+            "goals_conceded_2h": 0.416,
+            "xg_for_ft": 0.0,
+            "total_ft": 2.803,
+            "over15ht_rate": 0.7308,
+            "goals_conceded_ft": 0.956,
+            "conceded_ht_rate": 0.5394,
+            "points_per_game": 2.209,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.7686,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.627,
+            "over25_rate": 0.685,
+            "total_ht": 1.76,
+            "goals_conceded_ht": 0.539,
+            "gg_ht_rate": 0.4399,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -3514,24 +3514,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "over15ht_rate": 0.1939,
-            "total_ht": 0.737,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.429,
-            "total_ft": 2.119,
-            "scored_ht_rate": 0.4443,
-            "conceded_ht_rate": 0.2925,
-            "goals_scored_ft": 1.375,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 0.444,
-            "gg_ht_rate": 0.1939,
-            "goals_scored_2h": 0.931,
-            "goals_conceded_ft": 0.743,
-            "goals_conceded_2h": 0.451,
-            "goals_conceded_ht": 0.293,
-            "points_per_game": 1.67,
             "clean_sheet_rate": 0.374,
+            "goals_scored_ht": 0.444,
+            "goals_scored_ft": 1.375,
+            "goals_conceded_2h": 0.451,
+            "xg_for_ft": 0.0,
+            "total_ft": 2.119,
+            "over15ht_rate": 0.1939,
+            "goals_conceded_ft": 0.743,
+            "conceded_ht_rate": 0.2925,
+            "points_per_game": 1.67,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.4443,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.931,
+            "over25_rate": 0.429,
+            "total_ht": 0.737,
+            "goals_conceded_ht": 0.293,
+            "gg_ht_rate": 0.1939,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -4113,20 +4113,20 @@
         },
         "league": {
           "sample": 50,
-          "avg_home_goals": 1.7,
+          "avg_home_goals": 1.66,
           "avg_away_goals": 1.02,
-          "avg_total_ft": 2.72,
-          "avg_home_ht": 0.86,
+          "avg_total_ft": 2.68,
+          "avg_home_ht": 0.82,
           "avg_away_ht": 0.42,
-          "avg_total_ht": 1.28,
-          "over25_rate": 0.58,
+          "avg_total_ht": 1.24,
+          "over25_rate": 0.56,
           "over15ht_rate": 0.4,
           "gg_ht_rate": 0.26,
-          "draw_rate": 0.18,
+          "draw_rate": 0.2,
           "source": "api_recent_league",
-          "goal_ht_rate": 0.722,
-          "zero_zero_ht_rate": 0.278,
-          "home_scored_ht_rate": 0.5768,
+          "goal_ht_rate": 0.7106,
+          "zero_zero_ht_rate": 0.2894,
+          "home_scored_ht_rate": 0.5596,
           "away_scored_ht_rate": 0.343
         },
         "h2h": {
@@ -4256,7 +4256,7 @@
             "available": false,
             "sample_pair": 0,
             "weight": 0.0,
-            "home_ft": 0.903,
+            "home_ft": 0.914,
             "away_ft": 1.286,
             "conversion_assumption_goal_per_sot": 0.3
           }
@@ -4264,20 +4264,20 @@
       },
       "first_half_intelligence": {
         "goal_first_half": {
-          "raw_probability_pct": 70.63,
-          "calibrated_probability_pct": 70.63,
-          "lambda_total_ht": 1.165,
+          "raw_probability_pct": 70.6,
+          "calibrated_probability_pct": 70.6,
+          "lambda_total_ht": 1.173,
           "market": "over05_ht"
         },
         "over15_first_half": {
-          "raw_probability_pct": 36.65,
-          "calibrated_probability_pct": 36.45,
+          "raw_probability_pct": 36.82,
+          "calibrated_probability_pct": 36.6,
           "empirical_probability_pct": 43.94,
           "market": "over15_ht"
         },
         "gg_first_half": {
-          "raw_probability_pct": 24.17,
-          "calibrated_probability_pct": 23.95,
+          "raw_probability_pct": 24.27,
+          "calibrated_probability_pct": 24.04,
           "empirical_probability_pct": 29.59,
           "market": "gg_ht"
         },
@@ -4293,7 +4293,7 @@
           "market_score": 0.0,
           "early_stats_score": 63.028,
           "two_goal_stats_score": 80.524,
-          "ft_goal_score": 60.169,
+          "ft_goal_score": 58.811,
           "classification": "neutral",
           "experimental": true,
           "opening_favorite": "1",
@@ -4332,7 +4332,7 @@
           "pair_goal_ht_rate_pct": 70.555,
           "pair_over15_ht_rate_pct": 46.235,
           "pair_gg_ht_rate_pct": 31.69,
-          "pair_over25_ft_rate_pct": 56.467,
+          "pair_over25_ft_rate_pct": 55.8,
           "underdog_xg_for": 0.0,
           "favorite_xg_against": 0.0,
           "underdog_sot_for": 0.0,
@@ -6853,24 +6853,24 @@
           "context_weight": 0.46,
           "expected_side": "home",
           "metrics": {
-            "over15ht_rate": 0.3686,
-            "total_ht": 1.105,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.523,
-            "total_ft": 1.758,
-            "scored_ht_rate": 0.7361,
-            "conceded_ht_rate": 0.1425,
-            "goals_scored_ft": 1.473,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 0.962,
-            "gg_ht_rate": 0.1425,
-            "goals_scored_2h": 0.51,
-            "goals_conceded_ft": 0.285,
-            "goals_conceded_2h": 0.142,
-            "goals_conceded_ht": 0.142,
-            "points_per_game": 2.471,
             "clean_sheet_rate": 0.739,
+            "goals_scored_ht": 0.962,
+            "goals_scored_ft": 1.473,
+            "goals_conceded_2h": 0.142,
+            "xg_for_ft": 0.0,
+            "total_ft": 1.758,
+            "over15ht_rate": 0.3686,
+            "goals_conceded_ft": 0.285,
+            "conceded_ht_rate": 0.1425,
+            "points_per_game": 2.471,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.7361,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.51,
+            "over25_rate": 0.523,
+            "total_ht": 1.105,
+            "goals_conceded_ht": 0.142,
+            "gg_ht_rate": 0.1425,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -7195,24 +7195,24 @@
           "context_weight": 0.33,
           "expected_side": "away",
           "metrics": {
-            "over15ht_rate": 0.4338,
-            "total_ht": 0.868,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.333,
-            "total_ft": 2.228,
-            "scored_ht_rate": 0.4338,
-            "conceded_ht_rate": 0.4338,
-            "goals_scored_ft": 0.789,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 0.434,
-            "gg_ht_rate": 0.4338,
-            "goals_scored_2h": 0.355,
-            "goals_conceded_ft": 1.438,
-            "goals_conceded_2h": 1.005,
-            "goals_conceded_ht": 0.434,
-            "points_per_game": 0.533,
             "clean_sheet_rate": 0.167,
+            "goals_scored_ht": 0.434,
+            "goals_scored_ft": 0.789,
+            "goals_conceded_2h": 1.005,
+            "xg_for_ft": 0.0,
+            "total_ft": 2.228,
+            "over15ht_rate": 0.4338,
+            "goals_conceded_ft": 1.438,
+            "conceded_ht_rate": 0.4338,
+            "points_per_game": 0.533,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.4338,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.355,
+            "over25_rate": 0.333,
+            "total_ht": 0.868,
+            "goals_conceded_ht": 0.434,
+            "gg_ht_rate": 0.4338,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -7856,8 +7856,8 @@
               "1": {
                 "open_odd": 1.7,
                 "current_odd": 1.7,
-                "model_probability_pct": 23.81,
-                "model_probability_raw_pct": 21.12,
+                "model_probability_pct": 24.12,
+                "model_probability_raw_pct": 21.46,
                 "book_fair_probability_pct": 54.77,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -7875,8 +7875,8 @@
               "x": {
                 "open_odd": 3.5,
                 "current_odd": 3.5,
-                "model_probability_pct": 27.8,
-                "model_probability_raw_pct": 27.9,
+                "model_probability_pct": 27.78,
+                "model_probability_raw_pct": 27.88,
                 "book_fair_probability_pct": 26.6,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -7894,8 +7894,8 @@
               "2": {
                 "open_odd": 5.0,
                 "current_odd": 5.0,
-                "model_probability_pct": 48.39,
-                "model_probability_raw_pct": 50.98,
+                "model_probability_pct": 48.1,
+                "model_probability_raw_pct": 50.67,
                 "book_fair_probability_pct": 18.62,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -7977,22 +7977,22 @@
             "market_calibration_weight": 0.08,
             "recommendation_gate": {
               "eligible": false,
-              "score": 65.659,
+              "score": 65.296,
               "grade": "NO",
               "reasons": [
                 "modello_book_troppo_distanti"
               ],
               "absolute_probability_floor_pct": 44.0,
               "market_break_even_pct": 20.0,
-              "probability_pct": 48.39,
-              "raw_probability_pct": 50.98,
-              "expected_value_pct": 141.95,
-              "edge_over_break_even_pp": 28.39,
-              "book_disagreement_pp": 32.36,
+              "probability_pct": 48.1,
+              "raw_probability_pct": 50.67,
+              "expected_value_pct": 140.5,
+              "edge_over_break_even_pp": 28.1,
+              "book_disagreement_pp": 32.05,
               "competition_quality_score": 72,
               "bookmakers": 7,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 63.659,
+              "analytical_score_before_price_preference": 63.296,
               "price_preference_adjustment": 2.0,
               "price_profile": "high_return_band"
             },
@@ -8008,8 +8008,8 @@
               "over": {
                 "open_odd": 2.3,
                 "current_odd": 2.3,
-                "model_probability_pct": 40.02,
-                "model_probability_raw_pct": 39.93,
+                "model_probability_pct": 40.01,
+                "model_probability_raw_pct": 39.92,
                 "book_fair_probability_pct": 41.03,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -8027,8 +8027,8 @@
               "under": {
                 "open_odd": 1.6,
                 "current_odd": 1.6,
-                "model_probability_pct": 59.98,
-                "model_probability_raw_pct": 60.07,
+                "model_probability_pct": 59.99,
+                "model_probability_raw_pct": 60.08,
                 "book_fair_probability_pct": 58.97,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -8098,30 +8098,30 @@
             "market_calibration_weight": 0.08,
             "recommendation_gate": {
               "eligible": false,
-              "score": 51.146,
+              "score": 51.159,
               "grade": "NO",
               "reasons": [
                 "nessun_valore_sulla_quota"
               ],
               "absolute_probability_floor_pct": 52.0,
               "market_break_even_pct": 62.5,
-              "probability_pct": 59.98,
-              "raw_probability_pct": 60.07,
-              "expected_value_pct": -4.032,
-              "edge_over_break_even_pp": -2.52,
-              "book_disagreement_pp": 1.1,
+              "probability_pct": 59.99,
+              "raw_probability_pct": 60.08,
+              "expected_value_pct": -4.016,
+              "edge_over_break_even_pp": -2.51,
+              "book_disagreement_pp": 1.11,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 52.646,
+              "analytical_score_before_price_preference": 52.659,
               "price_preference_adjustment": -1.5,
               "price_profile": "below_preferred"
             },
             "empirical_layer": {
-              "poisson_positive": 0.3606,
-              "empirical_positive": 0.4815,
+              "poisson_positive": 0.3638,
+              "empirical_positive": 0.4745,
               "blend_weight": 0.32,
-              "blended_positive": 0.3993
+              "blended_positive": 0.3992
             },
             "favorite_trap_adjustment_pp": 0.0
           },
@@ -8135,8 +8135,8 @@
               "over": {
                 "open_odd": 3.3,
                 "current_odd": 3.3,
-                "model_probability_pct": 29.16,
-                "model_probability_raw_pct": 29.22,
+                "model_probability_pct": 29.22,
+                "model_probability_raw_pct": 29.28,
                 "book_fair_probability_pct": 28.26,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -8154,8 +8154,8 @@
               "under": {
                 "open_odd": 1.3,
                 "current_odd": 1.3,
-                "model_probability_pct": 70.84,
-                "model_probability_raw_pct": 70.78,
+                "model_probability_pct": 70.78,
+                "model_probability_raw_pct": 70.72,
                 "book_fair_probability_pct": 71.74,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -8256,7 +8256,7 @@
             "market_calibration_weight": 0.06,
             "recommendation_gate": {
               "eligible": false,
-              "score": 47.871,
+              "score": 47.946,
               "grade": "NO",
               "reasons": [
                 "nessun_valore_sulla_quota",
@@ -8264,26 +8264,26 @@
               ],
               "absolute_probability_floor_pct": 27.0,
               "market_break_even_pct": 30.303,
-              "probability_pct": 29.16,
-              "raw_probability_pct": 29.22,
-              "expected_value_pct": -3.772,
-              "edge_over_break_even_pp": -1.143,
-              "book_disagreement_pp": 0.96,
+              "probability_pct": 29.22,
+              "raw_probability_pct": 29.28,
+              "expected_value_pct": -3.574,
+              "edge_over_break_even_pp": -1.083,
+              "book_disagreement_pp": 1.02,
               "competition_quality_score": 72,
               "bookmakers": 7,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 47.871,
+              "analytical_score_before_price_preference": 47.946,
               "price_preference_adjustment": 0.0,
               "price_profile": "preferred_value_band"
             },
             "empirical_layer": {
-              "poisson_positive": 0.3236,
+              "poisson_positive": 0.3247,
               "empirical_positive": 0.2485,
-              "team_interaction_positive": 0.2999,
+              "team_interaction_positive": 0.3007,
               "poisson_weight": 0.5,
               "empirical_weight": 0.38,
               "interaction_weight": 0.12,
-              "blended_positive": 0.2922
+              "blended_positive": 0.2928
             },
             "favorite_trap_adjustment_pp": 0.0
           },
@@ -8297,8 +8297,8 @@
               "yes": {
                 "open_odd": 5.45,
                 "current_odd": 5.45,
-                "model_probability_pct": 17.75,
-                "model_probability_raw_pct": 17.79,
+                "model_probability_pct": 17.81,
+                "model_probability_raw_pct": 17.86,
                 "book_fair_probability_pct": 17.05,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -8316,8 +8316,8 @@
               "no": {
                 "open_odd": 1.12,
                 "current_odd": 1.12,
-                "model_probability_pct": 82.25,
-                "model_probability_raw_pct": 82.21,
+                "model_probability_pct": 82.19,
+                "model_probability_raw_pct": 82.14,
                 "book_fair_probability_pct": 82.95,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -8387,33 +8387,33 @@
             "market_calibration_weight": 0.06,
             "recommendation_gate": {
               "eligible": false,
-              "score": 49.859,
+              "score": 49.934,
               "grade": "NO",
               "reasons": [
                 "nessun_valore_sulla_quota"
               ],
               "absolute_probability_floor_pct": 12.0,
               "market_break_even_pct": 18.349,
-              "probability_pct": 17.75,
-              "raw_probability_pct": 17.79,
-              "expected_value_pct": -3.263,
-              "edge_over_break_even_pp": -0.599,
-              "book_disagreement_pp": 0.74,
+              "probability_pct": 17.81,
+              "raw_probability_pct": 17.86,
+              "expected_value_pct": -2.935,
+              "edge_over_break_even_pp": -0.539,
+              "book_disagreement_pp": 0.81,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 49.859,
+              "analytical_score_before_price_preference": 49.934,
               "price_preference_adjustment": 0.0,
               "price_profile": "high_return_band"
             },
             "empirical_layer": {
-              "poisson_positive": 0.1561,
+              "poisson_positive": 0.1574,
               "empirical_positive": 0.1907,
               "team_interaction_positive": 0.2286,
               "poisson_weight": 0.5,
               "empirical_weight": 0.38,
               "interaction_weight": 0.12,
-              "blended_positive": 0.1779
+              "blended_positive": 0.1786
             },
             "favorite_trap_adjustment_pp": 0.0
           },
@@ -8427,8 +8427,8 @@
               "over": {
                 "open_odd": 1.46,
                 "current_odd": 1.46,
-                "model_probability_pct": 73.52,
-                "model_probability_raw_pct": 73.52,
+                "model_probability_pct": 73.43,
+                "model_probability_raw_pct": 73.43,
                 "book_fair_probability_pct": 62.85,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -8446,8 +8446,8 @@
               "under": {
                 "open_odd": 2.47,
                 "current_odd": 2.47,
-                "model_probability_pct": 26.48,
-                "model_probability_raw_pct": 26.48,
+                "model_probability_pct": 26.57,
+                "model_probability_raw_pct": 26.57,
                 "book_fair_probability_pct": 37.15,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -8537,33 +8537,33 @@
             "market_calibration_weight": 0.0,
             "recommendation_gate": {
               "eligible": false,
-              "score": 72.575,
+              "score": 72.271,
               "grade": "NO",
               "reasons": [
                 "mercato_non_validato"
               ],
               "absolute_probability_floor_pct": 62.0,
               "market_break_even_pct": 68.493,
-              "probability_pct": 73.52,
-              "raw_probability_pct": 73.52,
-              "expected_value_pct": 7.339,
-              "edge_over_break_even_pp": 5.027,
-              "book_disagreement_pp": 10.67,
+              "probability_pct": 73.43,
+              "raw_probability_pct": 73.43,
+              "expected_value_pct": 7.208,
+              "edge_over_break_even_pp": 4.937,
+              "book_disagreement_pp": 10.58,
               "competition_quality_score": 72,
               "bookmakers": 7,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 77.575,
+              "analytical_score_before_price_preference": 77.271,
               "price_preference_adjustment": -5.0,
               "price_profile": "low_price"
             },
             "empirical_layer": {
-              "poisson_positive": 0.6868,
-              "empirical_positive": 0.7943,
+              "poisson_positive": 0.6881,
+              "empirical_positive": 0.7903,
               "team_interaction_positive": 0.7493,
               "poisson_weight": 0.5,
               "empirical_weight": 0.38,
               "interaction_weight": 0.12,
-              "blended_positive": 0.7352
+              "blended_positive": 0.7343
             },
             "favorite_trap_adjustment_pp": 0.0
           }
@@ -8582,22 +8582,22 @@
             "selection": "2",
             "gate": {
               "eligible": false,
-              "score": 65.659,
+              "score": 65.296,
               "grade": "NO",
               "reasons": [
                 "modello_book_troppo_distanti"
               ],
               "absolute_probability_floor_pct": 44.0,
               "market_break_even_pct": 20.0,
-              "probability_pct": 48.39,
-              "raw_probability_pct": 50.98,
-              "expected_value_pct": 141.95,
-              "edge_over_break_even_pp": 28.39,
-              "book_disagreement_pp": 32.36,
+              "probability_pct": 48.1,
+              "raw_probability_pct": 50.67,
+              "expected_value_pct": 140.5,
+              "edge_over_break_even_pp": 28.1,
+              "book_disagreement_pp": 32.05,
               "competition_quality_score": 72,
               "bookmakers": 7,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 63.659,
+              "analytical_score_before_price_preference": 63.296,
               "price_preference_adjustment": 2.0,
               "price_profile": "high_return_band"
             },
@@ -8608,22 +8608,22 @@
             "selection": "under",
             "gate": {
               "eligible": false,
-              "score": 51.146,
+              "score": 51.159,
               "grade": "NO",
               "reasons": [
                 "nessun_valore_sulla_quota"
               ],
               "absolute_probability_floor_pct": 52.0,
               "market_break_even_pct": 62.5,
-              "probability_pct": 59.98,
-              "raw_probability_pct": 60.07,
-              "expected_value_pct": -4.032,
-              "edge_over_break_even_pp": -2.52,
-              "book_disagreement_pp": 1.1,
+              "probability_pct": 59.99,
+              "raw_probability_pct": 60.08,
+              "expected_value_pct": -4.016,
+              "edge_over_break_even_pp": -2.51,
+              "book_disagreement_pp": 1.11,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 52.646,
+              "analytical_score_before_price_preference": 52.659,
               "price_preference_adjustment": -1.5,
               "price_profile": "below_preferred"
             },
@@ -8634,7 +8634,7 @@
             "selection": "over",
             "gate": {
               "eligible": false,
-              "score": 47.871,
+              "score": 47.946,
               "grade": "NO",
               "reasons": [
                 "nessun_valore_sulla_quota",
@@ -8642,15 +8642,15 @@
               ],
               "absolute_probability_floor_pct": 27.0,
               "market_break_even_pct": 30.303,
-              "probability_pct": 29.16,
-              "raw_probability_pct": 29.22,
-              "expected_value_pct": -3.772,
-              "edge_over_break_even_pp": -1.143,
-              "book_disagreement_pp": 0.96,
+              "probability_pct": 29.22,
+              "raw_probability_pct": 29.28,
+              "expected_value_pct": -3.574,
+              "edge_over_break_even_pp": -1.083,
+              "book_disagreement_pp": 1.02,
               "competition_quality_score": 72,
               "bookmakers": 7,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 47.871,
+              "analytical_score_before_price_preference": 47.946,
               "price_preference_adjustment": 0.0,
               "price_profile": "preferred_value_band"
             },
@@ -8661,22 +8661,22 @@
             "selection": "yes",
             "gate": {
               "eligible": false,
-              "score": 49.859,
+              "score": 49.934,
               "grade": "NO",
               "reasons": [
                 "nessun_valore_sulla_quota"
               ],
               "absolute_probability_floor_pct": 12.0,
               "market_break_even_pct": 18.349,
-              "probability_pct": 17.75,
-              "raw_probability_pct": 17.79,
-              "expected_value_pct": -3.263,
-              "edge_over_break_even_pp": -0.599,
-              "book_disagreement_pp": 0.74,
+              "probability_pct": 17.81,
+              "raw_probability_pct": 17.86,
+              "expected_value_pct": -2.935,
+              "edge_over_break_even_pp": -0.539,
+              "book_disagreement_pp": 0.81,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 49.859,
+              "analytical_score_before_price_preference": 49.934,
               "price_preference_adjustment": 0.0,
               "price_profile": "high_return_band"
             },
@@ -8687,22 +8687,22 @@
             "selection": "over",
             "gate": {
               "eligible": false,
-              "score": 72.575,
+              "score": 72.271,
               "grade": "NO",
               "reasons": [
                 "mercato_non_validato"
               ],
               "absolute_probability_floor_pct": 62.0,
               "market_break_even_pct": 68.493,
-              "probability_pct": 73.52,
-              "raw_probability_pct": 73.52,
-              "expected_value_pct": 7.339,
-              "edge_over_break_even_pp": 5.027,
-              "book_disagreement_pp": 10.67,
+              "probability_pct": 73.43,
+              "raw_probability_pct": 73.43,
+              "expected_value_pct": 7.208,
+              "edge_over_break_even_pp": 4.937,
+              "book_disagreement_pp": 10.58,
               "competition_quality_score": 72,
               "bookmakers": 7,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 77.575,
+              "analytical_score_before_price_preference": 77.271,
               "price_preference_adjustment": -5.0,
               "price_profile": "low_price"
             },
@@ -8714,21 +8714,21 @@
       "model": {
         "reliability_pct": 85.0,
         "lambdas": {
-          "home_ft": 0.771,
+          "home_ft": 0.783,
           "away_ft": 1.367,
-          "total_ft": 2.138,
-          "home_ht": 0.321,
+          "total_ft": 2.15,
+          "home_ht": 0.324,
           "away_ht": 0.841,
-          "total_ht": 1.161,
+          "total_ht": 1.165,
           "goals_only": {
-            "home_ft": 0.812,
+            "home_ft": 0.824,
             "away_ft": 1.439,
-            "home_ht": 0.244,
+            "home_ht": 0.25,
             "away_ht": 0.849
           },
           "xg_only": {
             "available": false,
-            "home_ft": 0.812,
+            "home_ft": 0.824,
             "away_ft": 1.439,
             "sample_pair": 0,
             "weight": 0.0
@@ -8745,7 +8745,7 @@
             "available": false,
             "sample_pair": 0,
             "weight": 0.0,
-            "home_ft": 0.771,
+            "home_ft": 0.783,
             "away_ft": 1.367,
             "conversion_assumption_goal_per_sot": 0.3
           },
@@ -8754,7 +8754,7 @@
             "away_score_probability_input": 0.5914,
             "home_event_lambda": 0.489,
             "away_event_lambda": 0.895,
-            "base_home_ht": 0.232,
+            "base_home_ht": 0.237,
             "base_away_ht": 0.807,
             "event_weight": 0.34,
             "trend_factor": 1.005,
@@ -8764,83 +8764,83 @@
         },
         "probabilities_raw": {
           "1x2_ft": {
-            "1": 0.2112,
-            "x": 0.279,
-            "2": 0.5098
+            "1": 0.2146,
+            "x": 0.2788,
+            "2": 0.5067
           },
           "over25_ft": {
-            "over": 0.3993,
-            "under": 0.6007
+            "over": 0.3992,
+            "under": 0.6008
+          },
+          "over15_ht": {
+            "over": 0.2928,
+            "under": 0.7072
+          },
+          "gg_ht": {
+            "yes": 0.1786,
+            "no": 0.8214
+          },
+          "over15_ft_extra": {
+            "over": 0.6331,
+            "under": 0.3669
+          },
+          "over05_ht": {
+            "over": 0.7343,
+            "under": 0.2657
+          }
+        },
+        "probabilities_calibrated": {
+          "1x2_ft": {
+            "1": 0.2412,
+            "x": 0.2778,
+            "2": 0.481
+          },
+          "over25_ft": {
+            "over": 0.4001,
+            "under": 0.5999
           },
           "over15_ht": {
             "over": 0.2922,
             "under": 0.7078
           },
           "gg_ht": {
-            "yes": 0.1779,
-            "no": 0.8221
-          },
-          "over15_ft_extra": {
-            "over": 0.6301,
-            "under": 0.3699
+            "yes": 0.1781,
+            "no": 0.8219
           },
           "over05_ht": {
-            "over": 0.7352,
-            "under": 0.2648
-          }
-        },
-        "probabilities_calibrated": {
-          "1x2_ft": {
-            "1": 0.2381,
-            "x": 0.278,
-            "2": 0.4839
-          },
-          "over25_ft": {
-            "over": 0.4002,
-            "under": 0.5998
-          },
-          "over15_ht": {
-            "over": 0.2916,
-            "under": 0.7084
-          },
-          "gg_ht": {
-            "yes": 0.1775,
-            "no": 0.8225
-          },
-          "over05_ht": {
-            "over": 0.7352,
-            "under": 0.2648
+            "over": 0.7343,
+            "under": 0.2657
           },
           "over15_ft_extra": {
-            "over": 0.6301,
-            "under": 0.3699
+            "over": 0.6331,
+            "under": 0.3669
           }
         },
         "probabilities": {
           "1x2_ft": {
-            "1": 0.2381,
-            "x": 0.278,
-            "2": 0.4839
+            "1": 0.2412,
+            "x": 0.2778,
+            "2": 0.481
           },
           "over25_ft": {
-            "over": 0.4002,
-            "under": 0.5998
+            "over": 0.4001,
+            "under": 0.5999
           },
           "over15_ht": {
-            "over": 0.2916,
-            "under": 0.7084
+            "over": 0.2922,
+            "under": 0.7078
           },
           "gg_ht": {
-            "yes": 0.1775,
-            "no": 0.8225
+            "yes": 0.1781,
+            "no": 0.8219
           },
           "over05_ht": {
-            "over": 0.7352,
-            "under": 0.2648
+            "over": 0.7343,
+            "under": 0.2657
           },
           "over15_ft_extra": {
-            "over": 0.6301,
-            "under": 0.3699
+            "over": 0.6331,
+            "under": 0.3669
           }
         },
         "market_calibration_weights": {
@@ -8854,16 +8854,16 @@
           "1x2_ft": {
             "model": {
               "pick": null,
-              "probability": 0.5098,
-              "probability_pct": 50.98,
+              "probability": 0.5067,
+              "probability_pct": 50.67,
               "market_fair_probability": 0.1862,
               "market_fair_probability_pct": 18.62,
-              "edge_pp": 32.36,
-              "score": 85.137,
+              "edge_pp": 32.05,
+              "score": 84.875,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.2308,
+              "probability_gap": 0.2279,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -8902,16 +8902,16 @@
           "over25_ft": {
             "model": {
               "pick": null,
-              "probability": 0.6007,
-              "probability_pct": 60.07,
+              "probability": 0.6008,
+              "probability_pct": 60.08,
               "market_fair_probability": 0.5897,
               "market_fair_probability_pct": 58.97,
-              "edge_pp": 1.1,
-              "score": 38.348,
+              "edge_pp": 1.11,
+              "score": 38.37,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.2014,
+              "probability_gap": 0.2016,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -8943,16 +8943,16 @@
           "over15_ht": {
             "model": {
               "pick": null,
-              "probability": 0.2922,
-              "probability_pct": 29.22,
+              "probability": 0.2928,
+              "probability_pct": 29.28,
               "market_fair_probability": 0.2826,
               "market_fair_probability_pct": 28.26,
-              "edge_pp": 0.96,
-              "score": 53.105,
+              "edge_pp": 1.02,
+              "score": 53.035,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.4156,
+              "probability_gap": 0.4144,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -8984,16 +8984,16 @@
           "gg_ht": {
             "model": {
               "pick": null,
-              "probability": 0.1779,
-              "probability_pct": 17.79,
+              "probability": 0.1786,
+              "probability_pct": 17.86,
               "market_fair_probability": 0.1705,
               "market_fair_probability_pct": 17.05,
-              "edge_pp": 0.74,
-              "score": 66.364,
+              "edge_pp": 0.81,
+              "score": 66.282,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.6442,
+              "probability_gap": 0.6428,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -9025,16 +9025,16 @@
           "over05_ht": {
             "model": {
               "pick": null,
-              "probability": 0.7352,
-              "probability_pct": 73.52,
+              "probability": 0.7343,
+              "probability_pct": 73.43,
               "market_fair_probability": 0.0,
               "market_fair_probability_pct": 0.0,
               "edge_pp": 0.0,
-              "score": 56.283,
+              "score": 56.179,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.4704,
+              "probability_gap": 0.4686,
               "basis": "arabsniper_raw"
             },
             "book": {},
@@ -9060,64 +9060,64 @@
         "calibration_note": "Il cerchio e la relazione usano il modello puro; la percentuale principale integra il book fino al 12%.",
         "probabilities_poisson": {
           "1x2_ft": {
-            "1": 0.2112,
-            "x": 0.279,
-            "2": 0.5098
+            "1": 0.2146,
+            "x": 0.2788,
+            "2": 0.5067
           },
           "over25_ft": {
-            "over": 0.3606,
-            "under": 0.6394
+            "over": 0.3638,
+            "under": 0.6362
           },
           "over15_ht": {
-            "over": 0.3236,
-            "under": 0.6764
+            "over": 0.3247,
+            "under": 0.6753
           },
           "gg_ht": {
-            "yes": 0.1561,
-            "no": 0.8439
+            "yes": 0.1574,
+            "no": 0.8426
           },
           "over15_ft_extra": {
-            "over": 0.6301,
-            "under": 0.3699
+            "over": 0.6331,
+            "under": 0.3669
           },
           "over05_ht": {
-            "over": 0.6868,
-            "under": 0.3132
+            "over": 0.6881,
+            "under": 0.3119
           }
         },
         "empirical_layer": {
           "over25_ft": {
-            "poisson_positive": 0.3606,
-            "empirical_positive": 0.4815,
+            "poisson_positive": 0.3638,
+            "empirical_positive": 0.4745,
             "blend_weight": 0.32,
-            "blended_positive": 0.3993
+            "blended_positive": 0.3992
           },
           "over15_ht": {
-            "poisson_positive": 0.3236,
+            "poisson_positive": 0.3247,
             "empirical_positive": 0.2485,
-            "team_interaction_positive": 0.2999,
+            "team_interaction_positive": 0.3007,
             "poisson_weight": 0.5,
             "empirical_weight": 0.38,
             "interaction_weight": 0.12,
-            "blended_positive": 0.2922
+            "blended_positive": 0.2928
           },
           "gg_ht": {
-            "poisson_positive": 0.1561,
+            "poisson_positive": 0.1574,
             "empirical_positive": 0.1907,
             "team_interaction_positive": 0.2286,
             "poisson_weight": 0.5,
             "empirical_weight": 0.38,
             "interaction_weight": 0.12,
-            "blended_positive": 0.1779
+            "blended_positive": 0.1786
           },
           "over05_ht": {
-            "poisson_positive": 0.6868,
-            "empirical_positive": 0.7943,
+            "poisson_positive": 0.6881,
+            "empirical_positive": 0.7903,
             "team_interaction_positive": 0.7493,
             "poisson_weight": 0.5,
             "empirical_weight": 0.38,
             "interaction_weight": 0.12,
-            "blended_positive": 0.7352
+            "blended_positive": 0.7343
           },
           "team_scoring_ht": {
             "home_scores_ht": 0.3865,
@@ -9133,7 +9133,7 @@
           "market_score": 0.0,
           "early_stats_score": 69.743,
           "two_goal_stats_score": 12.888,
-          "ft_goal_score": 28.985,
+          "ft_goal_score": 27.627,
           "classification": "neutral",
           "experimental": true,
           "opening_favorite": "1",
@@ -9172,7 +9172,7 @@
           "pair_goal_ht_rate_pct": 81.94,
           "pair_over15_ht_rate_pct": 18.075,
           "pair_gg_ht_rate_pct": 16.615,
-          "pair_over25_ft_rate_pct": 48.8,
+          "pair_over25_ft_rate_pct": 48.133,
           "underdog_xg_for": 0.0,
           "favorite_xg_against": 0.0,
           "underdog_sot_for": 0.0,
@@ -10567,24 +10567,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "over15ht_rate": 0.0481,
-            "total_ht": 0.919,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.313,
-            "total_ft": 1.867,
-            "scored_ht_rate": 0.2549,
-            "conceded_ht_rate": 0.6489,
-            "goals_scored_ft": 0.834,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 0.27,
-            "gg_ht_rate": 0.0481,
-            "goals_scored_2h": 0.563,
-            "goals_conceded_ft": 1.034,
-            "goals_conceded_2h": 0.385,
-            "goals_conceded_ht": 0.649,
-            "points_per_game": 1.292,
             "clean_sheet_rate": 0.116,
+            "goals_scored_ht": 0.27,
+            "goals_scored_ft": 0.834,
+            "goals_conceded_2h": 0.385,
+            "xg_for_ft": 0.0,
+            "total_ft": 1.867,
+            "over15ht_rate": 0.0481,
+            "goals_conceded_ft": 1.034,
+            "conceded_ht_rate": 0.6489,
+            "points_per_game": 1.292,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.2549,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.563,
+            "over25_rate": 0.313,
+            "total_ht": 0.919,
+            "goals_conceded_ht": 0.649,
+            "gg_ht_rate": 0.0481,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -11170,24 +11170,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "over15ht_rate": 0.3134,
-            "total_ht": 1.17,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.571,
-            "total_ft": 2.897,
-            "scored_ht_rate": 0.5383,
-            "conceded_ht_rate": 0.5291,
-            "goals_scored_ft": 1.473,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 0.597,
-            "gg_ht_rate": 0.2842,
-            "goals_scored_2h": 0.876,
-            "goals_conceded_ft": 1.424,
-            "goals_conceded_2h": 0.851,
-            "goals_conceded_ht": 0.574,
-            "points_per_game": 1.315,
             "clean_sheet_rate": 0.286,
+            "goals_scored_ht": 0.597,
+            "goals_scored_ft": 1.473,
+            "goals_conceded_2h": 0.851,
+            "xg_for_ft": 0.0,
+            "total_ft": 2.897,
+            "over15ht_rate": 0.3134,
+            "goals_conceded_ft": 1.424,
+            "conceded_ht_rate": 0.5291,
+            "points_per_game": 1.315,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.5383,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.876,
+            "over25_rate": 0.571,
+            "total_ht": 1.17,
+            "goals_conceded_ht": 0.574,
+            "gg_ht_rate": 0.2842,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -11769,20 +11769,20 @@
         },
         "league": {
           "sample": 50,
-          "avg_home_goals": 1.7,
+          "avg_home_goals": 1.66,
           "avg_away_goals": 1.02,
-          "avg_total_ft": 2.72,
-          "avg_home_ht": 0.86,
+          "avg_total_ft": 2.68,
+          "avg_home_ht": 0.82,
           "avg_away_ht": 0.42,
-          "avg_total_ht": 1.28,
-          "over25_rate": 0.58,
+          "avg_total_ht": 1.24,
+          "over25_rate": 0.56,
           "over15ht_rate": 0.4,
           "gg_ht_rate": 0.26,
-          "draw_rate": 0.18,
+          "draw_rate": 0.2,
           "source": "api_recent_league",
-          "goal_ht_rate": 0.722,
-          "zero_zero_ht_rate": 0.278,
-          "home_scored_ht_rate": 0.5768,
+          "goal_ht_rate": 0.7106,
+          "zero_zero_ht_rate": 0.2894,
+          "home_scored_ht_rate": 0.5596,
           "away_scored_ht_rate": 0.343
         },
         "h2h": {
@@ -11954,7 +11954,7 @@
             "available": false,
             "sample_pair": 0,
             "weight": 0.0,
-            "home_ft": 0.771,
+            "home_ft": 0.783,
             "away_ft": 1.367,
             "conversion_assumption_goal_per_sot": 0.3
           }
@@ -11962,20 +11962,20 @@
       },
       "first_half_intelligence": {
         "goal_first_half": {
-          "raw_probability_pct": 73.52,
-          "calibrated_probability_pct": 73.52,
-          "lambda_total_ht": 1.161,
+          "raw_probability_pct": 73.43,
+          "calibrated_probability_pct": 73.43,
+          "lambda_total_ht": 1.165,
           "market": "over05_ht"
         },
         "over15_first_half": {
-          "raw_probability_pct": 29.22,
-          "calibrated_probability_pct": 29.16,
+          "raw_probability_pct": 29.28,
+          "calibrated_probability_pct": 29.22,
           "empirical_probability_pct": 24.85,
           "market": "over15_ht"
         },
         "gg_first_half": {
-          "raw_probability_pct": 17.79,
-          "calibrated_probability_pct": 17.75,
+          "raw_probability_pct": 17.86,
+          "calibrated_probability_pct": 17.81,
           "empirical_probability_pct": 19.07,
           "market": "gg_ht"
         },
@@ -11991,7 +11991,7 @@
           "market_score": 0.0,
           "early_stats_score": 69.743,
           "two_goal_stats_score": 12.888,
-          "ft_goal_score": 28.985,
+          "ft_goal_score": 27.627,
           "classification": "neutral",
           "experimental": true,
           "opening_favorite": "1",
@@ -12030,7 +12030,7 @@
           "pair_goal_ht_rate_pct": 81.94,
           "pair_over15_ht_rate_pct": 18.075,
           "pair_gg_ht_rate_pct": 16.615,
-          "pair_over25_ft_rate_pct": 48.8,
+          "pair_over25_ft_rate_pct": 48.133,
           "underdog_xg_for": 0.0,
           "favorite_xg_against": 0.0,
           "underdog_sot_for": 0.0,
@@ -14783,24 +14783,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "over15ht_rate": 0.2432,
-            "total_ht": 1.209,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.685,
-            "total_ft": 2.9,
-            "scored_ht_rate": 0.5771,
-            "conceded_ht_rate": 0.484,
-            "goals_scored_ft": 1.655,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 0.693,
-            "gg_ht_rate": 0.1278,
-            "goals_scored_2h": 0.962,
-            "goals_conceded_ft": 1.245,
-            "goals_conceded_2h": 0.729,
-            "goals_conceded_ht": 0.517,
-            "points_per_game": 1.776,
             "clean_sheet_rate": 0.158,
+            "goals_scored_ht": 0.693,
+            "goals_scored_ft": 1.655,
+            "goals_conceded_2h": 0.729,
+            "xg_for_ft": 0.0,
+            "total_ft": 2.9,
+            "over15ht_rate": 0.2432,
+            "goals_conceded_ft": 1.245,
+            "conceded_ht_rate": 0.484,
+            "points_per_game": 1.776,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.5771,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.962,
+            "over25_rate": 0.685,
+            "total_ht": 1.209,
+            "goals_conceded_ht": 0.517,
+            "gg_ht_rate": 0.1278,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -15386,24 +15386,24 @@
           "context_weight": 0.46,
           "expected_side": "away",
           "metrics": {
-            "over15ht_rate": 0.4753,
-            "total_ht": 1.571,
-            "xg_for_ft": 2.466,
-            "over25_rate": 0.667,
-            "total_ft": 3.054,
-            "scored_ht_rate": 0.6989,
-            "conceded_ht_rate": 0.3086,
-            "goals_scored_ft": 2.374,
-            "xg_against_ft": 1.135,
-            "xg_sample": 2.0,
-            "goals_scored_ht": 1.158,
-            "gg_ht_rate": 0.1598,
-            "goals_scored_2h": 1.216,
-            "goals_conceded_ft": 0.681,
-            "goals_conceded_2h": 0.267,
-            "goals_conceded_ht": 0.413,
-            "points_per_game": 2.171,
             "clean_sheet_rate": 0.685,
+            "goals_scored_ht": 1.158,
+            "goals_scored_ft": 2.374,
+            "goals_conceded_2h": 0.267,
+            "xg_for_ft": 2.466,
+            "total_ft": 3.054,
+            "over15ht_rate": 0.4753,
+            "goals_conceded_ft": 0.681,
+            "conceded_ht_rate": 0.3086,
+            "points_per_game": 2.171,
+            "xg_against_ft": 1.135,
+            "scored_ht_rate": 0.6989,
+            "xg_sample": 2.0,
+            "goals_scored_2h": 1.216,
+            "over25_rate": 0.667,
+            "total_ht": 1.571,
+            "goals_conceded_ht": 0.413,
+            "gg_ht_rate": 0.1598,
             "shots_on_target_for": 6.481,
             "shots_on_target_against": 3.16,
             "total_shots_for": 20.358,
@@ -16316,8 +16316,8 @@
               "1": {
                 "open_odd": 11.0,
                 "current_odd": 11.0,
-                "model_probability_pct": 6.02,
-                "model_probability_raw_pct": 5.87,
+                "model_probability_pct": 6.07,
+                "model_probability_raw_pct": 5.92,
                 "book_fair_probability_pct": 8.36,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16335,8 +16335,8 @@
               "x": {
                 "open_odd": 5.1,
                 "current_odd": 5.1,
-                "model_probability_pct": 23.81,
-                "model_probability_raw_pct": 24.18,
+                "model_probability_pct": 23.82,
+                "model_probability_raw_pct": 24.19,
                 "book_fair_probability_pct": 18.04,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16354,8 +16354,8 @@
               "2": {
                 "open_odd": 1.25,
                 "current_odd": 1.25,
-                "model_probability_pct": 70.17,
-                "model_probability_raw_pct": 69.95,
+                "model_probability_pct": 70.11,
+                "model_probability_raw_pct": 69.89,
                 "book_fair_probability_pct": 73.6,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16444,11 +16444,11 @@
               ],
               "absolute_probability_floor_pct": 44.0,
               "market_break_even_pct": 80.0,
-              "probability_pct": 70.17,
-              "raw_probability_pct": 69.95,
-              "expected_value_pct": -12.288,
-              "edge_over_break_even_pp": -9.83,
-              "book_disagreement_pp": 3.65,
+              "probability_pct": 70.11,
+              "raw_probability_pct": 69.89,
+              "expected_value_pct": -12.363,
+              "edge_over_break_even_pp": -9.89,
+              "book_disagreement_pp": 3.71,
               "competition_quality_score": 72,
               "bookmakers": 7,
               "policy": "probability_floor_plus_price_edge",
@@ -16468,8 +16468,8 @@
               "over": {
                 "open_odd": 1.78,
                 "current_odd": 1.78,
-                "model_probability_pct": 31.94,
-                "model_probability_raw_pct": 30.14,
+                "model_probability_pct": 31.78,
+                "model_probability_raw_pct": 29.96,
                 "book_fair_probability_pct": 52.66,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16487,8 +16487,8 @@
               "under": {
                 "open_odd": 1.98,
                 "current_odd": 1.98,
-                "model_probability_pct": 68.06,
-                "model_probability_raw_pct": 69.86,
+                "model_probability_pct": 68.22,
+                "model_probability_raw_pct": 70.04,
                 "book_fair_probability_pct": 47.34,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16558,30 +16558,30 @@
             "market_calibration_weight": 0.08,
             "recommendation_gate": {
               "eligible": false,
-              "score": 74.148,
+              "score": 73.938,
               "grade": "NO",
               "reasons": [
                 "modello_book_troppo_distanti"
               ],
               "absolute_probability_floor_pct": 52.0,
               "market_break_even_pct": 50.505,
-              "probability_pct": 68.06,
-              "raw_probability_pct": 69.86,
-              "expected_value_pct": 34.759,
-              "edge_over_break_even_pp": 17.555,
-              "book_disagreement_pp": 22.52,
+              "probability_pct": 68.22,
+              "raw_probability_pct": 70.04,
+              "expected_value_pct": 35.076,
+              "edge_over_break_even_pp": 17.715,
+              "book_disagreement_pp": 22.7,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 71.148,
+              "analytical_score_before_price_preference": 70.938,
               "price_preference_adjustment": 3.0,
               "price_profile": "preferred_value_band"
             },
             "empirical_layer": {
-              "poisson_positive": 0.2624,
-              "empirical_positive": 0.3842,
+              "poisson_positive": 0.263,
+              "empirical_positive": 0.3772,
               "blend_weight": 0.32,
-              "blended_positive": 0.3014
+              "blended_positive": 0.2996
             },
             "favorite_trap_adjustment_pp": 0.0
           },
@@ -16595,8 +16595,8 @@
               "over": {
                 "open_odd": 2.61,
                 "current_odd": 2.61,
-                "model_probability_pct": 22.9,
-                "model_probability_raw_pct": 22.08,
+                "model_probability_pct": 22.95,
+                "model_probability_raw_pct": 22.14,
                 "book_fair_probability_pct": 35.71,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16614,8 +16614,8 @@
               "under": {
                 "open_odd": 1.45,
                 "current_odd": 1.45,
-                "model_probability_pct": 77.1,
-                "model_probability_raw_pct": 77.92,
+                "model_probability_pct": 77.05,
+                "model_probability_raw_pct": 77.86,
                 "book_fair_probability_pct": 64.29,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16711,13 +16711,13 @@
               ]
             },
             "empirical_layer": {
-              "poisson_positive": 0.178,
+              "poisson_positive": 0.179,
               "empirical_positive": 0.2948,
-              "team_interaction_positive": 0.1648,
+              "team_interaction_positive": 0.1655,
               "poisson_weight": 0.5,
               "empirical_weight": 0.38,
               "interaction_weight": 0.12,
-              "blended_positive": 0.2208
+              "blended_positive": 0.2214
             },
             "favorite_trap_adjustment_pp": 0.0
           },
@@ -16731,8 +16731,8 @@
               "yes": {
                 "open_odd": 5.75,
                 "current_odd": 5.75,
-                "model_probability_pct": 12.95,
-                "model_probability_raw_pct": 12.74,
+                "model_probability_pct": 12.98,
+                "model_probability_raw_pct": 12.78,
                 "book_fair_probability_pct": 16.18,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16750,8 +16750,8 @@
               "no": {
                 "open_odd": 1.11,
                 "current_odd": 1.11,
-                "model_probability_pct": 87.05,
-                "model_probability_raw_pct": 87.26,
+                "model_probability_pct": 87.02,
+                "model_probability_raw_pct": 87.22,
                 "book_fair_probability_pct": 83.82,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16821,33 +16821,33 @@
             "market_calibration_weight": 0.06,
             "recommendation_gate": {
               "eligible": false,
-              "score": 43.859,
+              "score": 43.896,
               "grade": "NO",
               "reasons": [
                 "nessun_valore_sulla_quota"
               ],
               "absolute_probability_floor_pct": 12.0,
               "market_break_even_pct": 17.391,
-              "probability_pct": 12.95,
-              "raw_probability_pct": 12.74,
-              "expected_value_pct": -25.538,
-              "edge_over_break_even_pp": -4.441,
-              "book_disagreement_pp": 3.44,
+              "probability_pct": 12.98,
+              "raw_probability_pct": 12.78,
+              "expected_value_pct": -25.365,
+              "edge_over_break_even_pp": -4.411,
+              "book_disagreement_pp": 3.4,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 43.859,
+              "analytical_score_before_price_preference": 43.896,
               "price_preference_adjustment": 0.0,
               "price_profile": "high_return_band"
             },
             "empirical_layer": {
-              "poisson_positive": 0.0908,
+              "poisson_positive": 0.0917,
               "empirical_positive": 0.1762,
               "team_interaction_positive": 0.1252,
               "poisson_weight": 0.5,
               "empirical_weight": 0.38,
               "interaction_weight": 0.12,
-              "blended_positive": 0.1274
+              "blended_positive": 0.1278
             },
             "favorite_trap_adjustment_pp": 0.0
           },
@@ -16861,8 +16861,8 @@
               "over": {
                 "open_odd": 1.335,
                 "current_odd": 1.335,
-                "model_probability_pct": 57.7,
-                "model_probability_raw_pct": 56.97,
+                "model_probability_pct": 57.59,
+                "model_probability_raw_pct": 56.86,
                 "book_fair_probability_pct": 69.1,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16880,8 +16880,8 @@
               "under": {
                 "open_odd": 2.985,
                 "current_odd": 2.985,
-                "model_probability_pct": 42.3,
-                "model_probability_raw_pct": 43.03,
+                "model_probability_pct": 42.41,
+                "model_probability_raw_pct": 43.14,
                 "book_fair_probability_pct": 30.9,
                 "delta_odd": 0.0,
                 "delta_fair_pp": 0.0,
@@ -16964,13 +16964,13 @@
               ]
             },
             "empirical_layer": {
-              "poisson_positive": 0.5342,
-              "empirical_positive": 0.6124,
+              "poisson_positive": 0.5351,
+              "empirical_positive": 0.6084,
               "team_interaction_positive": 0.5825,
               "poisson_weight": 0.5,
               "empirical_weight": 0.38,
               "interaction_weight": 0.12,
-              "blended_positive": 0.5697
+              "blended_positive": 0.5686
             },
             "favorite_trap_adjustment_pp": 0.0
           }
@@ -16996,11 +16996,11 @@
               ],
               "absolute_probability_floor_pct": 44.0,
               "market_break_even_pct": 80.0,
-              "probability_pct": 70.17,
-              "raw_probability_pct": 69.95,
-              "expected_value_pct": -12.288,
-              "edge_over_break_even_pp": -9.83,
-              "book_disagreement_pp": 3.65,
+              "probability_pct": 70.11,
+              "raw_probability_pct": 69.89,
+              "expected_value_pct": -12.363,
+              "edge_over_break_even_pp": -9.89,
+              "book_disagreement_pp": 3.71,
               "competition_quality_score": 72,
               "bookmakers": 7,
               "policy": "probability_floor_plus_price_edge",
@@ -17015,22 +17015,22 @@
             "selection": "under",
             "gate": {
               "eligible": false,
-              "score": 74.148,
+              "score": 73.938,
               "grade": "NO",
               "reasons": [
                 "modello_book_troppo_distanti"
               ],
               "absolute_probability_floor_pct": 52.0,
               "market_break_even_pct": 50.505,
-              "probability_pct": 68.06,
-              "raw_probability_pct": 69.86,
-              "expected_value_pct": 34.759,
-              "edge_over_break_even_pp": 17.555,
-              "book_disagreement_pp": 22.52,
+              "probability_pct": 68.22,
+              "raw_probability_pct": 70.04,
+              "expected_value_pct": 35.076,
+              "edge_over_break_even_pp": 17.715,
+              "book_disagreement_pp": 22.7,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 71.148,
+              "analytical_score_before_price_preference": 70.938,
               "price_preference_adjustment": 3.0,
               "price_profile": "preferred_value_band"
             },
@@ -17054,22 +17054,22 @@
             "selection": "yes",
             "gate": {
               "eligible": false,
-              "score": 43.859,
+              "score": 43.896,
               "grade": "NO",
               "reasons": [
                 "nessun_valore_sulla_quota"
               ],
               "absolute_probability_floor_pct": 12.0,
               "market_break_even_pct": 17.391,
-              "probability_pct": 12.95,
-              "raw_probability_pct": 12.74,
-              "expected_value_pct": -25.538,
-              "edge_over_break_even_pp": -4.441,
-              "book_disagreement_pp": 3.44,
+              "probability_pct": 12.98,
+              "raw_probability_pct": 12.78,
+              "expected_value_pct": -25.365,
+              "edge_over_break_even_pp": -4.411,
+              "book_disagreement_pp": 3.4,
               "competition_quality_score": 72,
               "bookmakers": 5,
               "policy": "probability_floor_plus_price_edge",
-              "analytical_score_before_price_preference": 43.859,
+              "analytical_score_before_price_preference": 43.896,
               "price_preference_adjustment": 0.0,
               "price_profile": "high_return_band"
             },
@@ -17094,21 +17094,21 @@
       "model": {
         "reliability_pct": 85.0,
         "lambdas": {
-          "home_ft": 0.254,
+          "home_ft": 0.256,
           "away_ft": 1.52,
-          "total_ft": 1.774,
-          "home_ht": 0.262,
+          "total_ft": 1.777,
+          "home_ht": 0.265,
           "away_ht": 0.501,
-          "total_ht": 0.764,
+          "total_ht": 0.766,
           "goals_only": {
-            "home_ft": 0.267,
+            "home_ft": 0.27,
             "away_ft": 1.6,
-            "home_ht": 0.181,
+            "home_ht": 0.185,
             "away_ht": 0.553
           },
           "xg_only": {
             "available": false,
-            "home_ft": 0.267,
+            "home_ft": 0.27,
             "away_ft": 1.6,
             "sample_pair": 0,
             "weight": 0.0
@@ -17125,7 +17125,7 @@
             "available": false,
             "sample_pair": 0,
             "weight": 0.0,
-            "home_ft": 0.254,
+            "home_ft": 0.256,
             "away_ft": 1.52,
             "conversion_assumption_goal_per_sot": 0.3
           },
@@ -17134,7 +17134,7 @@
             "away_score_probability_input": 0.3574,
             "home_event_lambda": 0.431,
             "away_event_lambda": 0.442,
-            "base_home_ht": 0.172,
+            "base_home_ht": 0.176,
             "base_away_ht": 0.525,
             "event_weight": 0.34,
             "trend_factor": 1.009,
@@ -17144,83 +17144,83 @@
         },
         "probabilities_raw": {
           "1x2_ft": {
-            "1": 0.0587,
-            "x": 0.2418,
-            "2": 0.6995
+            "1": 0.0592,
+            "x": 0.2419,
+            "2": 0.6989
           },
           "over25_ft": {
-            "over": 0.3014,
-            "under": 0.6986
+            "over": 0.2996,
+            "under": 0.7004
           },
           "over15_ht": {
-            "over": 0.2208,
-            "under": 0.7792
+            "over": 0.2214,
+            "under": 0.7786
           },
           "gg_ht": {
-            "yes": 0.1274,
-            "no": 0.8726
+            "yes": 0.1278,
+            "no": 0.8722
           },
           "over15_ft_extra": {
-            "over": 0.5294,
-            "under": 0.4706
+            "over": 0.53,
+            "under": 0.47
           },
           "over05_ht": {
-            "over": 0.5697,
-            "under": 0.4303
+            "over": 0.5686,
+            "under": 0.4314
           }
         },
         "probabilities_calibrated": {
           "1x2_ft": {
-            "1": 0.0602,
-            "x": 0.2381,
-            "2": 0.7017
+            "1": 0.0607,
+            "x": 0.2382,
+            "2": 0.7011
           },
           "over25_ft": {
-            "over": 0.3194,
-            "under": 0.6806
+            "over": 0.3178,
+            "under": 0.6822
           },
           "over15_ht": {
-            "over": 0.229,
-            "under": 0.771
+            "over": 0.2295,
+            "under": 0.7705
           },
           "gg_ht": {
-            "yes": 0.1295,
-            "no": 0.8705
+            "yes": 0.1298,
+            "no": 0.8702
           },
           "over05_ht": {
-            "over": 0.577,
-            "under": 0.423
+            "over": 0.5759,
+            "under": 0.4241
           },
           "over15_ft_extra": {
-            "over": 0.5294,
-            "under": 0.4706
+            "over": 0.53,
+            "under": 0.47
           }
         },
         "probabilities": {
           "1x2_ft": {
-            "1": 0.0602,
-            "x": 0.2381,
-            "2": 0.7017
+            "1": 0.0607,
+            "x": 0.2382,
+            "2": 0.7011
           },
           "over25_ft": {
-            "over": 0.3194,
-            "under": 0.6806
+            "over": 0.3178,
+            "under": 0.6822
           },
           "over15_ht": {
-            "over": 0.229,
-            "under": 0.771
+            "over": 0.2295,
+            "under": 0.7705
           },
           "gg_ht": {
-            "yes": 0.1295,
-            "no": 0.8705
+            "yes": 0.1298,
+            "no": 0.8702
           },
           "over05_ht": {
-            "over": 0.577,
-            "under": 0.423
+            "over": 0.5759,
+            "under": 0.4241
           },
           "over15_ft_extra": {
-            "over": 0.5294,
-            "under": 0.4706
+            "over": 0.53,
+            "under": 0.47
           }
         },
         "market_calibration_weights": {
@@ -17234,16 +17234,16 @@
           "1x2_ft": {
             "model": {
               "pick": null,
-              "probability": 0.6995,
-              "probability_pct": 69.95,
+              "probability": 0.6989,
+              "probability_pct": 69.89,
               "market_fair_probability": 0.736,
               "market_fair_probability_pct": 73.6,
-              "edge_pp": -3.65,
+              "edge_pp": -3.71,
               "score": 97.0,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.4577,
+              "probability_gap": 0.457,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -17282,16 +17282,16 @@
           "over25_ft": {
             "model": {
               "pick": null,
-              "probability": 0.6986,
-              "probability_pct": 69.86,
+              "probability": 0.7004,
+              "probability_pct": 70.04,
               "market_fair_probability": 0.4734,
               "market_fair_probability_pct": 47.34,
-              "edge_pp": 22.52,
-              "score": 52.038,
+              "edge_pp": 22.7,
+              "score": 52.246,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.3972,
+              "probability_gap": 0.4008,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -17364,16 +17364,16 @@
           "gg_ht": {
             "model": {
               "pick": null,
-              "probability": 0.1274,
-              "probability_pct": 12.74,
+              "probability": 0.1278,
+              "probability_pct": 12.78,
               "market_fair_probability": 0.1618,
               "market_fair_probability_pct": 16.18,
-              "edge_pp": -3.44,
-              "score": 72.222,
+              "edge_pp": -3.4,
+              "score": 72.175,
               "strength": "none",
               "color": "none",
               "marker_shape": "none",
-              "probability_gap": 0.7452,
+              "probability_gap": 0.7444,
               "basis": "arabsniper_raw"
             },
             "book": {
@@ -17447,64 +17447,64 @@
         "calibration_note": "Il cerchio e la relazione usano il modello puro; la percentuale principale integra il book fino al 12%.",
         "probabilities_poisson": {
           "1x2_ft": {
-            "1": 0.0587,
-            "x": 0.2418,
-            "2": 0.6995
+            "1": 0.0592,
+            "x": 0.2419,
+            "2": 0.6989
           },
           "over25_ft": {
-            "over": 0.2624,
-            "under": 0.7376
+            "over": 0.263,
+            "under": 0.737
           },
           "over15_ht": {
-            "over": 0.178,
-            "under": 0.822
+            "over": 0.179,
+            "under": 0.821
           },
           "gg_ht": {
-            "yes": 0.0908,
-            "no": 0.9092
+            "yes": 0.0917,
+            "no": 0.9083
           },
           "over15_ft_extra": {
-            "over": 0.5294,
-            "under": 0.4706
+            "over": 0.53,
+            "under": 0.47
           },
           "over05_ht": {
-            "over": 0.5342,
-            "under": 0.4658
+            "over": 0.5351,
+            "under": 0.4649
           }
         },
         "empirical_layer": {
           "over25_ft": {
-            "poisson_positive": 0.2624,
-            "empirical_positive": 0.3842,
+            "poisson_positive": 0.263,
+            "empirical_positive": 0.3772,
             "blend_weight": 0.32,
-            "blended_positive": 0.3014
+            "blended_positive": 0.2996
           },
           "over15_ht": {
-            "poisson_positive": 0.178,
+            "poisson_positive": 0.179,
             "empirical_positive": 0.2948,
-            "team_interaction_positive": 0.1648,
+            "team_interaction_positive": 0.1655,
             "poisson_weight": 0.5,
             "empirical_weight": 0.38,
             "interaction_weight": 0.12,
-            "blended_positive": 0.2208
+            "blended_positive": 0.2214
           },
           "gg_ht": {
-            "poisson_positive": 0.0908,
+            "poisson_positive": 0.0917,
             "empirical_positive": 0.1762,
             "team_interaction_positive": 0.1252,
             "poisson_weight": 0.5,
             "empirical_weight": 0.38,
             "interaction_weight": 0.12,
-            "blended_positive": 0.1274
+            "blended_positive": 0.1278
           },
           "over05_ht": {
-            "poisson_positive": 0.5342,
-            "empirical_positive": 0.6124,
+            "poisson_positive": 0.5351,
+            "empirical_positive": 0.6084,
             "team_interaction_positive": 0.5825,
             "poisson_weight": 0.5,
             "empirical_weight": 0.38,
             "interaction_weight": 0.12,
-            "blended_positive": 0.5697
+            "blended_positive": 0.5686
           },
           "team_scoring_ht": {
             "home_scores_ht": 0.3504,
@@ -17559,7 +17559,7 @@
           "pair_goal_ht_rate_pct": 56.565,
           "pair_over15_ht_rate_pct": 23.355,
           "pair_gg_ht_rate_pct": 14.195,
-          "pair_over25_ft_rate_pct": 36.333,
+          "pair_over25_ft_rate_pct": 35.667,
           "underdog_xg_for": 0.0,
           "favorite_xg_against": 0.0,
           "underdog_sot_for": 0.0,
@@ -18902,24 +18902,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "over15ht_rate": 0.225,
-            "total_ht": 1.22,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.313,
-            "total_ft": 2.219,
-            "scored_ht_rate": 0.4705,
-            "conceded_ht_rate": 0.4823,
-            "goals_scored_ft": 0.556,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 0.471,
-            "gg_ht_rate": 0.0856,
-            "goals_scored_2h": 0.086,
-            "goals_conceded_ft": 1.663,
-            "goals_conceded_2h": 0.914,
-            "goals_conceded_ht": 0.749,
-            "points_per_game": 0.785,
             "clean_sheet_rate": 0.116,
+            "goals_scored_ht": 0.471,
+            "goals_scored_ft": 0.556,
+            "goals_conceded_2h": 0.914,
+            "xg_for_ft": 0.0,
+            "total_ft": 2.219,
+            "over15ht_rate": 0.225,
+            "goals_conceded_ft": 1.663,
+            "conceded_ht_rate": 0.4823,
+            "points_per_game": 0.785,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.4705,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.086,
+            "over25_rate": 0.313,
+            "total_ht": 1.22,
+            "goals_conceded_ht": 0.749,
+            "gg_ht_rate": 0.0856,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -19505,24 +19505,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "over15ht_rate": 0.2421,
-            "total_ht": 0.535,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.197,
-            "total_ft": 1.539,
-            "scored_ht_rate": 0.2421,
-            "conceded_ht_rate": 0.2202,
-            "goals_scored_ft": 1.034,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 0.315,
-            "gg_ht_rate": 0.1983,
-            "goals_scored_2h": 0.72,
-            "goals_conceded_ft": 0.505,
-            "goals_conceded_2h": 0.284,
-            "goals_conceded_ht": 0.22,
-            "points_per_game": 1.914,
             "clean_sheet_rate": 0.776,
+            "goals_scored_ht": 0.315,
+            "goals_scored_ft": 1.034,
+            "goals_conceded_2h": 0.284,
+            "xg_for_ft": 0.0,
+            "total_ft": 1.539,
+            "over15ht_rate": 0.2421,
+            "goals_conceded_ft": 0.505,
+            "conceded_ht_rate": 0.2202,
+            "points_per_game": 1.914,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.2421,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.72,
+            "over25_rate": 0.197,
+            "total_ht": 0.535,
+            "goals_conceded_ht": 0.22,
+            "gg_ht_rate": 0.1983,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -20104,20 +20104,20 @@
         },
         "league": {
           "sample": 50,
-          "avg_home_goals": 1.7,
+          "avg_home_goals": 1.66,
           "avg_away_goals": 1.02,
-          "avg_total_ft": 2.72,
-          "avg_home_ht": 0.86,
+          "avg_total_ft": 2.68,
+          "avg_home_ht": 0.82,
           "avg_away_ht": 0.42,
-          "avg_total_ht": 1.28,
-          "over25_rate": 0.58,
+          "avg_total_ht": 1.24,
+          "over25_rate": 0.56,
           "over15ht_rate": 0.4,
           "gg_ht_rate": 0.26,
-          "draw_rate": 0.18,
+          "draw_rate": 0.2,
           "source": "api_recent_league",
-          "goal_ht_rate": 0.722,
-          "zero_zero_ht_rate": 0.278,
-          "home_scored_ht_rate": 0.5768,
+          "goal_ht_rate": 0.7106,
+          "zero_zero_ht_rate": 0.2894,
+          "home_scored_ht_rate": 0.5596,
           "away_scored_ht_rate": 0.343
         },
         "h2h": {
@@ -20331,7 +20331,7 @@
             "available": false,
             "sample_pair": 0,
             "weight": 0.0,
-            "home_ft": 0.254,
+            "home_ft": 0.256,
             "away_ft": 1.52,
             "conversion_assumption_goal_per_sot": 0.3
           }
@@ -20339,20 +20339,20 @@
       },
       "first_half_intelligence": {
         "goal_first_half": {
-          "raw_probability_pct": 56.97,
-          "calibrated_probability_pct": 57.7,
-          "lambda_total_ht": 0.764,
+          "raw_probability_pct": 56.86,
+          "calibrated_probability_pct": 57.59,
+          "lambda_total_ht": 0.766,
           "market": "over05_ht"
         },
         "over15_first_half": {
-          "raw_probability_pct": 22.08,
-          "calibrated_probability_pct": 22.9,
+          "raw_probability_pct": 22.14,
+          "calibrated_probability_pct": 22.95,
           "empirical_probability_pct": 29.48,
           "market": "over15_ht"
         },
         "gg_first_half": {
-          "raw_probability_pct": 12.74,
-          "calibrated_probability_pct": 12.95,
+          "raw_probability_pct": 12.78,
+          "calibrated_probability_pct": 12.98,
           "empirical_probability_pct": 17.62,
           "market": "gg_ht"
         },
@@ -20407,7 +20407,7 @@
           "pair_goal_ht_rate_pct": 56.565,
           "pair_over15_ht_rate_pct": 23.355,
           "pair_gg_ht_rate_pct": 14.195,
-          "pair_over25_ft_rate_pct": 36.333,
+          "pair_over25_ft_rate_pct": 35.667,
           "underdog_xg_for": 0.0,
           "favorite_xg_against": 0.0,
           "underdog_sot_for": 0.0,
@@ -23266,24 +23266,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "over15ht_rate": 0.4482,
-            "total_ht": 1.523,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.34,
-            "total_ft": 2.756,
-            "scored_ht_rate": 0.5293,
-            "conceded_ht_rate": 0.6849,
-            "goals_scored_ft": 1.527,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 0.692,
-            "gg_ht_rate": 0.3988,
-            "goals_scored_2h": 0.835,
-            "goals_conceded_ft": 1.229,
-            "goals_conceded_2h": 0.397,
-            "goals_conceded_ht": 0.832,
-            "points_per_game": 1.51,
             "clean_sheet_rate": 0.027,
+            "goals_scored_ht": 0.692,
+            "goals_scored_ft": 1.527,
+            "goals_conceded_2h": 0.397,
+            "xg_for_ft": 0.0,
+            "total_ft": 2.756,
+            "over15ht_rate": 0.4482,
+            "goals_conceded_ft": 1.229,
+            "conceded_ht_rate": 0.6849,
+            "points_per_game": 1.51,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.5293,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.835,
+            "over25_rate": 0.34,
+            "total_ht": 1.523,
+            "goals_conceded_ht": 0.832,
+            "gg_ht_rate": 0.3988,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -23869,24 +23869,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "over15ht_rate": 0.2035,
-            "total_ht": 0.982,
-            "xg_for_ft": 0.0,
-            "over25_rate": 0.49,
-            "total_ft": 2.371,
-            "scored_ht_rate": 0.5659,
-            "conceded_ht_rate": 0.3097,
-            "goals_scored_ft": 1.196,
-            "xg_against_ft": 0.0,
-            "xg_sample": 0.0,
-            "goals_scored_ht": 0.566,
-            "gg_ht_rate": 0.0974,
-            "goals_scored_2h": 0.63,
-            "goals_conceded_ft": 1.175,
-            "goals_conceded_2h": 0.76,
-            "goals_conceded_ht": 0.416,
-            "points_per_game": 1.699,
             "clean_sheet_rate": 0.51,
+            "goals_scored_ht": 0.566,
+            "goals_scored_ft": 1.196,
+            "goals_conceded_2h": 0.76,
+            "xg_for_ft": 0.0,
+            "total_ft": 2.371,
+            "over15ht_rate": 0.2035,
+            "goals_conceded_ft": 1.175,
+            "conceded_ht_rate": 0.3097,
+            "points_per_game": 1.699,
+            "xg_against_ft": 0.0,
+            "scored_ht_rate": 0.5659,
+            "xg_sample": 0.0,
+            "goals_scored_2h": 0.63,
+            "over25_rate": 0.49,
+            "total_ht": 0.982,
+            "goals_conceded_ht": 0.416,
+            "gg_ht_rate": 0.0974,
             "shots_on_target_for": 3.0,
             "shots_on_target_against": 4.0,
             "total_shots_for": 8.0,
