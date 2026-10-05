@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-10-05T04:29:50+02:00",
+  "updated_at": "2026-10-05T05:27:45+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -332134,7 +332134,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-10-05T04:28:23+02:00",
+        "settled_at": "2026-10-05T05:26:15+02:00",
         "home_ft": 3,
         "away_ft": 1,
         "home_ht": 3,
@@ -332180,7 +332180,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "won"
       },
-      "settled_at": "2026-10-05T04:28:23+02:00",
+      "settled_at": "2026-10-05T05:26:15+02:00",
       "market_pattern": {
         "available": true,
         "score": 55.516,
@@ -332257,7 +332257,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-10-05T04:28:23+02:00",
+        "settled_at": "2026-10-05T05:26:15+02:00",
         "home_ft": 2,
         "away_ft": 0,
         "home_ht": 2,
@@ -332303,7 +332303,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "won"
       },
-      "settled_at": "2026-10-05T04:28:23+02:00",
+      "settled_at": "2026-10-05T05:26:15+02:00",
       "market_pattern": {
         "available": true,
         "score": 47.968,
@@ -332380,7 +332380,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-10-05T04:28:23+02:00",
+        "settled_at": "2026-10-05T05:26:15+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 0,
@@ -332426,7 +332426,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-10-05T04:28:23+02:00",
+      "settled_at": "2026-10-05T05:26:15+02:00",
       "market_pattern": {
         "available": true,
         "score": 13.133,
@@ -332575,13 +332575,136 @@
         "gg_ht": true,
         "over25_ft": true
       }
+    },
+    "1549811": {
+      "fixture_id": "1549811",
+      "date": "2026-10-05",
+      "time": "03:15",
+      "match": "Llaneros - America de Cali",
+      "league": "Primera A",
+      "country": "Colombia",
+      "competition_quality_score": 68,
+      "competition_tier": "secondary_top_tier",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-10-05T05:26:15+02:00",
+        "home_ft": 1,
+        "away_ft": 2,
+        "home_ht": 1,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.96,
+        "probability_pct": 50.36,
+        "probability_raw_pct": 51.58,
+        "expected_value_pct": 49.066,
+        "relation": "confirmed",
+        "ranking_score": 96.799,
+        "recommendation_score": 85.799,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 85.799,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 33.784,
+          "probability_pct": 50.36,
+          "raw_probability_pct": 51.58,
+          "expected_value_pct": 49.066,
+          "edge_over_break_even_pp": 16.576,
+          "book_disagreement_pp": 20.26,
+          "competition_quality_score": 68,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 82.799,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-10-05T05:26:15+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 35.497,
+        "market_score": 0.0,
+        "early_stats_score": 72.904,
+        "two_goal_stats_score": 100.0,
+        "ft_goal_score": 42.908,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "2",
+        "favorite_changed": false,
+        "cross_strength_pp": 1.46,
+        "favorite_team": "America de Cali",
+        "underdog_team": "Llaneros",
+        "favorite_open_odd": 2.135,
+        "favorite_current_odd": 2.05,
+        "underdog_open_odd": 3.39,
+        "underdog_current_odd": 3.56,
+        "favorite_shortening_odd": 0.085,
+        "favorite_drift_odd": -0.085,
+        "underdog_steam_odd": -0.17,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 1.53,
+        "underdog_fair_delta_pp": -1.46,
+        "favorite_oci": 65.41,
+        "underdog_oci": -57.205,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "2",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": "2",
+        "favorite_margin_delta_pp": 0.413,
+        "underdog_margin_delta_pp": 0.042,
+        "margin_shift_favorite_vs_underdog_pp": 0.371,
+        "favorite_conceded_ht_rate_pct": 50.85,
+        "underdog_scored_ht_rate_pct": 66.44,
+        "favorite_scored_ht_rate_pct": 61.67,
+        "underdog_conceded_ht_rate_pct": 58.72,
+        "pair_goal_ht_rate_pct": 72.72,
+        "pair_over15_ht_rate_pct": 62.07,
+        "pair_gg_ht_rate_pct": 46.12,
+        "pair_over25_ft_rate_pct": 44.633,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": false,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": true
+      }
     }
   },
   "summary": {
-    "settled_primary": 2815,
+    "settled_primary": 2816,
     "wins": 1346,
-    "losses": 1469,
-    "win_rate_pct": 47.815,
+    "losses": 1470,
+    "win_rate_pct": 47.798,
     "by_market": {
       "1x2_ft": {
         "settled": 749,
@@ -332596,10 +332719,10 @@
         "win_rate_pct": 54.276
       },
       "over15_ht": {
-        "settled": 478,
+        "settled": 479,
         "wins": 180,
-        "losses": 298,
-        "win_rate_pct": 37.657
+        "losses": 299,
+        "win_rate_pct": 37.578
       },
       "gg_ht": {
         "settled": 168,
@@ -332628,10 +332751,10 @@
         "win_rate_pct": 48.996
       },
       "A": {
-        "settled": 1253,
+        "settled": 1254,
         "wins": 578,
-        "losses": 675,
-        "win_rate_pct": 46.129
+        "losses": 676,
+        "win_rate_pct": 46.093
       },
       "C": {
         "settled": 461,
@@ -332654,16 +332777,16 @@
         "over25_ft_rate_pct": 46.429
       },
       "neutral": {
-        "settled": 1550,
-        "goal_ht": 1158,
+        "settled": 1551,
+        "goal_ht": 1159,
         "over15_ht": 598,
         "gg_ht": 321,
-        "over25_ft": 888,
-        "avg_pattern_score": 22.532,
-        "goal_ht_rate_pct": 74.71,
-        "over15_ht_rate_pct": 38.581,
-        "gg_ht_rate_pct": 20.71,
-        "over25_ft_rate_pct": 57.29
+        "over25_ft": 889,
+        "avg_pattern_score": 22.541,
+        "goal_ht_rate_pct": 74.726,
+        "over15_ht_rate_pct": 38.556,
+        "gg_ht_rate_pct": 20.696,
+        "over25_ft_rate_pct": 57.318
       },
       "favorite_steam_only": {
         "settled": 138,
