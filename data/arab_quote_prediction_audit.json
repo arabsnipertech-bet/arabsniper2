@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-10-05T05:27:45+02:00",
+  "updated_at": "2026-10-05T13:17:29+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -332134,7 +332134,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-10-05T05:26:15+02:00",
+        "settled_at": "2026-10-05T13:17:28+02:00",
         "home_ft": 3,
         "away_ft": 1,
         "home_ht": 3,
@@ -332180,7 +332180,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "won"
       },
-      "settled_at": "2026-10-05T05:26:15+02:00",
+      "settled_at": "2026-10-05T13:17:28+02:00",
       "market_pattern": {
         "available": true,
         "score": 55.516,
@@ -332257,7 +332257,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-10-05T05:26:15+02:00",
+        "settled_at": "2026-10-05T13:17:28+02:00",
         "home_ft": 2,
         "away_ft": 0,
         "home_ht": 2,
@@ -332303,7 +332303,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "won"
       },
-      "settled_at": "2026-10-05T05:26:15+02:00",
+      "settled_at": "2026-10-05T13:17:28+02:00",
       "market_pattern": {
         "available": true,
         "score": 47.968,
@@ -332380,7 +332380,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-10-05T05:26:15+02:00",
+        "settled_at": "2026-10-05T13:17:28+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 0,
@@ -332426,7 +332426,7 @@
         "market_calibration_weight": 0.11,
         "outcome": "won"
       },
-      "settled_at": "2026-10-05T05:26:15+02:00",
+      "settled_at": "2026-10-05T13:17:28+02:00",
       "market_pattern": {
         "available": true,
         "score": 13.133,
@@ -332587,7 +332587,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-10-05T05:26:15+02:00",
+        "settled_at": "2026-10-05T13:17:28+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 1,
@@ -332633,7 +332633,7 @@
         "market_calibration_weight": 0.06,
         "outcome": "lost"
       },
-      "settled_at": "2026-10-05T05:26:15+02:00",
+      "settled_at": "2026-10-05T13:17:28+02:00",
       "market_pattern": {
         "available": true,
         "score": 35.497,
@@ -332698,13 +332698,220 @@
         "gg_ht": false,
         "over25_ft": true
       }
+    },
+    "1639991": {
+      "fixture_id": "1639991",
+      "date": "2026-10-05",
+      "time": "04:00",
+      "match": "Nicaragua - Dominican Republic",
+      "league": "CONCACAF Nations League",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-10-05T13:17:28+02:00",
+        "home_ft": 1,
+        "away_ft": 2,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 2.37,
+        "probability_pct": 44.19,
+        "probability_raw_pct": 44.77,
+        "expected_value_pct": 4.73,
+        "relation": "confirmed",
+        "ranking_score": 92.835,
+        "recommendation_score": 81.835,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 81.835,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 42.194,
+          "probability_pct": 44.19,
+          "raw_probability_pct": 44.77,
+          "expected_value_pct": 4.73,
+          "edge_over_break_even_pp": 1.996,
+          "book_disagreement_pp": 5.77,
+          "competition_quality_score": 88,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 78.835,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.1,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-10-05T13:17:28+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 32.221,
+        "market_score": 10.134,
+        "early_stats_score": 59.987,
+        "two_goal_stats_score": 66.369,
+        "ft_goal_score": 72.658,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "2",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.65,
+        "favorite_team": "Dominican Republic",
+        "underdog_team": "Nicaragua",
+        "favorite_open_odd": 1.64,
+        "favorite_current_odd": 1.62,
+        "underdog_open_odd": 4.86,
+        "underdog_current_odd": 4.7,
+        "favorite_shortening_odd": 0.02,
+        "favorite_drift_odd": -0.02,
+        "underdog_steam_odd": 0.16,
+        "medium_favorite_band": true,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 0.69,
+        "underdog_fair_delta_pp": 0.65,
+        "favorite_oci": 42.13,
+        "underdog_oci": 41.716,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "2",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": "2",
+        "favorite_margin_delta_pp": 0.055,
+        "underdog_margin_delta_pp": 0.052,
+        "margin_shift_favorite_vs_underdog_pp": 0.003,
+        "favorite_conceded_ht_rate_pct": 79.59,
+        "underdog_scored_ht_rate_pct": 32.79,
+        "favorite_scored_ht_rate_pct": 67.37,
+        "underdog_conceded_ht_rate_pct": 28.76,
+        "pair_goal_ht_rate_pct": 71.65,
+        "pair_over15_ht_rate_pct": 44.595,
+        "pair_gg_ht_rate_pct": 32.595,
+        "pair_over25_ft_rate_pct": 64.633,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": true
+      }
+    },
+    "1643934": {
+      "fixture_id": "1643934",
+      "date": "2026-10-05",
+      "time": "11:00",
+      "match": "Malaysia - Vietnam",
+      "league": "FIFA Asean Cup",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-10-05T13:17:28+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": null,
+      "settled_at": "2026-10-05T13:17:28+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 21.0,
+        "market_score": 12.532,
+        "early_stats_score": 41.751,
+        "two_goal_stats_score": 20.62,
+        "ft_goal_score": 25.205,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 1.09,
+        "favorite_team": "Malaysia",
+        "underdog_team": "Vietnam",
+        "favorite_open_odd": 2.3,
+        "favorite_current_odd": 2.5,
+        "underdog_open_odd": 2.63,
+        "underdog_current_odd": 2.57,
+        "favorite_shortening_odd": -0.2,
+        "favorite_drift_odd": 0.2,
+        "underdog_steam_odd": 0.06,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": -2.87,
+        "underdog_fair_delta_pp": 1.09,
+        "favorite_oci": -79.481,
+        "underdog_oci": 61.196,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "x",
+        "book_square_underdog": false,
+        "book_square_favorite": false,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": -0.604,
+        "underdog_margin_delta_pp": -0.196,
+        "margin_shift_favorite_vs_underdog_pp": -0.408,
+        "favorite_conceded_ht_rate_pct": 25.28,
+        "underdog_scored_ht_rate_pct": 42.62,
+        "favorite_scored_ht_rate_pct": 46.24,
+        "underdog_conceded_ht_rate_pct": 35.69,
+        "pair_goal_ht_rate_pct": 74.915,
+        "pair_over15_ht_rate_pct": 23.235,
+        "pair_gg_ht_rate_pct": 0.0,
+        "pair_over25_ft_rate_pct": 48.743,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 2.911,
+        "favorite_sot_against": 2.886,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": false,
+        "two_way_confirmation": true,
+        "over15_confirmation": false,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 2816,
+    "settled_primary": 2817,
     "wins": 1346,
-    "losses": 1470,
-    "win_rate_pct": 47.798,
+    "losses": 1471,
+    "win_rate_pct": 47.781,
     "by_market": {
       "1x2_ft": {
         "settled": 749,
@@ -332719,10 +332926,10 @@
         "win_rate_pct": 54.276
       },
       "over15_ht": {
-        "settled": 479,
+        "settled": 480,
         "wins": 180,
-        "losses": 299,
-        "win_rate_pct": 37.578
+        "losses": 300,
+        "win_rate_pct": 37.5
       },
       "gg_ht": {
         "settled": 168,
@@ -332751,10 +332958,10 @@
         "win_rate_pct": 48.996
       },
       "A": {
-        "settled": 1254,
+        "settled": 1255,
         "wins": 578,
-        "losses": 676,
-        "win_rate_pct": 46.093
+        "losses": 677,
+        "win_rate_pct": 46.056
       },
       "C": {
         "settled": 461,
@@ -332777,16 +332984,16 @@
         "over25_ft_rate_pct": 46.429
       },
       "neutral": {
-        "settled": 1551,
+        "settled": 1553,
         "goal_ht": 1159,
         "over15_ht": 598,
         "gg_ht": 321,
-        "over25_ft": 889,
-        "avg_pattern_score": 22.541,
-        "goal_ht_rate_pct": 74.726,
-        "over15_ht_rate_pct": 38.556,
-        "gg_ht_rate_pct": 20.696,
-        "over25_ft_rate_pct": 57.318
+        "over25_ft": 890,
+        "avg_pattern_score": 22.546,
+        "goal_ht_rate_pct": 74.63,
+        "over15_ht_rate_pct": 38.506,
+        "gg_ht_rate_pct": 20.67,
+        "over25_ft_rate_pct": 57.308
       },
       "favorite_steam_only": {
         "settled": 138,
