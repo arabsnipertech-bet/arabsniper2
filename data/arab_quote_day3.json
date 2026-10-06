@@ -1,7 +1,7 @@
 {
   "day": 3,
   "date": "2026-10-08",
-  "updated_at": "2026-10-06T05:24:39+02:00",
+  "updated_at": "2026-10-06T06:14:07+02:00",
   "matches": [
     {
       "fixture": {
@@ -49,7 +49,7 @@
                 "delta_fair_pp": 3.82,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": 73.013,
+                "oci_as": 72.978,
                 "marker": {
                   "shape": "square",
                   "color": "red",
@@ -68,7 +68,7 @@
                 "delta_fair_pp": 2.81,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": 62.632,
+                "oci_as": 62.606,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -87,7 +87,7 @@
                 "delta_fair_pp": -6.64,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": -75.598,
+                "oci_as": -75.536,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -202,7 +202,7 @@
                 "delta_fair_pp": -2.5,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": -58.196,
+                "oci_as": -58.172,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -221,7 +221,7 @@
                 "delta_fair_pp": 2.5,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": 58.196,
+                "oci_as": 58.172,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -335,7 +335,7 @@
                 "delta_fair_pp": -1.82,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": -52.456,
+                "oci_as": -52.44,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -354,7 +354,7 @@
                 "delta_fair_pp": 1.82,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": 52.456,
+                "oci_as": 52.44,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -622,7 +622,7 @@
                 "delta_fair_pp": -2.08,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": -55.129,
+                "oci_as": -55.109,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -641,7 +641,7 @@
                 "delta_fair_pp": 2.08,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": 55.129,
+                "oci_as": 55.109,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -1062,7 +1062,7 @@
             },
             "book": {
               "pick": "1",
-              "score": 73.013,
+              "score": 72.978,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -1110,7 +1110,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 58.196,
+              "score": 58.172,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -1151,7 +1151,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 52.456,
+              "score": 52.44,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -1349,8 +1349,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -6.64,
           "underdog_fair_delta_pp": 3.82,
-          "favorite_oci": -75.598,
-          "underdog_oci": 73.013,
+          "favorite_oci": -75.536,
+          "underdog_oci": 72.978,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "1",
           "book_square_underdog": true,
@@ -1476,14 +1476,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 73.013,
-                  "absolute": 73.013,
+                  "value": 72.978,
+                  "absolute": 72.978,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.159,
+                  "velocity_pp_per_hour": 0.154,
                   "components": {
                     "magnitude": 38.2,
                     "consensus": 25.0,
-                    "velocity": 1.063,
+                    "velocity": 1.028,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -1509,14 +1509,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 62.632,
-                  "absolute": 62.632,
+                  "value": 62.606,
+                  "absolute": 62.606,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.117,
+                  "velocity_pp_per_hour": 0.113,
                   "components": {
                     "magnitude": 28.1,
                     "consensus": 25.0,
-                    "velocity": 0.782,
+                    "velocity": 0.756,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -1542,14 +1542,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -75.598,
-                  "absolute": 75.598,
+                  "value": -75.536,
+                  "absolute": 75.536,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.277,
+                  "velocity_pp_per_hour": 0.268,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 1.848,
+                    "velocity": 1.786,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -1568,7 +1568,7 @@
             },
             "book": {
               "pick": "1",
-              "score": 73.013,
+              "score": 72.978,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -1714,14 +1714,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -58.196,
-                  "absolute": 58.196,
+                  "value": -58.172,
+                  "absolute": 58.172,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.104,
+                  "velocity_pp_per_hour": 0.101,
                   "components": {
                     "magnitude": 25.0,
                     "consensus": 25.0,
-                    "velocity": 0.696,
+                    "velocity": 0.672,
                     "persistence": 0.0,
                     "coverage": 7.5
                   }
@@ -1747,14 +1747,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 58.196,
-                  "absolute": 58.196,
+                  "value": 58.172,
+                  "absolute": 58.172,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.104,
+                  "velocity_pp_per_hour": 0.101,
                   "components": {
                     "magnitude": 25.0,
                     "consensus": 25.0,
-                    "velocity": 0.696,
+                    "velocity": 0.672,
                     "persistence": 0.0,
                     "coverage": 7.5
                   }
@@ -1773,7 +1773,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 58.196,
+              "score": 58.172,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -1913,14 +1913,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -52.456,
-                  "absolute": 52.456,
+                  "value": -52.44,
+                  "absolute": 52.44,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.076,
+                  "velocity_pp_per_hour": 0.073,
                   "components": {
                     "magnitude": 18.2,
                     "consensus": 25.0,
-                    "velocity": 0.506,
+                    "velocity": 0.49,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -1946,14 +1946,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 52.456,
-                  "absolute": 52.456,
+                  "value": 52.44,
+                  "absolute": 52.44,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.076,
+                  "velocity_pp_per_hour": 0.073,
                   "components": {
                     "magnitude": 18.2,
                     "consensus": 25.0,
-                    "velocity": 0.506,
+                    "velocity": 0.49,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -1972,7 +1972,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 52.456,
+              "score": 52.44,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -2322,14 +2322,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -55.129,
-                  "absolute": 55.129,
+                  "value": -55.109,
+                  "absolute": 55.109,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.087,
+                  "velocity_pp_per_hour": 0.084,
                   "components": {
                     "magnitude": 20.8,
                     "consensus": 25.0,
-                    "velocity": 0.579,
+                    "velocity": 0.559,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -2355,14 +2355,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 55.129,
-                  "absolute": 55.129,
+                  "value": 55.109,
+                  "absolute": 55.109,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.087,
+                  "velocity_pp_per_hour": 0.084,
                   "components": {
                     "magnitude": 20.8,
                     "consensus": 25.0,
-                    "velocity": 0.579,
+                    "velocity": 0.559,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -2381,7 +2381,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 55.129,
+              "score": 55.109,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -2770,24 +2770,24 @@
           "context_weight": 0.33,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.5082,
-            "conceded_ht_rate": 0.7888,
-            "total_ft": 3.313,
-            "total_ht": 1.508,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 1.805,
-            "goals_scored_ht": 0.719,
-            "goals_conceded_ht": 0.789,
-            "over25_rate": 0.388,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 2.525,
             "xg_against_ft": 0.0,
+            "total_ft": 3.313,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.0,
+            "total_ht": 1.508,
             "goals_conceded_ft": 0.789,
             "over15ht_rate": 0.5082,
-            "scored_ht_rate": 0.7194,
-            "goals_conceded_2h": 0.0,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 2.525,
+            "conceded_ht_rate": 0.7888,
             "clean_sheet_rate": 0.388,
+            "gg_ht_rate": 0.5082,
+            "scored_ht_rate": 0.7194,
             "points_per_game": 2.439,
+            "over25_rate": 0.388,
+            "goals_scored_ht": 0.719,
+            "goals_conceded_ht": 0.789,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -3050,24 +3050,24 @@
           "context_weight": 0.46,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.1567,
-            "conceded_ht_rate": 0.1567,
-            "total_ft": 1.834,
-            "total_ht": 0.85,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.614,
-            "goals_scored_ht": 0.693,
-            "goals_conceded_ht": 0.157,
-            "over25_rate": 0.243,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.307,
             "xg_against_ft": 0.0,
+            "total_ft": 1.834,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.37,
+            "total_ht": 0.85,
             "goals_conceded_ft": 0.527,
             "over15ht_rate": 0.1567,
-            "scored_ht_rate": 0.5362,
-            "goals_conceded_2h": 0.37,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.307,
+            "conceded_ht_rate": 0.1567,
             "clean_sheet_rate": 0.577,
+            "gg_ht_rate": 0.1567,
+            "scored_ht_rate": 0.5362,
             "points_per_game": 2.513,
+            "over25_rate": 0.243,
+            "goals_scored_ht": 0.693,
+            "goals_conceded_ht": 0.157,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -3597,8 +3597,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -6.64,
           "underdog_fair_delta_pp": 3.82,
-          "favorite_oci": -75.598,
-          "underdog_oci": 73.013,
+          "favorite_oci": -75.536,
+          "underdog_oci": 72.978,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "1",
           "book_square_underdog": true,
@@ -3712,7 +3712,7 @@
                 "delta_fair_pp": -0.39,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -21.036,
+                "oci_as": -21.035,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -3731,7 +3731,7 @@
                 "delta_fair_pp": 0.79,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 35.509,
+                "oci_as": 35.507,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -3750,7 +3750,7 @@
                 "delta_fair_pp": -0.4,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -37.805,
+                "oci_as": -37.804,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -3865,7 +3865,7 @@
                 "delta_fair_pp": -4.08,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": -80.561,
+                "oci_as": -80.552,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -3884,7 +3884,7 @@
                 "delta_fair_pp": 4.08,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": 80.561,
+                "oci_as": 80.552,
                 "marker": {
                   "shape": "square",
                   "color": "red",
@@ -4000,7 +4000,7 @@
                 "delta_fair_pp": -2.62,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": -60.31,
+                "oci_as": -60.304,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -4019,7 +4019,7 @@
                 "delta_fair_pp": 2.62,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": 60.31,
+                "oci_as": 60.304,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -4142,7 +4142,7 @@
                 "delta_fair_pp": -1.49,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -46.355,
+                "oci_as": -46.351,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -4161,7 +4161,7 @@
                 "delta_fair_pp": 1.49,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 46.355,
+                "oci_as": 46.351,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -4259,7 +4259,7 @@
                 "delta_fair_pp": -1.4,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -47.943,
+                "oci_as": -47.939,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -4278,7 +4278,7 @@
                 "delta_fair_pp": 1.4,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 47.943,
+                "oci_as": 47.939,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -4643,7 +4643,7 @@
             },
             "book": {
               "pick": "x",
-              "score": 35.509,
+              "score": 35.507,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -4691,7 +4691,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 80.561,
+              "score": 80.552,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -4732,7 +4732,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 60.31,
+              "score": 60.304,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -4773,7 +4773,7 @@
             },
             "book": {
               "pick": "no",
-              "score": 46.355,
+              "score": 46.351,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -4930,8 +4930,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -0.39,
           "underdog_fair_delta_pp": -0.4,
-          "favorite_oci": -21.036,
-          "underdog_oci": -37.805,
+          "favorite_oci": -21.035,
+          "underdog_oci": -37.804,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "x",
           "book_square_underdog": false,
@@ -5057,14 +5057,14 @@
                   "ratio": 0.3333
                 },
                 "oci_as": {
-                  "value": -21.036,
-                  "absolute": 21.036,
+                  "value": -21.035,
+                  "absolute": 21.035,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.008,
                   "components": {
                     "magnitude": 3.9,
                     "consensus": 8.332,
-                    "velocity": 0.054,
+                    "velocity": 0.053,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -5090,14 +5090,14 @@
                   "ratio": 0.75
                 },
                 "oci_as": {
-                  "value": 35.509,
-                  "absolute": 35.509,
+                  "value": 35.507,
+                  "absolute": 35.507,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.016,
                   "components": {
                     "magnitude": 7.9,
                     "consensus": 18.75,
-                    "velocity": 0.109,
+                    "velocity": 0.107,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -5123,14 +5123,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -37.805,
-                  "absolute": 37.805,
+                  "value": -37.804,
+                  "absolute": 37.804,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.008,
                   "components": {
                     "magnitude": 4.0,
                     "consensus": 25.0,
-                    "velocity": 0.055,
+                    "velocity": 0.054,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -5149,7 +5149,7 @@
             },
             "book": {
               "pick": "x",
-              "score": 35.509,
+              "score": 35.507,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -5295,14 +5295,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -80.561,
-                  "absolute": 80.561,
+                  "value": -80.552,
+                  "absolute": 80.552,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.084,
+                  "velocity_pp_per_hour": 0.083,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 0.561,
+                    "velocity": 0.552,
                     "persistence": 7.5,
                     "coverage": 7.5
                   }
@@ -5328,14 +5328,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 80.561,
-                  "absolute": 80.561,
+                  "value": 80.552,
+                  "absolute": 80.552,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.084,
+                  "velocity_pp_per_hour": 0.083,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 0.561,
+                    "velocity": 0.552,
                     "persistence": 7.5,
                     "coverage": 7.5
                   }
@@ -5354,7 +5354,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 80.561,
+              "score": 80.552,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -5494,14 +5494,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -60.31,
-                  "absolute": 60.31,
+                  "value": -60.304,
+                  "absolute": 60.304,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.054,
+                  "velocity_pp_per_hour": 0.053,
                   "components": {
                     "magnitude": 26.2,
                     "consensus": 25.0,
-                    "velocity": 0.36,
+                    "velocity": 0.354,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -5527,14 +5527,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 60.31,
-                  "absolute": 60.31,
+                  "value": 60.304,
+                  "absolute": 60.304,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.054,
+                  "velocity_pp_per_hour": 0.053,
                   "components": {
                     "magnitude": 26.2,
                     "consensus": 25.0,
-                    "velocity": 0.36,
+                    "velocity": 0.354,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -5553,7 +5553,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 60.31,
+              "score": 60.304,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -5712,14 +5712,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -46.355,
-                  "absolute": 46.355,
+                  "value": -46.351,
+                  "absolute": 46.351,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.031,
+                  "velocity_pp_per_hour": 0.03,
                   "components": {
                     "magnitude": 14.9,
                     "consensus": 25.0,
-                    "velocity": 0.205,
+                    "velocity": 0.201,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -5745,14 +5745,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 46.355,
-                  "absolute": 46.355,
+                  "value": 46.351,
+                  "absolute": 46.351,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.031,
+                  "velocity_pp_per_hour": 0.03,
                   "components": {
                     "magnitude": 14.9,
                     "consensus": 25.0,
-                    "velocity": 0.205,
+                    "velocity": 0.201,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -5771,7 +5771,7 @@
             },
             "book": {
               "pick": "no",
-              "score": 46.355,
+              "score": 46.351,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -5905,14 +5905,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -47.943,
-                  "absolute": 47.943,
+                  "value": -47.939,
+                  "absolute": 47.939,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.029,
+                  "velocity_pp_per_hour": 0.028,
                   "components": {
                     "magnitude": 14.0,
                     "consensus": 25.0,
-                    "velocity": 0.193,
+                    "velocity": 0.189,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -5938,14 +5938,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 47.943,
-                  "absolute": 47.943,
+                  "value": 47.939,
+                  "absolute": 47.939,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.029,
+                  "velocity_pp_per_hour": 0.028,
                   "components": {
                     "magnitude": 14.0,
                     "consensus": 25.0,
-                    "velocity": 0.193,
+                    "velocity": 0.189,
                     "persistence": 0.0,
                     "coverage": 8.75
                   }
@@ -5964,7 +5964,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 47.943,
+              "score": 47.939,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -6353,24 +6353,24 @@
           "context_weight": 0.2,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.0,
-            "conceded_ht_rate": 0.1646,
-            "total_ft": 1.857,
-            "total_ht": 0.649,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.769,
-            "goals_scored_ht": 0.484,
-            "goals_conceded_ht": 0.165,
-            "over25_rate": 0.133,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.253,
             "xg_against_ft": 0.0,
+            "total_ft": 1.857,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.439,
+            "total_ht": 0.649,
             "goals_conceded_ft": 0.604,
             "over15ht_rate": 0.0,
-            "scored_ht_rate": 0.484,
-            "goals_conceded_2h": 0.439,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.253,
+            "conceded_ht_rate": 0.1646,
             "clean_sheet_rate": 0.467,
+            "gg_ht_rate": 0.0,
+            "scored_ht_rate": 0.484,
             "points_per_game": 2.299,
+            "over25_rate": 0.133,
+            "goals_scored_ht": 0.484,
+            "goals_conceded_ht": 0.165,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -6724,24 +6724,24 @@
           "context_weight": 0.2,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.3688,
-            "conceded_ht_rate": 0.3688,
-            "total_ft": 2.977,
-            "total_ht": 1.106,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 1.0,
-            "goals_scored_ht": 0.369,
-            "goals_conceded_ht": 0.738,
-            "over25_rate": 0.733,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.369,
             "xg_against_ft": 0.0,
+            "total_ft": 2.977,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.871,
+            "total_ht": 1.106,
             "goals_conceded_ft": 1.608,
             "over15ht_rate": 0.3688,
-            "scored_ht_rate": 0.3688,
-            "goals_conceded_2h": 0.871,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.369,
+            "conceded_ht_rate": 0.3688,
             "clean_sheet_rate": 0.267,
+            "gg_ht_rate": 0.3688,
+            "scored_ht_rate": 0.3688,
             "points_per_game": 0.956,
+            "over25_rate": 0.733,
+            "goals_scored_ht": 0.369,
+            "goals_conceded_ht": 0.738,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -7202,8 +7202,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -0.39,
           "underdog_fair_delta_pp": -0.4,
-          "favorite_oci": -21.036,
-          "underdog_oci": -37.805,
+          "favorite_oci": -21.035,
+          "underdog_oci": -37.804,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "x",
           "book_square_underdog": false,
@@ -7395,7 +7395,7 @@
                 "delta_fair_pp": -1.59,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": -61.119,
+                "oci_as": -61.115,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -7414,7 +7414,7 @@
                 "delta_fair_pp": 1.1,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 54.901,
+                "oci_as": 54.899,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -7433,7 +7433,7 @@
                 "delta_fair_pp": 0.49,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 39.967,
+                "oci_as": 39.966,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -7559,7 +7559,7 @@
                 "delta_fair_pp": 0.37,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 32.501,
+                "oci_as": 32.5,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -7578,7 +7578,7 @@
                 "delta_fair_pp": -0.37,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -32.501,
+                "oci_as": -32.5,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -8461,7 +8461,7 @@
             },
             "book": {
               "pick": "x",
-              "score": 54.901,
+              "score": 54.899,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -8509,7 +8509,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 32.501,
+              "score": 32.5,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -8748,8 +8748,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -1.59,
           "underdog_fair_delta_pp": 0.49,
-          "favorite_oci": -61.119,
-          "underdog_oci": 39.967,
+          "favorite_oci": -61.115,
+          "underdog_oci": 39.966,
           "underdog_book_consensus": 0.4,
           "book_pick_1x2": "x",
           "book_square_underdog": false,
@@ -8875,14 +8875,14 @@
                   "ratio": 0.8
                 },
                 "oci_as": {
-                  "value": -61.119,
-                  "absolute": 61.119,
+                  "value": -61.115,
+                  "absolute": 61.115,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.033,
+                  "velocity_pp_per_hour": 0.032,
                   "components": {
                     "magnitude": 15.9,
                     "consensus": 20.0,
-                    "velocity": 0.219,
+                    "velocity": 0.215,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -8908,14 +8908,14 @@
                   "ratio": 0.75
                 },
                 "oci_as": {
-                  "value": 54.901,
-                  "absolute": 54.901,
+                  "value": 54.899,
+                  "absolute": 54.899,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.023,
+                  "velocity_pp_per_hour": 0.022,
                   "components": {
                     "magnitude": 11.0,
                     "consensus": 18.75,
-                    "velocity": 0.151,
+                    "velocity": 0.149,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -8941,14 +8941,14 @@
                   "ratio": 0.4
                 },
                 "oci_as": {
-                  "value": 39.967,
-                  "absolute": 39.967,
+                  "value": 39.966,
+                  "absolute": 39.966,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.01,
                   "components": {
                     "magnitude": 4.9,
                     "consensus": 10.0,
-                    "velocity": 0.067,
+                    "velocity": 0.066,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -8967,7 +8967,7 @@
             },
             "book": {
               "pick": "x",
-              "score": 54.901,
+              "score": 54.899,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -9125,14 +9125,14 @@
                   "ratio": 0.5
                 },
                 "oci_as": {
-                  "value": 32.501,
-                  "absolute": 32.501,
+                  "value": 32.5,
+                  "absolute": 32.5,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.008,
                   "components": {
                     "magnitude": 3.7,
                     "consensus": 12.5,
-                    "velocity": 0.051,
+                    "velocity": 0.05,
                     "persistence": 7.5,
                     "coverage": 8.75
                   }
@@ -9158,14 +9158,14 @@
                   "ratio": 0.5
                 },
                 "oci_as": {
-                  "value": -32.501,
-                  "absolute": 32.501,
+                  "value": -32.5,
+                  "absolute": 32.5,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.008,
                   "components": {
                     "magnitude": 3.7,
                     "consensus": 12.5,
-                    "velocity": 0.051,
+                    "velocity": 0.05,
                     "persistence": 7.5,
                     "coverage": 8.75
                   }
@@ -9184,7 +9184,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 32.501,
+              "score": 32.5,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -10263,24 +10263,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.1928,
-            "conceded_ht_rate": 0.3928,
-            "total_ft": 1.852,
-            "total_ht": 0.665,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.476,
-            "goals_scored_ht": 0.227,
-            "goals_conceded_ht": 0.439,
-            "over25_rate": 0.37,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 0.703,
             "xg_against_ft": 0.0,
+            "total_ft": 1.852,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.71,
+            "total_ht": 0.665,
             "goals_conceded_ft": 1.149,
             "over15ht_rate": 0.1928,
-            "scored_ht_rate": 0.2266,
-            "goals_conceded_2h": 0.71,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 0.703,
+            "conceded_ht_rate": 0.3928,
             "clean_sheet_rate": 0.027,
+            "gg_ht_rate": 0.1928,
+            "scored_ht_rate": 0.2266,
             "points_per_game": 0.876,
+            "over25_rate": 0.37,
+            "goals_scored_ht": 0.227,
+            "goals_conceded_ht": 0.439,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -10866,24 +10866,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.4092,
-            "conceded_ht_rate": 0.8605,
-            "total_ft": 2.473,
-            "total_ht": 1.513,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.402,
-            "goals_scored_ht": 0.509,
-            "goals_conceded_ht": 1.004,
-            "over25_rate": 0.63,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 0.911,
             "xg_against_ft": 0.0,
+            "total_ft": 2.473,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.558,
+            "total_ht": 1.513,
             "goals_conceded_ft": 1.562,
             "over15ht_rate": 0.4424,
-            "scored_ht_rate": 0.4424,
-            "goals_conceded_2h": 0.558,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 0.911,
+            "conceded_ht_rate": 0.8605,
             "clean_sheet_rate": 0.109,
+            "gg_ht_rate": 0.4092,
+            "scored_ht_rate": 0.4424,
             "points_per_game": 0.668,
+            "over25_rate": 0.63,
+            "goals_scored_ht": 0.509,
+            "goals_conceded_ht": 1.004,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -11751,8 +11751,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -1.59,
           "underdog_fair_delta_pp": 0.49,
-          "favorite_oci": -61.119,
-          "underdog_oci": 39.967,
+          "favorite_oci": -61.115,
+          "underdog_oci": 39.966,
           "underdog_book_consensus": 0.4,
           "book_pick_1x2": "x",
           "book_square_underdog": false,
@@ -11944,7 +11944,7 @@
                 "delta_fair_pp": -0.98,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -52.435,
+                "oci_as": -52.433,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -11982,7 +11982,7 @@
                 "delta_fair_pp": 1.27,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 62.875,
+                "oci_as": 62.872,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -12251,7 +12251,7 @@
                 "delta_fair_pp": 0.51,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 46.838,
+                "oci_as": 46.836,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -12270,7 +12270,7 @@
                 "delta_fair_pp": -0.51,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -46.838,
+                "oci_as": -46.836,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -12411,7 +12411,7 @@
                 "delta_fair_pp": 0.32,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 34.494,
+                "oci_as": 34.493,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -12430,7 +12430,7 @@
                 "delta_fair_pp": -0.32,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -34.494,
+                "oci_as": -34.493,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -12889,7 +12889,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 62.875,
+              "score": 62.872,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -12978,7 +12978,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 46.838,
+              "score": 46.836,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -13019,7 +13019,7 @@
             },
             "book": {
               "pick": "yes",
-              "score": 34.494,
+              "score": 34.493,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -13176,8 +13176,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -0.98,
           "underdog_fair_delta_pp": 1.27,
-          "favorite_oci": -52.435,
-          "underdog_oci": 62.875,
+          "favorite_oci": -52.433,
+          "underdog_oci": 62.872,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -13303,14 +13303,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -52.435,
-                  "absolute": 52.435,
+                  "value": -52.433,
+                  "absolute": 52.433,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.02,
                   "components": {
                     "magnitude": 9.8,
                     "consensus": 25.0,
-                    "velocity": 0.135,
+                    "velocity": 0.133,
                     "persistence": 7.5,
                     "coverage": 10.0
                   }
@@ -13343,7 +13343,7 @@
                   "components": {
                     "magnitude": 2.9,
                     "consensus": 4.167,
-                    "velocity": 0.04,
+                    "velocity": 0.039,
                     "persistence": 7.5,
                     "coverage": 10.0
                   }
@@ -13369,14 +13369,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 62.875,
-                  "absolute": 62.875,
+                  "value": 62.872,
+                  "absolute": 62.872,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.026,
                   "components": {
                     "magnitude": 12.7,
                     "consensus": 25.0,
-                    "velocity": 0.175,
+                    "velocity": 0.172,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -13395,7 +13395,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 62.875,
+              "score": 62.872,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -13764,14 +13764,14 @@
                   "ratio": 0.6667
                 },
                 "oci_as": {
-                  "value": 46.838,
-                  "absolute": 46.838,
+                  "value": 46.836,
+                  "absolute": 46.836,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.011,
+                  "velocity_pp_per_hour": 0.01,
                   "components": {
                     "magnitude": 5.1,
                     "consensus": 16.668,
-                    "velocity": 0.07,
+                    "velocity": 0.069,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -13797,14 +13797,14 @@
                   "ratio": 0.6667
                 },
                 "oci_as": {
-                  "value": -46.838,
-                  "absolute": 46.838,
+                  "value": -46.836,
+                  "absolute": 46.836,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.011,
+                  "velocity_pp_per_hour": 0.01,
                   "components": {
                     "magnitude": 5.1,
                     "consensus": 16.668,
-                    "velocity": 0.07,
+                    "velocity": 0.069,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -13823,7 +13823,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 46.838,
+              "score": 46.836,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -14000,14 +14000,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 34.494,
-                  "absolute": 34.494,
+                  "value": 34.493,
+                  "absolute": 34.493,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.007,
+                  "velocity_pp_per_hour": 0.006,
                   "components": {
                     "magnitude": 3.2,
                     "consensus": 25.0,
-                    "velocity": 0.044,
+                    "velocity": 0.043,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -14033,14 +14033,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -34.494,
-                  "absolute": 34.494,
+                  "value": -34.493,
+                  "absolute": 34.493,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.007,
+                  "velocity_pp_per_hour": 0.006,
                   "components": {
                     "magnitude": 3.2,
                     "consensus": 25.0,
-                    "velocity": 0.044,
+                    "velocity": 0.043,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -14059,7 +14059,7 @@
             },
             "book": {
               "pick": "yes",
-              "score": 34.494,
+              "score": 34.493,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -14695,24 +14695,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.072,
-            "conceded_ht_rate": 0.4429,
-            "total_ft": 2.225,
-            "total_ht": 1.156,
-            "xg_for_ft": 1.29,
             "goals_scored_2h": 0.727,
-            "goals_scored_ht": 0.267,
-            "goals_conceded_ht": 0.888,
-            "over25_rate": 0.34,
-            "xg_sample": 1.0,
-            "goals_scored_ft": 0.994,
             "xg_against_ft": 1.36,
+            "total_ft": 2.225,
+            "xg_sample": 1.0,
+            "goals_conceded_2h": 0.343,
+            "total_ht": 1.156,
             "goals_conceded_ft": 1.231,
             "over15ht_rate": 0.2805,
-            "scored_ht_rate": 0.2671,
-            "goals_conceded_2h": 0.343,
+            "xg_for_ft": 1.29,
+            "goals_scored_ft": 0.994,
+            "conceded_ht_rate": 0.4429,
             "clean_sheet_rate": 0.374,
+            "gg_ht_rate": 0.072,
+            "scored_ht_rate": 0.2671,
             "points_per_game": 0.853,
+            "over25_rate": 0.34,
+            "goals_scored_ht": 0.267,
+            "goals_conceded_ht": 0.888,
             "shots_on_target_for": 6.165,
             "shots_on_target_against": 3.329,
             "total_shots_for": 16.317,
@@ -15308,24 +15308,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.0344,
-            "conceded_ht_rate": 0.4138,
-            "total_ft": 2.101,
-            "total_ht": 0.471,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.812,
-            "goals_scored_ht": 0.058,
-            "goals_conceded_ht": 0.414,
-            "over25_rate": 0.37,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 0.87,
             "xg_against_ft": 0.0,
+            "total_ft": 2.101,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.817,
+            "total_ht": 0.471,
             "goals_conceded_ft": 1.231,
             "over15ht_rate": 0.0344,
-            "scored_ht_rate": 0.0579,
-            "goals_conceded_2h": 0.817,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 0.87,
+            "conceded_ht_rate": 0.4138,
             "clean_sheet_rate": 0.315,
+            "gg_ht_rate": 0.0344,
+            "scored_ht_rate": 0.0579,
             "points_per_game": 0.8,
+            "over25_rate": 0.37,
+            "goals_scored_ht": 0.058,
+            "goals_conceded_ht": 0.414,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -16193,8 +16193,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -0.98,
           "underdog_fair_delta_pp": 1.27,
-          "favorite_oci": -52.435,
-          "underdog_oci": 62.875,
+          "favorite_oci": -52.433,
+          "underdog_oci": 62.872,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -16308,7 +16308,7 @@
                 "delta_fair_pp": -3.21,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": -82.541,
+                "oci_as": -82.534,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -16327,7 +16327,7 @@
                 "delta_fair_pp": 1.58,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": 62.445,
+                "oci_as": 62.441,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -16346,7 +16346,7 @@
                 "delta_fair_pp": 1.62,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": 62.85,
+                "oci_as": 62.847,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -16473,7 +16473,7 @@
                 "delta_fair_pp": -2.05,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": -64.532,
+                "oci_as": -64.527,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -16492,7 +16492,7 @@
                 "delta_fair_pp": 2.05,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": 64.532,
+                "oci_as": 64.527,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -16792,7 +16792,7 @@
                 "delta_fair_pp": -0.88,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -40.171,
+                "oci_as": -40.169,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -16811,7 +16811,7 @@
                 "delta_fair_pp": 0.88,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 40.171,
+                "oci_as": 40.169,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -17364,7 +17364,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 62.85,
+              "score": 62.847,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -17412,7 +17412,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 64.532,
+              "score": 64.527,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -17494,7 +17494,7 @@
             },
             "book": {
               "pick": "no",
-              "score": 40.171,
+              "score": 40.169,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -17651,8 +17651,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -3.21,
           "underdog_fair_delta_pp": 1.62,
-          "favorite_oci": -82.541,
-          "underdog_oci": 62.85,
+          "favorite_oci": -82.534,
+          "underdog_oci": 62.847,
           "underdog_book_consensus": 0.8571,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -17778,14 +17778,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -82.541,
-                  "absolute": 82.541,
+                  "value": -82.534,
+                  "absolute": 82.534,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.066,
+                  "velocity_pp_per_hour": 0.065,
                   "components": {
                     "magnitude": 32.1,
                     "consensus": 25.0,
-                    "velocity": 0.441,
+                    "velocity": 0.434,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -17811,14 +17811,14 @@
                   "ratio": 0.8571
                 },
                 "oci_as": {
-                  "value": 62.445,
-                  "absolute": 62.445,
+                  "value": 62.441,
+                  "absolute": 62.441,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.033,
+                  "velocity_pp_per_hour": 0.032,
                   "components": {
                     "magnitude": 15.8,
                     "consensus": 21.427,
-                    "velocity": 0.217,
+                    "velocity": 0.214,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -17844,14 +17844,14 @@
                   "ratio": 0.8571
                 },
                 "oci_as": {
-                  "value": 62.85,
-                  "absolute": 62.85,
+                  "value": 62.847,
+                  "absolute": 62.847,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.033,
                   "components": {
                     "magnitude": 16.2,
                     "consensus": 21.427,
-                    "velocity": 0.223,
+                    "velocity": 0.219,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -17870,7 +17870,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 62.85,
+              "score": 62.847,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -18028,14 +18028,14 @@
                   "ratio": 0.8
                 },
                 "oci_as": {
-                  "value": -64.532,
-                  "absolute": 64.532,
+                  "value": -64.527,
+                  "absolute": 64.527,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.042,
                   "components": {
                     "magnitude": 20.5,
                     "consensus": 20.0,
-                    "velocity": 0.282,
+                    "velocity": 0.277,
                     "persistence": 15.0,
                     "coverage": 8.75
                   }
@@ -18061,14 +18061,14 @@
                   "ratio": 0.8
                 },
                 "oci_as": {
-                  "value": 64.532,
-                  "absolute": 64.532,
+                  "value": 64.527,
+                  "absolute": 64.527,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.042,
                   "components": {
                     "magnitude": 20.5,
                     "consensus": 20.0,
-                    "velocity": 0.282,
+                    "velocity": 0.277,
                     "persistence": 15.0,
                     "coverage": 8.75
                   }
@@ -18087,7 +18087,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 64.532,
+              "score": 64.527,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -18247,7 +18247,7 @@
                   "components": {
                     "magnitude": 2.1,
                     "consensus": 16.668,
-                    "velocity": 0.029,
+                    "velocity": 0.028,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -18280,7 +18280,7 @@
                   "components": {
                     "magnitude": 2.1,
                     "consensus": 16.668,
-                    "velocity": 0.029,
+                    "velocity": 0.028,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -18476,14 +18476,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -40.171,
-                  "absolute": 40.171,
+                  "value": -40.169,
+                  "absolute": 40.169,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.018,
                   "components": {
                     "magnitude": 8.8,
                     "consensus": 25.0,
-                    "velocity": 0.121,
+                    "velocity": 0.119,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -18509,14 +18509,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 40.171,
-                  "absolute": 40.171,
+                  "value": 40.169,
+                  "absolute": 40.169,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.018,
                   "components": {
                     "magnitude": 8.8,
                     "consensus": 25.0,
-                    "velocity": 0.121,
+                    "velocity": 0.119,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -18535,7 +18535,7 @@
             },
             "book": {
               "pick": "no",
-              "score": 40.171,
+              "score": 40.169,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -19172,24 +19172,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.1567,
-            "conceded_ht_rate": 0.3132,
-            "total_ft": 3.146,
-            "total_ht": 1.139,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.887,
-            "goals_scored_ht": 0.766,
-            "goals_conceded_ht": 0.373,
-            "over25_rate": 0.788,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.653,
             "xg_against_ft": 0.0,
+            "total_ft": 3.146,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 1.12,
+            "total_ht": 1.139,
             "goals_conceded_ft": 1.493,
             "over15ht_rate": 0.3699,
-            "scored_ht_rate": 0.5975,
-            "goals_conceded_2h": 1.12,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.653,
+            "conceded_ht_rate": 0.3132,
             "clean_sheet_rate": 0.288,
+            "gg_ht_rate": 0.1567,
+            "scored_ht_rate": 0.5975,
             "points_per_game": 1.308,
+            "over25_rate": 0.788,
+            "goals_scored_ht": 0.766,
+            "goals_conceded_ht": 0.373,
             "shots_on_target_for": 6.0,
             "shots_on_target_against": 6.0,
             "total_shots_for": 16.0,
@@ -19779,24 +19779,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.2585,
-            "conceded_ht_rate": 0.4312,
-            "total_ft": 1.808,
-            "total_ht": 0.941,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.251,
-            "goals_scored_ht": 0.383,
-            "goals_conceded_ht": 0.558,
-            "over25_rate": 0.266,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 0.634,
             "xg_against_ft": 0.0,
+            "total_ft": 1.808,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.617,
+            "total_ht": 0.941,
             "goals_conceded_ft": 1.175,
             "over15ht_rate": 0.4472,
-            "scored_ht_rate": 0.3206,
-            "goals_conceded_2h": 0.617,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 0.634,
+            "conceded_ht_rate": 0.4312,
             "clean_sheet_rate": 0.288,
+            "gg_ht_rate": 0.2585,
+            "scored_ht_rate": 0.3206,
             "points_per_game": 0.929,
+            "over25_rate": 0.266,
+            "goals_scored_ht": 0.383,
+            "goals_conceded_ht": 0.558,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -20664,8 +20664,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -3.21,
           "underdog_fair_delta_pp": 1.62,
-          "favorite_oci": -82.541,
-          "underdog_oci": 62.85,
+          "favorite_oci": -82.534,
+          "underdog_oci": 62.847,
           "underdog_book_consensus": 0.8571,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -20857,7 +20857,7 @@
                 "delta_fair_pp": -0.6,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -45.368,
+                "oci_as": -45.366,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -20895,7 +20895,7 @@
                 "delta_fair_pp": 0.65,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 56.589,
+                "oci_as": 56.588,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -21021,7 +21021,7 @@
                 "delta_fair_pp": 2.12,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": 56.492,
+                "oci_as": 56.487,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -21040,7 +21040,7 @@
                 "delta_fair_pp": -2.12,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": -56.492,
+                "oci_as": -56.487,
                 "marker": {
                   "shape": "circle",
                   "color": "yellow",
@@ -21164,7 +21164,7 @@
                 "delta_fair_pp": 0.74,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 42.502,
+                "oci_as": 42.5,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -21183,7 +21183,7 @@
                 "delta_fair_pp": -0.74,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -42.502,
+                "oci_as": -42.5,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -21337,7 +21337,7 @@
                 "delta_fair_pp": 1.01,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 41.489,
+                "oci_as": 41.487,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -21356,7 +21356,7 @@
                 "delta_fair_pp": -1.01,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -41.489,
+                "oci_as": -41.487,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -21467,7 +21467,7 @@
                 "delta_fair_pp": 1.48,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 63.754,
+                "oci_as": 63.75,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -21486,7 +21486,7 @@
                 "delta_fair_pp": -1.48,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -63.754,
+                "oci_as": -63.75,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -21878,7 +21878,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 56.589,
+              "score": 56.588,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -21926,7 +21926,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 56.492,
+              "score": 56.487,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -21967,7 +21967,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 42.502,
+              "score": 42.5,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -22008,7 +22008,7 @@
             },
             "book": {
               "pick": "yes",
-              "score": 41.489,
+              "score": 41.487,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -22165,8 +22165,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -0.6,
           "underdog_fair_delta_pp": 0.65,
-          "favorite_oci": -45.368,
-          "underdog_oci": 56.589,
+          "favorite_oci": -45.366,
+          "underdog_oci": 56.588,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -22292,14 +22292,14 @@
                   "ratio": 0.5714
                 },
                 "oci_as": {
-                  "value": -45.368,
-                  "absolute": 45.368,
+                  "value": -45.366,
+                  "absolute": 45.366,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.012,
                   "components": {
                     "magnitude": 6.0,
                     "consensus": 14.285,
-                    "velocity": 0.083,
+                    "velocity": 0.081,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -22357,14 +22357,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 56.589,
-                  "absolute": 56.589,
+                  "value": 56.588,
+                  "absolute": 56.588,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.013,
                   "components": {
                     "magnitude": 6.5,
                     "consensus": 25.0,
-                    "velocity": 0.089,
+                    "velocity": 0.088,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -22383,7 +22383,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 56.589,
+              "score": 56.588,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -22541,14 +22541,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 56.492,
-                  "absolute": 56.492,
+                  "value": 56.487,
+                  "absolute": 56.487,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.044,
+                  "velocity_pp_per_hour": 0.043,
                   "components": {
                     "magnitude": 21.2,
                     "consensus": 25.0,
-                    "velocity": 0.292,
+                    "velocity": 0.287,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -22574,14 +22574,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -56.492,
-                  "absolute": 56.492,
+                  "value": -56.487,
+                  "absolute": 56.487,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.044,
+                  "velocity_pp_per_hour": 0.043,
                   "components": {
                     "magnitude": 21.2,
                     "consensus": 25.0,
-                    "velocity": 0.292,
+                    "velocity": 0.287,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -22600,7 +22600,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 56.492,
+              "score": 56.487,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -22752,14 +22752,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 42.502,
-                  "absolute": 42.502,
+                  "value": 42.5,
+                  "absolute": 42.5,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.015,
                   "components": {
                     "magnitude": 7.4,
                     "consensus": 25.0,
-                    "velocity": 0.102,
+                    "velocity": 0.1,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -22785,14 +22785,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -42.502,
-                  "absolute": 42.502,
+                  "value": -42.5,
+                  "absolute": 42.5,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.015,
                   "components": {
                     "magnitude": 7.4,
                     "consensus": 25.0,
-                    "velocity": 0.102,
+                    "velocity": 0.1,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -22811,7 +22811,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 42.502,
+              "score": 42.5,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -22988,14 +22988,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 41.489,
-                  "absolute": 41.489,
+                  "value": 41.487,
+                  "absolute": 41.487,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.021,
+                  "velocity_pp_per_hour": 0.02,
                   "components": {
                     "magnitude": 10.1,
                     "consensus": 25.0,
-                    "velocity": 0.139,
+                    "velocity": 0.137,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -23021,14 +23021,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -41.489,
-                  "absolute": 41.489,
+                  "value": -41.487,
+                  "absolute": 41.487,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.021,
+                  "velocity_pp_per_hour": 0.02,
                   "components": {
                     "magnitude": 10.1,
                     "consensus": 25.0,
-                    "velocity": 0.139,
+                    "velocity": 0.137,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -23047,7 +23047,7 @@
             },
             "book": {
               "pick": "yes",
-              "score": 41.489,
+              "score": 41.487,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -23181,14 +23181,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 63.754,
-                  "absolute": 63.754,
+                  "value": 63.75,
+                  "absolute": 63.75,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.031,
+                  "velocity_pp_per_hour": 0.03,
                   "components": {
                     "magnitude": 14.8,
                     "consensus": 25.0,
-                    "velocity": 0.204,
+                    "velocity": 0.2,
                     "persistence": 15.0,
                     "coverage": 8.75
                   }
@@ -23214,14 +23214,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -63.754,
-                  "absolute": 63.754,
+                  "value": -63.75,
+                  "absolute": 63.75,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.031,
+                  "velocity_pp_per_hour": 0.03,
                   "components": {
                     "magnitude": 14.8,
                     "consensus": 25.0,
-                    "velocity": 0.204,
+                    "velocity": 0.2,
                     "persistence": 15.0,
                     "coverage": 8.75
                   }
@@ -23240,7 +23240,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 63.754,
+              "score": 63.75,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -23671,24 +23671,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.1558,
-            "conceded_ht_rate": 0.2766,
-            "total_ft": 1.951,
-            "total_ht": 0.851,
-            "xg_for_ft": 0.304,
             "goals_scored_2h": 0.367,
-            "goals_scored_ht": 0.391,
-            "goals_conceded_ht": 0.46,
-            "over25_rate": 0.212,
-            "xg_sample": 1.0,
-            "goals_scored_ft": 0.758,
             "xg_against_ft": 0.528,
+            "total_ft": 1.951,
+            "xg_sample": 1.0,
+            "goals_conceded_2h": 0.733,
+            "total_ht": 0.851,
             "goals_conceded_ft": 1.193,
             "over15ht_rate": 0.1839,
-            "scored_ht_rate": 0.2349,
-            "goals_conceded_2h": 0.733,
+            "xg_for_ft": 0.304,
+            "goals_scored_ft": 0.758,
+            "conceded_ht_rate": 0.2766,
             "clean_sheet_rate": 0.419,
+            "gg_ht_rate": 0.1558,
+            "scored_ht_rate": 0.2349,
             "points_per_game": 0.946,
+            "over25_rate": 0.212,
+            "goals_scored_ht": 0.391,
+            "goals_conceded_ht": 0.46,
             "shots_on_target_for": 8.0,
             "shots_on_target_against": 6.0,
             "total_shots_for": 14.0,
@@ -24280,24 +24280,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.1499,
-            "conceded_ht_rate": 0.4653,
-            "total_ft": 2.59,
-            "total_ht": 1.165,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.565,
-            "goals_scored_ht": 0.503,
-            "goals_conceded_ht": 0.663,
-            "over25_rate": 0.353,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.068,
             "xg_against_ft": 0.0,
+            "total_ft": 2.59,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.86,
+            "total_ht": 1.165,
             "goals_conceded_ft": 1.522,
             "over15ht_rate": 0.3939,
-            "scored_ht_rate": 0.4567,
-            "goals_conceded_2h": 0.86,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.068,
+            "conceded_ht_rate": 0.4653,
             "clean_sheet_rate": 0.029,
+            "gg_ht_rate": 0.1499,
+            "scored_ht_rate": 0.4567,
             "points_per_game": 1.126,
+            "over25_rate": 0.353,
+            "goals_scored_ht": 0.503,
+            "goals_conceded_ht": 0.663,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -25115,8 +25115,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -0.6,
           "underdog_fair_delta_pp": 0.65,
-          "favorite_oci": -45.368,
-          "underdog_oci": 56.589,
+          "favorite_oci": -45.366,
+          "underdog_oci": 56.588,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -25308,7 +25308,7 @@
                 "delta_fair_pp": -1.39,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -64.091,
+                "oci_as": -64.088,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -25346,7 +25346,7 @@
                 "delta_fair_pp": 1.45,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 64.699,
+                "oci_as": 64.696,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -25615,7 +25615,7 @@
                 "delta_fair_pp": -0.16,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -28.29,
+                "oci_as": -28.289,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -25634,7 +25634,7 @@
                 "delta_fair_pp": 0.16,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 28.29,
+                "oci_as": 28.289,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -26279,7 +26279,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 64.699,
+              "score": 64.696,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -26368,7 +26368,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 28.29,
+              "score": 28.289,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -26540,7 +26540,7 @@
         "selection_policy": "Solo segnali che superano validazione mercato, affidabilità, qualità competizione, probabilità, EV e coerenza storica.",
         "favorite_trap_pattern": {
           "available": true,
-          "score": 24.509,
+          "score": 24.508,
           "market_score": 30.963,
           "early_stats_score": 11.93,
           "two_goal_stats_score": 20.484,
@@ -26566,8 +26566,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -1.39,
           "underdog_fair_delta_pp": 1.45,
-          "favorite_oci": -64.091,
-          "underdog_oci": 64.699,
+          "favorite_oci": -64.088,
+          "underdog_oci": 64.696,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -26693,14 +26693,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -64.091,
-                  "absolute": 64.091,
+                  "value": -64.088,
+                  "absolute": 64.088,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.029,
+                  "velocity_pp_per_hour": 0.028,
                   "components": {
                     "magnitude": 13.9,
                     "consensus": 25.0,
-                    "velocity": 0.191,
+                    "velocity": 0.188,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -26758,14 +26758,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 64.699,
-                  "absolute": 64.699,
+                  "value": 64.696,
+                  "absolute": 64.696,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.03,
+                  "velocity_pp_per_hour": 0.029,
                   "components": {
                     "magnitude": 14.5,
                     "consensus": 25.0,
-                    "velocity": 0.199,
+                    "velocity": 0.196,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -26784,7 +26784,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 64.699,
+              "score": 64.696,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -27151,8 +27151,8 @@
                   "ratio": 0.6667
                 },
                 "oci_as": {
-                  "value": -28.29,
-                  "absolute": 28.29,
+                  "value": -28.289,
+                  "absolute": 28.289,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.003,
                   "components": {
@@ -27184,8 +27184,8 @@
                   "ratio": 0.6667
                 },
                 "oci_as": {
-                  "value": 28.29,
-                  "absolute": 28.29,
+                  "value": 28.289,
+                  "absolute": 28.289,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.003,
                   "components": {
@@ -27210,7 +27210,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 28.29,
+              "score": 28.289,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -28078,24 +28078,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.1973,
-            "conceded_ht_rate": 0.2897,
-            "total_ft": 2.563,
-            "total_ht": 0.734,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.716,
-            "goals_scored_ht": 0.297,
-            "goals_conceded_ht": 0.436,
-            "over25_rate": 0.527,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.013,
             "xg_against_ft": 0.0,
+            "total_ft": 2.563,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 1.113,
+            "total_ht": 0.734,
             "goals_conceded_ft": 1.549,
             "over15ht_rate": 0.2161,
-            "scored_ht_rate": 0.2971,
-            "goals_conceded_2h": 1.113,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.013,
+            "conceded_ht_rate": 0.2897,
             "clean_sheet_rate": 0.236,
+            "gg_ht_rate": 0.1973,
+            "scored_ht_rate": 0.2971,
             "points_per_game": 0.572,
+            "over25_rate": 0.527,
+            "goals_scored_ht": 0.297,
+            "goals_conceded_ht": 0.436,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -28681,24 +28681,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.2088,
-            "conceded_ht_rate": 0.4441,
-            "total_ft": 2.185,
-            "total_ht": 0.787,
-            "xg_for_ft": 0.258,
             "goals_scored_2h": 0.379,
-            "goals_scored_ht": 0.344,
-            "goals_conceded_ht": 0.444,
-            "over25_rate": 0.37,
-            "xg_sample": 1.0,
-            "goals_scored_ft": 0.723,
             "xg_against_ft": 0.578,
+            "total_ft": 2.185,
+            "xg_sample": 1.0,
+            "goals_conceded_2h": 1.019,
+            "total_ht": 0.787,
             "goals_conceded_ft": 1.463,
             "over15ht_rate": 0.2368,
-            "scored_ht_rate": 0.2906,
-            "goals_conceded_2h": 1.019,
+            "xg_for_ft": 0.258,
+            "goals_scored_ft": 0.723,
+            "conceded_ht_rate": 0.4441,
             "clean_sheet_rate": 0.185,
+            "gg_ht_rate": 0.2088,
+            "scored_ht_rate": 0.2906,
             "points_per_game": 0.538,
+            "over25_rate": 0.37,
+            "goals_scored_ht": 0.344,
+            "goals_conceded_ht": 0.444,
             "shots_on_target_for": 5.0,
             "shots_on_target_against": 5.81,
             "total_shots_for": 11.38,
@@ -29466,7 +29466,7 @@
         },
         "favorite_trap": {
           "available": true,
-          "score": 24.509,
+          "score": 24.508,
           "market_score": 30.963,
           "early_stats_score": 11.93,
           "two_goal_stats_score": 20.484,
@@ -29492,8 +29492,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -1.39,
           "underdog_fair_delta_pp": 1.45,
-          "favorite_oci": -64.091,
-          "underdog_oci": 64.699,
+          "favorite_oci": -64.088,
+          "underdog_oci": 64.696,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -31817,24 +31817,24 @@
           "context_weight": 0.2,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.0,
-            "conceded_ht_rate": 0.0,
-            "total_ft": 2.336,
-            "total_ht": 0.718,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.668,
-            "goals_scored_ht": 0.718,
-            "goals_conceded_ht": 0.0,
-            "over25_rate": 0.733,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.386,
             "xg_against_ft": 0.0,
+            "total_ft": 2.336,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.95,
+            "total_ht": 0.718,
             "goals_conceded_ft": 0.95,
             "over15ht_rate": 0.0,
-            "scored_ht_rate": 0.7178,
-            "goals_conceded_2h": 0.95,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.386,
+            "conceded_ht_rate": 0.0,
             "clean_sheet_rate": 0.267,
+            "gg_ht_rate": 0.0,
+            "scored_ht_rate": 0.7178,
             "points_per_game": 2.154,
+            "over25_rate": 0.733,
+            "goals_scored_ht": 0.718,
+            "goals_conceded_ht": 0.0,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -32097,24 +32097,24 @@
           "context_weight": 0.2,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.0,
-            "conceded_ht_rate": 0.4524,
-            "total_ft": 2.565,
-            "total_ht": 1.33,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.33,
-            "goals_scored_ht": 0.878,
-            "goals_conceded_ht": 0.452,
-            "over25_rate": 0.733,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.208,
             "xg_against_ft": 0.0,
+            "total_ft": 2.565,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.905,
+            "total_ht": 1.33,
             "goals_conceded_ft": 1.357,
             "over15ht_rate": 0.3301,
-            "scored_ht_rate": 0.5476,
-            "goals_conceded_2h": 0.905,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.208,
+            "conceded_ht_rate": 0.4524,
             "clean_sheet_rate": 0.533,
+            "gg_ht_rate": 0.0,
+            "scored_ht_rate": 0.5476,
             "points_per_game": 1.643,
+            "over25_rate": 0.733,
+            "goals_scored_ht": 0.878,
+            "goals_conceded_ht": 0.452,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -34222,7 +34222,7 @@
                   "value": -31.723,
                   "absolute": 31.723,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.004,
+                  "velocity_pp_per_hour": 0.003,
                   "components": {
                     "magnitude": 1.7,
                     "consensus": 5.0,
@@ -35572,24 +35572,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.0,
-            "conceded_ht_rate": 0.158,
-            "total_ft": 2.456,
-            "total_ht": 0.787,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.389,
-            "goals_scored_ht": 0.561,
-            "goals_conceded_ht": 0.226,
-            "over25_rate": 0.401,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 0.949,
             "xg_against_ft": 0.0,
+            "total_ft": 2.456,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 1.28,
+            "total_ht": 0.787,
             "goals_conceded_ft": 1.507,
             "over15ht_rate": 0.2108,
-            "scored_ht_rate": 0.4182,
-            "goals_conceded_2h": 1.28,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 0.949,
+            "conceded_ht_rate": 0.158,
             "clean_sheet_rate": 0.374,
+            "gg_ht_rate": 0.0,
+            "scored_ht_rate": 0.4182,
             "points_per_game": 1.167,
+            "over25_rate": 0.401,
+            "goals_scored_ht": 0.561,
+            "goals_conceded_ht": 0.226,
             "shots_on_target_for": 6.0,
             "shots_on_target_against": 5.0,
             "total_shots_for": 22.0,
@@ -36179,24 +36179,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.3839,
-            "conceded_ht_rate": 0.7587,
-            "total_ft": 2.835,
-            "total_ht": 1.613,
-            "xg_for_ft": 2.81,
             "goals_scored_2h": 0.511,
-            "goals_scored_ht": 0.604,
-            "goals_conceded_ht": 1.009,
-            "over25_rate": 0.576,
-            "xg_sample": 1.0,
-            "goals_scored_ft": 1.115,
             "xg_against_ft": 0.67,
+            "total_ft": 2.835,
+            "xg_sample": 1.0,
+            "goals_conceded_2h": 0.711,
+            "total_ht": 1.613,
             "goals_conceded_ft": 1.719,
             "over15ht_rate": 0.4809,
-            "scored_ht_rate": 0.6044,
-            "goals_conceded_2h": 0.711,
+            "xg_for_ft": 2.81,
+            "goals_scored_ft": 1.115,
+            "conceded_ht_rate": 0.7587,
             "clean_sheet_rate": 0.063,
+            "gg_ht_rate": 0.3839,
+            "scored_ht_rate": 0.6044,
             "points_per_game": 0.954,
+            "over25_rate": 0.576,
+            "goals_scored_ht": 0.604,
+            "goals_conceded_ht": 1.009,
             "shots_on_target_for": 9.0,
             "shots_on_target_against": 5.0,
             "total_shots_for": 32.0,
@@ -37205,7 +37205,7 @@
                 "delta_fair_pp": -2.58,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": -68.655,
+                "oci_as": -68.649,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -37224,7 +37224,7 @@
                 "delta_fair_pp": -0.69,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -46.28,
+                "oci_as": -46.278,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -37243,7 +37243,7 @@
                 "delta_fair_pp": 3.28,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": 75.751,
+                "oci_as": 75.744,
                 "marker": {
                   "shape": "circle_square",
                   "color": "red",
@@ -37367,7 +37367,7 @@
                 "delta_fair_pp": 0.77,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 44.056,
+                "oci_as": 44.054,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -37386,7 +37386,7 @@
                 "delta_fair_pp": -0.77,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -44.056,
+                "oci_as": -44.054,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -37511,7 +37511,7 @@
                 "delta_fair_pp": 1.08,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 60.949,
+                "oci_as": 60.946,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -37530,7 +37530,7 @@
                 "delta_fair_pp": -1.08,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -60.949,
+                "oci_as": -60.946,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -38147,7 +38147,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 75.751,
+              "score": 75.744,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -38195,7 +38195,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 44.056,
+              "score": 44.054,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -38236,7 +38236,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 60.949,
+              "score": 60.946,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -38434,8 +38434,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": 3.28,
           "underdog_fair_delta_pp": -2.58,
-          "favorite_oci": 75.751,
-          "underdog_oci": -68.655,
+          "favorite_oci": 75.744,
+          "underdog_oci": -68.649,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": false,
@@ -38561,14 +38561,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -68.655,
-                  "absolute": 68.655,
+                  "value": -68.649,
+                  "absolute": 68.649,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.053,
+                  "velocity_pp_per_hour": 0.052,
                   "components": {
                     "magnitude": 25.8,
                     "consensus": 25.0,
-                    "velocity": 0.355,
+                    "velocity": 0.349,
                     "persistence": 7.5,
                     "coverage": 10.0
                   }
@@ -38594,14 +38594,14 @@
                   "ratio": 0.5714
                 },
                 "oci_as": {
-                  "value": -46.28,
-                  "absolute": 46.28,
+                  "value": -46.278,
+                  "absolute": 46.278,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.014,
                   "components": {
                     "magnitude": 6.9,
                     "consensus": 14.285,
-                    "velocity": 0.095,
+                    "velocity": 0.093,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -38627,14 +38627,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 75.751,
-                  "absolute": 75.751,
+                  "value": 75.744,
+                  "absolute": 75.744,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.068,
+                  "velocity_pp_per_hour": 0.067,
                   "components": {
                     "magnitude": 32.8,
                     "consensus": 25.0,
-                    "velocity": 0.451,
+                    "velocity": 0.444,
                     "persistence": 7.5,
                     "coverage": 10.0
                   }
@@ -38653,7 +38653,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 75.751,
+              "score": 75.744,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -38811,14 +38811,14 @@
                   "ratio": 0.8
                 },
                 "oci_as": {
-                  "value": 44.056,
-                  "absolute": 44.056,
+                  "value": 44.054,
+                  "absolute": 44.054,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.016,
                   "components": {
                     "magnitude": 7.7,
                     "consensus": 20.0,
-                    "velocity": 0.106,
+                    "velocity": 0.104,
                     "persistence": 7.5,
                     "coverage": 8.75
                   }
@@ -38844,14 +38844,14 @@
                   "ratio": 0.8
                 },
                 "oci_as": {
-                  "value": -44.056,
-                  "absolute": 44.056,
+                  "value": -44.054,
+                  "absolute": 44.054,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.016,
                   "components": {
                     "magnitude": 7.7,
                     "consensus": 20.0,
-                    "velocity": 0.106,
+                    "velocity": 0.104,
                     "persistence": 7.5,
                     "coverage": 8.75
                   }
@@ -38870,7 +38870,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 44.056,
+              "score": 44.054,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -39023,14 +39023,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 60.949,
-                  "absolute": 60.949,
+                  "value": 60.946,
+                  "absolute": 60.946,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.022,
                   "components": {
                     "magnitude": 10.8,
                     "consensus": 25.0,
-                    "velocity": 0.149,
+                    "velocity": 0.146,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -39056,14 +39056,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -60.949,
-                  "absolute": 60.949,
+                  "value": -60.946,
+                  "absolute": 60.946,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.022,
                   "components": {
                     "magnitude": 10.8,
                     "consensus": 25.0,
-                    "velocity": 0.149,
+                    "velocity": 0.146,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -39082,7 +39082,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 60.949,
+              "score": 60.946,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -39955,24 +39955,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.0,
-            "conceded_ht_rate": 0.2512,
-            "total_ft": 2.187,
-            "total_ht": 0.565,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.482,
-            "goals_scored_ht": 0.29,
-            "goals_conceded_ht": 0.274,
-            "over25_rate": 0.367,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 0.772,
             "xg_against_ft": 0.0,
+            "total_ft": 2.187,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 1.14,
+            "total_ht": 0.565,
             "goals_conceded_ft": 1.415,
             "over15ht_rate": 0.1601,
-            "scored_ht_rate": 0.1531,
-            "goals_conceded_2h": 1.14,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 0.772,
+            "conceded_ht_rate": 0.2512,
             "clean_sheet_rate": 0.231,
+            "gg_ht_rate": 0.0,
+            "scored_ht_rate": 0.1531,
             "points_per_game": 0.977,
+            "over25_rate": 0.367,
+            "goals_scored_ht": 0.29,
+            "goals_conceded_ht": 0.274,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -40558,24 +40558,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.1544,
-            "conceded_ht_rate": 0.2759,
-            "total_ft": 1.97,
-            "total_ht": 0.922,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.538,
-            "goals_scored_ht": 0.646,
-            "goals_conceded_ht": 0.276,
-            "over25_rate": 0.315,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.184,
             "xg_against_ft": 0.0,
+            "total_ft": 1.97,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.51,
+            "total_ht": 0.922,
             "goals_conceded_ft": 0.786,
             "over15ht_rate": 0.1544,
-            "scored_ht_rate": 0.6303,
-            "goals_conceded_2h": 0.51,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.184,
+            "conceded_ht_rate": 0.2759,
             "clean_sheet_rate": 0.446,
+            "gg_ht_rate": 0.1544,
+            "scored_ht_rate": 0.6303,
             "points_per_game": 1.939,
+            "over25_rate": 0.315,
+            "goals_scored_ht": 0.646,
+            "goals_conceded_ht": 0.276,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -41443,8 +41443,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": 3.28,
           "underdog_fair_delta_pp": -2.58,
-          "favorite_oci": 75.751,
-          "underdog_oci": -68.655,
+          "favorite_oci": 75.744,
+          "underdog_oci": -68.649,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": false,
@@ -41675,7 +41675,7 @@
                 "delta_fair_pp": -0.17,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -47.556,
+                "oci_as": -47.555,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -41837,7 +41837,7 @@
                 "delta_fair_pp": 1.04,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 60.543,
+                "oci_as": 60.541,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -41856,7 +41856,7 @@
                 "delta_fair_pp": -1.04,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -60.543,
+                "oci_as": -60.541,
                 "marker": {
                   "shape": "circle",
                   "color": "yellow",
@@ -42140,7 +42140,7 @@
                 "delta_fair_pp": 0.15,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 32.771,
+                "oci_as": 32.77,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -42159,7 +42159,7 @@
                 "delta_fair_pp": -0.15,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -32.771,
+                "oci_as": -32.77,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -42270,7 +42270,7 @@
                 "delta_fair_pp": 0.35,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 38.548,
+                "oci_as": 38.547,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -42289,7 +42289,7 @@
                 "delta_fair_pp": -0.35,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -38.548,
+                "oci_as": -38.547,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -42666,7 +42666,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 60.543,
+              "score": 60.541,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -42748,7 +42748,7 @@
             },
             "book": {
               "pick": "yes",
-              "score": 32.771,
+              "score": 32.77,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -42906,7 +42906,7 @@
           "favorite_fair_delta_pp": 0.1,
           "underdog_fair_delta_pp": -0.17,
           "favorite_oci": 46.846,
-          "underdog_oci": -47.556,
+          "underdog_oci": -47.555,
           "underdog_book_consensus": 0.8333,
           "book_pick_1x2": "2",
           "book_square_underdog": false,
@@ -43032,10 +43032,10 @@
                   "ratio": 0.8333
                 },
                 "oci_as": {
-                  "value": -47.556,
-                  "absolute": 47.556,
+                  "value": -47.555,
+                  "absolute": 47.555,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.004,
+                  "velocity_pp_per_hour": 0.003,
                   "components": {
                     "magnitude": 1.7,
                     "consensus": 20.832,
@@ -43281,14 +43281,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 60.543,
-                  "absolute": 60.543,
+                  "value": 60.541,
+                  "absolute": 60.541,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.021,
                   "components": {
                     "magnitude": 10.4,
                     "consensus": 25.0,
-                    "velocity": 0.143,
+                    "velocity": 0.141,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -43314,14 +43314,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -60.543,
-                  "absolute": 60.543,
+                  "value": -60.541,
+                  "absolute": 60.541,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.021,
                   "components": {
                     "magnitude": 10.4,
                     "consensus": 25.0,
-                    "velocity": 0.143,
+                    "velocity": 0.141,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -43340,7 +43340,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 60.543,
+              "score": 60.541,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -43728,14 +43728,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 32.771,
-                  "absolute": 32.771,
+                  "value": 32.77,
+                  "absolute": 32.77,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.003,
                   "components": {
                     "magnitude": 1.5,
                     "consensus": 25.0,
-                    "velocity": 0.021,
+                    "velocity": 0.02,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -43761,14 +43761,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -32.771,
-                  "absolute": 32.771,
+                  "value": -32.77,
+                  "absolute": 32.77,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.003,
                   "components": {
                     "magnitude": 1.5,
                     "consensus": 25.0,
-                    "velocity": 0.021,
+                    "velocity": 0.02,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -43787,7 +43787,7 @@
             },
             "book": {
               "pick": "yes",
-              "score": 32.771,
+              "score": 32.77,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -43921,14 +43921,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 38.548,
-                  "absolute": 38.548,
+                  "value": 38.547,
+                  "absolute": 38.547,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.007,
                   "components": {
                     "magnitude": 3.5,
                     "consensus": 25.0,
-                    "velocity": 0.048,
+                    "velocity": 0.047,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -43954,14 +43954,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -38.548,
-                  "absolute": 38.548,
+                  "value": -38.547,
+                  "absolute": 38.547,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.007,
                   "components": {
                     "magnitude": 3.5,
                     "consensus": 25.0,
-                    "velocity": 0.048,
+                    "velocity": 0.047,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -43980,7 +43980,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 38.548,
+              "score": 38.547,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -44423,24 +44423,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.1535,
-            "conceded_ht_rate": 0.5197,
-            "total_ft": 2.458,
-            "total_ht": 1.175,
-            "xg_for_ft": 1.252,
             "goals_scored_2h": 0.738,
-            "goals_scored_ht": 0.439,
-            "goals_conceded_ht": 0.735,
-            "over25_rate": 0.395,
-            "xg_sample": 2.0,
-            "goals_scored_ft": 1.178,
             "xg_against_ft": 0.948,
+            "total_ft": 2.458,
+            "xg_sample": 2.0,
+            "goals_conceded_2h": 0.545,
+            "total_ht": 1.175,
             "goals_conceded_ft": 1.28,
             "over15ht_rate": 0.3191,
-            "scored_ht_rate": 0.4391,
-            "goals_conceded_2h": 0.545,
+            "xg_for_ft": 1.252,
+            "goals_scored_ft": 1.178,
+            "conceded_ht_rate": 0.5197,
             "clean_sheet_rate": 0.341,
+            "gg_ht_rate": 0.1535,
+            "scored_ht_rate": 0.4391,
             "points_per_game": 1.427,
+            "over25_rate": 0.395,
+            "goals_scored_ht": 0.439,
+            "goals_conceded_ht": 0.735,
             "shots_on_target_for": 5.046,
             "shots_on_target_against": 6.569,
             "total_shots_for": 17.661,
@@ -45038,24 +45038,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.0864,
-            "conceded_ht_rate": 0.2277,
-            "total_ft": 2.337,
-            "total_ht": 0.601,
-            "xg_for_ft": 1.52,
             "goals_scored_2h": 1.083,
-            "goals_scored_ht": 0.373,
-            "goals_conceded_ht": 0.228,
-            "over25_rate": 0.5,
-            "xg_sample": 1.0,
-            "goals_scored_ft": 1.456,
             "xg_against_ft": 0.68,
+            "total_ft": 2.337,
+            "xg_sample": 1.0,
+            "goals_conceded_2h": 0.654,
+            "total_ht": 0.601,
             "goals_conceded_ft": 0.882,
             "over15ht_rate": 0.1255,
-            "scored_ht_rate": 0.2475,
-            "goals_conceded_2h": 0.654,
+            "xg_for_ft": 1.52,
+            "goals_scored_ft": 1.456,
+            "conceded_ht_rate": 0.2277,
             "clean_sheet_rate": 0.422,
+            "gg_ht_rate": 0.0864,
+            "scored_ht_rate": 0.2475,
             "points_per_game": 1.768,
+            "over25_rate": 0.5,
+            "goals_scored_ht": 0.373,
+            "goals_conceded_ht": 0.228,
             "shots_on_target_for": 5.0,
             "shots_on_target_against": 5.0,
             "total_shots_for": 17.0,
@@ -45909,7 +45909,7 @@
           "favorite_fair_delta_pp": 0.1,
           "underdog_fair_delta_pp": -0.17,
           "favorite_oci": 46.846,
-          "underdog_oci": -47.556,
+          "underdog_oci": -47.555,
           "underdog_book_consensus": 0.8333,
           "book_pick_1x2": "2",
           "book_square_underdog": false,
@@ -46101,7 +46101,7 @@
                 "delta_fair_pp": -0.81,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -54.639,
+                "oci_as": -54.637,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -46139,7 +46139,7 @@
                 "delta_fair_pp": 0.77,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 43.163,
+                "oci_as": 43.162,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -46265,7 +46265,7 @@
                 "delta_fair_pp": 0.79,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 45.509,
+                "oci_as": 45.507,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -46284,7 +46284,7 @@
                 "delta_fair_pp": -0.79,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -45.509,
+                "oci_as": -45.507,
                 "marker": {
                   "shape": "circle",
                   "color": "yellow",
@@ -46408,7 +46408,7 @@
                 "delta_fair_pp": 0.4,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 41.555,
+                "oci_as": 41.554,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -46427,7 +46427,7 @@
                 "delta_fair_pp": -0.4,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -41.555,
+                "oci_as": -41.554,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -46712,7 +46712,7 @@
                 "delta_fair_pp": 0.52,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 55.272,
+                "oci_as": 55.27,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -46731,7 +46731,7 @@
                 "delta_fair_pp": -0.52,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -55.272,
+                "oci_as": -55.27,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -47128,7 +47128,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 43.163,
+              "score": 43.162,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -47176,7 +47176,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 45.509,
+              "score": 45.507,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -47217,7 +47217,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 41.555,
+              "score": 41.554,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -47415,8 +47415,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -0.81,
           "underdog_fair_delta_pp": 0.77,
-          "favorite_oci": -54.639,
-          "underdog_oci": 43.163,
+          "favorite_oci": -54.637,
+          "underdog_oci": 43.162,
           "underdog_book_consensus": 0.7143,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -47542,14 +47542,14 @@
                   "ratio": 0.8571
                 },
                 "oci_as": {
-                  "value": -54.639,
-                  "absolute": 54.639,
+                  "value": -54.637,
+                  "absolute": 54.637,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.017,
+                  "velocity_pp_per_hour": 0.016,
                   "components": {
                     "magnitude": 8.1,
                     "consensus": 21.427,
-                    "velocity": 0.111,
+                    "velocity": 0.11,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -47607,14 +47607,14 @@
                   "ratio": 0.7143
                 },
                 "oci_as": {
-                  "value": 43.163,
-                  "absolute": 43.163,
+                  "value": 43.162,
+                  "absolute": 43.162,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.016,
                   "components": {
                     "magnitude": 7.7,
                     "consensus": 17.858,
-                    "velocity": 0.106,
+                    "velocity": 0.104,
                     "persistence": 7.5,
                     "coverage": 10.0
                   }
@@ -47633,7 +47633,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 43.163,
+              "score": 43.162,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -47791,14 +47791,14 @@
                   "ratio": 0.8
                 },
                 "oci_as": {
-                  "value": 45.509,
-                  "absolute": 45.509,
+                  "value": 45.507,
+                  "absolute": 45.507,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.016,
                   "components": {
                     "magnitude": 7.9,
                     "consensus": 20.0,
-                    "velocity": 0.109,
+                    "velocity": 0.107,
                     "persistence": 7.5,
                     "coverage": 10.0
                   }
@@ -47824,14 +47824,14 @@
                   "ratio": 0.8
                 },
                 "oci_as": {
-                  "value": -45.509,
-                  "absolute": 45.509,
+                  "value": -45.507,
+                  "absolute": 45.507,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.016,
                   "components": {
                     "magnitude": 7.9,
                     "consensus": 20.0,
-                    "velocity": 0.109,
+                    "velocity": 0.107,
                     "persistence": 7.5,
                     "coverage": 10.0
                   }
@@ -47850,7 +47850,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 45.509,
+              "score": 45.507,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -48002,14 +48002,14 @@
                   "ratio": 0.8
                 },
                 "oci_as": {
-                  "value": 41.555,
-                  "absolute": 41.555,
+                  "value": 41.554,
+                  "absolute": 41.554,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.008,
                   "components": {
                     "magnitude": 4.0,
                     "consensus": 20.0,
-                    "velocity": 0.055,
+                    "velocity": 0.054,
                     "persistence": 7.5,
                     "coverage": 10.0
                   }
@@ -48035,14 +48035,14 @@
                   "ratio": 0.8
                 },
                 "oci_as": {
-                  "value": -41.555,
-                  "absolute": 41.555,
+                  "value": -41.554,
+                  "absolute": 41.554,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.008,
                   "components": {
                     "magnitude": 4.0,
                     "consensus": 20.0,
-                    "velocity": 0.055,
+                    "velocity": 0.054,
                     "persistence": 7.5,
                     "coverage": 10.0
                   }
@@ -48061,7 +48061,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 41.555,
+              "score": 41.554,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -48431,14 +48431,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 55.272,
-                  "absolute": 55.272,
+                  "value": 55.27,
+                  "absolute": 55.27,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.011,
                   "components": {
                     "magnitude": 5.2,
                     "consensus": 25.0,
-                    "velocity": 0.072,
+                    "velocity": 0.07,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -48464,14 +48464,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -55.272,
-                  "absolute": 55.272,
+                  "value": -55.27,
+                  "absolute": 55.27,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.011,
                   "components": {
                     "magnitude": 5.2,
                     "consensus": 25.0,
-                    "velocity": 0.072,
+                    "velocity": 0.07,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -48490,7 +48490,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 55.272,
+              "score": 55.27,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -48933,24 +48933,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.1053,
-            "conceded_ht_rate": 0.1729,
-            "total_ft": 2.6,
-            "total_ht": 1.055,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.996,
-            "goals_scored_ht": 0.848,
-            "goals_conceded_ht": 0.207,
-            "over25_rate": 0.66,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.844,
             "xg_against_ft": 0.0,
+            "total_ft": 2.6,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.549,
+            "total_ht": 1.055,
             "goals_conceded_ft": 0.756,
             "over15ht_rate": 0.2059,
-            "scored_ht_rate": 0.781,
-            "goals_conceded_2h": 0.549,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.844,
+            "conceded_ht_rate": 0.1729,
             "clean_sheet_rate": 0.429,
+            "gg_ht_rate": 0.1053,
+            "scored_ht_rate": 0.781,
             "points_per_game": 2.379,
+            "over25_rate": 0.66,
+            "goals_scored_ht": 0.848,
+            "goals_conceded_ht": 0.207,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -49536,24 +49536,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.1522,
-            "conceded_ht_rate": 0.2691,
-            "total_ft": 1.615,
-            "total_ht": 0.922,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.517,
-            "goals_scored_ht": 0.55,
-            "goals_conceded_ht": 0.372,
-            "over25_rate": 0.224,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.066,
             "xg_against_ft": 0.0,
+            "total_ft": 1.615,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.177,
+            "total_ht": 0.922,
             "goals_conceded_ft": 0.549,
             "over15ht_rate": 0.2091,
-            "scored_ht_rate": 0.443,
-            "goals_conceded_2h": 0.177,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.066,
+            "conceded_ht_rate": 0.2691,
             "clean_sheet_rate": 0.571,
+            "gg_ht_rate": 0.1522,
+            "scored_ht_rate": 0.443,
             "points_per_game": 1.839,
+            "over25_rate": 0.224,
+            "goals_scored_ht": 0.55,
+            "goals_conceded_ht": 0.372,
             "shots_on_target_for": 8.0,
             "shots_on_target_against": 3.0,
             "total_shots_for": 14.0,
@@ -50425,8 +50425,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -0.81,
           "underdog_fair_delta_pp": 0.77,
-          "favorite_oci": -54.639,
-          "underdog_oci": 43.163,
+          "favorite_oci": -54.637,
+          "underdog_oci": 43.162,
           "underdog_book_consensus": 0.7143,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -50618,7 +50618,7 @@
                 "delta_fair_pp": -4.88,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": -90.671,
+                "oci_as": -90.66,
                 "marker": {
                   "shape": "circle",
                   "color": "red",
@@ -50637,7 +50637,7 @@
                 "delta_fair_pp": 1.46,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 60.633,
+                "oci_as": 60.63,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -50656,7 +50656,7 @@
                 "delta_fair_pp": 3.41,
                 "movement_color": "red",
                 "movement_level": "strong",
-                "oci_as": 84.569,
+                "oci_as": 84.561,
                 "marker": {
                   "shape": "square",
                   "color": "red",
@@ -50780,7 +50780,7 @@
                 "delta_fair_pp": 0.46,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 39.663,
+                "oci_as": 39.662,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -50799,7 +50799,7 @@
                 "delta_fair_pp": -0.46,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -39.663,
+                "oci_as": -39.662,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -51101,7 +51101,7 @@
                 "delta_fair_pp": 0.59,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 37.231,
+                "oci_as": 37.23,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -51120,7 +51120,7 @@
                 "delta_fair_pp": -0.59,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -37.231,
+                "oci_as": -37.23,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -51231,7 +51231,7 @@
                 "delta_fair_pp": 0.36,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 47.4,
+                "oci_as": 47.399,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -51250,7 +51250,7 @@
                 "delta_fair_pp": -0.36,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -47.4,
+                "oci_as": -47.399,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -51646,7 +51646,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 84.569,
+              "score": 84.561,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -51694,7 +51694,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 39.663,
+              "score": 39.662,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -51776,7 +51776,7 @@
             },
             "book": {
               "pick": "yes",
-              "score": 37.231,
+              "score": 37.23,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -51933,8 +51933,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -4.88,
           "underdog_fair_delta_pp": 3.41,
-          "favorite_oci": -90.671,
-          "underdog_oci": 84.569,
+          "favorite_oci": -90.66,
+          "underdog_oci": 84.561,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -52060,14 +52060,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -90.671,
-                  "absolute": 90.671,
+                  "value": -90.66,
+                  "absolute": 90.66,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.101,
+                  "velocity_pp_per_hour": 0.099,
                   "components": {
                     "magnitude": 40.0,
                     "consensus": 25.0,
-                    "velocity": 0.671,
+                    "velocity": 0.66,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -52093,14 +52093,14 @@
                   "ratio": 0.8333
                 },
                 "oci_as": {
-                  "value": 60.633,
-                  "absolute": 60.633,
+                  "value": 60.63,
+                  "absolute": 60.63,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.03,
                   "components": {
                     "magnitude": 14.6,
                     "consensus": 20.832,
-                    "velocity": 0.201,
+                    "velocity": 0.197,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -52126,14 +52126,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 84.569,
-                  "absolute": 84.569,
+                  "value": 84.561,
+                  "absolute": 84.561,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.07,
+                  "velocity_pp_per_hour": 0.069,
                   "components": {
                     "magnitude": 34.1,
                     "consensus": 25.0,
-                    "velocity": 0.469,
+                    "velocity": 0.461,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -52152,7 +52152,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 84.569,
+              "score": 84.561,
               "strength": "strong",
               "color": "red",
               "marker_shape": "square",
@@ -52310,14 +52310,14 @@
                   "ratio": 0.75
                 },
                 "oci_as": {
-                  "value": 39.663,
-                  "absolute": 39.663,
+                  "value": 39.662,
+                  "absolute": 39.662,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.009,
                   "components": {
                     "magnitude": 4.6,
                     "consensus": 18.75,
-                    "velocity": 0.063,
+                    "velocity": 0.062,
                     "persistence": 7.5,
                     "coverage": 8.75
                   }
@@ -52343,14 +52343,14 @@
                   "ratio": 0.75
                 },
                 "oci_as": {
-                  "value": -39.663,
-                  "absolute": 39.663,
+                  "value": -39.662,
+                  "absolute": 39.662,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.009,
                   "components": {
                     "magnitude": 4.6,
                     "consensus": 18.75,
-                    "velocity": 0.063,
+                    "velocity": 0.062,
                     "persistence": 7.5,
                     "coverage": 8.75
                   }
@@ -52369,7 +52369,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 39.663,
+              "score": 39.662,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -52758,14 +52758,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 37.231,
-                  "absolute": 37.231,
+                  "value": 37.23,
+                  "absolute": 37.23,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.012,
                   "components": {
                     "magnitude": 5.9,
                     "consensus": 25.0,
-                    "velocity": 0.081,
+                    "velocity": 0.08,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -52791,14 +52791,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -37.231,
-                  "absolute": 37.231,
+                  "value": -37.23,
+                  "absolute": 37.23,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.012,
                   "components": {
                     "magnitude": 5.9,
                     "consensus": 25.0,
-                    "velocity": 0.081,
+                    "velocity": 0.08,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -52817,7 +52817,7 @@
             },
             "book": {
               "pick": "yes",
-              "score": 37.231,
+              "score": 37.23,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -52951,14 +52951,14 @@
                   "ratio": 0.75
                 },
                 "oci_as": {
-                  "value": 47.4,
-                  "absolute": 47.4,
+                  "value": 47.399,
+                  "absolute": 47.399,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.007,
                   "components": {
                     "magnitude": 3.6,
                     "consensus": 18.75,
-                    "velocity": 0.05,
+                    "velocity": 0.049,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -52984,14 +52984,14 @@
                   "ratio": 0.75
                 },
                 "oci_as": {
-                  "value": -47.4,
-                  "absolute": 47.4,
+                  "value": -47.399,
+                  "absolute": 47.399,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.007,
                   "components": {
                     "magnitude": 3.6,
                     "consensus": 18.75,
-                    "velocity": 0.05,
+                    "velocity": 0.049,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -53010,7 +53010,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 47.4,
+              "score": 47.399,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -53454,24 +53454,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.0338,
-            "conceded_ht_rate": 0.18,
-            "total_ft": 2.197,
-            "total_ht": 1.201,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.87,
-            "goals_scored_ht": 0.959,
-            "goals_conceded_ht": 0.242,
-            "over25_rate": 0.259,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.829,
             "xg_against_ft": 0.0,
+            "total_ft": 2.197,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.125,
+            "total_ht": 1.201,
             "goals_conceded_ft": 0.367,
             "over15ht_rate": 0.2354,
-            "scored_ht_rate": 0.6971,
-            "goals_conceded_2h": 0.125,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.829,
+            "conceded_ht_rate": 0.18,
             "clean_sheet_rate": 0.66,
+            "gg_ht_rate": 0.0338,
+            "scored_ht_rate": 0.6971,
             "points_per_game": 2.448,
+            "over25_rate": 0.259,
+            "goals_scored_ht": 0.959,
+            "goals_conceded_ht": 0.242,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -54057,24 +54057,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.1581,
-            "conceded_ht_rate": 0.5446,
-            "total_ft": 2.541,
-            "total_ht": 0.948,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.722,
-            "goals_scored_ht": 0.404,
-            "goals_conceded_ht": 0.545,
-            "over25_rate": 0.401,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.126,
             "xg_against_ft": 0.0,
+            "total_ft": 2.541,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.871,
+            "total_ht": 0.948,
             "goals_conceded_ft": 1.415,
             "over15ht_rate": 0.1581,
-            "scored_ht_rate": 0.4036,
-            "goals_conceded_2h": 0.871,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.126,
+            "conceded_ht_rate": 0.5446,
             "clean_sheet_rate": 0.109,
+            "gg_ht_rate": 0.1581,
+            "scored_ht_rate": 0.4036,
             "points_per_game": 1.321,
+            "over25_rate": 0.401,
+            "goals_scored_ht": 0.404,
+            "goals_conceded_ht": 0.545,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -54900,8 +54900,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -4.88,
           "underdog_fair_delta_pp": 3.41,
-          "favorite_oci": -90.671,
-          "underdog_oci": 84.569,
+          "favorite_oci": -90.66,
+          "underdog_oci": 84.561,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -55132,7 +55132,7 @@
                 "delta_fair_pp": 0.89,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 44.022,
+                "oci_as": 44.02,
                 "marker": {
                   "shape": "circle_square",
                   "color": "yellow",
@@ -55151,7 +55151,7 @@
                 "delta_fair_pp": -0.69,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -41.995,
+                "oci_as": -41.993,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -55170,7 +55170,7 @@
                 "delta_fair_pp": -0.2,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -30.778,
+                "oci_as": -30.777,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -55294,7 +55294,7 @@
                 "delta_fair_pp": 0.51,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 27.67,
+                "oci_as": 27.669,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -55313,7 +55313,7 @@
                 "delta_fair_pp": -0.51,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -27.67,
+                "oci_as": -27.669,
                 "marker": {
                   "shape": "circle",
                   "color": "yellow",
@@ -55597,7 +55597,7 @@
                 "delta_fair_pp": -0.32,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -34.494,
+                "oci_as": -34.493,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -55616,7 +55616,7 @@
                 "delta_fair_pp": 0.32,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 34.494,
+                "oci_as": 34.493,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -56103,7 +56103,7 @@
             },
             "book": {
               "pick": "1",
-              "score": 44.022,
+              "score": 44.02,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -56151,7 +56151,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 27.67,
+              "score": 27.669,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -56233,7 +56233,7 @@
             },
             "book": {
               "pick": "no",
-              "score": 34.494,
+              "score": 34.493,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -56390,8 +56390,8 @@
           "favorite_steam_band": true,
           "favorite_fair_delta_pp": 0.89,
           "underdog_fair_delta_pp": -0.2,
-          "favorite_oci": 44.022,
-          "underdog_oci": -30.778,
+          "favorite_oci": 44.02,
+          "underdog_oci": -30.777,
           "underdog_book_consensus": 0.75,
           "book_pick_1x2": "1",
           "book_square_underdog": false,
@@ -56517,14 +56517,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 44.022,
-                  "absolute": 44.022,
+                  "value": 44.02,
+                  "absolute": 44.02,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.018,
                   "components": {
                     "magnitude": 8.9,
                     "consensus": 25.0,
-                    "velocity": 0.122,
+                    "velocity": 0.12,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -56550,14 +56550,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -41.995,
-                  "absolute": 41.995,
+                  "value": -41.993,
+                  "absolute": 41.993,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.014,
                   "components": {
                     "magnitude": 6.9,
                     "consensus": 25.0,
-                    "velocity": 0.095,
+                    "velocity": 0.093,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -56583,14 +56583,14 @@
                   "ratio": 0.75
                 },
                 "oci_as": {
-                  "value": -30.778,
-                  "absolute": 30.778,
+                  "value": -30.777,
+                  "absolute": 30.777,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.004,
                   "components": {
                     "magnitude": 2.0,
                     "consensus": 18.75,
-                    "velocity": 0.028,
+                    "velocity": 0.027,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -56609,7 +56609,7 @@
             },
             "book": {
               "pick": "1",
-              "score": 44.022,
+              "score": 44.02,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -56767,14 +56767,14 @@
                   "ratio": 0.5
                 },
                 "oci_as": {
-                  "value": 27.67,
-                  "absolute": 27.67,
+                  "value": 27.669,
+                  "absolute": 27.669,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.011,
+                  "velocity_pp_per_hour": 0.01,
                   "components": {
                     "magnitude": 5.1,
                     "consensus": 12.5,
-                    "velocity": 0.07,
+                    "velocity": 0.069,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -56800,14 +56800,14 @@
                   "ratio": 0.5
                 },
                 "oci_as": {
-                  "value": -27.67,
-                  "absolute": 27.67,
+                  "value": -27.669,
+                  "absolute": 27.669,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.011,
+                  "velocity_pp_per_hour": 0.01,
                   "components": {
                     "magnitude": 5.1,
                     "consensus": 12.5,
-                    "velocity": 0.07,
+                    "velocity": 0.069,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -56826,7 +56826,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 27.67,
+              "score": 27.669,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -57212,14 +57212,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -34.494,
-                  "absolute": 34.494,
+                  "value": -34.493,
+                  "absolute": 34.493,
                   "direction": "away",
-                  "velocity_pp_per_hour": 0.007,
+                  "velocity_pp_per_hour": 0.006,
                   "components": {
                     "magnitude": 3.2,
                     "consensus": 25.0,
-                    "velocity": 0.044,
+                    "velocity": 0.043,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -57245,14 +57245,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 34.494,
-                  "absolute": 34.494,
+                  "value": 34.493,
+                  "absolute": 34.493,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.007,
+                  "velocity_pp_per_hour": 0.006,
                   "components": {
                     "magnitude": 3.2,
                     "consensus": 25.0,
-                    "velocity": 0.044,
+                    "velocity": 0.043,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -57271,7 +57271,7 @@
             },
             "book": {
               "pick": "no",
-              "score": 34.494,
+              "score": 34.493,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -57905,24 +57905,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.3096,
-            "conceded_ht_rate": 0.5713,
-            "total_ft": 2.953,
-            "total_ht": 1.055,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 1.473,
-            "goals_scored_ht": 0.441,
-            "goals_conceded_ht": 0.614,
-            "over25_rate": 0.554,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.914,
             "xg_against_ft": 0.0,
+            "total_ft": 2.953,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.425,
+            "total_ht": 1.055,
             "goals_conceded_ft": 1.039,
             "over15ht_rate": 0.3522,
-            "scored_ht_rate": 0.4408,
-            "goals_conceded_2h": 0.425,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.914,
+            "conceded_ht_rate": 0.5713,
             "clean_sheet_rate": 0.185,
+            "gg_ht_rate": 0.3096,
+            "scored_ht_rate": 0.4408,
             "points_per_game": 2.069,
+            "over25_rate": 0.554,
+            "goals_scored_ht": 0.441,
+            "goals_conceded_ht": 0.614,
             "shots_on_target_for": 4.0,
             "shots_on_target_against": 9.206,
             "total_shots_for": 10.191,
@@ -58516,24 +58516,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.0461,
-            "conceded_ht_rate": 0.3376,
-            "total_ft": 1.917,
-            "total_ht": 0.764,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.2,
-            "goals_scored_ht": 0.426,
-            "goals_conceded_ht": 0.338,
-            "over25_rate": 0.239,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 0.626,
             "xg_against_ft": 0.0,
+            "total_ft": 1.917,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.954,
+            "total_ht": 0.764,
             "goals_conceded_ft": 1.291,
             "over15ht_rate": 0.0692,
-            "scored_ht_rate": 0.403,
-            "goals_conceded_2h": 0.954,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 0.626,
+            "conceded_ht_rate": 0.3376,
             "clean_sheet_rate": 0.054,
+            "gg_ht_rate": 0.0461,
+            "scored_ht_rate": 0.403,
             "points_per_game": 0.572,
+            "over25_rate": 0.239,
+            "goals_scored_ht": 0.426,
+            "goals_conceded_ht": 0.338,
             "shots_on_target_for": 2.0,
             "shots_on_target_against": 7.0,
             "total_shots_for": 8.0,
@@ -59384,8 +59384,8 @@
           "favorite_steam_band": true,
           "favorite_fair_delta_pp": 0.89,
           "underdog_fair_delta_pp": -0.2,
-          "favorite_oci": 44.022,
-          "underdog_oci": -30.778,
+          "favorite_oci": 44.02,
+          "underdog_oci": -30.777,
           "underdog_book_consensus": 0.75,
           "book_pick_1x2": "1",
           "book_square_underdog": false,
@@ -59577,7 +59577,7 @@
                 "delta_fair_pp": -2.15,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": -71.796,
+                "oci_as": -71.791,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -59596,7 +59596,7 @@
                 "delta_fair_pp": 0.98,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 59.935,
+                "oci_as": 59.933,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -59615,7 +59615,7 @@
                 "delta_fair_pp": 1.16,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 61.76,
+                "oci_as": 61.757,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -59733,7 +59733,7 @@
                 "delta_fair_pp": 0.47,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 39.765,
+                "oci_as": 39.764,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -59752,7 +59752,7 @@
                 "delta_fair_pp": -0.47,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -39.765,
+                "oci_as": -39.764,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -60033,7 +60033,7 @@
                 "delta_fair_pp": 0.55,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 36.826,
+                "oci_as": 36.824,
                 "marker": {
                   "shape": "circle_square",
                   "color": "yellow",
@@ -60052,7 +60052,7 @@
                 "delta_fair_pp": -0.55,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -36.826,
+                "oci_as": -36.824,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -60608,7 +60608,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 61.76,
+              "score": 61.757,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -60656,7 +60656,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 39.765,
+              "score": 39.764,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -60738,7 +60738,7 @@
             },
             "book": {
               "pick": "yes",
-              "score": 36.826,
+              "score": 36.824,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -60869,7 +60869,7 @@
         "selection_policy": "Solo segnali che superano validazione mercato, affidabilità, qualità competizione, probabilità, EV e coerenza storica.",
         "favorite_trap_pattern": {
           "available": true,
-          "score": 47.786,
+          "score": 47.785,
           "market_score": 30.601,
           "early_stats_score": 67.784,
           "two_goal_stats_score": 76.493,
@@ -60895,8 +60895,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -2.15,
           "underdog_fair_delta_pp": 1.16,
-          "favorite_oci": -71.796,
-          "underdog_oci": 61.76,
+          "favorite_oci": -71.791,
+          "underdog_oci": 61.757,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -61022,14 +61022,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -71.796,
-                  "absolute": 71.796,
+                  "value": -71.791,
+                  "absolute": 71.791,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.044,
                   "components": {
                     "magnitude": 21.5,
                     "consensus": 25.0,
-                    "velocity": 0.296,
+                    "velocity": 0.291,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -61055,14 +61055,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 59.935,
-                  "absolute": 59.935,
+                  "value": 59.933,
+                  "absolute": 59.933,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.02,
                   "components": {
                     "magnitude": 9.8,
                     "consensus": 25.0,
-                    "velocity": 0.135,
+                    "velocity": 0.133,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -61088,14 +61088,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 61.76,
-                  "absolute": 61.76,
+                  "value": 61.757,
+                  "absolute": 61.757,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.024,
                   "components": {
                     "magnitude": 11.6,
                     "consensus": 25.0,
-                    "velocity": 0.16,
+                    "velocity": 0.157,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -61114,7 +61114,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 61.76,
+              "score": 61.757,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -61266,14 +61266,14 @@
                   "ratio": 0.75
                 },
                 "oci_as": {
-                  "value": 39.765,
-                  "absolute": 39.765,
+                  "value": 39.764,
+                  "absolute": 39.764,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.01,
                   "components": {
                     "magnitude": 4.7,
                     "consensus": 18.75,
-                    "velocity": 0.065,
+                    "velocity": 0.064,
                     "persistence": 7.5,
                     "coverage": 8.75
                   }
@@ -61299,14 +61299,14 @@
                   "ratio": 0.75
                 },
                 "oci_as": {
-                  "value": -39.765,
-                  "absolute": 39.765,
+                  "value": -39.764,
+                  "absolute": 39.764,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.01,
                   "components": {
                     "magnitude": 4.7,
                     "consensus": 18.75,
-                    "velocity": 0.065,
+                    "velocity": 0.064,
                     "persistence": 7.5,
                     "coverage": 8.75
                   }
@@ -61325,7 +61325,7 @@
             },
             "book": {
               "pick": "over",
-              "score": 39.765,
+              "score": 39.764,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -61695,14 +61695,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 36.826,
-                  "absolute": 36.826,
+                  "value": 36.824,
+                  "absolute": 36.824,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.011,
                   "components": {
                     "magnitude": 5.5,
                     "consensus": 25.0,
-                    "velocity": 0.076,
+                    "velocity": 0.074,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -61728,14 +61728,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -36.826,
-                  "absolute": 36.826,
+                  "value": -36.824,
+                  "absolute": 36.824,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.011,
                   "components": {
                     "magnitude": 5.5,
                     "consensus": 25.0,
-                    "velocity": 0.076,
+                    "velocity": 0.074,
                     "persistence": 0.0,
                     "coverage": 6.25
                   }
@@ -61754,7 +61754,7 @@
             },
             "book": {
               "pick": "yes",
-              "score": 36.826,
+              "score": 36.824,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -62352,24 +62352,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.4394,
-            "conceded_ht_rate": 0.4988,
-            "total_ft": 2.838,
-            "total_ht": 1.665,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 1.009,
-            "goals_scored_ht": 1.131,
-            "goals_conceded_ht": 0.534,
-            "over25_rate": 0.515,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 2.141,
             "xg_against_ft": 0.0,
+            "total_ft": 2.838,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.163,
+            "total_ht": 1.665,
             "goals_conceded_ft": 0.697,
             "over15ht_rate": 0.5738,
-            "scored_ht_rate": 0.7774,
-            "goals_conceded_2h": 0.163,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 2.141,
+            "conceded_ht_rate": 0.4988,
             "clean_sheet_rate": 0.456,
+            "gg_ht_rate": 0.4394,
+            "scored_ht_rate": 0.7774,
             "points_per_game": 2.442,
+            "over25_rate": 0.515,
+            "goals_scored_ht": 1.131,
+            "goals_conceded_ht": 0.534,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -62926,24 +62926,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.2369,
-            "conceded_ht_rate": 0.4332,
-            "total_ft": 2.449,
-            "total_ht": 0.932,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.6,
-            "goals_scored_ht": 0.483,
-            "goals_conceded_ht": 0.449,
-            "over25_rate": 0.63,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.083,
             "xg_against_ft": 0.0,
+            "total_ft": 2.449,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.916,
+            "total_ht": 0.932,
             "goals_conceded_ft": 1.365,
             "over15ht_rate": 0.2682,
-            "scored_ht_rate": 0.4674,
-            "goals_conceded_2h": 0.916,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.083,
+            "conceded_ht_rate": 0.4332,
             "clean_sheet_rate": 0.054,
+            "gg_ht_rate": 0.2369,
+            "scored_ht_rate": 0.4674,
             "points_per_game": 1.087,
+            "over25_rate": 0.63,
+            "goals_scored_ht": 0.483,
+            "goals_conceded_ht": 0.449,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -63785,7 +63785,7 @@
         },
         "favorite_trap": {
           "available": true,
-          "score": 47.786,
+          "score": 47.785,
           "market_score": 30.601,
           "early_stats_score": 67.784,
           "two_goal_stats_score": 76.493,
@@ -63811,8 +63811,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -2.15,
           "underdog_fair_delta_pp": 1.16,
-          "favorite_oci": -71.796,
-          "underdog_oci": 61.76,
+          "favorite_oci": -71.791,
+          "underdog_oci": 61.757,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -63926,7 +63926,7 @@
                 "delta_fair_pp": 0.36,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 38.65,
+                "oci_as": 38.649,
                 "marker": {
                   "shape": "square",
                   "color": "yellow",
@@ -63964,7 +63964,7 @@
                 "delta_fair_pp": -0.36,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -38.65,
+                "oci_as": -38.649,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -64236,7 +64236,7 @@
                 "delta_fair_pp": 0.26,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 12.636,
+                "oci_as": 12.635,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -64255,7 +64255,7 @@
                 "delta_fair_pp": -0.26,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -12.636,
+                "oci_as": -12.635,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -64968,7 +64968,7 @@
             },
             "book": {
               "pick": "1",
-              "score": 38.65,
+              "score": 38.649,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -65255,8 +65255,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": 0.36,
           "underdog_fair_delta_pp": -0.36,
-          "favorite_oci": 38.65,
-          "underdog_oci": -38.65,
+          "favorite_oci": 38.649,
+          "underdog_oci": -38.649,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "1",
           "book_square_underdog": false,
@@ -65382,14 +65382,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 38.65,
-                  "absolute": 38.65,
+                  "value": 38.649,
+                  "absolute": 38.649,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.007,
                   "components": {
                     "magnitude": 3.6,
                     "consensus": 25.0,
-                    "velocity": 0.05,
+                    "velocity": 0.049,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -65447,14 +65447,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -38.65,
-                  "absolute": 38.65,
+                  "value": -38.649,
+                  "absolute": 38.649,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.007,
                   "components": {
                     "magnitude": 3.6,
                     "consensus": 25.0,
-                    "velocity": 0.05,
+                    "velocity": 0.049,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -65473,7 +65473,7 @@
             },
             "book": {
               "pick": "1",
-              "score": 38.65,
+              "score": 38.649,
               "strength": "low",
               "color": "yellow",
               "marker_shape": "square",
@@ -65841,14 +65841,14 @@
                   "ratio": 0.0
                 },
                 "oci_as": {
-                  "value": 12.636,
-                  "absolute": 12.636,
+                  "value": 12.635,
+                  "absolute": 12.635,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.005,
                   "components": {
                     "magnitude": 2.6,
                     "consensus": 0.0,
-                    "velocity": 0.036,
+                    "velocity": 0.035,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -65874,14 +65874,14 @@
                   "ratio": 0.0
                 },
                 "oci_as": {
-                  "value": -12.636,
-                  "absolute": 12.636,
+                  "value": -12.635,
+                  "absolute": 12.635,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.005,
                   "components": {
                     "magnitude": 2.6,
                     "consensus": 0.0,
-                    "velocity": 0.036,
+                    "velocity": 0.035,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -66745,24 +66745,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.0443,
-            "conceded_ht_rate": 0.2774,
-            "total_ft": 2.882,
-            "total_ht": 1.224,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.97,
-            "goals_scored_ht": 0.947,
-            "goals_conceded_ht": 0.277,
-            "over25_rate": 0.603,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.917,
             "xg_against_ft": 0.0,
+            "total_ft": 2.882,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.687,
+            "total_ht": 1.224,
             "goals_conceded_ft": 0.965,
             "over15ht_rate": 0.4359,
-            "scored_ht_rate": 0.5556,
-            "goals_conceded_2h": 0.687,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.917,
+            "conceded_ht_rate": 0.2774,
             "clean_sheet_rate": 0.473,
+            "gg_ht_rate": 0.0443,
+            "scored_ht_rate": 0.5556,
             "points_per_game": 1.957,
+            "over25_rate": 0.603,
+            "goals_scored_ht": 0.947,
+            "goals_conceded_ht": 0.277,
             "shots_on_target_for": 4.0,
             "shots_on_target_against": 3.0,
             "total_shots_for": 13.0,
@@ -67352,24 +67352,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.2227,
-            "conceded_ht_rate": 0.5344,
-            "total_ft": 2.227,
-            "total_ht": 1.409,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.428,
-            "goals_scored_ht": 0.613,
-            "goals_conceded_ht": 0.797,
-            "over25_rate": 0.473,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.041,
             "xg_against_ft": 0.0,
+            "total_ft": 2.227,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.39,
+            "total_ht": 1.409,
             "goals_conceded_ft": 1.187,
             "over15ht_rate": 0.4095,
-            "scored_ht_rate": 0.4574,
-            "goals_conceded_2h": 0.39,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.041,
+            "conceded_ht_rate": 0.5344,
             "clean_sheet_rate": 0.212,
+            "gg_ht_rate": 0.2227,
+            "scored_ht_rate": 0.4574,
             "points_per_game": 1.2,
+            "over25_rate": 0.473,
+            "goals_scored_ht": 0.613,
+            "goals_conceded_ht": 0.797,
             "shots_on_target_for": 3.0,
             "shots_on_target_against": 5.0,
             "total_shots_for": 7.0,
@@ -68241,8 +68241,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": 0.36,
           "underdog_fair_delta_pp": -0.36,
-          "favorite_oci": 38.65,
-          "underdog_oci": -38.65,
+          "favorite_oci": 38.649,
+          "underdog_oci": -38.649,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "1",
           "book_square_underdog": false,
@@ -68741,7 +68741,7 @@
                 "delta_fair_pp": 0.64,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 16.488,
+                "oci_as": 16.487,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -68760,7 +68760,7 @@
                 "delta_fair_pp": -0.64,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": -16.488,
+                "oci_as": -16.487,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -70329,14 +70329,14 @@
                   "ratio": 0.0
                 },
                 "oci_as": {
-                  "value": 16.488,
-                  "absolute": 16.488,
+                  "value": 16.487,
+                  "absolute": 16.487,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.013,
                   "components": {
                     "magnitude": 6.4,
                     "consensus": 0.0,
-                    "velocity": 0.088,
+                    "velocity": 0.087,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -70362,14 +70362,14 @@
                   "ratio": 0.0
                 },
                 "oci_as": {
-                  "value": -16.488,
-                  "absolute": 16.488,
+                  "value": -16.487,
+                  "absolute": 16.487,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.013,
                   "components": {
                     "magnitude": 6.4,
                     "consensus": 0.0,
-                    "velocity": 0.088,
+                    "velocity": 0.087,
                     "persistence": 0.0,
                     "coverage": 10.0
                   }
@@ -71258,24 +71258,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.1705,
-            "conceded_ht_rate": 0.2531,
-            "total_ft": 2.124,
-            "total_ht": 1.176,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.365,
-            "goals_scored_ht": 0.684,
-            "goals_conceded_ht": 0.492,
-            "over25_rate": 0.286,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.05,
             "xg_against_ft": 0.0,
+            "total_ft": 2.124,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.583,
+            "total_ht": 1.176,
             "goals_conceded_ft": 1.075,
             "over15ht_rate": 0.2896,
-            "scored_ht_rate": 0.4641,
-            "goals_conceded_2h": 0.583,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.05,
+            "conceded_ht_rate": 0.2531,
             "clean_sheet_rate": 0.286,
+            "gg_ht_rate": 0.1705,
+            "scored_ht_rate": 0.4641,
             "points_per_game": 1.351,
+            "over25_rate": 0.286,
+            "goals_scored_ht": 0.684,
+            "goals_conceded_ht": 0.492,
             "shots_on_target_for": 0.0,
             "shots_on_target_against": 0.0,
             "total_shots_for": 0.0,
@@ -71861,24 +71861,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.1091,
-            "conceded_ht_rate": 0.6575,
-            "total_ft": 2.119,
-            "total_ht": 1.258,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.413,
-            "goals_scored_ht": 0.164,
-            "goals_conceded_ht": 1.094,
-            "over25_rate": 0.384,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 0.576,
             "xg_against_ft": 0.0,
+            "total_ft": 2.119,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 0.449,
+            "total_ht": 1.258,
             "goals_conceded_ft": 1.543,
             "over15ht_rate": 0.2455,
-            "scored_ht_rate": 0.1364,
-            "goals_conceded_2h": 0.449,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 0.576,
+            "conceded_ht_rate": 0.6575,
             "clean_sheet_rate": 0.205,
+            "gg_ht_rate": 0.1091,
+            "scored_ht_rate": 0.1364,
             "points_per_game": 0.817,
+            "over25_rate": 0.384,
+            "goals_scored_ht": 0.164,
+            "goals_conceded_ht": 1.094,
             "shots_on_target_for": 5.0,
             "shots_on_target_against": 3.0,
             "total_shots_for": 16.0,
@@ -72922,7 +72922,7 @@
                 "delta_fair_pp": -2.01,
                 "movement_color": "orange",
                 "movement_level": "medium",
-                "oci_as": -70.376,
+                "oci_as": -70.372,
                 "marker": {
                   "shape": "circle",
                   "color": "red",
@@ -72941,7 +72941,7 @@
                 "delta_fair_pp": 0.76,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 57.705,
+                "oci_as": 57.703,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -72960,7 +72960,7 @@
                 "delta_fair_pp": 1.26,
                 "movement_color": "yellow",
                 "movement_level": "low",
-                "oci_as": 62.773,
+                "oci_as": 62.77,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -73084,7 +73084,7 @@
                 "delta_fair_pp": -0.37,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": -45.001,
+                "oci_as": -45.0,
                 "marker": {
                   "shape": "none",
                   "color": "none",
@@ -73103,7 +73103,7 @@
                 "delta_fair_pp": 0.37,
                 "movement_color": "gray",
                 "movement_level": "stable",
-                "oci_as": 45.001,
+                "oci_as": 45.0,
                 "marker": {
                   "shape": "square",
                   "color": "orange",
@@ -73942,7 +73942,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 62.773,
+              "score": 62.77,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -73990,7 +73990,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 45.001,
+              "score": 45.0,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -74229,8 +74229,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -2.01,
           "underdog_fair_delta_pp": 1.26,
-          "favorite_oci": -70.376,
-          "underdog_oci": 62.773,
+          "favorite_oci": -70.372,
+          "underdog_oci": 62.77,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -74356,14 +74356,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -70.376,
-                  "absolute": 70.376,
+                  "value": -70.372,
+                  "absolute": 70.372,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.041,
                   "components": {
                     "magnitude": 20.1,
                     "consensus": 25.0,
-                    "velocity": 0.276,
+                    "velocity": 0.272,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -74389,14 +74389,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 57.705,
-                  "absolute": 57.705,
+                  "value": 57.703,
+                  "absolute": 57.703,
                   "direction": "toward",
-                  "velocity_pp_per_hour": 0.016,
+                  "velocity_pp_per_hour": 0.015,
                   "components": {
                     "magnitude": 7.6,
                     "consensus": 25.0,
-                    "velocity": 0.105,
+                    "velocity": 0.103,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -74422,14 +74422,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 62.773,
-                  "absolute": 62.773,
+                  "value": 62.77,
+                  "absolute": 62.77,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.026,
                   "components": {
                     "magnitude": 12.6,
                     "consensus": 25.0,
-                    "velocity": 0.173,
+                    "velocity": 0.17,
                     "persistence": 15.0,
                     "coverage": 10.0
                   }
@@ -74448,7 +74448,7 @@
             },
             "book": {
               "pick": "2",
-              "score": 62.773,
+              "score": 62.77,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -74606,14 +74606,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": -45.001,
-                  "absolute": 45.001,
+                  "value": -45.0,
+                  "absolute": 45.0,
                   "direction": "away",
                   "velocity_pp_per_hour": 0.008,
                   "components": {
                     "magnitude": 3.7,
                     "consensus": 25.0,
-                    "velocity": 0.051,
+                    "velocity": 0.05,
                     "persistence": 7.5,
                     "coverage": 8.75
                   }
@@ -74639,14 +74639,14 @@
                   "ratio": 1.0
                 },
                 "oci_as": {
-                  "value": 45.001,
-                  "absolute": 45.001,
+                  "value": 45.0,
+                  "absolute": 45.0,
                   "direction": "toward",
                   "velocity_pp_per_hour": 0.008,
                   "components": {
                     "magnitude": 3.7,
                     "consensus": 25.0,
-                    "velocity": 0.051,
+                    "velocity": 0.05,
                     "persistence": 7.5,
                     "coverage": 8.75
                   }
@@ -74665,7 +74665,7 @@
             },
             "book": {
               "pick": "under",
-              "score": 45.001,
+              "score": 45.0,
               "strength": "medium",
               "color": "orange",
               "marker_shape": "square",
@@ -75734,24 +75734,24 @@
           "context_weight": 0.62,
           "expected_side": "home",
           "metrics": {
-            "gg_ht_rate": 0.0306,
-            "conceded_ht_rate": 0.2364,
-            "total_ft": 2.967,
-            "total_ht": 1.473,
-            "xg_for_ft": 0.684,
             "goals_scored_2h": 0.791,
-            "goals_scored_ht": 1.01,
-            "goals_conceded_ht": 0.463,
-            "over25_rate": 0.712,
-            "xg_sample": 1.0,
-            "goals_scored_ft": 1.802,
             "xg_against_ft": 0.912,
+            "total_ft": 2.967,
+            "xg_sample": 1.0,
+            "goals_conceded_2h": 0.702,
+            "total_ht": 1.473,
             "goals_conceded_ft": 1.165,
             "over15ht_rate": 0.5369,
-            "scored_ht_rate": 0.5005,
-            "goals_conceded_2h": 0.702,
+            "xg_for_ft": 0.684,
+            "goals_scored_ft": 1.802,
+            "conceded_ht_rate": 0.2364,
             "clean_sheet_rate": 0.522,
+            "gg_ht_rate": 0.0306,
+            "scored_ht_rate": 0.5005,
             "points_per_game": 1.948,
+            "over25_rate": 0.712,
+            "goals_scored_ht": 1.01,
+            "goals_conceded_ht": 0.463,
             "shots_on_target_for": 3.687,
             "shots_on_target_against": 3.916,
             "total_shots_for": 9.833,
@@ -76347,24 +76347,24 @@
           "context_weight": 0.62,
           "expected_side": "away",
           "metrics": {
-            "gg_ht_rate": 0.123,
-            "conceded_ht_rate": 0.385,
-            "total_ft": 2.672,
-            "total_ht": 0.728,
-            "xg_for_ft": 0.0,
             "goals_scored_2h": 0.83,
-            "goals_scored_ht": 0.22,
-            "goals_conceded_ht": 0.508,
-            "over25_rate": 0.573,
-            "xg_sample": 0.0,
-            "goals_scored_ft": 1.05,
             "xg_against_ft": 0.0,
+            "total_ft": 2.672,
+            "xg_sample": 0.0,
+            "goals_conceded_2h": 1.114,
+            "total_ht": 0.728,
             "goals_conceded_ft": 1.622,
             "over15ht_rate": 0.123,
-            "scored_ht_rate": 0.2202,
-            "goals_conceded_2h": 1.114,
+            "xg_for_ft": 0.0,
+            "goals_scored_ft": 1.05,
+            "conceded_ht_rate": 0.385,
             "clean_sheet_rate": 0.324,
+            "gg_ht_rate": 0.123,
+            "scored_ht_rate": 0.2202,
             "points_per_game": 1.164,
+            "over25_rate": 0.573,
+            "goals_scored_ht": 0.22,
+            "goals_conceded_ht": 0.508,
             "shots_on_target_for": 3.0,
             "shots_on_target_against": 5.979,
             "total_shots_for": 8.817,
@@ -77211,8 +77211,8 @@
           "favorite_steam_band": false,
           "favorite_fair_delta_pp": -2.01,
           "underdog_fair_delta_pp": 1.26,
-          "favorite_oci": -70.376,
-          "underdog_oci": 62.773,
+          "favorite_oci": -70.372,
+          "underdog_oci": 62.77,
           "underdog_book_consensus": 1.0,
           "book_pick_1x2": "2",
           "book_square_underdog": true,
@@ -77285,5 +77285,5 @@
   "fresh_matches": 18,
   "preserved_matches": 0,
   "prematch_fixtures_found": 34,
-  "api_fixtures_found": 138
+  "api_fixtures_found": 140
 }

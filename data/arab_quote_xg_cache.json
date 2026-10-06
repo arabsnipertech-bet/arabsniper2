@@ -51410,8 +51410,654 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-06T05:23:52+02:00",
       "stats_schema": 2
+    },
+    "1588849": {
+      "fixture_id": "1588849",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1376,
+        "team_name": "Notts County",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1365,
+        "team_name": "Grimsby",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:26+02:00",
+      "stats_schema": 2
+    },
+    "1567394": {
+      "fixture_id": "1567394",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 748,
+        "team_name": "Burton Albion",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 67,
+        "team_name": "Blackburn",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 27.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:26+02:00",
+      "stats_schema": 2
+    },
+    "1588854": {
+      "fixture_id": "1588854",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1349,
+        "team_name": "Oldham",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1336,
+        "team_name": "Fleetwood Town",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:26+02:00",
+      "stats_schema": 2
+    },
+    "1588857": {
+      "fixture_id": "1588857",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1354,
+        "team_name": "Doncaster",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 37,
+        "team_name": "Huddersfield",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:27+02:00",
+      "stats_schema": 2
+    },
+    "1567405": {
+      "fixture_id": "1567405",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1373,
+        "team_name": "Leyton Orient",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1338,
+        "team_name": "Oxford United",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:27+02:00",
+      "stats_schema": 2
+    },
+    "1387097": {
+      "fixture_id": "1387097",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.14,
+      "away_xg": 1.09,
+      "home_stats": {
+        "team_id": 58,
+        "team_name": "Millwall",
+        "xg": 2.14,
+        "shots_on_target": 8.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1338,
+        "team_name": "Oxford United",
+        "xg": 1.09,
+        "shots_on_target": 1.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:28+02:00",
+      "stats_schema": 2
+    },
+    "1387084": {
+      "fixture_id": "1387084",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.28,
+      "away_xg": 0.97,
+      "home_stats": {
+        "team_id": 1338,
+        "team_name": "Oxford United",
+        "xg": 2.28,
+        "shots_on_target": 10.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 74,
+        "team_name": "Sheffield Wednesday",
+        "xg": 0.97,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:28+02:00",
+      "stats_schema": 2
+    },
+    "1387068": {
+      "fixture_id": "1387068",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.8,
+      "away_xg": 1.28,
+      "home_stats": {
+        "team_id": 1338,
+        "team_name": "Oxford United",
+        "xg": 0.8,
+        "shots_on_target": 4.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1837,
+        "team_name": "Wrexham",
+        "xg": 1.28,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:28+02:00",
+      "stats_schema": 2
+    },
+    "1588872": {
+      "fixture_id": "1588872",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1342,
+        "team_name": "Walsall",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1368,
+        "team_name": "Stevenage",
+        "xg": null,
+        "shots_on_target": 11.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:28+02:00",
+      "stats_schema": 2
+    },
+    "1623088": {
+      "fixture_id": "1623088",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 57,
+        "team_name": "Ipswich",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 46,
+        "team_name": "Leicester",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:29+02:00",
+      "stats_schema": 2
+    },
+    "1567404": {
+      "fixture_id": "1567404",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 46,
+        "team_name": "Leicester",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1337,
+        "team_name": "Northampton",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:29+02:00",
+      "stats_schema": 2
+    },
+    "1567391": {
+      "fixture_id": "1567391",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1334,
+        "team_name": "Bristol Rovers",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1350,
+        "team_name": "Peterborough",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:29+02:00",
+      "stats_schema": 2
+    },
+    "1588891": {
+      "fixture_id": "1588891",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1353,
+        "team_name": "Swindon Town",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1367,
+        "team_name": "Newport County",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:30+02:00",
+      "stats_schema": 2
+    },
+    "1623095": {
+      "fixture_id": "1623095",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1357,
+        "team_name": "Plymouth",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1346,
+        "team_name": "Coventry",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:30+02:00",
+      "stats_schema": 2
+    },
+    "1623103": {
+      "fixture_id": "1623103",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 4.21,
+      "away_xg": 0.38,
+      "home_stats": {
+        "team_id": 36,
+        "team_name": "Fulham",
+        "xg": 4.21,
+        "shots_on_target": 8.0,
+        "total_shots": 29.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1333,
+        "team_name": "AFC Wimbledon",
+        "xg": 0.38,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:30+02:00",
+      "stats_schema": 2
+    },
+    "1567395": {
+      "fixture_id": "1567395",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1370,
+        "team_name": "Cambridge United",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1369,
+        "team_name": "Barnet",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:31+02:00",
+      "stats_schema": 2
+    },
+    "1588899": {
+      "fixture_id": "1588899",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1347,
+        "team_name": "Gillingham",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1370,
+        "team_name": "Cambridge United",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:31+02:00",
+      "stats_schema": 2
+    },
+    "1623085": {
+      "fixture_id": "1623085",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.64,
+      "away_xg": 2.04,
+      "home_stats": {
+        "team_id": 1370,
+        "team_name": "Cambridge United",
+        "xg": 0.64,
+        "shots_on_target": 1.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 58,
+        "team_name": "Millwall",
+        "xg": 2.04,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:31+02:00",
+      "stats_schema": 2
+    },
+    "1637936": {
+      "fixture_id": "1637936",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:32+02:00",
+      "stats_schema": 2
+    },
+    "1637933": {
+      "fixture_id": "1637933",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-06T06:13:32+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-06T05:27:58+02:00",
+  "updated_at": "2026-10-06T06:16:56+02:00",
   "runtime_calls_last_run": 20
 }

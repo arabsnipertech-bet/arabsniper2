@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-10-06T05:28:01+02:00",
+  "updated_at": "2026-10-06T06:16:58+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -332905,13 +332905,136 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1639998": {
+      "fixture_id": "1639998",
+      "date": "2026-10-06",
+      "time": "04:00",
+      "match": "Honduras - Jamaica",
+      "league": "CONCACAF Nations League",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-10-06T06:13:42+02:00",
+        "home_ft": 1,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": {
+        "market": "over15_ht",
+        "selection": "over",
+        "odd": 3.22,
+        "probability_pct": 39.77,
+        "probability_raw_pct": 40.71,
+        "expected_value_pct": 28.059,
+        "relation": "confirmed",
+        "ranking_score": 111.0,
+        "recommendation_score": 100.0,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 100.0,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 27.0,
+          "market_break_even_pct": 31.056,
+          "probability_pct": 39.77,
+          "raw_probability_pct": 40.71,
+          "expected_value_pct": 28.059,
+          "edge_over_break_even_pp": 8.714,
+          "book_disagreement_pp": 11.79,
+          "competition_quality_score": 88,
+          "bookmakers": 8,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 98.534,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle_square",
+          "color": "yellow",
+          "model": true,
+          "book": true,
+          "agreement": true
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-10-06T06:13:42+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 45.144,
+        "market_score": 28.311,
+        "early_stats_score": 73.039,
+        "two_goal_stats_score": 62.189,
+        "ft_goal_score": 30.155,
+        "classification": "underdog_book_square",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 1.56,
+        "favorite_team": "Honduras",
+        "underdog_team": "Jamaica",
+        "favorite_open_odd": 1.945,
+        "favorite_current_odd": 2.01,
+        "underdog_open_odd": 3.84,
+        "underdog_current_odd": 3.6,
+        "favorite_shortening_odd": -0.065,
+        "favorite_drift_odd": 0.065,
+        "underdog_steam_odd": 0.24,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": -1.56,
+        "underdog_fair_delta_pp": 1.59,
+        "favorite_oci": -47.922,
+        "underdog_oci": 48.231,
+        "underdog_book_consensus": 0.875,
+        "book_pick_1x2": "2",
+        "book_square_underdog": true,
+        "book_square_favorite": false,
+        "protection_pick": "2",
+        "favorite_margin_delta_pp": -0.097,
+        "underdog_margin_delta_pp": 0.151,
+        "margin_shift_favorite_vs_underdog_pp": -0.248,
+        "favorite_conceded_ht_rate_pct": 45.35,
+        "underdog_scored_ht_rate_pct": 62.2,
+        "favorite_scored_ht_rate_pct": 70.21,
+        "underdog_conceded_ht_rate_pct": 29.36,
+        "pair_goal_ht_rate_pct": 78.24,
+        "pair_over15_ht_rate_pct": 32.67,
+        "pair_gg_ht_rate_pct": 25.32,
+        "pair_over25_ft_rate_pct": 37.9,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 4.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": false,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 2817,
+    "settled_primary": 2818,
     "wins": 1346,
-    "losses": 1471,
-    "win_rate_pct": 47.781,
+    "losses": 1472,
+    "win_rate_pct": 47.764,
     "by_market": {
       "1x2_ft": {
         "settled": 749,
@@ -332926,10 +333049,10 @@
         "win_rate_pct": 54.276
       },
       "over15_ht": {
-        "settled": 480,
+        "settled": 481,
         "wins": 180,
-        "losses": 300,
-        "win_rate_pct": 37.5
+        "losses": 301,
+        "win_rate_pct": 37.422
       },
       "gg_ht": {
         "settled": 168,
@@ -332958,10 +333081,10 @@
         "win_rate_pct": 48.996
       },
       "A": {
-        "settled": 1255,
+        "settled": 1256,
         "wins": 578,
-        "losses": 677,
-        "win_rate_pct": 46.056
+        "losses": 678,
+        "win_rate_pct": 46.019
       },
       "C": {
         "settled": 461,
@@ -333020,16 +333143,16 @@
         "over25_ft_rate_pct": 48.421
       },
       "underdog_book_square": {
-        "settled": 424,
-        "goal_ht": 303,
+        "settled": 425,
+        "goal_ht": 304,
         "over15_ht": 167,
         "gg_ht": 106,
         "over25_ft": 236,
-        "avg_pattern_score": 42.162,
-        "goal_ht_rate_pct": 71.462,
-        "over15_ht_rate_pct": 39.387,
-        "gg_ht_rate_pct": 25.0,
-        "over25_ft_rate_pct": 55.66
+        "avg_pattern_score": 42.169,
+        "goal_ht_rate_pct": 71.529,
+        "over15_ht_rate_pct": 39.294,
+        "gg_ht_rate_pct": 24.941,
+        "over25_ft_rate_pct": 55.529
       },
       "favorite_steam_vulnerable": {
         "settled": 157,
