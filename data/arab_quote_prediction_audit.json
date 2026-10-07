@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-10-07T05:45:50+02:00",
+  "updated_at": "2026-10-07T12:56:14+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -333124,7 +333124,7 @@
       "competition_tier": "international_major",
       "result": {
         "status": "FT",
-        "settled_at": "2026-10-07T05:40:40+02:00",
+        "settled_at": "2026-10-07T12:56:12+02:00",
         "home_ft": 3,
         "away_ft": 2,
         "home_ht": 2,
@@ -333170,7 +333170,7 @@
         "market_calibration_weight": 0.08,
         "outcome": "won"
       },
-      "settled_at": "2026-10-07T05:40:40+02:00",
+      "settled_at": "2026-10-07T12:56:12+02:00",
       "market_pattern": {
         "available": true,
         "score": 32.899,
@@ -333487,13 +333487,136 @@
         "gg_ht": false,
         "over25_ft": false
       }
+    },
+    "1640003": {
+      "fixture_id": "1640003",
+      "date": "2026-10-07",
+      "time": "04:00",
+      "match": "French Guyana - Belize",
+      "league": "CONCACAF Nations League",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-10-07T12:56:12+02:00",
+        "home_ft": 1,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 2.2,
+        "probability_pct": 50.85,
+        "probability_raw_pct": 51.39,
+        "expected_value_pct": 11.87,
+        "relation": "contrast",
+        "ranking_score": 72.46,
+        "recommendation_score": 72.46,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 72.46,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 45.455,
+          "probability_pct": 50.85,
+          "raw_probability_pct": 51.39,
+          "expected_value_pct": 11.87,
+          "edge_over_break_even_pp": 5.395,
+          "book_disagreement_pp": 8.98,
+          "competition_quality_score": 88,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 69.46,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.06,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-10-07T12:56:12+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 24.584,
+        "market_score": 27.401,
+        "early_stats_score": 30.057,
+        "two_goal_stats_score": 8.211,
+        "ft_goal_score": 46.632,
+        "classification": "underdog_book_square",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.98,
+        "favorite_team": "French Guyana",
+        "underdog_team": "Belize",
+        "favorite_open_odd": 2.15,
+        "favorite_current_odd": 2.2,
+        "underdog_open_odd": 3.265,
+        "underdog_current_odd": 3.13,
+        "favorite_shortening_odd": -0.05,
+        "favorite_drift_odd": 0.05,
+        "underdog_steam_odd": 0.135,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": false,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": -1.31,
+        "underdog_fair_delta_pp": 0.98,
+        "favorite_oci": -44.974,
+        "underdog_oci": 41.561,
+        "underdog_book_consensus": 0.8571,
+        "book_pick_1x2": "2",
+        "book_square_underdog": true,
+        "book_square_favorite": false,
+        "protection_pick": "2",
+        "favorite_margin_delta_pp": 0.249,
+        "underdog_margin_delta_pp": 0.342,
+        "margin_shift_favorite_vs_underdog_pp": -0.093,
+        "favorite_conceded_ht_rate_pct": 38.38,
+        "underdog_scored_ht_rate_pct": 41.63,
+        "favorite_scored_ht_rate_pct": 23.59,
+        "underdog_conceded_ht_rate_pct": 39.99,
+        "pair_goal_ht_rate_pct": 59.715,
+        "pair_over15_ht_rate_pct": 25.415,
+        "pair_gg_ht_rate_pct": 12.08,
+        "pair_over25_ft_rate_pct": 61.933,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": false,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 2819,
+    "settled_primary": 2820,
     "wins": 1347,
-    "losses": 1472,
-    "win_rate_pct": 47.783,
+    "losses": 1473,
+    "win_rate_pct": 47.766,
     "by_market": {
       "1x2_ft": {
         "settled": 749,
@@ -333502,10 +333625,10 @@
         "win_rate_pct": 47.263
       },
       "over25_ft": {
-        "settled": 1415,
+        "settled": 1416,
         "wins": 768,
-        "losses": 647,
-        "win_rate_pct": 54.276
+        "losses": 648,
+        "win_rate_pct": 54.237
       },
       "over15_ht": {
         "settled": 482,
@@ -333534,10 +333657,10 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 1096,
+        "settled": 1097,
         "wins": 537,
-        "losses": 559,
-        "win_rate_pct": 48.996
+        "losses": 560,
+        "win_rate_pct": 48.952
       },
       "A": {
         "settled": 1257,
@@ -333602,16 +333725,16 @@
         "over25_ft_rate_pct": 48.421
       },
       "underdog_book_square": {
-        "settled": 427,
+        "settled": 428,
         "goal_ht": 305,
         "over15_ht": 168,
         "gg_ht": 107,
         "over25_ft": 238,
-        "avg_pattern_score": 42.136,
-        "goal_ht_rate_pct": 71.429,
-        "over15_ht_rate_pct": 39.344,
-        "gg_ht_rate_pct": 25.059,
-        "over25_ft_rate_pct": 55.738
+        "avg_pattern_score": 42.095,
+        "goal_ht_rate_pct": 71.262,
+        "over15_ht_rate_pct": 39.252,
+        "gg_ht_rate_pct": 25.0,
+        "over25_ft_rate_pct": 55.607
       },
       "favorite_steam_vulnerable": {
         "settled": 157,
