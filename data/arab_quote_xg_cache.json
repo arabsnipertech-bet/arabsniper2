@@ -53136,8 +53136,688 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-08T05:04:39+02:00",
       "stats_schema": 2
+    },
+    "1492774": {
+      "fixture_id": "1492774",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.05,
+      "away_xg": 1.01,
+      "home_stats": {
+        "team_id": 652,
+        "team_name": "Shamrock Rovers",
+        "xg": 2.05,
+        "shots_on_target": 9.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3845,
+        "team_name": "Waterford",
+        "xg": 1.01,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:01+02:00",
+      "stats_schema": 2
+    },
+    "1492769": {
+      "fixture_id": "1492769",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.03,
+      "away_xg": 0.89,
+      "home_stats": {
+        "team_id": 3843,
+        "team_name": "St Patrick's Athl.",
+        "xg": 1.03,
+        "shots_on_target": 5.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 652,
+        "team_name": "Shamrock Rovers",
+        "xg": 0.89,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:01+02:00",
+      "stats_schema": 2
+    },
+    "1492754": {
+      "fixture_id": "1492754",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 652,
+        "team_name": "Shamrock Rovers",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3854,
+        "team_name": "Shelbourne",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1492757": {
+      "fixture_id": "1492757",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.2,
+      "away_xg": 0.89,
+      "home_stats": {
+        "team_id": 670,
+        "team_name": "Derry City",
+        "xg": 1.2,
+        "shots_on_target": 8.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 652,
+        "team_name": "Shamrock Rovers",
+        "xg": 0.89,
+        "shots_on_target": 5.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1492771": {
+      "fixture_id": "1492771",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.01,
+      "away_xg": 0.86,
+      "home_stats": {
+        "team_id": 3840,
+        "team_name": "Bohemians",
+        "xg": 2.01,
+        "shots_on_target": 6.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3850,
+        "team_name": "Drogheda United",
+        "xg": 0.86,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1492762": {
+      "fixture_id": "1492762",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.32,
+      "away_xg": 1.32,
+      "home_stats": {
+        "team_id": 3854,
+        "team_name": "Shelbourne",
+        "xg": 1.32,
+        "shots_on_target": 5.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3850,
+        "team_name": "Drogheda United",
+        "xg": 1.32,
+        "shots_on_target": 4.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1492766": {
+      "fixture_id": "1492766",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.42,
+      "away_xg": 1.22,
+      "home_stats": {
+        "team_id": 3850,
+        "team_name": "Drogheda United",
+        "xg": 1.42,
+        "shots_on_target": 7.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3842,
+        "team_name": "Sligo Rovers",
+        "xg": 1.22,
+        "shots_on_target": 1.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1629908": {
+      "fixture_id": "1629908",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1492318": {
+      "fixture_id": "1492318",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 126,
+        "team_name": "Sao Paulo",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 128,
+        "team_name": "Santos",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:03+02:00",
+      "stats_schema": 2
+    },
+    "1492386": {
+      "fixture_id": "1492386",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.84,
+      "away_xg": 0.9,
+      "home_stats": {
+        "team_id": 1198,
+        "team_name": "Remo",
+        "xg": 0.84,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 128,
+        "team_name": "Santos",
+        "xg": 0.9,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:04+02:00",
+      "stats_schema": 2
+    },
+    "1492383": {
+      "fixture_id": "1492383",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 127,
+        "team_name": "Flamengo",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 794,
+        "team_name": "RB Bragantino",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:04+02:00",
+      "stats_schema": 2
+    },
+    "1635387": {
+      "fixture_id": "1635387",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 127,
+        "team_name": "Flamengo",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1153,
+        "team_name": "Independiente del Valle",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:04+02:00",
+      "stats_schema": 2
+    },
+    "1492375": {
+      "fixture_id": "1492375",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.62,
+      "away_xg": 0.3,
+      "home_stats": {
+        "team_id": 127,
+        "team_name": "Flamengo",
+        "xg": 2.62,
+        "shots_on_target": 10.0,
+        "total_shots": 32.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 131,
+        "team_name": "Corinthians",
+        "xg": 0.3,
+        "shots_on_target": 1.0,
+        "total_shots": 3.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:04+02:00",
+      "stats_schema": 2
+    },
+    "1635386": {
+      "fixture_id": "1635386",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1153,
+        "team_name": "Independiente del Valle",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 127,
+        "team_name": "Flamengo",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:04+02:00",
+      "stats_schema": 2
+    },
+    "1520902": {
+      "fixture_id": "1520902",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.85,
+      "away_xg": 1.58,
+      "home_stats": {
+        "team_id": 145,
+        "team_name": "Avai",
+        "xg": 1.85,
+        "shots_on_target": 5.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 129,
+        "team_name": "Ceara",
+        "xg": 1.58,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:05+02:00",
+      "stats_schema": 2
+    },
+    "1520898": {
+      "fixture_id": "1520898",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1223,
+        "team_name": "Operario-PR",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 129,
+        "team_name": "Ceara",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:05+02:00",
+      "stats_schema": 2
+    },
+    "1520881": {
+      "fixture_id": "1520881",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.71,
+      "away_xg": 2.09,
+      "home_stats": {
+        "team_id": 129,
+        "team_name": "Ceara",
+        "xg": 0.71,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 7834,
+        "team_name": "Novorizontino",
+        "xg": 2.09,
+        "shots_on_target": 9.0,
+        "total_shots": 24.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:05+02:00",
+      "stats_schema": 2
+    },
+    "1520875": {
+      "fixture_id": "1520875",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 154,
+        "team_name": "Fortaleza EC",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 129,
+        "team_name": "Ceara",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:05+02:00",
+      "stats_schema": 2
+    },
+    "1520907": {
+      "fixture_id": "1520907",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 148,
+        "team_name": "Londrina",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 140,
+        "team_name": "Criciuma",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:06+02:00",
+      "stats_schema": 2
+    },
+    "1520893": {
+      "fixture_id": "1520893",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.82,
+      "away_xg": 0.05,
+      "home_stats": {
+        "team_id": 140,
+        "team_name": "Criciuma",
+        "xg": 0.82,
+        "shots_on_target": 5.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 145,
+        "team_name": "Avai",
+        "xg": 0.05,
+        "shots_on_target": 0.0,
+        "total_shots": 1.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-08T05:54:06+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-08T05:13:00+02:00",
+  "updated_at": "2026-10-08T06:01:31+02:00",
   "runtime_calls_last_run": 20
 }
