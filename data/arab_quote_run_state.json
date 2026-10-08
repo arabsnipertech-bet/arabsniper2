@@ -4,13 +4,13 @@
   "days": 5,
   "audit_date": "",
   "command": [
-    "/opt/hostedtoolcache/Python/3.11.16/x64/bin/python",
+    "/opt/hostedtoolcache/Python/3.11.17/x64/bin/python",
     "/home/runner/work/arabsniper2/arabsniper2/src/3appdays.py",
     "--today"
   ],
   "returncode": 0,
   "status": "ok",
-  "generated_at": "2026-10-08T13:16:56+02:00",
-  "stdout_tail": "[2026-10-08 13:16:47] 📅 Scan day1: 2026-10-08\n[2026-10-08 13:16:47] ⚽ Fixture pre-match valide: 14\n[2026-10-08 13:16:47]   [1/14] Home United - Công An Nhân Dân\n[2026-10-08 13:16:47]   ⚠️ Fixture 1551232 non aggiornata: dati incompleti, preservo eventuale versione precedente\n[2026-10-08 13:16:47]   [2/14] Johor Darul Takzim FC - Svay Rieng\n[2026-10-08 13:16:48]   ⚠️ Fixture 1551231 non aggiornata: dati incompleti, preservo eventuale versione precedente\n[2026-10-08 13:16:48]   [3/14] Port FC - Persib Bandung\n[2026-10-08 13:16:48]   ⚠️ Fixture 1551233 non aggiornata: dati incompleti, preservo eventuale versione precedente\n[2026-10-08 13:16:48]   [4/14] Denizli İYG - Serik Spor\n[2026-10-08 13:16:49]   ⚠️ Fixture 1640679 non aggiornata: dati incompleti, preservo eventuale versione precedente\n[2026-10-08 13:16:49]   [5/14] Al Shamal - Al-Duhail SC\n[2026-10-08 13:16:49]   [6/14] HJK Helsinki - VPS\n[2026-10-08 13:16:50]   [7/14] KuPS - AC Oulu\n[2026-10-08 13:16:51]   [8/14] Al Wakrah - Al-Gharafa\n[2026-10-08 13:16:51]   ⚠️ Fixture 1597935 non aggiornata: dati incompleti, preservo eventuale versione precedente\n[2026-10-08 13:16:51]   [9/14] Orduspor 1967 - Karadeniz Ereğli BSK\n[2026-10-08 13:16:51]   ⚠️ Fixture 1640697 non aggiornata: dati incompleti, preservo eventuale versione precedente\n[2026-10-08 13:16:51]   [10/14] CFR 1907 Cluj - Universitatea Cluj\n[2026-10-08 13:16:52]   [11/14] Beti Kozkor - Beti Onak\n[2026-10-08 13:16:52]   ⚠️ Fixture 1617033 non aggiornata: dati incompleti, preservo eventuale versione precedente\n[2026-10-08 13:16:52]   [12/14] Txantrea - Cortes\n[2026-10-08 13:16:53]   [13/14] River Ebro - Pradejón\n[2026-10-08 13:16:53]   ⚠️ Fixture 1617344 non aggiornata: dati incompleti, preservo eventuale versione precedente\n[2026-10-08 13:16:53]   [14/14] Shamrock Rovers - Drogheda United\n[2026-10-08 13:16:56] ✅ Output scritto: /home/runner/work/arabsniper2/arabsniper2/data/arab_quote_dashboard.json\n[2026-10-08 13:16:56] ✅ Stato quote scritto: /home/runner/work/arabsniper2/arabsniper2/data/arab_quote_state.json\n[2026-10-08 13:16:56] ✅ Cache xG scritta: /home/runner/work/arabsniper2/arabsniper2/data/arab_quote_xg_cache.json\n",
+  "generated_at": "2026-10-08T20:45:03+02:00",
+  "stdout_tail": "[2026-10-08 20:45:00] 📅 Scan day1: 2026-10-08\n[2026-10-08 20:45:01] ⚽ Fixture pre-match valide: 1\n[2026-10-08 20:45:01]   [1/1] Shamrock Rovers - Drogheda United\n[2026-10-08 20:45:03] ✅ Output scritto: /home/runner/work/arabsniper2/arabsniper2/data/arab_quote_dashboard.json\n[2026-10-08 20:45:03] ✅ Stato quote scritto: /home/runner/work/arabsniper2/arabsniper2/data/arab_quote_state.json\n[2026-10-08 20:45:03] ✅ Cache xG scritta: /home/runner/work/arabsniper2/arabsniper2/data/arab_quote_xg_cache.json\n",
   "stderr_tail": ""
 }
