@@ -55326,8 +55326,578 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-10T04:50:13+02:00",
       "stats_schema": 2
+    },
+    "1565474": {
+      "fixture_id": "1565474",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:14+02:00",
+      "stats_schema": 2
+    },
+    "1565487": {
+      "fixture_id": "1565487",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:15+02:00",
+      "stats_schema": 2
+    },
+    "1619905": {
+      "fixture_id": "1619905",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:15+02:00",
+      "stats_schema": 2
+    },
+    "1576491": {
+      "fixture_id": "1576491",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 216,
+        "team_name": "Portimonense",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "away_stats": {
+        "team_id": 218,
+        "team_name": "Tondela",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:15+02:00",
+      "stats_schema": 2
+    },
+    "1576472": {
+      "fixture_id": "1576472",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 4662,
+        "team_name": "União de Leiria",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "away_stats": {
+        "team_id": 218,
+        "team_name": "Tondela",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:15+02:00",
+      "stats_schema": 2
+    },
+    "1576465": {
+      "fixture_id": "1576465",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:16+02:00",
+      "stats_schema": 2
+    },
+    "1576493": {
+      "fixture_id": "1576493",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 4799,
+        "team_name": "Torreense",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 244,
+        "team_name": "Leixoes",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:16+02:00",
+      "stats_schema": 2
+    },
+    "1576475": {
+      "fixture_id": "1576475",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 4799,
+        "team_name": "Torreense",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "away_stats": {
+        "team_id": 810,
+        "team_name": "Vizela",
+        "xg": null,
+        "shots_on_target": null,
+        "total_shots": null,
+        "big_chances": null,
+        "matched_types": {}
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:16+02:00",
+      "stats_schema": 2
+    },
+    "1576462": {
+      "fixture_id": "1576462",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:16+02:00",
+      "stats_schema": 2
+    },
+    "1584413": {
+      "fixture_id": "1584413",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.74,
+      "away_xg": 0.52,
+      "home_stats": {
+        "team_id": 564,
+        "team_name": "Başakşehir",
+        "xg": 2.74,
+        "shots_on_target": 11.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 997,
+        "team_name": "Gençlerbirliği S.K.",
+        "xg": 0.52,
+        "shots_on_target": 0.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:18+02:00",
+      "stats_schema": 2
+    },
+    "1584409": {
+      "fixture_id": "1584409",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.16,
+      "away_xg": 1.32,
+      "home_stats": {
+        "team_id": 997,
+        "team_name": "Gençlerbirliği S.K.",
+        "xg": 1.16,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1004,
+        "team_name": "Kasımpaşa",
+        "xg": 1.32,
+        "shots_on_target": 3.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:18+02:00",
+      "stats_schema": 2
+    },
+    "1584402": {
+      "fixture_id": "1584402",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 3.21,
+      "away_xg": 0.86,
+      "home_stats": {
+        "team_id": 998,
+        "team_name": "Trabzonspor",
+        "xg": 3.21,
+        "shots_on_target": 13.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 997,
+        "team_name": "Gençlerbirliği S.K.",
+        "xg": 0.86,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:18+02:00",
+      "stats_schema": 2
+    },
+    "1584391": {
+      "fixture_id": "1584391",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.75,
+      "away_xg": 0.86,
+      "home_stats": {
+        "team_id": 997,
+        "team_name": "Gençlerbirliği S.K.",
+        "xg": 0.75,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1009,
+        "team_name": "Erzurumspor FK",
+        "xg": 0.86,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:18+02:00",
+      "stats_schema": 2
+    },
+    "1584412": {
+      "fixture_id": "1584412",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.54,
+      "away_xg": 2.04,
+      "home_stats": {
+        "team_id": 3579,
+        "team_name": "Amed",
+        "xg": 1.54,
+        "shots_on_target": 8.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 549,
+        "team_name": "Beşiktaş",
+        "xg": 2.04,
+        "shots_on_target": 8.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:18+02:00",
+      "stats_schema": 2
+    },
+    "1584404": {
+      "fixture_id": "1584404",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 4.25,
+      "away_xg": 0.39,
+      "home_stats": {
+        "team_id": 3579,
+        "team_name": "Amed",
+        "xg": 4.25,
+        "shots_on_target": 6.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 564,
+        "team_name": "Başakşehir",
+        "xg": 0.39,
+        "shots_on_target": 1.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:19+02:00",
+      "stats_schema": 2
+    },
+    "1584399": {
+      "fixture_id": "1584399",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.04,
+      "away_xg": 1.11,
+      "home_stats": {
+        "team_id": 1004,
+        "team_name": "Kasımpaşa",
+        "xg": 1.04,
+        "shots_on_target": 7.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3579,
+        "team_name": "Amed",
+        "xg": 1.11,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:19+02:00",
+      "stats_schema": 2
+    },
+    "1584385": {
+      "fixture_id": "1584385",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.69,
+      "away_xg": 0.93,
+      "home_stats": {
+        "team_id": 3579,
+        "team_name": "Amed",
+        "xg": 2.69,
+        "shots_on_target": 7.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 998,
+        "team_name": "Trabzonspor",
+        "xg": 0.93,
+        "shots_on_target": 5.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:19+02:00",
+      "stats_schema": 2
+    },
+    "1585768": {
+      "fixture_id": "1585768",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3605,
+        "team_name": "Sarıyer",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3569,
+        "team_name": "Boluspor",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:20+02:00",
+      "stats_schema": 2
+    },
+    "1585759": {
+      "fixture_id": "1585759",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1005,
+        "team_name": "Antalyaspor",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 6342,
+        "team_name": "Vanspor FK",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:20+02:00",
+      "stats_schema": 2
+    },
+    "1576187": {
+      "fixture_id": "1576187",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.72,
+      "away_xg": 1.23,
+      "home_stats": {
+        "team_id": 161,
+        "team_name": "VfL Wolfsburg",
+        "xg": 1.72,
+        "shots_on_target": 6.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 181,
+        "team_name": "SV Darmstadt 98",
+        "xg": 1.23,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-10T05:44:21+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-10T04:58:10+02:00",
+  "updated_at": "2026-10-10T05:51:28+02:00",
   "runtime_calls_last_run": 20
 }
