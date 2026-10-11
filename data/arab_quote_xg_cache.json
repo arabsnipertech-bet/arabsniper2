@@ -55896,8 +55896,428 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-10T05:44:21+02:00",
       "stats_schema": 2
+    },
+    "1635977": {
+      "fixture_id": "1635977",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:54+02:00",
+      "stats_schema": 2
+    },
+    "1635972": {
+      "fixture_id": "1635972",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:54+02:00",
+      "stats_schema": 2
+    },
+    "1635986": {
+      "fixture_id": "1635986",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:54+02:00",
+      "stats_schema": 2
+    },
+    "1635973": {
+      "fixture_id": "1635973",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:54+02:00",
+      "stats_schema": 2
+    },
+    "1549764": {
+      "fixture_id": "1549764",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1137,
+        "team_name": "Atletico Nacional",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1142,
+        "team_name": "Deportes Tolima",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:55+02:00",
+      "stats_schema": 2
+    },
+    "1549703": {
+      "fixture_id": "1549703",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1137,
+        "team_name": "Atletico Nacional",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1135,
+        "team_name": "Junior",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:55+02:00",
+      "stats_schema": 2
+    },
+    "1549794": {
+      "fixture_id": "1549794",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1137,
+        "team_name": "Atletico Nacional",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1125,
+        "team_name": "Millonarios",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:55+02:00",
+      "stats_schema": 2
+    },
+    "1549791": {
+      "fixture_id": "1549791",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.83,
+      "away_xg": 1.18,
+      "home_stats": {
+        "team_id": 1464,
+        "team_name": "Llaneros",
+        "xg": 0.83,
+        "shots_on_target": 5.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1137,
+        "team_name": "Atletico Nacional",
+        "xg": 1.18,
+        "shots_on_target": 5.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:55+02:00",
+      "stats_schema": 2
+    },
+    "1549808": {
+      "fixture_id": "1549808",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1126,
+        "team_name": "Deportivo Pasto",
+        "xg": null,
+        "shots_on_target": 0.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "total_shots": "Total Shots",
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "away_stats": {
+        "team_id": 1147,
+        "team_name": "Fortaleza FC",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "total_shots": "Total Shots",
+          "shots_on_target": "Shots on Goal"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:55+02:00",
+      "stats_schema": 2
+    },
+    "1549795": {
+      "fixture_id": "1549795",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1132,
+        "team_name": "Chico",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1126,
+        "team_name": "Deportivo Pasto",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:56+02:00",
+      "stats_schema": 2
+    },
+    "1549788": {
+      "fixture_id": "1549788",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1126,
+        "team_name": "Deportivo Pasto",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1136,
+        "team_name": "Once Caldas",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:56+02:00",
+      "stats_schema": 2
+    },
+    "1549774": {
+      "fixture_id": "1549774",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.38,
+      "away_xg": 0.65,
+      "home_stats": {
+        "team_id": 1138,
+        "team_name": "America de Cali",
+        "xg": 0.38,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1126,
+        "team_name": "Deportivo Pasto",
+        "xg": 0.65,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:56+02:00",
+      "stats_schema": 2
+    },
+    "1493724": {
+      "fixture_id": "1493724",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:57+02:00",
+      "stats_schema": 2
+    },
+    "1493720": {
+      "fixture_id": "1493720",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:57+02:00",
+      "stats_schema": 2
+    },
+    "1493711": {
+      "fixture_id": "1493711",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:57+02:00",
+      "stats_schema": 2
+    },
+    "1493702": {
+      "fixture_id": "1493702",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:57+02:00",
+      "stats_schema": 2
+    },
+    "1493722": {
+      "fixture_id": "1493722",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:57+02:00",
+      "stats_schema": 2
+    },
+    "1493708": {
+      "fixture_id": "1493708",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:57+02:00",
+      "stats_schema": 2
+    },
+    "1493693": {
+      "fixture_id": "1493693",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:58+02:00",
+      "stats_schema": 2
+    },
+    "1493678": {
+      "fixture_id": "1493678",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-11T04:18:58+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-10T05:51:28+02:00",
+  "updated_at": "2026-10-11T04:23:39+02:00",
   "runtime_calls_last_run": 20
 }
