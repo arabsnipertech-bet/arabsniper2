@@ -57068,8 +57068,644 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-12T04:43:28+02:00",
       "stats_schema": 2
+    },
+    "1569934": {
+      "fixture_id": "1569934",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 537,
+        "team_name": "Leganes",
+        "xg": null,
+        "shots_on_target": 12.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 715,
+        "team_name": "Granada CF",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:52+02:00",
+      "stats_schema": 2
+    },
+    "1569907": {
+      "fixture_id": "1569907",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.49,
+      "away_xg": 0.49,
+      "home_stats": {
+        "team_id": 545,
+        "team_name": "Eibar",
+        "xg": 1.49,
+        "shots_on_target": 8.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 715,
+        "team_name": "Granada CF",
+        "xg": 0.49,
+        "shots_on_target": 3.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:52+02:00",
+      "stats_schema": 2
+    },
+    "1565257": {
+      "fixture_id": "1565257",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 6231,
+        "team_name": "Rapid",
+        "xg": null,
+        "shots_on_target": 10.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2592,
+        "team_name": "Arges Pitesti",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:53+02:00",
+      "stats_schema": 2
+    },
+    "1565250": {
+      "fixture_id": "1565250",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.51,
+      "away_xg": 1.08,
+      "home_stats": {
+        "team_id": 2592,
+        "team_name": "Arges Pitesti",
+        "xg": 1.51,
+        "shots_on_target": 1.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2581,
+        "team_name": "FC Botosani",
+        "xg": 1.08,
+        "shots_on_target": 3.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:53+02:00",
+      "stats_schema": 2
+    },
+    "1565242": {
+      "fixture_id": "1565242",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.19,
+      "away_xg": 2.51,
+      "home_stats": {
+        "team_id": 2578,
+        "team_name": "FC Voluntari",
+        "xg": 1.19,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2592,
+        "team_name": "Arges Pitesti",
+        "xg": 2.51,
+        "shots_on_target": 2.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:53+02:00",
+      "stats_schema": 2
+    },
+    "1565207": {
+      "fixture_id": "1565207",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2246,
+        "team_name": "CFR 1907 Cluj",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2599,
+        "team_name": "Universitatea Cluj",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:53+02:00",
+      "stats_schema": 2
+    },
+    "1593322": {
+      "fixture_id": "1593322",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.12,
+      "away_xg": 2.08,
+      "home_stats": {
+        "team_id": 949,
+        "team_name": "Panetolikos",
+        "xg": 0.12,
+        "shots_on_target": 1.0,
+        "total_shots": 2.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 619,
+        "team_name": "PAOK",
+        "xg": 2.08,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:54+02:00",
+      "stats_schema": 2
+    },
+    "1635500": {
+      "fixture_id": "1635500",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:54+02:00",
+      "stats_schema": 2
+    },
+    "1593308": {
+      "fixture_id": "1593308",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.72,
+      "away_xg": 1.02,
+      "home_stats": {
+        "team_id": 617,
+        "team_name": "Panathinaikos",
+        "xg": 2.72,
+        "shots_on_target": 11.0,
+        "total_shots": 25.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 619,
+        "team_name": "PAOK",
+        "xg": 1.02,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:54+02:00",
+      "stats_schema": 2
+    },
+    "1593319": {
+      "fixture_id": "1593319",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.16,
+      "away_xg": 1.72,
+      "home_stats": {
+        "team_id": 5046,
+        "team_name": "Kalamata",
+        "xg": 1.16,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 617,
+        "team_name": "Panathinaikos",
+        "xg": 1.72,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:54+02:00",
+      "stats_schema": 2
+    },
+    "1635501": {
+      "fixture_id": "1635501",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:55+02:00",
+      "stats_schema": 2
+    },
+    "1638102": {
+      "fixture_id": "1638102",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 649,
+        "team_name": "HJK Helsinki",
+        "xg": null,
+        "shots_on_target": 10.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 650,
+        "team_name": "VPS",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:55+02:00",
+      "stats_schema": 2
+    },
+    "1638101": {
+      "fixture_id": "1638101",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2082,
+        "team_name": "Gnistan",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1164,
+        "team_name": "Inter Turku",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:56+02:00",
+      "stats_schema": 2
+    },
+    "1553176": {
+      "fixture_id": "1553176",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 3.98,
+      "away_xg": 0.98,
+      "home_stats": {
+        "team_id": 347,
+        "team_name": "Lech Poznan",
+        "xg": 3.98,
+        "shots_on_target": 9.0,
+        "total_shots": 26.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 4248,
+        "team_name": "Radomiak Radom",
+        "xg": 0.98,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:57+02:00",
+      "stats_schema": 2
+    },
+    "1553167": {
+      "fixture_id": "1553167",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.33,
+      "away_xg": 1.79,
+      "home_stats": {
+        "team_id": 4248,
+        "team_name": "Radomiak Radom",
+        "xg": 2.33,
+        "shots_on_target": 9.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 349,
+        "team_name": "Piast Gliwice",
+        "xg": 1.79,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:57+02:00",
+      "stats_schema": 2
+    },
+    "1553162": {
+      "fixture_id": "1553162",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.59,
+      "away_xg": 1.69,
+      "home_stats": {
+        "team_id": 6962,
+        "team_name": "Widzew Łódź",
+        "xg": 1.59,
+        "shots_on_target": 2.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 4248,
+        "team_name": "Radomiak Radom",
+        "xg": 1.69,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:57+02:00",
+      "stats_schema": 2
+    },
+    "1553149": {
+      "fixture_id": "1553149",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.89,
+      "away_xg": 2.02,
+      "home_stats": {
+        "team_id": 4248,
+        "team_name": "Radomiak Radom",
+        "xg": 1.89,
+        "shots_on_target": 5.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 350,
+        "team_name": "Cracovia Krakow",
+        "xg": 2.02,
+        "shots_on_target": 7.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:57+02:00",
+      "stats_schema": 2
+    },
+    "1553177": {
+      "fixture_id": "1553177",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 14562,
+        "team_name": "Motor Lublin",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 340,
+        "team_name": "Gornik Zabrze",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:58+02:00",
+      "stats_schema": 2
+    },
+    "1553159": {
+      "fixture_id": "1553159",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.48,
+      "away_xg": 2.26,
+      "home_stats": {
+        "team_id": 14562,
+        "team_name": "Motor Lublin",
+        "xg": 1.48,
+        "shots_on_target": 6.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 339,
+        "team_name": "Legia Warszawa",
+        "xg": 2.26,
+        "shots_on_target": 6.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:58+02:00",
+      "stats_schema": 2
+    },
+    "1612615": {
+      "fixture_id": "1612615",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T05:39:58+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-12T04:46:24+02:00",
+  "updated_at": "2026-10-12T05:42:57+02:00",
   "runtime_calls_last_run": 20
 }
