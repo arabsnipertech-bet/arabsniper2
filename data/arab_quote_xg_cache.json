@@ -56594,8 +56594,482 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-11T05:18:06+02:00",
       "stats_schema": 2
+    },
+    "1635870": {
+      "fixture_id": "1635870",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:22+02:00",
+      "stats_schema": 2
+    },
+    "1481028": {
+      "fixture_id": "1481028",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:23+02:00",
+      "stats_schema": 2
+    },
+    "1134902": {
+      "fixture_id": "1134902",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:23+02:00",
+      "stats_schema": 2
+    },
+    "1153949": {
+      "fixture_id": "1153949",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:24+02:00",
+      "stats_schema": 2
+    },
+    "1133309": {
+      "fixture_id": "1133309",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:24+02:00",
+      "stats_schema": 2
+    },
+    "1132081": {
+      "fixture_id": "1132081",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:24+02:00",
+      "stats_schema": 2
+    },
+    "1569956": {
+      "fixture_id": "1569956",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 534,
+        "team_name": "Las Palmas",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 720,
+        "team_name": "Valladolid",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:24+02:00",
+      "stats_schema": 2
+    },
+    "1569931": {
+      "fixture_id": "1569931",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 10139,
+        "team_name": "AD Ceuta FC",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 720,
+        "team_name": "Valladolid",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:24+02:00",
+      "stats_schema": 2
+    },
+    "1569948": {
+      "fixture_id": "1569948",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.0,
+      "away_xg": 1.07,
+      "home_stats": {
+        "team_id": 722,
+        "team_name": "Albacete",
+        "xg": 2.0,
+        "shots_on_target": 6.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 545,
+        "team_name": "Eibar",
+        "xg": 1.07,
+        "shots_on_target": 6.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:25+02:00",
+      "stats_schema": 2
+    },
+    "1569941": {
+      "fixture_id": "1569941",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 547,
+        "team_name": "Girona",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 722,
+        "team_name": "Albacete",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:25+02:00",
+      "stats_schema": 2
+    },
+    "1569922": {
+      "fixture_id": "1569922",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.95,
+      "away_xg": 1.21,
+      "home_stats": {
+        "team_id": 715,
+        "team_name": "Granada CF",
+        "xg": 0.95,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 722,
+        "team_name": "Albacete",
+        "xg": 1.21,
+        "shots_on_target": 4.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:25+02:00",
+      "stats_schema": 2
+    },
+    "1567329": {
+      "fixture_id": "1567329",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:26+02:00",
+      "stats_schema": 2
+    },
+    "1603041": {
+      "fixture_id": "1603041",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.54,
+      "away_xg": 5.22,
+      "home_stats": {
+        "team_id": 10509,
+        "team_name": "Al Kholood",
+        "xg": 2.54,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2933,
+        "team_name": "Al-Qadisiyah FC",
+        "xg": 5.22,
+        "shots_on_target": 9.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:26+02:00",
+      "stats_schema": 2
+    },
+    "1304133": {
+      "fixture_id": "1304133",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:27+02:00",
+      "stats_schema": 2
+    },
+    "1133311": {
+      "fixture_id": "1133311",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:27+02:00",
+      "stats_schema": 2
+    },
+    "1132079": {
+      "fixture_id": "1132079",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:27+02:00",
+      "stats_schema": 2
+    },
+    "1569949": {
+      "fixture_id": "1569949",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.19,
+      "away_xg": 1.14,
+      "home_stats": {
+        "team_id": 723,
+        "team_name": "Almeria",
+        "xg": 2.19,
+        "shots_on_target": 8.0,
+        "total_shots": 25.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 9580,
+        "team_name": "Burgos",
+        "xg": 1.14,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:27+02:00",
+      "stats_schema": 2
+    },
+    "1569933": {
+      "fixture_id": "1569933",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.53,
+      "away_xg": 1.07,
+      "home_stats": {
+        "team_id": 534,
+        "team_name": "Las Palmas",
+        "xg": 0.53,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 9580,
+        "team_name": "Burgos",
+        "xg": 1.07,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:28+02:00",
+      "stats_schema": 2
+    },
+    "1569916": {
+      "fixture_id": "1569916",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.85,
+      "away_xg": 0.91,
+      "home_stats": {
+        "team_id": 9580,
+        "team_name": "Burgos",
+        "xg": 0.85,
+        "shots_on_target": 2.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 10139,
+        "team_name": "AD Ceuta FC",
+        "xg": 0.91,
+        "shots_on_target": 3.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:28+02:00",
+      "stats_schema": 2
+    },
+    "1569942": {
+      "fixture_id": "1569942",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.09,
+      "away_xg": 0.9,
+      "home_stats": {
+        "team_id": 715,
+        "team_name": "Granada CF",
+        "xg": 2.09,
+        "shots_on_target": 5.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 8157,
+        "team_name": "FC Andorra",
+        "xg": 0.9,
+        "shots_on_target": 5.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-12T04:43:28+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-11T05:22:57+02:00",
+  "updated_at": "2026-10-12T04:46:24+02:00",
   "runtime_calls_last_run": 20
 }
