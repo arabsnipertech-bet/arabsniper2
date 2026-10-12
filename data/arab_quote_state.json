@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-24T16:34:11+02:00",
-  "updated_at": "2026-10-12T23:05:12+02:00",
+  "updated_at": "2026-10-12T23:11:34+02:00",
   "fixtures": {
     "1550985": {
       "meta": {
@@ -309024,7 +309024,7 @@
       "markets": {
         "1x2_ft": {
           "first_seen_at": "2026-10-08T05:12:55+02:00",
-          "last_seen_at": "2026-10-12T23:05:12+02:00",
+          "last_seen_at": "2026-10-12T23:11:33+02:00",
           "open": {
             "odds": {
               "1": 2.24,
@@ -309061,41 +309061,41 @@
           },
           "current": {
             "odds": {
-              "1": 2.31,
+              "1": 2.335,
               "x": 3.025,
               "2": 3.25
             },
             "math": {
               "raw_probabilities": {
-                "1": 0.4329,
+                "1": 0.4283,
                 "x": 0.3306,
                 "2": 0.3077
               },
               "fair_probabilities": {
-                "1": 0.4041,
-                "x": 0.3086,
-                "2": 0.2872
+                "1": 0.4015,
+                "x": 0.31,
+                "2": 0.2885
               },
-              "overround": 0.0712,
-              "overround_pct": 7.117,
-              "payout": 0.9336,
-              "payout_pct": 93.356,
+              "overround": 0.0665,
+              "overround_pct": 6.654,
+              "payout": 0.9376,
+              "payout_pct": 93.761,
               "margin_load_pp": {
-                "1": 2.876,
-                "x": 2.196,
-                "2": 2.044
+                "1": 2.672,
+                "x": 2.062,
+                "2": 1.92
               },
               "margin_load_share": {
-                "1": 0.4041,
-                "x": 0.3086,
-                "2": 0.2872
+                "1": 0.4015,
+                "x": 0.31,
+                "2": 0.2885
               }
             },
             "bookmakers_count": 10,
             "dispersion": {
-              "1": 0.063,
-              "x": 0.094,
-              "2": 0.126
+              "1": 0.045,
+              "x": 0.064,
+              "2": 0.114
             }
           },
           "bookmakers_open": {
@@ -309157,9 +309157,9 @@
               "2": 3.2
             },
             "8": {
-              "1": 2.35,
+              "1": 2.4,
               "x": 3.0,
-              "2": 3.5
+              "2": 3.4
             },
             "2": {
               "1": 2.3,
@@ -309172,19 +309172,19 @@
               "2": 3.25
             },
             "36": {
-              "1": 2.3,
+              "1": 2.38,
               "x": 3.13,
               "2": 3.2
             },
             "4": {
-              "1": 2.39,
-              "x": 3.09,
-              "2": 3.45
+              "1": 2.41,
+              "x": 3.07,
+              "2": 3.42
             },
             "5": {
-              "1": 2.15,
-              "x": 2.8,
-              "2": 3.04
+              "1": 2.28,
+              "x": 2.97,
+              "2": 3.0
             },
             "11": {
               "1": 2.35,
@@ -309412,12 +309412,47 @@
                 }
               },
               "bookmakers_count": 10
+            },
+            {
+              "ts": "2026-10-12T23:11:33+02:00",
+              "odds": {
+                "1": 2.335,
+                "x": 3.025,
+                "2": 3.25
+              },
+              "math": {
+                "raw_probabilities": {
+                  "1": 0.4283,
+                  "x": 0.3306,
+                  "2": 0.3077
+                },
+                "fair_probabilities": {
+                  "1": 0.4015,
+                  "x": 0.31,
+                  "2": 0.2885
+                },
+                "overround": 0.0665,
+                "overround_pct": 6.654,
+                "payout": 0.9376,
+                "payout_pct": 93.761,
+                "margin_load_pp": {
+                  "1": 2.672,
+                  "x": 2.062,
+                  "2": 1.92
+                },
+                "margin_load_share": {
+                  "1": 0.4015,
+                  "x": 0.31,
+                  "2": 0.2885
+                }
+              },
+              "bookmakers_count": 10
             }
           ]
         },
         "over25_ft": {
           "first_seen_at": "2026-10-08T05:12:55+02:00",
-          "last_seen_at": "2026-10-12T23:05:12+02:00",
+          "last_seen_at": "2026-10-12T23:11:33+02:00",
           "open": {
             "odds": {
               "over": 2.5,
@@ -309449,35 +309484,35 @@
           },
           "current": {
             "odds": {
-              "over": 2.42,
-              "under": 1.55
+              "over": 2.4,
+              "under": 1.56
             },
             "math": {
               "raw_probabilities": {
-                "over": 0.4132,
-                "under": 0.6452
+                "over": 0.4167,
+                "under": 0.641
               },
               "fair_probabilities": {
-                "over": 0.3904,
-                "under": 0.6096
+                "over": 0.3939,
+                "under": 0.6061
               },
-              "overround": 0.0584,
-              "overround_pct": 5.838,
-              "payout": 0.9448,
-              "payout_pct": 94.484,
+              "overround": 0.0577,
+              "overround_pct": 5.769,
+              "payout": 0.9455,
+              "payout_pct": 94.545,
               "margin_load_pp": {
-                "over": 2.279,
-                "under": 3.559
+                "over": 2.273,
+                "under": 3.497
               },
               "margin_load_share": {
-                "over": 0.3904,
-                "under": 0.6096
+                "over": 0.3939,
+                "under": 0.6061
               }
             },
             "bookmakers_count": 7,
             "dispersion": {
               "over": 0.072,
-              "under": 0.035
+              "under": 0.039
             }
           },
           "bookmakers_open": {
@@ -309512,23 +309547,23 @@
           },
           "bookmakers_current": {
             "8": {
-              "over": 2.4,
-              "under": 1.53
+              "over": 2.35,
+              "under": 1.57
             },
             "2": {
               "over": 2.3,
               "under": 1.49
             },
             "3": {
-              "over": 2.45,
-              "under": 1.53
+              "over": 2.4,
+              "under": 1.5
             },
             "36": {
-              "over": 2.25,
+              "over": 2.24,
               "under": 1.55
             },
             "4": {
-              "over": 2.45,
+              "over": 2.46,
               "under": 1.59
             },
             "11": {
@@ -309660,12 +309695,42 @@
                 }
               },
               "bookmakers_count": 7
+            },
+            {
+              "ts": "2026-10-12T23:11:33+02:00",
+              "odds": {
+                "over": 2.4,
+                "under": 1.56
+              },
+              "math": {
+                "raw_probabilities": {
+                  "over": 0.4167,
+                  "under": 0.641
+                },
+                "fair_probabilities": {
+                  "over": 0.3939,
+                  "under": 0.6061
+                },
+                "overround": 0.0577,
+                "overround_pct": 5.769,
+                "payout": 0.9455,
+                "payout_pct": 94.545,
+                "margin_load_pp": {
+                  "over": 2.273,
+                  "under": 3.497
+                },
+                "margin_load_share": {
+                  "over": 0.3939,
+                  "under": 0.6061
+                }
+              },
+              "bookmakers_count": 7
             }
           ]
         },
         "over15_ht": {
           "first_seen_at": "2026-10-08T05:12:55+02:00",
-          "last_seen_at": "2026-10-12T23:05:12+02:00",
+          "last_seen_at": "2026-10-12T23:11:33+02:00",
           "open": {
             "odds": {
               "over": 3.6,
@@ -309724,8 +309789,8 @@
             },
             "bookmakers_count": 7,
             "dispersion": {
-              "over": 0.208,
-              "under": 0.029
+              "over": 0.159,
+              "under": 0.025
             }
           },
           "bookmakers_open": {
@@ -309764,8 +309829,8 @@
               "under": 1.3
             },
             "8": {
-              "over": 3.75,
-              "under": 1.25
+              "over": 3.5,
+              "under": 1.28
             },
             "2": {
               "over": 3.2,
@@ -309820,7 +309885,7 @@
               "bookmakers_count": 7
             },
             {
-              "ts": "2026-10-12T23:05:12+02:00",
+              "ts": "2026-10-12T23:11:33+02:00",
               "odds": {
                 "over": 3.3,
                 "under": 1.29
@@ -309853,7 +309918,7 @@
         },
         "gg_ht": {
           "first_seen_at": "2026-10-08T05:12:55+02:00",
-          "last_seen_at": "2026-10-12T23:05:12+02:00",
+          "last_seen_at": "2026-10-12T23:11:33+02:00",
           "open": {
             "odds": {
               "yes": 5.9,
@@ -309992,7 +310057,7 @@
               "bookmakers_count": 5
             },
             {
-              "ts": "2026-10-12T23:05:12+02:00",
+              "ts": "2026-10-12T23:11:33+02:00",
               "odds": {
                 "yes": 5.5,
                 "no": 1.14
@@ -310025,7 +310090,7 @@
         },
         "over05_ht": {
           "first_seen_at": "2026-10-08T05:12:55+02:00",
-          "last_seen_at": "2026-10-12T23:05:12+02:00",
+          "last_seen_at": "2026-10-12T23:11:33+02:00",
           "open": {
             "odds": {
               "over": 1.54,
@@ -310057,35 +310122,35 @@
           },
           "current": {
             "odds": {
-              "over": 1.5,
-              "under": 2.47
+              "over": 1.51,
+              "under": 2.42
             },
             "math": {
               "raw_probabilities": {
-                "over": 0.6667,
-                "under": 0.4049
+                "over": 0.6623,
+                "under": 0.4132
               },
               "fair_probabilities": {
-                "over": 0.6222,
-                "under": 0.3778
+                "over": 0.6158,
+                "under": 0.3842
               },
-              "overround": 0.0715,
-              "overround_pct": 7.152,
-              "payout": 0.9332,
-              "payout_pct": 93.325,
+              "overround": 0.0755,
+              "overround_pct": 7.547,
+              "payout": 0.9298,
+              "payout_pct": 92.982,
               "margin_load_pp": {
-                "over": 4.45,
-                "under": 2.702
+                "over": 4.648,
+                "under": 2.9
               },
               "margin_load_share": {
-                "over": 0.6222,
-                "under": 0.3778
+                "over": 0.6158,
+                "under": 0.3842
               }
             },
-            "bookmakers_count": 8,
+            "bookmakers_count": 9,
             "dispersion": {
-              "over": 0.03,
-              "under": 0.095
+              "over": 0.034,
+              "under": 0.092
             }
           },
           "bookmakers_open": {
@@ -310146,6 +310211,10 @@
             "4": {
               "over": 1.51,
               "under": 2.59
+            },
+            "5": {
+              "over": 1.55,
+              "under": 2.4
             },
             "11": {
               "over": 1.49,
@@ -310276,6 +310345,36 @@
                 }
               },
               "bookmakers_count": 8
+            },
+            {
+              "ts": "2026-10-12T23:11:33+02:00",
+              "odds": {
+                "over": 1.51,
+                "under": 2.42
+              },
+              "math": {
+                "raw_probabilities": {
+                  "over": 0.6623,
+                  "under": 0.4132
+                },
+                "fair_probabilities": {
+                  "over": 0.6158,
+                  "under": 0.3842
+                },
+                "overround": 0.0755,
+                "overround_pct": 7.547,
+                "payout": 0.9298,
+                "payout_pct": 92.982,
+                "margin_load_pp": {
+                  "over": 4.648,
+                  "under": 2.9
+                },
+                "margin_load_share": {
+                  "over": 0.6158,
+                  "under": 0.3842
+                }
+              },
+              "bookmakers_count": 9
             }
           ]
         }
