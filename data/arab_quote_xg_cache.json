@@ -58172,8 +58172,688 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-13T06:00:35+02:00",
       "stats_schema": 2
+    },
+    "1597936": {
+      "fixture_id": "1597936",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.82,
+      "away_xg": 1.11,
+      "home_stats": {
+        "team_id": 2907,
+        "team_name": "Qatar SC",
+        "xg": 1.82,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2897,
+        "team_name": "Al-Rayyan SC",
+        "xg": 1.11,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:01+02:00",
+      "stats_schema": 2
+    },
+    "1597933": {
+      "fixture_id": "1597933",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2895,
+        "team_name": "Al Sadd",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 26.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2905,
+        "team_name": "Al-Arabi SC",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1629912": {
+      "fixture_id": "1629912",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2733,
+        "team_name": "Esteghlal FC",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2895,
+        "team_name": "Al Sadd",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1597930": {
+      "fixture_id": "1597930",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2898,
+        "team_name": "Al-Sailiya",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2895,
+        "team_name": "Al Sadd",
+        "xg": null,
+        "shots_on_target": 10.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1603040": {
+      "fixture_id": "1603040",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.26,
+      "away_xg": 1.14,
+      "home_stats": {
+        "team_id": 2932,
+        "team_name": "Al-Hilal Saudi FC",
+        "xg": 2.26,
+        "shots_on_target": 7.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2938,
+        "team_name": "Al-Ittihad FC",
+        "xg": 1.14,
+        "shots_on_target": 5.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1629924": {
+      "fixture_id": "1629924",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2932,
+        "team_name": "Al-Hilal Saudi FC",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2903,
+        "team_name": "Al-Gharafa",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:02+02:00",
+      "stats_schema": 2
+    },
+    "1603033": {
+      "fixture_id": "1603033",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.32,
+      "away_xg": 5.41,
+      "home_stats": {
+        "team_id": 2936,
+        "team_name": "Al Taawon",
+        "xg": 1.32,
+        "shots_on_target": 4.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2932,
+        "team_name": "Al-Hilal Saudi FC",
+        "xg": 5.41,
+        "shots_on_target": 10.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:03+02:00",
+      "stats_schema": 2
+    },
+    "1603018": {
+      "fixture_id": "1603018",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.81,
+      "away_xg": 1.35,
+      "home_stats": {
+        "team_id": 2932,
+        "team_name": "Al-Hilal Saudi FC",
+        "xg": 1.81,
+        "shots_on_target": 5.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 10513,
+        "team_name": "NEOM",
+        "xg": 1.35,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:03+02:00",
+      "stats_schema": 2
+    },
+    "246691": {
+      "fixture_id": "246691",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:03+02:00",
+      "stats_schema": 2
+    },
+    "1552775": {
+      "fixture_id": "1552775",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.34,
+      "away_xg": 1.04,
+      "home_stats": {
+        "team_id": 116,
+        "team_name": "Lens",
+        "xg": 1.34,
+        "shots_on_target": 7.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 80,
+        "team_name": "Lyon",
+        "xg": 1.04,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:04+02:00",
+      "stats_schema": 2
+    },
+    "1552769": {
+      "fixture_id": "1552769",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.75,
+      "away_xg": 1.19,
+      "home_stats": {
+        "team_id": 91,
+        "team_name": "Monaco",
+        "xg": 1.75,
+        "shots_on_target": 6.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 116,
+        "team_name": "Lens",
+        "xg": 1.19,
+        "shots_on_target": 4.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:04+02:00",
+      "stats_schema": 2
+    },
+    "1552759": {
+      "fixture_id": "1552759",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.59,
+      "away_xg": 1.62,
+      "home_stats": {
+        "team_id": 1298,
+        "team_name": "Le Mans",
+        "xg": 2.59,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 116,
+        "team_name": "Lens",
+        "xg": 1.62,
+        "shots_on_target": 6.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:04+02:00",
+      "stats_schema": 2
+    },
+    "1635729": {
+      "fixture_id": "1635729",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 560,
+        "team_name": "Slavia Praha",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 116,
+        "team_name": "Lens",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 26.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:04+02:00",
+      "stats_schema": 2
+    },
+    "1575512": {
+      "fixture_id": "1575512",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.5,
+      "away_xg": 0.95,
+      "home_stats": {
+        "team_id": 217,
+        "team_name": "SC Braga",
+        "xg": 1.5,
+        "shots_on_target": 4.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 228,
+        "team_name": "Sporting CP",
+        "xg": 0.95,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:05+02:00",
+      "stats_schema": 2
+    },
+    "1575507": {
+      "fixture_id": "1575507",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.28,
+      "away_xg": 2.08,
+      "home_stats": {
+        "team_id": 228,
+        "team_name": "Sporting CP",
+        "xg": 1.28,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 240,
+        "team_name": "Arouca",
+        "xg": 2.08,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:05+02:00",
+      "stats_schema": 2
+    },
+    "1575496": {
+      "fixture_id": "1575496",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.35,
+      "away_xg": 2.28,
+      "home_stats": {
+        "team_id": 242,
+        "team_name": "Famalicao",
+        "xg": 0.35,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 228,
+        "team_name": "Sporting CP",
+        "xg": 2.28,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:05+02:00",
+      "stats_schema": 2
+    },
+    "1635736": {
+      "fixture_id": "1635736",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.75,
+      "away_xg": 1.23,
+      "home_stats": {
+        "team_id": 228,
+        "team_name": "Sporting CP",
+        "xg": 1.75,
+        "shots_on_target": 5.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 645,
+        "team_name": "Galatasaray",
+        "xg": 1.23,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:05+02:00",
+      "stats_schema": 2
+    },
+    "1635697": {
+      "fixture_id": "1635697",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 33,
+        "team_name": "Manchester United",
+        "xg": null,
+        "shots_on_target": 10.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 13976,
+        "team_name": "Sabah FA",
+        "xg": null,
+        "shots_on_target": 0.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:06+02:00",
+      "stats_schema": 2
+    },
+    "1622623": {
+      "fixture_id": "1622623",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 563,
+        "team_name": "Hapoel Beer Sheva",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 13976,
+        "team_name": "Sabah FA",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:06+02:00",
+      "stats_schema": 2
+    },
+    "1607172": {
+      "fixture_id": "1607172",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 13976,
+        "team_name": "Sabah FA",
+        "xg": null,
+        "shots_on_target": 10.0,
+        "total_shots": 29.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 406,
+        "team_name": "Aarhus",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-13T06:54:06+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-13T06:08:09+02:00",
+  "updated_at": "2026-10-13T06:58:45+02:00",
   "runtime_calls_last_run": 20
 }
