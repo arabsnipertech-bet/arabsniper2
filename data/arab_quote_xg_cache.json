@@ -58852,8 +58852,594 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-13T06:54:06+02:00",
       "stats_schema": 2
+    },
+    "1556084": {
+      "fixture_id": "1556084",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.76,
+      "away_xg": 0.24,
+      "home_stats": {
+        "team_id": 292,
+        "team_name": "FC Tokyo",
+        "xg": 1.76,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 287,
+        "team_name": "Urawa",
+        "xg": 0.24,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:14:51+02:00",
+      "stats_schema": 2
+    },
+    "1556086": {
+      "fixture_id": "1556086",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 281,
+        "team_name": "Kashiwa Reysol",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 289,
+        "team_name": "Vissel Kobe",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:14:52+02:00",
+      "stats_schema": 2
+    },
+    "1551233": {
+      "fixture_id": "1551233",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:14:52+02:00",
+      "stats_schema": 2
+    },
+    "1556082": {
+      "fixture_id": "1556082",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.76,
+      "away_xg": 0.93,
+      "home_stats": {
+        "team_id": 291,
+        "team_name": "Cerezo Osaka",
+        "xg": 0.76,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 296,
+        "team_name": "Yokohama F. Marinos",
+        "xg": 0.93,
+        "shots_on_target": 1.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:14:54+02:00",
+      "stats_schema": 2
+    },
+    "1556087": {
+      "fixture_id": "1556087",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.33,
+      "away_xg": 1.12,
+      "home_stats": {
+        "team_id": 294,
+        "team_name": "Kawasaki Frontale",
+        "xg": 1.33,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 288,
+        "team_name": "Nagoya Grampus",
+        "xg": 1.12,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:14:55+02:00",
+      "stats_schema": 2
+    },
+    "1556089": {
+      "fixture_id": "1556089",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.6,
+      "away_xg": 1.3,
+      "home_stats": {
+        "team_id": 305,
+        "team_name": "Mito Hollyhock",
+        "xg": 0.6,
+        "shots_on_target": 2.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 283,
+        "team_name": "Shimizu S-pulse",
+        "xg": 1.3,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:14:55+02:00",
+      "stats_schema": 2
+    },
+    "1556081": {
+      "fixture_id": "1556081",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.34,
+      "away_xg": 1.21,
+      "home_stats": {
+        "team_id": 316,
+        "team_name": "Avispa Fukuoka",
+        "xg": 1.34,
+        "shots_on_target": 6.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 310,
+        "team_name": "Fagiano Okayama",
+        "xg": 1.21,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:14:56+02:00",
+      "stats_schema": 2
+    },
+    "1639005": {
+      "fixture_id": "1639005",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:14:58+02:00",
+      "stats_schema": 2
+    },
+    "1556090": {
+      "fixture_id": "1556090",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.49,
+      "away_xg": 1.39,
+      "home_stats": {
+        "team_id": 306,
+        "team_name": "Tokyo Verdy",
+        "xg": 0.49,
+        "shots_on_target": 3.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 282,
+        "team_name": "Sanfrecce Hiroshima",
+        "xg": 1.39,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:14:58+02:00",
+      "stats_schema": 2
+    },
+    "1585772": {
+      "fixture_id": "1585772",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 17259,
+        "team_name": "Iğdır FK",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 7395,
+        "team_name": "Batman Petrolspor",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:00+02:00",
+      "stats_schema": 2
+    },
+    "1585761": {
+      "fixture_id": "1585761",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 7395,
+        "team_name": "Batman Petrolspor",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 1003,
+        "team_name": "Bursaspor",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:00+02:00",
+      "stats_schema": 2
+    },
+    "1585741": {
+      "fixture_id": "1585741",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 3.15,
+      "away_xg": 2.85,
+      "home_stats": {
+        "team_id": 7395,
+        "team_name": "Batman Petrolspor",
+        "xg": 3.15,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 3589,
+        "team_name": "Fatih Karagümrük",
+        "xg": 2.85,
+        "shots_on_target": 5.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:00+02:00",
+      "stats_schema": 2
+    },
+    "1585773": {
+      "fixture_id": "1585773",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3578,
+        "team_name": "İstanbulspor",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 7402,
+        "team_name": "Esenler Erokspor",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:00+02:00",
+      "stats_schema": 2
+    },
+    "1585764": {
+      "fixture_id": "1585764",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3597,
+        "team_name": "Manisa F.K.",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3578,
+        "team_name": "İstanbulspor",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:01+02:00",
+      "stats_schema": 2
+    },
+    "1585754": {
+      "fixture_id": "1585754",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 1001,
+        "team_name": "Kayserispor",
+        "xg": null,
+        "shots_on_target": 6.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3578,
+        "team_name": "İstanbulspor",
+        "xg": null,
+        "shots_on_target": 1.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:01+02:00",
+      "stats_schema": 2
+    },
+    "1585743": {
+      "fixture_id": "1585743",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 3578,
+        "team_name": "İstanbulspor",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 17259,
+        "team_name": "Iğdır FK",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:01+02:00",
+      "stats_schema": 2
+    },
+    "1630290": {
+      "fixture_id": "1630290",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:03+02:00",
+      "stats_schema": 2
+    },
+    "1610999": {
+      "fixture_id": "1610999",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:03+02:00",
+      "stats_schema": 2
+    },
+    "1551570": {
+      "fixture_id": "1551570",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.39,
+      "away_xg": 1.49,
+      "home_stats": {
+        "team_id": 10534,
+        "team_name": "FK Košice",
+        "xg": 2.39,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 10535,
+        "team_name": "Komárno",
+        "xg": 1.49,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:03+02:00",
+      "stats_schema": 2
+    },
+    "1551565": {
+      "fixture_id": "1551565",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-14T04:15:03+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-13T06:58:45+02:00",
+  "updated_at": "2026-10-14T04:23:35+02:00",
   "runtime_calls_last_run": 20
 }
