@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-10-14T04:23:37+02:00",
+  "updated_at": "2026-10-14T05:09:16+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -378766,6 +378766,90 @@
         "gg_ht": false,
         "over25_ft": true
       }
+    },
+    "1639863": {
+      "fixture_id": "1639863",
+      "date": "2026-10-14",
+      "time": "02:30",
+      "match": "Boca Juniors - Vasco DA Gama",
+      "league": "CONMEBOL Sudamericana",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-10-14T05:01:53+02:00",
+        "home_ft": 0,
+        "away_ft": 1,
+        "home_ht": 0,
+        "away_ht": 1
+      },
+      "primary": null,
+      "settled_at": "2026-10-14T05:01:53+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 27.16,
+        "market_score": 29.0,
+        "early_stats_score": 27.517,
+        "two_goal_stats_score": 20.753,
+        "ft_goal_score": 25.222,
+        "classification": "favorite_steam_vulnerable",
+        "experimental": true,
+        "opening_favorite": "1",
+        "current_favorite": "1",
+        "favorite_changed": false,
+        "cross_strength_pp": 0.96,
+        "favorite_team": "Boca Juniors",
+        "underdog_team": "Vasco DA Gama",
+        "favorite_open_odd": 1.9,
+        "favorite_current_odd": 1.855,
+        "underdog_open_odd": 4.75,
+        "underdog_current_odd": 4.975,
+        "favorite_shortening_odd": 0.045,
+        "favorite_drift_odd": -0.045,
+        "underdog_steam_odd": -0.225,
+        "medium_favorite_band": true,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": true,
+        "favorite_fair_delta_pp": 1.06,
+        "underdog_fair_delta_pp": -0.96,
+        "favorite_oci": 55.702,
+        "underdog_oci": -59.692,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "1",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": "1",
+        "favorite_margin_delta_pp": 0.218,
+        "underdog_margin_delta_pp": 0.014,
+        "margin_shift_favorite_vs_underdog_pp": 0.204,
+        "favorite_conceded_ht_rate_pct": 28.49,
+        "underdog_scored_ht_rate_pct": 37.2,
+        "favorite_scored_ht_rate_pct": 55.01,
+        "underdog_conceded_ht_rate_pct": 21.28,
+        "pair_goal_ht_rate_pct": 57.905,
+        "pair_over15_ht_rate_pct": 22.765,
+        "pair_gg_ht_rate_pct": 13.09,
+        "pair_over25_ft_rate_pct": 50.133,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 0.0,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": true,
+        "two_way_confirmation": true,
+        "over15_confirmation": false,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": true,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
@@ -378893,16 +378977,16 @@
         "over25_ft_rate_pct": 55.242
       },
       "favorite_steam_vulnerable": {
-        "settled": 178,
-        "goal_ht": 119,
+        "settled": 179,
+        "goal_ht": 120,
         "over15_ht": 62,
         "gg_ht": 34,
         "over25_ft": 99,
-        "avg_pattern_score": 42.191,
-        "goal_ht_rate_pct": 66.854,
-        "over15_ht_rate_pct": 34.831,
-        "gg_ht_rate_pct": 19.101,
-        "over25_ft_rate_pct": 55.618
+        "avg_pattern_score": 42.107,
+        "goal_ht_rate_pct": 67.039,
+        "over15_ht_rate_pct": 34.637,
+        "gg_ht_rate_pct": 18.994,
+        "over25_ft_rate_pct": 55.307
       }
     }
   }
