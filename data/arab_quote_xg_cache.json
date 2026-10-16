@@ -3355,11 +3355,14 @@
     "1560870": {
       "fixture_id": "1560870",
       "available": false,
+      "shots_available": false,
       "home_xg": null,
       "away_xg": null,
-      "source": "api_no_xg",
-      "checked_at": "2026-07-28T03:24:52+02:00",
-      "raw_team_types": {}
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:40+02:00",
+      "stats_schema": 2
     },
     "1469708": {
       "fixture_id": "1469708",
@@ -61210,8 +61213,632 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-15T04:41:44+02:00",
       "stats_schema": 2
+    },
+    "1469701": {
+      "fixture_id": "1469701",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.88,
+      "away_xg": 1.54,
+      "home_stats": {
+        "team_id": 942,
+        "team_name": "Wellington Phoenix",
+        "xg": 1.88,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 939,
+        "team_name": "Western Sydney Wanderers",
+        "xg": 1.54,
+        "shots_on_target": 7.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:40+02:00",
+      "stats_schema": 2
+    },
+    "1469697": {
+      "fixture_id": "1469697",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.01,
+      "away_xg": 1.75,
+      "home_stats": {
+        "team_id": 939,
+        "team_name": "Western Sydney Wanderers",
+        "xg": 1.01,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 943,
+        "team_name": "Sydney",
+        "xg": 1.75,
+        "shots_on_target": 6.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:40+02:00",
+      "stats_schema": 2
+    },
+    "1565496": {
+      "fixture_id": "1565496",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 6501,
+        "team_name": "Veres Rivne",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 4.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 550,
+        "team_name": "Shakhtar Donetsk",
+        "xg": null,
+        "shots_on_target": 9.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:41+02:00",
+      "stats_schema": 2
+    },
+    "1629927": {
+      "fixture_id": "1629927",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.75,
+      "away_xg": 1.52,
+      "home_stats": {
+        "team_id": 4220,
+        "team_name": "Pakhtakor",
+        "xg": 1.75,
+        "shots_on_target": 4.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2933,
+        "team_name": "Al-Qadisiyah FC",
+        "xg": 1.52,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:43+02:00",
+      "stats_schema": 2
+    },
+    "1603027": {
+      "fixture_id": "1603027",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.35,
+      "away_xg": 0.68,
+      "home_stats": {
+        "team_id": 26738,
+        "team_name": "Al Diriyah",
+        "xg": 1.35,
+        "shots_on_target": 1.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2951,
+        "team_name": "Abha",
+        "xg": 0.68,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:43+02:00",
+      "stats_schema": 2
+    },
+    "1553879": {
+      "fixture_id": "1553879",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.37,
+      "away_xg": 1.33,
+      "home_stats": {
+        "team_id": 12316,
+        "team_name": "IMT Novi Beograd",
+        "xg": 1.37,
+        "shots_on_target": 6.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2657,
+        "team_name": "Radnik Surdulica",
+        "xg": 1.33,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:44+02:00",
+      "stats_schema": 2
+    },
+    "1553875": {
+      "fixture_id": "1553875",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2657,
+        "team_name": "Radnik Surdulica",
+        "xg": null,
+        "shots_on_target": 8.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 573,
+        "team_name": "FK Partizan",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:44+02:00",
+      "stats_schema": 2
+    },
+    "1553870": {
+      "fixture_id": "1553870",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.2,
+      "away_xg": 3.62,
+      "home_stats": {
+        "team_id": 2642,
+        "team_name": "Zemun",
+        "xg": 0.2,
+        "shots_on_target": 2.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2657,
+        "team_name": "Radnik Surdulica",
+        "xg": 3.62,
+        "shots_on_target": 8.0,
+        "total_shots": 24.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:44+02:00",
+      "stats_schema": 2
+    },
+    "1553825": {
+      "fixture_id": "1553825",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2657,
+        "team_name": "Radnik Surdulica",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 598,
+        "team_name": "FK Crvena Zvezda",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:45+02:00",
+      "stats_schema": 2
+    },
+    "1553883": {
+      "fixture_id": "1553883",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.25,
+      "away_xg": 2.39,
+      "home_stats": {
+        "team_id": 2254,
+        "team_name": "Radnicki NIS",
+        "xg": 1.25,
+        "shots_on_target": 4.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 702,
+        "team_name": "Vojvodina",
+        "xg": 2.39,
+        "shots_on_target": 4.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:45+02:00",
+      "stats_schema": 2
+    },
+    "1553871": {
+      "fixture_id": "1553871",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 598,
+        "team_name": "FK Crvena Zvezda",
+        "xg": null,
+        "shots_on_target": 12.0,
+        "total_shots": 27.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2254,
+        "team_name": "Radnicki NIS",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:45+02:00",
+      "stats_schema": 2
+    },
+    "1553868": {
+      "fixture_id": "1553868",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2254,
+        "team_name": "Radnicki NIS",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2633,
+        "team_name": "OFK Beograd",
+        "xg": null,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:45+02:00",
+      "stats_schema": 2
+    },
+    "1553859": {
+      "fixture_id": "1553859",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 699,
+        "team_name": "Mladost Lucani",
+        "xg": null,
+        "shots_on_target": 7.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2254,
+        "team_name": "Radnicki NIS",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:45+02:00",
+      "stats_schema": 2
+    },
+    "1565268": {
+      "fixture_id": "1565268",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.08,
+      "away_xg": 0.43,
+      "home_stats": {
+        "team_id": 559,
+        "team_name": "FCSB",
+        "xg": 2.08,
+        "shots_on_target": 4.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 6886,
+        "team_name": "Oţelul",
+        "xg": 0.43,
+        "shots_on_target": 1.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:46+02:00",
+      "stats_schema": 2
+    },
+    "1565264": {
+      "fixture_id": "1565264",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.5,
+      "away_xg": 2.44,
+      "home_stats": {
+        "team_id": 6230,
+        "team_name": "Csikszereda",
+        "xg": 0.5,
+        "shots_on_target": 3.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 632,
+        "team_name": "Universitatea Craiova",
+        "xg": 2.44,
+        "shots_on_target": 8.0,
+        "total_shots": 24.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:47+02:00",
+      "stats_schema": 2
+    },
+    "1565260": {
+      "fixture_id": "1565260",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.24,
+      "away_xg": 0.57,
+      "home_stats": {
+        "team_id": 2598,
+        "team_name": "Petrolul Ploiesti",
+        "xg": 2.24,
+        "shots_on_target": 7.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 6230,
+        "team_name": "Csikszereda",
+        "xg": 0.57,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:47+02:00",
+      "stats_schema": 2
+    },
+    "1629939": {
+      "fixture_id": "1629939",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.77,
+      "away_xg": 2.6,
+      "home_stats": {
+        "team_id": 2895,
+        "team_name": "Al Sadd",
+        "xg": 0.77,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2932,
+        "team_name": "Al-Hilal Saudi FC",
+        "xg": 2.6,
+        "shots_on_target": 5.0,
+        "total_shots": 17.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:48+02:00",
+      "stats_schema": 2
+    },
+    "1558019": {
+      "fixture_id": "1558019",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:49+02:00",
+      "stats_schema": 2
+    },
+    "1558017": {
+      "fixture_id": "1558017",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T03:46:49+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-15T04:50:09+02:00",
+  "updated_at": "2026-10-16T03:55:10+02:00",
   "runtime_calls_last_run": 20
 }
