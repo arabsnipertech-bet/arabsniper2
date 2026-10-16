@@ -61837,8 +61837,536 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-16T03:46:49+02:00",
       "stats_schema": 2
+    },
+    "1558012": {
+      "fixture_id": "1558012",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:27+02:00",
+      "stats_schema": 2
+    },
+    "1558004": {
+      "fixture_id": "1558004",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:27+02:00",
+      "stats_schema": 2
+    },
+    "1558022": {
+      "fixture_id": "1558022",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:27+02:00",
+      "stats_schema": 2
+    },
+    "1558014": {
+      "fixture_id": "1558014",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:27+02:00",
+      "stats_schema": 2
+    },
+    "1558011": {
+      "fixture_id": "1558011",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:28+02:00",
+      "stats_schema": 2
+    },
+    "1558008": {
+      "fixture_id": "1558008",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:28+02:00",
+      "stats_schema": 2
+    },
+    "1548537": {
+      "fixture_id": "1548537",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.25,
+      "away_xg": 1.61,
+      "home_stats": {
+        "team_id": 1068,
+        "team_name": "HNK Gorica",
+        "xg": 1.25,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1019,
+        "team_name": "Rudes",
+        "xg": 1.61,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:29+02:00",
+      "stats_schema": 2
+    },
+    "1548535": {
+      "fixture_id": "1548535",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.48,
+      "away_xg": 1.99,
+      "home_stats": {
+        "team_id": 1019,
+        "team_name": "Rudes",
+        "xg": 0.48,
+        "shots_on_target": 3.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1018,
+        "team_name": "NK Slaven Belupo",
+        "xg": 1.99,
+        "shots_on_target": 3.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:29+02:00",
+      "stats_schema": 2
+    },
+    "1548529": {
+      "fixture_id": "1548529",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.87,
+      "away_xg": 0.84,
+      "home_stats": {
+        "team_id": 1016,
+        "team_name": "Istra 1961",
+        "xg": 1.87,
+        "shots_on_target": 4.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1019,
+        "team_name": "Rudes",
+        "xg": 0.84,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:29+02:00",
+      "stats_schema": 2
+    },
+    "1635886": {
+      "fixture_id": "1635886",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:29+02:00",
+      "stats_schema": 2
+    },
+    "1548541": {
+      "fixture_id": "1548541",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.81,
+      "away_xg": 2.12,
+      "home_stats": {
+        "team_id": 1018,
+        "team_name": "NK Slaven Belupo",
+        "xg": 1.81,
+        "shots_on_target": 6.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 561,
+        "team_name": "HNK Rijeka",
+        "xg": 2.12,
+        "shots_on_target": 5.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:29+02:00",
+      "stats_schema": 2
+    },
+    "1548534": {
+      "fixture_id": "1548534",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.46,
+      "away_xg": 1.28,
+      "home_stats": {
+        "team_id": 561,
+        "team_name": "HNK Rijeka",
+        "xg": 1.46,
+        "shots_on_target": 4.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 608,
+        "team_name": "HNK Hajduk Split",
+        "xg": 1.28,
+        "shots_on_target": 7.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:30+02:00",
+      "stats_schema": 2
+    },
+    "1636716": {
+      "fixture_id": "1636716",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:30+02:00",
+      "stats_schema": 2
+    },
+    "1548530": {
+      "fixture_id": "1548530",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.39,
+      "away_xg": 2.01,
+      "home_stats": {
+        "team_id": 1017,
+        "team_name": "NK Lokomotiva Zagreb",
+        "xg": 0.39,
+        "shots_on_target": 3.0,
+        "total_shots": 7.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 561,
+        "team_name": "HNK Rijeka",
+        "xg": 2.01,
+        "shots_on_target": 5.0,
+        "total_shots": 23.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:30+02:00",
+      "stats_schema": 2
+    },
+    "1553119": {
+      "fixture_id": "1553119",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.9,
+      "away_xg": 2.57,
+      "home_stats": {
+        "team_id": 3484,
+        "team_name": "GKS Katowice",
+        "xg": 0.9,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 17115,
+        "team_name": "Wieczysta Kraków",
+        "xg": 2.57,
+        "shots_on_target": 4.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:31+02:00",
+      "stats_schema": 2
+    },
+    "1553190": {
+      "fixture_id": "1553190",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.83,
+      "away_xg": 0.57,
+      "home_stats": {
+        "team_id": 17115,
+        "team_name": "Wieczysta Kraków",
+        "xg": 1.83,
+        "shots_on_target": 6.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 341,
+        "team_name": "Wisla Plock",
+        "xg": 0.57,
+        "shots_on_target": 2.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:31+02:00",
+      "stats_schema": 2
+    },
+    "1553179": {
+      "fixture_id": "1553179",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.14,
+      "away_xg": 2.27,
+      "home_stats": {
+        "team_id": 6962,
+        "team_name": "Widzew Łódź",
+        "xg": 1.14,
+        "shots_on_target": 5.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 17115,
+        "team_name": "Wieczysta Kraków",
+        "xg": 2.27,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:31+02:00",
+      "stats_schema": 2
+    },
+    "1553166": {
+      "fixture_id": "1553166",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.95,
+      "away_xg": 1.2,
+      "home_stats": {
+        "team_id": 348,
+        "team_name": "Pogon Szczecin",
+        "xg": 1.95,
+        "shots_on_target": 6.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 17115,
+        "team_name": "Wieczysta Kraków",
+        "xg": 1.2,
+        "shots_on_target": 3.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:31+02:00",
+      "stats_schema": 2
+    },
+    "1553188": {
+      "fixture_id": "1553188",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.2,
+      "away_xg": 2.57,
+      "home_stats": {
+        "team_id": 3491,
+        "team_name": "Raków Częstochowa",
+        "xg": 1.2,
+        "shots_on_target": 4.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3484,
+        "team_name": "GKS Katowice",
+        "xg": 2.57,
+        "shots_on_target": 8.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:31+02:00",
+      "stats_schema": 2
+    },
+    "1553175": {
+      "fixture_id": "1553175",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 3.46,
+      "away_xg": 1.79,
+      "home_stats": {
+        "team_id": 346,
+        "team_name": "Korona Kielce",
+        "xg": 3.46,
+        "shots_on_target": 10.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 3491,
+        "team_name": "Raków Częstochowa",
+        "xg": 1.79,
+        "shots_on_target": 6.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-16T04:36:32+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-16T03:55:10+02:00",
+  "updated_at": "2026-10-16T04:44:21+02:00",
   "runtime_calls_last_run": 20
 }

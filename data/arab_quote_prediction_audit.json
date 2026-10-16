@@ -1,7 +1,7 @@
 {
   "version": "1.1.7",
   "created_at": "2026-07-29T10:13:57+02:00",
-  "updated_at": "2026-10-16T03:55:14+02:00",
+  "updated_at": "2026-10-16T04:44:25+02:00",
   "fixtures": {
     "1545518": {
       "fixture_id": "1545518",
@@ -385507,7 +385507,7 @@
       "competition_tier": "major_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-10-16T03:47:30+02:00",
+        "settled_at": "2026-10-16T04:37:18+02:00",
         "home_ft": 1,
         "away_ft": 2,
         "home_ht": 0,
@@ -385553,7 +385553,7 @@
         "market_calibration_weight": 0.09,
         "outcome": "lost"
       },
-      "settled_at": "2026-10-16T03:47:30+02:00",
+      "settled_at": "2026-10-16T04:37:18+02:00",
       "market_pattern": {
         "available": true,
         "score": 11.068,
@@ -385630,7 +385630,7 @@
       "competition_tier": "secondary_top_tier",
       "result": {
         "status": "FT",
-        "settled_at": "2026-10-16T03:47:30+02:00",
+        "settled_at": "2026-10-16T04:37:18+02:00",
         "home_ft": 4,
         "away_ft": 1,
         "home_ht": 2,
@@ -385676,7 +385676,7 @@
         "market_calibration_weight": 0.08,
         "outcome": "won"
       },
-      "settled_at": "2026-10-16T03:47:30+02:00",
+      "settled_at": "2026-10-16T04:37:18+02:00",
       "market_pattern": {
         "available": true,
         "score": 50.201,
@@ -385825,13 +385825,136 @@
         "gg_ht": false,
         "over25_ft": true
       }
+    },
+    "1640555": {
+      "fixture_id": "1640555",
+      "date": "2026-10-16",
+      "time": "02:30",
+      "match": "Estudiantes L.P. - Flamengo",
+      "league": "CONMEBOL Libertadores",
+      "country": "World",
+      "competition_quality_score": 88,
+      "competition_tier": "international_major",
+      "result": {
+        "status": "FT",
+        "settled_at": "2026-10-16T04:37:18+02:00",
+        "home_ft": 0,
+        "away_ft": 0,
+        "home_ht": 0,
+        "away_ht": 0
+      },
+      "primary": {
+        "market": "over25_ft",
+        "selection": "over",
+        "odd": 2.77,
+        "probability_pct": 52.56,
+        "probability_raw_pct": 54.21,
+        "expected_value_pct": 45.591,
+        "relation": "contrast",
+        "ranking_score": 71.62,
+        "recommendation_score": 71.62,
+        "grade": "B",
+        "gate": {
+          "eligible": true,
+          "score": 71.62,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 48.0,
+          "market_break_even_pct": 36.101,
+          "probability_pct": 52.56,
+          "raw_probability_pct": 54.21,
+          "expected_value_pct": 45.591,
+          "edge_over_break_even_pp": 16.459,
+          "book_disagreement_pp": 20.64,
+          "competition_quality_score": 88,
+          "bookmakers": 7,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 68.62,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "yellow",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.08,
+        "outcome": "lost"
+      },
+      "settled_at": "2026-10-16T04:37:18+02:00",
+      "market_pattern": {
+        "available": true,
+        "score": 17.237,
+        "market_score": 0.0,
+        "early_stats_score": 40.11,
+        "two_goal_stats_score": 42.281,
+        "ft_goal_score": 32.851,
+        "classification": "neutral",
+        "experimental": true,
+        "opening_favorite": "2",
+        "current_favorite": "2",
+        "favorite_changed": false,
+        "cross_strength_pp": 2.49,
+        "favorite_team": "Flamengo",
+        "underdog_team": "Estudiantes L.P.",
+        "favorite_open_odd": 2.25,
+        "favorite_current_odd": 2.15,
+        "underdog_open_odd": 3.4,
+        "underdog_current_odd": 4.0,
+        "favorite_shortening_odd": 0.1,
+        "favorite_drift_odd": -0.1,
+        "underdog_steam_odd": -0.6,
+        "medium_favorite_band": false,
+        "focal_170_180_band": false,
+        "favorite_steam": true,
+        "favorite_steam_band": false,
+        "favorite_fair_delta_pp": 2.49,
+        "underdog_fair_delta_pp": -3.81,
+        "favorite_oci": 70.002,
+        "underdog_oci": -88.256,
+        "underdog_book_consensus": 1.0,
+        "book_pick_1x2": "2",
+        "book_square_underdog": false,
+        "book_square_favorite": true,
+        "protection_pick": null,
+        "favorite_margin_delta_pp": -0.424,
+        "underdog_margin_delta_pp": -0.599,
+        "margin_shift_favorite_vs_underdog_pp": 0.175,
+        "favorite_conceded_ht_rate_pct": 3.45,
+        "underdog_scored_ht_rate_pct": 57.46,
+        "favorite_scored_ht_rate_pct": 55.32,
+        "underdog_conceded_ht_rate_pct": 37.05,
+        "pair_goal_ht_rate_pct": 61.845,
+        "pair_over15_ht_rate_pct": 27.175,
+        "pair_gg_ht_rate_pct": 14.795,
+        "pair_over25_ft_rate_pct": 50.0,
+        "underdog_xg_for": 0.0,
+        "favorite_xg_against": 0.0,
+        "underdog_sot_for": 0.0,
+        "favorite_sot_against": 4.5,
+        "early_goal_confirmation": true,
+        "underdog_threat_confirmation": false,
+        "two_way_confirmation": true,
+        "over15_confirmation": true,
+        "over25_confirmation": true,
+        "statistical_confirmation": true,
+        "interpretation": "Il movimento 1X2 e' una feature, non una prova di trappola. Il correttivo goal si attiva solo quando inversione/steam/quadrato book trovano conferma nelle frequenze PT, capacita' di segnare/subire presto e, quando disponibili, xG e tiri nello specchio."
+      },
+      "pattern_outcomes": {
+        "goal_ht": false,
+        "over15_ht": false,
+        "gg_ht": false,
+        "over25_ft": false
+      }
     }
   },
   "summary": {
-    "settled_primary": 3125,
+    "settled_primary": 3126,
     "wins": 1489,
-    "losses": 1636,
-    "win_rate_pct": 47.648,
+    "losses": 1637,
+    "win_rate_pct": 47.633,
     "by_market": {
       "1x2_ft": {
         "settled": 814,
@@ -385840,10 +385963,10 @@
         "win_rate_pct": 47.543
       },
       "over25_ft": {
-        "settled": 1538,
+        "settled": 1539,
         "wins": 835,
-        "losses": 703,
-        "win_rate_pct": 54.291
+        "losses": 704,
+        "win_rate_pct": 54.256
       },
       "over15_ht": {
         "settled": 572,
@@ -385872,10 +385995,10 @@
         "win_rate_pct": 80.0
       },
       "B": {
-        "settled": 1192,
+        "settled": 1193,
         "wins": 575,
-        "losses": 617,
-        "win_rate_pct": 48.238
+        "losses": 618,
+        "win_rate_pct": 48.198
       },
       "A": {
         "settled": 1419,
@@ -385904,16 +386027,16 @@
         "over25_ft_rate_pct": 50.0
       },
       "neutral": {
-        "settled": 1882,
+        "settled": 1883,
         "goal_ht": 1390,
         "over15_ht": 715,
         "gg_ht": 386,
         "over25_ft": 1075,
-        "avg_pattern_score": 22.478,
-        "goal_ht_rate_pct": 73.858,
-        "over15_ht_rate_pct": 37.991,
-        "gg_ht_rate_pct": 20.51,
-        "over25_ft_rate_pct": 57.12
+        "avg_pattern_score": 22.475,
+        "goal_ht_rate_pct": 73.818,
+        "over15_ht_rate_pct": 37.971,
+        "gg_ht_rate_pct": 20.499,
+        "over25_ft_rate_pct": 57.09
       },
       "favorite_steam_only": {
         "settled": 163,
