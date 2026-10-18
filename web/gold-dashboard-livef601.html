@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>ArabSniper Quote Dashboard V1.1.3</title>
+  <style>
+    :root {
+      --bg: #05070b;
+      --panel: #0d121b;
+      --panel-2: #131b27;
+      --panel-3: #1a2433;
+      --border: #263247;
+      --border-soft: #1b2534;
+      --text: #f7f9fc;
+      --muted: #98a6ba;
+      --cyan: #20dcff;
+      --gold: #ffd400;
+      --green: #1ee08b;
+      --red: #ff3d4f;
+      --orange: #ff9e2c;
+      --yellow: #ffe04d;
+      --gray: #78879a;
+      --blue: #45a8ff;
+      --shadow: 0 18px 55px rgba(0, 0, 0, .34);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(32, 220, 255, .08), transparent 28%),
+        radial-gradient(circle at 90% 4%, rgba(255, 212, 0, .07), transparent 25%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .page {
+      width: min(1540px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 18px 0 44px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      padding: 20px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(19, 27, 39, .96), rgba(8, 12, 19, .96));
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.25rem, 2vw, 2rem);
+      color: var(--gold);
+      letter-spacing: -.03em;
+    }
+
+    .brand p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: .92rem;
+    }
+
+    .live-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      color: var(--green);
+      font-size: .82rem;
+      font-weight: 800;
+    }
+
+    .live-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse { 50% { opacity: .35; } }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 13px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 800;
+      transition: .18s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); border-color: var(--cyan); }
+    .btn-gold { border-color: rgba(255, 212, 0, .55); color: var(--gold); }
+    .btn-danger { border-color: rgba(255, 61, 79, .4); color: #ffadb5; }
+
+    .toolbar {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background: rgba(13, 18, 27, .92);
+      border: 1px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 13px;
+    }
+
+    .day-buttons, .filter-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .day-btn, .filter-btn {
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: #0b1018;
+      border-radius: 11px;
+      padding: 9px 12px;
+      font-weight: 850;
+    }
+
+    .day-btn.active, .filter-btn.active {
+      color: #05070b;
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .sync-box {
+      text-align: right;
+      color: var(--muted);
+      font-size: .83rem;
+      line-height: 1.5;
+    }
+
+    .sync-box strong { color: var(--cyan); }
+
+    .searchbar {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(170px, auto) minmax(155px, auto) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .search-input, .sort-select {
+      width: 100%;
+      min-height: 43px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0a0f17;
+      color: var(--text);
+      padding: 10px 13px;
+      outline: none;
+    }
+
+    .search-input:focus, .sort-select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(32, 220, 255, .08);
+    }
+
+    .count { color: var(--muted); font-weight: 800; white-space: nowrap; }
+
+    .legend {
+      margin-top: 14px;
+      background: rgba(13, 18, 27, .82);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      align-items: center;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .legend-item { display: inline-flex; gap: 7px; align-items: center; }
+    .legend-mark {
+      width: 26px;
+      height: 26px;
+      display: inline-grid;
+      place-items: center;
+      font-size: .68rem;
+      font-weight: 900;
+      color: var(--text);
+      border: 3px solid var(--orange);
+      position: relative;
+    }
+    .legend-mark.circle { border-radius: 50%; }
+    .legend-mark.square { border-radius: 4px; }
+    .legend-mark.double { border-radius: 50%; }
+    .legend-mark.double::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border: 2px solid var(--orange);
+      border-radius: 4px;
+    }
+
+    .matches-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .match-card {
+      background: linear-gradient(165deg, rgba(19, 27, 39, .98), rgba(9, 13, 20, .98));
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, .24);
+    }
+
+    .match-head {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: start;
+      border-bottom: 1px solid var(--border-soft);
+      background: linear-gradient(90deg, rgba(32, 220, 255, .04), transparent 42%);
+    }
+
+    .league {
+      color: var(--cyan);
+      font-size: .76rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .match-title {
+      margin: 5px 0 0;
+      font-size: 1.08rem;
+      line-height: 1.25;
+      font-weight: 900;
+    }
+
+    .match-meta { margin-top: 6px; color: var(--muted); font-size: .78rem; }
+
+    .kickoff {
+      min-width: 70px;
+      text-align: center;
+      border: 1px solid rgba(255, 212, 0, .35);
+      background: rgba(255, 212, 0, .07);
+      border-radius: 13px;
+      padding: 8px 10px;
+    }
+    .kickoff-time { color: var(--gold); font-size: 1.05rem; font-weight: 950; }
+    .kickoff-date { color: var(--muted); font-size: .69rem; margin-top: 3px; }
+
+    .primary-choice {
+      margin: 13px 14px 0;
+      border: 1px solid rgba(255, 212, 0, .26);
+      background: linear-gradient(90deg, rgba(255, 212, 0, .09), rgba(255, 212, 0, .02));
+      border-radius: 15px;
+      padding: 11px 13px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .primary-label { color: var(--muted); font-size: .69rem; font-weight: 850; text-transform: uppercase; }
+    .primary-main { margin-top: 3px; font-weight: 950; color: var(--gold); }
+    .primary-sub { margin-top: 3px; color: var(--muted); font-size: .73rem; }
+    .primary-score { text-align: right; }
+    .primary-prob { font-size: 1.12rem; font-weight: 950; }
+    .primary-odd { color: var(--muted); font-size: .75rem; }
+
+    .markets {
+      padding: 14px;
+      display: grid;
+      gap: 11px;
+    }
+
+    .market-panel {
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      background: rgba(8, 12, 18, .64);
+      overflow: hidden;
+    }
+
+    .market-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .market-title { font-weight: 900; font-size: .86rem; }
+    .relation-pill {
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: .63rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .relation-confirmed { color: #ffb7bd; border-color: rgba(255,61,79,.4); background: rgba(255,61,79,.08); }
+    .relation-model_only { color: #ffd1a1; border-color: rgba(255,158,44,.4); background: rgba(255,158,44,.08); }
+    .relation-contrast { color: #aee0ff; border-color: rgba(69,168,255,.45); background: rgba(69,168,255,.08); }
+
+    .selection-grid {
+      display: grid;
+      gap: 7px;
+      padding: 11px;
+    }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .selection {
+      min-width: 0;
+      border: 1px solid #202a3a;
+      background: #111825;
+      border-radius: 13px;
+      padding: 9px 6px 8px;
+      text-align: center;
+      position: relative;
+    }
+
+    .selection-name {
+      color: var(--muted);
+      font-size: .65rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      min-height: 16px;
+    }
+
+    .quote-zone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 66px;
+      margin-top: 3px;
+    }
+
+    .quote-marker {
+      min-width: 62px;
+      min-height: 50px;
+      padding: 7px 10px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border: 4px solid transparent;
+      line-height: 1;
+    }
+
+    .shape-circle { border-radius: 999px; }
+    .shape-square { border-radius: 7px; }
+    .shape-circle_square { border-radius: 999px; }
+    .shape-circle_square::after {
+      content: "";
+      position: absolute;
+      inset: -9px;
+      border: 3px solid currentColor;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    .marker-red { border-color: var(--red); color: var(--red); box-shadow: 0 0 17px rgba(255,61,79,.22); }
+    .marker-orange { border-color: var(--orange); color: var(--orange); box-shadow: 0 0 15px rgba(255,158,44,.18); }
+    .marker-yellow { border-color: var(--yellow); color: var(--yellow); box-shadow: 0 0 14px rgba(255,224,77,.14); }
+    .marker-none { color: var(--text); }
+
+    .quote-current { color: inherit; font-size: 1.03rem; font-weight: 950; }
+    .quote-open { color: var(--muted); font-size: .62rem; margin-top: 4px; }
+
+    .movement-badge {
+      min-height: 21px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      margin-top: 2px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: .62rem;
+      font-weight: 900;
+    }
+    .move-red { color: #ffb5bc; background: rgba(255,61,79,.12); }
+    .move-orange { color: #ffc17a; background: rgba(255,158,44,.12); }
+    .move-yellow { color: #ffe98d; background: rgba(255,224,77,.1); }
+    .move-gray { color: var(--muted); background: rgba(120,135,154,.09); }
+
+    .selection-metrics {
+      margin-top: 7px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      color: var(--muted);
+      font-size: .62rem;
+    }
+    .selection-metrics b { color: var(--text); display: block; font-size: .68rem; margin-top: 1px; }
+
+    .market-foot {
+      padding: 8px 11px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: .66rem;
+      border-top: 1px solid var(--border-soft);
+    }
+    .market-foot b { color: var(--text); }
+    .aggio-low { color: var(--green) !important; }
+    .aggio-normal { color: var(--yellow) !important; }
+    .aggio-high { color: var(--red) !important; }
+
+    .card-actions {
+      padding: 0 14px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .reliability { color: var(--muted); font-size: .72rem; }
+    .reliability b { color: var(--cyan); }
+
+    .empty, .error {
+      grid-column: 1 / -1;
+      padding: 32px;
+      text-align: center;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 18px;
+      color: var(--muted);
+    }
+    .error { color: #ffb0b8; }
+
+    .modal-overlay, .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.78);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 28px 14px;
+      z-index: 1000;
+      overflow-y: auto;
+      backdrop-filter: blur(8px);
+    }
+    .modal-overlay.show, .login-overlay.show { display: flex; }
+
+    .modal {
+      width: min(1120px, 100%);
+      border-radius: 22px;
+      border: 1px solid rgba(255,212,0,.34);
+      background: #0b1018;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 17px 18px;
+      border-bottom: 1px solid var(--border);
+      align-items: flex-start;
+    }
+    .modal-head h2 { margin: 0; color: var(--gold); font-size: 1.25rem; }
+    .modal-sub { color: var(--muted); margin-top: 5px; font-size: .8rem; }
+    .modal-body { padding: 17px; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+    }
+    .detail-box {
+      background: var(--panel-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 13px;
+      padding: 10px;
+    }
+    .detail-label { color: var(--muted); font-size: .66rem; }
+    .detail-value { margin-top: 4px; font-size: .92rem; font-weight: 900; }
+
+    .detail-columns {
+      margin-top: 13px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .detail-section {
+      border: 1px solid var(--border-soft);
+      border-radius: 15px;
+      background: var(--panel-2);
+      padding: 13px;
+      overflow: hidden;
+    }
+    .detail-section h3 { margin: 0 0 10px; color: var(--cyan); font-size: .87rem; }
+
+    .stats-table-wrap { overflow-x: auto; }
+    .stats-table { width: 100%; border-collapse: collapse; min-width: 560px; font-size: .7rem; }
+    .stats-table th, .stats-table td { padding: 7px; border-bottom: 1px solid var(--border-soft); text-align: left; }
+    .stats-table th { color: var(--cyan); background: #0e1520; }
+    .stats-table td { color: #d7deea; }
+
+    .json-note { color: var(--muted); font-size: .72rem; line-height: 1.5; }
+
+    .login-card {
+      width: min(430px, 100%);
+      margin-top: 10vh;
+      border-radius: 22px;
+      border: 1px solid rgba(255,212,0,.42);
+      background: linear-gradient(160deg, #141c28, #080c12);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+    .login-card h2 { color: var(--gold); margin: 0; }
+    .login-card p { color: var(--muted); line-height: 1.5; font-size: .86rem; }
+    .login-input {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #070b11;
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+    }
+    .login-input:focus { border-color: var(--gold); }
+    .login-error { min-height: 20px; color: #ff9ba5; font-size: .76rem; margin-top: 8px; }
+    .login-button { width: 100%; margin-top: 10px; background: var(--gold); color: #05070b; border-color: var(--gold); }
+
+    @media (max-width: 1180px) {
+      .matches-grid { grid-template-columns: 1fr; }
+    }
+
+
+    .relation-book_only { color: #d9c1ff; border-color: rgba(174,123,255,.45); background: rgba(174,123,255,.08); }
+    .market-title-wrap { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+    .validation-badge {
+      border-radius:999px; padding:3px 7px; font-size:.56rem; font-weight:950;
+      text-transform:uppercase; letter-spacing:.03em; border:1px solid var(--border);
+    }
+    .validation-verified { color:#9df3c8; border-color:rgba(30,224,139,.38); background:rgba(30,224,139,.08); }
+    .validation-name_fallback { color:#ffe98d; border-color:rgba(255,224,77,.38); background:rgba(255,224,77,.08); }
+    .validation-missing { color:#ffadb5; border-color:rgba(255,61,79,.38); background:rgba(255,61,79,.08); }
+    .market-unverified { border-color:rgba(255,158,44,.26); }
+    .market-unverified .selection { opacity:.88; }
+    .calibration-note { color:var(--cyan); }
+    .xg-chip {
+      display:inline-flex; align-items:center; gap:5px; border:1px solid rgba(32,220,255,.28);
+      border-radius:999px; padding:4px 8px; color:#b9f5ff; background:rgba(32,220,255,.06);
+      font-size:.66rem; font-weight:850;
+    }
+    .xg-chip.fallback { color:var(--muted); border-color:var(--border); background:rgba(120,135,154,.05); }
+    .primary-raw { color:var(--muted); font-size:.65rem; margin-top:3px; }
+    .prob-table { width:100%; border-collapse:collapse; font-size:.72rem; }
+    .prob-table th, .prob-table td { padding:7px; border-bottom:1px solid var(--border-soft); text-align:right; }
+    .prob-table th:first-child, .prob-table td:first-child { text-align:left; }
+    .prob-table th { color:var(--cyan); background:#0e1520; }
+    .prob-up { color:var(--green); font-weight:900; }
+    .prob-down { color:#ffadb5; font-weight:900; }
+    .section-note { margin:8px 0 0; color:var(--muted); font-size:.69rem; line-height:1.45; }
+    .validation-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .validation-row { border:1px solid var(--border-soft); border-radius:11px; padding:9px; background:#0e1520; }
+    .validation-row strong { display:block; color:var(--text); font-size:.74rem; }
+    .validation-row span { display:block; margin-top:3px; color:var(--muted); font-size:.65rem; line-height:1.4; }
+    .refresh-note { color:var(--muted); font-size:.65rem; }
+    .audit-strip {
+      margin-top:12px; border:1px solid var(--border-soft); border-radius:15px; padding:10px 13px;
+      background:rgba(13,18,27,.82); display:none; gap:14px; align-items:center; flex-wrap:wrap;
+      color:var(--muted); font-size:.73rem;
+    }
+    .audit-strip.show { display:flex; }
+    .audit-strip strong { color:var(--gold); }
+    .audit-metric b { color:var(--text); margin-left:4px; }
+    .gate-badge {
+      display:inline-flex; align-items:center; gap:4px; border-radius:999px; padding:4px 8px;
+      font-size:.61rem; font-weight:950; border:1px solid var(--border);
+    }
+    .gate-eligible { color:#9df3c8; border-color:rgba(30,224,139,.38); background:rgba(30,224,139,.08); }
+    .gate-blocked { color:#ffb6bd; border-color:rgba(255,61,79,.34); background:rgba(255,61,79,.07); }
+    .no-primary { color:var(--muted); font-weight:850; }
+    .hour-hint { color:var(--cyan); font-size:.68rem; white-space:nowrap; }
+
+    @media (max-width: 820px) {
+      .page { width: min(100% - 12px, 1540px); padding-top: 6px; }
+      .topbar { position: static; border-radius: 16px; padding: 14px; }
+      .top-actions { width: 100%; justify-content: flex-start; }
+      .toolbar { grid-template-columns: 1fr; }
+      .sync-box { text-align: left; }
+      .searchbar { grid-template-columns: 1fr; }
+      .detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .detail-columns { grid-template-columns: 1fr; }
+      .validation-list { grid-template-columns:1fr; }
+    }
+
+    @media (max-width: 540px) {
+      .match-head { grid-template-columns: 1fr auto; padding: 13px; }
+      .primary-choice { grid-template-columns: 1fr; }
+      .primary-score { text-align: left; display: flex; gap: 10px; }
+      .selection-grid { padding: 8px; gap: 5px; }
+      .selection { padding-left: 3px; padding-right: 3px; }
+      .quote-marker { min-width: 54px; padding-left: 6px; padding-right: 6px; }
+      .selection-metrics { grid-template-columns: 1fr 1fr; }
+      .detail-grid { grid-template-columns: 1fr 1fr; }
+      .legend { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page" id="app" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <h1>ARABSNIPER · QUOTE DASHBOARD</h1>
+        <p>Probabilità ArabSniper pure e calibrate, xG reali e direzione del book direttamente sulle quote.</p>
+        <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-gold" type="button" onclick="manualRefresh()">Aggiorna</button>
+        <a class="btn" href="index.html" style="text-decoration:none">Home</a>
+        <button class="btn btn-danger" type="button" onclick="logoutGold()">Logout</button>
+      </div>
+    </header>
+
+    <section class="toolbar">
+      <div class="day-buttons" id="dayButtons"></div>
+      <div class="sync-box">
+        <div><strong id="selectedDay">--</strong></div>
+        <div id="fileSource">Fonte: --</div>
+        <div id="updatedAt">Aggiornamento: --</div>
+      </div>
+    </section>
+
+    <section class="searchbar">
+      <input id="searchInput" class="search-input" type="search" placeholder="Cerca squadra, campionato o Paese..." oninput="applyFilters()" />
+      <select id="sortSelect" class="sort-select" onchange="applyFilters()">
+        <option value="time">Ordina per orario</option>
+        <option value="probability">Probabilità principale</option>
+        <option value="agreement">Conferme prima</option>
+      </select>
+      <select id="hourSelect" class="sort-select" onchange="scrollToSelectedHour()" aria-label="Vai all'orario"></select>
+      <div class="count" id="matchCount">0 partite</div>
+    </section>
+
+    <section class="toolbar" style="grid-template-columns:1fr">
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="all" onclick="setRelationFilter('all')">Tutte</button>
+        <button class="filter-btn" data-filter="confirmed" onclick="setRelationFilter('confirmed')">Doppia conferma</button>
+        <button class="filter-btn" data-filter="model_only" onclick="setRelationFilter('model_only')">Solo ArabSniper</button>
+        <button class="filter-btn" data-filter="book_only" onclick="setRelationFilter('book_only')">Solo Book</button>
+        <button class="filter-btn" data-filter="contrast" onclick="setRelationFilter('contrast')">Contrasto</button>
+      </div>
+    </section>
+
+    <section id="auditStrip" class="audit-strip"></section>
+
+    <section class="legend">
+      <strong style="color:var(--gold)">Legenda:</strong>
+      <span class="legend-item"><span class="legend-mark circle">AS</span> cerchio = ArabSniper</span>
+      <span class="legend-item"><span class="legend-mark square">B</span> quadrato = Book</span>
+      <span class="legend-item"><span class="legend-mark double">A+B</span> doppio bordo = concordanza</span>
+      <span class="legend-item"><b style="color:var(--cyan)">Percentuale</b> = ArabSniper calibrata; il cerchio resta basato sul modello puro</span>
+      <span class="legend-item"><b style="color:var(--red)">Rosso</b> forte</span>
+      <span class="legend-item"><b style="color:var(--orange)">Arancio</b> media</span>
+      <span class="legend-item"><b style="color:var(--yellow)">Giallo</b> bassa</span>
+    </section>
+
+    <main class="matches-grid" id="matchesGrid">
+      <div class="empty">Caricamento...</div>
+    </main>
+  </div>
+
+  <div id="detailOverlay" class="modal-overlay" onclick="closeDetailFromOverlay(event)">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 id="detailTitle">Dettagli</h2>
+          <div id="detailSubtitle" class="modal-sub"></div>
+        </div>
+        <button class="btn" onclick="closeDetail()">Chiudi</button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+    </div>
+  </div>
+
+  <div id="loginOverlay" class="login-overlay show">
+    <form class="login-card" onsubmit="submitLogin(event)">
+      <h2>Accesso Area Premium</h2>
+      <p>Inserisci l’email utilizzata per l’acquisto. L’accesso viene verificato tramite il servizio Stripe già collegato al sito.</p>
+      <input id="loginEmail" class="login-input" type="email" autocomplete="email" placeholder="nome@email.it" required />
+      <div id="loginError" class="login-error"></div>
+      <button id="loginButton" class="btn login-button" type="submit">Verifica accesso</button>
+    </form>
+  </div>
+
+  <script>
+    'use strict';
+
+    const GITHUB_BASE = 'https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper2/main/data/';
+    const STRIPE_WORKER = 'https://stripe-checker.arabsnipertech.workers.dev/';
+    const STORAGE_KEY = 'arab_user_email';
+    const AUDIT_FILE = 'arab_quote_prediction_audit.json';
+
+    const MARKET_ORDER = ['1x2_ft', 'over25_ft', 'over15_ht', 'gg_ht'];
+    const MARKET_LABELS = {
+      '1x2_ft': '1 · X · 2',
+      'over25_ft': 'Over 2,5 FT',
+      'over15_ht': 'Over 1,5 PT',
+      'gg_ht': 'GG primo tempo'
+    };
+    const SELECTION_LABELS = {
+      '1': '1', 'x': 'X', '2': '2',
+      'over': 'Over', 'under': 'Under',
+      'yes': 'GG Sì', 'no': 'GG No'
+    };
+    const RELATION_LABELS = {
+      confirmed: 'Conferma AS + Book',
+      model_only: 'Solo ArabSniper',
+      book_only: 'Solo Book',
+      contrast: 'Contrasto AS / Book',
+      neutral: 'Nessuna direzione'
+    };
+    const AGGIO_LABELS = {
+      low: 'basso', normal: 'normale', high: 'alto', unavailable: 'n/d'
+    };
+
+    let currentDay = 1;
+    let currentPayload = null;
+    let currentMatches = [];
+    let filteredMatches = [];
+    let relationFilter = 'all';
+    let refreshTimer = null; // mantenuto solo per compatibilità; nessun timer viene avviato
+    let hourMenuReady = false;
+    let initialHourScrollDone = false;
+
+    function rawUrl(file) {
+      return `${GITHUB_BASE}${file}?v=${Date.now()}`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function normalizeText(value) {
+      return String(value ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function num(value, fallback = 0) {
+      const parsed = Number(String(value ?? '').replace(',', '.'));
+      return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    function formatOdd(value) {
+      const n = num(value, NaN);
+      return Number.isFinite(n) && n > 0 ? n.toFixed(2) : '—';
+    }
+
+    function formatPct(value, digits = 1) {
+      const n = num(value, NaN);
+      return Number.isFinite(n) ? `${n.toFixed(digits)}%` : '—';
+    }
+
+    function formatSigned(value, suffix = '') {
+      const n = num(value, NaN);
+      if (!Number.isFinite(n)) return '—';
+      const sign = n > 0 ? '+' : '';
+      return `${sign}${n.toFixed(2)}${suffix}`;
+    }
+
+    function formatDateIt(value) {
+      if (!value) return '—';
+      const date = new Date(`${String(value).slice(0, 10)}T12:00:00`);
+      return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
+    }
+
+    function formatTimestamp(value) {
+      if (!value) return '—';
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString('it-IT');
+    }
+
+    function dayDate(offset) {
+      const date = new Date();
+      date.setHours(12, 0, 0, 0);
+      date.setDate(date.getDate() + offset);
+      return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
+    }
+
+    function checkLogoutSignal() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('logout') === 'true') {
+        localStorage.removeItem(STORAGE_KEY);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    async function verifyGoldAccess(email) {
+      const workerUrl = `${STRIPE_WORKER}?email=${encodeURIComponent(email)}`;
+      const response = await fetch(workerUrl, { method: 'GET', headers: { Accept: 'application/json' } });
+      const rawText = await response.text();
+      let data;
+      try {
+        data = rawText ? JSON.parse(rawText) : {};
+      } catch (_) {
+        throw new Error(`Risposta non valida dal servizio accessi: ${rawText.slice(0, 100)}`);
+      }
+      if (!response.ok) throw new Error(data?.error || `HTTP ${response.status}`);
+      return data;
+    }
+
+    async function submitLogin(event) {
+      event.preventDefault();
+      const emailInput = document.getElementById('loginEmail');
+      const error = document.getElementById('loginError');
+      const button = document.getElementById('loginButton');
+      const email = String(emailInput.value || '').trim().toLowerCase();
+      error.textContent = '';
+      if (!email.includes('@')) {
+        error.textContent = 'Inserisci un indirizzo email valido.';
+        return;
+      }
+      button.disabled = true;
+      button.textContent = 'Verifica in corso...';
+      try {
+        const access = await verifyGoldAccess(email);
+        if (!access.active) {
+          localStorage.removeItem(STORAGE_KEY);
+          throw new Error('Accesso premium non attivo o scaduto per questa email.');
+        }
+        localStorage.setItem(STORAGE_KEY, email);
+        showApplication();
+      } catch (err) {
+        error.textContent = err.message || 'Errore durante la verifica.';
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Verifica accesso';
+      }
+    }
+
+    async function initializeAccess() {
+      checkLogoutSignal();
+      const saved = String(localStorage.getItem(STORAGE_KEY) || '').trim().toLowerCase();
+      if (!saved || !saved.includes('@')) return;
+      document.getElementById('loginEmail').value = saved;
+      try {
+        const access = await verifyGoldAccess(saved);
+        if (access.active) {
+          showApplication();
+          return;
+        }
+      } catch (err) {
+        console.error('Verifica automatica accesso fallita:', err);
+      }
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function showApplication() {
+      document.getElementById('loginOverlay').classList.remove('show');
+      document.getElementById('app').hidden = false;
+      buildDayButtons();
+      buildHourOptions();
+      loadAuditSummary();
+      loadCurrentDay();
+    }
+
+    function logoutGold() {
+      localStorage.removeItem(STORAGE_KEY);
+      window.location.href = 'index.html';
+    }
+
+    function buildDayButtons() {
+      const container = document.getElementById('dayButtons');
+      container.innerHTML = '';
+      for (let day = 1; day <= 5; day += 1) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `day-btn${day === currentDay ? ' active' : ''}`;
+        button.dataset.day = String(day);
+        button.textContent = dayDate(day - 1);
+        button.title = day === 1 ? 'Oggi' : `Giorno +${day - 1}`;
+        button.addEventListener('click', () => changeDay(day));
+        container.appendChild(button);
+      }
+    }
+
+    function changeDay(day) {
+      currentDay = day;
+      initialHourScrollDone = false;
+      document.querySelectorAll('.day-btn').forEach(button => {
+        button.classList.toggle('active', Number(button.dataset.day) === day);
+      });
+      setDefaultHourForDay();
+      loadCurrentDay();
+    }
+
+    function buildHourOptions() {
+      const select = document.getElementById('hourSelect');
+      if (!select || hourMenuReady) return;
+      select.innerHTML = '';
+      for (let hour = 0; hour <= 23; hour += 1) {
+        const option = document.createElement('option');
+        option.value = String(hour).padStart(2, '0');
+        option.textContent = `Vai alle ${String(hour).padStart(2, '0')}:00`;
+        select.appendChild(option);
+      }
+      hourMenuReady = true;
+      setDefaultHourForDay();
+    }
+
+    function setDefaultHourForDay() {
+      const select = document.getElementById('hourSelect');
+      if (!select) return;
+      const hour = currentDay === 1 ? new Date().getHours() : 0;
+      select.value = String(hour).padStart(2, '0');
+    }
+
+    function scrollToSelectedHour() {
+      const select = document.getElementById('hourSelect');
+      if (!select || !filteredMatches.length) return;
+      const targetMinutes = Number(select.value) * 60;
+      const ordered = [...filteredMatches].sort((a, b) => String(a?.fixture?.time || '').localeCompare(String(b?.fixture?.time || '')));
+      let targetMatch = ordered.find(match => {
+        const [h, m] = String(match?.fixture?.time || '00:00').split(':').map(Number);
+        return (h * 60 + (m || 0)) >= targetMinutes;
+      }) || ordered[ordered.length - 1];
+      const fixtureId = String(targetMatch?.fixture?.fixture_id || '');
+      const card = fixtureId ? document.querySelector(`.match-card[data-fixture-id="${CSS.escape(fixtureId)}"]`) : null;
+      if (!card) return;
+      const topbar = document.querySelector('.topbar');
+      const offset = (topbar?.getBoundingClientRect().height || 0) + 18;
+      const top = window.scrollY + card.getBoundingClientRect().top - offset;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+
+    function maybeAutoScrollToHour(preservePosition) {
+      if (preservePosition || initialHourScrollDone) return;
+      initialHourScrollDone = true;
+      requestAnimationFrame(() => requestAnimationFrame(() => scrollToSelectedHour()));
+    }
+
+    async function loadAuditSummary() {
+      const strip = document.getElementById('auditStrip');
+      try {
+        const payload = await loadJson(AUDIT_FILE);
+        const summary = payload?.summary || {};
+        const over = summary?.by_market?.over25_ft || {};
+        strip.innerHTML = `
+          <strong>Audit reale risultati</strong>
+          <span class="audit-metric">Scelte primarie chiuse:<b>${escapeHtml(String(summary.settled_primary ?? 0))}</b></span>
+          <span class="audit-metric">Vincenti:<b>${escapeHtml(String(summary.wins ?? 0))}</b></span>
+          <span class="audit-metric">Percentuale:<b>${escapeHtml(formatPct(summary.win_rate_pct))}</b></span>
+          <span class="audit-metric">Over 2,5:<b>${escapeHtml(formatPct(over.win_rate_pct))} su ${escapeHtml(String(over.settled ?? 0))}</b></span>
+          <span class="refresh-note">Agg. ${escapeHtml(formatTimestamp(payload.updated_at))}</span>`;
+        strip.classList.add('show');
+      } catch (_) {
+        strip.classList.remove('show');
+      }
+    }
+
+    function restartRefresh() {
+      // Aggiornamento automatico disabilitato: il lettore non perde più la posizione.
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = null;
+    }
+
+    function captureViewportAnchor() {
+      const topbar = document.querySelector('.topbar');
+      const threshold = (topbar?.getBoundingClientRect().bottom || 0) + 8;
+      const cards = [...document.querySelectorAll('.match-card[data-fixture-id]')];
+      const card = cards.find(item => item.getBoundingClientRect().bottom > threshold) || cards[0];
+      if (!card) return { fixtureId: null, offset: 0, scrollY: window.scrollY };
+      return {
+        fixtureId: card.dataset.fixtureId || null,
+        offset: card.getBoundingClientRect().top - threshold,
+        scrollY: window.scrollY
+      };
+    }
+
+    function restoreViewportAnchor(anchor) {
+      if (!anchor) return;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const topbar = document.querySelector('.topbar');
+        const threshold = (topbar?.getBoundingClientRect().bottom || 0) + 8;
+        const target = anchor.fixtureId
+          ? document.querySelector(`.match-card[data-fixture-id="${CSS.escape(String(anchor.fixtureId))}"]`)
+          : null;
+        if (target) {
+          const desired = window.scrollY + target.getBoundingClientRect().top - threshold - anchor.offset;
+          window.scrollTo({ top: Math.max(0, desired), behavior: 'auto' });
+        } else {
+          window.scrollTo({ top: anchor.scrollY || 0, behavior: 'auto' });
+        }
+      }));
+    }
+
+    async function manualRefresh() {
+      await loadCurrentDay({ preservePosition: true });
+    }
+
+    async function loadJson(file) {
+      const response = await fetch(rawUrl(file), { cache: 'no-store' });
+      if (!response.ok) throw new Error(`File non disponibile: ${file}`);
+      return response.json();
+    }
+
+    async function loadCurrentDay(options = {}) {
+      const preservePosition = Boolean(options.preservePosition);
+      const anchor = preservePosition ? captureViewportAnchor() : null;
+      const file = `arab_quote_day${currentDay}.json`;
+      const grid = document.getElementById('matchesGrid');
+      document.getElementById('liveStatus').textContent = 'Sincronizzazione in corso...';
+      if (!preservePosition) grid.innerHTML = '<div class="empty">Caricamento dati...</div>';
+      try {
+        const payload = await loadJson(file);
+        if (!payload || !Array.isArray(payload.matches)) throw new Error(`Formato JSON non valido in ${file}`);
+        currentPayload = payload;
+        currentMatches = [...payload.matches];
+        document.getElementById('selectedDay').textContent = `Giorno ${currentDay} · ${formatDateIt(payload.date)}`;
+        document.getElementById('fileSource').textContent = `Fonte: ${file}`;
+        document.getElementById('updatedAt').textContent = `Aggiornamento: ${formatTimestamp(payload.updated_at)}`;
+        document.getElementById('liveStatus').textContent = currentDay === 1
+          ? 'Dati Day 1 caricati · aggiornamento manuale'
+          : `Snapshot Day ${currentDay} · aggiornamento manuale`;
+        applyFilters();
+        if (preservePosition) restoreViewportAnchor(anchor);
+        else maybeAutoScrollToHour(false);
+      } catch (err) {
+        console.error(err);
+        currentMatches = [];
+        grid.innerHTML = `<div class="error">${escapeHtml(err.message)}. Verifica che il nuovo script abbia pubblicato il file nel repository.</div>`;
+        document.getElementById('matchCount').textContent = '0 partite';
+        document.getElementById('liveStatus').textContent = 'Errore caricamento';
+        if (preservePosition) restoreViewportAnchor(anchor);
+      }
+    }
+
+    function setRelationFilter(filter) {
+      relationFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(button => {
+        button.classList.toggle('active', button.dataset.filter === filter);
+      });
+      applyFilters();
+    }
+
+    function marketRelation(market) {
+      if (!market) return 'neutral';
+      const modelPick = market.model_pick || null;
+      const bookPick = market.book_pick || null;
+      if (modelPick && bookPick && modelPick === bookPick) return 'confirmed';
+      if (modelPick && !bookPick) return 'model_only';
+      if (!modelPick && bookPick) return 'book_only';
+      if (modelPick && bookPick && modelPick !== bookPick) return 'contrast';
+      return market.relation || 'neutral';
+    }
+
+    function relationPriority(match) {
+      const markets = match?.display?.markets || {};
+      const relations = Object.values(markets).map(marketRelation);
+      if (relations.includes('confirmed')) return 4;
+      if (relations.includes('model_only')) return 3;
+      if (relations.includes('book_only')) return 2;
+      if (relations.includes('contrast')) return 1;
+      return 0;
+    }
+
+    function matchHasRelation(match, relation) {
+      if (relation === 'all') return true;
+      const markets = match?.display?.markets || {};
+      return Object.values(markets).some(market => marketRelation(market) === relation);
+    }
+
+    function applyFilters() {
+      const search = normalizeText(document.getElementById('searchInput').value.trim());
+      const sortMode = document.getElementById('sortSelect').value;
+      filteredMatches = currentMatches.filter(match => {
+        const fixture = match.fixture || {};
+        const haystack = normalizeText([fixture.home, fixture.away, fixture.match, fixture.league, fixture.country].join(' '));
+        return (!search || haystack.includes(search)) && matchHasRelation(match, relationFilter);
+      });
+
+      filteredMatches.sort((a, b) => {
+        if (sortMode === 'probability') {
+          return num(b?.display?.primary_choice?.probability_pct) - num(a?.display?.primary_choice?.probability_pct);
+        }
+        if (sortMode === 'agreement') {
+          return relationPriority(b) - relationPriority(a) || String(a?.fixture?.time || '').localeCompare(String(b?.fixture?.time || ''));
+        }
+        return String(a?.fixture?.time || '').localeCompare(String(b?.fixture?.time || '')) || String(a?.fixture?.match || '').localeCompare(String(b?.fixture?.match || ''));
+      });
+
+      renderMatches(filteredMatches);
+      document.getElementById('matchCount').textContent = `${filteredMatches.length} ${filteredMatches.length === 1 ? 'partita' : 'partite'}`;
+    }
+
+    function relationClass(relation) {
+      return ['confirmed', 'model_only', 'book_only', 'contrast'].includes(relation) ? `relation-${relation}` : '';
+    }
+
+    function selectionKeys(marketKey, market) {
+      const selections = market?.selections || {};
+      const declared = Array.isArray(market?.selection_order) ? market.selection_order : [];
+      if (declared.length) return declared.filter(key => selections[key]);
+      const fallback = {
+        '1x2_ft': ['1', 'x', '2'],
+        'over25_ft': ['over', 'under'],
+        'over15_ht': ['over', 'under'],
+        'gg_ht': ['yes', 'no']
+      }[marketKey] || Object.keys(selections);
+      return fallback.filter(key => selections[key]);
+    }
+
+    function movementArrow(delta) {
+      const value = num(delta);
+      if (value < 0) return '↓';
+      if (value > 0) return '↑';
+      return '•';
+    }
+
+    function movementDescription(selection) {
+      const level = selection?.movement_level || 'stable';
+      const deltaOdd = num(selection?.delta_odd);
+      const color = selection?.movement_color || 'gray';
+      const labelMap = { stable: 'stabile', low: 'leggera', medium: 'media', strong: 'forte' };
+      const arrow = movementArrow(deltaOdd);
+      const deltaText = Math.abs(deltaOdd) >= .001 ? ` ${arrow}${Math.abs(deltaOdd).toFixed(2)}` : '';
+      return `<span class="movement-badge move-${escapeHtml(color)}">${escapeHtml(labelMap[level] || level)}${escapeHtml(deltaText)}</span>`;
+    }
+
+    function markerClasses(marker) {
+      const shape = marker?.shape || 'none';
+      const color = marker?.color || 'none';
+      return `shape-${shape} marker-${color}`;
+    }
+
+    function buildSelection(marketKey, selectionKey, selection) {
+      const marker = selection?.marker || {};
+      const shapeTitle = marker.shape === 'circle_square'
+        ? 'ArabSniper puro e Book concordano'
+        : marker.shape === 'circle'
+          ? 'Scelta ArabSniper pura'
+          : marker.shape === 'square'
+            ? 'Scelta del Book'
+            : 'Nessuna indicazione';
+      const openOdd = selection?.open_odd;
+      const currentOdd = selection?.current_odd;
+      const calibratedProbability = selection?.model_probability_pct;
+      const rawProbability = selection?.model_probability_raw_pct;
+      const bookFairProbability = selection?.book_fair_probability_pct;
+      const oci = selection?.oci_as;
+      return `
+        <div class="selection" title="${escapeHtml(shapeTitle)}">
+          <div class="selection-name">${escapeHtml(SELECTION_LABELS[selectionKey] || selectionKey)}</div>
+          <div class="quote-zone">
+            <div class="quote-marker ${markerClasses(marker)}">
+              <div class="quote-current">${escapeHtml(formatOdd(currentOdd))}</div>
+              <div class="quote-open">ap. ${escapeHtml(formatOdd(openOdd))}</div>
+            </div>
+          </div>
+          ${movementDescription(selection)}
+          <div class="selection-metrics">
+            <span>AS calibrata<b>${escapeHtml(formatPct(calibratedProbability))}</b></span>
+            <span>AS pura<b>${escapeHtml(formatPct(rawProbability))}</b></span>
+            <span>Book fair<b>${escapeHtml(formatPct(bookFairProbability))}</b></span>
+            <span>OCI-AS<b>${escapeHtml(Number.isFinite(num(oci, NaN)) ? num(oci).toFixed(0) : '—')}</b></span>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildMarketPanel(marketKey, market) {
+      if (!market) return '';
+      let keys = selectionKeys(marketKey, market);
+      if (marketKey === 'gg_ht') {
+        keys = keys.filter(key => key === 'yes' || num(market?.selections?.[key]?.current_odd) > 1);
+      }
+      if (!keys.length) return '';
+      const cols = keys.length === 3 ? 'cols-3' : 'cols-2';
+      const aggioStatus = market.aggio_status || 'unavailable';
+      const bookPick = market.book_pick ? (SELECTION_LABELS[market.book_pick] || market.book_pick) : 'neutro';
+      const modelPick = market.model_pick ? (SELECTION_LABELS[market.model_pick] || market.model_pick) : 'nessuno';
+      const protectionPick = market.protection_pick ? (SELECTION_LABELS[market.protection_pick] || market.protection_pick) : 'nessuna';
+      const relation = marketRelation(market);
+      const validation = market.market_validation || {};
+      const validationStatus = validation.status || 'missing';
+      const validationLabel = validationStatus === 'verified'
+        ? 'mercato verificato'
+        : validationStatus === 'name_fallback'
+          ? 'riconoscimento nome'
+          : 'mercato non verificato';
+      const usable = Boolean(validation.usable_for_signals);
+      const calibrationWeight = num(market.market_calibration_weight) * 100;
+      const gate = market.recommendation_gate || {};
+      const gateLabel = gate.eligible
+        ? `Consigliato ${gate.grade || ''} · ${num(gate.score).toFixed(0)}/100`
+        : `Non consigliato${Array.isArray(gate.reasons) && gate.reasons.length ? ` · ${gate.reasons.join(', ').replaceAll('_', ' ')}` : ''}`;
+      return `
+        <section class="market-panel ${usable ? '' : 'market-unverified'}">
+          <div class="market-head">
+            <div class="market-title-wrap">
+              <div class="market-title">${escapeHtml(market.name || MARKET_LABELS[marketKey] || marketKey)}</div>
+              <span class="validation-badge validation-${escapeHtml(validationStatus)}">${escapeHtml(validationLabel)}</span>
+            </div>
+            <span class="relation-pill ${relationClass(relation)}">${escapeHtml(RELATION_LABELS[relation] || RELATION_LABELS.neutral)}</span>
+          </div>
+          <div class="selection-grid ${cols}">
+            ${keys.map(key => buildSelection(marketKey, key, market.selections[key])).join('')}
+          </div>
+          <div class="market-foot">
+            <span>ArabSniper puro: <b>${escapeHtml(modelPick)}</b></span>
+            <span>Book: <b>${escapeHtml(bookPick)}</b></span>
+            <span>Carico margine: <b>${escapeHtml(protectionPick)}</b></span>
+            <span>Aggio: <b class="aggio-${escapeHtml(aggioStatus)}">${escapeHtml(formatPct(market.aggio_pct))} · ${escapeHtml(AGGIO_LABELS[aggioStatus] || aggioStatus)}</b></span>
+            <span class="calibration-note">Peso book nella %: <b>${escapeHtml(formatPct(calibrationWeight))}</b></span>
+            <span>Bookmaker: <b>${escapeHtml(String(validation.bookmakers_found ?? 0))}</b></span>
+            <span class="gate-badge ${gate.eligible ? 'gate-eligible' : 'gate-blocked'}">${escapeHtml(gateLabel)}</span>
+          </div>
+        </section>
+      `;
+    }
+
+    function displayMarketName(key) {
+      return MARKET_LABELS[key] || key || '—';
+    }
+
+    function buildPrimaryChoice(display) {
+      const primary = display?.primary_choice;
+      if (!primary) {
+        return `
+          <div class="primary-choice">
+            <div>
+              <div class="primary-label">Scelta principale</div>
+              <div class="primary-main no-primary">Nessun mercato supera i filtri di qualità</div>
+              <div class="primary-sub">La partita resta consultabile, ma ArabSniper non la consiglia.</div>
+            </div>
+            <div class="primary-score"><span class="gate-badge gate-blocked">NO BET</span></div>
+          </div>`;
+      }
+      const primarySelection = SELECTION_LABELS[primary.selection] || primary.selection || '—';
+      const relation = RELATION_LABELS[primary.relation] || RELATION_LABELS.neutral;
+      return `
+        <div class="primary-choice">
+          <div>
+            <div class="primary-label">Scelta principale selezionata dai filtri</div>
+            <div class="primary-main">${escapeHtml(displayMarketName(primary.market))} · ${escapeHtml(primarySelection)}</div>
+            <div class="primary-sub">${escapeHtml(relation)} · EV ${escapeHtml(formatSigned(primary.expected_value_pct, '%'))}</div>
+            <div class="primary-raw">AS pura ${escapeHtml(formatPct(primary.probability_raw_pct))} · peso book ${escapeHtml(formatPct(num(primary.market_calibration_weight) * 100))}</div>
+          </div>
+          <div class="primary-score">
+            <div class="primary-prob">${escapeHtml(formatPct(primary.probability_pct))}</div>
+            <div class="primary-odd">quota ${escapeHtml(formatOdd(primary.odd))}</div>
+            <span class="gate-badge gate-eligible">${escapeHtml(primary.grade || 'OK')} · ${escapeHtml(String(Math.round(num(primary.recommendation_score))))}/100</span>
+          </div>
+        </div>`;
+    }
+
+    function buildMatchCard(match, index) {
+      const fixture = match.fixture || {};
+      const display = match.display || {};
+      const primary = display.primary_choice || {};
+      const markets = display.markets || {};
+      const reliability = match?.model?.reliability_pct;
+      const xgLayer = match?.statistics?.xg_layer || {};
+      const hxg = xgLayer.home || {};
+      const axg = xgLayer.away || {};
+      const xgAvailable = Boolean(hxg.available && axg.available);
+      const xgText = xgAvailable
+        ? `xG reali: ${hxg.sample_all || 0} casa · ${axg.sample_all || 0} ospite`
+        : 'xG reali non disponibili · fallback goal';
+      const fixtureId = String(fixture.fixture_id ?? index);
+      return `
+        <article class="match-card" id="match-${escapeHtml(fixtureId)}" data-fixture-id="${escapeHtml(fixtureId)}" data-kickoff-time="${escapeHtml(fixture.time || '')}">
+          <div class="match-head">
+            <div>
+              <div class="league">${escapeHtml(fixture.country || '')} · ${escapeHtml(fixture.league || '')}</div>
+              <h2 class="match-title">${escapeHtml(fixture.match || `${fixture.home || ''} - ${fixture.away || ''}`)}</h2>
+              <div class="match-meta">${escapeHtml(fixture.round || '')} · qualità ${escapeHtml(String(fixture.competition_quality_score ?? '—'))}/100 · ${escapeHtml(fixture.competition_tier || '')}</div>
+            </div>
+            <div class="kickoff">
+              <div class="kickoff-time">${escapeHtml(fixture.time || '—')}</div>
+              <div class="kickoff-date">${escapeHtml(formatDateIt(fixture.date))}</div>
+            </div>
+          </div>
+
+          ${buildPrimaryChoice(display)}
+
+          <div class="markets">
+            ${MARKET_ORDER.map(key => buildMarketPanel(key, markets[key])).join('')}
+          </div>
+
+          <div class="card-actions">
+            <div class="reliability">
+              Affidabilità dati: <b>${escapeHtml(formatPct(reliability))}</b>
+              &nbsp; <span class="xg-chip ${xgAvailable ? '' : 'fallback'}">${escapeHtml(xgText)}</span>
+            </div>
+            <button class="btn" type="button" onclick="openDetail(${index})">Analisi completa</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderMatches(matches) {
+      const grid = document.getElementById('matchesGrid');
+      if (!matches.length) {
+        grid.innerHTML = '<div class="empty">Nessuna partita corrisponde ai filtri selezionati.</div>';
+        return;
+      }
+      grid.innerHTML = matches.map((match, index) => buildMatchCard(match, index)).join('');
+    }
+
+    function metricValue(profile, key) {
+      return profile?.metrics?.[key];
+    }
+
+    function buildDetailBox(label, value) {
+      return `<div class="detail-box"><div class="detail-label">${escapeHtml(label)}</div><div class="detail-value">${escapeHtml(value)}</div></div>`;
+    }
+
+    function matchHistoryTable(rows) {
+      if (!Array.isArray(rows) || !rows.length) return '<div class="json-note">Nessuna gara disponibile.</div>';
+      return `
+        <div class="stats-table-wrap">
+          <table class="stats-table">
+            <thead><tr><th>Data</th><th>Partita</th><th>HT</th><th>FT</th><th>xG</th><th>O2.5</th><th>O1.5 PT</th><th>GG PT</th></tr></thead>
+            <tbody>
+              ${rows.slice(0, 14).map(row => `
+                <tr>
+                  <td>${escapeHtml(row.date || '')}</td>
+                  <td>${escapeHtml(`${row.home || ''} - ${row.away || ''}`)}</td>
+                  <td>${escapeHtml(`${row.home_ht_goals ?? 0}-${row.away_ht_goals ?? 0}`)}</td>
+                  <td>${escapeHtml(`${row.home_goals ?? 0}-${row.away_goals ?? 0}`)}</td>
+                  <td>${row.xg_available ? escapeHtml(`${num(row.home_xg).toFixed(2)}-${num(row.away_xg).toFixed(2)}`) : '—'}</td>
+                  <td>${row.over25_ft ? '✅' : '—'}</td>
+                  <td>${row.over15_ht ? '✅' : '—'}</td>
+                  <td>${row.gg_ht ? '✅' : '—'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function probabilityComparisonTable(model) {
+      const raw = model?.probabilities_raw || {};
+      const calibrated = model?.probabilities_calibrated || {};
+      const rows = [];
+      MARKET_ORDER.forEach(marketKey => {
+        const order = ({
+          '1x2_ft': ['1', 'x', '2'],
+          'over25_ft': ['over', 'under'],
+          'over15_ht': ['over', 'under'],
+          'gg_ht': ['yes', 'no']
+        })[marketKey] || [];
+        order.forEach(selection => {
+          if (raw?.[marketKey]?.[selection] === undefined) return;
+          const rawPct = num(raw[marketKey][selection]) * 100;
+          const calPct = num(calibrated?.[marketKey]?.[selection], raw[marketKey][selection]) * 100;
+          const delta = calPct - rawPct;
+          rows.push(`
+            <tr>
+              <td>${escapeHtml(displayMarketName(marketKey))} · ${escapeHtml(SELECTION_LABELS[selection] || selection)}</td>
+              <td>${escapeHtml(formatPct(rawPct))}</td>
+              <td>${escapeHtml(formatPct(calPct))}</td>
+              <td class="${delta > .01 ? 'prob-up' : delta < -.01 ? 'prob-down' : ''}">${escapeHtml(formatSigned(delta, ' pp'))}</td>
+            </tr>
+          `);
+        });
+      });
+      return `<div class="stats-table-wrap"><table class="prob-table"><thead><tr><th>Mercato</th><th>AS pura</th><th>AS calibrata</th><th>Correzione book</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+    }
+
+    function marketValidationList(match) {
+      const markets = match?.display?.markets || {};
+      return `<div class="validation-list">${MARKET_ORDER.map(key => {
+        const market = markets[key] || {};
+        const validation = market.market_validation || {};
+        const status = validation.status || 'missing';
+        const ids = Array.isArray(validation.accepted_bet_ids) && validation.accepted_bet_ids.length
+          ? validation.accepted_bet_ids.join(', ')
+          : '—';
+        const names = Array.isArray(validation.accepted_bet_names) && validation.accepted_bet_names.length
+          ? validation.accepted_bet_names.join(' / ')
+          : '—';
+        return `<div class="validation-row"><strong>${escapeHtml(displayMarketName(key))} · ${escapeHtml(status)}</strong><span>ID: ${escapeHtml(ids)} · Bookmaker: ${escapeHtml(String(validation.bookmakers_found ?? 0))}</span><span>${escapeHtml(names)}</span></div>`;
+      }).join('')}</div>`;
+    }
+
+    function openDetail(index) {
+      const match = filteredMatches[index];
+      if (!match) return;
+      const fixture = match.fixture || {};
+      const model = match.model || {};
+      const stats = match.statistics || {};
+      const home = stats.home || {};
+      const away = stats.away || {};
+      const h2h = stats.h2h || {};
+      const league = stats.league || {};
+      const lambdas = model.lambdas || {};
+      const goalsOnly = lambdas.goals_only || {};
+      const xgOnly = lambdas.xg_only || {};
+      const components = lambdas.components || {};
+      const hxg = home.xg || {};
+      const axg = away.xg || {};
+      const shotsLayer = stats.shots_layer || {};
+      const hshots = shotsLayer.home || {};
+      const ashots = shotsLayer.away || {};
+      const lambdaShots = shotsLayer.lambda || lambdas.shots_layer || {};
+
+      document.getElementById('detailTitle').textContent = fixture.match || 'Dettagli partita';
+      document.getElementById('detailSubtitle').textContent = `${fixture.league || ''} · ${fixture.date || ''} ${fixture.time || ''}`;
+      document.getElementById('detailBody').innerHTML = `
+        <div class="detail-grid">
+          ${buildDetailBox('Affidabilità', formatPct(model.reliability_pct))}
+          ${buildDetailBox('Lambda casa FT finale', num(lambdas.home_ft).toFixed(2))}
+          ${buildDetailBox('Lambda ospite FT finale', num(lambdas.away_ft).toFixed(2))}
+          ${buildDetailBox('Lambda totale FT', num(lambdas.total_ft).toFixed(2))}
+          ${buildDetailBox('Lambda casa PT', num(lambdas.home_ht).toFixed(2))}
+          ${buildDetailBox('Lambda ospite PT', num(lambdas.away_ht).toFixed(2))}
+          ${buildDetailBox('Peso xG lambda', formatPct(num(components.xg_weight) * 100))}
+          ${buildDetailBox('Campione xG coppia', String(xgOnly.sample_pair ?? 0))}
+          ${buildDetailBox('Peso tiri lambda', formatPct(num(lambdaShots.weight) * 100))}
+          ${buildDetailBox('Campione tiri coppia', String(lambdaShots.sample_pair ?? 0))}
+          ${buildDetailBox('Media lega casa', num(league.avg_home_goals).toFixed(2))}
+          ${buildDetailBox('Media lega ospite', num(league.avg_away_goals).toFixed(2))}
+          ${buildDetailBox('H2H Over 2,5', formatPct(num(h2h.over25_rate) * 100))}
+          ${buildDetailBox('Campione H2H', String(h2h.sample ?? 0))}
+        </div>
+
+        <div class="detail-columns">
+          <section class="detail-section">
+            <h3>Probabilità pure e calibrate</h3>
+            ${probabilityComparisonTable(model)}
+            <p class="section-note">Il cerchio e la relazione AS/Book derivano sempre dalle probabilità pure. La percentuale calibrata integra il book fino al 12%.</p>
+          </section>
+          <section class="detail-section">
+            <h3>Costruzione lambda</h3>
+            <div class="detail-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+              ${buildDetailBox('Goal-only casa FT', num(goalsOnly.home_ft).toFixed(2))}
+              ${buildDetailBox('Goal-only ospite FT', num(goalsOnly.away_ft).toFixed(2))}
+              ${buildDetailBox('xG-only casa FT', xgOnly.available ? num(xgOnly.home_ft).toFixed(2) : 'n/d')}
+              ${buildDetailBox('xG-only ospite FT', xgOnly.available ? num(xgOnly.away_ft).toFixed(2) : 'n/d')}
+              ${buildDetailBox('Fattore H2H FT', num(components.h2h_ft_factor, 1).toFixed(3))}
+              ${buildDetailBox('Fattore H2H PT', num(components.h2h_ht_factor, 1).toFixed(3))}
+            </div>
+          </section>
+        </div>
+
+        <section class="detail-section" style="margin-top:13px">
+          <h3>Validazione mercati API</h3>
+          ${marketValidationList(match)}
+          <p class="section-note">Solo i mercati verificati per ID e con copertura sufficiente possono generare quadrato, OCI e calibrazione della probabilità.</p>
+        </section>
+
+        <div class="detail-columns">
+          <section class="detail-section">
+            <h3>${escapeHtml(fixture.home || 'Casa')} · profilo casa</h3>
+            <div class="detail-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+              ${buildDetailBox('Goal segnati FT', num(metricValue(home, 'goals_scored_ft')).toFixed(2))}
+              ${buildDetailBox('Goal subiti FT', num(metricValue(home, 'goals_conceded_ft')).toFixed(2))}
+              ${buildDetailBox('xG prodotti FT', hxg.available ? num(hxg.xg_for_ft).toFixed(2) : 'n/d')}
+              ${buildDetailBox('xG concessi FT', hxg.available ? num(hxg.xg_against_ft).toFixed(2) : 'n/d')}
+              ${buildDetailBox('Tiri in porta prodotti', hshots.available ? num(hshots.shots_on_target_for).toFixed(2) : 'n/d')}
+              ${buildDetailBox('Tiri in porta concessi', hshots.available ? num(hshots.shots_on_target_against).toFixed(2) : 'n/d')}
+              ${buildDetailBox('Grandi occasioni', num(hshots.big_chances_for) > 0 ? num(hshots.big_chances_for).toFixed(2) : 'n/d')}
+              ${buildDetailBox('Campione xG', String(hxg.sample_all ?? 0))}
+              ${buildDetailBox('Peso candidato xG', formatPct(num(hxg.weight_candidate) * 100))}
+              ${buildDetailBox('Over 2,5', formatPct(num(metricValue(home, 'over25_rate')) * 100))}
+              ${buildDetailBox('Over 1,5 PT', formatPct(num(metricValue(home, 'over15ht_rate')) * 100))}
+              ${buildDetailBox('GG PT', formatPct(num(metricValue(home, 'gg_ht_rate')) * 100))}
+              ${buildDetailBox('Forma PPG', num(home?.form?.recent5_points_per_game).toFixed(2))}
+              ${buildDetailBox('Goal − xG recenti', hxg.available ? formatSigned(home?.form?.finishing_gap_goals_minus_xg) : 'n/d')}
+              ${buildDetailBox('Metodo regressione', home?.form?.method || '—')}
+            </div>
+          </section>
+          <section class="detail-section">
+            <h3>${escapeHtml(fixture.away || 'Ospite')} · profilo trasferta</h3>
+            <div class="detail-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+              ${buildDetailBox('Goal segnati FT', num(metricValue(away, 'goals_scored_ft')).toFixed(2))}
+              ${buildDetailBox('Goal subiti FT', num(metricValue(away, 'goals_conceded_ft')).toFixed(2))}
+              ${buildDetailBox('xG prodotti FT', axg.available ? num(axg.xg_for_ft).toFixed(2) : 'n/d')}
+              ${buildDetailBox('xG concessi FT', axg.available ? num(axg.xg_against_ft).toFixed(2) : 'n/d')}
+              ${buildDetailBox('Tiri in porta prodotti', ashots.available ? num(ashots.shots_on_target_for).toFixed(2) : 'n/d')}
+              ${buildDetailBox('Tiri in porta concessi', ashots.available ? num(ashots.shots_on_target_against).toFixed(2) : 'n/d')}
+              ${buildDetailBox('Grandi occasioni', num(ashots.big_chances_for) > 0 ? num(ashots.big_chances_for).toFixed(2) : 'n/d')}
+              ${buildDetailBox('Campione xG', String(axg.sample_all ?? 0))}
+              ${buildDetailBox('Peso candidato xG', formatPct(num(axg.weight_candidate) * 100))}
+              ${buildDetailBox('Over 2,5', formatPct(num(metricValue(away, 'over25_rate')) * 100))}
+              ${buildDetailBox('Over 1,5 PT', formatPct(num(metricValue(away, 'over15ht_rate')) * 100))}
+              ${buildDetailBox('GG PT', formatPct(num(metricValue(away, 'gg_ht_rate')) * 100))}
+              ${buildDetailBox('Forma PPG', num(away?.form?.recent5_points_per_game).toFixed(2))}
+              ${buildDetailBox('Goal − xG recenti', axg.available ? formatSigned(away?.form?.finishing_gap_goals_minus_xg) : 'n/d')}
+              ${buildDetailBox('Metodo regressione', away?.form?.method || '—')}
+            </div>
+          </section>
+        </div>
+
+        <div class="detail-columns">
+          <section class="detail-section"><h3>Ultime partite · ${escapeHtml(fixture.home || '')}</h3>${matchHistoryTable(home.last_matches)}</section>
+          <section class="detail-section"><h3>Ultime partite · ${escapeHtml(fixture.away || '')}</h3>${matchHistoryTable(away.last_matches)}</section>
+        </div>
+
+        <section class="detail-section" style="margin-top:13px">
+          <h3>Scontri diretti</h3>
+          ${matchHistoryTable(h2h.matches)}
+          <p class="json-note">Gli scontri diretti hanno peso massimo del 5% e non vengono interpretati come eventi “in ritardo”.</p>
+        </section>
+      `;
+      document.getElementById('detailOverlay').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function closeDetailFromOverlay(event) {
+      if (event.target.id === 'detailOverlay') closeDetail();
+    }
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeDetail();
+    });
+
+    initializeAccess();
+  </script>
+</body>
+</html>
