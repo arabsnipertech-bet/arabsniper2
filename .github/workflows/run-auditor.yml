@@ -2,6 +2,12 @@ name: Run Auditor
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'auditor/current_audit.py'
+      - 'src/prematch_audit.py'
+      - '.github/workflows/run-auditor.yml'
   schedule:
     - cron: '7 9 * * *'
       timezone: 'Europe/Rome'
@@ -10,65 +16,33 @@ permissions:
   contents: write
 
 concurrency:
-  group: arabsniper-run-auditor
+  group: arabsniper-current-audit
   cancel-in-progress: false
 
 jobs:
   auditor:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-
+    timeout-minutes: 30
     env:
       API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          pip install requests
-
-      - name: Check frozen predictions for yesterday
-        id: source
-        run: |
-          python - <<'PY'
-          import os
-          from datetime import datetime, timedelta
-          from pathlib import Path
-          from zoneinfo import ZoneInfo
-
-          target = (datetime.now(ZoneInfo("Europe/Rome")).date() - timedelta(days=1)).isoformat()
-          source = Path("auditordata") / f"freeze_for_audit_{target}.json"
-          available = source.is_file()
-          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
-              output.write(f"available={str(available).lower()}\n")
-          message = (
-              f"Audit {target}: previsioni congelate disponibili."
-              if available else
-              f"Audit {target} NON ESEGUITO: manca {source}. Nessun risultato creato o aggiornato. "
-              "Non ricostruire previsioni dopo la partita."
-          )
-          print(message)
-          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
-              summary.write(message + "\n")
-          PY
-
-      - name: Run audit script
-        if: steps.source.outputs.available == 'true'
-        run: |
-          python auditor/run_audit.py
-
-      - name: Commit and push audit results
-        if: steps.source.outputs.available == 'true'
+      - name: Archive forecasts and settle completed matches
+        run: python auditor/current_audit.py settle
+      - name: Save current audit archive and report
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add auditarchive/
-          git commit -m "Run auditor" || echo "No changes to commit"
-          git push
+          git add auditordata/prematch_*.json auditarchive/prematch_*.json
+          if git diff --cached --quiet; then
+            echo "No audit changes"
+            exit 0
+          fi
+          git commit -m "Update current prematch audit"
+          git pull --rebase origin main
+          git push origin HEAD:main
