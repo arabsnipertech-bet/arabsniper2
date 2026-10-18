@@ -1102,8 +1102,8 @@
       const explain = {over15_ht:'Almeno 2 gol nel primo tempo',gg_ht:'Entrambe segnano nel primo tempo',over25_ft:'Almeno 3 gol nella partita'};
       const rowsFor = key => (Array.isArray(rankings?.[key]) ? rankings[key] : [])
         .filter(r => Number.isFinite(Date.parse(r.kickoff)) && Date.parse(r.kickoff)>Date.now())
-        .slice().sort((a,b)=>num(b.ranking_score)-num(a.ranking_score));
-      let html = '<h2>Trova le partite per mercato</h2><p>Scegli un mercato. Le selezioni sono ordinate per punteggio complessivo.</p>';
+        .slice().sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||num(b.ranking_score)-num(a.ranking_score));
+      let html = '<h2>Trova le partite per mercato</h2><p>Scegli un mercato. Le selezioni sono ordinate per orario. A parità di orario, precede il punteggio più alto.</p>';
       html += '<div class="ranking-tabs" role="group" aria-label="Mercato delle selezioni">'+keys.map(k=>`<button type="button" aria-pressed="${k===activeRankingMarket}" onclick="selectRankingMarket('${k}')">${labels[k]}<span>${rowsFor(k).length} selezioni</span></button>`).join('')+'</div>';
       html += `<p class="ranking-explain">${explain[activeRankingMarket]} · Dati del ${escapeHtml(formatTimestamp(payload.updated_at))}</p>`;
       if (!rankings || typeof rankings !== 'object') {
