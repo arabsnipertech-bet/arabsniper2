@@ -39,13 +39,14 @@ def build_report(store):
             if outcome is None or probability is None or not 0 <= probability <= 1:
                 continue
             # Display structure is preserved verbatim; derive relation from ranked selections only.
-            choice = next((c for c in record.get('ranked_choices', [])
+            choice = next((c for c in record.get('market_candidates', record.get('ranked_choices', []))
                            if c.get('market') == market and c.get('selection') == side), {})
             relation = choice.get('relation', 'unclassified')
             band = min(int(probability * 10), 9) * 10
             row = (float(probability), bool(outcome), choice.get('odd'))
             for key in ((market, 'all', 'all'), (market, relation, 'all'),
-                        (market, relation, f'{band}-{band+10}%')):
+                        (market, relation, f'{band}-{band+10}%'),
+                        (market, 'recovered' if choice.get('recovered') else 'ordinary' if choice.get('gate',{}).get('eligible', True) else 'rejected', 'all')):
                 groups[key].append(row)
     report = []
     for (market, relation, band), rows in sorted(groups.items()):
@@ -60,4 +61,39 @@ def build_report(store):
             'brier_score': round(sum((p-y)**2 for p,y,_ in rows)/n, 6),
             'wilson_95_pct': [round((center-margin)*100, 3), round((center+margin)*100, 3)],
             'priced_n': len(priced), 'roi_pct': round(sum((odd if y else 0)-1 for y,odd in priced)/len(priced)*100, 3) if priced else None})
-    return {'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report}
+    return {'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'quote_groups': quote_report(store)}
+
+
+def quote_report(store):
+    """Descriptive results for every observed 1X2 and positive goal-market quote."""
+    groups = defaultdict(list)
+    for record in store.get('fixtures', {}).values():
+        result = (record.get('settlement') or {}).get('result', {})
+        if not result:
+            continue
+        for market, observation in record.get('quote_observation', {}).items():
+            sides = ('1', 'x', '2') if market == '1x2_ft' else (MARKETS[market][0],) if market in MARKETS else ()
+            for side in sides:
+                odd = observation.get('current', {}).get('odds', {}).get(side)
+                if not isinstance(odd, (int,float)) or odd <= 1:
+                    continue
+                if market == '1x2_ft':
+                    h, a = result.get('home_ft'), result.get('away_ft')
+                    outcome = None if h is None or a is None else side == ('1' if h>a else '2' if a>h else 'x')
+                else:
+                    outcome = event_outcome(market, result)
+                if outcome is None:
+                    continue
+                features = observation.get('movement_features', {}).get(side, {})
+                drop = features.get('drop_pct')
+                movement = 'missing' if drop is None else 'drop' if drop>0 else 'rise' if drop<0 else 'stable'
+                odds_band = '<1.5' if odd<1.5 else '1.5-2' if odd<2 else '2-3' if odd<3 else '3-5' if odd<5 else '>=5'
+                for signal in ('all', movement, 'reversal' if features.get('direction_reversals',0)>0 else 'no_reversal',
+                               'favorite_inversion' if features.get('favorite_inversion') else 'no_favorite_inversion'):
+                    groups[(market,side,odds_band,signal)].append((bool(outcome),odd))
+    rows = []
+    for (market,side,band,signal), values in sorted(groups.items()):
+        n=len(values); wins=sum(y for y,_ in values)
+        rows.append({'market':market,'selection':side,'odds_band':band,'signal':signal,'n':n,'wins':wins,
+                     'hit_rate_pct':round(wins/n*100,3),'roi_pct':round(sum((odd if y else 0)-1 for y,odd in values)/n*100,3)})
+    return rows
