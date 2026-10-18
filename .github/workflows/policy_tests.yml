@@ -1,0 +1,23 @@
+name: Selection policy tests
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '.github/workflows/policy_tests.yml'
+  push:
+    branches: [main]
+    paths: ['src/**', 'tests/**']
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - run: python -m unittest discover -s tests -v
+      - run: python -m py_compile src/3appdays.py src/policy_integration.py src/selection_policy.py src/prematch_audit.py

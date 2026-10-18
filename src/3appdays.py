@@ -67,7 +67,7 @@ except Exception:  # pragma: no cover
 # =========================================================
 # CONFIGURAZIONE
 # =========================================================
-VERSION = "1.1.7"
+VERSION = "1.1.8"
 API_BASE_URL = "https://v3.football.api-sports.io"
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -2935,7 +2935,7 @@ def build_fixture_output(
             "probabilities_raw": raw_probabilities, "probabilities_calibrated": calibrated_probabilities,
             "probabilities": calibrated_probabilities, "market_calibration_weights": calibration_weights,
             "markers": markers,
-            "calibration_note": "Il cerchio e la relazione usano il modello puro; la percentuale principale integra il book fino al 12%.",
+            "calibration_note": "Il cerchio e la relazione usano il modello puro; la percentuale principale integra il book fino al 18%.",
         },
         "book": {"markets": market_analyses, "market_validation": market_validation},
         "statistics": {
@@ -3032,7 +3032,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
     output["method"] = {
         "book": "mediana multi-bookmaker + validazione bet_id/catalogo + probabilita fair + aggio + OCI-AS",
         "model": "Poisson con casa/trasferta, forma, campionato, H2H max 5% e xG reali dinamici",
-        "calibration": "probabilita calibrata con book 0-12%; marker e concordanza basati sul modello puro",
+        "calibration": "probabilita calibrata con book 0-18%; marker e concordanza basati sul modello puro",
         "markets": "1X2 bet_id 1; Over 2.5 FT bet_id 5; O1.5 PT e GG PT verificati da odds/bets",
         "markers": "cerchio ArabSniper puro, quadrato book, doppio bordo concordanza",
         "retention": "le partite analizzate restano visibili dopo il calcio d'inizio; errori API non svuotano i JSON",
@@ -3120,6 +3120,9 @@ def main() -> None:
         report_file = DATA_DIR / "arab_quote_prematch_report.json"
         if report_file.exists():
             log(f"GitHub prematch report: {upload_json_to_github('data/arab_quote_prematch_report.json', read_json(report_file, {}), 'Update prematch report')}")
+        for extra_file in [DATA_DIR / "arab_quote_observations.json", *DATA_DIR.glob("arab_quote_selections_day*.json")]:
+            if extra_file.exists():
+                log(f"GitHub policy data: {upload_json_to_github('data/' + extra_file.name, read_json(extra_file, {}), 'Update selection and quote evidence')}")
         if PREDICTION_AUDIT_FILE.exists():
             log(f"GitHub prediction audit: {upload_json_to_github(REMOTE_PREDICTION_AUDIT_FILE, read_json(PREDICTION_AUDIT_FILE, {}), 'Update ArabSniper prediction audit')}")
         for day_payload in output.get("days", []) or []:
@@ -3132,7 +3135,7 @@ def main() -> None:
 # ENHANCEMENT V1.1.3 — QUALITA' COMPETIZIONI, GATE SEGNALI,
 # STATISTICHE TIRI E AUDIT RISULTATI
 # =========================================================
-VERSION = "1.1.7"
+VERSION = "1.1.8"
 PREDICTION_AUDIT_FILE = DATA_DIR / "arab_quote_prediction_audit.json"
 REMOTE_PREDICTION_AUDIT_FILE = "data/arab_quote_prediction_audit.json"
 STRICT_COMPETITIONS = _bool_env(os.getenv("ARAB_STRICT_COMPETITIONS", "1"), True)
@@ -3996,7 +3999,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 # ENHANCEMENT V1.1.4 — FIRST-HALF INTELLIGENCE
 # Goal PT, Over 1.5 PT, GG PT, favorite trap e inversione quota
 # =========================================================
-VERSION = "1.1.7"
+VERSION = "1.1.8"
 MARKET_O05HT = "over05_ht"
 MARKET_SELECTIONS[MARKET_O05HT] = ("over", "under")
 DISPLAY_MARKET_NAMES[MARKET_O05HT] = "Goal primo tempo (Over 0,5 PT)"
@@ -4810,7 +4813,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 # ENHANCEMENT V1.1.5 — 1X2 -> GOAL REGIME + VALUE SHORTLIST
 # Mantiene lo schema web V1.1.x e aggiunge soltanto campi.
 # =========================================================
-VERSION = "1.1.7"
+VERSION = "1.1.8"
 
 
 def _profile_metric(profile: Mapping[str, Any], key: str) -> float:
@@ -5385,6 +5388,9 @@ def capture_prematch_predictions(output: Mapping[str, Any]) -> Dict[str, Any]:
                 "probabilities_calibrated": model.get("probabilities_calibrated", {}),
                 "reliability_pct": model.get("reliability_pct"),
                 "markets": display.get("markets", {}),
+                "market_candidates": display.get("market_candidates", []),
+                "quote_observation": match.get("quote_observation", {}),
+                "probabilities_without_drought_poisson": model.get("probabilities_without_drought_poisson", {}),
                 "primary_choice": display.get("primary_choice"),
                 "ranked_choices": display.get("ranked_choices", []),
             }))
@@ -5401,6 +5407,9 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
     atomic_write_json(PREMATCH_AUDIT_FILE, store)
     atomic_write_json(DATA_DIR / "arab_quote_prematch_report.json", build_report(store))
     return output
+
+from policy_integration import install as _install_user_policy
+_install_user_policy(globals())
 
 if __name__ == "__main__":
     main()
