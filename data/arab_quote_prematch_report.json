@@ -1,6 +1,3602 @@
 {
   "schema_version": 1,
   "note": "First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.",
-  "groups": [],
-  "quote_groups": []
+  "groups": [
+    {
+      "market": "gg_ht",
+      "relation": "all",
+      "probability_band": "all",
+      "n": 11,
+      "wins": 3,
+      "hit_rate_pct": 27.273,
+      "mean_probability_pct": 23.172,
+      "brier_score": 0.217366,
+      "wilson_95_pct": [
+        9.746,
+        56.565
+      ],
+      "priced_n": 11,
+      "roi_pct": 1.0
+    },
+    {
+      "market": "gg_ht",
+      "relation": "book_only",
+      "probability_band": "10-20%",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "mean_probability_pct": 17.82,
+      "brier_score": 0.371879,
+      "wilson_95_pct": [
+        9.453,
+        90.547
+      ],
+      "priced_n": 2,
+      "roi_pct": 110.0
+    },
+    {
+      "market": "gg_ht",
+      "relation": "book_only",
+      "probability_band": "20-30%",
+      "n": 2,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 26.88,
+      "brier_score": 0.072415,
+      "wilson_95_pct": [
+        0.0,
+        65.763
+      ],
+      "priced_n": 2,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "gg_ht",
+      "relation": "book_only",
+      "probability_band": "all",
+      "n": 4,
+      "wins": 1,
+      "hit_rate_pct": 25.0,
+      "mean_probability_pct": 22.35,
+      "brier_score": 0.222147,
+      "wilson_95_pct": [
+        4.559,
+        69.936
+      ],
+      "priced_n": 4,
+      "roi_pct": 5.0
+    },
+    {
+      "market": "gg_ht",
+      "relation": "neutral",
+      "probability_band": "10-20%",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "mean_probability_pct": 18.31,
+      "brier_score": 0.358388,
+      "wilson_95_pct": [
+        9.453,
+        90.547
+      ],
+      "priced_n": 2,
+      "roi_pct": 74.5
+    },
+    {
+      "market": "gg_ht",
+      "relation": "neutral",
+      "probability_band": "20-30%",
+      "n": 4,
+      "wins": 1,
+      "hit_rate_pct": 25.0,
+      "mean_probability_pct": 23.2,
+      "brier_score": 0.163889,
+      "wilson_95_pct": [
+        4.559,
+        69.936
+      ],
+      "priced_n": 4,
+      "roi_pct": -14.5
+    },
+    {
+      "market": "gg_ht",
+      "relation": "neutral",
+      "probability_band": "30-40%",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 36.07,
+      "brier_score": 0.130104,
+      "wilson_95_pct": [
+        0.0,
+        79.346
+      ],
+      "priced_n": 1,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "gg_ht",
+      "relation": "neutral",
+      "probability_band": "all",
+      "n": 7,
+      "wins": 2,
+      "hit_rate_pct": 28.571,
+      "mean_probability_pct": 23.641,
+      "brier_score": 0.214634,
+      "wilson_95_pct": [
+        8.222,
+        64.107
+      ],
+      "priced_n": 7,
+      "roi_pct": -1.286
+    },
+    {
+      "market": "gg_ht",
+      "relation": "rejected",
+      "probability_band": "all",
+      "n": 11,
+      "wins": 3,
+      "hit_rate_pct": 27.273,
+      "mean_probability_pct": 23.172,
+      "brier_score": 0.217366,
+      "wilson_95_pct": [
+        9.746,
+        56.565
+      ],
+      "priced_n": 11,
+      "roi_pct": 1.0
+    },
+    {
+      "market": "over15_ht",
+      "relation": "all",
+      "probability_band": "all",
+      "n": 11,
+      "wins": 4,
+      "hit_rate_pct": 36.364,
+      "mean_probability_pct": 41.423,
+      "brier_score": 0.258635,
+      "wilson_95_pct": [
+        15.166,
+        64.62
+      ],
+      "priced_n": 11,
+      "roi_pct": -13.591
+    },
+    {
+      "market": "over15_ht",
+      "relation": "book_only",
+      "probability_band": "30-40%",
+      "n": 3,
+      "wins": 2,
+      "hit_rate_pct": 66.667,
+      "mean_probability_pct": 34.88,
+      "brier_score": 0.332766,
+      "wilson_95_pct": [
+        20.765,
+        93.851
+      ],
+      "priced_n": 3,
+      "roi_pct": 85.167
+    },
+    {
+      "market": "over15_ht",
+      "relation": "book_only",
+      "probability_band": "40-50%",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 44.66,
+      "brier_score": 0.199452,
+      "wilson_95_pct": [
+        0.0,
+        79.346
+      ],
+      "priced_n": 1,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "over15_ht",
+      "relation": "book_only",
+      "probability_band": "all",
+      "n": 4,
+      "wins": 2,
+      "hit_rate_pct": 50.0,
+      "mean_probability_pct": 37.325,
+      "brier_score": 0.299438,
+      "wilson_95_pct": [
+        15.004,
+        84.996
+      ],
+      "priced_n": 4,
+      "roi_pct": 38.875
+    },
+    {
+      "market": "over15_ht",
+      "relation": "confirmed",
+      "probability_band": "40-50%",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 46.81,
+      "brier_score": 0.219118,
+      "wilson_95_pct": [
+        0.0,
+        79.346
+      ],
+      "priced_n": 1,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "over15_ht",
+      "relation": "confirmed",
+      "probability_band": "all",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 46.81,
+      "brier_score": 0.219118,
+      "wilson_95_pct": [
+        0.0,
+        79.346
+      ],
+      "priced_n": 1,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "over15_ht",
+      "relation": "model_only",
+      "probability_band": "50-60%",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 56.01,
+      "brier_score": 0.313712,
+      "wilson_95_pct": [
+        0.0,
+        79.346
+      ],
+      "priced_n": 1,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "over15_ht",
+      "relation": "model_only",
+      "probability_band": "all",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 56.01,
+      "brier_score": 0.313712,
+      "wilson_95_pct": [
+        0.0,
+        79.346
+      ],
+      "priced_n": 1,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "over15_ht",
+      "relation": "neutral",
+      "probability_band": "30-40%",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "mean_probability_pct": 36.18,
+      "brier_score": 0.271907,
+      "wilson_95_pct": [
+        9.453,
+        90.547
+      ],
+      "priced_n": 2,
+      "roi_pct": 12.5
+    },
+    {
+      "market": "over15_ht",
+      "relation": "neutral",
+      "probability_band": "40-50%",
+      "n": 2,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 40.34,
+      "brier_score": 0.162734,
+      "wilson_95_pct": [
+        0.0,
+        65.763
+      ],
+      "priced_n": 2,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "over15_ht",
+      "relation": "neutral",
+      "probability_band": "50-60%",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "mean_probability_pct": 50.49,
+      "brier_score": 0.245124,
+      "wilson_95_pct": [
+        20.654,
+        100.0
+      ],
+      "priced_n": 1,
+      "roi_pct": 70.0
+    },
+    {
+      "market": "over15_ht",
+      "relation": "neutral",
+      "probability_band": "all",
+      "n": 5,
+      "wins": 2,
+      "hit_rate_pct": 40.0,
+      "mean_probability_pct": 40.706,
+      "brier_score": 0.222881,
+      "wilson_95_pct": [
+        11.762,
+        76.928
+      ],
+      "priced_n": 5,
+      "roi_pct": -21.0
+    },
+    {
+      "market": "over15_ht",
+      "relation": "ordinary",
+      "probability_band": "all",
+      "n": 2,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 51.41,
+      "brier_score": 0.266415,
+      "wilson_95_pct": [
+        0.0,
+        65.763
+      ],
+      "priced_n": 2,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "over15_ht",
+      "relation": "rejected",
+      "probability_band": "all",
+      "n": 9,
+      "wins": 4,
+      "hit_rate_pct": 44.444,
+      "mean_probability_pct": 39.203,
+      "brier_score": 0.256906,
+      "wilson_95_pct": [
+        18.878,
+        73.335
+      ],
+      "priced_n": 9,
+      "roi_pct": 5.611
+    },
+    {
+      "market": "over25_ft",
+      "relation": "all",
+      "probability_band": "all",
+      "n": 11,
+      "wins": 7,
+      "hit_rate_pct": 63.636,
+      "mean_probability_pct": 59.841,
+      "brier_score": 0.244936,
+      "wilson_95_pct": [
+        35.38,
+        84.834
+      ],
+      "priced_n": 11,
+      "roi_pct": -1.909
+    },
+    {
+      "market": "over25_ft",
+      "relation": "book_only",
+      "probability_band": "40-50%",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "mean_probability_pct": 46.24,
+      "brier_score": 0.262535,
+      "wilson_95_pct": [
+        9.453,
+        90.547
+      ],
+      "priced_n": 2,
+      "roi_pct": 0.5
+    },
+    {
+      "market": "over25_ft",
+      "relation": "book_only",
+      "probability_band": "50-60%",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "mean_probability_pct": 53.6,
+      "brier_score": 0.215296,
+      "wilson_95_pct": [
+        20.654,
+        100.0
+      ],
+      "priced_n": 1,
+      "roi_pct": 83.0
+    },
+    {
+      "market": "over25_ft",
+      "relation": "book_only",
+      "probability_band": "60-70%",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "mean_probability_pct": 66.68,
+      "brier_score": 0.111022,
+      "wilson_95_pct": [
+        20.654,
+        100.0
+      ],
+      "priced_n": 1,
+      "roi_pct": 44.0
+    },
+    {
+      "market": "over25_ft",
+      "relation": "book_only",
+      "probability_band": "70-80%",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 70.56,
+      "brier_score": 0.497871,
+      "wilson_95_pct": [
+        0.0,
+        79.346
+      ],
+      "priced_n": 1,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "over25_ft",
+      "relation": "book_only",
+      "probability_band": "all",
+      "n": 5,
+      "wins": 3,
+      "hit_rate_pct": 60.0,
+      "mean_probability_pct": 56.664,
+      "brier_score": 0.269852,
+      "wilson_95_pct": [
+        23.072,
+        88.238
+      ],
+      "priced_n": 5,
+      "roi_pct": 5.6
+    },
+    {
+      "market": "over25_ft",
+      "relation": "model_only",
+      "probability_band": "40-50%",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "mean_probability_pct": 45.45,
+      "brier_score": 0.29757,
+      "wilson_95_pct": [
+        20.654,
+        100.0
+      ],
+      "priced_n": 1,
+      "roi_pct": 56.0
+    },
+    {
+      "market": "over25_ft",
+      "relation": "model_only",
+      "probability_band": "60-70%",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 65.95,
+      "brier_score": 0.43494,
+      "wilson_95_pct": [
+        0.0,
+        79.346
+      ],
+      "priced_n": 1,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "over25_ft",
+      "relation": "model_only",
+      "probability_band": "70-80%",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "mean_probability_pct": 78.64,
+      "brier_score": 0.045625,
+      "wilson_95_pct": [
+        20.654,
+        100.0
+      ],
+      "priced_n": 1,
+      "roi_pct": 44.0
+    },
+    {
+      "market": "over25_ft",
+      "relation": "model_only",
+      "probability_band": "all",
+      "n": 3,
+      "wins": 2,
+      "hit_rate_pct": 66.667,
+      "mean_probability_pct": 63.347,
+      "brier_score": 0.259378,
+      "wilson_95_pct": [
+        20.765,
+        93.851
+      ],
+      "priced_n": 3,
+      "roi_pct": 0.0
+    },
+    {
+      "market": "over25_ft",
+      "relation": "neutral",
+      "probability_band": "50-60%",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "mean_probability_pct": 53.995,
+      "brier_score": 0.256773,
+      "wilson_95_pct": [
+        9.453,
+        90.547
+      ],
+      "priced_n": 2,
+      "roi_pct": -35.0
+    },
+    {
+      "market": "over25_ft",
+      "relation": "neutral",
+      "probability_band": "70-80%",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "mean_probability_pct": 76.9,
+      "brier_score": 0.053361,
+      "wilson_95_pct": [
+        20.654,
+        100.0
+      ],
+      "priced_n": 1,
+      "roi_pct": 21.0
+    },
+    {
+      "market": "over25_ft",
+      "relation": "neutral",
+      "probability_band": "all",
+      "n": 3,
+      "wins": 2,
+      "hit_rate_pct": 66.667,
+      "mean_probability_pct": 61.63,
+      "brier_score": 0.188969,
+      "wilson_95_pct": [
+        20.765,
+        93.851
+      ],
+      "priced_n": 3,
+      "roi_pct": -16.333
+    },
+    {
+      "market": "over25_ft",
+      "relation": "ordinary",
+      "probability_band": "all",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "mean_probability_pct": 72.295,
+      "brier_score": 0.240283,
+      "wilson_95_pct": [
+        9.453,
+        90.547
+      ],
+      "priced_n": 2,
+      "roi_pct": -28.0
+    },
+    {
+      "market": "over25_ft",
+      "relation": "rejected",
+      "probability_band": "all",
+      "n": 9,
+      "wins": 6,
+      "hit_rate_pct": 66.667,
+      "mean_probability_pct": 57.073,
+      "brier_score": 0.245971,
+      "wilson_95_pct": [
+        35.42,
+        87.942
+      ],
+      "priced_n": 9,
+      "roi_pct": 3.889
+    }
+  ],
+  "quote_groups": [
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "1.5-2",
+      "signal": "all",
+      "n": 3,
+      "wins": 2,
+      "hit_rate_pct": 66.667,
+      "roi_pct": 3.333
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "1.5-2",
+      "signal": "drop",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -20.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "1.5-2",
+      "signal": "no_favorite_inversion",
+      "n": 3,
+      "wins": 2,
+      "hit_rate_pct": 66.667,
+      "roi_pct": 3.333
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "1.5-2",
+      "signal": "no_reversal",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 50.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "1.5-2",
+      "signal": "reversal",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -20.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "1.5-2",
+      "signal": "stable",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 50.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "2-3",
+      "signal": "all",
+      "n": 5,
+      "wins": 1,
+      "hit_rate_pct": 20.0,
+      "roi_pct": -49.5
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "2-3",
+      "signal": "drop",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "2-3",
+      "signal": "no_favorite_inversion",
+      "n": 5,
+      "wins": 1,
+      "hit_rate_pct": 20.0,
+      "roi_pct": -49.5
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "2-3",
+      "signal": "no_reversal",
+      "n": 3,
+      "wins": 1,
+      "hit_rate_pct": 33.333,
+      "roi_pct": -15.833
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "2-3",
+      "signal": "reversal",
+      "n": 2,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "2-3",
+      "signal": "rise",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "2-3",
+      "signal": "stable",
+      "n": 3,
+      "wins": 1,
+      "hit_rate_pct": 33.333,
+      "roi_pct": -15.833
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "3-5",
+      "signal": "all",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 264.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "3-5",
+      "signal": "no_favorite_inversion",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 264.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "3-5",
+      "signal": "reversal",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 264.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "3-5",
+      "signal": "rise",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 264.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "<1.5",
+      "signal": "all",
+      "n": 2,
+      "wins": 2,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 27.75
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "<1.5",
+      "signal": "no_favorite_inversion",
+      "n": 2,
+      "wins": 2,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 27.75
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "<1.5",
+      "signal": "no_reversal",
+      "n": 2,
+      "wins": 2,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 27.75
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "1",
+      "odds_band": "<1.5",
+      "signal": "stable",
+      "n": 2,
+      "wins": 2,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 27.75
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "1.5-2",
+      "signal": "all",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "1.5-2",
+      "signal": "drop",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "1.5-2",
+      "signal": "no_favorite_inversion",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "1.5-2",
+      "signal": "reversal",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "2-3",
+      "signal": "all",
+      "n": 4,
+      "wins": 3,
+      "hit_rate_pct": 75.0,
+      "roi_pct": 80.25
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "2-3",
+      "signal": "no_favorite_inversion",
+      "n": 4,
+      "wins": 3,
+      "hit_rate_pct": 75.0,
+      "roi_pct": 80.25
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "2-3",
+      "signal": "no_reversal",
+      "n": 4,
+      "wins": 3,
+      "hit_rate_pct": 75.0,
+      "roi_pct": 80.25
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "2-3",
+      "signal": "rise",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 196.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "2-3",
+      "signal": "stable",
+      "n": 3,
+      "wins": 2,
+      "hit_rate_pct": 66.667,
+      "roi_pct": 41.667
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "3-5",
+      "signal": "all",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": 125.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "3-5",
+      "signal": "drop",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "3-5",
+      "signal": "no_favorite_inversion",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": 125.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "3-5",
+      "signal": "no_reversal",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "3-5",
+      "signal": "reversal",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 350.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": "3-5",
+      "signal": "rise",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 350.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": ">=5",
+      "signal": "all",
+      "n": 4,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": ">=5",
+      "signal": "no_favorite_inversion",
+      "n": 4,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": ">=5",
+      "signal": "no_reversal",
+      "n": 3,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": ">=5",
+      "signal": "reversal",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": ">=5",
+      "signal": "rise",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "2",
+      "odds_band": ">=5",
+      "signal": "stable",
+      "n": 3,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "x",
+      "odds_band": "3-5",
+      "signal": "all",
+      "n": 10,
+      "wins": 1,
+      "hit_rate_pct": 10.0,
+      "roi_pct": -61.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "x",
+      "odds_band": "3-5",
+      "signal": "no_favorite_inversion",
+      "n": 10,
+      "wins": 1,
+      "hit_rate_pct": 10.0,
+      "roi_pct": -61.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "x",
+      "odds_band": "3-5",
+      "signal": "no_reversal",
+      "n": 6,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "x",
+      "odds_band": "3-5",
+      "signal": "reversal",
+      "n": 4,
+      "wins": 1,
+      "hit_rate_pct": 25.0,
+      "roi_pct": -2.5
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "x",
+      "odds_band": "3-5",
+      "signal": "rise",
+      "n": 4,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "x",
+      "odds_band": "3-5",
+      "signal": "stable",
+      "n": 6,
+      "wins": 1,
+      "hit_rate_pct": 16.667,
+      "roi_pct": -35.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "x",
+      "odds_band": ">=5",
+      "signal": "all",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "x",
+      "odds_band": ">=5",
+      "signal": "no_favorite_inversion",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "x",
+      "odds_band": ">=5",
+      "signal": "no_reversal",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "1x2_ft",
+      "selection": "x",
+      "odds_band": ">=5",
+      "signal": "stable",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "2-3",
+      "signal": "all",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "2-3",
+      "signal": "no_favorite_inversion",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "2-3",
+      "signal": "no_reversal",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "2-3",
+      "signal": "stable",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "3-5",
+      "signal": "all",
+      "n": 10,
+      "wins": 3,
+      "hit_rate_pct": 30.0,
+      "roi_pct": 11.1
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "3-5",
+      "signal": "drop",
+      "n": 3,
+      "wins": 1,
+      "hit_rate_pct": 33.333,
+      "roi_pct": 40.0
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "3-5",
+      "signal": "no_favorite_inversion",
+      "n": 10,
+      "wins": 3,
+      "hit_rate_pct": 30.0,
+      "roi_pct": 11.1
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "3-5",
+      "signal": "no_reversal",
+      "n": 9,
+      "wins": 3,
+      "hit_rate_pct": 33.333,
+      "roi_pct": 23.444
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "3-5",
+      "signal": "reversal",
+      "n": 1,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "3-5",
+      "signal": "rise",
+      "n": 2,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "roi_pct": -100.0
+    },
+    {
+      "market": "gg_ht",
+      "selection": "yes",
+      "odds_band": "3-5",
+      "signal": "stable",
+      "n": 5,
+      "wins": 2,
+      "hit_rate_pct": 40.0,
+      "roi_pct": 38.2
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "all",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -15.0
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "no_favorite_inversion",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -15.0
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "no_reversal",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -15.0
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "stable",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -15.0
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "all",
+      "n": 9,
+      "wins": 3,
+      "hit_rate_pct": 33.333,
+      "roi_pct": -13.278
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "drop",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": 29.25
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "no_favorite_inversion",
+      "n": 9,
+      "wins": 3,
+      "hit_rate_pct": 33.333,
+      "roi_pct": -13.278
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "no_reversal",
+      "n": 6,
+      "wins": 2,
+      "hit_rate_pct": 33.333,
+      "roi_pct": -13.0
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "reversal",
+      "n": 3,
+      "wins": 1,
+      "hit_rate_pct": 33.333,
+      "roi_pct": -13.833
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "rise",
+      "n": 3,
+      "wins": 1,
+      "hit_rate_pct": 33.333,
+      "roi_pct": -1.0
+    },
+    {
+      "market": "over15_ht",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "stable",
+      "n": 4,
+      "wins": 1,
+      "hit_rate_pct": 25.0,
+      "roi_pct": -43.75
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "all",
+      "n": 4,
+      "wins": 2,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -15.25
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "drop",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -8.5
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "favorite_inversion",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -8.5
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "no_favorite_inversion",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -22.0
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "no_reversal",
+      "n": 3,
+      "wins": 1,
+      "hit_rate_pct": 33.333,
+      "roi_pct": -48.0
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "reversal",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 83.0
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "1.5-2",
+      "signal": "stable",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -22.0
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "all",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 101.0
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "no_favorite_inversion",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 101.0
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "no_reversal",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 101.0
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "2-3",
+      "signal": "rise",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 101.0
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "<1.5",
+      "signal": "all",
+      "n": 6,
+      "wins": 4,
+      "hit_rate_pct": 66.667,
+      "roi_pct": -10.167
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "<1.5",
+      "signal": "no_favorite_inversion",
+      "n": 6,
+      "wins": 4,
+      "hit_rate_pct": 66.667,
+      "roi_pct": -10.167
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "<1.5",
+      "signal": "no_reversal",
+      "n": 4,
+      "wins": 3,
+      "hit_rate_pct": 75.0,
+      "roi_pct": -1.25
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "<1.5",
+      "signal": "reversal",
+      "n": 2,
+      "wins": 1,
+      "hit_rate_pct": 50.0,
+      "roi_pct": -28.0
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "<1.5",
+      "signal": "rise",
+      "n": 1,
+      "wins": 1,
+      "hit_rate_pct": 100.0,
+      "roi_pct": 44.0
+    },
+    {
+      "market": "over25_ft",
+      "selection": "over",
+      "odds_band": "<1.5",
+      "signal": "stable",
+      "n": 5,
+      "wins": 3,
+      "hit_rate_pct": 60.0,
+      "roi_pct": -21.0
+    }
+  ],
+  "filter_comparison": {
+    "schema_version": 1,
+    "profiles_version": "2026-10-18-v1",
+    "note": "Exploratory fixed profiles, not validated improvements. Includes rejected forecasts. Paper ROI at first recorded prices, no staking recommendation. Later-period data must not be used to tune profiles. No automatic live filter changes.",
+    "invalid_prematch_records_excluded": 0,
+    "markets": {
+      "over15_ht": {
+        "coverage": {
+          "frozen": 171,
+          "settled": 11,
+          "pending_or_missing_result": 160,
+          "missing_candidate": 1
+        },
+        "all_predictions": {
+          "n": 11,
+          "wins": 4,
+          "hit_rate_pct": 36.364,
+          "mean_probability_pct": 41.423,
+          "calibration_gap_pp": 5.059,
+          "brier_score": 0.258635,
+          "wilson_95_pct": [
+            15.166,
+            64.62
+          ],
+          "priced_n": 11,
+          "roi_pct": -13.591
+        },
+        "later_period_start_date": null,
+        "profiles": [
+          {
+            "profile": "current",
+            "accepted": {
+              "n": 2,
+              "wins": 0,
+              "hit_rate_pct": 0.0,
+              "mean_probability_pct": 51.41,
+              "calibration_gap_pp": 51.41,
+              "brier_score": 0.266415,
+              "wilson_95_pct": [
+                0.0,
+                65.763
+              ],
+              "priced_n": 2,
+              "roi_pct": -100.0
+            },
+            "rejected": {
+              "n": 9,
+              "wins": 4,
+              "hit_rate_pct": 44.444,
+              "mean_probability_pct": 39.203,
+              "calibration_gap_pp": -5.241,
+              "brier_score": 0.256906,
+              "wilson_95_pct": [
+                18.878,
+                73.335
+              ],
+              "priced_n": 9,
+              "roi_pct": 5.611
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_50",
+            "accepted": {
+              "n": 1,
+              "wins": 0,
+              "hit_rate_pct": 0.0,
+              "mean_probability_pct": 56.01,
+              "calibration_gap_pp": 56.01,
+              "brier_score": 0.313712,
+              "wilson_95_pct": [
+                0.0,
+                79.346
+              ],
+              "priced_n": 1,
+              "roi_pct": -100.0
+            },
+            "rejected": {
+              "n": 10,
+              "wins": 4,
+              "hit_rate_pct": 40.0,
+              "mean_probability_pct": 39.964,
+              "calibration_gap_pp": -0.036,
+              "brier_score": 0.253127,
+              "wilson_95_pct": [
+                16.818,
+                68.733
+              ],
+              "priced_n": 10,
+              "roi_pct": -4.95
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_60",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 11,
+              "wins": 4,
+              "hit_rate_pct": 36.364,
+              "mean_probability_pct": 41.423,
+              "calibration_gap_pp": 5.059,
+              "brier_score": 0.258635,
+              "wilson_95_pct": [
+                15.166,
+                64.62
+              ],
+              "priced_n": 11,
+              "roi_pct": -13.591
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "reliability_75",
+            "accepted": {
+              "n": 1,
+              "wins": 0,
+              "hit_rate_pct": 0.0,
+              "mean_probability_pct": 56.01,
+              "calibration_gap_pp": 56.01,
+              "brier_score": 0.313712,
+              "wilson_95_pct": [
+                0.0,
+                79.346
+              ],
+              "priced_n": 1,
+              "roi_pct": -100.0
+            },
+            "rejected": {
+              "n": 10,
+              "wins": 4,
+              "hit_rate_pct": 40.0,
+              "mean_probability_pct": 39.964,
+              "calibration_gap_pp": -0.036,
+              "brier_score": 0.253127,
+              "wilson_95_pct": [
+                16.818,
+                68.733
+              ],
+              "priced_n": 10,
+              "roi_pct": -4.95
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_agreement",
+            "accepted": {
+              "n": 1,
+              "wins": 0,
+              "hit_rate_pct": 0.0,
+              "mean_probability_pct": 46.81,
+              "calibration_gap_pp": 46.81,
+              "brier_score": 0.219118,
+              "wilson_95_pct": [
+                0.0,
+                79.346
+              ],
+              "priced_n": 1,
+              "roi_pct": -100.0
+            },
+            "rejected": {
+              "n": 10,
+              "wins": 4,
+              "hit_rate_pct": 40.0,
+              "mean_probability_pct": 40.884,
+              "calibration_gap_pp": 0.884,
+              "brier_score": 0.262587,
+              "wilson_95_pct": [
+                16.818,
+                68.733
+              ],
+              "priced_n": 10,
+              "roi_pct": -4.95
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "odds_1_5_to_3",
+            "accepted": {
+              "n": 2,
+              "wins": 0,
+              "hit_rate_pct": 0.0,
+              "mean_probability_pct": 51.41,
+              "calibration_gap_pp": 51.41,
+              "brier_score": 0.266415,
+              "wilson_95_pct": [
+                0.0,
+                65.763
+              ],
+              "priced_n": 2,
+              "roi_pct": -100.0
+            },
+            "rejected": {
+              "n": 9,
+              "wins": 4,
+              "hit_rate_pct": 44.444,
+              "mean_probability_pct": 39.203,
+              "calibration_gap_pp": -5.241,
+              "brier_score": 0.256906,
+              "wilson_95_pct": [
+                18.878,
+                73.335
+              ],
+              "priced_n": 9,
+              "roi_pct": 5.611
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_gap_15",
+            "accepted": {
+              "n": 2,
+              "wins": 0,
+              "hit_rate_pct": 0.0,
+              "mean_probability_pct": 51.41,
+              "calibration_gap_pp": 51.41,
+              "brier_score": 0.266415,
+              "wilson_95_pct": [
+                0.0,
+                65.763
+              ],
+              "priced_n": 2,
+              "roi_pct": -100.0
+            },
+            "rejected": {
+              "n": 9,
+              "wins": 4,
+              "hit_rate_pct": 44.444,
+              "mean_probability_pct": 39.203,
+              "calibration_gap_pp": -5.241,
+              "brier_score": 0.256906,
+              "wilson_95_pct": [
+                18.878,
+                73.335
+              ],
+              "priced_n": 9,
+              "roi_pct": 5.611
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          }
+        ],
+        "cohorts": [
+          {
+            "dimension": "country",
+            "value": "China",
+            "n": 2,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 40.34,
+            "calibration_gap_pp": 40.34,
+            "brier_score": 0.162734,
+            "wilson_95_pct": [
+              0.0,
+              65.763
+            ],
+            "priced_n": 2,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "country",
+            "value": "Denmark",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 36.46,
+            "calibration_gap_pp": 36.46,
+            "brier_score": 0.132933,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "country",
+            "value": "Italy",
+            "n": 3,
+            "wins": 2,
+            "hit_rate_pct": 66.667,
+            "mean_probability_pct": 38.39,
+            "calibration_gap_pp": -28.277,
+            "brier_score": 0.361931,
+            "wilson_95_pct": [
+              20.765,
+              93.851
+            ],
+            "priced_n": 3,
+            "roi_pct": 85.167
+          },
+          {
+            "dimension": "country",
+            "value": "Netherlands",
+            "n": 2,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 40.47,
+            "calibration_gap_pp": 40.47,
+            "brier_score": 0.165538,
+            "wilson_95_pct": [
+              0.0,
+              65.763
+            ],
+            "priced_n": 2,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "country",
+            "value": "Sweden",
+            "n": 3,
+            "wins": 2,
+            "hit_rate_pct": 66.667,
+            "mean_probability_pct": 47.467,
+            "calibration_gap_pp": -19.2,
+            "brier_score": 0.323239,
+            "wilson_95_pct": [
+              20.765,
+              93.851
+            ],
+            "priced_n": 3,
+            "roi_pct": 31.667
+          },
+          {
+            "dimension": "decision",
+            "value": "accepted",
+            "n": 2,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 51.41,
+            "calibration_gap_pp": 51.41,
+            "brier_score": 0.266415,
+            "wilson_95_pct": [
+              0.0,
+              65.763
+            ],
+            "priced_n": 2,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "decision",
+            "value": "rejected",
+            "n": 9,
+            "wins": 4,
+            "hit_rate_pct": 44.444,
+            "mean_probability_pct": 39.203,
+            "calibration_gap_pp": -5.241,
+            "brier_score": 0.256906,
+            "wilson_95_pct": [
+              18.878,
+              73.335
+            ],
+            "priced_n": 9,
+            "roi_pct": 5.611
+          },
+          {
+            "dimension": "league",
+            "value": "China/Super League",
+            "n": 2,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 40.34,
+            "calibration_gap_pp": 40.34,
+            "brier_score": 0.162734,
+            "wilson_95_pct": [
+              0.0,
+              65.763
+            ],
+            "priced_n": 2,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Denmark/1. Division",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 36.46,
+            "calibration_gap_pp": 36.46,
+            "brier_score": 0.132933,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Italy/Serie A",
+            "n": 1,
+            "wins": 1,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 35.23,
+            "calibration_gap_pp": -64.77,
+            "brier_score": 0.419515,
+            "wilson_95_pct": [
+              20.654,
+              100.0
+            ],
+            "priced_n": 1,
+            "roi_pct": 197.0
+          },
+          {
+            "dimension": "league",
+            "value": "Italy/Serie C - Girone B",
+            "n": 2,
+            "wins": 1,
+            "hit_rate_pct": 50.0,
+            "mean_probability_pct": 39.97,
+            "calibration_gap_pp": -10.03,
+            "brier_score": 0.333139,
+            "wilson_95_pct": [
+              9.453,
+              90.547
+            ],
+            "priced_n": 2,
+            "roi_pct": 29.25
+          },
+          {
+            "dimension": "league",
+            "value": "Netherlands/Eerste Divisie",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 36.28,
+            "calibration_gap_pp": 36.28,
+            "brier_score": 0.131624,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Netherlands/Eredivisie",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 44.66,
+            "calibration_gap_pp": 44.66,
+            "brier_score": 0.199452,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Sweden/Ettan - Norra",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 56.01,
+            "calibration_gap_pp": 56.01,
+            "brier_score": 0.313712,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Sweden/Ettan - Södra",
+            "n": 1,
+            "wins": 1,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 50.49,
+            "calibration_gap_pp": -49.51,
+            "brier_score": 0.245124,
+            "wilson_95_pct": [
+              20.654,
+              100.0
+            ],
+            "priced_n": 1,
+            "roi_pct": 70.0
+          },
+          {
+            "dimension": "league",
+            "value": "Sweden/Superettan",
+            "n": 1,
+            "wins": 1,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 35.9,
+            "calibration_gap_pp": -64.1,
+            "brier_score": 0.410881,
+            "wilson_95_pct": [
+              20.654,
+              100.0
+            ],
+            "priced_n": 1,
+            "roi_pct": 125.0
+          },
+          {
+            "dimension": "rejection_reason",
+            "value": "probabilita_sotto_40",
+            "n": 5,
+            "wins": 3,
+            "hit_rate_pct": 60.0,
+            "mean_probability_pct": 35.4,
+            "calibration_gap_pp": -24.6,
+            "brier_score": 0.308423,
+            "wilson_95_pct": [
+              23.072,
+              88.238
+            ],
+            "priced_n": 5,
+            "roi_pct": 56.1
+          },
+          {
+            "dimension": "rejection_reason",
+            "value": "valore_atteso_non_positivo",
+            "n": 8,
+            "wins": 3,
+            "hit_rate_pct": 37.5,
+            "mean_probability_pct": 39.7,
+            "calibration_gap_pp": 2.2,
+            "brier_score": 0.23658,
+            "wilson_95_pct": [
+              13.684,
+              69.426
+            ],
+            "priced_n": 8,
+            "roi_pct": -18.312
+          },
+          {
+            "dimension": "version",
+            "value": "1.1.8",
+            "n": 11,
+            "wins": 4,
+            "hit_rate_pct": 36.364,
+            "mean_probability_pct": 41.423,
+            "calibration_gap_pp": 5.059,
+            "brier_score": 0.258635,
+            "wilson_95_pct": [
+              15.166,
+              64.62
+            ],
+            "priced_n": 11,
+            "roi_pct": -13.591
+          }
+        ]
+      },
+      "gg_ht": {
+        "coverage": {
+          "frozen": 171,
+          "settled": 11,
+          "pending_or_missing_result": 160,
+          "missing_candidate": 1
+        },
+        "all_predictions": {
+          "n": 11,
+          "wins": 3,
+          "hit_rate_pct": 27.273,
+          "mean_probability_pct": 23.172,
+          "calibration_gap_pp": -4.101,
+          "brier_score": 0.217366,
+          "wilson_95_pct": [
+            9.746,
+            56.565
+          ],
+          "priced_n": 11,
+          "roi_pct": 1.0
+        },
+        "later_period_start_date": null,
+        "profiles": [
+          {
+            "profile": "current",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 11,
+              "wins": 3,
+              "hit_rate_pct": 27.273,
+              "mean_probability_pct": 23.172,
+              "calibration_gap_pp": -4.101,
+              "brier_score": 0.217366,
+              "wilson_95_pct": [
+                9.746,
+                56.565
+              ],
+              "priced_n": 11,
+              "roi_pct": 1.0
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_50",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 11,
+              "wins": 3,
+              "hit_rate_pct": 27.273,
+              "mean_probability_pct": 23.172,
+              "calibration_gap_pp": -4.101,
+              "brier_score": 0.217366,
+              "wilson_95_pct": [
+                9.746,
+                56.565
+              ],
+              "priced_n": 11,
+              "roi_pct": 1.0
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_60",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 11,
+              "wins": 3,
+              "hit_rate_pct": 27.273,
+              "mean_probability_pct": 23.172,
+              "calibration_gap_pp": -4.101,
+              "brier_score": 0.217366,
+              "wilson_95_pct": [
+                9.746,
+                56.565
+              ],
+              "priced_n": 11,
+              "roi_pct": 1.0
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "reliability_75",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 11,
+              "wins": 3,
+              "hit_rate_pct": 27.273,
+              "mean_probability_pct": 23.172,
+              "calibration_gap_pp": -4.101,
+              "brier_score": 0.217366,
+              "wilson_95_pct": [
+                9.746,
+                56.565
+              ],
+              "priced_n": 11,
+              "roi_pct": 1.0
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_agreement",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 11,
+              "wins": 3,
+              "hit_rate_pct": 27.273,
+              "mean_probability_pct": 23.172,
+              "calibration_gap_pp": -4.101,
+              "brier_score": 0.217366,
+              "wilson_95_pct": [
+                9.746,
+                56.565
+              ],
+              "priced_n": 11,
+              "roi_pct": 1.0
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "odds_1_5_to_3",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 11,
+              "wins": 3,
+              "hit_rate_pct": 27.273,
+              "mean_probability_pct": 23.172,
+              "calibration_gap_pp": -4.101,
+              "brier_score": 0.217366,
+              "wilson_95_pct": [
+                9.746,
+                56.565
+              ],
+              "priced_n": 11,
+              "roi_pct": 1.0
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_gap_15",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 11,
+              "wins": 3,
+              "hit_rate_pct": 27.273,
+              "mean_probability_pct": 23.172,
+              "calibration_gap_pp": -4.101,
+              "brier_score": 0.217366,
+              "wilson_95_pct": [
+                9.746,
+                56.565
+              ],
+              "priced_n": 11,
+              "roi_pct": 1.0
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          }
+        ],
+        "cohorts": [
+          {
+            "dimension": "country",
+            "value": "China",
+            "n": 2,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 22.09,
+            "calibration_gap_pp": 22.09,
+            "brier_score": 0.048797,
+            "wilson_95_pct": [
+              0.0,
+              65.763
+            ],
+            "priced_n": 2,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "country",
+            "value": "Denmark",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 20.46,
+            "calibration_gap_pp": 20.46,
+            "brier_score": 0.041861,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "country",
+            "value": "Italy",
+            "n": 3,
+            "wins": 1,
+            "hit_rate_pct": 33.333,
+            "mean_probability_pct": 20.417,
+            "calibration_gap_pp": -12.917,
+            "brier_score": 0.269782,
+            "wilson_95_pct": [
+              6.149,
+              79.235
+            ],
+            "priced_n": 3,
+            "roi_pct": 40.0
+          },
+          {
+            "dimension": "country",
+            "value": "Netherlands",
+            "n": 2,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 23.625,
+            "calibration_gap_pp": 23.625,
+            "brier_score": 0.057862,
+            "wilson_95_pct": [
+              0.0,
+              65.763
+            ],
+            "priced_n": 2,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "country",
+            "value": "Sweden",
+            "n": 3,
+            "wins": 2,
+            "hit_rate_pct": 66.667,
+            "mean_probability_pct": 27.25,
+            "calibration_gap_pp": -39.417,
+            "brier_score": 0.442166,
+            "wilson_95_pct": [
+              20.765,
+              93.851
+            ],
+            "priced_n": 3,
+            "roi_pct": 130.333
+          },
+          {
+            "dimension": "decision",
+            "value": "rejected",
+            "n": 11,
+            "wins": 3,
+            "hit_rate_pct": 27.273,
+            "mean_probability_pct": 23.172,
+            "calibration_gap_pp": -4.101,
+            "brier_score": 0.217366,
+            "wilson_95_pct": [
+              9.746,
+              56.565
+            ],
+            "priced_n": 11,
+            "roi_pct": 1.0
+          },
+          {
+            "dimension": "league",
+            "value": "China/Super League",
+            "n": 2,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 22.09,
+            "calibration_gap_pp": 22.09,
+            "brier_score": 0.048797,
+            "wilson_95_pct": [
+              0.0,
+              65.763
+            ],
+            "priced_n": 2,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Denmark/1. Division",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 20.46,
+            "calibration_gap_pp": 20.46,
+            "brier_score": 0.041861,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Italy/Serie A",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 19.62,
+            "calibration_gap_pp": 19.62,
+            "brier_score": 0.038494,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Italy/Serie C - Girone B",
+            "n": 2,
+            "wins": 1,
+            "hit_rate_pct": 50.0,
+            "mean_probability_pct": 20.815,
+            "calibration_gap_pp": -29.185,
+            "brier_score": 0.385426,
+            "wilson_95_pct": [
+              9.453,
+              90.547
+            ],
+            "priced_n": 2,
+            "roi_pct": 110.0
+          },
+          {
+            "dimension": "league",
+            "value": "Netherlands/Eerste Divisie",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 19.1,
+            "calibration_gap_pp": 19.1,
+            "brier_score": 0.036481,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Netherlands/Eredivisie",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 28.15,
+            "calibration_gap_pp": 28.15,
+            "brier_score": 0.079242,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Sweden/Ettan - Norra",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 36.07,
+            "calibration_gap_pp": 36.07,
+            "brier_score": 0.130104,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Sweden/Ettan - Södra",
+            "n": 1,
+            "wins": 1,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 28.16,
+            "calibration_gap_pp": -71.84,
+            "brier_score": 0.516099,
+            "wilson_95_pct": [
+              20.654,
+              100.0
+            ],
+            "priced_n": 1,
+            "roi_pct": 242.0
+          },
+          {
+            "dimension": "league",
+            "value": "Sweden/Superettan",
+            "n": 1,
+            "wins": 1,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 17.52,
+            "calibration_gap_pp": -82.48,
+            "brier_score": 0.680295,
+            "wilson_95_pct": [
+              20.654,
+              100.0
+            ],
+            "priced_n": 1,
+            "roi_pct": 249.0
+          },
+          {
+            "dimension": "rejection_reason",
+            "value": "probabilita_sotto_40",
+            "n": 11,
+            "wins": 3,
+            "hit_rate_pct": 27.273,
+            "mean_probability_pct": 23.172,
+            "calibration_gap_pp": -4.101,
+            "brier_score": 0.217366,
+            "wilson_95_pct": [
+              9.746,
+              56.565
+            ],
+            "priced_n": 11,
+            "roi_pct": 1.0
+          },
+          {
+            "dimension": "rejection_reason",
+            "value": "valore_atteso_non_positivo",
+            "n": 9,
+            "wins": 3,
+            "hit_rate_pct": 33.333,
+            "mean_probability_pct": 21.468,
+            "calibration_gap_pp": -11.866,
+            "brier_score": 0.243926,
+            "wilson_95_pct": [
+              12.058,
+              64.58
+            ],
+            "priced_n": 9,
+            "roi_pct": 23.444
+          },
+          {
+            "dimension": "version",
+            "value": "1.1.8",
+            "n": 11,
+            "wins": 3,
+            "hit_rate_pct": 27.273,
+            "mean_probability_pct": 23.172,
+            "calibration_gap_pp": -4.101,
+            "brier_score": 0.217366,
+            "wilson_95_pct": [
+              9.746,
+              56.565
+            ],
+            "priced_n": 11,
+            "roi_pct": 1.0
+          }
+        ]
+      },
+      "over25_ft": {
+        "coverage": {
+          "frozen": 171,
+          "settled": 11,
+          "pending_or_missing_result": 160,
+          "missing_candidate": 1
+        },
+        "all_predictions": {
+          "n": 11,
+          "wins": 7,
+          "hit_rate_pct": 63.636,
+          "mean_probability_pct": 59.841,
+          "calibration_gap_pp": -3.795,
+          "brier_score": 0.244936,
+          "wilson_95_pct": [
+            35.38,
+            84.834
+          ],
+          "priced_n": 11,
+          "roi_pct": -1.909
+        },
+        "later_period_start_date": null,
+        "profiles": [
+          {
+            "profile": "current",
+            "accepted": {
+              "n": 2,
+              "wins": 1,
+              "hit_rate_pct": 50.0,
+              "mean_probability_pct": 72.295,
+              "calibration_gap_pp": 22.295,
+              "brier_score": 0.240283,
+              "wilson_95_pct": [
+                9.453,
+                90.547
+              ],
+              "priced_n": 2,
+              "roi_pct": -28.0
+            },
+            "rejected": {
+              "n": 9,
+              "wins": 6,
+              "hit_rate_pct": 66.667,
+              "mean_probability_pct": 57.073,
+              "calibration_gap_pp": -9.593,
+              "brier_score": 0.245971,
+              "wilson_95_pct": [
+                35.42,
+                87.942
+              ],
+              "priced_n": 9,
+              "roi_pct": 3.889
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_50",
+            "accepted": {
+              "n": 2,
+              "wins": 1,
+              "hit_rate_pct": 50.0,
+              "mean_probability_pct": 72.295,
+              "calibration_gap_pp": 22.295,
+              "brier_score": 0.240283,
+              "wilson_95_pct": [
+                9.453,
+                90.547
+              ],
+              "priced_n": 2,
+              "roi_pct": -28.0
+            },
+            "rejected": {
+              "n": 9,
+              "wins": 6,
+              "hit_rate_pct": 66.667,
+              "mean_probability_pct": 57.073,
+              "calibration_gap_pp": -9.593,
+              "brier_score": 0.245971,
+              "wilson_95_pct": [
+                35.42,
+                87.942
+              ],
+              "priced_n": 9,
+              "roi_pct": 3.889
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_60",
+            "accepted": {
+              "n": 2,
+              "wins": 1,
+              "hit_rate_pct": 50.0,
+              "mean_probability_pct": 72.295,
+              "calibration_gap_pp": 22.295,
+              "brier_score": 0.240283,
+              "wilson_95_pct": [
+                9.453,
+                90.547
+              ],
+              "priced_n": 2,
+              "roi_pct": -28.0
+            },
+            "rejected": {
+              "n": 9,
+              "wins": 6,
+              "hit_rate_pct": 66.667,
+              "mean_probability_pct": 57.073,
+              "calibration_gap_pp": -9.593,
+              "brier_score": 0.245971,
+              "wilson_95_pct": [
+                35.42,
+                87.942
+              ],
+              "priced_n": 9,
+              "roi_pct": 3.889
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "reliability_75",
+            "accepted": {
+              "n": 2,
+              "wins": 1,
+              "hit_rate_pct": 50.0,
+              "mean_probability_pct": 72.295,
+              "calibration_gap_pp": 22.295,
+              "brier_score": 0.240283,
+              "wilson_95_pct": [
+                9.453,
+                90.547
+              ],
+              "priced_n": 2,
+              "roi_pct": -28.0
+            },
+            "rejected": {
+              "n": 9,
+              "wins": 6,
+              "hit_rate_pct": 66.667,
+              "mean_probability_pct": 57.073,
+              "calibration_gap_pp": -9.593,
+              "brier_score": 0.245971,
+              "wilson_95_pct": [
+                35.42,
+                87.942
+              ],
+              "priced_n": 9,
+              "roi_pct": 3.889
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_agreement",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 11,
+              "wins": 7,
+              "hit_rate_pct": 63.636,
+              "mean_probability_pct": 59.841,
+              "calibration_gap_pp": -3.795,
+              "brier_score": 0.244936,
+              "wilson_95_pct": [
+                35.38,
+                84.834
+              ],
+              "priced_n": 11,
+              "roi_pct": -1.909
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "odds_1_5_to_3",
+            "accepted": {
+              "n": 1,
+              "wins": 0,
+              "hit_rate_pct": 0.0,
+              "mean_probability_pct": 65.95,
+              "calibration_gap_pp": 65.95,
+              "brier_score": 0.43494,
+              "wilson_95_pct": [
+                0.0,
+                79.346
+              ],
+              "priced_n": 1,
+              "roi_pct": -100.0
+            },
+            "rejected": {
+              "n": 10,
+              "wins": 7,
+              "hit_rate_pct": 70.0,
+              "mean_probability_pct": 59.23,
+              "calibration_gap_pp": -10.77,
+              "brier_score": 0.225936,
+              "wilson_95_pct": [
+                39.677,
+                89.221
+              ],
+              "priced_n": 10,
+              "roi_pct": 7.9
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_gap_15",
+            "accepted": {
+              "n": 1,
+              "wins": 0,
+              "hit_rate_pct": 0.0,
+              "mean_probability_pct": 65.95,
+              "calibration_gap_pp": 65.95,
+              "brier_score": 0.43494,
+              "wilson_95_pct": [
+                0.0,
+                79.346
+              ],
+              "priced_n": 1,
+              "roi_pct": -100.0
+            },
+            "rejected": {
+              "n": 10,
+              "wins": 7,
+              "hit_rate_pct": 70.0,
+              "mean_probability_pct": 59.23,
+              "calibration_gap_pp": -10.77,
+              "brier_score": 0.225936,
+              "wilson_95_pct": [
+                39.677,
+                89.221
+              ],
+              "priced_n": 10,
+              "roi_pct": 7.9
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          }
+        ],
+        "cohorts": [
+          {
+            "dimension": "country",
+            "value": "China",
+            "n": 2,
+            "wins": 1,
+            "hit_rate_pct": 50.0,
+            "mean_probability_pct": 53.995,
+            "calibration_gap_pp": 3.995,
+            "brier_score": 0.256773,
+            "wilson_95_pct": [
+              9.453,
+              90.547
+            ],
+            "priced_n": 2,
+            "roi_pct": -35.0
+          },
+          {
+            "dimension": "country",
+            "value": "Denmark",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 65.95,
+            "calibration_gap_pp": 65.95,
+            "brier_score": 0.43494,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "country",
+            "value": "Italy",
+            "n": 3,
+            "wins": 2,
+            "hit_rate_pct": 66.667,
+            "mean_probability_pct": 48.693,
+            "calibration_gap_pp": -17.973,
+            "brier_score": 0.246789,
+            "wilson_95_pct": [
+              20.765,
+              93.851
+            ],
+            "priced_n": 3,
+            "roi_pct": 28.0
+          },
+          {
+            "dimension": "country",
+            "value": "Netherlands",
+            "n": 2,
+            "wins": 1,
+            "hit_rate_pct": 50.0,
+            "mean_probability_pct": 68.62,
+            "calibration_gap_pp": 18.62,
+            "brier_score": 0.304447,
+            "wilson_95_pct": [
+              9.453,
+              90.547
+            ],
+            "priced_n": 2,
+            "roi_pct": -28.0
+          },
+          {
+            "dimension": "country",
+            "value": "Sweden",
+            "n": 3,
+            "wins": 3,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 66.997,
+            "calibration_gap_pp": -33.003,
+            "brier_score": 0.132185,
+            "wilson_95_pct": [
+              43.849,
+              100.0
+            ],
+            "priced_n": 3,
+            "roi_pct": 40.333
+          },
+          {
+            "dimension": "decision",
+            "value": "accepted",
+            "n": 2,
+            "wins": 1,
+            "hit_rate_pct": 50.0,
+            "mean_probability_pct": 72.295,
+            "calibration_gap_pp": 22.295,
+            "brier_score": 0.240283,
+            "wilson_95_pct": [
+              9.453,
+              90.547
+            ],
+            "priced_n": 2,
+            "roi_pct": -28.0
+          },
+          {
+            "dimension": "decision",
+            "value": "rejected",
+            "n": 9,
+            "wins": 6,
+            "hit_rate_pct": 66.667,
+            "mean_probability_pct": 57.073,
+            "calibration_gap_pp": -9.593,
+            "brier_score": 0.245971,
+            "wilson_95_pct": [
+              35.42,
+              87.942
+            ],
+            "priced_n": 9,
+            "roi_pct": 3.889
+          },
+          {
+            "dimension": "league",
+            "value": "China/Super League",
+            "n": 2,
+            "wins": 1,
+            "hit_rate_pct": 50.0,
+            "mean_probability_pct": 53.995,
+            "calibration_gap_pp": 3.995,
+            "brier_score": 0.256773,
+            "wilson_95_pct": [
+              9.453,
+              90.547
+            ],
+            "priced_n": 2,
+            "roi_pct": -35.0
+          },
+          {
+            "dimension": "league",
+            "value": "Denmark/1. Division",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 65.95,
+            "calibration_gap_pp": 65.95,
+            "brier_score": 0.43494,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Italy/Serie A",
+            "n": 1,
+            "wins": 1,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 45.14,
+            "calibration_gap_pp": -54.86,
+            "brier_score": 0.300962,
+            "wilson_95_pct": [
+              20.654,
+              100.0
+            ],
+            "priced_n": 1,
+            "roi_pct": 101.0
+          },
+          {
+            "dimension": "league",
+            "value": "Italy/Serie C - Girone B",
+            "n": 2,
+            "wins": 1,
+            "hit_rate_pct": 50.0,
+            "mean_probability_pct": 50.47,
+            "calibration_gap_pp": 0.47,
+            "brier_score": 0.219702,
+            "wilson_95_pct": [
+              9.453,
+              90.547
+            ],
+            "priced_n": 2,
+            "roi_pct": -8.5
+          },
+          {
+            "dimension": "league",
+            "value": "Netherlands/Eerste Divisie",
+            "n": 1,
+            "wins": 0,
+            "hit_rate_pct": 0.0,
+            "mean_probability_pct": 70.56,
+            "calibration_gap_pp": 70.56,
+            "brier_score": 0.497871,
+            "wilson_95_pct": [
+              0.0,
+              79.346
+            ],
+            "priced_n": 1,
+            "roi_pct": -100.0
+          },
+          {
+            "dimension": "league",
+            "value": "Netherlands/Eredivisie",
+            "n": 1,
+            "wins": 1,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 66.68,
+            "calibration_gap_pp": -33.32,
+            "brier_score": 0.111022,
+            "wilson_95_pct": [
+              20.654,
+              100.0
+            ],
+            "priced_n": 1,
+            "roi_pct": 44.0
+          },
+          {
+            "dimension": "league",
+            "value": "Sweden/Ettan - Norra",
+            "n": 1,
+            "wins": 1,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 78.64,
+            "calibration_gap_pp": -21.36,
+            "brier_score": 0.045625,
+            "wilson_95_pct": [
+              20.654,
+              100.0
+            ],
+            "priced_n": 1,
+            "roi_pct": 44.0
+          },
+          {
+            "dimension": "league",
+            "value": "Sweden/Ettan - Södra",
+            "n": 1,
+            "wins": 1,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 76.9,
+            "calibration_gap_pp": -23.1,
+            "brier_score": 0.053361,
+            "wilson_95_pct": [
+              20.654,
+              100.0
+            ],
+            "priced_n": 1,
+            "roi_pct": 21.0
+          },
+          {
+            "dimension": "league",
+            "value": "Sweden/Superettan",
+            "n": 1,
+            "wins": 1,
+            "hit_rate_pct": 100.0,
+            "mean_probability_pct": 45.45,
+            "calibration_gap_pp": -54.55,
+            "brier_score": 0.29757,
+            "wilson_95_pct": [
+              20.654,
+              100.0
+            ],
+            "priced_n": 1,
+            "roi_pct": 56.0
+          },
+          {
+            "dimension": "rejection_reason",
+            "value": "valore_atteso_non_positivo",
+            "n": 9,
+            "wins": 6,
+            "hit_rate_pct": 66.667,
+            "mean_probability_pct": 57.073,
+            "calibration_gap_pp": -9.593,
+            "brier_score": 0.245971,
+            "wilson_95_pct": [
+              35.42,
+              87.942
+            ],
+            "priced_n": 9,
+            "roi_pct": 3.889
+          },
+          {
+            "dimension": "version",
+            "value": "1.1.8",
+            "n": 11,
+            "wins": 7,
+            "hit_rate_pct": 63.636,
+            "mean_probability_pct": 59.841,
+            "calibration_gap_pp": -3.795,
+            "brier_score": 0.244936,
+            "wilson_95_pct": [
+              35.38,
+              84.834
+            ],
+            "priced_n": 11,
+            "roi_pct": -1.909
+          }
+        ]
+      }
+    }
+  }
 }
