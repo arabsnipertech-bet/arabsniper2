@@ -3115,6 +3115,8 @@ def main() -> None:
         log(f"GitHub state: {upload_json_to_github(REMOTE_STATE_FILE, read_json(STATE_FILE, {}), 'Update ArabSniper quote state')}")
         if XG_CACHE_FILE.exists():
             log(f"GitHub xG cache: {upload_json_to_github(REMOTE_XG_CACHE_FILE, read_json(XG_CACHE_FILE, {}), 'Update ArabSniper xG cache')}")
+        if PREMATCH_AUDIT_FILE.exists():
+            log(f"GitHub prematch audit: {upload_json_to_github('data/arab_quote_prematch_audit.json', read_json(PREMATCH_AUDIT_FILE, {}), 'Update immutable prematch audit')}")
         if PREDICTION_AUDIT_FILE.exists():
             log(f"GitHub prediction audit: {upload_json_to_github(REMOTE_PREDICTION_AUDIT_FILE, read_json(PREDICTION_AUDIT_FILE, {}), 'Update ArabSniper prediction audit')}")
         for day_payload in output.get("days", []) or []:
@@ -3872,7 +3874,8 @@ def _result_payload(status_row: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
     return {
         "status": status.get("short"), "settled_at": iso_now(),
         "home_ft": safe_int(home_ft), "away_ft": safe_int(away_ft),
-        "home_ht": safe_int(halftime.get("home"), 0), "away_ht": safe_int(halftime.get("away"), 0),
+        "home_ht": safe_int(halftime["home"]) if halftime.get("home") is not None else None,
+        "away_ht": safe_int(halftime["away"]) if halftime.get("away") is not None else None,
     }
 
 
@@ -4767,6 +4770,10 @@ _selection_won_v113 = _selection_won
 
 
 def _selection_won(market: str, selection: str, result: Mapping[str, Any]) -> Optional[bool]:
+    if market in {MARKET_O05HT, MARKET_O15HT, MARKET_GGHT} and any(
+        result.get(key) is None for key in ("home_ht", "away_ht")
+    ):
+        return None
     if market == MARKET_O05HT:
         total_ht = safe_int(result.get("home_ht")) + safe_int(result.get("away_ht"))
         return (total_ht >= 1) if selection == "over" else (total_ht == 0) if selection == "under" else None
@@ -5176,6 +5183,8 @@ def _preserve_existing_match(item: Mapping[str, Any], status_row: Optional[Mappi
     pattern = ((preserved.get("model", {}) or {}).get("favorite_trap_pattern") or {})
     if not pattern:
         return preserved
+    if any(result.get(key) is None for key in ("home_ht", "away_ht")):
+        return preserved
     ht_total = safe_int(result.get("home_ht")) + safe_int(result.get("away_ht"))
     ft_total = safe_int(result.get("home_ft")) + safe_int(result.get("away_ft"))
     audit = preserved.setdefault("prediction_audit", {})
@@ -5340,6 +5349,50 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
         "prediction audit esteso a goal PT, over 1.5 PT, GG PT e over 2.5 FT per ogni classificazione del regime quote"
     )
     atomic_write_json(OUTPUT_FILE, output)
+    return output
+
+
+# Immutable first-observed pre-match evidence, independent of primary selection.
+PREMATCH_AUDIT_FILE = DATA_DIR / "arab_quote_prematch_audit.json"
+_scan_dates_before_prematch_audit = scan_dates
+
+
+def capture_prematch_predictions(output: Mapping[str, Any]) -> Dict[str, Any]:
+    store = read_json(PREMATCH_AUDIT_FILE, {"schema_version": 1, "fixtures": {}})
+    observed_at = now_rome()
+    fixtures = store.setdefault("fixtures", {})
+    for day in output.get("days", []) or []:
+        for match in day.get("matches", []) or []:
+            fixture = match.get("fixture", {}) or {}
+            fixture_id = str(fixture.get("fixture_id") or "")
+            kickoff = parse_iso(fixture.get("kickoff"))
+            # Missing or ambiguous timestamps must never become pre-match evidence.
+            if not fixture_id or not kickoff or kickoff.tzinfo is None:
+                continue
+            if kickoff <= observed_at or fixture.get("result"):
+                continue
+            if fixture_id in fixtures:
+                continue
+            model = match.get("model", {}) or {}
+            display = match.get("display", {}) or {}
+            fixtures[fixture_id] = json.loads(json.dumps({
+                "fixture": fixture, "captured_at": observed_at.isoformat(),
+                "model_version": VERSION,
+                "probabilities_raw": model.get("probabilities_raw", {}),
+                "probabilities_calibrated": model.get("probabilities_calibrated", {}),
+                "reliability_pct": model.get("reliability_pct"),
+                "markets": display.get("markets", {}),
+                "primary_choice": display.get("primary_choice"),
+                "ranked_choices": display.get("ranked_choices", []),
+            }))
+    store["updated_at"] = observed_at.isoformat()
+    atomic_write_json(PREMATCH_AUDIT_FILE, store)
+    return store
+
+
+def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countries: Sequence[str]) -> Dict[str, Any]:
+    output = _scan_dates_before_prematch_audit(client, target_dates, excluded_countries)
+    capture_prematch_predictions(output)
     return output
 
 if __name__ == "__main__":
