@@ -641,6 +641,14 @@
       .detail-grid { grid-template-columns: 1fr 1fr; }
       .legend { align-items: flex-start; }
     }
+
+    .ranking-section{margin:18px 0;padding:18px;border:1px solid var(--border);border-radius:20px;background:var(--panel);min-width:0}
+    .ranking-section h2{margin:0;color:var(--gold);font-size:1.25rem}.ranking-section p{color:var(--muted);line-height:1.5;font-size:.85rem;overflow-wrap:anywhere}
+    .ranking-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:16px 0}.ranking-tabs button{min-height:64px;border:1px solid var(--border);border-radius:12px;background:var(--panel-2);color:var(--text);padding:10px 5px;font-weight:800;font-size:.85rem}.ranking-tabs button span{display:block;font-size:.7rem;margin-top:6px;font-weight:500}.ranking-tabs button[aria-pressed=true]{background:var(--gold);color:#111;border-color:var(--gold)}
+    .ranking-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ranking-card{padding:15px;border:1px solid var(--border);border-radius:15px;background:var(--panel-2);min-width:0}.ranking-heading{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:9px;align-items:start}.ranking-heading strong{font-size:.95rem;overflow-wrap:anywhere}.ranking-heading time{color:var(--gold);font-weight:800}.ranking-position{color:var(--cyan);font-weight:800}.ranking-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0}.ranking-metrics span{display:block;color:var(--muted);font-size:.67rem;line-height:1.4}.ranking-metrics b{display:block;font-size:1.16rem;margin-top:6px}.ranking-metrics div:first-child b{color:var(--cyan)}.ranking-badges{display:flex;flex-wrap:wrap;gap:7px}.ranking-badges span{background:var(--panel);padding:6px 8px;border-radius:8px;font-size:.7rem;color:var(--muted)}
+    .ranking-card details,.ranking-guide{border-top:1px solid var(--border);margin-top:14px;padding-top:12px}.ranking-section summary{cursor:pointer;color:var(--cyan);padding:8px 0;font-size:.85rem}.ranking-card dl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;font-size:.78rem}.ranking-card dt{color:var(--muted)}.ranking-card dd{margin:0}.ranking-explain{font-size:.77rem!important}
+    @media(max-width:700px){.ranking-cards{grid-template-columns:1fr}.ranking-section{padding:13px}.topbar{position:static}.ranking-tabs button{font-size:.76rem}.ranking-card{padding:12px}}
+
   </style>
 </head>
 <body>
@@ -652,7 +660,7 @@
         <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
       </div>
       <div class="top-actions">
-        <button class="btn btn-gold" type="button" onclick="manualRefresh()">Aggiorna</button>
+        <button class="btn btn-gold" type="button" onclick="manualRefresh()">Ricarica dati</button>
         <a class="btn" href="index.html" style="text-decoration:none">Home</a>
         <button class="btn btn-danger" type="button" onclick="logoutGold()">Logout</button>
       </div>
@@ -1059,9 +1067,9 @@
         currentMatches = [...payload.matches];
         document.getElementById('selectedDay').textContent = `Giorno ${currentDay} · ${formatDateIt(payload.date)}`;
         document.getElementById('fileSource').textContent = `Fonte: ${file}`;
-        document.getElementById('updatedAt').textContent = `Aggiornamento: ${formatTimestamp(payload.updated_at)}`;
+        document.getElementById('updatedAt').textContent = `Ultima scansione: ${formatTimestamp(payload.updated_at)}`;
         document.getElementById('liveStatus').textContent = currentDay === 1
-          ? 'Dati Day 1 caricati · aggiornamento manuale'
+          ? 'Dati caricati · scansione separata'
           : `Snapshot Day ${currentDay} · aggiornamento manuale`;
         applyFilters();
         if (preservePosition) restoreViewportAnchor(anchor);
@@ -1078,34 +1086,46 @@
     }
 
 
+    let activeRankingMarket = 'over15_ht';
+    function selectRankingMarket(key) {
+      activeRankingMarket = key;
+      renderMarketRankings(currentPayload || {});
+    }
     function renderMarketRankings(payload) {
       document.getElementById('marketRankings')?.remove();
       const section = document.createElement('section');
       section.id = 'marketRankings';
-      section.className = 'legend';
-      section.style.display = 'block';
+      section.className = 'ranking-section';
       const rankings = payload.market_rankings;
-      let html = '<h2>Selezioni per mercato</h2><p>Probabilità calibrata ≥ 40% · Affidabilità ≥ 60% · Valore atteso positivo. Tutte le selezioni ammesse, ordinate per punteggio.</p>';
+      const keys = ['over15_ht','gg_ht','over25_ft'];
+      const labels = {over15_ht:'Over 1,5 PT',gg_ht:'GG PT sì',over25_ft:'Over 2,5 finale'};
+      const explain = {over15_ht:'Almeno 2 gol nel primo tempo',gg_ht:'Entrambe segnano nel primo tempo',over25_ft:'Almeno 3 gol nella partita'};
+      const rowsFor = key => (Array.isArray(rankings?.[key]) ? rankings[key] : [])
+        .filter(r => Number.isFinite(Date.parse(r.kickoff)) && Date.parse(r.kickoff)>Date.now())
+        .slice().sort((a,b)=>num(b.ranking_score)-num(a.ranking_score));
+      let html = '<h2>Trova le partite per mercato</h2><p>Scegli un mercato. Le selezioni sono ordinate per punteggio complessivo.</p>';
+      html += '<div class="ranking-tabs" role="group" aria-label="Mercato delle selezioni">'+keys.map(k=>`<button type="button" aria-pressed="${k===activeRankingMarket}" onclick="selectRankingMarket('${k}')">${labels[k]}<span>${rowsFor(k).length} selezioni</span></button>`).join('')+'</div>';
+      html += `<p class="ranking-explain">${explain[activeRankingMarket]} · Dati del ${escapeHtml(formatTimestamp(payload.updated_at))}</p>`;
       if (!rankings || typeof rankings !== 'object') {
-        html += '<p>Classifiche non ancora disponibili: attendi una scansione con la nuova versione.</p>';
+        html += '<div class="empty">Classifiche non ancora disponibili. Attendi la prossima scansione.</div>';
       } else {
-        for (const key of ['over15_ht', 'gg_ht', 'over25_ft']) {
-          const rows = (Array.isArray(rankings[key]) ? rankings[key] : [])
-            .filter(row => Number.isFinite(Date.parse(row.kickoff)) && Date.parse(row.kickoff) > Date.now())
-            .slice().sort((a,b) => num(b.ranking_score)-num(a.ranking_score));
-          html += `<h3>${escapeHtml(MARKET_LABELS[key])} · ${rows.length}</h3>`;
-          if (!rows.length) { html += '<p>Nessuna selezione disponibile prima del calcio d’inizio.</p>'; continue; }
-          html += '<div style="overflow-x:auto"><table style="width:100%;min-width:1050px"><thead><tr><th>#</th><th>Ora</th><th>Partita / Campionato</th><th>Pura</th><th>Calibrata</th><th>Affidabilità</th><th>Quota</th><th>Drop</th><th>Inversioni</th><th>EV</th><th>Punteggio</th><th>Valutazione</th></tr></thead><tbody>';
-          rows.forEach((r,i) => {
-            const movement = r.movement || {};
-            html += `<tr><td>${i+1}</td><td>${escapeHtml(r.time)}</td><td>${escapeHtml(r.match)}<br><small>${escapeHtml(r.country)} · ${escapeHtml(r.league)}</small></td><td>${escapeHtml(formatPct(r.probability_raw_pct))}</td><td>${escapeHtml(formatPct(r.probability_pct))}</td><td>${escapeHtml(formatPct(r.reliability_pct))}</td><td>${escapeHtml(formatOdd(r.odd))}</td><td>${movement.drop_pct == null ? '—' : escapeHtml(formatPct(movement.drop_pct))}</td><td>${escapeHtml(String(movement.direction_reversals ?? '—'))}</td><td>${escapeHtml(formatPct(r.expected_value_pct))}</td><td>${escapeHtml(String(r.ranking_score ?? '—'))}</td><td>${r.recovered ? '<b>Recuperata</b><br>' : ''}${escapeHtml(RELATION_LABELS[r.relation] || r.relation || '')}<br><small>${escapeHtml(r.selection_reason || '')}</small></td></tr>`;
-          });
-          html += '</tbody></table></div>';
-        }
+        const rows = rowsFor(activeRankingMarket);
+        if (!rows.length) html += '<div class="empty">Nessuna selezione disponibile prima del calcio d’inizio per questo mercato.</div>';
+        html += '<div class="ranking-cards">';
+        rows.forEach((r,i)=>{
+          const m=r.movement||{};
+          const drop=m.drop_pct;
+          const movement=drop==null?'Movimento quota non disponibile':Math.abs(drop)<0.01?'Quota stabile':`Quota ${drop>0?'in calo':'in aumento'} ${Math.abs(drop).toFixed(1)}%`;
+          html += `<article class="ranking-card"><div class="ranking-heading"><span class="ranking-position">#${i+1}</span><strong>${escapeHtml(r.match)}</strong><time>${escapeHtml(r.time)}</time></div><p>${escapeHtml(r.country)} · ${escapeHtml(r.league)}</p>
+          <div class="ranking-metrics"><div><span>Probabilità stimata</span><b>${escapeHtml(formatPct(r.probability_pct))}</b></div><div><span>Quota attuale</span><b>${escapeHtml(formatOdd(r.odd))}</b></div><div><span>Affidabilità dati</span><b>${escapeHtml(formatPct(r.reliability_pct))}</b></div></div>
+          <div class="ranking-badges"><span>Punteggio ${escapeHtml(String(r.ranking_score??'—'))}/100</span><span>${escapeHtml(movement)}</span>${r.recovered?'<span>Recuperata dai nuovi criteri</span>':''}</div>
+          <details><summary>Perché è in classifica</summary><p>${escapeHtml(r.selection_reason||'Supera i criteri del mercato.')}</p><p>${escapeHtml(RELATION_LABELS[r.relation]||r.relation||'')}</p><dl><dt>Probabilità pura</dt><dd>${escapeHtml(formatPct(r.probability_raw_pct))}</dd><dt>Valore atteso teorico (EV)</dt><dd>${escapeHtml(formatPct(r.expected_value_pct))}</dd><dt>Prima quota osservata</dt><dd>${escapeHtml(formatOdd(m.opening_observed_odd))}</dd><dt>Inversioni della quota</dt><dd>${escapeHtml(String(m.direction_reversals??'—'))}</dd></dl></details></article>`;
+        });
+        html+='</div>';
       }
-      html += '<p><small>Drop positivo = quota diminuita dalla prima osservazione; negativo = quota aumentata. Le probabilità sono stime. Le classifiche sono indipendenti dai filtri delle schede sottostanti.</small></p>';
-      section.innerHTML = html;
-      document.getElementById('matchesGrid').before(section);
+      html += '<details class="ranking-guide"><summary>Come leggere queste selezioni</summary><p>Probabilità calibrata almeno 40%, affidabilità dei dati almeno 60%, quota disponibile e valore atteso positivo. L’affidabilità misura la qualità dei dati, non la probabilità di vincita. Il punteggio combina più criteri e non è una percentuale di successo.</p><p>Recuperata: esclusa dai precedenti filtri, ammessa dai nuovi criteri. Quote confrontate con la prima osservazione. Le probabilità sono stime; un EV positivo dipende dalla loro accuratezza.</p><p>Le classifiche sono separate dai filtri delle schede complete sottostanti. Aggiornare la pagina rilegge i dati già pubblicati e non avvia una scansione.</p></details>';
+      section.innerHTML=html;
+      document.querySelector('.toolbar').before(section);
     }
 
     function setRelationFilter(filter) {
@@ -1504,7 +1524,7 @@
           <section class="detail-section">
             <h3>Probabilità pure e calibrate</h3>
             ${probabilityComparisonTable(model)}
-            <p class="section-note">Il cerchio e la relazione AS/Book derivano sempre dalle probabilità pure. La percentuale calibrata integra il book fino al 12%.</p>
+            <p class="section-note">Il cerchio e la relazione AS/Book derivano sempre dalle probabilità pure. La percentuale calibrata integra il book fino al 18%.</p>
           </section>
           <section class="detail-section">
             <h3>Costruzione lambda</h3>
