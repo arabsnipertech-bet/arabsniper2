@@ -34,11 +34,38 @@ jobs:
         run: |
           pip install requests
 
+      - name: Check frozen predictions for yesterday
+        id: source
+        run: |
+          python - <<'PY'
+          import os
+          from datetime import datetime, timedelta
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+
+          target = (datetime.now(ZoneInfo("Europe/Rome")).date() - timedelta(days=1)).isoformat()
+          source = Path("auditordata") / f"freeze_for_audit_{target}.json"
+          available = source.is_file()
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write(f"available={str(available).lower()}\n")
+          message = (
+              f"Audit {target}: previsioni congelate disponibili."
+              if available else
+              f"Audit {target} NON ESEGUITO: manca {source}. Nessun risultato creato o aggiornato. "
+              "Non ricostruire previsioni dopo la partita."
+          )
+          print(message)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+              summary.write(message + "\n")
+          PY
+
       - name: Run audit script
+        if: steps.source.outputs.available == 'true'
         run: |
           python auditor/run_audit.py
 
       - name: Commit and push audit results
+        if: steps.source.outputs.available == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
