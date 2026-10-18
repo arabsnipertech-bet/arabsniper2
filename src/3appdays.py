@@ -3117,6 +3117,9 @@ def main() -> None:
             log(f"GitHub xG cache: {upload_json_to_github(REMOTE_XG_CACHE_FILE, read_json(XG_CACHE_FILE, {}), 'Update ArabSniper xG cache')}")
         if PREMATCH_AUDIT_FILE.exists():
             log(f"GitHub prematch audit: {upload_json_to_github('data/arab_quote_prematch_audit.json', read_json(PREMATCH_AUDIT_FILE, {}), 'Update immutable prematch audit')}")
+        report_file = DATA_DIR / "arab_quote_prematch_report.json"
+        if report_file.exists():
+            log(f"GitHub prematch report: {upload_json_to_github('data/arab_quote_prematch_report.json', read_json(report_file, {}), 'Update prematch report')}")
         if PREDICTION_AUDIT_FILE.exists():
             log(f"GitHub prediction audit: {upload_json_to_github(REMOTE_PREDICTION_AUDIT_FILE, read_json(PREDICTION_AUDIT_FILE, {}), 'Update ArabSniper prediction audit')}")
         for day_payload in output.get("days", []) or []:
@@ -5392,7 +5395,11 @@ def capture_prematch_predictions(output: Mapping[str, Any]) -> Dict[str, Any]:
 
 def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countries: Sequence[str]) -> Dict[str, Any]:
     output = _scan_dates_before_prematch_audit(client, target_dates, excluded_countries)
-    capture_prematch_predictions(output)
+    from prematch_audit import settle_predictions, build_report
+    store = capture_prematch_predictions(output)
+    settle_predictions(store, output)
+    atomic_write_json(PREMATCH_AUDIT_FILE, store)
+    atomic_write_json(DATA_DIR / "arab_quote_prematch_report.json", build_report(store))
     return output
 
 if __name__ == "__main__":
