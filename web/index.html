@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<!-- Mirrored from arabsniperbet.com/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 01 Apr 2026 09:14:02 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta name="google-site-verification" content="1dsEbhe4B9fCxCoJcXdmURjbdcy6SDsk0rNp2Z8C-mw" />
+    <title>ArabSniperBet | Football Goal Probability Scanner</title>
+    <meta name="description" content="ArabSniperBet analizza partite di calcio tramite quote bookmaker, segnali HT/FT, movimenti di mercato e filtri statistici per individuare opportunità ad alta priorità.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="index.html">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --primary-gold: #FFD700;
+            --boost-green: #006400;
+            --over-light: #90EE90;
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --panel-bg: #0e1117;
+            --panel-2: #151922;
+            --soft-text: #d8d8d8;
+            --text-soft: #d7d7d7;
+            --line: #2b2b2b;
+            --telegram: #229ED9;
+            --live-green: #2cff72;
+            --cyan: #00e5ff;
+            --danger-red: #ff6363;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .btn-access {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: 1px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .logo-img {
+            width: 300px;
+            max-width: 90%;
+            margin-top: 20px;
+            border-radius: 15px;
+            border: 2px solid var(--primary-gold);
+        }
+
+        @keyframes goldPulse {
+            0% { box-shadow: 0 0 5px #FFD700; }
+            50% { background-color: #fff2a3 !important; box-shadow: 0 0 20px #FFD700; }
+            100% { box-shadow: 0 0 5px #FFD700; }
+        }
+
+        @keyframes livePulse {
+            0% { box-shadow: 0 0 4px rgba(44,255,114,0.5); opacity: 1; }
+            50% { box-shadow: 0 0 14px rgba(44,255,114,1); opacity: 0.85; }
+            100% { box-shadow: 0 0 4px rgba(44,255,114,0.5); opacity: 1; }
+        }
+
+        @keyframes blinkGoldText {
+            0% { opacity: 1; text-shadow: 0 0 4px rgba(255,215,0,0.35); }
+            50% { opacity: 0.45; text-shadow: 0 0 12px rgba(255,215,0,0.95); }
+            100% { opacity: 1; text-shadow: 0 0 4px rgba(255,215,0,0.35); }
+        }
+
+        .hero-sub {
+            max-width: 920px;
+            margin: 12px auto 6px;
+            color: var(--soft-text);
+            line-height: 1.65;
+            font-size: 0.98rem;
+        }
+
+        .hero-links {
+            margin: 18px auto 0;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero-link-btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid var(--primary-gold);
+            color: var(--primary-gold);
+            background: transparent;
+        }
+
+        .hero-link-btn.telegram {
+            border-color: var(--telegram);
+            color: #7fd8ff;
+        }
+
+        .hero-link-btn.secondary {
+            border-color: rgba(255,255,255,0.18);
+            color: #f1f1f1;
+        }
+
+        .live-status-bar {
+            margin: 18px auto 8px;
+            max-width: 760px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(180deg, rgba(44,255,114,0.07) 0%, rgba(17,24,39,0.95) 100%);
+            border: 1px solid rgba(44,255,114,0.35);
+            border-radius: 999px;
+            padding: 12px 18px;
+            color: #eafdf0;
+            font-size: 0.94rem;
+            font-weight: 700;
+            flex-wrap: wrap;
+        }
+
+        .live-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: var(--live-green);
+            animation: livePulse 1.6s infinite;
+            flex: 0 0 auto;
+        }
+
+        .live-text { color: #dfffe9; }
+        .live-time {
+            color: var(--primary-gold);
+            font-weight: 800;
+        }
+
+        .contact-box {
+            margin: 20px 0 10px;
+            background: linear-gradient(180deg, rgba(255,215,0,0.06) 0%, rgba(17,24,39,0.96) 100%);
+            border: 1px solid rgba(255,215,0,0.25);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: left;
+        }
+
+        .contact-title {
+            color: var(--primary-gold);
+            font-weight: 800;
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+        }
+
+        .contact-sub {
+            color: var(--soft-text);
+            font-size: 0.92rem;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 14px;
+        }
+
+        .contact-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,215,0,0.14);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .contact-card b {
+            color: var(--primary-gold);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .contact-line {
+            color: #fff;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .contact-btn {
+            display: inline-block;
+            padding: 10px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid var(--primary-gold);
+            color: var(--primary-gold);
+            background: transparent;
+        }
+
+        .contact-btn.telegram {
+            border-color: var(--telegram);
+            color: #7fd8ff;
+        }
+
+        .contact-gift-line {
+            margin-top: 10px;
+            font-size: 0.98rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.5;
+        }
+
+        .blink-gold {
+            color: var(--primary-gold);
+            animation: blinkGoldText 1.2s infinite;
+        }
+
+        .algo-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 22px 0 12px;
+        }
+
+        .algo-box {
+            background: linear-gradient(180deg, rgba(255,215,0,0.08) 0%, rgba(17,17,17,0.95) 100%);
+            border: 1px solid rgba(255,215,0,0.25);
+            border-radius: 14px;
+            padding: 14px 12px;
+            text-align: left;
+        }
+
+        .algo-box b {
+            display: block;
+            color: var(--primary-gold);
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .algo-box span {
+            color: #e9e9e9;
+            font-size: 0.83rem;
+            line-height: 1.45;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 14px 10px;
+            border-bottom: 1px solid #333;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        th {
+            background: #222;
+            color: var(--primary-gold);
+        }
+
+        .row-boost {
+            background-color: var(--boost-green) !important;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .row-gold-pulse {
+            animation: goldPulse 2s infinite;
+            background-color: var(--primary-gold) !important;
+            color: black !important;
+            font-weight: bold;
+        }
+
+        .row-dark {
+            background: #1c1c1c !important;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .premium-blur {
+            filter: blur(4px);
+            opacity: 0.62;
+        }
+
+        .section-box {
+            margin-top: 38px;
+            border: 1px solid rgba(255,215,0,0.20);
+            background: linear-gradient(180deg, rgba(255,215,0,0.04) 0%, rgba(17,17,17,0.96) 100%);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: left;
+        }
+
+        .section-box h2,
+        .section-box h3 {
+            color: var(--primary-gold);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .section-box p {
+            color: #ddd;
+            line-height: 1.65;
+            font-size: 0.95rem;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            color: var(--primary-gold);
+            margin: 0 6px 6px 0;
+        }
+
+        .small-muted {
+            color: #bfbfbf;
+            font-size: 0.82rem;
+            line-height: 1.45;
+        }
+
+        .history-box {
+            margin-top: 42px;
+            background: #111;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid var(--primary-gold);
+            text-align: left;
+        }
+
+        .win-tag {
+            color: var(--primary-gold);
+            font-weight: bold;
+        }
+
+        .btn-modal-trigger {
+            background: transparent;
+            color: var(--primary-gold);
+            border: 1px solid var(--primary-gold);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px;
+            font-weight: bold;
+        }
+
+        .software-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 18px;
+            margin-top: 16px;
+        }
+
+        .software-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,215,0,0.16);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .showcase-card {
+            background: #121212;
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid rgba(255,215,0,0.16);
+        }
+
+        .showcase-card h4 {
+            margin: 0 0 6px;
+            color: var(--primary-gold);
+            font-size: 1rem;
+        }
+
+        .showcase-meta {
+            font-size: 0.86rem;
+            color: #cfcfcf;
+            margin-bottom: 10px;
+        }
+
+        .showcase-note {
+            font-size: 0.88rem;
+            line-height: 1.55;
+            color: #efefef;
+        }
+
+        .confidence {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255,215,0,0.12);
+            color: var(--primary-gold);
+            border: 1px solid rgba(255,215,0,0.30);
+            font-weight: 800;
+            font-size: 0.82rem;
+        }
+
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .method-card {
+            background: #121212;
+            border-radius: 12px;
+            padding: 14px;
+            border: 1px solid rgba(255,215,0,0.15);
+        }
+
+        .method-card b {
+            display: block;
+            color: var(--primary-gold);
+            margin-bottom: 6px;
+        }
+
+        .method-card span {
+            color: #e9e9e9;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .premium-preview-intro {
+            margin-bottom: 8px;
+            color: #ddd;
+            line-height: 1.6;
+            font-size: 0.94rem;
+        }
+
+        .explore-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .explore-mini-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .explore-mini-card a {
+            color: var(--primary-gold);
+            text-decoration: none;
+            font-weight: 800;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .explore-mini-card p {
+            margin: 0;
+            color: #ddd;
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        .premium-section {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 0.95fr 1.05fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .why-gold-box {
+            border: 1px solid rgba(255,215,0,0.25);
+            background: rgba(255, 215, 0, 0.04);
+            border-radius: 16px;
+            padding: 22px;
+            text-align: left;
+            height: 100%;
+        }
+
+        .why-gold-box h3 {
+            margin: 0 0 8px;
+            color: var(--primary-gold);
+            text-align: center;
+        }
+
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .why-card {
+            background: #121212;
+            border-radius: 12px;
+            padding: 14px;
+            border: 1px solid rgba(255,215,0,0.15);
+        }
+
+        .why-card b {
+            display: block;
+            color: var(--primary-gold);
+            margin-bottom: 6px;
+        }
+
+        .why-card span {
+            color: #e9e9e9;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .free-bet-box {
+            border: 2px dashed var(--primary-gold);
+            padding: 25px;
+            border-radius: 15px;
+            background: rgba(255, 215, 0, 0.05);
+            text-align: left;
+            height: 100%;
+        }
+
+        .free-bet-box h2 {
+            color: var(--primary-gold);
+            margin-bottom: 8px;
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .free-bet-box p {
+            margin-top: 0;
+            color: #ddd;
+            text-align: center;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .plan-card {
+            background: linear-gradient(180deg, rgba(255,215,0,0.08) 0%, rgba(26,26,26,0.95) 100%);
+            border: 1px solid rgba(255,215,0,0.35);
+            border-radius: 16px;
+            padding: 22px 18px;
+            box-shadow: 0 0 18px rgba(255,215,0,0.08);
+        }
+
+        .plan-card.featured {
+            border: 2px solid var(--primary-gold);
+            box-shadow: 0 0 22px rgba(255,215,0,0.18);
+            transform: scale(1.01);
+        }
+
+        .plan-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+            background: rgba(255,215,0,0.12);
+            color: var(--primary-gold);
+            border: 1px solid rgba(255,215,0,0.35);
+        }
+
+        .plan-title {
+            color: var(--primary-gold);
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .plan-price {
+            font-size: 1.9rem;
+            font-weight: 900;
+            margin: 8px 0 6px;
+            text-align: center;
+        }
+
+        .plan-sub {
+            font-size: 0.9rem;
+            color: #d0d0d0;
+            margin-bottom: 16px;
+            min-height: 20px;
+            text-align: center;
+        }
+
+        .plan-desc {
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: #f0f0f0;
+            min-height: 72px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .plan-btn {
+            width: 100%;
+            background: var(--primary-gold);
+            color: black;
+            padding: 14px 18px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .plan-btn:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        .checkout-status {
+            margin-top: 18px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            min-height: 22px;
+            text-align: center;
+        }
+
+        .checkout-status.success { color: #7CFC00; }
+        .checkout-status.error { color: #ff6b6b; }
+        .checkout-status.info { color: var(--primary-gold); }
+
+        .btn-detail,
+        .modal-close {
+            border: 1px solid var(--primary-gold);
+            background: transparent;
+            color: var(--primary-gold);
+            text-decoration: none;
+            font-weight: bold;
+            padding: 9px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn-detail:hover,
+        .modal-close:hover {
+            background: rgba(255, 215, 0, 0.12);
+        }
+
+        .btn-detail {
+            padding: 6px 10px;
+            line-height: 1;
+            font-size: 0.95rem;
+        }
+
+        .btn-detail:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.78);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            z-index: 9999;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-box {
+            width: min(1100px, 100%);
+            max-height: 92vh;
+            overflow-y: auto;
+            background: #0e1117;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.4);
+            text-align: left;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .modal-title {
+            color: var(--primary-gold);
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .modal-sub {
+            color: var(--text-soft);
+            margin-top: 5px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .metric-box {
+            background: var(--panel-2);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #222;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .detail-section {
+            background: var(--panel-2);
+            border: 1px solid #222;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .detail-section h3 {
+            margin-top: 0;
+            color: var(--primary-gold);
+            font-size: 1rem;
+        }
+
+        .detail-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .detail-item {
+            font-size: 0.9rem;
+            color: var(--text-soft);
+            line-height: 1.5;
+        }
+
+        .detail-item b {
+            color: white;
+        }
+
+        .tables-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .mini-table-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .mini-table {
+            width: 100%;
+            min-width: 500px;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 0;
+        }
+
+        .mini-table th {
+            position: static;
+            background: #1a1c23;
+            color: var(--cyan);
+            font-size: 0.78rem;
+            padding: 8px 6px;
+        }
+
+        .mini-table td {
+            font-size: 0.76rem;
+            padding: 7px 6px;
+            color: black;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            background: #fff;
+        }
+
+        .floating-telegram {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 999;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: 999px;
+            background: #1597d3;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        @media (max-width: 1040px) {
+            .software-grid,
+            .premium-section {
+                grid-template-columns: 1fr;
+            }
+
+            .showcase-grid,
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .algo-strip,
+            .contact-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .tables-2col,
+            .detail-list,
+            .method-grid,
+            .explore-mini-grid,
+            .why-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-access {
+                position: static;
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modal-box {
+                padding: 14px;
+            }
+
+            .modal-title {
+                font-size: 1.05rem;
+            }
+
+            .btn-detail,
+            .modal-close {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 16px; }
+
+            th, td {
+                padding: 12px 8px;
+                font-size: 0.82rem;
+            }
+
+            .algo-strip,
+            .contact-grid,
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-sub { font-size: 0.92rem; }
+
+            .live-status-bar {
+                border-radius: 18px;
+                padding: 12px 14px;
+                font-size: 0.88rem;
+            }
+
+            .floating-telegram {
+                right: 12px;
+                left: 12px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button onclick="accessoOroReset()" class="btn-access">🔓 ACCESSO ORO</button>
+
+    <img src="logo1.jpg" alt="Arab Sniper Logo" class="logo-img">
+    <h1>ARAB SNIPER TECH <span style="font-size: 0.4em; color: var(--primary-gold);">v23</span></h1>
+    <p class="hero-sub">
+        Piattaforma di analisi che incrocia quote bookmaker, segnali HT/FT, medie goal e movimenti di mercato
+        per selezionare i match con priorità più alta. I segnali free mostrano una piccola anteprima del sistema,
+        mentre l’area Gold sblocca il dettaglio completo dei match analizzati.
+    </p>
+
+    <div class="hero-links">
+        <a class="hero-link-btn telegram" href="https://t.me/arabsniper_signals" target="_blank" rel="noopener">📣 Telegram Channel</a>
+        <a class="hero-link-btn secondary" href="gold-dashboard-live.html">💎 Vai alla Gold Dashboard</a>
+    </div>
+
+    <div class="live-status-bar">
+        <span class="live-dot"></span>
+        <span class="live-text">Segnale live attivo · ultimo aggiornamento:</span>
+        <span class="live-time" id="live-update-time">caricamento...</span>
+    </div>
+
+    <div class="contact-box">
+        <div class="contact-title">📩 Hai domande prima di entrare in Gold?</div>
+        <div class="contact-sub">
+            Scrivici per informazioni, supporto, accesso alla piattaforma o chiarimenti sui segnali.
+        </div>
+        <div class="contact-grid">
+            <div class="contact-card">
+                <b>Contatti diretti</b>
+                <div class="contact-line">📧 <a href="cdn-cgi/l/email-protection.html" class="__cf_email__" data-cfemail="28495a494a5b4641584d5a5c4d4b40684f45494144064b4745">[email&#160;protected]</a></div>
+                <div class="contact-line">💬 Telegram: @arabsniper_signals</div>
+                <div class="contact-actions">
+                    <a class="contact-btn" href="cdn-cgi/l/email-protection.html#3e5f4c5f5c4d50574e5b4c4a5b5d567e59535f5752105d5153">Scrivi via Email</a>
+                    <a class="contact-btn telegram" href="https://t.me/arabsniper_signals" target="_blank" rel="noopener">Apri Telegram</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <b>Prima di acquistare</b>
+                <div class="small-muted">
+                    Se vuoi capire meglio come funziona Arab Sniper, puoi contattarci prima di attivare Daily, Weekly o Gold.
+                    In questo modo entri con una visione più chiara della piattaforma.
+                </div>
+                <div class="contact-gift-line">
+                    CONTATTACI PER TE I SEGNALI DI UN <span class="blink-gold">WEEKEND GRATIS</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="algo-strip">
+        <div class="algo-box">
+            <b>⚽⭐ GOLD</b>
+            <span>Segnale premium con convergenza alta tra quote, pressione offensiva, medie e struttura del match.</span>
+        </div>
+        <div class="algo-box">
+            <b>🚀 BOOST</b>
+            <span>Match con spinta offensiva forte e contesto statistico favorevole su più indicatori recenti.</span>
+        </div>
+        <div class="algo-box">
+            <b>🎯 PT / ⚽ OVER</b>
+            <span>Segnali mirati sul primo tempo e sull’over finale, costruiti con lettura HT/FT e finestre quota.</span>
+        </div>
+        <div class="algo-box">
+            <b>💎 AREA GOLD</b>
+            <span>Dashboard completa con dettaglio match, quote, medie, ultime 8 gare e segnali filtrati dal sistema.</span>
+        </div>
+    </div>
+
+    <button class="btn-modal-trigger" onclick="openLegendaWindow()">📖 APRI LEGENDA IN NUOVA FINESTRA</button>
+
+    <section class="section-box">
+        <h2>🟢 Segnali Free del Giorno</h2>
+        <p>Una piccola anteprima dei match selezionati oggi dal software. In homepage ne mostriamo solo 2.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ora</th>
+                    <th>Match</th>
+                    <th>Target</th>
+                    <th>Quota</th>
+                    <th>Stats</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr><td colspan="5">Caricamento segnali free...</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="section-box">
+        <h2>🔒 Segnali Premium Riservati</h2>
+        <p class="premium-preview-intro">
+            Una preview oscurata dei segnali premium con priorità più alta rilevati oggi dal software.
+            I match Gold vengono evidenziati con priorità massima.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ora</th>
+                    <th>Match</th>
+                    <th>Target</th>
+                    <th>Quota</th>
+                </tr>
+            </thead>
+            <tbody id="premium-body">
+                <tr><td colspan="4">Preparazione segnali premium oscurati...</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="section-box">
+        <h2>⚙️ Il software in azione</h2>
+        <p>
+            ArabSniperBet analizza quote, movimenti di mercato e dati statistici per individuare segnali ad alta priorità.
+            Qui mostriamo una selezione dei Gold più forti e il modo in cui il sistema costruisce le sue scelte.
+        </p>
+
+        <div class="software-grid">
+            <div class="software-card">
+                <h3>Segnali Gold in evidenza</h3>
+                <p>Una vetrina dei match con convergenza più alta tra struttura quota, trend gara e filtri del software.</p>
+                <div id="gold-showcase" class="showcase-grid">
+                    <div class="showcase-card">
+                        <h4>Caricamento...</h4>
+                        <div class="showcase-meta">Stiamo preparando i Gold principali del giorno.</div>
+                        <div class="showcase-note">Attendi qualche secondo per il completamento del caricamento.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="software-card">
+                <h3>Come lavora ArabSniperBet</h3>
+                <div class="method-grid">
+                    <div class="method-card">
+                        <b>1. Analisi quote</b>
+                        <span>Confronto tra mercati principali, struttura favorita e finestre di quota compatibili col segnale.</span>
+                    </div>
+                    <div class="method-card">
+                        <b>2. Lettura HT/FT</b>
+                        <span>Incrocio tra produzione offensiva, gol medi e pressione nel primo tempo e a fine gara.</span>
+                    </div>
+                    <div class="method-card">
+                        <b>3. Assegnazione tag</b>
+                        <span>Il sistema classifica i match con tag come GOLD, BOOST, PT e OVER in base alla convergenza rilevata.</span>
+                    </div>
+                    <div class="method-card">
+                        <b>4. Monitoraggio risultati</b>
+                        <span>Le analisi vengono archiviate e confrontate con gli esiti reali per costruire storico e casse recenti.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="history-box">
+        <h3 style="margin-top:0; color: var(--primary-gold);">🏆 Le nostre casse recenti</h3>
+        <p style="margin: 0 0 12px; color: #ddd; line-height: 1.6;">
+            Una selezione di match chiusi positivamente tra i segnali monitorati dal software nelle ultime giornate.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Match</th>
+                    <th>Segnale</th>
+                    <th>Quota Ref</th>
+                    <th>Esito</th>
+                </tr>
+            </thead>
+            <tbody id="history-content">
+                <tr><td colspan="5">Caricamento casse verificate...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <section class="section-box">
+        <h2>Approfondisci ArabSniperBet</h2>
+        <p>
+            Entra nella dashboard completa oppure consulta una pagina dedicata di analisi giornaliera.
+        </p>
+        <div class="explore-mini-grid">
+            <div class="explore-mini-card">
+                <a href="gold-dashboard-live.html">Gold Dashboard Live</a>
+                <p>Area premium con segnali completi, filtri avanzati, dettagli match e lettura completa delle partite analizzate.</p>
+            </div>
+            <div class="explore-mini-card">
+                <a href="football-predictions-today.html">Football Predictions Today</a>
+                <p>Pagina secondaria con panoramica giornaliera utile come supporto esterno alla homepage principale.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="premium-section">
+        <div class="why-gold-box">
+            <h3>Perché entrare in Gold</h3>
+            <div class="why-grid">
+                <div class="why-card">
+                    <b>Dashboard live completa</b>
+                    <span>Non solo 2 segnali free: vedi il flusso completo con filtri, priorità e ordinamento dedicato.</span>
+                </div>
+                <div class="why-card">
+                    <b>Dettaglio completo match</b>
+                    <span>Lente 🔎 con quote, medie HT/FT, flags e ultime 8 partite home e away.</span>
+                </div>
+                <div class="why-card">
+                    <b>Più segnali, meno rumore</b>
+                    <span>Accedi al flusso premium completo, non solo alla piccola anteprima mostrata in homepage.</span>
+                </div>
+                <div class="why-card">
+                    <b>Accesso rapido e flessibile</b>
+                    <span>Scegli tra pass giornaliero, settimanale o Gold mensile senza cambiare esperienza utente.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="free-bet-box">
+            <h2>🎯 Sblocca la Dashboard Gold Live</h2>
+            <p>
+                Segui lo scanner completo, apri il dettaglio match e consulta la dashboard premium senza perdere il ritmo della giornata.
+            </p>
+
+            <div class="plans-grid">
+                <div class="plan-card">
+                    <div class="plan-badge">DAY PASS</div>
+                    <div class="plan-title">Arab Sniper Daily</div>
+                    <div class="plan-price">€3</div>
+                    <div class="plan-sub">Accesso 24 ore</div>
+                    <div class="plan-desc">
+                        Ideale per testare il servizio in una giornata live con accesso rapido all’area premium.
+                    </div>
+                    <button class="plan-btn" onclick="buy('daily', this)">SBLOCCA DAILY</button>
+                </div>
+
+                <div class="plan-card">
+                    <div class="plan-badge">WEEK PASS</div>
+                    <div class="plan-title">Arab Sniper Weekly</div>
+                    <div class="plan-price">€7</div>
+                    <div class="plan-sub">Accesso 7 giorni</div>
+                    <div class="plan-desc">
+                        Pensato per chi vuole seguire più scan e più giornate senza entrare nel mensile.
+                    </div>
+                    <button class="plan-btn" onclick="buy('weekly', this)">SBLOCCA WEEKLY</button>
+                </div>
+
+                <div class="plan-card featured">
+                    <div class="plan-badge">MONTHLY GOLD</div>
+                    <div class="plan-title">Arab Sniper Gold</div>
+                    <div class="plan-price">€19</div>
+                    <div class="plan-sub">Abbonamento mensile</div>
+                    <div class="plan-desc">
+                        Accesso completo continuativo all’area Gold, soluzione principale per utenti registrati premium.
+                    </div>
+                    <button class="plan-btn" onclick="buy('monthly', this)">ATTIVA GOLD</button>
+                </div>
+            </div>
+
+            <div id="checkout-status" class="checkout-status"></div>
+        </div>
+    </div>
+</div>
+
+<div id="detail-modal" class="modal-overlay" onclick="closeModalFromOverlay(event)">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div>
+                <h2 id="modal-title" class="modal-title">Dettagli partita</h2>
+                <div id="modal-sub" class="modal-sub"></div>
+            </div>
+            <button class="modal-close" onclick="closeModal()">Chiudi</button>
+        </div>
+
+        <div id="modal-tags" style="margin-bottom: 12px;"></div>
+
+        <div id="modal-metrics" class="metrics-grid"></div>
+
+        <div class="detail-section">
+            <h3>📊 Medie e Flags</h3>
+            <div id="modal-flags" class="detail-list"></div>
+        </div>
+
+        <div class="tables-2col">
+            <div class="detail-section">
+                <h3 id="home-last-title">🏠 Ultime 8 Home</h3>
+                <div class="mini-table-wrap">
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Lega</th>
+                                <th>Match</th>
+                                <th>HT</th>
+                                <th>FT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="home-last-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3 id="away-last-title">✈️ Ultime 8 Away</h3>
+                <div class="mini-table-wrap">
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Lega</th>
+                                <th>Match</th>
+                                <th>HT</th>
+                                <th>FT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="away-last-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a class="floating-telegram" href="https://t.me/arabsniper_signals" target="_blank" rel="noopener">
+    📣 Join Telegram
+</a>
+
+<script data-cfasync="false" src="cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+    const github_url = 'https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper/main/data.json?v=' + Date.now();
+    const details_day1_url = 'https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper/main/details_day1.json?v=' + Date.now();
+    const last_update_url = 'https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper/main/last_fast_update.json?v=' + Date.now();
+    const casse_recenti_url = 'https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper/main/casse_recenti.json?v=' + Date.now();
+
+    let currentDetails = {};
+    let freeSelectionMap = {};
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function openLegendaWindow() {
+        const width = 760;
+        const height = 820;
+        const left = (window.screen.width / 2) - (width / 2);
+        const top = (window.screen.height / 2) - (height / 2);
+
+        const legendaWindow = window.open("", "LegendaArabSniper", `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`);
+
+        legendaWindow.document.write(`
+            <html>
+            <head>
+                <title>Legenda Tecnica Arab Sniper</title>
+                <style>
+                    body { background-color: #0a0a0a; color: white; font-family: 'Segoe UI', sans-serif; padding: 25px; line-height: 1.6; }
+                    h2 { color: #FFD700; text-align: center; border-bottom: 2px solid #FFD700; padding-bottom: 10px; }
+                    h4 { color: #FFD700; margin-bottom: 5px; text-transform: uppercase; border-left: 4px solid #FFD700; padding-left: 10px; margin-top: 25px; }
+                    p { margin-bottom: 15px; font-size: 0.95rem; }
+                    .color-sample { display: inline-block; width: 18px; height: 18px; vertical-align: middle; border-radius: 3px; margin-right: 10px; }
+                </style>
+            </head>
+            <body>
+                <h2>📖 GUIDA TECNICA ARAB SNIPER</h2>
+
+                <h4>1. Significato dei Tag</h4>
+                <p><b>⚽⭐ GOLD:</b> segnale premium con convergenza alta tra quote, struttura partita e filtri statistici.</p>
+                <p><b>🚀 BOOST:</b> match con spinta offensiva forte e contesto favorevole su più indicatori recenti.</p>
+                <p><b>🎯 PT:</b> segnale orientato al primo tempo sulla base di pressione, medie HT e produzione iniziale.</p>
+                <p><b>⚽ OVER:</b> match con profilo compatibile con over finale, supportato da struttura quota e dati gara.</p>
+
+                <h4>2. Lettura visiva dei match</h4>
+                <p><span class="color-sample" style="background: #FFD700;"></span> <b>GIALLO:</b> priorità GOLD.</p>
+                <p><span class="color-sample" style="background: #006400;"></span> <b>VERDE SCURO:</b> priorità BOOST.</p>
+                <p><span class="color-sample" style="background: #1c1c1c;"></span> <b>SCURO:</b> altri segnali premium non mostrati nel free.</p>
+
+                <h4>3. Come leggere la homepage</h4>
+                <p>I segnali free mostrano solo una piccola anteprima giornaliera.</p>
+                <p>I premium oscurati fanno vedere la presenza di analisi forti senza esporre il contenuto completo.</p>
+                <p>La dashboard Gold sblocca dettaglio match, segnali completi, quote e statistiche estese.</p>
+
+                <h4>4. Valutazione corretta</h4>
+                <p>Meglio valutare i match con <b>più segnali contemporaneamente</b> e con una struttura quota coerente.</p>
+                <p>L’homepage mostra il meglio in forma sintetica; l’area Gold è la vista operativa completa del software.</p>
+            </body>
+            </html>
+        `);
+    }
+
+    function accessoOroReset() {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "gold-dashboard-livef601.html?logout=true";
+    }
+
+    function setCheckoutStatus(message, type = "info") {
+        const statusEl = document.getElementById("checkout-status");
+        statusEl.className = `checkout-status ${type}`;
+        statusEl.textContent = message;
+    }
+
+    async function buy(plan, buttonEl) {
+        const allButtons = document.querySelectorAll('.plan-btn');
+
+        try {
+            allButtons.forEach(btn => btn.disabled = true);
+            if (buttonEl) buttonEl.textContent = "ATTENDI...";
+
+            setCheckoutStatus("Connessione sicura a Stripe in corso...", "info");
+
+            const response = await fetch("/api/create-checkout-session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ plan })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.url) {
+                throw new Error(data.error || "Errore nella creazione della sessione di pagamento.");
+            }
+
+            setCheckoutStatus("Checkout aperto in una nuova scheda.", "success");
+            window.open(data.url, "_blank");
+
+            allButtons.forEach(btn => btn.disabled = false);
+            if (buttonEl) {
+                if (plan === "daily") buttonEl.textContent = "SBLOCCA DAILY";
+                if (plan === "weekly") buttonEl.textContent = "SBLOCCA WEEKLY";
+                if (plan === "monthly") buttonEl.textContent = "ATTIVA GOLD";
+            }
+
+        } catch (error) {
+            console.error("Errore checkout:", error);
+            setCheckoutStatus(error.message || "Errore di connessione al checkout.", "error");
+            allButtons.forEach(btn => btn.disabled = false);
+            if (buttonEl) {
+                if (plan === "daily") buttonEl.textContent = "SBLOCCA DAILY";
+                if (plan === "weekly") buttonEl.textContent = "SBLOCCA WEEKLY";
+                if (plan === "monthly") buttonEl.textContent = "ATTIVA GOLD";
+            }
+        }
+    }
+
+    function handleUrlMessages() {
+        const params = new URLSearchParams(window.location.search);
+
+        if (params.get("canceled") === "true") {
+            setCheckoutStatus("Pagamento annullato. Nessun addebito effettuato.", "error");
+        }
+
+        if (params.get("success") === "true") {
+            setCheckoutStatus("Pagamento completato. Verifica accesso premium in corso.", "success");
+        }
+    }
+
+    function normalizeDataPayload(payload) {
+        if (Array.isArray(payload)) return payload;
+        if (payload && Array.isArray(payload.results)) return payload.results;
+        if (payload && Array.isArray(payload.data)) return payload.data;
+        return [];
+    }
+
+    function isGold(item) { return (item.Info || "").includes("GOLD"); }
+    function isBoost(item) { return (item.Info || "").includes("BOOST"); }
+    function isOver(item) { return (item.Info || "").includes("OVER"); }
+    function isPT(item) {
+        const info = String(item.Info || "");
+        return info.includes("PT") || info.includes("PTGG") || info.includes("PTO1.5");
+    }
+
+    function getSignalPriority(item) {
+        if (isGold(item)) return 1;
+        if (isBoost(item)) return 2;
+        if (isOver(item)) return 3;
+        if (isPT(item)) return 4;
+        return 9;
+    }
+
+    function getTargetLabel(item) {
+        const info = String(item.Info || "");
+        if (info.includes("GOLD")) return "GOLD TARGET";
+        if (info.includes("BOOST")) return "BOOST TARGET";
+        if (info.includes("PTO1.5")) return "PT 1.5";
+        if (info.includes("PTGG")) return "PT GG";
+        if (info.includes("OVER")) return "OVER 2.5";
+        if (info.includes("PT")) return "PT TARGET";
+        return "SNIPER PICK";
+    }
+
+    function getQuoteValue(item) {
+        if (isGold(item)) {
+            const odds = String(item["1X2"] || "");
+            if (odds.includes("|")) {
+                const parts = odds.split("|").map(x => x.trim()).filter(Boolean);
+                return parts[0] || "N/D";
+            }
+            return odds || "N/D";
+        }
+        if (isBoost(item) || isOver(item)) return item["O2.5"] || "N/D";
+        return item["O2.5"] || item["1X2"] || "N/D";
+    }
+
+    function getLeagueValue(item) {
+        return item.Lega || item.League || item.Campionato || item.Country || item.Nazione || "—";
+    }
+
+    function safeFixtureId(item) {
+        return String(item.Fixture_ID || item.FixtureID || item.fixture_id || '').trim();
+    }
+
+    function getInfoTags(item) {
+        const info = String(item.Info || "");
+        const tags = [];
+        if (info.includes("GOLD")) tags.push("GOLD");
+        if (info.includes("BOOST")) tags.push("BOOST");
+        if (info.includes("PTO1.5")) tags.push("PT1.5");
+        if (info.includes("PTGG")) tags.push("PTGG");
+        else if (info.includes("PT")) tags.push("PT");
+        if (info.includes("OVER")) tags.push("OVER");
+        return tags;
+    }
+
+    function buildConfidenceLabel(item) {
+        if (isGold(item)) return "Affidabilità analitica: Alta";
+        if (isBoost(item)) return "Affidabilità analitica: Buona";
+        if (isOver(item) || isPT(item)) return "Affidabilità analitica: Monitorata";
+        return "Affidabilità analitica: Standard";
+    }
+
+    function buildSoftwareNote(item) {
+        if (isGold(item)) return "Convergenza forte tra struttura quota, selezione del favorito e pressione statistica.";
+        if (isBoost(item)) return "Match sostenuto da spinta offensiva e contesto compatibile su più filtri recenti.";
+        if (isOver(item)) return "Profilo gara orientato verso sviluppo over e produzione offensiva finale.";
+        if (isPT(item)) return "Segnale primo tempo rilevato su ritmo iniziale, medie HT e struttura partita.";
+        return "Match filtrato dal software.";
+    }
+
+    function renderFreeSignals(data) {
+        const tableBody = document.getElementById('table-body');
+        tableBody.innerHTML = '';
+
+        const sorted = [...data]
+            .filter(s => isGold(s) || isBoost(s))
+            .sort((a, b) => {
+                const p = getSignalPriority(a) - getSignalPriority(b);
+                if (p !== 0) return p;
+                return String(a.Ora || '').localeCompare(String(b.Ora || ''));
+            });
+
+        const freeSelection = sorted.slice(0, 2);
+        freeSelectionMap = {};
+
+        if (freeSelection.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5">Nessun segnale free disponibile al momento.</td></tr>';
+            return [];
+        }
+
+        freeSelection.forEach((s) => {
+            const rowClass = isGold(s) ? 'row-gold-pulse' : 'row-boost';
+            const fid = safeFixtureId(s);
+            if (fid) freeSelectionMap[fid] = s;
+
+            tableBody.innerHTML += `
+                <tr class="${rowClass}">
+                    <td>${escapeHtml(s.Ora || '')}</td>
+                    <td>${escapeHtml(s.Match || '')}</td>
+                    <td>${escapeHtml(getTargetLabel(s))}</td>
+                    <td>${escapeHtml(getQuoteValue(s))}</td>
+                    <td>
+                        <button
+                            class="btn-detail"
+                            onclick="openMatchModal('${escapeHtml(fid)}')"
+                            ${fid ? '' : 'disabled'}
+                            title="Apri statistiche complete">
+                            🔎
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        return freeSelection;
+    }
+
+    function buildPremiumSelection(data, usedFree) {
+        const freeKeys = new Set((usedFree || []).map(s => `${s.Data}|${s.Match}|${s.Ora}`));
+
+        const eligible = [...data]
+            .filter(s => isGold(s) || isBoost(s) || isOver(s) || isPT(s))
+            .sort((a, b) => {
+                const p = getSignalPriority(a) - getSignalPriority(b);
+                if (p !== 0) return p;
+                return String(a.Ora || '').localeCompare(String(b.Ora || ''));
+            });
+
+        const goldOnly = eligible.filter(s =>
+            isGold(s) && !freeKeys.has(`${s.Data}|${s.Match}|${s.Ora}`)
+        );
+
+        if (goldOnly.length >= 4) return goldOnly.slice(0, 4);
+
+        const usedKeys = new Set();
+        const combined = [];
+
+        goldOnly.forEach(s => {
+            const key = `${s.Data}|${s.Match}|${s.Ora}|${getTargetLabel(s)}`;
+            if (!usedKeys.has(key)) {
+                usedKeys.add(key);
+                combined.push(s);
+            }
+        });
+
+        const nonFreeEligible = eligible.filter(s => !freeKeys.has(`${s.Data}|${s.Match}|${s.Ora}`));
+        for (const s of nonFreeEligible) {
+            if (combined.length >= 4) break;
+            const key = `${s.Data}|${s.Match}|${s.Ora}|${getTargetLabel(s)}`;
+            if (!usedKeys.has(key)) {
+                usedKeys.add(key);
+                combined.push(s);
+            }
+        }
+
+        for (const s of eligible) {
+            if (combined.length >= 4) break;
+            const key = `${s.Data}|${s.Match}|${s.Ora}|${getTargetLabel(s)}`;
+            if (!usedKeys.has(key)) {
+                usedKeys.add(key);
+                combined.push(s);
+            }
+        }
+
+        return combined.slice(0, 4);
+    }
+
+    function renderPremiumSignals(data, usedFree) {
+        const premiumBody = document.getElementById('premium-body');
+        premiumBody.innerHTML = '';
+
+        const premiumSelection = buildPremiumSelection(data, usedFree);
+
+        if (premiumSelection.length === 0) {
+            premiumBody.innerHTML = '<tr><td colspan="4">Area premium in aggiornamento...</td></tr>';
+            return;
+        }
+
+        premiumSelection.forEach(s => {
+            const rowClass = isGold(s) ? 'row-gold-pulse' : (isBoost(s) ? 'row-boost' : 'row-dark');
+            premiumBody.innerHTML += `
+                <tr class="${rowClass} premium-blur">
+                    <td>${escapeHtml(s.Ora || '')}</td>
+                    <td>ACCESSO RISERVATO GOLD</td>
+                    <td>${escapeHtml(getTargetLabel(s))}</td>
+                    <td>${escapeHtml(getQuoteValue(s))}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function renderGoldShowcase(data) {
+        const wrap = document.getElementById('gold-showcase');
+        if (!wrap) return;
+
+        const selected = [...data]
+            .filter(s => isGold(s) || isBoost(s))
+            .sort((a, b) => {
+                const p = getSignalPriority(a) - getSignalPriority(b);
+                if (p !== 0) return p;
+                return String(a.Ora || '').localeCompare(String(b.Ora || ''));
+            })
+            .slice(0, 3);
+
+        if (!selected.length) {
+            wrap.innerHTML = `
+                <div class="showcase-card">
+                    <h4>Nessun Gold disponibile</h4>
+                    <div class="showcase-meta">La vetrina si aggiorna con i prossimi scan.</div>
+                    <div class="showcase-note">Appena il sistema rileva segnali forti, compariranno qui.</div>
+                </div>
+            `;
+            return;
+        }
+
+        wrap.innerHTML = selected.map(item => {
+            const tags = getInfoTags(item);
+            return `
+                <div class="showcase-card">
+                    <h4>${escapeHtml(item.Match || 'Match')}</h4>
+                    <div class="showcase-meta">${escapeHtml(getLeagueValue(item))} · ${escapeHtml(item.Ora || '')}</div>
+                    <div style="margin-bottom:8px;">${tags.map(tag => `<span class="pill">${escapeHtml(tag)}</span>`).join('')}</div>
+                    <div class="showcase-note">${escapeHtml(buildSoftwareNote(item))}</div>
+                    <span class="confidence">${escapeHtml(buildConfidenceLabel(item))}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function formatDateTimeForItaly(value) {
+        try {
+            const date = new Date(value);
+            if (isNaN(date.getTime())) throw new Error("Data non valida");
+            return new Intl.DateTimeFormat('it-IT', {
+                timeZone: 'Europe/Rome',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(date);
+        } catch (_) {
+            return value || 'aggiornamento recente';
+        }
+    }
+
+    async function updateLiveStatus() {
+        const liveEl = document.getElementById('live-update-time');
+
+        try {
+            const response = await fetch(last_update_url, { cache: "no-store" });
+            const payload = await response.json();
+
+            const rawValue =
+                payload?.last_fast_update ||
+                payload?.updated_at ||
+                payload?.last_update ||
+                payload?.timestamp ||
+                payload?.date ||
+                payload?.datetime;
+
+            if (rawValue) {
+                liveEl.textContent = formatDateTimeForItaly(rawValue);
+                return;
+            }
+
+            liveEl.textContent = formatDateTimeForItaly(new Date().toISOString());
+        } catch (_) {
+            liveEl.textContent = formatDateTimeForItaly(new Date().toISOString());
+        }
+    }
+
+    function getCassaDate(row) {
+        return row?.date || row?.data || row?.giorno || row?.day || '';
+    }
+
+    function getCassaMatch(row) {
+        return row?.match || row?.partita || row?.evento || row?.game || '';
+    }
+
+    function getCassaSignal(row) {
+        return row?.signal || row?.segnale || row?.pick || row?.target || '';
+    }
+
+    function getCassaQuote(row) {
+        return row?.quote || row?.quota || row?.quota_ref || row?.odds || '';
+    }
+
+    function getCassaResult(row) {
+        return row?.result || row?.esito || row?.status || '';
+    }
+
+    async function loadRecentCasse() {
+        const historyArea = document.getElementById('history-content');
+
+        try {
+            const response = await fetch(casse_recenti_url, { cache: "no-store" });
+            if (!response.ok) throw new Error("casse_recenti.json non trovato");
+
+            const rows = await response.json();
+            renderRecentCasse(rows);
+        } catch (error) {
+            console.error("Errore caricamento casse_recenti.json:", error);
+            historyArea.innerHTML = `<tr><td colspan="5">Casse verificate non disponibili.</td></tr>`;
+        }
+    }
+
+    function renderRecentCasse(rows) {
+        const historyArea = document.getElementById('history-content');
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            historyArea.innerHTML = `<tr><td colspan="5">Casse verificate non disponibili.</td></tr>`;
+            return;
+        }
+
+        historyArea.innerHTML = rows.slice(0, 6).map(w => `
+            <tr>
+                <td>${escapeHtml(getCassaDate(w))}</td>
+                <td>${escapeHtml(getCassaMatch(w))}</td>
+                <td><span class="pill">${escapeHtml(getCassaSignal(w))}</span></td>
+                <td>${escapeHtml(getCassaQuote(w))}</td>
+                <td><span class="win-tag">${escapeHtml(getCassaResult(w))}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    function buildMetricBox(label, value) {
+        return `
+            <div class="metric-box">
+                <div class="metric-label">${escapeHtml(label)}</div>
+                <div class="metric-value">${escapeHtml(value)}</div>
+            </div>
+        `;
+    }
+
+    function buildHistoryRows(rows) {
+        if (!Array.isArray(rows) || rows.length === 0) {
+            return `<tr><td colspan="5">Nessun dato disponibile</td></tr>`;
+        }
+
+        return rows.map(r => `
+            <tr>
+                <td>${escapeHtml(r.date || '')}</td>
+                <td>${escapeHtml(r.league || '')}</td>
+                <td>${escapeHtml(r.match || '')}</td>
+                <td>${escapeHtml(r.ht || '')}</td>
+                <td>${escapeHtml(r.ft || '')}</td>
+            </tr>
+        `).join('');
+    }
+
+    function openMatchModal(fixtureId) {
+        const detail = currentDetails[String(fixtureId)];
+
+        if (!detail) {
+            alert("Dettagli non disponibili per questa partita.");
+            return;
+        }
+
+        document.getElementById('modal-title').innerText = detail.match || 'Dettagli partita';
+        document.getElementById('modal-sub').innerHTML = `
+            <b>Data:</b> ${escapeHtml(detail.date || '')} &nbsp; | &nbsp;
+            <b>Ora:</b> ${escapeHtml(detail.time || '')} &nbsp; | &nbsp;
+            <b>Lega:</b> ${escapeHtml(detail.league || '')} (${escapeHtml(detail.country || '')})
+        `;
+
+        const tags = Array.isArray(detail.tags) ? detail.tags : [];
+        document.getElementById('modal-tags').innerHTML = tags.length
+            ? tags.map(tag => `<span class="pill">${escapeHtml(tag)}</span>`).join('')
+            : `<span class="pill">N/D</span>`;
+
+        const markets = detail.markets || {};
+        const averages = detail.averages || {};
+        const flags = detail.flags || {};
+
+        document.getElementById('modal-metrics').innerHTML = [
+            buildMetricBox('1', markets.q1 ?? '0'),
+            buildMetricBox('X', markets.qx ?? '0'),
+            buildMetricBox('2', markets.q2 ?? '0'),
+            buildMetricBox('O2.5', markets.o25 ?? '0'),
+            buildMetricBox('O0.5 HT', markets.o05ht ?? '0'),
+            buildMetricBox('O1.5 HT', markets.o15ht ?? '0'),
+            buildMetricBox('AVG FT Home', averages.home_avg_ft ?? '0'),
+            buildMetricBox('AVG FT Away', averages.away_avg_ft ?? '0'),
+            buildMetricBox('AVG HT Home', averages.home_avg_ht ?? '0'),
+            buildMetricBox('AVG HT Away', averages.away_avg_ht ?? '0'),
+            buildMetricBox('AVG HT Combo', averages.combined_ht_avg ?? '0'),
+            buildMetricBox('Fav Quote', flags.fav_quote ?? '0')
+        ].join('');
+
+        document.getElementById('modal-flags').innerHTML = `
+            <div class="detail-item"><b>Home Team:</b> ${escapeHtml(detail.home_team || '')}</div>
+            <div class="detail-item"><b>Away Team:</b> ${escapeHtml(detail.away_team || '')}</div>
+            <div class="detail-item"><b>Gold Zone:</b> ${flags.is_gold_zone ? '✅ Sì' : '❌ No'}</div>
+            <div class="detail-item"><b>Home last 2H zero:</b> ${flags.home_last_2h_zero ? '✅ Sì' : '❌ No'}</div>
+            <div class="detail-item"><b>Away last 2H zero:</b> ${flags.away_last_2h_zero ? '✅ Sì' : '❌ No'}</div>
+            <div class="detail-item"><b>Mercati validati:</b> ${escapeHtml(tags.join(' ') || 'N/D')}</div>
+        `;
+
+        document.getElementById('home-last-title').innerText = `🏠 Ultime 8 ${detail.home_team || 'Home'}`;
+        document.getElementById('away-last-title').innerText = `✈️ Ultime 8 ${detail.away_team || 'Away'}`;
+        document.getElementById('home-last-body').innerHTML = buildHistoryRows(detail.home_last_8 || []);
+        document.getElementById('away-last-body').innerHTML = buildHistoryRows(detail.away_last_8 || []);
+
+        document.getElementById('detail-modal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        document.getElementById('detail-modal').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function closeModalFromOverlay(event) {
+        if (event.target.id === 'detail-modal') {
+            closeModal();
+        }
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeModal();
+    });
+
+    async function initPage() {
+        try {
+            updateLiveStatus();
+
+            const [dataResponse, detailsResponse] = await Promise.all([
+                fetch(github_url, { cache: "no-store" }),
+                fetch(details_day1_url, { cache: "no-store" }).catch(() => null)
+            ]);
+
+            const dataPayload = await dataResponse.json();
+            const data = normalizeDataPayload(dataPayload);
+
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error("Formato data.json non valido.");
+            }
+
+            if (detailsResponse && detailsResponse.ok) {
+                const detailsPayload = await detailsResponse.json();
+                currentDetails = detailsPayload?.details || {};
+            } else {
+                currentDetails = {};
+            }
+
+            const freeUsed = renderFreeSignals(data);
+            renderPremiumSignals(data, freeUsed);
+            renderGoldShowcase(data);
+
+            await loadRecentCasse();
+
+        } catch (err) {
+            console.error("Errore index:", err);
+            document.getElementById('table-body').innerHTML =
+                '<tr><td colspan="5">Errore nel caricamento dei segnali free.</td></tr>';
+            document.getElementById('premium-body').innerHTML =
+                '<tr><td colspan="4">Errore nel caricamento dei segnali premium.</td></tr>';
+            document.getElementById('history-content').innerHTML =
+                '<tr><td colspan="5">Errore nel caricamento dello storico.</td></tr>';
+            document.getElementById('gold-showcase').innerHTML =
+                '<div class="showcase-card"><h4>Errore caricamento</h4><div class="showcase-note">La vetrina Gold non è disponibile al momento.</div></div>';
+            document.getElementById('live-update-time').textContent = 'live non disponibile';
+        }
+    }
+
+    handleUrlMessages();
+    initPage();
+</script>
+</body>
+
+<!-- Mirrored from arabsniperbet.com/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 01 Apr 2026 09:14:04 GMT -->
+</html>
