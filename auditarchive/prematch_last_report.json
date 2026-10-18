@@ -3,7 +3,1092 @@
   "note": "First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.",
   "groups": [],
   "quote_groups": [],
-  "generated_at": "2026-10-18T14:09:07.393090+02:00",
+  "filter_comparison": {
+    "schema_version": 1,
+    "profiles_version": "2026-10-18-v1",
+    "note": "Exploratory fixed profiles, not validated improvements. Includes rejected forecasts. Paper ROI at first recorded prices, no staking recommendation. Later-period data must not be used to tune profiles. No automatic live filter changes.",
+    "invalid_prematch_records_excluded": 0,
+    "markets": {
+      "over15_ht": {
+        "coverage": {
+          "frozen": 0,
+          "settled": 0,
+          "pending_or_missing_result": 0,
+          "missing_candidate": 0
+        },
+        "all_predictions": {
+          "n": 0,
+          "wins": 0,
+          "hit_rate_pct": null,
+          "roi_pct": null,
+          "priced_n": 0,
+          "brier_score": null,
+          "wilson_95_pct": null,
+          "mean_probability_pct": null,
+          "calibration_gap_pp": null
+        },
+        "later_period_start_date": null,
+        "profiles": [
+          {
+            "profile": "current",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_50",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_60",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "reliability_75",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_agreement",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "odds_1_5_to_3",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_gap_15",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          }
+        ],
+        "cohorts": []
+      },
+      "gg_ht": {
+        "coverage": {
+          "frozen": 0,
+          "settled": 0,
+          "pending_or_missing_result": 0,
+          "missing_candidate": 0
+        },
+        "all_predictions": {
+          "n": 0,
+          "wins": 0,
+          "hit_rate_pct": null,
+          "roi_pct": null,
+          "priced_n": 0,
+          "brier_score": null,
+          "wilson_95_pct": null,
+          "mean_probability_pct": null,
+          "calibration_gap_pp": null
+        },
+        "later_period_start_date": null,
+        "profiles": [
+          {
+            "profile": "current",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_50",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_60",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "reliability_75",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_agreement",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "odds_1_5_to_3",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_gap_15",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          }
+        ],
+        "cohorts": []
+      },
+      "over25_ft": {
+        "coverage": {
+          "frozen": 0,
+          "settled": 0,
+          "pending_or_missing_result": 0,
+          "missing_candidate": 0
+        },
+        "all_predictions": {
+          "n": 0,
+          "wins": 0,
+          "hit_rate_pct": null,
+          "roi_pct": null,
+          "priced_n": 0,
+          "brier_score": null,
+          "wilson_95_pct": null,
+          "mean_probability_pct": null,
+          "calibration_gap_pp": null
+        },
+        "later_period_start_date": null,
+        "profiles": [
+          {
+            "profile": "current",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_50",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "probability_60",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "reliability_75",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_agreement",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "odds_1_5_to_3",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          },
+          {
+            "profile": "model_book_gap_15",
+            "accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "earlier_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "later_period": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "sample_status": "insufficient_sample"
+          }
+        ],
+        "cohorts": []
+      }
+    }
+  },
+  "generated_at": "2026-10-18T15:01:16.392929+02:00",
   "results_dates_queried": [],
   "archived_forecasts": 0
 }
