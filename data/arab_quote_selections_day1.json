@@ -1,6 +1,6 @@
 {
   "date": "2026-10-18",
-  "generated_at": "2026-10-18T10:45:43+02:00",
+  "generated_at": "2026-10-18T10:50:00+02:00",
   "rankings": {
     "over15_ht": [
       {
@@ -47,7 +47,7 @@
         "expected_value_pct": 32.216,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 1.351388888888889,
+          "observation_hours": 1.4244444444444444,
           "drop_pct_per_hour": 0.0,
           "opening_observed_odd": 2.1,
           "current_odd": 2.1,
@@ -159,7 +159,7 @@
         "expected_value_pct": 24.006,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.59194444444445,
+          "observation_hours": 101.665,
           "drop_pct_per_hour": 0.0,
           "opening_observed_odd": 2.26,
           "current_odd": 2.26,
@@ -170,6 +170,64 @@
           "opening_note": "first observed quote, not certified bookmaker opening"
         },
         "selection_reason": "criteri specifici mercato superati"
+      },
+      {
+        "market": "over15_ht",
+        "selection": "over",
+        "fixture_id": "1549824",
+        "match": "Bucaramanga - America de Cali",
+        "time": "23:00",
+        "kickoff": "2026-10-18T23:00:00+02:00",
+        "league": "Primera A",
+        "country": "Colombia",
+        "probability_pct": 49.47,
+        "probability_raw_pct": 52.629999999999995,
+        "odd": 3.22,
+        "reliability_pct": 85.0,
+        "relation": "confirmed",
+        "gate": {
+          "eligible": true,
+          "score": 69.209,
+          "grade": "B",
+          "reasons": [],
+          "absolute_probability_floor_pct": 40,
+          "market_break_even_pct": 31.056,
+          "probability_pct": 49.47,
+          "raw_probability_pct": 52.63,
+          "expected_value_pct": 59.293,
+          "edge_over_break_even_pp": 18.414,
+          "book_disagreement_pp": 23.4,
+          "competition_quality_score": 84,
+          "bookmakers": 5,
+          "policy": "user_40pct_60reliability_positive_ev",
+          "analytical_score_before_price_preference": 82.579,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band",
+          "initial_reasons": [
+            "modello_book_troppo_distanti"
+          ],
+          "initial_eligible": false,
+          "recovered": true,
+          "reliability_floor_pct": 60,
+          "selection_reason": "recuperata: criteri specifici mercato superati"
+        },
+        "recovered": true,
+        "ranking_score": 69.209,
+        "grade": "B",
+        "expected_value_pct": 59.293,
+        "movement": {
+          "consensus_ratio": 1.0,
+          "observation_hours": 54.92027777777778,
+          "drop_pct_per_hour": 0.014,
+          "opening_observed_odd": 3.245,
+          "current_odd": 3.22,
+          "drop_pct": 0.77,
+          "direction_reversals": 1,
+          "favorite_inversion": false,
+          "observation_count": 5,
+          "opening_note": "first observed quote, not certified bookmaker opening"
+        },
+        "selection_reason": "recuperata: criteri specifici mercato superati"
       },
       {
         "market": "over15_ht",
@@ -327,7 +385,7 @@
         "expected_value_pct": 19.167,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 54.01972222222222,
+          "observation_hours": 54.0925,
           "drop_pct_per_hour": 0.067,
           "opening_observed_odd": 2.47,
           "current_odd": 2.38,
@@ -383,7 +441,7 @@
         "expected_value_pct": 11.678,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 77.92527777777778,
+          "observation_hours": 77.99694444444444,
           "drop_pct_per_hour": 0.026,
           "opening_observed_odd": 1.95,
           "current_odd": 1.91,
@@ -609,7 +667,7 @@
         "expected_value_pct": 18.897,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 54.84777777777778,
+          "observation_hours": 54.92111111111111,
           "drop_pct_per_hour": 0.145,
           "opening_observed_odd": 2.76,
           "current_odd": 2.54,
@@ -665,7 +723,7 @@
         "expected_value_pct": 17.62,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.59,
+          "observation_hours": 101.66333333333333,
           "drop_pct_per_hour": 0.032,
           "opening_observed_odd": 2.46,
           "current_odd": 2.38,
@@ -721,7 +779,7 @@
         "expected_value_pct": 13.39,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.60111111111111,
+          "observation_hours": 101.67361111111111,
           "drop_pct_per_hour": 0.005,
           "opening_observed_odd": 2.0,
           "current_odd": 1.99,
@@ -732,64 +790,6 @@
           "opening_note": "first observed quote, not certified bookmaker opening"
         },
         "selection_reason": "criteri specifici mercato superati"
-      },
-      {
-        "market": "over15_ht",
-        "selection": "over",
-        "fixture_id": "1549824",
-        "match": "Bucaramanga - America de Cali",
-        "time": "23:00",
-        "kickoff": "2026-10-18T23:00:00+02:00",
-        "league": "Primera A",
-        "country": "Colombia",
-        "probability_pct": 50.470000000000006,
-        "probability_raw_pct": 52.629999999999995,
-        "odd": 3.22,
-        "reliability_pct": 85.0,
-        "relation": "model_only",
-        "gate": {
-          "eligible": true,
-          "score": 62.758,
-          "grade": "C",
-          "reasons": [],
-          "absolute_probability_floor_pct": 40,
-          "market_break_even_pct": 31.056,
-          "probability_pct": 50.47,
-          "raw_probability_pct": 52.63,
-          "expected_value_pct": 62.513,
-          "edge_over_break_even_pp": 19.414,
-          "book_disagreement_pp": 24.03,
-          "competition_quality_score": 84,
-          "bookmakers": 5,
-          "policy": "user_40pct_60reliability_positive_ev",
-          "analytical_score_before_price_preference": 73.879,
-          "price_preference_adjustment": 3.0,
-          "price_profile": "preferred_value_band",
-          "initial_reasons": [
-            "modello_book_troppo_distanti"
-          ],
-          "initial_eligible": false,
-          "recovered": true,
-          "reliability_floor_pct": 60,
-          "selection_reason": "recuperata: criteri specifici mercato superati"
-        },
-        "recovered": true,
-        "ranking_score": 62.758,
-        "grade": "C",
-        "expected_value_pct": 62.513,
-        "movement": {
-          "consensus_ratio": 1.0,
-          "observation_hours": 54.84916666666667,
-          "drop_pct_per_hour": 0.014,
-          "opening_observed_odd": 3.245,
-          "current_odd": 3.22,
-          "drop_pct": 0.77,
-          "direction_reversals": 1,
-          "favorite_inversion": false,
-          "observation_count": 4,
-          "opening_note": "first observed quote, not certified bookmaker opening"
-        },
-        "selection_reason": "recuperata: criteri specifici mercato superati"
       },
       {
         "market": "over15_ht",
@@ -891,7 +891,7 @@
         "expected_value_pct": 37.56,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 54.0225,
+          "observation_hours": 54.095555555555556,
           "drop_pct_per_hour": -0.111,
           "opening_observed_odd": 2.16,
           "current_odd": 2.29,
@@ -1115,7 +1115,7 @@
         "expected_value_pct": 8.391,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.59083333333334,
+          "observation_hours": 101.66416666666667,
           "drop_pct_per_hour": 0.026,
           "opening_observed_odd": 2.23,
           "current_odd": 2.17,
@@ -1227,7 +1227,7 @@
         "expected_value_pct": 9.889,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 77.9225,
+          "observation_hours": 77.99555555555555,
           "drop_pct_per_hour": 0.052,
           "opening_observed_odd": 2.2,
           "current_odd": 2.11,
@@ -1339,7 +1339,7 @@
         "expected_value_pct": 12.842,
         "movement": {
           "consensus_ratio": 0.0,
-          "observation_hours": 101.59,
+          "observation_hours": 101.66305555555556,
           "drop_pct_per_hour": -0.004,
           "opening_observed_odd": 2.25,
           "current_odd": 2.26,
@@ -1451,7 +1451,7 @@
         "expected_value_pct": 15.452,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 77.92833333333333,
+          "observation_hours": 78.00083333333333,
           "drop_pct_per_hour": -0.099,
           "opening_observed_odd": 1.94,
           "current_odd": 2.09,
@@ -1507,8 +1507,8 @@
         "expected_value_pct": 3.558,
         "movement": {
           "consensus_ratio": 0.0,
-          "observation_hours": 7.091388888888889,
-          "drop_pct_per_hour": 0.123,
+          "observation_hours": 7.164722222222222,
+          "drop_pct_per_hour": 0.121,
           "opening_observed_odd": 1.725,
           "current_odd": 1.71,
           "drop_pct": 0.87,
@@ -1563,7 +1563,7 @@
         "expected_value_pct": 15.738,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 30.157777777777778,
+          "observation_hours": 30.230833333333333,
           "drop_pct_per_hour": -0.034,
           "opening_observed_odd": 2.425,
           "current_odd": 2.45,
@@ -1675,7 +1675,7 @@
         "expected_value_pct": 44.06,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 54.0225,
+          "observation_hours": 54.095,
           "drop_pct_per_hour": 0.0,
           "opening_observed_odd": 3.5,
           "current_odd": 3.5,
@@ -1731,7 +1731,7 @@
         "expected_value_pct": 11.77,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 77.92416666666666,
+          "observation_hours": 78.00277777777778,
           "drop_pct_per_hour": -0.036,
           "opening_observed_odd": 2.3,
           "current_odd": 2.365,
@@ -1787,7 +1787,7 @@
         "expected_value_pct": 2.527,
         "movement": {
           "consensus_ratio": 0.6,
-          "observation_hours": 101.59416666666667,
+          "observation_hours": 101.67277777777778,
           "drop_pct_per_hour": 0.003,
           "opening_observed_odd": 1.91,
           "current_odd": 1.905,
@@ -1843,7 +1843,7 @@
         "expected_value_pct": 4.07,
         "movement": {
           "consensus_ratio": 0.0,
-          "observation_hours": 54.02055555555555,
+          "observation_hours": 54.09916666666667,
           "drop_pct_per_hour": 0.005,
           "opening_observed_odd": 1.91,
           "current_odd": 1.905,
@@ -1899,7 +1899,7 @@
         "expected_value_pct": 9.567,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 54.022222222222226,
+          "observation_hours": 54.09527777777778,
           "drop_pct_per_hour": -0.063,
           "opening_observed_odd": 2.06,
           "current_odd": 2.13,
@@ -2013,7 +2013,7 @@
         "expected_value_pct": 0.796,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 102.35444444444444,
+          "observation_hours": 102.42777777777778,
           "drop_pct_per_hour": -0.022,
           "opening_observed_odd": 2.18,
           "current_odd": 2.23,
@@ -2071,7 +2071,7 @@
         "expected_value_pct": 25.512,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 77.92527777777778,
+          "observation_hours": 77.99694444444444,
           "drop_pct_per_hour": 0.063,
           "opening_observed_odd": 3.05,
           "current_odd": 2.9,
@@ -2351,7 +2351,7 @@
         "expected_value_pct": 38.104,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 54.0225,
+          "observation_hours": 54.095555555555556,
           "drop_pct_per_hour": -0.12,
           "opening_observed_odd": 3.24,
           "current_odd": 3.45,
@@ -2409,7 +2409,7 @@
         "expected_value_pct": 10.794,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.59083333333334,
+          "observation_hours": 101.66416666666667,
           "drop_pct_per_hour": 0.023,
           "opening_observed_odd": 1.485,
           "current_odd": 1.45,
@@ -2465,7 +2465,7 @@
         "expected_value_pct": 7.981,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 102.35805555555555,
+          "observation_hours": 102.43055555555556,
           "drop_pct_per_hour": 0.023,
           "opening_observed_odd": 1.485,
           "current_odd": 1.45,
@@ -2693,8 +2693,8 @@
         "expected_value_pct": 44.64,
         "movement": {
           "consensus_ratio": 0.75,
-          "observation_hours": 77.92805555555556,
-          "drop_pct_per_hour": 0.067,
+          "observation_hours": 78.00083333333333,
+          "drop_pct_per_hour": 0.066,
           "opening_observed_odd": 2.7,
           "current_odd": 2.56,
           "drop_pct": 5.185,
@@ -2749,7 +2749,7 @@
         "expected_value_pct": 15.409,
         "movement": {
           "consensus_ratio": 0.0,
-          "observation_hours": 101.60111111111111,
+          "observation_hours": 101.67361111111111,
           "drop_pct_per_hour": 0.0,
           "opening_observed_odd": 1.38,
           "current_odd": 1.38,
@@ -2861,7 +2861,7 @@
         "expected_value_pct": 18.18,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.60416666666667,
+          "observation_hours": 101.67666666666666,
           "drop_pct_per_hour": 0.033,
           "opening_observed_odd": 2.39,
           "current_odd": 2.31,
@@ -3197,7 +3197,7 @@
         "expected_value_pct": 12.683,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 77.92861111111111,
+          "observation_hours": 78.00138888888888,
           "drop_pct_per_hour": -0.016,
           "opening_observed_odd": 1.57,
           "current_odd": 1.59,
@@ -3309,7 +3309,7 @@
         "expected_value_pct": 8.062,
         "movement": {
           "consensus_ratio": 0.0,
-          "observation_hours": 101.59,
+          "observation_hours": 101.66305555555556,
           "drop_pct_per_hour": 0.0,
           "opening_observed_odd": 1.54,
           "current_odd": 1.54,
@@ -3477,7 +3477,7 @@
         "expected_value_pct": 17.347,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 77.92972222222222,
+          "observation_hours": 78.00222222222222,
           "drop_pct_per_hour": -0.104,
           "opening_observed_odd": 1.72,
           "current_odd": 1.86,
@@ -3533,7 +3533,7 @@
         "expected_value_pct": 1.115,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 77.9225,
+          "observation_hours": 77.99555555555555,
           "drop_pct_per_hour": 0.026,
           "opening_observed_odd": 1.46,
           "current_odd": 1.43,
@@ -3589,7 +3589,7 @@
         "expected_value_pct": 3.221,
         "movement": {
           "consensus_ratio": 0.6,
-          "observation_hours": 101.59416666666667,
+          "observation_hours": 101.67277777777778,
           "drop_pct_per_hour": -0.007,
           "opening_observed_odd": 1.32,
           "current_odd": 1.33,
@@ -3645,7 +3645,7 @@
         "expected_value_pct": 8.623,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.60472222222222,
+          "observation_hours": 101.67722222222223,
           "drop_pct_per_hour": 0.023,
           "opening_observed_odd": 2.16,
           "current_odd": 2.11,
@@ -3701,7 +3701,7 @@
         "expected_value_pct": 3.342,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.59,
+          "observation_hours": 101.66333333333333,
           "drop_pct_per_hour": 0.024,
           "opening_observed_odd": 1.67,
           "current_odd": 1.63,
@@ -3869,7 +3869,7 @@
         "expected_value_pct": 1.226,
         "movement": {
           "consensus_ratio": 0.0,
-          "observation_hours": 77.92388888888888,
+          "observation_hours": 78.0025,
           "drop_pct_per_hour": 0.014,
           "opening_observed_odd": 1.345,
           "current_odd": 1.33,
@@ -3925,7 +3925,7 @@
         "expected_value_pct": 9.681,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 77.92416666666666,
+          "observation_hours": 78.00277777777778,
           "drop_pct_per_hour": -0.072,
           "opening_observed_odd": 1.6,
           "current_odd": 1.69,
@@ -4037,7 +4037,7 @@
         "expected_value_pct": 10.604,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 77.92388888888888,
+          "observation_hours": 77.99694444444444,
           "drop_pct_per_hour": 0.0,
           "opening_observed_odd": 1.67,
           "current_odd": 1.67,
@@ -4205,7 +4205,7 @@
         "expected_value_pct": 6.312,
         "movement": {
           "consensus_ratio": 0.3333,
-          "observation_hours": 77.92333333333333,
+          "observation_hours": 78.00194444444445,
           "drop_pct_per_hour": 0.013,
           "opening_observed_odd": 1.91,
           "current_odd": 1.89,
@@ -4213,6 +4213,62 @@
           "direction_reversals": 0,
           "favorite_inversion": false,
           "observation_count": 3,
+          "opening_note": "first observed quote, not certified bookmaker opening"
+        },
+        "selection_reason": "criteri specifici mercato superati"
+      },
+      {
+        "market": "over25_ft",
+        "selection": "over",
+        "fixture_id": "1551356",
+        "match": "Hvidovre - Hillerød",
+        "time": "13:00",
+        "kickoff": "2026-10-18T13:00:00+02:00",
+        "league": "1. Division",
+        "country": "Denmark",
+        "probability_pct": 65.95,
+        "probability_raw_pct": 66.43,
+        "odd": 1.57,
+        "reliability_pct": 79.983,
+        "relation": "model_only",
+        "gate": {
+          "eligible": true,
+          "score": 57.925,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 40,
+          "market_break_even_pct": 63.694,
+          "probability_pct": 65.95,
+          "raw_probability_pct": 66.43,
+          "expected_value_pct": 3.541,
+          "edge_over_break_even_pp": 2.256,
+          "book_disagreement_pp": 7.0,
+          "competition_quality_score": 72,
+          "bookmakers": 5,
+          "policy": "user_40pct_60reliability_positive_ev",
+          "analytical_score_before_price_preference": 65.713,
+          "price_preference_adjustment": -5.0,
+          "price_profile": "low_price",
+          "initial_reasons": [],
+          "initial_eligible": true,
+          "recovered": false,
+          "reliability_floor_pct": 60,
+          "selection_reason": "criteri specifici mercato superati"
+        },
+        "recovered": false,
+        "ranking_score": 57.925,
+        "grade": "C",
+        "expected_value_pct": 3.541,
+        "movement": {
+          "consensus_ratio": 0.0,
+          "observation_hours": null,
+          "drop_pct_per_hour": null,
+          "opening_observed_odd": 1.57,
+          "current_odd": 1.57,
+          "drop_pct": 0.0,
+          "direction_reversals": 0,
+          "favorite_inversion": false,
+          "observation_count": 1,
           "opening_note": "first observed quote, not certified bookmaker opening"
         },
         "selection_reason": "criteri specifici mercato superati"
@@ -4265,62 +4321,6 @@
           "drop_pct_per_hour": null,
           "opening_observed_odd": 2.12,
           "current_odd": 2.12,
-          "drop_pct": 0.0,
-          "direction_reversals": 0,
-          "favorite_inversion": false,
-          "observation_count": 1,
-          "opening_note": "first observed quote, not certified bookmaker opening"
-        },
-        "selection_reason": "criteri specifici mercato superati"
-      },
-      {
-        "market": "over25_ft",
-        "selection": "over",
-        "fixture_id": "1551356",
-        "match": "Hvidovre - Hillerød",
-        "time": "13:00",
-        "kickoff": "2026-10-18T13:00:00+02:00",
-        "league": "1. Division",
-        "country": "Denmark",
-        "probability_pct": 65.97,
-        "probability_raw_pct": 66.43,
-        "odd": 1.55,
-        "reliability_pct": 79.983,
-        "relation": "model_only",
-        "gate": {
-          "eligible": true,
-          "score": 56.97,
-          "grade": "C",
-          "reasons": [],
-          "absolute_probability_floor_pct": 40,
-          "market_break_even_pct": 64.516,
-          "probability_pct": 65.97,
-          "raw_probability_pct": 66.43,
-          "expected_value_pct": 2.253,
-          "edge_over_break_even_pp": 1.454,
-          "book_disagreement_pp": 6.69,
-          "competition_quality_score": 72,
-          "bookmakers": 5,
-          "policy": "user_40pct_60reliability_positive_ev",
-          "analytical_score_before_price_preference": 63.007,
-          "price_preference_adjustment": -5.0,
-          "price_profile": "low_price",
-          "initial_reasons": [],
-          "initial_eligible": true,
-          "recovered": false,
-          "reliability_floor_pct": 60,
-          "selection_reason": "criteri specifici mercato superati"
-        },
-        "recovered": false,
-        "ranking_score": 56.97,
-        "grade": "C",
-        "expected_value_pct": 2.253,
-        "movement": {
-          "consensus_ratio": 0.0,
-          "observation_hours": null,
-          "drop_pct_per_hour": null,
-          "opening_observed_odd": 1.55,
-          "current_odd": 1.55,
           "drop_pct": 0.0,
           "direction_reversals": 0,
           "favorite_inversion": false,
@@ -4431,7 +4431,7 @@
         "expected_value_pct": 23.801,
         "movement": {
           "consensus_ratio": 0.5,
-          "observation_hours": 77.93,
+          "observation_hours": 78.00111111111111,
           "drop_pct_per_hour": -0.07,
           "opening_observed_odd": 2.75,
           "current_odd": 2.9,
@@ -4545,7 +4545,7 @@
         "expected_value_pct": 2.22,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 102.35583333333334,
+          "observation_hours": 102.42916666666666,
           "drop_pct_per_hour": 0.033,
           "opening_observed_odd": 2.07,
           "current_odd": 2.0,
@@ -4827,7 +4827,7 @@
         "expected_value_pct": 9.367,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.59194444444445,
+          "observation_hours": 101.665,
           "drop_pct_per_hour": -0.054,
           "opening_observed_odd": 1.81,
           "current_odd": 1.91,
@@ -4883,7 +4883,7 @@
         "expected_value_pct": 12.036,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.59388888888888,
+          "observation_hours": 101.6725,
           "drop_pct_per_hour": -0.015,
           "opening_observed_odd": 2.0,
           "current_odd": 2.03,
@@ -4939,7 +4939,7 @@
         "expected_value_pct": 1.218,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 102.35444444444444,
+          "observation_hours": 102.42777777777778,
           "drop_pct_per_hour": -0.013,
           "opening_observed_odd": 1.55,
           "current_odd": 1.57,
@@ -4995,7 +4995,7 @@
         "expected_value_pct": 4.954,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 102.35222222222222,
+          "observation_hours": 102.43055555555556,
           "drop_pct_per_hour": 0.005,
           "opening_observed_odd": 1.92,
           "current_odd": 1.91,
@@ -5051,7 +5051,7 @@
         "expected_value_pct": 1.248,
         "movement": {
           "consensus_ratio": 0.8,
-          "observation_hours": 54.02194444444444,
+          "observation_hours": 54.09444444444444,
           "drop_pct_per_hour": -0.014,
           "opening_observed_odd": 1.915,
           "current_odd": 1.93,
@@ -5109,7 +5109,7 @@
         "expected_value_pct": 1.925,
         "movement": {
           "consensus_ratio": 0.0,
-          "observation_hours": 101.60416666666667,
+          "observation_hours": 101.67527777777778,
           "drop_pct_per_hour": 0.009,
           "opening_observed_odd": 2.23,
           "current_odd": 2.21,
@@ -5167,7 +5167,7 @@
         "expected_value_pct": 2.102,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 54.022777777777776,
+          "observation_hours": 54.09527777777778,
           "drop_pct_per_hour": 0.082,
           "opening_observed_odd": 2.49,
           "current_odd": 2.38,
@@ -5225,7 +5225,7 @@
         "expected_value_pct": 1.304,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 101.60111111111111,
+          "observation_hours": 101.67388888888888,
           "drop_pct_per_hour": -0.03,
           "opening_observed_odd": 2.33,
           "current_odd": 2.4,
