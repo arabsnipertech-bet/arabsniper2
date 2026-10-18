@@ -3,14 +3,14 @@ name: Freeze Audit Source
 on:
   workflow_dispatch:
   schedule:
-    - cron: '37 8 * * *'
+    - cron: '37 * * * *'
       timezone: 'Europe/Rome'
 
 permissions:
   contents: write
 
 concurrency:
-  group: arabsniper-freeze-audit
+  group: arabsniper-current-audit
   cancel-in-progress: false
 
 jobs:
@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -29,12 +31,12 @@ jobs:
 
       - name: Run freeze script
         run: |
-          python auditor/freeze_for_audit.py
+          python auditor/current_audit.py freeze
 
       - name: Commit and push freeze
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add auditordata/
+          git add auditordata/prematch_*.json
           git commit -m "Freeze audit source" || echo "No changes to commit"
           git push
