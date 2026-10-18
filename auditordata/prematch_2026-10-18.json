@@ -395665,6 +395665,2058 @@
       },
       "primary_choice": null,
       "ranked_choices": []
+    },
+    "1498887": {
+      "fixture": {
+        "fixture_id": "1498887",
+        "kickoff": "2026-10-18T22:00:00+02:00",
+        "date": "2026-10-18",
+        "time": "22:00",
+        "league_id": 129,
+        "league": "Primera Nacional",
+        "country": "Argentina",
+        "season": 2026,
+        "round": "Regular Season - 34",
+        "status_short": "NS",
+        "status_long": "Not Started",
+        "elapsed": null,
+        "home_id": 1946,
+        "home": "Chaco For Ever",
+        "away_id": 1951,
+        "away": "Central Norte",
+        "match": "Chaco For Ever - Central Norte",
+        "competition_quality_score": 72,
+        "competition_tier": "user_division_2",
+        "competition_reason": "user_allowlist",
+        "data_freshness": "fresh"
+      },
+      "captured_at": "2026-10-18T19:11:15.083283+02:00",
+      "model_version": "1.1.8",
+      "probabilities_raw": {
+        "1x2_ft": {
+          "1": 0.582,
+          "x": 0.2843,
+          "2": 0.1337
+        },
+        "over25_ft": {
+          "over": 0.3058,
+          "under": 0.6942
+        },
+        "over15_ht": {
+          "over": 0.3203,
+          "under": 0.6797
+        },
+        "gg_ht": {
+          "yes": 0.0894,
+          "no": 0.9106
+        },
+        "over15_ft_extra": {
+          "over": 0.5443,
+          "under": 0.4557
+        },
+        "over05_ht": {
+          "over": 0.654,
+          "under": 0.346
+        }
+      },
+      "probabilities_calibrated": {
+        "1x2_ft": {
+          "1": 0.57,
+          "x": 0.2888,
+          "2": 0.1412
+        },
+        "over25_ft": {
+          "over": 0.3054,
+          "under": 0.6946
+        },
+        "over15_ht": {
+          "over": 0.3131,
+          "under": 0.6869
+        },
+        "gg_ht": {
+          "yes": 0.092,
+          "no": 0.908
+        },
+        "over05_ht": {
+          "over": 0.654,
+          "under": 0.346
+        },
+        "over15_ft_extra": {
+          "over": 0.5443,
+          "under": 0.4557
+        }
+      },
+      "reliability_pct": 85.0,
+      "markets": {
+        "1x2_ft": {
+          "name": "1-X-2",
+          "selection_order": [
+            "1",
+            "x",
+            "2"
+          ],
+          "selections": {
+            "1": {
+              "open_odd": 2.05,
+              "current_odd": 2.05,
+              "model_probability_pct": 57.0,
+              "model_probability_raw_pct": 58.2,
+              "book_fair_probability_pct": 45.2,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "circle",
+                "color": "red",
+                "model": true,
+                "book": false,
+                "agreement": false
+              }
+            },
+            "x": {
+              "open_odd": 2.78,
+              "current_odd": 2.78,
+              "model_probability_pct": 28.88,
+              "model_probability_raw_pct": 28.43,
+              "book_fair_probability_pct": 33.33,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "none",
+                "color": "none",
+                "model": false,
+                "book": false,
+                "agreement": false
+              }
+            },
+            "2": {
+              "open_odd": 4.315,
+              "current_odd": 4.315,
+              "model_probability_pct": 14.12,
+              "model_probability_raw_pct": 13.37,
+              "book_fair_probability_pct": 21.47,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "none",
+                "color": "none",
+                "model": false,
+                "book": false,
+                "agreement": false
+              }
+            }
+          },
+          "model_pick": "1",
+          "book_pick": null,
+          "relation": "model_only",
+          "aggio_pct": 7.927,
+          "aggio_status": "normal",
+          "protection_pick": null,
+          "market_validation": {
+            "accepted": [
+              {
+                "bet_id": 1,
+                "bet_name": "Match Winner",
+                "bookmaker": "William Hill",
+                "source": "strict_bet_id"
+              },
+              {
+                "bet_id": 1,
+                "bet_name": "Match Winner",
+                "bookmaker": "Bet365",
+                "source": "strict_bet_id"
+              },
+              {
+                "bet_id": 1,
+                "bet_name": "Match Winner",
+                "bookmaker": "Marathonbet",
+                "source": "strict_bet_id"
+              },
+              {
+                "bet_id": 1,
+                "bet_name": "Match Winner",
+                "bookmaker": "BetVictor",
+                "source": "strict_bet_id"
+              },
+              {
+                "bet_id": 1,
+                "bet_name": "Match Winner",
+                "bookmaker": "Pinnacle",
+                "source": "strict_bet_id"
+              },
+              {
+                "bet_id": 1,
+                "bet_name": "Match Winner",
+                "bookmaker": "1xBet",
+                "source": "strict_bet_id"
+              }
+            ],
+            "rejected": [],
+            "accepted_bet_ids": [
+              1
+            ],
+            "accepted_bet_names": [
+              "Match Winner"
+            ],
+            "bookmakers_found": 6,
+            "status": "verified",
+            "usable_for_signals": true,
+            "minimum_books_required": 2
+          },
+          "market_calibration_weight": 0.092,
+          "recommendation_gate": {
+            "eligible": true,
+            "score": 86.505,
+            "grade": "A",
+            "reasons": [],
+            "absolute_probability_floor_pct": 44.0,
+            "market_break_even_pct": 48.78,
+            "probability_pct": 57.0,
+            "raw_probability_pct": 58.2,
+            "expected_value_pct": 16.85,
+            "edge_over_break_even_pp": 8.22,
+            "book_disagreement_pp": 13.0,
+            "competition_quality_score": 72,
+            "bookmakers": 6,
+            "policy": "probability_floor_plus_price_edge",
+            "analytical_score_before_price_preference": 83.505,
+            "price_preference_adjustment": 3.0,
+            "price_profile": "preferred_value_band"
+          },
+          "empirical_layer": {}
+        },
+        "over25_ft": {
+          "name": "Over 2,5 FT",
+          "selection_order": [
+            "over",
+            "under"
+          ],
+          "selections": {
+            "over": {
+              "open_odd": 3.1,
+              "current_odd": 3.1,
+              "model_probability_pct": 30.54,
+              "model_probability_raw_pct": 30.58,
+              "book_fair_probability_pct": 30.02,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "none",
+                "color": "none",
+                "model": false,
+                "book": false,
+                "agreement": false
+              }
+            },
+            "under": {
+              "open_odd": 1.33,
+              "current_odd": 1.33,
+              "model_probability_pct": 69.46,
+              "model_probability_raw_pct": 69.42,
+              "book_fair_probability_pct": 69.98,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "none",
+                "color": "none",
+                "model": false,
+                "book": false,
+                "agreement": false
+              }
+            }
+          },
+          "model_pick": null,
+          "book_pick": null,
+          "relation": "neutral",
+          "aggio_pct": 7.446,
+          "aggio_status": "high",
+          "protection_pick": null,
+          "market_validation": {
+            "accepted": [
+              {
+                "bet_id": 5,
+                "bet_name": "Goals Over/Under",
+                "bookmaker": "Bet365",
+                "source": "strict_bet_id"
+              },
+              {
+                "bet_id": 5,
+                "bet_name": "Goals Over/Under",
+                "bookmaker": "Marathonbet",
+                "source": "strict_bet_id"
+              },
+              {
+                "bet_id": 5,
+                "bet_name": "Goals Over/Under",
+                "bookmaker": "BetVictor",
+                "source": "strict_bet_id"
+              },
+              {
+                "bet_id": 5,
+                "bet_name": "Goals Over/Under",
+                "bookmaker": "Pinnacle",
+                "source": "strict_bet_id"
+              },
+              {
+                "bet_id": 5,
+                "bet_name": "Goals Over/Under",
+                "bookmaker": "1xBet",
+                "source": "strict_bet_id"
+              }
+            ],
+            "rejected": [],
+            "accepted_bet_ids": [
+              5
+            ],
+            "accepted_bet_names": [
+              "Goals Over/Under"
+            ],
+            "bookmakers_found": 5,
+            "status": "verified",
+            "usable_for_signals": true,
+            "minimum_books_required": 2
+          },
+          "market_calibration_weight": 0.069,
+          "recommendation_gate": {
+            "eligible": false,
+            "score": 51.421,
+            "grade": "NO",
+            "reasons": [
+              "nessun_valore_sulla_quota"
+            ],
+            "absolute_probability_floor_pct": 52.0,
+            "market_break_even_pct": 75.188,
+            "probability_pct": 69.46,
+            "raw_probability_pct": 69.42,
+            "expected_value_pct": -7.618,
+            "edge_over_break_even_pp": -5.728,
+            "book_disagreement_pp": 0.56,
+            "competition_quality_score": 72,
+            "bookmakers": 5,
+            "policy": "probability_floor_plus_price_edge",
+            "analytical_score_before_price_preference": 56.421,
+            "price_preference_adjustment": -5.0,
+            "price_profile": "low_price"
+          },
+          "empirical_layer": {
+            "poisson_positive": 0.2758,
+            "empirical_positive": 0.3697,
+            "blend_weight": 0.32,
+            "blended_positive": 0.3058
+          },
+          "favorite_trap_adjustment_pp": 0.0
+        },
+        "over15_ht": {
+          "name": "Over 1,5 PT",
+          "selection_order": [
+            "over",
+            "under"
+          ],
+          "selections": {
+            "over": {
+              "open_odd": 4.25,
+              "current_odd": 4.25,
+              "model_probability_pct": 31.31,
+              "model_probability_raw_pct": 32.03,
+              "book_fair_probability_pct": 21.66,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "none",
+                "color": "none",
+                "model": false,
+                "book": false,
+                "agreement": false
+              }
+            },
+            "under": {
+              "open_odd": 1.175,
+              "current_odd": 1.175,
+              "model_probability_pct": 68.69,
+              "model_probability_raw_pct": 67.97,
+              "book_fair_probability_pct": 78.34,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "none",
+                "color": "none",
+                "model": false,
+                "book": false,
+                "agreement": false
+              }
+            }
+          },
+          "model_pick": null,
+          "book_pick": null,
+          "relation": "neutral",
+          "aggio_pct": 8.636,
+          "aggio_status": "high",
+          "protection_pick": null,
+          "market_validation": {
+            "accepted": [
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "William Hill",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "Bet365",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "Marathonbet",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "1xBet",
+                "source": "catalog_bet_id"
+              }
+            ],
+            "rejected": [
+              {
+                "bet_id": 46,
+                "bet_name": "Exact Goals Number - First Half",
+                "bookmaker": "Bet365",
+                "reason": "incomplete_over_under_15_ht"
+              },
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "BetVictor",
+                "reason": "incomplete_over_under_15_ht"
+              },
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "Pinnacle",
+                "reason": "incomplete_over_under_15_ht"
+              }
+            ],
+            "accepted_bet_ids": [
+              6
+            ],
+            "accepted_bet_names": [
+              "Goals Over/Under First Half"
+            ],
+            "bookmakers_found": 4,
+            "status": "verified",
+            "usable_for_signals": true,
+            "minimum_books_required": 2
+          },
+          "market_calibration_weight": 0.069,
+          "recommendation_gate": {
+            "eligible": false,
+            "score": 52.221,
+            "grade": "NO",
+            "reasons": [
+              "probabilita_sotto_40"
+            ],
+            "absolute_probability_floor_pct": 40,
+            "market_break_even_pct": 23.529,
+            "probability_pct": 31.31,
+            "raw_probability_pct": 32.03,
+            "expected_value_pct": 33.068,
+            "edge_over_break_even_pp": 7.781,
+            "book_disagreement_pp": 10.37,
+            "competition_quality_score": 72,
+            "bookmakers": 4,
+            "policy": "user_40pct_60reliability_positive_ev",
+            "analytical_score_before_price_preference": 73.809,
+            "price_preference_adjustment": 2.0,
+            "price_profile": "high_return_band",
+            "initial_reasons": [],
+            "initial_eligible": true,
+            "recovered": false,
+            "reliability_floor_pct": 60,
+            "selection_reason": "probabilita_sotto_40"
+          },
+          "empirical_layer": {
+            "poisson_positive": 0.3534,
+            "empirical_positive": 0.2881,
+            "team_interaction_positive": 0.2842,
+            "poisson_weight": 0.5,
+            "empirical_weight": 0.38,
+            "interaction_weight": 0.12,
+            "blended_positive": 0.3203
+          },
+          "favorite_trap_adjustment_pp": 0.0
+        },
+        "gg_ht": {
+          "name": "GG primo tempo",
+          "selection_order": [
+            "yes",
+            "no"
+          ],
+          "selections": {
+            "yes": {
+              "open_odd": 7.3,
+              "current_odd": 7.3,
+              "model_probability_pct": 9.2,
+              "model_probability_raw_pct": 8.94,
+              "book_fair_probability_pct": 12.78,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "none",
+                "color": "none",
+                "model": false,
+                "book": false,
+                "agreement": false
+              }
+            },
+            "no": {
+              "open_odd": 1.07,
+              "current_odd": 1.07,
+              "model_probability_pct": 90.8,
+              "model_probability_raw_pct": 91.06,
+              "book_fair_probability_pct": 87.22,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "none",
+                "color": "none",
+                "model": false,
+                "book": false,
+                "agreement": false
+              }
+            }
+          },
+          "model_pick": null,
+          "book_pick": null,
+          "relation": "neutral",
+          "aggio_pct": 7.157,
+          "aggio_status": "high",
+          "protection_pick": null,
+          "market_validation": {
+            "accepted": [
+              {
+                "bet_id": 34,
+                "bet_name": "Both Teams Score - First Half",
+                "bookmaker": "William Hill",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 34,
+                "bet_name": "Both Teams Score - First Half",
+                "bookmaker": "Bet365",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 34,
+                "bet_name": "Both Teams Score - First Half",
+                "bookmaker": "Marathonbet",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 34,
+                "bet_name": "Both Teams Score - First Half",
+                "bookmaker": "1xBet",
+                "source": "catalog_bet_id"
+              }
+            ],
+            "rejected": [],
+            "accepted_bet_ids": [
+              34
+            ],
+            "accepted_bet_names": [
+              "Both Teams Score - First Half"
+            ],
+            "bookmakers_found": 4,
+            "status": "verified",
+            "usable_for_signals": true,
+            "minimum_books_required": 1
+          },
+          "market_calibration_weight": 0.069,
+          "recommendation_gate": {
+            "eligible": false,
+            "score": 0.0,
+            "grade": "NO",
+            "reasons": [
+              "nessuna_selezione"
+            ]
+          },
+          "empirical_layer": {
+            "poisson_positive": 0.0797,
+            "empirical_positive": 0.1061,
+            "team_interaction_positive": 0.0767,
+            "poisson_weight": 0.5,
+            "empirical_weight": 0.38,
+            "interaction_weight": 0.12,
+            "blended_positive": 0.0894
+          },
+          "favorite_trap_adjustment_pp": 0.0
+        },
+        "over05_ht": {
+          "name": "Goal primo tempo (Over 0,5 PT)",
+          "selection_order": [
+            "over",
+            "under"
+          ],
+          "selections": {
+            "over": {
+              "open_odd": 1.66,
+              "current_odd": 1.66,
+              "model_probability_pct": 65.4,
+              "model_probability_raw_pct": 65.4,
+              "book_fair_probability_pct": 55.91,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "none",
+                "color": "none",
+                "model": false,
+                "book": false,
+                "agreement": false
+              }
+            },
+            "under": {
+              "open_odd": 2.105,
+              "current_odd": 2.105,
+              "model_probability_pct": 34.6,
+              "model_probability_raw_pct": 34.6,
+              "book_fair_probability_pct": 44.09,
+              "delta_odd": 0.0,
+              "delta_fair_pp": 0.0,
+              "movement_color": "gray",
+              "movement_level": "stable",
+              "oci_as": 0.0,
+              "marker": {
+                "shape": "none",
+                "color": "none",
+                "model": false,
+                "book": false,
+                "agreement": false
+              }
+            }
+          },
+          "model_pick": null,
+          "book_pick": null,
+          "relation": "neutral",
+          "aggio_pct": 7.747,
+          "aggio_status": "high",
+          "protection_pick": null,
+          "market_validation": {
+            "accepted": [
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "William Hill",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "Bet365",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 72,
+                "bet_name": "Goal Line (1st Half)",
+                "bookmaker": "Bet365",
+                "source": "name_fallback"
+              },
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "Marathonbet",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "BetVictor",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "Pinnacle",
+                "source": "catalog_bet_id"
+              },
+              {
+                "bet_id": 6,
+                "bet_name": "Goals Over/Under First Half",
+                "bookmaker": "1xBet",
+                "source": "catalog_bet_id"
+              }
+            ],
+            "rejected": [],
+            "accepted_bet_ids": [
+              6,
+              72
+            ],
+            "accepted_bet_names": [
+              "Goal Line (1st Half)",
+              "Goals Over/Under First Half"
+            ],
+            "bookmakers_found": 6,
+            "status": "name_fallback",
+            "usable_for_signals": false,
+            "minimum_books_required": 2
+          },
+          "market_calibration_weight": 0.0,
+          "recommendation_gate": {
+            "eligible": false,
+            "score": 65.771,
+            "grade": "NO",
+            "reasons": [
+              "mercato_non_validato"
+            ],
+            "absolute_probability_floor_pct": 62.0,
+            "market_break_even_pct": 60.241,
+            "probability_pct": 65.4,
+            "raw_probability_pct": 65.4,
+            "expected_value_pct": 8.564,
+            "edge_over_break_even_pp": 5.159,
+            "book_disagreement_pp": 9.49,
+            "competition_quality_score": 72,
+            "bookmakers": 6,
+            "policy": "probability_floor_plus_price_edge",
+            "analytical_score_before_price_preference": 67.271,
+            "price_preference_adjustment": -1.5,
+            "price_profile": "below_preferred"
+          },
+          "empirical_layer": {
+            "poisson_positive": 0.7121,
+            "empirical_positive": 0.5906,
+            "team_interaction_positive": 0.6124,
+            "poisson_weight": 0.5,
+            "empirical_weight": 0.38,
+            "interaction_weight": 0.12,
+            "blended_positive": 0.654
+          },
+          "favorite_trap_adjustment_pp": 0.0
+        }
+      },
+      "market_candidates": [
+        {
+          "market": "over15_ht",
+          "selection": "over",
+          "fixture_id": "1498887",
+          "match": "Chaco For Ever - Central Norte",
+          "time": "22:00",
+          "kickoff": "2026-10-18T22:00:00+02:00",
+          "league": "Primera Nacional",
+          "country": "Argentina",
+          "probability_pct": 31.31,
+          "probability_raw_pct": 32.029999999999994,
+          "odd": 4.25,
+          "reliability_pct": 85.0,
+          "relation": "neutral",
+          "gate": {
+            "eligible": false,
+            "score": 49.221,
+            "grade": "NO",
+            "reasons": [
+              "probabilita_sotto_40"
+            ],
+            "absolute_probability_floor_pct": 40,
+            "market_break_even_pct": 23.529,
+            "probability_pct": 31.31,
+            "raw_probability_pct": 32.03,
+            "expected_value_pct": 33.068,
+            "edge_over_break_even_pp": 7.781,
+            "book_disagreement_pp": 10.37,
+            "competition_quality_score": 72,
+            "bookmakers": 4,
+            "policy": "user_40pct_60reliability_positive_ev",
+            "analytical_score_before_price_preference": 69.809,
+            "price_preference_adjustment": 2.0,
+            "price_profile": "high_return_band",
+            "initial_reasons": [],
+            "initial_eligible": true,
+            "recovered": false,
+            "reliability_floor_pct": 60,
+            "selection_reason": "probabilita_sotto_40"
+          },
+          "recovered": false,
+          "ranking_score": 49.221,
+          "grade": "NO",
+          "expected_value_pct": 33.068,
+          "movement": {
+            "consensus_ratio": 0.0,
+            "observation_hours": null,
+            "drop_pct_per_hour": null,
+            "opening_observed_odd": 4.25,
+            "current_odd": 4.25,
+            "drop_pct": 0.0,
+            "direction_reversals": 0,
+            "favorite_inversion": false,
+            "observation_count": 1,
+            "opening_note": "first observed quote, not certified bookmaker opening"
+          },
+          "selection_reason": "probabilita_sotto_40"
+        },
+        {
+          "market": "gg_ht",
+          "selection": "yes",
+          "fixture_id": "1498887",
+          "match": "Chaco For Ever - Central Norte",
+          "time": "22:00",
+          "kickoff": "2026-10-18T22:00:00+02:00",
+          "league": "Primera Nacional",
+          "country": "Argentina",
+          "probability_pct": 9.2,
+          "probability_raw_pct": 8.94,
+          "odd": 7.3,
+          "reliability_pct": 85.0,
+          "relation": "neutral",
+          "gate": {
+            "eligible": false,
+            "score": 22.06,
+            "grade": "NO",
+            "reasons": [
+              "probabilita_sotto_40",
+              "valore_atteso_non_positivo"
+            ],
+            "absolute_probability_floor_pct": 40,
+            "market_break_even_pct": 13.699,
+            "probability_pct": 9.2,
+            "raw_probability_pct": 8.94,
+            "expected_value_pct": -32.84,
+            "edge_over_break_even_pp": -4.499,
+            "book_disagreement_pp": 3.84,
+            "competition_quality_score": 72,
+            "bookmakers": 4,
+            "policy": "user_40pct_60reliability_positive_ev",
+            "analytical_score_before_price_preference": 33.921,
+            "price_preference_adjustment": -4.0,
+            "price_profile": "very_high_price",
+            "initial_reasons": [
+              "probabilita_assoluta_insufficiente",
+              "nessun_valore_sulla_quota"
+            ],
+            "initial_eligible": false,
+            "recovered": false,
+            "reliability_floor_pct": 60,
+            "selection_reason": "probabilita_sotto_40; valore_atteso_non_positivo"
+          },
+          "recovered": false,
+          "ranking_score": 22.06,
+          "grade": "NO",
+          "expected_value_pct": -32.84,
+          "movement": {
+            "consensus_ratio": 0.0,
+            "observation_hours": null,
+            "drop_pct_per_hour": null,
+            "opening_observed_odd": 7.3,
+            "current_odd": 7.3,
+            "drop_pct": 0.0,
+            "direction_reversals": 0,
+            "favorite_inversion": false,
+            "observation_count": 1,
+            "opening_note": "first observed quote, not certified bookmaker opening"
+          },
+          "selection_reason": "probabilita_sotto_40; valore_atteso_non_positivo"
+        },
+        {
+          "market": "over25_ft",
+          "selection": "over",
+          "fixture_id": "1498887",
+          "match": "Chaco For Ever - Central Norte",
+          "time": "22:00",
+          "kickoff": "2026-10-18T22:00:00+02:00",
+          "league": "Primera Nacional",
+          "country": "Argentina",
+          "probability_pct": 30.54,
+          "probability_raw_pct": 30.580000000000002,
+          "odd": 3.1,
+          "reliability_pct": 85.0,
+          "relation": "neutral",
+          "gate": {
+            "eligible": false,
+            "score": 33.797,
+            "grade": "NO",
+            "reasons": [
+              "probabilita_sotto_40",
+              "valore_atteso_non_positivo"
+            ],
+            "absolute_probability_floor_pct": 40,
+            "market_break_even_pct": 32.258,
+            "probability_pct": 30.54,
+            "raw_probability_pct": 30.58,
+            "expected_value_pct": -5.326,
+            "edge_over_break_even_pp": -1.718,
+            "book_disagreement_pp": 0.56,
+            "competition_quality_score": 72,
+            "bookmakers": 5,
+            "policy": "user_40pct_60reliability_positive_ev",
+            "analytical_score_before_price_preference": 32.421,
+            "price_preference_adjustment": 0.0,
+            "price_profile": "preferred_value_band",
+            "initial_reasons": [
+              "probabilita_assoluta_insufficiente",
+              "nessun_valore_sulla_quota"
+            ],
+            "initial_eligible": false,
+            "recovered": false,
+            "reliability_floor_pct": 60,
+            "selection_reason": "probabilita_sotto_40; valore_atteso_non_positivo"
+          },
+          "recovered": false,
+          "ranking_score": 33.797,
+          "grade": "NO",
+          "expected_value_pct": -5.326,
+          "movement": {
+            "consensus_ratio": 0.0,
+            "observation_hours": null,
+            "drop_pct_per_hour": null,
+            "opening_observed_odd": 3.1,
+            "current_odd": 3.1,
+            "drop_pct": 0.0,
+            "direction_reversals": 0,
+            "favorite_inversion": false,
+            "observation_count": 1,
+            "opening_note": "first observed quote, not certified bookmaker opening"
+          },
+          "selection_reason": "probabilita_sotto_40; valore_atteso_non_positivo"
+        }
+      ],
+      "quote_observation": {
+        "1x2_ft": {
+          "history": [
+            {
+              "ts": "2026-10-18T19:10:34+02:00",
+              "odds": {
+                "1": 2.05,
+                "x": 2.78,
+                "2": 4.315
+              },
+              "math": {
+                "raw_probabilities": {
+                  "1": 0.4878,
+                  "x": 0.3597,
+                  "2": 0.2317
+                },
+                "fair_probabilities": {
+                  "1": 0.452,
+                  "x": 0.3333,
+                  "2": 0.2147
+                },
+                "overround": 0.0793,
+                "overround_pct": 7.927,
+                "payout": 0.9266,
+                "payout_pct": 92.655,
+                "margin_load_pp": {
+                  "1": 3.583,
+                  "x": 2.642,
+                  "2": 1.702
+                },
+                "margin_load_share": {
+                  "1": 0.452,
+                  "x": 0.3333,
+                  "2": 0.2147
+                }
+              },
+              "bookmakers_count": 6
+            }
+          ],
+          "movement_features": {
+            "1": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 2.05,
+              "current_odd": 2.05,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            },
+            "x": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 2.78,
+              "current_odd": 2.78,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            },
+            "2": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 4.315,
+              "current_odd": 4.315,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            }
+          },
+          "open": {
+            "odds": {
+              "1": 2.05,
+              "x": 2.78,
+              "2": 4.315
+            },
+            "math": {
+              "raw_probabilities": {
+                "1": 0.4878,
+                "x": 0.3597,
+                "2": 0.2317
+              },
+              "fair_probabilities": {
+                "1": 0.452,
+                "x": 0.3333,
+                "2": 0.2147
+              },
+              "overround": 0.0793,
+              "overround_pct": 7.927,
+              "payout": 0.9266,
+              "payout_pct": 92.655,
+              "margin_load_pp": {
+                "1": 3.583,
+                "x": 2.642,
+                "2": 1.702
+              },
+              "margin_load_share": {
+                "1": 0.452,
+                "x": 0.3333,
+                "2": 0.2147
+              }
+            },
+            "bookmakers_count": 6
+          },
+          "current": {
+            "odds": {
+              "1": 2.05,
+              "x": 2.78,
+              "2": 4.315
+            },
+            "math": {
+              "raw_probabilities": {
+                "1": 0.4878,
+                "x": 0.3597,
+                "2": 0.2317
+              },
+              "fair_probabilities": {
+                "1": 0.452,
+                "x": 0.3333,
+                "2": 0.2147
+              },
+              "overround": 0.0793,
+              "overround_pct": 7.927,
+              "payout": 0.9266,
+              "payout_pct": 92.655,
+              "margin_load_pp": {
+                "1": 3.583,
+                "x": 2.642,
+                "2": 1.702
+              },
+              "margin_load_share": {
+                "1": 0.452,
+                "x": 0.3333,
+                "2": 0.2147
+              }
+            },
+            "bookmakers_count": 6,
+            "dispersion": {
+              "1": 0.066,
+              "x": 0.06,
+              "2": 0.099
+            }
+          },
+          "selections": {
+            "1": {
+              "open_odd": 2.05,
+              "current_odd": 2.05,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.452,
+              "current_fair_probability": 0.452,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 3.583,
+              "margin_load_current_pp": 3.583,
+              "margin_load_delta_pp": 0.0
+            },
+            "x": {
+              "open_odd": 2.78,
+              "current_odd": 2.78,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.3333,
+              "current_fair_probability": 0.3333,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 2.642,
+              "margin_load_current_pp": 2.642,
+              "margin_load_delta_pp": 0.0
+            },
+            "2": {
+              "open_odd": 4.315,
+              "current_odd": 4.315,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.2147,
+              "current_fair_probability": 0.2147,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 1.702,
+              "margin_load_current_pp": 1.702,
+              "margin_load_delta_pp": 0.0
+            }
+          }
+        },
+        "over25_ft": {
+          "history": [
+            {
+              "ts": "2026-10-18T19:10:34+02:00",
+              "odds": {
+                "over": 3.1,
+                "under": 1.33
+              },
+              "math": {
+                "raw_probabilities": {
+                  "over": 0.3226,
+                  "under": 0.7519
+                },
+                "fair_probabilities": {
+                  "over": 0.3002,
+                  "under": 0.6998
+                },
+                "overround": 0.0745,
+                "overround_pct": 7.446,
+                "payout": 0.9307,
+                "payout_pct": 93.07,
+                "margin_load_pp": {
+                  "over": 2.235,
+                  "under": 5.211
+                },
+                "margin_load_share": {
+                  "over": 0.3002,
+                  "under": 0.6998
+                }
+              },
+              "bookmakers_count": 5
+            }
+          ],
+          "movement_features": {
+            "over": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 3.1,
+              "current_odd": 3.1,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            },
+            "under": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 1.33,
+              "current_odd": 1.33,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            }
+          },
+          "open": {
+            "odds": {
+              "over": 3.1,
+              "under": 1.33
+            },
+            "math": {
+              "raw_probabilities": {
+                "over": 0.3226,
+                "under": 0.7519
+              },
+              "fair_probabilities": {
+                "over": 0.3002,
+                "under": 0.6998
+              },
+              "overround": 0.0745,
+              "overround_pct": 7.446,
+              "payout": 0.9307,
+              "payout_pct": 93.07,
+              "margin_load_pp": {
+                "over": 2.235,
+                "under": 5.211
+              },
+              "margin_load_share": {
+                "over": 0.3002,
+                "under": 0.6998
+              }
+            },
+            "bookmakers_count": 5
+          },
+          "current": {
+            "odds": {
+              "over": 3.1,
+              "under": 1.33
+            },
+            "math": {
+              "raw_probabilities": {
+                "over": 0.3226,
+                "under": 0.7519
+              },
+              "fair_probabilities": {
+                "over": 0.3002,
+                "under": 0.6998
+              },
+              "overround": 0.0745,
+              "overround_pct": 7.446,
+              "payout": 0.9307,
+              "payout_pct": 93.07,
+              "margin_load_pp": {
+                "over": 2.235,
+                "under": 5.211
+              },
+              "margin_load_share": {
+                "over": 0.3002,
+                "under": 0.6998
+              }
+            },
+            "bookmakers_count": 5,
+            "dispersion": {
+              "over": 0.079,
+              "under": 0.025
+            }
+          },
+          "selections": {
+            "over": {
+              "open_odd": 3.1,
+              "current_odd": 3.1,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.3002,
+              "current_fair_probability": 0.3002,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 2.235,
+              "margin_load_current_pp": 2.235,
+              "margin_load_delta_pp": 0.0
+            },
+            "under": {
+              "open_odd": 1.33,
+              "current_odd": 1.33,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.6998,
+              "current_fair_probability": 0.6998,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 5.211,
+              "margin_load_current_pp": 5.211,
+              "margin_load_delta_pp": 0.0
+            }
+          }
+        },
+        "over15_ht": {
+          "history": [
+            {
+              "ts": "2026-10-18T19:10:34+02:00",
+              "odds": {
+                "over": 4.25,
+                "under": 1.175
+              },
+              "math": {
+                "raw_probabilities": {
+                  "over": 0.2353,
+                  "under": 0.8511
+                },
+                "fair_probabilities": {
+                  "over": 0.2166,
+                  "under": 0.7834
+                },
+                "overround": 0.0864,
+                "overround_pct": 8.636,
+                "payout": 0.9205,
+                "payout_pct": 92.051,
+                "margin_load_pp": {
+                  "over": 1.87,
+                  "under": 6.765
+                },
+                "margin_load_share": {
+                  "over": 0.2166,
+                  "under": 0.7834
+                }
+              },
+              "bookmakers_count": 4
+            }
+          ],
+          "movement_features": {
+            "over": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 4.25,
+              "current_odd": 4.25,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            },
+            "under": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 1.175,
+              "current_odd": 1.175,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            }
+          },
+          "open": {
+            "odds": {
+              "over": 4.25,
+              "under": 1.175
+            },
+            "math": {
+              "raw_probabilities": {
+                "over": 0.2353,
+                "under": 0.8511
+              },
+              "fair_probabilities": {
+                "over": 0.2166,
+                "under": 0.7834
+              },
+              "overround": 0.0864,
+              "overround_pct": 8.636,
+              "payout": 0.9205,
+              "payout_pct": 92.051,
+              "margin_load_pp": {
+                "over": 1.87,
+                "under": 6.765
+              },
+              "margin_load_share": {
+                "over": 0.2166,
+                "under": 0.7834
+              }
+            },
+            "bookmakers_count": 4
+          },
+          "current": {
+            "odds": {
+              "over": 4.25,
+              "under": 1.175
+            },
+            "math": {
+              "raw_probabilities": {
+                "over": 0.2353,
+                "under": 0.8511
+              },
+              "fair_probabilities": {
+                "over": 0.2166,
+                "under": 0.7834
+              },
+              "overround": 0.0864,
+              "overround_pct": 8.636,
+              "payout": 0.9205,
+              "payout_pct": 92.051,
+              "margin_load_pp": {
+                "over": 1.87,
+                "under": 6.765
+              },
+              "margin_load_share": {
+                "over": 0.2166,
+                "under": 0.7834
+              }
+            },
+            "bookmakers_count": 4,
+            "dispersion": {
+              "over": 0.124,
+              "under": 0.031
+            }
+          },
+          "selections": {
+            "over": {
+              "open_odd": 4.25,
+              "current_odd": 4.25,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.2166,
+              "current_fair_probability": 0.2166,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 1.87,
+              "margin_load_current_pp": 1.87,
+              "margin_load_delta_pp": 0.0
+            },
+            "under": {
+              "open_odd": 1.175,
+              "current_odd": 1.175,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.7834,
+              "current_fair_probability": 0.7834,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 6.765,
+              "margin_load_current_pp": 6.765,
+              "margin_load_delta_pp": 0.0
+            }
+          }
+        },
+        "gg_ht": {
+          "history": [
+            {
+              "ts": "2026-10-18T19:10:34+02:00",
+              "odds": {
+                "yes": 7.3,
+                "no": 1.07
+              },
+              "math": {
+                "raw_probabilities": {
+                  "yes": 0.137,
+                  "no": 0.9346
+                },
+                "fair_probabilities": {
+                  "yes": 0.1278,
+                  "no": 0.8722
+                },
+                "overround": 0.0716,
+                "overround_pct": 7.157,
+                "payout": 0.9332,
+                "payout_pct": 93.321,
+                "margin_load_pp": {
+                  "yes": 0.915,
+                  "no": 6.242
+                },
+                "margin_load_share": {
+                  "yes": 0.1278,
+                  "no": 0.8722
+                }
+              },
+              "bookmakers_count": 4
+            }
+          ],
+          "movement_features": {
+            "yes": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 7.3,
+              "current_odd": 7.3,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            },
+            "no": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 1.07,
+              "current_odd": 1.07,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            }
+          },
+          "open": {
+            "odds": {
+              "yes": 7.3,
+              "no": 1.07
+            },
+            "math": {
+              "raw_probabilities": {
+                "yes": 0.137,
+                "no": 0.9346
+              },
+              "fair_probabilities": {
+                "yes": 0.1278,
+                "no": 0.8722
+              },
+              "overround": 0.0716,
+              "overround_pct": 7.157,
+              "payout": 0.9332,
+              "payout_pct": 93.321,
+              "margin_load_pp": {
+                "yes": 0.915,
+                "no": 6.242
+              },
+              "margin_load_share": {
+                "yes": 0.1278,
+                "no": 0.8722
+              }
+            },
+            "bookmakers_count": 4
+          },
+          "current": {
+            "odds": {
+              "yes": 7.3,
+              "no": 1.07
+            },
+            "math": {
+              "raw_probabilities": {
+                "yes": 0.137,
+                "no": 0.9346
+              },
+              "fair_probabilities": {
+                "yes": 0.1278,
+                "no": 0.8722
+              },
+              "overround": 0.0716,
+              "overround_pct": 7.157,
+              "payout": 0.9332,
+              "payout_pct": 93.321,
+              "margin_load_pp": {
+                "yes": 0.915,
+                "no": 6.242
+              },
+              "margin_load_share": {
+                "yes": 0.1278,
+                "no": 0.8722
+              }
+            },
+            "bookmakers_count": 4,
+            "dispersion": {
+              "yes": 0.531,
+              "no": 0.019
+            }
+          },
+          "selections": {
+            "yes": {
+              "open_odd": 7.3,
+              "current_odd": 7.3,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.1278,
+              "current_fair_probability": 0.1278,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 0.915,
+              "margin_load_current_pp": 0.915,
+              "margin_load_delta_pp": 0.0
+            },
+            "no": {
+              "open_odd": 1.07,
+              "current_odd": 1.07,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.8722,
+              "current_fair_probability": 0.8722,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 6.242,
+              "margin_load_current_pp": 6.242,
+              "margin_load_delta_pp": 0.0
+            }
+          }
+        },
+        "over05_ht": {
+          "history": [
+            {
+              "ts": "2026-10-18T19:10:34+02:00",
+              "odds": {
+                "over": 1.66,
+                "under": 2.105
+              },
+              "math": {
+                "raw_probabilities": {
+                  "over": 0.6024,
+                  "under": 0.4751
+                },
+                "fair_probabilities": {
+                  "over": 0.5591,
+                  "under": 0.4409
+                },
+                "overround": 0.0775,
+                "overround_pct": 7.747,
+                "payout": 0.9281,
+                "payout_pct": 92.81,
+                "margin_load_pp": {
+                  "over": 4.331,
+                  "under": 3.416
+                },
+                "margin_load_share": {
+                  "over": 0.5591,
+                  "under": 0.4409
+                }
+              },
+              "bookmakers_count": 6
+            }
+          ],
+          "movement_features": {
+            "over": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 1.66,
+              "current_odd": 1.66,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            },
+            "under": {
+              "consensus_ratio": 0.0,
+              "observation_hours": null,
+              "drop_pct_per_hour": null,
+              "opening_observed_odd": 2.105,
+              "current_odd": 2.105,
+              "drop_pct": 0.0,
+              "direction_reversals": 0,
+              "favorite_inversion": false,
+              "observation_count": 1,
+              "opening_note": "first observed quote, not certified bookmaker opening"
+            }
+          },
+          "open": {
+            "odds": {
+              "over": 1.66,
+              "under": 2.105
+            },
+            "math": {
+              "raw_probabilities": {
+                "over": 0.6024,
+                "under": 0.4751
+              },
+              "fair_probabilities": {
+                "over": 0.5591,
+                "under": 0.4409
+              },
+              "overround": 0.0775,
+              "overround_pct": 7.747,
+              "payout": 0.9281,
+              "payout_pct": 92.81,
+              "margin_load_pp": {
+                "over": 4.331,
+                "under": 3.416
+              },
+              "margin_load_share": {
+                "over": 0.5591,
+                "under": 0.4409
+              }
+            },
+            "bookmakers_count": 6
+          },
+          "current": {
+            "odds": {
+              "over": 1.66,
+              "under": 2.105
+            },
+            "math": {
+              "raw_probabilities": {
+                "over": 0.6024,
+                "under": 0.4751
+              },
+              "fair_probabilities": {
+                "over": 0.5591,
+                "under": 0.4409
+              },
+              "overround": 0.0775,
+              "overround_pct": 7.747,
+              "payout": 0.9281,
+              "payout_pct": 92.81,
+              "margin_load_pp": {
+                "over": 4.331,
+                "under": 3.416
+              },
+              "margin_load_share": {
+                "over": 0.5591,
+                "under": 0.4409
+              }
+            },
+            "bookmakers_count": 6,
+            "dispersion": {
+              "over": 0.022,
+              "under": 0.06
+            }
+          },
+          "selections": {
+            "over": {
+              "open_odd": 1.66,
+              "current_odd": 1.66,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.5591,
+              "current_fair_probability": 0.5591,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 4.331,
+              "margin_load_current_pp": 4.331,
+              "margin_load_delta_pp": 0.0
+            },
+            "under": {
+              "open_odd": 2.105,
+              "current_odd": 2.105,
+              "delta_odd": 0.0,
+              "open_fair_probability": 0.4409,
+              "current_fair_probability": 0.4409,
+              "delta_fair_pp": 0.0,
+              "movement": {
+                "level": "stable",
+                "color": "gray"
+              },
+              "bookmaker_consensus": {
+                "concordant": 0,
+                "considered": 0,
+                "ratio": 0.0
+              },
+              "oci_as": {
+                "value": 0.0,
+                "absolute": 0.0,
+                "direction": "stable",
+                "components": {
+                  "magnitude": 0.0,
+                  "consensus": 0.0,
+                  "velocity": 0.0,
+                  "persistence": 0.0,
+                  "coverage": 0.0
+                }
+              },
+              "margin_load_open_pp": 3.416,
+              "margin_load_current_pp": 3.416,
+              "margin_load_delta_pp": 0.0
+            }
+          }
+        }
+      },
+      "probabilities_without_drought_poisson": {
+        "1x2_ft": {
+          "1": 0.5835,
+          "x": 0.2842,
+          "2": 0.1323
+        },
+        "over25_ft": {
+          "over": 0.2745,
+          "under": 0.7255
+        },
+        "over15_ht": {
+          "over": 0.353,
+          "under": 0.647
+        },
+        "gg_ht": {
+          "yes": 0.0791,
+          "no": 0.9209
+        },
+        "over15_ft_extra": {
+          "over": 0.5428,
+          "under": 0.4572
+        },
+        "over05_ht": {
+          "over": 0.7118,
+          "under": 0.2882
+        }
+      },
+      "primary_choice": {
+        "market": "1x2_ft",
+        "selection": "1",
+        "odd": 2.05,
+        "probability_pct": 57.0,
+        "probability_raw_pct": 58.2,
+        "expected_value_pct": 16.85,
+        "relation": "model_only",
+        "ranking_score": 86.505,
+        "recommendation_score": 86.505,
+        "grade": "A",
+        "gate": {
+          "eligible": true,
+          "score": 86.505,
+          "grade": "A",
+          "reasons": [],
+          "absolute_probability_floor_pct": 44.0,
+          "market_break_even_pct": 48.78,
+          "probability_pct": 57.0,
+          "raw_probability_pct": 58.2,
+          "expected_value_pct": 16.85,
+          "edge_over_break_even_pp": 8.22,
+          "book_disagreement_pp": 13.0,
+          "competition_quality_score": 72,
+          "bookmakers": 6,
+          "policy": "probability_floor_plus_price_edge",
+          "analytical_score_before_price_preference": 83.505,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band"
+        },
+        "marker": {
+          "shape": "circle",
+          "color": "red",
+          "model": true,
+          "book": false,
+          "agreement": false
+        },
+        "market_calibration_weight": 0.092
+      },
+      "ranked_choices": [
+        {
+          "market": "1x2_ft",
+          "selection": "1",
+          "odd": 2.05,
+          "probability_pct": 57.0,
+          "probability_raw_pct": 58.2,
+          "expected_value_pct": 16.85,
+          "relation": "model_only",
+          "ranking_score": 86.505,
+          "recommendation_score": 86.505,
+          "grade": "A",
+          "gate": {
+            "eligible": true,
+            "score": 86.505,
+            "grade": "A",
+            "reasons": [],
+            "absolute_probability_floor_pct": 44.0,
+            "market_break_even_pct": 48.78,
+            "probability_pct": 57.0,
+            "raw_probability_pct": 58.2,
+            "expected_value_pct": 16.85,
+            "edge_over_break_even_pp": 8.22,
+            "book_disagreement_pp": 13.0,
+            "competition_quality_score": 72,
+            "bookmakers": 6,
+            "policy": "probability_floor_plus_price_edge",
+            "analytical_score_before_price_preference": 83.505,
+            "price_preference_adjustment": 3.0,
+            "price_profile": "preferred_value_band"
+          },
+          "marker": {
+            "shape": "circle",
+            "color": "red",
+            "model": true,
+            "book": false,
+            "agreement": false
+          },
+          "market_calibration_weight": 0.092
+        }
+      ]
     }
   }
 }
