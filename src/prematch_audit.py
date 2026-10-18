@@ -1,6 +1,7 @@
 """Evaluate frozen pre-match probabilities; missing scores never count as losses."""
 from collections import defaultdict
 from math import sqrt
+from filter_audit import build_filter_comparison
 
 MARKETS = {'over15_ht': ('over', 'home_ht', 'away_ht', 2),
            'gg_ht': ('yes', 'home_ht', 'away_ht', None),
@@ -61,7 +62,7 @@ def build_report(store):
             'brier_score': round(sum((p-y)**2 for p,y,_ in rows)/n, 6),
             'wilson_95_pct': [round((center-margin)*100, 3), round((center+margin)*100, 3)],
             'priced_n': len(priced), 'roi_pct': round(sum((odd if y else 0)-1 for y,odd in priced)/len(priced)*100, 3) if priced else None})
-    return {'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'quote_groups': quote_report(store)}
+    return {'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'quote_groups': quote_report(store), 'filter_comparison': build_filter_comparison(store)}
 
 
 def quote_report(store):
