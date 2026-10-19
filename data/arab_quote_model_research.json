@@ -1,11 +1,11 @@
 {
-  "model_id": "coherent-markets-v1",
+  "model_id": "coherent-markets-v2",
   "validation_from": "2026-10-20",
   "status": "experimental",
   "note": "No threshold tuning. Retrospective development is separated from frozen prospective forecasts. ROI is theoretical, not executed.",
   "cohorts": [
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "frozen_fixtures": 171,
       "settled_fixtures": 171,
@@ -14,7 +14,7 @@
   ],
   "groups": [
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "group": "all",
@@ -33,7 +33,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "group": "matched_benchmark",
@@ -52,7 +52,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "group": "matched_benchmark",
@@ -71,7 +71,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "group": "matched_benchmark",
@@ -90,7 +90,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "group": "matched_benchmark",
@@ -109,7 +109,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "group": "matched_benchmark",
@@ -128,7 +128,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "group": "matched_benchmark",
@@ -147,7 +147,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "group": "rejected",
@@ -166,7 +166,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "group": "all",
@@ -185,7 +185,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "group": "matched_benchmark",
@@ -204,7 +204,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "group": "matched_benchmark",
@@ -223,7 +223,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "group": "matched_benchmark",
@@ -242,7 +242,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "group": "matched_benchmark",
@@ -261,7 +261,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "group": "matched_benchmark",
@@ -280,7 +280,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "group": "matched_benchmark",
@@ -299,7 +299,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "group": "rejected",
@@ -318,7 +318,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "group": "all",
@@ -337,7 +337,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "group": "matched_benchmark",
@@ -356,7 +356,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "group": "matched_benchmark",
@@ -375,7 +375,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "group": "matched_benchmark",
@@ -394,7 +394,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "group": "matched_benchmark",
@@ -413,7 +413,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "group": "matched_benchmark",
@@ -432,7 +432,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "group": "matched_benchmark",
@@ -451,7 +451,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "group": "rejected",
@@ -470,7 +470,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "group": "all",
@@ -489,7 +489,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "group": "rejected",
@@ -508,7 +508,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "group": "all",
@@ -527,7 +527,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "group": "rejected",
@@ -546,7 +546,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "group": "all",
@@ -565,7 +565,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "group": "rejected",
@@ -584,7 +584,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "group": "all",
@@ -603,7 +603,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "group": "rejected",
@@ -622,7 +622,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "group": "all",
@@ -641,7 +641,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "group": "matched_benchmark",
@@ -660,7 +660,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "group": "matched_benchmark",
@@ -679,7 +679,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "group": "matched_benchmark",
@@ -698,7 +698,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "group": "matched_benchmark",
@@ -717,7 +717,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "group": "matched_benchmark",
@@ -736,7 +736,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "group": "matched_benchmark",
@@ -755,7 +755,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "group": "rejected",
@@ -774,7 +774,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "group": "all",
@@ -793,7 +793,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "group": "matched_benchmark",
@@ -812,7 +812,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "group": "matched_benchmark",
@@ -831,7 +831,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "group": "matched_benchmark",
@@ -850,7 +850,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "group": "matched_benchmark",
@@ -869,7 +869,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "group": "matched_benchmark",
@@ -888,7 +888,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "group": "matched_benchmark",
@@ -907,7 +907,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "group": "rejected",
@@ -926,7 +926,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "group": "all",
@@ -945,7 +945,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "group": "rejected",
@@ -964,7 +964,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "group": "all",
@@ -983,7 +983,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "group": "rejected",
@@ -1002,7 +1002,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "group": "all",
@@ -1021,7 +1021,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "group": "matched_benchmark",
@@ -1040,7 +1040,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "group": "matched_benchmark",
@@ -1059,7 +1059,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "group": "matched_benchmark",
@@ -1078,7 +1078,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "group": "matched_benchmark",
@@ -1097,7 +1097,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "group": "matched_benchmark",
@@ -1116,7 +1116,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "group": "matched_benchmark",
@@ -1135,7 +1135,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "group": "rejected",
@@ -1154,7 +1154,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "group": "all",
@@ -1173,7 +1173,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "group": "matched_benchmark",
@@ -1192,7 +1192,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "group": "matched_benchmark",
@@ -1211,7 +1211,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "group": "matched_benchmark",
@@ -1230,7 +1230,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "group": "matched_benchmark",
@@ -1249,7 +1249,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "group": "matched_benchmark",
@@ -1268,7 +1268,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "group": "matched_benchmark",
@@ -1287,7 +1287,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "group": "rejected",
@@ -1306,7 +1306,83 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "group": "all",
+      "variant": "combined",
+      "n": 171,
+      "wins": 66,
+      "hit_rate_pct": 38.596,
+      "mean_probability_pct": 43.379,
+      "brier": 0.223346,
+      "log_loss": 0.637687,
+      "wilson_95_pct": [
+        31.627,
+        46.068
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "group": "rejected",
+      "variant": "combined",
+      "n": 171,
+      "wins": 66,
+      "hit_rate_pct": 38.596,
+      "mean_probability_pct": 43.379,
+      "brier": 0.223346,
+      "log_loss": 0.637687,
+      "wilson_95_pct": [
+        31.627,
+        46.068
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "group": "all",
+      "variant": "combined",
+      "n": 171,
+      "wins": 105,
+      "hit_rate_pct": 61.404,
+      "mean_probability_pct": 56.621,
+      "brier": 0.223346,
+      "log_loss": 0.637687,
+      "wilson_95_pct": [
+        53.932,
+        68.373
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "group": "rejected",
+      "variant": "combined",
+      "n": 171,
+      "wins": 105,
+      "hit_rate_pct": 61.404,
+      "mean_probability_pct": 56.621,
+      "brier": 0.223346,
+      "log_loss": 0.637687,
+      "wilson_95_pct": [
+        53.932,
+        68.373
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "group": "all",
@@ -1325,7 +1401,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "group": "rejected",
@@ -1344,7 +1420,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "group": "all",
@@ -1363,7 +1439,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "group": "rejected",
@@ -1382,7 +1458,83 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "group": "all",
+      "variant": "combined",
+      "n": 171,
+      "wins": 130,
+      "hit_rate_pct": 76.023,
+      "mean_probability_pct": 76.601,
+      "brier": 0.174801,
+      "log_loss": 0.528173,
+      "wilson_95_pct": [
+        69.097,
+        81.806
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "group": "rejected",
+      "variant": "combined",
+      "n": 171,
+      "wins": 130,
+      "hit_rate_pct": 76.023,
+      "mean_probability_pct": 76.601,
+      "brier": 0.174801,
+      "log_loss": 0.528173,
+      "wilson_95_pct": [
+        69.097,
+        81.806
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "group": "all",
+      "variant": "combined",
+      "n": 171,
+      "wins": 41,
+      "hit_rate_pct": 23.977,
+      "mean_probability_pct": 23.399,
+      "brier": 0.174801,
+      "log_loss": 0.528173,
+      "wilson_95_pct": [
+        18.194,
+        30.903
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "group": "rejected",
+      "variant": "combined",
+      "n": 171,
+      "wins": 41,
+      "hit_rate_pct": 23.977,
+      "mean_probability_pct": 23.399,
+      "brier": 0.174801,
+      "log_loss": 0.528173,
+      "wilson_95_pct": [
+        18.194,
+        30.903
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "group": "all",
@@ -1401,7 +1553,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "group": "matched_benchmark",
@@ -1420,7 +1572,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "group": "matched_benchmark",
@@ -1439,7 +1591,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "group": "matched_benchmark",
@@ -1458,7 +1610,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "group": "matched_benchmark",
@@ -1477,7 +1629,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "group": "matched_benchmark",
@@ -1496,7 +1648,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "group": "matched_benchmark",
@@ -1515,7 +1667,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "group": "rejected",
@@ -1534,7 +1686,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "group": "all",
@@ -1553,7 +1705,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "group": "matched_benchmark",
@@ -1572,7 +1724,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "group": "matched_benchmark",
@@ -1591,7 +1743,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "group": "matched_benchmark",
@@ -1610,7 +1762,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "group": "matched_benchmark",
@@ -1629,7 +1781,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "group": "matched_benchmark",
@@ -1648,7 +1800,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "group": "matched_benchmark",
@@ -1667,7 +1819,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "group": "rejected",
@@ -1686,7 +1838,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "group": "all",
@@ -1705,7 +1857,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "group": "rejected",
@@ -1724,7 +1876,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "group": "all",
@@ -1743,7 +1895,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "group": "rejected",
@@ -1762,7 +1914,83 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "group": "all",
+      "variant": "combined",
+      "n": 171,
+      "wins": 127,
+      "hit_rate_pct": 74.269,
+      "mean_probability_pct": 82.357,
+      "brier": 0.186699,
+      "log_loss": 0.559461,
+      "wilson_95_pct": [
+        67.234,
+        80.238
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "group": "rejected",
+      "variant": "combined",
+      "n": 171,
+      "wins": 127,
+      "hit_rate_pct": 74.269,
+      "mean_probability_pct": 82.357,
+      "brier": 0.186699,
+      "log_loss": 0.559461,
+      "wilson_95_pct": [
+        67.234,
+        80.238
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "group": "all",
+      "variant": "combined",
+      "n": 171,
+      "wins": 44,
+      "hit_rate_pct": 25.731,
+      "mean_probability_pct": 17.643,
+      "brier": 0.186699,
+      "log_loss": 0.559461,
+      "wilson_95_pct": [
+        19.762,
+        32.766
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "group": "rejected",
+      "variant": "combined",
+      "n": 171,
+      "wins": 44,
+      "hit_rate_pct": 25.731,
+      "mean_probability_pct": 17.643,
+      "brier": 0.186699,
+      "log_loss": 0.559461,
+      "wilson_95_pct": [
+        19.762,
+        32.766
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "group": "all",
@@ -1781,7 +2009,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "group": "matched_benchmark",
@@ -1800,7 +2028,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "group": "matched_benchmark",
@@ -1819,7 +2047,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "group": "matched_benchmark",
@@ -1838,7 +2066,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "group": "matched_benchmark",
@@ -1857,7 +2085,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "group": "matched_benchmark",
@@ -1876,7 +2104,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "group": "matched_benchmark",
@@ -1895,7 +2123,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "group": "rejected",
@@ -1914,7 +2142,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "group": "all",
@@ -1933,7 +2161,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "group": "matched_benchmark",
@@ -1952,7 +2180,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "group": "matched_benchmark",
@@ -1971,7 +2199,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "group": "matched_benchmark",
@@ -1990,7 +2218,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "group": "matched_benchmark",
@@ -2009,7 +2237,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "group": "matched_benchmark",
@@ -2028,7 +2256,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "group": "matched_benchmark",
@@ -2047,7 +2275,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "group": "rejected",
@@ -2066,7 +2294,83 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "group": "all",
+      "variant": "combined",
+      "n": 171,
+      "wins": 29,
+      "hit_rate_pct": 16.959,
+      "mean_probability_pct": 14.663,
+      "brier": 0.137833,
+      "log_loss": 0.444206,
+      "wilson_95_pct": [
+        12.075,
+        23.295
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "group": "rejected",
+      "variant": "combined",
+      "n": 171,
+      "wins": 29,
+      "hit_rate_pct": 16.959,
+      "mean_probability_pct": 14.663,
+      "brier": 0.137833,
+      "log_loss": 0.444206,
+      "wilson_95_pct": [
+        12.075,
+        23.295
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "group": "all",
+      "variant": "combined",
+      "n": 171,
+      "wins": 142,
+      "hit_rate_pct": 83.041,
+      "mean_probability_pct": 85.337,
+      "brier": 0.137833,
+      "log_loss": 0.444206,
+      "wilson_95_pct": [
+        76.705,
+        87.925
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "group": "rejected",
+      "variant": "combined",
+      "n": 171,
+      "wins": 142,
+      "hit_rate_pct": 83.041,
+      "mean_probability_pct": 85.337,
+      "brier": 0.137833,
+      "log_loss": 0.444206,
+      "wilson_95_pct": [
+        76.705,
+        87.925
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "group": "all",
@@ -2085,7 +2389,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "group": "rejected",
@@ -2104,7 +2408,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "group": "all",
@@ -2123,7 +2427,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "group": "rejected",
@@ -2144,7 +2448,7 @@
   ],
   "calibration": [
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "band_from_pct": 0,
@@ -2162,7 +2466,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "band_from_pct": 10,
@@ -2180,7 +2484,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "band_from_pct": 20,
@@ -2198,7 +2502,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "band_from_pct": 30,
@@ -2216,7 +2520,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "band_from_pct": 40,
@@ -2234,7 +2538,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "band_from_pct": 50,
@@ -2252,7 +2556,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "band_from_pct": 60,
@@ -2270,7 +2574,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "band_from_pct": 70,
@@ -2288,7 +2592,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "band_from_pct": 10,
@@ -2306,7 +2610,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "band_from_pct": 20,
@@ -2324,7 +2628,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "band_from_pct": 30,
@@ -2342,7 +2646,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "band_from_pct": 40,
@@ -2360,7 +2664,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "band_from_pct": 50,
@@ -2378,7 +2682,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "band_from_pct": 60,
@@ -2396,7 +2700,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "band_from_pct": 70,
@@ -2414,7 +2718,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "band_from_pct": 80,
@@ -2432,7 +2736,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "band_from_pct": 10,
@@ -2450,7 +2754,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "band_from_pct": 20,
@@ -2468,7 +2772,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "band_from_pct": 30,
@@ -2486,7 +2790,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "band_from_pct": 10,
@@ -2504,7 +2808,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "band_from_pct": 20,
@@ -2522,7 +2826,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "band_from_pct": 30,
@@ -2540,7 +2844,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "band_from_pct": 40,
@@ -2558,7 +2862,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "band_from_pct": 50,
@@ -2576,7 +2880,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "band_from_pct": 60,
@@ -2594,7 +2898,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "band_from_pct": 70,
@@ -2612,7 +2916,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "band_from_pct": 80,
@@ -2630,7 +2934,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "band_from_pct": 10,
@@ -2648,7 +2952,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "band_from_pct": 20,
@@ -2666,7 +2970,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "band_from_pct": 30,
@@ -2684,7 +2988,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "band_from_pct": 40,
@@ -2702,7 +3006,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "band_from_pct": 50,
@@ -2720,7 +3024,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "band_from_pct": 60,
@@ -2738,7 +3042,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "band_from_pct": 70,
@@ -2756,7 +3060,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "band_from_pct": 80,
@@ -2774,7 +3078,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "band_from_pct": 20,
@@ -2792,7 +3096,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "band_from_pct": 30,
@@ -2810,7 +3114,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "band_from_pct": 40,
@@ -2828,7 +3132,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "band_from_pct": 50,
@@ -2846,7 +3150,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "band_from_pct": 60,
@@ -2864,7 +3168,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "band_from_pct": 30,
@@ -2882,7 +3186,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "band_from_pct": 40,
@@ -2900,7 +3204,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "band_from_pct": 50,
@@ -2918,7 +3222,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "band_from_pct": 60,
@@ -2936,7 +3240,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "band_from_pct": 70,
@@ -2954,7 +3258,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "band_from_pct": 60,
@@ -2972,7 +3276,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "band_from_pct": 70,
@@ -2990,7 +3294,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "band_from_pct": 80,
@@ -3008,7 +3312,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "band_from_pct": 90,
@@ -3026,7 +3330,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "band_from_pct": 0,
@@ -3044,7 +3348,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "band_from_pct": 10,
@@ -3062,7 +3366,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "band_from_pct": 20,
@@ -3080,7 +3384,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "band_from_pct": 30,
@@ -3098,7 +3402,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "band_from_pct": 10,
@@ -3116,7 +3420,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "band_from_pct": 20,
@@ -3134,7 +3438,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "band_from_pct": 30,
@@ -3152,7 +3456,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "band_from_pct": 40,
@@ -3170,7 +3474,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "band_from_pct": 50,
@@ -3188,7 +3492,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "band_from_pct": 60,
@@ -3206,7 +3510,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "band_from_pct": 70,
@@ -3224,7 +3528,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "band_from_pct": 20,
@@ -3242,7 +3546,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "band_from_pct": 30,
@@ -3260,7 +3564,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "band_from_pct": 40,
@@ -3278,7 +3582,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "band_from_pct": 50,
@@ -3296,7 +3600,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "band_from_pct": 60,
@@ -3314,7 +3618,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "band_from_pct": 70,
@@ -3332,7 +3636,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "band_from_pct": 80,
@@ -3350,7 +3654,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "band_from_pct": 50,
@@ -3368,7 +3672,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "band_from_pct": 60,
@@ -3386,7 +3690,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "band_from_pct": 70,
@@ -3404,7 +3708,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "band_from_pct": 80,
@@ -3422,7 +3726,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "band_from_pct": 10,
@@ -3440,7 +3744,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "band_from_pct": 20,
@@ -3458,7 +3762,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "band_from_pct": 30,
@@ -3476,7 +3780,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "band_from_pct": 40,
@@ -3494,7 +3798,187 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "band_from_pct": 20,
+      "n": 12,
+      "wins": 1,
+      "hit_rate_pct": 8.333,
+      "mean_probability_pct": 26.646,
+      "brier": 0.109696,
+      "log_loss": 0.393225,
+      "wilson_95_pct": [
+        1.486,
+        35.389
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "band_from_pct": 30,
+      "n": 51,
+      "wins": 16,
+      "hit_rate_pct": 31.373,
+      "mean_probability_pct": 35.519,
+      "brier": 0.213667,
+      "log_loss": 0.618218,
+      "wilson_95_pct": [
+        20.328,
+        45.027
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "band_from_pct": 40,
+      "n": 63,
+      "wins": 23,
+      "hit_rate_pct": 36.508,
+      "mean_probability_pct": 45.003,
+      "brier": 0.238549,
+      "log_loss": 0.670084,
+      "wilson_95_pct": [
+        25.715,
+        48.852
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "band_from_pct": 50,
+      "n": 41,
+      "wins": 22,
+      "hit_rate_pct": 53.659,
+      "mean_probability_pct": 53.748,
+      "brier": 0.252911,
+      "log_loss": 0.6991,
+      "wilson_95_pct": [
+        38.746,
+        67.944
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "band_from_pct": 60,
+      "n": 4,
+      "wins": 4,
+      "hit_rate_pct": 100.0,
+      "mean_probability_pct": 61.926,
+      "brier": 0.145217,
+      "log_loss": 0.479553,
+      "wilson_95_pct": [
+        51.01,
+        100.0
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "band_from_pct": 30,
+      "n": 4,
+      "wins": 0,
+      "hit_rate_pct": 0.0,
+      "mean_probability_pct": 38.074,
+      "brier": 0.145217,
+      "log_loss": 0.479553,
+      "wilson_95_pct": [
+        0.0,
+        48.99
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "band_from_pct": 40,
+      "n": 41,
+      "wins": 19,
+      "hit_rate_pct": 46.341,
+      "mean_probability_pct": 46.252,
+      "brier": 0.252911,
+      "log_loss": 0.6991,
+      "wilson_95_pct": [
+        32.056,
+        61.254
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "band_from_pct": 50,
+      "n": 63,
+      "wins": 40,
+      "hit_rate_pct": 63.492,
+      "mean_probability_pct": 54.997,
+      "brier": 0.238549,
+      "log_loss": 0.670084,
+      "wilson_95_pct": [
+        51.148,
+        74.285
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "band_from_pct": 60,
+      "n": 51,
+      "wins": 35,
+      "hit_rate_pct": 68.627,
+      "mean_probability_pct": 64.481,
+      "brier": 0.213667,
+      "log_loss": 0.618218,
+      "wilson_95_pct": [
+        54.973,
+        79.672
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "band_from_pct": 70,
+      "n": 12,
+      "wins": 11,
+      "hit_rate_pct": 91.667,
+      "mean_probability_pct": 73.354,
+      "brier": 0.109696,
+      "log_loss": 0.393225,
+      "wilson_95_pct": [
+        64.611,
+        98.514
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "band_from_pct": 50,
@@ -3512,7 +3996,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "band_from_pct": 60,
@@ -3530,7 +4014,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "band_from_pct": 70,
@@ -3548,7 +4032,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "band_from_pct": 80,
@@ -3566,7 +4050,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "band_from_pct": 90,
@@ -3584,7 +4068,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "band_from_pct": 0,
@@ -3602,7 +4086,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "band_from_pct": 10,
@@ -3620,7 +4104,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "band_from_pct": 20,
@@ -3638,7 +4122,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "band_from_pct": 30,
@@ -3656,7 +4140,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "band_from_pct": 40,
@@ -3674,7 +4158,187 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "band_from_pct": 50,
+      "n": 4,
+      "wins": 3,
+      "hit_rate_pct": 75.0,
+      "mean_probability_pct": 57.89,
+      "brier": 0.217882,
+      "log_loss": 0.628353,
+      "wilson_95_pct": [
+        30.064,
+        95.441
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "band_from_pct": 60,
+      "n": 33,
+      "wins": 20,
+      "hit_rate_pct": 60.606,
+      "mean_probability_pct": 66.0,
+      "brier": 0.248563,
+      "log_loss": 0.692266,
+      "wilson_95_pct": [
+        43.683,
+        75.317
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "band_from_pct": 70,
+      "n": 70,
+      "wins": 52,
+      "hit_rate_pct": 74.286,
+      "mean_probability_pct": 74.974,
+      "brier": 0.187712,
+      "log_loss": 0.560973,
+      "wilson_95_pct": [
+        62.974,
+        83.071
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "band_from_pct": 80,
+      "n": 56,
+      "wins": 48,
+      "hit_rate_pct": 85.714,
+      "mean_probability_pct": 84.162,
+      "brier": 0.121498,
+      "log_loss": 0.405253,
+      "wilson_95_pct": [
+        74.264,
+        92.579
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "band_from_pct": 90,
+      "n": 8,
+      "wins": 7,
+      "hit_rate_pct": 87.5,
+      "mean_probability_pct": 91.005,
+      "brier": 0.10915,
+      "log_loss": 0.374639,
+      "wilson_95_pct": [
+        52.911,
+        97.758
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "band_from_pct": 0,
+      "n": 8,
+      "wins": 1,
+      "hit_rate_pct": 12.5,
+      "mean_probability_pct": 8.995,
+      "brier": 0.10915,
+      "log_loss": 0.374639,
+      "wilson_95_pct": [
+        2.242,
+        47.089
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "band_from_pct": 10,
+      "n": 56,
+      "wins": 8,
+      "hit_rate_pct": 14.286,
+      "mean_probability_pct": 15.838,
+      "brier": 0.121498,
+      "log_loss": 0.405253,
+      "wilson_95_pct": [
+        7.421,
+        25.736
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "band_from_pct": 20,
+      "n": 70,
+      "wins": 18,
+      "hit_rate_pct": 25.714,
+      "mean_probability_pct": 25.026,
+      "brier": 0.187712,
+      "log_loss": 0.560973,
+      "wilson_95_pct": [
+        16.929,
+        37.026
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "band_from_pct": 30,
+      "n": 33,
+      "wins": 13,
+      "hit_rate_pct": 39.394,
+      "mean_probability_pct": 34.0,
+      "brier": 0.248563,
+      "log_loss": 0.692266,
+      "wilson_95_pct": [
+        24.683,
+        56.317
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "band_from_pct": 40,
+      "n": 4,
+      "wins": 1,
+      "hit_rate_pct": 25.0,
+      "mean_probability_pct": 42.11,
+      "brier": 0.217882,
+      "log_loss": 0.628353,
+      "wilson_95_pct": [
+        4.559,
+        69.936
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "band_from_pct": 10,
@@ -3692,7 +4356,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "band_from_pct": 20,
@@ -3710,7 +4374,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "band_from_pct": 30,
@@ -3728,7 +4392,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "band_from_pct": 40,
@@ -3746,7 +4410,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "band_from_pct": 50,
@@ -3764,7 +4428,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "band_from_pct": 40,
@@ -3782,7 +4446,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "band_from_pct": 50,
@@ -3800,7 +4464,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "band_from_pct": 60,
@@ -3818,7 +4482,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "band_from_pct": 70,
@@ -3836,7 +4500,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "band_from_pct": 80,
@@ -3854,7 +4518,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "band_from_pct": 50,
@@ -3872,7 +4536,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "band_from_pct": 60,
@@ -3890,7 +4554,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "band_from_pct": 70,
@@ -3908,7 +4572,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "band_from_pct": 80,
@@ -3926,7 +4590,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "band_from_pct": 10,
@@ -3944,7 +4608,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "band_from_pct": 20,
@@ -3962,7 +4626,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "band_from_pct": 30,
@@ -3980,7 +4644,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "band_from_pct": 40,
@@ -3998,7 +4662,151 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "band_from_pct": 60,
+      "n": 11,
+      "wins": 5,
+      "hit_rate_pct": 45.455,
+      "mean_probability_pct": 66.043,
+      "brier": 0.290469,
+      "log_loss": 0.778086,
+      "wilson_95_pct": [
+        21.271,
+        71.991
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "band_from_pct": 70,
+      "n": 49,
+      "wins": 33,
+      "hit_rate_pct": 67.347,
+      "mean_probability_pct": 76.11,
+      "brier": 0.22377,
+      "log_loss": 0.641822,
+      "wilson_95_pct": [
+        53.379,
+        78.793
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "band_from_pct": 80,
+      "n": 87,
+      "wins": 68,
+      "hit_rate_pct": 78.161,
+      "mean_probability_pct": 85.353,
+      "brier": 0.174335,
+      "log_loss": 0.538079,
+      "wilson_95_pct": [
+        68.391,
+        85.549
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "band_from_pct": 90,
+      "n": 24,
+      "wins": 21,
+      "hit_rate_pct": 87.5,
+      "mean_probability_pct": 91.726,
+      "brier": 0.108272,
+      "log_loss": 0.368611,
+      "wilson_95_pct": [
+        68.996,
+        95.656
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "band_from_pct": 0,
+      "n": 24,
+      "wins": 3,
+      "hit_rate_pct": 12.5,
+      "mean_probability_pct": 8.274,
+      "brier": 0.108272,
+      "log_loss": 0.368611,
+      "wilson_95_pct": [
+        4.344,
+        31.004
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "band_from_pct": 10,
+      "n": 87,
+      "wins": 19,
+      "hit_rate_pct": 21.839,
+      "mean_probability_pct": 14.647,
+      "brier": 0.174335,
+      "log_loss": 0.538079,
+      "wilson_95_pct": [
+        14.451,
+        31.609
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "band_from_pct": 20,
+      "n": 49,
+      "wins": 16,
+      "hit_rate_pct": 32.653,
+      "mean_probability_pct": 23.89,
+      "brier": 0.22377,
+      "log_loss": 0.641822,
+      "wilson_95_pct": [
+        21.207,
+        46.621
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "band_from_pct": 30,
+      "n": 11,
+      "wins": 6,
+      "hit_rate_pct": 54.545,
+      "mean_probability_pct": 33.957,
+      "brier": 0.290469,
+      "log_loss": 0.778086,
+      "wilson_95_pct": [
+        28.009,
+        78.729
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "band_from_pct": 20,
@@ -4016,7 +4824,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "band_from_pct": 30,
@@ -4034,7 +4842,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "band_from_pct": 40,
@@ -4052,7 +4860,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "band_from_pct": 50,
@@ -4070,7 +4878,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "band_from_pct": 60,
@@ -4088,7 +4896,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "band_from_pct": 70,
@@ -4106,7 +4914,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "band_from_pct": 20,
@@ -4124,7 +4932,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "band_from_pct": 30,
@@ -4142,7 +4950,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "band_from_pct": 40,
@@ -4160,7 +4968,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "band_from_pct": 50,
@@ -4178,7 +4986,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "band_from_pct": 60,
@@ -4196,7 +5004,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "band_from_pct": 70,
@@ -4214,7 +5022,115 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "band_from_pct": 0,
+      "n": 31,
+      "wins": 2,
+      "hit_rate_pct": 6.452,
+      "mean_probability_pct": 8.125,
+      "brier": 0.060689,
+      "log_loss": 0.241207,
+      "wilson_95_pct": [
+        1.787,
+        20.719
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "band_from_pct": 10,
+      "n": 113,
+      "wins": 20,
+      "hit_rate_pct": 17.699,
+      "mean_probability_pct": 14.376,
+      "brier": 0.146872,
+      "log_loss": 0.471525,
+      "wilson_95_pct": [
+        11.76,
+        25.763
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "band_from_pct": 20,
+      "n": 27,
+      "wins": 7,
+      "hit_rate_pct": 25.926,
+      "mean_probability_pct": 23.366,
+      "brier": 0.188577,
+      "log_loss": 0.562944,
+      "wilson_95_pct": [
+        13.17,
+        44.679
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "band_from_pct": 70,
+      "n": 27,
+      "wins": 20,
+      "hit_rate_pct": 74.074,
+      "mean_probability_pct": 76.634,
+      "brier": 0.188577,
+      "log_loss": 0.562944,
+      "wilson_95_pct": [
+        55.321,
+        86.83
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "band_from_pct": 80,
+      "n": 113,
+      "wins": 93,
+      "hit_rate_pct": 82.301,
+      "mean_probability_pct": 85.624,
+      "brier": 0.146872,
+      "log_loss": 0.471525,
+      "wilson_95_pct": [
+        74.237,
+        88.24
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "band_from_pct": 90,
+      "n": 31,
+      "wins": 29,
+      "hit_rate_pct": 93.548,
+      "mean_probability_pct": 91.875,
+      "brier": 0.060689,
+      "log_loss": 0.241207,
+      "wilson_95_pct": [
+        79.281,
+        98.213
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "band_from_pct": 10,
@@ -4232,7 +5148,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "band_from_pct": 20,
@@ -4250,7 +5166,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "band_from_pct": 30,
@@ -4268,7 +5184,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "band_from_pct": 40,
@@ -4286,7 +5202,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "band_from_pct": 50,
@@ -4304,7 +5220,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "band_from_pct": 60,
@@ -4322,7 +5238,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "band_from_pct": 30,
@@ -4340,7 +5256,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "band_from_pct": 40,
@@ -4358,7 +5274,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "band_from_pct": 50,
@@ -4376,7 +5292,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "band_from_pct": 60,
@@ -4394,7 +5310,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "band_from_pct": 70,
@@ -4412,7 +5328,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "band_from_pct": 80,
@@ -4432,7 +5348,7 @@
   ],
   "feature_comparisons": [
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "below_lambda_ft_ge_3",
@@ -4450,7 +5366,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "below_lambda_ht_ge_1_5",
@@ -4468,7 +5384,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "drought_below_90",
@@ -4486,7 +5402,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "drought_ge_90",
@@ -4504,7 +5420,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "historical_ht_mean_below_1_5",
@@ -4522,7 +5438,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "historical_ht_mean_ge_1_5",
@@ -4540,7 +5456,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "lambda_ft_ge_3",
@@ -4558,7 +5474,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "lambda_ht_ge_1_5",
@@ -4576,7 +5492,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "oci_below_45",
@@ -4594,7 +5510,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "oci_ge_45",
@@ -4612,7 +5528,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "recent_ht_mean_below_1_5",
@@ -4630,7 +5546,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::1",
       "feature": "recent_ht_mean_ge_1_5",
@@ -4648,7 +5564,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "below_lambda_ft_ge_3",
@@ -4666,7 +5582,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "below_lambda_ht_ge_1_5",
@@ -4684,7 +5600,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "drought_below_90",
@@ -4702,7 +5618,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "drought_ge_90",
@@ -4720,7 +5636,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "historical_ht_mean_below_1_5",
@@ -4738,7 +5654,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "historical_ht_mean_ge_1_5",
@@ -4756,7 +5672,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "lambda_ft_ge_3",
@@ -4774,7 +5690,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "lambda_ht_ge_1_5",
@@ -4792,7 +5708,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "oci_below_45",
@@ -4810,7 +5726,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "oci_ge_45",
@@ -4828,7 +5744,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "recent_ht_mean_below_1_5",
@@ -4846,7 +5762,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::2",
       "feature": "recent_ht_mean_ge_1_5",
@@ -4864,7 +5780,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "below_lambda_ft_ge_3",
@@ -4882,7 +5798,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "below_lambda_ht_ge_1_5",
@@ -4900,7 +5816,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "drought_below_90",
@@ -4918,7 +5834,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "drought_ge_90",
@@ -4936,7 +5852,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "historical_ht_mean_below_1_5",
@@ -4954,7 +5870,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "historical_ht_mean_ge_1_5",
@@ -4972,7 +5888,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "lambda_ft_ge_3",
@@ -4990,7 +5906,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "lambda_ht_ge_1_5",
@@ -5008,7 +5924,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "oci_below_45",
@@ -5026,7 +5942,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "oci_ge_45",
@@ -5044,7 +5960,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "recent_ht_mean_below_1_5",
@@ -5062,7 +5978,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "1x2_ft::x",
       "feature": "recent_ht_mean_ge_1_5",
@@ -5080,7 +5996,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "feature": "below_lambda_ft_ge_3",
@@ -5098,7 +6014,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "feature": "below_lambda_ht_ge_1_5",
@@ -5116,7 +6032,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "feature": "drought_below_90",
@@ -5134,7 +6050,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "feature": "drought_ge_90",
@@ -5152,7 +6068,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "feature": "historical_ht_mean_below_1_5",
@@ -5170,7 +6086,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "feature": "historical_ht_mean_ge_1_5",
@@ -5188,7 +6104,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "feature": "lambda_ft_ge_3",
@@ -5206,7 +6122,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "feature": "lambda_ht_ge_1_5",
@@ -5224,7 +6140,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "feature": "recent_ht_mean_below_1_5",
@@ -5242,7 +6158,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::over",
       "feature": "recent_ht_mean_ge_1_5",
@@ -5260,7 +6176,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "feature": "below_lambda_ft_ge_3",
@@ -5278,7 +6194,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "feature": "below_lambda_ht_ge_1_5",
@@ -5296,7 +6212,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "feature": "drought_below_90",
@@ -5314,7 +6230,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "feature": "drought_ge_90",
@@ -5332,7 +6248,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "feature": "historical_ht_mean_below_1_5",
@@ -5350,7 +6266,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "feature": "historical_ht_mean_ge_1_5",
@@ -5368,7 +6284,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "feature": "lambda_ft_ge_3",
@@ -5386,7 +6302,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "feature": "lambda_ht_ge_1_5",
@@ -5404,7 +6320,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "feature": "recent_ht_mean_below_1_5",
@@ -5422,7 +6338,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "away15_ft::under",
       "feature": "recent_ht_mean_ge_1_5",
@@ -5440,7 +6356,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "feature": "below_lambda_ft_ge_3",
@@ -5458,7 +6374,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "feature": "below_lambda_ht_ge_1_5",
@@ -5476,7 +6392,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "feature": "drought_below_90",
@@ -5494,7 +6410,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "feature": "drought_ge_90",
@@ -5512,7 +6428,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "feature": "historical_ht_mean_below_1_5",
@@ -5530,7 +6446,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "feature": "historical_ht_mean_ge_1_5",
@@ -5548,7 +6464,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "feature": "lambda_ft_ge_3",
@@ -5566,7 +6482,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "feature": "lambda_ht_ge_1_5",
@@ -5584,7 +6500,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "feature": "recent_ht_mean_below_1_5",
@@ -5602,7 +6518,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::no",
       "feature": "recent_ht_mean_ge_1_5",
@@ -5620,7 +6536,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "feature": "below_lambda_ft_ge_3",
@@ -5638,7 +6554,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "feature": "below_lambda_ht_ge_1_5",
@@ -5656,7 +6572,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "feature": "drought_below_90",
@@ -5674,7 +6590,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "feature": "drought_ge_90",
@@ -5692,7 +6608,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "feature": "historical_ht_mean_below_1_5",
@@ -5710,7 +6626,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "feature": "historical_ht_mean_ge_1_5",
@@ -5728,7 +6644,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "feature": "lambda_ft_ge_3",
@@ -5746,7 +6662,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "feature": "lambda_ht_ge_1_5",
@@ -5764,7 +6680,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "feature": "recent_ht_mean_below_1_5",
@@ -5782,7 +6698,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ft::yes",
       "feature": "recent_ht_mean_ge_1_5",
@@ -5800,7 +6716,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "below_lambda_ft_ge_3",
@@ -5818,7 +6734,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "below_lambda_ht_ge_1_5",
@@ -5836,7 +6752,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "drought_below_90",
@@ -5854,7 +6770,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "drought_ge_90",
@@ -5872,7 +6788,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "historical_ht_mean_below_1_5",
@@ -5890,7 +6806,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "historical_ht_mean_ge_1_5",
@@ -5908,7 +6824,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "lambda_ft_ge_3",
@@ -5926,7 +6842,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "lambda_ht_ge_1_5",
@@ -5944,7 +6860,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "oci_below_45",
@@ -5962,7 +6878,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "oci_ge_45",
@@ -5980,7 +6896,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "recent_ht_mean_below_1_5",
@@ -5998,7 +6914,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::no",
       "feature": "recent_ht_mean_ge_1_5",
@@ -6016,7 +6932,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "below_lambda_ft_ge_3",
@@ -6034,7 +6950,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "below_lambda_ht_ge_1_5",
@@ -6052,7 +6968,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "drought_below_90",
@@ -6070,7 +6986,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "drought_ge_90",
@@ -6088,7 +7004,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "historical_ht_mean_below_1_5",
@@ -6106,7 +7022,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "historical_ht_mean_ge_1_5",
@@ -6124,7 +7040,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "lambda_ft_ge_3",
@@ -6142,7 +7058,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "lambda_ht_ge_1_5",
@@ -6160,7 +7076,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "oci_below_45",
@@ -6178,7 +7094,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "oci_ge_45",
@@ -6196,7 +7112,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "recent_ht_mean_below_1_5",
@@ -6214,7 +7130,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "gg_ht::yes",
       "feature": "recent_ht_mean_ge_1_5",
@@ -6232,7 +7148,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "feature": "below_lambda_ft_ge_3",
@@ -6250,7 +7166,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "feature": "below_lambda_ht_ge_1_5",
@@ -6268,7 +7184,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "feature": "drought_below_90",
@@ -6286,7 +7202,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "feature": "drought_ge_90",
@@ -6304,7 +7220,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "feature": "historical_ht_mean_below_1_5",
@@ -6322,7 +7238,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "feature": "historical_ht_mean_ge_1_5",
@@ -6340,7 +7256,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "feature": "lambda_ft_ge_3",
@@ -6358,7 +7274,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "feature": "lambda_ht_ge_1_5",
@@ -6376,7 +7292,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "feature": "recent_ht_mean_below_1_5",
@@ -6394,7 +7310,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::over",
       "feature": "recent_ht_mean_ge_1_5",
@@ -6412,7 +7328,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "feature": "below_lambda_ft_ge_3",
@@ -6430,7 +7346,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "feature": "below_lambda_ht_ge_1_5",
@@ -6448,7 +7364,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "feature": "drought_below_90",
@@ -6466,7 +7382,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "feature": "drought_ge_90",
@@ -6484,7 +7400,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "feature": "historical_ht_mean_below_1_5",
@@ -6502,7 +7418,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "feature": "historical_ht_mean_ge_1_5",
@@ -6520,7 +7436,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "feature": "lambda_ft_ge_3",
@@ -6538,7 +7454,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "feature": "lambda_ht_ge_1_5",
@@ -6556,7 +7472,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "feature": "recent_ht_mean_below_1_5",
@@ -6574,7 +7490,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "home15_ft::under",
       "feature": "recent_ht_mean_ge_1_5",
@@ -6592,7 +7508,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "below_lambda_ft_ge_3",
@@ -6610,7 +7526,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "below_lambda_ht_ge_1_5",
@@ -6628,7 +7544,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "drought_below_90",
@@ -6646,7 +7562,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "drought_ge_90",
@@ -6664,7 +7580,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "historical_ht_mean_below_1_5",
@@ -6682,7 +7598,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "historical_ht_mean_ge_1_5",
@@ -6700,7 +7616,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "lambda_ft_ge_3",
@@ -6718,7 +7634,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "lambda_ht_ge_1_5",
@@ -6736,7 +7652,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "oci_below_45",
@@ -6754,7 +7670,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "oci_ge_45",
@@ -6772,7 +7688,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "recent_ht_mean_below_1_5",
@@ -6790,7 +7706,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::over",
       "feature": "recent_ht_mean_ge_1_5",
@@ -6808,7 +7724,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "below_lambda_ft_ge_3",
@@ -6826,7 +7742,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "below_lambda_ht_ge_1_5",
@@ -6844,7 +7760,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "drought_below_90",
@@ -6862,7 +7778,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "drought_ge_90",
@@ -6880,7 +7796,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "historical_ht_mean_below_1_5",
@@ -6898,7 +7814,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "historical_ht_mean_ge_1_5",
@@ -6916,7 +7832,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "lambda_ft_ge_3",
@@ -6934,7 +7850,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "lambda_ht_ge_1_5",
@@ -6952,7 +7868,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "oci_below_45",
@@ -6970,7 +7886,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "oci_ge_45",
@@ -6988,7 +7904,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "recent_ht_mean_below_1_5",
@@ -7006,7 +7922,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_ht::under",
       "feature": "recent_ht_mean_ge_1_5",
@@ -7024,7 +7940,367 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "feature": "below_lambda_ft_ge_3",
+      "n": 100,
+      "wins": 45,
+      "hit_rate_pct": 45.0,
+      "mean_probability_pct": 48.154,
+      "brier": 0.240718,
+      "log_loss": 0.674139,
+      "wilson_95_pct": [
+        35.614,
+        54.756
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "feature": "below_lambda_ht_ge_1_5",
+      "n": 120,
+      "wins": 52,
+      "hit_rate_pct": 43.333,
+      "mean_probability_pct": 45.992,
+      "brier": 0.235594,
+      "log_loss": 0.66331,
+      "wilson_95_pct": [
+        34.81,
+        52.27
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "feature": "drought_below_90",
+      "n": 101,
+      "wins": 36,
+      "hit_rate_pct": 35.644,
+      "mean_probability_pct": 42.564,
+      "brier": 0.216055,
+      "log_loss": 0.622883,
+      "wilson_95_pct": [
+        26.987,
+        45.353
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "feature": "drought_ge_90",
+      "n": 69,
+      "wins": 29,
+      "hit_rate_pct": 42.029,
+      "mean_probability_pct": 44.548,
+      "brier": 0.232876,
+      "log_loss": 0.657035,
+      "wilson_95_pct": [
+        31.106,
+        53.793
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "feature": "historical_ht_mean_below_1_5",
+      "n": 120,
+      "wins": 52,
+      "hit_rate_pct": 43.333,
+      "mean_probability_pct": 46.439,
+      "brier": 0.238752,
+      "log_loss": 0.670233,
+      "wilson_95_pct": [
+        34.81,
+        52.27
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "feature": "historical_ht_mean_ge_1_5",
+      "n": 51,
+      "wins": 14,
+      "hit_rate_pct": 27.451,
+      "mean_probability_pct": 36.179,
+      "brier": 0.187097,
+      "log_loss": 0.561106,
+      "wilson_95_pct": [
+        17.114,
+        40.947
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "feature": "lambda_ft_ge_3",
+      "n": 71,
+      "wins": 21,
+      "hit_rate_pct": 29.577,
+      "mean_probability_pct": 36.653,
+      "brier": 0.198879,
+      "log_loss": 0.586345,
+      "wilson_95_pct": [
+        20.233,
+        41.019
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "feature": "lambda_ht_ge_1_5",
+      "n": 51,
+      "wins": 14,
+      "hit_rate_pct": 27.451,
+      "mean_probability_pct": 37.229,
+      "brier": 0.194528,
+      "log_loss": 0.577396,
+      "wilson_95_pct": [
+        17.114,
+        40.947
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "feature": "recent_ht_mean_below_1_5",
+      "n": 118,
+      "wins": 51,
+      "hit_rate_pct": 43.22,
+      "mean_probability_pct": 45.461,
+      "brier": 0.23835,
+      "log_loss": 0.669047,
+      "wilson_95_pct": [
+        34.635,
+        52.233
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::no",
+      "feature": "recent_ht_mean_ge_1_5",
+      "n": 53,
+      "wins": 15,
+      "hit_rate_pct": 28.302,
+      "mean_probability_pct": 38.744,
+      "brier": 0.189941,
+      "log_loss": 0.567864,
+      "wilson_95_pct": [
+        17.966,
+        41.571
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "feature": "below_lambda_ft_ge_3",
+      "n": 100,
+      "wins": 55,
+      "hit_rate_pct": 55.0,
+      "mean_probability_pct": 51.846,
+      "brier": 0.240718,
+      "log_loss": 0.674139,
+      "wilson_95_pct": [
+        45.244,
+        64.386
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "feature": "below_lambda_ht_ge_1_5",
+      "n": 120,
+      "wins": 68,
+      "hit_rate_pct": 56.667,
+      "mean_probability_pct": 54.008,
+      "brier": 0.235594,
+      "log_loss": 0.66331,
+      "wilson_95_pct": [
+        47.73,
+        65.19
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "feature": "drought_below_90",
+      "n": 101,
+      "wins": 65,
+      "hit_rate_pct": 64.356,
+      "mean_probability_pct": 57.436,
+      "brier": 0.216055,
+      "log_loss": 0.622883,
+      "wilson_95_pct": [
+        54.647,
+        73.013
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "feature": "drought_ge_90",
+      "n": 69,
+      "wins": 40,
+      "hit_rate_pct": 57.971,
+      "mean_probability_pct": 55.452,
+      "brier": 0.232876,
+      "log_loss": 0.657035,
+      "wilson_95_pct": [
+        46.207,
+        68.894
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "feature": "historical_ht_mean_below_1_5",
+      "n": 120,
+      "wins": 68,
+      "hit_rate_pct": 56.667,
+      "mean_probability_pct": 53.561,
+      "brier": 0.238752,
+      "log_loss": 0.670233,
+      "wilson_95_pct": [
+        47.73,
+        65.19
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "feature": "historical_ht_mean_ge_1_5",
+      "n": 51,
+      "wins": 37,
+      "hit_rate_pct": 72.549,
+      "mean_probability_pct": 63.821,
+      "brier": 0.187097,
+      "log_loss": 0.561106,
+      "wilson_95_pct": [
+        59.053,
+        82.886
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "feature": "lambda_ft_ge_3",
+      "n": 71,
+      "wins": 50,
+      "hit_rate_pct": 70.423,
+      "mean_probability_pct": 63.347,
+      "brier": 0.198879,
+      "log_loss": 0.586345,
+      "wilson_95_pct": [
+        58.981,
+        79.767
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "feature": "lambda_ht_ge_1_5",
+      "n": 51,
+      "wins": 37,
+      "hit_rate_pct": 72.549,
+      "mean_probability_pct": 62.771,
+      "brier": 0.194528,
+      "log_loss": 0.577396,
+      "wilson_95_pct": [
+        59.053,
+        82.886
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "feature": "recent_ht_mean_below_1_5",
+      "n": 118,
+      "wins": 67,
+      "hit_rate_pct": 56.78,
+      "mean_probability_pct": 54.539,
+      "brier": 0.23835,
+      "log_loss": 0.669047,
+      "wilson_95_pct": [
+        47.767,
+        65.365
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over05_ht_over05_sh::yes",
+      "feature": "recent_ht_mean_ge_1_5",
+      "n": 53,
+      "wins": 38,
+      "hit_rate_pct": 71.698,
+      "mean_probability_pct": 61.256,
+      "brier": 0.189941,
+      "log_loss": 0.567864,
+      "wilson_95_pct": [
+        58.429,
+        82.034
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "feature": "below_lambda_ft_ge_3",
@@ -7042,7 +8318,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "feature": "below_lambda_ht_ge_1_5",
@@ -7060,7 +8336,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "feature": "drought_below_90",
@@ -7078,7 +8354,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "feature": "drought_ge_90",
@@ -7096,7 +8372,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "feature": "historical_ht_mean_below_1_5",
@@ -7114,7 +8390,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "feature": "historical_ht_mean_ge_1_5",
@@ -7132,7 +8408,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "feature": "lambda_ft_ge_3",
@@ -7150,7 +8426,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "feature": "lambda_ht_ge_1_5",
@@ -7168,7 +8444,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "feature": "recent_ht_mean_below_1_5",
@@ -7186,7 +8462,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::over",
       "feature": "recent_ht_mean_ge_1_5",
@@ -7204,7 +8480,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "feature": "below_lambda_ft_ge_3",
@@ -7222,7 +8498,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "feature": "below_lambda_ht_ge_1_5",
@@ -7240,7 +8516,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "feature": "drought_below_90",
@@ -7258,7 +8534,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "feature": "drought_ge_90",
@@ -7276,7 +8552,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "feature": "historical_ht_mean_below_1_5",
@@ -7294,7 +8570,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "feature": "historical_ht_mean_ge_1_5",
@@ -7312,7 +8588,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "feature": "lambda_ft_ge_3",
@@ -7330,7 +8606,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "feature": "lambda_ht_ge_1_5",
@@ -7348,7 +8624,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "feature": "recent_ht_mean_below_1_5",
@@ -7366,7 +8642,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over05_sh::under",
       "feature": "recent_ht_mean_ge_1_5",
@@ -7384,7 +8660,367 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "feature": "below_lambda_ft_ge_3",
+      "n": 100,
+      "wins": 72,
+      "hit_rate_pct": 72.0,
+      "mean_probability_pct": 72.269,
+      "brier": 0.199435,
+      "log_loss": 0.586838,
+      "wilson_95_pct": [
+        62.512,
+        79.86
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "feature": "below_lambda_ht_ge_1_5",
+      "n": 120,
+      "wins": 87,
+      "hit_rate_pct": 72.5,
+      "mean_probability_pct": 74.262,
+      "brier": 0.195742,
+      "log_loss": 0.578578,
+      "wilson_95_pct": [
+        63.907,
+        79.697
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "feature": "drought_below_90",
+      "n": 101,
+      "wins": 78,
+      "hit_rate_pct": 77.228,
+      "mean_probability_pct": 77.368,
+      "brier": 0.163012,
+      "log_loss": 0.498252,
+      "wilson_95_pct": [
+        68.141,
+        84.319
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "feature": "drought_ge_90",
+      "n": 69,
+      "wins": 52,
+      "hit_rate_pct": 75.362,
+      "mean_probability_pct": 75.5,
+      "brier": 0.186391,
+      "log_loss": 0.559403,
+      "wilson_95_pct": [
+        64.039,
+        84.01
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "feature": "historical_ht_mean_below_1_5",
+      "n": 120,
+      "wins": 86,
+      "hit_rate_pct": 71.667,
+      "mean_probability_pct": 73.904,
+      "brier": 0.201426,
+      "log_loss": 0.592906,
+      "wilson_95_pct": [
+        63.03,
+        78.959
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "feature": "historical_ht_mean_ge_1_5",
+      "n": 51,
+      "wins": 44,
+      "hit_rate_pct": 86.275,
+      "mean_probability_pct": 82.948,
+      "brier": 0.112155,
+      "log_loss": 0.37586,
+      "wilson_95_pct": [
+        74.278,
+        93.189
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "feature": "lambda_ft_ge_3",
+      "n": 71,
+      "wins": 58,
+      "hit_rate_pct": 81.69,
+      "mean_probability_pct": 82.704,
+      "brier": 0.140107,
+      "log_loss": 0.445546,
+      "wilson_95_pct": [
+        71.152,
+        88.975
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "feature": "lambda_ht_ge_1_5",
+      "n": 51,
+      "wins": 43,
+      "hit_rate_pct": 84.314,
+      "mean_probability_pct": 82.106,
+      "brier": 0.125529,
+      "log_loss": 0.409573,
+      "wilson_95_pct": [
+        71.989,
+        91.831
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "feature": "recent_ht_mean_below_1_5",
+      "n": 118,
+      "wins": 85,
+      "hit_rate_pct": 72.034,
+      "mean_probability_pct": 74.77,
+      "brier": 0.20267,
+      "log_loss": 0.596971,
+      "wilson_95_pct": [
+        63.339,
+        79.339
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::over",
+      "feature": "recent_ht_mean_ge_1_5",
+      "n": 53,
+      "wins": 45,
+      "hit_rate_pct": 84.906,
+      "mean_probability_pct": 80.679,
+      "brier": 0.112754,
+      "log_loss": 0.375001,
+      "wilson_95_pct": [
+        72.945,
+        92.148
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "feature": "below_lambda_ft_ge_3",
+      "n": 100,
+      "wins": 28,
+      "hit_rate_pct": 28.0,
+      "mean_probability_pct": 27.731,
+      "brier": 0.199435,
+      "log_loss": 0.586838,
+      "wilson_95_pct": [
+        20.14,
+        37.488
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "feature": "below_lambda_ht_ge_1_5",
+      "n": 120,
+      "wins": 33,
+      "hit_rate_pct": 27.5,
+      "mean_probability_pct": 25.738,
+      "brier": 0.195742,
+      "log_loss": 0.578578,
+      "wilson_95_pct": [
+        20.303,
+        36.093
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "feature": "drought_below_90",
+      "n": 101,
+      "wins": 23,
+      "hit_rate_pct": 22.772,
+      "mean_probability_pct": 22.632,
+      "brier": 0.163012,
+      "log_loss": 0.498252,
+      "wilson_95_pct": [
+        15.681,
+        31.859
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "feature": "drought_ge_90",
+      "n": 69,
+      "wins": 17,
+      "hit_rate_pct": 24.638,
+      "mean_probability_pct": 24.5,
+      "brier": 0.186391,
+      "log_loss": 0.559403,
+      "wilson_95_pct": [
+        15.99,
+        35.961
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "feature": "historical_ht_mean_below_1_5",
+      "n": 120,
+      "wins": 34,
+      "hit_rate_pct": 28.333,
+      "mean_probability_pct": 26.096,
+      "brier": 0.201426,
+      "log_loss": 0.592906,
+      "wilson_95_pct": [
+        21.041,
+        36.97
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "feature": "historical_ht_mean_ge_1_5",
+      "n": 51,
+      "wins": 7,
+      "hit_rate_pct": 13.725,
+      "mean_probability_pct": 17.052,
+      "brier": 0.112155,
+      "log_loss": 0.37586,
+      "wilson_95_pct": [
+        6.811,
+        25.722
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "feature": "lambda_ft_ge_3",
+      "n": 71,
+      "wins": 13,
+      "hit_rate_pct": 18.31,
+      "mean_probability_pct": 17.296,
+      "brier": 0.140107,
+      "log_loss": 0.445546,
+      "wilson_95_pct": [
+        11.025,
+        28.848
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "feature": "lambda_ht_ge_1_5",
+      "n": 51,
+      "wins": 8,
+      "hit_rate_pct": 15.686,
+      "mean_probability_pct": 17.894,
+      "brier": 0.125529,
+      "log_loss": 0.409573,
+      "wilson_95_pct": [
+        8.169,
+        28.011
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "feature": "recent_ht_mean_below_1_5",
+      "n": 118,
+      "wins": 33,
+      "hit_rate_pct": 27.966,
+      "mean_probability_pct": 25.23,
+      "brier": 0.20267,
+      "log_loss": 0.596971,
+      "wilson_95_pct": [
+        20.661,
+        36.661
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ft::under",
+      "feature": "recent_ht_mean_ge_1_5",
+      "n": 53,
+      "wins": 8,
+      "hit_rate_pct": 15.094,
+      "mean_probability_pct": 19.321,
+      "brier": 0.112754,
+      "log_loss": 0.375001,
+      "wilson_95_pct": [
+        7.852,
+        27.055
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "below_lambda_ft_ge_3",
@@ -7402,7 +9038,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "below_lambda_ht_ge_1_5",
@@ -7420,7 +9056,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "drought_below_90",
@@ -7438,7 +9074,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "drought_ge_90",
@@ -7456,7 +9092,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "historical_ht_mean_below_1_5",
@@ -7474,7 +9110,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "historical_ht_mean_ge_1_5",
@@ -7492,7 +9128,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "lambda_ft_ge_3",
@@ -7510,7 +9146,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "lambda_ht_ge_1_5",
@@ -7528,7 +9164,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "oci_below_45",
@@ -7546,7 +9182,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "oci_ge_45",
@@ -7564,7 +9200,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "recent_ht_mean_below_1_5",
@@ -7582,7 +9218,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::over",
       "feature": "recent_ht_mean_ge_1_5",
@@ -7600,7 +9236,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "below_lambda_ft_ge_3",
@@ -7618,7 +9254,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "below_lambda_ht_ge_1_5",
@@ -7636,7 +9272,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "drought_below_90",
@@ -7654,7 +9290,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "drought_ge_90",
@@ -7672,7 +9308,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "historical_ht_mean_below_1_5",
@@ -7690,7 +9326,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "historical_ht_mean_ge_1_5",
@@ -7708,7 +9344,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "lambda_ft_ge_3",
@@ -7726,7 +9362,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "lambda_ht_ge_1_5",
@@ -7744,7 +9380,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "oci_below_45",
@@ -7762,7 +9398,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "oci_ge_45",
@@ -7780,7 +9416,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "recent_ht_mean_below_1_5",
@@ -7798,7 +9434,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht::under",
       "feature": "recent_ht_mean_ge_1_5",
@@ -7816,7 +9452,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "feature": "below_lambda_ft_ge_3",
@@ -7834,7 +9470,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "feature": "below_lambda_ht_ge_1_5",
@@ -7852,7 +9488,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "feature": "drought_below_90",
@@ -7870,7 +9506,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "feature": "drought_ge_90",
@@ -7888,7 +9524,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "feature": "historical_ht_mean_below_1_5",
@@ -7906,7 +9542,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "feature": "historical_ht_mean_ge_1_5",
@@ -7924,7 +9560,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "feature": "lambda_ft_ge_3",
@@ -7942,7 +9578,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "feature": "lambda_ht_ge_1_5",
@@ -7960,7 +9596,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "feature": "recent_ht_mean_below_1_5",
@@ -7978,7 +9614,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::no",
       "feature": "recent_ht_mean_ge_1_5",
@@ -7996,7 +9632,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "feature": "below_lambda_ft_ge_3",
@@ -8014,7 +9650,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "feature": "below_lambda_ht_ge_1_5",
@@ -8032,7 +9668,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "feature": "drought_below_90",
@@ -8050,7 +9686,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "feature": "drought_ge_90",
@@ -8068,7 +9704,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "feature": "historical_ht_mean_below_1_5",
@@ -8086,7 +9722,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "feature": "historical_ht_mean_ge_1_5",
@@ -8104,7 +9740,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "feature": "lambda_ft_ge_3",
@@ -8122,7 +9758,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "feature": "lambda_ht_ge_1_5",
@@ -8140,7 +9776,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "feature": "recent_ht_mean_below_1_5",
@@ -8158,7 +9794,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over15_ht_over05_sh::yes",
       "feature": "recent_ht_mean_ge_1_5",
@@ -8176,7 +9812,367 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "feature": "below_lambda_ft_ge_3",
+      "n": 100,
+      "wins": 77,
+      "hit_rate_pct": 77.0,
+      "mean_probability_pct": 86.169,
+      "brier": 0.177593,
+      "log_loss": 0.542769,
+      "wilson_95_pct": [
+        67.845,
+        84.157
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "feature": "below_lambda_ht_ge_1_5",
+      "n": 120,
+      "wins": 94,
+      "hit_rate_pct": 78.333,
+      "mean_probability_pct": 84.404,
+      "brier": 0.169011,
+      "log_loss": 0.520937,
+      "wilson_95_pct": [
+        70.145,
+        84.763
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "feature": "drought_below_90",
+      "n": 101,
+      "wins": 70,
+      "hit_rate_pct": 69.307,
+      "mean_probability_pct": 81.777,
+      "brier": 0.215899,
+      "log_loss": 0.628571,
+      "wilson_95_pct": [
+        59.742,
+        77.457
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "feature": "drought_ge_90",
+      "n": 69,
+      "wins": 56,
+      "hit_rate_pct": 81.159,
+      "mean_probability_pct": 83.172,
+      "brier": 0.146323,
+      "log_loss": 0.463994,
+      "wilson_95_pct": [
+        70.387,
+        88.645
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "feature": "historical_ht_mean_below_1_5",
+      "n": 120,
+      "wins": 94,
+      "hit_rate_pct": 78.333,
+      "mean_probability_pct": 84.846,
+      "brier": 0.171143,
+      "log_loss": 0.527272,
+      "wilson_95_pct": [
+        70.145,
+        84.763
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "feature": "historical_ht_mean_ge_1_5",
+      "n": 51,
+      "wins": 33,
+      "hit_rate_pct": 64.706,
+      "mean_probability_pct": 76.499,
+      "brier": 0.223302,
+      "log_loss": 0.635199,
+      "wilson_95_pct": [
+        50.986,
+        76.366
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "feature": "lambda_ft_ge_3",
+      "n": 71,
+      "wins": 50,
+      "hit_rate_pct": 70.423,
+      "mean_probability_pct": 76.987,
+      "brier": 0.199525,
+      "log_loss": 0.58297,
+      "wilson_95_pct": [
+        58.981,
+        79.767
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "feature": "lambda_ht_ge_1_5",
+      "n": 51,
+      "wins": 33,
+      "hit_rate_pct": 64.706,
+      "mean_probability_pct": 77.54,
+      "brier": 0.228318,
+      "log_loss": 0.650105,
+      "wilson_95_pct": [
+        50.986,
+        76.366
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "feature": "recent_ht_mean_below_1_5",
+      "n": 118,
+      "wins": 93,
+      "hit_rate_pct": 78.814,
+      "mean_probability_pct": 84.001,
+      "brier": 0.163075,
+      "log_loss": 0.50532,
+      "wilson_95_pct": [
+        70.593,
+        85.218
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::no",
+      "feature": "recent_ht_mean_ge_1_5",
+      "n": 53,
+      "wins": 34,
+      "hit_rate_pct": 64.151,
+      "mean_probability_pct": 78.696,
+      "brier": 0.239296,
+      "log_loss": 0.68,
+      "wilson_95_pct": [
+        50.691,
+        75.698
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "feature": "below_lambda_ft_ge_3",
+      "n": 100,
+      "wins": 23,
+      "hit_rate_pct": 23.0,
+      "mean_probability_pct": 13.831,
+      "brier": 0.177593,
+      "log_loss": 0.542769,
+      "wilson_95_pct": [
+        15.843,
+        32.155
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "feature": "below_lambda_ht_ge_1_5",
+      "n": 120,
+      "wins": 26,
+      "hit_rate_pct": 21.667,
+      "mean_probability_pct": 15.596,
+      "brier": 0.169011,
+      "log_loss": 0.520937,
+      "wilson_95_pct": [
+        15.237,
+        29.855
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "feature": "drought_below_90",
+      "n": 101,
+      "wins": 31,
+      "hit_rate_pct": 30.693,
+      "mean_probability_pct": 18.223,
+      "brier": 0.215899,
+      "log_loss": 0.628571,
+      "wilson_95_pct": [
+        22.543,
+        40.258
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "feature": "drought_ge_90",
+      "n": 69,
+      "wins": 13,
+      "hit_rate_pct": 18.841,
+      "mean_probability_pct": 16.828,
+      "brier": 0.146323,
+      "log_loss": 0.463994,
+      "wilson_95_pct": [
+        11.355,
+        29.613
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "feature": "historical_ht_mean_below_1_5",
+      "n": 120,
+      "wins": 26,
+      "hit_rate_pct": 21.667,
+      "mean_probability_pct": 15.154,
+      "brier": 0.171143,
+      "log_loss": 0.527272,
+      "wilson_95_pct": [
+        15.237,
+        29.855
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "feature": "historical_ht_mean_ge_1_5",
+      "n": 51,
+      "wins": 18,
+      "hit_rate_pct": 35.294,
+      "mean_probability_pct": 23.501,
+      "brier": 0.223302,
+      "log_loss": 0.635199,
+      "wilson_95_pct": [
+        23.634,
+        49.014
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "feature": "lambda_ft_ge_3",
+      "n": 71,
+      "wins": 21,
+      "hit_rate_pct": 29.577,
+      "mean_probability_pct": 23.013,
+      "brier": 0.199525,
+      "log_loss": 0.58297,
+      "wilson_95_pct": [
+        20.233,
+        41.019
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "feature": "lambda_ht_ge_1_5",
+      "n": 51,
+      "wins": 18,
+      "hit_rate_pct": 35.294,
+      "mean_probability_pct": 22.46,
+      "brier": 0.228318,
+      "log_loss": 0.650105,
+      "wilson_95_pct": [
+        23.634,
+        49.014
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "feature": "recent_ht_mean_below_1_5",
+      "n": 118,
+      "wins": 25,
+      "hit_rate_pct": 21.186,
+      "mean_probability_pct": 15.999,
+      "brier": 0.163075,
+      "log_loss": 0.50532,
+      "wilson_95_pct": [
+        14.782,
+        29.407
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over15_ht_over15_sh::yes",
+      "feature": "recent_ht_mean_ge_1_5",
+      "n": 53,
+      "wins": 19,
+      "hit_rate_pct": 35.849,
+      "mean_probability_pct": 21.304,
+      "brier": 0.239296,
+      "log_loss": 0.68,
+      "wilson_95_pct": [
+        24.302,
+        49.309
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "below_lambda_ft_ge_3",
@@ -8194,7 +10190,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "below_lambda_ht_ge_1_5",
@@ -8212,7 +10208,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "drought_below_90",
@@ -8230,7 +10226,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "drought_ge_90",
@@ -8248,7 +10244,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "historical_ht_mean_below_1_5",
@@ -8266,7 +10262,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "historical_ht_mean_ge_1_5",
@@ -8284,7 +10280,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "lambda_ft_ge_3",
@@ -8302,7 +10298,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "lambda_ht_ge_1_5",
@@ -8320,7 +10316,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "oci_below_45",
@@ -8338,7 +10334,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "oci_ge_45",
@@ -8356,7 +10352,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "recent_ht_mean_below_1_5",
@@ -8374,7 +10370,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::over",
       "feature": "recent_ht_mean_ge_1_5",
@@ -8392,7 +10388,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "below_lambda_ft_ge_3",
@@ -8410,7 +10406,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "below_lambda_ht_ge_1_5",
@@ -8428,7 +10424,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "drought_below_90",
@@ -8446,7 +10442,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "drought_ge_90",
@@ -8464,7 +10460,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "historical_ht_mean_below_1_5",
@@ -8482,7 +10478,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "historical_ht_mean_ge_1_5",
@@ -8500,7 +10496,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "lambda_ft_ge_3",
@@ -8518,7 +10514,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "lambda_ht_ge_1_5",
@@ -8536,7 +10532,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "oci_below_45",
@@ -8554,7 +10550,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "oci_ge_45",
@@ -8572,7 +10568,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "recent_ht_mean_below_1_5",
@@ -8590,7 +10586,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over25_ft::under",
       "feature": "recent_ht_mean_ge_1_5",
@@ -8608,7 +10604,367 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "feature": "below_lambda_ft_ge_3",
+      "n": 100,
+      "wins": 14,
+      "hit_rate_pct": 14.0,
+      "mean_probability_pct": 12.09,
+      "brier": 0.118668,
+      "log_loss": 0.39731,
+      "wilson_95_pct": [
+        8.526,
+        22.137
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "feature": "below_lambda_ht_ge_1_5",
+      "n": 120,
+      "wins": 17,
+      "hit_rate_pct": 14.167,
+      "mean_probability_pct": 13.021,
+      "brier": 0.120033,
+      "log_loss": 0.399976,
+      "wilson_95_pct": [
+        9.037,
+        21.52
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "feature": "drought_below_90",
+      "n": 101,
+      "wins": 16,
+      "hit_rate_pct": 15.842,
+      "mean_probability_pct": 15.137,
+      "brier": 0.134482,
+      "log_loss": 0.43896,
+      "wilson_95_pct": [
+        9.993,
+        24.194
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "feature": "drought_ge_90",
+      "n": 69,
+      "wins": 13,
+      "hit_rate_pct": 18.841,
+      "mean_probability_pct": 13.958,
+      "brier": 0.144394,
+      "log_loss": 0.455906,
+      "wilson_95_pct": [
+        11.355,
+        29.613
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "feature": "historical_ht_mean_below_1_5",
+      "n": 120,
+      "wins": 17,
+      "hit_rate_pct": 14.167,
+      "mean_probability_pct": 12.714,
+      "brier": 0.120807,
+      "log_loss": 0.402633,
+      "wilson_95_pct": [
+        9.037,
+        21.52
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "feature": "historical_ht_mean_ge_1_5",
+      "n": 51,
+      "wins": 12,
+      "hit_rate_pct": 23.529,
+      "mean_probability_pct": 19.247,
+      "brier": 0.177894,
+      "log_loss": 0.542024,
+      "wilson_95_pct": [
+        14.005,
+        36.762
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "feature": "lambda_ft_ge_3",
+      "n": 71,
+      "wins": 15,
+      "hit_rate_pct": 21.127,
+      "mean_probability_pct": 18.286,
+      "brier": 0.164827,
+      "log_loss": 0.510256,
+      "wilson_95_pct": [
+        13.242,
+        31.975
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "feature": "lambda_ht_ge_1_5",
+      "n": 51,
+      "wins": 12,
+      "hit_rate_pct": 23.529,
+      "mean_probability_pct": 18.525,
+      "brier": 0.179716,
+      "log_loss": 0.548276,
+      "wilson_95_pct": [
+        14.005,
+        36.762
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "feature": "recent_ht_mean_below_1_5",
+      "n": 118,
+      "wins": 16,
+      "hit_rate_pct": 13.559,
+      "mean_probability_pct": 13.243,
+      "brier": 0.116108,
+      "log_loss": 0.389849,
+      "wilson_95_pct": [
+        8.522,
+        20.895
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::over",
+      "feature": "recent_ht_mean_ge_1_5",
+      "n": 53,
+      "wins": 13,
+      "hit_rate_pct": 24.528,
+      "mean_probability_pct": 17.824,
+      "brier": 0.186201,
+      "log_loss": 0.565227,
+      "wilson_95_pct": [
+        14.933,
+        37.567
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "feature": "below_lambda_ft_ge_3",
+      "n": 100,
+      "wins": 86,
+      "hit_rate_pct": 86.0,
+      "mean_probability_pct": 87.91,
+      "brier": 0.118668,
+      "log_loss": 0.39731,
+      "wilson_95_pct": [
+        77.863,
+        91.474
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "feature": "below_lambda_ht_ge_1_5",
+      "n": 120,
+      "wins": 103,
+      "hit_rate_pct": 85.833,
+      "mean_probability_pct": 86.979,
+      "brier": 0.120033,
+      "log_loss": 0.399976,
+      "wilson_95_pct": [
+        78.48,
+        90.963
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "feature": "drought_below_90",
+      "n": 101,
+      "wins": 85,
+      "hit_rate_pct": 84.158,
+      "mean_probability_pct": 84.863,
+      "brier": 0.134482,
+      "log_loss": 0.43896,
+      "wilson_95_pct": [
+        75.806,
+        90.007
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "feature": "drought_ge_90",
+      "n": 69,
+      "wins": 56,
+      "hit_rate_pct": 81.159,
+      "mean_probability_pct": 86.042,
+      "brier": 0.144394,
+      "log_loss": 0.455906,
+      "wilson_95_pct": [
+        70.387,
+        88.645
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "feature": "historical_ht_mean_below_1_5",
+      "n": 120,
+      "wins": 103,
+      "hit_rate_pct": 85.833,
+      "mean_probability_pct": 87.286,
+      "brier": 0.120807,
+      "log_loss": 0.402633,
+      "wilson_95_pct": [
+        78.48,
+        90.963
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "feature": "historical_ht_mean_ge_1_5",
+      "n": 51,
+      "wins": 39,
+      "hit_rate_pct": 76.471,
+      "mean_probability_pct": 80.753,
+      "brier": 0.177894,
+      "log_loss": 0.542024,
+      "wilson_95_pct": [
+        63.238,
+        85.995
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "feature": "lambda_ft_ge_3",
+      "n": 71,
+      "wins": 56,
+      "hit_rate_pct": 78.873,
+      "mean_probability_pct": 81.714,
+      "brier": 0.164827,
+      "log_loss": 0.510256,
+      "wilson_95_pct": [
+        68.025,
+        86.758
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "feature": "lambda_ht_ge_1_5",
+      "n": 51,
+      "wins": 39,
+      "hit_rate_pct": 76.471,
+      "mean_probability_pct": 81.475,
+      "brier": 0.179716,
+      "log_loss": 0.548276,
+      "wilson_95_pct": [
+        63.238,
+        85.995
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "feature": "recent_ht_mean_below_1_5",
+      "n": 118,
+      "wins": 102,
+      "hit_rate_pct": 86.441,
+      "mean_probability_pct": 86.757,
+      "brier": 0.116108,
+      "log_loss": 0.389849,
+      "wilson_95_pct": [
+        79.105,
+        91.478
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "retrospective",
+      "market_selection": "over25_ht::under",
+      "feature": "recent_ht_mean_ge_1_5",
+      "n": 53,
+      "wins": 40,
+      "hit_rate_pct": 75.472,
+      "mean_probability_pct": 82.176,
+      "brier": 0.186201,
+      "log_loss": 0.565227,
+      "wilson_95_pct": [
+        62.433,
+        85.067
+      ],
+      "priced_n": 0,
+      "paper_roi_pct": null
+    },
+    {
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "feature": "below_lambda_ft_ge_3",
@@ -8626,7 +10982,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "feature": "below_lambda_ht_ge_1_5",
@@ -8644,7 +11000,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "feature": "drought_below_90",
@@ -8662,7 +11018,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "feature": "drought_ge_90",
@@ -8680,7 +11036,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "feature": "historical_ht_mean_below_1_5",
@@ -8698,7 +11054,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "feature": "historical_ht_mean_ge_1_5",
@@ -8716,7 +11072,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "feature": "lambda_ft_ge_3",
@@ -8734,7 +11090,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "feature": "lambda_ht_ge_1_5",
@@ -8752,7 +11108,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "feature": "recent_ht_mean_below_1_5",
@@ -8770,7 +11126,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::over",
       "feature": "recent_ht_mean_ge_1_5",
@@ -8788,7 +11144,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "feature": "below_lambda_ft_ge_3",
@@ -8806,7 +11162,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "feature": "below_lambda_ht_ge_1_5",
@@ -8824,7 +11180,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "feature": "drought_below_90",
@@ -8842,7 +11198,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "feature": "drought_ge_90",
@@ -8860,7 +11216,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "feature": "historical_ht_mean_below_1_5",
@@ -8878,7 +11234,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "feature": "historical_ht_mean_ge_1_5",
@@ -8896,7 +11252,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "feature": "lambda_ft_ge_3",
@@ -8914,7 +11270,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "feature": "lambda_ht_ge_1_5",
@@ -8932,7 +11288,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "feature": "recent_ht_mean_below_1_5",
@@ -8950,7 +11306,7 @@
       "paper_roi_pct": null
     },
     {
-      "model_id": "coherent-markets-v1",
+      "model_id": "coherent-markets-v2",
       "period": "retrospective",
       "market_selection": "over35_ft::under",
       "feature": "recent_ht_mean_ge_1_5",
