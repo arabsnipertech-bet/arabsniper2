@@ -18,15 +18,23 @@ def event_outcome(market, result):
 
 def settle_predictions(store, output):
     """Attach results without modifying any frozen forecast fields."""
+    indexed = defaultdict(list)
+    for record in store.get('quality_evaluations', {}).values():
+        indexed[str((record.get('fixture') or {}).get('fixture_id'))].append(record)
     for day in output.get('days', []):
         for match in day.get('matches', []):
             fixture = match.get('fixture') or {}
-            record = store.get('fixtures', {}).get(str(fixture.get('fixture_id')))
+            fixture_id = str(fixture.get('fixture_id'))
+            records = indexed[fixture_id][:]
+            original = store.get('fixtures', {}).get(fixture_id)
+            if original is not None:
+                records.append(original)
             result = fixture.get('result') or (match.get('prediction_audit') or {}).get('result')
-            if record is None or not result or result.get('status') not in {'FT', 'AET', 'PEN'}:
+            if not records or not result or result.get('status') not in {'FT', 'AET', 'PEN'}:
                 continue
-            record['settlement'] = {'result': dict(result), 'outcomes': {
-                market: event_outcome(market, result) for market in MARKETS}}
+            for record in records:
+                record['settlement'] = {'result': dict(result), 'outcomes': {
+                    market: event_outcome(market, result) for market in MARKETS}}
     return store
 
 
@@ -62,7 +70,14 @@ def build_report(store):
             'brier_score': round(sum((p-y)**2 for p,y,_ in rows)/n, 6),
             'wilson_95_pct': [round((center-margin)*100, 3), round((center+margin)*100, 3)],
             'priced_n': len(priced), 'roi_pct': round(sum((odd if y else 0)-1 for y,odd in priced)/len(priced)*100, 3) if priced else None})
-    return {'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'quote_groups': quote_report(store), 'filter_comparison': build_filter_comparison(store)}
+    quality_versions = defaultdict(dict)
+    for key, record in store.get('quality_evaluations', {}).items():
+        profile = (record.get('first_half_assessment') or {}).get('profile_id', 'unknown')
+        quality_versions[(record.get('model_version', 'unknown'), profile)][key] = record
+    return {'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'quote_groups': quote_report(store), 'filter_comparison': build_filter_comparison(store),
+        'first_half_quality_by_version': [{'model_version': version, 'profile_id': profile,
+            'comparison': build_filter_comparison({'fixtures': records})['over15_ht_probability_comparison']}
+            for (version, profile), records in sorted(quality_versions.items())]}
 
 
 def quote_report(store):

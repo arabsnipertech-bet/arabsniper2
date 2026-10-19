@@ -63,5 +63,21 @@ class AuditTests(unittest.TestCase):
         capture(payload)
         self.assertNotIn('3', self.store['fixtures'])
 
+    def test_new_quality_version_freezes_separately_from_original_forecast(self):
+        fixture = {'fixture_id': 1, 'kickoff': (self.now+timedelta(hours=1)).isoformat()}
+        original = {'fixture': fixture, 'probabilities_raw': {'over15_ht': {'over': .3}}}
+        self.store['fixtures'] = {'1': original}
+        match = {'fixture': fixture, 'model': {'probabilities_raw': {'over15_ht': {'over': .6}}},
+                 'display': {'first_half_assessment': {'profile_id': 'quality_v1', 'eligible': False}}}
+        payload = {'days': [{'matches': [match]}]}
+        self.ns['capture_prematch_predictions'](payload)
+        quality = self.store['quality_evaluations']['test::quality_v1::1']
+        self.assertIs(self.store['fixtures']['1'], original)
+        self.assertEqual(original['probabilities_raw']['over15_ht']['over'], .3)
+        self.assertEqual(quality['probabilities_raw']['over15_ht']['over'], .6)
+        match['model']['probabilities_raw']['over15_ht']['over'] = .9
+        self.ns['capture_prematch_predictions'](payload)
+        self.assertEqual(quality['probabilities_raw']['over15_ht']['over'], .6)
+
 if __name__ == '__main__':
     unittest.main()

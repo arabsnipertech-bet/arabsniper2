@@ -44,21 +44,28 @@ def archive(root, now):
     if not isinstance(records, dict):
         raise ValueError('Archivio prepartita non valido: fixtures deve essere un oggetto')
     days, rejected, added = {}, 0, 0
-    for key, record in records.items():
+    entries = [('fixtures', k, r) for k, r in records.items()]
+    entries += [('quality_evaluations', k, r) for k, r in payload.get('quality_evaluations', {}).items()]
+    for collection, key, record in entries:
         fixture = record.get('fixture') or {}
         kickoff, captured = stamp(fixture.get('kickoff')), stamp(record.get('captured_at'))
+        expected_key = str(fixture.get('fixture_id'))
+        if collection == 'quality_evaluations':
+            profile = (record.get('first_half_assessment') or {}).get('profile_id')
+            expected_key = f"{record.get('model_version')}::{profile}::{expected_key}"
         if (not kickoff or not captured or captured >= kickoff or captured > now
-                or str(fixture.get('fixture_id')) != str(key)):
+                or expected_key != str(key)):
             rejected += 1
             continue
         date = kickoff.astimezone(TZ).date().isoformat()
         path = root / f'auditordata/prematch_{date}.json'
         day = days.setdefault(date, read(path, {'schema_version': 1,
             'audit_date': date, 'source_file': str(source.relative_to(root)), 'fixtures': {}}))
-        if str(key) not in day['fixtures']:
+        target = day.setdefault(collection, {})
+        if str(key) not in target:
             frozen = deepcopy(record)
             frozen.pop('settlement', None)
-            day['fixtures'][str(key)] = frozen
+            target[str(key)] = frozen
             added += 1
     for date, day in days.items():
         write(root / f'auditordata/prematch_{date}.json', day)
@@ -89,7 +96,7 @@ def fetch_results(date, key):
 
 
 def settle(root, now, fetcher=fetch_results):
-    combined = {'schema_version': 1, 'fixtures': {}}
+    combined = {'schema_version': 1, 'fixtures': {}, 'quality_evaluations': {}}
     queried = []
     for path in sorted((root / 'auditordata').glob('prematch_????-??-??.json')):
         day = read(path, {})
@@ -98,14 +105,17 @@ def settle(root, now, fetcher=fetch_results):
             continue
         results_path = root / f'auditarchive/prematch_{date}_results.json'
         previous = read(results_path, {'fixtures': {}})
-        records = deepcopy(day['fixtures'])
-        for key, record in records.items():
-            saved = previous.get('fixtures', {}).get(key, {}).get('settlement')
-            if saved:
-                record['settlement'] = saved
-        store = {'schema_version': 1, 'fixtures': records}
+        store = {'schema_version': 1}
+        for collection in ('fixtures', 'quality_evaluations'):
+            records = deepcopy(day.get(collection, {}))
+            for key, record in records.items():
+                saved = previous.get(collection, {}).get(key, {}).get('settlement')
+                if saved:
+                    record['settlement'] = saved
+            store[collection] = records
+        records = list(store['fixtures'].values()) + list(store['quality_evaluations'].values())
         pending = any(any((r.get('settlement') or {}).get('outcomes', {}).get(m) is None
-                          for m in ('over15_ht', 'gg_ht', 'over25_ft')) for r in records.values())
+                          for m in ('over15_ht', 'gg_ht', 'over25_ft')) for r in records)
         if pending and (now.astimezone(TZ).date() - date).days <= 14:
             key = os.environ.get('API_SPORTS_KEY', '').strip()
             if not key:
@@ -113,10 +123,12 @@ def settle(root, now, fetcher=fetch_results):
             settle_predictions(store, fetcher(str(date), key))
             queried.append(str(date))
         write(results_path, store)
-        combined['fixtures'].update(store['fixtures'])
+        for collection in ('fixtures', 'quality_evaluations'):
+            combined[collection].update(store[collection])
     report = build_report(combined)
     report.update({'generated_at': now.isoformat(), 'results_dates_queried': queried,
-                   'archived_forecasts': len(combined['fixtures'])})
+                   'archived_forecasts': len(combined['fixtures']),
+                   'archived_quality_evaluations': len(combined['quality_evaluations'])})
     write(root / 'auditarchive/prematch_last_report.json', report)
     return {'results_dates_queried': queried, 'settled_report_groups': len(report['groups'])}
 

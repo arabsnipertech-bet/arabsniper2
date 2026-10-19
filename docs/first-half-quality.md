@@ -29,6 +29,11 @@ are needed before the report marks a profile available for review.
   candidates rejected by the value gate. The website presents kickoff order.
 - Immutable first-observed forecasts include the new fields on new captures.
   Existing frozen forecasts are never replaced or enriched after the event.
+- `quality_evaluations` freezes the first forecast independently for each model,
+  profile and fixture, including rejected candidates. This allows the new model
+  to be measured even when an older forecast for that fixture already exists.
+  Daily archival and settlement retain both forecasts and reuse the same result
+  request. `first_half_quality_by_version` reports each model separately.
 
 `filter_comparison.over15_ht_probability_comparison` compares the whole frozen
 universe, separately reports selections from accepted/rejected candidates, and
