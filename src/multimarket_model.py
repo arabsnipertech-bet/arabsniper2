@@ -9,7 +9,7 @@ from math import exp, log, isfinite
 from statistics import median
 import re
 
-MODEL_ID = 'coherent-markets-v1'
+MODEL_ID = 'coherent-markets-v2'
 VALIDATION_FROM = '2026-10-20'
 CONFIG = {'prior_penalty': .01, 'minimum_books': 2, 'max_quote_age_hours': 6,
           'minimum_reliability': 60, 'movement_probability_bonus': 0,
@@ -20,7 +20,9 @@ SPECS = {
     '1x2_ft': (1, 'Match Winner', None, ('1', 'x', '2'), 'Esito finale'),
     'over05_ht': (6, 'Goals Over/Under First Half', .5, ('over', 'under'), 'Over 0,5 PT'),
     'over15_ht': (6, 'Goals Over/Under First Half', 1.5, ('over', 'under'), 'Over 1,5 PT'),
+    'over25_ht': (6, 'Goals Over/Under First Half', 2.5, ('over', 'under'), 'Over 2,5 PT'),
     'gg_ht': (34, 'Both Teams Score - First Half', None, ('yes', 'no'), 'GG PT sì'),
+    'over15_ft': (5, 'Goals Over/Under', 1.5, ('over', 'under'), 'Over 1,5 finale'),
     'over25_ft': (5, 'Goals Over/Under', 2.5, ('over', 'under'), 'Over 2,5 finale'),
     'over35_ft': (5, 'Goals Over/Under', 3.5, ('over', 'under'), 'Over 3,5 finale'),
     'gg_ft': (8, 'Both Teams Score', None, ('yes', 'no'), 'GG finale sì'),
@@ -29,6 +31,11 @@ SPECS = {
     'over05_sh': (26, 'Goals Over/Under - Second Half', .5, ('over', 'under'), 'Over 0,5 ST'),
 }
 COMBO = 'over15_ht_over05_sh'
+COMBOS = {
+    'over05_ht_over05_sh': ('Over 0,5 PT + Over 0,5 ST', 1, 1),
+    COMBO: ('Over 1,5 PT + Over 0,5 ST', 2, 1),
+    'over15_ht_over15_sh': ('Over 1,5 PT + Over 1,5 ST', 2, 2),
+}
 
 
 def stamp(value):
@@ -190,12 +197,16 @@ def goal_probabilities(rates):
     binary = lambda p, yes='over', no='under': {yes: p, no: 1 - p}
     return {'1x2_ft': {'1': home_win, 'x': draw, '2': max(0., 1 - draw - home_win)},
             'over05_ht': binary(one(ht)), 'over15_ht': binary(two(ht)),
+            'over25_ht': binary(1-exp(-ht)*(1+ht+ht**2/2)),
+            'over15_ft': binary(two(h+a)),
             'gg_ht': binary(one(hh) * one(ah), 'yes', 'no'),
             'over25_ft': binary(1 - exp(-(h+a)) * (1 + h+a + (h+a)**2 / 2)),
             'over35_ft': binary(1 - exp(-(h+a)) * (1 + h+a + (h+a)**2 / 2 + (h+a)**3 / 6)),
             'home15_ft': binary(two(h)), 'away15_ft': binary(two(a)),
             'gg_ft': binary(one(h) * one(a), 'yes', 'no'), 'over05_sh': binary(one(sh)),
-            COMBO: binary(two(ht) * one(sh), 'yes', 'no')}
+            COMBO: binary(two(ht) * one(sh), 'yes', 'no'),
+            'over05_ht_over05_sh': binary(one(ht)*one(sh), 'yes', 'no'),
+            'over15_ht_over15_sh': binary(two(ht)*two(sh), 'yes', 'no')}
 
 
 def fit_rates(prior, benchmarks, penalty):
@@ -259,7 +270,7 @@ def evaluate(match, as_of, quotes=None):
     is_prematch = bool(now and kickoff and now < kickoff and not meta.get('result'))
     ht_missing = any((match.get('statistics', {}).get(s, {}).get('ht_sample_all') or 0) < 6 for s in ('home','away'))
     markets = []
-    for key in [*SPECS, COMBO]:
+    for key in [*SPECS, *COMBOS]:
         sides = SPECS[key][3] if key in SPECS else ('yes','no')
         # Include all 1X2 outcomes, positive goals events and their complements.
         for side in sides:
@@ -284,11 +295,11 @@ def evaluate(match, as_of, quotes=None):
             robust_ev = low*odd-1 if odd else None
             if robust_ev is not None and robust_ev <= 0: reasons.append('valore_non_concorde_tra_modelli')
             if high-low > .10: reasons.append('modelli_divergenti')
-            label = SPECS[key][4] if key in SPECS else 'Over 1,5 PT + Over 0,5 ST'
+            label = SPECS[key][4] if key in SPECS else COMBOS[key][0]
             if key == '1x2_ft': label = {'1':'Vittoria casa', 'x':'Pareggio', '2':'Vittoria ospite'}[side]
             elif side in ('under','no'):
                 label = label.replace('Over','Under').replace('sì','no').replace('almeno 2 gol','meno di 2 gol')
-                if key == COMBO: label = 'Combinazione PT + ST non realizzata'
+                if key in COMBOS: label = COMBOS[key][0] + ' — non realizzata'
             movements = [b.get('movement', {}) for b in books if b.get('movement', {}).get('observations', 0) >= 2]
             markets.append({'market':key, 'selection':side, 'label':label,
                 'probability_pct':round(p*100,3), 'statistical_pct':round(probabilities['statistics'][key][side]*100,3),

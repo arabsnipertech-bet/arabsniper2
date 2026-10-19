@@ -53,7 +53,7 @@ researchPayload.matches[1].multimarket.markets.push({...market('over15_ht',2.2),
 const researchContext={...context,currentPayload:researchPayload,Map,
  document:{getElementById:()=>host}};
 vm.createContext(researchContext);
-vm.runInContext(html.slice(html.indexOf('    let researchMarket ='),html.indexOf('    let activeRankingMarket =')),researchContext);
+vm.runInContext(html.slice(html.indexOf('    const RESEARCH_MARKET_OPTIONS ='),html.indexOf('    let activeRankingMarket =')),researchContext);
 vm.runInContext('renderMatchResearch(currentPayload)',researchContext);
 assert(host.innerHTML.indexOf('Match earlier &lt;script&gt;')<host.innerHTML.indexOf('Match later &lt;script&gt;'));
 assert(!host.innerHTML.includes('Match started'));
@@ -69,3 +69,18 @@ assert(host.innerHTML.includes('assumendo indipendenza'));
 vm.runInContext("researchFilter('price','2to5')",researchContext);
 assert(host.innerHTML.includes('Nessuna partita con questi criteri'));
 console.log('Multimarket: chronological cards, experimental status, absent quotes, unique fixtures and filters passed.');
+
+
+vm.runInContext("researchFilter('price','all');researchFilter('market','over35_ft::over')",researchContext);
+assert.equal(vm.runInContext('researchMarkets(currentPayload.matches[0]).length',researchContext),1);
+assert.equal(vm.runInContext('researchMarkets(currentPayload.matches[0])[0].market',researchContext),'over35_ft');
+vm.runInContext("researchFilter('market','all');researchSelectFixture('earlier','over15_ht::under')",researchContext);
+assert.equal(vm.runInContext("researchFocus.get('earlier')",researchContext),'over15_ht::under');
+assert(host.innerHTML.includes('Valuta una giocata per questa partita'));
+assert(host.innerHTML.includes('over05_ht_over05_sh::yes'));
+assert(host.innerHTML.includes('over15_ht_over15_sh::yes'));
+assert(host.innerHTML.includes('over15_ft::over'));
+assert(host.innerHTML.includes('gg_ht::no'));
+vm.runInContext("researchFilter('market','ht')",researchContext);
+assert(host.innerHTML.includes('<details open>'));
+console.log('Exact market filters and per-fixture selection passed.');
