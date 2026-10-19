@@ -1491,6 +1491,25 @@
       "roi_pct": null
     }
   ],
+  "signal_research": {
+    "protocol_id": "september-signals-v1",
+    "config": {
+      "home_initial_min": 1.5,
+      "home_initial_max": 1.7,
+      "movement_pct": 2,
+      "minimum_paired_books": 2,
+      "max_quote_age_hours": 6,
+      "history_matches": 8,
+      "goal_mean_min": 1.5,
+      "drought_matches": 2,
+      "probability_bonus": 0
+    },
+    "validation_from": "2026-10-20",
+    "note": "Observed frequencies, not calibrated probabilities. No automatic fitting or bonus. First evaluable paired-operator snapshot per fixture; first team baseline. Same-operator means are not the September archive market averages or closing quotes.",
+    "coverage": [],
+    "groups": [],
+    "fixtures": []
+  },
   "quote_groups": [
     {
       "market": "1x2_ft",
@@ -9826,7 +9845,7 @@
     "calibration": [],
     "feature_comparisons": []
   },
-  "generated_at": "2026-10-19T11:26:52.971028+02:00",
+  "generated_at": "2026-10-19T13:47:40.077452+02:00",
   "results_dates_queried": [],
   "archived_forecasts": 172,
   "archived_quality_evaluations": 0
