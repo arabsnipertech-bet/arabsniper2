@@ -18,6 +18,8 @@ def event_outcome(market, result):
 
 def settle_predictions(store, output):
     """Attach results without modifying any frozen forecast fields."""
+    from multimarket_audit import settle as settle_multimarket
+    settle_multimarket(store, {str(m.get('fixture',{}).get('fixture_id')):m.get('fixture',{}).get('result') for d in output.get('days',[]) for m in d.get('matches',[])})
     indexed = defaultdict(list)
     for record in store.get('quality_evaluations', {}).values():
         indexed[str((record.get('fixture') or {}).get('fixture_id'))].append(record)

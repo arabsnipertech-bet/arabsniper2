@@ -9,6 +9,9 @@ on:
       - 'src/prematch_audit.py'
       - 'src/filter_audit.py'
       - 'src/first_half_quality.py'
+      - 'src/multimarket_model.py'
+      - 'src/multimarket_audit.py'
+      - 'src/model_research.py'
       - '.github/workflows/run-auditor.yml'
   schedule:
     - cron: '7 9 * * *'
@@ -18,7 +21,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: arabsniper-current-audit
+  group: arabsniper-quote-data-writer
   cancel-in-progress: false
 
 jobs:
@@ -36,11 +39,14 @@ jobs:
           python-version: '3.11'
       - name: Archive forecasts and settle completed matches
         run: python auditor/current_audit.py settle
+      - name: Compare multimarket models
+        run: python src/model_research.py
       - name: Save current audit archive and report
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add auditordata/prematch_*.json auditarchive/prematch_*.json
+          git add data/arab_quote_multimarket_report.json data/arab_quote_model_research.json
           if git diff --cached --quiet; then
             echo "No audit changes"
             exit 0

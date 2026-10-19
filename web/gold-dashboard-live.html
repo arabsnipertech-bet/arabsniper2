@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
-  <meta name="application-version" content="1.1.9" />
-  <title>ArabSniper Quote Dashboard V1.1.9</title>
+  <meta name="application-version" content="1.2.0" />
+  <title>ArabSniper Quote Dashboard V1.2.0</title>
   <style>
     :root {
       --bg: #05070b;
@@ -650,6 +650,8 @@
     .ranking-card details,.ranking-guide{border-top:1px solid var(--border);margin-top:14px;padding-top:12px}.ranking-section summary{cursor:pointer;color:var(--cyan);padding:8px 0;font-size:.85rem}.ranking-card dl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;font-size:.78rem}.ranking-card dt{color:var(--muted)}.ranking-card dd{margin:0}.ranking-explain{font-size:.77rem!important}
     @media(max-width:700px){.ranking-cards{grid-template-columns:1fr}.ranking-section{padding:13px}.topbar{position:static}.ranking-tabs button{font-size:.76rem}.ranking-card{padding:12px}}
 
+    .research-head{display:flex;align-items:start;justify-content:space-between;gap:12px}.research-tag{color:var(--cyan);font-size:.72rem;font-weight:800;white-space:nowrap}.research-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0}.research-controls select,.research-search{width:100%;min-height:44px;border:1px solid var(--border);border-radius:11px;padding:10px;background:var(--panel-2);color:var(--text)}.research-controls label{font-size:.7rem;color:var(--muted)}.research-controls label select{margin-top:7px;font-size:.8rem}.research-search{margin-bottom:12px;font-size:.85rem}.research-status{color:var(--muted);font-size:.74rem;line-height:1.6}.research-status b{color:var(--cyan)}.research-scenario{border-left:3px solid var(--cyan);padding:9px 11px;margin:12px 0;background:var(--panel);border-radius:5px}.research-scenario small{display:block;color:var(--muted);margin-top:7px;line-height:1.5}.research-market{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;padding:11px 0;border-bottom:1px solid var(--border-soft)}.research-market b{font-size:.8rem}.research-market small{display:block;color:var(--muted);font-size:.72rem;line-height:1.7;margin-top:4px}.research-market button{align-self:center;min-height:40px;font-size:.72rem}.research-comparison{padding:14px;border:1px solid var(--border);border-radius:13px;margin:15px 0;background:var(--panel-2)}.research-comparison ul{padding-left:18px;font-size:.8rem;line-height:1.7}.research-comparison button{margin-top:8px}.legacy-dashboard{margin-top:22px;border-top:1px solid var(--border);padding-top:16px}.legacy-dashboard>summary{cursor:pointer;padding:14px;color:var(--cyan);font-weight:700}.research-validation{padding:12px 0;border-top:1px solid var(--border);margin-top:18px}.research-validation table{width:100%;font-size:.75rem;border-collapse:collapse}.research-validation th,.research-validation td{padding:8px 4px;text-align:left;border-bottom:1px solid var(--border-soft)}
+    @media(max-width:600px){.research-controls{grid-template-columns:1fr}.research-head{display:block}.research-tag{display:block;margin-top:9px}.ranking-metrics b{font-size:1.05rem}.top-actions{justify-content:flex-start}.research-market small{overflow-wrap:anywhere}}
   </style>
 </head>
 <body>
@@ -657,7 +659,7 @@
     <header class="topbar">
       <div class="brand">
         <h1>ARABSNIPER · QUOTE DASHBOARD</h1>
-        <p>Over PT: confronto dei segnali e valore della quota. GG PT e Over finale nelle viste dedicate. · v1.1.9</p>
+        <p>Analisi per partita · gol, esiti e movimenti delle quote · v1.2.0</p>
         <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
       </div>
       <div class="top-actions">
@@ -676,6 +678,11 @@
       </div>
     </section>
 
+    <section id="matchResearch" class="ranking-section" aria-live="polite"></section>
+
+    <details class="legacy-dashboard" id="legacyDashboard">
+      <summary>Dashboard dettagliata e filtri precedenti</summary>
+      <div id="legacyRankings"></div>
     <section class="searchbar">
       <input id="searchInput" class="search-input" type="search" placeholder="Cerca squadra, campionato o Paese..." oninput="applyFilters()" />
       <select id="sortSelect" class="sort-select" onchange="applyFilters()">
@@ -713,6 +720,7 @@
     <main class="matches-grid" id="matchesGrid">
       <div class="empty">Caricamento...</div>
     </main>
+    </details>
   </div>
 
   <div id="detailOverlay" class="modal-overlay" onclick="closeDetailFromOverlay(event)">
@@ -995,7 +1003,7 @@
         const summary = payload?.summary || {};
         const over = summary?.by_market?.over25_ft || {};
         strip.innerHTML = `
-          <strong>Audit reale risultati</strong>
+          <strong>Audit storico · modelli precedenti</strong>
           <span class="audit-metric">Scelte primarie chiuse:<b>${escapeHtml(String(summary.settled_primary ?? 0))}</b></span>
           <span class="audit-metric">Vincenti:<b>${escapeHtml(String(summary.wins ?? 0))}</b></span>
           <span class="audit-metric">Percentuale:<b>${escapeHtml(formatPct(summary.win_rate_pct))}</b></span>
@@ -1065,6 +1073,8 @@
         if (!payload || !Array.isArray(payload.matches)) throw new Error(`Formato JSON non valido in ${file}`);
         currentPayload = payload;
         renderMarketRankings(payload);
+        renderMatchResearch(payload);
+        loadModelResearch();
         currentMatches = [...payload.matches];
         document.getElementById('selectedDay').textContent = `Giorno ${currentDay} · ${formatDateIt(payload.date)}`;
         document.getElementById('fileSource').textContent = `Fonte: ${file}`;
@@ -1074,11 +1084,12 @@
           : `Snapshot Day ${currentDay} · aggiornamento manuale`;
         applyFilters();
         if (preservePosition) restoreViewportAnchor(anchor);
-        else maybeAutoScrollToHour(false);
+        else if (!payload.multimarket_method) maybeAutoScrollToHour(false);
       } catch (err) {
         console.error(err);
         currentMatches = [];
         document.getElementById('marketRankings')?.remove();
+        document.getElementById('matchResearch').innerHTML = '<div class="empty">Analisi non disponibile. Ricarica i dati.</div>';
         grid.innerHTML = `<div class="error">${escapeHtml(err.message)}. Verifica che il nuovo script abbia pubblicato il file nel repository.</div>`;
         document.getElementById('matchCount').textContent = '0 partite';
         document.getElementById('liveStatus').textContent = 'Errore caricamento';
@@ -1086,6 +1097,122 @@
       }
     }
 
+
+    let researchMarket = 'all';
+    let researchPrice = 'all';
+    let researchScope = 'all';
+    let researchSearch = '';
+    let modelResearchSummary = null;
+    const researchComparison = new Map();
+    const RESEARCH_REASONS = {
+      partita_iniziata_o_orario_assente:'Orario non utilizzabile prima del calcio d’inizio',
+      lambda_tempi_incoerenti:'Stime dei tempi incoerenti', dati_insufficienti:'Copertura dei dati insufficiente',
+      campione_primo_tempo_insufficiente:'Pochi primi tempi nello storico',
+      quote_operatori_insufficienti:'Meno di 2 operatori con mercato completo',
+      quota_specifica_assente:'Quota specifica non disponibile',
+      aggiornamento_quota_non_verificato:'Quota datata o aggiornamento non verificabile',
+      valore_non_concorde_tra_modelli:'Il valore della quota non è confermato dalle diverse stime',
+      modelli_divergenti:'Le stime dei modelli divergono di oltre 10 punti'
+    };
+    function researchFilter(field,value) {
+      if (field==='market') researchMarket=value;
+      if (field==='price') researchPrice=value;
+      if (field==='scope') researchScope=value;
+      renderMatchResearch(currentPayload||{});
+    }
+    function researchCandidate(row) {
+      const updated=Date.parse(row.quote?.provider_updated_at);
+      const age=(Date.now()-updated)/3600000;
+      return row.research_candidate && Number.isFinite(updated) && age>=0 && age<=6;
+    }
+    function researchMatches(payload) {
+      return (payload.matches||[]).filter(m=>m.multimarket?.status==='experimental' &&
+        !m.fixture?.result && Date.parse(m.fixture?.kickoff)>Date.now())
+        .sort((a,b)=>Date.parse(a.fixture.kickoff)-Date.parse(b.fixture.kickoff)||String(a.fixture.fixture_id).localeCompare(String(b.fixture.fixture_id)));
+    }
+    function researchMarkets(match) {
+      return (match.multimarket?.markets||[]).filter(m=>{
+        if (researchScope==='candidates' && !researchCandidate(m)) return false;
+        if (researchPrice==='2to5' && !(m.odd>=2 && m.odd<=5)) return false;
+        if (researchMarket==='ht') return ['over05_ht','over15_ht','gg_ht'].includes(m.market);
+        if (researchMarket==='ft') return ['1x2_ft','over25_ft','over35_ft','gg_ft'].includes(m.market);
+        if (researchMarket==='teams') return ['home15_ft','away15_ft'].includes(m.market);
+        if (researchMarket==='combo') return m.market==='over15_ht_over05_sh' && m.selection==='yes';
+        return !['under','no'].includes(m.selection);
+      }).sort((a,b)=>Number(researchCandidate(b))-Number(researchCandidate(a))||
+        (b.conservative_ev_pct??-999)-(a.conservative_ev_pct??-999)||b.probability_pct-a.probability_pct);
+    }
+    function addResearchComparison(fid,market,side) {
+      const match=researchMatches(currentPayload||{}).find(m=>String(m.fixture.fixture_id)===String(fid));
+      const row=match?.multimarket.markets.find(m=>m.market===market && m.selection===side);
+      if (!match || !row?.odd || row.odd<=1) return;
+      if (researchComparison.size>=3 && !researchComparison.has(String(fid))) return;
+      researchComparison.set(String(fid),{fixture:match.fixture,row});
+      renderMatchResearch(currentPayload||{});
+    }
+    function clearResearchComparison() {researchComparison.clear();renderMatchResearch(currentPayload||{});}
+    async function loadModelResearch() {
+      try { modelResearchSummary=await loadJson('arab_quote_model_research.json');
+        renderMatchResearch(currentPayload||{});
+      } catch (_) { /* Day payload still shows the current version and validation state. */ }
+    }
+    function researchComparisonHtml() {
+      for (const [fid,item] of researchComparison) {
+        if (Date.parse(item.fixture.kickoff)<=Date.now()) researchComparison.delete(fid);
+      }
+      if (!researchComparison.size) return '';
+      let total=1,probability=1;
+      const items=[...researchComparison.values()];
+      for (const item of items) {total*=item.row.odd;probability*=item.row.probability_pct/100;}
+      return `<aside class="research-comparison"><strong>Confronto manuale · ${items.length}/3 partite distinte</strong><ul>${items.map(i=>`<li>${escapeHtml(i.fixture.match)} · ${escapeHtml(i.row.label)} · ${escapeHtml(formatOdd(i.row.odd))}</li>`).join('')}</ul><p>Prodotto delle quote osservate: <b>${escapeHtml(formatOdd(total))}</b>. Stima congiunta: ${escapeHtml(formatPct(probability*100))}, assumendo indipendenza tra partite. Questa ipotesi e il rendimento della combinazione non sono validati.</p><button type="button" class="btn" onclick="clearResearchComparison()">Svuota confronto</button></aside>`;
+    }
+    function renderMatchResearch(payload) {
+      const host=document.getElementById('matchResearch');
+      if (!host) return;
+      const matches=researchMatches(payload);
+      const count=matches.filter(m=>m.multimarket.markets.some(researchCandidate)).length;
+      const prospective=(payload.multimarket_audit?.cohorts||[]).filter(c=>c.period==='prospective');
+      const n=prospective.reduce((s,c)=>s+(c.settled_fixtures||0),0);
+      let html='<div class="research-head"><h2>Cosa indica ogni partita</h2><span class="research-tag">NUOVO MODELLO · IN VERIFICA</span></div>';
+      html+=`<p>Confronta esiti, gol e quote per scegliere il mercato da studiare. Partite in ordine di orario.</p><div class="research-status"><b>${matches.length} partite da analizzare</b> · ${count} con candidati sperimentali · ${n} risultati nella verifica dal 20/10. Dati: ${escapeHtml(formatTimestamp(payload.updated_at))}</div>`;
+      const options=(list,current)=>list.map(([v,label])=>`<option value="${v}" ${v===current?'selected':''}>${label}</option>`).join('');
+      html+='<div class="research-controls">'+
+        `<label>Mercato<select onchange="researchFilter('market',this.value)">${options([['all','Tutti i mercati'],['ht','Primo tempo'],['ft','Esiti e gol finali'],['teams','Gol squadra'],['combo','Combinazione PT + ST']],researchMarket)}</select></label>`+
+        `<label>Quote<select onchange="researchFilter('price',this.value)">${options([['all','Tutte, anche senza quota'],['2to5','Solo quote da 2 a 5']],researchPrice)}</select></label>`+
+        `<label>Vista<select onchange="researchFilter('scope',this.value)">${options([['all','Tutte le analisi'],['candidates','Solo candidati sperimentali']],researchScope)}</select></label></div>`;
+      html+=`<input class="research-search" type="search" aria-label="Cerca nell’analisi per partita" placeholder="Cerca squadra, Paese o campionato" value="${escapeHtml(researchSearch)}" onchange="researchSearch=this.value;renderMatchResearch(currentPayload||{})">`;
+      html+=researchComparisonHtml();
+      let shown=0;
+      html+='<div class="ranking-cards">';
+      for (const match of matches) {
+        const f=match.fixture, assessment=match.multimarket;
+        if (researchSearch && !`${f.match} ${f.country} ${f.league}`.toLocaleLowerCase().includes(researchSearch.toLocaleLowerCase())) continue;
+        const rows=researchMarkets(match);
+        if (!rows.length) continue;
+        shown++;
+        const r=rows[0], quote=r.quote, movement=r.movement||{};
+        const change=movement.median_drop_pct;
+        const moveText=change==null?'Movimento: servono due osservazioni degli stessi operatori':`Quota ${change>0?'in calo':change<0?'in aumento':'stabile'} ${Math.abs(change).toFixed(1)}% · ${movement.paired_books} operatori confrontabili`;
+        const reasons=(r.reasons||[]).map(k=>RESEARCH_REASONS[k]||k);
+        html+=`<article class="ranking-card"><div class="ranking-heading"><span class="ranking-position">${shown}</span><strong>${escapeHtml(f.match)}</strong><time datetime="${escapeHtml(f.kickoff)}">${escapeHtml(f.time)}</time></div><p>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</p><div class="research-scenario"><strong>${escapeHtml(r.label)}</strong><small>${researchCandidate(r)?'Candidato sperimentale · valore concorde tra le stime':'Scenario da confrontare · solo analisi'}</small></div><div class="ranking-metrics"><div><span>Stima modello</span><b>${escapeHtml(formatPct(r.probability_pct))}</b></div><div><span>Book senza margine</span><b>${r.book_probability_pct==null?'—':escapeHtml(formatPct(r.book_probability_pct))}</b></div><div><span>Quota osservata</span><b>${quote?escapeHtml(formatOdd(r.odd)):'—'}</b></div></div><p>${quote?`${escapeHtml(quote.bookmaker)} · quota aggiornata ${escapeHtml(formatTimestamp(quote.provider_updated_at))}`:'Quota specifica assente: valore atteso non calcolabile.'}</p><div class="ranking-badges"><span>${escapeHtml(moveText)}</span></div><p>${escapeHtml(reasons.slice(0,2).join(' · ')||(researchCandidate(r)?'Criteri sperimentali superati; verifica dei risultati ancora aperta.':'Quota da aggiornare prima di confrontare il valore.'))}</p><details><summary>Confronta ${rows.length} esiti e leggi i segnali</summary>`;
+        rows.forEach(row=>{
+          const q=row.quote;
+          const args=[String(f.fixture_id),row.market,row.selection].map(v=>escapeHtml(JSON.stringify(v))).join(',');
+          html+=`<div class="research-market"><div><b>${escapeHtml(row.label)}</b><small>Modello ${escapeHtml(formatPct(row.probability_pct))} · statistica ${escapeHtml(formatPct(row.statistical_pct))} · book ${row.book_probability_pct==null?'—':escapeHtml(formatPct(row.book_probability_pct))}<br>Quote: ${q?`${escapeHtml(formatOdd(row.odd))} · ${escapeHtml(q.bookmaker)}`:'non disponibile'} · EV teorico ${row.expected_value_pct==null?'—':escapeHtml(formatPct(row.expected_value_pct))}<br>Dispersione delle stime: ${escapeHtml(formatPct(row.model_range_pct?.[0]))}–${escapeHtml(formatPct(row.model_range_pct?.[1]))}; non è un intervallo di confidenza.<br>${escapeHtml((row.reasons||[]).map(k=>RESEARCH_REASONS[k]||k).join(' · ')||'Candidato sperimentale')}</small></div>${q?`<button class="btn" type="button" onclick="addResearchComparison(${args})">Confronta</button>`:''}</div>`;
+        });
+        const rates=assessment.rates?.combined||[];
+        html+=`<p>Gol attesi PT: ${escapeHtml(Number((rates[0]||0)+(rates[1]||0)).toFixed(2))} · gol attesi finali: ${escapeHtml(rates.reduce((s,v)=>s+v,0).toFixed(2))}. Digiuno gol e movimenti sono registrati senza bonus automatici. L’aggio deriva dalle quote: non misura gli incassi dei bookmaker.</p></details></article>`;
+      }
+      html+='</div>';
+      if (!shown) html+=`<div class="empty">${payload.multimarket_method?'Nessuna partita con questi criteri. Prova “Tutte le analisi” o “Tutti i mercati”. Le quote mancanti non generano selezioni.':'La nuova analisi sarà disponibile dopo la scansione. Le viste precedenti restano consultabili sotto.'}</div>`;
+      html+='<details class="research-validation"><summary>Metodo e verifica dei risultati</summary><p>Un solo modello dei gol per squadra e per tempo confronta storico e probabilità dei bookmaker. Conserviamo la prima analisi prima dell’inizio, anche per gli eventi scartati. Le variazioni sono confrontate sugli stessi operatori; la prima quota osservata non è un’apertura certificata.</p><p>Una quota positiva nei calcoli non basta: servono copertura, aggiornamento verificabile e accordo tra stime. Non viene imposta una quota totale da raggiungere. I risultati di sviluppo del 18/10 sono separati dalla verifica dal 20/10.</p>';
+      if (modelResearchSummary?.summary) {
+        const s=modelResearchSummary.summary;
+        html+=`<p>Studio retrospettivo: ${escapeHtml(String(s.fixtures||0))} partite con dati anteriori al calcio d’inizio. Confronto Brier: più basso è meglio. Nessuna di queste righe dimostra un rendimento futuro.</p><table><thead><tr><th>Mercato</th><th>Book</th><th>Statistica</th><th>Nuovo</th></tr></thead><tbody>${(s.benchmarks||[]).map(r=>`<tr><td>${escapeHtml(r.label)}</td><td>${escapeHtml(String(r.book??'—'))}</td><td>${escapeHtml(String(r.statistics??'—'))}</td><td>${escapeHtml(String(r.combined??'—'))}</td></tr>`).join('')}</tbody></table>`;
+      }
+      html+='</details>';
+      host.innerHTML=html;
+    }
 
     let activeRankingMarket = 'over15_ht';
     let activeRankingView = 'probability';
@@ -1114,7 +1241,7 @@
         .filter(r => Number.isFinite(Date.parse(r.kickoff)) && Date.parse(r.kickoff)>Date.now())
         .slice().sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||num(b.ranking_score)-num(a.ranking_score));
       };
-      let html = '<h2>Trova le partite per mercato</h2><p>Scegli un mercato. Le selezioni sono ordinate per orario. A parità di orario, precede il punteggio più alto.</p>';
+      let html = '<h2>Filtri precedenti per mercato</h2><p>Vista del modello precedente, conservata per confronto. Le selezioni sono ordinate per orario.</p>';
       html += '<div class="ranking-tabs" role="group" aria-label="Mercato delle selezioni">'+keys.map(k=>`<button type="button" aria-pressed="${k===activeRankingMarket}" onclick="selectRankingMarket('${k}')">${labels[k]}<span>${rowsFor(k).length} selezioni</span></button>`).join('')+'</div>';
       if (activeRankingMarket === 'over15_ht') {
         html += '<div class="ranking-tabs" style="grid-template-columns:repeat(2,minmax(0,1fr))" role="group" aria-label="Tipo di selezione PT">'+
@@ -1145,7 +1272,9 @@
       }
       html += '<details class="ranking-guide"><summary>Come leggere queste selezioni</summary><p>Convergenza PT confronta book senza margine, storico e Poisson prima del calcio d’inizio; include anche partite escluse dal filtro valore. È una regola in verifica su giornate successive.</p><p>Valore della quota richiede probabilità calibrata almeno 40%, copertura dati almeno 60%, quota disponibile e valore atteso positivo. La copertura dei dati e il punteggio non sono probabilità di vincita. Un EV positivo dipende dall’accuratezza della stima.</p><p>Ogni mercato conserva i propri criteri. Le partite sono ordinate per orario. Aggiornare la pagina rilegge i dati pubblicati e non avvia una scansione.</p></details>';
       section.innerHTML=html;
-      document.querySelector('.toolbar').before(section);
+      const legacy=document.getElementById('legacyRankings');
+      if (legacy?.append) legacy.append(section);
+      else document.querySelector('.toolbar').before(section);
     }
 
     function setRelationFilter(filter) {
@@ -1322,7 +1451,7 @@
           <div class="market-foot">
             <span>ArabSniper puro: <b>${escapeHtml(modelPick)}</b></span>
             <span>Book: <b>${escapeHtml(bookPick)}</b></span>
-            <span>Carico margine: <b>${escapeHtml(protectionPick)}</b></span>
+            <span>Ripartizione teorica aggio: <b>${escapeHtml(protectionPick)}</b></span>
             <span>Aggio: <b class="aggio-${escapeHtml(aggioStatus)}">${escapeHtml(formatPct(market.aggio_pct))} · ${escapeHtml(AGGIO_LABELS[aggioStatus] || aggioStatus)}</b></span>
             <span class="calibration-note">Peso book nella %: <b>${escapeHtml(formatPct(calibrationWeight))}</b></span>
             <span>Bookmaker: <b>${escapeHtml(String(validation.bookmakers_found ?? 0))}</b></span>
