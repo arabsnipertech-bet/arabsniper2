@@ -48,6 +48,8 @@ const market=(key='over35_ft',odd=3)=>({market:key,selection:key==='over15_ht_ov
 const fixture=(id,hours)=>({fixture:{fixture_id:id,match:'Match '+id+' <script>',time:'16:00',kickoff:future(hours),country:'Italy',league:'Test'},
   multimarket:{status:'experimental',markets:[market(),market('over15_ht_over05_sh',null)],rates:{combined:[.6,.6,.8,.8]}}});
 const researchPayload={updated_at:future(-1),multimarket_method:{model_id:'coherent-markets-v1'},matches:[fixture('later',3),fixture('earlier',2),fixture('started',-1)]};
+researchPayload.matches[1].multimarket.markets.push({...market('over15_ht',2.2),
+  selection:'under',label:'Under 1,5 PT',research_candidate:true});
 const researchContext={...context,currentPayload:researchPayload,Map,
  document:{getElementById:()=>host}};
 vm.createContext(researchContext);
@@ -56,6 +58,8 @@ vm.runInContext('renderMatchResearch(currentPayload)',researchContext);
 assert(host.innerHTML.indexOf('Match earlier &lt;script&gt;')<host.innerHTML.indexOf('Match later &lt;script&gt;'));
 assert(!host.innerHTML.includes('Match started'));
 assert(host.innerHTML.includes('IN VERIFICA'));
+assert(host.innerHTML.includes('Under 1,5 PT'));
+assert(host.innerHTML.includes('1 con candidati sperimentali'));
 vm.runInContext("researchFilter('market','combo')",researchContext);
 assert(host.innerHTML.includes('Quota specifica assente'));
 assert(!host.innerHTML.includes('onclick="addResearchComparison'));
