@@ -1,19 +1,14 @@
-name: ArabSniper Fast Scan
+name: ArabSniper Fast Scan (legacy manual only)
 
 on:
   workflow_dispatch:
-  schedule:
-    # Fast scan ogni ora dalle 06:00 alle 23:00 Europe/Rome.
-    # Il codice Python ora pulisce automaticamente le partite fuori finestra live.
-    - cron: "0 6-23 * * *"
-      timezone: "Europe/Rome"
 
 permissions:
   contents: write
   actions: read
 
 concurrency:
-  group: arabsniper-fast-scan
+  group: arabsniper-quote-data-writer
   cancel-in-progress: false
 
 jobs:
