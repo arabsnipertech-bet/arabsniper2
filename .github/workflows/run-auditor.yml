@@ -7,6 +7,8 @@ on:
     paths:
       - 'auditor/current_audit.py'
       - 'src/prematch_audit.py'
+      - 'src/filter_audit.py'
+      - 'src/first_half_quality.py'
       - '.github/workflows/run-auditor.yml'
   schedule:
     - cron: '7 9 * * *'

@@ -50,6 +50,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple
 
 import requests
+from first_half_quality import valid_ht_row, ht_context_sample
 
 try:
     from zoneinfo import ZoneInfo
@@ -67,7 +68,7 @@ except Exception:  # pragma: no cover
 # =========================================================
 # CONFIGURAZIONE
 # =========================================================
-VERSION = "1.1.8"
+VERSION = "1.1.9"
 API_BASE_URL = "https://v3.football.api-sports.io"
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -964,6 +965,7 @@ def _match_row(fixture_row: Mapping[str, Any], team_id: Optional[int] = None) ->
     ga = safe_int(goals.get("away"), 0)
     hth = safe_int(halftime.get("home"), 0)
     hta = safe_int(halftime.get("away"), 0)
+    ht_available = all(halftime.get(k) is not None for k in ("home", "away"))
     dt = fixture_datetime_rome(fixture)
 
     row: Dict[str, Any] = {
@@ -986,6 +988,7 @@ def _match_row(fixture_row: Mapping[str, Any], team_id: Optional[int] = None) ->
         "over15_ht": hth + hta >= 2,
         "gg_ft": gh > 0 and ga > 0,
         "gg_ht": hth > 0 and hta > 0,
+        "halftime_available": ht_available,
     }
 
     if team_id is not None:
@@ -1003,6 +1006,11 @@ def _match_row(fixture_row: Mapping[str, Any], team_id: Optional[int] = None) ->
             "team_conceded_2h": max((ga - hta) if is_home else (gh - hth), 0),
             "result_points": 3 if ((gh > ga and is_home) or (ga > gh and is_away)) else 1 if gh == ga else 0,
         })
+    if not ht_available:
+        for key in ("home_ht_goals", "away_ht_goals", "total_ht", "over15_ht", "gg_ht",
+                    "team_goals_ht", "team_conceded_ht", "team_goals_2h", "team_conceded_2h"):
+            if key in row:
+                row[key] = None
     return row
 
 
@@ -1042,6 +1050,7 @@ def get_league_baseline(client: APIClient, league_id: int, season: int, last: in
     if not rows:
         return {
             "sample": 0,
+            "ht_sample": 0, "ht_source": "fallback",
             "avg_home_goals": 1.45,
             "avg_away_goals": 1.15,
             "avg_total_ft": 2.60,
@@ -1055,17 +1064,19 @@ def get_league_baseline(client: APIClient, league_id: int, season: int, last: in
             "source": "fallback",
         }
 
+    ht_rows = [row for row in rows if valid_ht_row(row)]
     return {
         "sample": len(rows),
+        "ht_sample": len(ht_rows), "ht_source": "api_recent_league" if ht_rows else "fallback",
         "avg_home_goals": round3(mean(row["home_goals"] for row in rows)),
         "avg_away_goals": round3(mean(row["away_goals"] for row in rows)),
         "avg_total_ft": round3(mean(row["total_ft"] for row in rows)),
-        "avg_home_ht": round3(mean(row["home_ht_goals"] for row in rows)),
-        "avg_away_ht": round3(mean(row["away_ht_goals"] for row in rows)),
-        "avg_total_ht": round3(mean(row["total_ht"] for row in rows)),
+        "avg_home_ht": round3(mean((row["home_ht_goals"] for row in ht_rows), 0.68)),
+        "avg_away_ht": round3(mean((row["away_ht_goals"] for row in ht_rows), 0.52)),
+        "avg_total_ht": round3(mean((row["total_ht"] for row in ht_rows), 1.20)),
         "over25_rate": round4(mean(1.0 if row["over25_ft"] else 0.0 for row in rows)),
-        "over15ht_rate": round4(mean(1.0 if row["over15_ht"] else 0.0 for row in rows)),
-        "gg_ht_rate": round4(mean(1.0 if row["gg_ht"] else 0.0 for row in rows)),
+        "over15ht_rate": round4(mean((1.0 if row["over15_ht"] else 0.0 for row in ht_rows), 0.30)),
+        "gg_ht_rate": round4(mean((1.0 if row["gg_ht"] else 0.0 for row in ht_rows), 0.12)),
         "draw_rate": round4(mean(1.0 if row["home_goals"] == row["away_goals"] else 0.0 for row in rows)),
         "source": "api_recent_league",
     }
@@ -1182,6 +1193,7 @@ def summarize_h2h(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
     if not rows:
         return {
             "sample": 0,
+            "ht_sample": 0,
             "avg_total_ft": 0.0,
             "avg_total_ht": 0.0,
             "over25_rate": 0.0,
@@ -1191,13 +1203,16 @@ def summarize_h2h(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
             "matches": [],
         }
     weights = [1.0, 0.82, 0.66, 0.52, 0.40][:len(rows)]
+    ht_rows = [row for row in rows if valid_ht_row(row)]
+    ht_weights = [1.0, 0.82, 0.66, 0.52, 0.40][:len(ht_rows)]
     return {
         "sample": len(rows),
+        "ht_sample": len(ht_rows),
         "avg_total_ft": round3(weighted_mean([row["total_ft"] for row in rows], weights)),
-        "avg_total_ht": round3(weighted_mean([row["total_ht"] for row in rows], weights)),
+        "avg_total_ht": round3(weighted_mean([row["total_ht"] for row in ht_rows], ht_weights)),
         "over25_rate": round4(weighted_mean([1.0 if row["over25_ft"] else 0.0 for row in rows], weights)),
-        "over15ht_rate": round4(weighted_mean([1.0 if row["over15_ht"] else 0.0 for row in rows], weights)),
-        "gg_ht_rate": round4(weighted_mean([1.0 if row["gg_ht"] else 0.0 for row in rows], weights)),
+        "over15ht_rate": round4(weighted_mean([1.0 if row["over15_ht"] else 0.0 for row in ht_rows], ht_weights)),
+        "gg_ht_rate": round4(weighted_mean([1.0 if row["gg_ht"] else 0.0 for row in ht_rows], ht_weights)),
         "weight_cap": 0.05,
         "matches": list(rows),
     }
@@ -2401,10 +2416,10 @@ def _goal_lambdas_base(
     home_ft = league_home * (hs / league_home) * (ac / league_home)
     away_ft = league_away * (as_ / league_away) * (hc / league_away)
 
-    hsh = shrink_rate(safe_float(hm.get("goals_scored_ht"), league_home_ht), safe_int(home_profile.get("sample_context")), league_home_ht)
-    ach = shrink_rate(safe_float(am.get("goals_conceded_ht"), league_home_ht), safe_int(away_profile.get("sample_context")), league_home_ht)
-    ash = shrink_rate(safe_float(am.get("goals_scored_ht"), league_away_ht), safe_int(away_profile.get("sample_context")), league_away_ht)
-    hch = shrink_rate(safe_float(hm.get("goals_conceded_ht"), league_away_ht), safe_int(home_profile.get("sample_context")), league_away_ht)
+    hsh = shrink_rate(safe_float(hm.get("goals_scored_ht"), league_home_ht), safe_int(ht_context_sample(home_profile)), league_home_ht)
+    ach = shrink_rate(safe_float(am.get("goals_conceded_ht"), league_home_ht), safe_int(ht_context_sample(away_profile)), league_home_ht)
+    ash = shrink_rate(safe_float(am.get("goals_scored_ht"), league_away_ht), safe_int(ht_context_sample(away_profile)), league_away_ht)
+    hch = shrink_rate(safe_float(hm.get("goals_conceded_ht"), league_away_ht), safe_int(ht_context_sample(home_profile)), league_away_ht)
     home_ht = league_home_ht * (hsh / league_home_ht) * (ach / league_home_ht)
     away_ht = league_away_ht * (ash / league_away_ht) * (hch / league_away_ht)
 
@@ -2470,10 +2485,11 @@ def build_lambdas(
     if safe_int(h2h.get("sample")) >= 2:
         league_total = max(safe_float(league.get("avg_total_ft"), 2.60), 1.50)
         h2h_ft_factor = clamp(safe_float(h2h.get("avg_total_ft"), league_total) / league_total, 0.95, 1.05)
-        league_total_ht = max(safe_float(league.get("avg_total_ht"), 1.20), 0.60)
-        h2h_ht_factor = clamp(safe_float(h2h.get("avg_total_ht"), league_total_ht) / league_total_ht, 0.95, 1.05)
         home_ft *= h2h_ft_factor
         away_ft *= h2h_ft_factor
+    if safe_int(h2h.get("ht_sample", h2h.get("sample"))) >= 2:
+        league_total_ht = max(safe_float(league.get("avg_total_ht"), 1.20), 0.60)
+        h2h_ht_factor = clamp(safe_float(h2h.get("avg_total_ht"), league_total_ht) / league_total_ht, 0.95, 1.05)
         home_ht *= h2h_ht_factor
         away_ht *= h2h_ht_factor
 
@@ -3135,7 +3151,7 @@ def main() -> None:
 # ENHANCEMENT V1.1.3 — QUALITA' COMPETIZIONI, GATE SEGNALI,
 # STATISTICHE TIRI E AUDIT RISULTATI
 # =========================================================
-VERSION = "1.1.8"
+VERSION = "1.1.9"
 PREDICTION_AUDIT_FILE = DATA_DIR / "arab_quote_prediction_audit.json"
 REMOTE_PREDICTION_AUDIT_FILE = "data/arab_quote_prediction_audit.json"
 STRICT_COMPETITIONS = _bool_env(os.getenv("ARAB_STRICT_COMPETITIONS", "1"), True)
@@ -3636,12 +3652,18 @@ def build_lambdas(home_profile: Mapping[str, Any], away_profile: Mapping[str, An
 
 def _binary_empirical(home: Mapping[str, Any], away: Mapping[str, Any], league: Mapping[str, Any], h2h: Mapping[str, Any], key: str) -> float:
     hm, am = home.get("metrics", {}) or {}, away.get("metrics", {}) or {}
-    values = [safe_float(hm.get(key)), safe_float(am.get(key)), safe_float(league.get(key))]
-    weights = [0.30, 0.30, 0.35]
-    if safe_int(h2h.get("sample"), 0) >= 2:
+    is_ht = key in {"over15ht_rate", "gg_ht_rate", "goal_ht_rate"}
+    values, weights = [], []
+    for profile, metrics, weight in ((home, hm, .30), (away, am, .30), (league, league, .35)):
+        sample = profile.get("ht_sample", profile.get("sample", 0)) if profile is league else profile.get("ht_sample_all", profile.get("sample_all", 0))
+        if not is_ht or sample > 0:
+            values.append(safe_float(metrics.get(key)))
+            weights.append(weight)
+    if safe_int(h2h.get("ht_sample" if is_ht else "sample", h2h.get("sample")), 0) >= 2:
         values.append(safe_float(h2h.get(key)))
         weights.append(0.05)
-    return clamp(weighted_mean(values, weights), 0.01, 0.99)
+    fallback = safe_float(league.get(key), .30 if key == "over15ht_rate" else .12)
+    return clamp(weighted_mean(values, weights) if values else fallback, 0.01, 0.99)
 
 
 def blend_empirical_probabilities(poisson: Mapping[str, Any], home: Mapping[str, Any], away: Mapping[str, Any], league: Mapping[str, Any], h2h: Mapping[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -3999,7 +4021,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 # ENHANCEMENT V1.1.4 — FIRST-HALF INTELLIGENCE
 # Goal PT, Over 1.5 PT, GG PT, favorite trap e inversione quota
 # =========================================================
-VERSION = "1.1.8"
+VERSION = "1.1.9"
 MARKET_O05HT = "over05_ht"
 MARKET_SELECTIONS[MARKET_O05HT] = ("over", "under")
 DISPLAY_MARKET_NAMES[MARKET_O05HT] = "Goal primo tempo (Over 0,5 PT)"
@@ -4031,13 +4053,13 @@ def _weighted_event_rate(rows: Sequence[Mapping[str, Any]], predicate) -> float:
 
 
 def _first_half_rates(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
-    sample = list(rows)
+    sample = [row for row in rows if valid_ht_row(row)]
     if not sample:
         return {
             "sample": 0, "goal_ht_rate": 0.0, "zero_zero_ht_rate": 0.0,
             "over15_ht_rate": 0.0, "gg_ht_rate": 0.0,
             "scored_ht_rate": 0.0, "conceded_ht_rate": 0.0,
-            "avg_total_ht": 0.0,
+            "avg_total_ht": 0.0, "goals_scored_ht": 0.0, "goals_conceded_ht": 0.0,
         }
     weights = recency_weights(sample)
     return {
@@ -4049,6 +4071,8 @@ def _first_half_rates(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
         "scored_ht_rate": round4(_weighted_event_rate(sample, lambda row: safe_int(row.get("team_goals_ht")) >= 1)),
         "conceded_ht_rate": round4(_weighted_event_rate(sample, lambda row: safe_int(row.get("team_conceded_ht")) >= 1)),
         "avg_total_ht": round3(weighted_mean([safe_float(row.get("total_ht")) for row in sample], weights)),
+        "goals_scored_ht": round3(weighted_mean([safe_float(row.get("team_goals_ht")) for row in sample], weights)),
+        "goals_conceded_ht": round3(weighted_mean([safe_float(row.get("team_conceded_ht")) for row in sample], weights)),
     }
 
 
@@ -4058,9 +4082,13 @@ _summarize_team_matches_v113 = summarize_team_matches
 def summarize_team_matches(rows: Sequence[Mapping[str, Any]], expected_side: str) -> Dict[str, Any]:
     """Aggiunge un profilo primo tempo realmente recency-weighted."""
     profile = _summarize_team_matches_v113(rows, expected_side)
-    all_rows = list(rows)
+    all_rows = [row for row in rows if valid_ht_row(row)]
     side_rows = [row for row in all_rows if row.get("side") == expected_side]
-    context_weight = safe_float(profile.get("context_weight"), 0.0)
+    n = len(side_rows)
+    context_weight = .62 if n >= 5 else .55 if n == 4 else .46 if n == 3 else .33 if n == 2 else .20 if n == 1 else 0.0
+    profile.update(ht_sample_all=len(all_rows), ht_sample_context=n,
+                   ht_missing_count=len(rows)-len(all_rows),
+                   ht_coverage_pct=round3(len(all_rows)/len(rows)*100) if rows else 0.0)
     all_rates = _first_half_rates(all_rows)
     context_rates = _first_half_rates(side_rows)
     recent5 = _first_half_rates(all_rows[:5])
@@ -4070,6 +4098,7 @@ def summarize_team_matches(rows: Sequence[Mapping[str, Any]], expected_side: str
     for key in (
         "goal_ht_rate", "zero_zero_ht_rate", "over15_ht_rate", "gg_ht_rate",
         "scored_ht_rate", "conceded_ht_rate", "avg_total_ht",
+        "goals_scored_ht", "goals_conceded_ht",
     ):
         all_value = safe_float(all_rates.get(key))
         context_value = safe_float(context_rates.get(key), all_value) if context_rates.get("sample") else all_value
@@ -4083,9 +4112,11 @@ def summarize_team_matches(rows: Sequence[Mapping[str, Any]], expected_side: str
     metrics["scored_ht_rate"] = blended["scored_ht_rate"]
     metrics["conceded_ht_rate"] = blended["conceded_ht_rate"]
     metrics["total_ht"] = round3(blended["avg_total_ht"])
+    for key in ("goals_scored_ht", "goals_conceded_ht"):
+        metrics[key] = blended[key] if all_rows else None
 
     trend = {
-        key: round3(safe_float(recent5.get(key)) - safe_float(previous.get(key)))
+        key: round3(safe_float(recent5.get(key)) - safe_float(previous.get(key))) if previous["sample"] else 0.0
         for key in ("goal_ht_rate", "over15_ht_rate", "gg_ht_rate", "avg_total_ht")
     }
     profile["first_half"] = {
@@ -4096,6 +4127,7 @@ def summarize_team_matches(rows: Sequence[Mapping[str, Any]], expected_side: str
         "previous5": previous,
         "trend_recent5_vs_previous5": trend,
         "recency_method": "date_and_order_weighted",
+        "context_weight": context_weight,
     }
     return profile
 
@@ -4116,7 +4148,7 @@ def _last_occurrence(rows: Sequence[Mapping[str, Any]], key: str) -> Dict[str, A
 
 def summarize_h2h(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
     base = _summarize_h2h_v113(rows)
-    sample = list(rows)
+    sample = [row for row in rows if valid_ht_row(row)]
     base["goal_ht_rate"] = round4(_weighted_event_rate(sample, lambda row: safe_int(row.get("total_ht")) >= 1))
     base["zero_zero_ht_rate"] = round4(_weighted_event_rate(sample, lambda row: safe_int(row.get("total_ht")) == 0))
     base["last_occurrence"] = {
@@ -4160,20 +4192,20 @@ def build_lambdas(home_profile: Mapping[str, Any], away_profile: Mapping[str, An
     league_away_p = safe_float(league.get("away_scored_ht_rate"), 1.0 - math.exp(-max(safe_float(league.get("avg_away_ht"), 0.52), 0.01)))
     home_score_p = shrink_rate(
         weighted_mean([safe_float(hm.get("scored_ht_rate")), safe_float(am.get("conceded_ht_rate"))], [0.52, 0.48]),
-        min(safe_int(home_profile.get("sample_context")), safe_int(away_profile.get("sample_context"))),
+        min(safe_int(ht_context_sample(home_profile)), safe_int(ht_context_sample(away_profile))),
         league_home_p,
         full_sample=6,
     )
     away_score_p = shrink_rate(
         weighted_mean([safe_float(am.get("scored_ht_rate")), safe_float(hm.get("conceded_ht_rate"))], [0.52, 0.48]),
-        min(safe_int(home_profile.get("sample_context")), safe_int(away_profile.get("sample_context"))),
+        min(safe_int(ht_context_sample(home_profile)), safe_int(ht_context_sample(away_profile))),
         league_away_p,
         full_sample=6,
     )
     home_event_lambda = -math.log(max(1.0 - clamp(home_score_p, 0.03, 0.90), 0.01))
     away_event_lambda = -math.log(max(1.0 - clamp(away_score_p, 0.02, 0.85), 0.01))
 
-    context_sample = min(safe_int(home_profile.get("sample_context")), safe_int(away_profile.get("sample_context")))
+    context_sample = min(safe_int(ht_context_sample(home_profile)), safe_int(ht_context_sample(away_profile)))
     event_weight = 0.34 if context_sample >= 5 else 0.27 if context_sample >= 3 else 0.20
     base_home_ht = safe_float(result.get("home_ht"), 0.60)
     base_away_ht = safe_float(result.get("away_ht"), 0.45)
@@ -4281,13 +4313,13 @@ def _team_interaction_probabilities(home: Mapping[str, Any], away: Mapping[str, 
     am = away.get("metrics", {}) or {}
     home_p = shrink_rate(
         weighted_mean([safe_float(hm.get("scored_ht_rate")), safe_float(am.get("conceded_ht_rate"))], [0.52, 0.48]),
-        min(safe_int(home.get("sample_context")), safe_int(away.get("sample_context"))),
+        min(safe_int(ht_context_sample(home)), safe_int(ht_context_sample(away))),
         safe_float(league.get("home_scored_ht_rate"), 0.49),
         full_sample=6,
     )
     away_p = shrink_rate(
         weighted_mean([safe_float(am.get("scored_ht_rate")), safe_float(hm.get("conceded_ht_rate"))], [0.52, 0.48]),
-        min(safe_int(home.get("sample_context")), safe_int(away.get("sample_context"))),
+        min(safe_int(ht_context_sample(home)), safe_int(ht_context_sample(away))),
         safe_float(league.get("away_scored_ht_rate"), 0.41),
         full_sample=6,
     )
@@ -4306,7 +4338,7 @@ def blend_empirical_probabilities(poisson: Mapping[str, Any], home: Mapping[str,
     """Mix dedicato PT: Poisson + frequenze recency-weighted + interazione squadre."""
     output, layer = _blend_empirical_probabilities_v113(poisson, home, away, league, h2h)
     interaction = _team_interaction_probabilities(home, away, league)
-    context_sample = min(safe_int(home.get("sample_context")), safe_int(away.get("sample_context")))
+    context_sample = min(safe_int(ht_context_sample(home)), safe_int(ht_context_sample(away)))
     empirical_weight = 0.38 if context_sample >= 5 else 0.32 if context_sample >= 3 else 0.24
     interaction_weight = 0.12 if context_sample >= 3 else 0.08
     poisson_weight = 1.0 - empirical_weight - interaction_weight
@@ -4813,7 +4845,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 # ENHANCEMENT V1.1.5 — 1X2 -> GOAL REGIME + VALUE SHORTLIST
 # Mantiene lo schema web V1.1.x e aggiunge soltanto campi.
 # =========================================================
-VERSION = "1.1.8"
+VERSION = "1.1.9"
 
 
 def _profile_metric(profile: Mapping[str, Any], key: str) -> float:
@@ -5387,6 +5419,8 @@ def capture_prematch_predictions(output: Mapping[str, Any]) -> Dict[str, Any]:
                 "probabilities_raw": model.get("probabilities_raw", {}),
                 "probabilities_calibrated": model.get("probabilities_calibrated", {}),
                 "reliability_pct": model.get("reliability_pct"),
+                "first_half_evidence": model.get("first_half_evidence", {}),
+                "first_half_assessment": display.get("first_half_assessment", {}),
                 "markets": display.get("markets", {}),
                 "market_candidates": display.get("market_candidates", []),
                 "quote_observation": match.get("quote_observation", {}),

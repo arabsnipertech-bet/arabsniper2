@@ -2,6 +2,7 @@
 import os
 from copy import deepcopy
 from selection_policy import competition, drought, movements
+from first_half_quality import assess, evidence, PROFILE_ID, THRESHOLDS, VALIDATION_FROM
 
 TARGETS = {'over15_ht': 'over', 'gg_ht': 'yes', 'over25_ft': 'over'}
 
@@ -127,6 +128,17 @@ def install(ns):
                 'grade':checked['grade'],'expected_value_pct':checked['expected_value_pct'],
                 'movement':features,'selection_reason':checked['selection_reason']})
         output.setdefault('display',{})['market_candidates'] = candidates
+        first_half_market = output['display'].get('markets', {}).get('over15_ht', {})
+        ht_candidate = next(c for c in candidates if c['market'] == 'over15_ht')
+        assessment = assess(first_half_market, rel, ht_candidate['gate'])
+        model['first_half_evidence'] = evidence(output.get('statistics', {}), model.get('lambdas', {}))
+        assessment['ht_coverage_status'] = model['first_half_evidence']['coverage_status']
+        if assessment['ht_coverage_status'] != 'available':
+            assessment['eligible'] = False
+            assessment['status'] = 'unavailable'
+            assessment['reasons'].append(assessment['ht_coverage_status'])
+        ht_candidate['probability_assessment'] = assessment
+        output['display']['first_half_assessment'] = assessment
         # Archive every market and both odds sides, including rejected selections.
         output['quote_observation'] = {k: {'history':deepcopy(v.get('history',[])),
             'movement_features':deepcopy(v.get('movement_features',{})),
@@ -179,15 +191,23 @@ def install(ns):
         ns['atomic_write_json'](observations_path,observations)
         for day in output.get('days',[]):
             rankings = {market: [] for market in TARGETS}
+            probability_rankings = {'over15_ht': []}
             for match in day.get('matches',[]):
                 meta = match.get('fixture',{})
                 kickoff = ns['parse_iso'](meta.get('kickoff'))
                 if not kickoff or kickoff<=ns['now_rome']() or meta.get('result'): continue
                 for candidate in match.get('display',{}).get('market_candidates',[]):
                     if candidate['gate']['eligible']: rankings[candidate['market']].append(candidate)
+                    if candidate['market'] == 'over15_ht' and candidate.get('probability_assessment', {}).get('eligible'):
+                        probability_rankings['over15_ht'].append(candidate)
             for rows in rankings.values(): rows.sort(key=lambda c:(-c['ranking_score'],-c['probability_pct'],str(c['fixture_id'])))
+            # Chronological presentation; do not manufacture a new success percentage.
+            probability_rankings['over15_ht'].sort(key=lambda c:(c['kickoff'],str(c['fixture_id'])))
             day['market_rankings'] = rankings
-            ns['atomic_write_json'](ns['DATA_DIR']/f"arab_quote_selections_day{day.get('day',1)}.json",{'date':day.get('date'),'generated_at':ns['iso_now'](),'rankings':rankings})
+            day['probability_rankings'] = probability_rankings
+            day['first_half_quality_method'] = {'profile_id': PROFILE_ID, 'experimental': True,
+                'thresholds': dict(THRESHOLDS), 'validation_from': VALIDATION_FROM}
+            ns['atomic_write_json'](ns['DATA_DIR']/f"arab_quote_selections_day{day.get('day',1)}.json",{'date':day.get('date'),'generated_at':ns['iso_now'](),'rankings':rankings,'probability_rankings':probability_rankings,'first_half_quality_method':day['first_half_quality_method']})
         output['competition_review'] = list(review.values())
         output.setdefault('method',{})['user_policy'] = {'probability_floor_pct':40,'reliability_floor_pct':60,'book_max_weight':.18,'drought_bonus_max':.04,'rankings':'separate_uncapped'}
         ns['atomic_write_json'](ns['OUTPUT_FILE'],output)
