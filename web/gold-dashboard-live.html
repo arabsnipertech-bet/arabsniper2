@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
-  <title>ArabSniper Quote Dashboard V1.1.8</title>
+  <title>ArabSniper Quote Dashboard V1.1.9</title>
   <style>
     :root {
       --bg: #05070b;
@@ -656,7 +656,7 @@
     <header class="topbar">
       <div class="brand">
         <h1>ARABSNIPER · QUOTE DASHBOARD</h1>
-        <p>Probabilità ArabSniper pure e calibrate, xG reali e direzione del book direttamente sulle quote.</p>
+        <p>Over PT: confronto dei segnali e valore della quota. GG PT e Over finale nelle viste dedicate. · v1.1.9</p>
         <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
       </div>
       <div class="top-actions">
@@ -1087,8 +1087,13 @@
 
 
     let activeRankingMarket = 'over15_ht';
+    let activeRankingView = 'probability';
     function selectRankingMarket(key) {
       activeRankingMarket = key;
+      renderMarketRankings(currentPayload || {});
+    }
+    function selectRankingView(view) {
+      activeRankingView = view;
       renderMarketRankings(currentPayload || {});
     }
     function renderMarketRankings(payload) {
@@ -1097,33 +1102,47 @@
       section.id = 'marketRankings';
       section.className = 'ranking-section';
       const rankings = payload.market_rankings;
+      const probabilityRankings = payload.probability_rankings;
+      const probabilityView = activeRankingMarket === 'over15_ht' && activeRankingView === 'probability';
       const keys = ['over15_ht','gg_ht','over25_ft'];
       const labels = {over15_ht:'Over 1,5 PT',gg_ht:'GG PT sì',over25_ft:'Over 2,5 finale'};
       const explain = {over15_ht:'Almeno 2 gol nel primo tempo',gg_ht:'Entrambe segnano nel primo tempo',over25_ft:'Almeno 3 gol nella partita'};
-      const rowsFor = key => (Array.isArray(rankings?.[key]) ? rankings[key] : [])
+      const rowsFor = key => {
+        const source = key === 'over15_ht' && activeRankingView === 'probability' ? probabilityRankings : rankings;
+        return (Array.isArray(source?.[key]) ? source[key] : [])
         .filter(r => Number.isFinite(Date.parse(r.kickoff)) && Date.parse(r.kickoff)>Date.now())
         .slice().sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||num(b.ranking_score)-num(a.ranking_score));
+      };
       let html = '<h2>Trova le partite per mercato</h2><p>Scegli un mercato. Le selezioni sono ordinate per orario. A parità di orario, precede il punteggio più alto.</p>';
       html += '<div class="ranking-tabs" role="group" aria-label="Mercato delle selezioni">'+keys.map(k=>`<button type="button" aria-pressed="${k===activeRankingMarket}" onclick="selectRankingMarket('${k}')">${labels[k]}<span>${rowsFor(k).length} selezioni</span></button>`).join('')+'</div>';
+      if (activeRankingMarket === 'over15_ht') {
+        html += '<div class="ranking-tabs" style="grid-template-columns:repeat(2,minmax(0,1fr))" role="group" aria-label="Tipo di selezione PT">'+
+          `<button type="button" aria-pressed="${probabilityView}" onclick="selectRankingView('probability')">Convergenza PT<span>Book + storico + Poisson</span></button>`+
+          `<button type="button" aria-pressed="${!probabilityView}" onclick="selectRankingView('value')">Valore della quota<span>Filtro con EV positivo</span></button></div>`;
+        html += `<p>${probabilityView ? 'Segnali concordi sull’Over PT · filtro in verifica. La convenienza della quota è indicata separatamente.' : 'Selezioni che superano il filtro di probabilità, copertura dati e valore atteso della quota.'}</p>`;
+      }
       html += `<p class="ranking-explain">${explain[activeRankingMarket]} · Dati del ${escapeHtml(formatTimestamp(payload.updated_at))}</p>`;
-      if (!rankings || typeof rankings !== 'object') {
-        html += '<div class="empty">Classifiche non ancora disponibili. Attendi la prossima scansione.</div>';
+      const available = probabilityView ? probabilityRankings : rankings;
+      if (!available || typeof available !== 'object') {
+        html += '<div class="empty">Questa vista sarà disponibile dopo la prossima scansione dei dati. Puoi consultare le altre selezioni.</div>';
       } else {
         const rows = rowsFor(activeRankingMarket);
         if (!rows.length) html += '<div class="empty">Nessuna selezione disponibile prima del calcio d’inizio per questo mercato.</div>';
         html += '<div class="ranking-cards">';
         rows.forEach((r,i)=>{
           const m=r.movement||{};
+          const a=r.probability_assessment||{};
+          const c=a.components||{};
           const drop=m.drop_pct;
           const movement=drop==null?'Movimento quota non disponibile':Math.abs(drop)<0.01?'Quota stabile':`Quota ${drop>0?'in calo':'in aumento'} ${Math.abs(drop).toFixed(1)}%`;
           html += `<article class="ranking-card"><div class="ranking-heading"><span class="ranking-position">#${i+1}</span><strong>${escapeHtml(r.match)}</strong><time>${escapeHtml(r.time)}</time></div><p>${escapeHtml(r.country)} · ${escapeHtml(r.league)}</p>
-          <div class="ranking-metrics"><div><span>Probabilità stimata</span><b>${escapeHtml(formatPct(r.probability_pct))}</b></div><div><span>Quota attuale</span><b>${escapeHtml(formatOdd(r.odd))}</b></div><div><span>Affidabilità dati</span><b>${escapeHtml(formatPct(r.reliability_pct))}</b></div></div>
-          <div class="ranking-badges"><span>Punteggio ${escapeHtml(String(r.ranking_score??'—'))}/100</span><span>${escapeHtml(movement)}</span>${r.recovered?'<span>Recuperata dai nuovi criteri</span>':''}</div>
-          <details><summary>Perché è in classifica</summary><p>${escapeHtml(r.selection_reason||'Supera i criteri del mercato.')}</p><p>${escapeHtml(RELATION_LABELS[r.relation]||r.relation||'')}</p><dl><dt>Probabilità pura</dt><dd>${escapeHtml(formatPct(r.probability_raw_pct))}</dd><dt>Valore atteso teorico (EV)</dt><dd>${escapeHtml(formatPct(r.expected_value_pct))}</dd><dt>Prima quota osservata</dt><dd>${escapeHtml(formatOdd(m.opening_observed_odd))}</dd><dt>Inversioni della quota</dt><dd>${escapeHtml(String(m.direction_reversals??'—'))}</dd></dl></details></article>`;
+          ${probabilityView ? `<div class="ranking-metrics"><div><span>Book senza margine</span><b>${escapeHtml(formatPct(c.book_fair_pct))}</b></div><div><span>Stima Poisson PT</span><b>${escapeHtml(formatPct(c.poisson_pct))}</b></div><div><span>Stima storica PT</span><b>${escapeHtml(formatPct(c.empirical_pct))}</b></div></div><div class="ranking-badges"><span>Convergenza in verifica</span><span>Quota ${escapeHtml(formatOdd(r.odd))}</span><span>${a.value_eligible ? 'Supera anche il filtro valore' : 'Fuori dal filtro valore della quota'}</span></div>` :
+          `<div class="ranking-metrics"><div><span>Probabilità stimata</span><b>${escapeHtml(formatPct(r.probability_pct))}</b></div><div><span>Quota attuale</span><b>${escapeHtml(formatOdd(r.odd))}</b></div><div><span>Copertura dati</span><b>${escapeHtml(formatPct(r.reliability_pct))}</b></div></div><div class="ranking-badges"><span>Punteggio ${escapeHtml(String(r.ranking_score??'—'))}/100</span><span>${escapeHtml(movement)}</span>${r.recovered?'<span>Recuperata dai nuovi criteri</span>':''}</div>`}
+          <details><summary>Perché è in questa selezione</summary><p>${escapeHtml(probabilityView ? 'Book senza margine almeno 45%, Poisson PT almeno 40%, stima storica PT almeno 40%, mercato verificato e copertura dati almeno 60%.' : r.selection_reason||'Supera i criteri del mercato.')}</p><dl><dt>Probabilità ArabSniper</dt><dd>${escapeHtml(formatPct(r.probability_pct))}</dd><dt>Valore atteso teorico (EV)</dt><dd>${escapeHtml(formatPct(r.expected_value_pct))}</dd><dt>Prima quota osservata</dt><dd>${escapeHtml(formatOdd(m.opening_observed_odd))}</dd><dt>Inversioni della quota</dt><dd>${escapeHtml(String(m.direction_reversals??'—'))}</dd></dl><p>La convergenza confronta stime che condividono parte dei dati: non è una nuova percentuale di successo.</p></details></article>`;
         });
         html+='</div>';
       }
-      html += '<details class="ranking-guide"><summary>Come leggere queste selezioni</summary><p>Probabilità calibrata almeno 40%, affidabilità dei dati almeno 60%, quota disponibile e valore atteso positivo. L’affidabilità misura la qualità dei dati, non la probabilità di vincita. Il punteggio combina più criteri e non è una percentuale di successo.</p><p>Recuperata: esclusa dai precedenti filtri, ammessa dai nuovi criteri. Quote confrontate con la prima osservazione. Le probabilità sono stime; un EV positivo dipende dalla loro accuratezza.</p><p>Le classifiche sono separate dai filtri delle schede complete sottostanti. Aggiornare la pagina rilegge i dati già pubblicati e non avvia una scansione.</p></details>';
+      html += '<details class="ranking-guide"><summary>Come leggere queste selezioni</summary><p>Convergenza PT confronta book senza margine, storico e Poisson prima del calcio d’inizio; include anche partite escluse dal filtro valore. È una regola in verifica su giornate successive.</p><p>Valore della quota richiede probabilità calibrata almeno 40%, copertura dati almeno 60%, quota disponibile e valore atteso positivo. La copertura dei dati e il punteggio non sono probabilità di vincita. Un EV positivo dipende dall’accuratezza della stima.</p><p>Ogni mercato conserva i propri criteri. Le partite sono ordinate per orario. Aggiornare la pagina rilegge i dati pubblicati e non avvia una scansione.</p></details>';
       section.innerHTML=html;
       document.querySelector('.toolbar').before(section);
     }
@@ -1420,7 +1439,7 @@
                 <tr>
                   <td>${escapeHtml(row.date || '')}</td>
                   <td>${escapeHtml(`${row.home || ''} - ${row.away || ''}`)}</td>
-                  <td>${escapeHtml(`${row.home_ht_goals ?? 0}-${row.away_ht_goals ?? 0}`)}</td>
+                  <td>${row.halftime_available === false || row.home_ht_goals == null || row.away_ht_goals == null ? 'n/d' : escapeHtml(`${row.home_ht_goals}-${row.away_ht_goals}`)}</td>
                   <td>${escapeHtml(`${row.home_goals ?? 0}-${row.away_goals ?? 0}`)}</td>
                   <td>${row.xg_available ? escapeHtml(`${num(row.home_xg).toFixed(2)}-${num(row.away_xg).toFixed(2)}`) : '—'}</td>
                   <td>${row.over25_ft ? '✅' : '—'}</td>
@@ -1479,6 +1498,19 @@
       }).join('')}</div>`;
     }
 
+    function firstHalfQualityBox(match) {
+      const assessment = match?.display?.first_half_assessment;
+      if (!assessment) return '';
+      const e = match?.model?.first_half_evidence || {};
+      const c = assessment.components || {};
+      const counts = side => {
+        const t = e.teams?.[side] || {};
+        return t.sample_all == null ? 'n/d' : `${t.sample_all} PT · ${t.sample_context ?? 0} nel contesto casa/trasferta`;
+      };
+      const reasons = {book_fair_pct_below_threshold:'Book sotto il 45%',poisson_pct_below_threshold:'Poisson sotto il 40%',empirical_pct_below_threshold:'Storico sotto il 40%',market_not_verified:'Mercato non verificato',data_reliability_below_60_or_missing:'Copertura dati insufficiente',missing_team_ht:'Storico PT di una squadra assente',unrecorded:'Copertura PT non registrata'};
+      return `<section class="detail-section" style="margin-bottom:16px"><h3>Over 1,5 PT · confronto dei segnali</h3><p class="section-note">${assessment.eligible ? 'Convergenza presente · regola in verifica' : 'Fuori dal filtro di convergenza'}</p><div class="detail-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">${buildDetailBox('Book senza margine',formatPct(c.book_fair_pct))}${buildDetailBox('Poisson PT',formatPct(c.poisson_pct))}${buildDetailBox('Stima storica PT',formatPct(c.empirical_pct))}${buildDetailBox('Filtro valore quota',assessment.value_eligible ? 'Superato' : 'Non superato')}${buildDetailBox('Campione PT casa',counts('home'))}${buildDetailBox('Campione PT ospite',counts('away'))}</div><p class="section-note">${escapeHtml((assessment.reasons||[]).map(r=>reasons[r]||'Dato necessario non disponibile').join(' · '))}</p></section>`;
+    }
+
     function openDetail(index) {
       const match = filteredMatches[index];
       if (!match) return;
@@ -1503,6 +1535,7 @@
       document.getElementById('detailTitle').textContent = fixture.match || 'Dettagli partita';
       document.getElementById('detailSubtitle').textContent = `${fixture.league || ''} · ${fixture.date || ''} ${fixture.time || ''}`;
       document.getElementById('detailBody').innerHTML = `
+        ${firstHalfQualityBox(match)}
         <div class="detail-grid">
           ${buildDetailBox('Affidabilità', formatPct(model.reliability_pct))}
           ${buildDetailBox('Lambda casa FT finale', num(lambdas.home_ft).toFixed(2))}

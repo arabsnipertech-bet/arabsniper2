@@ -42,12 +42,16 @@ class AuditTests(unittest.TestCase):
 
     def test_snapshot_frozen_and_late_capture_rejected(self):
         fixture = {'fixture_id': 1, 'kickoff': (self.now+timedelta(hours=1)).isoformat()}
-        match = {'fixture': fixture, 'model': {'probabilities_raw': {'gg_ht': {'yes': .3}}}}
+        match = {'fixture': fixture, 'model': {'probabilities_raw': {'gg_ht': {'yes': .3}},
+                 'first_half_evidence': {'teams': {'home': {'sample_all': 8}}}},
+                 'display': {'first_half_assessment': {'eligible': True}}}
         payload = {'days': [{'matches': [match]}]}
         capture = self.ns['capture_prematch_predictions']
         capture(payload)
         original = json.dumps(self.store['fixtures']['1'], sort_keys=True)
         match['model']['probabilities_raw']['gg_ht']['yes'] = .9
+        match['model']['first_half_evidence']['teams']['home']['sample_all'] = 99
+        match['display']['first_half_assessment']['eligible'] = False
         capture(payload)
         self.assertEqual(original, json.dumps(self.store['fixtures']['1'], sort_keys=True))
         fixture['fixture_id'] = 2

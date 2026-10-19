@@ -6,6 +6,7 @@ from collections import defaultdict
 from datetime import datetime
 from math import isfinite, sqrt
 from zoneinfo import ZoneInfo
+from first_half_quality import assess, DISCOVERY_THROUGH, VALIDATION_FROM, PROFILE_ID, THRESHOLDS
 
 SIDES = {'over15_ht': 'over', 'gg_ht': 'yes', 'over25_ft': 'over'}
 PROFILES = ('current', 'probability_50', 'probability_60', 'reliability_75',
@@ -98,11 +99,15 @@ def build_filter_comparison(store):
                 cov['pending_or_missing_result'] += 1
                 continue
             cov['settled'] += 1
+            displayed = (record.get('markets') or {}).get(market) or {}
+            ht_signal = assess(displayed, record.get('reliability_pct'), gate) if market == 'over15_ht' else {}
             markets[market].append({'p': p, 'outcome': outcome, 'odd': choice.get('odd'),
                 'current': gate.get('eligible') is True,
                 'reliability': record.get('reliability_pct'),
                 'relation': choice.get('relation'), 'gap': gate.get('book_disagreement_pp'),
                 'reasons': gate.get('reasons') or [],
+                'ht_signal': ht_signal,
+                'ht_evidence': record.get('first_half_evidence') or {},
                 'date': kickoff.astimezone(ZoneInfo('Europe/Rome')).date().isoformat(),
                 'country': fixture.get('country') or 'unknown',
                 'league': (fixture.get('country') or 'unknown') + '/' + (fixture.get('league') or 'unknown'),
@@ -134,8 +139,63 @@ def build_filter_comparison(store):
             'later_period_start_date': cutoff, 'profiles': profiles,
             'cohorts': [{'dimension': d, 'value': v, **metrics(rs)}
                         for (d, v), rs in sorted(cohorts.items())]}
-    return {'schema_version': 1, 'profiles_version': '2026-10-18-v1',
+    return {'schema_version': 2, 'profiles_version': '2026-10-19-v2',
         'note': 'Exploratory fixed profiles, not validated improvements. Includes rejected forecasts. '
                 'Paper ROI at first recorded prices, no staking recommendation. '
                 'Later-period data must not be used to tune profiles. No automatic live filter changes.',
-        'invalid_prematch_records_excluded': invalid_evidence, 'markets': output}
+        'invalid_prematch_records_excluded': invalid_evidence, 'markets': output,
+        'over15_ht_probability_comparison': probability_comparison(markets['over15_ht'])}
+
+
+def probability_comparison(rows):
+    """Whole-universe HT profiles, without inheriting the existing EV gate.
+
+    No automatic fitting. Discovery results and later, whole-date validation
+    remain separate, including when more dates are added to the store.
+    """
+    def component(row, key, floor):
+        value = row['ht_signal']['components'].get(key)
+        return number(value) and value >= floor
+
+    rules = {
+        'current_value_filter': lambda r: r['current'],
+        'model_probability_50': lambda r: r['p'] >= .50,
+        'book_fair_45': lambda r: component(r, 'book_fair_pct', 45),
+        'book_poisson_empirical_45_40_40': lambda r: all(component(r, k, v) for k, v in
+            (('book_fair_pct', 45), ('poisson_pct', 40), ('empirical_pct', 40))),
+        'convergence_quality_60': lambda r: r['ht_signal']['eligible'] and
+            r['ht_evidence'].get('coverage_status') == 'available',
+    }
+    report = []
+    for name, rule in rules.items():
+        selected = [r for r in rows if rule(r)]
+        discovery = [r for r in selected if r['date'] <= DISCOVERY_THROUGH]
+        prospective = [r for r in selected if r['date'] >= VALIDATION_FROM]
+        dates = sorted({r['date'] for r in prospective})
+        report.append({'profile': name, 'selected': metrics(selected),
+            'excluded': metrics([r for r in rows if not rule(r)]),
+            'selected_from_current_accepted': metrics([r for r in selected if r['decision'] == 'accepted']),
+            'selected_from_current_rejected': metrics([r for r in selected if r['decision'] == 'rejected']),
+            'discovery': metrics(discovery), 'prospective': metrics(prospective),
+            'transition': metrics([r for r in selected if DISCOVERY_THROUGH < r['date'] < VALIDATION_FROM]),
+            'prospective_dates': dates,
+            'prospective_by_model_version': [{'model_version': version,
+                **metrics([r for r in prospective if r['version'] == version])}
+                for version in sorted({r['version'] for r in prospective})],
+            'sample_status': 'available_for_review' if len(prospective) >= 100 and len(dates) >= 3
+                             else 'insufficient_prospective_sample'})
+    predictors = []
+    for field in ('book_fair_pct', 'poisson_pct', 'empirical_pct'):
+        available = [r for r in rows if number(r['ht_signal']['components'].get(field))]
+        paired = [{**r, 'p': r['ht_signal']['components'][field]/100} for r in available]
+        predictors.append({'predictor': field, 'all': metrics(paired),
+            'bands': [{'from_pct': low, 'to_pct_exclusive': high,
+                       **metrics([r for r in paired if low <= r['p']*100 < high])}
+                      for low, high in ((0, 30), (30, 40), (40, 45), (45, 50), (50, 101))]})
+    return {'profile_id': PROFILE_ID, 'thresholds': dict(THRESHOLDS),
+        'discovery_through': DISCOVERY_THROUGH, 'validation_from': VALIDATION_FROM,
+        'all_predictions': metrics(rows), 'profiles': report, 'predictors': predictors,
+        'unrecorded_ht_coverage': sum(not r['ht_evidence'] for r in rows),
+        'note': 'Fixed exploratory rules include accepted and rejected predictions. '
+                'Convergence is not a calibrated probability or a value recommendation. '
+                'Only dates from validation_from are prospective; thresholds are never fitted automatically.'}
