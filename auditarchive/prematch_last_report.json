@@ -9816,7 +9816,17 @@
     }
   },
   "first_half_quality_by_version": [],
-  "generated_at": "2026-10-19T08:58:16.424935+02:00",
+  "multimarket": {
+    "model_id": "coherent-markets-v1",
+    "validation_from": "2026-10-20",
+    "status": "experimental",
+    "note": "No threshold tuning. Retrospective development is separated from frozen prospective forecasts. ROI is theoretical, not executed.",
+    "cohorts": [],
+    "groups": [],
+    "calibration": [],
+    "feature_comparisons": []
+  },
+  "generated_at": "2026-10-19T11:26:52.971028+02:00",
   "results_dates_queried": [],
   "archived_forecasts": 172,
   "archived_quality_evaluations": 0
