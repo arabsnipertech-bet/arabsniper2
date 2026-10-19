@@ -1,6 +1,6 @@
 {
   "date": "2026-10-19",
-  "generated_at": "2026-10-19T06:36:39+02:00",
+  "generated_at": "2026-10-19T08:47:56+02:00",
   "rankings": {
     "over15_ht": [
       {
@@ -12,27 +12,27 @@
         "kickoff": "2026-10-19T21:30:00+02:00",
         "league": "Division Intermedia",
         "country": "Paraguay",
-        "probability_pct": 51.92,
-        "probability_raw_pct": 52.44,
+        "probability_pct": 51.9,
+        "probability_raw_pct": 52.42,
         "odd": 2.42,
         "reliability_pct": 85.0,
         "relation": "model_only",
         "gate": {
           "eligible": true,
-          "score": 63.556,
+          "score": 63.545,
           "grade": "C",
           "reasons": [],
           "absolute_probability_floor_pct": 40,
           "market_break_even_pct": 41.322,
-          "probability_pct": 51.92,
-          "raw_probability_pct": 52.44,
-          "expected_value_pct": 25.646,
-          "edge_over_break_even_pp": 10.598,
-          "book_disagreement_pp": 14.97,
+          "probability_pct": 51.9,
+          "raw_probability_pct": 52.42,
+          "expected_value_pct": 25.598,
+          "edge_over_break_even_pp": 10.578,
+          "book_disagreement_pp": 14.95,
           "competition_quality_score": 72,
           "bookmakers": 2,
           "policy": "user_40pct_60reliability_positive_ev",
-          "analytical_score_before_price_preference": 76.206,
+          "analytical_score_before_price_preference": 76.23,
           "price_preference_adjustment": 3.0,
           "price_profile": "preferred_value_band",
           "initial_reasons": [],
@@ -42,9 +42,9 @@
           "selection_reason": "criteri specifici mercato superati"
         },
         "recovered": false,
-        "ranking_score": 63.556,
+        "ranking_score": 63.545,
         "grade": "C",
-        "expected_value_pct": 25.646,
+        "expected_value_pct": 25.598,
         "movement": {
           "consensus_ratio": 0.0,
           "observation_hours": null,
@@ -57,63 +57,34 @@
           "observation_count": 1,
           "opening_note": "first observed quote, not certified bookmaker opening"
         },
-        "selection_reason": "criteri specifici mercato superati"
-      },
-      {
-        "market": "over15_ht",
-        "selection": "over",
-        "fixture_id": "1639826",
-        "match": "Mushuc Runa SC - Orense SC",
-        "time": "22:30",
-        "kickoff": "2026-10-19T22:30:00+02:00",
-        "league": "Liga Pro",
-        "country": "Ecuador",
-        "probability_pct": 43.93,
-        "probability_raw_pct": 44.76,
-        "odd": 2.8,
-        "reliability_pct": 85.0,
-        "relation": "model_only",
-        "gate": {
-          "eligible": true,
-          "score": 59.162,
-          "grade": "C",
-          "reasons": [],
-          "absolute_probability_floor_pct": 40,
-          "market_break_even_pct": 35.714,
-          "probability_pct": 43.93,
-          "raw_probability_pct": 44.76,
-          "expected_value_pct": 23.004,
-          "edge_over_break_even_pp": 8.216,
-          "book_disagreement_pp": 12.07,
-          "competition_quality_score": 84,
-          "bookmakers": 5,
-          "policy": "user_40pct_60reliability_positive_ev",
-          "analytical_score_before_price_preference": 87.797,
-          "price_preference_adjustment": 3.0,
-          "price_profile": "preferred_value_band",
-          "initial_reasons": [],
-          "initial_eligible": true,
-          "recovered": false,
-          "reliability_floor_pct": 60,
-          "selection_reason": "criteri specifici mercato superati"
-        },
-        "recovered": false,
-        "ranking_score": 59.162,
-        "grade": "C",
-        "expected_value_pct": 23.004,
-        "movement": {
-          "consensus_ratio": 0.0,
-          "observation_hours": 73.8825,
-          "drop_pct_per_hour": 0.038,
-          "opening_observed_odd": 2.88,
-          "current_odd": 2.8,
-          "drop_pct": 2.778,
-          "direction_reversals": 0,
-          "favorite_inversion": false,
-          "observation_count": 2,
-          "opening_note": "first observed quote, not certified bookmaker opening"
-        },
-        "selection_reason": "criteri specifici mercato superati"
+        "selection_reason": "criteri specifici mercato superati",
+        "probability_assessment": {
+          "profile_id": "over15_ht_convergence_v1",
+          "experimental": true,
+          "validation_from": "2026-10-20",
+          "thresholds": {
+            "book_fair_pct": 45.0,
+            "poisson_pct": 40.0,
+            "empirical_pct": 40.0,
+            "reliability_pct": 60.0
+          },
+          "components": {
+            "book_fair_pct": 37.47,
+            "poisson_pct": 58.68,
+            "empirical_pct": 45.04
+          },
+          "converges": false,
+          "eligible": false,
+          "status": "excluded",
+          "reasons": [
+            "book_fair_pct_below_threshold"
+          ],
+          "reliability_pct": 85.0,
+          "value_eligible": true,
+          "expected_value_pct": 25.598,
+          "note": "Convergence is a research rule, not a calibrated success probability. Poisson and empirical estimates share historical inputs.",
+          "ht_coverage_status": "available"
+        }
       },
       {
         "market": "over15_ht",
@@ -124,27 +95,27 @@
         "kickoff": "2026-10-19T23:00:00+02:00",
         "league": "Primera B",
         "country": "Colombia",
-        "probability_pct": 42.26,
-        "probability_raw_pct": 43.11,
+        "probability_pct": 42.28,
+        "probability_raw_pct": 43.13,
         "odd": 2.95,
         "reliability_pct": 85.0,
         "relation": "model_only",
         "gate": {
           "eligible": true,
-          "score": 58.243,
+          "score": 58.254,
           "grade": "C",
           "reasons": [],
           "absolute_probability_floor_pct": 40,
           "market_break_even_pct": 33.898,
-          "probability_pct": 42.26,
-          "raw_probability_pct": 43.11,
-          "expected_value_pct": 24.667,
-          "edge_over_break_even_pp": 8.362,
-          "book_disagreement_pp": 12.36,
+          "probability_pct": 42.28,
+          "raw_probability_pct": 43.13,
+          "expected_value_pct": 24.726,
+          "edge_over_break_even_pp": 8.382,
+          "book_disagreement_pp": 12.38,
           "competition_quality_score": 72,
           "bookmakers": 4,
           "policy": "user_40pct_60reliability_positive_ev",
-          "analytical_score_before_price_preference": 81.751,
+          "analytical_score_before_price_preference": 81.728,
           "price_preference_adjustment": 3.0,
           "price_profile": "preferred_value_band",
           "initial_reasons": [],
@@ -154,9 +125,9 @@
           "selection_reason": "criteri specifici mercato superati"
         },
         "recovered": false,
-        "ranking_score": 58.243,
+        "ranking_score": 58.254,
         "grade": "C",
-        "expected_value_pct": 24.667,
+        "expected_value_pct": 24.726,
         "movement": {
           "consensus_ratio": 0.0,
           "observation_hours": null,
@@ -169,7 +140,35 @@
           "observation_count": 1,
           "opening_note": "first observed quote, not certified bookmaker opening"
         },
-        "selection_reason": "criteri specifici mercato superati"
+        "selection_reason": "criteri specifici mercato superati",
+        "probability_assessment": {
+          "profile_id": "over15_ht_convergence_v1",
+          "experimental": true,
+          "validation_from": "2026-10-20",
+          "thresholds": {
+            "book_fair_pct": 45.0,
+            "poisson_pct": 40.0,
+            "empirical_pct": 40.0,
+            "reliability_pct": 60.0
+          },
+          "components": {
+            "book_fair_pct": 30.75,
+            "poisson_pct": 46.98,
+            "empirical_pct": 37.9
+          },
+          "converges": false,
+          "eligible": false,
+          "status": "excluded",
+          "reasons": [
+            "book_fair_pct_below_threshold",
+            "empirical_pct_below_threshold"
+          ],
+          "reliability_pct": 85.0,
+          "value_eligible": true,
+          "expected_value_pct": 24.726,
+          "note": "Convergence is a research rule, not a calibrated success probability. Poisson and empirical estimates share historical inputs.",
+          "ht_coverage_status": "available"
+        }
       },
       {
         "market": "over15_ht",
@@ -215,7 +214,7 @@
         "expected_value_pct": 13.306,
         "movement": {
           "consensus_ratio": 0.3333,
-          "observation_hours": 73.87416666666667,
+          "observation_hours": 76.06222222222222,
           "drop_pct_per_hour": 0.003,
           "opening_observed_odd": 2.2,
           "current_odd": 2.195,
@@ -225,7 +224,117 @@
           "observation_count": 3,
           "opening_note": "first observed quote, not certified bookmaker opening"
         },
-        "selection_reason": "criteri specifici mercato superati"
+        "selection_reason": "criteri specifici mercato superati",
+        "probability_assessment": {
+          "profile_id": "over15_ht_convergence_v1",
+          "experimental": true,
+          "validation_from": "2026-10-20",
+          "thresholds": {
+            "book_fair_pct": 45.0,
+            "poisson_pct": 40.0,
+            "empirical_pct": 40.0,
+            "reliability_pct": 60.0
+          },
+          "components": {
+            "book_fair_pct": 42.24,
+            "poisson_pct": 56.330000000000005,
+            "empirical_pct": 47.54
+          },
+          "converges": false,
+          "eligible": false,
+          "status": "excluded",
+          "reasons": [
+            "book_fair_pct_below_threshold"
+          ],
+          "reliability_pct": 83.583,
+          "value_eligible": true,
+          "expected_value_pct": 13.306,
+          "note": "Convergence is a research rule, not a calibrated success probability. Poisson and empirical estimates share historical inputs.",
+          "ht_coverage_status": "available"
+        }
+      },
+      {
+        "market": "over15_ht",
+        "selection": "over",
+        "fixture_id": "1639826",
+        "match": "Mushuc Runa SC - Orense SC",
+        "time": "22:30",
+        "kickoff": "2026-10-19T22:30:00+02:00",
+        "league": "Liga Pro",
+        "country": "Ecuador",
+        "probability_pct": 43.580000000000005,
+        "probability_raw_pct": 44.73,
+        "odd": 2.9,
+        "reliability_pct": 85.0,
+        "relation": "contrast",
+        "gate": {
+          "eligible": true,
+          "score": 55.969,
+          "grade": "C",
+          "reasons": [],
+          "absolute_probability_floor_pct": 40,
+          "market_break_even_pct": 34.483,
+          "probability_pct": 43.58,
+          "raw_probability_pct": 44.73,
+          "expected_value_pct": 26.382,
+          "edge_over_break_even_pp": 9.097,
+          "book_disagreement_pp": 12.81,
+          "competition_quality_score": 84,
+          "bookmakers": 5,
+          "policy": "user_40pct_60reliability_positive_ev",
+          "analytical_score_before_price_preference": 82.934,
+          "price_preference_adjustment": 3.0,
+          "price_profile": "preferred_value_band",
+          "initial_reasons": [],
+          "initial_eligible": true,
+          "recovered": false,
+          "reliability_floor_pct": 60,
+          "selection_reason": "criteri specifici mercato superati"
+        },
+        "recovered": false,
+        "ranking_score": 55.969,
+        "grade": "C",
+        "expected_value_pct": 26.382,
+        "movement": {
+          "consensus_ratio": 1.0,
+          "observation_hours": 76.07055555555556,
+          "drop_pct_per_hour": -0.009,
+          "opening_observed_odd": 2.88,
+          "current_odd": 2.9,
+          "drop_pct": -0.694,
+          "direction_reversals": 1,
+          "favorite_inversion": false,
+          "observation_count": 3,
+          "opening_note": "first observed quote, not certified bookmaker opening"
+        },
+        "selection_reason": "criteri specifici mercato superati",
+        "probability_assessment": {
+          "profile_id": "over15_ht_convergence_v1",
+          "experimental": true,
+          "validation_from": "2026-10-20",
+          "thresholds": {
+            "book_fair_pct": 45.0,
+            "poisson_pct": 40.0,
+            "empirical_pct": 40.0,
+            "reliability_pct": 60.0
+          },
+          "components": {
+            "book_fair_pct": 31.920000000000005,
+            "poisson_pct": 44.3,
+            "empirical_pct": 46.9
+          },
+          "converges": false,
+          "eligible": false,
+          "status": "excluded",
+          "reasons": [
+            "book_fair_pct_below_threshold"
+          ],
+          "reliability_pct": 85.0,
+          "value_eligible": true,
+          "expected_value_pct": 26.382,
+          "note": "Convergence is a research rule, not a calibrated success probability. Poisson and empirical estimates share historical inputs.",
+          "ht_coverage_status": "available"
+        }
       }
     ],
     "gg_ht": [],
@@ -332,7 +441,7 @@
         "expected_value_pct": 16.922,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 26.055555555555557,
+          "observation_hours": 28.24361111111111,
           "drop_pct_per_hour": 0.0,
           "opening_observed_odd": 2.6,
           "current_odd": 2.6,
@@ -353,27 +462,27 @@
         "kickoff": "2026-10-19T18:30:00+02:00",
         "league": "Serie A",
         "country": "Italy",
-        "probability_pct": 50.870000000000005,
-        "probability_raw_pct": 51.59,
+        "probability_pct": 50.88,
+        "probability_raw_pct": 51.6,
         "odd": 2.1,
         "reliability_pct": 68.054,
         "relation": "model_only",
         "gate": {
           "eligible": true,
-          "score": 49.71,
+          "score": 49.731,
           "grade": "C",
           "reasons": [],
           "absolute_probability_floor_pct": 40,
           "market_break_even_pct": 47.619,
-          "probability_pct": 50.87,
-          "raw_probability_pct": 51.59,
-          "expected_value_pct": 6.827,
-          "edge_over_break_even_pp": 3.251,
-          "book_disagreement_pp": 5.99,
+          "probability_pct": 50.88,
+          "raw_probability_pct": 51.6,
+          "expected_value_pct": 6.848,
+          "edge_over_break_even_pp": 3.261,
+          "book_disagreement_pp": 6.0,
           "competition_quality_score": 84,
           "bookmakers": 5,
           "policy": "user_40pct_60reliability_positive_ev",
-          "analytical_score_before_price_preference": 57.232,
+          "analytical_score_before_price_preference": 57.278,
           "price_preference_adjustment": 3.0,
           "price_profile": "preferred_value_band",
           "initial_reasons": [],
@@ -383,12 +492,12 @@
           "selection_reason": "recuperata: criteri specifici mercato superati"
         },
         "recovered": true,
-        "ranking_score": 49.71,
+        "ranking_score": 49.731,
         "grade": "C",
-        "expected_value_pct": 6.827,
+        "expected_value_pct": 6.848,
         "movement": {
           "consensus_ratio": 1.0,
-          "observation_hours": 98.53222222222222,
+          "observation_hours": 100.72055555555555,
           "drop_pct_per_hour": -0.007,
           "opening_observed_odd": 2.085,
           "current_odd": 2.1,
@@ -409,27 +518,27 @@
         "kickoff": "2026-10-19T20:45:00+02:00",
         "league": "Serie A",
         "country": "Italy",
-        "probability_pct": 45.17,
+        "probability_pct": 45.269999999999996,
         "probability_raw_pct": 45.87,
-        "odd": 2.41,
+        "odd": 2.34,
         "reliability_pct": 80.442,
         "relation": "book_only",
         "gate": {
           "eligible": true,
-          "score": 47.577,
+          "score": 45.436,
           "grade": "C",
           "reasons": [],
           "absolute_probability_floor_pct": 40,
-          "market_break_even_pct": 41.494,
-          "probability_pct": 45.17,
+          "market_break_even_pct": 42.735,
+          "probability_pct": 45.27,
           "raw_probability_pct": 45.87,
-          "expected_value_pct": 8.86,
-          "edge_over_break_even_pp": 3.676,
-          "book_disagreement_pp": 5.82,
+          "expected_value_pct": 5.932,
+          "edge_over_break_even_pp": 2.535,
+          "book_disagreement_pp": 4.96,
           "competition_quality_score": 84,
           "bookmakers": 5,
           "policy": "user_40pct_60reliability_positive_ev",
-          "analytical_score_before_price_preference": 53.686,
+          "analytical_score_before_price_preference": 49.959,
           "price_preference_adjustment": 3.0,
           "price_profile": "preferred_value_band",
           "initial_reasons": [
@@ -441,23 +550,37 @@
           "selection_reason": "recuperata: criteri specifici mercato superati"
         },
         "recovered": true,
-        "ranking_score": 47.577,
+        "ranking_score": 45.436,
         "grade": "C",
-        "expected_value_pct": 8.86,
+        "expected_value_pct": 5.932,
         "movement": {
           "consensus_ratio": 0.6,
-          "observation_hours": 73.87361111111112,
-          "drop_pct_per_hour": -0.011,
+          "observation_hours": 76.06166666666667,
+          "drop_pct_per_hour": 0.028,
           "opening_observed_odd": 2.39,
-          "current_odd": 2.41,
-          "drop_pct": -0.837,
-          "direction_reversals": 0,
+          "current_odd": 2.34,
+          "drop_pct": 2.092,
+          "direction_reversals": 1,
           "favorite_inversion": false,
-          "observation_count": 3,
+          "observation_count": 4,
           "opening_note": "first observed quote, not certified bookmaker opening"
         },
         "selection_reason": "recuperata: criteri specifici mercato superati"
       }
     ]
+  },
+  "probability_rankings": {
+    "over15_ht": []
+  },
+  "first_half_quality_method": {
+    "profile_id": "over15_ht_convergence_v1",
+    "experimental": true,
+    "thresholds": {
+      "book_fair_pct": 45.0,
+      "poisson_pct": 40.0,
+      "empirical_pct": 40.0,
+      "reliability_pct": 60.0
+    },
+    "validation_from": "2026-10-20"
   }
 }
