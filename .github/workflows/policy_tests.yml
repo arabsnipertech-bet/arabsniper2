@@ -4,11 +4,12 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
+      - 'auditor/current_audit.py'
       - '.github/workflows/policy_tests.yml'
       - 'web/gold-dashboard-live.html'
   push:
     branches: [main]
-    paths: ['src/**', 'tests/**', 'web/gold-dashboard-live.html']
+    paths: ['src/**', 'tests/**', 'auditor/current_audit.py', 'web/gold-dashboard-live.html']
 permissions:
   contents: read
 jobs:
@@ -21,5 +22,6 @@ jobs:
           python-version: '3.11'
       - run: pip install requests
       - run: python -m unittest discover -s tests -v
-      - run: python -m py_compile src/3appdays.py src/policy_integration.py src/selection_policy.py src/prematch_audit.py src/first_half_quality.py src/filter_audit.py src/multimarket_model.py src/multimarket_audit.py src/model_research.py
+      - run: python -m py_compile src/3appdays.py src/policy_integration.py src/selection_policy.py src/prematch_audit.py src/first_half_quality.py src/filter_audit.py src/multimarket_model.py src/multimarket_audit.py src/model_research.py src/signal_research.py auditor/current_audit.py
       - run: node tests/test_dashboard.js
+

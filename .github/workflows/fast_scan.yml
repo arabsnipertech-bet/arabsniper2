@@ -10,6 +10,7 @@ on:
       - 'src/first_half_quality.py'
       - 'src/multimarket_model.py'
       - 'src/multimarket_audit.py'
+      - 'src/signal_research.py'
       - 'src/model_research.py'
   schedule:
     - cron: "0 6-23 * * *"
@@ -121,3 +122,4 @@ jobs:
 
           echo "Errore: impossibile pubblicare dopo 3 tentativi"
           exit 1
+

@@ -20,6 +20,8 @@ def settle_predictions(store, output):
     """Attach results without modifying any frozen forecast fields."""
     from multimarket_audit import settle as settle_multimarket
     settle_multimarket(store, {str(m.get('fixture',{}).get('fixture_id')):m.get('fixture',{}).get('result') for d in output.get('days',[]) for m in d.get('matches',[])})
+    from signal_research import settle as settle_signals
+    settle_signals(store, {str(m.get('fixture',{}).get('fixture_id')):m.get('fixture',{}).get('result') for d in output.get('days',[]) for m in d.get('matches',[])})
     indexed = defaultdict(list)
     for record in store.get('quality_evaluations', {}).values():
         indexed[str((record.get('fixture') or {}).get('fixture_id'))].append(record)
@@ -72,11 +74,12 @@ def build_report(store):
             'brier_score': round(sum((p-y)**2 for p,y,_ in rows)/n, 6),
             'wilson_95_pct': [round((center-margin)*100, 3), round((center+margin)*100, 3)],
             'priced_n': len(priced), 'roi_pct': round(sum((odd if y else 0)-1 for y,odd in priced)/len(priced)*100, 3) if priced else None})
+    from signal_research import build_report as signal_report
     quality_versions = defaultdict(dict)
     for key, record in store.get('quality_evaluations', {}).items():
         profile = (record.get('first_half_assessment') or {}).get('profile_id', 'unknown')
         quality_versions[(record.get('model_version', 'unknown'), profile)][key] = record
-    return {'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'quote_groups': quote_report(store), 'filter_comparison': build_filter_comparison(store),
+    return {'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'signal_research': signal_report(store), 'quote_groups': quote_report(store), 'filter_comparison': build_filter_comparison(store),
         'first_half_quality_by_version': [{'model_version': version, 'profile_id': profile,
             'comparison': build_filter_comparison({'fixtures': records})['over15_ht_probability_comparison']}
             for (version, profile), records in sorted(quality_versions.items())]}
@@ -115,3 +118,4 @@ def quote_report(store):
         rows.append({'market':market,'selection':side,'odds_band':band,'signal':signal,'n':n,'wins':wins,
                      'hit_rate_pct':round(wins/n*100,3),'roi_pct':round(sum((odd if y else 0)-1 for y,odd in values)/n*100,3)})
     return rows
+
