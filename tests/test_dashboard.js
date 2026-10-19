@@ -84,3 +84,39 @@ assert(host.innerHTML.includes('gg_ht::no'));
 vm.runInContext("researchFilter('market','ht')",researchContext);
 assert(host.innerHTML.includes('<details open>'));
 console.log('Exact market filters and per-fixture selection passed.');
+
+// Suggestions compare only the same exact market/side, not raw cross-market probability.
+const suggestionMarket=(key,side,p,odd=2.5)=>({...market(key,odd),market:key,selection:side,
+  label:key+' '+side,probability_pct:p,model_range_pct:[p-2,p+2],research_candidate:true,
+  conservative_ev_pct:5,book_probability_pct:p-3});
+const suggestionFixtures=Array.from({length:5},(_,i)=>({fixture:{fixture_id:'s'+i,kickoff:future(2),match:'Suggestion '+i},
+  multimarket:{model_id:'coherent-markets-v2',markets:[
+    suggestionMarket('gg_ht','yes',i===0?35:20+i,4),
+    suggestionMarket('over05_ht','over',i===0?70:80+i),
+    suggestionMarket('over25_ft','over',i===0?60:40+i),
+    suggestionMarket('over35_ft','over',i===0?40:30+i,3.5),
+    suggestionMarket('gg_ht','no',i===0?65:80-i,3)
+  ]}}));
+researchContext.suggestionFixtures=suggestionFixtures;
+let suggested=vm.runInContext('researchSuggestions(suggestionFixtures[0],suggestionFixtures)',researchContext);
+assert.equal(suggested[0].pick.row.market,'gg_ht');
+assert.equal(suggested[0].pick.row.probability_pct,35);
+assert.equal(suggested[1].pick.row.market,'over25_ft');
+assert.equal(suggested[2].pick.row.market,'over35_ft');
+assert.equal(new Set(suggested.map(x=>x.pick.row.market)).size,3);
+vm.runInContext("researchFilter('market','over35_ft::over');researchFilter('price','2to5')",researchContext);
+assert.equal(vm.runInContext('researchSuggestions(suggestionFixtures[0],suggestionFixtures)[0].pick.row.market',researchContext),'gg_ht');
+assert(vm.runInContext('researchSuggestions(suggestionFixtures[0],suggestionFixtures.slice(0,4)).every(x=>!x.pick)',researchContext));
+const stale=JSON.parse(JSON.stringify(suggestionFixtures));
+stale[0].multimarket.markets.forEach(r=>r.quote.provider_updated_at=future(-7));
+researchContext.stale=stale;
+assert(vm.runInContext('researchSuggestions(stale[0],stale).every(x=>!x.pick)',researchContext));
+const noEV=JSON.parse(JSON.stringify(suggestionFixtures));
+noEV[0].multimarket.markets.forEach(r=>r.conservative_ev_pct=-1);
+researchContext.noEV=noEV;
+assert(vm.runInContext('researchSuggestions(noEV[0],noEV).every(x=>!x.pick)',researchContext));
+const unpriced=JSON.parse(JSON.stringify(suggestionFixtures));
+unpriced[0].multimarket.markets.forEach(r=>r.quote=null);
+researchContext.unpriced=unpriced;
+assert(vm.runInContext('researchSuggestions(unpriced[0],unpriced).every(x=>!x.pick)',researchContext));
+console.log('Three proposals: exact-market ranking, unchanged probability, distinct markets, stable filters, missing/stale evidence passed.');
