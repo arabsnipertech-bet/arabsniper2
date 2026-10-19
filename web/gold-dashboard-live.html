@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
-  <meta name="application-version" content="1.2.2" />
-  <title>ArabSniper Quote Dashboard V1.2.2</title>
+  <meta name="application-version" content="1.2.3" />
+  <title>ArabSniper Quote Dashboard V1.2.3</title>
   <style>
     :root {
       --bg: #05070b;
@@ -666,7 +666,7 @@
     <header class="topbar">
       <div class="brand">
         <h1>ARABSNIPER · QUOTE DASHBOARD</h1>
-        <p>Analisi per partita · gol, esiti e movimenti delle quote · v1.2.2</p>
+        <p>Analisi per partita · gol, esiti e movimenti delle quote · v1.2.3</p>
         <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
       </div>
       <div class="top-actions">
@@ -1170,23 +1170,19 @@
     }
     function researchSuggestions(match,matches) {
       const used=new Set();
-      const eligible=(match.multimarket?.markets||[]).filter(r=>researchCandidate(r) &&
-        Number.isFinite(r.odd) && r.odd>1 && r.quote &&
-        Number.isFinite(r.book_probability_pct) && Number.isFinite(r.conservative_ev_pct) && r.conservative_ev_pct>0 &&
-        Array.isArray(r.model_range_pct) && r.model_range_pct.length===2 &&
-        r.model_range_pct.every(Number.isFinite) && r.model_range_pct[1]-r.model_range_pct[0]<=10)
-        .map(row=>({row,relative:researchRelative(match,row,matches)})).filter(x=>x.relative)
-        .sort((a,b)=>b.relative.percentile-a.relative.percentile ||
-          b.row.conservative_ev_pct-a.row.conservative_ev_pct || b.row.probability_pct-a.row.probability_pct ||
+      const eligible=(match.multimarket?.markets||[]).filter(r=>
+        Number.isFinite(r.probability_pct) && r.probability_pct>=0 && r.probability_pct<=100 &&
+        (!r.market.includes('_ht_over') || r.selection==='yes'))
+        .map(row=>({row,relative:researchRelative(match,row,matches)}))
+        .sort((a,b)=>(b.relative?.percentile??50)-(a.relative?.percentile??50) ||
+          Number(researchCandidate(b.row))-Number(researchCandidate(a.row)) ||
+          (b.row.conservative_ev_pct??-999)-(a.row.conservative_ev_pct??-999) ||
+          b.row.probability_pct-a.row.probability_pct ||
           `${a.row.market}::${a.row.selection}`.localeCompare(`${b.row.market}::${b.row.selection}`));
-      const categories=[['Primo tempo',r=>['over05_ht','over15_ht','over25_ht','gg_ht'].includes(r.market)],
-        ['Finale',r=>['1x2_ft','over15_ft','over25_ft','over35_ft','gg_ft','home15_ft','away15_ft'].includes(r.market)],
-        ['Quota alta · 3–5',r=>r.odd>=3 && r.odd<=5]];
-      return categories.map(([label,accept])=>{
-        const pick=eligible.find(x=>accept(x.row) && !used.has(x.row.market));
-        if(pick) used.add(pick.row.market);
-        return {label,pick};
-      });
+      return eligible.filter(x=>{
+        if(used.has(x.row.market)) return false;
+        used.add(x.row.market);return true;
+      }).slice(0,3).map(pick=>({pick}));
     }
     function researchUseSuggestion(fid,market,side) {
       // Open the exact suggestion even if a different global filter is selected.
@@ -1194,13 +1190,15 @@
       researchSelectFixture(fid,`${market}::${side}`);
     }
     function researchSuggestionsHtml(match,matches) {
-      const cards=researchSuggestions(match,matches).map(({label,pick})=>{
-        if(!pick) return `<div class="research-proposal"><strong>${label}</strong><p>Nessuna proposta sufficientemente supportata.</p></div>`;
+      const cards=researchSuggestions(match,matches).map(({pick})=>{
         const {row,relative}=pick;
         const args=[String(match.fixture.fixture_id),row.market,row.selection].map(v=>escapeHtml(JSON.stringify(v))).join(',');
-        return `<div class="research-proposal"><strong>${label}</strong><b>${escapeHtml(row.label)}</b><p>Probabilità stimata: ${escapeHtml(formatPct(row.probability_pct))}<br>Quota: ${escapeHtml(formatOdd(row.odd))} · ${escapeHtml(row.quote.bookmaker)}<br>Book senza margine: ${escapeHtml(formatPct(row.book_probability_pct))}</p><small>Posizione relativa: ${relative.percentile.toFixed(0)}/100 su ${relative.n} partite dello stesso mercato/esito. Valore teorico positivo nelle tre stime; quota aggiornata ${escapeHtml(formatTimestamp(row.quote.provider_updated_at))}.</small><button class="btn" type="button" onclick="researchUseSuggestion(${args})">Valuta questa giocata</button></div>`;
+        const priced=row.quote && Number.isFinite(row.odd) && row.odd>1;
+        const comparison=relative?`Posizione relativa: ${relative.percentile.toFixed(0)}/100 su ${relative.n} partite dello stesso mercato/esito.`:'Confronto relativo non disponibile: meno di 5 stime comparabili; ordinamento provvisorio.';
+        const evidence=researchCandidate(row)?'Criteri sperimentali superati.':'Scenario esplorativo: criteri di valore non tutti soddisfatti.';
+        return `<div class="research-proposal"><b>${escapeHtml(row.label)}</b><p>Probabilità stimata: ${escapeHtml(formatPct(row.probability_pct))}<br>Quota: ${priced?`${escapeHtml(formatOdd(row.odd))} · ${escapeHtml(row.quote.bookmaker)}`:'non disponibile'}<br>Book senza margine: ${Number.isFinite(row.book_probability_pct)?escapeHtml(formatPct(row.book_probability_pct)):'—'}</p><small>${comparison} ${evidence} ${priced?`Quota aggiornata ${escapeHtml(formatTimestamp(row.quote.provider_updated_at))}.`:''}</small><button class="btn" type="button" onclick="researchUseSuggestion(${args})">Valuta questa giocata</button></div>`;
       }).join('');
-      return `<section class="research-proposals" aria-label="Tre proposte per questa partita">${cards}</section><p class="research-proposal-note">Proposte sperimentali su tutti i mercati. La posizione relativa non è una probabilità né un’affidabilità storica: confronta le partite del giorno, prima dei filtri, con almeno 5 stime comparabili. Ordine: posizione relativa, valore teorico prudente, probabilità. Quota alta non significa maggiore affidabilità. Le tre proposte sono alternative, non una multipla.</p>`;
+      return `<p><strong>Le tre migliori proposte per questa partita</strong></p><section class="research-proposals" aria-label="Tre proposte per questa partita">${cards||'<p>Stime non disponibili per questa partita.</p>'}</section><p class="research-proposal-note">Selezione sperimentale tra tutti i mercati disponibili, senza categorie. Le percentuali restano quelle del modello. La posizione relativa confronta lo stesso mercato/esito nelle partite del giorno: non è affidabilità storica. Le proposte possono includere scenari senza quota o senza valore positivo; saranno affinate con i risultati raccolti. Sono alternative, non una multipla.</p>`;
     }
     function addResearchComparison(fid,market,side) {
       const match=researchMatches(currentPayload||{}).find(m=>String(m.fixture.fixture_id)===String(fid));

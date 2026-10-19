@@ -158,28 +158,24 @@ still match. Additional lines reuse the existing odds response. New snapshots
 are frozen only before kickoff. Old daily JSONs may lack new markets until a
 successful scan publishes v2 data; the UI does not fabricate those probabilities.
 
-## Three per-fixture proposals (dashboard 1.2.2)
+## Three per-fixture proposals (dashboard 1.2.3)
 
-Presentation only: first-half, full-time and high-odds (3–5) cards below the fixture
-selector. All candidates must already pass backend research gates and have fresh
-operator timestamps, a real price, book probability, positive conservative EV,
-and model spread <=10 percentage points. There is no new probability adjustment.
+Presentation only: show up to three distinct markets below the fixture selector,
+without first-half, full-time or price categories. All finite model probabilities
+in [0,100] are eligible, including scenarios without quotes or positive EV.
+Combination complements are excluded; opposite sides of a selected market cannot
+be repeated. Fewer than three valid distinct markets means fewer cards, never
+fabricated probabilities. Missing quotes and exploratory status are explicit.
 
-For each exact market AND side, compare the fixture's probability with at least
-five not-started fixtures in the current day payload using the same model ID.
-Relative position is the midrank percentile: (strictly lower + half the tied
-observations) / N. It is not calibrated confidence or historical reliability.
-Rank lexicographically by relative position, conservative EV and probability,
-then stable market/side key. Do not infer an absolute cross-market probability
-ordering. The cohort precedes search/market/price filters to avoid filter-induced
-rank changes. No candidates are forced when the evidence is insufficient.
+Compare each exact market AND side with at least five upcoming fixtures of the
+same model ID in the day payload. Midrank percentile is (lower + half tied)/N.
+This is not calibrated probability or historical reliability. Rank by percentile,
+then backend candidate status with fresh quote, conservative EV, probability and
+stable market/side key. Missing relative comparisons use a neutral 50 ordering
+key, explicitly labeled provisional, never displayed as a measured percentile.
+The cohort precedes global filters. No probability or backend gates are changed.
 
-Select first-half, then final, then high-odds. Exclude already selected market IDs
-(including the opposite side), so the third card cannot repeat either previous
-market. These are alternatives for analysis, not legs of a same-fixture multiple.
-Absent specifically quoted combinations do not enter high-odds proposals. Clicking
-Valuta opens all markets and focuses the exact selected event for that fixture.
-
-This display is recalculated from the current payload and available matches;
-proposal choices are not additional immutable forecasts. The underlying model
-forecasts and their model versions continue to be archived by the existing ledger.
+These are alternatives for analysis, not legs of a multiple. Clicking Valuta
+focuses the exact selected event. Proposal choices are recalculated, not frozen
+as additional forecasts; the existing model forecast archive remains unchanged.
+Historical results will inform future refinement of this provisional ordering.
