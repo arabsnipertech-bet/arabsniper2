@@ -35,6 +35,41 @@ def match():
 
 
 class ModelTests(unittest.TestCase):
+    def test_added_markets_coherence_and_settlement(self):
+        from math import exp
+        from multimarket_model import COMBOS
+        p=goal_probabilities([.6,.4,.9,.7])
+        self.assertAlmostEqual(p['over05_ht_over05_sh']['yes'],(1-exp(-1))*(1-exp(-1.6)))
+        self.assertLessEqual(p['over15_ht_over15_sh']['yes'],p[COMBO]['yes'])
+        self.assertLessEqual(p[COMBO]['yes'],p['over05_ht_over05_sh']['yes'])
+        self.assertLessEqual(p['over25_ht']['over'],p['over15_ht']['over'])
+        self.assertLessEqual(p['over25_ft']['over'],p['over15_ft']['over'])
+        result={'status':'FT','home_ht':1,'away_ht':0,'home_ft':1,'away_ft':1}
+        self.assertTrue(outcome('over05_ht_over05_sh','yes',result))
+        self.assertFalse(outcome(COMBO,'yes',result))
+        self.assertTrue(outcome('over15_ft','over',result))
+        self.assertFalse(outcome('over25_ht','over',result))
+        result.update(home_ht=1,away_ht=1,home_ft=2,away_ft=2)
+        self.assertTrue(outcome('over15_ht_over15_sh','yes',result))
+        result['away_ht']=None
+        for key in COMBOS:self.assertIsNone(outcome(key,'yes',result))
+        a=evaluate(match(),NOW)
+        for row in a['markets']:
+            if row['market'] in COMBOS:
+                self.assertIsNone(row['odd']);self.assertIsNone(row['expected_value_pct'])
+
+    def test_new_total_lines_require_exact_quotes(self):
+        p=payload()
+        for b in p['response'][0]['bookmakers']:
+            b['bets'].extend([
+                {'id':5,'name':'Goals Over/Under','values':[{'value':'Over 1.5','odd':1.4},{'value':'Under 1.5','odd':3.2}]},
+                {'id':6,'name':'Goals Over/Under First Half','values':[{'value':'Over 2.5','odd':4.2},{'value':'Under 2.5','odd':1.2}]}
+            ])
+        q=collect_quotes(p,NOW)['1']
+        self.assertEqual(q['over15_ft']['1']['line'],1.5)
+        self.assertEqual(q['over25_ht']['1']['line'],2.5)
+        self.assertNotIn('over15_ht',q)
+
     def test_research_does_not_use_post_kickoff_or_future_inputs(self):
         from model_research import research
         record={'input':match(),'captured_at':NOW,'statistics_at':NOW,
@@ -147,3 +182,4 @@ class ModelTests(unittest.TestCase):
 
 
 if __name__=='__main__': unittest.main()
+

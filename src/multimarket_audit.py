@@ -1,7 +1,7 @@
 """Matched-cohort evaluation of immutable, versioned multimarket forecasts."""
 from collections import defaultdict
 from math import log, sqrt
-from multimarket_model import COMBO, MODEL_ID, VALIDATION_FROM, stamp
+from multimarket_model import COMBO, COMBOS, MODEL_ID, VALIDATION_FROM, stamp
 
 
 def outcome(market, side, result):
@@ -12,17 +12,18 @@ def outcome(market, side, result):
     if market == '1x2_ft':
         if None in ft: return None
         return side == ('1' if ft[0]>ft[1] else '2' if ft[1]>ft[0] else 'x')
-    needed = ht if market in {'over05_ht','over15_ht','gg_ht'} else ft
-    if None in needed or market in {COMBO,'over05_sh'} and None in ht:
+    needed = ht if market in {'over05_ht','over15_ht','over25_ht','gg_ht'} else ft
+    if None in needed or market in {*COMBOS,'over05_sh'} and None in ht:
         return None
-    if market in {COMBO,'over05_sh'} and any(a<b for a,b in zip(ft,ht)):
+    if market in {*COMBOS,'over05_sh'} and any(a<b for a,b in zip(ft,ht)):
         return None
     h,a = needed
-    events = {'over05_ht':h+a>=1,'over15_ht':h+a>=2,'gg_ht':h>0 and a>0,
+    events = {'over05_ht':h+a>=1,'over15_ht':h+a>=2,'gg_ht':h>0 and a>0,'over25_ht':h+a>=3,'over15_ft':h+a>=2,
               'over25_ft':h+a>=3,'over35_ft':h+a>=4,'gg_ft':h>0 and a>0,
               'home15_ft':h>=2,'away15_ft':a>=2}
-    if market in {COMBO,'over05_sh'}:
-        event = sum(ft)-sum(ht)>=1 and (sum(ht)>=2 if market==COMBO else True)
+    if market in {*COMBOS,'over05_sh'}:
+        pt_min, sh_min = COMBOS[market][1:] if market in COMBOS else (0, 1)
+        event = sum(ft)-sum(ht)>=sh_min and sum(ht)>=pt_min
     else:
         event = events.get(market)
     return event if side in {'over','yes'} or event is None else not event
@@ -126,3 +127,4 @@ def build_report(store):
         'groups':[dict(zip(('model_id','period','market_selection','group','variant'),key),**metrics(rows)) for key,rows in sorted(groups.items())],
         'calibration':[dict(zip(('model_id','period','market_selection','band_from_pct'),key),**metrics(rows)) for key,rows in sorted(calibration.items())],
         'feature_comparisons':[dict(zip(('model_id','period','market_selection','feature'),key),**metrics(rows)) for key,rows in sorted(features.items())]}
+

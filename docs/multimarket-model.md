@@ -140,3 +140,20 @@ The report separates development before 20 October from prospective observations
  not independent games. Repeated scans do not inflate hit-rate denominators.
  The statistical uncertainty and non-matched opponent strength remain limitations.
  No threshold tuning, automatic bonus, or claim of profitability is introduced.
+
+## Exact market selection (dashboard 1.2.1)
+
+The dashboard now exposes exact market/side filters and a selector on each match.
+First-half, full-time and combination group views open the full comparison list.
+New lines: Over/Under 2.5 HT and Over/Under 1.5 FT. New combinations:
+Over 0.5 HT + Over 0.5 SH, and Over 1.5 HT + Over 1.5 SH, alongside the existing
+Over 1.5 HT + Over 0.5 SH. Combination complements are retained in the ledger.
+The three conjunctions use the same independent-half Poisson assumption;
+none receives a synthetic bookmaker quote or EV.
+
+The expanded catalogue can add bookmaker constraints to rate fitting, so the
+model ID is bumped to `coherent-markets-v2`. Existing v1 snapshots are preserved
+and reports separate the versions. Source-market IDs/names and exact lines must
+still match. Additional lines reuse the existing odds response. New snapshots
+are frozen only before kickoff. Old daily JSONs may lack new markets until a
+successful scan publishes v2 data; the UI does not fabricate those probabilities.
