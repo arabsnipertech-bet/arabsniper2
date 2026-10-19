@@ -64793,8 +64793,700 @@
       "source": "api_fixture_statistics",
       "checked_at": "2026-10-19T03:54:27+02:00",
       "stats_schema": 2
+    },
+    "1550135": {
+      "fixture_id": "1550135",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.13,
+      "away_xg": 1.12,
+      "home_stats": {
+        "team_id": 494,
+        "team_name": "Udinese",
+        "xg": 2.13,
+        "shots_on_target": 5.0,
+        "total_shots": 26.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 490,
+        "team_name": "Cagliari",
+        "xg": 1.12,
+        "shots_on_target": 2.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:33+02:00",
+      "stats_schema": 2
+    },
+    "1550117": {
+      "fixture_id": "1550117",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.74,
+      "away_xg": 1.32,
+      "home_stats": {
+        "team_id": 499,
+        "team_name": "Atalanta",
+        "xg": 1.74,
+        "shots_on_target": 4.0,
+        "total_shots": 22.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 490,
+        "team_name": "Cagliari",
+        "xg": 1.32,
+        "shots_on_target": 5.0,
+        "total_shots": 5.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:33+02:00",
+      "stats_schema": 2
+    },
+    "1550109": {
+      "fixture_id": "1550109",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.61,
+      "away_xg": 0.5,
+      "home_stats": {
+        "team_id": 490,
+        "team_name": "Cagliari",
+        "xg": 1.61,
+        "shots_on_target": 9.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 867,
+        "team_name": "Lecce",
+        "xg": 0.5,
+        "shots_on_target": 3.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:33+02:00",
+      "stats_schema": 2
+    },
+    "1494296": {
+      "fixture_id": "1494296",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.31,
+      "away_xg": 0.75,
+      "home_stats": {
+        "team_id": 2240,
+        "team_name": "Mjallby AIF",
+        "xg": 2.31,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2172,
+        "team_name": "Degerfors IF",
+        "xg": 0.75,
+        "shots_on_target": 2.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:34+02:00",
+      "stats_schema": 2
+    },
+    "1494282": {
+      "fixture_id": "1494282",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.98,
+      "away_xg": 2.38,
+      "home_stats": {
+        "team_id": 2172,
+        "team_name": "Degerfors IF",
+        "xg": 1.98,
+        "shots_on_target": 1.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 363,
+        "team_name": "Hammarby FF",
+        "xg": 2.38,
+        "shots_on_target": 11.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:34+02:00",
+      "stats_schema": 2
+    },
+    "1494280": {
+      "fixture_id": "1494280",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.86,
+      "away_xg": 1.71,
+      "home_stats": {
+        "team_id": 370,
+        "team_name": "Sirius",
+        "xg": 1.86,
+        "shots_on_target": 8.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 2172,
+        "team_name": "Degerfors IF",
+        "xg": 1.71,
+        "shots_on_target": 7.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:34+02:00",
+      "stats_schema": 2
+    },
+    "1494266": {
+      "fixture_id": "1494266",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.97,
+      "away_xg": 0.79,
+      "home_stats": {
+        "team_id": 2172,
+        "team_name": "Degerfors IF",
+        "xg": 2.97,
+        "shots_on_target": 5.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 766,
+        "team_name": "Halmstad",
+        "xg": 0.79,
+        "shots_on_target": 3.0,
+        "total_shots": 11.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:34+02:00",
+      "stats_schema": 2
+    },
+    "1494295": {
+      "fixture_id": "1494295",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.33,
+      "away_xg": 1.8,
+      "home_stats": {
+        "team_id": 375,
+        "team_name": "Malmo FF",
+        "xg": 1.33,
+        "shots_on_target": 6.0,
+        "total_shots": 19.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 374,
+        "team_name": "Kalmar FF",
+        "xg": 1.8,
+        "shots_on_target": 4.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:34+02:00",
+      "stats_schema": 2
+    },
+    "1494285": {
+      "fixture_id": "1494285",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.02,
+      "away_xg": 3.24,
+      "home_stats": {
+        "team_id": 374,
+        "team_name": "Kalmar FF",
+        "xg": 1.02,
+        "shots_on_target": 2.0,
+        "total_shots": 10.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 367,
+        "team_name": "BK Hacken",
+        "xg": 3.24,
+        "shots_on_target": 7.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:35+02:00",
+      "stats_schema": 2
+    },
+    "1494275": {
+      "fixture_id": "1494275",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.46,
+      "away_xg": 1.97,
+      "home_stats": {
+        "team_id": 372,
+        "team_name": "IF Elfsborg",
+        "xg": 2.46,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 374,
+        "team_name": "Kalmar FF",
+        "xg": 1.97,
+        "shots_on_target": 3.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:35+02:00",
+      "stats_schema": 2
+    },
+    "1494268": {
+      "fixture_id": "1494268",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.65,
+      "away_xg": 0.48,
+      "home_stats": {
+        "team_id": 374,
+        "team_name": "Kalmar FF",
+        "xg": 1.65,
+        "shots_on_target": 1.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 364,
+        "team_name": "Djurgardens IF",
+        "xg": 0.48,
+        "shots_on_target": 2.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:35+02:00",
+      "stats_schema": 2
+    },
+    "1549032": {
+      "fixture_id": "1549032",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.02,
+      "away_xg": 2.18,
+      "home_stats": {
+        "team_id": 401,
+        "team_name": "Randers FC",
+        "xg": 1.02,
+        "shots_on_target": 4.0,
+        "total_shots": 16.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2070,
+        "team_name": "Viborg",
+        "xg": 2.18,
+        "shots_on_target": 4.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:36+02:00",
+      "stats_schema": 2
+    },
+    "1549027": {
+      "fixture_id": "1549027",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 2.6,
+      "away_xg": 1.32,
+      "home_stats": {
+        "team_id": 2070,
+        "team_name": "Viborg",
+        "xg": 2.6,
+        "shots_on_target": 6.0,
+        "total_shots": 20.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 398,
+        "team_name": "FC Nordsjaelland",
+        "xg": 1.32,
+        "shots_on_target": 2.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:36+02:00",
+      "stats_schema": 2
+    },
+    "1636671": {
+      "fixture_id": "1636671",
+      "available": false,
+      "shots_available": false,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {},
+      "away_stats": {},
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:36+02:00",
+      "stats_schema": 2
+    },
+    "1549021": {
+      "fixture_id": "1549021",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 2073,
+        "team_name": "Silkeborg",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 2070,
+        "team_name": "Viborg",
+        "xg": null,
+        "shots_on_target": 4.0,
+        "total_shots": 9.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:36+02:00",
+      "stats_schema": 2
+    },
+    "1636404": {
+      "fixture_id": "1636404",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 0.59,
+      "away_xg": 1.37,
+      "home_stats": {
+        "team_id": 3327,
+        "team_name": "Egnatia Rrogozhinë",
+        "xg": 0.59,
+        "shots_on_target": 5.0,
+        "total_shots": 12.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 397,
+        "team_name": "FC Midtjylland",
+        "xg": 1.37,
+        "shots_on_target": 5.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:37+02:00",
+      "stats_schema": 2
+    },
+    "1549030": {
+      "fixture_id": "1549030",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.62,
+      "away_xg": 1.67,
+      "home_stats": {
+        "team_id": 397,
+        "team_name": "FC Midtjylland",
+        "xg": 1.62,
+        "shots_on_target": 3.0,
+        "total_shots": 8.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 400,
+        "team_name": "FC Copenhagen",
+        "xg": 1.67,
+        "shots_on_target": 1.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "xg": "expected_goals",
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:37+02:00",
+      "stats_schema": 2
+    },
+    "1549025": {
+      "fixture_id": "1549025",
+      "available": false,
+      "shots_available": true,
+      "home_xg": null,
+      "away_xg": null,
+      "home_stats": {
+        "team_id": 405,
+        "team_name": "Odense",
+        "xg": null,
+        "shots_on_target": 5.0,
+        "total_shots": 21.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "away_stats": {
+        "team_id": 397,
+        "team_name": "FC Midtjylland",
+        "xg": null,
+        "shots_on_target": 3.0,
+        "total_shots": 6.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:37+02:00",
+      "stats_schema": 2
+    },
+    "1549018": {
+      "fixture_id": "1549018",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.16,
+      "away_xg": 0.8,
+      "home_stats": {
+        "team_id": 397,
+        "team_name": "FC Midtjylland",
+        "xg": 1.16,
+        "shots_on_target": 5.0,
+        "total_shots": 15.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 407,
+        "team_name": "Brondby",
+        "xg": 0.8,
+        "shots_on_target": 4.0,
+        "total_shots": 13.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:37+02:00",
+      "stats_schema": 2
+    },
+    "1612249": {
+      "fixture_id": "1612249",
+      "available": true,
+      "shots_available": true,
+      "home_xg": 1.54,
+      "away_xg": 2.5,
+      "home_stats": {
+        "team_id": 13822,
+        "team_name": "Olympic El Qanah",
+        "xg": 1.54,
+        "shots_on_target": 5.0,
+        "total_shots": 14.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "away_stats": {
+        "team_id": 1031,
+        "team_name": "AL Masry",
+        "xg": 2.5,
+        "shots_on_target": 3.0,
+        "total_shots": 18.0,
+        "big_chances": null,
+        "matched_types": {
+          "shots_on_target": "Shots on Goal",
+          "total_shots": "Total Shots",
+          "xg": "expected_goals"
+        }
+      },
+      "source": "api_fixture_statistics",
+      "checked_at": "2026-10-19T04:43:38+02:00",
+      "stats_schema": 2
     }
   },
-  "updated_at": "2026-10-19T03:57:11+02:00",
+  "updated_at": "2026-10-19T04:46:20+02:00",
   "runtime_calls_last_run": 20
 }
