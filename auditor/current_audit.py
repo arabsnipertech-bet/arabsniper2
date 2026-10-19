@@ -46,6 +46,7 @@ def archive(root, now):
     days, rejected, added = {}, 0, 0
     entries = [('fixtures', k, r) for k, r in records.items()]
     entries += [('quality_evaluations', k, r) for k, r in payload.get('quality_evaluations', {}).items()]
+    entries += [('multimarket_evaluations', k, r) for k, r in payload.get('multimarket_evaluations', {}).items()]
     for collection, key, record in entries:
         fixture = record.get('fixture') or {}
         kickoff, captured = stamp(fixture.get('kickoff')), stamp(record.get('captured_at'))
@@ -53,6 +54,8 @@ def archive(root, now):
         if collection == 'quality_evaluations':
             profile = (record.get('first_half_assessment') or {}).get('profile_id')
             expected_key = f"{record.get('model_version')}::{profile}::{expected_key}"
+        if collection == 'multimarket_evaluations':
+            expected_key = f"{record.get('model_version')}::{expected_key}"
         if (not kickoff or not captured or captured >= kickoff or captured > now
                 or expected_key != str(key)):
             rejected += 1
@@ -96,7 +99,7 @@ def fetch_results(date, key):
 
 
 def settle(root, now, fetcher=fetch_results):
-    combined = {'schema_version': 1, 'fixtures': {}, 'quality_evaluations': {}}
+    combined = {'schema_version': 1, 'fixtures': {}, 'quality_evaluations': {}, 'multimarket_evaluations': {}}
     queried = []
     for path in sorted((root / 'auditordata').glob('prematch_????-??-??.json')):
         day = read(path, {})
@@ -106,16 +109,16 @@ def settle(root, now, fetcher=fetch_results):
         results_path = root / f'auditarchive/prematch_{date}_results.json'
         previous = read(results_path, {'fixtures': {}})
         store = {'schema_version': 1}
-        for collection in ('fixtures', 'quality_evaluations'):
+        for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations'):
             records = deepcopy(day.get(collection, {}))
             for key, record in records.items():
                 saved = previous.get(collection, {}).get(key, {}).get('settlement')
                 if saved:
                     record['settlement'] = saved
             store[collection] = records
-        records = list(store['fixtures'].values()) + list(store['quality_evaluations'].values())
-        pending = any(any((r.get('settlement') or {}).get('outcomes', {}).get(m) is None
-                          for m in ('over15_ht', 'gg_ht', 'over25_ft')) for r in records)
+        records = list(store['fixtures'].values()) + list(store['quality_evaluations'].values()) + list(store['multimarket_evaluations'].values())
+        pending = any(not (r.get('settlement') or {}).get('outcomes') or
+                      any(v is None for v in r['settlement']['outcomes'].values()) for r in records)
         if pending and (now.astimezone(TZ).date() - date).days <= 14:
             key = os.environ.get('API_SPORTS_KEY', '').strip()
             if not key:
@@ -123,9 +126,12 @@ def settle(root, now, fetcher=fetch_results):
             settle_predictions(store, fetcher(str(date), key))
             queried.append(str(date))
         write(results_path, store)
-        for collection in ('fixtures', 'quality_evaluations'):
+        for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations'):
             combined[collection].update(store[collection])
     report = build_report(combined)
+    from multimarket_audit import build_report as multimarket_report
+    report['multimarket'] = multimarket_report(combined)
+    write(root / 'data/arab_quote_multimarket_report.json', report['multimarket'])
     report.update({'generated_at': now.isoformat(), 'results_dates_queried': queried,
                    'archived_forecasts': len(combined['fixtures']),
                    'archived_quality_evaluations': len(combined['quality_evaluations'])})

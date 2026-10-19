@@ -8,6 +8,9 @@ on:
       - 'src/3appdays.py'
       - 'src/policy_integration.py'
       - 'src/first_half_quality.py'
+      - 'src/multimarket_model.py'
+      - 'src/multimarket_audit.py'
+      - 'src/model_research.py'
   schedule:
     - cron: "0 6-23 * * *"
       timezone: "Europe/Rome"
@@ -55,6 +58,9 @@ jobs:
 
       - name: Run Fast Scan
         run: python src/3appdays_runner.py --fast
+
+      - name: Compare fixed models on archived inputs
+        run: python src/model_research.py
 
       - name: Validate generated files
         run: |

@@ -3,11 +3,19 @@ import os
 from copy import deepcopy
 from selection_policy import competition, drought, movements
 from first_half_quality import assess, evidence, PROFILE_ID, THRESHOLDS, VALIDATION_FROM
+from multimarket_model import collect_quotes, update_ledger, evaluate, MODEL_ID
 
 TARGETS = {'over15_ht': 'over', 'gg_ht': 'yes', 'over25_ft': 'over'}
 
 
 def install(ns):
+    # Capture the odds response already fetched by the legacy engine.
+    captured_quotes = {}
+    old_extract = ns['extract_bookmaker_markets_with_audit']
+    def extract(payload):
+        captured_quotes.update(collect_quotes(payload, ns['iso_now']()))
+        return old_extract(payload)
+    ns['extract_bookmaker_markets_with_audit'] = extract
     ns['DEFAULT_EXCLUDED_COUNTRIES'].discard('Egypt')
     drought_enabled = os.getenv('ARAB_DROUGHT_BONUS_ENABLED', '1').lower() not in {'0','false','no'}
     review = {}
@@ -147,6 +155,8 @@ def install(ns):
         layer = model.get('lambdas',{}).get('drought_layer',{})
         if layer:
             model['probabilities_without_drought_poisson'] = ns['probabilities_from_lambdas'](layer['baseline_lambdas'])
+        quotes = update_ledger(state if state is not None else {}, meta['fixture_id'], captured_quotes.pop(str(meta['fixture_id']), {}), ns['iso_now'](), meta.get('kickoff'))
+        output['multimarket'] = evaluate(output, ns['iso_now'](), quotes)
         return output
     ns['build_fixture_output'] = fixture
 
@@ -158,7 +168,7 @@ def install(ns):
         # One request per pending date, not per fixture; never recalculate forecasts.
         pending_dates = set()
         today = ns['now_rome']().date()
-        for record in [*frozen.get('fixtures',{}).values(), *frozen.get('quality_evaluations',{}).values()]:
+        for record in [*frozen.get('fixtures',{}).values(), *frozen.get('quality_evaluations',{}).values(), *frozen.get('multimarket_evaluations',{}).values()]:
             kickoff = ns['parse_iso'](record.get('fixture',{}).get('kickoff'))
             if kickoff and kickoff.date() < today and (today-kickoff.date()).days <= 14:
                 outcomes = record.get('settlement',{}).get('outcomes',{})
@@ -174,10 +184,15 @@ def install(ns):
         settle_predictions(frozen, {'days':[{'matches':extra_matches}]})
         ns['atomic_write_json'](audit_path,frozen)
         ns['atomic_write_json'](ns['DATA_DIR']/'arab_quote_prematch_report.json',build_report(frozen))
+        from multimarket_audit import build_report as multimarket_report
+        research = multimarket_report(frozen)
+        ns['atomic_write_json'](ns['DATA_DIR']/'arab_quote_multimarket_report.json', research)
         observations_path = ns['DATA_DIR']/'arab_quote_observations.json'
         observations = ns['read_json'](observations_path, {'schema_version':1,'fixtures':{}})
         stamp = ns['iso_now']()
         for day in output.get('days',[]):
+            day['multimarket_method'] = {'model_id':MODEL_ID,'experimental':True,'validation_from':'2026-10-20'}
+            day['multimarket_audit'] = {'cohorts':research['cohorts'],'status':research['status']}
             for match in day.get('matches',[]):
                 meta=match.get('fixture',{})
                 kickoff=ns['parse_iso'](meta.get('kickoff'))

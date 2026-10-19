@@ -68,7 +68,7 @@ except Exception:  # pragma: no cover
 # =========================================================
 # CONFIGURAZIONE
 # =========================================================
-VERSION = "1.1.9"
+VERSION = "1.2.0"
 API_BASE_URL = "https://v3.football.api-sports.io"
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -1790,6 +1790,7 @@ def prune_state(state: MutableMapping[str, Any], keep_days_after_kickoff: int = 
             to_remove.append(fixture_id)
     for fixture_id in to_remove:
         fixtures.pop(fixture_id, None)
+        state.get('multimarket_quotes', {}).pop(fixture_id, None)
 
 
 def upload_json_to_github(filename: str, payload: Any, message: str) -> str:
@@ -1857,11 +1858,11 @@ def scan_dates(
     current_version = str(state.get("version", ""))
     current_family = ".".join(current_version.split(".")[:2])
     target_family = ".".join(VERSION.split(".")[:2])
-    if current_version and current_family != target_family:
+    if current_version and current_family != target_family and {current_family, target_family} != {'1.1', '1.2'}:
         log(f"♻️ Reset stato quote per cambio schema: {current_version} -> {VERSION}")
         state = default_state()
     elif current_version != VERSION:
-        # Le patch 1.1.x mantengono aperture, storico e fixture già analizzate.
+        # 1.2 adds an independent model/ledger; existing 1.1 quote history is compatible.
         log(f"🧩 Aggiornamento compatibile stato quote: {current_version or 'N/D'} -> {VERSION}")
         state["version"] = VERSION
 
@@ -3151,7 +3152,7 @@ def main() -> None:
 # ENHANCEMENT V1.1.3 — QUALITA' COMPETIZIONI, GATE SEGNALI,
 # STATISTICHE TIRI E AUDIT RISULTATI
 # =========================================================
-VERSION = "1.1.9"
+VERSION = "1.2.0"
 PREDICTION_AUDIT_FILE = DATA_DIR / "arab_quote_prediction_audit.json"
 REMOTE_PREDICTION_AUDIT_FILE = "data/arab_quote_prediction_audit.json"
 STRICT_COMPETITIONS = _bool_env(os.getenv("ARAB_STRICT_COMPETITIONS", "1"), True)
@@ -4021,7 +4022,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 # ENHANCEMENT V1.1.4 — FIRST-HALF INTELLIGENCE
 # Goal PT, Over 1.5 PT, GG PT, favorite trap e inversione quota
 # =========================================================
-VERSION = "1.1.9"
+VERSION = "1.2.0"
 MARKET_O05HT = "over05_ht"
 MARKET_SELECTIONS[MARKET_O05HT] = ("over", "under")
 DISPLAY_MARKET_NAMES[MARKET_O05HT] = "Goal primo tempo (Over 0,5 PT)"
@@ -4845,7 +4846,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 # ENHANCEMENT V1.1.5 — 1X2 -> GOAL REGIME + VALUE SHORTLIST
 # Mantiene lo schema web V1.1.x e aggiunge soltanto campi.
 # =========================================================
-VERSION = "1.1.9"
+VERSION = "1.2.0"
 
 
 def _profile_metric(profile: Mapping[str, Any], key: str) -> float:
@@ -5433,6 +5434,8 @@ def capture_prematch_predictions(output: Mapping[str, Any]) -> Dict[str, Any]:
             if profile:
                 key = f"{VERSION}::{profile}::{fixture_id}"
                 store.setdefault("quality_evaluations", {}).setdefault(key, json.loads(json.dumps(snapshot)))
+    from multimarket_model import freeze_evaluations
+    freeze_evaluations(store, output, observed_at.isoformat())
     store["updated_at"] = observed_at.isoformat()
     atomic_write_json(PREMATCH_AUDIT_FILE, store)
     return store
