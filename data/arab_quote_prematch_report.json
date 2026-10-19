@@ -10505,6 +10505,696 @@
         "unrecorded_ht_coverage": 0,
         "note": "Fixed exploratory rules include accepted and rejected predictions. Convergence is not a calibrated probability or a value recommendation. Only dates from validation_from are prospective; thresholds are never fitted automatically."
       }
+    },
+    {
+      "model_version": "1.2.0",
+      "profile_id": "over15_ht_convergence_v1",
+      "comparison": {
+        "profile_id": "over15_ht_convergence_v1",
+        "thresholds": {
+          "book_fair_pct": 45.0,
+          "poisson_pct": 40.0,
+          "empirical_pct": 40.0,
+          "reliability_pct": 60.0
+        },
+        "discovery_through": "2026-10-18",
+        "validation_from": "2026-10-20",
+        "all_predictions": {
+          "n": 0,
+          "wins": 0,
+          "hit_rate_pct": null,
+          "roi_pct": null,
+          "priced_n": 0,
+          "brier_score": null,
+          "wilson_95_pct": null,
+          "mean_probability_pct": null,
+          "calibration_gap_pp": null
+        },
+        "profiles": [
+          {
+            "profile": "current_value_filter",
+            "selected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "excluded": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "selected_from_current_accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "selected_from_current_rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "discovery": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "prospective": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "transition": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "prospective_dates": [],
+            "prospective_by_model_version": [],
+            "sample_status": "insufficient_prospective_sample"
+          },
+          {
+            "profile": "model_probability_50",
+            "selected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "excluded": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "selected_from_current_accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "selected_from_current_rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "discovery": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "prospective": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "transition": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "prospective_dates": [],
+            "prospective_by_model_version": [],
+            "sample_status": "insufficient_prospective_sample"
+          },
+          {
+            "profile": "book_fair_45",
+            "selected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "excluded": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "selected_from_current_accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "selected_from_current_rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "discovery": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "prospective": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "transition": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "prospective_dates": [],
+            "prospective_by_model_version": [],
+            "sample_status": "insufficient_prospective_sample"
+          },
+          {
+            "profile": "book_poisson_empirical_45_40_40",
+            "selected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "excluded": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "selected_from_current_accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "selected_from_current_rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "discovery": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "prospective": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "transition": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "prospective_dates": [],
+            "prospective_by_model_version": [],
+            "sample_status": "insufficient_prospective_sample"
+          },
+          {
+            "profile": "convergence_quality_60",
+            "selected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "excluded": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "selected_from_current_accepted": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "selected_from_current_rejected": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "discovery": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "prospective": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "transition": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "prospective_dates": [],
+            "prospective_by_model_version": [],
+            "sample_status": "insufficient_prospective_sample"
+          }
+        ],
+        "predictors": [
+          {
+            "predictor": "book_fair_pct",
+            "all": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "bands": [
+              {
+                "from_pct": 0,
+                "to_pct_exclusive": 30,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 30,
+                "to_pct_exclusive": 40,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 40,
+                "to_pct_exclusive": 45,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 45,
+                "to_pct_exclusive": 50,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 50,
+                "to_pct_exclusive": 101,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              }
+            ]
+          },
+          {
+            "predictor": "poisson_pct",
+            "all": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "bands": [
+              {
+                "from_pct": 0,
+                "to_pct_exclusive": 30,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 30,
+                "to_pct_exclusive": 40,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 40,
+                "to_pct_exclusive": 45,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 45,
+                "to_pct_exclusive": 50,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 50,
+                "to_pct_exclusive": 101,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              }
+            ]
+          },
+          {
+            "predictor": "empirical_pct",
+            "all": {
+              "n": 0,
+              "wins": 0,
+              "hit_rate_pct": null,
+              "roi_pct": null,
+              "priced_n": 0,
+              "brier_score": null,
+              "wilson_95_pct": null,
+              "mean_probability_pct": null,
+              "calibration_gap_pp": null
+            },
+            "bands": [
+              {
+                "from_pct": 0,
+                "to_pct_exclusive": 30,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 30,
+                "to_pct_exclusive": 40,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 40,
+                "to_pct_exclusive": 45,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 45,
+                "to_pct_exclusive": 50,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              },
+              {
+                "from_pct": 50,
+                "to_pct_exclusive": 101,
+                "n": 0,
+                "wins": 0,
+                "hit_rate_pct": null,
+                "roi_pct": null,
+                "priced_n": 0,
+                "brier_score": null,
+                "wilson_95_pct": null,
+                "mean_probability_pct": null,
+                "calibration_gap_pp": null
+              }
+            ]
+          }
+        ],
+        "unrecorded_ht_coverage": 0,
+        "note": "Fixed exploratory rules include accepted and rejected predictions. Convergence is not a calibrated probability or a value recommendation. Only dates from validation_from are prospective; thresholds are never fitted automatically."
+      }
     }
   ]
 }
