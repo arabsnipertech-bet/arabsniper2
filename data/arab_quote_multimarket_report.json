@@ -3,7 +3,22 @@
   "validation_from": "2026-10-20",
   "status": "experimental",
   "note": "No threshold tuning. Retrospective development is separated from frozen prospective forecasts. ROI is theoretical, not executed.",
-  "cohorts": [],
+  "cohorts": [
+    {
+      "model_id": "coherent-markets-v1",
+      "period": "development",
+      "frozen_fixtures": 23,
+      "settled_fixtures": 0,
+      "pending_fixtures": 23
+    },
+    {
+      "model_id": "coherent-markets-v2",
+      "period": "development",
+      "frozen_fixtures": 23,
+      "settled_fixtures": 0,
+      "pending_fixtures": 23
+    }
+  ],
   "groups": [],
   "calibration": [],
   "feature_comparisons": []
