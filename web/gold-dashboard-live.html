@@ -1138,7 +1138,7 @@
         if (researchMarket==='ft') return ['1x2_ft','over25_ft','over35_ft','gg_ft'].includes(m.market);
         if (researchMarket==='teams') return ['home15_ft','away15_ft'].includes(m.market);
         if (researchMarket==='combo') return m.market==='over15_ht_over05_sh' && m.selection==='yes';
-        return !['under','no'].includes(m.selection);
+        return m.market!=='over15_ht_over05_sh' || m.selection==='yes';
       }).sort((a,b)=>Number(researchCandidate(b))-Number(researchCandidate(a))||
         (b.conservative_ev_pct??-999)-(a.conservative_ev_pct??-999)||b.probability_pct-a.probability_pct);
     }
@@ -1170,7 +1170,7 @@
       const host=document.getElementById('matchResearch');
       if (!host) return;
       const matches=researchMatches(payload);
-      const count=matches.filter(m=>m.multimarket.markets.some(researchCandidate)).length;
+      const count=matches.filter(m=>researchMarkets(m).some(researchCandidate)).length;
       const prospective=(payload.multimarket_audit?.cohorts||[]).filter(c=>c.period==='prospective');
       const n=prospective.reduce((s,c)=>s+(c.settled_fixtures||0),0);
       let html='<div class="research-head"><h2>Cosa indica ogni partita</h2><span class="research-tag">NUOVO MODELLO · IN VERIFICA</span></div>';
