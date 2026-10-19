@@ -158,7 +158,7 @@ def install(ns):
         # One request per pending date, not per fixture; never recalculate forecasts.
         pending_dates = set()
         today = ns['now_rome']().date()
-        for record in frozen.get('fixtures',{}).values():
+        for record in [*frozen.get('fixtures',{}).values(), *frozen.get('quality_evaluations',{}).values()]:
             kickoff = ns['parse_iso'](record.get('fixture',{}).get('kickoff'))
             if kickoff and kickoff.date() < today and (today-kickoff.date()).days <= 14:
                 outcomes = record.get('settlement',{}).get('outcomes',{})

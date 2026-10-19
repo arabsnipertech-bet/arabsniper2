@@ -5409,11 +5409,9 @@ def capture_prematch_predictions(output: Mapping[str, Any]) -> Dict[str, Any]:
                 continue
             if kickoff <= observed_at or fixture.get("result"):
                 continue
-            if fixture_id in fixtures:
-                continue
             model = match.get("model", {}) or {}
             display = match.get("display", {}) or {}
-            fixtures[fixture_id] = json.loads(json.dumps({
+            snapshot = json.loads(json.dumps({
                 "fixture": fixture, "captured_at": observed_at.isoformat(),
                 "model_version": VERSION,
                 "probabilities_raw": model.get("probabilities_raw", {}),
@@ -5428,6 +5426,13 @@ def capture_prematch_predictions(output: Mapping[str, Any]) -> Dict[str, Any]:
                 "primary_choice": display.get("primary_choice"),
                 "ranked_choices": display.get("ranked_choices", []),
             }))
+            fixtures.setdefault(fixture_id, snapshot)
+            # Preserve the original forecast while independently freezing each
+            # new model/profile version, including its rejected candidates.
+            profile = (display.get("first_half_assessment") or {}).get("profile_id")
+            if profile:
+                key = f"{VERSION}::{profile}::{fixture_id}"
+                store.setdefault("quality_evaluations", {}).setdefault(key, json.loads(json.dumps(snapshot)))
     store["updated_at"] = observed_at.isoformat()
     atomic_write_json(PREMATCH_AUDIT_FILE, store)
     return store
