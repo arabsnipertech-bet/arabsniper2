@@ -100,3 +100,43 @@ script; current live audit is published separately in
   https://www.api-football.com/news/post/how-to-get-started-with-api-football-the-complete-beginners-guide
   Pre-match history is limited; archive observations when acquired. Pre-match and
   live market IDs use different namespaces.
+
+
+## Fixed September signal protocol (observation only)
+
+`signal_research.py` adds `september-signals-v1` under `signal_observations` in
+ the existing prematch ledger. It does not change MODEL_ID, probabilities,
+ candidate gates, UI, or the existing legacy drought calculation. The coherent
+ model continues to use baseline lambdas without a drought bonus.
+
+Every scan appends an immutable timestamped observation before kickoff, including
+ unavailable/outside-band cases, current forecasts, raw paired quotes and source
+ games. Existing observations and older frozen forecasts are not backfilled.
+ The daily auditor archives and settles this collection through the existing
+ one-request-per-pending-date path. Results appear in `signal_research` in the
+ prematch report and in the auditor's final report, ordered by kickoff.
+
+The favourite cohort uses the first snapshot with at least two valid complete
+ 1X2 operator pairs, regardless of band or direction; later scans never move
+ that fixture to a more favourable cohort. Both mean home prices use exactly the
+ same operators. First observed mean 1.50–1.70, drop at least 2%, rise at least
+ 2%, otherwise stable. Unknown/stale/future timestamps and duplicate operators
+ are excluded. Quote freshness is at most six hours. Initial observations are
+ not certified opening prices, and current observations are not closing prices.
+ These paired means differ from Football-Data's market averages, so this is a
+ prospective operational hypothesis, not an exact replication of September.
+
+Team baselines use the FIRST snapshot: last eight distinct prior matches in the
+ fixture's league, including previous seasons when already in the fetched data.
+ Dates must be strictly before the observation date in Europe/Rome; same-day
+ history is excluded conservatively. Verified regulation-time scores are required;
+ legacy zero-filled values are not used. No extra history/odds calls are added.
+ Mean scored/conceded >=1.5 and the latest two scores equal to zero define the
+ drought groups. Unavailable first baselines remain unavailable for that fixture.
+
+The report separates development before 20 October from prospective observations,
+ reports all requested goal/combination outcomes (unpriced outcomes have no ROI),
+ Wilson intervals and unavailable coverage. Team rows are team-fixture observations,
+ not independent games. Repeated scans do not inflate hit-rate denominators.
+ The statistical uncertainty and non-matched opponent strength remain limitations.
+ No threshold tuning, automatic bonus, or claim of profitability is introduced.

@@ -320,6 +320,8 @@ def evaluate(match, as_of, quotes=None):
 
 
 def freeze_evaluations(store, output, as_of):
+    from signal_research import capture as capture_signals
+    capture_signals(store, output, as_of)
     now = stamp(as_of)
     for day in output.get('days', []):
         for match in day.get('matches', []):
@@ -333,3 +335,4 @@ def freeze_evaluations(store, output, as_of):
                 'fixture':meta,'captured_at':as_of,'model_version':assessment['model_id'],
                 'multimarket':assessment}))
     return store
+

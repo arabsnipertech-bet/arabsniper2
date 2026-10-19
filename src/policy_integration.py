@@ -31,6 +31,11 @@ def install(ns):
         if result:
             halftime = (fixture.get('score') or {}).get('halftime') or {}
             result['halftime_available'] = all(halftime.get(k) is not None for k in ('home','away'))
+            ft = (fixture.get('score') or {}).get('fulltime') or {}
+            side = result.get('side')
+            if side in {'home', 'away'} and all(ft.get(k) is not None for k in ('home', 'away')):
+                other = 'away' if side == 'home' else 'home'
+                result['research_ft'] = {'scored': ft[side], 'conceded': ft[other]}
         return result
     ns['_match_row'] = match_row
     old_summary = ns['summarize_team_matches']
@@ -168,7 +173,7 @@ def install(ns):
         # One request per pending date, not per fixture; never recalculate forecasts.
         pending_dates = set()
         today = ns['now_rome']().date()
-        for record in [*frozen.get('fixtures',{}).values(), *frozen.get('quality_evaluations',{}).values(), *frozen.get('multimarket_evaluations',{}).values()]:
+        for record in [*frozen.get('fixtures',{}).values(), *frozen.get('quality_evaluations',{}).values(), *frozen.get('multimarket_evaluations',{}).values(), *frozen.get('signal_observations',{}).values()]:
             kickoff = ns['parse_iso'](record.get('fixture',{}).get('kickoff'))
             if kickoff and kickoff.date() < today and (today-kickoff.date()).days <= 14:
                 outcomes = record.get('settlement',{}).get('outcomes',{})
@@ -232,3 +237,4 @@ def install(ns):
             if number in ns['REMOTE_DAY_FILES']: ns['atomic_write_json'](ns['DATA_DIR']/ns['REMOTE_DAY_FILES'][number].split('/')[-1],day)
         return output
     ns['scan_dates'] = scan
+
