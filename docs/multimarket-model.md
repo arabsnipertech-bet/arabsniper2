@@ -157,3 +157,29 @@ and reports separate the versions. Source-market IDs/names and exact lines must
 still match. Additional lines reuse the existing odds response. New snapshots
 are frozen only before kickoff. Old daily JSONs may lack new markets until a
 successful scan publishes v2 data; the UI does not fabricate those probabilities.
+
+## Three per-fixture proposals (dashboard 1.2.2)
+
+Presentation only: first-half, full-time and high-odds (3–5) cards below the fixture
+selector. All candidates must already pass backend research gates and have fresh
+operator timestamps, a real price, book probability, positive conservative EV,
+and model spread <=10 percentage points. There is no new probability adjustment.
+
+For each exact market AND side, compare the fixture's probability with at least
+five not-started fixtures in the current day payload using the same model ID.
+Relative position is the midrank percentile: (strictly lower + half the tied
+observations) / N. It is not calibrated confidence or historical reliability.
+Rank lexicographically by relative position, conservative EV and probability,
+then stable market/side key. Do not infer an absolute cross-market probability
+ordering. The cohort precedes search/market/price filters to avoid filter-induced
+rank changes. No candidates are forced when the evidence is insufficient.
+
+Select first-half, then final, then high-odds. Exclude already selected market IDs
+(including the opposite side), so the third card cannot repeat either previous
+market. These are alternatives for analysis, not legs of a same-fixture multiple.
+Absent specifically quoted combinations do not enter high-odds proposals. Clicking
+Valuta opens all markets and focuses the exact selected event for that fixture.
+
+This display is recalculated from the current payload and available matches;
+proposal choices are not additional immutable forecasts. The underlying model
+forecasts and their model versions continue to be archived by the existing ledger.

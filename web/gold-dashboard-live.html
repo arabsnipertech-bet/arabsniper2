@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
-  <meta name="application-version" content="1.2.1" />
-  <title>ArabSniper Quote Dashboard V1.2.1</title>
+  <meta name="application-version" content="1.2.2" />
+  <title>ArabSniper Quote Dashboard V1.2.2</title>
   <style>
     :root {
       --bg: #05070b;
@@ -652,6 +652,13 @@
 
     .research-head{display:flex;align-items:start;justify-content:space-between;gap:12px}.research-tag{color:var(--cyan);font-size:.72rem;font-weight:800;white-space:nowrap}.research-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0}.research-controls select,.research-search{width:100%;min-height:44px;border:1px solid var(--border);border-radius:11px;padding:10px;background:var(--panel-2);color:var(--text)}.research-controls label{font-size:.7rem;color:var(--muted)}.research-controls label select{margin-top:7px;font-size:.8rem}.research-search{margin-bottom:12px;font-size:.85rem}.research-status{color:var(--muted);font-size:.74rem;line-height:1.6}.research-status b{color:var(--cyan)}.research-scenario{border-left:3px solid var(--cyan);padding:9px 11px;margin:12px 0;background:var(--panel);border-radius:5px}.research-scenario small{display:block;color:var(--muted);margin-top:7px;line-height:1.5}.research-market{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;padding:11px 0;border-bottom:1px solid var(--border-soft)}.research-market b{font-size:.8rem}.research-market small{display:block;color:var(--muted);font-size:.72rem;line-height:1.7;margin-top:4px}.research-market button{align-self:center;min-height:40px;font-size:.72rem}.research-comparison{padding:14px;border:1px solid var(--border);border-radius:13px;margin:15px 0;background:var(--panel-2)}.research-comparison ul{padding-left:18px;font-size:.8rem;line-height:1.7}.research-comparison button{margin-top:8px}.legacy-dashboard{margin-top:22px;border-top:1px solid var(--border);padding-top:16px}.legacy-dashboard>summary{cursor:pointer;padding:14px;color:var(--cyan);font-weight:700}.research-validation{padding:12px 0;border-top:1px solid var(--border);margin-top:18px}.research-validation table{width:100%;font-size:.75rem;border-collapse:collapse}.research-validation th,.research-validation td{padding:8px 4px;text-align:left;border-bottom:1px solid var(--border-soft)}
     @media(max-width:600px){.research-controls{grid-template-columns:1fr}.research-head{display:block}.research-tag{display:block;margin-top:9px}.ranking-metrics b{font-size:1.05rem}.top-actions{justify-content:flex-start}.research-market small{overflow-wrap:anywhere}}
+    .research-proposals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+    .research-proposal{min-width:0;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:10px;overflow-wrap:anywhere}
+    .research-proposal>strong{display:block;color:var(--cyan);font-size:.8rem;margin-bottom:8px}
+    .research-proposal>b{display:block;font-size:.85rem}.research-proposal p,.research-proposal small{font-size:.73rem;line-height:1.5;color:var(--muted)}
+    .research-proposal .btn{margin-top:10px;width:100%;white-space:normal;font-size:.72rem}
+    .research-proposal-note{font-size:.7rem!important;color:var(--muted)}
+    @media(max-width:1100px){.research-proposals{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -659,7 +666,7 @@
     <header class="topbar">
       <div class="brand">
         <h1>ARABSNIPER · QUOTE DASHBOARD</h1>
-        <p>Analisi per partita · gol, esiti e movimenti delle quote · v1.2.1</p>
+        <p>Analisi per partita · gol, esiti e movimenti delle quote · v1.2.2</p>
         <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
       </div>
       <div class="top-actions">
@@ -1149,6 +1156,52 @@
       }).sort((a,b)=>Number(researchCandidate(b))-Number(researchCandidate(a))||
         (b.conservative_ev_pct??-999)-(a.conservative_ev_pct??-999)||b.probability_pct-a.probability_pct);
     }
+    // Presentation-only ranking: within exact market/side, never a new probability.
+    function researchRelative(match,row,matches) {
+      const model=match.multimarket?.model_id;
+      if (!model || !Number.isFinite(row.probability_pct)) return null;
+      const peers=matches.filter(m=>m.multimarket?.model_id===model).map(m=>
+        m.multimarket.markets.find(r=>r.market===row.market && r.selection===row.selection))
+        .filter(r=>r && Number.isFinite(r.probability_pct) && r.probability_pct>=0 && r.probability_pct<=100);
+      if (peers.length<5) return null;
+      const lower=peers.filter(r=>r.probability_pct<row.probability_pct).length;
+      const equal=peers.filter(r=>r.probability_pct===row.probability_pct).length;
+      return {percentile:100*(lower+equal/2)/peers.length,n:peers.length};
+    }
+    function researchSuggestions(match,matches) {
+      const used=new Set();
+      const eligible=(match.multimarket?.markets||[]).filter(r=>researchCandidate(r) &&
+        Number.isFinite(r.odd) && r.odd>1 && r.quote &&
+        Number.isFinite(r.book_probability_pct) && Number.isFinite(r.conservative_ev_pct) && r.conservative_ev_pct>0 &&
+        Array.isArray(r.model_range_pct) && r.model_range_pct.length===2 &&
+        r.model_range_pct.every(Number.isFinite) && r.model_range_pct[1]-r.model_range_pct[0]<=10)
+        .map(row=>({row,relative:researchRelative(match,row,matches)})).filter(x=>x.relative)
+        .sort((a,b)=>b.relative.percentile-a.relative.percentile ||
+          b.row.conservative_ev_pct-a.row.conservative_ev_pct || b.row.probability_pct-a.row.probability_pct ||
+          `${a.row.market}::${a.row.selection}`.localeCompare(`${b.row.market}::${b.row.selection}`));
+      const categories=[['Primo tempo',r=>['over05_ht','over15_ht','over25_ht','gg_ht'].includes(r.market)],
+        ['Finale',r=>['1x2_ft','over15_ft','over25_ft','over35_ft','gg_ft','home15_ft','away15_ft'].includes(r.market)],
+        ['Quota alta · 3–5',r=>r.odd>=3 && r.odd<=5]];
+      return categories.map(([label,accept])=>{
+        const pick=eligible.find(x=>accept(x.row) && !used.has(x.row.market));
+        if(pick) used.add(pick.row.market);
+        return {label,pick};
+      });
+    }
+    function researchUseSuggestion(fid,market,side) {
+      // Open the exact suggestion even if a different global filter is selected.
+      researchMarket='all';researchPrice='all';researchScope='all';
+      researchSelectFixture(fid,`${market}::${side}`);
+    }
+    function researchSuggestionsHtml(match,matches) {
+      const cards=researchSuggestions(match,matches).map(({label,pick})=>{
+        if(!pick) return `<div class="research-proposal"><strong>${label}</strong><p>Nessuna proposta sufficientemente supportata.</p></div>`;
+        const {row,relative}=pick;
+        const args=[String(match.fixture.fixture_id),row.market,row.selection].map(v=>escapeHtml(JSON.stringify(v))).join(',');
+        return `<div class="research-proposal"><strong>${label}</strong><b>${escapeHtml(row.label)}</b><p>Probabilità stimata: ${escapeHtml(formatPct(row.probability_pct))}<br>Quota: ${escapeHtml(formatOdd(row.odd))} · ${escapeHtml(row.quote.bookmaker)}<br>Book senza margine: ${escapeHtml(formatPct(row.book_probability_pct))}</p><small>Posizione relativa: ${relative.percentile.toFixed(0)}/100 su ${relative.n} partite dello stesso mercato/esito. Valore teorico positivo nelle tre stime; quota aggiornata ${escapeHtml(formatTimestamp(row.quote.provider_updated_at))}.</small><button class="btn" type="button" onclick="researchUseSuggestion(${args})">Valuta questa giocata</button></div>`;
+      }).join('');
+      return `<section class="research-proposals" aria-label="Tre proposte per questa partita">${cards}</section><p class="research-proposal-note">Proposte sperimentali su tutti i mercati. La posizione relativa non è una probabilità né un’affidabilità storica: confronta le partite del giorno, prima dei filtri, con almeno 5 stime comparabili. Ordine: posizione relativa, valore teorico prudente, probabilità. Quota alta non significa maggiore affidabilità. Le tre proposte sono alternative, non una multipla.</p>`;
+    }
     function addResearchComparison(fid,market,side) {
       const match=researchMatches(currentPayload||{}).find(m=>String(m.fixture.fixture_id)===String(fid));
       const row=match?.multimarket.markets.find(m=>m.market===market && m.selection===side);
@@ -1204,7 +1257,7 @@
         const change=movement.median_drop_pct;
         const moveText=change==null?'Movimento: servono due osservazioni degli stessi operatori':`Quota ${change>0?'in calo':change<0?'in aumento':'stabile'} ${Math.abs(change).toFixed(1)}% · ${movement.paired_books} operatori confrontabili`;
         const reasons=(r.reasons||[]).map(k=>RESEARCH_REASONS[k]||k);
-        html+=`<article class="ranking-card"><div class="ranking-heading"><span class="ranking-position">${shown}</span><strong>${escapeHtml(f.match)}</strong><time datetime="${escapeHtml(f.kickoff)}">${escapeHtml(f.time)}</time></div><p>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</p>${fixtureSelect}<div class="research-scenario"><strong>${escapeHtml(r.label)}</strong><small>${researchCandidate(r)?'Candidato sperimentale · valore concorde tra le stime':'Scenario da confrontare · solo analisi'}</small></div><div class="ranking-metrics"><div><span>Stima modello</span><b>${escapeHtml(formatPct(r.probability_pct))}</b></div><div><span>Book senza margine</span><b>${r.book_probability_pct==null?'—':escapeHtml(formatPct(r.book_probability_pct))}</b></div><div><span>Quota osservata</span><b>${quote?escapeHtml(formatOdd(r.odd)):'—'}</b></div></div><p>${quote?`${escapeHtml(quote.bookmaker)} · quota aggiornata ${escapeHtml(formatTimestamp(quote.provider_updated_at))}`:'Quota specifica assente: valore atteso non calcolabile.'}</p><div class="ranking-badges"><span>${escapeHtml(moveText)}</span></div><p>${escapeHtml(reasons.slice(0,2).join(' · ')||(researchCandidate(r)?'Criteri sperimentali superati; verifica dei risultati ancora aperta.':'Quota da aggiornare prima di confrontare il valore.'))}</p><details ${['ht','ft','teams','combo'].includes(researchMarket)?'open':''}><summary>Confronta tutti i ${rows.length} esiti disponibili</summary>`;
+        html+=`<article class="ranking-card"><div class="ranking-heading"><span class="ranking-position">${shown}</span><strong>${escapeHtml(f.match)}</strong><time datetime="${escapeHtml(f.kickoff)}">${escapeHtml(f.time)}</time></div><p>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</p>${fixtureSelect}${researchSuggestionsHtml(match,matches)}<div class="research-scenario"><strong>${escapeHtml(r.label)}</strong><small>${researchCandidate(r)?'Candidato sperimentale · valore concorde tra le stime':'Scenario da confrontare · solo analisi'}</small></div><div class="ranking-metrics"><div><span>Stima modello</span><b>${escapeHtml(formatPct(r.probability_pct))}</b></div><div><span>Book senza margine</span><b>${r.book_probability_pct==null?'—':escapeHtml(formatPct(r.book_probability_pct))}</b></div><div><span>Quota osservata</span><b>${quote?escapeHtml(formatOdd(r.odd)):'—'}</b></div></div><p>${quote?`${escapeHtml(quote.bookmaker)} · quota aggiornata ${escapeHtml(formatTimestamp(quote.provider_updated_at))}`:'Quota specifica assente: valore atteso non calcolabile.'}</p><div class="ranking-badges"><span>${escapeHtml(moveText)}</span></div><p>${escapeHtml(reasons.slice(0,2).join(' · ')||(researchCandidate(r)?'Criteri sperimentali superati; verifica dei risultati ancora aperta.':'Quota da aggiornare prima di confrontare il valore.'))}</p><details ${['ht','ft','teams','combo'].includes(researchMarket)?'open':''}><summary>Confronta tutti i ${rows.length} esiti disponibili</summary>`;
         rows.forEach(row=>{
           const q=row.quote;
           const args=[String(f.fixture_id),row.market,row.selection].map(v=>escapeHtml(JSON.stringify(v))).join(',');
