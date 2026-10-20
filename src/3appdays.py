@@ -68,7 +68,7 @@ except Exception:  # pragma: no cover
 # =========================================================
 # CONFIGURAZIONE
 # =========================================================
-VERSION = "1.2.0"
+VERSION = "1.4.0"
 API_BASE_URL = "https://v3.football.api-sports.io"
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -87,7 +87,7 @@ REMOTE_BET_CATALOG_FILE = "data/arab_bet_catalog.json"
 API_MIN_INTERVAL = 0.14
 API_RETRIES = (0, 2, 5)
 MAX_HISTORY_POINTS = 120
-MAX_TEAM_MATCHES = 14
+MAX_TEAM_MATCHES = 8
 MAX_H2H_MATCHES = 5
 MAX_LEAGUE_MATCHES = 50
 
@@ -1645,8 +1645,7 @@ def build_fixture_output(
     fixture_id = meta["fixture_id"]
 
     odds_payload = client.get("odds", {"fixture": fixture_id}, use_cache=False)
-    if not odds_payload or not odds_payload.get("response"):
-        return None
+    odds_payload = odds_payload or {"response": []}
 
     bookmaker_markets = extract_bookmaker_markets(odds_payload)
     consensuses = {
@@ -1654,8 +1653,7 @@ def build_fixture_output(
         for market_key in MARKET_SELECTIONS
         if (consensus := build_market_consensus(bookmaker_markets, market_key)) is not None
     }
-    if MARKET_1X2 not in consensuses:
-        return None
+
 
     timestamp = iso_now()
     fixture_state = state.setdefault("fixtures", {}).setdefault(fixture_id, {
@@ -1671,8 +1669,7 @@ def build_fixture_output(
 
     home_matches = get_team_recent_matches(client, safe_int(meta["home_id"]))
     away_matches = get_team_recent_matches(client, safe_int(meta["away_id"]))
-    if len(home_matches) < 3 or len(away_matches) < 3:
-        return None
+
 
     home_profile = summarize_team_matches(home_matches, expected_side="home")
     away_profile = summarize_team_matches(away_matches, expected_side="away")
@@ -2039,6 +2036,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="ArabSniper Quote Engine V1")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--today", action="store_true", help="Scansiona il giorno corrente")
+    mode.add_argument("--fast", action="store_true", help="Scansiona oggi e domani riusando la cache xG")
     mode.add_argument("--night", action="store_true", help="Scansione rolling da oggi")
     mode.add_argument("--date", type=str, help="Data iniziale YYYY-MM-DD")
     mode.add_argument("--catalog", action="store_true", help="Aggiorna solo il catalogo odds/bets")
@@ -2067,7 +2065,7 @@ def main() -> None:
             log(f"GitHub catalog: {status}")
         return
 
-    if args.today or args.night:
+    if args.today or args.fast or args.night:
         start = now_rome().date()
     else:
         try:
@@ -2076,7 +2074,7 @@ def main() -> None:
             log("❌ Formato --date non valido. Usa YYYY-MM-DD")
             raise SystemExit(2)
 
-    days = 1 if args.today else max(1, min(args.days, 7))
+    days = 2 if args.fast else 1 if args.today else 5 if args.night else max(1, min(args.days, 7))
     excluded = sorted(DEFAULT_EXCLUDED_COUNTRIES - set(args.include_country))
     output = scan_dates(client, get_target_dates(start, days), excluded)
 
@@ -2105,7 +2103,7 @@ REMOTE_MARKET_AUDIT_FILE = "data/arab_quote_market_audit.json"
 REMOTE_DAY_FILES = {day: f"data/arab_quote_day{day}.json" for day in range(1, 8)}
 
 XG_ENABLED = str(os.getenv("ARAB_XG_ENABLED", "1")).strip().lower() not in {"0", "false", "no", "off"}
-XG_MATCHES_PER_TEAM = max(0, min(safe_int(os.getenv("ARAB_XG_MATCHES_PER_TEAM", 4), 4), MAX_TEAM_MATCHES))
+XG_MATCHES_PER_TEAM = max(0, min(safe_int(os.getenv("ARAB_XG_MATCHES_PER_TEAM", 8), 8), MAX_TEAM_MATCHES))
 XG_MAX_CALLS_PER_RUN = max(0, safe_int(os.getenv("ARAB_XG_MAX_CALLS_PER_RUN", 20), 20))
 MARKET_MIN_BOOKS = max(1, safe_int(os.getenv("ARAB_MARKET_MIN_BOOKS", 2), 2))
 
@@ -2863,8 +2861,7 @@ def build_fixture_output(
     meta = fixture_meta(fixture_row)
     fixture_id = meta["fixture_id"]
     odds_payload = client.get("odds", {"fixture": fixture_id}, use_cache=False)
-    if not odds_payload or not odds_payload.get("response"):
-        return None
+    odds_payload = odds_payload or {"response": []}
 
     bookmaker_markets, market_validation = extract_bookmaker_markets_with_audit(odds_payload)
     consensuses = {
@@ -2872,8 +2869,7 @@ def build_fixture_output(
         for market_key in MARKET_SELECTIONS
         if (consensus := build_market_consensus(bookmaker_markets, market_key)) is not None
     }
-    if MARKET_1X2 not in consensuses:
-        return None
+
 
     timestamp = iso_now()
     fixture_state = state.setdefault("fixtures", {}).setdefault(fixture_id, {"meta": meta, "markets": {}})
@@ -2887,8 +2883,7 @@ def build_fixture_output(
 
     home_matches = enrich_team_matches_with_xg(client, get_team_recent_matches(client, safe_int(meta["home_id"])), safe_int(meta["home_id"]))
     away_matches = enrich_team_matches_with_xg(client, get_team_recent_matches(client, safe_int(meta["away_id"])), safe_int(meta["away_id"]))
-    if len(home_matches) < 3 or len(away_matches) < 3:
-        return None
+
     home_profile = summarize_team_matches(home_matches, "home")
     away_profile = summarize_team_matches(away_matches, "away")
 
@@ -3063,6 +3058,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="ArabSniper Quote Engine V1.1.7")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--today", action="store_true", help="Scansiona il giorno corrente")
+    mode.add_argument("--fast", action="store_true", help="Scansiona oggi e domani riusando la cache xG")
     mode.add_argument("--night", action="store_true", help="Scansione rolling da oggi")
     mode.add_argument("--date", type=str, help="Data iniziale YYYY-MM-DD")
     mode.add_argument("--catalog", action="store_true", help="Aggiorna solo il catalogo odds/bets")
@@ -3080,7 +3076,7 @@ def main() -> None:
 
     # I Fast Scan orari riusano la cache xG già costruita dal Night Scan,
     # evitando decine di chiamate statistiche ogni ora.
-    if args.today and "ARAB_XG_MAX_CALLS_PER_RUN" not in os.environ:
+    if (args.today or args.fast) and "ARAB_XG_MAX_CALLS_PER_RUN" not in os.environ:
         XG_MAX_CALLS_PER_RUN = 0
 
     api_key = str(os.getenv("API_SPORTS_KEY", "")).strip()
@@ -3113,7 +3109,7 @@ def main() -> None:
             log(f"GitHub audit: {upload_json_to_github(REMOTE_MARKET_AUDIT_FILE, audit, 'Update ArabSniper market audit')}")
         return
 
-    if args.today or args.night:
+    if args.today or args.fast or args.night:
         start = now_rome().date()
     else:
         try:
@@ -3121,7 +3117,7 @@ def main() -> None:
         except Exception:
             log("❌ Formato --date non valido. Usa YYYY-MM-DD")
             raise SystemExit(2)
-    days = 1 if args.today else max(1, min(args.days, 7))
+    days = 2 if args.fast else 1 if args.today else 5 if args.night else max(1, min(args.days, 7))
     output = scan_dates(client, get_target_dates(start, days), excluded)
     log(f"✅ Output scritto: {OUTPUT_FILE}")
     log(f"✅ Stato quote scritto: {STATE_FILE}")
@@ -3152,7 +3148,7 @@ def main() -> None:
 # ENHANCEMENT V1.1.3 — QUALITA' COMPETIZIONI, GATE SEGNALI,
 # STATISTICHE TIRI E AUDIT RISULTATI
 # =========================================================
-VERSION = "1.2.0"
+VERSION = "1.4.0"
 PREDICTION_AUDIT_FILE = DATA_DIR / "arab_quote_prediction_audit.json"
 REMOTE_PREDICTION_AUDIT_FILE = "data/arab_quote_prediction_audit.json"
 STRICT_COMPETITIONS = _bool_env(os.getenv("ARAB_STRICT_COMPETITIONS", "1"), True)
@@ -4022,7 +4018,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 # ENHANCEMENT V1.1.4 — FIRST-HALF INTELLIGENCE
 # Goal PT, Over 1.5 PT, GG PT, favorite trap e inversione quota
 # =========================================================
-VERSION = "1.2.0"
+VERSION = "1.4.0"
 MARKET_O05HT = "over05_ht"
 MARKET_SELECTIONS[MARKET_O05HT] = ("over", "under")
 DISPLAY_MARKET_NAMES[MARKET_O05HT] = "Goal primo tempo (Over 0,5 PT)"
@@ -4846,7 +4842,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 # ENHANCEMENT V1.1.5 — 1X2 -> GOAL REGIME + VALUE SHORTLIST
 # Mantiene lo schema web V1.1.x e aggiunge soltanto campi.
 # =========================================================
-VERSION = "1.2.0"
+VERSION = "1.4.0"
 
 
 def _profile_metric(profile: Mapping[str, Any], key: str) -> float:
@@ -5455,3 +5451,4 @@ _install_user_policy(globals())
 
 if __name__ == "__main__":
     main()
+

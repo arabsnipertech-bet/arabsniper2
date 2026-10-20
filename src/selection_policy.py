@@ -75,8 +75,8 @@ def competition(league):
         return {'allowed': False, 'score': 10, 'tier': 'blocked', 'reason': 'youth_reserve_or_women'}
     if name in INTERNATIONAL:
         return {'allowed': True, 'score': 88, 'tier': 'international_major', 'reason': 'user_major_cup'}
-    if name in CUPS.get(country, set()):
-        return {'allowed': True, 'score': 76, 'tier': 'major_cup', 'reason': 'user_national_cup'}
+    if name in CUPS.get(country, set()) or norm(league.get('type')) == 'cup':
+        return {'allowed': False, 'score': 0, 'tier': 'blocked', 'reason': 'national_cup_excluded'}
     for level, aliases in enumerate(LEAGUES.get(country, []), 1):
         if name in aliases:
             return {'allowed': True, 'score': {1:84,2:72,3:64}[level], 'tier': f'user_division_{level}', 'reason': 'user_allowlist'}
@@ -123,3 +123,4 @@ def movements(market, side):
             'direction_reversals': sum(a!=b for a,b in zip(signs,signs[1:])),
             'favorite_inversion': favorite(initial)!=favorite(final) if initial and final else False,
             'observation_count': len(points), 'opening_note': 'first observed quote, not certified bookmaker opening'}
+

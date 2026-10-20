@@ -110,3 +110,23 @@ assert(vm.runInContext('researchSuggestionsHtml(singleMatch,[])',researchContext
 vm.runInContext('singleMatch.multimarket.markets=[]',researchContext);
 assert.equal(vm.runInContext('researchSuggestions(singleMatch,[]).length',researchContext),0);
 console.log('Single proposal: quality priority, four fixed markets, divergence, stale/missing data and stable probabilities passed.');
+
+
+// V3 consumes the backend's single primary, independently of selected market.
+researchContext.v3={matches:[{fixture:{fixture_id:'100',kickoff:future(2),match:'Squadra casa – Squadra ospite'},multimarket:{
+  model_id:'context-goals-v3',status:'experimental',profiles:{},weights:{},
+  best_candidate:{...market('over25_ft'),source:'analisi statistica',pros:['Produzione osservata'],cons:[],missing:['PT incompleti']},
+  markets:[{...market('over25_ft'),source:'analisi statistica',pros:['Produzione osservata'],cons:[],missing:['PT incompleti']},
+           {...market('over15_ht'),source:'analisi statistica',pros:['Produzione PT'],cons:[],missing:[]}],ranked_hypotheses:[]}}]};
+researchContext.currentPayload=researchContext.v3;
+vm.runInContext("researchFilter('market','all');researchSearch='';renderMatchResearch(currentPayload)",researchContext);
+assert(host.innerHTML.includes('La partita, spiegata.'));
+assert.equal((host.innerHTML.match(/PROPOSTA PRINCIPALE/g)||[]).length,1);
+assert(host.innerHTML.includes('A favore'));
+assert(host.innerHTML.includes('Da considerare'));
+assert(host.innerHTML.includes('Dati mancanti'));
+assert(!host.innerHTML.includes('Probabilità combinata'));
+vm.runInContext("researchSelectFixture('100','over15_ht::over')",researchContext);
+assert(host.innerHTML.includes('value="over15_ht::over" selected'));
+assert(host.innerHTML.includes('Pesi e calcolo, dato per dato'));
+console.log('V3 dossier: backend primary, independent sources, evidence, missing data and market selection passed.');

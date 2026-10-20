@@ -12,6 +12,10 @@ on:
       - 'src/multimarket_audit.py'
       - 'src/signal_research.py'
       - 'src/model_research.py'
+      - 'src/context_analysis.py'
+      - 'src/analysis_history.py'
+      - 'src/3appdays_runner.py'
+      - 'src/selection_policy.py'
   schedule:
     - cron: "0 6-23 * * *"
       timezone: "Europe/Rome"
@@ -70,6 +74,7 @@ jobs:
           test -f data/arab_quote_dashboard.json
           test -f data/arab_quote_state.json
           test -f data/arab_quote_day1.json
+          test -f data/arab_quote_day2.json
 
       - name: Publish Fast Scan safely
         shell: bash
@@ -122,4 +127,5 @@ jobs:
 
           echo "Errore: impossibile pubblicare dopo 3 tentativi"
           exit 1
+
 

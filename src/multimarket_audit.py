@@ -30,7 +30,7 @@ def outcome(market, side, result):
 
 
 def settle(store, result_by_id):
-    for record in store.get('multimarket_evaluations', {}).values():
+    for record in [*store.get('multimarket_evaluations', {}).values(), *store.get('analysis_updates', {}).values()]:
         result = result_by_id.get(str(record.get('fixture',{}).get('fixture_id')))
         if not result or result.get('status') not in {'FT','AET','PEN'}:
             continue
@@ -55,7 +55,7 @@ def metrics(rows):
             'paper_roi_pct':round(sum((odd if y else 0)-1 for y,odd in priced)/len(priced)*100,3) if priced else None}
 
 
-def build_report(store):
+def build_report(store, include_updates=True):
     groups=defaultdict(list); calibration=defaultdict(list); features=defaultdict(list)
     frozen=defaultdict(set); settled=defaultdict(set); pending=defaultdict(set)
     for record in store.get('multimarket_evaluations',{}).values():
@@ -78,10 +78,12 @@ def build_report(store):
             if y is None: continue
             probabilities=market['probabilities']
             odd=market.get('odd')
-            p=probabilities['combined']
+            variant_main='statistics' if version=='context-goals-v3' else 'combined'
+            p=probabilities.get(variant_main)
+            if p is None: continue
             selected=bool(market.get('research_candidate'))
             for group in ('all','candidate' if selected else 'rejected'):
-                groups[(version,period,key,group,'combined')].append((p,y,odd))
+                groups[(version,period,key,group,variant_main)].append((p,y,odd))
             calibration[(version,period,key,min(int(p*10),9)*10)].append((p,y,odd))
             b=market.get('book_probability_pct')
             # Compare every variant on exactly the same market/side/fixture cohort.
@@ -89,7 +91,7 @@ def build_report(store):
                 for variant,value in [*probabilities.items(),('book',b/100)]:
                     groups[(version,period,key,'matched_benchmark',variant)].append((value,y,odd))
             if odd and 2<=odd<=5:
-                groups[(version,period,key,'odds_2_to_5','combined')].append((p,y,odd))
+                groups[(version,period,key,'odds_2_to_5',variant_main)].append((p,y,odd))
             movement=market.get('movement',{}); drop=movement.get('median_drop_pct')
             if drop is not None:
                 features[(version,period,key,'drop_ge_10' if drop>=10 else 'other_paired_movements')].append((p,y,odd))
@@ -105,7 +107,7 @@ def build_report(store):
             steam=any(1.45<=q.get('odds',{}).get('1',0)<=1.65 for q in eligible_steam)
             if eligible_steam:
                 features[(version,period,key,'home_favourite_steam' if steam else 'no_home_favourite_steam')].append((p,y,odd))
-            rates=assessment.get('rates',{}).get('statistics',[])
+            rates=assessment.get('rates',{}).get('statistics') or []
             if len(rates)==4:
                 for name,condition in [('lambda_ht_ge_1_5',sum(rates[:2])>=1.5),('lambda_ft_ge_3',sum(rates)>=3)]:
                     features[(version,period,key,name if condition else 'below_'+name)].append((p,y,odd))
@@ -121,10 +123,17 @@ def build_report(store):
             margin_delta=movement.get('median_overround_delta_pp')
             if margin_delta is not None:
                 features[(version,period,key,'aggio_rising' if margin_delta>=.5 else 'aggio_falling' if margin_delta<=-.5 else 'aggio_stable')].append((p,y,odd))
-    return {'model_id':MODEL_ID,'validation_from':VALIDATION_FROM,'status':'experimental',
+    report = {'model_id':MODEL_ID,'validation_from':VALIDATION_FROM,'status':'experimental',
         'note':'No threshold tuning. Retrospective development is separated from frozen prospective forecasts. ROI is theoretical, not executed.',
         'cohorts':[{'model_id':v,'period':p,'frozen_fixtures':len(ids),'settled_fixtures':len(settled[(v,p)]),'pending_fixtures':len(pending[(v,p)])} for (v,p),ids in sorted(frozen.items())],
         'groups':[dict(zip(('model_id','period','market_selection','group','variant'),key),**metrics(rows)) for key,rows in sorted(groups.items())],
         'calibration':[dict(zip(('model_id','period','market_selection','band_from_pct'),key),**metrics(rows)) for key,rows in sorted(calibration.items())],
         'feature_comparisons':[dict(zip(('model_id','period','market_selection','feature'),key),**metrics(rows)) for key,rows in sorted(features.items())]}
 
+
+
+    if include_updates:
+        from analysis_history import latest_store
+        report['latest_prematch'] = build_report(latest_store(store), include_updates=False)
+        report['snapshot_policy'] = 'first and latest prematch evaluated separately; never count updates as independent fixtures'
+    return report

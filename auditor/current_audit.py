@@ -48,6 +48,7 @@ def archive(root, now):
     entries += [('quality_evaluations', k, r) for k, r in payload.get('quality_evaluations', {}).items()]
     entries += [('multimarket_evaluations', k, r) for k, r in payload.get('multimarket_evaluations', {}).items()]
     entries += [('signal_observations', k, r) for k, r in payload.get('signal_observations', {}).items()]
+    entries += [('analysis_updates', k, r) for k, r in payload.get('analysis_updates', {}).items()]
     for collection, key, record in entries:
         fixture = record.get('fixture') or {}
         kickoff, captured = stamp(fixture.get('kickoff')), stamp(record.get('captured_at'))
@@ -57,6 +58,8 @@ def archive(root, now):
             expected_key = f"{record.get('model_version')}::{profile}::{expected_key}"
         if collection == 'multimarket_evaluations':
             expected_key = f"{record.get('model_version')}::{expected_key}"
+        if collection == 'analysis_updates':
+            expected_key = f"{record.get('model_version')}::{expected_key}::{record.get('captured_at')}"
         if collection == 'signal_observations':
             from signal_research import record_key
             expected_key = record_key(record)
@@ -103,7 +106,7 @@ def fetch_results(date, key):
 
 
 def settle(root, now, fetcher=fetch_results):
-    combined = {'schema_version': 1, 'fixtures': {}, 'quality_evaluations': {}, 'multimarket_evaluations': {}, 'signal_observations': {}}
+    combined = {'schema_version': 1, 'fixtures': {}, 'quality_evaluations': {}, 'multimarket_evaluations': {}, 'signal_observations': {}, 'analysis_updates': {}}
     queried = []
     for path in sorted((root / 'auditordata').glob('prematch_????-??-??.json')):
         day = read(path, {})
@@ -113,14 +116,14 @@ def settle(root, now, fetcher=fetch_results):
         results_path = root / f'auditarchive/prematch_{date}_results.json'
         previous = read(results_path, {'fixtures': {}})
         store = {'schema_version': 1}
-        for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations', 'signal_observations'):
+        for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations', 'signal_observations', 'analysis_updates'):
             records = deepcopy(day.get(collection, {}))
             for key, record in records.items():
                 saved = previous.get(collection, {}).get(key, {}).get('settlement')
                 if saved:
                     record['settlement'] = saved
             store[collection] = records
-        records = list(store['fixtures'].values()) + list(store['quality_evaluations'].values()) + list(store['multimarket_evaluations'].values()) + list(store['signal_observations'].values())
+        records = list(store['fixtures'].values()) + list(store['quality_evaluations'].values()) + list(store['multimarket_evaluations'].values()) + list(store['signal_observations'].values()) + list(store['analysis_updates'].values())
         pending = any(not (r.get('settlement') or {}).get('outcomes') or
                       any(v is None for v in r['settlement']['outcomes'].values()) for r in records)
         if pending and (now.astimezone(TZ).date() - date).days <= 14:
@@ -130,7 +133,7 @@ def settle(root, now, fetcher=fetch_results):
             settle_predictions(store, fetcher(str(date), key))
             queried.append(str(date))
         write(results_path, store)
-        for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations', 'signal_observations'):
+        for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations', 'signal_observations', 'analysis_updates'):
             combined[collection].update(store[collection])
     report = build_report(combined)
     from multimarket_audit import build_report as multimarket_report
@@ -160,4 +163,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
