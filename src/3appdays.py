@@ -194,6 +194,10 @@ def weighted_mean(values: Sequence[float], weights: Sequence[float]) -> float:
 
 
 def atomic_write_json(path: Path, payload: Any) -> None:
+    if path.name == "arab_quote_prematch_audit.json":
+        from audit_storage import write_store
+        write_store(path, payload)
+        return
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
     with open(tmp, "w", encoding="utf-8") as handle:
@@ -205,10 +209,15 @@ def read_json(path: Path, default: Any) -> Any:
     if not path.exists():
         return default
     try:
+        if path.name == "arab_quote_prematch_audit.json":
+            from audit_storage import read_store
+            return read_store(path, default)
         with open(path, "r", encoding="utf-8") as handle:
             return json.load(handle)
     except Exception as exc:
         log(f"⚠️ Lettura fallita {path}: {exc}")
+        if path.name == "arab_quote_prematch_audit.json":
+            raise  # Never replace unreadable historical evidence with an empty store.
         return default
 
 
@@ -1798,6 +1807,20 @@ def upload_json_to_github(filename: str, payload: Any, message: str) -> str:
         return "MISSING_TOKEN"
     try:
         repo = Github(token).get_repo(REPO_NAME)
+        if filename == 'data/arab_quote_prematch_audit.json':
+            from audit_storage import write_store
+            local = DATA_DIR / 'arab_quote_prematch_audit.json'
+            write_store(local, payload)
+            manifest = json.loads(local.read_text())
+            for part in manifest.get('parts', []):
+                part_path = '_audit_parts/' + part['sha256'] + '.json.gz'
+                remote_path = 'data/' + part_path
+                try:
+                    repo.get_contents(remote_path)
+                except Exception as exc:
+                    if getattr(exc, 'status', None) != 404: raise
+                    repo.create_file(remote_path, message, (DATA_DIR / part_path).read_bytes())
+            payload = manifest
         content = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
         try:
             current = repo.get_contents(filename)
@@ -1855,7 +1878,7 @@ def scan_dates(
     current_version = str(state.get("version", ""))
     current_family = ".".join(current_version.split(".")[:2])
     target_family = ".".join(VERSION.split(".")[:2])
-    if current_version and current_family != target_family and {current_family, target_family} != {'1.1', '1.2'}:
+    if current_version and current_family != target_family and not {current_family, target_family}.issubset({'1.1', '1.2', '1.4'}):
         log(f"♻️ Reset stato quote per cambio schema: {current_version} -> {VERSION}")
         state = default_state()
     elif current_version != VERSION:

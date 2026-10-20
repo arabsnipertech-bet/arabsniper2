@@ -102,3 +102,18 @@ Engine and dashboard version 1.4.0. Dashboard source:
 `web/gold-dashboard-live.html`. Backend is run through GitHub Actions, not by
 Cloudflare. Cloudflare must serve this updated HTML (or build the linked commit).
 No claim of live deployment should be made until the public version is checked.
+
+## Audit storage recovery (20 October 2026)
+
+The second Fast run hit GitHub's 100 MiB file limit: computation succeeded but
+publication failed at 103.09 MiB. `audit_storage.py` transparently migrates large
+JSON to an atomic manifest plus immutable gzip parts in `_audit_parts/`.
+Each part contains at most 4 MiB of original UTF-8 bytes. SHA-256 validates each
+part and the reassembled document. The existing JSON format is still readable.
+Missing/corrupt parts stop processing; they never reset historical evidence.
+No forecast or old part is deleted. The current auditor, research reader and both
+scan publishers share this format. Parts and their manifests are committed together.
+
+Compatibility: state schema 1.4 retains the existing 1.1/1.2 quote ledger; a version
+change must not reset it. Scan failures retain generated public data in a recovery
+artifact for 14 days. Archived daily forecasts are read through the same storage API.

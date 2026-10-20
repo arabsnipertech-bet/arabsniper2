@@ -12,19 +12,18 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 from prematch_audit import build_report, settle_predictions
+from audit_storage import read_store, write_store
 
 TZ = ZoneInfo('Europe/Rome')
 
 
 def read(path, default):
-    return json.loads(path.read_text()) if path.exists() else deepcopy(default)
+    return read_store(path, default)
 
 
 def write(path, value):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_suffix('.tmp')
-    temp.write_text(json.dumps(value, ensure_ascii=False, separators=(",", ":")) + '\n')
-    temp.replace(path)
+    from audit_storage import write_store
+    write_store(path, value)
 
 
 def stamp(value):
