@@ -154,3 +154,24 @@ Major 1X2 conflicts also use market-specific book references instead of forcing 
 1X2 selection at any price. The statistical estimate remains separately inspectable.
 Both the 20pp diagnostic threshold and the price floor are provisional controls.
 No claim is made that opponent strength or small-sample estimation is fully solved.
+
+## v3.3: probability / price comparison (supersedes the opposite-outcome veto)
+
+Being less likely than the opposite outcome no longer excludes a scenario. The
+ranking compares `reference_probability * observed_decimal_price`, with coverage
+and reference probability as tie breakers. This is an experimental ranking, not an
+optimized or validated betting strategy. No team-specific override exists.
+
+For usable statistics and at least two books, the comparison uses the lower of the
+two estimates. This is deliberately named a comparison reference, NOT a calibrated
+probability, confidence bound or independently validated advantage. Flagged fragile
+statistics do not enter the comparison; a multi-book reference may be used instead.
+A book-only comparison is labelled as such even if its price ratio exceeds one.
+Positive statistical estimates remain unvalidated. Missing prices produce no EV.
+
+Stored price assessments include the probability source, break-even probability
+(100 / quoted price), reference fair price and source-dependent theoretical return.
+Every minimum-price preset is frozen with the assessment. If no price meets a preset,
+the best available scenario is returned with `price_preference_met=false`; the UI
+explicitly identifies this fallback. A genuinely unavailable estimate is not invented.
+Raw probabilities, prior model versions and original forecasts remain intact.

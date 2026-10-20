@@ -2,7 +2,7 @@ import sys, unittest
 from pathlib import Path
 from copy import deepcopy
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
-from context_analysis import select_proposal
+from context_analysis import select_proposal,pick_for_price
 from analysis_history import freeze_update
 
 def row(m,s,p,b,score=0):
@@ -10,11 +10,11 @@ def row(m,s,p,b,score=0):
              pros=[],cons=[],evidence_blocks={'goals':score,'book':1,'form':0},support_score=score)
 
 class DirectionalTests(unittest.TestCase):
- def test_close_minority_is_not_agreement_or_primary(self):
+ def test_close_minority_is_not_agreement_but_remains_eligible(self):
   rs=[row('over25_ft','under',45,35.7,3),row('over25_ft','over',55,64.3,-1)]
   picks,_=select_proposal(rs)
   self.assertEqual(picks[0]['selection'],'over')
-  self.assertFalse(rs[0]['primary_eligible'])
+  self.assertTrue(rs[0]['primary_eligible'])
   self.assertNotEqual(rs[0]['source'],'statistica e bookmaker')
  def test_dortmund_conflict_routes_to_book_without_changing_statistics(self):
   rs=[row('1x2_ft','1',44.887,10.781),row('1x2_ft','x',24.508,16.114),row('1x2_ft','2',30.605,73.105),
@@ -54,10 +54,37 @@ class HalfTimeAndPriceTests(unittest.TestCase):
   rs=[row('over25_ht','under',96,88),row('over25_ht','over',4,12),row('over25_ft','over',61,60),row('over25_ft','under',39,40)]
   for r,odd in zip(rs,[1.05,7,1.65,2.2]):r['odd']=odd
   picks,_=select_proposal(rs)
-  self.assertEqual(picks[0]['market'],'over25_ft')
-  self.assertGreaterEqual(picks[0]['odd'],1.5)
+  chosen=pick_for_price(picks,1.5)
+  self.assertEqual(chosen['market'],'over25_ft')
+  self.assertGreaterEqual(chosen['odd'],1.5)
  def test_fragile_pt_without_book_is_not_primary(self):
   rs=[row('over15_ht','over',6.3,None),row('over15_ht','under',93.7,None),row('over25_ft','over',61,None),row('over25_ft','under',39,None)]
   for r in rs[:2]:r['halftime_sample_fragile']=True
   picks,_=select_proposal(rs)
   self.assertEqual(picks[0]['market'],'over25_ft')
+
+class ProbabilityPriceTests(unittest.TestCase):
+ def test_under_fifty_can_win_price_comparison(self):
+  rs=[row('over15_ht','over',6.3,44.744),row('over15_ht','under',93.7,55.256)]
+  for r,o in zip(rs,[2.12,1.67]):r['odd']=o;r['halftime_sample_fragile']=True
+  picks,_=select_proposal(rs);chosen=pick_for_price(picks,1.5)
+  self.assertEqual(chosen['selection'],'over')
+  a=chosen['price_assessment'];self.assertEqual(a['status'],'market_comparison_only')
+  self.assertFalse(a['validated_advantage']);self.assertLess(a['estimated_return_pct'],0)
+  self.assertAlmostEqual(a['break_even_probability_pct'],100/2.12)
+  self.assertEqual(chosen['statistical_pct'],6.3)
+ def test_more_probable_is_not_necessarily_better_priced(self):
+  rs=[row('over25_ft','over',60,62),row('over25_ft','under',40,38)]
+  for r,o in zip(rs,[1.4,3]):r['odd']=o
+  picks,_=select_proposal(rs)
+  self.assertEqual(picks[0]['selection'],'under')
+  self.assertEqual(picks[0]['price_assessment']['status'],'unvalidated_positive_estimate')
+  self.assertFalse(picks[0]['price_assessment']['validated_advantage'])
+ def test_fallback_below_preferred_price_is_explicit(self):
+  rs=[row('over25_ft','over',70,70)];rs[0]['odd']=1.3
+  picks,_=select_proposal(rs);chosen=pick_for_price(picks,2)
+  self.assertIsNotNone(chosen);self.assertFalse(chosen['price_preference_met'])
+  self.assertEqual(chosen['requested_min_odd'],2)
+ def test_missing_price_never_gets_invented_return(self):
+  picks,_=select_proposal([row('over25_ft','over',70,None)])
+  a=picks[0]['price_assessment'];self.assertIsNone(a['return_index']);self.assertIsNone(a['break_even_probability_pct'])

@@ -14,10 +14,10 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     const rows=[mk('over15_ht','over','Over 1,5 PT',44),mk('gg_ht','yes','GG PT sì',29),mk('over25_ft','over','Over 2,5 FT',61),mk('over35_ft','over','Over 3,5 FT',38)];
     rows.push(mk('1x2_ft','1','Casa',24),mk('1x2_ft','x','Pareggio',26),mk('1x2_ft','2','Ospite',50));
     rows[6].odd=1.65; rows[6].movement={confirmed:true,color:'red',arrow:'↓',amplitude_pct:10,agreeing_books:2,paired_books:2,operators:[{bookmaker:'Test',initial:1.85,current:1.65,sequence:[1.85,1.65]}]};
-    const primary={...rows[2],research_candidate:true};
+    const primary={...rows[2],research_candidate:true,price_assessment:{reference_probability_pct:58,break_even_probability_pct:50,reference_fair_odd:100/58,estimated_return_pct:16,status:'unvalidated_positive_estimate',note:'Esempio sintetico non validato.'}};
     const payload={updated_at:now,matches:[{fixture:{fixture_id:'demo',kickoff:new Date(Date.now()+3600000).toISOString(),
       match:'Squadra casa – Squadra ospite <script>',time:'20:45',league:'Campionato di prova',country:'Italia'},
-      multimarket:{model_id:'context-goals-v3.2',status:'experimental',captured_at:now,profiles:{},weights:{},markets:rows,
+      multimarket:{model_id:'context-goals-v3.3',status:'experimental',captured_at:now,profiles:{},weights:{},markets:rows,
         best_candidate:primary,ranked_hypotheses:rows.map(r=>r.market+'::'+r.selection)}}]};
     // Isolated synthetic renderer test: no network, premium account or auth change.
     await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;researchMarket='all';renderMatchResearch(p)},payload);
@@ -26,6 +26,7 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       await page.setViewportSize({width,height});
       await page.evaluate(()=>contextBack());
       assert.equal(await page.locator('.cx-list-row').count(),1);
+      assert((await page.locator('.cx-list-pick').textContent()).includes('Vantaggio teorico · da validare'));
       assert.equal(await page.locator('.cx-card').count(),0);
       assert(await page.locator('.cx-compact-odds .cx-red').isVisible(),'Movement visible in mobile/desktop list');
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
