@@ -41,3 +41,23 @@ class DirectionalTests(unittest.TestCase):
   freeze_update(store,meta,new,'2026-10-20T12:45:00+02:00')
   for k,v in saved['analysis_updates'].items():self.assertEqual(store['analysis_updates'][k],v)
   self.assertEqual(len(store['analysis_updates']),2)
+
+class HalfTimeAndPriceTests(unittest.TestCase):
+ def test_fragile_pt_keeps_raw_probability_but_uses_book_source(self):
+  rs=[row('over15_ht','over',6.3,44),row('over15_ht','under',93.7,56)]
+  for r in rs:r['halftime_sample_fragile']=True
+  select_proposal(rs)
+  self.assertEqual(rs[0]['statistical_pct'],6.3)
+  self.assertEqual(rs[0]['statistical_reliability'],'fragile_halftime')
+  self.assertEqual(rs[0]['source'],'analisi bookmaker')
+ def test_price_floor_skips_one_point_zero_five(self):
+  rs=[row('over25_ht','under',96,88),row('over25_ht','over',4,12),row('over25_ft','over',61,60),row('over25_ft','under',39,40)]
+  for r,odd in zip(rs,[1.05,7,1.65,2.2]):r['odd']=odd
+  picks,_=select_proposal(rs)
+  self.assertEqual(picks[0]['market'],'over25_ft')
+  self.assertGreaterEqual(picks[0]['odd'],1.5)
+ def test_fragile_pt_without_book_is_not_primary(self):
+  rs=[row('over15_ht','over',6.3,None),row('over15_ht','under',93.7,None),row('over25_ft','over',61,None),row('over25_ft','under',39,None)]
+  for r in rs[:2]:r['halftime_sample_fragile']=True
+  picks,_=select_proposal(rs)
+  self.assertEqual(picks[0]['market'],'over25_ft')

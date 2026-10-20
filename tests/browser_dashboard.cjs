@@ -17,13 +17,20 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     const primary={...rows[2],research_candidate:true};
     const payload={updated_at:now,matches:[{fixture:{fixture_id:'demo',kickoff:new Date(Date.now()+3600000).toISOString(),
       match:'Squadra casa – Squadra ospite <script>',time:'20:45',league:'Campionato di prova',country:'Italia'},
-      multimarket:{model_id:'context-goals-v3',status:'experimental',captured_at:now,profiles:{},weights:{},markets:rows,
+      multimarket:{model_id:'context-goals-v3.2',status:'experimental',captured_at:now,profiles:{},weights:{},markets:rows,
         best_candidate:primary,ranked_hypotheses:rows.map(r=>r.market+'::'+r.selection)}}]};
     // Isolated synthetic renderer test: no network, premium account or auth change.
     await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;researchMarket='all';renderMatchResearch(p)},payload);
     fs.mkdirSync('test-artifacts',{recursive:true});
     for(const [name,width,height] of [['desktop',1280,1000],['mobile',390,844]]){
       await page.setViewportSize({width,height});
+      await page.evaluate(()=>contextBack());
+      assert.equal(await page.locator('.cx-list-row').count(),1);
+      assert.equal(await page.locator('.cx-card').count(),0);
+      assert(await page.locator('.cx-compact-odds .cx-red').isVisible(),'Movement visible in mobile/desktop list');
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
+      await page.screenshot({path:`test-artifacts/list-${name}.png`,fullPage:true});
+      await page.locator('.cx-open').click();
       assert.equal(await page.locator('.cx-card').count(),1);
       assert.equal(await page.locator('.cx-odd-cell').count(),5);
       assert((await page.locator('.cx-odds-panel').textContent()).includes('1.85'));
