@@ -131,7 +131,7 @@ class IntegrationTests(unittest.TestCase):
                 return {'response':[]}
         result=e.build_fixture_output(Client(),fixture(100,now+timedelta(hours=2)),{}, {})
         self.assertIsNotNone(result)
-        self.assertEqual(result['multimarket']['model_id'],'context-goals-v3.1')
+        self.assertEqual(result['multimarket']['model_id'],'context-goals-v3.2')
         self.assertEqual(result['multimarket']['profiles']['home']['sample'],8)
         self.assertEqual(result['multimarket']['best_candidate']['source'],'analisi statistica')
         class Empty:

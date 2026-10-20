@@ -137,3 +137,20 @@ The thresholds are explicit controls, not calibrated performance claims.
 Audit snapshots use the distinct model id context-goals-v3.1. Prior v3 predictions
 are preserved; new primary selections are frozen only at their actual capture time.
 Replay of the 20 October snapshot is a regression check, not evidence of profitability.
+
+## v3.2: compact list, quote floor and fragile halftime estimates
+
+The dashboard opens as a compact fixture/odds/proposal list, with the full dossier
+on a separate detail view. The confirmed movement badges remain visible on mobile.
+A configurable 0 / 1.40 / 1.50 / 1.80 / 2.00 minimum price uses proposals frozen by
+the backend; the default is 1.50. No proposal for a threshold is shown when none
+qualifies. These are preference filters, not evidence of positive expected return.
+
+Raw statistical rates are unchanged. An HT component estimated as zero from the
+short sample, or a >=20pp statistical/book gap on an HT market, flags that estimate
+as fragile. With at least two recent operators the specific market book probability
+is the displayed reference; otherwise it cannot support a primary recommendation.
+Major 1X2 conflicts also use market-specific book references instead of forcing a
+1X2 selection at any price. The statistical estimate remains separately inspectable.
+Both the 20pp diagnostic threshold and the price floor are provisional controls.
+No claim is made that opponent strength or small-sample estimation is fully solved.

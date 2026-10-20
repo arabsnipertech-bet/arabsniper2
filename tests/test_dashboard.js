@@ -121,6 +121,9 @@ researchContext.v3={matches:[{fixture:{fixture_id:'100',kickoff:future(2),match:
 researchContext.currentPayload=researchContext.v3;
 vm.runInContext("researchFilter('market','all');researchSearch='';renderMatchResearch(currentPayload)",researchContext);
 assert(host.innerHTML.includes('La partita, spiegata.'));
+assert(host.innerHTML.includes('cx-list-row'));
+assert(!host.innerHTML.includes('Quadro statistico'));
+vm.runInContext("contextDetailId='100';renderMatchResearch(currentPayload)",researchContext);
 assert.equal((host.innerHTML.match(/PROPOSTA PRINCIPALE/g)||[]).length,1);
 assert(host.innerHTML.includes('A favore'));
 assert(host.innerHTML.includes('Da considerare'));
