@@ -23,7 +23,7 @@ def read(path, default):
 def write(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix('.tmp')
-    temp.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+    temp.write_text(json.dumps(value, ensure_ascii=False, separators=(",", ":")) + '\n')
     temp.replace(path)
 
 
@@ -151,7 +151,7 @@ def main():
     summary = {'archive': archive(ROOT, now)}
     if args.mode == 'settle':
         summary['settlement'] = settle(ROOT, now)
-    text = json.dumps(summary, ensure_ascii=False, indent=2)
+    text = json.dumps(summary, ensure_ascii=False, separators=(",", ":"))
     print(text)
     if os.environ.get('GITHUB_STEP_SUMMARY'):
         with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:

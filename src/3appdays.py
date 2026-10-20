@@ -197,7 +197,7 @@ def atomic_write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
     with open(tmp, "w", encoding="utf-8") as handle:
-        json.dump(payload, handle, ensure_ascii=False, indent=2)
+        json.dump(payload, handle, ensure_ascii=False, separators=(",", ":"))
     os.replace(tmp, path)
 
 
@@ -1801,7 +1801,7 @@ def upload_json_to_github(filename: str, payload: Any, message: str) -> str:
         return "MISSING_TOKEN"
     try:
         repo = Github(token).get_repo(REPO_NAME)
-        content = json.dumps(payload, ensure_ascii=False, indent=2)
+        content = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
         try:
             current = repo.get_contents(filename)
             repo.update_file(current.path, message, content, current.sha)
