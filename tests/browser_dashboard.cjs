@@ -47,6 +47,19 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       assert.equal(await page.locator('.cx-primary h4').textContent(),'Over 2,5 FT');
       await page.screenshot({path:`test-artifacts/context-${name}.png`,fullPage:true});
     }
+    // Started matches stay available with explicit prematch/live separation.
+    await page.evaluate(()=>{
+      const f=currentPayload.matches[0].fixture;
+      f.kickoff=new Date(Date.now()-3600000).toISOString();
+      f.status_short='HT';f.live={status:'HT',elapsed:45,goals:{home:1,away:1},halftime:{home:1,away:1},observed_at:new Date().toISOString()};
+      contextBack();
+    });
+    assert.equal(await page.locator('.cx-list-row').count(),1);
+    await page.locator('.cx-open').click();
+    assert((await page.locator('.cx-card').textContent()).includes('non sono probabilità live'));
+    assert((await page.locator('.cx-mini').filter({hasText:'GG PT sì'}).textContent()).includes('Verificato: riuscito'));
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Live mobile overflow');
+    await page.screenshot({path:'test-artifacts/live-mobile.png',fullPage:true});
     // Global market filter must not block exact per-fixture alternatives.
     await page.evaluate(()=>researchFilter('market','over25_ft::over'));
     await page.locator('.cx-mini').filter({hasText:'GG PT sì'}).click();

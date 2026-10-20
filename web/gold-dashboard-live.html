@@ -1203,9 +1203,9 @@
       const age=(Date.now()-updated)/3600000;
       return row.research_candidate && Number.isFinite(updated) && age>=0 && age<=6;
     }
-    function researchMatches(payload) {
+    function researchMatches(payload, includeStarted=false) {
       return (payload.matches||[]).filter(m=>m.multimarket?.status==='experimental' &&
-        !m.fixture?.result && Date.parse(m.fixture?.kickoff)>Date.now())
+        (includeStarted || (!m.fixture?.result && Date.parse(m.fixture?.kickoff)>Date.now())))
         .sort((a,b)=>Date.parse(a.fixture.kickoff)-Date.parse(b.fixture.kickoff)||String(a.fixture.fixture_id).localeCompare(String(b.fixture.fixture_id)));
     }
     function researchMarkets(match) {
@@ -1389,6 +1389,47 @@
       const relative=result.length===3?`Esito più probabile per i book: ${leader.selection==='1'?'1 · '+(match.fixture.home||'casa'):leader.selection==='2'?'2 · '+(match.fixture.away||'ospite'):'X · pareggio'} (${contextPct(leader.book_probability_pct)} senza margine).`:'Forza relativa: confronto 1X2 incompleto.';
       return `<section class="cx-odds-panel ${compact?'cx-compact-odds':''}" aria-label="Quote di riferimento della partita"><div class="cx-odds-grid">${cell('1x2_ft','1','1 · Casa')}${cell('1x2_ft','x','X · Pareggio')}${cell('1x2_ft','2','2 · Ospite')}</div><div class="cx-odds-grid cx-odds-goals">${cell('over15_ht','over','Over 1,5 PT')}${cell('over25_ft','over','Over 2,5 FT')}</div><p class="cx-odds-note">${escapeHtml(relative)}</p><details class="cx-odds-note"><summary>Come leggere quote e frecce</summary><p>* Apertura = prima quota osservata dello stesso operatore, non apertura ufficiale. — = dato assente. Frecce solo con consenso di almeno due operatori: ↓ calo, ↑ rialzo, ⇅ inversione. Verde debole, giallo medio, rosso forte. Nessuna freccia = movimento non confermato. OCI e aggio sono nei dettagli bookmaker.</p></details></section>`;
     }
+
+    let contextStateFilter='all';
+    function contextState(match) {
+      const f=match.fixture||{},s=f.live?.status||f.status_short||f.result?.status;
+      if(['FT','AET','PEN'].includes(s))return 'finished';
+      if(['PST','CANC','ABD','AWD','WO'].includes(s))return 'other';
+      if(['1H','HT','2H','ET','BT','P','LIVE','SUSP','INT'].includes(s))return 'live';
+      if(Number.isFinite(Date.parse(f.kickoff))&&Date.parse(f.kickoff)<=Date.now())return 'live';
+      return 'upcoming';
+    }
+    function contextStateLabel(match) {
+      const f=match.fixture||{},l=f.live||{},s=l.status||f.status_short||f.result?.status;
+      const state=contextState(match);
+      if(state==='finished')return 'Terminata · '+s;
+      if(state==='other')return ({PST:'Rinviata',CANC:'Annullata',ABD:'Abbandonata',AWD:'Assegnata a tavolino',WO:'Walkover'})[s]||'Stato da verificare';
+      if(state==='upcoming')return 'Da iniziare';
+      if(!['1H','HT','2H','ET','BT','P','LIVE','SUSP','INT'].includes(s))return 'Orario di inizio trascorso · aggiornamento atteso';
+      return s==='HT'?'Intervallo':s==='SUSP'?'Sospesa':s==='INT'?'Interrotta':"In corso · "+s+(Number.isFinite(l.elapsed??f.elapsed)?" · "+(l.elapsed??f.elapsed)+"′":'');
+    }
+    function contextStateControls(matches) {
+      return '<nav class="research-controls" aria-label="Stato delle partite">'+[['all','Tutte'],['upcoming','Da iniziare'],['live','In corso / da aggiornare'],['finished','Terminate'],['other','Altri stati']].map(([k,label])=>`<button type="button" class="btn" aria-pressed="${contextStateFilter===k}" onclick="contextStateFilter='${k}';renderMatchResearch(currentPayload||{})">${label} (${matches.filter(m=>k==='all'||contextState(m)===k).length})</button>`).join('')+'</nav>';
+    }
+    function contextOutcome(match,market) {
+      const f=match.fixture||{},l=f.live||{},s=l.status||f.status_short||f.result?.status;
+      const ht=market.endsWith('_ht');
+      const htFinal=['HT','2H','ET','BT','P','FT','AET','PEN'].includes(s);
+      const ftFinal=['FT','AET','PEN'].includes(s);
+      if(!(ht?htFinal:ftFinal))return 'Esito da verificare';
+      const score=ht?l.halftime:l.fulltime;
+      const home=score?.home??f.result?.[ht?'home_ht':'home_ft'];
+      const away=score?.away??f.result?.[ht?'away_ht':'away_ft'];
+      if(!Number.isFinite(home)||!Number.isFinite(away))return 'Risultato non disponibile';
+      const won=market==='gg_ht'?home>0&&away>0:home+away>=({over15_ht:2,over25_ht:3,over25_ft:3,over35_ft:4})[market];
+      return won?'Verificato: riuscito':'Verificato: non riuscito';
+    }
+    function contextLivePanel(match) {
+      if(contextState(match)==='upcoming')return '';
+      const f=match.fixture||{},l=f.live||{},r=f.result||{};
+      const score=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)?a+'–'+b:'non disponibile';
+      return `<section class="cx-context"><strong>${escapeHtml(contextStateLabel(match))}</strong><p>Punteggio osservato: ${score(l.goals?.home??r.home_ft,l.goals?.away??r.away_ft)} · PT: ${score(l.halftime?.home??r.home_ht,l.halftime?.away??r.away_ht)} · FT (90 minuti): ${score(l.fulltime?.home??r.home_ft,l.fulltime?.away??r.away_ft)}</p><p>Aggiornamento risultato: ${l.observed_at?escapeHtml(formatTimestamp(l.observed_at)):'non disponibile'}${l.refresh_failed?' · ultimo recupero fallito, dati precedenti conservati':''}.</p><p><b>Analisi e quote prematch conservate</b> · ${escapeHtml(formatTimestamp(match.multimarket?.captured_at))}. Le percentuali sotto non sono probabilità live.</p><p>Quote live non disponibili in questa versione. Risultato aggiornato dalle scansioni periodiche, non in tempo reale. Nessuna proposta live calcolata.</p></section>`;
+    }
     function contextList(matches) {
       let shown=0;
       const cards=matches.map(match=>{
@@ -1397,7 +1438,7 @@
         if(!researchMarkets(match).length)return '';
         shown++;
         const main=contextPick(a),arg=escapeHtml(JSON.stringify(String(f.fixture_id)));
-        return `<article class="cx-list-row"><button class="cx-open" type="button" onclick="contextOpen(${arg})"><time>${escapeHtml(f.time||'')}</time><span><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><strong>${escapeHtml(f.match)}</strong><em>Apri analisi →</em></span></button>${contextOdds(match,true)}<div class="cx-list-pick"><small>IPOTESI PRINCIPALE · QUOTA PREFERITA ≥ ${escapeHtml(contextMinimumOdd)}</small>${main?`<b>${escapeHtml(main.label)}</b><strong>Quota ${contextNumber(main.odd)}</strong><span>${escapeHtml(main.source)}</span><span>Statistica ${contextPct(main.statistical_pct)} · Book ${contextPct(main.book_probability_pct)}</span>${contextPrice(main,true)}${main.statistical_reliability?.includes('conflict')||main.statistical_reliability==='fragile_halftime'?'<em>Statistica da verificare · apri i dettagli</em>':''}`:'<b>Nessuna stima utilizzabile</b><span>Apri l’analisi per vedere i dati mancanti.</span>'}</div></article>`;
+        return `<article class="cx-list-row"><button class="cx-open" type="button" onclick="contextOpen(${arg})"><time>${escapeHtml(f.time||'')}</time><span><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><strong>${escapeHtml(f.match)}</strong><em>${escapeHtml(contextStateLabel(match))}</em><em>Apri analisi →</em></span></button>${contextOdds(match,true)}<div class="cx-list-pick"><small>IPOTESI PREMATCH · QUOTA PREFERITA ≥ ${escapeHtml(contextMinimumOdd)}</small>${main?`<b>${escapeHtml(main.label)}</b><strong>Quota ${contextNumber(main.odd)}</strong><span>${escapeHtml(main.source)}</span><span>Statistica ${contextPct(main.statistical_pct)} · Book ${contextPct(main.book_probability_pct)}</span>${contextPrice(main,true)}${main.statistical_reliability?.includes('conflict')||main.statistical_reliability==='fragile_halftime'?'<em>Statistica da verificare · apri i dettagli</em>':''}`:'<b>Nessuna stima utilizzabile</b><span>Apri l’analisi per vedere i dati mancanti.</span>'}</div></article>`;
       }).join('');
       return `<div class="cx-list-head"><span>Partita</span><span>Quote · apertura / attuale / movimento</span><span>Proposta principale</span></div><div class="cx-list">${cards||'<p>Nessuna partita con questi filtri.</p>'}</div>`;
     }
@@ -1433,12 +1474,12 @@
       return `<details class="cx-detail"><summary>Pesi e calcolo, dato per dato</summary><p>I pesi attacco/difesa dipendono dalla copertura e dal contesto. xG: fino al 25% del componente FT, proporzionale ai dati disponibili. Tiri usati come riscontro alternativo. Le quote hanno peso zero nel calcolo statistico.</p><div class="cx-table-wrap"><table class="cx-table"><thead><tr><th>Componente</th><th>Attacco / difesa</th><th>Gol base</th><th>Correzione</th><th>Origine</th></tr></thead><tbody>${rows}</tbody></table></div><p>Scarto dalla media: ipotesi sperimentale, 2% per gol di differenza, massimo ±5%, attenuata dal confronto 60/40 e dalle occasioni. Almeno tre precedenti nello stesso contesto, esclusa l’ultima. Non trasferita automaticamente al PT. La versione senza correzione resta nell’audit.</p><p>Forza degli avversari nelle gare storiche: non valutabile senza dati disponibili prima di quelle gare. Nessun peso inventato.</p></details>`;
     }
     function renderContextDashboard(payload,host) {
-      const all=researchMatches(payload).filter(m=>m.multimarket.model_id?.startsWith('context-goals-v3'));
+      const all=researchMatches(payload,true).filter(m=>m.multimarket.model_id?.startsWith('context-goals-v3'));
       if(contextDetailId!==null&&!all.some(m=>String(m.fixture.fixture_id)===contextDetailId))contextDetailId=null;
       const options=(list,current)=>list.map(([v,l])=>`<option value="${escapeHtml(v)}" ${v===current?'selected':''}>${escapeHtml(l)}</option>`).join('');
       let html=`<header class="cx-heading"><div><span class="cx-eyebrow">ARABSNIPER / MATCH INTELLIGENCE</span><h2>La partita, spiegata.</h2><p>Una proposta principale. Due fonti a confronto. Ogni dato al suo posto.</p></div><span class="research-tag">V3 · IN VERIFICA</span></header><div class="cx-summary"><div><b>${all.length}</b><span>partite in ordine di orario</span></div><div><b>8 / 4</b><span>gare ufficiali / primi tempi</span></div><div><b>Night 5 · Fast 2</b><span>giorni coperti dalle scansioni</span></div></div><p class="cx-muted">Snapshot: ${escapeHtml(formatTimestamp(payload.updated_at||payload.generated_at))}. Le percentuali sono stime sperimentali, non frequenze di successo già validate.</p><div class="research-controls"><label>Mercato${`<select onchange="researchFilter('market',this.value)">${options(RESEARCH_MARKET_OPTIONS,researchMarket)}</select>`}</label><label>Quote<select onchange="researchFilter('price',this.value)">${options([['all','Tutte, anche senza quota'],['2to5','Da 2 a 5']],researchPrice)}</select></label><label>Cerca squadra<input class="research-search" type="search" value="${escapeHtml(researchSearch)}" placeholder="Squadra o campionato" onchange="researchSearch=this.value;renderMatchResearch(currentPayload||{})"></label></div>`;
       html+=`<label class="cx-minimum">Quota preferita da <select onchange="contextMinimumOdd=this.value;renderMatchResearch(currentPayload||{})">${options([['0','Tutte'],['1.4','1,40'],['1.5','1,50'],['1.8','1,80'],['2','2,00']],contextMinimumOdd)}</select></label><p class="cx-odds-note">Confronto probabilità/quota: anche un esito sotto il 50% può essere una proposta. Se manca una quota sopra la preferenza, mostriamo un’alternativa dichiarata. Convenienza da verificare negli audit.</p>`;
-      if(contextDetailId===null){host.innerHTML=html+contextList(all);return;}
+      if(contextDetailId===null){host.innerHTML=html+contextStateControls(all)+contextList(all.filter(m=>contextStateFilter==='all'||contextState(m)===contextStateFilter));return;}
       html=`<button type="button" class="btn cx-back" onclick="contextBack()">← Torna all’elenco</button>`;
       let shown=0;
       for(const match of all){
@@ -1452,13 +1493,13 @@
         const main=contextPick(a);shown++;
         const chooseArgs=(r)=>[String(f.fixture_id),`${r.market}::${r.selection}`].map(v=>escapeHtml(JSON.stringify(v))).join(',');
         html+=`<article class="cx-card"><header class="cx-match"><time>${escapeHtml(f.time||new Date(f.kickoff).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'}))}</time><div class="cx-match-info"><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><h3>${escapeHtml(f.match||`${f.home} – ${f.away}`)}</h3></div>${contextOdds(match)}</header>`;
-        html+=contextCoverage(match);
+        html+=contextLivePanel(match)+contextCoverage(match);
         if(a.selection_diagnostic?.status==='major_conflict')html+=`<aside class="cx-context"><strong>Forte divergenza sulla favorita</strong><p>Statistica ${contextPct(a.selection_diagnostic.statistical_pct)} · book ${contextPct(a.selection_diagnostic.book_probability_pct)}. La proposta usa il bookmaker del mercato selezionato; le medie storiche non sono normalizzate per forza degli avversari.</p></aside>`;
         html+=main?`<section class="cx-primary"><div><span class="cx-eyebrow">PROPOSTA PRINCIPALE</span><h4>${escapeHtml(main.label)}</h4><span class="cx-source">${escapeHtml(main.source)}</span></div><div class="cx-prob"><b>${contextPct(main.statistical_pct)}</b><span>Stima statistica</span></div><div class="cx-prob"><b>${contextPct(main.book_probability_pct)}</b><span>Probabilità book · senza margine</span></div></section><p class="cx-muted">Quota ${main.odd?escapeHtml(formatOdd(main.odd)):'non disponibile'}${main.quote?` · ${escapeHtml(main.quote.bookmaker)} · ${escapeHtml(formatTimestamp(main.quote.provider_updated_at))}`:''}. ${escapeHtml(main.source_reason||'')}</p>${contextPrice(main)}<details class="cx-detail"><summary>Perché questa proposta · pro e contro</summary>${contextEvidence(main)}</details>`:'<p>Nessuna proposta con questa quota minima. Torna all’elenco per modificarla; tutti i mercati sono consultabili sotto.</p>';
         html+='<p class="cx-odds-note">Stima statistica = modello ArabSniper. Book senza margine = probabilità ricavate dalle quote e normalizzate al 100% sul mercato completo di ogni operatore. Esempio: due quote 1,80 implicano 55,6% + 55,6%; senza margine diventano 50% + 50%. Non è la probabilità vera né una media con la statistica.</p><div class="cx-four">';
         for(const [market,selection,label] of [['over15_ht','over','Over 1,5 PT'],['over25_ht','over','Over 2,5 PT'],['gg_ht','yes','GG PT sì'],['over25_ft','over','Over 2,5 FT'],['over35_ft','over','Over 3,5 FT']]){
           const r=a.markets.find(x=>x.market===market&&x.selection===selection);
-          html+=`<button type="button" class="cx-mini" ${r?`onclick="researchSelectFixture(${chooseArgs(r)})"`:''}><span>${label}</span>${contextProbability(r)}</button>`;
+          html+=`<button type="button" class="cx-mini" ${r?`onclick="researchSelectFixture(${chooseArgs(r)})"`:''}><span>${label}</span>${contextProbability(r)}<small>${escapeHtml(contextOutcome(match,market))}</small></button>`;
         }
         html+='</div>';
         const selectOptions=a.markets.filter(r=>!r.market.includes('_ht_over')||r.selection==='yes').map(r=>[`${r.market}::${r.selection}`,r.label]);

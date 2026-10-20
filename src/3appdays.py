@@ -1860,6 +1860,8 @@ def _preserve_existing_match(
         fixture["status_short"] = status.get("short")
         fixture["status_long"] = status.get("long")
         fixture["elapsed"] = status.get("elapsed")
+    from match_lifecycle import observed_live_state
+    fixture["live"] = observed_live_state(status_row, iso_now(), fixture.get("live"))
     fixture["data_freshness"] = "preserved"
     fixture["preserved_reason"] = reason
     fixture["preserved_at"] = iso_now()
@@ -3917,8 +3919,8 @@ def _result_payload(status_row: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
     fulltime = score.get("fulltime", {}) or {}
     halftime = score.get("halftime", {}) or {}
     goals = status_row.get("goals", {}) or {}
-    home_ft = fulltime.get("home") if fulltime.get("home") is not None else goals.get("home")
-    away_ft = fulltime.get("away") if fulltime.get("away") is not None else goals.get("away")
+    home_ft = fulltime.get("home") if fulltime.get("home") is not None else goals.get("home") if status.get("short") == "FT" else None
+    away_ft = fulltime.get("away") if fulltime.get("away") is not None else goals.get("away") if status.get("short") == "FT" else None
     if home_ft is None or away_ft is None:
         return None
     return {
