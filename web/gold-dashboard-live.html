@@ -1219,7 +1219,7 @@
       return text+(limits.length?' Limiti: '+limits.slice(0,2).join('; ')+'.':'');
     }
     function researchSuggestions(match,matches) {
-      if(match.multimarket?.model_id==='context-goals-v3')return match.multimarket.best_candidate?[{pick:{row:match.multimarket.best_candidate}}]:[];
+      if(match.multimarket?.model_id?.startsWith('context-goals-v3'))return match.multimarket.best_candidate?[{pick:{row:match.multimarket.best_candidate}}]:[];
       const rows=(match.multimarket?.markets||[]).filter(r=>Number.isFinite(r.probability_pct)&&r.probability_pct>=0&&r.probability_pct<=100&&(!r.market.includes('_ht_over')||r.selection==='yes'));
       rows.sort((a,b)=>{
         const x=researchEvidence(a),y=researchEvidence(b);
@@ -1281,7 +1281,7 @@
     function renderMatchResearch(payload) {
       const host=document.getElementById('matchResearch');
       if (!host) return;
-      if ((payload.matches||[]).some(m=>m.multimarket?.model_id==='context-goals-v3')) { renderContextDashboard(payload,host);return; }
+      if ((payload.matches||[]).some(m=>m.multimarket?.model_id?.startsWith('context-goals-v3'))) { renderContextDashboard(payload,host);return; }
       const matches=researchMatches(payload);
       const count=matches.filter(m=>researchMarkets(m).some(researchCandidate)).length;
       const prospective=(payload.multimarket_audit?.cohorts||[]).filter(c=>c.period==='prospective');
@@ -1384,7 +1384,7 @@
       return `<details class="cx-detail"><summary>Pesi e calcolo, dato per dato</summary><p>I pesi attacco/difesa dipendono dalla copertura e dal contesto. xG: fino al 25% del componente FT, proporzionale ai dati disponibili. Tiri usati come riscontro alternativo. Le quote hanno peso zero nel calcolo statistico.</p><div class="cx-table-wrap"><table class="cx-table"><thead><tr><th>Componente</th><th>Attacco / difesa</th><th>Gol base</th><th>Correzione</th><th>Origine</th></tr></thead><tbody>${rows}</tbody></table></div><p>Scarto dalla media: ipotesi sperimentale, 2% per gol di differenza, massimo ±5%, attenuata dal confronto 60/40 e dalle occasioni. Almeno tre precedenti nello stesso contesto, esclusa l’ultima. Non trasferita automaticamente al PT. La versione senza correzione resta nell’audit.</p><p>Forza degli avversari nelle gare storiche: non valutabile senza dati disponibili prima di quelle gare. Nessun peso inventato.</p></details>`;
     }
     function renderContextDashboard(payload,host) {
-      const all=researchMatches(payload).filter(m=>m.multimarket.model_id==='context-goals-v3');
+      const all=researchMatches(payload).filter(m=>m.multimarket.model_id?.startsWith('context-goals-v3'));
       const options=(list,current)=>list.map(([v,l])=>`<option value="${escapeHtml(v)}" ${v===current?'selected':''}>${escapeHtml(l)}</option>`).join('');
       let html=`<header class="cx-heading"><div><span class="cx-eyebrow">ARABSNIPER / MATCH INTELLIGENCE</span><h2>La partita, spiegata.</h2><p>Una proposta principale. Due fonti a confronto. Ogni dato al suo posto.</p></div><span class="research-tag">V3 · IN VERIFICA</span></header><div class="cx-summary"><div><b>${all.length}</b><span>partite in ordine di orario</span></div><div><b>8 / 4</b><span>gare ufficiali / primi tempi</span></div><div><b>Night 5 · Fast 2</b><span>giorni coperti dalle scansioni</span></div></div><p class="cx-muted">Snapshot: ${escapeHtml(formatTimestamp(payload.updated_at||payload.generated_at))}. Le percentuali sono stime sperimentali, non frequenze di successo già validate.</p><div class="research-controls"><label>Mercato${`<select onchange="researchFilter('market',this.value)">${options(RESEARCH_MARKET_OPTIONS,researchMarket)}</select>`}</label><label>Quote<select onchange="researchFilter('price',this.value)">${options([['all','Tutte, anche senza quota'],['2to5','Da 2 a 5']],researchPrice)}</select></label><label>Cerca squadra<input class="research-search" type="search" value="${escapeHtml(researchSearch)}" placeholder="Squadra o campionato" onchange="researchSearch=this.value;renderMatchResearch(currentPayload||{})"></label></div>`;
       let shown=0;
@@ -1398,6 +1398,7 @@
         const main=a.best_candidate;shown++;
         const chooseArgs=(r)=>[String(f.fixture_id),`${r.market}::${r.selection}`].map(v=>escapeHtml(JSON.stringify(v))).join(',');
         html+=`<article class="cx-card"><header class="cx-match"><time>${escapeHtml(f.time||new Date(f.kickoff).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'}))}</time><div class="cx-match-info"><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><h3>${escapeHtml(f.match||`${f.home} – ${f.away}`)}</h3></div>${contextOdds(match)}</header>`;
+        if(a.selection_diagnostic?.status==='major_conflict')html+=`<aside class="cx-context"><strong>Forte divergenza sulla favorita</strong><p>Statistica ${contextPct(a.selection_diagnostic.statistical_pct)} · book ${contextPct(a.selection_diagnostic.book_probability_pct)}. La proposta segue il consenso bookmaker 1X2; le medie storiche non sono normalizzate per forza degli avversari.</p></aside>`;
         html+=main?`<section class="cx-primary"><div><span class="cx-eyebrow">PROPOSTA PRINCIPALE</span><h4>${escapeHtml(main.label)}</h4><span class="cx-source">${escapeHtml(main.source)}</span></div><div class="cx-prob"><b>${contextPct(main.statistical_pct)}</b><span>Stima statistica</span></div><div class="cx-prob"><b>${contextPct(main.book_probability_pct)}</b><span>Probabilità book · senza margine</span></div></section><p class="cx-muted">Quota ${main.odd?escapeHtml(formatOdd(main.odd)):'non disponibile'}${main.quote?` · ${escapeHtml(main.quote.bookmaker)} · ${escapeHtml(formatTimestamp(main.quote.provider_updated_at))}`:''}. ${escapeHtml(main.source_reason||'')}</p><details class="cx-detail"><summary>Perché questa proposta · pro e contro</summary>${contextEvidence(main)}</details>`:'<p>Proposta non disponibile: mancano entrambe le fonti.</p>';
         html+='<p class="cx-odds-note">Stima statistica = modello ArabSniper. Book = probabilità delle quote senza margine. Sono due valutazioni separate, non una media.</p><div class="cx-four">';
         for(const [market,selection,label] of [['over15_ht','over','Over 1,5 PT'],['gg_ht','yes','GG PT sì'],['over25_ft','over','Over 2,5 FT'],['over35_ft','over','Over 3,5 FT']]){

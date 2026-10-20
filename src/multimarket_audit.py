@@ -78,7 +78,7 @@ def build_report(store, include_updates=True):
             if y is None: continue
             probabilities=market['probabilities']
             odd=market.get('odd')
-            variant_main='statistics' if version=='context-goals-v3' else 'combined'
+            variant_main='statistics' if version.startswith('context-goals-v3') else 'combined'
             p=probabilities.get(variant_main)
             if p is None: continue
             selected=bool(market.get('research_candidate'))

@@ -117,3 +117,23 @@ scan publishers share this format. Parts and their manifests are committed toget
 Compatibility: state schema 1.4 retains the existing 1.1/1.2 quote ledger; a version
 change must not reset it. Scan failures retain generated public data in a recovery
 artifact for 14 days. Archived daily forecasts are read through the same storage API.
+
+## Directional selection correction — context-goals-v3.1
+
+A reference probability or a small gap between sources is not directional agreement.
+The selector now compares alternatives within the exact market. An outcome dominated
+by another outcome in every available source remains inspectable but cannot be the
+primary. League reference rates remain descriptive and do not add selection votes.
+Both sources must prefer the same outcome, with at least two books, to label it
+`statistica e bookmaker`. There is no common 50/60% gate across markets.
+
+Provisional context safeguard: at least two recent complete 1X2 books, a home/away
+favorite at >=60% fair probability, and >=25 percentage points more than the raw
+statistical estimate. In that case the primary routes explicitly to the observed
+1X2 book favorite; raw statistical outputs stay unchanged and are flagged diagnostic.
+This does not infer a large winning margin or claim opponent-strength normalization.
+The thresholds are explicit controls, not calibrated performance claims.
+
+Audit snapshots use the distinct model id context-goals-v3.1. Prior v3 predictions
+are preserved; new primary selections are frozen only at their actual capture time.
+Replay of the 20 October snapshot is a regression check, not evidence of profitability.
