@@ -7,11 +7,12 @@ from statistics import mean, median
 from copy import deepcopy
 from multimarket_model import SPECS, COMBOS, number, stamp, fair, goal_probabilities, quote_benchmarks
 
-MODEL_ID = 'context-goals-v3'
+MODEL_ID = 'context-goals-v3.1'
 CONFIG = {'history': 8, 'form': 4, 'halftime': 4, 'correction_per_goal': .02,
           'correction_cap': .05, 'minimum_context_reference': 3,
           'max_quote_age_hours': 6, 'agreement_pp': 10,
-          'experimental': True, 'book_weight_in_statistics': 0}
+          'favorite_guard_min_pct': 60, 'favorite_guard_gap_pp': 25,
+          'selection_policy': 'directional-consensus-v1', 'experimental': True, 'book_weight_in_statistics': 0}
 
 
 def avg(values):
@@ -219,6 +220,60 @@ def market_label(key, side):
     return label
 
 
+
+def select_proposal(rows):
+    """Rank evidence only after checking direction within each exact market.
+
+    Guard thresholds are explicit provisional controls, not fitted probabilities.
+    A major 1X2 conflict routes the main proposal to the observed book favorite;
+    raw statistical probabilities remain visible, never rewritten as book estimates.
+    """
+    result=[r for r in rows if r['market']=='1x2_ft' and r.get('book_probability_pct') is not None and r.get('bookmakers_count',0)>=2]
+    favorite=max(result,key=lambda r:r['book_probability_pct']) if len(result)==3 else None
+    guard=bool(favorite and favorite['selection'] in ('1','2') and
+        favorite['book_probability_pct']>=CONFIG['favorite_guard_min_pct'] and
+        favorite.get('statistical_pct') is not None and
+        favorite['book_probability_pct']-favorite['statistical_pct']>=CONFIG['favorite_guard_gap_pp'])
+    diagnostic={'status':'major_conflict' if guard else 'no_major_conflict',
+        'opponent_strength_adjusted':False,
+        'reason':'Forza degli avversari storici non normalizzata: copertura del campione e affidabilità sono distinte.'}
+    if guard:
+        diagnostic.update(favorite=favorite['selection'],statistical_pct=favorite['statistical_pct'],book_probability_pct=favorite['book_probability_pct'])
+    for r in rows:
+        r['research_candidate']=False
+        peers=[x for x in rows if x['market']==r['market'] and x is not r]
+        p,b=r.get('statistical_pct'),r.get('book_probability_pct')
+        stats_leads=p is not None and all(x.get('statistical_pct') is not None and p>=x['statistical_pct'] for x in peers)
+        book_leads=b is not None and all(x.get('book_probability_pct') is not None and b>=x['book_probability_pct'] for x in peers)
+        dominated=any((p is None or x.get('statistical_pct') is not None and x['statistical_pct']>p) and
+                      (b is None or x.get('book_probability_pct') is not None and x['book_probability_pct']>b) for x in peers) if p is not None or b is not None else True
+        r['primary_eligible']=not dominated and (p is not None or b is not None)
+        r['statistical_reliability']='context_conflict' if guard else 'opponent_strength_unadjusted'
+        r['evidence_blocks']['goals']=1 if stats_leads else -1 if p is not None else 0
+        # Proximity is descriptive; it never contributes a favorable vote by itself.
+        r['evidence_blocks']['book']=1 if stats_leads and book_leads and r.get('bookmakers_count',0)>=2 else -1 if b is not None and not book_leads else 0
+        r['support_score']=sum(r['evidence_blocks'].values())
+        r['pros']=[v for v in r['pros'] if not v.startswith(('Book senza margine','Frequenza di riferimento'))]
+        r['cons']=[v for v in r['cons'] if not v.startswith(('Book senza margine','Frequenza di riferimento'))]
+        if b is not None:
+            (r['pros'] if book_leads else r['cons']).append(f"Book senza margine {b:.1f}%: {'esito più probabile' if book_leads else 'preferisce un altro esito'} nello stesso mercato.")
+        if dominated: r['cons'].insert(0,'Un altro esito dello stesso mercato è più probabile per tutte le fonti disponibili; resta consultabile ma non è proposta principale.')
+        directional=stats_leads and book_leads and r.get('bookmakers_count',0)>=2
+        if directional and not guard:
+            r['source']='statistica e bookmaker';r['source_reason']='Entrambe le fonti preferiscono questo esito nello stesso mercato. Percentuali separate, senza bonus.'
+        else:
+            r['source']='analisi bookmaker' if b is not None and (guard or p is None or r.get('coverage',0)<.375) else 'analisi statistica' if p is not None else 'non disponibile'
+            r['source_reason']='Fonti non concordi sulla direzione; nessuna conferma dedotta dalla sola vicinanza delle percentuali.' if p is not None and b is not None else 'Proposta basata sulla sola fonte disponibile.'
+        if guard:
+            r['cons'].insert(0,'Forte divergenza sulla favorita 1X2; medie storiche non corrette per forza degli avversari. Statistica da trattare come diagnostica.')
+            r['primary_eligible']=r is favorite
+            r['source_reason']='Prevale il consenso bookmaker 1X2: il modello contraddice nettamente la favorita e non normalizza la forza degli avversari. Nessuna previsione automatica di goleada.'
+    candidates=[r for r in rows if r['primary_eligible'] and not (r['market'] in COMBOS and r['selection']=='no')]
+    candidates.sort(key=lambda r:(-r['support_score'],-r['coverage'],len(r['cons']),-(r.get('statistical_pct') or r.get('book_probability_pct') or 0),r['market'],r['selection']))
+    if candidates: candidates[0]['research_candidate']=True
+    return candidates,diagnostic
+
+
 def evaluate(match, as_of, quotes=None):
     meta=match.get('fixture',{}); stats=match.get('statistics',{})
     profiles={s:profile(select_history(stats.get(s,{}).get('last_matches',[]),as_of,meta.get('season')),s) for s in ('home','away')}
@@ -325,14 +380,12 @@ def evaluate(match, as_of, quotes=None):
                 'research_candidate':False,'reasons':[],'pros':pro[:3],'cons':con[:3],'missing':missing,
                 'evidence_blocks':blocks,'support_score':score,'coverage':quality,'movement':movement(books,side),'reference_probability_pct':round(league_reference[key][side]*100,2) if key in league_reference else None})
     trap=favorite_context(profiles,benchmarks,rows)
-    candidates=[r for r in rows if r['source']!='non disponibile' and not (r['market'] in COMBOS and r['selection']=='no')]
-    candidates.sort(key=lambda r:(-r['support_score'],-r['coverage'],len(r['cons']),-(r['statistical_pct'] or r['book_probability_pct'] or 0),r['market'],r['selection']))
-    if candidates: candidates[0]['research_candidate']=True
+    candidates,diagnostic=select_proposal(rows)
     for p in profiles.values():
         p['history_ids']=[r['fixture_id'] for r in p.pop('rows')]; p['ht_history_ids']=[r['fixture_id'] for r in p.pop('ht_rows')]
     return {'model_id':MODEL_ID,'status':'experimental','captured_at':as_of,'config':CONFIG,
             'rates':{'statistics':rates,'without_correction':uncorrected},'weights':weights,
-            'profiles':profiles,'favorite_context':trap,'features':{},'markets':rows,'best_candidate':deepcopy(candidates[0]) if candidates else None,
+            'selection_diagnostic':diagnostic,'profiles':profiles,'favorite_context':trap,'features':{},'markets':rows,'best_candidate':deepcopy(candidates[0]) if candidates else None,
             'ranked_hypotheses':[r['market']+'::'+r['selection'] for r in candidates],
             'notes':['Coefficienti sperimentali da verificare negli audit.','Il digiuno non rende un gol dovuto.','Book e statistica restano separati.']}
 
