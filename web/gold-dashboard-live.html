@@ -675,6 +675,27 @@
     .cx-scenario{padding:18px;background:#0c151c;border:1px solid #273e48;border-radius:13px}.cx-scenario label{font-size:.75rem;color:var(--muted)}.cx-scenario select{display:block;width:100%;background:#192b35;color:#edf4f4;border:1px solid #47606a;border-radius:9px;min-height:46px;padding:10px;margin:9px 0 18px;font-size:.9rem}.cx-scenario-title{display:flex;justify-content:space-between;align-items:center;gap:12px}.cx-scenario-title h4{margin:0;font-size:1rem}.cx-scenario-title span{font-size:.76rem;color:#b5c8ce}.cx-movement{font-size:.78rem;line-height:1.7;padding:14px 0}.cx-movement>span{margin-left:12px;color:var(--muted)}.cx-green{color:#81c5a3}.cx-yellow{color:#ebca68}.cx-red{color:#ff8981}.cx-detail{padding:15px 0;border-bottom:1px solid var(--border-soft);font-size:.8rem;line-height:1.65}.cx-detail summary{font-weight:650;color:#b9d0d7}.cx-detail p{color:var(--muted)}.cx-table-wrap{overflow-x:auto}.cx-table{width:100%;border-collapse:collapse;font-size:.74rem;text-align:left;margin:12px 0}.cx-table th,.cx-table td{padding:11px 9px;border-bottom:1px solid #263a43;min-width:95px}.cx-table thead{color:#9ddac9}.cx-table tbody th{color:#a9bbc3;font-weight:400}.cx-table td{font-variant-numeric:tabular-nums}.cx-alternative{display:flex;justify-content:space-between;gap:12px;width:100%;border:0;border-bottom:1px solid #263a43;color:#c3d2d5;background:none;text-align:left;padding:12px 0;cursor:pointer;font-size:.76rem}.cx-alternative:hover{color:var(--cyan)}.cx-footer{font-size:.65rem;color:var(--muted);margin-top:18px;line-height:1.6}.cx-context{border-left:3px solid #e8b75c;background:#e8b75c09;padding:12px;margin:16px 0;font-size:.8rem}
     @media(max-width:640px){.cx-card{padding:16px;border-radius:15px}.cx-heading{display:block}.cx-heading .research-tag{display:inline-block;margin-top:10px}.cx-summary>div{padding:12px}.cx-summary b{font-size:.95rem}.cx-summary span{font-size:.64rem}.cx-primary{grid-template-columns:1fr 1fr;gap:16px}.cx-primary>div:first-child{grid-column:1/-1}.cx-prob{text-align:left}.cx-prob b{font-size:1.7rem}.cx-evidence-grid{grid-template-columns:1fr}.cx-four{grid-template-columns:1fr 1fr}.cx-scenario{padding:12px}.cx-scenario-title{display:block}.cx-scenario-title span{display:block;margin-top:8px}.cx-match{gap:12px}.cx-match h3{font-size:1.1rem}.cx-alternative{display:block}.cx-alternative span{display:block;margin:4px 0}.cx-movement>span{display:block;margin-left:0}}
 
+
+    /* Visual hierarchy: cyan prices, violet book estimates, amber main proposal. */
+    .cx-odd-cell{background:linear-gradient(145deg,#113440,#10232f);border-color:#326579;border-top:3px solid #49d9ef;box-shadow:0 4px 14px #0002}
+    .cx-odd-cell>b{color:#9befff;font-size:.82rem;font-weight:800}
+    .cx-odd-line{align-items:center;flex-wrap:wrap;gap:3px}
+    .cx-odd-line:nth-child(2)>b{color:#b5c9d3;font-size:.86rem}
+    .cx-odd-line:nth-child(3)>b{color:#82f3ff;background:#183e4b;border:1px solid #367387;border-radius:6px;padding:3px 7px;font-size:1.22rem;font-weight:850;font-variant-numeric:tabular-nums}
+    .cx-odds-goals .cx-odd-cell{background:linear-gradient(145deg,#282447,#172439);border-top-color:#b8a0ff;border-color:#615482}
+    .cx-odds-goals .cx-odd-cell>b{color:#d2c1ff}
+    .cx-odds-goals .cx-odd-line:nth-child(3)>b{color:#eadfff;background:#393054;border-color:#746194}
+    .cx-odd-cell>strong{display:inline-block;border:1px solid currentColor;border-radius:5px;padding:3px 6px;margin-top:8px;font-size:.82rem}
+    .cx-primary{background:linear-gradient(110deg,#342e19,#19252e);border:1px solid #806c31;border-left:5px solid #f3cf66;border-radius:12px;margin-top:18px;padding:18px}
+    .cx-primary .cx-eyebrow{color:#ffe193}.cx-primary h4{color:#ffe193}
+    .cx-primary .cx-prob:nth-child(2) b{color:#82f3ff}.cx-primary .cx-prob:nth-child(3) b{color:#d2c1ff}
+    .cx-primary .cx-prob span{color:#ccd8df;font-size:.72rem}
+    .cx-mini{background:linear-gradient(145deg,#123541,#152632);border-color:#326579;border-top:3px solid #49d9ef}
+    .cx-mini b{color:#82f3ff}.cx-mini small:last-child{color:#d2c1ff}
+    .cx-scenario select{border-color:#628c9e;background:#183440}
+    .cx-detail>summary{color:#9befff}.cx-pro{background:#14382d;border-color:#70d2a5}.cx-con{background:#352d1a;border-color:#e4bd60}
+    @media(max-width:640px){.cx-primary{padding:14px;gap:12px}.cx-odd-line:nth-child(3)>b{font-size:1.12rem;padding:3px 5px}}
+
   </style>
 </head>
 <body>
