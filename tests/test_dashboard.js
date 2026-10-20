@@ -147,3 +147,21 @@ prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(!price
 vm.runInContext('oddsFixture.multimarket.markets[0].quote.bookmaker="C"',researchContext);
 prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(!prices.includes('1.90'));
 console.log('Quote overview: same-book opening, missing history and multi-book arrows passed.');
+
+researchContext.liveFixture={fixture:{fixture_id:'live',kickoff:future(-1),status_short:'HT',live:{status:'HT',elapsed:45,goals:{home:1,away:1},halftime:{home:1,away:1},observed_at:future(-0.1)}},multimarket:researchContext.v3.matches[0].multimarket};
+assert.equal(vm.runInContext('researchMatches({matches:[liveFixture]},true).length',researchContext),1);
+assert.equal(vm.runInContext('contextState(liveFixture)',researchContext),'live');
+assert.equal(vm.runInContext("contextOutcome(liveFixture,'gg_ht')",researchContext),'Verificato: riuscito');
+assert.equal(vm.runInContext("contextOutcome(liveFixture,'over25_ht')",researchContext),'Verificato: non riuscito');
+assert.equal(vm.runInContext("contextOutcome(liveFixture,'over25_ft')",researchContext),'Esito da verificare');
+vm.runInContext("liveFixture.fixture.live.halftime={}",researchContext);
+assert.equal(vm.runInContext("contextOutcome(liveFixture,'gg_ht')",researchContext),'Risultato non disponibile');
+vm.runInContext("liveFixture.fixture.live.status='AET';liveFixture.fixture.live.fulltime={home:1,away:1};liveFixture.fixture.live.goals={home:3,away:2}",researchContext);
+assert.equal(vm.runInContext("contextOutcome(liveFixture,'over25_ft')",researchContext),'Verificato: non riuscito');
+assert.equal(vm.runInContext('contextState(liveFixture)',researchContext),'finished');
+assert(vm.runInContext('contextLivePanel(liveFixture)',researchContext).includes('non sono probabilità live'));
+vm.runInContext("currentPayload={matches:[liveFixture]};contextDetailId=null;contextStateFilter='all';renderMatchResearch(currentPayload)",researchContext);
+assert(host.innerHTML.includes('cx-list-row'));
+vm.runInContext("contextStateFilter='upcoming';renderMatchResearch(currentPayload)",researchContext);
+assert(!host.innerHTML.includes('cx-list-row'));
+console.log('Lifecycle: retained fixtures, status filters, halftime settlement, missing scores and regulation-time scores passed.');
