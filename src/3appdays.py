@@ -3519,8 +3519,10 @@ def fetch_fixture_xg(client: APIClient, fixture_id: Any, home_id: Any, away_id: 
     global _XG_RUNTIME_CALLS, _XG_DIRTY
     key = str(fixture_id)
     cached = (_XG_STORE.get("fixtures", {}) or {}).get(key)
-    cache_complete = isinstance(cached, dict) and safe_int(cached.get("stats_schema"), 0) >= 2
-    if cache_complete:
+    # A schema marker describes the format, not successful data coverage.
+    # Empty/error responses must become eligible for a later retry.
+    from statistics_coverage import cache_reusable
+    if cache_reusable(cached, iso_now()):
         return cached
     if isinstance(cached, dict) and (not XG_ENABLED or _XG_RUNTIME_CALLS >= XG_MAX_CALLS_PER_RUN):
         return cached
@@ -3547,7 +3549,7 @@ def fetch_fixture_xg(client: APIClient, fixture_id: Any, home_id: Any, away_id: 
         "shots_available": home_stats.get("shots_on_target") is not None and away_stats.get("shots_on_target") is not None,
         "home_xg": home_xg, "away_xg": away_xg,
         "home_stats": home_stats, "away_stats": away_stats,
-        "source": "api_fixture_statistics" if payload else "api_statistics_unavailable",
+        "source": "api_fixture_statistics" if home_stats or away_stats else "api_no_statistics" if payload is not None else "api_statistics_unavailable",
         "checked_at": iso_now(), "stats_schema": 2,
     }
     _XG_STORE.setdefault("fixtures", {})[key] = record

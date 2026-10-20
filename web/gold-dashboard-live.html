@@ -1163,11 +1163,12 @@
     }
     function contextPrice(row,compact=false) {
       const a=row?.price_assessment;
+      const reason=row?.proposal_note?`<small>${escapeHtml(row.proposal_note)}</small>`:'';
       const fallback=row?.price_preference_met===false?'<em>Quota minima non raggiunta · ipotesi alternativa disponibile</em>':'';
       if(!a)return fallback;
       const title=a.status==='unvalidated_positive_estimate'?'Vantaggio teorico · da validare':a.status==='market_comparison_only'?'Ipotesi bookmaker · convenienza non dimostrata':'Ipotesi esplorativa · convenienza non dimostrata';
-      if(compact)return `${fallback}<em>${title}</em><span>Probabilità di riferimento ${contextPct(a.reference_probability_pct)} · soglia di pareggio ${contextPct(a.break_even_probability_pct)}</span>`;
-      return `<section class="cx-price-analysis">${fallback}<strong>${title}</strong><p>Probabilità usata nel confronto: ${contextPct(a.reference_probability_pct)} · probabilità necessaria a questa quota: ${contextPct(a.break_even_probability_pct)}.</p><p>Quota di pareggio della stima: ${contextNumber(a.reference_fair_odd)} · rendimento teorico sulla fonte indicata: ${contextPct(a.estimated_return_pct)}.</p><p>${escapeHtml(a.note||'')} Nessun rendimento garantito o vantaggio già validato.</p></section>`;
+      if(compact)return `${fallback}<em>${title}</em>${reason}<span>Probabilità di riferimento ${contextPct(a.reference_probability_pct)} · soglia di pareggio ${contextPct(a.break_even_probability_pct)}</span>`;
+      return `<section class="cx-price-analysis">${fallback}<strong>${title}</strong>${reason}<p>Probabilità usata nel confronto: ${contextPct(a.reference_probability_pct)} · probabilità necessaria a questa quota: ${contextPct(a.break_even_probability_pct)}.</p><p>Quota di pareggio della stima: ${contextNumber(a.reference_fair_odd)} · rendimento teorico sulla fonte indicata: ${contextPct(a.estimated_return_pct)}.</p><p>${escapeHtml(a.note||'')} Nessun rendimento garantito o vantaggio già validato.</p></section>`;
     }
     const researchFocus = new Map();
     function researchSelectFixture(fid, value) {
@@ -1404,6 +1405,11 @@
       const fragile=['context_conflict','fragile_halftime'].includes(row?.statistical_reliability);
       return fragile?`<b>${contextPct(row?.book_probability_pct)}</b><small>Book senza margine · fonte di riferimento</small><small>Statistica fragile: ${contextPct(row?.statistical_pct)}</small>`:`<b>${contextPct(row?.statistical_pct)}</b><small>Stima statistica</small><small>Book senza margine ${contextPct(row?.book_probability_pct)}</small>`;
     }
+    function contextCoverage(match) {
+      const q=match.multimarket.data_quality;
+      if(!q)return '';
+      return `<details class="cx-detail"><summary>Completezza dei dati · cosa usa questa analisi</summary><div class="cx-table-wrap"><table class="cx-table"><thead><tr><th>Squadra</th><th>Gare</th><th>xG fatti/subiti</th><th>Tiri fatti/subiti</th><th>Occasioni utilizzabili</th></tr></thead><tbody>${['home','away'].map(s=>`<tr><th>${escapeHtml(match.fixture[s]||s)}</th><td>${q[s]?.sample??0}/8</td><td>${q[s]?.xg_for??0} / ${q[s]?.xg_against??0}</td><td>${q[s]?.shots_for??0} / ${q[s]?.shots_against??0}</td><td>${q[s]?.opportunity_matches??0}/${q[s]?.sample??0}</td></tr>`).join('')}</tbody></table></div><p>Conteggi delle partite con dati reali: zero osservato è valido, dato mancante resta assente. La copertura non dimostra la precisione del modello. Le stime non sono ancora corrette per la forza degli avversari.</p></details>`;
+    }
     function contextTeamTable(match) {
       const a=match.multimarket,p=a.profiles||{};
       const metric=(label,fn)=>`<tr><th scope="row">${label}</th>${['home','away'].map(s=>`<td>${escapeHtml(fn(p[s]||{}))}</td>`).join('')}</tr>`;
@@ -1446,10 +1452,11 @@
         const main=contextPick(a);shown++;
         const chooseArgs=(r)=>[String(f.fixture_id),`${r.market}::${r.selection}`].map(v=>escapeHtml(JSON.stringify(v))).join(',');
         html+=`<article class="cx-card"><header class="cx-match"><time>${escapeHtml(f.time||new Date(f.kickoff).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'}))}</time><div class="cx-match-info"><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><h3>${escapeHtml(f.match||`${f.home} – ${f.away}`)}</h3></div>${contextOdds(match)}</header>`;
+        html+=contextCoverage(match);
         if(a.selection_diagnostic?.status==='major_conflict')html+=`<aside class="cx-context"><strong>Forte divergenza sulla favorita</strong><p>Statistica ${contextPct(a.selection_diagnostic.statistical_pct)} · book ${contextPct(a.selection_diagnostic.book_probability_pct)}. La proposta usa il bookmaker del mercato selezionato; le medie storiche non sono normalizzate per forza degli avversari.</p></aside>`;
         html+=main?`<section class="cx-primary"><div><span class="cx-eyebrow">PROPOSTA PRINCIPALE</span><h4>${escapeHtml(main.label)}</h4><span class="cx-source">${escapeHtml(main.source)}</span></div><div class="cx-prob"><b>${contextPct(main.statistical_pct)}</b><span>Stima statistica</span></div><div class="cx-prob"><b>${contextPct(main.book_probability_pct)}</b><span>Probabilità book · senza margine</span></div></section><p class="cx-muted">Quota ${main.odd?escapeHtml(formatOdd(main.odd)):'non disponibile'}${main.quote?` · ${escapeHtml(main.quote.bookmaker)} · ${escapeHtml(formatTimestamp(main.quote.provider_updated_at))}`:''}. ${escapeHtml(main.source_reason||'')}</p>${contextPrice(main)}<details class="cx-detail"><summary>Perché questa proposta · pro e contro</summary>${contextEvidence(main)}</details>`:'<p>Nessuna proposta con questa quota minima. Torna all’elenco per modificarla; tutti i mercati sono consultabili sotto.</p>';
         html+='<p class="cx-odds-note">Stima statistica = modello ArabSniper. Book senza margine = probabilità ricavate dalle quote e normalizzate al 100% sul mercato completo di ogni operatore. Esempio: due quote 1,80 implicano 55,6% + 55,6%; senza margine diventano 50% + 50%. Non è la probabilità vera né una media con la statistica.</p><div class="cx-four">';
-        for(const [market,selection,label] of [['over15_ht','over','Over 1,5 PT'],['gg_ht','yes','GG PT sì'],['over25_ft','over','Over 2,5 FT'],['over35_ft','over','Over 3,5 FT']]){
+        for(const [market,selection,label] of [['over15_ht','over','Over 1,5 PT'],['over25_ht','over','Over 2,5 PT'],['gg_ht','yes','GG PT sì'],['over25_ft','over','Over 2,5 FT'],['over35_ft','over','Over 3,5 FT']]){
           const r=a.markets.find(x=>x.market===market&&x.selection===selection);
           html+=`<button type="button" class="cx-mini" ${r?`onclick="researchSelectFixture(${chooseArgs(r)})"`:''}><span>${label}</span>${contextProbability(r)}</button>`;
         }

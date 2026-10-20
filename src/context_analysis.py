@@ -7,12 +7,13 @@ from statistics import mean, median
 from copy import deepcopy
 from multimarket_model import SPECS, COMBOS, number, stamp, fair, goal_probabilities, quote_benchmarks
 
-MODEL_ID = 'context-goals-v3.3'
+MODEL_ID = 'context-goals-v3.4'
+PRIMARY_MARKETS = {('over15_ht','over'), ('over25_ht','over'), ('over25_ft','over'), ('over35_ft','over'), ('gg_ht','yes')}
 CONFIG = {'history': 8, 'form': 4, 'halftime': 4, 'correction_per_goal': .02,
           'correction_cap': .05, 'minimum_context_reference': 3,
           'max_quote_age_hours': 6, 'agreement_pp': 10,
           'favorite_guard_min_pct': 60, 'favorite_guard_gap_pp': 25,
-          'selection_policy': 'probability-price-v1', 'primary_min_odd': 1.5, 'halftime_conflict_pp': 20, 'experimental': True, 'book_weight_in_statistics': 0}
+          'selection_policy': 'five-goal-markets-v1', 'primary_min_odd': 1.5, 'halftime_conflict_pp': 20, 'experimental': True, 'book_weight_in_statistics': 0}
 
 
 def avg(values):
@@ -231,7 +232,6 @@ def select_proposal(rows):
     result=[r for r in rows if r['market']=='1x2_ft' and r.get('book_probability_pct') is not None and r.get('bookmakers_count',0)>=2]
     favorite=max(result,key=lambda r:r['book_probability_pct']) if len(result)==3 else None
     guard=bool(favorite and favorite['selection'] in ('1','2') and
-        favorite['book_probability_pct']>=CONFIG['favorite_guard_min_pct'] and
         favorite.get('statistical_pct') is not None and
         favorite['book_probability_pct']-favorite['statistical_pct']>=CONFIG['favorite_guard_gap_pp'])
     diagnostic={'status':'major_conflict' if guard else 'no_major_conflict',
@@ -330,6 +330,25 @@ def pick_for_price(candidates, minimum):
     result['price_preference_met']=bool(qualified)
     result['proposal_note']='Migliore ipotesi nel confronto probabilità/quota; convenienza non dimostrata.' if qualified else 'Nessuna quota soddisfa la preferenza: mostrata la migliore ipotesi disponibile, anche sotto soglia o senza quota.'
     return result
+
+
+
+def pick_goal_proposal(candidates, minimum):
+    """Separate a theoretical edge from a no-edge, likelihood-based fallback."""
+    pool=[r for r in candidates if (r['market'],r['selection']) in PRIMARY_MARKETS]
+    qualified=[r for r in pool if minimum==0 or number(r.get('odd')) is not None and r['odd']>=minimum]
+    available=qualified or pool
+    positive=[r for r in available if r['price_assessment']['status']=='unvalidated_positive_estimate']
+    if positive:
+        ranked=sorted(positive,key=price_rank)
+    else:
+        ranked=sorted(available,key=lambda r: (-(r['price_assessment']['reference_probability_pct'] or 0),price_rank(r)))
+    chosen=pick_for_price(ranked,minimum)
+    if chosen:
+        chosen['selection_mode']='theoretical_edge' if positive else 'likelihood_without_demonstrated_edge'
+        if not positive:
+            chosen['proposal_note']='Convenienza non dimostrata: ipotesi più probabile tra quelle nella fascia richiesta.' if qualified else 'Convenienza non dimostrata e quota preferita non disponibile: ipotesi più probabile tra quelle disponibili.'
+    return chosen
 
 
 def evaluate(match, as_of, quotes=None):
@@ -438,12 +457,24 @@ def evaluate(match, as_of, quotes=None):
                 'research_candidate':False,'reasons':[],'pros':pro[:3],'cons':con[:3],'missing':missing,
                 'halftime_sample_fragile':bool(ht and any(weights[s+'_ht'].get('uncorrected_goals')==0 for s in ('home','away'))),
                 'evidence_blocks':blocks,'support_score':score,'coverage':quality,'movement':movement(books,side),'reference_probability_pct':round(league_reference[key][side]*100,2) if key in league_reference else None})
+    from statistics_coverage import profile_coverage
+    data_quality = {side: profile_coverage(p['rows']) for side,p in profiles.items()}
+    for r in rows:
+        r['data_quality'] = data_quality
+        r['missing'].extend(f"{side}: occasioni disponibili su {q['opportunity_matches']}/{q['sample']} gare."
+                            for side,q in data_quality.items() if q['opportunity_matches'] < q['sample'])
     trap=favorite_context(profiles,benchmarks,rows)
     candidates,diagnostic=select_proposal(rows)
-    proposals={str(limit):pick_for_price(candidates,limit) for limit in (0,1.4,1.5,1.8,2)}
+    candidates=[r for r in candidates if (r['market'],r['selection']) in PRIMARY_MARKETS]
+    selected=pick_goal_proposal(candidates,CONFIG['primary_min_odd'])
+    for r in rows:
+        r['research_candidate']=bool(selected and (r['market'],r['selection'])==(selected['market'],selected['selection']))
+    diagnostic['primary_scope']='five_goal_markets'
+    proposals={str(limit):pick_goal_proposal(candidates,limit) for limit in (0,1.4,1.5,1.8,2)}
     for p in profiles.values():
         p['history_ids']=[r['fixture_id'] for r in p.pop('rows')]; p['ht_history_ids']=[r['fixture_id'] for r in p.pop('ht_rows')]
     return {'model_id':MODEL_ID,'status':'experimental','captured_at':as_of,'config':CONFIG,
+            'data_quality':data_quality,
             'rates':{'statistics':rates,'without_correction':uncorrected},'weights':weights,
             'proposals_by_min_odd':proposals,'selection_diagnostic':diagnostic,'profiles':profiles,'favorite_context':trap,'features':{},'markets':rows,'best_candidate':deepcopy(proposals[str(CONFIG['primary_min_odd'])]),
             'ranked_hypotheses':[r['market']+'::'+r['selection'] for r in candidates],
