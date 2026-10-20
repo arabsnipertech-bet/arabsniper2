@@ -12,6 +12,8 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       source:'statistica e bookmaker',source_reason:'Dati sintetici per verifica interfaccia.',quote:{bookmaker:'Test',provider_updated_at:now},odd:2,
       pros:['Produzione nel contesto confermata dai dati di prova.'],cons:['Campione di prova limitato.'],missing:['Trend PT di prova non disponibile.'],movement:{confirmed:false}});
     const rows=[mk('over15_ht','over','Over 1,5 PT',44),mk('gg_ht','yes','GG PT sì',29),mk('over25_ft','over','Over 2,5 FT',61),mk('over35_ft','over','Over 3,5 FT',38)];
+    rows.push(mk('1x2_ft','1','Casa',24),mk('1x2_ft','x','Pareggio',26),mk('1x2_ft','2','Ospite',50));
+    rows[6].odd=1.65; rows[6].movement={confirmed:true,color:'red',arrow:'↓',amplitude_pct:10,agreeing_books:2,paired_books:2,operators:[{bookmaker:'Test',initial:1.85,current:1.65,sequence:[1.85,1.65]}]};
     const primary={...rows[2],research_candidate:true};
     const payload={updated_at:now,matches:[{fixture:{fixture_id:'demo',kickoff:new Date(Date.now()+3600000).toISOString(),
       match:'Squadra casa – Squadra ospite <script>',time:'20:45',league:'Campionato di prova',country:'Italia'},
@@ -23,6 +25,10 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     for(const [name,width,height] of [['desktop',1280,1000],['mobile',390,844]]){
       await page.setViewportSize({width,height});
       assert.equal(await page.locator('.cx-card').count(),1);
+      assert.equal(await page.locator('.cx-odd-cell').count(),5);
+      assert((await page.locator('.cx-odds-panel').textContent()).includes('1.85'));
+      assert((await page.locator('.cx-odds-panel').textContent()).includes('1.65'));
+      assert.equal(await page.locator('.cx-odds-panel .cx-red').count(),1);
       assert.equal(await page.locator('.cx-primary h4').textContent(),'Over 2,5 FT');
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Horizontal overflow at '+name);
       await page.locator('.cx-scenario select').selectOption('gg_ht::yes');
