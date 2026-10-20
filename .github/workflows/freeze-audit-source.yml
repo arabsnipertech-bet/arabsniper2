@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -34,11 +35,35 @@ jobs:
           python auditor/current_audit.py freeze
 
       - name: Commit and push freeze
+        shell: bash
         run: |
+          set -euo pipefail
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           if [ -d auditordata/_audit_parts ]; then git add auditordata/_audit_parts; fi
           if [ -d auditarchive/_audit_parts ]; then git add auditarchive/_audit_parts; fi
           git add auditordata/prematch_*.json
-          git commit -m "Freeze audit source" || echo "No changes to commit"
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Freeze audit source"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            # Replay the snapshot commit without overwriting newer remote files.
+            # Conflicts fail visibly and the recovery artifact preserves the work.
+            git rebase origin/main
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          exit 1
+
+      - name: Preserve freeze if publication fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freeze-recovery-${{ github.run_id }}
+          retention-days: 14
+          path: |
+            auditordata/prematch_*.json
+            auditordata/_audit_parts/
+            auditarchive/_audit_parts/
