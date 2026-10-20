@@ -130,3 +130,17 @@ vm.runInContext("researchSelectFixture('100','over15_ht::over')",researchContext
 assert(host.innerHTML.includes('value="over15_ht::over" selected'));
 assert(host.innerHTML.includes('Pesi e calcolo, dato per dato'));
 console.log('V3 dossier: backend primary, independent sources, evidence, missing data and market selection passed.');
+
+// Opening must belong to the displayed book; single-book movements get no signal.
+researchContext.oddsFixture={fixture:{home:'Home',away:'Away'},multimarket:{markets:[{
+ market:'1x2_ft',selection:'2',odd:1.6,book_probability_pct:60,quote:{bookmaker:'A',provider_updated_at:future(-1)},
+ movement:{confirmed:true,color:'red',arrow:'⇅',amplitude_pct:10,agreeing_books:2,paired_books:3,
+ operators:[{bookmaker:'B',initial:9,current:8},{bookmaker:'A',initial:1.9,current:1.6}]}}]}};
+let prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);
+assert(prices.includes('1.90'));assert(prices.includes('1.60'));assert(!prices.includes('9.00'));
+assert(prices.includes('cx-red'));assert(prices.includes('⇅'));assert(prices.includes('Over 1,5 PT'));
+vm.runInContext('oddsFixture.multimarket.markets[0].movement.confirmed=false',researchContext);
+prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(!prices.includes('class="cx-red"'));
+vm.runInContext('oddsFixture.multimarket.markets[0].quote.bookmaker="C"',researchContext);
+prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(!prices.includes('1.90'));
+console.log('Quote overview: same-book opening, missing history and multi-book arrows passed.');
