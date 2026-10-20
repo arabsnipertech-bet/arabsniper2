@@ -78,6 +78,15 @@ class ContextTests(unittest.TestCase):
         a=evaluate({'fixture':match()['fixture']},NOW,{'over25_ft':[book('A',[2,2.1])]})
         self.assertEqual(a['best_candidate']['source'],'analisi bookmaker')
 
+    def test_unlike_opportunity_units_do_not_sum(self):
+        m=match()
+        for i,r in enumerate(m['statistics']['home']['last_matches']):r['team_xg_for']=1.6 if i<4 else 1.5
+        for i,r in enumerate(m['statistics']['away']['last_matches']):
+            r.pop('team_xg_for');r['team_shots_on_target_for']=3 if i<4 else 4
+        a=evaluate(m,NOW)
+        event=next(r for r in a['markets'] if r['market']=='over25_ft' and r['selection']=='over')
+        self.assertEqual(event['evidence_blocks']['opportunities'],0)
+
     def test_immutable_updates_first_latest_and_no_postkickoff(self):
         m=match();a=evaluate(m,NOW);s={}
         freeze_update(s,m['fixture'],a,NOW)

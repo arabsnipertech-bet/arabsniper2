@@ -284,9 +284,12 @@ def evaluate(match, as_of, quotes=None):
             else: missing.append('Trend recente non confrontabile su due blocchi completi.')
             os=[profiles[s]['opportunities']['for'] for s in considered]
             if not ht and all(o['trend'] is not None for o in os):
-                supportive=sum(o['trend'] for o in os)>=0 if positive else sum(o['trend'] for o in os)<=0
-                blocks['opportunities']=1 if supportive else -1
-                (pro if supportive else con).append('Occasioni create '+('confermano' if supportive else 'non confermano')+' la direzione: xG prioritari, altrimenti tiri in porta.')
+                # xG and shots are unlike units: compare directions, never sum magnitudes.
+                directions=[(1 if o['trend']>0 else -1 if o['trend']<0 else 0)*(1 if positive else -1) for o in os]
+                supportive=all(t>=0 for t in directions)
+                contrary=all(t<=0 for t in directions) and any(t<0 for t in directions)
+                blocks['opportunities']=1 if supportive else -1 if contrary else 0
+                (pro if supportive else con).append('Occasioni create '+('confermano' if supportive else 'non confermano' if contrary else 'danno indicazioni miste su')+' la direzione: xG prioritari, altrimenti tiri in porta.')
             elif ht: missing.append('Occasioni FT non usate come prova specifica del primo tempo.')
             else: missing.append('Trend occasioni non disponibile su otto gare complete.')
             if key in ('gg_ht','gg_ft'):
