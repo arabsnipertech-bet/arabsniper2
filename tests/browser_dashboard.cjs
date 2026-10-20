@@ -14,10 +14,11 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     const rows=[mk('over15_ht','over','Over 1,5 PT',44),mk('gg_ht','yes','GG PT sì',29),mk('over25_ft','over','Over 2,5 FT',61),mk('over35_ft','over','Over 3,5 FT',38)];
     rows.push(mk('1x2_ft','1','Casa',24),mk('1x2_ft','x','Pareggio',26),mk('1x2_ft','2','Ospite',50));
     rows[6].odd=1.65; rows[6].movement={confirmed:true,color:'red',arrow:'↓',amplitude_pct:10,agreeing_books:2,paired_books:2,operators:[{bookmaker:'Test',initial:1.85,current:1.65,sequence:[1.85,1.65]}]};
+    rows.push(mk('over25_ht','over','Over 2,5 PT',18));
     const primary={...rows[2],research_candidate:true,price_assessment:{reference_probability_pct:58,break_even_probability_pct:50,reference_fair_odd:100/58,estimated_return_pct:16,status:'unvalidated_positive_estimate',note:'Esempio sintetico non validato.'}};
     const payload={updated_at:now,matches:[{fixture:{fixture_id:'demo',kickoff:new Date(Date.now()+3600000).toISOString(),
       match:'Squadra casa – Squadra ospite <script>',time:'20:45',league:'Campionato di prova',country:'Italia'},
-      multimarket:{model_id:'context-goals-v3.3',status:'experimental',captured_at:now,profiles:{},weights:{},markets:rows,
+      multimarket:{model_id:'context-goals-v3.4',status:'experimental',captured_at:now,data_quality:{home:{sample:8,xg_for:4,shots_for:6,opportunity_matches:6},away:{sample:8,xg_for:0,shots_for:0,opportunity_matches:0}},profiles:{},weights:{},markets:rows,
         best_candidate:primary,ranked_hypotheses:rows.map(r=>r.market+'::'+r.selection)}}]};
     // Isolated synthetic renderer test: no network, premium account or auth change.
     await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;researchMarket='all';renderMatchResearch(p)},payload);
@@ -33,6 +34,8 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       await page.screenshot({path:`test-artifacts/list-${name}.png`,fullPage:true});
       await page.locator('.cx-open').click();
       assert.equal(await page.locator('.cx-card').count(),1);
+      assert.equal(await page.locator('.cx-mini').count(),5);
+      assert((await page.locator('.cx-card').textContent()).includes('Completezza dei dati'));
       assert.equal(await page.locator('.cx-odd-cell').count(),5);
       assert((await page.locator('.cx-odds-panel').textContent()).includes('1.85'));
       assert((await page.locator('.cx-odds-panel').textContent()).includes('1.65'));
