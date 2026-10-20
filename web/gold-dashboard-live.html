@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
-  <meta name="application-version" content="1.3.0" />
-  <title>ArabSniper Quote Dashboard V1.3.0</title>
+  <meta name="application-version" content="1.4.0" />
+  <title>ArabSniper Quote Dashboard V1.4.0</title>
   <style>
     :root {
       --bg: #05070b;
@@ -659,6 +659,16 @@
     .research-proposal .btn{margin-top:10px;width:100%;white-space:normal;font-size:.72rem}
     .research-proposal-note{font-size:.7rem!important;color:var(--muted)}
     @media(max-width:1100px){.research-proposals{grid-template-columns:1fr}}
+    /* Context v3: readable mobile match dossiers. */
+    .cx-heading{display:flex;justify-content:space-between;gap:16px;padding:14px 0 24px}.cx-heading h2{font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:-.055em;margin:9px 0}.cx-heading p,.cx-muted{color:var(--muted);line-height:1.65;font-size:.82rem}.cx-eyebrow{font-size:.64rem;letter-spacing:.17em;font-weight:800;color:var(--cyan)}
+    .cx-summary{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);border-radius:16px;background:linear-gradient(125deg,#162b31,#111923);margin-bottom:16px}.cx-summary>div{padding:18px;border-right:1px solid var(--border)}.cx-summary>div:last-child{border:0}.cx-summary b{display:block;font-size:1.2rem;color:#eff9f6}.cx-summary span{display:block;font-size:.7rem;color:var(--muted);margin-top:7px}
+    .cx-card{margin:22px 0;background:linear-gradient(145deg,#15212a,#101821 70%);border:1px solid #2c404a;border-radius:20px;padding:24px;box-shadow:0 12px 32px #0002}.cx-match{display:flex;gap:18px;align-items:center;padding-bottom:20px;border-bottom:1px solid var(--border-soft)}.cx-match time{font-size:1.25rem;font-weight:800;font-variant-numeric:tabular-nums;color:#d9bc75;background:#252c2c;padding:13px;border-radius:12px}.cx-match small{color:var(--muted);font-size:.72rem}.cx-match h3{font-size:1.3rem;margin:7px 0 0;letter-spacing:-.025em}
+    .cx-primary{display:grid;grid-template-columns:1fr auto auto;gap:28px;align-items:center;padding:23px 0 12px}.cx-primary h4{font-size:1.4rem;margin:7px 0 12px}.cx-source{display:inline-block;color:#9be8ce;background:#153f36;border:1px solid #2d6655;border-radius:30px;padding:5px 10px;font-size:.7rem}.cx-prob{text-align:right}.cx-prob b{display:block;font-size:1.8rem;font-weight:750;letter-spacing:-.04em}.cx-prob span{display:block;font-size:.66rem;color:var(--muted);margin-top:5px}
+    .cx-evidence-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:17px 0 8px}.cx-evidence{padding:14px 16px;border-radius:11px;background:#ffffff03;border-left:2px solid #75b8a2}.cx-evidence strong{font-size:.75rem;color:#9de1c6}.cx-con{border-left-color:#bc9e61}.cx-con strong{color:#dfc58f}.cx-evidence ul,.cx-missing ul{padding-left:17px;margin:9px 0 0;font-size:.78rem;line-height:1.65;color:#bdcbd0}.cx-evidence li+li{margin-top:7px}.cx-evidence p{color:var(--muted);font-size:.76rem}.cx-missing{font-size:.73rem;color:var(--muted);padding:8px 0}.cx-missing summary,.cx-detail summary{cursor:pointer;min-height:32px;line-height:1.6}
+    .cx-four{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0}.cx-mini{border:1px solid #34464e;border-radius:12px;background:#162630;padding:15px;text-align:left;color:var(--text);cursor:pointer}.cx-mini:hover,.cx-mini:focus-visible{border-color:var(--cyan);background:#1c343e}.cx-mini span{display:block;font-size:.75rem}.cx-mini b{display:block;font-size:1.45rem;margin:9px 0;color:#e1d1a2}.cx-mini small{color:var(--muted);font-size:.68rem}
+    .cx-scenario{padding:18px;background:#0c151c;border:1px solid #273e48;border-radius:13px}.cx-scenario label{font-size:.75rem;color:var(--muted)}.cx-scenario select{display:block;width:100%;background:#192b35;color:#edf4f4;border:1px solid #47606a;border-radius:9px;min-height:46px;padding:10px;margin:9px 0 18px;font-size:.9rem}.cx-scenario-title{display:flex;justify-content:space-between;align-items:center;gap:12px}.cx-scenario-title h4{margin:0;font-size:1rem}.cx-scenario-title span{font-size:.76rem;color:#b5c8ce}.cx-movement{font-size:.78rem;line-height:1.7;padding:14px 0}.cx-movement>span{margin-left:12px;color:var(--muted)}.cx-green{color:#81c5a3}.cx-yellow{color:#ebca68}.cx-red{color:#ff8981}.cx-detail{padding:15px 0;border-bottom:1px solid var(--border-soft);font-size:.8rem;line-height:1.65}.cx-detail summary{font-weight:650;color:#b9d0d7}.cx-detail p{color:var(--muted)}.cx-table-wrap{overflow-x:auto}.cx-table{width:100%;border-collapse:collapse;font-size:.74rem;text-align:left;margin:12px 0}.cx-table th,.cx-table td{padding:11px 9px;border-bottom:1px solid #263a43;min-width:95px}.cx-table thead{color:#9ddac9}.cx-table tbody th{color:#a9bbc3;font-weight:400}.cx-table td{font-variant-numeric:tabular-nums}.cx-alternative{display:flex;justify-content:space-between;gap:12px;width:100%;border:0;border-bottom:1px solid #263a43;color:#c3d2d5;background:none;text-align:left;padding:12px 0;cursor:pointer;font-size:.76rem}.cx-alternative:hover{color:var(--cyan)}.cx-footer{font-size:.65rem;color:var(--muted);margin-top:18px;line-height:1.6}.cx-context{border-left:3px solid #e8b75c;background:#e8b75c09;padding:12px;margin:16px 0;font-size:.8rem}
+    @media(max-width:640px){.cx-card{padding:16px;border-radius:15px}.cx-heading{display:block}.cx-heading .research-tag{display:inline-block;margin-top:10px}.cx-summary>div{padding:12px}.cx-summary b{font-size:.95rem}.cx-summary span{font-size:.64rem}.cx-primary{grid-template-columns:1fr 1fr;gap:16px}.cx-primary>div:first-child{grid-column:1/-1}.cx-prob{text-align:left}.cx-prob b{font-size:1.7rem}.cx-evidence-grid{grid-template-columns:1fr}.cx-four{grid-template-columns:1fr 1fr}.cx-scenario{padding:12px}.cx-scenario-title{display:block}.cx-scenario-title span{display:block;margin-top:8px}.cx-match{gap:12px}.cx-match h3{font-size:1.1rem}.cx-alternative{display:block}.cx-alternative span{display:block;margin:4px 0}.cx-movement>span{display:block;margin-left:0}}
+
   </style>
 </head>
 <body>
@@ -666,7 +676,7 @@
     <header class="topbar">
       <div class="brand">
         <h1>ARABSNIPER · QUOTE DASHBOARD</h1>
-        <p>Analisi per partita · gol, esiti e movimenti delle quote · v1.3.0</p>
+        <p>Analisi per partita · gol, esiti e movimenti delle quote · v1.4.0</p>
         <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
       </div>
       <div class="top-actions">
@@ -1134,6 +1144,7 @@
       renderMatchResearch(currentPayload||{});
     }
     function researchCandidate(row) {
+      if(row.source)return !!row.research_candidate;
       const updated=Date.parse(row.quote?.provider_updated_at);
       const age=(Date.now()-updated)/3600000;
       return row.research_candidate && Number.isFinite(updated) && age>=0 && age<=6;
@@ -1181,6 +1192,7 @@
       return text+(limits.length?' Limiti: '+limits.slice(0,2).join('; ')+'.':'');
     }
     function researchSuggestions(match,matches) {
+      if(match.multimarket?.model_id==='context-goals-v3')return match.multimarket.best_candidate?[{pick:{row:match.multimarket.best_candidate}}]:[];
       const rows=(match.multimarket?.markets||[]).filter(r=>Number.isFinite(r.probability_pct)&&r.probability_pct>=0&&r.probability_pct<=100&&(!r.market.includes('_ht_over')||r.selection==='yes'));
       rows.sort((a,b)=>{
         const x=researchEvidence(a),y=researchEvidence(b);
@@ -1242,6 +1254,7 @@
     function renderMatchResearch(payload) {
       const host=document.getElementById('matchResearch');
       if (!host) return;
+      if ((payload.matches||[]).some(m=>m.multimarket?.model_id==='context-goals-v3')) { renderContextDashboard(payload,host);return; }
       const matches=researchMatches(payload);
       const count=matches.filter(m=>researchMarkets(m).some(researchCandidate)).length;
       const prospective=(payload.multimarket_audit?.cohorts||[]).filter(c=>c.period==='prospective');
@@ -1289,6 +1302,72 @@
         html+=`<p>Studio retrospettivo: ${escapeHtml(String(s.fixtures||0))} partite con dati anteriori al calcio d’inizio. Confronto Brier: più basso è meglio. Nessuna di queste righe dimostra un rendimento futuro.</p><table><thead><tr><th>Mercato</th><th>Book</th><th>Statistica</th><th>Nuovo</th></tr></thead><tbody>${(s.benchmarks||[]).map(r=>`<tr><td>${escapeHtml(r.label)}</td><td>${escapeHtml(String(r.book??'—'))}</td><td>${escapeHtml(String(r.statistics??'—'))}</td><td>${escapeHtml(String(r.combined??'—'))}</td></tr>`).join('')}</tbody></table>`;
       }
       html+='</details>';
+      host.innerHTML=html;
+    }
+
+    function contextPct(v) { return Number.isFinite(v)?`${v.toFixed(1)}%`:'—'; }
+    function contextNumber(v) { return Number.isFinite(v)?v.toFixed(2):'—'; }
+    function contextEvidence(row) {
+      if(!row) return '<p>Dati non disponibili per questo mercato.</p>';
+      const group=(title,values,cls)=>`<div class="cx-evidence ${cls}"><strong>${title}</strong>${values?.length?`<ul>${values.map(v=>`<li>${escapeHtml(v)}</li>`).join('')}</ul>`:'<p>Nessun elemento specifico rilevato.</p>'}</div>`;
+      return `<div class="cx-evidence-grid">${group('A favore',row.pros,'cx-pro')}${group('Da considerare',row.cons,'cx-con')}</div>${row.missing?.length?`<details class="cx-missing"><summary>Dati mancanti · ${row.missing.length}</summary><ul>${row.missing.map(v=>`<li>${escapeHtml(v)}</li>`).join('')}</ul></details>`:''}`;
+    }
+    function contextMovement(row) {
+      const m=row?.movement||{};
+      if(!m.confirmed) return `<p class="cx-muted">Movimento non confermato da una maggioranza di almeno due operatori${m.paired_books?` (${m.paired_books} confrontabili)`:''}.</p>`;
+      return `<div class="cx-movement"><strong class="cx-${m.color}">${escapeHtml(m.arrow)} ${escapeHtml(contextNumber(m.amplitude_pct))}% · movimento ${m.color==='red'?'forte':m.color==='yellow'?'medio':'debole'}</strong><span>${m.agreeing_books}/${m.paired_books} operatori concordi</span><p>Probabilità senza margine: ${escapeHtml(contextNumber(m.median_fair_delta_pp))} punti · aggio: ${escapeHtml(contextNumber(m.median_overround_delta_pp))} punti · OCI: ${escapeHtml(contextNumber(m.oci))}</p><details><summary>Quote iniziali osservate e percorso</summary>${(m.operators||[]).map(o=>`<p><b>${escapeHtml(o.bookmaker)}</b> ${o.sequence.map(v=>escapeHtml(formatOdd(v))).join(' → ')}<br><small>${escapeHtml(formatTimestamp(o.observed_from))} → ${escapeHtml(formatTimestamp(o.observed_to))}</small></p>`).join('')}</details><small>Il colore misura l’ampiezza. OCI e aggio derivano dalle stesse quote: non sono conferme indipendenti né flussi di denaro.</small></div>`;
+    }
+    function contextTeamTable(match) {
+      const a=match.multimarket,p=a.profiles||{};
+      const metric=(label,fn)=>`<tr><th scope="row">${label}</th>${['home','away'].map(s=>`<td>${escapeHtml(fn(p[s]||{}))}</td>`).join('')}</tr>`;
+      return `<div class="cx-table-wrap"><table class="cx-table"><thead><tr><th>Dato osservato</th><th>${escapeHtml(match.fixture.home||'Casa')}</th><th>${escapeHtml(match.fixture.away||'Trasferta')}</th></tr></thead><tbody>${metric('Gare ufficiali / contesto',t=>`${t.sample??0}/8 · ${t.context_sample??0} nel contesto`)}${metric('Primi tempi validi',t=>`${t.ht_sample??0}/4`)}${metric('Gol fatti · media contesto',t=>contextNumber(t.for_ft?.context_mean))}${metric('Gol subiti · media contesto',t=>contextNumber(t.against_ft?.context_mean))}${metric('Gol fatti · ultima / media',t=>`${contextNumber(t.for_ft?.last)} / ${contextNumber(t.for_ft?.mean)}`)}${metric('Gol subiti · ultima / media',t=>`${contextNumber(t.against_ft?.last)} / ${contextNumber(t.against_ft?.mean)}`)}${metric('Trend gol FT · 4 contro 4',t=>contextNumber(t.for_ft?.trend))}${metric('Trend gol PT · 2 contro 2',t=>contextNumber(t.for_ht?.trend))}${metric('Occasioni · fonte / campione',t=>`${t.opportunities?.for?.source||'—'} · ${t.opportunities?.for?.sample||0}`)}${metric('Occasioni create · media',t=>contextNumber(t.opportunities?.for?.mean))}${metric('Conversione gol / occasioni',t=>contextNumber(t.opportunities?.for?.goal_conversion))}</tbody></table></div>`;
+    }
+    function contextBook(match) {
+      const rows=match.multimarket.markets.filter(r=>r.market==='1x2_ft');
+      return `<details class="cx-detail"><summary>Bookmaker · forza relativa e movimenti 1X2</summary><div class="cx-table-wrap"><table class="cx-table"><thead><tr><th>Esito</th><th>Statistica</th><th>Book senza aggio</th><th>Quota osservata</th></tr></thead><tbody>${rows.map(r=>`<tr><th>${escapeHtml(r.label)}</th><td>${contextPct(r.statistical_pct)}</td><td>${contextPct(r.book_probability_pct)}</td><td>${r.odd?escapeHtml(formatOdd(r.odd)):'—'}</td></tr>`).join('')}</tbody></table></div>${rows.map(r=>`<strong>${escapeHtml(r.label)}</strong>${contextMovement(r)}`).join('')}<p>${escapeHtml(match.multimarket.favorite_context?.reason||'')} ${escapeHtml(match.multimarket.favorite_context?.note||'')}</p></details>`;
+    }
+    function contextHistory(match) {
+      return ['home','away'].map(side=>{
+        const ids=match.multimarket.profiles?.[side]?.history_ids||[];
+        const rows=(match.statistics?.[side]?.last_matches||[]).filter(r=>ids.includes(r.fixture_id));
+        if(!rows.length)return '';
+        return `<h4>${escapeHtml(match.fixture[side]||side)} · gare utilizzate</h4><div class="cx-table-wrap"><table class="cx-table"><thead><tr><th>Data / avversario</th><th>Contesto</th><th>Fatti–subiti FT</th><th>Fatti–subiti PT</th></tr></thead><tbody>${rows.map(r=>`<tr><th>${escapeHtml(r.date)}<br>${escapeHtml(r.side==='home'?r.away:r.home)}</th><td>${r.side==='home'?'Casa':'Trasferta'}</td><td>${escapeHtml(r.research_ft?.scored??'—')}–${escapeHtml(r.research_ft?.conceded??'—')}</td><td>${r.halftime_available?`${escapeHtml(r.team_goals_ht??'—')}–${escapeHtml(r.team_conceded_ht??'—')}`:'non disponibile'}</td></tr>`).join('')}</tbody></table></div>`;
+      }).join('');
+    }
+    function contextWeights(match) {
+      const a=match.multimarket;
+      const rows=Object.entries(a.weights||{}).map(([key,w])=>`<tr><th>${{home_ft:'Casa FT',away_ft:'Trasferta FT',home_ht:'Casa PT',away_ht:'Trasferta PT'}[key]}</th><td>${contextPct(w.attack_weight==null?null:w.attack_weight*100)} / ${contextPct(w.defense_weight==null?null:w.defense_weight*100)}</td><td>${contextNumber(w.uncorrected_goals)}</td><td>${contextPct(w.correction_relative*100)}</td><td>${w.indirect?'FT × rapporto PT del campionato':'Campione diretto'}</td></tr>`).join('');
+      return `<details class="cx-detail"><summary>Pesi e calcolo, dato per dato</summary><p>I pesi attacco/difesa dipendono dalla copertura e dal contesto. xG: fino al 25% del componente FT, proporzionale ai dati disponibili. Tiri usati come riscontro alternativo. Le quote hanno peso zero nel calcolo statistico.</p><div class="cx-table-wrap"><table class="cx-table"><thead><tr><th>Componente</th><th>Attacco / difesa</th><th>Gol base</th><th>Correzione</th><th>Origine</th></tr></thead><tbody>${rows}</tbody></table></div><p>Scarto dalla media: ipotesi sperimentale, 2% per gol di differenza, massimo ±5%, attenuata dal confronto 60/40 e dalle occasioni. Almeno tre precedenti nello stesso contesto, esclusa l’ultima. Non trasferita automaticamente al PT. La versione senza correzione resta nell’audit.</p><p>Forza degli avversari nelle gare storiche: non valutabile senza dati disponibili prima di quelle gare. Nessun peso inventato.</p></details>`;
+    }
+    function renderContextDashboard(payload,host) {
+      const all=researchMatches(payload).filter(m=>m.multimarket.model_id==='context-goals-v3');
+      const options=(list,current)=>list.map(([v,l])=>`<option value="${escapeHtml(v)}" ${v===current?'selected':''}>${escapeHtml(l)}</option>`).join('');
+      let html=`<header class="cx-heading"><div><span class="cx-eyebrow">ARABSNIPER / MATCH INTELLIGENCE</span><h2>La partita, spiegata.</h2><p>Una proposta principale. Due fonti a confronto. Ogni dato al suo posto.</p></div><span class="research-tag">V3 · IN VERIFICA</span></header><div class="cx-summary"><div><b>${all.length}</b><span>partite in ordine di orario</span></div><div><b>8 / 4</b><span>gare ufficiali / primi tempi</span></div><div><b>Night 5 · Fast 2</b><span>giorni coperti dalle scansioni</span></div></div><p class="cx-muted">Snapshot: ${escapeHtml(formatTimestamp(payload.updated_at||payload.generated_at))}. Le percentuali sono stime sperimentali, non frequenze di successo già validate.</p><div class="research-controls"><label>Mercato${`<select onchange="researchFilter('market',this.value)">${options(RESEARCH_MARKET_OPTIONS,researchMarket)}</select>`}</label><label>Quote<select onchange="researchFilter('price',this.value)">${options([['all','Tutte, anche senza quota'],['2to5','Da 2 a 5']],researchPrice)}</select></label><label>Cerca squadra<input class="research-search" type="search" value="${escapeHtml(researchSearch)}" placeholder="Squadra o campionato" onchange="researchSearch=this.value;renderMatchResearch(currentPayload||{})"></label></div>`;
+      let shown=0;
+      for(const match of all){
+        const f=match.fixture,a=match.multimarket;
+        if(researchSearch&&!`${f.match} ${f.league} ${f.country}`.toLowerCase().includes(researchSearch.toLowerCase()))continue;
+        const rows=researchMarkets(match);
+        if(!rows.length)continue;
+        const key=researchFocus.get(String(f.fixture_id));
+        const chosen=a.markets.find(r=>`${r.market}::${r.selection}`===key)||rows.find(r=>r.research_candidate)||rows[0];
+        const main=a.best_candidate;shown++;
+        const chooseArgs=(r)=>[String(f.fixture_id),`${r.market}::${r.selection}`].map(v=>escapeHtml(JSON.stringify(v))).join(',');
+        html+=`<article class="cx-card"><header class="cx-match"><time>${escapeHtml(f.time||new Date(f.kickoff).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'}))}</time><div><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><h3>${escapeHtml(f.match||`${f.home} – ${f.away}`)}</h3></div></header>`;
+        html+=main?`<section class="cx-primary"><div><span class="cx-eyebrow">PROPOSTA PRINCIPALE</span><h4>${escapeHtml(main.label)}</h4><span class="cx-source">${escapeHtml(main.source)}</span></div><div class="cx-prob"><b>${contextPct(main.statistical_pct)}</b><span>statistica</span></div><div class="cx-prob"><b>${contextPct(main.book_probability_pct)}</b><span>book senza margine</span></div></section><p class="cx-muted">Quota ${main.odd?escapeHtml(formatOdd(main.odd)):'non disponibile'}${main.quote?` · ${escapeHtml(main.quote.bookmaker)} · ${escapeHtml(formatTimestamp(main.quote.provider_updated_at))}`:''}. ${escapeHtml(main.source_reason||'')} Proposta ordinata per riscontri nei blocchi di analisi; il punteggio non è una probabilità.</p>${contextEvidence(main)}`:'<p>Proposta non disponibile: mancano entrambe le fonti.</p>';
+        html+='<div class="cx-four">';
+        for(const [market,selection,label] of [['over15_ht','over','Over 1,5 PT'],['gg_ht','yes','GG PT sì'],['over25_ft','over','Over 2,5 FT'],['over35_ft','over','Over 3,5 FT']]){
+          const r=a.markets.find(x=>x.market===market&&x.selection===selection);
+          html+=`<button type="button" class="cx-mini" ${r?`onclick="researchSelectFixture(${chooseArgs(r)})"`:''}><span>${label}</span><b>${contextPct(r?.statistical_pct)}</b><small>Book ${contextPct(r?.book_probability_pct)}</small></button>`;
+        }
+        html+='</div>';
+        const selectOptions=a.markets.filter(r=>!r.market.includes('_ht_over')||r.selection==='yes').map(r=>[`${r.market}::${r.selection}`,r.label]);
+        html+=`<section class="cx-scenario"><label>Valuta una giocata per questa partita<select onchange="researchSelectFixture(${escapeHtml(JSON.stringify(String(f.fixture_id)))},this.value)">${options(selectOptions,`${chosen.market}::${chosen.selection}`)}</select></label><div class="cx-scenario-title"><h4>${escapeHtml(chosen.label)}</h4><span>${contextPct(chosen.statistical_pct)} statistica · ${contextPct(chosen.book_probability_pct)} book</span></div>${contextEvidence(chosen)}${contextMovement(chosen)}</section>`;
+        if(a.favorite_context?.status==='signal')html+=`<aside class="cx-context"><strong>Attenzione al gol PT dello sfavorito</strong><p>${escapeHtml(a.favorite_context.reason)}</p><p>${a.favorite_context.drop_confirmed?'Drop della favorita confermato su più operatori.':'Drop della favorita non confermato.'} ${escapeHtml(a.favorite_context.note)}</p></aside>`;
+        html+=`<details class="cx-detail"><summary>Quadro statistico · casa e trasferta</summary>${contextTeamTable(match)}${contextHistory(match)}</details>${contextBook(match)}${contextWeights(match)}<details class="cx-detail"><summary>Altre ipotesi, in ordine di riscontro</summary>${(a.ranked_hypotheses||[]).slice(1).map(id=>{const r=a.markets.find(x=>`${x.market}::${x.selection}`===id);return r?`<button type="button" class="cx-alternative" onclick="researchSelectFixture(${chooseArgs(r)})"><span>${escapeHtml(r.label)}</span><span>${contextPct(r.statistical_pct)} · ${escapeHtml(r.source)}</span></button>`:'';}).join('')}</details><footer class="cx-footer">Analisi ${escapeHtml(formatTimestamp(a.captured_at))} · ${escapeHtml(a.model_id)} · tutti i mercati conservati prima dell’inizio</footer></article>`;
+      }
+      if(!shown)html+='<div class="empty">Nessuna partita con questi criteri. Cambia mercato o ricerca.</div>';
+      html+='<details class="cx-detail"><summary>Come leggerla e come la verifichiamo</summary><p>La proposta principale cerca conferme tra analisi gol, andamento recente, occasioni e mercato. La concordanza non aumenta le percentuali. Gli eventi rari sono confrontati con il riferimento del proprio mercato, senza soglie di probabilità uguali per tutte le giocate.</p><p>Conserviamo prima analisi e aggiornamenti prima del calcio d’inizio. L’audit confronta separatamente prima e ultima previsione, con e senza correzioni, incluse le ipotesi non selezionate. I dati vecchi restano attribuiti alla propria versione.</p></details>';
       host.innerHTML=html;
     }
 
@@ -1861,5 +1940,6 @@
   </script>
 </body>
 </html>
+
 
 

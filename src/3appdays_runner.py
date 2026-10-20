@@ -67,9 +67,9 @@ def build_command(mode: str, github: bool = False, days: int = 5, audit_date: st
     python_exe = sys.executable or "python"
     command = [python_exe, str(resolve_engine_file())]
     if mode == "fast":
-        command.append("--today")
+        command.append("--fast")
     elif mode == "night":
-        command.extend(["--night", "--days", str(days)])
+        command.extend(["--night", "--days", "5"])
     elif mode == "catalog":
         command.append("--catalog")
     elif mode == "audit":
@@ -108,7 +108,7 @@ def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "") ->
     report = {
         "mode": mode,
         "github": github,
-        "days": days,
+        "days": 2 if mode == "fast" else 5 if mode == "night" else days,
         "audit_date": audit_date,
         "command": command,
         "returncode": result.returncode,
@@ -129,7 +129,7 @@ def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "") ->
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Runner ArabSniper Quote Engine")
     modes = parser.add_mutually_exclusive_group(required=True)
-    modes.add_argument("--fast", action="store_true", help="Scansiona solo oggi")
+    modes.add_argument("--fast", action="store_true", help="Scansiona oggi e domani")
     modes.add_argument("--night", action="store_true", help="Scansiona rolling più giorni")
     modes.add_argument("--catalog", action="store_true", help="Aggiorna catalogo mercati API")
     modes.add_argument("--audit-markets", action="store_true", help="Esegue l'audit dei mercati quota")
@@ -149,3 +149,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

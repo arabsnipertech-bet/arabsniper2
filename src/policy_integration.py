@@ -3,7 +3,8 @@ import os
 from copy import deepcopy
 from selection_policy import competition, drought, movements
 from first_half_quality import assess, evidence, PROFILE_ID, THRESHOLDS, VALIDATION_FROM
-from multimarket_model import collect_quotes, update_ledger, evaluate, MODEL_ID
+from multimarket_model import collect_quotes, update_ledger
+from context_analysis import evaluate, MODEL_ID
 
 TARGETS = {'over15_ht': 'over', 'gg_ht': 'yes', 'over25_ft': 'over'}
 
@@ -30,6 +31,9 @@ def install(ns):
         result = old_row(fixture, team_id)
         if result:
             halftime = (fixture.get('score') or {}).get('halftime') or {}
+            result['kickoff'] = (fixture.get('fixture') or {}).get('date')
+            result['season'] = (fixture.get('league') or {}).get('season')
+            result['friendly'] = 'friendl' in str((fixture.get('league') or {}).get('name','')).lower()
             result['halftime_available'] = all(halftime.get(k) is not None for k in ('home','away'))
             ft = (fixture.get('score') or {}).get('fulltime') or {}
             side = result.get('side')
@@ -38,6 +42,15 @@ def install(ns):
                 result['research_ft'] = {'scored': ft[side], 'conceded': ft[other]}
         return result
     ns['_match_row'] = match_row
+    history_context = {}
+    def recent(client, team_id, last=8):
+        # Retrieve candidates, then select eight official CURRENT-season records.
+        # Extra candidates only replace friendlies; never enlarge the analysis window.
+        from context_analysis import select_history
+        payload = client.get('fixtures', {'team':team_id, 'last':32, 'status':'FT'})
+        rows = [match_row(r,team_id) for r in (payload or {}).get('response',[])]
+        return select_history([r for r in rows if r], history_context.get('as_of',ns['iso_now']()), history_context.get('season'))
+    ns['get_team_recent_matches'] = recent
     old_summary = ns['summarize_team_matches']
     def summary(rows, expected_side):
         result = old_summary(rows, expected_side)
@@ -114,6 +127,7 @@ def install(ns):
 
     old_fixture = ns['build_fixture_output']
     def fixture(client, row, state, cache):
+        history_context.update(season=((row or {}).get('league') or {}).get('season'), as_of=ns['iso_now']())
         output = old_fixture(client,row,state,cache)
         if not output: return output
         model = output.get('model', {})
@@ -173,7 +187,7 @@ def install(ns):
         # One request per pending date, not per fixture; never recalculate forecasts.
         pending_dates = set()
         today = ns['now_rome']().date()
-        for record in [*frozen.get('fixtures',{}).values(), *frozen.get('quality_evaluations',{}).values(), *frozen.get('multimarket_evaluations',{}).values(), *frozen.get('signal_observations',{}).values()]:
+        for record in [*frozen.get('fixtures',{}).values(), *frozen.get('quality_evaluations',{}).values(), *frozen.get('multimarket_evaluations',{}).values(), *frozen.get('signal_observations',{}).values(), *frozen.get('analysis_updates',{}).values()]:
             kickoff = ns['parse_iso'](record.get('fixture',{}).get('kickoff'))
             if kickoff and kickoff.date() < today and (today-kickoff.date()).days <= 14:
                 outcomes = record.get('settlement',{}).get('outcomes',{})
@@ -202,7 +216,7 @@ def install(ns):
                 meta=match.get('fixture',{})
                 kickoff=ns['parse_iso'](meta.get('kickoff'))
                 if kickoff and kickoff>ns['now_rome']() and not meta.get('result'):
-                    data=match.get('quote_observation',{})
+                    data={} if match.get('multimarket',{}).get('model_id') == MODEL_ID else match.get('quote_observation',{})
                     if data:
                         history=observations['fixtures'].setdefault(str(meta.get('fixture_id')),[])
                         if not history or history[-1]['markets'] != data:
@@ -229,6 +243,7 @@ def install(ns):
                 'thresholds': dict(THRESHOLDS), 'validation_from': VALIDATION_FROM}
             ns['atomic_write_json'](ns['DATA_DIR']/f"arab_quote_selections_day{day.get('day',1)}.json",{'date':day.get('date'),'generated_at':ns['iso_now'](),'rankings':rankings,'probability_rankings':probability_rankings,'first_half_quality_method':day['first_half_quality_method']})
         output['competition_review'] = list(review.values())
+        output.setdefault('method',{})['active_analysis'] = {'model_id':MODEL_ID,'book_weight_in_statistics':0,'history':8,'ht_history':4,'snapshot_policy':'first_and_each_prematch_update','legacy_fields':'comparative_only'}
         output.setdefault('method',{})['user_policy'] = {'probability_floor_pct':40,'reliability_floor_pct':60,'book_max_weight':.18,'drought_bonus_max':.04,'rankings':'separate_uncapped'}
         ns['atomic_write_json'](ns['OUTPUT_FILE'],output)
         # Existing main publishes each day from output, while local consumers need updated files too.
@@ -237,4 +252,5 @@ def install(ns):
             if number in ns['REMOTE_DAY_FILES']: ns['atomic_write_json'](ns['DATA_DIR']/ns['REMOTE_DAY_FILES'][number].split('/')[-1],day)
         return output
     ns['scan_dates'] = scan
+
 

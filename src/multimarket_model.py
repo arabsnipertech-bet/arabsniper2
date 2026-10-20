@@ -128,7 +128,7 @@ def update_ledger(state, fid, markets, observed_at, kickoff):
                       'drop_pct': {s: (first['odds'][s] - row['odds'][s]) / first['odds'][s] * 100 for s in row['odds']},
                       'overround_delta_pp': row['overround_pct'] - first['overround_pct'],
                       'observations': len(history), 'opening_certified': False}
-            result[key].append({**deepcopy(row), 'movement': paired})
+            result[key].append({**deepcopy(row), 'movement': paired, 'trace': [{'observed_at':v['observed_at'],'odds':v['odds']} for v in history]})
     return result
 
 
@@ -342,8 +342,12 @@ def freeze_evaluations(store, output, as_of):
             if not now or not kickoff or now >= kickoff or meta.get('result') or assessment.get('status') != 'experimental':
                 continue
             key = f"{assessment['model_id']}::{meta['fixture_id']}"
+            if assessment['model_id'] == 'context-goals-v3':
+                from analysis_history import freeze_update
+                freeze_update(store, meta, assessment, as_of)
             store.setdefault('multimarket_evaluations', {}).setdefault(key, deepcopy({
                 'fixture':meta,'captured_at':as_of,'model_version':assessment['model_id'],
                 'multimarket':assessment}))
     return store
+
 
