@@ -11324,6 +11324,17 @@
       "paper_roi_pct": null
     }
   ],
+  "latest_prematch": {
+    "model_id": "coherent-markets-v2",
+    "validation_from": "2026-10-20",
+    "status": "experimental",
+    "note": "No threshold tuning. Retrospective development is separated from frozen prospective forecasts. ROI is theoretical, not executed.",
+    "cohorts": [],
+    "groups": [],
+    "calibration": [],
+    "feature_comparisons": []
+  },
+  "snapshot_policy": "first and latest prematch evaluated separately; never count updates as independent fixtures",
   "summary": {
     "fixtures": 171,
     "rejected_input_count": 0,
