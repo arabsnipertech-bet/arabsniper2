@@ -22,8 +22,11 @@ def read(path, default):
 
 
 def write(path, value):
-    from audit_storage import write_store
-    write_store(path, value)
+    from audit_storage import write_store, atomic_bytes
+    if path.parent.name == "data" or path.name == "prematch_last_report.json":
+        atomic_bytes(path, json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8") + b"\n")
+    else:
+        write_store(path, value)
 
 
 def stamp(value):
