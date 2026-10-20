@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
-  <meta name="application-version" content="1.2.3" />
-  <title>ArabSniper Quote Dashboard V1.2.3</title>
+  <meta name="application-version" content="1.3.0" />
+  <title>ArabSniper Quote Dashboard V1.3.0</title>
   <style>
     :root {
       --bg: #05070b;
@@ -666,7 +666,7 @@
     <header class="topbar">
       <div class="brand">
         <h1>ARABSNIPER · QUOTE DASHBOARD</h1>
-        <p>Analisi per partita · gol, esiti e movimenti delle quote · v1.2.3</p>
+        <p>Analisi per partita · gol, esiti e movimenti delle quote · v1.3.0</p>
         <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
       </div>
       <div class="top-actions">
@@ -1156,49 +1156,64 @@
       }).sort((a,b)=>Number(researchCandidate(b))-Number(researchCandidate(a))||
         (b.conservative_ev_pct??-999)-(a.conservative_ev_pct??-999)||b.probability_pct-a.probability_pct);
     }
-    // Presentation-only ranking: within exact market/side, never a new probability.
-    function researchRelative(match,row,matches) {
-      const model=match.multimarket?.model_id;
-      if (!model || !Number.isFinite(row.probability_pct)) return null;
-      const peers=matches.filter(m=>m.multimarket?.model_id===model).map(m=>
-        m.multimarket.markets.find(r=>r.market===row.market && r.selection===row.selection))
-        .filter(r=>r && Number.isFinite(r.probability_pct) && r.probability_pct>=0 && r.probability_pct<=100);
-      if (peers.length<5) return null;
-      const lower=peers.filter(r=>r.probability_pct<row.probability_pct).length;
-      const equal=peers.filter(r=>r.probability_pct===row.probability_pct).length;
-      return {percentile:100*(lower+equal/2)/peers.length,n:peers.length};
+    // primary-v1: quality before agreement; no daily percentile or probability boost.
+    function researchEvidence(row) {
+      const valid=p=>Number.isFinite(p)&&p>=0&&p<=100;
+      const age=(Date.now()-Date.parse(row.quote?.provider_updated_at))/3600000;
+      const book=valid(row.book_probability_pct)&&row.bookmakers_count>=2&&Number.isFinite(row.odd)&&row.odd>1&&age>=0&&age<=6;
+      const stats=valid(row.statistical_pct);
+      const gap=book&&stats?Math.abs(row.statistical_pct-row.book_probability_pct):null;
+      const quality=!(row.reasons||[]).some(x=>['dati_insufficienti','campione_primo_tempo_insufficiente','lambda_tempi_incoerenti'].includes(x));
+      return {book,stats,gap,agreement:gap!==null&&gap<=10,tier:researchCandidate(row)?3:book&&quality?2:quality?1:0};
+    }
+    function researchExplanation(row) {
+      const e=researchEvidence(row);
+      let text;
+      if(!e.book) text='Confronto book non utilizzabile: quota assente, scaduta o meno di due operatori. Preferenza esplorativa; stima combinata non ricalcolata.';
+      else if(!e.stats) text='Stima statistica assente: confronto tra fonti non disponibile.';
+      else if(e.agreement) text=`Statistica e book vicini (scarto ${e.gap.toFixed(1)} punti): maggiore priorità, senza bonus alla probabilità.`;
+      else {
+        const ds=Math.abs(row.probability_pct-row.statistical_pct),db=Math.abs(row.probability_pct-row.book_probability_pct);
+        const source=Math.abs(ds-db)<0.1?'equidistante dalle due fonti':db<ds?'più vicina al book':'più vicina alla statistica';
+        text=`Fonti divergenti di ${e.gap.toFixed(1)} punti; la stima combinata è ${source}. È il risultato del modello attuale, non un peso validato dagli audit.`;
+      }
+      const limits=(row.reasons||[]).filter(x=>x!=='valore_non_concorde_tra_modelli'&&x!=='modelli_divergenti').map(x=>RESEARCH_REASONS[x]||x);
+      return text+(limits.length?' Limiti: '+limits.slice(0,2).join('; ')+'.':'');
     }
     function researchSuggestions(match,matches) {
-      const used=new Set();
-      const eligible=(match.multimarket?.markets||[]).filter(r=>
-        Number.isFinite(r.probability_pct) && r.probability_pct>=0 && r.probability_pct<=100 &&
-        (!r.market.includes('_ht_over') || r.selection==='yes'))
-        .map(row=>({row,relative:researchRelative(match,row,matches)}))
-        .sort((a,b)=>(b.relative?.percentile??50)-(a.relative?.percentile??50) ||
-          Number(researchCandidate(b.row))-Number(researchCandidate(a.row)) ||
-          (b.row.conservative_ev_pct??-999)-(a.row.conservative_ev_pct??-999) ||
-          b.row.probability_pct-a.row.probability_pct ||
-          `${a.row.market}::${a.row.selection}`.localeCompare(`${b.row.market}::${b.row.selection}`));
-      return eligible.filter(x=>{
-        if(used.has(x.row.market)) return false;
-        used.add(x.row.market);return true;
-      }).slice(0,3).map(pick=>({pick}));
+      const rows=(match.multimarket?.markets||[]).filter(r=>Number.isFinite(r.probability_pct)&&r.probability_pct>=0&&r.probability_pct<=100&&(!r.market.includes('_ht_over')||r.selection==='yes'));
+      rows.sort((a,b)=>{
+        const x=researchEvidence(a),y=researchEvidence(b);
+        const ev=r=>researchEvidence(r).book&&Number.isFinite(r.conservative_ev_pct)?r.conservative_ev_pct:-999;
+        return y.tier-x.tier||Number(y.agreement)-Number(x.agreement)||ev(b)-ev(a)||b.probability_pct-a.probability_pct||`${a.market}::${a.selection}`.localeCompare(`${b.market}::${b.selection}`);
+      });
+      return rows.length?[{pick:{row:rows[0]}}]:[];
     }
     function researchUseSuggestion(fid,market,side) {
       // Open the exact suggestion even if a different global filter is selected.
       researchMarket='all';researchPrice='all';researchScope='all';
       researchSelectFixture(fid,`${market}::${side}`);
     }
+    function researchWeightsHtml(match) {
+      const l=match.model?.lambdas||{}, layer=l.first_half_layer||{}, c=l.components||{};
+      const weight=v=>Number.isFinite(v)?escapeHtml((v*100).toFixed(1))+'%':'non disponibile';
+      const factor=v=>Number.isFinite(v)?escapeHtml(((v-1)*100).toFixed(1))+'%':'non disponibile';
+      return `<details><summary>Dati e pesi effettivi dell’analisi</summary><p>Questi coefficienti agiscono in passaggi diversi sui gol attesi: non si sommano al 100% e non sono punti aggiunti alla probabilità.</p><ul><li>Gol fatti/subiti, casa/trasferta e medie del campionato: base statistica, con correzione verso il campionato quando il campione è piccolo.</li><li>xG: peso nel passaggio FT ${weight(l.xg_only?.weight)}; tiri in porta: ${weight(l.shots_layer?.weight)}.</li><li>Frequenza di segnare/subire nel primo tempo: peso ${weight(layer.event_weight)}; correzione trend PT ${factor(layer.trend_factor)}.</li><li>Scontri diretti: correzione FT ${factor(c.h2h_ft_factor)}, PT ${factor(c.h2h_ht_factor)}.</li><li>Quote complete: probabilità ripulite dall’aggio per operatore e mediana fra operatori. Integrazione tramite adattamento dei gol attesi, non una media a pesi fissi.</li><li>Digiuno, movimenti quota e OCI: nessun bonus diretto nel modello multimercato; conservati per le verifiche.</li></ul><p>Copertura, numero di operatori e aggiornamento quote determinano la qualità della proposta. Pesi storicamente ottimali ancora da validare.</p></details>`;
+    }
     function researchSuggestionsHtml(match,matches) {
-      const cards=researchSuggestions(match,matches).map(({pick})=>{
-        const {row,relative}=pick;
+      const row=researchSuggestions(match,matches)[0]?.pick.row;
+      const pct=v=>Number.isFinite(v)?escapeHtml(formatPct(v)):'—';
+      let main='<p>Nessuna proposta: stime non disponibili.</p>';
+      if(row){
         const args=[String(match.fixture.fixture_id),row.market,row.selection].map(v=>escapeHtml(JSON.stringify(v))).join(',');
-        const priced=row.quote && Number.isFinite(row.odd) && row.odd>1;
-        const comparison=relative?`Posizione relativa: ${relative.percentile.toFixed(0)}/100 su ${relative.n} partite dello stesso mercato/esito.`:'Confronto relativo non disponibile: meno di 5 stime comparabili; ordinamento provvisorio.';
-        const evidence=researchCandidate(row)?'Criteri sperimentali superati.':'Scenario esplorativo: criteri di valore non tutti soddisfatti.';
-        return `<div class="research-proposal"><b>${escapeHtml(row.label)}</b><p>Probabilità stimata: ${escapeHtml(formatPct(row.probability_pct))}<br>Quota: ${priced?`${escapeHtml(formatOdd(row.odd))} · ${escapeHtml(row.quote.bookmaker)}`:'non disponibile'}<br>Book senza margine: ${Number.isFinite(row.book_probability_pct)?escapeHtml(formatPct(row.book_probability_pct)):'—'}</p><small>${comparison} ${evidence} ${priced?`Quota aggiornata ${escapeHtml(formatTimestamp(row.quote.provider_updated_at))}.`:''}</small><button class="btn" type="button" onclick="researchUseSuggestion(${args})">Valuta questa giocata</button></div>`;
+        const e=researchEvidence(row);
+        main=`<div class="research-proposal"><strong>Proposta principale · ${researchCandidate(row)?'criteri sperimentali superati':'preferenza esplorativa'}</strong><b>${escapeHtml(row.label)}</b><p>Probabilità combinata: ${pct(row.probability_pct)} · Quota osservata: ${Number.isFinite(row.odd)?escapeHtml(formatOdd(row.odd)):'—'}<br>Statistica: ${pct(row.statistical_pct)} · Book senza margine: ${pct(row.book_probability_pct)}</p><p>${escapeHtml(researchExplanation(row))}</p><small>${researchCandidate(row)?'Valore teorico positivo anche nella stima prudente.':'Nessun vantaggio robusto confermato per questa proposta.'} ${row.quote?`Fonte: ${escapeHtml(row.quote.bookmaker)} · ${escapeHtml(formatTimestamp(row.quote.provider_updated_at))}`:''}</small><button class="btn" type="button" onclick="researchUseSuggestion(${args})">Valuta questa giocata</button></div>`;
+      }
+      const comparisons=[['over15_ht','over','Over 1,5 PT'],['gg_ht','yes','GG PT sì — entrambe segnano'],['over25_ft','over','Over 2,5 finale'],['over35_ft','over','Over 3,5 finale']].map(([key,side,label])=>{
+        const r=(match.multimarket?.markets||[]).find(x=>x.market===key&&x.selection===side);
+        return `<div class="research-market"><div><b>${label}</b><p>Statistica: ${pct(r?.statistical_pct)} · Book senza margine: ${pct(r?.book_probability_pct)} · Combinata: ${pct(r?.probability_pct)}</p><small>${r?escapeHtml(researchExplanation(r)):'Dati non disponibili per questo mercato.'}</small></div></div>`;
       }).join('');
-      return `<p><strong>Le tre migliori proposte per questa partita</strong></p><section class="research-proposals" aria-label="Tre proposte per questa partita">${cards||'<p>Stime non disponibili per questa partita.</p>'}</section><p class="research-proposal-note">Selezione sperimentale tra tutti i mercati disponibili, senza categorie. Le percentuali restano quelle del modello. La posizione relativa confronta lo stesso mercato/esito nelle partite del giorno: non è affidabilità storica. Le proposte possono includere scenari senza quota o senza valore positivo; saranno affinate con i risultati raccolti. Sono alternative, non una multipla.</p>`;
+      return `<section aria-label="Proposta principale e quattro mercati">${main}<h4>Confronto dei quattro mercati</h4>${comparisons}${researchWeightsHtml(match)}</section><p class="research-proposal-note">Metodo primary-v1: qualità dei dati, concordanza entro 10 punti, valore prudente e probabilità. Soglia di concordanza provvisoria, non calibrata. Nessuna percentuale viene aumentata per la concordanza. I pesi statistici e del book non sono percentuali fisse.</p>`;
     }
     function addResearchComparison(fid,market,side) {
       const match=researchMatches(currentPayload||{}).find(m=>String(m.fixture.fixture_id)===String(fid));
@@ -1249,18 +1264,20 @@
         if (!rows.length) continue;
         shown++;
         const chosen=researchFocus.get(String(f.fixture_id));
-        const r=rows.find(row=>`${row.market}::${row.selection}`===chosen)||rows[0], quote=r.quote, movement=r.movement||{};
+        const primary=researchSuggestions(match,matches)[0]?.pick.row;
+        const r=rows.find(row=>`${row.market}::${row.selection}`===chosen)||rows.find(row=>row.market===primary?.market&&row.selection===primary?.selection)||rows[0], quote=r.quote, movement=r.movement||{};
         const fixtureOptions=rows.map(row=>[` ${row.market}::${row.selection}`.trim(),row.label]);
         const fixtureSelect=`<label>Valuta una giocata per questa partita<select aria-label="Mercato per ${escapeHtml(f.match)}" onchange="researchSelectFixture(${escapeHtml(JSON.stringify(String(f.fixture_id)))},this.value)">${fixtureOptions.map(([v,label])=>`<option value="${escapeHtml(v)}" ${v===`${r.market}::${r.selection}`?'selected':''}>${escapeHtml(label)}</option>`).join('')}</select></label>`;
         const change=movement.median_drop_pct;
         const moveText=change==null?'Movimento: servono due osservazioni degli stessi operatori':`Quota ${change>0?'in calo':change<0?'in aumento':'stabile'} ${Math.abs(change).toFixed(1)}% · ${movement.paired_books} operatori confrontabili`;
         const reasons=(r.reasons||[]).map(k=>RESEARCH_REASONS[k]||k);
-        html+=`<article class="ranking-card"><div class="ranking-heading"><span class="ranking-position">${shown}</span><strong>${escapeHtml(f.match)}</strong><time datetime="${escapeHtml(f.kickoff)}">${escapeHtml(f.time)}</time></div><p>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</p>${fixtureSelect}${researchSuggestionsHtml(match,matches)}<div class="research-scenario"><strong>${escapeHtml(r.label)}</strong><small>${researchCandidate(r)?'Candidato sperimentale · valore concorde tra le stime':'Scenario da confrontare · solo analisi'}</small></div><div class="ranking-metrics"><div><span>Stima modello</span><b>${escapeHtml(formatPct(r.probability_pct))}</b></div><div><span>Book senza margine</span><b>${r.book_probability_pct==null?'—':escapeHtml(formatPct(r.book_probability_pct))}</b></div><div><span>Quota osservata</span><b>${quote?escapeHtml(formatOdd(r.odd)):'—'}</b></div></div><p>${quote?`${escapeHtml(quote.bookmaker)} · quota aggiornata ${escapeHtml(formatTimestamp(quote.provider_updated_at))}`:'Quota specifica assente: valore atteso non calcolabile.'}</p><div class="ranking-badges"><span>${escapeHtml(moveText)}</span></div><p>${escapeHtml(reasons.slice(0,2).join(' · ')||(researchCandidate(r)?'Criteri sperimentali superati; verifica dei risultati ancora aperta.':'Quota da aggiornare prima di confrontare il valore.'))}</p><details ${['ht','ft','teams','combo'].includes(researchMarket)?'open':''}><summary>Confronta tutti i ${rows.length} esiti disponibili</summary>`;
+        html+=`<article class="ranking-card"><div class="ranking-heading"><span class="ranking-position">${shown}</span><strong>${escapeHtml(f.match)}</strong><time datetime="${escapeHtml(f.kickoff)}">${escapeHtml(f.time)}</time></div><p>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</p>${fixtureSelect}${researchSuggestionsHtml(match,matches)}<details><summary>Esamina il mercato selezionato</summary><div class="research-scenario"><strong>${escapeHtml(r.label)}</strong><small>${researchCandidate(r)?'Candidato sperimentale · valore concorde tra le stime':'Scenario da confrontare · solo analisi'}</small></div><div class="ranking-metrics"><div><span>Stima modello</span><b>${escapeHtml(formatPct(r.probability_pct))}</b></div><div><span>Book senza margine</span><b>${r.book_probability_pct==null?'—':escapeHtml(formatPct(r.book_probability_pct))}</b></div><div><span>Quota osservata</span><b>${quote?escapeHtml(formatOdd(r.odd)):'—'}</b></div></div><p>${quote?`${escapeHtml(quote.bookmaker)} · quota aggiornata ${escapeHtml(formatTimestamp(quote.provider_updated_at))}`:'Quota specifica assente: valore atteso non calcolabile.'}</p><div class="ranking-badges"><span>${escapeHtml(moveText)}</span></div><p>${escapeHtml(reasons.slice(0,2).join(' · ')||(researchCandidate(r)?'Criteri sperimentali superati; verifica dei risultati ancora aperta.':'Quota da aggiornare prima di confrontare il valore.'))}</p><details ${['ht','ft','teams','combo'].includes(researchMarket)?'open':''}><summary>Confronta tutti i ${rows.length} esiti disponibili</summary>`;
         rows.forEach(row=>{
           const q=row.quote;
           const args=[String(f.fixture_id),row.market,row.selection].map(v=>escapeHtml(JSON.stringify(v))).join(',');
           html+=`<div class="research-market"><div><b>${escapeHtml(row.label)}</b><small>Modello ${escapeHtml(formatPct(row.probability_pct))} · statistica ${escapeHtml(formatPct(row.statistical_pct))} · book ${row.book_probability_pct==null?'—':escapeHtml(formatPct(row.book_probability_pct))}<br>Quote: ${q?`${escapeHtml(formatOdd(row.odd))} · ${escapeHtml(q.bookmaker)}`:'non disponibile'} · EV teorico ${row.expected_value_pct==null?'—':escapeHtml(formatPct(row.expected_value_pct))}<br>Dispersione delle stime: ${escapeHtml(formatPct(row.model_range_pct?.[0]))}–${escapeHtml(formatPct(row.model_range_pct?.[1]))}; non è un intervallo di confidenza.<br>${escapeHtml((row.reasons||[]).map(k=>RESEARCH_REASONS[k]||k).join(' · ')||'Candidato sperimentale')}</small></div>${q?`<button class="btn" type="button" onclick="addResearchComparison(${args})">Confronta</button>`:''}</div>`;
         });
+        html+='</details>';
         const rates=assessment.rates?.combined||[];
         html+=`<p>Gol attesi PT: ${escapeHtml(Number((rates[0]||0)+(rates[1]||0)).toFixed(2))} · gol attesi finali: ${escapeHtml(rates.reduce((s,v)=>s+v,0).toFixed(2))}. Digiuno gol e movimenti sono registrati senza bonus automatici. L’aggio deriva dalle quote: non misura gli incassi dei bookmaker.</p></details></article>`;
       }
@@ -1844,4 +1861,5 @@
   </script>
 </body>
 </html>
+
 
