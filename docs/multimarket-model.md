@@ -158,24 +158,56 @@ still match. Additional lines reuse the existing odds response. New snapshots
 are frozen only before kickoff. Old daily JSONs may lack new markets until a
 successful scan publishes v2 data; the UI does not fabricate those probabilities.
 
-## Three per-fixture proposals (dashboard 1.2.3)
+## Single proposal (dashboard 1.3.0, primary-v1)
 
-Presentation only: show up to three distinct markets below the fixture selector,
-without first-half, full-time or price categories. All finite model probabilities
-in [0,100] are eligible, including scenarios without quotes or positive EV.
-Combination complements are excluded; opposite sides of a selected market cannot
-be repeated. Fewer than three valid distinct markets means fewer cards, never
-fabricated probabilities. Missing quotes and exploratory status are explicit.
+Replaces the three mandatory suggestions. UI ranks finite model rows by evidence
+quality (fresh backend candidate; usable book and no statistical coverage flags;
+statistical quality only; incomplete), then statistical-versus-book agreement
+within 10 percentage points, conservative EV where book evidence is usable,
+combined probability and stable market/side key. Two operators and a quote aged
+0–6 hours are required for usable book evidence. Combination complements are
+excluded. The day cohort and UI filters do not determine ranking.
 
-Compare each exact market AND side with at least five upcoming fixtures of the
-same model ID in the day payload. Midrank percentile is (lower + half tied)/N.
-This is not calibrated probability or historical reliability. Rank by percentile,
-then backend candidate status with fresh quote, conservative EV, probability and
-stable market/side key. Missing relative comparisons use a neutral 50 ordering
-key, explicitly labeled provisional, never displayed as a measured percentile.
-The cohort precedes global filters. No probability or backend gates are changed.
+The agreement threshold is a provisional display rule, not calibrated confidence.
+Agreement does not boost probability. Divergence explanations say whether the
+existing combined output is nearer to book or statistics, not that an optimal
+source weight has been learned. Fallbacks are explicitly exploratory, including
+missing/stale book data; no missing probabilities are generated. Unavailable
+markets remain visible as missing in the four fixed comparisons: Over 1.5 HT,
+BTTS HT yes, Over 2.5 FT, Over 3.5 FT. Every comparison includes its own reason.
 
-These are alternatives for analysis, not legs of a multiple. Clicking Valuta
-focuses the exact selected event. Proposal choices are recalculated, not frozen
-as additional forecasts; the existing model forecast archive remains unchanged.
-Historical results will inform future refinement of this provisional ordering.
+This change does not alter backend probability formulas, candidate gates or
+previous frozen forecasts. The proposal itself is presentation-time selection,
+not an additional frozen recommendation ledger; do not report it as an audited
+historical recommendation. Forecast archival remains unchanged.
+
+## Current data and coefficient inventory
+
+Coefficients below belong to sequential transformations, NOT an additive feature
+importance breakdown or percentages of a final probability. Source: active
+build_lambdas wrappers in src/3appdays.py and evaluate in multimarket_model.py.
+
+| Data | Current role / coefficient |
+| --- | --- |
+| Goals scored/conceded FT and HT, home/away | Attack/defence base relative to league means; rates shrink to league with sample/8, capped at 1 (HT event frequencies use sample/6). |
+| Home/away-specific history | Context weight 0, .20, .33, .46, .55, .62 for 0,1,2,3,4,5+ observations; remaining weight to overall history. |
+| Recency | Date/order-weighted historical observations; recent five versus previous five tracked. |
+| xG for/against | FT blend 0/.20/.35/.50/.60 for 0/1–3/4–6/7–10/11+ paired samples. HT adjustment limited to ±6%. |
+| Shots on target for/against | FT blend .05/.10/.15 for 2–3/4–7/8+ paired samples; multiplied by .55 when xG is available; assumed .30 goals per shot on target. HT adjustment limited to ±5%. |
+| Total shots and big chances | Collected where available; no separate direct coefficient in the coherent model. |
+| Finishing/form | Regression factor ±8% with xG, ±6% goals-only; recent points gap contributes at most ±2.16% to FT rates. |
+| H2H | At least 2 usable matches; FT and HT rate factors each limited to ±5%. |
+| HT scored/conceded frequencies | Attack/defence event input .52/.48, shrunk toward league; blended into HT rates with .20/.27/.34 for context samples <3/3–4/5+. |
+| Recent HT trend | Mean change in total HT goals times .025; rate factor limited to ±4%. |
+| Empirical Over/GG frequencies | Stored, and used by the legacy probability layer (.18/.26/.32 blend); not an additional direct blend in coherent-markets-v2. |
+| Book odds and margin | Complete outcome pairs normalized per operator, median probabilities renormalized. Each eligible market contributes equally to fitting loss (outcomes averaged within market). At least 2 operators for fit targets. |
+| Combined statistical/book model | Four rates fitted to book targets with log-rate prior penalty .01; market projection penalty .0001. These are NOT 1%/99% source weights. |
+| Drought / goal absence | Observed for research; direct bonus 0 in coherent model. Legacy drought layer is explicitly bypassed through baseline_lambdas. |
+| Quote changes, breadth/consensus, margin changes | Recorded with same-operator comparisons; direct probability bonus 0 in coherent model. |
+| OCI and favorite/trap patterns | Recorded diagnostics, no direct coherent probability coefficient. |
+| Data reliability | Index: overall team samples 34%, home/away samples 36%, league sample 15%, xG coverage 15%. Candidate threshold 60; not event probability. |
+| Quote freshness / sample coverage | Candidate gates: at least 2 books, quote at most 6h old, HT samples at least 6 per team; spread <=10pp and positive conservative EV. |
+| Country/competition classification | Eligibility/context, not an automatic probability bonus. |
+
+Prospective tests must measure the incremental benefit of each feature without
+counting correlated inputs (e.g. xG and shots, odds and OCI) as independent evidence.

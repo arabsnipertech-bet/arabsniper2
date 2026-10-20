@@ -85,49 +85,28 @@ vm.runInContext("researchFilter('market','ht')",researchContext);
 assert(host.innerHTML.includes('<details open>'));
 console.log('Exact market filters and per-fixture selection passed.');
 
-// Suggestions compare only the same exact market/side, not raw cross-market probability.
-const suggestionMarket=(key,side,p,odd=2.5)=>({...market(key,odd),market:key,selection:side,
-  label:key+' '+side,probability_pct:p,model_range_pct:[p-2,p+2],research_candidate:true,
-  conservative_ev_pct:5,book_probability_pct:p-3});
-const suggestionFixtures=Array.from({length:5},(_,i)=>({fixture:{fixture_id:'s'+i,kickoff:future(2),match:'Suggestion '+i},
-  multimarket:{model_id:'coherent-markets-v2',markets:[
-    suggestionMarket('gg_ht','yes',i===0?35:20+i,4),
-    suggestionMarket('over05_ht','over',i===0?70:80+i),
-    suggestionMarket('over25_ft','over',i===0?60:40+i),
-    suggestionMarket('over35_ft','over',i===0?40:30+i,3.5),
-    suggestionMarket('gg_ht','no',i===0?65:80-i,3)
-  ]}}));
-researchContext.suggestionFixtures=suggestionFixtures;
-let suggested=vm.runInContext('researchSuggestions(suggestionFixtures[0],suggestionFixtures)',researchContext);
-assert.equal(suggested[0].pick.row.market,'over25_ft');
-assert.equal(suggested[2].pick.row.probability_pct,35);
-assert.equal(suggested[1].pick.row.market,'over35_ft');
-assert.equal(suggested[2].pick.row.market,'gg_ht');
-assert.equal(new Set(suggested.map(x=>x.pick.row.market)).size,3);
-vm.runInContext("researchFilter('market','over35_ft::over');researchFilter('price','2to5')",researchContext);
-assert.equal(vm.runInContext('researchSuggestions(suggestionFixtures[0],suggestionFixtures)[0].pick.row.market',researchContext),'over25_ft');
-assert(vm.runInContext('researchSuggestions(suggestionFixtures[0],suggestionFixtures.slice(0,4)).length===3',researchContext));
-const stale=JSON.parse(JSON.stringify(suggestionFixtures));
-stale[0].multimarket.markets.forEach(r=>r.quote.provider_updated_at=future(-7));
-researchContext.stale=stale;
-assert(vm.runInContext('researchSuggestions(stale[0],stale).length===3',researchContext));
-const noEV=JSON.parse(JSON.stringify(suggestionFixtures));
-noEV[0].multimarket.markets.forEach(r=>r.conservative_ev_pct=-1);
-researchContext.noEV=noEV;
-assert(vm.runInContext('researchSuggestions(noEV[0],noEV).length===3',researchContext));
-const unpriced=JSON.parse(JSON.stringify(suggestionFixtures));
-unpriced[0].multimarket.markets.forEach(r=>r.quote=null);
-researchContext.unpriced=unpriced;
-assert(vm.runInContext('researchSuggestions(unpriced[0],unpriced).length===3',researchContext));
-console.log('Three proposals: exact-market ranking, unchanged probability, distinct markets, stable filters, missing/stale evidence passed.');
 
-const onlyHT=JSON.parse(JSON.stringify(suggestionFixtures));
-onlyHT.forEach(m=>{m.multimarket.markets=m.multimarket.markets.filter(r=>r.selection!=='no');m.multimarket.markets[2].market='over15_ht';m.multimarket.markets[3].market='over25_ht';});
-researchContext.onlyHT=onlyHT;
-assert(vm.runInContext("researchSuggestions(onlyHT[0],onlyHT).every(x=>x.pick.row.market.endsWith('_ht'))",researchContext));
-assert.equal(vm.runInContext('researchSuggestions(onlyHT[0],onlyHT).length',researchContext),3);
-const proposalHtml=vm.runInContext('researchSuggestionsHtml(unpriced[0],unpriced)',researchContext);
-assert(proposalHtml.includes('non disponibile'));
-assert(!proposalHtml.includes('Quota alta ·'));
-assert(!proposalHtml.includes('Nessuna proposta sufficientemente supportata'));
-console.log('Top three without category quotas, exploratory fallbacks and missing-price rendering passed.');
+// One proposal: quality before agreement; independent of other fixtures.
+const single=(key,stat,book,p,ev,candidate=true)=>({...market(key,2),market:key,selection:'over',label:key,
+ statistical_pct:stat,book_probability_pct:book,probability_pct:p,bookmakers_count:3,
+ conservative_ev_pct:ev,research_candidate:candidate,reasons:[]});
+researchContext.singleMatch={fixture:{fixture_id:'single'},multimarket:{markets:[
+ single('over15_ht',55,52,54,5),single('over25_ft',90,50,70,20,false),single('over35_ft',45,43,44,1)]}};
+assert.equal(vm.runInContext('researchSuggestions(singleMatch,[]).length',researchContext),1);
+assert.equal(vm.runInContext('researchSuggestions(singleMatch,[])[0].pick.row.market',researchContext),'over15_ht');
+assert.equal(vm.runInContext('researchSuggestions(singleMatch,[singleMatch])[0].pick.row.probability_pct',researchContext),54);
+let result=vm.runInContext('researchSuggestionsHtml(singleMatch,[])',researchContext);
+assert(result.includes('GG PT sì — entrambe segnano'));
+assert(result.includes('Dati non disponibili per questo mercato'));
+assert(result.includes('Fonti divergenti'));
+assert(!result.includes('tre migliori'));
+assert(result.includes('Statistica:'));
+vm.runInContext("singleMatch.multimarket.markets[0].quote.provider_updated_at='2000-01-01T00:00:00Z'",researchContext);
+assert.equal(vm.runInContext('researchSuggestions(singleMatch,[])[0].pick.row.market',researchContext),'over35_ft');
+assert(vm.runInContext('researchExplanation(singleMatch.multimarket.markets[0])',researchContext).includes('scaduta'));
+vm.runInContext('singleMatch.multimarket.markets.forEach(r=>{r.quote=null;r.book_probability_pct=null;r.research_candidate=false;})',researchContext);
+assert.equal(vm.runInContext('researchSuggestions(singleMatch,[]).length',researchContext),1);
+assert(vm.runInContext('researchSuggestionsHtml(singleMatch,[])',researchContext).includes('preferenza esplorativa'));
+vm.runInContext('singleMatch.multimarket.markets=[]',researchContext);
+assert.equal(vm.runInContext('researchSuggestions(singleMatch,[]).length',researchContext),0);
+console.log('Single proposal: quality priority, four fixed markets, divergence, stale/missing data and stable probabilities passed.');
