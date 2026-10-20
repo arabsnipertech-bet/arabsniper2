@@ -304,6 +304,7 @@ def attach_price_assessment(row):
         ref=p;source='limited_statistics';note='Campione statistico limitato: ipotesi esplorativa, convenienza non verificata.'
     else:
         ref=None;source='unavailable';note='Nessuna stima utilizzabile per il confronto probabilità/quota.'
+    if ref is not None:row.setdefault('probabilities',{})['selection_reference']=ref/100
     odd=number(row.get('odd'));priced=odd is not None and odd>1
     ratio=ref/100*odd if ref is not None and priced else None
     independent=source in ('lower_of_two_estimates','statistics_only')
