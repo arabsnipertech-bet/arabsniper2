@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: arabsniper-current-audit
+  group: arabsniper-quote-data-writer
   cancel-in-progress: false
 
 jobs:
@@ -37,6 +37,8 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+          if [ -d auditordata/_audit_parts ]; then git add auditordata/_audit_parts; fi
+          if [ -d auditarchive/_audit_parts ]; then git add auditarchive/_audit_parts; fi
           git add auditordata/prematch_*.json
           git commit -m "Freeze audit source" || echo "No changes to commit"
           git push

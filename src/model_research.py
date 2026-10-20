@@ -104,7 +104,8 @@ def main():
             url=f'https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper2/{sha}/data/arab_quote_dashboard.json'
             with urlopen(url,timeout=60) as response:
                 snapshots[label]=json.load(response)
-    frozen=json.loads((ROOT/'data/arab_quote_prematch_audit.json').read_text())
+    from audit_storage import read_store
+    frozen=read_store(ROOT/'data/arab_quote_prematch_audit.json', {})
     dataset=development_inputs(frozen,snapshots)
     report=research(dataset)
     target=ROOT/'data/arab_quote_model_research.json'
@@ -115,3 +116,4 @@ def main():
 
 
 if __name__=='__main__': main()
+
