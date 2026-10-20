@@ -17,7 +17,8 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       match:'Squadra casa – Squadra ospite <script>',time:'20:45',league:'Campionato di prova',country:'Italia'},
       multimarket:{model_id:'context-goals-v3',status:'experimental',captured_at:now,profiles:{},weights:{},markets:rows,
         best_candidate:primary,ranked_hypotheses:rows.map(r=>r.market+'::'+r.selection)}}]};
-    await page.evaluate(p=>{currentPayload=p;researchMarket='all';renderMatchResearch(p)},payload);
+    // Isolated synthetic renderer test: no network, premium account or auth change.
+    await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;researchMarket='all';renderMatchResearch(p)},payload);
     fs.mkdirSync('test-artifacts',{recursive:true});
     for(const [name,width,height] of [['desktop',1280,1000],['mobile',390,844]]){
       await page.setViewportSize({width,height});
