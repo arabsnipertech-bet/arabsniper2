@@ -137,15 +137,17 @@ console.log('V3 dossier: backend primary, independent sources, evidence, missing
 // Opening must belong to the displayed book; single-book movements get no signal.
 researchContext.oddsFixture={fixture:{home:'Home',away:'Away'},multimarket:{markets:[{
  market:'1x2_ft',selection:'2',odd:1.6,book_probability_pct:60,quote:{bookmaker:'A',provider_updated_at:future(-1)},
- movement:{confirmed:true,color:'red',arrow:'⇅',amplitude_pct:10,agreeing_books:2,paired_books:3,
+ movement:{confirmed:true,color:'red',direction:'down',has_direction_reversal:true,arrow:'↓',amplitude_pct:10,agreeing_books:2,paired_books:3,
  operators:[{bookmaker:'B',initial:9,current:8},{bookmaker:'A',initial:1.9,current:1.6}]}}]}};
 let prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);
 assert(prices.includes('1.90'));assert(prices.includes('1.60'));assert(!prices.includes('9.00'));
-assert(prices.includes('cx-red'));assert(prices.includes('⇅'));assert(prices.includes('Over 1,5 PT'));
+assert(prices.includes('cx-red'));assert(prices.includes('↓ discesa'));assert(prices.includes('-15.79%'));assert(prices.includes('inversione di movimento'));assert(prices.includes('Over 1,5 PT'));
 vm.runInContext('oddsFixture.multimarket.markets[0].movement.confirmed=false',researchContext);
 prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(!prices.includes('class="cx-red"'));
 vm.runInContext('oddsFixture.multimarket.markets[0].quote.bookmaker="C"',researchContext);
 prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(!prices.includes('1.90'));
+vm.runInContext('oddsFixture.multimarket.markets[0].quote.bookmaker="A";oddsFixture.multimarket.markets[0].odd=1.9',researchContext);
+prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(prices.includes('→ invariata 0.00%'));
 console.log('Quote overview: same-book opening, missing history and multi-book arrows passed.');
 
 researchContext.liveFixture={fixture:{fixture_id:'live',kickoff:future(-1),status_short:'HT',live:{status:'HT',elapsed:45,goals:{home:1,away:1},halftime:{home:1,away:1},observed_at:future(-0.1)}},multimarket:researchContext.v3.matches[0].multimarket};
