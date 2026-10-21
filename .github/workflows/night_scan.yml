@@ -55,6 +55,11 @@ jobs:
       - name: Compare fixed models on archived inputs
         run: python src/model_research.py
 
+      - name: Publish live fixture identifiers and usage counters
+        run: |
+          python src/live_watchlist.py
+          python src/scan_usage.py
+
       - name: Pack and verify publication size
         run: python src/publication_storage.py
 
@@ -82,6 +87,7 @@ jobs:
           rm -rf /tmp/arabsniper-publish
           mkdir -p /tmp/arabsniper-publish
           cp data/arab_quote_*.json /tmp/arabsniper-publish/
+          cp data/live_watchlist.json /tmp/arabsniper-publish/
           if [ -d data/_audit_parts ]; then cp -a data/_audit_parts /tmp/arabsniper-publish/; fi
           if [ -f data/arab_bet_catalog.json ]; then
             cp data/arab_bet_catalog.json /tmp/arabsniper-publish/
@@ -93,12 +99,13 @@ jobs:
 
             mkdir -p data
             cp /tmp/arabsniper-publish/arab_quote_*.json data/
+            cp /tmp/arabsniper-publish/live_watchlist.json data/
             if [ -d /tmp/arabsniper-publish/_audit_parts ]; then cp -a /tmp/arabsniper-publish/_audit_parts data/; fi
             if [ -f /tmp/arabsniper-publish/arab_bet_catalog.json ]; then
               cp /tmp/arabsniper-publish/arab_bet_catalog.json data/
             fi
 
-            git add data/arab_quote_*.json
+            git add data/arab_quote_*.json data/live_watchlist.json
             if [ -d data/_audit_parts ]; then git add data/_audit_parts; fi
             if [ -f data/arab_bet_catalog.json ]; then
               git add data/arab_bet_catalog.json

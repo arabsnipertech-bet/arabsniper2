@@ -1,0 +1,11 @@
+{
+  "name": "arabsniper-live-scores",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "routes": [{"pattern": "arabsniperbet.com/api/live-scores*", "zone_name": "arabsniperbet.com"}],
+  "triggers": {"crons": ["*/2 * * * *"]},
+  "durable_objects": {"bindings": [{"name": "SCORES", "class_name": "ScoreStore"}]},
+  "migrations": [{"tag": "v1", "new_sqlite_classes": ["ScoreStore"]}],
+  "vars": {"LIVE_ENABLED": "false", "MAX_CALLS_PER_DAY": "1500", "RESERVE_REQUESTS": "1000"}
+}

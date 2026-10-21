@@ -705,6 +705,9 @@
     .cx-minimum{display:flex;align-items:center;gap:10px;color:#ffe193;font-size:.82rem;margin:16px 0}.cx-minimum select{padding:9px;border-radius:7px;background:#193440;color:#fff;border:1px solid #5a8193}.cx-back{margin:12px 0}
     @media(max-width:850px){.cx-list-head{display:none}.cx-list-row{grid-template-columns:1fr;gap:12px;padding:12px}.cx-compact-odds{width:100%;margin-top:0}.cx-open strong{font-size:1rem}.cx-list-pick{padding:8px 12px}}
 .cx-price-analysis{border:1px solid #45636e;border-left:3px solid #85d9e8;border-radius:9px;padding:12px;margin:14px 0;font-size:.78rem;line-height:1.6;background:#122c35}.cx-price-analysis strong{color:#9ce9ed}.cx-price-analysis em{display:block;color:#f0ce7f}
+
+    .cx-list-row.cx-is-live,.cx-card.cx-is-live{border:2px solid #ddbb62;box-shadow:0 0 18px #d7b25233;background:linear-gradient(120deg,#253027,#141e25)}
+    .cx-live-stale{border-color:#827548}.cx-score{display:block;margin:8px 0;color:#f4df9b;font-variant-numeric:tabular-nums}.cx-score>b{display:inline-block;padding:3px 7px;border-radius:6px;background:#24352b;color:#a0f1ba;font-size:.7rem;letter-spacing:.04em}.cx-score>strong{font-size:1.35rem!important;display:inline!important;margin-left:6px}.cx-score>small{display:block;font-size:.65rem!important;color:#b0b9bf;margin-top:3px}.cx-live-stale .cx-score>b{color:#f0d490;background:#443b28}
   </style>
 </head>
 <body>
@@ -799,6 +802,7 @@
     </form>
   </div>
 
+  <script src="/live-scores.js?v=1"></script>
   <script>
     'use strict';
 
@@ -1143,6 +1147,7 @@
         const payload = await loadJson(file);
         if (!payload || !Array.isArray(payload.matches)) throw new Error(`Formato JSON non valido in ${file}`);
         currentPayload = payload;
+        window.ArabLive?.poll();
         renderMarketRankings(payload);
         renderMatchResearch(payload);
         loadModelResearch();
@@ -1408,9 +1413,16 @@
       return `<section class="cx-odds-panel ${compact?'cx-compact-odds':''}" aria-label="Quote di riferimento della partita"><div class="cx-odds-grid">${cell('1x2_ft','1','1 · Casa')}${cell('1x2_ft','x','X · Pareggio')}${cell('1x2_ft','2','2 · Ospite')}</div><div class="cx-odds-grid cx-odds-goals">${cell('over15_ht','over','Over 1,5 PT')}${cell('over25_ft','over','Over 2,5 FT')}</div><p class="cx-odds-note">${escapeHtml(relative)}</p><details class="cx-odds-note"><summary>Come leggere quote e frecce</summary><p>* Apertura = prima quota osservata dello stesso operatore, non apertura ufficiale. — = dato assente. Frecce solo con consenso di almeno due operatori: ↓ calo, ↑ rialzo, ⇅ inversione. Verde debole, giallo medio, rosso forte. Nessuna freccia = movimento non confermato. OCI e aggio sono nei dettagli bookmaker.</p></details></section>`;
     }
 
+    function contextFixture(match) { return typeof window!=='undefined' && window.ArabLive ? window.ArabLive.fixture(match) : match.fixture||{}; }
+    function contextLiveView(match) { return typeof window!=='undefined' && window.ArabLive ? window.ArabLive.view(match) : {visible:false}; }
+    function contextLiveClass(match) { const v=contextLiveView(match);return v.active?' cx-is-live':v.stale?' cx-live-stale':''; }
+    function contextLiveBadge(match) {
+      const v=contextLiveView(match);if(!v.visible)return '';
+      return `<span class="cx-score"><b>${escapeHtml(v.label)}</b>${v.score?` <strong>${escapeHtml(v.score)}</strong>`:''}${v.minute?` <span>${escapeHtml(v.minute)}</span>`:''}<small>${v.observed_at?'Agg. '+escapeHtml(formatTimestamp(v.observed_at)):'Risultato da aggiornare'}</small></span>`;
+    }
     let contextStateFilter='all';
     function contextState(match) {
-      const f=match.fixture||{},s=f.live?.status||f.status_short||f.result?.status;
+      const f=contextFixture(match),s=f.live?.status||f.status_short||f.result?.status;
       if(['FT','AET','PEN'].includes(s))return 'finished';
       if(['PST','CANC','ABD','AWD','WO'].includes(s))return 'other';
       if(['1H','HT','2H','ET','BT','P','LIVE','SUSP','INT'].includes(s))return 'live';
@@ -1418,19 +1430,20 @@
       return 'upcoming';
     }
     function contextStateLabel(match) {
-      const f=match.fixture||{},l=f.live||{},s=l.status||f.status_short||f.result?.status;
+      const f=contextFixture(match),l=f.live||{},s=l.status||f.status_short||f.result?.status;
       const state=contextState(match);
       if(state==='finished')return 'Terminata · '+s;
       if(state==='other')return ({PST:'Rinviata',CANC:'Annullata',ABD:'Abbandonata',AWD:'Assegnata a tavolino',WO:'Walkover'})[s]||'Stato da verificare';
       if(state==='upcoming')return 'Da iniziare';
       if(!['1H','HT','2H','ET','BT','P','LIVE','SUSP','INT'].includes(s))return 'Orario di inizio trascorso · aggiornamento atteso';
+      if(contextLiveView(match).stale)return 'Ultimo stato: '+s+' · da aggiornare';
       return s==='HT'?'Intervallo':s==='SUSP'?'Sospesa':s==='INT'?'Interrotta':"In corso · "+s+(Number.isFinite(l.elapsed??f.elapsed)?" · "+(l.elapsed??f.elapsed)+"′":'');
     }
     function contextStateControls(matches) {
       return '<nav class="research-controls" aria-label="Stato delle partite">'+[['all','Tutte'],['upcoming','Da iniziare'],['live','In corso / da aggiornare'],['finished','Terminate'],['other','Altri stati']].map(([k,label])=>`<button type="button" class="btn" aria-pressed="${contextStateFilter===k}" onclick="contextStateFilter='${k}';renderMatchResearch(currentPayload||{})">${label} (${matches.filter(m=>k==='all'||contextState(m)===k).length})</button>`).join('')+'</nav>';
     }
     function contextOutcome(match,market) {
-      const f=match.fixture||{},l=f.live||{},s=l.status||f.status_short||f.result?.status;
+      const f=contextFixture(match),l=f.live||{},s=l.status||f.status_short||f.result?.status;
       const ht=market.endsWith('_ht');
       const htFinal=['HT','2H','ET','BT','P','FT','AET','PEN'].includes(s);
       const ftFinal=['FT','AET','PEN'].includes(s);
@@ -1444,9 +1457,9 @@
     }
     function contextLivePanel(match) {
       if(contextState(match)==='upcoming')return '';
-      const f=match.fixture||{},l=f.live||{},r=f.result||{};
+      const f=contextFixture(match),l=f.live||{},r=f.result||{};
       const score=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)?a+'–'+b:'non disponibile';
-      return `<section class="cx-context"><strong>${escapeHtml(contextStateLabel(match))}</strong><p>Punteggio osservato: ${score(l.goals?.home??r.home_ft,l.goals?.away??r.away_ft)} · PT: ${score(l.halftime?.home??r.home_ht,l.halftime?.away??r.away_ht)} · FT (90 minuti): ${score(l.fulltime?.home??r.home_ft,l.fulltime?.away??r.away_ft)}</p><p>Aggiornamento risultato: ${l.observed_at?escapeHtml(formatTimestamp(l.observed_at)):'non disponibile'}${l.refresh_failed?' · ultimo recupero fallito, dati precedenti conservati':''}.</p><p><b>Analisi e quote prematch conservate</b> · ${escapeHtml(formatTimestamp(match.multimarket?.captured_at))}. Le percentuali sotto non sono probabilità live.</p><p>Quote live non disponibili in questa versione. Risultato aggiornato dalle scansioni periodiche, non in tempo reale. Nessuna proposta live calcolata.</p></section>`;
+      return `<section class="cx-context"><strong>${escapeHtml(contextStateLabel(match))}</strong><p>Punteggio osservato: ${score(l.goals?.home??r.home_ft,l.goals?.away??r.away_ft)} · PT: ${score(l.halftime?.home??r.home_ht,l.halftime?.away??r.away_ht)} · FT (90 minuti): ${score(l.fulltime?.home??r.home_ft,l.fulltime?.away??r.away_ft)}</p><p>Aggiornamento risultato: ${l.observed_at?escapeHtml(formatTimestamp(l.observed_at)):'non disponibile'}${l.refresh_failed?' · ultimo recupero fallito, dati precedenti conservati':''}.</p><p><b>Analisi e quote prematch conservate</b> · ${escapeHtml(formatTimestamp(match.multimarket?.captured_at))}. Le percentuali sotto non sono probabilità live.</p><p>Quote live non disponibili in questa versione. Risultato aggiornato separatamente quando il servizio live è attivo; verifica sempre l’ora dell’ultima osservazione. Nessuna proposta live calcolata.</p></section>`;
     }
     function contextList(matches) {
       let shown=0;
@@ -1456,7 +1469,7 @@
         if(!researchMarkets(match).length)return '';
         shown++;
         const main=contextPick(a),arg=escapeHtml(JSON.stringify(String(f.fixture_id)));
-        return `<article class="cx-list-row"><button class="cx-open" type="button" onclick="contextOpen(${arg})"><time>${escapeHtml(f.time||'')}</time><span><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><strong>${escapeHtml(f.match)}</strong><em>${escapeHtml(contextStateLabel(match))}</em><em>Apri analisi →</em></span></button>${contextOdds(match,true)}<div class="cx-list-pick"><small>IPOTESI PREMATCH · QUOTA PREFERITA ≥ ${escapeHtml(contextMinimumOdd)}</small>${main?`<b>${escapeHtml(main.label)}</b><strong>Quota ${contextNumber(main.odd)}</strong><span>${escapeHtml(main.source)}</span><span>Statistica ${contextPct(main.statistical_pct)} · Book ${contextPct(main.book_probability_pct)}</span>${contextPrice(main,true)}${main.statistical_reliability?.includes('conflict')||main.statistical_reliability==='fragile_halftime'?'<em>Statistica da verificare · apri i dettagli</em>':''}`:'<b>Nessuna stima utilizzabile</b><span>Apri l’analisi per vedere i dati mancanti.</span>'}</div></article>`;
+        return `<article class="cx-list-row${contextLiveClass(match)}"><button class="cx-open" type="button" onclick="contextOpen(${arg})"><time>${escapeHtml(f.time||'')}</time><span><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><strong>${escapeHtml(f.match)}</strong>${contextLiveBadge(match)}<em>${escapeHtml(contextStateLabel(match))}</em><em>Apri analisi →</em></span></button>${contextOdds(match,true)}<div class="cx-list-pick"><small>IPOTESI PREMATCH · QUOTA PREFERITA ≥ ${escapeHtml(contextMinimumOdd)}</small>${main?`<b>${escapeHtml(main.label)}</b><strong>Quota ${contextNumber(main.odd)}</strong><span>${escapeHtml(main.source)}</span><span>Statistica ${contextPct(main.statistical_pct)} · Book ${contextPct(main.book_probability_pct)}</span>${contextPrice(main,true)}${main.statistical_reliability?.includes('conflict')||main.statistical_reliability==='fragile_halftime'?'<em>Statistica da verificare · apri i dettagli</em>':''}`:'<b>Nessuna stima utilizzabile</b><span>Apri l’analisi per vedere i dati mancanti.</span>'}</div></article>`;
       }).join('');
       return `<div class="cx-list-head"><span>Partita</span><span>Quote · apertura / attuale / movimento</span><span>Proposta principale</span></div><div class="cx-list">${cards||'<p>Nessuna partita con questi filtri.</p>'}</div>`;
     }
@@ -1510,7 +1523,7 @@
         const chosen=a.markets.find(r=>`${r.market}::${r.selection}`===key)||rows.find(r=>r.research_candidate)||rows[0];
         const main=contextPick(a);shown++;
         const chooseArgs=(r)=>[String(f.fixture_id),`${r.market}::${r.selection}`].map(v=>escapeHtml(JSON.stringify(v))).join(',');
-        html+=`<article class="cx-card"><header class="cx-match"><time>${escapeHtml(f.time||new Date(f.kickoff).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'}))}</time><div class="cx-match-info"><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><h3>${escapeHtml(f.match||`${f.home} – ${f.away}`)}</h3></div>${contextOdds(match)}</header>`;
+        html+=`<article class="cx-card${contextLiveClass(match)}"><header class="cx-match"><time>${escapeHtml(f.time||new Date(f.kickoff).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'}))}</time><div class="cx-match-info"><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><h3>${escapeHtml(f.match||`${f.home} – ${f.away}`)}</h3>${contextLiveBadge(match)}</div>${contextOdds(match)}</header>`;
         html+=contextLivePanel(match)+contextCoverage(match);
         if(a.selection_diagnostic?.status==='major_conflict')html+=`<aside class="cx-context"><strong>Forte divergenza sulla favorita</strong><p>Statistica ${contextPct(a.selection_diagnostic.statistical_pct)} · book ${contextPct(a.selection_diagnostic.book_probability_pct)}. La proposta usa il bookmaker del mercato selezionato; le medie storiche non sono normalizzate per forza degli avversari.</p></aside>`;
         html+=main?`<section class="cx-primary"><div><span class="cx-eyebrow">PROPOSTA PRINCIPALE</span><h4>${escapeHtml(main.label)}</h4><span class="cx-source">${escapeHtml(main.source)}</span></div><div class="cx-prob"><b>${contextPct(main.statistical_pct)}</b><span>Stima statistica</span></div><div class="cx-prob"><b>${contextPct(main.book_probability_pct)}</b><span>Probabilità book · senza margine</span></div></section><p class="cx-muted">Quota ${main.odd?escapeHtml(formatOdd(main.odd)):'non disponibile'}${main.quote?` · ${escapeHtml(main.quote.bookmaker)} · ${escapeHtml(formatTimestamp(main.quote.provider_updated_at))}`:''}. ${escapeHtml(main.source_reason||'')}</p>${contextPrice(main)}<details class="cx-detail"><summary>Perché questa proposta · pro e contro</summary>${contextEvidence(main)}</details>`:'<p>Nessuna proposta con questa quota minima. Torna all’elenco per modificarla; tutti i mercati sono consultabili sotto.</p>';
@@ -2095,6 +2108,12 @@
       if (event.key === 'Escape') closeDetail();
     });
 
+    window.addEventListener('arabsniper-live-update',()=>{
+      if(!currentPayload)return;
+      const y=window.scrollY;
+      renderMatchResearch(currentPayload);
+      window.scrollTo({top:y,behavior:'auto'});
+    });
     initializeAccess();
   </script>
 </body>
