@@ -194,7 +194,7 @@ def weighted_mean(values: Sequence[float], weights: Sequence[float]) -> float:
 
 
 def atomic_write_json(path: Path, payload: Any) -> None:
-    if path.name == "arab_quote_prematch_audit.json":
+    if path.name.startswith("arab_quote_"):
         from audit_storage import write_store
         write_store(path, payload)
         return
@@ -209,14 +209,14 @@ def read_json(path: Path, default: Any) -> Any:
     if not path.exists():
         return default
     try:
-        if path.name == "arab_quote_prematch_audit.json":
+        if path.name.startswith("arab_quote_"):
             from audit_storage import read_store
             return read_store(path, default)
         with open(path, "r", encoding="utf-8") as handle:
             return json.load(handle)
     except Exception as exc:
         log(f"⚠️ Lettura fallita {path}: {exc}")
-        if path.name == "arab_quote_prematch_audit.json":
+        if path.name.startswith("arab_quote_"):
             raise  # Never replace unreadable historical evidence with an empty store.
         return default
 
@@ -1807,9 +1807,9 @@ def upload_json_to_github(filename: str, payload: Any, message: str) -> str:
         return "MISSING_TOKEN"
     try:
         repo = Github(token).get_repo(REPO_NAME)
-        if filename == 'data/arab_quote_prematch_audit.json':
+        if Path(filename).name.startswith('arab_quote_'):
             from audit_storage import write_store
-            local = DATA_DIR / 'arab_quote_prematch_audit.json'
+            local = DATA_DIR / Path(filename).name
             write_store(local, payload)
             manifest = json.loads(local.read_text())
             for part in manifest.get('parts', []):

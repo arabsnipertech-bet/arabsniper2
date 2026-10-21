@@ -43,7 +43,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -69,6 +69,9 @@ jobs:
 
       - name: Compare fixed models on archived inputs
         run: python src/model_research.py
+
+      - name: Pack and verify publication size
+        run: python src/publication_storage.py
 
       - name: Validate generated files
         run: |
