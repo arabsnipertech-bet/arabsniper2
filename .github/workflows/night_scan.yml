@@ -55,6 +55,9 @@ jobs:
       - name: Compare fixed models on archived inputs
         run: python src/model_research.py
 
+      - name: Pack and verify publication size
+        run: python src/publication_storage.py
+
       - name: Validate generated files
         run: |
           echo "File ArabSniper prodotti:"

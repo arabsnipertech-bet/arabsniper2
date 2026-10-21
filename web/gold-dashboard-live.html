@@ -1111,7 +1111,25 @@
     async function loadJson(file) {
       const response = await fetch(rawUrl(file), { cache: 'no-store' });
       if (!response.ok) throw new Error(`File non disponibile: ${file}`);
-      return response.json();
+      const value = await response.json();
+      if (value?._storage !== 'arabsniper-audit-parts-v1') return value;
+      const digest = async bytes => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), b => b.toString(16).padStart(2, '0')).join('');
+      const chunks = [];
+      let total = 0;
+      for (const part of value.parts) {
+        if (!/^[a-f0-9]{64}$/.test(part.sha256)) throw new Error('Identificatore dati non valido');
+        const res = await fetch(rawUrl(`_audit_parts/${part.sha256}.json.gz`), {cache: 'force-cache'});
+        if (!res.ok) throw new Error('Parte dei dati non disponibile: riprovare la sincronizzazione');
+        const raw = new Uint8Array(await new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
+        if (raw.length !== part.bytes || await digest(raw) !== part.sha256) throw new Error('Integrità dati non verificata');
+        chunks.push(raw); total += raw.length;
+      }
+      if (total !== value.bytes) throw new Error('Dati incompleti');
+      const joined = new Uint8Array(total);
+      let offset = 0;
+      for (const chunk of chunks) { joined.set(chunk, offset); offset += chunk.length; }
+      if (await digest(joined) !== value.sha256) throw new Error('Integrità documento non verificata');
+      return JSON.parse(new TextDecoder('utf-8', {fatal:true}).decode(joined));
     }
 
     async function loadCurrentDay(options = {}) {
