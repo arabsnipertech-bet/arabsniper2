@@ -71,8 +71,12 @@ def archive(root, now):
             continue
         date = kickoff.astimezone(TZ).date().isoformat()
         path = root / f'auditordata/prematch_{date}.json'
-        day = days.setdefault(date, read(path, {'schema_version': 1,
-            'audit_date': date, 'source_file': str(source.relative_to(root)), 'fixtures': {}}))
+        # setdefault evaluates its default even when the date is already loaded.
+        # Read/checksum/decompress each daily archive only once per run.
+        if date not in days:
+            days[date] = read(path, {'schema_version': 1,
+                'audit_date': date, 'source_file': str(source.relative_to(root)), 'fixtures': {}})
+        day = days[date]
         target = day.setdefault(collection, {})
         if str(key) not in target:
             frozen = deepcopy(record)

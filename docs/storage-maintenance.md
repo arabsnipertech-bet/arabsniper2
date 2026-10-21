@@ -21,3 +21,10 @@ This reduces current checkouts and deployments; it does not purge historical Git
 objects, remove old Actions runs/artifacts, or delete Cloudflare deployments.
 Historical commit URLs used by model research remain valid. For rollback, deploy
 an entire earlier commit rather than copying an old manifest into current main.
+
+The prematch freezer loads each daily archive once per execution. Do not put
+`read(...)` inside `dict.setdefault(...)`: Python evaluates that argument for
+every record, repeatedly decompressing and checking the same archive until the
+workflow times out. Existing frozen records are retained unchanged; only missing
+keys with valid prematch timestamps are appended. The daily auditor uses the
+same archive function before settling results.
