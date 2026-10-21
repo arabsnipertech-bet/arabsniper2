@@ -2,7 +2,7 @@
 
 Experimental. First/latest are separate cohorts, never additive. Paper ROI is not executed profit. No forecast is recalculated.
 
-Generated: 2026-10-21T14:52:09.656379+02:00 | Revision: 5cef6ef3f86de0cdb802538ca5ca0d45c6e2206b
+Generated: 2026-10-21T16:49:20.626386+02:00 | Revision: 8e3d6052c60540115c3de53619dc01158be59f74
 
 Invalid records excluded: 0
 
@@ -14,3 +14,11 @@ Invalid records excluded: 0
 
 See the adjacent JSON for every frozen source key, SHA-256, quote, probability, missing field and result.
 A missing result is pending, never a loss. A missing quote is excluded from paper ROI.
+## Studi sulla selezione
+
+Exploratory rules fixed after observing 21 October. 10pp is an experimental definition, not a learned optimum. First/latest and overlapping cohorts must not be added. No stake adjustment. Paper ROI only; original recorded odds, not personal ticket odds.
+
+| Snapshot | Modello | Fase | Mercato | Regola | Gruppo | Partite | Pendenti | Vinte/valutate | ROI teorico % |
+|---|---|---|---|---|---|---:|---:|---|---:|
+
+Il JSON include anche alternative non principali, scartati, dati mancanti e suddivisioni per campionato. Nessuna promozione automatica delle regole.

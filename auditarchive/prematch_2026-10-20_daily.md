@@ -2,7 +2,7 @@
 
 Experimental. First/latest are separate cohorts, never additive. Paper ROI is not executed profit. No forecast is recalculated.
 
-Generated: 2026-10-21T14:52:09.656379+02:00 | Revision: 5cef6ef3f86de0cdb802538ca5ca0d45c6e2206b
+Generated: 2026-10-21T16:49:20.626386+02:00 | Revision: 8e3d6052c60540115c3de53619dc01158be59f74
 
 Invalid records excluded: 0
 
@@ -338,3 +338,47 @@ Invalid records excluded: 0
 
 See the adjacent JSON for every frozen source key, SHA-256, quote, probability, missing field and result.
 A missing result is pending, never a loss. A missing quote is excluded from paper ROI.
+## Studi sulla selezione
+
+Exploratory rules fixed after observing 21 October. 10pp is an experimental definition, not a learned optimum. First/latest and overlapping cohorts must not be added. No stake adjustment. Paper ROI only; original recorded odds, not personal ticket odds.
+
+| Snapshot | Modello | Fase | Mercato | Regola | Gruppo | Partite | Pendenti | Vinte/valutate | ROI teorico % |
+|---|---|---|---|---|---|---:|---:|---|---:|
+| first | context-goals-v3.4 | exploratory | over15_ht | agreement_10pp | not_selected | 5 | 0 | 3/5 | 28.0 |
+| first | context-goals-v3.4 | exploratory | over15_ht | agreement_above_break_even | not_selected | 5 | 0 | 3/5 | 28.0 |
+| first | context-goals-v3.4 | exploratory | over15_ht | agreement_below_break_even | not_selected | 5 | 0 | 3/5 | 28.0 |
+| first | context-goals-v3.4 | exploratory | over15_ht | both_over_50 | not_selected | 5 | 0 | 3/5 | 28.0 |
+| first | context-goals-v3.4 | exploratory | over25_ft | agreement_10pp | not_selected | 15 | 0 | 6/15 | -17.267 |
+| first | context-goals-v3.4 | exploratory | over25_ft | agreement_10pp | selected | 7 | 1 | 4/6 | 5.333 |
+| first | context-goals-v3.4 | exploratory | over25_ft | agreement_above_break_even | not_selected | 22 | 1 | 10/21 | -10.81 |
+| first | context-goals-v3.4 | exploratory | over25_ft | agreement_below_break_even | not_selected | 15 | 0 | 6/15 | -17.267 |
+| first | context-goals-v3.4 | exploratory | over25_ft | agreement_below_break_even | selected | 7 | 1 | 4/6 | 5.333 |
+| first | context-goals-v3.4 | exploratory | over25_ft | both_over_50 | not_selected | 13 | 0 | 5/13 | -18.769 |
+| first | context-goals-v3.4 | exploratory | over25_ft | both_over_50 | selected | 9 | 1 | 5/8 | 2.125 |
+| first | context-goals-v3.4 | exploratory | over35_ft | agreement_10pp | not_selected | 2 | 0 | 1/2 | -17.0 |
+| first | context-goals-v3.4 | exploratory | over35_ft | agreement_10pp | selected | 2 | 0 | 2/2 | 60.0 |
+| first | context-goals-v3.4 | exploratory | over35_ft | agreement_above_break_even | not_selected | 4 | 0 | 3/4 | 21.5 |
+| first | context-goals-v3.4 | exploratory | over35_ft | agreement_below_break_even | not_selected | 2 | 0 | 1/2 | -17.0 |
+| first | context-goals-v3.4 | exploratory | over35_ft | agreement_below_break_even | selected | 2 | 0 | 2/2 | 60.0 |
+| first | context-goals-v3.4 | exploratory | over35_ft | both_over_50 | not_selected | 2 | 0 | 1/2 | -17.0 |
+| first | context-goals-v3.4 | exploratory | over35_ft | both_over_50 | selected | 2 | 0 | 2/2 | 60.0 |
+| latest | context-goals-v3.4 | exploratory | over15_ht | agreement_10pp | not_selected | 5 | 0 | 3/5 | 28.0 |
+| latest | context-goals-v3.4 | exploratory | over15_ht | agreement_above_break_even | not_selected | 5 | 0 | 3/5 | 28.0 |
+| latest | context-goals-v3.4 | exploratory | over15_ht | agreement_below_break_even | not_selected | 5 | 0 | 3/5 | 28.0 |
+| latest | context-goals-v3.4 | exploratory | over15_ht | both_over_50 | not_selected | 5 | 0 | 3/5 | 28.0 |
+| latest | context-goals-v3.4 | exploratory | over25_ft | agreement_10pp | not_selected | 15 | 0 | 6/15 | -16.867 |
+| latest | context-goals-v3.4 | exploratory | over25_ft | agreement_10pp | selected | 7 | 1 | 4/6 | 4.667 |
+| latest | context-goals-v3.4 | exploratory | over25_ft | agreement_above_break_even | not_selected | 22 | 1 | 10/21 | -10.714 |
+| latest | context-goals-v3.4 | exploratory | over25_ft | agreement_below_break_even | not_selected | 15 | 0 | 6/15 | -16.867 |
+| latest | context-goals-v3.4 | exploratory | over25_ft | agreement_below_break_even | selected | 7 | 1 | 4/6 | 4.667 |
+| latest | context-goals-v3.4 | exploratory | over25_ft | both_over_50 | not_selected | 13 | 0 | 5/13 | -18.308 |
+| latest | context-goals-v3.4 | exploratory | over25_ft | both_over_50 | selected | 9 | 1 | 5/8 | 1.625 |
+| latest | context-goals-v3.4 | exploratory | over35_ft | agreement_10pp | not_selected | 2 | 0 | 1/2 | -17.0 |
+| latest | context-goals-v3.4 | exploratory | over35_ft | agreement_10pp | selected | 2 | 0 | 2/2 | 60.0 |
+| latest | context-goals-v3.4 | exploratory | over35_ft | agreement_above_break_even | not_selected | 4 | 0 | 3/4 | 21.5 |
+| latest | context-goals-v3.4 | exploratory | over35_ft | agreement_below_break_even | not_selected | 2 | 0 | 1/2 | -17.0 |
+| latest | context-goals-v3.4 | exploratory | over35_ft | agreement_below_break_even | selected | 2 | 0 | 2/2 | 60.0 |
+| latest | context-goals-v3.4 | exploratory | over35_ft | both_over_50 | not_selected | 2 | 0 | 1/2 | -17.0 |
+| latest | context-goals-v3.4 | exploratory | over35_ft | both_over_50 | selected | 2 | 0 | 2/2 | 60.0 |
+
+Il JSON include anche alternative non principali, scartati, dati mancanti e suddivisioni per campionato. Nessuna promozione automatica delle regole.
