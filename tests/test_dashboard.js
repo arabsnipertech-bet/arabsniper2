@@ -165,3 +165,17 @@ assert(host.innerHTML.includes('cx-list-row'));
 vm.runInContext("contextStateFilter='upcoming';renderMatchResearch(currentPayload)",researchContext);
 assert(!host.innerHTML.includes('cx-list-row'));
 console.log('Lifecycle: retained fixtures, status filters, halftime settlement, missing scores and regulation-time scores passed.');
+
+// Market comparison ranks one source and never presents started games as prematch picks.
+researchContext.comparison=[.4,.7,.55].map((p,i)=>({fixture:{fixture_id:String(i),kickoff:future(i===2?-1:2)},multimarket:{markets:[{market:'over25_ft',selection:'over',statistical_pct:p*100,book_probability_pct:(1-p)*100}]}}));
+vm.runInContext("contextCompareMarket='over25_ft';contextCompareSource='statistical_pct'",researchContext);
+assert.equal(vm.runInContext('contextComparisonMatches(comparison).map(m=>m.fixture.fixture_id).join() ',researchContext),'1,0');
+vm.runInContext("contextCompareSource='book_probability_pct'",researchContext);
+assert.equal(vm.runInContext('contextComparisonMatches(comparison).map(m=>m.fixture.fixture_id).join()',researchContext),'0,1');
+assert.equal(researchContext.comparison[0].fixture.fixture_id,'0');
+researchContext.window={ArabLive:{view:()=>({active:true}),fixture:m=>m.fixture}};
+vm.runInContext("liveFixture.fixture.live={status:'HT',goals:{home:0,away:0}};liveFixture.fixture.result=null;liveFixture.fixture.status_short='HT'",researchContext);
+assert(vm.runInContext("contextGoalProgress(liveFixture,{market:'over25_ft'})",researchContext).includes('Servono ancora 3 gol'));
+vm.runInContext('liveFixture.fixture.live.goals.home=2',researchContext);
+assert(vm.runInContext("contextGoalProgress(liveFixture,{market:'over25_ft'})",researchContext).includes('Serve ancora 1 gol'));
+console.log('Market comparison: source ranking, started exclusion, immutable order and live goal distance passed.');

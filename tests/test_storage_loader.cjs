@@ -17,11 +17,16 @@ for (let i=0;i<bytes.length;i+=7) {
 const manifest={_storage:'arabsniper-audit-parts-v1',bytes:bytes.length,sha256:sha(bytes),parts};
 files['day.json']=JSON.stringify(manifest);
 files['legacy.json']=JSON.stringify(value);
+let active=0,peak=0;
 const context={crypto:webcrypto,Uint8Array,TextDecoder,DecompressionStream,Response,
-  rawUrl:x=>x,fetch:async path=>new Response(files[path],{status:files[path]?200:404})};
+  rawUrl:x=>x,fetch:async path=>{active++;peak=Math.max(peak,active);await new Promise(r=>setTimeout(r,5));active--;return new Response(files[path],{status:files[path]?200:404});}};
 vm.createContext(context);vm.runInContext(source,context);
 (async()=>{
   for(const file of ['legacy.json','day.json']) assert.equal(JSON.stringify(await context.loadJson(file)),JSON.stringify(value));
+  assert(peak>1&&peak<=3, 'bounded parallel downloads');
+  const urls={GITHUB_BASE:'https://example.test/',Date};vm.createContext(urls);
+  vm.runInContext(html.slice(html.indexOf('    function rawUrl(file)'),html.indexOf('    function escapeHtml')),urls);
+  assert.equal(urls.rawUrl('_audit_parts/hash.json.gz'),'https://example.test/_audit_parts/hash.json.gz');
   delete files[`_audit_parts/${parts[0].sha256}.json.gz`];
   await assert.rejects(context.loadJson('day.json'),/non disponibile/);
   console.log('Browser loader: legacy, split UTF-8, checksums and missing parts passed');

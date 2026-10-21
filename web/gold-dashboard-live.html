@@ -844,7 +844,8 @@
     let initialHourScrollDone = false;
 
     function rawUrl(file) {
-      return `${GITHUB_BASE}${file}?v=${Date.now()}`;
+      // Content-addressed blocks are immutable: keep their URL cacheable.
+      return `${GITHUB_BASE}${file}${file.startsWith('_audit_parts/')?'':`?v=${Date.now()}`}`;
     }
 
     function escapeHtml(value) {
@@ -1118,16 +1119,22 @@
       const value = await response.json();
       if (value?._storage !== 'arabsniper-audit-parts-v1') return value;
       const digest = async bytes => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), b => b.toString(16).padStart(2, '0')).join('');
-      const chunks = [];
-      let total = 0;
-      for (const part of value.parts) {
+      const chunks = new Array(value.parts.length);
+      let next = 0;
+      async function worker() {
+      while (next < value.parts.length) {
+        const index = next++;
+        const part = value.parts[index];
         if (!/^[a-f0-9]{64}$/.test(part.sha256)) throw new Error('Identificatore dati non valido');
         const res = await fetch(rawUrl(`_audit_parts/${part.sha256}.json.gz`), {cache: 'force-cache'});
         if (!res.ok) throw new Error('Parte dei dati non disponibile: riprovare la sincronizzazione');
         const raw = new Uint8Array(await new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
         if (raw.length !== part.bytes || await digest(raw) !== part.sha256) throw new Error('Integrità dati non verificata');
-        chunks.push(raw); total += raw.length;
+        chunks[index] = raw;
       }
+      }
+      await Promise.all(Array.from({length: Math.min(3, value.parts.length)}, worker));
+      const total = chunks.reduce((sum, raw) => sum + raw.length, 0);
       if (total !== value.bytes) throw new Error('Dati incompleti');
       const joined = new Uint8Array(total);
       let offset = 0;
@@ -1176,6 +1183,8 @@
 
     const RESEARCH_MARKET_OPTIONS = [["all", "Tutti i mercati"], ["ht", "Tutti i mercati del primo tempo"], ["ft", "Tutti gli esiti e gol finali"], ["teams", "Gol squadra"], ["combo", "Tutte le combinazioni PT + ST"], ["1x2_ft::1", "1 — Vittoria casa"], ["1x2_ft::x", "X — Pareggio"], ["1x2_ft::2", "2 — Vittoria ospite"], ["over05_ht::over", "Over 0,5 PT"], ["over05_ht::under", "Under 0,5 PT"], ["over15_ht::over", "Over 1,5 PT"], ["over15_ht::under", "Under 1,5 PT"], ["over25_ht::over", "Over 2,5 PT"], ["over25_ht::under", "Under 2,5 PT"], ["over15_ft::over", "Over 1,5 FT"], ["over15_ft::under", "Under 1,5 FT"], ["over25_ft::over", "Over 2,5 FT"], ["over25_ft::under", "Under 2,5 FT"], ["over35_ft::over", "Over 3,5 FT"], ["over35_ft::under", "Under 3,5 FT"], ["gg_ht::yes", "GG PT sì"], ["gg_ht::no", "GG PT no"], ["over05_ht_over05_sh::yes", "Over 0,5 PT + Over 0,5 ST"], ["over15_ht_over05_sh::yes", "Over 1,5 PT + Over 0,5 ST"], ["over15_ht_over15_sh::yes", "Over 1,5 PT + Over 1,5 ST"]];
     let contextDetailId = null;
+    let contextCompareMarket = '';
+    let contextCompareSource = 'book_probability_pct';
     let contextMinimumOdd = '1.5';
     function contextOpen(fid) { contextDetailId=String(fid);renderMatchResearch(currentPayload||{});document.getElementById('matchResearch')?.scrollIntoView?.({block:'start'}); }
     function contextBack() { contextDetailId=null;renderMatchResearch(currentPayload||{}); }
@@ -1461,17 +1470,43 @@
       const score=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)?a+'–'+b:'non disponibile';
       return `<section class="cx-context"><strong>${escapeHtml(contextStateLabel(match))}</strong><p>Punteggio osservato: ${score(l.goals?.home??r.home_ft,l.goals?.away??r.away_ft)} · PT: ${score(l.halftime?.home??r.home_ht,l.halftime?.away??r.away_ht)} · FT (90 minuti): ${score(l.fulltime?.home??r.home_ft,l.fulltime?.away??r.away_ft)}</p><p>Aggiornamento risultato: ${l.observed_at?escapeHtml(formatTimestamp(l.observed_at)):'non disponibile'}${l.refresh_failed?' · ultimo recupero fallito, dati precedenti conservati':''}.</p><p><b>Analisi e quote prematch conservate</b> · ${escapeHtml(formatTimestamp(match.multimarket?.captured_at))}. Le percentuali sotto non sono probabilità live.</p><p>Quote live non disponibili in questa versione. Risultato aggiornato separatamente quando il servizio live è attivo; verifica sempre l’ora dell’ultima osservazione. Nessuna proposta live calcolata.</p></section>`;
     }
+    function contextComparisonRow(match) {
+      return (match.multimarket?.markets||[]).find(r=>r.market===contextCompareMarket&&r.selection==='over');
+    }
+    function contextComparisonMatches(matches) {
+      if(!contextCompareMarket)return matches;
+      return matches.filter(m=>contextState(m)==='upcoming'&&contextComparisonRow(m)).slice().sort((a,b)=>{
+        const score=m=>{const r=contextComparisonRow(m);const p=r[contextCompareSource];
+          if(contextCompareSource==='statistical_pct'&&['context_conflict','fragile_halftime'].includes(r.statistical_reliability))return -1;
+          return Number.isFinite(p)?p:-1;};
+        return score(b)-score(a)||Date.parse(a.fixture.kickoff)-Date.parse(b.fixture.kickoff);
+      });
+    }
+    function contextGoalProgress(match, row) {
+      if(!row||contextState(match)==='upcoming')return '';
+      const target={over15_ht:2,over25_ht:3,over25_ft:3,over35_ft:4}[row.market];
+      if(!target)return '<em>Percentuali prematch · nessuna stima live</em>';
+      const v=contextLiveView(match),f=contextFixture(match),l=f.live||{};
+      if(!v.active)return '<em>Percentuali prematch · '+escapeHtml(contextOutcome(match,row.market))+'</em>';
+      const ht=row.market.endsWith('_ht');
+      if(ht&&['HT','2H','ET','BT','P'].includes(l.status))return '<em>'+escapeHtml(contextOutcome(match,row.market))+' · analisi prematch</em>';
+      if(!['1H','HT','2H'].includes(l.status))return '<em>Verificare il risultato dei 90 minuti · analisi prematch</em>';
+      const h=l.goals?.home,a=l.goals?.away;
+      if(!Number.isFinite(h)||!Number.isFinite(a))return '<em>Punteggio da verificare · analisi prematch</em>';
+      const remaining=Math.max(0,target-h-a);
+      return '<em>'+(remaining?`${remaining===1?'Serve ancora 1 gol':`Servono ancora ${remaining} gol`} ${ht?'nel primo tempo':'entro il 90′'}`:'Soglia gol raggiunta nel punteggio osservato')+' · nessuna probabilità live calcolata</em>';
+    }
     function contextList(matches) {
       let shown=0;
-      const cards=matches.map(match=>{
+      const cards=contextComparisonMatches(matches).map(match=>{
         const f=match.fixture,a=match.multimarket;
         if(researchSearch&&!`${f.match} ${f.league} ${f.country}`.toLowerCase().includes(researchSearch.toLowerCase()))return '';
         if(!researchMarkets(match).length)return '';
         shown++;
-        const main=contextPick(a),arg=escapeHtml(JSON.stringify(String(f.fixture_id)));
-        return `<article class="cx-list-row${contextLiveClass(match)}"><button class="cx-open" type="button" onclick="contextOpen(${arg})"><time>${escapeHtml(f.time||'')}</time><span><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><strong>${escapeHtml(f.match)}</strong>${contextLiveBadge(match)}<em>${escapeHtml(contextStateLabel(match))}</em><em>Apri analisi →</em></span></button>${contextOdds(match,true)}<div class="cx-list-pick"><small>IPOTESI PREMATCH · QUOTA PREFERITA ≥ ${escapeHtml(contextMinimumOdd)}</small>${main?`<b>${escapeHtml(main.label)}</b><strong>Quota ${contextNumber(main.odd)}</strong><span>${escapeHtml(main.source)}</span><span>Statistica ${contextPct(main.statistical_pct)} · Book ${contextPct(main.book_probability_pct)}</span>${contextPrice(main,true)}${main.statistical_reliability?.includes('conflict')||main.statistical_reliability==='fragile_halftime'?'<em>Statistica da verificare · apri i dettagli</em>':''}`:'<b>Nessuna stima utilizzabile</b><span>Apri l’analisi per vedere i dati mancanti.</span>'}</div></article>`;
+        const main=contextCompareMarket?contextComparisonRow(match):contextPick(a),arg=escapeHtml(JSON.stringify(String(f.fixture_id)));
+        return `<article class="cx-list-row${contextLiveClass(match)}"><button class="cx-open" type="button" onclick="contextOpen(${arg})"><time>${escapeHtml(f.time||'')}</time><span><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><strong>${escapeHtml(f.match)}</strong>${contextLiveBadge(match)}<em>${escapeHtml(contextStateLabel(match))}</em><em>Apri analisi →</em></span></button>${contextOdds(match,true)}<div class="cx-list-pick"><small>${contextCompareMarket?'CONFRONTO MERCATO PREMATCH':'IPOTESI PREMATCH · QUOTA PREFERITA ≥ '+escapeHtml(contextMinimumOdd)}</small>${main?`<b>${escapeHtml(main.label)}</b><strong>Quota ${contextNumber(main.odd)}</strong><span>${escapeHtml(main.source)}</span><span>Statistica ${contextPct(main.statistical_pct)} · Book ${contextPct(main.book_probability_pct)}</span>${contextPrice(main,true)}${contextGoalProgress(match,main)}${main.statistical_reliability?.includes('conflict')||main.statistical_reliability==='fragile_halftime'?'<em>Statistica da verificare · apri i dettagli</em>':''}`:'<b>Nessuna stima utilizzabile</b><span>Apri l’analisi per vedere i dati mancanti.</span>'}</div></article>`;
       }).join('');
-      return `<div class="cx-list-head"><span>Partita</span><span>Quote · apertura / attuale / movimento</span><span>Proposta principale</span></div><div class="cx-list">${cards||'<p>Nessuna partita con questi filtri.</p>'}</div>`;
+      return `<div class="cx-list-head"><span>Partita</span><span>Quote · apertura / attuale / movimento</span><span>${contextCompareMarket?'Mercato confrontato':'Proposta principale'}</span></div><div class="cx-list">${cards||'<p>Nessuna partita con questi filtri.</p>'}</div>`;
     }
     function contextProbability(row) {
       const fragile=['context_conflict','fragile_halftime'].includes(row?.statistical_reliability);
@@ -1510,6 +1545,8 @@
       const options=(list,current)=>list.map(([v,l])=>`<option value="${escapeHtml(v)}" ${v===current?'selected':''}>${escapeHtml(l)}</option>`).join('');
       let html=`<header class="cx-heading"><div><span class="cx-eyebrow">ARABSNIPER / MATCH INTELLIGENCE</span><h2>La partita, spiegata.</h2><p>Una proposta principale. Due fonti a confronto. Ogni dato al suo posto.</p></div><span class="research-tag">V3 · IN VERIFICA</span></header><div class="cx-summary"><div><b>${all.length}</b><span>partite in ordine di orario</span></div><div><b>8 / 4</b><span>gare ufficiali / primi tempi</span></div><div><b>Night 5 · Fast 2</b><span>giorni coperti dalle scansioni</span></div></div><p class="cx-muted">Snapshot: ${escapeHtml(formatTimestamp(payload.updated_at||payload.generated_at))}. Le percentuali sono stime sperimentali, non frequenze di successo già validate.</p><div class="research-controls"><label>Mercato${`<select onchange="researchFilter('market',this.value)">${options(RESEARCH_MARKET_OPTIONS,researchMarket)}</select>`}</label><label>Quote<select onchange="researchFilter('price',this.value)">${options([['all','Tutte, anche senza quota'],['2to5','Da 2 a 5']],researchPrice)}</select></label><label>Cerca squadra<input class="research-search" type="search" value="${escapeHtml(researchSearch)}" placeholder="Squadra o campionato" onchange="researchSearch=this.value;renderMatchResearch(currentPayload||{})"></label></div>`;
       html+=`<label class="cx-minimum">Quota preferita da <select onchange="contextMinimumOdd=this.value;renderMatchResearch(currentPayload||{})">${options([['0','Tutte'],['1.4','1,40'],['1.5','1,50'],['1.8','1,80'],['2','2,00']],contextMinimumOdd)}</select></label><p class="cx-odds-note">Confronto probabilità/quota: anche un esito sotto il 50% può essere una proposta. Se manca una quota sopra la preferenza, mostriamo un’alternativa dichiarata. Convenienza da verificare negli audit.</p>`;
+      html+=`<div class="research-controls"><label>Confronto prematch<select onchange="contextCompareMarket=this.value;contextStateFilter='all';renderMatchResearch(currentPayload||{})">${options([['','Elenco ordinato per orario'],['over15_ht','Over 1,5 PT'],['over25_ft','Over 2,5 FT'],['over35_ft','Over 3,5 FT']],contextCompareMarket)}</select></label><label>Ordina per probabilità<select onchange="contextCompareSource=this.value;renderMatchResearch(currentPayload||{})">${options([['book_probability_pct','Book senza margine'],['statistical_pct','Analisi statistica']],contextCompareSource)}</select></label></div>`;
+      if(contextCompareMarket)html+='<p class="cx-odds-note">Confronto dello stesso mercato su sole partite da iniziare, anche quando non è la proposta principale. Probabilità decrescente della fonte scelta; dati assenti o statistica fragile in fondo. Controlla quota, soglia di pareggio e dati mancanti. Questo ordine non indica uno stake consigliato. Torna all’elenco per vedere le partite live.</p>';
       if(contextDetailId===null){host.innerHTML=html+contextStateControls(all)+contextList(all.filter(m=>contextStateFilter==='all'||contextState(m)===contextStateFilter));return;}
       html=`<button type="button" class="btn cx-back" onclick="contextBack()">← Torna all’elenco</button>`;
       let shown=0;
