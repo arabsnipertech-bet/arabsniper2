@@ -701,6 +701,7 @@
     .cx-list-head{padding:14px;color:#a6c7d4;font-size:.76rem}.cx-list-row{border:1px solid #34525e;border-radius:12px;padding:14px;background:#11212b;margin:10px 0}
     .cx-open{display:flex;gap:12px;align-items:center;background:none;border:0;color:#eef7fa;text-align:left;cursor:pointer;min-width:0;width:100%}.cx-open time{color:#ffe193;font-weight:800}.cx-open strong,.cx-open small,.cx-open em{display:block}.cx-open strong{font-size:1rem;margin:6px 0}.cx-open small{color:#a8bec8;font-size:.7rem}.cx-open em{color:#83e8f6;font-style:normal;font-size:.74rem}
     .cx-list-pick{background:#302d1d;border-left:3px solid #e8c75a;padding:12px;border-radius:8px;font-size:.75rem}.cx-list-pick>*{display:block;margin:5px 0}.cx-list-pick b{color:#ffe193;font-size:1rem}.cx-list-pick strong{color:#82f3ff;font-size:1.05rem}.cx-list-pick em{color:#f1d59a;font-style:normal}
+    .cx-compact-odds .cx-odd-cell small.cx-consensus,.cx-compact-odds>.cx-favorite{display:block}.cx-odd-cell .cx-consensus.cx-red{color:#ff8981}.cx-odd-cell .cx-consensus.cx-yellow{color:#ffd166}.cx-odd-cell .cx-consensus.cx-green{color:#77dfa6}
     .cx-compact-odds{width:100%;margin:0}.cx-compact-odds .cx-odd-cell small,.cx-compact-odds>.cx-odds-note{display:none}.cx-compact-odds .cx-odd-cell{padding:7px}.cx-compact-odds .cx-odd-cell>b{font-size:.72rem}.cx-compact-odds .cx-odd-line{font-size:.7rem}.cx-compact-odds .cx-odd-cell>strong{display:inline-block!important;font-size:.75rem}
     .cx-minimum{display:flex;align-items:center;gap:10px;color:#ffe193;font-size:.82rem;margin:16px 0}.cx-minimum select{padding:9px;border-radius:7px;background:#193440;color:#fff;border:1px solid #5a8193}.cx-back{margin:12px 0}
     @media(max-width:850px){.cx-list-head{display:none}.cx-list-row{grid-template-columns:1fr;gap:12px;padding:12px}.cx-compact-odds{width:100%;margin-top:0}.cx-open strong{font-size:1rem}.cx-list-pick{padding:8px 12px}}
@@ -1398,10 +1399,42 @@
       const group=(title,values,cls)=>`<div class="cx-evidence ${cls}"><strong>${title}</strong>${values?.length?`<ul>${values.map(v=>`<li>${escapeHtml(v)}</li>`).join('')}</ul>`:'<p>Nessun elemento specifico rilevato.</p>'}</div>`;
       return `<div class="cx-evidence-grid">${group('A favore',row.pros,'cx-pro')}${group('Da considerare',row.cons,'cx-con')}</div>${row.missing?.length?`<details class="cx-missing"><summary>Dati mancanti · ${row.missing.length}</summary><ul>${row.missing.map(v=>`<li>${escapeHtml(v)}</li>`).join('')}</ul></details>`:''}`;
     }
+    function contextSigned(v, suffix='') {
+      return Number.isFinite(v)?`${v>0?'+':''}${v.toFixed(2)}${suffix}`:'—';
+    }
+    function contextMovementLabel(m) {
+      if(!m.confirmed)return 'Consenso multi-book non confermato';
+      const up=m.direction==='up',down=m.direction==='down';
+      const dir=up?'↑ salita':down?'↓ discesa':'direzione non disponibile';
+      const reverse=m.has_direction_reversal??(m.operators||[]).some(o=>o.reversal);
+      return `Ultimo tratto multi-book: ${dir} ${contextNumber(m.amplitude_pct)}% · ${m.agreeing_books}/${m.paired_books} operatori${reverse?' · inversione di movimento osservata':''}`;
+    }
+    function contextFavorite(match) {
+      const m=(match.multimarket.markets||[]).find(r=>r.market==='1x2_ft'&&r.movement?.favorite_switch)?.movement;
+      const f=m?.favorite_switch;
+      if(!f)return '<p class="cx-odds-note cx-favorite">Cambio favorita 1↔2: storico completo da aggiornare con la prossima scansione.</p>';
+      const side=x=>x==='1'?'1 · casa':x==='2'?'2 · ospite':'quote pari';
+      const title=f.confirmed?`Cambio favorita confermato: ${side(f.from)} → ${side(f.to)} (${f.agreeing_books}/${f.paired_books} operatori)`:
+        `Nessun cambio favorita netto confermato (${f.paired_books} operatori confrontabili)`;
+      const details=(m.operators||[]).filter(o=>o.favorite_path).map(o=>{
+        const p=o.favorite_path;
+        return `<p><b>${escapeHtml(o.bookmaker)}</b>: ${side(p.initial)} → ${side(p.current)} · ${p.changes.length} cambi nel percorso${p.changes.length&&!p.net_switch?' · nessuno scambio netto fra inizio e fine':''}.<br><small>${escapeHtml(formatTimestamp(o.observed_from))} → ${escapeHtml(formatTimestamp(o.observed_to))}</small></p>`;
+      }).join('');
+      return `<details class="cx-odds-note cx-favorite"><summary>${escapeHtml(title)}</summary><p>Confronto tra casa e ospite sulle quote dello stesso operatore. Il pareggio X resta un esito distinto. Parità di quota non significa cambio di favorita.</p>${details}</details>`;
+    }
     function contextMovement(row) {
-      const m=row?.movement||{};
-      if(!m.confirmed) return `<p class="cx-muted">Movimento non confermato da una maggioranza di almeno due operatori${m.paired_books?` (${m.paired_books} confrontabili)`:''}.</p>`;
-      return `<div class="cx-movement"><strong class="cx-${m.color}">${escapeHtml(m.arrow)} ${escapeHtml(contextNumber(m.amplitude_pct))}% · movimento ${m.color==='red'?'forte':m.color==='yellow'?'medio':'debole'}</strong><span>${m.agreeing_books}/${m.paired_books} operatori concordi</span><p>Probabilità senza margine: ${escapeHtml(contextNumber(m.median_fair_delta_pp))} punti · aggio: ${escapeHtml(contextNumber(m.median_overround_delta_pp))} punti · OCI: ${escapeHtml(contextNumber(m.oci))}</p><details><summary>Quote iniziali osservate e percorso</summary>${(m.operators||[]).map(o=>`<p><b>${escapeHtml(o.bookmaker)}</b> ${o.sequence.map(v=>escapeHtml(formatOdd(v))).join(' → ')}<br><small>${escapeHtml(formatTimestamp(o.observed_from))} → ${escapeHtml(formatTimestamp(o.observed_to))}</small></p>`).join('')}</details><small>Il colore misura l’ampiezza. OCI e aggio derivano dalle stesse quote: non sono conferme indipendenti né flussi di denaro.</small></div>`;
+      const m=row?.movement||{},operators=m.operators||[];
+      const details=operators.map(o=>{
+        const complete=[o.fair_initial_pct,o.fair_current_pct,o.margin_initial_pct,o.margin_current_pct].every(Number.isFinite);
+        let comparison='';
+        if(complete&&Number.isFinite(row.statistical_pct)) {
+          const before=Math.abs(o.fair_initial_pct-row.statistical_pct),after=Math.abs(o.fair_current_pct-row.statistical_pct);
+          const direction=Math.abs(before-after)<.05?'distanza sostanzialmente invariata':after<before?'book più vicino alla statistica':'book più lontano dalla statistica';
+          comparison=`<p>Distanza dalla statistica attuale (${contextPct(row.statistical_pct)}), tenuta fissa nel confronto: ${contextNumber(before)} → ${contextNumber(after)} punti · ${direction}. Non è una conferma della previsione.</p>`;
+        }
+        return `<section><b>${escapeHtml(o.bookmaker)}</b><p>Quote osservate: ${(o.sequence||[]).map(v=>escapeHtml(formatOdd(v))).join(' → ')}</p><p>Totale apertura → ultima: ${contextSigned(Number.isFinite(o.net_delta_pct)?o.net_delta_pct:(o.current/o.initial-1)*100,'%')}. Ultimo tratto: ${contextSigned(o.delta_pct,'%')}${o.reversal?' · inversione di movimento':''}.</p>${complete?`<p>Book senza margine: ${contextPct(o.fair_initial_pct)} → ${contextPct(o.fair_current_pct)} (${contextSigned(o.fair_current_pct-o.fair_initial_pct,' punti')}).<br>Aggio del mercato completo: ${contextPct(o.margin_initial_pct)} → ${contextPct(o.margin_current_pct)} (${contextSigned(o.margin_current_pct-o.margin_initial_pct,' punti')}).</p>${comparison}`:'<p>Book prima/dopo e aggio: dettagli disponibili dalla prossima scansione.</p>'}<small>${escapeHtml(formatTimestamp(o.observed_from))} → ${escapeHtml(formatTimestamp(o.observed_to))}${o.leg_from?' · ultimo tratto da '+escapeHtml(formatTimestamp(o.leg_from)):''}</small></section>`;
+      }).join('');
+      return `<div class="cx-movement"><strong>${escapeHtml(contextMovementLabel(m))}</strong><p>OCI ArabSniper attuale: ${contextSigned(m.oci)} · precedente confrontabile: ${contextSigned(m.oci_previous)}${m.oci_previous_at?' ('+escapeHtml(formatTimestamp(m.oci_previous_at))+')':''}. ${Number.isFinite(m.oci)?m.oci>0?'Segno positivo: probabilità book in aumento nell’ultimo tratto.':m.oci<0?'Segno negativo: probabilità book in diminuzione nell’ultimo tratto.':'Nessuna variazione rilevante della probabilità book.':'Storico o consenso insufficienti.'}</p><details><summary>Percorso, aggio e confronto con la statistica per operatore</summary>${details||'<p>Storico confrontabile non disponibile.</p>'}</details><small>OCI è un indice sperimentale, non una percentuale di successo. Aggio e movimenti provengono dalle stesse quote: non sono conferme indipendenti né flussi di denaro.</small></div>`;
     }
     function contextOdds(match, compact=false) {
       const rows=match.multimarket.markets||[];
@@ -1411,14 +1444,16 @@
         const o=(m.operators||[]).find(x=>x.bookmaker===r?.quote?.bookmaker);
         const initial=o?.initial;
         const current=r?.odd;
-        const arrow=m.confirmed?`<strong class="cx-${['red','yellow','green'].includes(m.color)?m.color:'green'}" title="${escapeHtml(`${m.agreeing_books}/${m.paired_books} operatori concordi · ${contextNumber(m.amplitude_pct)}%`)}">${escapeHtml(m.arrow)} ${contextNumber(m.amplitude_pct)}%</strong>`:'';
-        return `<div class="cx-odd-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line"><span>Attuale</span><b>${contextNumber(current)}</b></div>${arrow}<small>${r?.quote?`${escapeHtml(r.quote.bookmaker)} · ${escapeHtml(formatTimestamp(r.quote.provider_updated_at))}`:'Quota non disponibile'}</small></div>`;
+        const delta=Number.isFinite(initial)&&initial>1&&Number.isFinite(current)?(current/initial-1)*100:null;
+        const net=Number.isFinite(delta)?`<strong>Totale ${Math.abs(delta)<.005?'→ invariata':delta>0?'↑ salita':'↓ discesa'} ${contextSigned(Math.abs(delta)<.005?0:delta,'%')}</strong>`:'<small>Variazione totale non disponibile</small>';
+        const consensus=m.confirmed?`<small class="cx-consensus cx-${['red','yellow','green'].includes(m.color)?m.color:'green'}">${escapeHtml(contextMovementLabel(m))}</small>`:'<small class="cx-consensus">Movimento multi-book non confermato</small>';
+        return `<div class="cx-odd-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line"><span>Attuale</span><b>${contextNumber(current)}</b></div>${net}${consensus}<small>${r?.quote?`${escapeHtml(r.quote.bookmaker)} · ${escapeHtml(formatTimestamp(r.quote.provider_updated_at))}`:'Quota non disponibile'}</small></div>`;
       };
       const result=rows.filter(r=>r.market==='1x2_ft'&&Number.isFinite(r.book_probability_pct));
       const sorted=[...result].sort((a,b)=>b.book_probability_pct-a.book_probability_pct);
       const leader=sorted[0];
       const relative=result.length===3?`Esito più probabile per i book: ${leader.selection==='1'?'1 · '+(match.fixture.home||'casa'):leader.selection==='2'?'2 · '+(match.fixture.away||'ospite'):'X · pareggio'} (${contextPct(leader.book_probability_pct)} senza margine).`:'Forza relativa: confronto 1X2 incompleto.';
-      return `<section class="cx-odds-panel ${compact?'cx-compact-odds':''}" aria-label="Quote di riferimento della partita"><div class="cx-odds-grid">${cell('1x2_ft','1','1 · Casa')}${cell('1x2_ft','x','X · Pareggio')}${cell('1x2_ft','2','2 · Ospite')}</div><div class="cx-odds-grid cx-odds-goals">${cell('over15_ht','over','Over 1,5 PT')}${cell('over25_ft','over','Over 2,5 FT')}</div><p class="cx-odds-note">${escapeHtml(relative)}</p><details class="cx-odds-note"><summary>Come leggere quote e frecce</summary><p>* Apertura = prima quota osservata dello stesso operatore, non apertura ufficiale. — = dato assente. Frecce solo con consenso di almeno due operatori: ↓ calo, ↑ rialzo, ⇅ inversione. Verde debole, giallo medio, rosso forte. Nessuna freccia = movimento non confermato. OCI e aggio sono nei dettagli bookmaker.</p></details></section>`;
+      return `<section class="cx-odds-panel ${compact?'cx-compact-odds':''}" aria-label="Quote di riferimento della partita"><div class="cx-odds-grid">${cell('1x2_ft','1','1 · Casa')}${cell('1x2_ft','x','X · Pareggio')}${cell('1x2_ft','2','2 · Ospite')}</div><div class="cx-odds-grid cx-odds-goals">${cell('over15_ht','over','Over 1,5 PT')}${cell('over25_ft','over','Over 2,5 FT')}</div><p class="cx-odds-note">${escapeHtml(relative)}</p>${contextFavorite(match)}<details class="cx-odds-note"><summary>Come leggere quote e frecce</summary><p>* Apertura = prima quota osservata, non apertura ufficiale. Totale = variazione fra le due quote visibili dello stesso operatore. Il movimento multi-book è separato e riguarda l’ultimo tratto: ↑ salita, ↓ discesa; un’inversione di movimento segnala un precedente cambio di direzione. Il cambio favorita 1↔2 confronta invece casa e ospite. Verde/giallo/rosso indicano soltanto ampiezza debole/media/forte. Percentuali di quota e punti di probabilità sono misure diverse.</p></details></section>`;
     }
 
     function contextFixture(match) { return typeof window!=='undefined' && window.ArabLive ? window.ArabLive.fixture(match) : match.fixture||{}; }

@@ -154,7 +154,36 @@ def estimate(home, away, league):
     return vector(rates),vector(raw),details
 
 
-def movement(books, side):
+def favorite_path(history):
+    """Compare home/away within each complete 1X2 observation; ties are neutral."""
+    if not all(set(h.get('odds', {})) == {'1', 'x', '2'} for h in history):
+        return None
+    def leader(odds):
+        return None if odds['1'] == odds['2'] else '1' if odds['1'] < odds['2'] else '2'
+    values=[leader(h['odds']) for h in history]
+    previous=None;changes=[]
+    for h, value in zip(history, values):
+        if value is None: continue
+        if previous is not None and previous != value:
+            changes.append({'from':previous,'to':value,'observed_at':h['observed_at']})
+        previous=value
+    return {'initial':values[0], 'current':values[-1], 'changes':changes,
+            'net_switch':bool(values[0] and values[-1] and values[0]!=values[-1])}
+
+
+def favorite_consensus(rows):
+    eligible=[r['favorite_path'] for r in rows if r.get('favorite_path') is not None]
+    transitions={k:sum(r['net_switch'] and (r['initial'],r['current'])==k for r in eligible)
+                 for k in [('1','2'),('2','1')]}
+    direction=max(transitions,key=transitions.get)
+    n=transitions[direction]
+    return {'paired_books':len(eligible),'agreeing_books':n,
+            'confirmed':n>=2 and n>len(eligible)/2,
+            'from':direction[0] if n else None,'to':direction[1] if n else None,
+            'books_with_historical_switch':sum(bool(r['changes']) for r in eligible)}
+
+
+def movement(books, side, include_previous=True):
     """Same operators over the same observation window; no aggregate mix shift."""
     paired=[]
     for b in books:
@@ -188,7 +217,12 @@ def movement(books, side):
         rows.append({'leg_fair_delta_pp':leg_delta,'hours':hours,'persistence':persistence,'bookmaker':b['bookmaker'],'initial':points[0],'current':points[-1],
             'turning':points[turn] if reversal else None,'reversal':reversal,'delta_pct':delta,
             'fair_delta_pp':fair_delta,'margin_delta_pp':margin-om,'observed_from':start.isoformat(),
-            'observed_to':end.isoformat(), 'sequence':points})
+            'observed_to':end.isoformat(), 'sequence':points,
+            'net_delta_pct':(points[-1]/points[0]-1)*100,
+            'leg_from':h[turn]['observed_at'],
+            'fair_initial_pct':op[side]*100,'fair_current_pct':fp[side]*100,
+            'margin_initial_pct':om,'margin_current_pct':margin,
+            'favorite_path':favorite_path(h)})
     direction=lambda r: 1 if r['delta_pct']>0 else -1 if r['delta_pct']<0 else 0
     counts={s:sum(direction(r)==s for r in rows) for s in (-1,1)}
     sign=max(counts,key=counts.get); agreeing=[r for r in rows if direction(r)==sign]
@@ -202,15 +236,33 @@ def movement(books, side):
         absolute=(min(abs(delta)/4,1)*40+len(agreeing)/len(rows)*25+
                   min(abs(delta)/hours/1.5,1)*10+median(r['persistence'] for r in agreeing)*15+min(len(rows)/8,1)*10)
         oci=0 if abs(delta)<.10 else absolute*(1 if delta>0 else -1)
-    return {'oci':oci,'oci_method':'OCI-AS on paired operators, last leg; descriptive, not independent evidence',
+    result = {'schema_version':2,'oci':oci,'oci_method':'OCI-AS on paired operators, last leg; descriptive, not independent evidence',
         'fair_direction_coherent':bool(confirmed and all(r['leg_fair_delta_pp']*sign<0 for r in agreeing)),
         'confirmed':confirmed,'paired_books':len(rows),'agreeing_books':len(agreeing),
-        'direction':'up' if sign>0 else 'down','arrow':'⇅' if confirmed and any(r['reversal'] for r in agreeing) else '↑' if sign>0 else '↓',
+        'direction':('up' if sign>0 else 'down') if confirmed else None,
+        'arrow':('↑' if sign>0 else '↓') if confirmed else None,
+        'has_direction_reversal':any(r['reversal'] for r in agreeing) if confirmed else False,
+        'favorite_switch':favorite_consensus(rows),
         'color':'red' if amplitude>=8 else 'yellow' if amplitude>=3 else 'green',
         'amplitude_pct':amplitude,'median_drop_pct':-median(r['delta_pct'] for r in selected) if selected else None,
         'median_fair_delta_pp':median(r['fair_delta_pp'] for r in selected) if selected else None,
         'median_overround_delta_pp':median(r['margin_delta_pp'] for r in selected) if selected else None,
         'operators':rows,'reason':'consenso_multi_operatore' if confirmed else 'nessuna_maggioranza_multi_operatore'}
+    # Compare OCI only with a preceding observation on the same operator cohort.
+    result['oci_previous']=None
+    if include_previous and confirmed:
+        earliest_end=min(end for _,_,_,end in paired)
+        candidates=[stamp(hh['observed_at']) for _,h,_,_ in paired for hh in h
+                    if stamp(hh['observed_at']) < earliest_end]
+        if candidates:
+            cutoff=max(candidates)
+            old_books=[dict(b,trace=[hh for hh in h if stamp(hh['observed_at'])<=cutoff]) for b,h,_,_ in paired]
+            prior=movement(old_books, side, include_previous=False)
+            if prior.get('confirmed') and {r['bookmaker'] for r in prior.get('operators',[])}=={r['bookmaker'] for r in rows}:
+                result['oci_previous']=prior['oci']
+                result['oci_previous_at']=cutoff.isoformat()
+    return result
+
 
 
 def market_label(key, side):

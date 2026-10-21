@@ -4,7 +4,7 @@ from copy import deepcopy
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
-from context_analysis import select_history,profile,correction,evaluate,movement
+from context_analysis import select_history,profile,correction,evaluate,movement,favorite_path
 from analysis_history import freeze_update,latest_store
 from multimarket_model import fair
 from multimarket_audit import settle,build_report
@@ -68,8 +68,44 @@ class ContextTests(unittest.TestCase):
         self.assertFalse(movement([book('A',[2.5,2])],'over')['confirmed'])
         self.assertFalse(movement([book('A',[2.5,2]),book('B',[2,2.5])],'over')['confirmed'])
         m=movement([book('A',[2.5,2,2.4]),book('B',[2.5,2,2.4])],'over')
-        self.assertTrue(m['confirmed']);self.assertEqual(m['arrow'],'⇅');self.assertEqual(m['color'],'red')
+        self.assertTrue(m['confirmed']);self.assertEqual(m['arrow'],'↑');self.assertTrue(m['has_direction_reversal']);self.assertEqual(m['color'],'red')
         self.assertAlmostEqual(m['amplitude_pct'],20)
+
+    def test_favorite_switch_is_distinct_from_direction_reversal(self):
+        def team_book(name, pairs):
+            b=book(name,[2]*len(pairs))
+            for h,(home,away) in zip(b['trace'],pairs):
+                h['odds']={'1':home,'x':3.5,'2':away}
+            return b
+        pairs=[(1.8,2.8),(2.2,2.2),(2.8,1.8)]
+        a,b=team_book('A',pairs),team_book('B',pairs)
+        m=movement([a,b],'1')
+        self.assertTrue(m['favorite_switch']['confirmed'])
+        self.assertEqual((m['favorite_switch']['from'],m['favorite_switch']['to']),('1','2'))
+        self.assertFalse(m['has_direction_reversal'])
+        self.assertEqual(len(m['operators'][0]['favorite_path']['changes']),1)
+        self.assertFalse(movement([a],'1')['favorite_switch']['confirmed'])
+        other=team_book('B',[(2.8,1.8),(2.2,2.2),(1.8,2.8)])
+        self.assertFalse(movement([a,other],'1')['favorite_switch']['confirmed'])
+        returned=team_book('A',[(1.8,2.8),(2.8,1.8),(1.8,2.8)])
+        p=favorite_path(returned['trace'])
+        self.assertEqual(len(p['changes']),2);self.assertFalse(p['net_switch'])
+        tied=team_book('A',[(1.8,2.8),(2.2,2.2),(1.8,2.8)])
+        self.assertEqual(favorite_path(tied['trace'])['changes'],[])
+        end_tie=team_book('A',[(1.8,2.8),(2.2,2.2)])
+        self.assertFalse(favorite_path(end_tie['trace'])['net_switch'])
+
+    def test_margin_fair_and_previous_oci_are_observed(self):
+        m=movement([book('A',[2.5,2.2,2]),book('B',[2.5,2.2,2])],'over')
+        row=m['operators'][0]
+        self.assertAlmostEqual(row['fair_initial_pct'],100*(1/2.5)/(1/2.5+1/2))
+        self.assertAlmostEqual(row['fair_current_pct'],50)
+        self.assertAlmostEqual(row['margin_initial_pct'],-10)
+        self.assertAlmostEqual(row['margin_current_pct'],0)
+        self.assertAlmostEqual(row['net_delta_pct'],-20)
+        self.assertIsNotNone(m['oci_previous'])
+        m=movement([book('A',[2.5,2]),book('B',[2.5,2])],'over')
+        self.assertIsNone(m['oci_previous'])
 
     def test_stale_quotes_excluded_and_book_only_available(self):
         q=book('A',[2,2.1]);q['provider_updated_at']='2026-10-19T00:00:00+00:00'

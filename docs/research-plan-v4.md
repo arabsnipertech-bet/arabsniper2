@@ -114,3 +114,12 @@ non si sommano. Brier/log-loss confrontano le fonti sugli stessi eventi;
 quote assenti escluse dal ROI teorico a puntata costante, esiti assenti pendenti.
 Non si tratta dello snapshot esatto a -2 ore: prima/ultima sono esplicitate.
 Nessuna variazione del modello, dello stake o dell'ordine cronologico della UI.
+
+
+### Diagnostica quote: inversione e cambio favorita (21 ottobre 2026)
+
+La dashboard separa la variazione totale delle quote visibili dello stesso operatore dall’ampiezza mediana dell’ultimo tratto multi-book. Le frecce indicano sempre salita o discesa; un precedente cambio di direzione è dichiarato a parte.
+
+Il cambio favorita 1↔2 confronta casa e ospite nello stesso mercato completo 1X2, per operatore e finestra temporale confrontabile. Conferma: almeno due operatori e maggioranza stretta; le parità sono neutrali. Un ritorno alla favorita iniziale resta visibile nel percorso, senza essere chiamato cambio netto. X è un esito distinto.
+
+Book senza margine e aggio prima/dopo usano tutte le quote dello stesso mercato. La distanza dalla statistica mantiene fissa la stima attuale: non ricostruisce una statistica passata. OCI precedente viene ricostruito solo con osservazioni antecedenti e lo stesso insieme di operatori confrontabili. Dati assenti restano assenti. Questi indicatori sono descrittivi: non alterano modello, selezione, stake o previsioni archiviate. Nessuna chiamata API aggiuntiva.
