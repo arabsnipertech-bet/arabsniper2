@@ -7,5 +7,5 @@
   "triggers": {"crons": ["*/2 * * * *"]},
   "durable_objects": {"bindings": [{"name": "SCORES", "class_name": "ScoreStore"}]},
   "migrations": [{"tag": "v1", "new_sqlite_classes": ["ScoreStore"]}],
-  "vars": {"LIVE_ENABLED": "false", "MAX_CALLS_PER_DAY": "1500", "RESERVE_REQUESTS": "1000"}
+  "vars": {"LIVE_ENABLED": "true", "MAX_CALLS_PER_DAY": "1500", "RESERVE_REQUESTS": "1000"}
 }
