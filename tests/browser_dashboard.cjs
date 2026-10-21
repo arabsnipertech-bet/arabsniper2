@@ -62,12 +62,13 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Live mobile overflow');
     await page.screenshot({path:'test-artifacts/live-mobile.png',fullPage:true});
     assert.equal(await page.locator('.cx-card.cx-is-live').count(),1);
-    const frozen=await page.evaluate(()=>JSON.stringify(currentPayload));
+    const frozen=await page.evaluate(()=>{window.savedCard=document.querySelector('.cx-card');window.savedScenario=document.querySelector('.cx-scenario');document.querySelector('.cx-detail').open=true;return JSON.stringify(currentPayload)});
     await page.evaluate(()=>{
       ArabLive.accept({schema_version:1,enabled:true,fixtures:{'123456':{fixture_id:'123456',status:'2H',elapsed:63,goals:{home:2,away:1},halftime:{home:1,away:1},observed_at:new Date(Date.now()+1000).toISOString()}}});
       window.dispatchEvent(new Event('arabsniper-live-update'));
     });
     assert((await page.locator('.cx-score').textContent()).includes('2–1'));
+    assert(await page.evaluate(()=>savedCard===document.querySelector('.cx-card')&&savedScenario===document.querySelector('.cx-scenario')&&document.querySelector('.cx-detail').open),'Live patch preserves card, controls and open details');
     assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozen,'Live must not mutate prematch data');
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Score mobile overflow');
     await page.screenshot({path:'test-artifacts/live-score-mobile.png',fullPage:true});
