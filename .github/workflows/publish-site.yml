@@ -1,0 +1,62 @@
+name: Pubblica sito
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: cloudflare-pages-manual-publication
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Richiedi pubblicazione di main
+        shell: python
+        env:
+          DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_PAGES_DEPLOY_HOOK }}
+        run: |
+          import json
+          import os
+          import re
+          import urllib.request
+          import urllib.error
+
+          def fail(message):
+              raise SystemExit(message)
+
+          if os.environ.get('GITHUB_REF') != 'refs/heads/main':
+              fail('Selezionare il ramo main per questo workflow.')
+          hook = os.environ.get('DEPLOY_HOOK', '').strip()
+          if not hook:
+              fail('Secret CLOUDFLARE_PAGES_DEPLOY_HOOK assente o vuoto.')
+          if not re.fullmatch(r'https://api\.cloudflare\.com/client/v4/pages/webhooks/deploy_hooks/[0-9a-fA-F-]{36}', hook):
+              fail('Il secret non contiene un URL Cloudflare Pages Deploy Hook valido.')
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+
+          request = urllib.request.Request(hook, data=b'', method='POST')
+          try:
+              # One POST only: retrying a timeout could start duplicate builds.
+              with urllib.request.build_opener(NoRedirect()).open(request, timeout=30) as response:
+                  result = json.load(response)
+          except urllib.error.HTTPError as error:
+              fail(f'Cloudflare ha rifiutato la richiesta: HTTP {error.code}. URL e risposta omessi.')
+          except Exception:
+              fail('Risposta non verificabile. Controllare Cloudflare prima di riprovare: la richiesta potrebbe essere stata ricevuta.')
+          if not isinstance(result, dict) or result.get('success') is not True:
+              fail('Cloudflare non ha confermato la richiesta. Controllare le distribuzioni del progetto.')
+          deployment = (result.get('result') or {}).get('id')
+          if not isinstance(deployment, str) or not re.fullmatch(r'[0-9a-fA-F-]{36}', deployment):
+              fail('Richiesta ricevuta ma identificativo non verificabile: controllare Cloudflare prima di riprovare.')
+          message = f'Richiesta accettata da Cloudflare. ID: {deployment}. La pubblicazione deve ancora completarsi.'
+          print(message)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('## Pubblicazione richiesta\n\n' + message + '\n\n')
+              summary.write('Il hook deve essere configurato sul ramo main del progetto arabsniperbet. Pubblica il main disponibile al momento della richiesta, non un commit storico.\n\n')
+              summary.write('Verificare lo stato in Cloudflare → Workers & Pages → arabsniperbet → Distribuzioni, poi https://arabsniperbet.com. Il successo di questo job conferma la richiesta, non il completamento della build.\n')
