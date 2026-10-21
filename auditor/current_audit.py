@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 from prematch_audit import build_report, settle_predictions
 from audit_storage import read_store, write_store
+from daily_audit import build_daily, markdown, fingerprint
 
 TZ = ZoneInfo('Europe/Rome')
 
@@ -125,7 +126,10 @@ def settle(root, now, fetcher=fetch_results):
         for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations', 'signal_observations', 'analysis_updates'):
             records = deepcopy(day.get(collection, {}))
             for key, record in records.items():
-                saved = previous.get(collection, {}).get(key, {}).get('settlement')
+                old = previous.get(collection, {}).get(key)
+                if old is not None and fingerprint(old) != fingerprint(record):
+                    raise ValueError(f'Frozen forecast mismatch: {date}/{collection}/{key}')
+                saved = (old or {}).get('settlement')
                 if saved:
                     record['settlement'] = saved
             store[collection] = records
@@ -139,6 +143,10 @@ def settle(root, now, fetcher=fetch_results):
             settle_predictions(store, fetcher(str(date), key))
             queried.append(str(date))
         write(results_path, store)
+        daily = build_daily(store, str(date), now.isoformat(), os.environ.get('GITHUB_SHA'))
+        write(root / f'auditarchive/prematch_{date}_daily.json', daily)
+        from audit_storage import atomic_bytes
+        atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md', markdown(daily).encode())
         for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations', 'signal_observations', 'analysis_updates'):
             combined[collection].update(store[collection])
     report = build_report(combined)
