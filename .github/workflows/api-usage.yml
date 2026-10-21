@@ -1,0 +1,20 @@
+name: Inspect API quota
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/api_usage.py', '.github/workflows/api-usage.yml']
+permissions:
+  contents: read
+jobs:
+  quota:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Read sanitized plan and daily usage
+        env:
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+        run: python src/api_usage.py

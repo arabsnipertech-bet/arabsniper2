@@ -7,9 +7,11 @@ on:
       - 'auditor/current_audit.py'
       - '.github/workflows/policy_tests.yml'
       - 'web/gold-dashboard-live.html'
+      - 'web/live-scores.js'
+      - 'workers/live-scores/**'
   push:
     branches: [main]
-    paths: ['src/**', 'tests/**', 'auditor/current_audit.py', 'web/gold-dashboard-live.html']
+    paths: ['src/**', 'tests/**', 'auditor/current_audit.py', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'workers/live-scores/**']
 permissions:
   contents: read
 jobs:
@@ -25,6 +27,7 @@ jobs:
       - run: python -m py_compile src/3appdays.py src/policy_integration.py src/selection_policy.py src/prematch_audit.py src/first_half_quality.py src/filter_audit.py src/multimarket_model.py src/context_analysis.py src/analysis_history.py src/multimarket_audit.py src/model_research.py src/signal_research.py auditor/current_audit.py
       - run: node tests/test_dashboard.js
       - run: node tests/test_storage_loader.cjs
+      - run: node --test tests/test_live_scores.mjs
 
 
       - name: Install browser for dashboard checks

@@ -7,6 +7,7 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     const page=await browser.newPage();
     await page.route('**/*',r=>r.abort());
     await page.setContent(fs.readFileSync(path.join(__dirname,'../web/gold-dashboard-live.html'),'utf8'));
+    await page.addScriptTag({content:fs.readFileSync(path.join(__dirname,'../web/live-scores.js'),'utf8')});
     const now=new Date().toISOString();
     const mk=(market,selection,label,p)=>({market,selection,label,probability_pct:p,statistical_pct:p,book_probability_pct:p-3,
       source:'statistica e bookmaker',source_reason:'Dati sintetici per verifica interfaccia.',quote:{bookmaker:'Test',provider_updated_at:now},odd:2,
@@ -16,7 +17,7 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     rows[6].odd=1.65; rows[6].movement={confirmed:true,color:'red',arrow:'↓',amplitude_pct:10,agreeing_books:2,paired_books:2,operators:[{bookmaker:'Test',initial:1.85,current:1.65,sequence:[1.85,1.65]}]};
     rows.push(mk('over25_ht','over','Over 2,5 PT',18));
     const primary={...rows[2],research_candidate:true,price_assessment:{reference_probability_pct:58,break_even_probability_pct:50,reference_fair_odd:100/58,estimated_return_pct:16,status:'unvalidated_positive_estimate',note:'Esempio sintetico non validato.'}};
-    const payload={updated_at:now,matches:[{fixture:{fixture_id:'demo',kickoff:new Date(Date.now()+3600000).toISOString(),
+    const payload={updated_at:now,matches:[{fixture:{fixture_id:'123456',kickoff:new Date(Date.now()+3600000).toISOString(),
       match:'Squadra casa – Squadra ospite <script>',time:'20:45',league:'Campionato di prova',country:'Italia'},
       multimarket:{model_id:'context-goals-v3.4',status:'experimental',captured_at:now,data_quality:{home:{sample:8,xg_for:4,shots_for:6,opportunity_matches:6},away:{sample:8,xg_for:0,shots_for:0,opportunity_matches:0}},profiles:{},weights:{},markets:rows,
         best_candidate:primary,ranked_hypotheses:rows.map(r=>r.market+'::'+r.selection)}}]};
@@ -60,6 +61,16 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     assert((await page.locator('.cx-mini').filter({hasText:'GG PT sì'}).textContent()).includes('Verificato: riuscito'));
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Live mobile overflow');
     await page.screenshot({path:'test-artifacts/live-mobile.png',fullPage:true});
+    assert.equal(await page.locator('.cx-card.cx-is-live').count(),1);
+    const frozen=await page.evaluate(()=>JSON.stringify(currentPayload));
+    await page.evaluate(()=>{
+      ArabLive.accept({schema_version:1,enabled:true,fixtures:{'123456':{fixture_id:'123456',status:'2H',elapsed:63,goals:{home:2,away:1},halftime:{home:1,away:1},observed_at:new Date(Date.now()+1000).toISOString()}}});
+      window.dispatchEvent(new Event('arabsniper-live-update'));
+    });
+    assert((await page.locator('.cx-score').textContent()).includes('2–1'));
+    assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozen,'Live must not mutate prematch data');
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Score mobile overflow');
+    await page.screenshot({path:'test-artifacts/live-score-mobile.png',fullPage:true});
     // Global market filter must not block exact per-fixture alternatives.
     await page.evaluate(()=>researchFilter('market','over25_ft::over'));
     await page.locator('.cx-mini').filter({hasText:'GG PT sì'}).click();
