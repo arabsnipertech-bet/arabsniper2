@@ -44,5 +44,7 @@
   if(root.document){
     root.setInterval(poll,120000);
     root.document.addEventListener('visibilitychange',()=>{if(!root.document.hidden)poll();});
+    root.addEventListener('pageshow',poll);
+    root.addEventListener('focus',poll);
   }
 })(typeof window==='undefined'?globalThis:window);
