@@ -43,3 +43,44 @@ class AuditStorageTests(unittest.TestCase):
             result=a.archive(root,datetime(2026,10,20,10,tzinfo=timezone.utc))
             self.assertEqual(result['new_forecasts'],1)
             self.assertEqual(read_store(root/'auditordata/prematch_2026-10-21.json')['fixtures']['1'],record)
+
+    def test_freeze_reads_each_day_once_and_preserves_existing_forecasts(self):
+        import importlib.util
+        from copy import deepcopy
+        from datetime import datetime, timezone
+        from unittest.mock import patch
+        spec = importlib.util.spec_from_file_location('freeze_regression', Path(__file__).resolve().parents[1]/'auditor/current_audit.py')
+        a = importlib.util.module_from_spec(spec); spec.loader.exec_module(a)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            record = {'fixture': {'fixture_id': '1', 'kickoff': '2026-10-21T12:00:00+00:00'},
+                      'captured_at': '2026-10-20T08:00:00+00:00', 'probability': .3, 'padding': 'è'*1000}
+            day_path = root/'auditordata/prematch_2026-10-21.json'
+            original = {'schema_version': 1, 'audit_date': '2026-10-21', 'fixtures': {'1': deepcopy(record)}}
+            original['fixtures']['1']['settlement'] = {'outcomes': {'over25_ft::over': True}}
+            write_store(day_path, original, chunk_bytes=257)
+            records = {}
+            for i in range(1, 41):
+                value = deepcopy(record)
+                value['fixture']['fixture_id'] = str(i)
+                value['probability'] = .9
+                value['settlement'] = {'outcomes': {'over25_ft::over': False}}
+                records[str(i)] = value
+            # A late capture is never admitted, even when its daily file is cached.
+            late = deepcopy(record); late['fixture']['fixture_id'] = 'late'
+            late['captured_at'] = late['fixture']['kickoff']
+            records['late'] = late
+            source = root/'data/arab_quote_prematch_audit.json'
+            write_store(source, {'fixtures': records}, chunk_bytes=257)
+            now = datetime(2026, 10, 22, tzinfo=timezone.utc)
+            with patch.object(a, 'read', wraps=a.read) as reader:
+                result = a.archive(root, now)
+            self.assertEqual(sum(call.args[0] == day_path for call in reader.call_args_list), 1)
+            self.assertEqual(result['new_forecasts'], 39)
+            self.assertEqual(result['rejected_without_valid_prematch_evidence'], 1)
+            saved = read_store(day_path)
+            self.assertEqual(saved['fixtures']['1'], original['fixtures']['1'])
+            self.assertNotIn('settlement', saved['fixtures']['2'])
+            self.assertNotIn('late', saved['fixtures'])
+            self.assertEqual(a.archive(root, now)['new_forecasts'], 0)
+            self.assertEqual(read_store(day_path), saved)
