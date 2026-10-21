@@ -88,3 +88,29 @@ ROI teorico. Il confronto statistica/book usa gli stessi eventi con entrambe le
 probabilità. I dati retrospettivi restano distinti. Il report non aggiusta soglie,
 non promuove varianti e non dimostra redditività. Prima di modificare il modello,
 registrare l'ipotesi e confrontarla su un blocco temporale futuro separato.
+
+## Studio osservazionale goal-convergence-study-v1
+
+Registrato il 21 ottobre dopo aver osservato la selezione personale giapponese
+5/6. Quella giornata e le precedenti sono esplorative, non validazione della
+regola. Validazione su fixture dal 22 ottobre, con previsioni prematch congelate.
+
+Confronti fissi, separati per Over 1,5 PT, Over 2,5 FT e Over 3,5 FT:
+- entrambe le fonti strettamente sopra il 50%;
+- entrambe sopra il 50% e distanza <=10 punti;
+- precedente accordo e riferimento sotto la soglia di pareggio;
+- precedente accordo e riferimento sopra la soglia di pareggio.
+
+10 punti è una definizione sperimentale di “paragonabili”, non il limite ottimo
+né un valore stimato sui risultati. Non imponiamo un limite alla distanza dalla
+soglia di pareggio: non era stato definito dall'utente. Le quote sono quelle
+archiviate dal sistema, non quelle del biglietto personale. Il caso 5/6 non è
+ricostruito come una regola storica verificata.
+
+Il daily audit include gruppi selezionati/non selezionati/dati mancanti,
+prima e ultima osservazione separate, sole proposte principali e tutti i mercati
+separati, dettaglio per paese/league_id e totale. Le coorti si sovrappongono e
+non si sommano. Brier/log-loss confrontano le fonti sugli stessi eventi;
+quote assenti escluse dal ROI teorico a puntata costante, esiti assenti pendenti.
+Non si tratta dello snapshot esatto a -2 ore: prima/ultima sono esplicitate.
+Nessuna variazione del modello, dello stake o dell'ordine cronologico della UI.
