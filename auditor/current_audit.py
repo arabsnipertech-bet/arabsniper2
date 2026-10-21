@@ -144,9 +144,11 @@ def settle(root, now, fetcher=fetch_results):
             queried.append(str(date))
         write(results_path, store)
         daily = build_daily(store, str(date), now.isoformat(), os.environ.get('GITHUB_SHA'))
+        from selection_studies import build_studies, study_markdown
+        daily['selection_studies'] = build_studies(daily)
         write(root / f'auditarchive/prematch_{date}_daily.json', daily)
         from audit_storage import atomic_bytes
-        atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md', markdown(daily).encode())
+        atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md', (markdown(daily)+study_markdown(daily['selection_studies'])).encode())
         for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations', 'signal_observations', 'analysis_updates'):
             combined[collection].update(store[collection])
     report = build_report(combined)
