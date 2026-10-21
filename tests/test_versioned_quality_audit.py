@@ -73,3 +73,23 @@ class VersionedQualityAuditTests(unittest.TestCase):
             self.assertTrue(next(iter(stored['quality_evaluations'].values()))['settlement']['outcomes']['over15_ht'])
             report = json.loads((root/'auditarchive/prematch_last_report.json').read_text())
             self.assertEqual(report['first_half_quality_by_version'][0]['comparison']['all_predictions']['n'], 1)
+
+    def test_settlement_blocks_changed_frozen_forecast(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root/'data/arab_quote_prematch_audit.json'
+            source.parent.mkdir()
+            source.write_text(json.dumps(data()))
+            now = datetime.fromisoformat('2026-10-21T09:00:00+02:00')
+            auditor.archive(root, now)
+            with patch.dict(os.environ, {'API_SPORTS_KEY': 'test-placeholder'}):
+                auditor.settle(root, now, fetcher=lambda date,key: results())
+            result_path = root/'auditarchive/prematch_2026-10-20_results.json'
+            before = result_path.read_bytes()
+            frozen_path = root/'auditordata/prematch_2026-10-20.json'
+            changed = json.loads(frozen_path.read_text())
+            changed['fixtures']['1']['probabilities_calibrated']['over15_ht']['over'] = .99
+            frozen_path.write_text(json.dumps(changed))
+            with self.assertRaisesRegex(ValueError, 'Frozen forecast mismatch'):
+                auditor.settle(root, now)
+            self.assertEqual(before, result_path.read_bytes())

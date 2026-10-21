@@ -66,3 +66,25 @@ Fonti di progetto:
 - https://www.api-football.com/documentation-v3
 - https://arxiv.org/abs/1802.08848
 - https://scikit-learn.org/stable/modules/calibration.html
+
+## Audit giornaliero verificabile
+
+L'auditor produce `auditarchive/prematch_YYYY-MM-DD_daily.json` e `.md` ad ogni
+settlement. Il JSON conserva identità della fixture, versione, prima/ultima
+osservazione separata, scelta `best_candidate` effettivamente congelata, cinque
+mercati obiettivo (e la scelta storica se esterna), quote, probabilità distinte,
+pro/contro, dati mancanti e risultato. Non ricostruisce una proposta con il modello
+odierno. Senza aggiornamenti, l'ultima osservazione coincide con la prima.
+
+Ogni riga rinvia alla collection/key dell'archivio risultati del giorno e contiene
+SHA-256 del record originale, serializzato JSON UTF-8 con chiavi ordinate,
+separatori compatti e senza `settlement`. L'auditor si blocca se un record già
+archiviato differisce dalla fonte congelata. Git conserva le revisioni dei report;
+`generated_at` e `source_revision` identificano l'esecuzione.
+
+Le fixture sono deduplicate per versione/periodo/snapshot; prima e ultima non si
+sommano. I risultati mancanti restano pendenti; le quote mancanti non entrano nel
+ROI teorico. Il confronto statistica/book usa gli stessi eventi con entrambe le
+probabilità. I dati retrospettivi restano distinti. Il report non aggiusta soglie,
+non promuove varianti e non dimostra redditività. Prima di modificare il modello,
+registrare l'ipotesi e confrontarla su un blocco temporale futuro separato.

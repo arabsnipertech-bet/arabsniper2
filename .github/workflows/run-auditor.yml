@@ -7,6 +7,7 @@ on:
     paths:
       - 'auditor/current_audit.py'
       - 'src/prematch_audit.py'
+      - 'src/daily_audit.py'
       - 'src/filter_audit.py'
       - 'src/first_half_quality.py'
       - 'src/multimarket_model.py'
@@ -47,7 +48,7 @@ jobs:
           git config user.email "github-actions@github.com"
           if [ -d auditordata/_audit_parts ]; then git add auditordata/_audit_parts; fi
           if [ -d auditarchive/_audit_parts ]; then git add auditarchive/_audit_parts; fi
-          git add auditordata/prematch_*.json auditarchive/prematch_*.json
+          git add auditordata/prematch_*.json auditarchive/prematch_*.json auditarchive/prematch_*_daily.md
           git add data/arab_quote_multimarket_report.json data/arab_quote_model_research.json
           if git diff --cached --quiet; then
             echo "No audit changes"
