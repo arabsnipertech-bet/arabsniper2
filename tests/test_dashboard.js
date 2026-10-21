@@ -143,7 +143,7 @@ let prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);
 assert(prices.includes('1.90'));assert(prices.includes('1.60'));assert(!prices.includes('9.00'));
 assert(prices.includes('cx-red'));assert(prices.includes('↓ discesa'));assert(prices.includes('-15.79%'));assert(prices.includes('inversione di movimento'));assert(prices.includes('Over 1,5 PT'));
 vm.runInContext('oddsFixture.multimarket.markets[0].movement.confirmed=false',researchContext);
-prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(!prices.includes('class="cx-red"'));
+prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(prices.includes('cx-green cx-unconfirmed'));assert(!prices.includes('cx-signal cx-red'));
 vm.runInContext('oddsFixture.multimarket.markets[0].quote.bookmaker="C"',researchContext);
 prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(!prices.includes('1.90'));
 vm.runInContext('oddsFixture.multimarket.markets[0].quote.bookmaker="A";oddsFixture.multimarket.markets[0].odd=1.9',researchContext);
@@ -180,3 +180,12 @@ assert(vm.runInContext("contextGoalProgress(liveFixture,{market:'over25_ft'})",r
 vm.runInContext('liveFixture.fixture.live.goals.home=2',researchContext);
 assert(vm.runInContext("contextGoalProgress(liveFixture,{market:'over25_ft'})",researchContext).includes('Serve ancora 1 gol'));
 console.log('Market comparison: chronological ranking, started exclusion, immutable order and live goal distance passed.');
+
+// Visual intensity must never promote a large, unconfirmed movement.
+for(const [amplitude,count,confirmed,expected] of [[2.99,3,true,'green'],[3,3,true,'yellow'],[8,3,true,'red'],[30,1,false,'green']]){
+ researchContext.visualMovement={amplitude_pct:amplitude,paired_books:4,agreeing_books:count,confirmed,direction:'up'};
+ const badge=vm.runInContext('contextMovementBadge(visualMovement)',researchContext);
+ assert(badge.includes('cx-signal cx-'+expected));
+ assert(badge.includes(confirmed?'✓':'Non confermato'));
+}
+assert(vm.runInContext('contextMovementBadge({})',researchContext).includes('cx-unknown'));

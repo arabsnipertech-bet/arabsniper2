@@ -24,7 +24,7 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     // Isolated synthetic renderer test: no network, premium account or auth change.
     await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;researchMarket='all';renderMatchResearch(p)},payload);
     fs.mkdirSync('test-artifacts',{recursive:true});
-    for(const [name,width,height] of [['desktop',1280,1000],['mobile',390,844]]){
+    for(const [name,width,height] of [['desktop',1280,1000],['mobile',390,844],['small-mobile',360,800]]){
       await page.setViewportSize({width,height});
       await page.evaluate(()=>contextBack());
       assert.equal(await page.locator('.cx-list-row').count(),1);
@@ -32,6 +32,9 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       assert.equal(await page.locator('.cx-card').count(),0);
       assert(await page.locator('.cx-compact-odds .cx-favorite').isVisible());
       assert(await page.locator('.cx-compact-odds .cx-red').isVisible(),'Movement visible in mobile/desktop list');
+      assert(await page.locator('.cx-red .cx-direction').isVisible());
+      assert(await page.locator('.cx-legend').isVisible());
+      assert((await page.locator('.cx-red').textContent()).includes('✓ 2/2 book'));
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
       await page.screenshot({path:`test-artifacts/list-${name}.png`,fullPage:true});
       await page.locator('.cx-open').click();
