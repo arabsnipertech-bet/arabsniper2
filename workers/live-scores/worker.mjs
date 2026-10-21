@@ -25,7 +25,7 @@ export class ScoreStore {
     const state=await this.ctx.storage.get('state');
     return json({schema_version:1,enabled:this.env.LIVE_ENABLED==='true',
       generated_at:state?.published_at||null,poll_interval_seconds:120,
-      status:state?.status||'not_configured',fixtures:state?.scores||{}});
+      status:state?.status||'not_configured',diagnostic:state?.diagnostic||null,fixtures:state?.scores||{}});
   }
   async refresh(now=Date.now()) {
     if(this.env.LIVE_ENABLED!=='true'||!this.env.API_SPORTS_KEY) return;
@@ -33,6 +33,7 @@ export class ScoreStore {
     let s=await store.get('state')||{scores:{},watch:[],calls:0};
     if(s.attempted_at && now-s.attempted_at<115000) return;
     s.attempted_at=now;
+    s.diagnostic=null;
     const today=iso(now).slice(0,10);
     if(s.day!==today){s.day=today;s.calls=0;s.quota=null;}
     // Persist the interval before network I/O, including failed attempts.
@@ -64,7 +65,13 @@ export class ScoreStore {
         if(s.quota && remaining!==null && /^\d+$/.test(remaining)) s.quota.current=Math.max(0,s.quota.limit-Number(remaining));
         if(!response.ok) throw new Error('provider_unavailable');
         const value=await response.json();
-        if(value.errors && Object.keys(value.errors).length) throw new Error('provider_error');
+        if(value.errors && Object.keys(value.errors).length) {
+          // Only fixed category names may leave the Worker; never upstream messages.
+          const known=['token','key','headers','access','ip','rateLimit','requests','subscription','plan','date','timezone'];
+          const categories=known.filter(k=>Object.prototype.hasOwnProperty.call(value.errors,k));
+          s.diagnostic={endpoint:path==='status'?'status':'fixtures',http_status:response.status,categories:categories.length?categories:['other']};
+          throw new Error('provider_error');
+        }
         return value;
       };
       if(!s.quota || now-s.quota.checked_at>3600000) {
