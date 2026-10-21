@@ -18,11 +18,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0
+          fetch-depth: 1
       - name: Check that recovered data cannot replace newer scans
         id: guard
         shell: bash
         run: |
+          git fetch --depth=1 origin fc645228d7505c23ddd84c81f402967863e01713
           if git diff --quiet fc645228d7505c23ddd84c81f402967863e01713 HEAD -- data; then
             echo 'restore=true' >> "$GITHUB_OUTPUT"
           else
