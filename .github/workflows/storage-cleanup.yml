@@ -1,0 +1,36 @@
+name: Cleanup unreferenced storage
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/storage_cleanup.py', '.github/workflows/storage-cleanup.yml']
+  schedule:
+    - cron: '20 3 * * 0'
+permissions:
+  contents: write
+concurrency:
+  group: arabsniper-quote-data-writer
+  cancel-in-progress: false
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Verify all archives and remove unreferenced parts
+        run: |
+          set -euo pipefail
+          python src/storage_cleanup.py --apply | tee /tmp/storage-cleanup-report.json
+          cat /tmp/storage-cleanup-report.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish deletions without overwriting newer data
+        run: |
+          set -euo pipefail
+          git add -u data auditordata auditarchive
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Remove verified unreferenced storage parts'
+          git push origin HEAD:main
