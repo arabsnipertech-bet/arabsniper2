@@ -21,7 +21,7 @@ Questa patch corregge il billing, NON completa autenticazione o protezione dati:
 2. Sul Worker `stripe-checker`, aggiungere binding D1 `ACCESS_DB` a quel database.
 3. Conservare `STRIPE_SECRET_KEY` come secret già presente (oppure usare una chiave ristretta con autorizzazioni necessarie). Non incollarla in chat, HTML, git o variabili pubbliche.
 4. Variabili: `STRIPE_MODE=live` e `CHECKOUT_ENABLED=false` durante preparazione. Secret `STRIPE_WEBHOOK_SECRET` verrà configurato con il segreto dell'endpoint corretto. Il Worker richiede la modalità esplicita.
-5. Distribuire `worker.mjs` nel Worker ES module. Aggiungere route `arabsniperbet.com/api/*` e, se usato, `www.arabsniperbet.com/api/*` al medesimo Worker, senza modificare il dominio Pages. Il dominio `stripe-checker.arabsnipertech.workers.dev` continua a servire il login esistente.
+5. Distribuire `worker.mjs` nel Worker ES module. Aggiungere solo le route esatte `arabsniperbet.com/api/create-checkout-session` e `arabsniperbet.com/api/stripe-webhook` al medesimo Worker. Non usare `/api/*`: altre API del sito sono gestite da Worker diversi. Se il sito serve anche www senza redirect, configurare le corrispondenti due route esatte, senza modificare il dominio Pages. Il dominio `stripe-checker.arabsnipertech.workers.dev` continua a servire il login esistente.
 6. Su Stripe configurare l'endpoint HTTPS `https://arabsniperbet.com/api/stripe-webhook`: eventi `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`, `charge.dispute.created`. Per questa versione le subscription vengono verificate direttamente su Stripe al login: non vengono memorizzate in D1. Il vecchio endpoint è disabilitato: non riabilitarlo prima del deployment e dell'inserimento del suo segreto esatto. API usata dal Worker: `2026-08-26.dahlia`.
 7. Chiave webhook in Cloudflare come secret `STRIPE_WEBHOOK_SECRET`. Nessun bisogno di inviarla in chat.
 
@@ -44,3 +44,7 @@ I vecchi mensili 19 e 19,90 EUR sono riconosciuti. I vecchi pass singoli precede
 ## Test eseguiti
 
 `node --test tests/test_stripe_access.mjs` (Node 24, SQLite in-memory): nove test con API Stripe simulate. Firma/tamper/replay, duplicati, durata e scadenza esatta, pagamento asincrono, rimborso prima/dopo fulfillment, prezzo/quantità/valuta, più customer stessa email, fattura mensile non pagata, VIP, blocco checkout non configurato, prezzo non controllabile dal client e origine. Questi test non sostituiscono le prove end-to-end su Stripe/Cloudflare.
+
+## Verifica sandbox 22 ottobre 2026
+
+Checkout reali in modalità test completati per Daily 5 EUR, Weekly 15 EUR e Monthly 29 EUR. Il Worker di test ha restituito accesso daily, weekly e stripe_subscription/monthly per email non VIP. Rimborso simulato del Daily riuscito: il successivo controllo ha riconosciuto il mensile anziché il pass rimborsato. I test automatici su duplicati e scadenze passano. Nessun addebito reale; la consegna firmata del webhook di produzione resta da verificare.
