@@ -23,8 +23,8 @@
                 <div class="plan-card">
                     <div class="plan-badge">DAY PASS</div>
                     <div class="plan-title">Arab Sniper Daily</div>
-                    <div class="plan-price">€3</div>
-                    <div class="plan-sub">Accesso 24 ore</div>
+                    <div class="plan-price">€5</div>
+                    <div class="plan-sub">24 ore · pagamento unico</div>
                     <div class="plan-desc">
                         Ideale per testare il servizio in una giornata live con accesso rapido all’area premium.
                     </div>
@@ -34,8 +34,8 @@
                 <div class="plan-card">
                     <div class="plan-badge">WEEK PASS</div>
                     <div class="plan-title">Arab Sniper Weekly</div>
-                    <div class="plan-price">€7</div>
-                    <div class="plan-sub">Accesso 7 giorni</div>
+                    <div class="plan-price">€15</div>
+                    <div class="plan-sub">7 giorni · pagamento unico</div>
                     <div class="plan-desc">
                         Pensato per chi vuole seguire più scan e più giornate senza entrare nel mensile.
                     </div>
@@ -45,8 +45,8 @@
                 <div class="plan-card featured">
                     <div class="plan-badge">MONTHLY GOLD</div>
                     <div class="plan-title">Arab Sniper Gold</div>
-                    <div class="plan-price">€19</div>
-                    <div class="plan-sub">Abbonamento mensile</div>
+                    <div class="plan-price">€29</div>
+                    <div class="plan-sub">29 € al mese · rinnovo automatico</div>
                     <div class="plan-desc">
                         Accesso completo continuativo all’area Gold, soluzione principale per utenti registrati premium.
                     </div>
@@ -87,8 +87,10 @@
                 throw new Error(data.error || "Errore nella creazione della sessione di pagamento.");
             }
 
-            setCheckoutStatus("Checkout aperto in una nuova scheda.", "success");
-            window.open(data.url, "_blank");
+            const checkoutUrl = new URL(data.url);
+            if (checkoutUrl.origin !== "https://checkout.stripe.com") throw new Error("Indirizzo di pagamento non valido.");
+            setCheckoutStatus("Apertura del pagamento Stripe…", "info");
+            window.location.assign(data.url);
 
             allButtons.forEach(btn => btn.disabled = false);
             if (buttonEl) {
@@ -117,7 +119,7 @@
         }
 
         if (params.get("success") === "true") {
-            setCheckoutStatus("Pagamento completato. Verifica accesso premium in corso.", "success");
+            setCheckoutStatus("Ritorno da Stripe. Accedi a Gold con l’email usata nel pagamento: l’accesso viene verificato dal servizio.", "success");
         }
     }
 
