@@ -189,3 +189,20 @@ for(const [amplitude,count,confirmed,expected] of [[2.99,3,true,'green'],[3,3,tr
  assert(badge.includes(confirmed?'✓':'Non confermato'));
 }
 assert(vm.runInContext('contextMovementBadge({})',researchContext).includes('cx-unknown'));
+
+// Gold marker uses the same unrounded inputs and boundaries as the audit.
+const badgeContext={Number,Math,contextPct:x=>x+'%'};
+vm.createContext(badgeContext);
+vm.runInContext(html.slice(html.indexOf('    function contextAgreementBadge('),html.indexOf('    function contextPrice(')),badgeContext);
+const badge=(p,b,model='context-goals-v3.4')=>badgeContext.contextAgreementBadge({multimarket:{model_id:model,markets:[{market:'over25_ft',selection:'over',probabilities:{statistics:p},book_probability_pct:b}]}});
+assert(badge(.60,50.1).includes('cx-agreement-ring'));
+assert(badge(.65,55).includes('accordo prematch'));
+assert.equal(badge(.6501,55),'');
+assert.equal(badge(.5,55),'');
+assert.equal(badge(.6,50),'');
+assert.equal(badge(null,55),'');
+assert.equal(badge(.6,NaN),'');
+assert.equal(badge(.6,55,'context-goals-v3.3'),'');
+assert(html.includes('${contextAgreementBadge(match)}'));
+assert(html.includes('contextCoverage(match)+contextAgreementBadge(match)'));
+console.log('Gold marker: audit thresholds, missing data, model scope and both placements passed.');
