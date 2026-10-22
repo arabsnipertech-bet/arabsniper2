@@ -5,6 +5,8 @@ from audit_storage import read_store, write_store
 
 def prepare(directory):
     directory = Path(directory)
+    from homepage_preview import publish
+    publish(directory)
     for path in sorted(directory.glob('arab_quote_*.json')):
         value = read_store(path)
         write_store(path, value)
@@ -20,3 +22,4 @@ def prepare(directory):
 if __name__ == '__main__':
     import sys
     prepare(sys.argv[1] if len(sys.argv) > 1 else 'data')
+
