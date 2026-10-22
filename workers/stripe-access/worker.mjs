@@ -7,7 +7,7 @@ export const PLANS = {
   monthly:{price:'price_1UTM5yH763HaPm5Uo2hm0Ped', amount:2900}
 };
 const LEGACY_MONTHLY = new Set(['price_1T8fx8H763HaPm5UVjZgaawF','price_1T6ri6H763HaPm5UiG9xQY5F']);
-const VIPS = new Set(['bruno.pirolo@gmail.com','manuelmambri@hotmail.it']);
+const VIPS = new Set(['bruno.pirolo@gmail.com']);
 const normalize = s => String(s||'').trim().toLowerCase();
 const id = o => typeof o === 'string' ? o : o?.id;
 function plans(env) {
