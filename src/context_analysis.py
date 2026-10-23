@@ -192,12 +192,27 @@ def movement(books, side, include_previous=True):
         start,end=stamp(h[0]['observed_at']),stamp(h[-1]['observed_at'])
         if not start or not end or end<=start: continue
         paired.append((b,h,start,end))
-    if not paired: return {'confirmed':False,'paired_books':0,'reason':'storico_comparabile_assente'}
+    if not paired: return {'schema_version':3,'available_books':len(books),'history_books':0,'recovered_books':0,'confirmed':False,'paired_books':0,'agreeing_books':0,'reason':'storico_comparabile_assente'}
     # Use one common window (one hour tolerance), not incomparable first dates.
+    candidates=paired[:]
     anchor=max(p[2] for p in paired)
     paired=[p for p in paired if abs((p[2]-anchor).total_seconds())<=3600]
     end=max(p[3] for p in paired)
     paired=[p for p in paired if abs((p[3]-end).total_seconds())<=3600]
+    # Recover older histories only when actual observations overlap the same window.
+    # Choose by coverage, never by movement direction or eventual result.
+    latest_end=max(p[3] for p in candidates)
+    recent=[p for p in candidates if (latest_end-p[3]).total_seconds()<=3600]
+    common_end=min(p[3] for p in recent)
+    recovered=[]
+    for b,h,start,end in recent:
+        window=[x for x in h if anchor<=stamp(x['observed_at'])<=common_end]
+        if len(window)<2: continue
+        start,end=stamp(window[0]['observed_at']),stamp(window[-1]['observed_at'])
+        if (start-anchor).total_seconds()<=3600 and (common_end-end).total_seconds()<=3600 and end>start:
+            recovered.append((b,window,start,end))
+    recovered_count=max(0,len(recovered)-len(paired))
+    if recovered_count: paired=recovered
     rows=[]
     for b,h,start,end in paired:
         points=[x['odds'][side] for x in h]; signs=[1 if y>x else -1 for x,y in zip(points,points[1:]) if y!=x]
@@ -221,6 +236,7 @@ def movement(books, side, include_previous=True):
             'net_delta_pct':(points[-1]/points[0]-1)*100,
             'leg_from':h[turn]['observed_at'],
             'fair_initial_pct':op[side]*100,'fair_current_pct':fp[side]*100,
+            'first_observed_fair_pct':fair(b['trace'][0]['odds'])[0][side]*100,
             'margin_initial_pct':om,'margin_current_pct':margin,
             'favorite_path':favorite_path(h)})
     direction=lambda r: 1 if r['delta_pct']>0 else -1 if r['delta_pct']<0 else 0
@@ -236,7 +252,7 @@ def movement(books, side, include_previous=True):
         absolute=(min(abs(delta)/4,1)*40+len(agreeing)/len(rows)*25+
                   min(abs(delta)/hours/1.5,1)*10+median(r['persistence'] for r in agreeing)*15+min(len(rows)/8,1)*10)
         oci=0 if abs(delta)<.10 else absolute*(1 if delta>0 else -1)
-    result = {'schema_version':2,'oci':oci,'oci_method':'OCI-AS on paired operators, last leg; descriptive, not independent evidence',
+    result = {'schema_version':3,'available_books':len(books),'history_books':len(candidates),'recovered_books':recovered_count,'window_method':'common_observations' if recovered_count else 'original_aligned_starts','oci':oci,'oci_method':'OCI-AS on paired operators, last leg; descriptive, not independent evidence',
         'fair_direction_coherent':bool(confirmed and all(r['leg_fair_delta_pp']*sign<0 for r in agreeing)),
         'confirmed':confirmed,'paired_books':len(rows),'agreeing_books':len(agreeing),
         'direction':('up' if sign>0 else 'down') if confirmed else None,

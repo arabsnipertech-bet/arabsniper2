@@ -281,6 +281,14 @@ class APIClient:
         self.last_call_ts = 0.0
         self.cache: Dict[str, Any] = {}
         self.request_count = 0
+        self.odds_enricher = None
+        self.odds_extra_pages = 0
+        self.odds_books_recovered = 0
+        self.odds_pagination_incomplete = 0
+        self.odds_quota_checked = False
+        self.odds_quota_remaining = None
+        self.odds_quota_at_call = 0
+        self.odds_quota_reserve = 250
         self.last_error: Optional[Dict[str, Any]] = None
 
     def _throttle(self) -> None:
@@ -294,6 +302,51 @@ class APIClient:
         return f"{path}?" + "&".join(f"{key}={params[key]}" for key in sorted(params))
 
     def get(self, path: str, params: Mapping[str, Any], use_cache: bool = True) -> Optional[Dict[str, Any]]:
+        if path != "odds" or "page" in params:
+            return self._get_page(path, params, use_cache)
+        # Collect every advertised page, never publish a truncated response as complete.
+        first = self._get_page(path, params, use_cache=False)
+        if first is None:
+            return None
+        total = (first.get("paging") or {}).get("total", 1)
+        if not isinstance(total, int) or isinstance(total, bool) or total < 1 or total > 100:
+            return self._odds_incomplete("invalid_page_count")
+        rows = list(first.get("response") or [])
+        initial_books = {(r.get("fixture", {}).get("id"), b.get("id")) for r in rows for b in r.get("bookmakers", [])}
+        if total > 1 and not self.odds_quota_checked:
+            status = self._get_page("status", {}, use_cache=False)
+            self.odds_quota_checked = True
+            requests_info = ((status or {}).get("response") or {}).get("requests", {})
+            used, limit = requests_info.get("current"), requests_info.get("limit_day")
+            if isinstance(used, int) and isinstance(limit, int) and limit > 0:
+                self.odds_quota_remaining = max(0, limit-used)
+                self.odds_quota_reserve = max(250, int(limit*.05))
+                self.odds_quota_at_call = self.request_count
+        for page in range(2, total+1):
+            remaining = None if self.odds_quota_remaining is None else self.odds_quota_remaining-(self.request_count-self.odds_quota_at_call)
+            if self.odds_extra_pages >= 2000 or remaining is None or remaining <= self.odds_quota_reserve+len(API_RETRIES):
+                return self._odds_incomplete("pagination_budget_or_quota")
+            self.odds_extra_pages += 1
+            payload = self._get_page(path, {**params, "page": page}, use_cache=False)
+            paging = (payload or {}).get("paging") or {}
+            if not payload or paging.get("current") != page or paging.get("total") != total or not payload.get("response"):
+                return self._odds_incomplete("missing_or_changed_page")
+            rows.extend(payload["response"])
+        all_books = {(r.get("fixture", {}).get("id"), b.get("id")) for r in rows for b in r.get("bookmakers", [])}
+        self.odds_books_recovered += len(all_books-initial_books)
+        result = {**first, "response": rows, "results": len(rows),
+                  "collection": {"pages_fetched": total, "pages_total": total, "complete": True}}
+        if self.odds_enricher is not None and set(params) == {"fixture"}:
+            result = self.odds_enricher.enrich(result, params["fixture"])
+        return result
+
+    def _odds_incomplete(self, reason):
+        self.odds_pagination_incomplete += 1
+        self.last_error = {"path": "odds", "errors": reason, "at": iso_now()}
+        log(f"Quote non pubblicabili: {reason}; paginazione incompleta.")
+        return None
+
+    def _get_page(self, path: str, params: Mapping[str, Any], use_cache: bool = True) -> Optional[Dict[str, Any]]:
         key = self._cache_key(path, params)
         if use_cache and key in self.cache:
             cached = self.cache[key]
@@ -356,6 +409,12 @@ class APIClient:
 def fetch_bet_catalog(client: APIClient) -> Dict[str, Any]:
     payload = client.get("odds/bets", {}, use_cache=False)
     rows = payload.get("response", []) if payload else []
+    rows = [row for row in rows if isinstance(row, dict) and row.get("id") and row.get("name")]
+    if not rows:
+        # A failed refresh must never erase the last good catalog.
+        return read_json(BET_CATALOG_FILE, {"bets": []})
+    global _MARKET_RULES_CACHE
+    _MARKET_RULES_CACHE = None
     catalog = {
         "updated_at": iso_now(),
         "bets": [
@@ -3059,8 +3118,15 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
         )
 
     output["version"] = VERSION
+    enricher = getattr(client, "odds_enricher", None)
+    if enricher is not None:
+        atomic_write_json(DATA_DIR / "arab_quote_odds_collection.json", enricher.finish())
     output["api_health"] = {
+        **(enricher.stats if enricher is not None else {}),
         "requests_this_run": getattr(client, "request_count", 0),
+        "odds_extra_pages": getattr(client, "odds_extra_pages", 0),
+        "odds_books_recovered": getattr(client, "odds_books_recovered", 0),
+        "odds_pagination_incomplete": getattr(client, "odds_pagination_incomplete", 0),
         "last_error": client.last_error,
         "total_api_fixtures": total_api_fixtures,
         "total_output_matches": total_matches,
@@ -3143,6 +3209,17 @@ def main() -> None:
             log("❌ Formato --date non valido. Usa YYYY-MM-DD")
             raise SystemExit(2)
     days = 2 if args.fast else 1 if args.today else 5 if args.night else max(1, min(args.days, 7))
+    # Refresh reference IDs daily and preserve the last good catalog on errors.
+    catalog = read_json(BET_CATALOG_FILE, {})
+    from multimarket_model import stamp
+    catalog_at = stamp(catalog.get("updated_at"))
+    if not catalog_at or (now_rome()-catalog_at).total_seconds() >= 86400:
+        fetch_bet_catalog(client)
+    if os.getenv("ARAB_DEEP_ODDS_ENABLED", "1").lower() not in {"0", "false", "no"}:
+        from odds_collection import OddsEnricher
+        collection_state = read_json(DATA_DIR / "arab_quote_odds_collection.json", {})
+        client.odds_enricher = OddsEnricher(client, collection_state)
+        client.odds_enricher.refresh_catalog()
     output = scan_dates(client, get_target_dates(start, days), excluded)
     log(f"✅ Output scritto: {OUTPUT_FILE}")
     log(f"✅ Stato quote scritto: {STATE_FILE}")
@@ -3537,6 +3614,11 @@ def fetch_fixture_xg(client: APIClient, fixture_id: Any, home_id: Any, away_id: 
     if not XG_ENABLED or _XG_RUNTIME_CALLS >= XG_MAX_CALLS_PER_RUN:
         empty["source"] = "disabled" if not XG_ENABLED else "run_budget_exhausted"
         return empty
+
+    enricher = getattr(client, "odds_enricher", None)
+    if enricher is not None and not enricher.allowed(check_limits=False):
+        empty["source"] = "run_budget_exhausted"
+        return cached if isinstance(cached, dict) else empty
 
     _XG_RUNTIME_CALLS += 1
     payload = client.get("fixtures/statistics", {"fixture": fixture_id}, use_cache=True)

@@ -2,7 +2,7 @@
 
 Experimental. First/latest are separate cohorts, never additive. Paper ROI is not executed profit. No forecast is recalculated.
 
-Generated: 2026-10-22T14:55:42.592935+02:00 | Revision: d7f71e591240f7bf0348486e7541dc7e046f2c56
+Generated: 2026-10-23T10:23:14.372928+02:00 | Revision: 196f493f78aeea3076c6036ad5c9c98865e26e26
 
 Invalid records excluded: 0
 
