@@ -1,4 +1,5 @@
-// Billing migration. Existing email-only login is preserved, NOT authentication.
+import {authRoute, cleanupAuth} from './auth.mjs';
+// OTP remains disabled until its staged deployment requirements are satisfied.
 const API_VERSION = '2026-08-26.dahlia';
 const ORIGINS = new Set(['https://arabsniperbet.com','https://www.arabsniperbet.com']);
 export const PLANS = {
@@ -117,7 +118,10 @@ export async function access(env,email,now=Math.floor(Date.now()/1000)) {
   return {active:false};
 }
 export default {
+  async scheduled(event,env) { if(env.AUTH_ENABLED==='true')await cleanupAuth(env); },
   async fetch(request,env) {
+    const authResponse=await authRoute(request,env,access);
+    if(authResponse)return authResponse;
     const u=new URL(request.url),origin=request.headers.get('Origin');
     const headers={'Content-Type':'application/json','Cache-Control':'no-store','Vary':'Origin'};
     if(ORIGINS.has(origin))Object.assign(headers,{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'GET, POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type'});
@@ -151,6 +155,7 @@ export default {
         return reply({url:session.url});
       }
       if((u.pathname==='/'||u.pathname==='/api/check-access')&&request.method==='GET') {
+        if(env.AUTH_ENABLED==='true')return reply({active:false,error:'Usa il codice email per accedere.'},401);
         const email=normalize(u.searchParams.get('email'));
         if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254)return reply({active:false});
         return reply(await access(env,email));

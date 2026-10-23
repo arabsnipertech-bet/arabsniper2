@@ -823,10 +823,12 @@
   <div id="loginOverlay" class="login-overlay show">
     <form class="login-card" onsubmit="submitLogin(event)">
       <h2>Accesso Area Premium</h2>
-      <p>Inserisci l’email utilizzata per l’acquisto. L’accesso viene verificato tramite il servizio Stripe già collegato al sito.</p>
+      <p>Inserisci la tua email: riceverai un codice a 6 cifre per accedere. Usa la stessa email del pagamento.</p>
       <input id="loginEmail" class="login-input" type="email" autocomplete="email" placeholder="nome@email.it" required />
-      <div id="loginError" class="login-error"></div>
-      <button id="loginButton" class="btn login-button" type="submit">Verifica accesso</button>
+      <input id="loginCode" class="login-input" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="Codice a 6 cifre" aria-label="Codice ricevuto via email" hidden disabled />
+      <div id="loginError" class="login-error" role="status" aria-live="polite"></div>
+      <button id="changeEmail" class="btn" type="button" onclick="resetCodeLogin()" hidden>Cambia email / richiedi un nuovo codice</button>
+      <button id="loginButton" class="btn login-button" type="submit">Invia codice</button>
     </form>
   </div>
 
@@ -834,8 +836,7 @@
   <script>
     'use strict';
 
-    const GITHUB_BASE = 'https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper2/main/data/';
-    const STRIPE_WORKER = 'https://stripe-checker.arabsnipertech.workers.dev/';
+    const GITHUB_BASE = '/api/gold-data/';
     const STORAGE_KEY = 'arab_user_email';
     const AUDIT_FILE = 'arab_quote_prediction_audit.json';
 
@@ -930,72 +931,63 @@
       return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
     }
 
-    function checkLogoutSignal() {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('logout') === 'true') {
-        localStorage.removeItem(STORAGE_KEY);
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }
-
-    async function verifyGoldAccess(email) {
-      const workerUrl = `${STRIPE_WORKER}?email=${encodeURIComponent(email)}`;
-      const response = await fetch(workerUrl, { method: 'GET', headers: { Accept: 'application/json' } });
-      const rawText = await response.text();
-      let data;
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch (_) {
-        throw new Error(`Risposta non valida dal servizio accessi: ${rawText.slice(0, 100)}`);
-      }
-      if (!response.ok) throw new Error(data?.error || `HTTP ${response.status}`);
+    let loginChallenge = null;
+    async function authRequest(path, body) {
+      const response = await fetch('/api/auth/' + path, {
+        method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
+        headers: body ? {'Content-Type': 'application/json'} : {},
+        ...(body ? {body: JSON.stringify(body)} : {})
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Accedi con il codice ricevuto via email.');
       return data;
     }
-
+    function resetCodeLogin() {
+      loginChallenge = null;
+      document.getElementById('loginEmail').readOnly = false;
+      const code = document.getElementById('loginCode');
+      code.hidden = true; code.disabled = true; code.required = false; code.value = '';
+      document.getElementById('changeEmail').hidden = true;
+      document.getElementById('loginButton').textContent = 'Invia codice';
+      document.getElementById('loginError').textContent = '';
+    }
     async function submitLogin(event) {
       event.preventDefault();
-      const emailInput = document.getElementById('loginEmail');
+      const input = document.getElementById('loginEmail');
+      const code = document.getElementById('loginCode');
       const error = document.getElementById('loginError');
       const button = document.getElementById('loginButton');
-      const email = String(emailInput.value || '').trim().toLowerCase();
-      error.textContent = '';
-      if (!email.includes('@')) {
-        error.textContent = 'Inserisci un indirizzo email valido.';
-        return;
-      }
+      const email = input.value.trim().toLowerCase();
       button.disabled = true;
-      button.textContent = 'Verifica in corso...';
+      document.getElementById('changeEmail').disabled = true;
+      error.textContent = '';
       try {
-        const access = await verifyGoldAccess(email);
-        if (!access.active) {
-          localStorage.removeItem(STORAGE_KEY);
-          throw new Error('Accesso premium non attivo o scaduto per questa email.');
+        if (!loginChallenge) {
+          const data = await authRequest('request-code', {email});
+          loginChallenge = data.challenge;
+          input.readOnly = true;
+          code.hidden = false; code.disabled = false; code.required = true;
+          document.getElementById('changeEmail').hidden = false;
+          error.textContent = 'Codice inviato. Controlla anche la posta indesiderata. Scade tra 10 minuti.';
+          code.focus();
+        } else {
+          const data = await authRequest('verify-code', {email, code: code.value, challenge: loginChallenge});
+          if (data.active) { resetCodeLogin(); showApplication(); }
         }
-        localStorage.setItem(STORAGE_KEY, email);
-        showApplication();
-      } catch (err) {
-        error.textContent = err.message || 'Errore durante la verifica.';
-      } finally {
+      } catch (err) { error.textContent = err.message; }
+      finally {
         button.disabled = false;
-        button.textContent = 'Verifica accesso';
+        document.getElementById('changeEmail').disabled = false;
+        button.textContent = loginChallenge ? 'Verifica codice e accedi' : 'Invia codice';
       }
     }
-
     async function initializeAccess() {
-      checkLogoutSignal();
-      const saved = String(localStorage.getItem(STORAGE_KEY) || '').trim().toLowerCase();
-      if (!saved || !saved.includes('@')) return;
-      document.getElementById('loginEmail').value = saved;
-      try {
-        const access = await verifyGoldAccess(saved);
-        if (access.active) {
-          showApplication();
-          return;
-        }
-      } catch (err) {
-        console.error('Verifica automatica accesso fallita:', err);
-      }
       localStorage.removeItem(STORAGE_KEY);
+      if (new URLSearchParams(location.search).get('logout') === 'true') {
+        await logoutGold(); return;
+      }
+      try { if ((await authRequest('session')).active) showApplication(); }
+      catch (_) { /* Login stays visible when there is no valid session. */ }
     }
 
     function showApplication() {
@@ -1007,9 +999,12 @@
       loadCurrentDay();
     }
 
-    function logoutGold() {
-      localStorage.removeItem(STORAGE_KEY);
-      window.location.href = 'index.html';
+    async function logoutGold() {
+      try {
+        await authRequest('logout', {});
+        localStorage.removeItem(STORAGE_KEY);
+        window.location.href = 'index.html';
+      } catch (_) { alert('Uscita non riuscita. Riprova per chiudere la sessione.'); }
     }
 
     function buildDayButtons() {
@@ -1142,7 +1137,12 @@
     }
 
     async function loadJson(file) {
-      const response = await fetch(rawUrl(file), { cache: 'no-store' });
+      const response = await fetch(rawUrl(file), { cache: 'no-store', credentials: 'same-origin' });
+      if (response.status === 401 || response.status === 403) {
+        document.getElementById('app').hidden = true;
+        document.getElementById('loginOverlay').classList.add('show');
+        throw new Error('Sessione scaduta o accesso Gold non attivo. Accedi nuovamente.');
+      }
       if (!response.ok) throw new Error(`File non disponibile: ${file}`);
       const value = await response.json();
       if (value?._storage !== 'arabsniper-audit-parts-v1') return value;
@@ -1154,7 +1154,7 @@
         const index = next++;
         const part = value.parts[index];
         if (!/^[a-f0-9]{64}$/.test(part.sha256)) throw new Error('Identificatore dati non valido');
-        const res = await fetch(rawUrl(`_audit_parts/${part.sha256}.json.gz`), {cache: 'force-cache'});
+        const res = await fetch(rawUrl(`_audit_parts/${part.sha256}.json.gz`), {cache: 'no-store', credentials: 'same-origin'});
         if (!res.ok) throw new Error('Parte dei dati non disponibile: riprovare la sincronizzazione');
         const raw = new Uint8Array(await new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
         if (raw.length !== part.bytes || await digest(raw) !== part.sha256) throw new Error('Integrità dati non verificata');
