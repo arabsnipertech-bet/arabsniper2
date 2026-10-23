@@ -95,3 +95,11 @@ class AdaptiveTests(unittest.TestCase):
         c=OddsEnricher(client,{},now=NOW,max_seconds=0)
         self.assertFalse(c.allowed())
         self.assertTrue(c.allowed(check_limits=False))
+
+class MarketPreservationTests(unittest.TestCase):
+    def test_recovery_cannot_drop_other_complete_lines(self):
+        base=payload(values=[{'value':'Over 1.5','odd':'1.3'},{'value':'Under 1.5','odd':'3.2'},
+                             {'value':'Over 2.5','odd':'1.8'},{'value':'Under 2.5','odd':'2.1'}])
+        c,client=RecoveryTests().collector(payload(updated='2026-10-23T08:30:00+00:00'))
+        result=c.enrich(base,100)
+        self.assertIn(('over15_ft','1'),coverage(result,100,NOW,target_only=False))

@@ -12,10 +12,10 @@ TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht'
 BET_IDS = {'1x2_ft':1, 'over25_ft':5, 'over35_ft':5, 'over15_ht':6, 'over25_ht':6, 'gg_ht':34}
 
 
-def coverage(payload, fid, now):
+def coverage(payload, fid, now, target_only=True):
     quotes = collect_quotes(payload or {}, now)
     return {(market, book) for market, books in quotes.get(str(fid), {}).items()
-            if market in TARGETS for book in books}
+            if not target_only or market in TARGETS for book in books}
 
 
 def merge_payload(base, extra, fid, now):
@@ -158,7 +158,7 @@ class OddsEnricher:
             candidate = merge_payload(result,extra,fid,self.now)
             after = coverage(candidate,fid,self.now)
             # Don't discard a usable market in favour of a partial targeted response.
-            if not previous <= after:
+            if not coverage(result, fid, self.now, target_only=False) <= coverage(candidate, fid, self.now, target_only=False):
                 self.stats['odds_targeted_no_gain'] += 1
                 continue
             result = candidate
