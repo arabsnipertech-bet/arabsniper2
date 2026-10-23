@@ -58,3 +58,59 @@ class CoverageTests(unittest.TestCase):
         self.assertEqual(chosen['market'],'over25_ft')
         self.assertEqual(chosen['selection_mode'],'likelihood_without_demonstrated_edge')
         self.assertLess(chosen['price_assessment']['estimated_return_pct'],0)
+
+
+class OddsPaginationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        spec=importlib.util.spec_from_file_location('pagination_engine',Path(__file__).resolve().parents[1]/'src/3appdays.py')
+        cls.engine=importlib.util.module_from_spec(spec)
+        sys.modules[spec.name]=cls.engine
+        spec.loader.exec_module(cls.engine)
+
+    def page(self, current=1, total=2, book=1):
+        return {'paging':{'current':current,'total':total},'response':[
+            {'fixture':{'id':100},'bookmakers':[{'id':book}]}]}
+
+    def client(self, responses):
+        from unittest.mock import Mock
+        client=self.engine.APIClient('test-only')
+        client._get_page=Mock(side_effect=responses)
+        return client
+
+    def quota(self, used=2904):
+        return {'response':{'requests':{'current':used,'limit_day':75000}}}
+
+    def test_all_pages_combined_and_recovered_books_counted(self):
+        c=self.client([self.page(),self.quota(),self.page(2,2,2)])
+        result=c.get('odds',{'fixture':100})
+        self.assertEqual(len(result['response']),2)
+        self.assertTrue(result['collection']['complete'])
+        self.assertEqual((c.odds_extra_pages,c.odds_books_recovered),(1,1))
+        self.assertEqual(c._get_page.call_args.args,('odds',{'fixture':100,'page':2}))
+
+    def test_single_page_needs_no_quota_call(self):
+        c=self.client([self.page(total=1)])
+        self.assertIsNotNone(c.get('odds',{'fixture':100}))
+        self.assertEqual(c._get_page.call_count,1)
+
+    def test_missing_or_inconsistent_page_never_publishes_partial(self):
+        for page in (None,self.page(1,2,2),self.page(2,3,2)):
+            with self.subTest(page=page):
+                c=self.client([self.page(),self.quota(),page])
+                self.assertIsNone(c.get('odds',{'fixture':100}))
+                self.assertEqual(c.odds_pagination_incomplete,1)
+                self.assertEqual(c.odds_books_recovered,0)
+
+    def test_quota_reserve_or_unknown_quota_stops_extra_calls(self):
+        for quota in (self.quota(74900),None):
+            c=self.client([self.page(),quota])
+            self.assertIsNone(c.get('odds',{'fixture':100}))
+            self.assertEqual(c._get_page.call_count,2)
+
+    def test_extra_page_budget_and_other_endpoints(self):
+        c=self.client([self.page(),self.quota()]);c.odds_extra_pages=2000
+        self.assertIsNone(c.get('odds',{'fixture':100}))
+        c=self.client([{'response':[]}])
+        self.assertEqual(c.get('fixtures',{'id':100}),{'response':[]})
+        self.assertEqual(c._get_page.call_count,1)

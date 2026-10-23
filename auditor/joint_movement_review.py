@@ -24,7 +24,7 @@ def main():
             opening={}
             for s in ss:
                 ops=(ms.get(('1x2_ft',s),{}).get('movement') or {}).get('operators',[])
-                ps=[o['fair_initial_pct'] for o in ops if o.get('fair_initial_pct') is not None]
+                ps=[o.get('first_observed_fair_pct',o.get('fair_initial_pct')) for o in ops if o.get('first_observed_fair_pct',o.get('fair_initial_pct')) is not None]
                 opening[s]=median(ps) if ps else None
             # Descriptive first-observed favorite; operator windows may differ.
             favorite=max(opening,key=opening.get) if all(v is not None for v in opening.values()) else None
