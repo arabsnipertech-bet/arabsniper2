@@ -39,7 +39,7 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       assert((await page.locator('.cx-red').textContent()).includes('✓ 2/2 book'));
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
       await page.screenshot({path:`test-artifacts/list-${name}.png`,fullPage:true});
-      assert.equal(await page.locator('.cx-list-row .cx-crossing').count(),2);
+      assert.equal(await page.locator('.cx-list-row .cx-crossing').count(),3);
       assert(await page.locator('.cx-list-row .cx-crossing').first().isVisible());
       assert((await page.locator('.cx-list-row').textContent()).includes('1 ↑ + Over 2,5 FT ↓'));
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Overview overflow at '+name);
