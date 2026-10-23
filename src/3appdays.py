@@ -281,6 +281,13 @@ class APIClient:
         self.last_call_ts = 0.0
         self.cache: Dict[str, Any] = {}
         self.request_count = 0
+        self.odds_extra_pages = 0
+        self.odds_books_recovered = 0
+        self.odds_pagination_incomplete = 0
+        self.odds_quota_checked = False
+        self.odds_quota_remaining = None
+        self.odds_quota_at_call = 0
+        self.odds_quota_reserve = 250
         self.last_error: Optional[Dict[str, Any]] = None
 
     def _throttle(self) -> None:
@@ -294,6 +301,48 @@ class APIClient:
         return f"{path}?" + "&".join(f"{key}={params[key]}" for key in sorted(params))
 
     def get(self, path: str, params: Mapping[str, Any], use_cache: bool = True) -> Optional[Dict[str, Any]]:
+        if path != "odds" or "page" in params:
+            return self._get_page(path, params, use_cache)
+        # Collect every advertised page, never publish a truncated response as complete.
+        first = self._get_page(path, params, use_cache=False)
+        if first is None:
+            return None
+        total = (first.get("paging") or {}).get("total", 1)
+        if not isinstance(total, int) or isinstance(total, bool) or total < 1 or total > 100:
+            return self._odds_incomplete("invalid_page_count")
+        rows = list(first.get("response") or [])
+        initial_books = {(r.get("fixture", {}).get("id"), b.get("id")) for r in rows for b in r.get("bookmakers", [])}
+        if total > 1 and not self.odds_quota_checked:
+            status = self._get_page("status", {}, use_cache=False)
+            self.odds_quota_checked = True
+            requests_info = ((status or {}).get("response") or {}).get("requests", {})
+            used, limit = requests_info.get("current"), requests_info.get("limit_day")
+            if isinstance(used, int) and isinstance(limit, int) and limit > 0:
+                self.odds_quota_remaining = max(0, limit-used)
+                self.odds_quota_reserve = max(250, int(limit*.05))
+                self.odds_quota_at_call = self.request_count
+        for page in range(2, total+1):
+            remaining = None if self.odds_quota_remaining is None else self.odds_quota_remaining-(self.request_count-self.odds_quota_at_call)
+            if self.odds_extra_pages >= 2000 or remaining is None or remaining <= self.odds_quota_reserve+len(API_RETRIES):
+                return self._odds_incomplete("pagination_budget_or_quota")
+            self.odds_extra_pages += 1
+            payload = self._get_page(path, {**params, "page": page}, use_cache=False)
+            paging = (payload or {}).get("paging") or {}
+            if not payload or paging.get("current") != page or paging.get("total") != total or not payload.get("response"):
+                return self._odds_incomplete("missing_or_changed_page")
+            rows.extend(payload["response"])
+        all_books = {(r.get("fixture", {}).get("id"), b.get("id")) for r in rows for b in r.get("bookmakers", [])}
+        self.odds_books_recovered += len(all_books-initial_books)
+        return {**first, "response": rows, "results": len(rows),
+                "collection": {"pages_fetched": total, "pages_total": total, "complete": True}}
+
+    def _odds_incomplete(self, reason):
+        self.odds_pagination_incomplete += 1
+        self.last_error = {"path": "odds", "errors": reason, "at": iso_now()}
+        log(f"Quote non pubblicabili: {reason}; paginazione incompleta.")
+        return None
+
+    def _get_page(self, path: str, params: Mapping[str, Any], use_cache: bool = True) -> Optional[Dict[str, Any]]:
         key = self._cache_key(path, params)
         if use_cache and key in self.cache:
             cached = self.cache[key]
@@ -3061,6 +3110,9 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
     output["version"] = VERSION
     output["api_health"] = {
         "requests_this_run": getattr(client, "request_count", 0),
+        "odds_extra_pages": getattr(client, "odds_extra_pages", 0),
+        "odds_books_recovered": getattr(client, "odds_books_recovered", 0),
+        "odds_pagination_incomplete": getattr(client, "odds_pagination_incomplete", 0),
         "last_error": client.last_error,
         "total_api_fixtures": total_api_fixtures,
         "total_output_matches": total_matches,
