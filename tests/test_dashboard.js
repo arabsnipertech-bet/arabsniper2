@@ -273,6 +273,35 @@ for(const move of [strongMove('down'),strongMove('up',2.99),strongMove('up',10,2
  assert(crossHtml.includes('cx-agreement-ring'));assert(!crossHtml.includes('class="cx-crossing"'));
 }
 crossed.multimarket.markets[2].movement=strongMove('up');
+crossed.multimarket.markets[0].movement=strongMove('up');
+assert(badgeContext.contextAgreementBadge(crossed).includes('1 ↑ + Over 2,5 FT ↑'));
+crossed.multimarket.markets[2].movement=strongMove('down');
+crossed.multimarket.markets.push({market:'1x2_ft',selection:'2',movement:strongMove('down',8)});
+crossed.multimarket.markets[0].movement=strongMove('down');
+assert(badgeContext.contextAgreementBadge(crossed).includes('2 ↓ + Over 2,5 FT ↓'));
+assert(!badgeContext.contextAgreementBadge(crossed).includes('2 ↓ + Over 1,5 PT'));
+crossed.multimarket.markets[3].movement=strongMove('down',2.99);
+assert(!badgeContext.contextAgreementBadge(crossed).includes('class="cx-crossing"'));
 crossed.multimarket.markets[0].probabilities.statistics=.5;
 assert.equal(badgeContext.contextAgreementBadge(crossed),'');
 console.log('Gold plus quote crossing: exact directions, consensus, thresholds, market labels and immutable probabilities passed.');
+
+// Favorite-red PT signal uses initial fair medians, complete data and a unique favorite.
+crossed.multimarket.markets[0].probabilities.statistics=.61;
+const side1=crossed.multimarket.markets[2],side2=crossed.multimarket.markets[3];
+side1.movement={...strongMove('down',8),operators:[{fair_initial_pct:60},{fair_initial_pct:64}]};
+side2.movement={...strongMove('up'),operators:[{fair_initial_pct:18}]};
+const draw={market:'1x2_ft',selection:'x',movement:{operators:[{fair_initial_pct:20}]}};
+crossed.multimarket.markets.push(draw);
+assert(badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓ + Over 1,5 PT ↓'));
+side1.movement.amplitude_pct=7.99;
+assert(!badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓'));
+side1.movement.amplitude_pct=8;
+draw.movement.operators=[];
+assert(!badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓'));
+draw.movement.operators=[{fair_initial_pct:62}];
+assert(!badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓'));
+draw.movement.operators=[{fair_initial_pct:20}];
+crossed.multimarket.markets[1].movement=strongMove('up');
+assert(!badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓'));
+console.log('Initial favorite red PT: medians, missing data, ties, intensity and Over direction passed.');
