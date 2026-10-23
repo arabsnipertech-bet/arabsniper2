@@ -5,6 +5,8 @@ on:
   push:
     branches: [main]
     paths:
+      - .github/workflows/publish-site.yml
+      - web/gold-dashboard-live.html
       - web/index.html
       - web/homepage.js
       - web/results.js
