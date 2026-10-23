@@ -23,7 +23,16 @@ class Results(unittest.TestCase):
   p=build({'2026-10-22':{'markets':rows}},NOW)
   self.assertEqual([r['fixture_id'] for r in p['examples']],['2','1'])
   self.assertEqual(len(p['all_results']),5)
+ def test_midnight_rollover_never_reuses_older_day(self):
+  reports={'2026-10-22':{'markets':[row(1,True)]}}
+  before=build(reports,datetime(2026,10,23,21,59,tzinfo=timezone.utc))
+  after=build(reports,datetime(2026,10,23,22,0,tzinfo=timezone.utc))
+  self.assertEqual(before['date'],'2026-10-22')
+  self.assertEqual(after['date'],'2026-10-23')
+  self.assertFalse(after['available'])
+  self.assertEqual(after['examples'],[])
  def test_rome_date(self):
   r=row(1,True);r['fixture']['kickoff']='2026-10-21T23:00:00Z';r['captured_at']='2026-10-21T20:00:00Z'
   self.assertEqual(build({'2026-10-22':{'markets':[r]}},NOW)['daily']['wins'],1)
 if __name__=='__main__':unittest.main()
+

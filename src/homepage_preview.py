@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from pathlib import Path
 import math
+import random
 from audit_storage import read_store, atomic_bytes
 import json
 
@@ -19,13 +20,11 @@ def stamp(value):
 def number(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
-def build_preview(payload, previous=None, now=None):
+def build_preview(payload, previous=None, now=None, rng=None):
     now = now or datetime.now(timezone.utc)
     today = now.astimezone(ROME).date().isoformat()
     result = {'date': today, 'updated_at': now.isoformat(), 'source_updated_at': payload.get('updated_at'), 'selections': []}
-    # Keep the day's public set and prematch snapshot stable: refreshes cannot leak more picks.
-    if previous and previous.get('date') == today and previous.get('selections'):
-        return previous
+    rng = rng or random.SystemRandom()
     updated = stamp(payload.get('updated_at'))
     if payload.get('date') != today or not updated or not 0 <= (now-updated).total_seconds() <= 86400:
         return result
@@ -51,11 +50,16 @@ def build_preview(payload, previous=None, now=None):
                'captured_at': a.get('captured_at') or payload['updated_at']}
         candidates.append((min(p,b), r.get('support_score') or 0, row))
     candidates.sort(key=lambda x: (-x[0], -x[1], x[2]['kickoff'], x[2]['fixture_id']))
-    seen = set()
+    unique = {}
     for _, _, row in candidates:
-        if row['fixture_id'] in seen: continue
-        seen.add(row['fixture_id']); result['selections'].append(row)
-        if len(result['selections']) == 3: break
+        unique.setdefault(row['fixture_id'], row)
+    pool = list(unique.values())
+    selected = rng.sample(pool, min(3, len(pool)))
+    previous_ids = {r.get('fixture_id') for r in (previous or {}).get('selections', [])}
+    if (previous or {}).get('date') == today and len(pool) > 3 and {r['fixture_id'] for r in selected} == previous_ids:
+        alternatives = [r for r in pool if r['fixture_id'] not in previous_ids]
+        selected[-1] = rng.choice(alternatives)
+    result['selections'] = sorted(selected, key=lambda r: (r['kickoff'], r['fixture_id']))
     return result
 
 def publish(directory='data'):
@@ -66,3 +70,4 @@ def publish(directory='data'):
     return value
 
 if __name__ == '__main__': publish()
+

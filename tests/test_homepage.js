@@ -11,6 +11,8 @@ async function run(payload,fail=false){
  const data={date:'2026-10-22', selections:[1,2,3].map(id=>({fixture_id:String(id),match:'Home - Away',league:'League',kickoff:'2026-10-22T20:00:00+02:00',captured_at:'2026-10-22T10:00:00+02:00',odd:1.8,label:'Over 2,5 finale',statistical_pct:65,book_probability_pct:60}))};
  let r=await run(data);assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,3);assert.equal(r.calls.length,1);assert.match(r.calls[0],/arab_quote_homepage.json/);
  r=await run({...data,date:'2026-10-21'});assert.match(r.nodes['daily-picks'].innerHTML,/Nessuna selezione/);
+ const started=structuredClone(data);started.selections[0].kickoff='2026-10-22T10:00:00Z';
+ r=await run(started);assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,2);
  const evil=structuredClone(data);evil.selections[0].match='<img src=x onerror=alert(1)>';
  r=await run(evil);assert(!r.nodes['daily-picks'].innerHTML.includes('<img'));assert(r.nodes['daily-picks'].innerHTML.includes('&lt;img'));
  r=await run(data,true);assert.match(r.nodes['daily-picks'].innerHTML,/temporaneamente/);
@@ -18,3 +20,4 @@ async function run(payload,fail=false){
  for(const plan of ['daily','weekly','monthly']) assert(html.includes("buy('"+plan+"', this)"));
  console.log('PASS: public feed only, three cards, stale day, escaped HTML, unavailable feed, Gold entry links and plan IDs');
 })();
+
