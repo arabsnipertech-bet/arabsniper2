@@ -22,7 +22,7 @@ jobs:
     env:
       API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
       # Bounded incremental recovery; completed historical statistics are reused.
-      ARAB_XG_MAX_CALLS_PER_RUN: ${{ vars.ARAB_NIGHT_STATS_BUDGET || '80' }}
+      ARAB_XG_MAX_CALLS_PER_RUN: ${{ vars.ARAB_NIGHT_STATS_BUDGET || '1000' }}
 
     steps:
       - name: Checkout repo

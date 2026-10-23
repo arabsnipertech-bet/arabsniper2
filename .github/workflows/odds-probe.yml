@@ -1,0 +1,28 @@
+name: Diagnose bookmaker coverage
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: arabsniper-quote-data-writer
+  cancel-in-progress: false
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Compare general and targeted odds queries
+        env:
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+        run: python src/odds_probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bookmaker-coverage-probe
+          path: probe-output/
+          retention-days: 14

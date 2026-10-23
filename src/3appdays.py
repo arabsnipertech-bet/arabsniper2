@@ -281,6 +281,7 @@ class APIClient:
         self.last_call_ts = 0.0
         self.cache: Dict[str, Any] = {}
         self.request_count = 0
+        self.odds_enricher = None
         self.odds_extra_pages = 0
         self.odds_books_recovered = 0
         self.odds_pagination_incomplete = 0
@@ -333,8 +334,11 @@ class APIClient:
             rows.extend(payload["response"])
         all_books = {(r.get("fixture", {}).get("id"), b.get("id")) for r in rows for b in r.get("bookmakers", [])}
         self.odds_books_recovered += len(all_books-initial_books)
-        return {**first, "response": rows, "results": len(rows),
-                "collection": {"pages_fetched": total, "pages_total": total, "complete": True}}
+        result = {**first, "response": rows, "results": len(rows),
+                  "collection": {"pages_fetched": total, "pages_total": total, "complete": True}}
+        if self.odds_enricher is not None and set(params) == {"fixture"}:
+            result = self.odds_enricher.enrich(result, params["fixture"])
+        return result
 
     def _odds_incomplete(self, reason):
         self.odds_pagination_incomplete += 1
@@ -405,6 +409,12 @@ class APIClient:
 def fetch_bet_catalog(client: APIClient) -> Dict[str, Any]:
     payload = client.get("odds/bets", {}, use_cache=False)
     rows = payload.get("response", []) if payload else []
+    rows = [row for row in rows if isinstance(row, dict) and row.get("id") and row.get("name")]
+    if not rows:
+        # A failed refresh must never erase the last good catalog.
+        return read_json(BET_CATALOG_FILE, {"bets": []})
+    global _MARKET_RULES_CACHE
+    _MARKET_RULES_CACHE = None
     catalog = {
         "updated_at": iso_now(),
         "bets": [
@@ -3108,7 +3118,11 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
         )
 
     output["version"] = VERSION
+    enricher = getattr(client, "odds_enricher", None)
+    if enricher is not None:
+        atomic_write_json(DATA_DIR / "arab_quote_odds_collection.json", enricher.finish())
     output["api_health"] = {
+        **(enricher.stats if enricher is not None else {}),
         "requests_this_run": getattr(client, "request_count", 0),
         "odds_extra_pages": getattr(client, "odds_extra_pages", 0),
         "odds_books_recovered": getattr(client, "odds_books_recovered", 0),
@@ -3195,6 +3209,17 @@ def main() -> None:
             log("❌ Formato --date non valido. Usa YYYY-MM-DD")
             raise SystemExit(2)
     days = 2 if args.fast else 1 if args.today else 5 if args.night else max(1, min(args.days, 7))
+    # Refresh reference IDs daily and preserve the last good catalog on errors.
+    catalog = read_json(BET_CATALOG_FILE, {})
+    from multimarket_model import stamp
+    catalog_at = stamp(catalog.get("updated_at"))
+    if not catalog_at or (now_rome()-catalog_at).total_seconds() >= 86400:
+        fetch_bet_catalog(client)
+    if os.getenv("ARAB_DEEP_ODDS_ENABLED", "1").lower() not in {"0", "false", "no"}:
+        from odds_collection import OddsEnricher
+        collection_state = read_json(DATA_DIR / "arab_quote_odds_collection.json", {})
+        client.odds_enricher = OddsEnricher(client, collection_state)
+        client.odds_enricher.refresh_catalog()
     output = scan_dates(client, get_target_dates(start, days), excluded)
     log(f"✅ Output scritto: {OUTPUT_FILE}")
     log(f"✅ Stato quote scritto: {STATE_FILE}")
@@ -3589,6 +3614,11 @@ def fetch_fixture_xg(client: APIClient, fixture_id: Any, home_id: Any, away_id: 
     if not XG_ENABLED or _XG_RUNTIME_CALLS >= XG_MAX_CALLS_PER_RUN:
         empty["source"] = "disabled" if not XG_ENABLED else "run_budget_exhausted"
         return empty
+
+    enricher = getattr(client, "odds_enricher", None)
+    if enricher is not None and not enricher.allowed(check_limits=False):
+        empty["source"] = "run_budget_exhausted"
+        return cached if isinstance(cached, dict) else empty
 
     _XG_RUNTIME_CALLS += 1
     payload = client.get("fixtures/statistics", {"fixture": fixture_id}, use_cache=True)
