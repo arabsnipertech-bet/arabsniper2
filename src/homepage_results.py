@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
-import json
+import json, math
 from audit_storage import read_store, atomic_bytes
 from homepage_preview import stamp
 
@@ -29,11 +29,12 @@ def project(report, day):
     for fid, row in chosen.items():
         fixture = row['fixture']
         outcome = row.get('outcome')
-        result = results.get(('latest', MODEL, fid), {})
+        odd = row.get('odd')
+        odd = float(odd) if isinstance(odd,(int,float)) and not isinstance(odd,bool) and math.isfinite(odd) and odd > 1 else None
         output.append({'fixture_id':fid, 'match':fixture.get('match',''), 'league':fixture.get('league',''),
                        'kickoff':fixture['kickoff'], 'captured_at':row['captured_at'],
                        'forecast_sha256':row.get('forecast_sha256'), 'label':LABELS[row['market']],
-                       'market':row['market'], 'outcome':'won' if outcome is True else 'lost' if outcome is False else 'pending'})
+                       'market':row['market'], 'odd':odd, 'outcome':'won' if outcome is True else 'lost' if outcome is False else 'pending'})
     return sorted(output, key=lambda r:(r['kickoff'],r['fixture_id']))
 
 def totals(rows):
@@ -53,7 +54,7 @@ def build(reports, now=None):
             'cohort':'Ultima proposta principale registrata prima del calcio d’inizio; Over e Goal PT.',
             'available':yesterday.isoformat() in by_day,'daily':totals(rows),
             'history':dict(totals(history),from_date=start.isoformat(),to_date=yesterday.isoformat(),days_with_data=sum(bool(v) for v in by_day.values())),
-            'examples':[r for r in rows if r['outcome']=='won'][:10]+[r for r in rows if r['outcome']=='lost'][:3],
+            'examples':sorted([r for r in rows if r['outcome']=='won' and r['market'].startswith('over') and r['odd'] is not None], key=lambda r:(-r['odd'],r['kickoff'],r['fixture_id']))[:10],
             'all_results':rows}
 
 def publish(root='.', now=None):
