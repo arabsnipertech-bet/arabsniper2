@@ -141,7 +141,7 @@ researchContext.oddsFixture={fixture:{home:'Home',away:'Away'},multimarket:{mark
  operators:[{bookmaker:'B',initial:9,current:8},{bookmaker:'A',initial:1.9,current:1.6}]}}]}};
 let prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);
 assert(prices.includes('1.90'));assert(prices.includes('1.60'));assert(!prices.includes('9.00'));
-assert(prices.includes('cx-red'));assert(prices.includes('↓ discesa'));assert(prices.includes('-15.79%'));assert(prices.includes('inversione di movimento'));assert(prices.includes('Over 3,5 FT'));assert(!prices.includes('Over 1,5 PT'));
+assert(prices.includes('cx-red'));assert(prices.includes('↓ discesa'));assert(prices.includes('-15.79%'));assert(prices.includes('inversione di movimento'));assert(prices.includes('Over 2,5 FT'));assert(prices.includes('Over 1,5 PT'));
 vm.runInContext('oddsFixture.multimarket.markets[0].movement.confirmed=false',researchContext);
 prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(prices.includes('cx-green cx-unconfirmed'));assert(!prices.includes('cx-signal cx-red'));
 vm.runInContext('oddsFixture.multimarket.markets[0].quote.bookmaker="C"',researchContext);
@@ -218,7 +218,7 @@ assert.equal(vm.runInContext('contextOver25(feedFixture.multimarket).market',res
 assert.equal(vm.runInContext('contextOver35(feedFixture.multimarket)',researchContext),null);
 vm.runInContext("contextCompareMarket='';contextFeed='over25_ft';researchSearch='';",researchContext);
 let feed=vm.runInContext('contextList([feedFixture])',researchContext);
-assert(feed.includes('Over 2,5 FT'));assert(!feed.includes('Over 1,5 PT'));
+assert(feed.includes('Over 2,5 FT'));assert(feed.includes('Over 1,5 PT'));assert(feed.includes('OVER 2,5 FT · ANALISI PREMATCH'));
 assert.equal(JSON.stringify(researchContext.feedFixture),original);
 vm.runInContext("contextFeed='over35_ft'",researchContext);
 assert.equal(vm.runInContext('contextFeedMatches([feedFixture]).length',researchContext),0);
@@ -244,3 +244,12 @@ assert(joint.includes('Nessun bonus'));
 assert.equal(JSON.stringify(researchContext.feedFixture),frozenBeforeObservation);
 assert.equal(vm.runInContext('contextFeedMatches([{multimarket:{markets:[]}}]).length',researchContext),0);
 console.log('HT observation and joint movements: missing markets, absent history, immutable forecasts and non-recommendation label passed.');
+
+// Both Over movements are visible in the main feed without opening a dossier.
+vm.runInContext("contextFeed='over25_ft'",researchContext);
+const overview=vm.runInContext('contextOdds(feedFixture,true)',researchContext);
+for(const label of ['1 · Casa','X · Pareggio','2 · Ospite','Over 1,5 PT','Over 2,5 FT','Stat.','Book','Gold = accordo'])assert(overview.includes(label));
+assert(!overview.includes('<details class="cx-detail">'));
+assert(overview.includes('cx-overview-cell'));
+assert(!overview.includes('Over 3,5 FT'));
+console.log('Main overview: five markets, estimates, missing-history states and distinct Gold meaning passed.');
