@@ -1250,9 +1250,30 @@
         const m=markets.find(r=>r.market===market&&r.selection===selection)?.movement;
         return m?.confirmed===true&&Number.isFinite(m.paired_books)&&Number.isFinite(m.agreeing_books)&&m.agreeing_books>=2&&m.agreeing_books>m.paired_books/2&&Number.isFinite(m.amplitude_pct)&&Math.abs(m.amplitude_pct)>=3&&m.direction===direction;
       };
-      const crosses=strong('1x2_ft','1','up')?[['over25_ft','Over 2,5 FT'],['over15_ht','Over 1,5 PT']].filter(([market])=>strong(market,'over','down')):[];
-      const signals=crosses.map(([,label])=>`<span class="cx-crossing"><span class="cx-crossing-ring" aria-hidden="true"></span><span class="cx-crossing-label">Incrocio quote · ${label}</span><span class="cx-crossing-rule">1 ↑ + ${label} ↓ · sperimentale</span></span>`).join('');
-      const explanation=crosses.length?'<p>Secondo cerchio azzurro: quota casa in salita e quota dell’Over indicato in discesa, entrambe con movimento almeno del 3%, confermato da almeno due book e dalla maggioranza degli operatori confrontabili. Ultimi tratti osservati: non necessariamente simultanei o senza inversioni.</p><p>Incrocio osservato nell’audit del 21–22 ottobre 2026, da verificare su nuove giornate: non dimostra maggiore affidabilità. Il Gold resta esclusivamente sull’Over 2,5 FT, anche quando l’incrocio riguarda il PT. Nessun bonus alle percentuali.</p>':'';
+      const rules=[
+        ['1','up','over25_ft','Over 2,5 FT','down'],
+        ['2','down','over25_ft','Over 2,5 FT','down'],
+        ['1','up','over25_ft','Over 2,5 FT','up'],
+        ['1','up','over15_ht','Over 1,5 PT','down']
+      ];
+      const crosses=rules.filter(([side,direction,market,,overDirection])=>strong('1x2_ft',side,direction)&&strong(market,'over',overDirection));
+      // Match the audit definition: median first-observed fair probability per 1/X/2.
+      const opening=['1','x','2'].map(side=>{
+        const operators=markets.find(r=>r.market==='1x2_ft'&&r.selection===side)?.movement?.operators||[];
+        const values=operators.map(o=>o.fair_initial_pct).filter(v=>Number.isFinite(v)&&v>=0&&v<=100).sort((a,b)=>a-b);
+        const n=values.length;
+        return {side,p:n?(values[Math.floor(n/2)]+values[Math.floor((n-1)/2)])/2:null};
+      });
+      if(opening.every(o=>o.p!==null)){
+        opening.sort((a,b)=>b.p-a.p);
+        const favorite=opening[0];
+        const movement=markets.find(r=>r.market==='1x2_ft'&&r.selection===favorite.side)?.movement;
+        if(favorite.p>opening[1].p&&strong('1x2_ft',favorite.side,'down')&&Math.abs(movement.amplitude_pct)>=8&&strong('over15_ht','over','down'))
+          crosses.push([`Favorita iniziale ${favorite.side.toUpperCase()} (rosso)`,'down','over15_ht','Over 1,5 PT','down']);
+      }
+      const arrow=d=>d==='up'?'↑':'↓';
+      const signals=crosses.map(([side,direction,,label,overDirection])=>`<span class="cx-crossing"><span class="cx-crossing-ring" aria-hidden="true"></span><span class="cx-crossing-label">Incrocio quote · ${label}</span><span class="cx-crossing-rule">${side} ${arrow(direction)} + ${label} ${arrow(overDirection)} · sperimentale</span></span>`).join('');
+      const explanation=crosses.length?'<p>Cerchio azzurro: incrocio indicato tra quota 1 o 2 e quota Over, entrambe con movimento almeno del 3%, confermato da almeno due book e dalla maggioranza degli operatori confrontabili. Favorita iniziale: esito con maggiore probabilità mediana senza aggio nelle prime osservazioni disponibili; il suo segnale PT richiede calo rosso (almeno 8%) e calo Over giallo/rosso. Assente se mancano dati o la favorita è a pari merito. Più incroci possono riguardare la stessa partita: non sono conferme indipendenti. Ultimi tratti osservati: non necessariamente simultanei o senza inversioni.</p><p>Incrocio osservato nell’audit del 21–22 ottobre 2026, da verificare su nuove giornate: non dimostra maggiore affidabilità. Il Gold resta esclusivamente sull’Over 2,5 FT, anche quando l’incrocio riguarda il PT. Nessun bonus alle percentuali.</p>':'';
       return `<details class="cx-agreement"><summary><span class="cx-agreement-ring" aria-hidden="true"></span>Over 2,5 FT · accordo prematch<small>Filtro sperimentale · dettagli</small>${signals}</summary>${explanation}<p>Statistica ${contextPct(p*100)} · book senza margine ${contextPct(b)}. Entrambe >50%, distanza ≤10 punti percentuali.</p><p>Segnale riferito soltanto all’Over 2,5 FT, anche quando la proposta principale è diversa. Non indica valore della quota, probabilità live o successo garantito. Verifica quota e dati mancanti nella scheda.</p></details>`;
     }
     function contextPrice(row,compact=false) {
