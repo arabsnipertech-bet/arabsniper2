@@ -1,0 +1,73 @@
+name: Verify private Gold storage
+
+on:
+  workflow_dispatch:
+    inputs:
+      bucket:
+        description: 'Bucket privato da inizializzare e verificare'
+        type: choice
+        default: arabsniper-gold-test
+        options:
+          - arabsniper-gold-test
+          - arabsniper-gold
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arabsniper-quote-data-writer
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ inputs.bucket }}
+      GOLD_PRIVATE: ${{ vars.GOLD_PRIVATE }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Block public bootstrap after private cutover
+        run: |
+          if [ "$GOLD_PRIVATE" = 'true' ]; then
+            echo 'Bootstrap disabled: the private checkpoint is already authoritative.'
+            exit 1
+          fi
+          test -n "$R2_ACCESS_KEY_ID"
+          test -n "$R2_SECRET_ACCESS_KEY"
+      - name: Install R2 SDK
+        run: python -m pip install boto3
+      - name: Verify storage failure and integrity handling
+        run: python -m unittest discover -s tests -p test_gold_storage.py
+      - name: Publish and read back every checkpoint object and Gold feed
+        env:
+          PYTHONPATH: src
+        run: |
+          python - <<'PY'
+          import json, os, tempfile
+          from pathlib import Path
+          from gold_storage import client, collect, publish, restore, GOLD
+          from audit_storage import read_store
+          try:
+              root=Path.cwd(); bucket=os.environ['R2_BUCKET']; s3=client()
+              expected=collect(root)
+              publish(s3,bucket,root)
+              with tempfile.TemporaryDirectory() as directory:
+                  restore(s3,bucket,directory)
+                  if collect(directory)!=expected:raise ValueError('Checkpoint roundtrip mismatch')
+              for name in GOLD:
+                  value=json.loads(s3.get_object(Bucket=bucket,Key=name)['Body'].read())
+                  if value!=read_store(root/'data'/name):raise ValueError('Gold feed mismatch')
+              print('PASS: private checkpoint and all seven Gold feeds verified')
+          except Exception as error:
+              raise SystemExit('Storage verification failed: '+type(error).__name__)
+          PY
