@@ -2,6 +2,12 @@ name: Pubblica sito
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - web/index.html
+      - web/homepage.js
+      - web/results.js
 
 permissions: {}
 
@@ -60,3 +66,4 @@ jobs:
               summary.write('## Pubblicazione richiesta\n\n' + message + '\n\n')
               summary.write('Il hook deve essere configurato sul ramo main del progetto arabsniperbet. Pubblica il main disponibile al momento della richiesta, non un commit storico.\n\n')
               summary.write('Verificare lo stato in Cloudflare → Workers & Pages → arabsniperbet → Distribuzioni, poi https://arabsniperbet.com. Il successo di questo job conferma la richiesta, non il completamento della build.\n')
+
