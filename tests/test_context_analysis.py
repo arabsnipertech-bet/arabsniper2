@@ -185,3 +185,33 @@ class IntegrationTests(unittest.TestCase):
         from selection_policy import competition
         self.assertFalse(competition({'name':'Coppa Italia','country':'Italy','type':'Cup'})['allowed'])
         self.assertTrue(competition({'name':'UEFA Champions League','country':'World','type':'Cup'})['allowed'])
+
+
+class ComparableWindowTests(unittest.TestCase):
+    def older(self, name='A', points=(3.,2.5,2.4,2.)):
+        b=book(name,points)
+        for row,hour in zip(b['trace'],(0,5,6,7)):
+            row['observed_at']=f'2026-10-20T{hour:02d}:00:00+00:00'
+        return b
+
+    def test_recovers_older_start_using_real_shared_observations(self):
+        books=[self.older(),book('B',[2.5,2.4,2.])];before=deepcopy(books)
+        result=movement(books,'over')
+        self.assertEqual(result['paired_books'],2)
+        self.assertEqual(result['recovered_books'],1)
+        self.assertTrue(result['confirmed'])
+        self.assertEqual(result['operators'][0]['sequence'],[2.5,2.4,2.])
+        self.assertNotEqual(result['operators'][0]['first_observed_fair_pct'],result['operators'][0]['fair_initial_pct'])
+        self.assertEqual(books,before)
+
+    def test_recovery_does_not_force_agreement(self):
+        result=movement([self.older(),book('B',[2.,2.2,2.5])],'over')
+        self.assertEqual(result['paired_books'],2)
+        self.assertFalse(result['confirmed'])
+
+    def test_stale_or_nonoverlapping_history_not_recovered(self):
+        old=self.older();old['trace']=old['trace'][:1]+old['trace'][1:2]
+        result=movement([old,book('B',[2.5,2.4,2.]),book('C',[2.5,2.4,2.])],'over')
+        self.assertEqual(result['paired_books'],2)
+        self.assertEqual(result['recovered_books'],0)
+        self.assertEqual({r['bookmaker'] for r in result['operators']},{'B','C'})
