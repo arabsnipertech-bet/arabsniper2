@@ -43,6 +43,8 @@ jobs:
         run: python auditor/current_audit.py settle
       - name: Compare multimarket models
         run: python src/model_research.py
+      - name: Build public results from frozen forecasts
+        run: python src/homepage_results.py
       - name: Save current audit archive and report
         run: |
           git config user.name "github-actions"
@@ -50,7 +52,7 @@ jobs:
           if [ -d auditordata/_audit_parts ]; then git add auditordata/_audit_parts; fi
           if [ -d auditarchive/_audit_parts ]; then git add auditarchive/_audit_parts; fi
           git add auditordata/prematch_*.json auditarchive/prematch_*.json auditarchive/prematch_*_daily.md
-          git add data/arab_quote_multimarket_report.json data/arab_quote_model_research.json
+          git add data/arab_quote_multimarket_report.json data/arab_quote_model_research.json data/arab_quote_results_public.json
           if git diff --cached --quiet; then
             echo "No audit changes"
             exit 0
@@ -58,3 +60,4 @@ jobs:
           git commit -m "Update current prematch audit"
           git pull --rebase origin main
           git push origin HEAD:main
+
