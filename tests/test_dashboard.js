@@ -253,3 +253,26 @@ assert(!overview.includes('<details class="cx-detail">'));
 assert(overview.includes('cx-overview-cell'));
 assert(!overview.includes('Over 3,5 FT'));
 console.log('Main overview: five markets, estimates, missing-history states and distinct Gold meaning passed.');
+
+// Joint badge requires existing Gold AND the exact observed 1-up / Over-down pattern.
+const strongMove=(direction,amplitude=3,agree=3,paired=4)=>({confirmed:true,direction,amplitude_pct:amplitude,agreeing_books:agree,paired_books:paired});
+const crossed={multimarket:{model_id:'context-goals-v3.4',markets:[
+ {market:'over25_ft',selection:'over',probabilities:{statistics:.61},book_probability_pct:57,movement:strongMove('down')},
+ {market:'over15_ht',selection:'over',movement:strongMove('down',8)},
+ {market:'1x2_ft',selection:'1',movement:strongMove('up')}]}};
+const beforeCross=JSON.stringify(crossed);
+let crossHtml=badgeContext.contextAgreementBadge(crossed);
+assert.equal((crossHtml.match(/class="cx-crossing"/g)||[]).length,2);
+assert(crossHtml.includes('1 ↑ + Over 2,5 FT ↓'));
+assert(crossHtml.includes('1 ↑ + Over 1,5 PT ↓'));
+assert(crossHtml.includes('non dimostra maggiore affidabilità'));
+assert.equal(JSON.stringify(crossed),beforeCross);
+for(const move of [strongMove('down'),strongMove('up',2.99),strongMove('up',10,2,4),{...strongMove('up'),confirmed:false},{...strongMove('up'),amplitude_pct:null}]){
+ crossed.multimarket.markets[2].movement=move;
+ crossHtml=badgeContext.contextAgreementBadge(crossed);
+ assert(crossHtml.includes('cx-agreement-ring'));assert(!crossHtml.includes('class="cx-crossing"'));
+}
+crossed.multimarket.markets[2].movement=strongMove('up');
+crossed.multimarket.markets[0].probabilities.statistics=.5;
+assert.equal(badgeContext.contextAgreementBadge(crossed),'');
+console.log('Gold plus quote crossing: exact directions, consensus, thresholds, market labels and immutable probabilities passed.');

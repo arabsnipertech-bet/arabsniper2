@@ -16,6 +16,8 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     rows.push(mk('1x2_ft','1','Casa',24),mk('1x2_ft','x','Pareggio',26),mk('1x2_ft','2','Ospite',50));
     rows[6].odd=1.65; rows[6].movement={confirmed:true,color:'red',direction:'down',arrow:'↓',favorite_switch:{confirmed:true,from:'1',to:'2',agreeing_books:2,paired_books:2},amplitude_pct:10,agreeing_books:2,paired_books:2,operators:[{bookmaker:'Test',initial:1.85,current:1.65,sequence:[1.85,1.65]}]};
     rows.push(mk('over25_ht','over','Over 2,5 PT',18));
+    rows[2].probabilities={statistics:.61};
+    for(const [index,direction] of [[4,'up'],[2,'down'],[0,'down']])rows[index].movement={confirmed:true,direction,amplitude_pct:4,agreeing_books:3,paired_books:4};
     const primary={...rows[2],research_candidate:true,price_assessment:{reference_probability_pct:58,break_even_probability_pct:50,reference_fair_odd:100/58,estimated_return_pct:16,status:'unvalidated_positive_estimate',note:'Esempio sintetico non validato.'}};
     const payload={updated_at:now,matches:[{fixture:{fixture_id:'123456',kickoff:new Date(Date.now()+3600000).toISOString(),
       match:'Squadra casa – Squadra ospite <script>',time:'20:45',league:'Campionato di prova',country:'Italia'},
@@ -37,6 +39,11 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       assert((await page.locator('.cx-red').textContent()).includes('✓ 2/2 book'));
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
       await page.screenshot({path:`test-artifacts/list-${name}.png`,fullPage:true});
+      assert.equal(await page.locator('.cx-list-row .cx-crossing').count(),2);
+      assert(await page.locator('.cx-list-row .cx-crossing').first().isVisible());
+      assert((await page.locator('.cx-list-row').textContent()).includes('1 ↑ + Over 2,5 FT ↓'));
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Overview overflow at '+name);
+      await page.screenshot({path:`test-artifacts/overview-${name}.png`,fullPage:true});
       await page.locator('.cx-open').click();
       assert.equal(await page.locator('.cx-card').count(),1);
       assert.equal(await page.locator('.cx-mini').count(),5);

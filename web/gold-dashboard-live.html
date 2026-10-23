@@ -704,6 +704,9 @@
     .cx-agreement summary{cursor:pointer;font-weight:700;line-height:1.5;min-height:44px}
     .cx-agreement summary small{display:block;font-weight:400;color:#eee0ba}
     .cx-agreement-ring{display:inline-block;width:17px;height:17px;border:3px solid #f5cc52;border-radius:50%;box-shadow:0 0 7px #e8c75a66;vertical-align:middle;margin-right:7px}
+    .cx-crossing{display:block;margin:8px 0 2px;padding:7px 9px;border:1px solid #61d7ef;border-radius:8px;background:#132e39;color:#b9f2ff;font-size:.75rem;line-height:1.5}
+    .cx-crossing-ring{display:inline-block;width:13px;height:13px;border:2px solid #61d7ef;border-radius:50%;vertical-align:middle;margin-right:6px}
+    .cx-crossing-rule{display:block;font-weight:400}.cx-crossing-label{font-weight:800}
     .cx-agreement p{line-height:1.5;color:#f1e6c8}.cx-agreement summary:focus-visible{outline:2px solid #fff;outline-offset:4px}
     .cx-list-pick{background:#302d1d;border-left:3px solid #e8c75a;padding:12px;border-radius:8px;font-size:.75rem}.cx-list-pick>*{display:block;margin:5px 0}.cx-list-pick b{color:#ffe193;font-size:1rem}.cx-list-pick strong{color:#82f3ff;font-size:1.05rem}.cx-list-pick em{color:#f1d59a;font-style:normal}
     .cx-compact-odds .cx-odd-cell small.cx-consensus,.cx-compact-odds>.cx-odds-note.cx-favorite{display:block}.cx-odd-cell .cx-consensus.cx-red{color:#ff8981}.cx-odd-cell .cx-consensus.cx-yellow{color:#ffd166}.cx-odd-cell .cx-consensus.cx-green{color:#77dfa6}
@@ -1241,7 +1244,16 @@
       const row=match.multimarket.markets?.find(r=>r.market==='over25_ft'&&r.selection==='over');
       const p=row?.probabilities?.statistics,b=row?.book_probability_pct;
       if(!Number.isFinite(p)||!Number.isFinite(b)||p<=.5||p>1||b<=50||b>100||Math.abs(p*100-b)>10+1e-9)return '';
-      return `<details class="cx-agreement"><summary><span class="cx-agreement-ring" aria-hidden="true"></span>Over 2,5 FT · accordo prematch<small>Filtro sperimentale · dettagli</small></summary><p>Statistica ${contextPct(p*100)} · book senza margine ${contextPct(b)}. Entrambe >50%, distanza ≤10 punti percentuali.</p><p>Segnale riferito soltanto all’Over 2,5 FT, anche quando la proposta principale è diversa. Non indica valore della quota, probabilità live o successo garantito. Verifica quota e dati mancanti nella scheda.</p></details>`;
+      // Descriptive audit pattern only: never modifies Gold eligibility or probabilities.
+      const markets=match.multimarket.markets||[];
+      const strong=(market,selection,direction)=>{
+        const m=markets.find(r=>r.market===market&&r.selection===selection)?.movement;
+        return m?.confirmed===true&&Number.isFinite(m.paired_books)&&Number.isFinite(m.agreeing_books)&&m.agreeing_books>=2&&m.agreeing_books>m.paired_books/2&&Number.isFinite(m.amplitude_pct)&&Math.abs(m.amplitude_pct)>=3&&m.direction===direction;
+      };
+      const crosses=strong('1x2_ft','1','up')?[['over25_ft','Over 2,5 FT'],['over15_ht','Over 1,5 PT']].filter(([market])=>strong(market,'over','down')):[];
+      const signals=crosses.map(([,label])=>`<span class="cx-crossing"><span class="cx-crossing-ring" aria-hidden="true"></span><span class="cx-crossing-label">Incrocio quote · ${label}</span><span class="cx-crossing-rule">1 ↑ + ${label} ↓ · sperimentale</span></span>`).join('');
+      const explanation=crosses.length?'<p>Secondo cerchio azzurro: quota casa in salita e quota dell’Over indicato in discesa, entrambe con movimento almeno del 3%, confermato da almeno due book e dalla maggioranza degli operatori confrontabili. Ultimi tratti osservati: non necessariamente simultanei o senza inversioni.</p><p>Incrocio osservato nell’audit del 21–22 ottobre 2026, da verificare su nuove giornate: non dimostra maggiore affidabilità. Il Gold resta esclusivamente sull’Over 2,5 FT, anche quando l’incrocio riguarda il PT. Nessun bonus alle percentuali.</p>':'';
+      return `<details class="cx-agreement"><summary><span class="cx-agreement-ring" aria-hidden="true"></span>Over 2,5 FT · accordo prematch<small>Filtro sperimentale · dettagli</small>${signals}</summary>${explanation}<p>Statistica ${contextPct(p*100)} · book senza margine ${contextPct(b)}. Entrambe >50%, distanza ≤10 punti percentuali.</p><p>Segnale riferito soltanto all’Over 2,5 FT, anche quando la proposta principale è diversa. Non indica valore della quota, probabilità live o successo garantito. Verifica quota e dati mancanti nella scheda.</p></details>`;
     }
     function contextPrice(row,compact=false) {
       const a=row?.price_assessment;
