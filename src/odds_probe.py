@@ -45,7 +45,7 @@ def main():
         raise RuntimeError('Catalog unavailable')
     book_ids = [b['id'] for b in catalog['response']]
     bet_ids = [b['id'] for b in bets['response'] if b['id'] in (1,5) or
-               ('first half' in b['name'].lower() and ('goals' in b['name'].lower() or 'score' in b['name'].lower()))]
+               ('first half' in str(b.get('name') or '').lower() and ('goals' in str(b.get('name') or '').lower() or 'score' in str(b.get('name') or '').lower()))]
     now = datetime.now(timezone.utc)
     matches = []
     for day in (1,2):
