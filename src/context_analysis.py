@@ -192,7 +192,7 @@ def movement(books, side, include_previous=True):
         start,end=stamp(h[0]['observed_at']),stamp(h[-1]['observed_at'])
         if not start or not end or end<=start: continue
         paired.append((b,h,start,end))
-    if not paired: return {'confirmed':False,'paired_books':0,'reason':'storico_comparabile_assente'}
+    if not paired: return {'schema_version':3,'available_books':len(books),'history_books':0,'recovered_books':0,'confirmed':False,'paired_books':0,'agreeing_books':0,'reason':'storico_comparabile_assente'}
     # Use one common window (one hour tolerance), not incomparable first dates.
     candidates=paired[:]
     anchor=max(p[2] for p in paired)
