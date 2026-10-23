@@ -305,3 +305,10 @@ draw.movement.operators=[{fair_initial_pct:20}];
 crossed.multimarket.markets[1].movement=strongMove('up');
 assert(!badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓'));
 console.log('Initial favorite red PT: medians, missing data, ties, intensity and Over direction passed.');
+
+// Recovering a common window must not redefine the initially favored outcome.
+crossed.multimarket.markets[1].movement=strongMove('down');
+side1.movement.operators=[{fair_initial_pct:15,first_observed_fair_pct:62}];
+side2.movement.operators=[{fair_initial_pct:65,first_observed_fair_pct:18}];
+assert(badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓ + Over 1,5 PT ↓'));
+console.log('Common window preserves the original favorite passed.');
