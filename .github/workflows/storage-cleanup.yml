@@ -13,6 +13,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   cleanup:
+    if: vars.GOLD_PRIVATE != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -34,3 +35,4 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit -m 'Remove verified unreferenced storage parts'
           git push origin HEAD:main
+

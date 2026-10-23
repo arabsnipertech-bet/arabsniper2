@@ -35,6 +35,12 @@ jobs:
     timeout-minutes: 75
 
     env:
+      GOLD_PRIVATE: ${{ vars.GOLD_PRIVATE }}
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      PYTHONUNBUFFERED: '1'
       API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
       # Bounded incremental recovery; completed historical statistics are reused.
       ARAB_XG_MAX_CALLS_PER_RUN: ${{ vars.ARAB_FAST_STATS_BUDGET || '250' }}
@@ -43,6 +49,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 1
 
       - name: Setup Python
@@ -55,6 +62,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests PyGithub
+
+      - name: Prepare private storage client
+        if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
+        run: pip install boto3
+
+      - name: Restore authoritative private checkpoint
+        if: vars.GOLD_PRIVATE == 'true'
+        run: python src/gold_storage.py restore
 
       - name: Create market catalog if missing
         run: |
@@ -87,7 +102,16 @@ jobs:
           test -f data/arab_quote_day1.json
           test -f data/arab_quote_day2.json
 
+      - name: Save verified state in private storage
+        if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
+        run: python src/gold_storage.py publish
+
+      - name: Publish only public projections
+        if: vars.GOLD_PRIVATE == 'true'
+        run: python src/private_publication.py
+
       - name: Publish Fast Scan safely
+        if: vars.GOLD_PRIVATE != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -145,7 +169,7 @@ jobs:
           exit 1
 
       - name: Preserve generated data if publication fails
-        if: failure()
+        if: failure() && vars.GOLD_PRIVATE != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: scan-recovery-${{ github.run_id }}
@@ -153,3 +177,4 @@ jobs:
           path: |
             data/arab_quote_*.json
             data/_audit_parts/
+
