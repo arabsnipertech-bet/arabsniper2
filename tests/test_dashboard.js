@@ -228,3 +228,19 @@ assert(vm.runInContext('contextList([feedFixture])',researchContext).includes('O
 researchContext.feedFixture.multimarket.proposals_by_min_odd={'1.5':feedRows[2]};
 assert.equal(vm.runInContext('contextFeedMatches([feedFixture]).length',researchContext),0);
 console.log('Over 2.5 feed: frozen data preserved, HT hidden, missing prices retained, exact Over 3.5 recommendation eligibility passed.');
+
+// HT observation feed and joint table never alter the frozen forecast or Gold.
+const frozenBeforeObservation=JSON.stringify(researchContext.feedFixture);
+vm.runInContext("contextFeed='over15_ht';contextCompareMarket=''",researchContext);
+assert.equal(vm.runInContext('contextFeedMatches([feedFixture]).length',researchContext),1);
+const htFeed=vm.runInContext('contextList([feedFixture])',researchContext);
+assert(htFeed.includes('OVER 1,5 PT · IN OSSERVAZIONE'));
+assert(htFeed.includes('Over 1,5 PT'));
+assert(!htFeed.includes('CONSIGLIATA DAL MODELLO · PREMATCH'));
+const joint=vm.runInContext('contextJointMovements(feedFixture)',researchContext);
+assert(joint.includes('1 · Casa')&&joint.includes('Over 1,5 PT')&&joint.includes('Over 2,5 FT'));
+assert(joint.includes('Storico multi-book assente')||joint.includes('Dati assenti'));
+assert(joint.includes('Nessun bonus'));
+assert.equal(JSON.stringify(researchContext.feedFixture),frozenBeforeObservation);
+assert.equal(vm.runInContext('contextFeedMatches([{multimarket:{markets:[]}}]).length',researchContext),0);
+console.log('HT observation and joint movements: missing markets, absent history, immutable forecasts and non-recommendation label passed.');
