@@ -1,6 +1,7 @@
 """Private R2 checkpoint + Gold projection. Activate only after staging verification."""
 from pathlib import Path
 import hashlib, json, os, re, sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from audit_storage import read_store, atomic_bytes, FORMAT
 PUBLIC = {'data/arab_quote_homepage.json','data/arab_quote_results_public.json'}
 GOLD = [f'arab_quote_day{i}.json' for i in range(1,6)]+['arab_quote_prediction_audit.json','arab_quote_model_research.json']
@@ -41,12 +42,20 @@ def publish(s3,bucket,root):
     gold={name:json.dumps(read_store(root/'data'/name),ensure_ascii=False,separators=(',',':')).encode() for name in GOLD if (root/'data'/name).exists()}
     if len(gold)!=len(GOLD): raise ValueError('Missing Gold files; publication aborted')
     files=collect(root); index={}; known=previous_objects(s3,bucket)
+    uploads={}
     for path,data in files.items():
-        digest=sha(data);key='state/objects/'+digest
-        if digest not in known:
-            s3.put_object(Bucket=bucket,Key=key,Body=data,Metadata={'sha256':digest})
-            known.add(digest)
+        digest=sha(data)
+        if digest not in known: uploads[digest]=data
         index[path]={'sha256':digest,'bytes':len(data)}
+    print(f'Uploading {len(uploads)} changed objects; reusing unchanged data',flush=True)
+    def upload(item):
+        digest,data=item
+        s3.put_object(Bucket=bucket,Key='state/objects/'+digest,Body=data,Metadata={'sha256':digest})
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        tasks=[pool.submit(upload,item) for item in uploads.items()]
+        for count,task in enumerate(as_completed(tasks),1):
+            task.result()
+            if count%25==0 or count==len(tasks):print(f'Uploaded {count}/{len(tasks)} objects',flush=True)
     # Gold uses its existing names and requires authenticated Worker access.
     for name,data in gold.items():
         s3.put_object(Bucket=bucket,Key=name,Body=data,ContentType='application/json',CacheControl='private, no-store')
@@ -60,12 +69,26 @@ def restore(s3,bucket,root):
     root=Path(root)
     manifest=json.loads(s3.get_object(Bucket=bucket,Key='state/current.json')['Body'].read())
     if manifest.get('version')!=1 or not isinstance(manifest.get('files'),dict):raise ValueError('Invalid checkpoint')
-    pending={}
+    pending={}; objects={}
     for path,item in manifest['files'].items():
         if not allowed(path) or not re.fullmatch('[a-f0-9]{64}',item['sha256']):raise ValueError('Invalid checkpoint path')
-        raw=s3.get_object(Bucket=bucket,Key='state/objects/'+item['sha256'])['Body'].read()
-        if len(raw)!=item['bytes'] or sha(raw)!=item['sha256']:raise ValueError('Checkpoint checksum mismatch')
-        pending[path]=raw
+        if not isinstance(item['bytes'],int) or item['bytes']<0:raise ValueError('Invalid checkpoint size')
+        digest=item['sha256']
+        if digest in objects and objects[digest]!=item['bytes']:raise ValueError('Conflicting object sizes')
+        objects[digest]=item['bytes']
+    print(f'Restoring {len(objects)} unique objects',flush=True)
+    def download(item):
+        digest,size=item
+        raw=s3.get_object(Bucket=bucket,Key='state/objects/'+digest)['Body'].read()
+        if len(raw)!=size or sha(raw)!=digest:raise ValueError('Checkpoint checksum mismatch')
+        return digest,raw
+    downloaded={}
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        tasks=[pool.submit(download,item) for item in objects.items()]
+        for count,task in enumerate(as_completed(tasks),1):
+            digest,raw=task.result();downloaded[digest]=raw
+            if count%25==0 or count==len(tasks):print(f'Restored {count}/{len(tasks)} objects',flush=True)
+    for path,item in manifest['files'].items():pending[path]=downloaded[item['sha256']]
     if not pending:raise ValueError('Empty checkpoint')
     # Validate/download all objects first. No fallback to stale public data.
     for path in collect(root):
@@ -89,3 +112,4 @@ if __name__=='__main__':
     except Exception as error:
         # Never print SDK request headers/credentials.
         raise SystemExit('Private storage failed: '+type(error).__name__)
+

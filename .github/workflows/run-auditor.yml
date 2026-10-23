@@ -32,6 +32,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
+      GOLD_PRIVATE: ${{ vars.GOLD_PRIVATE }}
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      PYTHONUNBUFFERED: '1'
       API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
     steps:
       - uses: actions/checkout@v4
@@ -40,13 +46,30 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Prepare private storage client
+        if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
+        run: pip install boto3
+
+      - name: Restore authoritative private checkpoint
+        if: vars.GOLD_PRIVATE == 'true'
+        run: python src/gold_storage.py restore
+
       - name: Archive forecasts and settle completed matches
         run: python auditor/current_audit.py settle
       - name: Compare multimarket models
         run: python src/model_research.py
       - name: Build public results from frozen forecasts
         run: python src/homepage_results.py
+      - name: Save verified state in private storage
+        if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
+        run: python src/gold_storage.py publish
+
+      - name: Publish only public projections
+        if: vars.GOLD_PRIVATE == 'true'
+        run: python src/private_publication.py
+
       - name: Save current audit archive and report
+        if: vars.GOLD_PRIVATE != 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -61,4 +84,5 @@ jobs:
           git commit -m "Update current prematch audit"
           git pull --rebase origin main
           git push origin HEAD:main
+
 

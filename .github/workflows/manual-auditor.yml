@@ -20,11 +20,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: arabsniper-manual-auditor-${{ github.event.inputs.date }}
+  group: arabsniper-quote-data-writer
   cancel-in-progress: false
 
 jobs:
   manual_auditor:
+    if: vars.GOLD_PRIVATE != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -122,3 +123,4 @@ jobs:
 
           git commit -m "Manual auditor ${{ github.event.inputs.date }}" || echo "No changes to commit"
           git push
+
