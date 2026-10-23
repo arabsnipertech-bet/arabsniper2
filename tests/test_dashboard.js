@@ -124,7 +124,7 @@ assert(host.innerHTML.includes('La partita, spiegata.'));
 assert(host.innerHTML.includes('cx-list-row'));
 assert(!host.innerHTML.includes('Quadro statistico'));
 vm.runInContext("contextDetailId='100';renderMatchResearch(currentPayload)",researchContext);
-assert.equal((host.innerHTML.match(/PROPOSTA PRINCIPALE/g)||[]).length,1);
+assert.equal((host.innerHTML.match(/ANALISI OVER 2,5 FT/g)||[]).length,1);
 assert(host.innerHTML.includes('A favore'));
 assert(host.innerHTML.includes('Da considerare'));
 assert(host.innerHTML.includes('Dati mancanti'));
@@ -141,7 +141,7 @@ researchContext.oddsFixture={fixture:{home:'Home',away:'Away'},multimarket:{mark
  operators:[{bookmaker:'B',initial:9,current:8},{bookmaker:'A',initial:1.9,current:1.6}]}}]}};
 let prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);
 assert(prices.includes('1.90'));assert(prices.includes('1.60'));assert(!prices.includes('9.00'));
-assert(prices.includes('cx-red'));assert(prices.includes('↓ discesa'));assert(prices.includes('-15.79%'));assert(prices.includes('inversione di movimento'));assert(prices.includes('Over 1,5 PT'));
+assert(prices.includes('cx-red'));assert(prices.includes('↓ discesa'));assert(prices.includes('-15.79%'));assert(prices.includes('inversione di movimento'));assert(prices.includes('Over 3,5 FT'));assert(!prices.includes('Over 1,5 PT'));
 vm.runInContext('oddsFixture.multimarket.markets[0].movement.confirmed=false',researchContext);
 prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(prices.includes('cx-green cx-unconfirmed'));assert(!prices.includes('cx-signal cx-red'));
 vm.runInContext('oddsFixture.multimarket.markets[0].quote.bookmaker="C"',researchContext);
@@ -206,3 +206,25 @@ assert.equal(badge(.6,55,'context-goals-v3.3'),'');
 assert(html.includes('${contextAgreementBadge(match)}'));
 assert(html.includes('contextCoverage(match)+contextAgreementBadge(match)'));
 console.log('Gold marker: audit thresholds, missing data, model scope and both placements passed.');
+
+// Public feed is Over 2.5 regardless of the frozen original primary. Only an
+// actual frozen Over 3.5 proposal qualifies for the recommended view.
+const feedRows=[{market:'over25_ft',selection:'over',label:'Over 2,5 FT',statistical_pct:61,book_probability_pct:55},
+ {market:'over35_ft',selection:'over',label:'Over 3,5 FT',odd:2.2},
+ {market:'over15_ht',selection:'over',label:'Over 1,5 PT',odd:2}];
+researchContext.feedFixture={fixture:{fixture_id:'feed',kickoff:future(1),match:'Feed test'},multimarket:{model_id:'context-goals-v3.4',markets:feedRows,best_candidate:feedRows[2]}};
+const original=JSON.stringify(researchContext.feedFixture);
+assert.equal(vm.runInContext('contextOver25(feedFixture.multimarket).market',researchContext),'over25_ft');
+assert.equal(vm.runInContext('contextOver35(feedFixture.multimarket)',researchContext),null);
+vm.runInContext("contextCompareMarket='';contextFeed='over25_ft';researchSearch='';",researchContext);
+let feed=vm.runInContext('contextList([feedFixture])',researchContext);
+assert(feed.includes('Over 2,5 FT'));assert(!feed.includes('Over 1,5 PT'));
+assert.equal(JSON.stringify(researchContext.feedFixture),original);
+vm.runInContext("contextFeed='over35_ft'",researchContext);
+assert.equal(vm.runInContext('contextFeedMatches([feedFixture]).length',researchContext),0);
+researchContext.feedFixture.multimarket.best_candidate=feedRows[1];
+assert.equal(vm.runInContext('contextFeedMatches([feedFixture]).length',researchContext),1);
+assert(vm.runInContext('contextList([feedFixture])',researchContext).includes('Over 3,5 FT'));
+researchContext.feedFixture.multimarket.proposals_by_min_odd={'1.5':feedRows[2]};
+assert.equal(vm.runInContext('contextFeedMatches([feedFixture]).length',researchContext),0);
+console.log('Over 2.5 feed: frozen data preserved, HT hidden, missing prices retained, exact Over 3.5 recommendation eligibility passed.');
