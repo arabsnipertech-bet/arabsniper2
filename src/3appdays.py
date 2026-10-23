@@ -3615,6 +3615,11 @@ def fetch_fixture_xg(client: APIClient, fixture_id: Any, home_id: Any, away_id: 
         empty["source"] = "disabled" if not XG_ENABLED else "run_budget_exhausted"
         return empty
 
+    enricher = getattr(client, "odds_enricher", None)
+    if enricher is not None and not enricher.allowed(check_limits=False):
+        empty["source"] = "run_budget_exhausted"
+        return cached if isinstance(cached, dict) else empty
+
     _XG_RUNTIME_CALLS += 1
     payload = client.get("fixtures/statistics", {"fixture": fixture_id}, use_cache=True)
     parsed = parse_fixture_xg_statistics(payload or {})

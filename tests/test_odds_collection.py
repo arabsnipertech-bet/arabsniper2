@@ -80,3 +80,18 @@ class CatalogTests(unittest.TestCase):
             self.assertEqual(e.fetch_bet_catalog(client)['bets'],[{'id':1}]);write.assert_not_called()
 
 if __name__=='__main__':unittest.main()
+
+class AdaptiveTests(unittest.TestCase):
+    def test_unproductive_route_pauses_then_recovers(self):
+        client=Mock();client.request_count=0
+        state={'route_health':{'bet':{'paused_at':NOW,'no_gain_streak':24},'bookmaker':{'paused_at':NOW,'no_gain_streak':24}}}
+        c=OddsEnricher(client,state,now=NOW)
+        c.enrich(payload(),100)
+        client.get.assert_not_called()
+        self.assertGreater(c.stats['odds_targeted_unproductive_skips'],0)
+    def test_statistics_quota_check_ignores_collector_time_limit(self):
+        client=Mock();client.request_count=0
+        client.get.return_value={'response':{'requests':{'current':5000,'limit_day':75000}}}
+        c=OddsEnricher(client,{},now=NOW,max_seconds=0)
+        self.assertFalse(c.allowed())
+        self.assertTrue(c.allowed(check_limits=False))

@@ -67,12 +67,12 @@ class OddsEnricher:
                           odds_targeted_markets_recovered=0, odds_targeted_empty=0,
                           odds_targeted_errors=0, odds_targeted_no_gain=0,
                           odds_targeted_cooldown_skips=0, odds_targeted_budget_stops=0,
-                          odds_targeted_fixtures=0)
+                          odds_targeted_fixtures=0, odds_targeted_unproductive_skips=0)
         self.report = []
         self.catalog = state.get('bookmakers', [])
 
-    def allowed(self):
-        if self.calls >= self.max_calls or time.monotonic()-self.started >= self.max_seconds:
+    def allowed(self, check_limits=True):
+        if check_limits and (self.calls >= self.max_calls or time.monotonic()-self.started >= self.max_seconds):
             return False
         # Recheck provider quota to account for other consumers and UTC resets.
         if self.quota_checked_at is None or time.monotonic()-self.quota_checked_at > 60:
@@ -119,6 +119,13 @@ class OddsEnricher:
         result = base
         attempts = 0
         for kind, value in queries:
+            health = self.state.setdefault('route_health', {}).setdefault(kind, {})
+            paused = stamp(health.get('paused_at'))
+            if paused and 0 <= (stamp(self.now)-paused).total_seconds() < 21600:
+                self.stats['odds_targeted_unproductive_skips'] += 1
+                continue
+            if paused:
+                health.clear()
             key = f'{fid}:{kind}:{value}'
             checked = stamp(history.get(key))
             if checked and 0 <= (stamp(self.now)-checked).total_seconds() < 10800:
@@ -139,6 +146,9 @@ class OddsEnricher:
                 self.stats['odds_targeted_errors'] += 1
                 continue  # Failed request is not cached as an empty result.
             history[key] = self.now
+            health['no_gain_streak'] = health.get('no_gain_streak', 0)+1
+            if health['no_gain_streak'] >= 24:
+                health['paused_at'] = self.now
             if kind == 'bookmaker':
                 self.state['cursors'][str(fid)] = cursor = cursor+1
             if not extra.get('response'):
@@ -154,6 +164,8 @@ class OddsEnricher:
             result = candidate
             if not after-previous:
                 self.stats['odds_targeted_no_gain'] += 1
+            else:
+                health.clear()
         after = coverage(result,fid,self.now)
         new_books = {b for m,b in after}-{b for m,b in before}
         self.stats['odds_targeted_books_recovered'] += len(new_books)
