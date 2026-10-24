@@ -1,0 +1,28 @@
+name: Analyze frozen Gold cohorts
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: Audit date YYYY-MM-DD
+        required: true
+        default: '2026-10-23'
+permissions:
+  contents: read
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AUDIT_DATE: ${{ inputs.date }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3
+      - name: Analyze immutable daily reports (read only)
+        run: python src/gold_cohort_analysis.py --date "$AUDIT_DATE"
