@@ -87,6 +87,22 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     await page.evaluate(()=>researchFilter('market','over25_ft::over'));
     await page.locator('.cx-mini').filter({hasText:'GG PT sì'}).click();
     assert((await page.locator('.cx-scenario-title').textContent()).includes('GG PT sì'));
+    await page.evaluate(()=>{
+      const rows=currentPayload.matches[0].multimarket.markets;
+      rows.find(r=>r.market==='1x2_ft'&&r.selection==='1').odd=1.65;
+      for(const [side,pct] of [['1',60],['x',23],['2',17]])rows.find(r=>r.market==='1x2_ft'&&r.selection===side).book_probability_pct=pct;
+      contextBack();
+    });
+    await page.getByLabel('Segnale Gold',{exact:true}).selectOption('gold');
+    assert.equal(await page.locator('.cx-list-row').count(),0);
+    await page.getByLabel('Segnale Gold',{exact:true}).selectOption('dual');
+    assert.equal(await page.locator('.cx-list-row').count(),1);
+    await page.getByLabel('Fascia quota 1',{exact:true}).selectOption('band');
+    assert.equal(await page.locator('.cx-list-row').count(),1);
+    assert((await page.locator('.cx-home-band').textContent()).includes('FAVORITA CASA 1'));
+    assert.equal(await page.locator('.cx-home-focus>span').count(),3);
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Favorite focus mobile overflow');
+    await page.screenshot({path:'test-artifacts/favorite-focus-mobile.png',fullPage:true});
     console.log('Browser: desktop/mobile layout, no horizontal overflow, exact markets and stable primary passed.');
   } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

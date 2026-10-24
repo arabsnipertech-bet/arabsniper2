@@ -317,12 +317,12 @@ console.log('Common window preserves the original favorite passed.');
 
 // Observe the original requested HOME win band; never promote forecasts.
 for(const [odd,expected] of [[1.579,false],[1.58,true],[1.65,true],[1.75,true],[1.751,false],[null,false]]){
- researchContext.bandMatch={multimarket:{markets:[{market:'1x2_ft',selection:'1',odd}]}};
+ researchContext.bandMatch={multimarket:{markets:[{market:'1x2_ft',selection:'1',odd,book_probability_pct:60},{market:'1x2_ft',selection:'x',book_probability_pct:23},{market:'1x2_ft',selection:'2',book_probability_pct:17}]}};
  assert.equal(vm.runInContext('contextHomeBand(bandMatch)',researchContext),expected);
 }
 researchContext.bandMatch={multimarket:{markets:[{market:'1x2_ft',selection:'2',odd:1.65}]}};
 assert.equal(vm.runInContext('contextHomeBand(bandMatch)',researchContext),false);
-researchContext.bandMatch={multimarket:{markets:[{market:'1x2_ft',selection:'1',odd:1.65}]}};
+researchContext.bandMatch={multimarket:{markets:[{market:'1x2_ft',selection:'1',odd:1.65,book_probability_pct:60},{market:'1x2_ft',selection:'x',book_probability_pct:23},{market:'1x2_ft',selection:'2',book_probability_pct:17}]}};
 const bandBefore=JSON.stringify(researchContext.bandMatch);
 assert(vm.runInContext('contextHomeBandBadge(bandMatch)',researchContext).includes('in osservazione'));
 assert.equal(JSON.stringify(researchContext.bandMatch),bandBefore);
@@ -334,3 +334,26 @@ researchContext.priceMatch={multimarket:{markets:[{market:'1x2_ft',selection:'1'
 const dualPrice=vm.runInContext('contextOdds(priceMatch,true)',researchContext);
 assert(dualPrice.includes('1.95')&&dualPrice.includes('1.65'));
 console.log('Gold frames, compact dual odds and observational home-odds band passed.');
+
+// Signal filters are mutually exclusive; combinations with the home band are intersections.
+researchContext.filterMatches=[
+ {multimarket:{model_id:'context-goals-v3.4',markets:[{market:'over25_ft',selection:'over',probabilities:{statistics:.6},book_probability_pct:55}]}},
+ {multimarket:{model_id:'context-goals-v3.4',markets:[{market:'over25_ft',selection:'over',probabilities:{statistics:.6},book_probability_pct:55,movement:strongMove('down')},{market:'1x2_ft',selection:'1',movement:strongMove('up')}]}},
+ {multimarket:{markets:[]}}
+];
+vm.runInContext("contextGoldFilter='gold'",researchContext);
+assert.equal(vm.runInContext('contextFeedMatches(filterMatches).length',researchContext),1);
+assert.equal(vm.runInContext('contextFeedMatches(filterMatches)[0]===filterMatches[0]',researchContext),true);
+vm.runInContext("contextGoldFilter='dual'",researchContext);
+assert.equal(vm.runInContext('contextFeedMatches(filterMatches)[0]===filterMatches[1]',researchContext),true);
+vm.runInContext('contextHomeBandOnly=true',researchContext);
+assert.equal(vm.runInContext('contextFeedMatches(filterMatches).length',researchContext),0);
+vm.runInContext("contextHomeBandOnly=false;contextGoldFilter='all'",researchContext);
+assert.equal(vm.runInContext('contextFeedMatches(filterMatches).length',researchContext),3);
+researchContext.bandMatch.multimarket.markets[2].book_probability_pct=65;
+assert.equal(vm.runInContext('contextHomeBand(bandMatch)',researchContext),false);
+researchContext.bandMatch.multimarket.markets[2].book_probability_pct=60;
+assert.equal(vm.runInContext('contextHomeBand(bandMatch)',researchContext),false);
+researchContext.bandMatch.multimarket.markets.pop();
+assert.equal(vm.runInContext('contextHomeBand(bandMatch)',researchContext),false);
+console.log('Exclusive Gold filters, filter intersections, confirmed home favorite and missing data passed.');
