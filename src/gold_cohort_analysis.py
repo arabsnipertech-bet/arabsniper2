@@ -62,6 +62,7 @@ def band(row, kind):
 
 def analyze(reports, target):
     groups, slices, paired = defaultdict(list), defaultdict(list), defaultdict(lambda:defaultdict(int))
+    filters = defaultdict(list)
     missing = []
     for day, report in sorted(reports.items()):
         if report.get('audit_date') != day: raise ValueError('Report date mismatch')
@@ -78,6 +79,16 @@ def analyze(reports, target):
             badge = gold(ft)
             for scope in ('all_candidates', 'primary_only') if row.get('primary') else ('all_candidates',):
                 groups[(day, snapshot, market, scope, badge)].append(row)
+                if snapshot == 'latest' and badge == 'no_gold' and valid(row.get('odd'), 1) and row['odd'] > 1:
+                    p, b = row.get('statistical_probability'), row.get('book_probability_pct')
+                    ref = (row.get('price_assessment') or {}).get('reference_probability_pct')
+                    rules = {'statistics_over50': valid(p,0,1) and p>.5,
+                             'book_over50': valid(b) and b>50,
+                             'both_over50': valid(p,0,1) and valid(b) and p>.5 and b>50,
+                             'reference_above_break_even': valid(ref) and ref>100/row['odd'],
+                             'statistics_above_book': valid(p,0,1) and valid(b) and p*100>b}
+                    for rule, passed in rules.items():
+                        filters[(day, market, scope, rule, 'selected' if passed else 'excluded')].append(row)
                 if day == target and snapshot == 'latest':
                     for kind in ('odds', 'statistics', 'league'):
                         slices[(market, scope, kind, band(row,kind), badge)].append(row)
@@ -96,6 +107,7 @@ def analyze(reports, target):
         groups=[dict(zip(('day','snapshot','market','scope','gold'),k), **metrics(v)) for k,v in sorted(groups.items())],
         slices=[dict(zip(('market','scope','kind','band','gold'),k), **metrics(v)) for k,v in sorted(slices.items())],
         joint=[dict(zip(('day','snapshot','gold'),k), counts=dict(v)) for k,v in sorted(paired.items())],
+        nongold_filters=[dict(zip(('day','market','scope','rule','membership'),k), **metrics(v)) for k,v in sorted(filters.items())],
         pending_primary=missing)
 
 
