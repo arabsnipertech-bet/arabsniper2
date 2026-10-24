@@ -237,6 +237,7 @@ def movement(books, side, include_previous=True):
             'leg_from':h[turn]['observed_at'],
             'fair_initial_pct':op[side]*100,'fair_current_pct':fp[side]*100,
             'first_observed_fair_pct':fair(b['trace'][0]['odds'])[0][side]*100,
+            'first_observed_odd':b['trace'][0]['odds'][side],
             'margin_initial_pct':om,'margin_current_pct':margin,
             'favorite_path':favorite_path(h)})
     direction=lambda r: 1 if r['delta_pct']>0 else -1 if r['delta_pct']<0 else 0

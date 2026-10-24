@@ -201,6 +201,7 @@ class ComparableWindowTests(unittest.TestCase):
         self.assertEqual(result['recovered_books'],1)
         self.assertTrue(result['confirmed'])
         self.assertEqual(result['operators'][0]['sequence'],[2.5,2.4,2.])
+        self.assertEqual(result['operators'][0]['first_observed_odd'],3.0)
         self.assertNotEqual(result['operators'][0]['first_observed_fair_pct'],result['operators'][0]['fair_initial_pct'])
         self.assertEqual(books,before)
 

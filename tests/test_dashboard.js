@@ -196,7 +196,7 @@ vm.createContext(badgeContext);
 vm.runInContext(html.slice(html.indexOf('    function contextAgreementBadge('),html.indexOf('    function contextPrice(')),badgeContext);
 const badge=(p,b,model='context-goals-v3.4')=>badgeContext.contextAgreementBadge({multimarket:{model_id:model,markets:[{market:'over25_ft',selection:'over',probabilities:{statistics:p},book_probability_pct:b}]}});
 assert(badge(.60,50.1).includes('cx-agreement-ring'));
-assert(badge(.65,55).includes('accordo prematch'));
+assert(badge(.65,55).includes('GOLD · OVER 2,5 FT'));
 assert.equal(badge(.6501,55),'');
 assert.equal(badge(.5,55),'');
 assert.equal(badge(.6,50),'');
@@ -204,7 +204,8 @@ assert.equal(badge(null,55),'');
 assert.equal(badge(.6,NaN),'');
 assert.equal(badge(.6,55,'context-goals-v3.3'),'');
 assert(html.includes('${contextAgreementBadge(match)}'));
-assert(html.includes('contextCoverage(match)+contextAgreementBadge(match)'));
+assert(html.includes('${contextSignalClass(match)}">${contextAgreementBadge(match)}'));
+assert(!html.includes('contextCoverage(match)+contextAgreementBadge(match)'));
 console.log('Gold marker: audit thresholds, missing data, model scope and both placements passed.');
 
 // Public feed is Over 2.5 regardless of the frozen original primary. Only an
@@ -248,7 +249,7 @@ console.log('HT observation and joint movements: missing markets, absent history
 // Both Over movements are visible in the main feed without opening a dossier.
 vm.runInContext("contextFeed='over25_ft'",researchContext);
 const overview=vm.runInContext('contextOdds(feedFixture,true)',researchContext);
-for(const label of ['1 · Casa','X · Pareggio','2 · Ospite','Over 1,5 PT','Over 2,5 FT','Stat.','Book','Gold = accordo'])assert(overview.includes(label));
+for(const label of ['1 · Casa','X · Pareggio','2 · Ospite','Over 1,5 PT','Over 2,5 FT','Stat.','Book','Apertura*','Attuale'])assert(overview.includes(label));
 assert(!overview.includes('<details class="cx-detail">'));
 assert(overview.includes('cx-overview-cell'));
 assert(!overview.includes('Over 3,5 FT'));
@@ -262,10 +263,11 @@ const crossed={multimarket:{model_id:'context-goals-v3.4',markets:[
  {market:'1x2_ft',selection:'1',movement:strongMove('up')}]}};
 const beforeCross=JSON.stringify(crossed);
 let crossHtml=badgeContext.contextAgreementBadge(crossed);
-assert.equal((crossHtml.match(/class="cx-crossing"/g)||[]).length,2);
+assert.equal((crossHtml.match(/class="cx-crossing"/g)||[]).length,1);
 assert(crossHtml.includes('1 ↑ + Over 2,5 FT ↓'));
 assert(crossHtml.includes('1 ↑ + Over 1,5 PT ↓'));
-assert(crossHtml.includes('non dimostra maggiore affidabilità'));
+assert(!crossHtml.includes('<details'));
+assert(!crossHtml.includes('non dimostra maggiore affidabilità'));
 assert.equal(JSON.stringify(crossed),beforeCross);
 for(const move of [strongMove('down'),strongMove('up',2.99),strongMove('up',10,2,4),{...strongMove('up'),confirmed:false},{...strongMove('up'),amplitude_pct:null}]){
  crossed.multimarket.markets[2].movement=move;
@@ -312,3 +314,23 @@ side1.movement.operators=[{fair_initial_pct:15,first_observed_fair_pct:62}];
 side2.movement.operators=[{fair_initial_pct:65,first_observed_fair_pct:18}];
 assert(badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓ + Over 1,5 PT ↓'));
 console.log('Common window preserves the original favorite passed.');
+
+// Observe the original requested HOME win band; never promote forecasts.
+for(const [odd,expected] of [[1.579,false],[1.58,true],[1.65,true],[1.75,true],[1.751,false],[null,false]]){
+ researchContext.bandMatch={multimarket:{markets:[{market:'1x2_ft',selection:'1',odd}]}};
+ assert.equal(vm.runInContext('contextHomeBand(bandMatch)',researchContext),expected);
+}
+researchContext.bandMatch={multimarket:{markets:[{market:'1x2_ft',selection:'2',odd:1.65}]}};
+assert.equal(vm.runInContext('contextHomeBand(bandMatch)',researchContext),false);
+researchContext.bandMatch={multimarket:{markets:[{market:'1x2_ft',selection:'1',odd:1.65}]}};
+const bandBefore=JSON.stringify(researchContext.bandMatch);
+assert(vm.runInContext('contextHomeBandBadge(bandMatch)',researchContext).includes('in osservazione'));
+assert.equal(JSON.stringify(researchContext.bandMatch),bandBefore);
+vm.runInContext("contextHomeBandOnly=true;contextFeed='over25_ft'",researchContext);
+assert.equal(vm.runInContext('contextFeedMatches([bandMatch,{multimarket:{markets:[]}}]).length',researchContext),1);
+vm.runInContext('contextHomeBandOnly=false',researchContext);
+assert(vm.runInContext('contextFeedMatches([{multimarket:{markets:[]}}]).length',researchContext)===1);
+researchContext.priceMatch={multimarket:{markets:[{market:'1x2_ft',selection:'1',odd:1.65,quote:{bookmaker:'Same book'},movement:{operators:[{bookmaker:'Other book',initial:9},{bookmaker:'Same book',initial:1.8,first_observed_odd:1.95}]}}]}};
+const dualPrice=vm.runInContext('contextOdds(priceMatch,true)',researchContext);
+assert(dualPrice.includes('1.95')&&dualPrice.includes('1.65'));
+console.log('Gold frames, compact dual odds and observational home-odds band passed.');

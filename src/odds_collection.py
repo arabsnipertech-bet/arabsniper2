@@ -56,7 +56,8 @@ class OddsEnricher:
         self.client, self.state = client, state
         self.fixed_now = now
         self.now = now or datetime.now(timezone.utc).isoformat()
-        self.started = time.monotonic()
+        self.elapsed = 0.0
+        self.fixtures = {}
         self.max_calls, self.max_seconds = max_calls, max_seconds
         self.calls = 0
         self.quota_remaining = None
@@ -72,7 +73,7 @@ class OddsEnricher:
         self.catalog = state.get('bookmakers', [])
 
     def allowed(self, check_limits=True):
-        if check_limits and (self.calls >= self.max_calls or time.monotonic()-self.started >= self.max_seconds):
+        if check_limits and (self.calls >= self.max_calls or self.elapsed >= self.max_seconds):
             return False
         # Recheck provider quota to account for other consumers and UTC resets.
         if self.quota_checked_at is None or time.monotonic()-self.quota_checked_at > 60:
@@ -97,13 +98,20 @@ class OddsEnricher:
             self.catalog = [{'id':b['id'],'name':b['name']} for b in payload['response'] if b.get('id') and b.get('name')]
             self.state.update(bookmakers=self.catalog, catalog_at=self.now)
 
+    def register_fixture(self, meta):
+        """Trusted fixture metadata from the fixtures endpoint, never inferred odds."""
+        self.fixtures[str(meta["fixture_id"])] = dict(meta)
+
     def enrich(self, base, fid):
         self.now = self.fixed_now or datetime.now(timezone.utc).isoformat()
         if not base or not base.get('collection', {}).get('complete'):
             return base
         rows = base.get('response', [])
-        # Empty baseline has no verified kickoff; don't attach odds to a live fixture.
+        meta = self.fixtures.get(str(fid), {})
+        # Verify kickoff from independently fetched fixture metadata for empty odds.
         starts = [stamp(r.get('fixture', {}).get('date')) for r in rows if str(r.get('fixture', {}).get('id'))==str(fid)]
+        if not starts and meta:
+            starts = [stamp(meta.get("kickoff"))]
         if not starts or any(t is None or t <= stamp(self.now) for t in starts):
             return base
         before = coverage(base, fid, self.now)
@@ -116,12 +124,15 @@ class OddsEnricher:
         missing = [b['id'] for b in self.catalog if str(b['id']) not in present_books]
         missing = missing[cursor % len(missing):]+missing[:cursor % len(missing)] if missing else []
         queries = [('bet',b) for b in markets] + [('bookmaker',b) for b in missing]
+        uncovered = not before
+        if uncovered and all(meta.get(k) is not None for k in ('league_id','season','date')):
+            queries.insert(0, ('league_date', meta['date']))
         result = base
         attempts = 0
         for kind, value in queries:
             health = self.state.setdefault('route_health', {}).setdefault(kind, {})
             paused = stamp(health.get('paused_at'))
-            if paused and 0 <= (stamp(self.now)-paused).total_seconds() < 21600:
+            if not uncovered and paused and 0 <= (stamp(self.now)-paused).total_seconds() < 21600:
                 self.stats['odds_targeted_unproductive_skips'] += 1
                 continue
             if paused:
@@ -137,7 +148,13 @@ class OddsEnricher:
                 self.stats['odds_targeted_budget_stops'] += 1
                 break
             start_calls = self.client.request_count
-            extra = self.client.get('odds', {'fixture':fid,kind:value}, use_cache=False)
+            params = ({'league':meta['league_id'],'season':meta['season'],'date':meta['date'],'timezone':'Europe/Rome'}
+                      if kind == 'league_date' else {'fixture':fid,kind:value})
+            started = time.monotonic()
+            try:
+                extra = self.client.get('odds', params, use_cache=False)
+            finally:
+                self.elapsed += time.monotonic()-started
             used = self.client.request_count-start_calls
             self.calls += max(1,used)
             self.stats['odds_targeted_requests'] += max(1,used)
@@ -173,7 +190,10 @@ class OddsEnricher:
         self.stats['odds_targeted_fixtures'] += bool(attempts)
         self.report.append({'fixture_id':str(fid),'raw_books':len(present_books),
                             'usable_before':counts, 'usable_after':{k:sum(m==k for m,b in after) for k in TARGETS},
-                            'new_books':sorted(new_books),'attempts':attempts})
+                            'new_books':sorted(new_books),'attempts':attempts,
+                            'match':meta.get('match'), 'league':meta.get('league'),
+                            'country':meta.get('country'), 'date':meta.get('date'),
+                            'baseline_empty':not bool(rows), 'recovered_from_empty':not bool(rows) and bool(after)})
         return result
 
     def finish(self):
@@ -183,3 +203,4 @@ class OddsEnricher:
         self.state['cursors'] = {k:v for k,v in self.state.get('cursors',{}).items() if k in active}
         self.state.update(updated_at=self.now, last_run=dict(self.stats), coverage=self.report)
         return self.state
+
