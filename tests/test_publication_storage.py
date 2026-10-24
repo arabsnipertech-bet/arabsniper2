@@ -1,52 +1,42 @@
+import ast
 import json
-from pathlib import Path
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+from pathlib import Path
+from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
-from audit_storage import read_store, write_store, FORMAT
-from publication_storage import prepare, prepare_file
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'src'))
+from audit_storage import read_store, FORMAT
+from publication_storage import prepare
 
 
 class PublicationTests(unittest.TestCase):
-    def test_existing_manifest_is_verified_without_rewriting(self):
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / 'arab_quote_state.json'
-            value = {'rows': ['è' * 1000] * 3}
-            write_store(path, value, chunk_bytes=257)
-            original = path.read_bytes()
-            with patch('publication_storage.write_store', side_effect=AssertionError('repacked')):
-                prepare_file(path)
-            self.assertEqual(path.read_bytes(), original)
-            self.assertEqual(read_store(path), value)
-            manifest = json.loads(original)
-            part = path.parent / '_audit_parts' / (manifest['parts'][0]['sha256'] + '.json.gz')
-            part.write_bytes(b'broken')
-            with self.assertRaises(Exception):
-                prepare_file(path)
+    def test_real_scan_writer_bounds_all_public_outputs(self):
+        tree = ast.parse((ROOT / 'src/3appdays.py').read_text())
+        nodes = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in ('atomic_write_json', 'read_json')]
+        ns = dict(Path=Path, Any=Any, log=lambda *a: None)
+        exec(compile(ast.Module(body=nodes, type_ignores=[]), 'scan', 'exec'), ns)
+        value = {'matches': [{'text': 'è' * (3 * 1024 * 1024), 'probability': 0.123456789}]}
+        with tempfile.TemporaryDirectory() as d:
+            for name in ['dashboard', 'day1', 'state', 'xg_cache']:
+                p = Path(d) / f'arab_quote_{name}.json'
+                ns['atomic_write_json'](p, value)
+                self.assertEqual(json.loads(p.read_text())['_storage'], FORMAT)
+                self.assertEqual(ns['read_json'](p, {}), value)
+            part = next((Path(d) / '_audit_parts').iterdir())
+            part.unlink()
+            with self.assertRaises(FileNotFoundError):
+                ns['read_json'](p, {})
 
-    def test_legacy_large_json_roundtrip(self):
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / 'arab_quote_state.json'
-            value = {'rows': ['è' * 1000] * 2500}
-            path.write_text(json.dumps(value, ensure_ascii=False))
-            prepare_file(path)
-            self.assertEqual(json.loads(path.read_bytes())['_storage'], FORMAT)
-            self.assertEqual(read_store(path), value)
-
-    def test_pipeline_and_corruption_fail_closed(self):
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / 'arab_quote_state.json'
-            write_store(path, {'rows': ['a' * 1000]}, chunk_bytes=257)
-            prepare(directory)
-            self.assertTrue((Path(directory) / 'arab_quote_homepage.json').exists())
-            manifest = json.loads(path.read_bytes())
-            (path.parent / '_audit_parts' / (manifest['parts'][0]['sha256'] + '.json.gz')).unlink()
-            with self.assertRaises(Exception):
-                prepare(directory)
-
-
-if __name__ == '__main__':
-    unittest.main()
+    def test_legacy_recovery_preserves_all_records(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / 'arab_quote_dashboard.json'
+            value = {'days': [{'matches': [{'id': 42, 'text': 'x' * (5 * 1024 * 1024)}]}]}
+            p.write_text(json.dumps(value))
+            prepare(d)
+            self.assertEqual(read_store(p), value)
+            self.assertLess(p.stat().st_size, 4096)
+            prepare(d)
+            self.assertEqual(read_store(p), value)

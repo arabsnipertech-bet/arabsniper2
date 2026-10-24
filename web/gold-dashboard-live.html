@@ -720,7 +720,7 @@
     @media(max-width:850px){.cx-list-head{display:none}.cx-list-row{grid-template-columns:1fr;gap:12px;padding:12px}.cx-compact-odds{width:100%;margin-top:0}.cx-open strong{font-size:1rem}.cx-list-pick{padding:8px 12px}}
 .cx-price-analysis{border:1px solid #45636e;border-left:3px solid #85d9e8;border-radius:9px;padding:12px;margin:14px 0;font-size:.78rem;line-height:1.6;background:#122c35}.cx-price-analysis strong{color:#9ce9ed}.cx-price-analysis em{display:block;color:#f0ce7f}
 
-    .cx-list-row.cx-is-live,.cx-card.cx-is-live{border:2px solid #72cfa3;box-shadow:0 0 18px #72cfa333;background:linear-gradient(120deg,#253027,#141e25)}
+    .cx-list-row.cx-is-live,.cx-card.cx-is-live{border:2px solid #ddbb62;box-shadow:0 0 18px #d7b25233;background:linear-gradient(120deg,#253027,#141e25)}
     .cx-live-stale{border-color:#827548}.cx-score{display:block;margin:8px 0;color:#f4df9b;font-variant-numeric:tabular-nums}.cx-score>b{display:inline-block;padding:3px 7px;border-radius:6px;background:#24352b;color:#a0f1ba;font-size:.7rem;letter-spacing:.04em}.cx-score>strong{font-size:1.35rem!important;display:inline!important;margin-left:6px}.cx-score>small{display:block;font-size:.65rem!important;color:#b0b9bf;margin-top:3px}.cx-live-stale .cx-score>b{color:#f0d490;background:#443b28}
 
     .cx-quote-total{margin-top:9px;padding-top:7px;border-top:1px solid #ffffff25;color:#e3edf3}
@@ -736,13 +736,6 @@
     .cx-signal-level{display:flex;gap:3px;align-items:flex-end;height:13px}.cx-signal-level i{width:5px;border:1px solid currentColor;border-radius:1px}.cx-signal-level i:nth-child(1){height:5px}.cx-signal-level i:nth-child(2){height:9px}.cx-signal-level i:nth-child(3){height:13px}.cx-signal-level i.on{background:currentColor}
     .cx-signal-state,.cx-reversal{display:block;font-size:.63rem;margin-top:5px;line-height:1.3}.cx-reversal{font-weight:700}
     .cx-compact-odds>.cx-odds-note.cx-legend{display:block;font-size:.7rem}.cx-legend summary{cursor:pointer}
-    /* Gold is identified before the odds on mobile and across the entire card. */
-    .cx-list-row.cx-gold,.cx-card.cx-gold{border:2px solid #e8c75a;background:linear-gradient(130deg,#302b19,#15232b 65%);box-shadow:inset 0 0 0 1px #e8c75a33}
-    .cx-list-row.cx-gold-blue,.cx-card.cx-gold-blue{box-shadow:0 0 0 2px #61d7ef,inset 0 0 0 1px #e8c75a66;background:linear-gradient(130deg,#302b19,#123039 85%)}
-    .cx-status-top{grid-column:1/-1;margin:0 0 4px;border:0;border-bottom:1px solid #e8c75a66;border-radius:0;background:transparent;padding:0 0 9px}
-    .cx-status-top summary{font-size:.86rem;letter-spacing:.025em}.cx-dual-label{display:inline-block;margin-left:12px;color:#99ebff}.cx-status-top summary small{font-size:.68rem;color:#c8c3ac;letter-spacing:0;margin-top:5px}
-    .cx-awaiting{padding:12px;border:1px dashed #61717e;border-radius:10px;color:#b8c7cf;font-size:.8rem;line-height:1.6;background:#ffffff03}.cx-awaiting p{margin:6px 0 0}.cx-missing-quote{opacity:.8;border-top:1px solid #526675;background:#15232b;min-height:0}.cx-missing-quote>span{color:#b8c7cf;font-size:.7rem}
-    @media(max-width:600px){.cx-dual-label{display:block;margin:8px 0 0}.cx-list-row.cx-gold-blue{margin-left:2px;margin-right:2px}.cx-status-top summary{font-size:.8rem}}
   </style>
 </head>
 <body>
@@ -1221,29 +1214,6 @@
     let contextCompareMarket = '';
     let contextMinimumOdd = '1.5';
     let contextFeed = 'over25_ft';
-    let contextQuoteFilter = 'all';
-    let contextSignalFilter = 'all';
-    function contextHasQuote(row) { return Number.isFinite(row?.odd)&&row.odd>1; }
-    function contextFeedRow(match) {
-      const a=match.multimarket||{};
-      return contextFeed==='over35_ft'?contextOver35(a):contextFeed==='over15_ht'?(a.markets||[]).find(r=>r.market==='over15_ht'&&r.selection==='over'):contextOver25(a);
-    }
-    function contextVisibleMatch(match) {
-      const priced=contextHasQuote(contextFeedRow(match)),signal=contextSignal(match);
-      if(contextQuoteFilter==='priced'&&!priced||contextQuoteFilter==='missing'&&priced)return false;
-      if(contextSignalFilter==='gold'&&!signal.gold)return false;
-      if(contextSignalFilter==='dual'&&!(signal.gold&&signal.crosses.length))return false;
-      if(contextSignalFilter==='nongold'&&(!signal.known||signal.gold))return false;
-      if(contextSignalFilter==='nongold_watch'){
-        const ft=contextOver25(match.multimarket||{});
-        if(contextFeed!=='over25_ft'||!signal.known||signal.gold||!contextHasQuote(ft)||!(ft.book_probability_pct>50))return false;
-      }
-      return true;
-    }
-    function contextSignalClass(match) {
-      const signal=contextSignal(match);
-      return signal.gold?(signal.crosses.length?' cx-gold cx-gold-blue':' cx-gold'):'';
-    }
     function contextOpen(fid) { contextDetailId=String(fid);renderMatchResearch(currentPayload||{});document.getElementById('matchResearch')?.scrollIntoView?.({block:'start'}); }
     function contextBack() { contextDetailId=null;renderMatchResearch(currentPayload||{}); }
     function contextPick(a) {
@@ -1256,13 +1226,11 @@
       const row=(a.markets||[]).find(r=>r.market==='over25_ft'&&r.selection==='over');
       if(!row)return null;
       const frozen=contextPick(a);
-      return frozen?.market==='over25_ft'&&frozen.selection==='over'?{...row,...frozen,odd:row.odd,quote:row.quote,price_assessment:row.price_assessment??(row.odd===frozen.odd&&!row.quote?.indicative&&row.quote?.bookmaker===frozen.quote?.bookmaker&&row.quote?.provider_updated_at===frozen.quote?.provider_updated_at?frozen.price_assessment:null),expected_value_pct:row.expected_value_pct}:row;
+      return frozen?.market==='over25_ft'&&frozen.selection==='over'?{...row,...frozen}:row;
     }
     function contextOver35(a) {
       const frozen=contextPick(a);
-      if(frozen?.market!=='over35_ft'||frozen.selection!=='over')return null;
-      const row=(a.markets||[]).find(r=>r.market==='over35_ft'&&r.selection==='over');
-      return row?{...frozen,odd:row.odd,quote:row.quote,price_assessment:row.price_assessment??(row.odd===frozen.odd&&!row.quote?.indicative&&row.quote?.bookmaker===frozen.quote?.bookmaker&&row.quote?.provider_updated_at===frozen.quote?.provider_updated_at?frozen.price_assessment:null),expected_value_pct:row.expected_value_pct}:frozen;
+      return frozen?.market==='over35_ft'&&frozen.selection==='over'?frozen:null;
     }
     function contextFeedMatches(matches) {
       return contextFeed==='over35_ft'?matches.filter(m=>contextOver35(m.multimarket)):contextFeed==='over15_ht'?matches.filter(m=>(m.multimarket.markets||[]).some(r=>r.market==='over15_ht'&&r.selection==='over')):matches;
@@ -1271,13 +1239,11 @@
       const row=contextOver35(a);
       return row?`<aside class="cx-context"><strong>Consigliata dal modello · Over 3,5 FT</strong><p>Quota ${contextNumber(row.odd)} · Statistica ${contextPct(row.statistical_pct)} · Book ${contextPct(row.book_probability_pct)}</p>${contextPrice(row,true)}</aside>`:'';
     }
-    function contextSignal(match) {
-      if(match.multimarket?.model_id!=='context-goals-v3.4')return {gold:false,known:false,crosses:[]};
+    function contextAgreementBadge(match) {
+      if(match.multimarket?.model_id!=='context-goals-v3.4')return '';
       const row=match.multimarket.markets?.find(r=>r.market==='over25_ft'&&r.selection==='over');
-      if(row?.quote?.indicative)return {gold:false,known:false,crosses:[]};
       const p=row?.probabilities?.statistics,b=row?.book_probability_pct;
-      if(!Number.isFinite(p)||!Number.isFinite(b)||p<0||p>1||b<0||b>100)return {gold:false,known:false,crosses:[]};
-      if(p<=.5||b<=50||Math.abs(p*100-b)>10+1e-9)return {gold:false,known:true,crosses:[]};
+      if(!Number.isFinite(p)||!Number.isFinite(b)||p<=.5||p>1||b<=50||b>100||Math.abs(p*100-b)>10+1e-9)return '';
       // Descriptive audit pattern only: never modifies Gold eligibility or probabilities.
       const markets=match.multimarket.markets||[];
       const strong=(market,selection,direction)=>{
@@ -1305,19 +1271,12 @@
         if(favorite.p>opening[1].p&&strong('1x2_ft',favorite.side,'down')&&Math.abs(movement.amplitude_pct)>=8&&strong('over15_ht','over','down'))
           crosses.push([`Favorita iniziale ${favorite.side.toUpperCase()} (rosso)`,'down','over15_ht','Over 1,5 PT','down']);
       }
-      return {gold:true,known:true,crosses};
-    }
-    function contextAgreementBadge(match) {
-      const {gold,crosses}=contextSignal(match);
-      if(!gold)return '';
       const arrow=d=>d==='up'?'↑':'↓';
       const signals=crosses.map(([side,direction,,label,overDirection])=>`<span class="cx-crossing"><span class="cx-crossing-ring" aria-hidden="true"></span><span class="cx-crossing-label">Incrocio quote · ${label}</span><span class="cx-crossing-rule">${side} ${arrow(direction)} + ${label} ${arrow(overDirection)}</span></span>`).join('');
       const explanation=crosses.length?'<p>Cerchio azzurro: incrocio indicato tra quota 1 o 2 e quota Over, entrambe con movimento almeno del 3%, confermato da almeno due book e dalla maggioranza degli operatori confrontabili. Favorita iniziale: esito con maggiore probabilità mediana senza aggio nelle prime osservazioni disponibili; il suo segnale PT richiede calo rosso (almeno 8%) e calo Over giallo/rosso. Assente se mancano dati o la favorita è a pari merito. Più incroci possono riguardare la stessa partita: non sono conferme indipendenti. Ultimi tratti osservati: non necessariamente simultanei o senza inversioni.</p><p>Incrocio osservato nell’audit del 21–22 ottobre 2026, da verificare su nuove giornate: non dimostra maggiore affidabilità. Il Gold resta esclusivamente sull’Over 2,5 FT, anche quando l’incrocio riguarda il PT. Nessun bonus alle percentuali.</p>':'';
-      return `<details class="cx-agreement cx-status-top"><summary><span class="cx-agreement-ring" aria-hidden="true"></span>GOLD · OVER 2,5 FT${crosses.length?'<span class="cx-dual-label"><span class="cx-crossing-ring" aria-hidden="true"></span>+ INCROCIO AZZURRO</span>':''}<small>Apri i criteri del segnale</small></summary>${signals}${explanation}<p>Le due stime sull’Over 2,5 FT superano il 50% e distano al massimo 10 punti percentuali.</p><p>Segnale riferito soltanto all’Over 2,5 FT, anche quando la proposta principale è diversa. Non indica valore della quota, probabilità live o successo garantito. Verifica quota e dati mancanti nella scheda.</p></details>`;
+      return `<details class="cx-agreement"><summary><span class="cx-agreement-ring" aria-hidden="true"></span>Over 2,5 FT · accordo prematch<small>Criteri e dettagli</small>${signals}</summary>${explanation}<p>Statistica ${contextPct(p*100)} · book senza margine ${contextPct(b)}. Entrambe >50%, distanza ≤10 punti percentuali.</p><p>Segnale riferito soltanto all’Over 2,5 FT, anche quando la proposta principale è diversa. Non indica valore della quota, probabilità live o successo garantito. Verifica quota e dati mancanti nella scheda.</p></details>`;
     }
     function contextPrice(row,compact=false) {
-      if(!contextHasQuote(row))return '<p class="cx-awaiting">In attesa di quota · sola analisi statistica. Convenienza e movimento non valutabili.</p>';
-      if(row?.quote?.indicative)return `<p class="cx-odds-note">Quota indicativa esterna · ${escapeHtml(row.quote.bookmaker)} via ${escapeHtml(row.quote.source)} · letta ${escapeHtml(formatTimestamp(row.quote.observed_at))}. Anteprima ritardata, aggiornamento bookmaker non certificato. Nessuno storico confrontabile.</p>`;
       const a=row?.price_assessment;
       const reason=row?.proposal_note?`<small>${escapeHtml(row.proposal_note)}</small>`:'';
       const fallback=row?.price_preference_met===false?'<em>Quota minima non raggiunta · ipotesi alternativa disponibile</em>':'';
@@ -1580,28 +1539,25 @@
     }
     function contextOdds(match, compact=false) {
       const rows=match.multimarket.markets||[];
-      const visibleMarkets=['1x2_ft','over15_ht','over25_ft',...(contextFeed==='over35_ft'?['over35_ft']:[])];
-      if(!rows.some(r=>visibleMarkets.includes(r.market)&&contextHasQuote(r)))return '<section class="cx-awaiting" aria-label="Quote mancanti"><strong>Quote non disponibili</strong><p>Restano consultabili le statistiche. Le scansioni successive cercheranno nuovi prezzi; nessuna quota viene ricostruita o stimata.</p></section>';
       const cell=(market,selection,label)=>{
         const r=rows.find(x=>x.market===market&&x.selection===selection),m=r?.movement||{};
         // Opening/current belong to the same displayed operator; never join different books.
         const o=(m.operators||[]).find(x=>x.bookmaker===r?.quote?.bookmaker);
         const initial=o?.initial;
         const current=r?.odd;
-        if(!contextHasQuote(r))return `<div class="cx-odd-cell cx-missing-quote"><b>${label}</b><span>Quota non disponibile</span>${compact?`<div class="cx-overview-estimates">Stat. ${contextPct(r?.statistical_pct)}</div>`:''}</div>`;
         const delta=Number.isFinite(initial)&&initial>1&&Number.isFinite(current)?(current/initial-1)*100:null;
         const dir=Number.isFinite(delta)?Math.abs(delta)<.005?'flat':delta>0?'up':'down':null;
         const netLabel=dir?`Totale ${dir==='flat'?'→ invariata':dir==='up'?'↑ salita':'↓ discesa'} ${contextSigned(dir==='flat'?0:delta,'%')}`:'Variazione totale non disponibile';
         const net=`<div class="cx-quote-total" aria-label="${escapeHtml(netLabel)}" title="Variazione fra apertura e attuale dello stesso operatore"><span>TOTALE</span><div class="cx-quote-value">${dir?contextDirection(dir):''}<b>${dir?contextSigned(dir==='flat'?0:delta,'%'):'—'}</b></div></div>`;
         const consensus=contextMovementBadge(m);
-        if(compact)return `<div class="cx-odd-cell cx-overview-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line"><span>Attuale</span><b>${contextNumber(current)}</b></div>${net}${consensus}<small>${r?.quote?escapeHtml(r.quote.bookmaker):'Quota non disponibile'}</small><div class="cx-overview-estimates"><span>Stat. <b>${contextPct(r?.statistical_pct)}</b></span><span>Book <b>${contextPct(r?.book_probability_pct)}</b></span></div></div>`;
+        if(compact)return `<div class="cx-odd-cell cx-overview-cell"><b>${label}</b><div class="cx-overview-quote">${contextNumber(current)}<span>quota</span></div>${consensus}<div class="cx-overview-estimates"><span>Stat. <b>${contextPct(r?.statistical_pct)}</b></span><span>Book <b>${contextPct(r?.book_probability_pct)}</b></span></div></div>`;
         return `<div class="cx-odd-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line"><span>Attuale</span><b>${contextNumber(current)}</b></div>${net}${consensus}<small>${r?.quote?`${escapeHtml(r.quote.bookmaker)} · ${escapeHtml(formatTimestamp(r.quote.provider_updated_at))}`:'Quota non disponibile'}</small></div>`;
       };
       const result=rows.filter(r=>r.market==='1x2_ft'&&Number.isFinite(r.book_probability_pct));
       const sorted=[...result].sort((a,b)=>b.book_probability_pct-a.book_probability_pct);
       const leader=sorted[0];
       const relative=result.length===3?`Esito più probabile per i book: ${leader.selection==='1'?'1 · '+(match.fixture.home||'casa'):leader.selection==='2'?'2 · '+(match.fixture.away||'ospite'):'X · pareggio'} (${contextPct(leader.book_probability_pct)} senza margine).`:'Forza relativa: confronto 1X2 incompleto.';
-      return `<section class="cx-odds-panel ${compact?'cx-compact-odds':''}" aria-label="Quote di riferimento della partita">${compact?'<div class="cx-overview-heading">MOVIMENTI PREMATCH · 1X2 E OVER</div>':''}<div class="cx-odds-grid">${cell('1x2_ft','1','1 · Casa')}${cell('1x2_ft','x','X · Pareggio')}${cell('1x2_ft','2','2 · Ospite')}</div><div class="cx-odds-grid cx-odds-goals">${cell('over15_ht','over','Over 1,5 PT')}${cell('over25_ft','over','Over 2,5 FT')}${contextFeed==='over35_ft'?cell('over35_ft','over','Over 3,5 FT'):''}</div><p class="cx-odds-note cx-overview-relative">${escapeHtml(relative)}</p>${compact?'<p class="cx-overview-note">Apertura* e attuale: stesso bookmaker. Ultimo tratto: confronto separato tra più bookmaker.</p>':''}${contextFavorite(match)}<details class="cx-odds-note cx-legend"><summary>ⓘ Frecce e colori</summary><p>* Apertura = prima quota osservata, non apertura ufficiale. Totale = variazione fra le due quote visibili dello stesso operatore. Il movimento multi-book è separato e riguarda l’ultimo tratto: ↑ salita, ↓ discesa; un’inversione di movimento segnala un precedente cambio di direzione. Il cambio favorita 1↔2 confronta invece casa e ospite. Verde: movimento lieve (meno del 3%) oppure non confermato, con bordo tratteggiato e ?. Giallo: dal 3% a meno dell’8%, confermato. Rosso: almeno 8%, confermato. ✓ = almeno due book concordi e maggioranza stretta; il rapporto indica concordi/confrontabili. Grigio = storico assente. Il colore misura il movimento, non la probabilità di vincita. Percentuali di quota e punti di probabilità sono misure diverse.</p></details></section>`;
+      return `<section class="cx-odds-panel ${compact?'cx-compact-odds':''}" aria-label="Quote di riferimento della partita">${compact?'<div class="cx-overview-heading">MOVIMENTI PREMATCH · 1X2 E OVER</div>':''}<div class="cx-odds-grid">${cell('1x2_ft','1','1 · Casa')}${cell('1x2_ft','x','X · Pareggio')}${cell('1x2_ft','2','2 · Ospite')}</div><div class="cx-odds-grid cx-odds-goals">${cell('over15_ht','over','Over 1,5 PT')}${cell('over25_ft','over','Over 2,5 FT')}${contextFeed==='over35_ft'?cell('over35_ft','over','Over 3,5 FT'):''}</div><p class="cx-odds-note cx-overview-relative">${escapeHtml(relative)}</p>${compact?'<p class="cx-overview-note">Frecce = direzione · colori = intensità del movimento. Gold = accordo delle stime Over 2,5 FT.</p>':''}${contextFavorite(match)}<details class="cx-odds-note cx-legend"><summary>ⓘ Frecce e colori</summary><p>* Apertura = prima quota osservata, non apertura ufficiale. Totale = variazione fra le due quote visibili dello stesso operatore. Il movimento multi-book è separato e riguarda l’ultimo tratto: ↑ salita, ↓ discesa; un’inversione di movimento segnala un precedente cambio di direzione. Il cambio favorita 1↔2 confronta invece casa e ospite. Verde: movimento lieve (meno del 3%) oppure non confermato, con bordo tratteggiato e ?. Giallo: dal 3% a meno dell’8%, confermato. Rosso: almeno 8%, confermato. ✓ = almeno due book concordi e maggioranza stretta; il rapporto indica concordi/confrontabili. Grigio = storico assente. Il colore misura il movimento, non la probabilità di vincita. Percentuali di quota e punti di probabilità sono misure diverse.</p></details></section>`;
     }
 
     function contextFixture(match) { return typeof window!=='undefined' && window.ArabLive ? window.ArabLive.fixture(match) : match.fixture||{}; }
@@ -1675,13 +1631,13 @@
     }
     function contextList(matches) {
       let shown=0;
-      const cards=contextComparisonMatches(contextFeedMatches(matches)).filter(contextVisibleMatch).map(match=>{
+      const cards=contextComparisonMatches(contextFeedMatches(matches)).map(match=>{
         const f=match.fixture,a=match.multimarket;
         if(researchSearch&&!`${f.match} ${f.league} ${f.country}`.toLowerCase().includes(researchSearch.toLowerCase()))return '';
         if(!(a.markets||[]).length)return '';
         shown++;
-        const main=contextFeedRow(match),arg=escapeHtml(JSON.stringify(String(f.fixture_id)));
-        return `<article data-live-fixture="${escapeHtml(String(f.fixture_id))}" class="cx-list-row${contextLiveClass(match)}${contextSignalClass(match)}">${contextAgreementBadge(match)}<button class="cx-open" type="button" onclick="contextOpen(${arg})"><time>${escapeHtml(f.time||'')}</time><span><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><strong>${escapeHtml(f.match)}</strong><span data-live-slot="badge">${contextLiveBadge(match)}</span><em data-live-slot="state">${escapeHtml(contextStateLabel(match))}</em><em>Apri analisi →</em></span></button>${contextOdds(match,true)}<div class="cx-list-pick"><small>${contextFeed==='over35_ft'?'CONSIGLIATA DAL MODELLO · PREMATCH':contextFeed==='over15_ht'?'OVER 1,5 PT · IN OSSERVAZIONE':'OVER 2,5 FT · ANALISI PREMATCH'}</small>${main?`<b>${escapeHtml(main.label)}</b><strong>${contextHasQuote(main)?'Quota '+contextNumber(main.odd):'In attesa di quota'}</strong><span>${escapeHtml(main.source)}</span><span>Statistica ${contextPct(main.statistical_pct)} · Book ${contextPct(main.book_probability_pct)}</span>${contextPrice(main,true)}<div data-live-slot="progress" data-market="${escapeHtml(main.market)}">${contextGoalProgress(match,main)}</div>${main.statistical_reliability?.includes('conflict')||main.statistical_reliability==='fragile_halftime'?'<em>Statistica da verificare · apri i dettagli</em>':''}`:'<b>Nessuna stima utilizzabile</b><span>Apri l’analisi per vedere i dati mancanti.</span>'}</div></article>`;
+        const main=contextFeed==='over35_ft'?contextOver35(a):contextFeed==='over15_ht'?(a.markets||[]).find(r=>r.market==='over15_ht'&&r.selection==='over'):contextOver25(a),arg=escapeHtml(JSON.stringify(String(f.fixture_id)));
+        return `<article data-live-fixture="${escapeHtml(String(f.fixture_id))}" class="cx-list-row${contextLiveClass(match)}"><button class="cx-open" type="button" onclick="contextOpen(${arg})"><time>${escapeHtml(f.time||'')}</time><span><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><strong>${escapeHtml(f.match)}</strong><span data-live-slot="badge">${contextLiveBadge(match)}</span><em data-live-slot="state">${escapeHtml(contextStateLabel(match))}</em><em>Apri analisi →</em></span></button>${contextOdds(match,true)}<div class="cx-list-pick">${contextAgreementBadge(match)}<small>${contextFeed==='over35_ft'?'CONSIGLIATA DAL MODELLO · PREMATCH':contextFeed==='over15_ht'?'OVER 1,5 PT · IN OSSERVAZIONE':'OVER 2,5 FT · ANALISI PREMATCH'}</small>${main?`<b>${escapeHtml(main.label)}</b><strong>Quota ${contextNumber(main.odd)}</strong><span>${escapeHtml(main.source)}</span><span>Statistica ${contextPct(main.statistical_pct)} · Book ${contextPct(main.book_probability_pct)}</span>${contextPrice(main,true)}<div data-live-slot="progress" data-market="${escapeHtml(main.market)}">${contextGoalProgress(match,main)}</div>${main.statistical_reliability?.includes('conflict')||main.statistical_reliability==='fragile_halftime'?'<em>Statistica da verificare · apri i dettagli</em>':''}`:'<b>Nessuna stima utilizzabile</b><span>Apri l’analisi per vedere i dati mancanti.</span>'}</div></article>`;
       }).join('');
       return `<div class="cx-list-head"><span>Partita</span><span>Colpo d’occhio · 1X2 e Over</span><span>${contextFeed==='over35_ft'?'Consigliate Over 3,5 FT':contextFeed==='over15_ht'?'Over 1,5 PT · analisi':'Over 2,5 FT'}</span></div><div class="cx-list">${cards||'<p>Nessuna partita con questi filtri.</p>'}</div>`;
     }
@@ -1730,11 +1686,8 @@
       if(contextDetailId!==null&&!all.some(m=>String(m.fixture.fixture_id)===contextDetailId))contextDetailId=null;
       const options=(list,current)=>list.map(([v,l])=>`<option value="${escapeHtml(v)}" ${v===current?'selected':''}>${escapeHtml(l)}</option>`).join('');
       let html=`<header class="cx-heading"><div><span class="cx-eyebrow">ARABSNIPER / MATCH INTELLIGENCE</span><h2>La partita, spiegata.</h2><p>Over 2,5 per ogni partita. Statistica e bookmaker a confronto.</p></div><span class="research-tag">V3 · IN VERIFICA</span></header><div class="cx-summary"><div><b>${all.length}</b><span>partite in ordine di orario</span></div><div><b>8 / 4</b><span>gare ufficiali / primi tempi</span></div><div><b>Night 5 · Fast 2</b><span>giorni coperti dalle scansioni</span></div></div><p class="cx-muted">Snapshot: ${escapeHtml(formatTimestamp(payload.updated_at||payload.generated_at))}. Le percentuali sono stime sperimentali, non frequenze di successo già validate.</p><div class="research-controls"><label>Cerca squadra<input class="research-search" type="search" value="${escapeHtml(researchSearch)}" placeholder="Squadra o campionato" onchange="researchSearch=this.value;renderMatchResearch(currentPayload||{})"></label></div>`;
-      html+=`<div class="research-controls"><label>Elenco<select onchange="contextFeed=this.value;contextCompareMarket='';if(contextSignalFilter==='nongold_watch')contextSignalFilter='all';renderMatchResearch(currentPayload||{})">${options([['over25_ft','Tutti gli Over 2,5 FT'],['over35_ft','Consigliate · Over 3,5 FT'],['over15_ht','In osservazione · Over 1,5 PT']],contextFeed)}</select></label><label>Quota preferita per le consigliate<select onchange="contextMinimumOdd=this.value;renderMatchResearch(currentPayload||{})">${options([['0','Tutte'],['1.4','1,40'],['1.5','1,50'],['1.8','1,80'],['2','2,00']],contextMinimumOdd)}</select></label></div><p class="cx-odds-note">Di default sono visibili tutte le partite, anche senza quota: l’analisi statistica resta consultabile. Usa «In attesa di quote» per vedere i recuperi ancora necessari. Cornice oro: accordo sull’Over 2,5 FT. Bordo azzurro aggiuntivo: incrocio dei movimenti descritto nella scheda. Sono segnali prematch, anche nelle partite iniziate; non aumentano le percentuali. La quota preferita riguarda soltanto le consigliate Over 3,5.</p>`;
-      const feed=contextFeedMatches(all),priced=feed.filter(m=>contextHasQuote(contextFeedRow(m))).length;
-      html+=`<div class="research-controls"><label>Disponibilità quote<select onchange="contextQuoteFilter=this.value;renderMatchResearch(currentPayload||{})">${options([['priced','Con quota disponibile'],['missing','In attesa di quote'],['all','Tutte, incluse quote mancanti']],contextQuoteFilter)}</select></label><label>Segnali della partita<select onchange="contextSignalFilter=this.value;renderMatchResearch(currentPayload||{})">${options([['all','Tutti i segnali'],['gold','Gold'],['dual','Gold + incrocio azzurro'],['nongold','Non Gold · dati confrontabili'],...(contextFeed==='over25_ft'?[['nongold_watch','Non Gold FT · book >50% (in verifica)']]:[])],contextSignalFilter)}</select></label></div><p class="cx-odds-note" role="status">${priced} partite con quota · ${feed.length-priced} in attesa di quote per questo elenco. Non Gold esclude i casi senza dati sufficienti per il confronto.</p>`;
-      if(contextSignalFilter==='nongold_watch')html+='<p class="cx-awaiting"><strong>Non Gold FT · book sopra il 50%</strong><br>Quota presente, dati confrontabili, assenza di Gold e probabilità bookmaker senza margine sopra il 50%. Filtro osservativo fissato il 24 ottobre 2026: privilegia la probabilità bookmaker, spesso con quote più basse. Non è un vantaggio validato e non cambia la proposta del modello.</p>';
-      if(contextDetailId===null){host.innerHTML=html+contextStateControls(feed.filter(contextVisibleMatch))+contextList(all.filter(m=>contextStateFilter==='all'||contextState(m)===contextStateFilter));return;}
+      html+=`<div class="research-controls"><label>Elenco<select onchange="contextFeed=this.value;contextCompareMarket='';renderMatchResearch(currentPayload||{})">${options([['over25_ft','Tutti gli Over 2,5 FT'],['over35_ft','Consigliate · Over 3,5 FT'],['over15_ht','In osservazione · Over 1,5 PT']],contextFeed)}</select></label><label>Quota preferita per le consigliate<select onchange="contextMinimumOdd=this.value;renderMatchResearch(currentPayload||{})">${options([['0','Tutte'],['1.4','1,40'],['1.5','1,50'],['1.8','1,80'],['2','2,00']],contextMinimumOdd)}</select></label></div><p class="cx-odds-note">L’elenco Over 2,5 comprende anche partite senza pallino oro e quote mancanti. Il pallino segnala entrambe le stime sopra il 50%, distanti al massimo 10 punti. Nelle consigliate compaiono solo gli Over 3,5 già scelti dal modello per la quota preferita. Over 1,5 PT è disponibile in un elenco di osservazione: i movimenti non costituiscono ancora una conferma di maggiore affidabilità. Il pallino oro resta riferito esclusivamente all’Over 2,5 FT.</p>`;
+      if(contextDetailId===null){host.innerHTML=html+contextStateControls(contextFeedMatches(all))+contextList(all.filter(m=>contextStateFilter==='all'||contextState(m)===contextStateFilter));return;}
       html=`<button type="button" class="btn cx-back" onclick="contextBack()">← Torna all’elenco</button>`;
       let shown=0;
       for(const match of all){
@@ -1747,8 +1700,8 @@
         const chosen=a.markets.find(r=>`${r.market}::${r.selection}`===key)||rows.find(r=>r.market==='over25_ft'&&r.selection==='over')||rows[0];
         const main=contextOver25(a);shown++;
         const chooseArgs=(r)=>[String(f.fixture_id),`${r.market}::${r.selection}`].map(v=>escapeHtml(JSON.stringify(v))).join(',');
-        html+=`<article data-live-fixture="${escapeHtml(String(f.fixture_id))}" class="cx-card${contextLiveClass(match)}${contextSignalClass(match)}">${contextAgreementBadge(match)}<header class="cx-match"><time>${escapeHtml(f.time||new Date(f.kickoff).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'}))}</time><div class="cx-match-info"><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><h3>${escapeHtml(f.match||`${f.home} – ${f.away}`)}</h3><span data-live-slot="badge">${contextLiveBadge(match)}</span></div>${contextOdds(match)}</header>`;
-        html+=`<div data-live-slot="panel">${contextLivePanel(match)}</div>`+contextCoverage(match)+contextRecommendation(a);
+        html+=`<article data-live-fixture="${escapeHtml(String(f.fixture_id))}" class="cx-card${contextLiveClass(match)}"><header class="cx-match"><time>${escapeHtml(f.time||new Date(f.kickoff).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'}))}</time><div class="cx-match-info"><small>${escapeHtml(f.country)} · ${escapeHtml(f.league)}</small><h3>${escapeHtml(f.match||`${f.home} – ${f.away}`)}</h3><span data-live-slot="badge">${contextLiveBadge(match)}</span></div>${contextOdds(match)}</header>`;
+        html+=`<div data-live-slot="panel">${contextLivePanel(match)}</div>`+contextCoverage(match)+contextAgreementBadge(match)+contextRecommendation(a);
         if(a.selection_diagnostic?.status==='major_conflict')html+=`<aside class="cx-context"><strong>Forte divergenza sulla favorita</strong><p>Statistica ${contextPct(a.selection_diagnostic.statistical_pct)} · book ${contextPct(a.selection_diagnostic.book_probability_pct)}. La proposta usa il bookmaker del mercato selezionato; le medie storiche non sono normalizzate per forza degli avversari.</p></aside>`;
         html+=main?`<section class="cx-primary"><div><span class="cx-eyebrow">ANALISI OVER 2,5 FT</span><h4>${escapeHtml(main.label)}</h4><span class="cx-source">${escapeHtml(main.source)}</span></div><div class="cx-prob"><b>${contextPct(main.statistical_pct)}</b><span>Stima statistica</span></div><div class="cx-prob"><b>${contextPct(main.book_probability_pct)}</b><span>Probabilità book · senza margine</span></div></section><p class="cx-muted">Quota ${main.odd?escapeHtml(formatOdd(main.odd)):'non disponibile'}${main.quote?` · ${escapeHtml(main.quote.bookmaker)} · ${escapeHtml(formatTimestamp(main.quote.provider_updated_at))}`:''}. ${escapeHtml(main.source_reason||'')}</p>${contextPrice(main)}<details class="cx-detail"><summary>Perché questa proposta · pro e contro</summary>${contextEvidence(main)}</details>`:'<p>Dati Over 2,5 FT non disponibili; gli altri mercati restano consultabili sotto.</p>';
         html+='<p class="cx-odds-note">Stima statistica = modello ArabSniper. Book senza margine = probabilità ricavate dalle quote e normalizzate al 100% sul mercato completo di ogni operatore. Esempio: due quote 1,80 implicano 55,6% + 55,6%; senza margine diventano 50% + 50%. Non è la probabilità vera né una media con la statistica.</p><div class="cx-four">';
@@ -2357,8 +2310,6 @@
   </script>
 </body>
 </html>
-
-
 
 
 

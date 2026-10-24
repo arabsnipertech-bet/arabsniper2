@@ -12,8 +12,6 @@ TARGETS = {'over15_ht': 'over', 'gg_ht': 'yes', 'over25_ft': 'over'}
 def install(ns):
     # Capture the odds response already fetched by the legacy engine.
     captured_quotes = {}
-    from external_odds import Recovery
-    external_recovery = Recovery()
     old_extract = ns['extract_bookmaker_markets_with_audit']
     def extract(payload):
         captured_quotes.update(collect_quotes(payload, ns['iso_now']()))
@@ -178,21 +176,12 @@ def install(ns):
             model['probabilities_without_drought_poisson'] = ns['probabilities_from_lambdas'](layer['baseline_lambdas'])
         quotes = update_ledger(state if state is not None else {}, meta['fixture_id'], captured_quotes.pop(str(meta['fixture_id']), {}), ns['iso_now'](), meta.get('kickoff'))
         output['multimarket'] = evaluate(output, ns['iso_now'](), quotes)
-        try:
-            external_recovery.apply(output, ns['iso_now']())
-        except Exception as exc:
-            # An external provider must never stop the statistical/API scan.
-            external_recovery.report['errors'] += 1
-            print('EXTERNAL_ODDS_ERROR', type(exc).__name__)
         return output
     ns['build_fixture_output'] = fixture
 
     old_scan = ns['scan_dates']
     def scan(client, dates, excluded):
         output = old_scan(client,dates,excluded)
-        output.setdefault('method', {})['external_odds'] = {'enabled': True, 'scope': 'all_countries', 'markets': ['over25_ft', 'over35_ft'], 'priority': 'API-Football', 'display_only': True, 'max_requests': 120, 'budget_seconds': 180}
-        ns['atomic_write_json'](ns['DATA_DIR']/'arab_quote_external_recovery.json', external_recovery.report)
-        print('EXTERNAL_ODDS_RECOVERY', __import__('json').dumps(external_recovery.report, ensure_ascii=False))
         audit_path = ns['PREMATCH_AUDIT_FILE']
         frozen = ns['read_json'](audit_path, {'fixtures':{}})
         # One request per pending date, not per fixture; never recalculate forecasts.

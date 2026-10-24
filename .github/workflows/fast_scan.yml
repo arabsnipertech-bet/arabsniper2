@@ -7,7 +7,6 @@ on:
     paths:
       - 'src/3appdays.py'
       - 'src/policy_integration.py'
-      - 'src/external_odds.py'
       - 'src/first_half_quality.py'
       - 'src/multimarket_model.py'
       - 'src/multimarket_audit.py'
@@ -20,8 +19,7 @@ on:
       - 'src/selection_policy.py'
       - 'src/homepage_preview.py'
   schedule:
-    # Avoid the busiest top-of-hour scheduling window on GitHub Actions.
-    - cron: "17 6-23 * * *"
+    - cron: "0 6-23 * * *"
       timezone: "Europe/Rome"
 
 permissions:

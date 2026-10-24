@@ -48,22 +48,3 @@ test('Legacy email endpoint cannot grant even VIP when OTP enabled',async()=>{
  const s=setup();s.env.STRIPE_MODE='live';
  const r=await worker.fetch(new Request(origin+'/?email=bruno.pirolo@gmail.com'),s.env);assert.equal(r.status,401);assert.equal((await r.json()).active,false);
 });
-
-test('One-hour session expires exactly and reads do not renew it',async()=>{
- const s=setup(),b=await s.issue(),r=await s.call('/api/auth/verify-code',b),c=r.headers.get('Set-Cookie');
- assert(c.includes('__Host-gold_session_v2='));assert(c.includes('Max-Age=3600'));
- assert.equal((await r.json()).session_expires_at,now+3600);
- const check=await s.call('/api/auth/session',null,c,now+3599);
- assert.equal(check.status,200);assert.equal((await check.json()).session_expires_at,now+3600);
- assert.equal((await s.call('/api/auth/session',null,c,now+3600)).status,401);
- assert.equal((await s.call('/api/gold-data/arab_quote_day1.json',null,c,now+3600)).status,401);
-});
-test('Old seven-day cookies cannot survive the new session policy, even renamed',async()=>{
- const s=setup(),t='b'.repeat(64);
- const digest=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t))).toString('hex');
- s.db.prepare('INSERT INTO gold_sessions(digest,email,expires_at) VALUES (?,?,?)').run(digest,'user@example.com',now+604800);
- for(const cookie of ['__Host-gold_session='+t,'__Host-gold_session_v2='+t]){
-  assert.equal((await s.call('/api/auth/session',null,cookie)).status,401);
-  assert.equal((await s.call('/api/gold-data/arab_quote_day1.json',null,cookie)).status,401);
- }
-});

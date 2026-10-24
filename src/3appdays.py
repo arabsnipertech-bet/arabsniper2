@@ -2016,14 +2016,6 @@ def scan_dates(
                 continue
             fixtures.append(fixture_row)
 
-        # Give uncovered fixtures the recovery budget before already-priced ones.
-        def recovery_order(row):
-            fid = str((row.get("fixture") or {}).get("id"))
-            previous = existing_by_id.get(fid, {})
-            markets = (previous.get("multimarket") or {}).get("markets", [])
-            priced = any(r.get("market") in ("over25_ft", "over15_ht") and safe_float(r.get("odd")) > 1 for r in markets)
-            return (priced, (row.get("fixture") or {}).get("date") or "")
-        fixtures.sort(key=recovery_order)
         log(f"⚽ Fixture pre-match valide: {len(fixtures)}")
         refreshed_matches: List[Dict[str, Any]] = []
         refreshed_ids: set[str] = set()
@@ -3129,8 +3121,6 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
     enricher = getattr(client, "odds_enricher", None)
     if enricher is not None:
         atomic_write_json(DATA_DIR / "arab_quote_odds_collection.json", enricher.finish())
-        log("ODDS_RECOVERY_SUMMARY " + json.dumps({"stats": enricher.stats,
-            "empty_baselines": [r for r in enricher.report if r.get("baseline_empty")]}, ensure_ascii=False))
     output["api_health"] = {
         **(enricher.stats if enricher is not None else {}),
         "requests_this_run": getattr(client, "request_count", 0),
@@ -4835,8 +4825,6 @@ _build_fixture_output_v113_final = build_fixture_output
 
 
 def build_fixture_output(client: APIClient, fixture_row: Mapping[str, Any], state: MutableMapping[str, Any], league_cache: MutableMapping[str, Any]) -> Optional[Dict[str, Any]]:
-    if getattr(client, "odds_enricher", None) is not None:
-        client.odds_enricher.register_fixture(fixture_meta(fixture_row))
     output = _build_fixture_output_v113_final(client, fixture_row, state, league_cache)
     if not output:
         return None
@@ -5572,5 +5560,4 @@ _install_user_policy(globals())
 
 if __name__ == "__main__":
     main()
-
 

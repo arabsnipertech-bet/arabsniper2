@@ -34,7 +34,6 @@ jobs:
           node tests/test_homepage.js
           node tests/test_results.js
       - run: node tests/test_dashboard.js
-      - run: node tests/test_gold_display.cjs
       - run: node tests/test_storage_loader.cjs
       - run: node --test tests/test_live_scores.mjs
 
