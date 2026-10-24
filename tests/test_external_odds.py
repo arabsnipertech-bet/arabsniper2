@@ -3,14 +3,15 @@ import unittest
 from copy import deepcopy
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
-from external_odds import Recovery, parse_pairs, parse_index, INDEX
+from external_odds import Recovery, parse_pairs, parse_index, parse_catalog, INDEX
+from urllib.error import HTTPError
 
 META = {'fixture_id': 1, 'country': 'Italy', 'league': 'Serie C - Girone C',
         'home': 'Scafatese', 'away': 'Barletta', 'kickoff': '2026-10-24T14:30:00+02:00'}
 INDEX_HTML = '<a href="/it/odds/match/123-scafatese-vs-barletta">Scafatese Calcio 1922 – Barletta</a>'
 
 def page(line='2.5'):
-    return f'''<h1>Scafatese Calcio 1922 – Barletta <span>Over/Under {line}</span></h1>
+    return f'''<a href="/it/odds/league/123-italy-serie-c">Italy, Serie C</a><h1>Scafatese Calcio 1922 – Barletta <span>Over/Under {line}</span></h1>
     <p class="od-matchmeta">Saturday 24 October 2026 · 12:30 UKT</p>
     <table class="od-table od-mbtable"><tr><th>Bookmaker</th><th>Handicap</th><th>Over</th><th>Under</th></tr>
     <tr><td>BWin</td><td>{line}</td><td>2.00</td><td>1.70</td></tr></table>'''
@@ -22,6 +23,33 @@ def match(odd=None):
         for side in ('over','under')]}}
 
 class ExternalOddsTests(unittest.TestCase):
+    def test_non_italian_fixture_is_recovered(self):
+        for nation in ('England', 'Spain', 'Japan', 'Brazil'):
+            r=Recovery(fetch=lambda url: INDEX_HTML if url==INDEX else page().replace('Italy, Serie C', nation+', League'))
+            m=match();m['fixture'].update(country=nation,league='League')
+            r.apply(m,'2026-10-24T08:00:00+00:00')
+            self.assertEqual(m['multimarket']['markets'][0]['odd'],2.)
+
+    def test_wrong_country_is_rejected(self):
+        self.assertEqual(parse_pairs(page(),{**META,'country':'Spain'},'2.5'),[])
+
+    def test_catalog_finds_future_fixture(self):
+        catalog='<optgroup label="Italy"><option value="/it/odds/league/123-serie-c">Serie C (25)</option></optgroup>'
+        self.assertEqual(len(parse_catalog(catalog)),1)
+        def fetch(url):
+            if url==INDEX:return catalog
+            if '/league/' in url:return INDEX_HTML
+            return page().replace('24 October','27 October').replace('Saturday','Tuesday')
+        r=Recovery(fetch=fetch);m=match();m['fixture']['kickoff']='2026-10-27T14:30:00+02:00'
+        r.apply(m,'2026-10-24T08:00:00+00:00')
+        self.assertEqual(m['multimarket']['markets'][0]['odd'],2.)
+
+    def test_access_rejection_stops_further_requests(self):
+        def fetch(url):raise HTTPError(url,403,'Forbidden',{},None)
+        r=Recovery(fetch=fetch);r.read(INDEX);r.read(INDEX+'other')
+        self.assertEqual(r.report['requests'],1)
+        self.assertTrue(r.disabled)
+
     def test_parses_both_sides_same_operator(self):
         self.assertEqual(parse_pairs(page(), META, '2.5')[0]['odds'], {'over':2.,'under':1.7})
 

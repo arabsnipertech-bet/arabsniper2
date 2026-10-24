@@ -190,6 +190,7 @@ def install(ns):
     old_scan = ns['scan_dates']
     def scan(client, dates, excluded):
         output = old_scan(client,dates,excluded)
+        output.setdefault('method', {})['external_odds'] = {'enabled': True, 'scope': 'all_countries', 'markets': ['over25_ft', 'over35_ft'], 'priority': 'API-Football', 'display_only': True, 'max_requests': 120, 'budget_seconds': 180}
         ns['atomic_write_json'](ns['DATA_DIR']/'arab_quote_external_recovery.json', external_recovery.report)
         print('EXTERNAL_ODDS_RECOVERY', __import__('json').dumps(external_recovery.report, ensure_ascii=False))
         audit_path = ns['PREMATCH_AUDIT_FILE']

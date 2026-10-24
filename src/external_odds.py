@@ -12,9 +12,10 @@ from datetime import datetime, timezone
 from html import unescape
 from urllib.parse import urljoin, urlsplit
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 
 BASE = 'https://www.oddstorm.com'
-INDEX = BASE + '/it/odds/league/2180990-italy-serie-c'
+INDEX = BASE + '/it/odds/'
 MARKETS = {'over25_ft': '2.5', 'over35_ft': '3.5'}
 PREFERRED = ('BWin', 'Bet365', 'Unibet', 'Pinnacle', 'Ladbrokes', 'BetWay')
 
@@ -40,10 +41,29 @@ def parse_index(html):
     return {key: next(iter(paths)) for key, paths in found.items() if len(paths) == 1}
 
 
+def country(value):
+    value = re.sub(r'[^a-z]', '', (value or '').lower())
+    return {'usa': 'unitedstates', 'southkorea': 'korearepublic',
+            'world': 'international', 'czechrepublic': 'czechia'}.get(value, value)
+
+
+def parse_catalog(html):
+    result = {}
+    for nation, group in re.findall(r'<optgroup\b[^>]*label="([^"]+)"[^>]*>(.*?)</optgroup>', html, re.S):
+        for path, label in re.findall(r'<option\b[^>]*value="(/it/odds/league/[^"]+)"[^>]*>(.*?)</option>', group, re.S):
+            league = re.sub(r'\s*\(\d+\)$', '', text(label))
+            result[(country(unescape(nation)), team(league))] = path
+    return result
+
+
 def parse_pairs(html, meta, line):
     heading = re.search(r'<h1\b[^>]*>(.*?)</h1>', html, re.S)
     date = re.search(r'<p\b[^>]*class="od-matchmeta"[^>]*>(.*?)</p>', html, re.S)
     if not heading or not date:
+        return []
+    nations = [country(text(label).split(',')[0]) for label in re.findall(
+        r'<a\b[^>]*href="/it/odds/league/[^"]+"[^>]*>(.*?)</a>', html, re.S)]
+    if not meta.get('country') or country(meta['country']) not in nations:
         return []
     title = text(heading[1])
     suffix = ' Over/Under ' + line
@@ -84,14 +104,17 @@ def parse_pairs(html, meta, line):
 
 
 class Recovery:
-    def __init__(self, fetch=None, max_requests=40, budget_seconds=90):
+    def __init__(self, fetch=None, max_requests=120, budget_seconds=180):
         self.fetch = fetch or self._get
         self.max_requests = max_requests
         self.budget_seconds = budget_seconds
         self.elapsed = 0.
         self.index = None
+        self.catalog = {}
+        self.disabled = False
         self.cache = {}
-        self.report = {'source': 'OddStorm', 'requests': 0, 'errors': 0, 'markets_recovered': 0, 'fixtures': {}}
+        self.report = {'source': 'OddStorm', 'scope': 'all_countries', 'requests': 0, 'errors': 0,
+                       'markets_recovered': 0, 'fixtures': {}, 'unmatched_fixtures': 0, 'budget_skips': 0}
 
     @staticmethod
     def _get(url):
@@ -101,20 +124,28 @@ class Recovery:
         with urlopen(req, timeout=8) as response:
             if urlsplit(response.url).hostname != 'www.oddstorm.com':
                 raise ValueError('unexpected redirect')
-            body = response.read(2_000_001)
-            if len(body) > 2_000_000:
+            body = response.read(8_000_001)
+            if len(body) > 8_000_000:
                 raise ValueError('response too large')
             return body.decode('utf-8')
 
     def read(self, url):
         if url in self.cache:
             return self.cache[url]
+        if self.disabled:
+            return ''
         if self.report['requests'] >= self.max_requests or self.elapsed >= self.budget_seconds:
+            self.report['budget_skips'] += 1
             return ''
         started = time.monotonic()
         self.report['requests'] += 1
         try:
             self.cache[url] = self.fetch(url)
+        except HTTPError as exc:
+            self.report['errors'] += 1
+            self.cache[url] = ''
+            if exc.code in (403, 429):
+                self.disabled = True
         except Exception:
             self.report['errors'] += 1
             self.cache[url] = ''
@@ -124,12 +155,12 @@ class Recovery:
 
     def apply(self, output, as_of):
         meta = output.get('fixture', {})
-        if meta.get('country') != 'Italy' or not str(meta.get('league', '')).startswith('Serie C') or meta.get('result'):
+        if meta.get('result'):
             return
         try:
             now = datetime.fromisoformat(as_of.replace('Z', '+00:00'))
             kickoff = datetime.fromisoformat(str(meta.get('kickoff', '')).replace('Z', '+00:00'))
-            if now.tzinfo is None or kickoff.tzinfo is None or not 0 < (kickoff - now).total_seconds() <= 48 * 3600:
+            if now.tzinfo is None or kickoff.tzinfo is None or not 0 < (kickoff - now).total_seconds() <= 120 * 3600:
                 return
         except (ValueError, KeyError, TypeError):
             return
@@ -138,9 +169,19 @@ class Recovery:
         if not missing:
             return
         if self.index is None:
-            self.index = parse_index(self.read(INDEX))
-        path = self.index.get((team(meta.get('home')), team(meta.get('away'))))
+            html = self.read(INDEX)
+            self.index = parse_index(html)
+            self.catalog = parse_catalog(html)
+        key = (team(meta.get('home')), team(meta.get('away')))
+        path = self.index.get(key)
         if not path:
+            league = re.sub(r' - Girone [ABC]$', '', str(meta.get('league', '')))
+            league_path = self.catalog.get((country(meta.get('country')), team(league)))
+            if league_path:
+                # League pages include future dates absent from the daily index.
+                path = parse_index(self.read(urljoin(BASE, league_path))).get(key)
+        if not path:
+            self.report['unmatched_fixtures'] += 1
             return
         recovered = {}
         for market in sorted(missing):
