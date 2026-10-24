@@ -63,8 +63,35 @@ def build_studies(report):
                               statistics=stat, book=book,
                               fixture_ids=[r['fixture_id'] for r in rows]))
     return {'study_id': STUDY_ID, 'validation_from': VALIDATION_FROM, 'rules': RULES,
+            'nongold_ft_watch': build_nongold_ft_watch(report),
             'note': 'Exploratory rules fixed after observing 21 October. 10pp is an experimental definition, not a learned optimum. First/latest and overlapping cohorts must not be added. No stake adjustment. Paper ROI only; original recorded odds, not personal ticket odds.',
             'groups': summaries}
+
+
+def build_nongold_ft_watch(report):
+    """Fixed on 24 October after exploratory 22-23 data; no selection mutation."""
+    groups = defaultdict(list)
+    for row in report['markets']:
+        if (row.get('model_id') != 'context-goals-v3.4' or row.get('period') != 'prospective' or row.get('market') != 'over25_ft'
+                or row.get('selection') != 'over' or not row.get('candidate_present')):
+            continue
+        labels = classify(row)
+        odd = row.get('odd')
+        if labels is None or labels['agreement_10pp'] or not valid(odd,1,float('inf')) or odd <= 1:
+            continue
+        group = 'selected' if row['book_probability_pct'] > 50 else 'excluded'
+        for scope in ('all_candidates','primary_only') if row.get('primary') else ('all_candidates',):
+            groups[(row['snapshot'], scope, group)].append(row)
+    summary=[]
+    for key, rows in sorted(groups.items()):
+        settled=[r for r in rows if type(r.get('outcome')) is bool]
+        summary.append(dict(zip(('snapshot','scope','membership'),key), total=len(rows),
+            pending=len(rows)-len(settled), statistics=metrics([(r['statistical_probability'],r['outcome'],r['odd']) for r in settled])))
+    return {'study_id':'nongold-ft-book-over50-v1','fixed_on':'2026-10-24',
+            'phase':'validation' if report['audit_date']>='2026-10-24' else 'exploratory',
+            'rule':'Non-Gold Over 2.5 FT, usable recorded odds, fair bookmaker probability >50%. Gold/missing evidence excluded from both groups.',
+            'note':'Selected after inspecting 22-23 October. Earlier results are exploratory. Lower odds can explain higher hit rates. No change to model probabilities or frozen proposals.',
+            'groups':summary}
 
 
 def study_markdown(study):
@@ -79,4 +106,13 @@ def study_markdown(study):
         values += [g['fixtures'],g['pending'],f"{m.get('wins',0)}/{m['n']}",m.get('paper_roi_pct','—')]
         lines.append('| '+' | '.join(str(v) for v in values)+' |')
     lines += ['', 'Il JSON include anche alternative non principali, scartati, dati mancanti e suddivisioni per campionato. Nessuna promozione automatica delle regole.', '']
+    watch=study.get('nongold_ft_watch',{})
+    if watch:
+        lines += ['## Non Gold FT: book sopra il 50%', '',
+                  'Regola fissata il 24 ottobre 2026. I dati precedenti sono esplorativi; quota presente, assenza di Gold e book senza margine >50%. Nessuna modifica delle proposte.', '',
+                  '| Snapshot | Ambito | Gruppo | Vinte/valutate | Pendenti |', '|---|---|---|---|---:|']
+        for g in watch['groups']:
+            m=g['statistics']
+            lines.append(f"| {g['snapshot']} | {g['scope']} | {g['membership']} | {m.get('wins',0)}/{m['n']} | {g['pending']} |")
     return '\n'.join(lines)
+
