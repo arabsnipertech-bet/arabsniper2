@@ -8,11 +8,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from audit_storage import read_store, write_store
-from external_odds import Recovery
+from external_odds import Recovery, MARKETS
 
 def repair(root, recovery=None):
     root=Path(root); recovery=recovery or Recovery(); changed={}; counts={}
-    now=datetime.now(timezone.utc).isoformat(); targets={'present':0,'priced':0}
+    now=datetime.now(timezone.utc).isoformat(); targets={'present':0,'priced':0,'complete_1x2':0}
     for i in range(1,6):
         path=root/'data'/f'arab_quote_day{i}.json'
         if not path.exists(): continue
@@ -22,13 +22,16 @@ def repair(root, recovery=None):
             if match.get('fixture',{}).get('home') in ('Treviso','Sambenedettese'):
                 targets['present']+=1
                 targets['priced']+=int(any(r.get('market')=='over25_ft' and r.get('selection')=='over' and isinstance(r.get('odd'),(int,float)) and r['odd']>1 for r in match.get('multimarket',{}).get('markets',[])))
+                targets['complete_1x2']+=int(all(any(r.get('market')=='1x2_ft' and r.get('selection')==side and isinstance(r.get('odd'),(int,float)) and r['odd']>1 for r in match.get('multimarket',{}).get('markets',[])) for side in ('1','x','2')))
         if json.dumps(day,sort_keys=True)!=before:
             day['external_quotes_checked_at']=now
+            day['external_quote_markets']=list(MARKETS)
             write_store(path,day);changed[day['date']]=day
         counts[str(i)]={'matches':len(day.get('matches',[])), 'over25_present':sum(any(r.get('market')=='over25_ft' and r.get('selection')=='over' and isinstance(r.get('odd'),(int,float)) and r['odd']>1 for r in m.get('multimarket',{}).get('markets',[])) for m in day.get('matches',[]))}
     dashboard=root/'data/arab_quote_dashboard.json'
     if changed and dashboard.exists():
         data=read_store(dashboard)
+        data.setdefault('method',{}).setdefault('external_odds',{})['markets']=list(MARKETS)
         data['days']=[changed.get(d.get('date'),d) for d in data.get('days',[])]
         write_store(dashboard,data)
     print('FINAL_QUOTE_RECOVERY='+json.dumps({'changed_days':len(changed),'requests':recovery.report['requests'],'errors':recovery.report['errors'],'markets_recovered':recovery.report['markets_recovered'],'coverage':counts,'reported_cases':targets}),flush=True)
