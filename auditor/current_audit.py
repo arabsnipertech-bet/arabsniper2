@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / 'src'))
 from prematch_audit import build_report, settle_predictions
 from audit_storage import read_store, write_store
 from daily_audit import build_daily, markdown, fingerprint
+from workflow_heartbeat import heartbeat
 
 TZ = ZoneInfo('Europe/Rome')
 
@@ -167,7 +168,8 @@ def main():
     parser.add_argument('mode', choices=['freeze', 'settle'])
     args = parser.parse_args()
     now = datetime.now(TZ)
-    summary = {'archive': archive(ROOT, now)}
+    with heartbeat('audit-' + args.mode):
+        summary = {'archive': archive(ROOT, now)}
     if args.mode == 'settle':
         summary['settlement'] = settle(ROOT, now)
     text = json.dumps(summary, ensure_ascii=False, separators=(",", ":"))
