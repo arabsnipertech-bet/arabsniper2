@@ -71,21 +71,25 @@ def archive(root, now):
             rejected += 1
             continue
         date = kickoff.astimezone(TZ).date().isoformat()
+        # Group references only; load and release one daily archive at a time.
+        days.setdefault(date, []).append((collection, key, record))
+    for date, entries in days.items():
         path = root / f'auditordata/prematch_{date}.json'
-        # setdefault evaluates its default even when the date is already loaded.
-        # Read/checksum/decompress each daily archive only once per run.
-        if date not in days:
-            days[date] = read(path, {'schema_version': 1,
-                'audit_date': date, 'source_file': str(source.relative_to(root)), 'fixtures': {}})
-        day = days[date]
-        target = day.setdefault(collection, {})
-        if str(key) not in target:
-            frozen = deepcopy(record)
-            frozen.pop('settlement', None)
-            target[str(key)] = frozen
-            added += 1
-    for date, day in days.items():
-        write(root / f'auditordata/prematch_{date}.json', day)
+        day = read(path, {'schema_version': 1, 'audit_date': date,
+                         'source_file': str(source.relative_to(root)), 'fixtures': {}})
+        changed = False
+        for collection, key, record in entries:
+            target = day.setdefault(collection, {})
+            if str(key) not in target:
+                # Only settlement is removed; nested forecast values stay immutable.
+                frozen = dict(record)
+                frozen.pop('settlement', None)
+                target[str(key)] = frozen
+                added += 1
+                changed = True
+        if changed:
+            write(path, day)
+        del day
     return {'archived_dates': sorted(days), 'new_forecasts': added,
             'rejected_without_valid_prematch_evidence': rejected}
 

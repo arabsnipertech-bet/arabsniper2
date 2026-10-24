@@ -7,6 +7,7 @@ import gzip
 import hashlib
 import json
 import os
+import tempfile
 from pathlib import Path
 from copy import deepcopy
 
@@ -28,33 +29,51 @@ def read_store(path, default=None):
     if not path.exists():return deepcopy(default)
     value=json.loads(path.read_bytes())
     if not isinstance(value,dict) or value.get('_storage')!=FORMAT:return value
-    chunks=[]
-    for part in value['parts']:
-        name=part['sha256']
-        if len(name)!=64 or any(c not in '0123456789abcdef' for c in name):
-            raise ValueError('Invalid audit part identifier')
-        raw=gzip.decompress((path.parent/'_audit_parts'/(name+'.json.gz')).read_bytes())
-        if len(raw)!=part['bytes'] or digest(raw)!=name:raise ValueError('Audit part checksum mismatch')
-        chunks.append(raw)
-    raw=b''.join(chunks)
-    if len(raw)!=value['bytes'] or digest(raw)!=value['sha256']:
-        raise ValueError('Audit manifest checksum mismatch')
-    return json.loads(raw)
+    checksum=hashlib.sha256()
+    size=0
+    # Keep decompressed chunks on disk, not alongside the parsed object graph.
+    with tempfile.TemporaryFile(mode='w+b') as spool:
+        for part in value['parts']:
+            name=part['sha256']
+            if len(name)!=64 or any(c not in '0123456789abcdef' for c in name):
+                raise ValueError('Invalid audit part identifier')
+            raw=gzip.decompress((path.parent/'_audit_parts'/(name+'.json.gz')).read_bytes())
+            if len(raw)!=part['bytes'] or digest(raw)!=name:
+                raise ValueError('Audit part checksum mismatch')
+            spool.write(raw);checksum.update(raw);size+=len(raw)
+        if size!=value['bytes'] or checksum.hexdigest()!=value['sha256']:
+            raise ValueError('Audit manifest checksum mismatch')
+        spool.seek(0)
+        # Text decoding avoids retaining a second full UTF-8 bytes copy.
+        import io
+        with io.TextIOWrapper(spool, encoding='utf-8') as text:
+            return json.load(text)
 
 
 def write_store(path, value, chunk_bytes=CHUNK_BYTES):
     path=Path(path)
     if chunk_bytes<1:raise ValueError('Positive chunk size required')
-    raw=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8')
-    if len(raw)<=chunk_bytes:
-        atomic_bytes(path,raw+b'\n');return
-    parts=[]
-    for offset in range(0,len(raw),chunk_bytes):
-        part=raw[offset:offset+chunk_bytes];sha=digest(part)
-        target=path.parent/'_audit_parts'/(sha+'.json.gz')
-        encoded=gzip.compress(part,compresslevel=6,mtime=0)
-        if not target.exists() or target.read_bytes()!=encoded:atomic_bytes(target,encoded)
-        parts.append({'sha256':sha,'bytes':len(part)})
-    manifest={'_storage':FORMAT,'bytes':len(raw),'sha256':digest(raw),'parts':parts}
-    # All parts exist before the index is switched. Interrupted writes keep old index valid.
+    # Serialize incrementally to disk; retain only one chunk while compressing.
+    with tempfile.TemporaryFile(mode='w+b') as spool:
+        import io
+        text=io.TextIOWrapper(spool, encoding='utf-8', write_through=False)
+        try:
+            json.dump(value,text,ensure_ascii=False,separators=(',',':'))
+            text.flush()
+        finally:
+            text.detach()
+        size=spool.tell();spool.seek(0)
+        if size<=chunk_bytes:
+            atomic_bytes(path,spool.read()+b'\n');return
+        parts=[];checksum=hashlib.sha256()
+        while True:
+            part=spool.read(chunk_bytes)
+            if not part:break
+            checksum.update(part);sha=digest(part)
+            target=path.parent/'_audit_parts'/(sha+'.json.gz')
+            encoded=gzip.compress(part,compresslevel=6,mtime=0)
+            if not target.exists() or target.read_bytes()!=encoded:atomic_bytes(target,encoded)
+            parts.append({'sha256':sha,'bytes':len(part)})
+        manifest={'_storage':FORMAT,'bytes':size,'sha256':checksum.hexdigest(),'parts':parts}
+    # Publish the index only after every checksummed part exists.
     atomic_bytes(path,json.dumps(manifest,separators=(',',':')).encode()+b'\n')
