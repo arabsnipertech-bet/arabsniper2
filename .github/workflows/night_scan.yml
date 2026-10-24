@@ -75,6 +75,9 @@ jobs:
           python src/live_watchlist.py
           python src/scan_usage.py
 
+      - name: Final recovery of missing display quotes
+        run: python src/recover_external_feeds.py
+
       - name: Pack and verify publication size
         run: python src/publication_storage.py
 

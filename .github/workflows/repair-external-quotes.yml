@@ -1,0 +1,28 @@
+name: Repair missing external quotes
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/recover_external_feeds.py']
+permissions:
+  contents: read
+concurrency:
+  group: arabsniper-quote-data-writer
+  cancel-in-progress: false
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3
+      - run: python src/recover_external_feeds.py --remote
