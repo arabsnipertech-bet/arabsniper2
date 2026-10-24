@@ -1256,13 +1256,13 @@
       const row=(a.markets||[]).find(r=>r.market==='over25_ft'&&r.selection==='over');
       if(!row)return null;
       const frozen=contextPick(a);
-      return frozen?.market==='over25_ft'&&frozen.selection==='over'?{...row,...frozen,odd:row.odd,quote:row.quote,price_assessment:row.price_assessment,expected_value_pct:row.expected_value_pct}:row;
+      return frozen?.market==='over25_ft'&&frozen.selection==='over'?{...row,...frozen,odd:row.odd,quote:row.quote,price_assessment:row.price_assessment??(row.odd===frozen.odd&&!row.quote?.indicative&&row.quote?.bookmaker===frozen.quote?.bookmaker&&row.quote?.provider_updated_at===frozen.quote?.provider_updated_at?frozen.price_assessment:null),expected_value_pct:row.expected_value_pct}:row;
     }
     function contextOver35(a) {
       const frozen=contextPick(a);
       if(frozen?.market!=='over35_ft'||frozen.selection!=='over')return null;
       const row=(a.markets||[]).find(r=>r.market==='over35_ft'&&r.selection==='over');
-      return row?{...frozen,odd:row.odd,quote:row.quote,price_assessment:row.price_assessment,expected_value_pct:row.expected_value_pct}:frozen;
+      return row?{...frozen,odd:row.odd,quote:row.quote,price_assessment:row.price_assessment??(row.odd===frozen.odd&&!row.quote?.indicative&&row.quote?.bookmaker===frozen.quote?.bookmaker&&row.quote?.provider_updated_at===frozen.quote?.provider_updated_at?frozen.price_assessment:null),expected_value_pct:row.expected_value_pct}:frozen;
     }
     function contextFeedMatches(matches) {
       return contextFeed==='over35_ft'?matches.filter(m=>contextOver35(m.multimarket)):contextFeed==='over15_ht'?matches.filter(m=>(m.multimarket.markets||[]).some(r=>r.market==='over15_ht'&&r.selection==='over')):matches;
