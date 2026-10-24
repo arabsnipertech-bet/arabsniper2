@@ -40,6 +40,10 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
       await page.screenshot({path:`test-artifacts/list-${name}.png`,fullPage:true});
       assert.equal(await page.locator('.cx-list-row .cx-crossing').count(),3);
+      assert(await page.locator('.cx-list-row.cx-gold.cx-gold-blue').isVisible());
+      assert(await page.locator('.cx-list-row .cx-status-top summary').isVisible());
+      assert(!(await page.locator('.cx-list-row .cx-crossing').first().isVisible()));
+      await page.locator('.cx-list-row .cx-status-top summary').click();
       assert(await page.locator('.cx-list-row .cx-crossing').first().isVisible());
       assert((await page.locator('.cx-list-row').textContent()).includes('1 ↑ + Over 2,5 FT ↓'));
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Overview overflow at '+name);

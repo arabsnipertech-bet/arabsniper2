@@ -196,10 +196,10 @@ assert(vm.runInContext('contextMovementBadge({})',researchContext).includes('cx-
 // Gold marker uses the same unrounded inputs and boundaries as the audit.
 const badgeContext={Number,Math,contextPct:x=>x+'%'};
 vm.createContext(badgeContext);
-vm.runInContext(html.slice(html.indexOf('    function contextAgreementBadge('),html.indexOf('    function contextPrice(')),badgeContext);
+vm.runInContext(html.slice(html.indexOf('    function contextSignal('),html.indexOf('    function contextPrice(')),badgeContext);
 const badge=(p,b,model='context-goals-v3.4')=>badgeContext.contextAgreementBadge({multimarket:{model_id:model,markets:[{market:'over25_ft',selection:'over',probabilities:{statistics:p},book_probability_pct:b}]}});
 assert(badge(.60,50.1).includes('cx-agreement-ring'));
-assert(badge(.65,55).includes('Accordo Gold'));
+assert(badge(.65,55).includes('GOLD · OVER 2,5 FT'));
 assert.equal(badge(.6501,55),'');
 assert.equal(badge(.5,55),'');
 assert.equal(badge(.6,50),'');
@@ -207,7 +207,7 @@ assert.equal(badge(null,55),'');
 assert.equal(badge(.6,NaN),'');
 assert.equal(badge(.6,55,'context-goals-v3.3'),'');
 assert(html.includes('${contextAgreementBadge(match)}'));
-assert(html.includes('contextCoverage(match)+contextAgreementBadge(match)'));
+assert(html.includes('${contextSignalClass(match)}">${contextAgreementBadge(match)}<header'));
 console.log('Gold marker: audit thresholds, missing data, model scope and both placements passed.');
 
 // Public feed is Over 2.5 regardless of the frozen original primary. Only an
@@ -219,7 +219,7 @@ researchContext.feedFixture={fixture:{fixture_id:'feed',kickoff:future(1),match:
 const original=JSON.stringify(researchContext.feedFixture);
 assert.equal(vm.runInContext('contextOver25(feedFixture.multimarket).market',researchContext),'over25_ft');
 assert.equal(vm.runInContext('contextOver35(feedFixture.multimarket)',researchContext),null);
-vm.runInContext("contextCompareMarket='';contextFeed='over25_ft';researchSearch='';",researchContext);
+vm.runInContext("contextCompareMarket='';contextFeed='over25_ft';contextQuoteFilter='all';researchSearch='';",researchContext);
 let feed=vm.runInContext('contextList([feedFixture])',researchContext);
 assert(feed.includes('Over 2,5 FT'));assert(feed.includes('Over 1,5 PT'));assert(feed.includes('OVER 2,5 FT · ANALISI PREMATCH'));
 assert.equal(JSON.stringify(researchContext.feedFixture),original);
