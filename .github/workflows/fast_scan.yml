@@ -19,7 +19,8 @@ on:
       - 'src/selection_policy.py'
       - 'src/homepage_preview.py'
   schedule:
-    - cron: "0 6-23 * * *"
+    # Avoid the busiest top-of-hour scheduling window on GitHub Actions.
+    - cron: "17 6-23 * * *"
       timezone: "Europe/Rome"
 
 permissions:
