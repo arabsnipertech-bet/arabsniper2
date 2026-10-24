@@ -979,7 +979,7 @@
           code.focus();
         } else {
           const data = await authRequest('verify-code', {email, code: code.value, challenge: loginChallenge});
-          if (data.active) { resetCodeLogin(); showApplication(); }
+          if (data.active) { resetCodeLogin(); showApplication(data); }
         }
       } catch (err) { error.textContent = err.message; }
       finally {
@@ -990,14 +990,43 @@
     }
     async function initializeAccess() {
       localStorage.removeItem(STORAGE_KEY);
+      if (new URLSearchParams(location.search).get('expired') === '1') document.getElementById('loginError').textContent = 'Sessione scaduta dopo un’ora. Richiedi un nuovo codice email.';
       if (new URLSearchParams(location.search).get('logout') === 'true') {
         await logoutGold(); return;
       }
-      try { if ((await authRequest('session')).active) showApplication(); }
+      try { const session = await authRequest('session'); if (session.active) showApplication(session); }
       catch (_) { /* Login stays visible when there is no valid session. */ }
     }
 
-    function showApplication() {
+    let goldSessionExpiresAt = 0;
+    let goldSessionTimer = null;
+    function expireGoldSession() {
+      clearTimeout(goldSessionTimer);
+      goldSessionExpiresAt = 0;
+      document.getElementById('app').hidden = true;
+      document.getElementById('loginOverlay').classList.add('show');
+      currentPayload = null; currentMatches = []; filteredMatches = [];
+      window.location.replace('gold-dashboard-live.html?expired=1');
+    }
+    function armGoldSession(session) {
+      const expiry = Number(session?.session_expires_at) * 1000;
+      if (!Number.isFinite(expiry) || expiry <= Date.now()) return false;
+      goldSessionExpiresAt = expiry;
+      clearTimeout(goldSessionTimer);
+      goldSessionTimer = setTimeout(expireGoldSession, Math.max(0, expiry - Date.now()));
+      return true;
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (goldSessionExpiresAt && Date.now() >= goldSessionExpiresAt) expireGoldSession();
+    });
+    window.addEventListener('pageshow', () => {
+      if (goldSessionExpiresAt && Date.now() >= goldSessionExpiresAt) expireGoldSession();
+    });
+    function showApplication(session) {
+      if (!armGoldSession(session)) {
+        document.getElementById('loginError').textContent = 'Sessione scaduta. Richiedi un nuovo codice email.';
+        return;
+      }
       document.getElementById('loginOverlay').classList.remove('show');
       document.getElementById('app').hidden = false;
       buildDayButtons();
