@@ -1221,7 +1221,7 @@
     let contextCompareMarket = '';
     let contextMinimumOdd = '1.5';
     let contextFeed = 'over25_ft';
-    let contextQuoteFilter = 'priced';
+    let contextQuoteFilter = 'all';
     let contextSignalFilter = 'all';
     function contextHasQuote(row) { return Number.isFinite(row?.odd)&&row.odd>1; }
     function contextFeedRow(match) {
@@ -1256,11 +1256,13 @@
       const row=(a.markets||[]).find(r=>r.market==='over25_ft'&&r.selection==='over');
       if(!row)return null;
       const frozen=contextPick(a);
-      return frozen?.market==='over25_ft'&&frozen.selection==='over'?{...row,...frozen}:row;
+      return frozen?.market==='over25_ft'&&frozen.selection==='over'?{...row,...frozen,odd:row.odd,quote:row.quote,price_assessment:row.price_assessment,expected_value_pct:row.expected_value_pct}:row;
     }
     function contextOver35(a) {
       const frozen=contextPick(a);
-      return frozen?.market==='over35_ft'&&frozen.selection==='over'?frozen:null;
+      if(frozen?.market!=='over35_ft'||frozen.selection!=='over')return null;
+      const row=(a.markets||[]).find(r=>r.market==='over35_ft'&&r.selection==='over');
+      return row?{...frozen,odd:row.odd,quote:row.quote,price_assessment:row.price_assessment,expected_value_pct:row.expected_value_pct}:frozen;
     }
     function contextFeedMatches(matches) {
       return contextFeed==='over35_ft'?matches.filter(m=>contextOver35(m.multimarket)):contextFeed==='over15_ht'?matches.filter(m=>(m.multimarket.markets||[]).some(r=>r.market==='over15_ht'&&r.selection==='over')):matches;
@@ -1728,7 +1730,7 @@
       if(contextDetailId!==null&&!all.some(m=>String(m.fixture.fixture_id)===contextDetailId))contextDetailId=null;
       const options=(list,current)=>list.map(([v,l])=>`<option value="${escapeHtml(v)}" ${v===current?'selected':''}>${escapeHtml(l)}</option>`).join('');
       let html=`<header class="cx-heading"><div><span class="cx-eyebrow">ARABSNIPER / MATCH INTELLIGENCE</span><h2>La partita, spiegata.</h2><p>Over 2,5 per ogni partita. Statistica e bookmaker a confronto.</p></div><span class="research-tag">V3 · IN VERIFICA</span></header><div class="cx-summary"><div><b>${all.length}</b><span>partite in ordine di orario</span></div><div><b>8 / 4</b><span>gare ufficiali / primi tempi</span></div><div><b>Night 5 · Fast 2</b><span>giorni coperti dalle scansioni</span></div></div><p class="cx-muted">Snapshot: ${escapeHtml(formatTimestamp(payload.updated_at||payload.generated_at))}. Le percentuali sono stime sperimentali, non frequenze di successo già validate.</p><div class="research-controls"><label>Cerca squadra<input class="research-search" type="search" value="${escapeHtml(researchSearch)}" placeholder="Squadra o campionato" onchange="researchSearch=this.value;renderMatchResearch(currentPayload||{})"></label></div>`;
-      html+=`<div class="research-controls"><label>Elenco<select onchange="contextFeed=this.value;contextCompareMarket='';if(contextSignalFilter==='nongold_watch')contextSignalFilter='all';renderMatchResearch(currentPayload||{})">${options([['over25_ft','Tutti gli Over 2,5 FT'],['over35_ft','Consigliate · Over 3,5 FT'],['over15_ht','In osservazione · Over 1,5 PT']],contextFeed)}</select></label><label>Quota preferita per le consigliate<select onchange="contextMinimumOdd=this.value;renderMatchResearch(currentPayload||{})">${options([['0','Tutte'],['1.4','1,40'],['1.5','1,50'],['1.8','1,80'],['2','2,00']],contextMinimumOdd)}</select></label></div><p class="cx-odds-note">Di default sono visibili solo le partite con quota del mercato scelto. Le altre restano in «In attesa di quote» e vengono ricontrollate dalle scansioni. Cornice oro: accordo sull’Over 2,5 FT. Bordo azzurro aggiuntivo: incrocio dei movimenti descritto nella scheda. Sono segnali prematch, anche nelle partite iniziate; non aumentano le percentuali. La quota preferita riguarda soltanto le consigliate Over 3,5.</p>`;
+      html+=`<div class="research-controls"><label>Elenco<select onchange="contextFeed=this.value;contextCompareMarket='';if(contextSignalFilter==='nongold_watch')contextSignalFilter='all';renderMatchResearch(currentPayload||{})">${options([['over25_ft','Tutti gli Over 2,5 FT'],['over35_ft','Consigliate · Over 3,5 FT'],['over15_ht','In osservazione · Over 1,5 PT']],contextFeed)}</select></label><label>Quota preferita per le consigliate<select onchange="contextMinimumOdd=this.value;renderMatchResearch(currentPayload||{})">${options([['0','Tutte'],['1.4','1,40'],['1.5','1,50'],['1.8','1,80'],['2','2,00']],contextMinimumOdd)}</select></label></div><p class="cx-odds-note">Di default sono visibili tutte le partite, anche senza quota: l’analisi statistica resta consultabile. Usa «In attesa di quote» per vedere i recuperi ancora necessari. Cornice oro: accordo sull’Over 2,5 FT. Bordo azzurro aggiuntivo: incrocio dei movimenti descritto nella scheda. Sono segnali prematch, anche nelle partite iniziate; non aumentano le percentuali. La quota preferita riguarda soltanto le consigliate Over 3,5.</p>`;
       const feed=contextFeedMatches(all),priced=feed.filter(m=>contextHasQuote(contextFeedRow(m))).length;
       html+=`<div class="research-controls"><label>Disponibilità quote<select onchange="contextQuoteFilter=this.value;renderMatchResearch(currentPayload||{})">${options([['priced','Con quota disponibile'],['missing','In attesa di quote'],['all','Tutte, incluse quote mancanti']],contextQuoteFilter)}</select></label><label>Segnali della partita<select onchange="contextSignalFilter=this.value;renderMatchResearch(currentPayload||{})">${options([['all','Tutti i segnali'],['gold','Gold'],['dual','Gold + incrocio azzurro'],['nongold','Non Gold · dati confrontabili'],...(contextFeed==='over25_ft'?[['nongold_watch','Non Gold FT · book >50% (in verifica)']]:[])],contextSignalFilter)}</select></label></div><p class="cx-odds-note" role="status">${priced} partite con quota · ${feed.length-priced} in attesa di quote per questo elenco. Non Gold esclude i casi senza dati sufficienti per il confronto.</p>`;
       if(contextSignalFilter==='nongold_watch')html+='<p class="cx-awaiting"><strong>Non Gold FT · book sopra il 50%</strong><br>Quota presente, dati confrontabili, assenza di Gold e probabilità bookmaker senza margine sopra il 50%. Filtro osservativo fissato il 24 ottobre 2026: privilegia la probabilità bookmaker, spesso con quote più basse. Non è un vantaggio validato e non cambia la proposta del modello.</p>';
