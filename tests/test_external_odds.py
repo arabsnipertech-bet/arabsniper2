@@ -23,31 +23,6 @@ def match(odd=None):
         for side in ('over','under')]}}
 
 class ExternalOddsTests(unittest.TestCase):
-    def result_page(self,kind='1x2'):
-        html=page().replace('Over/Under 2.5','1X2' if kind=='1x2' else 'Gol/No Gol')
-        if kind=='1x2':
-            return html.replace('<th>Handicap</th><th>Over</th><th>Under</th>','<th>Casa</th><th>Pareggio</th><th>Ospite</th>').replace('<td>2.5</td><td>2.00</td><td>1.70</td>','<td>1.55</td><td>3.60</td><td>5.25</td>')
-        return html.replace('<th>Handicap</th><th>Over</th><th>Under</th>','<th>Gol</th><th>No Gol</th>').replace('<td>2.5</td>','')
-
-    def test_complete_1x2_same_book_and_no_handicap_or_wrong_period(self):
-        html=self.result_page()
-        self.assertEqual(parse_pairs(html,META,None,'1x2')[0]['odds'],{'1':1.55,'x':3.6,'2':5.25})
-        for bad in (html.replace('1X2','1X2 con Handicap'),html.replace('1X2','1X2 primo tempo'),html.replace('<td>5.25</td>',''),html.replace('<th>Casa</th>','<th>Ospite</th>')):
-            self.assertFalse(parse_pairs(bad,META,None,'1x2'))
-
-    def test_gg_complete_pair(self):
-        self.assertEqual(parse_pairs(self.result_page('gg'),META,None,'gg')[0]['odds'],{'yes':2.,'no':1.7})
-
-    def test_1x2_missing_sides_only_and_api_priority(self):
-        m=match();m['multimarket']['markets']=[{'market':'1x2_ft','selection':s,'odd':1.6 if s=='1' else None,'statistical_pct':40} for s in ('1','x','2')]
-        r=Recovery(fetch=lambda url:INDEX_HTML if url==INDEX else self.result_page())
-        r.apply(m,'2026-10-24T08:00:00+00:00')
-        self.assertEqual([x['odd'] for x in m['multimarket']['markets']],[1.6,3.6,5.25])
-        self.assertNotIn('quote',m['multimarket']['markets'][0])
-        self.assertTrue(m['multimarket']['markets'][1]['quote']['indicative'])
-        self.assertEqual(m['multimarket']['markets'][1]['statistical_pct'],40)
-        self.assertFalse(m['multimarket']['markets'][1]['movement']['confirmed'])
-
     def test_non_italian_fixture_is_recovered(self):
         for nation in ('England', 'Spain', 'Japan', 'Brazil'):
             r=Recovery(fetch=lambda url: INDEX_HTML if url==INDEX else page().replace('Italy, Serie C', nation+', League'))

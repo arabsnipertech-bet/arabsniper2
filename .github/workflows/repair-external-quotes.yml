@@ -1,9 +1,6 @@
 name: Repair missing external quotes
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['src/recover_external_feeds.py', 'src/external_odds.py']
 permissions:
   contents: read
 concurrency:

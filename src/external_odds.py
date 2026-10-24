@@ -16,7 +16,7 @@ from urllib.error import HTTPError
 
 BASE = 'https://www.oddstorm.com'
 INDEX = BASE + '/it/odds/'
-MARKETS = {'1x2_ft': None, 'over25_ft': '2.5', 'over35_ft': '3.5', 'over15_ft': '1.5', 'gg_ft': None}
+MARKETS = {'over25_ft': '2.5', 'over35_ft': '3.5'}
 PREFERRED = ('BWin', 'Bet365', 'Unibet', 'Pinnacle', 'Ladbrokes', 'BetWay')
 
 
@@ -56,7 +56,7 @@ def parse_catalog(html):
     return result
 
 
-def parse_pairs(html, meta, line, kind='total'):
+def parse_pairs(html, meta, line):
     heading = re.search(r'<h1\b[^>]*>(.*?)</h1>', html, re.S)
     date = re.search(r'<p\b[^>]*class="od-matchmeta"[^>]*>(.*?)</p>', html, re.S)
     if not heading or not date:
@@ -66,7 +66,7 @@ def parse_pairs(html, meta, line, kind='total'):
     if not meta.get('country') or country(meta['country']) not in nations:
         return []
     title = text(heading[1])
-    suffix = {'1x2':' 1X2','gg':' Gol/No Gol'}.get(kind, ' Over/Under ' + str(line))
+    suffix = ' Over/Under ' + line
     if not title.endswith(suffix):
         return []
     names = title[:-len(suffix)].split(' – ')
@@ -83,25 +83,23 @@ def parse_pairs(html, meta, line, kind='total'):
     if not table:
         return []
     headers = [text(c) for c in re.findall(r'<th\b[^>]*>(.*?)</th>', table[1], re.S)]
-    expected={'1x2':['Casa','Pareggio','Ospite'],'gg':['Gol','No Gol'],'total':['Handicap','Over','Under']}[kind]
-    if headers[1:] != expected or len(headers)!=len(expected)+1:
+    if len(headers) != 4 or headers[1:] != ['Handicap', 'Over', 'Under']:
         return []
     result = []
     for row in re.findall(r'<tr\b[^>]*>(.*?)</tr>', table[1], re.S):
         cells = [text(c) for c in re.findall(r'<td\b[^>]*>(.*?)</td>', row, re.S)]
-        if len(cells) != len(expected)+1 or cells[0] not in PREFERRED or (kind=='total' and cells[1]!=line):
+        if len(cells) != 4 or cells[1] != line or cells[0] not in PREFERRED:
             continue
         try:
-            values = [float(v) for v in cells[2 if kind=='total' else 1:]]
-            if not all(math.isfinite(v) and 1 < v <= 100 for v in values):
+            over, under = float(cells[2]), float(cells[3])
+            if not all(math.isfinite(v) and 1 < v <= 100 for v in (over, under)):
                 continue
             # Reject corrupt pairs; this is validation, not a model input.
-            if not .95 <= sum(1/v for v in values) <= 1.35:
+            if not .95 <= 1 / over + 1 / under <= 1.35:
                 continue
         except ValueError:
             continue
-        sides={'1x2':('1','x','2'),'gg':('yes','no'),'total':('over','under')}[kind]
-        result.append({'bookmaker': cells[0], 'odds': dict(zip(sides,values))})
+        result.append({'bookmaker': cells[0], 'odds': {'over': over, 'under': under}})
     return sorted(result, key=lambda r: PREFERRED.index(r['bookmaker']))
 
 
@@ -186,12 +184,9 @@ class Recovery:
             self.report['unmatched_fixtures'] += 1
             return
         recovered = {}
-        for market in MARKETS:
-            if market not in missing:continue
-            kind='1x2' if market=='1x2_ft' else 'gg' if market=='gg_ft' else 'total'
-            suffix='/1x2' if kind=='1x2' else '/gg-ng' if kind=='gg' else '/over-under?h='+MARKETS[market]
-            url = urljoin(BASE, path) + suffix
-            pairs = parse_pairs(self.read(url), meta, MARKETS[market],kind)
+        for market in sorted(missing):
+            url = urljoin(BASE, path) + '/over-under?h=' + MARKETS[market]
+            pairs = parse_pairs(self.read(url), meta, MARKETS[market])
             if not pairs:
                 continue
             quote = {**pairs[0], 'source': 'OddStorm', 'source_url': url,
@@ -220,7 +215,7 @@ class Recovery:
                 for child in value:
                     patch(child)
         patch(output.get('multimarket', {}))
-        output.setdefault('external_quotes',{}).update(recovered)
+        output['external_quotes'] = recovered
         self.report['markets_recovered'] += len(recovered)
         self.report['fixtures'][str(meta.get('fixture_id'))] = recovered
 

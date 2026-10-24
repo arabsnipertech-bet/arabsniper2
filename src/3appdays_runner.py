@@ -18,7 +18,6 @@ import json
 import os
 import subprocess
 import sys
-from workflow_heartbeat import heartbeat
 from datetime import datetime
 from pathlib import Path
 
@@ -94,14 +93,12 @@ def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "") ->
         log(f"⚠️ Uso copia fallback {engine_file.name}; online è preferibile rinominarla 3appdays.py")
     command = build_command(mode, github=github, days=days, audit_date=audit_date)
     log(f"🚀 Avvio: {' '.join(command)}")
-    # Keep payload logs buffered; publish only non-sensitive liveness while running.
-    with heartbeat("scan-" + mode):
-        result = subprocess.run(
-            command,
-            cwd=str(PROJECT_ROOT),
-            text=True,
-            capture_output=True,
-        )
+    result = subprocess.run(
+        command,
+        cwd=str(PROJECT_ROOT),
+        text=True,
+        capture_output=True,
+    )
 
     if result.stdout:
         print(result.stdout, end="")
