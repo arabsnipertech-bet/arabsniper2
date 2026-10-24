@@ -1272,6 +1272,7 @@
     function contextSignal(match) {
       if(match.multimarket?.model_id!=='context-goals-v3.4')return {gold:false,known:false,crosses:[]};
       const row=match.multimarket.markets?.find(r=>r.market==='over25_ft'&&r.selection==='over');
+      if(row?.quote?.indicative)return {gold:false,known:false,crosses:[]};
       const p=row?.probabilities?.statistics,b=row?.book_probability_pct;
       if(!Number.isFinite(p)||!Number.isFinite(b)||p<0||p>1||b<0||b>100)return {gold:false,known:false,crosses:[]};
       if(p<=.5||b<=50||Math.abs(p*100-b)>10+1e-9)return {gold:false,known:true,crosses:[]};
@@ -1314,6 +1315,7 @@
     }
     function contextPrice(row,compact=false) {
       if(!contextHasQuote(row))return '<p class="cx-awaiting">In attesa di quota · sola analisi statistica. Convenienza e movimento non valutabili.</p>';
+      if(row?.quote?.indicative)return `<p class="cx-odds-note">Quota indicativa esterna · ${escapeHtml(row.quote.bookmaker)} via ${escapeHtml(row.quote.source)} · letta ${escapeHtml(formatTimestamp(row.quote.observed_at))}. Anteprima ritardata, aggiornamento bookmaker non certificato. Nessuno storico confrontabile.</p>`;
       const a=row?.price_assessment;
       const reason=row?.proposal_note?`<small>${escapeHtml(row.proposal_note)}</small>`:'';
       const fallback=row?.price_preference_met===false?'<em>Quota minima non raggiunta · ipotesi alternativa disponibile</em>':'';
