@@ -16,6 +16,7 @@ def get(path,params):
     if r.status_code!=200: raise RuntimeError('Provider HTTP '+str(r.status_code))
     p=r.json()
     if p.get('errors'): raise RuntimeError('Provider returned errors; diagnostic stopped')
+    if not isinstance(p.get('response'),list): return p
     rows=list(p.get('response') or [])
     total=1 if 'page' in params else p.get('paging',{}).get('total',1)
     if total>60: raise RuntimeError('Unexpected pagination')
