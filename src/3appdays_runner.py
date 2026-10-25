@@ -16,8 +16,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import signal
 import subprocess
 import sys
+import threading
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -37,6 +40,7 @@ ENGINE_CANDIDATES = (
     SRC_DIR / "3appdays(3).py",  # fallback solo per copie scaricate dal browser
 )
 RUN_STATE_FILE = DATA_DIR / "arab_quote_run_state.json"
+OUTPUT_TAIL_CHARS = 4000
 
 
 def resolve_engine_file() -> Path:
@@ -83,6 +87,103 @@ def build_command(mode: str, github: bool = False, days: int = 5, audit_date: st
     return command
 
 
+def stream_process(command: list[str], *, heartbeat_seconds: float = 60,
+                   termination_grace_seconds: float = 10) -> subprocess.CompletedProcess:
+    """Stream both pipes immediately, retaining only bounded diagnostic tails.
+
+    A quiet engine still gets a liveness message, not a claim of progress.
+    Cancellation remains a failure even if the child handles SIGTERM cleanly.
+    """
+    started = time.monotonic()
+    last_output = started
+    tails = {"stdout": "", "stderr": ""}
+    lock = threading.Lock()
+    stopped = {"signal": None, "at": None}
+    old_handlers = {}
+    process = subprocess.Popen(
+        command, cwd=str(PROJECT_ROOT), text=True, encoding="utf-8",
+        errors="replace", stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        env={**os.environ, "PYTHONUNBUFFERED": "1"},
+        start_new_session=(os.name == "posix"),
+    )
+
+    def send_signal(signum):
+        if process.poll() is not None:
+            return
+        try:
+            if os.name == "posix":
+                os.killpg(process.pid, signum)
+            else:
+                process.send_signal(signum)
+        except ProcessLookupError:
+            pass
+
+    def stop(signum, _frame):
+        if stopped["signal"] is None:
+            stopped.update(signal=signum, at=time.monotonic())
+        send_signal(signum)
+
+    def drain(pipe, target, name):
+        nonlocal last_output
+        try:
+            # The size bound also handles very long lines without growing memory.
+            for chunk in iter(lambda: pipe.readline(4096), ""):
+                with lock:
+                    tails[name] = (tails[name] + chunk)[-OUTPUT_TAIL_CHARS:]
+                    last_output = time.monotonic()
+                target.write(chunk)
+                target.flush()
+        finally:
+            pipe.close()
+
+    readers = [threading.Thread(target=drain, args=(pipe, target, name), daemon=True)
+               for pipe, target, name in ((process.stdout, sys.stdout, "stdout"),
+                                          (process.stderr, sys.stderr, "stderr"))]
+    try:
+        if threading.current_thread() is threading.main_thread():
+            for signum in (signal.SIGTERM, signal.SIGINT):
+                old_handlers[signum] = signal.signal(signum, stop)
+        for reader in readers:
+            reader.start()
+        next_heartbeat = started + heartbeat_seconds
+        while True:
+            try:
+                code = process.wait(timeout=min(1, heartbeat_seconds))
+                break
+            except subprocess.TimeoutExpired:
+                now = time.monotonic()
+                if stopped["at"] is not None:
+                    if now - stopped["at"] >= termination_grace_seconds:
+                        if os.name == "posix":
+                            send_signal(signal.SIGKILL)
+                        else:
+                            process.kill()
+                elif now >= next_heartbeat:
+                    with lock:
+                        quiet_for = now - last_output
+                    log(f"⏳ Motore in esecuzione da {int(now-started)}s; "
+                        f"ultimo output {int(quiet_for)}s fa (non indica completamento)")
+                    next_heartbeat = now + heartbeat_seconds
+    finally:
+        if process.poll() is None:
+            if os.name == "posix":
+                send_signal(signal.SIGKILL)
+            else:
+                process.kill()
+            process.wait()
+        for reader in readers:
+            if reader.ident is not None:
+                reader.join()
+        for signum, handler in old_handlers.items():
+            signal.signal(signum, handler)
+
+    if stopped["signal"] is not None:
+        code = 128 + stopped["signal"]
+    elif code < 0:
+        code = 128 - code
+    return subprocess.CompletedProcess(command, code, tails["stdout"], tails["stderr"])
+
+
 def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "") -> int:
     engine_file = resolve_engine_file()
     if not engine_file.exists():
@@ -93,30 +194,25 @@ def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "") ->
         log(f"⚠️ Uso copia fallback {engine_file.name}; online è preferibile rinominarla 3appdays.py")
     command = build_command(mode, github=github, days=days, audit_date=audit_date)
     log(f"🚀 Avvio: {' '.join(command)}")
-    result = subprocess.run(
-        command,
-        cwd=str(PROJECT_ROOT),
-        text=True,
-        capture_output=True,
-    )
-
-    if result.stdout:
-        print(result.stdout, end="")
-    if result.stderr:
-        print(result.stderr, file=sys.stderr, end="")
-
     report = {
         "mode": mode,
         "github": github,
         "days": 2 if mode == "fast" else 5 if mode == "night" else days,
         "audit_date": audit_date,
         "command": command,
-        "returncode": result.returncode,
-        "status": "ok" if result.returncode == 0 else "error",
+        "returncode": None,
+        "status": "running",
         "generated_at": now_iso(),
-        "stdout_tail": result.stdout[-4000:],
-        "stderr_tail": result.stderr[-4000:],
     }
+    atomic_write_json(RUN_STATE_FILE, report)
+    result = stream_process(command)
+    report.update(
+        returncode=result.returncode,
+        status="ok" if result.returncode == 0 else "error",
+        generated_at=now_iso(),
+        stdout_tail=result.stdout,
+        stderr_tail=result.stderr,
+    )
     atomic_write_json(RUN_STATE_FILE, report)
 
     if result.returncode == 0:
