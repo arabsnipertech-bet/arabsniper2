@@ -149,6 +149,14 @@ prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(!price
 vm.runInContext('oddsFixture.multimarket.markets[0].quote.bookmaker="A";oddsFixture.multimarket.markets[0].odd=1.9',researchContext);
 prices=vm.runInContext('contextOdds(oddsFixture)',researchContext);assert(prices.includes('→ invariata 0.00%'));
 console.log('Quote overview: same-book opening, missing history and multi-book arrows passed.');
+researchContext.staleFixture={fixture:{},multimarket:{markets:[{market:'over25_ft',selection:'over',odd:null,quote:null,display_odd:2.05,display_quote:{bookmaker:'Bet365',provider_updated_at:future(-8)},movement:{}}]}};
+for(const compact of [true,false]){
+ researchContext.compact=compact;
+ const staleHtml=vm.runInContext('contextOdds(staleFixture,compact)',researchContext);
+ assert(staleHtml.includes('2.05'));assert(staleHtml.includes('Bet365'));assert(staleHtml.includes('Ultima disponibile'));assert(staleHtml.includes('esclusa dai segnali recenti'));
+ assert(!staleHtml.includes('cx-signal cx-red'));
+}
+
 
 researchContext.liveFixture={fixture:{fixture_id:'live',kickoff:future(-1),status_short:'HT',live:{status:'HT',elapsed:45,goals:{home:1,away:1},halftime:{home:1,away:1},observed_at:future(-0.1)}},multimarket:researchContext.v3.matches[0].multimarket};
 assert.equal(vm.runInContext('researchMatches({matches:[liveFixture]},true).length',researchContext),1);
