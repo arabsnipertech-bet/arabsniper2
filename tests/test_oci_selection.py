@@ -28,3 +28,13 @@ class OciSelectionTests(unittest.TestCase):
         over=next(r for r in a['markets'] if r['market']=='over25_ft' and r['selection']=='over')
         self.assertEqual(over['over25_signals'],a['over25_signals'])
         self.assertEqual(a['over25_signals']['probability_bonus'],0)
+
+    def test_near_kickoff_rejects_old_provider_quotes(self):
+        f=match();f['fixture']['kickoff']='2026-10-20T09:00:00+00:00'
+        b=dict(bookmaker='A',observed_at=NOW,provider_updated_at='2026-10-20T06:59:00+00:00',odds={'1':1.6,'x':4,'2':5})
+        a=evaluate(f,NOW,{'1x2_ft':[b]})
+        self.assertEqual(a['quote_max_age_hours'],1)
+        self.assertTrue(all(r['odd'] is None for r in a['markets'] if r['market']=='1x2_ft'))
+        b['provider_updated_at']='2026-10-20T07:30:00+00:00'
+        a=evaluate(f,NOW,{'1x2_ft':[b]})
+        self.assertTrue(all(r['odd'] is not None for r in a['markets'] if r['market']=='1x2_ft'))
