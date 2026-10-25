@@ -35,6 +35,10 @@ class OciSelectionTests(unittest.TestCase):
         a=evaluate(f,NOW,{'1x2_ft':[b]})
         self.assertEqual(a['quote_max_age_hours'],1)
         self.assertTrue(all(r['odd'] is None for r in a['markets'] if r['market']=='1x2_ft'))
+        rows=[r for r in a['markets'] if r['market']=='1x2_ft']
+        self.assertEqual([r['display_odd'] for r in rows],[1.6,4,5])
+        self.assertTrue(all(r['quote_status']=='stale' and r['book_probability_pct'] is None for r in rows))
+        self.assertEqual(a['over25_signals']['rules'],[])
         b['provider_updated_at']='2026-10-20T07:30:00+00:00'
         a=evaluate(f,NOW,{'1x2_ft':[b]})
         self.assertTrue(all(r['odd'] is not None for r in a['markets'] if r['market']=='1x2_ft'))
