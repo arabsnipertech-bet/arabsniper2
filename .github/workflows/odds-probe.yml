@@ -4,7 +4,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: arabsniper-quote-data-writer
+  group: arabsniper-readonly-two-fixtures
   cancel-in-progress: false
 jobs:
   probe:
