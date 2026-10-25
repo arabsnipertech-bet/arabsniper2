@@ -465,9 +465,11 @@ def evaluate(match, as_of, quotes=None):
             if not league.get('ht_sample'): league_reference={k:v for k,v in league_reference.items() if k.endswith('_ft')}
 
     now=stamp(as_of); valid={}
+    kickoff=stamp(meta.get('kickoff'))
+    max_age_hours=1 if now and kickoff and 0<(kickoff-now).total_seconds()<=3*3600 else CONFIG['max_quote_age_hours']
     for key,books in (quotes or {}).items():
         valid[key]=[b for b in books if stamp(b.get('provider_updated_at')) and now and
-                    0<=(now-stamp(b['provider_updated_at'])).total_seconds()<=6*3600]
+                    0<=(now-stamp(b['provider_updated_at'])).total_seconds()<=max_age_hours*3600]
     benchmarks=quote_benchmarks(valid,as_of); rows=[]
     for key in [*SPECS,*COMBOS]:
         for side in SPECS[key][3] if key in SPECS else ('yes','no'):
@@ -569,7 +571,7 @@ def evaluate(match, as_of, quotes=None):
     for p in profiles.values():
         p['history_ids']=[r['fixture_id'] for r in p.pop('rows')]; p['ht_history_ids']=[r['fixture_id'] for r in p.pop('ht_rows')]
     return {'model_id':MODEL_ID,'status':'experimental','captured_at':as_of,'config':CONFIG,
-            'data_quality':data_quality,'over25_signals':signals,
+            'data_quality':data_quality,'over25_signals':signals,'quote_max_age_hours':max_age_hours,
             'rates':{'statistics':rates,'without_correction':uncorrected},'weights':weights,
             'proposals_by_min_odd':proposals,'selection_diagnostic':diagnostic,'profiles':profiles,'favorite_context':trap,'features':{},'markets':rows,'best_candidate':deepcopy(proposals[str(CONFIG['primary_min_odd'])]),
             'ranked_hypotheses':[r['market']+'::'+r['selection'] for r in candidates],
