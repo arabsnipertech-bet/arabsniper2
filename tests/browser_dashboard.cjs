@@ -18,6 +18,8 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     rows.push(mk('over25_ht','over','Over 2,5 PT',18));
     rows[2].probabilities={statistics:.61};
     for(const [index,direction] of [[4,'up'],[2,'down'],[0,'down']])rows[index].movement={confirmed:true,direction,amplitude_pct:4,agreeing_books:3,paired_books:4};
+    rows[6].movement.oci=1;rows[6].movement.oci_previous=2;
+    rows[4].movement.oci=2;rows[4].movement.oci_previous=1;
     const primary={...rows[2],research_candidate:true,price_assessment:{reference_probability_pct:58,break_even_probability_pct:50,reference_fair_odd:100/58,estimated_return_pct:16,status:'unvalidated_positive_estimate',note:'Esempio sintetico non validato.'}};
     const payload={updated_at:now,matches:[{fixture:{fixture_id:'123456',kickoff:new Date(Date.now()+3600000).toISOString(),
       match:'Squadra casa – Squadra ospite <script>',time:'20:45',league:'Campionato di prova',country:'Italia'},
@@ -41,7 +43,7 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       await page.screenshot({path:`test-artifacts/list-${name}.png`,fullPage:true});
       assert.equal(await page.locator('.cx-list-row .cx-crossing').count(),1);
       assert(await page.locator('.cx-list-row .cx-crossing').first().isVisible());
-      assert((await page.locator('.cx-list-row .cx-crossing').getAttribute('title')).includes('1 ↑ + Over 2,5 FT ↓'));
+      assert((await page.locator('.cx-list-row .cx-crossing').getAttribute('title')).includes('OCI 2 ↓'));
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Overview overflow at '+name);
       await page.screenshot({path:`test-artifacts/overview-${name}.png`,fullPage:true});
       await page.locator('.cx-open').click();
