@@ -48,7 +48,18 @@ def main():
                ('first half' in str(b.get('name') or '').lower() and ('goals' in str(b.get('name') or '').lower() or 'score' in str(b.get('name') or '').lower()))]
     now = datetime.now(timezone.utc)
     matches = []
-    for day in (1,2):
+    fixtures = c.get('fixtures', {'date': now.strftime('%Y-%m-%d'), 'timezone':'Europe/Rome'}, use_cache=False)
+    for row in (fixtures or {}).get('response', []):
+        home = row.get('teams', {}).get('home', {}).get('name', '')
+        away = row.get('teams', {}).get('away', {}).get('name', '')
+        if ('Renate' in home and 'Albin' in away) or ('AVS' in home and 'Tondela' in away):
+            matches.append({'fixture_id':row['fixture']['id'], 'kickoff':row['fixture']['date'],
+                            'match':home+' - '+away, 'league_id':row['league']['id'],
+                            'league':row['league']['name'], 'season':row['league']['season'],
+                            'date':row['fixture']['date'][:10]})
+    if len(matches) != 2:
+        raise RuntimeError('Expected both named fixtures; found '+str(matches))
+    for day in ():
         data = read_store(Path(f'data/arab_quote_day{day}.json'))
         matches.extend(m['fixture'] for m in data['matches']
                        if datetime.fromisoformat(m['fixture']['kickoff']) > now)
@@ -67,7 +78,7 @@ def main():
         base = c.get('odds', {'fixture':fid}, use_cache=False)
         initial = inventory(base, fid)
         extracted, audit = e.extract_bookmaker_markets_with_audit(base or {})
-        row = {'fixture_id':fid,'match':f['match'],'league':f['league'], 'baseline':initial,
+        row = {'fixture_id':fid,'match':f['match'],'league':f['league'], 'baseline':initial, 'provider_updates':[x.get('update') for x in (base or {}).get('response',[])], 'baseline_prices':[{'update':x.get('update'),'books':[{'name':b.get('name'),'bets':[v for v in b.get('bets',[]) if v.get('id') in (1,5,6)]} for b in x.get('bookmakers',[])]} for x in (base or {}).get('response',[])],
                'usable':{k:len(e.complete_market_books(extracted,k)) for k in e.MARKET_SELECTIONS},
                'rejected':{k:dict(Counter(r['reason'] for r in a.get('rejected',[]))) for k,a in audit.items() if isinstance(a,dict)},
                'queries':[]}
@@ -82,7 +93,7 @@ def main():
             new_books = sorted(set(current)-set(initial))
             new_markets = [(b,m) for b,v in current.items() for m in v['markets'] if m not in initial.get(b,{}).get('markets',{})]
             row['queries'].append({'route':route,'filter':params.get(route), 'ok':payload is not None,
-                                   'books':len(current),'new_books':new_books,'new_book_markets':new_markets})
+                                   'books':len(current),'provider_updates':[x.get('update') for x in (payload or {}).get('response',[])],'new_books':new_books,'new_book_markets':new_markets})
         report['fixtures'].append(row)
         print(json.dumps({'match':f['match'],'baseline_books':len(initial),'usable':row['usable'],
                           'queries':len(row['queries']),'queries_adding_books':sum(bool(x['new_books']) for x in row['queries']),
