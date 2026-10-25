@@ -1573,18 +1573,19 @@
       const cell=(market,selection,label)=>{
         const r=rows.find(x=>x.market===market&&x.selection===selection),m=r?.movement||{};
         // Opening/current belong to the same displayed operator; never join different books.
-        const o=(m.operators||[]).find(x=>x.bookmaker===r?.quote?.bookmaker);
+        const q=r?.quote||r?.display_quote, stale=!r?.quote&&!!q;
+        const o=(m.operators||[]).find(x=>x.bookmaker===q?.bookmaker);
         const initial=o?.first_observed_odd??o?.initial;
-        const current=r?.odd;
+        const current=r?.odd??r?.display_odd;
         const delta=Number.isFinite(initial)&&initial>1&&Number.isFinite(current)?(current/initial-1)*100:null;
         const dir=Number.isFinite(delta)?Math.abs(delta)<.005?'flat':delta>0?'up':'down':null;
         const netLabel=dir?`Totale ${dir==='flat'?'→ invariata':dir==='up'?'↑ salita':'↓ discesa'} ${contextSigned(dir==='flat'?0:delta,'%')}`:'Variazione totale non disponibile';
         const net=`<div class="cx-quote-total" aria-label="${escapeHtml(netLabel)}" title="Variazione fra apertura e attuale dello stesso operatore"><span>TOTALE</span><div class="cx-quote-value">${dir?contextDirection(dir):''}<b>${dir?contextSigned(dir==='flat'?0:delta,'%'):'—'}</b></div></div>`;
         const consensus=contextMovementBadge(m);
-        const age=(Date.now()-Date.parse(r?.quote?.provider_updated_at))/3600000;
-        const source=`<small class="cx-quote-source">${r?.quote?`${escapeHtml(r.quote.bookmaker)} · ${escapeHtml(formatTimestamp(r.quote.provider_updated_at))}`:'Fonte o orario non disponibili'}${Number.isFinite(age)&&age>1?' · quota da ricontrollare':''}</small>`;
-        if(compact)return `<div class="cx-odd-cell cx-overview-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line cx-current"><span>Attuale</span><b>${contextNumber(current)}</b></div>${source}${consensus}<div class="cx-overview-estimates"><span>Stat. <b>${contextPct(r?.statistical_pct)}</b></span><span>Book <b>${contextPct(r?.book_probability_pct)}</b></span></div></div>`;
-        return `<div class="cx-odd-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line"><span>Attuale</span><b>${contextNumber(current)}</b></div>${net}${consensus}<small>${r?.quote?`${escapeHtml(r.quote.bookmaker)} · ${escapeHtml(formatTimestamp(r.quote.provider_updated_at))}`:'Quota non disponibile'}</small></div>`;
+        const age=(Date.now()-Date.parse(q?.provider_updated_at))/3600000;
+        const source=`<small class="cx-quote-source">${q?`${escapeHtml(q.bookmaker)} · ${escapeHtml(formatTimestamp(q.provider_updated_at))}`:'Fonte o orario non disponibili'}${stale?' · rilevazione precedente, esclusa dai segnali recenti':Number.isFinite(age)&&age>1?' · quota da ricontrollare':''}</small>`;
+        if(compact)return `<div class="cx-odd-cell cx-overview-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line cx-current"><span>${stale?'Ultima disponibile':'Attuale'}</span><b>${contextNumber(current)}</b></div>${source}${consensus}<div class="cx-overview-estimates"><span>Stat. <b>${contextPct(r?.statistical_pct)}</b></span><span>Book <b>${contextPct(r?.book_probability_pct)}</b></span></div></div>`;
+        return `<div class="cx-odd-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line"><span>${stale?'Ultima disponibile':'Attuale'}</span><b>${contextNumber(current)}</b></div>${net}${source}${consensus}</div>`;
       };
       const result=rows.filter(r=>r.market==='1x2_ft'&&Number.isFinite(r.book_probability_pct));
       const sorted=[...result].sort((a,b)=>b.book_probability_pct-a.book_probability_pct);
