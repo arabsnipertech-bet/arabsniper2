@@ -1238,10 +1238,26 @@
       const frozen=contextPick(a);
       return frozen?.market==='over35_ft'&&frozen.selection==='over'?frozen:null;
     }
+    function contextHighOdds(matches) {
+      return matches.filter(m=>{
+        const r=(m.multimarket?.markets||[]).find(x=>x.market==='over25_ft'&&x.selection==='over');
+        const profiles=m.multimarket?.profiles||{};
+        const age=(Date.now()-Date.parse(r?.quote?.provider_updated_at))/3600000;
+        const hours=(Date.parse(m.fixture.kickoff)-Date.now())/3600000;
+        return contextState(m)==='upcoming'&&r?.quote&&Number.isFinite(r.odd)&&r.odd>=Math.max(1.8,Number(contextMinimumOdd))&&
+          Number.isFinite(r.statistical_pct)&&r.statistical_pct>100/r.odd&&r.statistical_pct<=100&&
+          profiles.home?.sample>=8&&profiles.away?.sample>=8&&age>=0&&age<=(hours<=3?1:6);
+      }).sort((a,b)=>{
+        const row=m=>m.multimarket.markets.find(r=>r.market==='over25_ft'&&r.selection==='over');
+        const margin=m=>row(m).statistical_pct-100/row(m).odd;
+        return margin(b)-margin(a)||Date.parse(a.fixture.kickoff)-Date.parse(b.fixture.kickoff)||String(a.fixture.fixture_id).localeCompare(String(b.fixture.fixture_id));
+      }).slice(0,4);
+    }
     function contextFeedMatches(matches) {
       matches=matches.filter(contextMatchesGoldFilter);
       if(contextRuleFilter!=='all')matches=matches.filter(m=>contextSignal(m).crosses.includes(contextRuleFilter));
       if(contextHomeBandOnly)matches=matches.filter(contextHomeBand);
+      if(contextFeed==='high_odds')return contextHighOdds(matches);
       return contextFeed==='over35_ft'?matches.filter(m=>contextOver35(m.multimarket)):contextFeed==='over15_ht'?matches.filter(m=>(m.multimarket.markets||[]).some(r=>r.market==='over15_ht'&&r.selection==='over')):matches;
     }
     function contextRecommendation(a) {
@@ -1720,9 +1736,11 @@
       if(contextDetailId!==null&&!all.some(m=>String(m.fixture.fixture_id)===contextDetailId))contextDetailId=null;
       const options=(list,current)=>list.map(([v,l])=>`<option value="${escapeHtml(v)}" ${v===current?'selected':''}>${escapeHtml(l)}</option>`).join('');
       let html=`<header class="cx-heading"><div><span class="cx-eyebrow">ARABSNIPER / MATCH INTELLIGENCE</span><h2>La partita, spiegata.</h2><p>Over 2,5 per ogni partita. Statistica e bookmaker a confronto.</p></div><span class="research-tag">V3 · IN VERIFICA</span></header><div class="cx-summary"><div><b>${all.length}</b><span>partite in ordine di orario</span></div><div><b>8 / 4</b><span>gare ufficiali / primi tempi</span></div><div><b>Night 5 · Fast 2</b><span>giorni coperti dalle scansioni</span></div></div><p class="cx-muted">Snapshot: ${escapeHtml(formatTimestamp(payload.updated_at||payload.generated_at))}. Le percentuali sono stime sperimentali, non frequenze di successo già validate.</p><div class="research-controls"><label>Cerca squadra<input class="research-search" type="search" value="${escapeHtml(researchSearch)}" placeholder="Squadra o campionato" onchange="researchSearch=this.value;renderMatchResearch(currentPayload||{})"></label></div>`;
-      html+=`<div class="research-controls"><label>Elenco<select onchange="contextFeed=this.value;contextCompareMarket='';renderMatchResearch(currentPayload||{})">${options([['over25_ft','Tutti gli Over 2,5 FT'],['over35_ft','Consigliate · Over 3,5 FT'],['over15_ht','In osservazione · Over 1,5 PT']],contextFeed)}</select></label><label>Quota preferita per le consigliate<select onchange="contextMinimumOdd=this.value;renderMatchResearch(currentPayload||{})">${options([['0','Tutte'],['1.4','1,40'],['1.5','1,50'],['1.8','1,80'],['2','2,00']],contextMinimumOdd)}</select></label></div><div class="research-controls"><label>Segnale Gold<select aria-label="Segnale Gold" onchange="contextGoldFilter=this.value;renderMatchResearch(currentPayload||{})">${options([['all','Tutte le partite'],['gold','Solo Gold · senza azzurro'],['dual','Gold + azzurro'],['blue','Tutti gli azzurri']],contextGoldFilter)}</select></label><label>Fascia quota favorita<select aria-label="Fascia quota favorita" onchange="contextHomeBandOnly=this.value==='band';renderMatchResearch(currentPayload||{})">${options([['all','Tutte le partite'],['band','Favorita 1 o 2 · 1,55–1,75']],contextHomeBandOnly?'band':'all')}</select></label></div><p class="cx-odds-note">Oro: accordo Over 2,5 FT. Azzurro: condizioni OCI A/B/C; B e C includono A, non sono conferme indipendenti. Focus favorita 1 o 2: quota tra 1,55 e 1,75 e probabilità book 1X2 più alta. Confronto di Over 1,5 PT, GG PT e Over 2,5 FT; non modifica le stime. Restano visibili anche le partite senza quota.</p>`;
+      html+=`<div class="research-controls"><label>Elenco<select onchange="contextFeed=this.value;contextCompareMarket='';renderMatchResearch(currentPayload||{})">${options([['over25_ft','Tutti gli Over 2,5 FT'],['high_odds','Quote alte · massimo 4 Over 2,5'],['over35_ft','Consigliate · Over 3,5 FT'],['over15_ht','In osservazione · Over 1,5 PT']],contextFeed)}</select></label><label>Quota preferita per le consigliate<select onchange="contextMinimumOdd=this.value;renderMatchResearch(currentPayload||{})">${options([['0','Tutte'],['1.4','1,40'],['1.5','1,50'],['1.8','1,80'],['2','2,00']],contextMinimumOdd)}</select></label></div><div class="research-controls"><label>Segnale Gold<select aria-label="Segnale Gold" onchange="contextGoldFilter=this.value;renderMatchResearch(currentPayload||{})">${options([['all','Tutte le partite'],['gold','Solo Gold · senza azzurro'],['dual','Gold + azzurro'],['blue','Tutti gli azzurri']],contextGoldFilter)}</select></label><label>Fascia quota favorita<select aria-label="Fascia quota favorita" onchange="contextHomeBandOnly=this.value==='band';renderMatchResearch(currentPayload||{})">${options([['all','Tutte le partite'],['band','Favorita 1 o 2 · 1,55–1,75']],contextHomeBandOnly?'band':'all')}</select></label></div><p class="cx-odds-note">Oro: accordo Over 2,5 FT. Azzurro: condizioni OCI A/B/C; B e C includono A, non sono conferme indipendenti. Focus favorita 1 o 2: quota tra 1,55 e 1,75 e probabilità book 1X2 più alta. Confronto di Over 1,5 PT, GG PT e Over 2,5 FT; non modifica le stime. Restano visibili anche le partite senza quota.</p>`;
       html+=`<div class="research-controls"><label>Condizione azzurra<select aria-label="Condizione azzurra" onchange="contextRuleFilter=this.value;renderMatchResearch(currentPayload||{})">${options([['all','Tutte'],...Object.entries(contextRuleLabels)],contextRuleFilter)}</select></label></div>`;
 
+      html+=`<button type="button" class="btn" onclick="contextFeed='high_odds';contextMinimumOdd='1.8';contextGoldFilter='all';contextRuleFilter='all';contextHomeBandOnly=false;contextStateFilter='all';researchSearch='';renderMatchResearch(currentPayload||{})">Quote alte · fino a 4 Over 2,5 da 1,80</button>`;
+      if(contextFeed==='high_odds')html+='<p class="cx-odds-note">Massimo 4 partite da iniziare: quota recente almeno 1,80, 8 gare per squadra e stima statistica superiore a 100/quota. Ordine di selezione: scarto dalla soglia di pareggio; visualizzazione per orario. Gold e conferme OCI restano distinti. Il filtro può restituire meno di 4 partite; il rendimento va verificato sui risultati successivi.</p>';
       if(contextDetailId===null){host.innerHTML=html+contextStateControls(contextFeedMatches(all))+contextList(all.filter(m=>contextStateFilter==='all'||contextState(m)===contextStateFilter));return;}
       html=`<button type="button" class="btn cx-back" onclick="contextBack()">← Torna all’elenco</button>`;
       let shown=0;
