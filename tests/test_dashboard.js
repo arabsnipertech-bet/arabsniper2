@@ -333,3 +333,11 @@ vm.runInContext("contextRuleFilter='B'",researchContext);
 assert.equal(vm.runInContext('contextFeedMatches(filterMatches).length',researchContext),0);
 vm.runInContext("contextRuleFilter='A'",researchContext);
 assert.equal(vm.runInContext('contextFeedMatches(filterMatches).length',researchContext),1);
+
+// High odds are independent of Gold and require a recent real quote and full FT samples.
+researchContext.highFixture={fixture:{fixture_id:'high',kickoff:future(8),status_short:'NS'},multimarket:{profiles:{home:{sample:8},away:{sample:8}},markets:[{market:'over25_ft',selection:'over',odd:2.61,statistical_pct:47.625,book_probability_pct:35.644,quote:{provider_updated_at:future(-0.5)}}]}};
+assert.equal(vm.runInContext('contextHighOdds([highFixture]).length',researchContext),1);
+vm.runInContext('highFixture.multimarket.markets[0].statistical_pct=30',researchContext);
+assert.equal(vm.runInContext('contextHighOdds([highFixture]).length',researchContext),0);
+researchContext.highFixture.multimarket.markets[0].statistical_pct=48;researchContext.highFixture.multimarket.markets[0].quote.provider_updated_at=future(-8);
+assert.equal(vm.runInContext('contextHighOdds([highFixture]).length',researchContext),0);
