@@ -99,9 +99,9 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     assert.equal(await page.locator('.cx-list-row').count(),0);
     await page.getByLabel('Segnale Gold',{exact:true}).selectOption('dual');
     assert.equal(await page.locator('.cx-list-row').count(),1);
-    await page.getByLabel('Fascia quota 1',{exact:true}).selectOption('band');
+    await page.getByLabel('Fascia quota favorita',{exact:true}).selectOption('band');
     assert.equal(await page.locator('.cx-list-row').count(),1);
-    assert((await page.locator('.cx-home-band').textContent()).includes('FAVORITA CASA 1'));
+    assert((await page.locator('.cx-home-band').textContent()).includes('FAVORITA 1'));
     assert.equal(await page.locator('.cx-home-focus>span').count(),3);
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Favorite focus mobile overflow');
     await page.screenshot({path:'test-artifacts/favorite-focus-mobile.png',fullPage:true});
