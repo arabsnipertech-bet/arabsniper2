@@ -5,7 +5,11 @@ on:
   push:
     branches: [main]
     paths:
+      - 'src/audit_storage.py'
+      - 'src/audit_ledger.py'
+      - 'src/scan_audit.py'
       - 'auditor/current_audit.py'
+      - 'src/task_progress.py'
       - 'src/prematch_audit.py'
       - 'src/daily_audit.py'
       - 'src/homepage_results.py'
@@ -46,9 +50,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install streaming archive parser
+        run: pip install ijson==3.6.0
+
       - name: Prepare private storage client
         if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
-        run: pip install boto3
+        run: pip install boto3 ijson==3.6.0
 
       - name: Restore authoritative private checkpoint
         if: vars.GOLD_PRIVATE == 'true'
@@ -57,9 +64,9 @@ jobs:
       - name: Archive forecasts and settle completed matches
         run: python auditor/current_audit.py settle
       - name: Compare multimarket models
-        run: python src/model_research.py
+        run: python src/task_progress.py src/model_research.py
       - name: Build public results from frozen forecasts
-        run: python src/homepage_results.py
+        run: python src/task_progress.py src/homepage_results.py
       - name: Save verified state in private storage
         if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
         run: python src/gold_storage.py publish

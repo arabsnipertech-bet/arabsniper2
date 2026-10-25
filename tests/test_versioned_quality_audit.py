@@ -93,3 +93,37 @@ class VersionedQualityAuditTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Frozen forecast mismatch'):
                 auditor.settle(root, now)
             self.assertEqual(before, result_path.read_bytes())
+
+    def test_current_and_future_archives_are_not_loaded_for_settlement(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root/'auditordata').mkdir()
+            for date in ('2026-10-21', '2026-10-22'):
+                (root/f'auditordata/prematch_{date}.json').write_text('not loaded')
+            with patch.object(auditor, 'read', side_effect=AssertionError('future file read')):
+                auditor.settle(root, datetime.fromisoformat('2026-10-21T09:00:00+02:00'))
+
+    def test_settlement_does_not_mutate_loaded_frozen_records(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root/'auditordata').mkdir()
+            path = root/'auditordata/prematch_2026-10-20.json'
+            day = dict(data(), audit_date='2026-10-20')
+            path.write_text(json.dumps(day))
+            before = path.read_bytes()
+            with patch.dict(os.environ, {'API_SPORTS_KEY': 'test-placeholder'}):
+                auditor.settle(root, datetime.fromisoformat('2026-10-21T09:00:00+02:00'),
+                               fetcher=lambda *args: results())
+            self.assertEqual(path.read_bytes(), before)
+            stored = auditor.read_store(root/'auditarchive/prematch_2026-10-20_results.json')
+            self.assertTrue(stored['fixtures']['1']['settlement']['outcomes']['over15_ht'])
+
+    def test_mismatched_archive_date_fails_before_writing_results(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root/'auditordata').mkdir()
+            path = root/'auditordata/prematch_2026-10-20.json'
+            path.write_text(json.dumps(dict(data(), audit_date='2026-10-19')))
+            with self.assertRaisesRegex(ValueError, 'Audit date does not match filename'):
+                auditor.settle(root, datetime.fromisoformat('2026-10-21T09:00:00+02:00'))
+            self.assertFalse((root/'auditarchive').exists())

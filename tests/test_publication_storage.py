@@ -43,12 +43,12 @@ class PublicationTests(unittest.TestCase):
 
     def test_packed_archives_are_validated_once_without_rewriting(self):
         from unittest.mock import patch
-        from audit_storage import write_store
+        from audit_storage import write_store, validate_store
         with tempfile.TemporaryDirectory() as d:
             p = Path(d) / 'arab_quote_state.json'
             write_store(p, {'records': ['value' * 100]}, chunk_bytes=100)
             before = p.read_bytes()
-            with patch('publication_storage.write_store') as writer, patch('publication_storage.read_store', wraps=read_store) as reader:
+            with patch('publication_storage.write_store') as writer, patch('publication_storage.validate_store', wraps=validate_store) as reader:
                 prepare(d)
             self.assertFalse(any(call.args[0] == p for call in writer.call_args_list))
             self.assertEqual(sum(call.args[0] == p for call in reader.call_args_list), 1)

@@ -38,9 +38,12 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install streaming archive parser
+        run: pip install ijson==3.6.0
+
       - name: Prepare private storage client
         if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
-        run: pip install boto3
+        run: pip install boto3 ijson==3.6.0
 
       - name: Restore authoritative private checkpoint
         if: vars.GOLD_PRIVATE == 'true'

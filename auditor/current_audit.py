@@ -1,7 +1,6 @@
 """Archive first-observed forecasts and settle them without rebuilding predictions."""
 import argparse
-from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 import os
 from pathlib import Path
@@ -16,6 +15,8 @@ from audit_storage import read_store, write_store
 from daily_audit import build_daily, markdown, fingerprint
 
 TZ = ZoneInfo('Europe/Rome')
+COLLECTIONS = ('fixtures', 'quality_evaluations', 'multimarket_evaluations',
+               'signal_observations', 'analysis_updates')
 
 
 def read(path, default):
@@ -38,58 +39,52 @@ def stamp(value):
         return None
 
 
-def archive(root, now):
+def archive(root, now, progress=lambda message: None):
+    from audit_ledger import AuditLedger
     source = root / 'data/arab_quote_prematch_audit.json'
     if not source.exists():
         raise FileNotFoundError(f'Archivio prepartita corrente mancante: {source}')
-    payload = read(source, {})
-    records = payload.get('fixtures')
-    if not isinstance(records, dict):
-        raise ValueError('Archivio prepartita non valido: fixtures deve essere un oggetto')
-    days, rejected, added = {}, 0, 0
-    entries = [('fixtures', k, r) for k, r in records.items()]
-    entries += [('quality_evaluations', k, r) for k, r in payload.get('quality_evaluations', {}).items()]
-    entries += [('multimarket_evaluations', k, r) for k, r in payload.get('multimarket_evaluations', {}).items()]
-    entries += [('signal_observations', k, r) for k, r in payload.get('signal_observations', {}).items()]
-    entries += [('analysis_updates', k, r) for k, r in payload.get('analysis_updates', {}).items()]
-    for collection, key, record in entries:
-        fixture = record.get('fixture') or {}
-        kickoff, captured = stamp(fixture.get('kickoff')), stamp(record.get('captured_at'))
-        expected_key = str(fixture.get('fixture_id'))
-        if collection == 'quality_evaluations':
-            profile = (record.get('first_half_assessment') or {}).get('profile_id')
-            expected_key = f"{record.get('model_version')}::{profile}::{expected_key}"
-        if collection == 'multimarket_evaluations':
-            expected_key = f"{record.get('model_version')}::{expected_key}"
-        if collection == 'analysis_updates':
-            expected_key = f"{record.get('model_version')}::{expected_key}::{record.get('captured_at')}"
-        if collection == 'signal_observations':
-            from signal_research import record_key
-            expected_key = record_key(record)
-        if (not kickoff or not captured or captured >= kickoff or captured > now
-                or expected_key != str(key)):
-            rejected += 1
-            continue
-        date = kickoff.astimezone(TZ).date().isoformat()
-        # Group references only; load and release one daily archive at a time.
-        days.setdefault(date, []).append((collection, key, record))
-    for date, entries in days.items():
-        path = root / f'auditordata/prematch_{date}.json'
-        day = read(path, {'schema_version': 1, 'audit_date': date,
-                         'source_file': str(source.relative_to(root)), 'fixtures': {}})
-        changed = False
-        for collection, key, record in entries:
-            target = day.setdefault(collection, {})
-            if str(key) not in target:
-                # Only settlement is removed; nested forecast values stay immutable.
-                frozen = dict(record)
-                frozen.pop('settlement', None)
-                target[str(key)] = frozen
-                added += 1
-                changed = True
-        if changed:
-            write(path, day)
-        del day
+    days, rejected, added = set(), 0, 0
+    with AuditLedger(source, progress=progress) as incoming:
+        if 'fixtures' not in incoming.collections:
+            raise ValueError('Archivio prepartita non valido: fixtures deve essere un oggetto')
+        for collection, key, record in incoming.records():
+            fixture = record.get('fixture') or {}
+            kickoff, captured = stamp(fixture.get('kickoff')), stamp(record.get('captured_at'))
+            expected_key = str(fixture.get('fixture_id'))
+            if collection == 'quality_evaluations':
+                profile = (record.get('first_half_assessment') or {}).get('profile_id')
+                expected_key = f"{record.get('model_version')}::{profile}::{expected_key}"
+            elif collection == 'multimarket_evaluations':
+                expected_key = f"{record.get('model_version')}::{expected_key}"
+            elif collection == 'analysis_updates':
+                expected_key = f"{record.get('model_version')}::{expected_key}::{record.get('captured_at')}"
+            elif collection == 'signal_observations':
+                from signal_research import record_key
+                expected_key = record_key(record)
+            if (not kickoff or not captured or captured >= kickoff or captured > now
+                    or expected_key != str(key)):
+                rejected += 1
+                incoming.db.execute('UPDATE records SET day=NULL WHERE collection=? AND key=?',
+                                    (collection, key))
+            else:
+                days.add(kickoff.astimezone(TZ).date().isoformat())
+        for date in sorted(days):
+            progress(f'archiviazione {date}')
+            path = root / f'auditordata/prematch_{date}.json'
+            with AuditLedger(path, progress=progress) as day:
+                if not path.exists():
+                    day.metadata = {'schema_version': 1, 'audit_date': date,
+                                    'source_file': str(source.relative_to(root))}
+                    day.add_collection('fixtures')
+                count = 0
+                for collection, key, record in incoming.records(day=date):
+                    record.pop('settlement', None)
+                    count += day.put(collection, key, record, overwrite=False)
+                if count:
+                    progress(f'salvataggio archivio {date}: {count} nuove osservazioni')
+                    day.write(path)
+                    added += count
     return {'archived_dates': sorted(days), 'new_forecasts': added,
             'rejected_without_valid_prematch_evidence': rejected}
 
@@ -116,53 +111,68 @@ def fetch_results(date, key):
     return {'days': [{'matches': matches}]}
 
 
-def settle(root, now, fetcher=fetch_results):
-    combined = {'schema_version': 1, 'fixtures': {}, 'quality_evaluations': {}, 'multimarket_evaluations': {}, 'signal_observations': {}, 'analysis_updates': {}}
-    queried = []
-    for path in sorted((root / 'auditordata').glob('prematch_????-??-??.json')):
-        day = read(path, {})
-        date = datetime.strptime(day['audit_date'], '%Y-%m-%d').date()
-        if date >= now.astimezone(TZ).date():
-            continue
-        results_path = root / f'auditarchive/prematch_{date}_results.json'
-        previous = read(results_path, {'fixtures': {}})
-        store = {'schema_version': 1}
-        for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations', 'signal_observations', 'analysis_updates'):
-            records = deepcopy(day.get(collection, {}))
-            for key, record in records.items():
-                old = previous.get(collection, {}).get(key)
-                if old is not None and fingerprint(old) != fingerprint(record):
-                    raise ValueError(f'Frozen forecast mismatch: {date}/{collection}/{key}')
-                saved = (old or {}).get('settlement')
-                if saved:
-                    record['settlement'] = saved
-            store[collection] = records
-        records = list(store['fixtures'].values()) + list(store['quality_evaluations'].values()) + list(store['multimarket_evaluations'].values()) + list(store['signal_observations'].values()) + list(store['analysis_updates'].values())
-        pending = any(not (r.get('settlement') or {}).get('outcomes') or
-                      any(v is None for v in r['settlement']['outcomes'].values()) for r in records)
-        if pending and (now.astimezone(TZ).date() - date).days <= 14:
-            key = os.environ.get('API_SPORTS_KEY', '').strip()
-            if not key:
-                raise RuntimeError('API_SPORTS_KEY mancante per verificare i risultati')
-            settle_predictions(store, fetcher(str(date), key))
-            queried.append(str(date))
-        write(results_path, store)
-        daily = build_daily(store, str(date), now.isoformat(), os.environ.get('GITHUB_SHA'))
-        from selection_studies import build_studies, study_markdown
-        daily['selection_studies'] = build_studies(daily)
-        write(root / f'auditarchive/prematch_{date}_daily.json', daily)
-        from audit_storage import atomic_bytes
-        atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md', (markdown(daily)+study_markdown(daily['selection_studies'])).encode())
-        for collection in ('fixtures', 'quality_evaluations', 'multimarket_evaluations', 'signal_observations', 'analysis_updates'):
-            combined[collection].update(store[collection])
-    report = build_report(combined)
+def settle(root, now, fetcher=fetch_results, progress=lambda message: None):
+    from audit_ledger import AuditLedger, settle_ledger
     from multimarket_audit import build_report as multimarket_report
-    report['multimarket'] = multimarket_report(combined)
-    write(root / 'data/arab_quote_multimarket_report.json', report['multimarket'])
-    report.update({'generated_at': now.isoformat(), 'results_dates_queried': queried,
-                   'archived_forecasts': len(combined['fixtures']),
-                   'archived_quality_evaluations': len(combined['quality_evaluations'])})
-    write(root / 'auditarchive/prematch_last_report.json', report)
+    from selection_studies import build_studies, study_markdown
+    from audit_storage import atomic_bytes
+    queried = []
+    with AuditLedger(progress=progress) as combined:
+        combined.metadata['schema_version'] = 1
+        for collection in COLLECTIONS:
+            combined.add_collection(collection)
+        for path in sorted((root / 'auditordata').glob('prematch_????-??-??.json')):
+            date = datetime.strptime(path.stem.removeprefix('prematch_'), '%Y-%m-%d').date()
+            if date >= now.astimezone(TZ).date():
+                continue
+            progress(f'caricamento e verifica previsioni {date}')
+            results_path = root / f'auditarchive/prematch_{date}_results.json'
+            with AuditLedger(path, progress=progress) as day:
+                if day.metadata['audit_date'] != str(date):
+                    raise ValueError(f'Audit date does not match filename: {path.name}')
+                with AuditLedger(results_path, progress=progress) as previous:
+                    for collection, key, record in day.records():
+                        old = previous.get(collection, {}).get(key)
+                        if old is not None and fingerprint(old) != fingerprint(record):
+                            raise ValueError(f'Frozen forecast mismatch: {date}/{collection}/{key}')
+                        if (old or {}).get('settlement'):
+                            record['settlement'] = old['settlement']
+                            day.put(collection, key, record)
+                pending = any(not (r.get('settlement') or {}).get('outcomes') or
+                              any(v is None for v in r['settlement']['outcomes'].values())
+                              for _, _, r in day.records())
+                if pending and (now.astimezone(TZ).date() - date).days <= 14:
+                    key = os.environ.get('API_SPORTS_KEY', '').strip()
+                    if not key:
+                        raise RuntimeError('API_SPORTS_KEY mancante per verificare i risultati')
+                    progress(f'richiesta risultati API-Football {date}')
+                    settle_ledger(day, fetcher(str(date), key))
+                    queried.append(str(date))
+                day.metadata = {'schema_version': 1}
+                for collection in COLLECTIONS:
+                    day.add_collection(collection)
+                progress(f'salvataggio esiti {date}')
+                day.write(results_path)
+                progress(f'costruzione rapporto giornaliero {date}')
+                daily = build_daily(day, str(date), now.isoformat(), os.environ.get('GITHUB_SHA'))
+                daily['selection_studies'] = build_studies(daily)
+                write(root / f'auditarchive/prematch_{date}_daily.json', daily)
+                atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md',
+                             (markdown(daily)+study_markdown(daily['selection_studies'])).encode())
+                del daily
+                for collection, key, record in day.records():
+                    combined.put(collection, key, record)
+            progress(f'giornata {date} completata')
+        progress('costruzione rapporto complessivo')
+        report = build_report(combined)
+        progress('confronto mercati: prima e ultima osservazione')
+        report['multimarket'] = multimarket_report(combined)
+        write(root / 'data/arab_quote_multimarket_report.json', report['multimarket'])
+        report.update({'generated_at': now.isoformat(), 'results_dates_queried': queried,
+                       'archived_forecasts': len(combined['fixtures']),
+                       'archived_quality_evaluations': len(combined['quality_evaluations'])})
+        progress('salvataggio rapporto complessivo')
+        write(root / 'auditarchive/prematch_last_report.json', report)
     return {'results_dates_queried': queried, 'settled_report_groups': len(report['groups'])}
 
 
@@ -171,9 +181,11 @@ def main():
     parser.add_argument('mode', choices=['freeze', 'settle'])
     args = parser.parse_args()
     now = datetime.now(TZ)
-    summary = {'archive': archive(ROOT, now)}
-    if args.mode == 'settle':
-        summary['settlement'] = settle(ROOT, now)
+    from task_progress import TaskProgress
+    with TaskProgress('Auditor') as progress:
+        summary = {'archive': archive(ROOT, now, progress=progress.update)}
+        if args.mode == 'settle':
+            summary['settlement'] = settle(ROOT, now, progress=progress.update)
     text = json.dumps(summary, ensure_ascii=False, separators=(",", ":"))
     print(text)
     if os.environ.get('GITHUB_STEP_SUMMARY'):

@@ -1,7 +1,7 @@
 """Pack legacy scan outputs and reject oversized publication files before git push."""
 import json
 from pathlib import Path
-from audit_storage import read_store, write_store, FORMAT
+from audit_storage import read_store, write_store, FORMAT, validate_store
 
 
 def prepare(directory):
@@ -15,7 +15,7 @@ def prepare(directory):
             value = json.load(handle)
         if isinstance(value, dict) and value.get('_storage') == FORMAT:
             del value
-            read_store(path)
+            validate_store(path)
             continue
         write_store(path, value)
         if read_store(path) != value:
