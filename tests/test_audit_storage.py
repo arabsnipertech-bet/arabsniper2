@@ -73,9 +73,15 @@ class AuditStorageTests(unittest.TestCase):
             source = root/'data/arab_quote_prematch_audit.json'
             write_store(source, {'fixtures': records}, chunk_bytes=257)
             now = datetime(2026, 10, 22, tzinfo=timezone.utc)
-            with patch.object(a, 'read', wraps=a.read) as reader:
+            from audit_ledger import AuditLedger
+            loaded = []
+            load = AuditLedger.load
+            def tracked_load(ledger, path):
+                loaded.append(path)
+                return load(ledger, path)
+            with patch.object(AuditLedger, 'load', tracked_load):
                 result = a.archive(root, now)
-            self.assertEqual(sum(call.args[0] == day_path for call in reader.call_args_list), 1)
+            self.assertEqual(loaded.count(day_path), 1)
             self.assertEqual(result['new_forecasts'], 39)
             self.assertEqual(result['rejected_without_valid_prematch_evidence'], 1)
             saved = read_store(day_path)

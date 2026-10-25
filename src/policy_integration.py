@@ -179,33 +179,12 @@ def install(ns):
         return output
     ns['build_fixture_output'] = fixture
 
-    old_scan = ns['scan_dates']
+    # Audit once after fixture collection; avoid the legacy full-history pass.
+    old_scan = ns['_scan_dates_before_prematch_audit']
     def scan(client, dates, excluded):
         output = old_scan(client,dates,excluded)
-        audit_path = ns['PREMATCH_AUDIT_FILE']
-        frozen = ns['read_json'](audit_path, {'fixtures':{}})
-        # One request per pending date, not per fixture; never recalculate forecasts.
-        pending_dates = set()
-        today = ns['now_rome']().date()
-        for record in [*frozen.get('fixtures',{}).values(), *frozen.get('quality_evaluations',{}).values(), *frozen.get('multimarket_evaluations',{}).values(), *frozen.get('signal_observations',{}).values(), *frozen.get('analysis_updates',{}).values()]:
-            kickoff = ns['parse_iso'](record.get('fixture',{}).get('kickoff'))
-            if kickoff and kickoff.date() < today and (today-kickoff.date()).days <= 14:
-                outcomes = record.get('settlement',{}).get('outcomes',{})
-                if not outcomes or any(v is None for v in outcomes.values()): pending_dates.add(kickoff.date().isoformat())
-        extra_matches = []
-        for date in sorted(pending_dates):
-            payload = client.get('fixtures', {'date':date, 'timezone':'Europe/Rome'}, use_cache=True)
-            for row in (payload or {}).get('response',[]):
-                result = ns['_result_payload'](row)
-                if result:
-                    extra_matches.append({'fixture':{'fixture_id':str(row.get('fixture',{}).get('id')), 'result':result}})
-        from prematch_audit import settle_predictions, build_report
-        settle_predictions(frozen, {'days':[{'matches':extra_matches}]})
-        ns['atomic_write_json'](audit_path,frozen)
-        ns['atomic_write_json'](ns['DATA_DIR']/'arab_quote_prematch_report.json',build_report(frozen))
-        from multimarket_audit import build_report as multimarket_report
-        research = multimarket_report(frozen)
-        ns['atomic_write_json'](ns['DATA_DIR']/'arab_quote_multimarket_report.json', research)
+        from scan_audit import update_audit
+        research = update_audit(ns, output, client)
         observations_path = ns['DATA_DIR']/'arab_quote_observations.json'
         observations = ns['read_json'](observations_path, {'schema_version':1,'fixtures':{}})
         stamp = ns['iso_now']()

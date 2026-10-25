@@ -159,16 +159,23 @@ def frequency(values):
 
 
 def build_report(store):
-    by_fixture=defaultdict(list)
+    by_fixture={}
     for r in store.get(COLLECTION, {}).values():
         now, start=stamp(r.get('captured_at')),stamp(r.get('fixture',{}).get('kickoff'))
-        if r.get('protocol_id')==PROTOCOL_ID and now and start and now<start:
-            by_fixture[str(r['fixture']['fixture_id'])].append(r)
+        if r.get('protocol_id') != PROTOCOL_ID or not now or not start or now>=start:
+            continue
+        fid=str(r['fixture']['fixture_id'])
+        # Only the first baseline and first evaluable price are used downstream.
+        # Retaining every repeated observation inflated memory without changing results.
+        compact={k:v for k,v in r.items() if k != 'forecasts'}
+        pair=by_fixture.setdefault(fid, {'first':compact, 'usable':None})
+        if now<stamp(pair['first']['captured_at']): pair['first']=compact
+        if r['favourite']['status']=='available' and (pair['usable'] is None or
+                now<stamp(pair['usable']['captured_at'])): pair['usable']=compact
     groups=defaultdict(list); coverage=defaultdict(int); fixtures=[]
-    for fid, records in by_fixture.items():
-        records.sort(key=lambda r:stamp(r['captured_at']))
-        # The choice depends ONLY on input availability, never on signal or outcome.
-        choice=next((r for r in records if r['favourite']['status']=='available'),records[0])
+    for fid, pair in by_fixture.items():
+        first=pair['first']
+        choice=pair['usable'] or first
         period=('retrospective' if choice.get('retrospective') else 'prospective' if
                 stamp(choice['fixture']['kickoff']).astimezone(TZ).date().isoformat()>=VALIDATION_FROM else 'development')
         feature=choice['favourite']; group=feature.get('group','unavailable')
@@ -180,7 +187,7 @@ def build_report(store):
         teams={}
         for side in ('home','away'):
             # Freeze team baseline on first observation, including unavailable histories.
-            first=records[0]; t=first['teams'][side]; teams[side]=t
+            t=first['teams'][side]; teams[side]=t
             if t['status']!='available': continue
             for kind,mean_key,flag,event in [('attack','mean_scored','two_without_scoring','scored'),
                                              ('defence','mean_conceded','two_without_conceding','conceded')]:
@@ -190,7 +197,7 @@ def build_report(store):
                     groups[(period,kind,'two_zeros' if t[flag] else 'no_two_zeros',event)].append(bool(y))
         fixtures.append({'fixture':deepcopy(choice['fixture']), 'captured_at':choice['captured_at'],
                          'period':period, 'favourite_group':group, 'favourite':deepcopy(feature),
-                         'team_baseline_at':records[0]['captured_at'], 'teams':deepcopy(teams),
+                         'team_baseline_at':first['captured_at'], 'teams':deepcopy(teams),
                          'outcomes':deepcopy(choice.get('settlement',{}).get('outcomes',{}))})
     fixtures.sort(key=lambda r:(stamp(r['fixture']['kickoff']),str(r['fixture']['fixture_id'])))
     return {'protocol_id':PROTOCOL_ID,'config':deepcopy(CONFIG),'validation_from':VALIDATION_FROM,

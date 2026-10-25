@@ -2,7 +2,7 @@
 from pathlib import Path
 import hashlib, json, os, re, sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from audit_storage import read_store, atomic_bytes, FORMAT
+from audit_storage import read_store, atomic_bytes, FORMAT, validate_store
 PUBLIC = {'data/arab_quote_homepage.json','data/arab_quote_results_public.json'}
 GOLD = [f'arab_quote_day{i}.json' for i in range(1,6)]+['arab_quote_prediction_audit.json','arab_quote_model_research.json']
 
@@ -20,7 +20,7 @@ def collect(root):
             if p.suffix=='.json':
                 value=json.loads(files[key])
                 if isinstance(value,dict) and value.get('_storage')==FORMAT:
-                    read_store(p) # Validate all referenced parts before publication.
+                    validate_store(p) # Validate tokens/checksums without materializing the archive.
                     for part in value['parts']:
                         chunk=p.parent/'_audit_parts'/(part['sha256']+'.json.gz')
                         files[chunk.relative_to(root).as_posix()]=chunk.read_bytes()

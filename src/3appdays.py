@@ -5511,9 +5511,10 @@ PREMATCH_AUDIT_FILE = DATA_DIR / "arab_quote_prematch_audit.json"
 _scan_dates_before_prematch_audit = scan_dates
 
 
-def capture_prematch_predictions(output: Mapping[str, Any]) -> Dict[str, Any]:
-    store = read_json(PREMATCH_AUDIT_FILE, {"schema_version": 1, "fixtures": {}})
-    observed_at = now_rome()
+def capture_prematch_predictions(output: Mapping[str, Any], store=None, persist=True, observed_at=None) -> Dict[str, Any]:
+    if store is None:
+        store = read_json(PREMATCH_AUDIT_FILE, {"schema_version": 1, "fixtures": {}})
+    observed_at = observed_at or now_rome()
     fixtures = store.setdefault("fixtures", {})
     for day in output.get("days", []) or []:
         for match in day.get("matches", []) or []:
@@ -5552,7 +5553,8 @@ def capture_prematch_predictions(output: Mapping[str, Any]) -> Dict[str, Any]:
     from multimarket_model import freeze_evaluations
     freeze_evaluations(store, output, observed_at.isoformat())
     store["updated_at"] = observed_at.isoformat()
-    atomic_write_json(PREMATCH_AUDIT_FILE, store)
+    if persist:
+        atomic_write_json(PREMATCH_AUDIT_FILE, store)
     return store
 
 

@@ -79,7 +79,7 @@ class PublicationTests(unittest.TestCase):
             ns['DATA_DIR']=Path(folder)
             ns['PREMATCH_AUDIT_FILE']=Path(folder)/'frozen.json'
             ns['OUTPUT_FILE']=Path(folder)/'dashboard.json'
-            ns['scan_dates']=lambda *args:payload
+            ns['_scan_dates_before_prematch_audit']=lambda *args:payload
             install(ns)
             result=ns['scan_dates'](None,[],[])
             ranks=result['days'][0]['market_rankings']['over15_ht']

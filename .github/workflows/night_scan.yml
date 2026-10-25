@@ -46,11 +46,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests PyGithub
+          pip install requests PyGithub ijson==3.6.0
 
       - name: Prepare private storage client
         if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
-        run: pip install boto3
+        run: pip install boto3 ijson==3.6.0
 
       - name: Restore authoritative private checkpoint
         if: vars.GOLD_PRIVATE == 'true'
@@ -68,7 +68,7 @@ jobs:
         run: python src/3appdays_runner.py --night --days 5
 
       - name: Compare fixed models on archived inputs
-        run: python src/model_research.py
+        run: python src/task_progress.py src/model_research.py
 
       - name: Publish live fixture identifiers and usage counters
         run: |
