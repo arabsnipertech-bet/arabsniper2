@@ -471,6 +471,7 @@ def evaluate(match, as_of, quotes=None):
         valid[key]=[b for b in books if stamp(b.get('provider_updated_at')) and now and
                     0<=(now-stamp(b['provider_updated_at'])).total_seconds()<=max_age_hours*3600]
     benchmarks=quote_benchmarks(valid,as_of); rows=[]
+    available=quote_benchmarks({k:[b for b in v if stamp(b.get("provider_updated_at"))] for k,v in (quotes or {}).items()},as_of)
     for key in [*SPECS,*COMBOS]:
         for side in SPECS[key][3] if key in SPECS else ('yes','no'):
             bench=benchmarks.get(key,{}); books=bench.get('books',[])
@@ -478,6 +479,11 @@ def evaluate(match, as_of, quotes=None):
             priced=sorted(books,key=lambda b:(b['odds']['1' if key=='1x2_ft' else side],str(b.get('bookmaker','')))); quote=deepcopy(priced[(len(priced)-1)//2]) if priced else None
             if quote: quote.pop('trace',None)
             odd=quote['odds'][side] if quote else None
+            # Preserve a real provider price for display even when too old for signals.
+            fallback=sorted(available.get(key,{}).get('books',[]),key=lambda b:(b['provider_updated_at'],str(b.get('bookmaker',''))),reverse=True)
+            display_quote=deepcopy(quote or (fallback[0] if fallback else None))
+            if display_quote: display_quote.pop('trace',None)
+
             pro=[]; con=[]; missing=[]; blocks={}
             ht='ht' in key or '_sh' in key
             n=min(profiles[s]['ht_sample' if ht else 'sample'] for s in profiles)
@@ -545,6 +551,7 @@ def evaluate(match, as_of, quotes=None):
                 'probability_pct':round(p*100,3) if p is not None else None,'statistical_pct':round(p*100,3) if p is not None else None,
                 'book_probability_pct':round(bp*100,3) if bp is not None else None,
                 'probabilities':{'statistics':p,'without_correction':baseline[key][side]} if p is not None else {},
+                'display_quote':display_quote,'display_odd':display_quote['odds'][side] if display_quote else None,'quote_status':'recent' if quote else 'stale' if display_quote else 'missing',
                 'odd':odd,'quote':quote,'bookmakers_count':len(books),'source':source,'source_reason':source_reason,
                 'expected_value_pct':round((p*odd-1)*100,3) if p is not None and odd else None,
                 'research_candidate':False,'reasons':[],'pros':pro[:3],'cons':con[:3],'missing':missing,
