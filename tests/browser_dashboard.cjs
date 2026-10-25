@@ -35,6 +35,8 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
       assert((await page.locator('.cx-list-pick').textContent()).includes('Vantaggio teorico · da validare'));
       assert.equal(await page.locator('.cx-card').count(),0);
       assert(await page.locator('.cx-compact-odds .cx-favorite').isVisible());
+      assert(await page.locator('.cx-quote-source').first().isVisible());
+      assert((await page.locator('.cx-quote-source').first().textContent()).includes('Test')); 
       assert(await page.locator('.cx-compact-odds .cx-red').isVisible(),'Movement visible in mobile/desktop list');
       assert(await page.locator('.cx-red .cx-direction').isVisible());
       assert(await page.locator('.cx-legend').isVisible());
