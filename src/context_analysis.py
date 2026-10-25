@@ -420,6 +420,28 @@ def pick_goal_proposal(candidates, minimum):
     return chosen
 
 
+def over25_signals(rows, as_of):
+    """Versioned observed rules; probabilities remain separately calibrated inputs."""
+    indexed={(r['market'],r['selection']):r for r in rows}
+    def move(market, side): return indexed.get((market,side),{}).get('movement') or {}
+    def confirmed(m):
+        n,a=number(m.get('paired_books')),number(m.get('agreeing_books'))
+        return m.get('confirmed') is True and n is not None and a is not None and a>=2 and a>n/2
+    def change(m):
+        a,b=number(m.get('oci')),number(m.get('oci_previous'))
+        return a-b if confirmed(m) and a is not None and b is not None else None
+    one,two,over=move('1x2_ft','1'),move('1x2_ft','2'),move('over25_ft','over')
+    c1,c2=change(one),change(two)
+    active=[]
+    if c2 is not None and c2<0:
+        active.append('A')
+        if c1 is not None and c1>0: active.append('B')
+        amp=number(over.get('amplitude_pct'))
+        if confirmed(over) and over.get('direction')=='down' and amp is not None and abs(amp)>=3: active.append('C')
+    return {'version':'oci-over25-v1','captured_at':as_of,'rules':active,
+            'oci_1_change':c1,'oci_2_change':c2,'probability_bonus':0}
+
+
 def evaluate(match, as_of, quotes=None):
     meta=match.get('fixture',{}); stats=match.get('statistics',{})
     profiles={s:profile(select_history(stats.get(s,{}).get('last_matches',[]),as_of,meta.get('season')),s) for s in ('home','away')}
@@ -443,15 +465,17 @@ def evaluate(match, as_of, quotes=None):
             if not league.get('ht_sample'): league_reference={k:v for k,v in league_reference.items() if k.endswith('_ft')}
 
     now=stamp(as_of); valid={}
+    kickoff=stamp(meta.get('kickoff'))
+    max_age_hours=1 if now and kickoff and 0<(kickoff-now).total_seconds()<=3*3600 else CONFIG['max_quote_age_hours']
     for key,books in (quotes or {}).items():
         valid[key]=[b for b in books if stamp(b.get('provider_updated_at')) and now and
-                    0<=(now-stamp(b['provider_updated_at'])).total_seconds()<=6*3600]
+                    0<=(now-stamp(b['provider_updated_at'])).total_seconds()<=max_age_hours*3600]
     benchmarks=quote_benchmarks(valid,as_of); rows=[]
     for key in [*SPECS,*COMBOS]:
         for side in SPECS[key][3] if key in SPECS else ('yes','no'):
             bench=benchmarks.get(key,{}); books=bench.get('books',[])
             p=probs.get(key,{}).get(side); bp=bench.get('probabilities',{}).get(side)
-            priced=sorted(books,key=lambda b:b['odds'][side]); quote=deepcopy(priced[(len(priced)-1)//2]) if priced else None
+            priced=sorted(books,key=lambda b:(b['odds']['1' if key=='1x2_ft' else side],str(b.get('bookmaker','')))); quote=deepcopy(priced[(len(priced)-1)//2]) if priced else None
             if quote: quote.pop('trace',None)
             odd=quote['odds'][side] if quote else None
             pro=[]; con=[]; missing=[]; blocks={}
@@ -532,6 +556,10 @@ def evaluate(match, as_of, quotes=None):
         r['data_quality'] = data_quality
         r['missing'].extend(f"{side}: occasioni disponibili su {q['opportunity_matches']}/{q['sample']} gare."
                             for side,q in data_quality.items() if q['opportunity_matches'] < q['sample'])
+    signals=over25_signals(rows,as_of)
+    for r in rows:
+        if (r['market'],r['selection'])==('over25_ft','over'):
+            r['over25_signals']=deepcopy(signals)
     trap=favorite_context(profiles,benchmarks,rows)
     candidates,diagnostic=select_proposal(rows)
     candidates=[r for r in candidates if (r['market'],r['selection']) in PRIMARY_MARKETS]
@@ -543,7 +571,7 @@ def evaluate(match, as_of, quotes=None):
     for p in profiles.values():
         p['history_ids']=[r['fixture_id'] for r in p.pop('rows')]; p['ht_history_ids']=[r['fixture_id'] for r in p.pop('ht_rows')]
     return {'model_id':MODEL_ID,'status':'experimental','captured_at':as_of,'config':CONFIG,
-            'data_quality':data_quality,
+            'data_quality':data_quality,'over25_signals':signals,'quote_max_age_hours':max_age_hours,
             'rates':{'statistics':rates,'without_correction':uncorrected},'weights':weights,
             'proposals_by_min_odd':proposals,'selection_diagnostic':diagnostic,'profiles':profiles,'favorite_context':trap,'features':{},'markets':rows,'best_candidate':deepcopy(proposals[str(CONFIG['primary_min_odd'])]),
             'ranked_hypotheses':[r['market']+'::'+r['selection'] for r in candidates],

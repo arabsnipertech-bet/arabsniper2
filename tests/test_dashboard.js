@@ -191,9 +191,9 @@ for(const [amplitude,count,confirmed,expected] of [[2.99,3,true,'green'],[3,3,tr
 assert(vm.runInContext('contextMovementBadge({})',researchContext).includes('cx-unknown'));
 
 // Gold marker uses the same unrounded inputs and boundaries as the audit.
-const badgeContext={Number,Math,contextPct:x=>x+'%'};
+const badgeContext={Number,Math,escapeHtml:x=>String(x),contextPct:x=>x+'%'};
 vm.createContext(badgeContext);
-vm.runInContext(html.slice(html.indexOf('    function contextAgreementBadge('),html.indexOf('    function contextPrice(')),badgeContext);
+vm.runInContext(html.slice(html.indexOf('    const contextRuleLabels='),html.indexOf('    function contextPrice(')),badgeContext);
 const badge=(p,b,model='context-goals-v3.4')=>badgeContext.contextAgreementBadge({multimarket:{model_id:model,markets:[{market:'over25_ft',selection:'over',probabilities:{statistics:p},book_probability_pct:b}]}});
 assert(badge(.60,50.1).includes('cx-agreement-ring'));
 assert(badge(.65,55).includes('GOLD · OVER 2,5 FT'));
@@ -255,68 +255,28 @@ assert(overview.includes('cx-overview-cell'));
 assert(!overview.includes('Over 3,5 FT'));
 console.log('Main overview: five markets, estimates, missing-history states and distinct Gold meaning passed.');
 
-// Joint badge requires existing Gold AND the exact observed 1-up / Over-down pattern.
+// OCI comparisons require two confirmed snapshots, not an absolute OCI sign.
 const strongMove=(direction,amplitude=3,agree=3,paired=4)=>({confirmed:true,direction,amplitude_pct:amplitude,agreeing_books:agree,paired_books:paired});
 const crossed={multimarket:{model_id:'context-goals-v3.4',markets:[
  {market:'over25_ft',selection:'over',probabilities:{statistics:.61},book_probability_pct:57,movement:strongMove('down')},
- {market:'over15_ht',selection:'over',movement:strongMove('down',8)},
- {market:'1x2_ft',selection:'1',movement:strongMove('up')}]}};
+ {market:'1x2_ft',selection:'1',movement:{...strongMove('up'),oci:2,oci_previous:1}},
+ {market:'1x2_ft',selection:'2',movement:{...strongMove('down'),oci:1,oci_previous:2}}]}};
 const beforeCross=JSON.stringify(crossed);
 let crossHtml=badgeContext.contextAgreementBadge(crossed);
-assert.equal((crossHtml.match(/class="cx-crossing"/g)||[]).length,1);
-assert(crossHtml.includes('1 ↑ + Over 2,5 FT ↓'));
-assert(crossHtml.includes('1 ↑ + Over 1,5 PT ↓'));
-assert(!crossHtml.includes('<details'));
-assert(!crossHtml.includes('non dimostra maggiore affidabilità'));
+assert(crossHtml.includes('A + B + C'));
+assert(crossHtml.includes('OCI 2 ↓'));
 assert.equal(JSON.stringify(crossed),beforeCross);
-for(const move of [strongMove('down'),strongMove('up',2.99),strongMove('up',10,2,4),{...strongMove('up'),confirmed:false},{...strongMove('up'),amplitude_pct:null}]){
- crossed.multimarket.markets[2].movement=move;
- crossHtml=badgeContext.contextAgreementBadge(crossed);
- assert(crossHtml.includes('cx-agreement-ring'));assert(!crossHtml.includes('class="cx-crossing"'));
+for(const override of [{oci_previous:null},{oci_previous:1},{confirmed:false},{agreeing_books:2,paired_books:4}]){
+ const copy=JSON.parse(beforeCross);Object.assign(copy.multimarket.markets[2].movement,override);
+ assert(!badgeContext.contextAgreementBadge(copy).includes('class="cx-crossing"'));
 }
-crossed.multimarket.markets[2].movement=strongMove('up');
-crossed.multimarket.markets[0].movement=strongMove('up');
-assert(badgeContext.contextAgreementBadge(crossed).includes('1 ↑ + Over 2,5 FT ↑'));
-crossed.multimarket.markets[2].movement=strongMove('down');
-crossed.multimarket.markets.push({market:'1x2_ft',selection:'2',movement:strongMove('down',8)});
-crossed.multimarket.markets[0].movement=strongMove('down');
-assert(badgeContext.contextAgreementBadge(crossed).includes('2 ↓ + Over 2,5 FT ↓'));
-assert(!badgeContext.contextAgreementBadge(crossed).includes('2 ↓ + Over 1,5 PT'));
-crossed.multimarket.markets[3].movement=strongMove('down',2.99);
-assert(!badgeContext.contextAgreementBadge(crossed).includes('class="cx-crossing"'));
-crossed.multimarket.markets[0].probabilities.statistics=.5;
-assert.equal(badgeContext.contextAgreementBadge(crossed),'');
-console.log('Gold plus quote crossing: exact directions, consensus, thresholds, market labels and immutable probabilities passed.');
-
-// Favorite-red PT signal uses initial fair medians, complete data and a unique favorite.
-crossed.multimarket.markets[0].probabilities.statistics=.61;
-const side1=crossed.multimarket.markets[2],side2=crossed.multimarket.markets[3];
-side1.movement={...strongMove('down',8),operators:[{fair_initial_pct:60},{fair_initial_pct:64}]};
-side2.movement={...strongMove('up'),operators:[{fair_initial_pct:18}]};
-const draw={market:'1x2_ft',selection:'x',movement:{operators:[{fair_initial_pct:20}]}};
-crossed.multimarket.markets.push(draw);
-assert(badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓ + Over 1,5 PT ↓'));
-side1.movement.amplitude_pct=7.99;
-assert(!badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓'));
-side1.movement.amplitude_pct=8;
-draw.movement.operators=[];
-assert(!badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓'));
-draw.movement.operators=[{fair_initial_pct:62}];
-assert(!badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓'));
-draw.movement.operators=[{fair_initial_pct:20}];
-crossed.multimarket.markets[1].movement=strongMove('up');
-assert(!badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓'));
-console.log('Initial favorite red PT: medians, missing data, ties, intensity and Over direction passed.');
-
-// Recovering a common window must not redefine the initially favored outcome.
-crossed.multimarket.markets[1].movement=strongMove('down');
-side1.movement.operators=[{fair_initial_pct:15,first_observed_fair_pct:62}];
-side2.movement.operators=[{fair_initial_pct:65,first_observed_fair_pct:18}];
-assert(badgeContext.contextAgreementBadge(crossed).includes('Favorita iniziale 1 (rosso) ↓ + Over 1,5 PT ↓'));
-console.log('Common window preserves the original favorite passed.');
+crossed.multimarket.markets[0].probabilities.statistics=.4;
+assert(badgeContext.contextAgreementBadge(crossed).includes('AZZURRO'));
+assert(!badgeContext.contextAgreementBadge(crossed).includes('GOLD ·'));
+console.log('OCI A/B/C: previous value, strict majority, overlap and immutable forecasts passed.');
 
 // Observe the original requested HOME win band; never promote forecasts.
-for(const [odd,expected] of [[1.579,false],[1.58,true],[1.65,true],[1.75,true],[1.751,false],[null,false]]){
+for(const [odd,expected] of [[1.549,false],[1.55,true],[1.65,true],[1.75,true],[1.751,false],[null,false]]){
  researchContext.bandMatch={multimarket:{markets:[{market:'1x2_ft',selection:'1',odd,book_probability_pct:60},{market:'1x2_ft',selection:'x',book_probability_pct:23},{market:'1x2_ft',selection:'2',book_probability_pct:17}]}};
  assert.equal(vm.runInContext('contextHomeBand(bandMatch)',researchContext),expected);
 }
@@ -338,7 +298,7 @@ console.log('Gold frames, compact dual odds and observational home-odds band pas
 // Signal filters are mutually exclusive; combinations with the home band are intersections.
 researchContext.filterMatches=[
  {multimarket:{model_id:'context-goals-v3.4',markets:[{market:'over25_ft',selection:'over',probabilities:{statistics:.6},book_probability_pct:55}]}},
- {multimarket:{model_id:'context-goals-v3.4',markets:[{market:'over25_ft',selection:'over',probabilities:{statistics:.6},book_probability_pct:55,movement:strongMove('down')},{market:'1x2_ft',selection:'1',movement:strongMove('up')}]}},
+ {multimarket:{model_id:'context-goals-v3.4',markets:[{market:'over25_ft',selection:'over',probabilities:{statistics:.6},book_probability_pct:55,movement:strongMove('down')},{market:'1x2_ft',selection:'2',movement:{...strongMove('up'),oci:-2,oci_previous:-1}}]}},
  {multimarket:{markets:[]}}
 ];
 vm.runInContext("contextGoldFilter='gold'",researchContext);
@@ -357,3 +317,11 @@ assert.equal(vm.runInContext('contextHomeBand(bandMatch)',researchContext),false
 researchContext.bandMatch.multimarket.markets.pop();
 assert.equal(vm.runInContext('contextHomeBand(bandMatch)',researchContext),false);
 console.log('Exclusive Gold filters, filter intersections, confirmed home favorite and missing data passed.');
+
+researchContext.awayBand={multimarket:{markets:[{market:'1x2_ft',selection:'1',odd:4,book_probability_pct:20},{market:'1x2_ft',selection:'x',odd:3,book_probability_pct:25},{market:'1x2_ft',selection:'2',odd:1.65,book_probability_pct:55}]}};
+assert(vm.runInContext('contextHomeBand(awayBand)',researchContext));
+assert(vm.runInContext('contextHomeBandBadge(awayBand)',researchContext).includes('FAVORITA 2'));
+vm.runInContext("contextRuleFilter='B'",researchContext);
+assert.equal(vm.runInContext('contextFeedMatches(filterMatches).length',researchContext),0);
+vm.runInContext("contextRuleFilter='A'",researchContext);
+assert.equal(vm.runInContext('contextFeedMatches(filterMatches).length',researchContext),1);
