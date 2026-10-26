@@ -170,6 +170,13 @@ def install(ns, matrix_mode=False):
                         ('live', 'result', 'status_short', 'status_long', 'elapsed') if k in meta})
                     day['matches'][index] = restored
             board = build_board(day, as_of) if matrix_mode else build_selection_board(day, as_of)
+            if matrix_mode:
+                summary = day['matrix_summary']
+                coverage = day.get('universal_coverage', {})
+                ns['log'](f"V5 {day['date']}: {summary['displayed_fixtures']} partite visibili / "
+                          f"{coverage.get('available_fixture_ids')} disponibili; "
+                          f"{summary['analyzed_fixtures']} matrici, {summary['modeled_markets']} esiti, "
+                          f"{summary['priced_markets']} quote recenti; categorie {summary['categories']}")
             rankings = {key: [] for key in board['markets']}
             for match in day.get('matches', []):
                 assessment = match.get('multimarket') or {}

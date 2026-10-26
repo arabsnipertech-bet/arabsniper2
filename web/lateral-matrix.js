@@ -67,6 +67,7 @@
  function marketRow(row,helpers){
   const asian=['asian_total','handicap','dnb'].includes(row.spec?.kind);
   const trend={compressing:'in compressione',expanding:'in aumento',stable:'stabile',unavailable:'storico non disponibile'}[row.margin_trend]||'';
+  const marginBand={low:'Basso',medium:'Intermedio',high:'Alto',unavailable:'Non disponibile'}[row.margin_band]||'';
   return '<div class="mx-market-row" role="row"><div class="mx-market-name" role="cell"><b>'+esc(row.label)+'</b>'+badge(row)+
    '<small>'+esc(row.category_reason||'Profilo statistico indipendente dalle quote')+'</small></div>'+
    '<div role="cell" data-title="Statistica"><strong>'+pct(row.statistical_pct)+'</strong><small>'+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>'+
@@ -76,7 +77,7 @@
     (row.provider_updated_at?'<small>Fonte '+esc(helpers.timestamp?.(row.provider_updated_at)||row.provider_updated_at)+'</small>':'')+'</div>'+
    '<div role="cell" data-title="OCI"><b>'+signed(row.oci)+'</b><small>'+esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi</small>'+
     (row.oci_previous!=null?'<small>Precedente '+signed(row.oci_previous)+'</small>':'')+'</div>'+
-   '<div role="cell" data-title="Aggio"><b>'+pct(row.margin_pct)+'</b><small>Δ '+signed(row.margin_delta_pp)+' punti</small><small>'+esc(trend)+'</small>'+
+   '<div role="cell" data-title="Aggio"><b>'+pct(row.margin_pct)+'</b><small>'+esc(marginBand)+' · Δ '+signed(row.margin_delta_pp)+' punti</small><small>'+esc(trend)+'</small>'+
     (row.margin_anomaly?'<small>Margine anomalo</small>':'')+'</div>'+
    '<div role="cell" data-title="Valore teorico"><b class="'+(row.ev_pct>0?'mx-positive':'')+'">'+(row.ev_pct==null?'—':signed(row.ev_pct)+'%')+'</b><small>Scenario prudente '+(row.ev_low_pct==null?'—':signed(row.ev_low_pct)+'%')+'</small></div>'+
    '<div role="cell" data-title="Movimento"><b>'+pct(row.amplitude_pct)+'</b><small>'+num(row.speed_pp_per_hour,2)+' punti/ora</small><small>Persistenza '+pct(row.persistence==null?null:row.persistence*100)+'</small>'+
