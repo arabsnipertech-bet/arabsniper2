@@ -31,7 +31,7 @@ class MarketOddsCaps(unittest.TestCase):
                                     (3.5001, maximum == 5.5), (5.5, maximum == 5.5),
                                     (maximum+.0001, False), (150, False)]:
                 with self.subTest(spec=spec, price=price):
-                    decision = evaluate(row(spec=spec, odd=price, statistical_pct=35))
+                    decision = evaluate(row(spec=spec, odd=price, statistical_pct=60))
                     self.assertEqual(decision['eligible'], eligible)
                     self.assertEqual((decision['odds_min'], decision['odds_max']), (1.4, maximum))
                     self.assertEqual(decision['goal_market'], goal_market({'spec': spec}))
@@ -61,7 +61,7 @@ class MarketOddsCaps(unittest.TestCase):
                      S('total', 'ft', 'over', 3.5), S('btts', 'ht', 'yes'),
                      S('asian_total', 'ft', 'over', 3.5), S('asian_total', 'ft', 'over', 3.25)]:
             for price in (1.3999, 1.4, 3.5, 3.5001, 4.2, 5.5, 5.5001):
-                r = row(spec=spec, odd=price, statistical_pct=35)
+                r = row(spec=spec, odd=price, statistical_pct=60)
                 annotate({'rows': [r]}, NOW)
                 cases.append(r)
         script = "const a=require('./web/lateral-matrix.js');let s='';process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>console.log(JSON.stringify(JSON.parse(s).map(r=>!!a.bestOpportunity([r])))));"

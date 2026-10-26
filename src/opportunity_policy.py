@@ -7,12 +7,17 @@ from collections import Counter
 from math import isfinite, sqrt
 from statistics import mean, median
 
-POLICY_ID = 'gold-goals-v4'
-SUPPORTED_POLICY_IDS = ('gold-goals-v2', 'gold-goals-v3', POLICY_ID)
+POLICY_ID = 'gold-goals-v5'
+SUPPORTED_POLICY_IDS = ('gold-goals-v2', 'gold-goals-v3', 'gold-goals-v4', POLICY_ID)
 ODDS_MIN, ODDS_MAX = 1.40, 3.50
 GOALS = {('total', 'ht', 'over', 1.5): 'over15_ht', ('btts', 'ht', 'yes', None): 'gg_ht',
          ('total', 'ft', 'over', 2.5): 'over25_ft', ('total', 'ft', 'over', 3.5): 'over35_ft'}
 ODDS_MAX_BY_MARKET = {'over15_ht': 3.50, 'over25_ft': 3.50, 'gg_ht': 5.50, 'over35_ft': 5.50}
+# Prudential admission rules, not fitted/calibrated probabilities. The model's
+# independent 45-minute estimates remain untouched, including absent HT xG.
+MIN_PROBABILITY_BY_MARKET = {'over15_ht': 45., 'gg_ht': 40., 'over25_ft': 35., 'over35_ft': 35.}
+HT_EVIDENCE_ID = 'observed-first-half-v1'
+HT_MIN_MATCHES = 4
 LABELS = {'convergence': 'Convergenza di Trend',
           'contrarian': 'Contrarian sano',
           'unconfirmed': 'Valore statistico · flusso non confermato',
@@ -23,6 +28,7 @@ REASONS = {
     'price': 'Quota fuori dall’intervallo consentito per il mercato',
     'stale': 'Quota recente non disponibile',
     'history': 'Storico statistico insufficiente',
+    'ht_history': 'Servono almeno quattro primi tempi osservati per ciascuna squadra',
     'adapter': 'Associazione della quota da aggiornare',
     'margin': 'Aggio anomalo: prezzo da verificare',
     'edge': 'Vantaggio insufficiente rispetto all’aggio',
@@ -46,6 +52,47 @@ def goal_market(row):
 
 def odds_max(row):
     return ODDS_MAX_BY_MARKET.get(goal_market(row), ODDS_MAX)
+
+
+def min_probability(row):
+    return MIN_PROBABILITY_BY_MARKET.get(goal_market(row), 35.)
+
+
+def first_half_evidence(assessment):
+    """Summarize the same real HT window used by the model, never FT proxies.
+
+    Missing xG/shots remain missing. They cannot be invented from FT totals or
+    converted into a probability bonus. Record coverage for prospective review.
+    """
+    from statistics_first import CONFIG, period_rows, weighted
+    histories = (assessment.get('inputs') or {}).get('histories') or {}
+    teams = {}
+    for side in ('home', 'away'):
+        valid, seen = [], set()
+        for row in histories.get(side, []):
+            fid = row.get('fixture_id')
+            if fid is None or str(fid) in seen: continue
+            if not all(numeric(row.get(k)) and row[k] >= 0 for k in ('team_goals_ft', 'team_conceded_ft')): continue
+            seen.add(str(fid)); valid.append(row)
+        pool = period_rows(valid, 'ht')
+        team = {'sample': len(pool), 'venue_sample': sum(r.get('side') == side for r in pool)}
+        for label, field in [('scored', 'team_goals_ht'), ('conceded', 'team_conceded_ht'),
+                ('xg_for', 'team_xg_for_ht'), ('xg_against', 'team_xg_against_ht'),
+                ('shots_for', 'team_shots_on_target_for_ht'), ('shots_against', 'team_shots_on_target_against_ht')]:
+            observed = [r for r in pool if numeric(r.get(field)) and r[field] >= 0]
+            team[label+'_sample'] = len(observed)
+            team[label+'_mean'] = weighted([r[field] for r in observed], observed, side) if observed else None
+        teams[side] = team
+    return {'id': HT_EVIDENCE_ID, 'period_minutes': 45, 'window_matches': CONFIG['history_ht'],
+            'minimum_matches': HT_MIN_MATCHES, 'teams': teams,
+            'xg_supported': all(t[k+'_sample'] >= CONFIG['minimum_xg'] for t in teams.values() for k in ('xg_for', 'xg_against')),
+            'xg_source': 'observed_ht_only', 'validation_status': 'prospective_pending'}
+
+
+def supported_first_half(evidence):
+    return bool(isinstance(evidence, dict) and evidence.get('id') == HT_EVIDENCE_ID and
+        all(numeric(((evidence.get('teams') or {}).get(side) or {}).get('sample')) and
+            evidence['teams'][side]['sample'] >= HT_MIN_MATCHES for side in ('home', 'away')))
 
 
 def market_tier(row):
@@ -155,7 +202,9 @@ def signal_for(row, eligible):
 
 def evaluate(row, pt_priority=False, preferred_pt=None):
     tier = market_tier(row)
-    minimum_p = 35
+    minimum_p = min_probability(row)
+    ht_target = goal_market(row) in ('over15_ht', 'gg_ht')
+    ht_supported = supported_first_half(row.get('ht_evidence')) if ht_target else None
     if tier is not None and pt_priority:
         spec = row.get('spec') or {}
         if spec.get('period') != 'ht': tier = 2
@@ -185,6 +234,7 @@ def evaluate(row, pt_priority=False, preferred_pt=None):
     if not numeric(odd) or not ODDS_MIN <= odd <= maximum_odd: reasons.append('price')
     if row.get('quote_status') != 'recent': reasons.append('stale')
     if row.get('quality') != 'supported': reasons.append('history')
+    if ht_target and not ht_supported: reasons.append('ht_history')
     if (row.get('spec') or {}).get('kind') == 'handicap' and row.get('quote_adapter_version') != 2:
         reasons.append('adapter')
     if anomalous: reasons.append('margin')
@@ -198,6 +248,8 @@ def evaluate(row, pt_priority=False, preferred_pt=None):
     return {'policy_id': POLICY_ID, 'eligible': eligible, 'strict_eligible': eligible, 'rank': None, 'priority': tier,
             'goal_market': goal_market(row), 'odds_min': ODDS_MIN, 'odds_max': maximum_odd,
             'min_probability_pct': minimum_p, 'min_ev_pct': min_ev,
+            'ht_history_supported': ht_supported,
+            'threshold_status': 'prudential_unvalidated',
             'entry_min_ev_pct': min_ev, 'entry_min_ev_low_pct': min_low,
             'min_ev_low_pct': min_low, 'margin_band': band,
             'signal': signal, 'label': LABELS[signal], 'reasons': reasons,
@@ -212,7 +264,11 @@ def ranking_key(row):
 
 def annotate(matrix, as_of=None, assessment=None):
     rows = matrix.get('rows', [])
-    if assessment is not None: matrix['goal_context'] = goal_context(assessment, rows)
+    if assessment is not None:
+        matrix['goal_context'] = goal_context(assessment, rows)
+        evidence = first_half_evidence(assessment)
+        for row in rows:
+            if goal_market(row) in ('over15_ht', 'gg_ht'): row['ht_evidence'] = evidence
     context = matrix.get('goal_context') or {}
     for row in rows: row['opportunity'] = evaluate(row, context.get('pt_priority_active', False), context.get('preferred_pt_market'))
     goals = {key: [r for r in rows if goal_market(r) == key] for key in ODDS_MAX_BY_MARKET}
@@ -233,6 +289,8 @@ def annotate(matrix, as_of=None, assessment=None):
         'odds_min': ODDS_MIN, 'odds_max': max(ODDS_MAX_BY_MARKET.values()),
         'standard_odds_max': ODDS_MAX, 'odds_max_by_market': dict(ODDS_MAX_BY_MARKET),
         'asian_equivalence': 'identical_half_line_only', 'min_probability_pct': 35,
+        'min_probability_pct_by_market': dict(MIN_PROBABILITY_BY_MARKET),
+        'ht_min_matches_per_team': HT_MIN_MATCHES, 'threshold_status': 'prudential_unvalidated',
         'goal_markets_only': True, 'pt_priority_active': context.get('pt_priority_active', False),
         'eligible_markets': len(eligible),
         'excluded_reasons': dict(Counter(reason for r in rows for reason in r['opportunity']['reasons'])),

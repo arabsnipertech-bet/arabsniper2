@@ -24,7 +24,7 @@ const prior={...priced,id:'prior',quality:'prior_only',ev_pct:200,ev_low_pct:200
 assert.equal(api.bestOpportunity([priced,asian,fragile,prior]).id,'regular');
 assert.equal(api.bestOpportunity([{...asian,quote_status:'stale'}]),null);
 for(const extra of [{odd:150,statistical_pct:1},{odd:3.51},{odd:1.39},{statistical_pct:34.99},{opportunity:null},{spec:{kind:'score'}},{spec:{kind:'dc',period:'ft',side:'x2'}}])assert.equal(api.bestOpportunity([{...priced,...extra}]),null);
-const high={...priced,odd:5.5,statistical_pct:35,spec:{kind:'btts',period:'ht',side:'yes'}};
+const high={...priced,odd:5.5,statistical_pct:40,opportunity:{...decision,min_probability_pct:40,ht_history_supported:true},spec:{kind:'btts',period:'ht',side:'yes'}};
 assert.equal(api.bestOpportunity([high]).id,'regular');
 assert(api.marketRow(high).includes('Ammissibile · quote 1,40–5,50'));
 assert(api.opportunityPanel([high]).includes('Goal PT / Over 3,5 FT: 1,40–5,50'));

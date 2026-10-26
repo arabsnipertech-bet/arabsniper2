@@ -49,8 +49,14 @@ class GoldPolicyAudit(unittest.TestCase):
         previous['sha256'] = sha256(json.dumps(previous, sort_keys=True, allow_nan=False).encode()).hexdigest()
         previous_frozen = deepcopy(previous)
         capture(store, m, '2026-10-26T09:00:00Z')
-        report = build_report(store, '2026-10-26T09:00:00Z')
-        self.assertEqual(report['policy_ids'], ['gold-goals-v2', 'gold-goals-v3', POLICY_ID])
+        v4 = store['fixtures']['100']['snapshots'][2]
+        v4['policy_id'] = 'gold-goals-v4'; v4.pop('sha256')
+        v4['sha256'] = sha256(json.dumps(v4, sort_keys=True, allow_nan=False).encode()).hexdigest()
+        frozen_v4 = deepcopy(v4)
+        capture(store, m, '2026-10-26T09:30:00Z')
+        report = build_report(store, '2026-10-26T09:30:00Z')
+        self.assertEqual(report['policy_ids'], ['gold-goals-v2', 'gold-goals-v3', 'gold-goals-v4', POLICY_ID])
+        self.assertEqual(v4, frozen_v4)
         self.assertTrue(report['production_policy_changed'])
         for version in report['policy_ids']:
             rows = [r for r in report['strategies'] if r['policy_id'] == version and r['strategy'] == 'published' and r['cohort'] == 'baseline_26']

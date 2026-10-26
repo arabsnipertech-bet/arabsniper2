@@ -17,7 +17,7 @@ from matrix_pipeline import build_board, selection_export
 def history_for(side, gap=False):
     goals = [0, 0, 0, 2, 2, 2, 2, 2] if gap else [2]*8
     return [{'fixture_id': f'{side}-{i}', 'side': side if i % 2 == 0 else ('away' if side == 'home' else 'home'),
-        'team_goals_ft': g, 'team_goals_ht': min(1, g), 'halftime_available': True}
+        'team_goals_ft': g, 'team_conceded_ft': 2, 'team_conceded_ht': 1, 'team_goals_ht': min(1, g), 'halftime_available': True}
         for i, g in enumerate(goals)]
 
 
