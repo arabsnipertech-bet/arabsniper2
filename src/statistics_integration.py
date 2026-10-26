@@ -199,7 +199,7 @@ def install(ns, matrix_mode=False):
                 for rows in rankings.values():
                     rows.sort(key=lambda r: (r['published_rank'] or 999, str(r['fixture_id'])))
                 match['display'] = {'analysis_engine': engine_id,
-                    'primary_choice': assessment['best_candidate'],
+                    'primary_choice': assessment.get('best_candidate'),
                     'ranked_choices': [r for r in candidates if r['gate']['eligible']],
                     'market_candidates': candidates, 'markets': {}}
             day['market_rankings'] = rankings

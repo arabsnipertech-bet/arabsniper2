@@ -14,4 +14,17 @@ const frozen=JSON.stringify(p);api.selectMatches(p,{...opts,sort:'value'},0);ass
 assert(!api.esc('<img src=x onerror=alert(1)>').includes('<img'));
 const html=api.marketRow({...rows[0],label:'<script>x</script>',statistical_pct:61,odd:2,first_odd:2.2,margin_pct:4,oci:50},{});
 assert(html.includes('&lt;script&gt;'));assert(html.includes('Aggio'));assert(html.includes('OCI'));
+const priced={...rows[0],odd:2,statistical_pct:60,id:'regular'};
+const asian={...priced,id:'asian',family:'asian',ev_pct:30,ev_low_pct:12};
+const fragile={...priced,id:'fragile',ev_pct:100,ev_low_pct:-20};
+const prior={...priced,id:'prior',quality:'prior_only',ev_pct:200,ev_low_pct:200};
+assert.equal(api.bestOpportunity([priced,asian,fragile,prior]).id,'asian');
+assert.equal(api.bestOpportunity([{...asian,quote_status:'stale'}]),null);
+assert(api.movementSignal({...priced,delta_pct:-10}).includes('mx-net-red'));
+assert(api.movementSignal({...priced,delta_pct:5}).includes('↑ +5,0%'));
+assert(api.movementSignal({...priced,delta_pct:1}).includes('mx-net-green'));
+assert(api.movementSignal({...priced,delta_pct:10,quote_status:'stale'}).includes('Storico assente'));
+const cell=api.quoteCell({...priced,first_odd:2.2,delta_pct:-9.09,margin_pct:4,oci:55},'1 · Casa');
+assert(cell.includes('Apertura*'));assert(cell.includes('Attuale'));assert(cell.includes('2,20'));assert(cell.includes('OCI'));assert(cell.includes('Aggio'));
+assert(api.opportunityPanel([priced,asian]).includes('MIGLIOR VALORE STIMATO'));
 console.log('PASS V5 UI: all 160 fixtures, macro behaviors, market/period filters, immutable inputs and escaped text');
