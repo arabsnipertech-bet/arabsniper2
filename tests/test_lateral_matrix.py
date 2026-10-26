@@ -80,17 +80,20 @@ class MatrixMath(unittest.TestCase):
     def test_schedule_completion_keeps_sparse_future_and_started_fixtures(self):
         raw = [
             {'fixture': {'id': 1, 'date': KICKOFF, 'status': {'short': 'TBD'}},
-             'league': {'country': 'Egypt', 'name': 'Women Youth'}},
+             'league': {'country': 'Italy', 'name': 'Serie A'}},
             {'fixture': {'id': 2, 'date': '2026-10-26T04:00:00Z', 'status': {'short': 'FT'}},
-             'league': {'country': 'Unknown', 'name': 'Unmapped'}}]
+             'league': {'country': 'Romania', 'name': 'Liga I'}},
+            {'fixture': {'id': 3, 'date': KICKOFF, 'status': {'short': 'NS'}},
+             'league': {'country': 'Italy', 'name': 'Primavera U19'}}]
         class Client:
             def get(self, path, params):
                 return {'response': raw}
         ns = {'fixture_meta': lambda r: {'fixture_id': str(r['fixture']['id']),
+                'league': r['league']['name'], 'country': r['league']['country'],
                 'kickoff': r['fixture']['date'], 'status_short': r['fixture']['status']['short']},
               '_result_payload': lambda r: {'status': 'FT', 'home_ft': 1, 'away_ft': 0}}
         day = {'date': '2026-10-26', 'matches': []}
-        self.assertTrue(all(fixture_allowed(r) for r in raw))
+        self.assertEqual([fixture_allowed(r) for r in raw], [True, True, False])
         complete_day(ns, Client(), day, NOW)
         self.assertEqual(len(day['matches']), 2)
         indexed = {m['fixture']['fixture_id']: m for m in day['matches']}
@@ -99,7 +102,7 @@ class MatrixMath(unittest.TestCase):
         self.assertTrue(all(r['quality'] == 'prior_only' for r in future['matrix']['rows']))
         self.assertEqual(started['matrix']['rows'], [])
         self.assertEqual(started['status'], 'no_prematch_snapshot')
-        self.assertEqual(day['universal_coverage']['excluded_by_competition'], 0)
+        self.assertEqual(day['universal_coverage']['excluded_by_competition'], 1)
         build_board(day, NOW)
 
     def test_started_snapshot_is_immutable(self):

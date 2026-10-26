@@ -840,8 +840,8 @@
 
   <link rel="stylesheet" href="/statistics-first.css?v=4.0">
   <script src="/statistics-first.js?v=4.0"></script>
-  <link rel="stylesheet" href="/lateral-matrix.css?v=5.3">
-  <script src="/lateral-matrix.js?v=5.3"></script>
+  <link rel="stylesheet" href="/lateral-matrix.css?v=5.4">
+  <script src="/lateral-matrix.js?v=5.4"></script>
   <script src="/live-scores.js?v=2"></script>
   <script>
     'use strict';
@@ -1189,8 +1189,9 @@
       document.getElementById('liveStatus').textContent = 'Sincronizzazione in corso...';
       if (!preservePosition) grid.innerHTML = '<div class="empty">Caricamento dati...</div>';
       try {
-        const payload = await loadJson(file);
+        let payload = await loadJson(file);
         if (!payload || !Array.isArray(payload.matches)) throw new Error(`Formato JSON non valido in ${file}`);
+        if(window.ArabMatrix)payload=window.ArabMatrix.scopePayload(payload);
         currentPayload = payload;
         window.ArabLive?.poll();
         renderMarketRankings(payload);
@@ -1483,7 +1484,7 @@
       const host=document.getElementById('matchResearch');
       if (!host) return;
       const legacy=document.getElementById('legacyDashboard');
-      if (payload.multimarket_method?.model_id==='lateral-matrix-v5.0' ||
+      if (payload.gold_scope || payload.multimarket_method?.model_id==='lateral-matrix-v5.0' ||
           (payload.matches||[]).some(m=>m.multimarket?.model_id==='lateral-matrix-v5.0')) {
         if(legacy)legacy.hidden=true;
         if(!window.ArabMatrix){host.innerHTML='<div class="empty">Interfaccia in aggiornamento. Ricarica la pagina.</div>';return;}

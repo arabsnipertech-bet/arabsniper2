@@ -6,9 +6,10 @@ from audit_storage import read_store, write_store
 from lateral_matrix import MODEL_ID
 from matrix_quotes import (CATALOG, partition, migrate_handicap_history, ledger_offers,
                            analyse_prices, expire)
-from matrix_pipeline import build_board
+from matrix_pipeline import build_board, selection_export
 from multimarket_model import stamp
 from opportunity_policy import POLICY_ID
+from gold_competitions import SCOPE_ID, enforce_day
 
 
 def cached_refresh_safe(paths):
@@ -17,7 +18,8 @@ def cached_refresh_safe(paths):
     Unknown paths fail to the normal scan. Scheduled/manual scans stay normal.
     """
     price_files = {'src/opportunity_policy.py', 'src/matrix_quotes.py', 'src/matrix_pipeline.py',
-                   'src/homepage_preview.py', 'src/context_analysis.py', 'src/refresh_opportunities.py'}
+                   'src/homepage_preview.py', 'src/context_analysis.py', 'src/refresh_opportunities.py',
+                   'src/gold_competitions.py', 'src/statistics_integration.py'}
     auxiliary = {'.github/workflows/fast_scan.yml', '.github/workflows/policy_tests.yml'}
     return bool(set(paths) & price_files) and all(
         p in price_files | auxiliary or p.startswith(('web/', 'tests/', 'docs/')) for p in paths)
@@ -52,6 +54,10 @@ def captured_prices(fixture, rows):
 
 def refresh_day(day, state, as_of):
     count = 0
+    scope_changed = (day.get('gold_scope') or {}).get('policy_id') != SCOPE_ID
+    previous_count = len(day.get('matches', []))
+    enforce_day(day)
+    scope_changed = scope_changed or previous_count != len(day['matches'])
     for match in day.get('matches', []):
         meta, a = match.get('fixture') or {}, match.get('multimarket') or {}
         kickoff = stamp(meta.get('kickoff'))
@@ -72,7 +78,7 @@ def refresh_day(day, state, as_of):
             movement_markets=sum(r.get('oci') is not None for r in rows),
             categories=dict(Counter(r.get('category', 'no_quote') for r in rows)))
         count += 1
-    if count:
+    if count or scope_changed:
         day['opportunity_refreshed_at'] = as_of
         day['updated_at'] = as_of
         build_board(day, as_of)
@@ -87,19 +93,35 @@ def main(directory='data'):
     for path in sorted(directory.glob('arab_quote_day[1-5].json')):
         day = read_store(path)
         count = refresh_day(day, state, as_of)
-        if count:
-            write_store(path, day)
-            refreshed[day['date']] = day
+        # Empty allowed schedules are valid. Publish the scope even when every
+        # former fixture was excluded; otherwise stale minor leagues reappear.
+        write_store(path, day)
+        write_store(directory/path.name.replace('arab_quote_day', 'arab_quote_selections_day'),
+                    selection_export(day, as_of))
+        refreshed[day['date']] = day
         summary = day.get('matrix_summary') or {}
         counters[path.name] = {'fixtures': count, 'eligible_markets': summary.get('eligible_markets', 0),
-                               'fixtures_with_proposal': summary.get('upcoming_fixtures_with_proposal', 0)}
+            'fixtures_with_proposal': summary.get('upcoming_fixtures_with_proposal', 0),
+            'allowed_fixtures': len(day.get('matches', [])),
+            'excluded_fixtures': (day.get('gold_scope') or {}).get('excluded_fixtures', 0)}
         print(f'{path.name}: {counters[path.name]}; policy {POLICY_ID}; API calls: 0', flush=True)
-    if not refreshed: raise RuntimeError('No future matrices refreshed; refusing empty publication')
+    if not refreshed: raise RuntimeError('No day files restored; refusing publication')
     dashboard_path = directory/'arab_quote_dashboard.json'
     dashboard = read_store(dashboard_path)
-    dashboard['days'] = [refreshed.get(day.get('date'), day) for day in dashboard.get('days', [])]
+    # Rebuild from the authoritative day files: no stale fallback day can leak
+    # an excluded competition or an old recommendation into the dashboard.
+    dashboard['days'] = sorted(refreshed.values(), key=lambda d: d['date'])
     dashboard['updated_at'] = as_of
     dashboard['opportunity_refresh'] = {'policy_id': POLICY_ID, 'at': as_of, 'api_calls': 0, 'days': counters}
+    dashboard.setdefault('method', {}).setdefault('user_policy', {}).update(
+        competition_policy=SCOPE_ID, universal_observation=False, romania_allowed=True,
+        goals_only_proposals=True, drought_probability_bonus=0)
+    dashboard['method'].setdefault('active_analysis', {}).update(
+        competition_policy=SCOPE_ID, opportunity_policy=POLICY_ID,
+        universal_observation=False, all_whitelisted_fixtures=True)
+    dashboard['method'].update(
+        competition_filter='Massime divisioni senior e coppe autorizzate; Romania inclusa; niente giovanili o leghe minori.',
+        markers='Proposte su quattro mercati gol; priorità PT da digiuno nel contesto casa/trasferta e flussi verificabili.')
     write_store(dashboard_path, dashboard)
     write_store(directory/'arab_quote_state.json', state)
     print('Policy refresh complete: statistics, source timestamps and started forecasts preserved', flush=True)

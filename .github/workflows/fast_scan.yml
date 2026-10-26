@@ -29,6 +29,7 @@ on:
       - 'src/homepage_preview.py'
       - 'src/opportunity_policy.py'
       - 'src/refresh_opportunities.py'
+      - 'src/gold_competitions.py'
   schedule:
     - cron: "0 6-23 * * *"
       timezone: "Europe/Rome"
@@ -118,10 +119,11 @@ jobs:
         run: test -f data/arab_quote_model_research.json
 
       - name: Publish live fixture identifiers and usage counters
-        if: steps.refresh.outputs.mode != 'cached'
+        env:
+          REFRESH_MODE: ${{ steps.refresh.outputs.mode }}
         run: |
           python src/live_watchlist.py
-          python src/scan_usage.py
+          if [ "$REFRESH_MODE" != cached ]; then python src/scan_usage.py; fi
 
       - name: Pack and verify publication size
         run: python src/publication_storage.py
