@@ -167,9 +167,12 @@ class IntegrationTests(unittest.TestCase):
                 return {'response':[]}
         result=e.build_fixture_output(Client(),fixture(100,now+timedelta(hours=2)),{}, {})
         self.assertIsNotNone(result)
-        self.assertEqual(result['multimarket']['model_id'],'context-goals-v3.4')
-        self.assertEqual(result['multimarket']['profiles']['home']['sample'],8)
-        self.assertEqual(result['multimarket']['best_candidate']['source'],'analisi statistica')
+        self.assertEqual(result['multimarket']['model_id'],'statistics-first-v4.0')
+        self.assertEqual(result['multimarket']['profiles']['home']['for_ft']['sample'],8)
+        self.assertTrue(all(r['source']=='analisi statistica' for r in result['multimarket']['markets']))
+        self.assertTrue(all(r['odd'] is None for r in result['multimarket']['markets']))
+        # Missing context/sample support must not force a primary recommendation.
+        self.assertIsNone(result['multimarket']['best_candidate'])
         class Empty:
             def get(self,*args,**kwargs):return {'response':[]}
         empty=e.build_fixture_output(Empty(),fixture(101,now+timedelta(hours=2)),{}, {})

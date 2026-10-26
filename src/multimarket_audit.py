@@ -66,7 +66,8 @@ def build_report(store, include_updates=True):
         if not kickoff or not captured or captured>=kickoff:
             continue
         # Retrospective source inputs are never counted as prospective forecasts.
-        period='retrospective' if record.get('retrospective') else 'prospective' if kickoff.date().isoformat()>=VALIDATION_FROM else 'development'
+        validation_from = assessment.get('validation_from', VALIDATION_FROM)
+        period='retrospective' if record.get('retrospective') else 'prospective' if kickoff.date().isoformat()>=validation_from else 'development'
         cohort=(version,period); fid=str(record.get('fixture',{}).get('fixture_id'))
         frozen[cohort].add(fid)
         outcomes=record.get('settlement',{}).get('outcomes',{})
@@ -78,10 +79,22 @@ def build_report(store, include_updates=True):
             if y is None: continue
             probabilities=market['probabilities']
             odd=market.get('odd')
-            variant_main='statistics' if version.startswith('context-goals-v3') else 'combined'
+            variant_main='statistics' if version.startswith(('context-goals-v3', 'statistics-first-v4')) else 'combined'
             p=probabilities.get(variant_main)
             if p is None: continue
-            selected=bool(market.get('research_candidate'))
+            selected=bool(market.get('published_selection') if version.startswith('statistics-first-v4') else market.get('research_candidate'))
+            if version.startswith('statistics-first-v4'):
+                for variant, value in probabilities.items():
+                    if isinstance(value, (int, float)):
+                        groups[(version, period, key, 'independent_model_variants', variant)].append((value,y,odd))
+                profile_key = 'for_ht' if market['market'].endswith('_ht') else 'for_ft'
+                profiles = [assessment.get('profiles', {}).get(s, {}).get(profile_key, {}) for s in ('home','away')]
+                for name, flag in [('under_conversion', any(r.get('under_conversion') for r in profiles)),
+                                   ('peak_reduced', any(r.get('peak_reduction',0) > .15 for r in profiles)),
+                                   ('unsupported_drought', any(r.get('drought',0) and not r.get('under_conversion') for r in profiles))]:
+                    features[(version,period,key,name if flag else 'without_'+name)].append((p,y,odd))
+                confirmation = (market.get('market_confirmation') or {}).get('status', 'unavailable')
+                features[(version,period,key,('selected_' if selected else 'not_selected_')+confirmation)].append((p,y,odd))
             for group in ('all','candidate' if selected else 'rejected'):
                 groups[(version,period,key,group,variant_main)].append((p,y,odd))
             calibration[(version,period,key,min(int(p*10),9)*10)].append((p,y,odd))
@@ -89,7 +102,8 @@ def build_report(store, include_updates=True):
             # Compare every variant on exactly the same market/side/fixture cohort.
             if b is not None:
                 for variant,value in [*probabilities.items(),('book',b/100)]:
-                    groups[(version,period,key,'matched_benchmark',variant)].append((value,y,odd))
+                    if isinstance(value, (int, float)):
+                        groups[(version,period,key,'matched_benchmark',variant)].append((value,y,odd))
             if odd and 2<=odd<=5:
                 groups[(version,period,key,'odds_2_to_5',variant_main)].append((p,y,odd))
             movement=market.get('movement',{}); drop=movement.get('median_drop_pct')

@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
-  <meta name="application-version" content="1.4.0" />
-  <title>ArabSniper Quote Dashboard V1.4.0</title>
+  <meta name="application-version" content="2.0.0" />
+  <title>ArabSniper · Statistiche prima · V4</title>
   <style>
     :root {
       --bg: #05070b;
@@ -749,7 +749,7 @@
     <header class="topbar">
       <div class="brand">
         <h1>ARABSNIPER · QUOTE DASHBOARD</h1>
-        <p>Analisi per partita · gol, esiti e movimenti delle quote · v1.4.0</p>
+        <p>Statistiche prima · potenziale gol e conferme nelle quote · V4</p>
         <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
       </div>
       <div class="top-actions">
@@ -838,6 +838,8 @@
     </form>
   </div>
 
+  <link rel="stylesheet" href="/statistics-first.css?v=4.0">
+  <script src="/statistics-first.js?v=4.0"></script>
   <script src="/live-scores.js?v=2"></script>
   <script>
     'use strict';
@@ -1479,6 +1481,14 @@
       const host=document.getElementById('matchResearch');
       if (!host) return;
       const legacy=document.getElementById('legacyDashboard');
+      if (payload.multimarket_method?.model_id==='statistics-first-v4.0' ||
+          (payload.matches||[]).some(m=>m.multimarket?.model_id==='statistics-first-v4.0')) {
+        if(legacy)legacy.hidden=true;
+        if(!window.ArabStatistics){host.innerHTML='<div class="empty">Interfaccia in aggiornamento. Ricarica la pagina.</div>';return;}
+        window.ArabStatistics.render(payload,host,{phase:contextState,stateLabel:contextStateLabel,
+          liveBadge:contextLiveBadge,livePanel:contextLivePanel,outcome:contextOutcome,timestamp:formatTimestamp});
+        return;
+      }
       if(legacy)legacy.hidden=(payload.matches||[]).some(m=>m.multimarket?.model_id?.startsWith('context-goals-v3'));
       if ((payload.matches||[]).some(m=>m.multimarket?.model_id?.startsWith('context-goals-v3'))) { renderContextDashboard(payload,host);return; }
       const matches=researchMatches(payload);

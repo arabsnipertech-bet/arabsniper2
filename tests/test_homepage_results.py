@@ -5,7 +5,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
 from homepage_results import build, MODEL
 NOW=datetime(2026,10,23,8,tzinfo=timezone.utc)
 def row(fid,won,**extra):
- return dict(snapshot='latest',model_id=MODEL,period='prospective',primary=True,fixture_id=str(fid),fixture={'kickoff':'2026-10-22T18:00:00+02:00','match':'A - B'},captured_at='2026-10-22T12:00:00+02:00',market='over25_ft',outcome=won,odd=1.9,**extra)
+ return dict(snapshot='latest',model_id=MODEL,period='prospective',primary=True,published_selection=True,fixture_id=str(fid),fixture={'kickoff':'2026-10-22T18:00:00+02:00','match':'A - B'},captured_at='2026-10-22T12:00:00+02:00',market='over25_ft',outcome=won,odd=1.9,**extra)
 class Results(unittest.TestCase):
  def test_denominator_does_not_use_showcase(self):
   rows=[row(i,i<20) for i in range(40)]+[row(50,None)]

@@ -342,7 +342,7 @@ def freeze_evaluations(store, output, as_of):
             if not now or not kickoff or now >= kickoff or meta.get('result') or assessment.get('status') != 'experimental':
                 continue
             key = f"{assessment['model_id']}::{meta['fixture_id']}"
-            if assessment['model_id'].startswith('context-goals-v3'):
+            if assessment['model_id'].startswith(('context-goals-v3', 'statistics-first-v4')):
                 from analysis_history import freeze_update
                 freeze_update(store, meta, assessment, as_of)
             store.setdefault('multimarket_evaluations', {}).setdefault(key, deepcopy({
