@@ -13,6 +13,8 @@ from matrix_quotes import attach
 from copy import deepcopy
 from test_gold_scope_goals import example
 from opportunity_policy import annotate
+from test_opportunity_policy import row
+from lateral_matrix import specification as S, label
 a=build_matrix(statistical_analysis(match(),NOW),NOW)
 variants=[]
 for first,last in [(2.5,2.1),(2.1,2.6)]:
@@ -30,9 +32,18 @@ for args in [('home','1',None),('away','2',None),('away','1',None),('home','2',N
   target.update({k:v for k,v in source.items() if k not in ('id','label')})
  annotate(b['matrix'],NOW,b)
  contexts.append(b)
-print(json.dumps({'variants':variants,'contexts':contexts}))
+caps=[]
+for spec,price in [(S('btts','ht','yes'),5.5),(S('total','ft','over',3.5),5.5),
+                   (S('asian_total','ft','over',3.5),5.5),(S('total','ht','over',1.5),3.5),
+                   (S('total','ft','over',2.5),3.5),(S('total','ht','over',1.5),3.5001),
+                   (S('total','ft','over',3.5),5.5001)]:
+ b=deepcopy(a)
+ b['matrix']['rows']=[row(spec=spec,period=spec['period'],label=label(spec),odd=price,statistical_pct=35)]
+ annotate(b['matrix'],NOW)
+ caps.append(b)
+print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
 `],{encoding:'utf8',maxBuffer:10*1024*1024});
- const {variants,contexts}=JSON.parse(raw),now=Date.now();
+ const {variants,contexts,caps}=JSON.parse(raw),now=Date.now();
  const payload={gold_scope:{policy_id:'gold-senior-whitelist-v1'},updated_at:new Date(now).toISOString(),multimarket_method:{model_id:'lateral-matrix-v5.0'},matches:Array.from({length:9},(_,i)=>({gold_scope:{policy_id:'gold-senior-whitelist-v1',allowed:true},fixture:{fixture_id:String(i+1),home:'Squadra casa',away:'Squadra ospite',
   kickoff:new Date(now+7200000+i*60000).toISOString(),status_short:'NS',time:'20:45',country:'Italia',league:'DATI SINTETICI DI VERIFICA',match:i===8?'Nome squadra molto lungo per verificare la visualizzazione da telefono – Avversaria':'Squadra '+(i+1)+' – Avversaria'},multimarket:structuredClone(variants[i%2])}))};
  // UI-only price fixtures exercise all three result cells and movement colors.
@@ -54,8 +65,8 @@ print(json.dumps({'variants':variants,'contexts':contexts}))
    assert.equal(await page.locator('.mx-1x2 .mx-quote-cell').count(),27);
    assert.equal(await page.locator('.mx-best').count(),9);
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),9);
-   const proposals=await page.locator('.mx-best[data-opportunity-id]').evaluateAll(nodes=>nodes.map(n=>({odd:+n.dataset.opportunityOdd,p:+n.dataset.opportunityProbability,text:n.textContent})));
-   assert(proposals.every(r=>r.odd>=1.4&&r.odd<=3.5&&r.p>=35));
+   const proposals=await page.locator('.mx-best[data-opportunity-id]').evaluateAll(nodes=>nodes.map(n=>({odd:+n.dataset.opportunityOdd,max:+n.dataset.opportunityMaxOdd,p:+n.dataset.opportunityProbability,text:n.textContent})));
+   assert(proposals.every(r=>r.odd>=1.4&&r.odd<=r.max&&[3.5,5.5].includes(r.max)&&r.p>=35));
    assert(proposals.some(r=>r.text.includes('Convergenza di Trend')));
    assert(proposals.some(r=>r.text.includes('Contrarian sano')));
    assert.equal(await page.locator('.mx-1x2 .mx-net-red').count(),27);
@@ -135,6 +146,21 @@ print(json.dumps({'variants':variants,'contexts':contexts}))
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Drought priority overflow');
   await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
   await page.screenshot({path:'test-artifacts/matrix-drought-priority-mobile.png'});
+  const capped={...payload,matches:caps.map((a,i)=>({...payload.matches[i],multimarket:a}))};
+  await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},capped);
+  for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
+   await page.setViewportSize({width,height:844});
+   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5);
+   assert.equal(await page.locator('.mx-best[data-opportunity-odd="5.5"]').count(),3);
+   assert.equal(await page.locator('.mx-best-empty').count(),2);
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Market caps overflow '+name);
+   await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
+   await page.screenshot({path:`test-artifacts/matrix-market-caps-${name}.png`});
+   await page.locator('[data-mx-open]').first().click();
+   assert((await page.locator('.mx-market-row').textContent()).includes('Ammissibile · quote 1,40–5,50'));
+   assert(await page.evaluate(()=>{const e=document.querySelector('dialog.mx-modal');return e.scrollWidth<=e.clientWidth}),'Market caps modal overflow');
+   await page.locator('[data-mx-close]').click();
+  }
   console.log('PASS V5 browser: full palinsesto, 55 core markets, modal tabs/focus/Escape/backdrop and Fast persistence, desktop/390/360, contrarian and missing-price filters, immutable live overlays');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

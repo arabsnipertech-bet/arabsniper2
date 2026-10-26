@@ -74,7 +74,7 @@ def build_preview(payload, previous=None, now=None, rng=None):
             if row:
                 candidates.append((row.get('ev_low_pct', -100), {'fixture_id': str(f['fixture_id']),
                     'match': f.get('match', ''), 'league': f.get('league', ''), 'kickoff': f['kickoff'],
-                    'label': row['label'], 'market': row['spec']['kind']+'_'+row['period'],
+                    'label': row['label'], 'market': row['spec']['kind']+'_'+row['period'], 'spec': deepcopy(row['spec']),
                     'odd': row['odd'], 'statistical_pct': row['statistical_pct'],
                     'market_confirmation': row['opportunity']['signal'], 'category': row['category'],
                     'opportunity': row['opportunity'], 'oci': row.get('oci'),

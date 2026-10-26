@@ -6,7 +6,7 @@ Hard probability, price, freshness, coverage and coherence gates cannot relax.
 from copy import deepcopy
 from datetime import timedelta
 from multimarket_model import stamp
-from opportunity_policy import POLICY_ID, evaluate, numeric, ranking_key, signal_for, LABELS
+from opportunity_policy import SUPPORTED_POLICY_IDS, evaluate, numeric, ranking_key, signal_for, LABELS
 
 STABILITY_ID = 'gold-stability-v1'
 LIMITS = {'max_hold_minutes': 90, 'odds_change_pct': 3., 'probability_change_pp': 1.,
@@ -25,7 +25,7 @@ def seed_stability(previous, current):
         matrix['proposal_stability'] = deepcopy(state)
         return
     policy = old.get('opportunity_policy') or {}
-    if policy.get('id') not in ('gold-goals-v2', POLICY_ID) or not stamp(policy.get('evaluated_at')): return
+    if policy.get('id') not in SUPPORTED_POLICY_IDS or not stamp(policy.get('evaluated_at')): return
     row = next((r for r in old.get('rows', []) if r.get('id') == policy.get('best_market_id')), None)
     if row and (row.get('opportunity') or {}).get('eligible') is True and evaluate(row)['eligible']:
         matrix['proposal_stability'] = strict_state(row, policy['evaluated_at'])

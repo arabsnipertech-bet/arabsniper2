@@ -20,6 +20,12 @@ async function run(payload,fail=false){
  for(const row of v5.selections)Object.assign(row,{model_id:'lateral-matrix-v5.0',market_confirmation:'contrarian',competition_policy:'gold-senior-whitelist-v1',opportunity:{policy_id:'gold-goals-v2',eligible:true,min_probability_pct:35}});
  v5.selections[1].odd=150;v5.selections[2].statistical_pct=34;
  r=await run(v5);assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,1);assert.match(r.nodes['daily-picks'].innerHTML,/Contrarian/);
+ for(const [spec,max] of [[{kind:'total',period:'ft',side:'over',line:2.5},3.5],[{kind:'total',period:'ht',side:'over',line:1.5},3.5],[{kind:'total',period:'ft',side:'over',line:3.5},5.5],[{kind:'btts',period:'ht',side:'yes'},5.5],[{kind:'asian_total',period:'ft',side:'over',line:3.5},5.5]]){
+  const selection={...v5.selections[0],spec,odd:max,statistical_pct:35,opportunity:{policy_id:'gold-goals-v4',eligible:true,min_probability_pct:35,odds_min:1.4,odds_max:max}};
+  for(const [extra,ok] of [[{},true],[{odd:max+.0001},false],[{odd:1.399},false],[{statistical_pct:34.999},false],[{opportunity:{...selection.opportunity,odds_max:150}},false]]){
+   r=await run({...v5,selections:[{...selection,...extra}]});assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,ok?1:0);
+  }
+ }
  const html=fs.readFileSync('web/index.html','utf8');assert(!html.includes('localStorage.clear'));assert(!html.includes('logout=true'));assert(!html.includes('details_day1'));
  for(const plan of ['daily','weekly','monthly']) assert(html.includes("buy('"+plan+"', this)"));
  console.log('PASS: public feed only, three cards, stale day, escaped HTML, unavailable feed, Gold entry links and plan IDs');
