@@ -10,6 +10,10 @@ on:
       - 'src/scan_audit.py'
       - 'src/3appdays.py'
       - 'src/policy_integration.py'
+      - 'src/lateral_matrix.py'
+      - 'src/matrix_quotes.py'
+      - 'src/matrix_pipeline.py'
+      - 'src/matrix_audit.py'
       - 'src/statistics_first.py'
       - 'src/statistics_integration.py'
       - 'src/first_half_quality.py'
@@ -100,6 +104,9 @@ jobs:
 
       - name: Pack and verify publication size
         run: python src/publication_storage.py
+
+      - name: Refresh public results for the active model
+        run: python src/homepage_results.py
 
       - name: Validate generated files
         run: |

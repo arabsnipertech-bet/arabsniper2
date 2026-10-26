@@ -1,3 +1,7 @@
-"""Stable 3appdays entry point for the active statistics-first engine."""
-from statistics_integration import install
-from statistics_first import MODEL_ID
+"""Stable 3appdays entry point for the universal lateral observation engine."""
+from lateral_matrix import MODEL_ID
+from statistics_integration import install as _install
+
+
+def install(ns):
+    return _install(ns, matrix_mode=True)

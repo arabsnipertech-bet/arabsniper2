@@ -56,9 +56,12 @@ def metrics(rows):
 
 
 def build_report(store, include_updates=True):
+    from matrix_audit import MatrixAccumulator
+    matrix_accumulator = MatrixAccumulator()
     groups=defaultdict(list); calibration=defaultdict(list); features=defaultdict(list)
     frozen=defaultdict(set); settled=defaultdict(set); pending=defaultdict(set)
     for record in store.get('multimarket_evaluations',{}).values():
+        matrix_accumulator.add(record)
         assessment=record.get('multimarket',{})
         version=assessment.get('model_id','unknown')
         kickoff=stamp(record.get('fixture',{}).get('kickoff'))
@@ -79,11 +82,11 @@ def build_report(store, include_updates=True):
             if y is None: continue
             probabilities=market['probabilities']
             odd=market.get('odd')
-            variant_main='statistics' if version.startswith(('context-goals-v3', 'statistics-first-v4')) else 'combined'
+            variant_main='statistics' if version.startswith(('context-goals-v3', 'statistics-first-v4', 'lateral-matrix-v5')) else 'combined'
             p=probabilities.get(variant_main)
             if p is None: continue
-            selected=bool(market.get('published_selection') if version.startswith('statistics-first-v4') else market.get('research_candidate'))
-            if version.startswith('statistics-first-v4'):
+            selected=bool(market.get('published_selection') if version.startswith(('statistics-first-v4', 'lateral-matrix-v5')) else market.get('research_candidate'))
+            if version.startswith(('statistics-first-v4', 'lateral-matrix-v5')):
                 for variant, value in probabilities.items():
                     if isinstance(value, (int, float)):
                         groups[(version, period, key, 'independent_model_variants', variant)].append((value,y,odd))
@@ -145,6 +148,8 @@ def build_report(store, include_updates=True):
         'feature_comparisons':[dict(zip(('model_id','period','market_selection','feature'),key),**metrics(rows)) for key,rows in sorted(features.items())]}
 
 
+
+    report['matrix_observation'] = matrix_accumulator.report()
 
     if include_updates:
         from analysis_history import latest_store
