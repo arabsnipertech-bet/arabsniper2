@@ -52,6 +52,9 @@ class GoldPolicyDiagnostics(unittest.TestCase):
             self.assertTrue(all('odd' not in r and 'statistical_pct' not in r for r in case['markets']))
             stale = inspect_checkpoint(s3, 'test', '2026-10-26T19:00:00Z')
             self.assertNotIn('published', stale['counts']['2026-10-26'])
+            self.assertEqual(stale['counts']['2026-10-26']['last_saved_proposals'], 1)
+            self.assertTrue(any(r['eligible'] for r in stale['requested_cases'][0]['as_published']['markets']))
+            self.assertFalse(any(r['eligible'] for r in stale['requested_cases'][0]['markets']))
 
     def test_corrupt_or_missing_objects_fail_without_fallback_or_writes(self):
         s3 = ReadOnlyStore()

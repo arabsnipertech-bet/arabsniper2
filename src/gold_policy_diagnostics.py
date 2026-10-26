@@ -13,7 +13,7 @@ import tempfile
 
 from audit_storage import FORMAT, read_store, atomic_bytes
 from gold_storage import sha
-from gold_policy_audit import (ROME, MODEL_ID, STRATEGIES, policy_choices,
+from gold_policy_audit import (ROME, MODEL_ID, POLICY_ID, STRATEGIES, policy_choices,
     requested_case, stamp, output_allowed, market_tier)
 from matrix_quotes import expire
 
@@ -58,7 +58,13 @@ def inspect_checkpoint(s3, bucket, observed_at=None):
                 if fid in seen or not kickoff or kickoff <= stamp(now): continue
                 seen.add(fid)
                 case = requested_case(match, now)
-                if case: cases.append(case)
+                saved_policy = ((match.get('multimarket') or {}).get('matrix') or {}).get('opportunity_policy') or {}
+                if case:
+                    decision = stamp(saved_policy.get('evaluated_at'))
+                    if saved_policy.get('id') == POLICY_ID and decision and decision <= stamp(now):
+                        saved_case = requested_case(match, saved_policy['evaluated_at'])
+                        case['as_published'] = {'evaluated_at': saved_policy['evaluated_at'], 'markets': saved_case['markets']}
+                    cases.append(case)
                 if not output_allowed(match) or meta.get('status_short') not in ('NS', 'TBD') or meta.get('result'): continue
                 date = kickoff.astimezone(ROME).date().isoformat()
                 counts[date]['allowed_upcoming'] += 1
@@ -66,9 +72,13 @@ def inspect_checkpoint(s3, bucket, observed_at=None):
                 if assessment.get('model_id') != MODEL_ID:
                     counts[date]['pending_current_engine'] += 1
                     continue
+                if saved_policy.get('id') == POLICY_ID and saved_policy.get('best_market_id'):
+                    counts[date]['last_saved_proposals'] += 1
                 expire(assessment, meta, now)
                 matrix = assessment.get('matrix') or {}
                 rows = [r for r in matrix.get('rows', []) if market_tier(r) is not None]
+                if any(r.get('quote_status') == 'recent' for r in rows): counts[date]['with_recent_goal_quote'] += 1
+                if any(r.get('quality') == 'supported' for r in rows): counts[date]['with_supported_goal_statistics'] += 1
                 choices = policy_choices(rows, matrix.get('goal_context') or {})
                 for strategy in STRATEGIES:
                     if choices[strategy] is not None:
