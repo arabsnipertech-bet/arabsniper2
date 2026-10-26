@@ -2,7 +2,7 @@
 from collections import Counter
 from copy import deepcopy
 from lateral_matrix import MODEL_ID, CONFIG_ID, build_matrix, market_id, specification
-from matrix_quotes import expire
+from matrix_quotes import expire, safe_price_row
 from multimarket_model import stamp
 
 LEGACY = {'over25_ft': specification('total', 'ft', 'over', 2.5),
@@ -67,7 +67,7 @@ def build_board(day, as_of):
                     board[row['market']]['started_selections'] += 1
         if a.get('model_id') != MODEL_ID: continue
         if kickoff and kickoff > stamp(as_of): expire(a, meta, as_of)
-        rows = a.get('matrix', {}).get('rows', [])
+        rows = [safe_price_row(r) for r in a.get('matrix', {}).get('rows', [])]
         indexed = {r['id']: r for r in rows}
         modeled += len(rows)
         priced += sum(r.get('quote_status') == 'recent' for r in rows)

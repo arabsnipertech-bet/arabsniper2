@@ -1,0 +1,38 @@
+name: Repair cached matrix prices
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/repair_matrix_quotes.py']
+permissions:
+  contents: write
+concurrency:
+  group: arabsniper-quote-data-writer
+  cancel-in-progress: false
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GOLD_PRIVATE: ${{ vars.GOLD_PRIVATE }}
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install boto3 requests ijson==3.6.0
+      - name: Restore verified private checkpoint
+        run: python src/gold_storage.py restore
+      - name: Repair handicap market identity without API requests
+        run: python src/repair_matrix_quotes.py
+      - name: Validate files and refresh public projection
+        run: python src/publication_storage.py
+      - name: Save repaired Gold feeds and checkpoint
+        run: python src/gold_storage.py publish
+      - name: Publish public projection
+        run: python src/private_publication.py

@@ -19,7 +19,12 @@
   return Date.parse(f.kickoff)>now?'upcoming':'live';
  };
  function rowsOf(m){
-  if(m.multimarket?.matrix)return m.multimarket.matrix.rows||[];
+  if(m.multimarket?.matrix)return (m.multimarket.matrix.rows||[]).map(r=>{
+   if(r.spec?.kind!=='handicap'||r.quote_adapter_version===2)return r;
+   const clean={...r};
+   for(const key of ['odd','first_odd','last_odd','ev_pct','ev_low_pct','ev_high_pct','oci','oci_previous','margin_pct','margin_delta_pp','delta_pct','persistence','speed_pp_per_hour','amplitude_pct'])clean[key]=null;
+   return {...clean,quote_status:'invalid_adapter',category:'no_quote',market_behavior:'unavailable',margin_band:'unavailable',margin_trend:'unavailable',paired_books:0,agreeing_books:0,category_reason:'Quota handicap della versione precedente: associazione da aggiornare'};
+  });
   return (m.multimarket?.markets||[]).map(r=>({...r,id:r.market+'::'+r.selection,
     family:r.market?.includes('gg')?'btts':'totals',period:r.market?.endsWith('_ht')?'ht':'ft',
     quote_status:r.quote_status||'missing',first_odd:r.quote?.movement?.first_odds?.[r.selection],

@@ -27,4 +27,12 @@ assert(api.movementSignal({...priced,delta_pct:10,quote_status:'stale'}).include
 const cell=api.quoteCell({...priced,first_odd:2.2,delta_pct:-9.09,margin_pct:4,oci:55},'1 · Casa');
 assert(cell.includes('Apertura*'));assert(cell.includes('Attuale'));assert(cell.includes('2,20'));assert(cell.includes('OCI'));assert(cell.includes('Aggio'));
 assert(api.opportunityPanel([priced,asian]).includes('MIGLIOR VALORE STIMATO'));
+const oldHandicap={...asian,spec:{kind:'handicap'},odd:12,oci:99,margin_pct:4};
+const legacyMatch={multimarket:{matrix:{rows:[oldHandicap,priced]}}};
+const safe=api.rowsOf(legacyMatch);
+assert.equal(safe[0].quote_status,'invalid_adapter');
+assert.equal(safe[0].oci,null);assert.equal(safe[0].margin_pct,null);
+assert.equal(api.bestOpportunity(safe).id,priced.id);
+assert.equal(oldHandicap.odd,12);
+assert.equal(api.rowsOf({multimarket:{matrix:{rows:[{...oldHandicap,quote_adapter_version:2}]}}})[0].odd,12);
 console.log('PASS V5 UI: all 160 fixtures, macro behaviors, market/period filters, immutable inputs and escaped text');
