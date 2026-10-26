@@ -81,6 +81,7 @@ print(json.dumps({'variants':variants,'contexts':contexts}))
    await page.locator('[data-mx-close]').focus();
    await page.screenshot({path:`test-artifacts/matrix-details-${name}.png`});
    await page.keyboard.press('Escape');
+   await page.locator('dialog.mx-modal').waitFor({state:'detached',timeout:5000});
    assert.equal(await page.locator('dialog.mx-modal').count(),0);
    assert(await page.locator('[data-mx-open]').first().evaluate(e=>e===document.activeElement),'Focus restored after Escape');
    await page.locator('[data-mx-open]').first().click();
@@ -90,9 +91,11 @@ print(json.dumps({'variants':variants,'contexts':contexts}))
    assert.equal(await page.locator('[data-mx-section="ht"]').getAttribute('aria-pressed'),'true');
    assert.equal(await page.locator('.mx-market-row').count(),4);
    await page.locator('[data-mx-close]').click();
+   await page.locator('dialog.mx-modal').waitFor({state:'detached',timeout:5000});
    assert.equal(await page.locator('dialog.mx-modal').count(),0);
    await page.locator('[data-mx-open]').first().click();
    await page.mouse.click(1,1);
+   await page.locator('dialog.mx-modal').waitFor({state:'detached',timeout:5000});
    assert.equal(await page.locator('dialog.mx-modal').count(),0,'Backdrop closes modal');
    assert(await page.evaluate(()=>document.body.style.overflow!=='hidden'),'Body scrolling restored');
   }

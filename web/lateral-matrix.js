@@ -170,6 +170,12 @@
  }
  const MATRIX_SECTIONS={targets:'4 obiettivi gol',ft:'Gol FT',ht:'Primo tempo',result:'1 · X · 2',asian:'Asiatici'};
  let dialog=null,modalFixtureId=null,modalSection='targets',bodyOverflow='';
+ function releaseModal(instance){
+  if(dialog!==instance)return;
+  const oldId=modalFixtureId;dialog=null;modalFixtureId=null;instance.remove();document.body.style.overflow=bodyOverflow;
+  [...(host?.querySelectorAll('[data-mx-open]')||[])].find(e=>e.dataset.mxOpen===oldId)?.focus();
+ }
+ function closeModal(){const instance=dialog;if(!instance)return;instance.close();releaseModal(instance);}
  function sectionRows(rows,section){return rows.filter(r=>section==='targets'?goalMarket(r)!==null:section==='asian'?r.family==='asian':section==='result'?r.spec?.kind==='result':r.period===section&&['total','btts'].includes(r.spec?.kind));}
  function matrixDetail(m,rows,services){
   return '<div class="mx-detail"><p class="mx-explanation">'+rows.length+' esiti in questa vista. Quote, OCI e aggio della stessa linea e periodo.</p>'+
@@ -180,7 +186,7 @@
  function updateModal(){
   if(!dialog)return;
   const m=(payload?.matches||[]).find(x=>String(x.fixture?.fixture_id)===modalFixtureId);
-  if(!m){dialog.close();return;}
+  if(!m){closeModal();return;}
   const focused=dialog.contains(document.activeElement)?document.activeElement?.dataset?.mxSection:null;
   const closeFocused=document.activeElement?.hasAttribute('data-mx-close');
   const scroll=dialog.querySelector('.mx-modal-scroll')?.scrollTop||0;
@@ -196,15 +202,14 @@
   modalFixtureId=id;modalSection='targets';
   dialog=document.createElement('dialog');dialog.className='mx-modal';dialog.setAttribute('aria-labelledby','mx-modal-title');dialog.setAttribute('aria-modal','true');
   document.body.append(dialog);bodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
-  dialog.addEventListener('close',()=>{
-   const oldId=modalFixtureId;dialog.remove();dialog=null;modalFixtureId=null;document.body.style.overflow=bodyOverflow;
-   [...(host?.querySelectorAll('[data-mx-open]')||[])].find(e=>e.dataset.mxOpen===oldId)?.focus();
-  },{once:true});
+  const instance=dialog;
+  dialog.addEventListener('close',()=>releaseModal(instance),{once:true});
+  dialog.addEventListener('cancel',e=>{e.preventDefault();closeModal();});
   dialog.addEventListener('click',e=>{
-   if(e.target.closest?.('[data-mx-close]')){dialog.close();return;}
+   if(e.target.closest?.('[data-mx-close]')){closeModal();return;}
    const tab=e.target.closest?.('[data-mx-section]');
    if(tab){modalSection=tab.dataset.mxSection;updateModal();return;}
-   if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}
+   if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}
   });
   dialog.addEventListener('keydown',e=>{
    if(e.key!=='Tab')return;
