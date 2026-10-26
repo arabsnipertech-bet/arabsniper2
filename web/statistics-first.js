@@ -8,7 +8,7 @@
   const state = {market:'over25_ft', scope:'selected', signal:'all', phase:'upcoming', sort:'probability', search:''};
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const number = (v,n=1) => typeof v==='number'&&Number.isFinite(v)?v.toLocaleString('it-IT',{minimumFractionDigits:n,maximumFractionDigits:n}):'—';
-  const pct = v => number(v)+'%';
+  const pct = v => typeof v==='number'&&Number.isFinite(v)?number(v)+'%':'—';
   const rowFor = (match, market) => (match.multimarket?.markets||[]).find(r=>r.market===market&&['over','yes'].includes(r.selection));
   function phase(match, now=Date.now()) {
     const f=match.fixture||{}, status=f.result?.status||f.live?.status||f.status_short;

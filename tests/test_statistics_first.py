@@ -170,16 +170,13 @@ class PublicationTests(unittest.TestCase):
         day={'matches':[evaluated()]};build_selection_board(day,NOW)
         output={'days':[day]};store={};freeze_evaluations(store,output,NOW)
         self.assertTrue(store.get('analysis_updates'))
-        day['matches'][0]['fixture']['result']={'status':'FT','ft_home':3,'ft_away':2,'ht_home':1,'ht_away':1}
-        # Use the settlement shape expected by the existing audited outcomes.
-        result={'status':'FT','home_goals':3,'away_goals':2,'home_ht_goals':1,'away_ht_goals':1}
-        for collection in ('multimarket_evaluations','analysis_updates'):
-            for record in store.get(collection,{}).values():
-                record['settlement']={'result':result,'outcomes':{f'{m}::{s}':True for m,s in TARGETS.items()}}
+        result={'status':'FT','home_ft':3,'away_ft':2,'home_ht':1,'away_ht':1}
+        settle(store, {'100':result})
         report=build_daily(store,'2026-10-26',NOW)
         rows=[r for r in report['markets'] if r['snapshot']=='latest' and r['published_selection']]
         self.assertEqual(len(rows),4)
         self.assertEqual(len(project(report,'2026-10-26')),4)
+        self.assertTrue(all(r['outcome']=='won' for r in project(report,'2026-10-26')))
         self.assertEqual(len({(r['fixture_id'],r['market']) for r in project(report,'2026-10-26')}),4)
         audit=build_report(store)
         self.assertTrue(any(r['group']=='independent_model_variants' for r in audit['groups']))

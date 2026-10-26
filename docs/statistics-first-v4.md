@@ -55,7 +55,7 @@ that an Over will be completed in the first half. Display unavailable/stale pric
 ## Validation
 
 These coefficients are transparent engineering assumptions, not an optimized or calibrated winning system.
-V4 automatically stores comparisons without xG, without H2H and using raw goals, plus selected/rejected,
+V4 automatically stores comparisons without xG, without H2H, without peak control and using raw goals, plus selected/rejected,
 under-conversion, peak reduction and quote-confirmation cohorts. Assess Brier/log loss, sample size, hit rate
 and theoretical price return on the same frozen future fixtures. Do not tune thresholds from one weekend
 and present that same weekend as validation. Outcomes from the old model cannot establish V4 performance.

@@ -254,6 +254,7 @@ def statistical_analysis(match, as_of):
     rates, profiles, h2h_effect = rates_for(histories, league, h2h, as_of)
     central = probabilities(rates)
     no_xg = probabilities(rates_for(histories, league, h2h, as_of, use_xg=False)[0])
+    no_peak_control = probabilities(rates_for(histories, league, h2h, as_of, use_robust=False)[0])
     raw = probabilities(rates_for(histories, league, [], as_of, use_xg=False, use_robust=False)[0])
     no_h2h = probabilities(rates_for(histories, league, [], as_of)[0])
     scenarios = [central, no_h2h]
@@ -307,6 +308,7 @@ def statistical_analysis(match, as_of):
                      'statistical_pct': p*100 if p is not None else None,
                      'probabilities': {'statistics': p, 'selection_reference': p,
                          'without_opportunities': no_xg[market][selection] if sample else None,
+                         'without_peak_control': no_peak_control[market][selection] if sample else None,
                          'raw_goals': raw[market][selection] if sample else None,
                          'without_h2h': no_h2h[market][selection] if sample else None},
                      'sensitivity': {'low_pct': low*100 if low is not None else None,
