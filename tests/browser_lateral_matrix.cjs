@@ -23,6 +23,10 @@ print(json.dumps(variants))
  const variants=JSON.parse(raw),now=Date.now();
  const payload={updated_at:new Date(now).toISOString(),multimarket_method:{model_id:'lateral-matrix-v5.0'},matches:Array.from({length:9},(_,i)=>({fixture:{fixture_id:String(i+1),home:'Squadra casa',away:'Squadra ospite',
   kickoff:new Date(now+7200000+i*60000).toISOString(),status_short:'NS',time:'20:45',country:'Italia',league:'DATI SINTETICI DI VERIFICA',match:i===8?'Nome squadra molto lungo per verificare la visualizzazione da telefono – Avversaria':'Squadra '+(i+1)+' – Avversaria'},multimarket:structuredClone(variants[i%2])}))};
+ // UI-only price fixtures exercise all three result cells and movement colors.
+ for(const m of payload.matches)for(const row of m.multimarket.matrix.rows){
+  if(row.spec.kind==='result'&&row.period==='ft')Object.assign(row,{quote_status:'recent',first_odd:2.5,odd:2.2,delta_pct:-12,bookmaker:'OPERATORE SINTETICO',oci:55,paired_books:3,agreeing_books:3,margin_pct:4,margin_delta_pp:-1,margin_band:'low',ev_pct:-1,ev_low_pct:-2});
+ }
  const browser=await chromium.launch({headless:true});
  try{
   const page=await browser.newPage();await page.route('**/*',r=>r.abort());
@@ -35,6 +39,10 @@ print(json.dumps(variants))
   for(const [name,width,height] of [['desktop',1280,1000],['mobile',390,844],['small-mobile',360,800]]){
    await page.setViewportSize({width,height});
    assert.equal(await page.locator('.mx-card').count(),9);
+   assert.equal(await page.locator('.mx-1x2 .mx-quote-cell').count(),27);
+   assert.equal(await page.locator('.mx-best').count(),9);
+   assert.equal(await page.locator('.mx-1x2 .mx-net-red').count(),27);
+   assert((await page.locator('.mx-1x2').first().textContent()).includes('Apertura*'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
    await page.screenshot({path:`test-artifacts/matrix-${name}.png`});
    await page.locator('[data-mx-open]').first().click();

@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
 """
-ARAB SNIPER 2.0 — STATISTICS FIRST
+ARAB SNIPER 3.0 — OSSERVATORIO UNIVERSALE V5
 
-La pipeline attiva è installata da statistics_integration.py:
-statistiche prima, modello statistics-first-v4.0, quote come conferma successiva,
-quattro selettori con astensione, archiviazione immutabile delle decisioni.
-Le funzioni storiche di raccolta restano compatibili con API, cache e storage.
-I vecchi calcoli di confronto con il bookmaker non generano le proposte attive.
+Il percorso attivo, installato prima di main() in fondo a questo file, è:
+policy_integration.install -> statistics_integration.install(matrix_mode=True).
+Modello: lateral-matrix-v5.0. Ogni futura partita NS/TBD del palinsesto
+disponibile viene analizzata, senza esclusioni per competizione e senza tetti
+di selezioni. matrix_pipeline sostituisce i filtri storici sotto riportati.
+
+statistics_first calcola i tassi indipendenti da quote e bookmaker;
+lateral_matrix produce probabilità congiunte FT/PT/ST, asiatici e combo;
+matrix_quotes associa prezzi reali, aggio e movimenti sul mercato esatto;
+context_analysis.movement calcola OCI sugli stessi operatori confrontabili.
+La dashboard confronta tutti i mercati quotati e mostra il miglior valore
+teorico con la sua sensibilità, mantenendo consultabile la matrice completa.
+
+Le implementazioni storiche restano per lettura degli archivi e compatibilità
+di API, cache e storage: non sono i filtri o i selettori attivi. Le quattro
+colonne Over/GG residue sono esportazioni compatibili, non un limite V5.
 
 Esempi:
     python arab_quote_engine.py --today
@@ -5554,6 +5565,8 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
     atomic_write_json(DATA_DIR / "arab_quote_prematch_report.json", build_report(store))
     return output
 
+# Install V5 after legacy definitions and before main: universal admission,
+# independent matrices and exact-market OCI/overround replace legacy selection.
 from policy_integration import install as _install_user_policy
 _install_user_policy(globals())
 
