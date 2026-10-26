@@ -41,4 +41,5 @@ assert.equal(safe[0].oci,null);assert.equal(safe[0].margin_pct,null);
 assert.equal(api.bestOpportunity(safe).id,priced.id);
 assert.equal(oldHandicap.odd,12);
 assert.equal(api.rowsOf({multimarket:{matrix:{rows:[{...oldHandicap,quote_adapter_version:2}]}}})[0].odd,12);
+assert.deepEqual(api.rowsOf({multimarket:{markets:[{market:'over25_ht'},{market:'over15_ht'},{market:'score'}]}}).map(r=>r.market),['over15_ht']);
 console.log('PASS V5 UI: all 160 fixtures, macro behaviors, market/period filters, immutable inputs and escaped text');
