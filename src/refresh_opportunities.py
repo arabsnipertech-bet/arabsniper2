@@ -19,8 +19,8 @@ def cached_refresh_safe(paths):
     """
     price_files = {'src/opportunity_policy.py', 'src/matrix_quotes.py', 'src/matrix_pipeline.py',
                    'src/homepage_preview.py', 'src/context_analysis.py', 'src/refresh_opportunities.py',
-                   'src/gold_competitions.py', 'src/statistics_integration.py'}
-    auxiliary = {'.github/workflows/fast_scan.yml', '.github/workflows/policy_tests.yml'}
+                   'src/gold_competitions.py', 'src/statistics_integration.py', 'src/gold_policy_audit.py'}
+    auxiliary = {'.github/workflows/fast_scan.yml', '.github/workflows/night_scan.yml', '.github/workflows/policy_tests.yml'}
     return bool(set(paths) & price_files) and all(
         p in price_files | auxiliary or p.startswith(('web/', 'tests/', 'docs/')) for p in paths)
 

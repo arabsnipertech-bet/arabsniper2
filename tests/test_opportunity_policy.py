@@ -128,6 +128,9 @@ class PlayableValue(unittest.TestCase):
 
     def test_price_only_release_avoids_collection_but_engine_changes_do_not(self):
         self.assertTrue(cached_refresh_safe(['src/opportunity_policy.py', 'web/lateral-matrix.js', 'tests/test_opportunity_policy.py']))
+        self.assertTrue(cached_refresh_safe(['src/gold_policy_audit.py', 'src/refresh_opportunities.py',
+            '.github/workflows/fast_scan.yml', '.github/workflows/night_scan.yml',
+            'tests/test_gold_policy_audit.py', 'docs/gold-audit-20261027-29.md']))
         for paths in ([], ['web/lateral-matrix.js'], ['src/statistics_first.py', 'src/opportunity_policy.py'],
                       ['src/3appdays.py', 'src/matrix_quotes.py'], ['new_unknown.py']):
             self.assertFalse(cached_refresh_safe(paths))
