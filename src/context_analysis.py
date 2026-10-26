@@ -229,7 +229,7 @@ def movement(books, side, include_previous=True):
         directions=[1 if y>x else -1 for x,y in zip(fair_steps,fair_steps[1:]) if abs(y-x)>=.001]
         persistence=max(directions.count(1),directions.count(-1))/len(directions) if directions and len(h)>=3 else 0.
         hours=max((end-stamp(h[turn]['observed_at'])).total_seconds()/3600,.25)
-        rows.append({'leg_fair_delta_pp':leg_delta,'hours':hours,'persistence':persistence,'bookmaker':b['bookmaker'],'initial':points[0],'current':points[-1],
+        rows.append({'leg_fair_delta_pp':leg_delta,'hours':hours,'persistence':persistence,'bookmaker':b['bookmaker'],'bookmaker_id':b.get('bookmaker_id'),'initial':points[0],'current':points[-1],
             'turning':points[turn] if reversal else None,'reversal':reversal,'delta_pct':delta,
             'fair_delta_pp':fair_delta,'margin_delta_pp':margin-om,'observed_from':start.isoformat(),
             'observed_to':end.isoformat(), 'sequence':points,
