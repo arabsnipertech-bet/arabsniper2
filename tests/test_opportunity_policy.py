@@ -32,7 +32,7 @@ class PlayableValue(unittest.TestCase):
             self.assertTrue(evaluate(row(statistical_pct=p, odd=q))['eligible'])
         for p, q, reason in [(34.999, 3.5, 'probability'), (80, 1.3999, 'price'), (35, 3.5001, 'price')]:
             self.assertIn(reason, evaluate(row(statistical_pct=p, odd=q))['reasons'])
-        for p, eligible in [(39.999, False), (40, True)]:
+        for p, eligible in [(34.999, False), (35, True)]:
             self.assertEqual(evaluate(row(spec=S('total', 'ht', 'over', 1.5), statistical_pct=p))['eligible'], eligible)
 
     def test_nonfinite_missing_or_limited_data_cannot_be_promoted(self):
@@ -48,13 +48,13 @@ class PlayableValue(unittest.TestCase):
                   row(odd=150., statistical_pct=1., ev_pct=50., ev_low_pct=50.)]:
             self.assertIsNone(best_opportunity([r]))
 
-    def test_primary_priority_then_secondary_and_combo(self):
+    def test_only_four_goal_markets_can_be_proposed(self):
         primary = row(ev_pct=5., ev_low_pct=2.)
         secondary = row(id='asian', spec=S('handicap', 'ft', 'home', -.25),
                         quote_adapter_version=2, ev_pct=35., ev_low_pct=30.)
         combo = row(id='combo', spec=S('result_total', 'ft', '1', 1.5, 'over'), ev_pct=50., ev_low_pct=40.)
         self.assertEqual(best_opportunity([combo, secondary, primary])['id'], 'primary')
-        self.assertEqual(best_opportunity([combo, secondary])['id'], 'asian')
+        self.assertIsNone(best_opportunity([combo, secondary]))
         self.assertIsNone(best_opportunity([dict(secondary, quote_adapter_version=1)]))
 
     def test_margin_tiers_expansion_and_selected_operator_anomaly(self):
@@ -84,7 +84,7 @@ class PlayableValue(unittest.TestCase):
 
     def test_frontend_consumes_same_rank_and_fails_closed(self):
         matrix = {'rows': [row(), row(id='distant', odd=150, statistical_pct=1),
-                           row(id='secondary', spec=S('total', 'ht', 'over', 1.5), ev_low_pct=50.)]}
+                           row(id='secondary', spec=S('total', 'ht', 'over', 1.5), ev_pct=15., ev_low_pct=5.)]}
         best = annotate(matrix, NOW)
         raw = subprocess.check_output(['node', '-e', "const api=require('./web/lateral-matrix.js');let s='';process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>{const rows=JSON.parse(s);console.log(JSON.stringify({id:api.bestOpportunity(rows)?.id,old:api.bestOpportunity(rows.map(({opportunity,...r})=>r))}));});"], input=json.dumps(matrix['rows']).encode())
         result = json.loads(raw)

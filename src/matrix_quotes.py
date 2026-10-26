@@ -283,7 +283,8 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
 def analyse_prices(row, offers, as_of, kickoff):
     row['quote_adapter_version'] = HANDICAP_ADAPTER_VERSION
     row.update(selected_margin_pct=None, selected_margin_delta_pp=None,
-               selected_movement=None, movement_confirmed=False, fair_direction_coherent=False)
+               selected_movement=None, selected_market_odds=None,
+               movement_confirmed=False, fair_direction_coherent=False)
     now, start = stamp(as_of), stamp(kickoff)
     max_hours = 1 if now and start and 0 < (start-now).total_seconds() <= 10800 else 6
     recent = [o for o in offers if stamp(o.get('provider_updated_at')) and
@@ -356,6 +357,7 @@ def analyse_prices(row, offers, as_of, kickoff):
                         if len(own_trace) >= 2 else None)
     row.update(selected_margin_pct=fair(best['odds'])[1] if best['complete'] else None,
                selected_margin_delta_pp=own_margin_delta,
+               selected_market_odds=deepcopy(best['odds']) if best['complete'] and row['spec']['kind'] == 'result' and row['period'] == 'ft' else None,
                movement_confirmed=bool(move.get('confirmed')),
                fair_direction_coherent=bool(move.get('fair_direction_coherent')),
                selected_movement={
@@ -389,7 +391,7 @@ def attach(assessment, payload, state, meta, as_of):
         'OCI da variazioni sugli stessi operatori: non prova smart money, disinteresse o informazioni privilegiate.',
         'Conferma e divergenza si riferiscono al mercato esatto; nessun trasferimento automatico alle combo.',
         'Aggio in calo non implica una direzione: servono le variazioni delle probabilità depurate dal margine.']
-    annotate(matrix, as_of)
+    annotate(matrix, as_of, assessment)
     return assessment
 
 
@@ -408,6 +410,7 @@ def expire(assessment, meta, as_of):
                        speed_pp_per_hour=None, amplitude_pct=None, paired_books=0,
                        agreeing_books=0, theoretical_value=False,
                        selected_margin_pct=None, selected_margin_delta_pp=None,
-                       selected_movement=None, movement_confirmed=False, fair_direction_coherent=False,
+                       selected_movement=None, selected_market_odds=None,
+                       movement_confirmed=False, fair_direction_coherent=False,
                        market_behavior='unavailable', stable_value=False)
-    annotate(assessment.get('matrix', {}), as_of)
+    annotate(assessment.get('matrix', {}), as_of, assessment)

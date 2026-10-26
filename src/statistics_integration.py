@@ -1,4 +1,4 @@
-"""Statistics-first pipeline with the active universal V5 matrix and V4 replay."""
+"""Statistics-first pipeline with the active scoped V5 matrix and V4 replay."""
 from copy import deepcopy
 
 from selection_policy import competition
@@ -12,12 +12,13 @@ def install(ns, matrix_mode=False):
     if matrix_mode:
         from lateral_matrix import MODEL_ID as engine_id, build_matrix
         from matrix_quotes import attach as attach_matrix
-        from matrix_pipeline import universal_profile, fixture_allowed, complete_day, build_board
+        from matrix_pipeline import universal_profile, fixture_allowed, complete_day, build_board, selection_export
+        from gold_competitions import SCOPE_ID, output_allowed, fixture_profile
         ns['DEFAULT_EXCLUDED_COUNTRIES'].clear()
         ns['fixture_allowed'] = fixture_allowed
-        ns['output_fixture_allowed'] = lambda item, excluded=(): bool(item.get('fixture', {}).get('fixture_id'))
-        ns['fixture_filter_profile'] = lambda row, excluded=(): universal_profile(row.get('league', {}))
-        ns['competition_allowed'] = lambda league, excluded=(): True
+        ns['output_fixture_allowed'] = output_allowed
+        ns['fixture_filter_profile'] = lambda row, excluded=(): fixture_profile(row)
+        ns['competition_allowed'] = lambda league, excluded=(): universal_profile(league)['allowed']
     ns['ACTIVE_ANALYSIS_ENGINE'] = engine_id
     ns['DEFAULT_EXCLUDED_COUNTRIES'].discard('Egypt')
     review, history_context = {}, {}
@@ -77,6 +78,7 @@ def install(ns, matrix_mode=False):
     ns['get_team_recent_matches'] = recent
 
     def fixture(client, row, state, cache):
+        if matrix_mode and not fixture_allowed(row): return None
         meta = ns['fixture_meta'](row)
         if not meta:
             return None
@@ -177,36 +179,40 @@ def install(ns, matrix_mode=False):
                           f"{coverage.get('available_fixture_ids')} disponibili; "
                           f"{summary['analyzed_fixtures']} matrici, {summary['modeled_markets']} esiti, "
                           f"{summary['priced_markets']} quote recenti; categorie {summary['categories']}")
-            rankings = {key: [] for key in board['markets']}
-            for match in day.get('matches', []):
-                assessment = match.get('multimarket') or {}
-                if assessment.get('model_id') != engine_id:
-                    continue
-                meta = match['fixture']
-                candidates = []
-                for row in assessment['markets']:
-                    candidate = {**{k: meta.get(k) for k in ('fixture_id', 'match', 'time', 'kickoff', 'league', 'country')},
-                        'market': row['market'], 'selection': row['selection'],
-                        'probability_pct': row['statistical_pct'], 'odd': row['odd'],
-                        'gate': {'eligible': row['published_selection'], 'reasons': row['selection_reasons']},
-                        'ranking_score': row['statistical_score'],
-                        'market_confirmation': row['market_confirmation'],
-                        'published_rank': row['published_rank']}
-                    candidates.append(candidate)
-                    kickoff = stamp(meta.get('kickoff'))
-                    if row['published_selection'] and kickoff and kickoff > stamp(as_of):
-                        rankings[row['market']].append(candidate)
-                for rows in rankings.values():
-                    rows.sort(key=lambda r: (r['published_rank'] or 999, str(r['fixture_id'])))
-                match['display'] = {'analysis_engine': engine_id,
-                    'primary_choice': assessment.get('best_candidate'),
-                    'ranked_choices': [r for r in candidates if r['gate']['eligible']],
-                    'market_candidates': candidates, 'markets': {}}
-            day['market_rankings'] = rankings
-            day['probability_rankings'] = deepcopy(rankings)
-            day['multimarket_method'] = {'model_id': engine_id, 'validation_from': VALIDATION_FROM,
-                                         'experimental': True, 'statistics_first': True}
+            if matrix_mode:
+                rankings = day['market_rankings']
+            else:
+                rankings = {key: [] for key in board['markets']}
+                for match in day.get('matches', []):
+                    assessment = match.get('multimarket') or {}
+                    if assessment.get('model_id') != engine_id:
+                        continue
+                    meta = match['fixture']
+                    candidates = []
+                    for row in assessment['markets']:
+                        candidate = {**{k: meta.get(k) for k in ('fixture_id', 'match', 'time', 'kickoff', 'league', 'country')},
+                            'market': row['market'], 'selection': row['selection'],
+                            'probability_pct': row['statistical_pct'], 'odd': row['odd'],
+                            'gate': {'eligible': row['published_selection'], 'reasons': row['selection_reasons']},
+                            'ranking_score': row['statistical_score'],
+                            'market_confirmation': row['market_confirmation'],
+                            'published_rank': row['published_rank']}
+                        candidates.append(candidate)
+                        kickoff = stamp(meta.get('kickoff'))
+                        if row['published_selection'] and kickoff and kickoff > stamp(as_of):
+                            rankings[row['market']].append(candidate)
+                    for rows in rankings.values():
+                        rows.sort(key=lambda r: (r['published_rank'] or 999, str(r['fixture_id'])))
+                    match['display'] = {'analysis_engine': engine_id,
+                        'primary_choice': assessment.get('best_candidate'),
+                        'ranked_choices': [r for r in candidates if r['gate']['eligible']],
+                        'market_candidates': candidates, 'markets': {}}
+                day['market_rankings'] = rankings
+                day['probability_rankings'] = deepcopy(rankings)
+            day.setdefault('multimarket_method', {}).update(model_id=engine_id, validation_from=VALIDATION_FROM,
+                                         experimental=True, statistics_first=True)
             ns['atomic_write_json'](ns['DATA_DIR']/f"arab_quote_selections_day{day.get('day', 1)}.json",
+                                   selection_export(day, as_of) if matrix_mode else
                                    {'date': day.get('date'), 'generated_at': as_of, 'selection_board': board,
                                     'rankings': rankings, 'probability_rankings': rankings})
         from scan_audit import update_audit
@@ -234,10 +240,14 @@ def install(ns, matrix_mode=False):
             markers='Oro: selezione statistica. Azzurro: conferma diretta nelle quote.',
             book='Movimenti osservati sugli stessi operatori, depurati dall’aggio; nessun bonus alle probabilità.')
         if matrix_mode:
-            output['method']['active_analysis'].update(universal_observation=True, all_supported_score_markets=True)
-            output['method']['user_policy'].update(universal_observation=True, market_confirmation_after_selection=False)
+            output['method']['active_analysis'].update(universal_observation=False, all_whitelisted_fixtures=True,
+                competition_policy=SCOPE_ID, all_supported_score_markets=True)
+            output['method']['user_policy'].update(universal_observation=False, competition_policy=SCOPE_ID,
+                romania_allowed=True, goals_only_proposals=True, drought_probability_bonus=0,
+                market_confirmation_after_selection=False)
             output['method'].update(markets='Matrice 1X2, doppia chance, Over/Under, GG/NG, PT/ST, asiatici, multigol e combo.',
-                markers='Convergenza, contrarian, laterali e valore in osservazione: nessun limite di partite.',
+                competition_filter='Massime divisioni senior e coppe autorizzate; Romania inclusa; niente giovanili o leghe minori.',
+                markers='Proposte su quattro mercati gol; priorità PT da digiuno nel contesto casa/trasferta e flussi verificabili.',
                 book='OCI e aggio per esito, linea e periodo; volumi e smart money non osservati.')
         ns['atomic_write_json'](ns['OUTPUT_FILE'], output)
         for day in output.get('days', []):

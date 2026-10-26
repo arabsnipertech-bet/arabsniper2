@@ -11,6 +11,8 @@ from statistics_first import statistical_analysis
 from lateral_matrix import build_matrix
 from matrix_quotes import attach
 from copy import deepcopy
+from test_gold_scope_goals import example
+from opportunity_policy import annotate
 a=build_matrix(statistical_analysis(match(),NOW),NOW)
 variants=[]
 for first,last in [(2.5,2.1),(2.1,2.6)]:
@@ -19,10 +21,19 @@ for first,last in [(2.5,2.1),(2.1,2.6)]:
  attach(b,payload('2026-10-26T07:00:00Z',(first+last)/2,1.6),state,match()['fixture'],'2026-10-26T07:00:00Z')
  attach(b,payload(NOW,last,1.6),state,match()['fixture'],NOW)
  variants.append(b)
-print(json.dumps(variants))
+contexts=[]
+for args in [('home','1',None),('away','2',None),('away','1',None),('home','2',None),('home','1',.4)]:
+ b=deepcopy(a);context=example(*args)
+ b['inputs']=context['inputs']
+ for source in context['matrix']['rows']:
+  target=next(r for r in b['matrix']['rows'] if r['spec']==source['spec'])
+  target.update({k:v for k,v in source.items() if k not in ('id','label')})
+ annotate(b['matrix'],NOW,b)
+ contexts.append(b)
+print(json.dumps({'variants':variants,'contexts':contexts}))
 `],{encoding:'utf8',maxBuffer:10*1024*1024});
- const variants=JSON.parse(raw),now=Date.now();
- const payload={updated_at:new Date(now).toISOString(),multimarket_method:{model_id:'lateral-matrix-v5.0'},matches:Array.from({length:9},(_,i)=>({fixture:{fixture_id:String(i+1),home:'Squadra casa',away:'Squadra ospite',
+ const {variants,contexts}=JSON.parse(raw),now=Date.now();
+ const payload={gold_scope:{policy_id:'gold-senior-whitelist-v1'},updated_at:new Date(now).toISOString(),multimarket_method:{model_id:'lateral-matrix-v5.0'},matches:Array.from({length:9},(_,i)=>({gold_scope:{policy_id:'gold-senior-whitelist-v1',allowed:true},fixture:{fixture_id:String(i+1),home:'Squadra casa',away:'Squadra ospite',
   kickoff:new Date(now+7200000+i*60000).toISOString(),status_short:'NS',time:'20:45',country:'Italia',league:'DATI SINTETICI DI VERIFICA',match:i===8?'Nome squadra molto lungo per verificare la visualizzazione da telefono – Avversaria':'Squadra '+(i+1)+' – Avversaria'},multimarket:structuredClone(variants[i%2])}))};
  // UI-only price fixtures exercise all three result cells and movement colors.
  for(const m of payload.matches)for(const row of m.multimarket.matrix.rows){
@@ -46,11 +57,13 @@ print(json.dumps(variants))
    const proposals=await page.locator('.mx-best[data-opportunity-id]').evaluateAll(nodes=>nodes.map(n=>({odd:+n.dataset.opportunityOdd,p:+n.dataset.opportunityProbability,text:n.textContent})));
    assert(proposals.every(r=>r.odd>=1.4&&r.odd<=3.5&&r.p>=35));
    assert(proposals.some(r=>r.text.includes('Convergenza di Trend')));
-   assert(proposals.some(r=>r.text.includes('Opportunità Contrarian')));
+   assert(proposals.some(r=>r.text.includes('Contrarian sano')));
    assert.equal(await page.locator('.mx-1x2 .mx-net-red').count(),27);
    assert((await page.locator('.mx-1x2').first().textContent()).includes('Apertura*'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
    await page.screenshot({path:`test-artifacts/matrix-${name}.png`});
+   await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
+   await page.screenshot({path:`test-artifacts/matrix-proposal-${name}.png`});
    await page.locator('[data-mx-open]').first().click();
    assert((await page.locator('.mx-market-row').count())>250,'Full matrix must remain accessible');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Matrix overflow '+name);
@@ -79,6 +92,17 @@ print(json.dumps(variants))
   assert(await page.evaluate(()=>savedMatrixCard===document.querySelector('.mx-card')));
   assert((await page.locator('.mx-card').first().textContent()).includes('2–1'));
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Live overflow');
+  const timed={...payload,matches:contexts.map((a,i)=>({...payload.matches[i],multimarket:a}))};
+  await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},timed);
+  const timing=await page.locator('.mx-timing').allTextContents();
+  assert(timing[0].includes('Priorità Over 1,5 PT')&&timing[0].includes('Favorita in casa'));
+  assert(timing[1].includes('Priorità Over 1,5 PT')&&timing[1].includes('Favorita in trasferta'));
+  assert(timing[2].includes('Priorità Goal PT')&&timing[3].includes('Priorità Goal PT'));
+  assert(timing[4].includes('Quote bilanciate')&&timing[4].includes('0,40'));
+  assert((await page.locator('.mx-best h4').allTextContents())[2].includes('Goal'));
+  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Drought priority overflow');
+  await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
+  await page.screenshot({path:'test-artifacts/matrix-drought-priority-mobile.png'});
   console.log('PASS V5 browser: full palinsesto, 297-market matrices, desktop/390/360, contrarian and missing-price filters, immutable live overlays');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

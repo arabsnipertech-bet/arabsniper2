@@ -3,9 +3,11 @@ const api=require('../web/lateral-matrix.js');
 const rows=[{id:'a',family:'totals',period:'ft',category:'mature',market_behavior:'convergence',ev_pct:12,ev_low_pct:5,quote_status:'recent',quality:'supported'},
  {id:'b',family:'combo',period:'ht',category:'contrarian',market_behavior:'divergence',ev_pct:30,ev_low_pct:20,quote_status:'recent',quality:'supported'},
  {id:'c',family:'btts',period:'ht',category:'no_quote',quote_status:'missing'}];
-const matches=Array.from({length:160},(_,i)=>({fixture:{fixture_id:String(i+1),kickoff:'2026-10-26T20:00:00Z',match:'Casa '+i+' – Ospite',league:'Serie prova'},multimarket:{model_id:api.MODEL,matrix:{rows:structuredClone(rows)}}}));
-const p={matches},opts={...api.state};
+const matches=Array.from({length:160},(_,i)=>({gold_scope:{policy_id:api.SCOPE,allowed:true},fixture:{fixture_id:String(i+1),kickoff:'2026-10-26T20:00:00Z',match:'Casa '+i+' – Ospite',league:'Serie prova'},multimarket:{model_id:api.MODEL,matrix:{rows:structuredClone(rows)}}}));
+const p={matches,gold_scope:{policy_id:api.SCOPE}},opts={...api.state};
 assert.equal(api.selectMatches(p,opts,0).length,160);
+assert.equal(api.selectMatches({matches:[{...matches[0],gold_scope:null}]},opts,0).length,0);
+assert.equal(api.scopePayload({matches:[{...matches[0],gold_scope:{policy_id:api.SCOPE,allowed:false}}]}).matches.length,0);
 assert.equal(api.matchingRows(matches[0],{...opts,category:'divergence'}).length,1);
 assert.equal(api.matchingRows(matches[0],{...opts,family:'combo'}).length,1);
 assert.equal(api.matchingRows(matches[0],{...opts,category:'no_quote'}).length,1);
@@ -16,12 +18,12 @@ const html=api.marketRow({...rows[0],label:'<script>x</script>',statistical_pct:
 assert(html.includes('&lt;script&gt;'));assert(html.includes('Aggio'));assert(html.includes('OCI'));
 const decision={policy_id:api.POLICY,eligible:true,rank:1,priority:0,min_probability_pct:35,min_ev_pct:2,min_ev_low_pct:0,signal:'convergence',label:'Convergenza di Trend',reasons:[]};
 const priced={...rows[0],odd:2,statistical_pct:60,id:'regular',spec:{kind:'total',period:'ft',side:'over',line:2.5},opportunity:decision};
-const asian={...priced,id:'asian',family:'asian',ev_pct:30,ev_low_pct:12,opportunity:{...decision,rank:2,priority:1,min_probability_pct:40}};
+const asian={...priced,id:'asian',family:'asian',spec:{kind:'handicap',period:'ft',side:'home',line:.25},quote_adapter_version:2,ev_pct:30,ev_low_pct:12,opportunity:{...decision,rank:2,priority:1,min_probability_pct:35}};
 const fragile={...priced,id:'fragile',ev_pct:100,ev_low_pct:-20};
 const prior={...priced,id:'prior',quality:'prior_only',ev_pct:200,ev_low_pct:200};
 assert.equal(api.bestOpportunity([priced,asian,fragile,prior]).id,'regular');
 assert.equal(api.bestOpportunity([{...asian,quote_status:'stale'}]),null);
-for(const extra of [{odd:150,statistical_pct:1},{odd:3.51},{odd:1.39},{statistical_pct:34.99},{opportunity:null},{spec:{kind:'score'}}])assert.equal(api.bestOpportunity([{...priced,...extra}]),null);
+for(const extra of [{odd:150,statistical_pct:1},{odd:3.51},{odd:1.39},{statistical_pct:34.99},{opportunity:null},{spec:{kind:'score'}},{spec:{kind:'dc',period:'ft',side:'x2'}}])assert.equal(api.bestOpportunity([{...priced,...extra}]),null);
 assert(api.opportunityPanel([{...priced,odd:150}]).includes('Nessuna proposta supera i criteri'));
 assert(api.opportunityPanel([priced]).includes('Convergenza di Trend'));
 assert(api.movementSignal({...priced,delta_pct:-10}).includes('mx-net-red'));
@@ -31,7 +33,7 @@ assert(api.movementSignal({...priced,delta_pct:10,quote_status:'stale'}).include
 const cell=api.quoteCell({...priced,first_odd:2.2,delta_pct:-9.09,margin_pct:4,oci:55},'1 · Casa');
 assert(cell.includes('Apertura*'));assert(cell.includes('Attuale'));assert(cell.includes('2,20'));assert(cell.includes('OCI'));assert(cell.includes('Aggio'));
 assert(api.opportunityPanel([priced,asian]).includes('MIGLIOR VALORE STIMATO'));
-const oldHandicap={...asian,spec:{kind:'handicap'},odd:12,oci:99,margin_pct:4};
+const oldHandicap={...asian,spec:{kind:'handicap'},quote_adapter_version:1,odd:12,oci:99,margin_pct:4};
 const legacyMatch={multimarket:{matrix:{rows:[oldHandicap,priced]}}};
 const safe=api.rowsOf(legacyMatch);
 assert.equal(safe[0].quote_status,'invalid_adapter');

@@ -1,10 +1,12 @@
-"""Universal fixture admission and uncapped daily observation summaries."""
+"""Strict competition admission and uncapped observation within that scope."""
 from collections import Counter
 from copy import deepcopy
 from lateral_matrix import MODEL_ID, CONFIG_ID, build_matrix, market_id, specification
 from matrix_quotes import expire, safe_price_row
 from multimarket_model import stamp
 from opportunity_policy import POLICY_ID
+from gold_competitions import (SCOPE_ID, profile as whitelist_profile, fixture_allowed,
+                               enforce_day, output_allowed)
 
 LEGACY = {'over25_ft': specification('total', 'ft', 'over', 2.5),
           'over15_ht': specification('total', 'ht', 'over', 1.5),
@@ -12,19 +14,14 @@ LEGACY = {'over25_ft': specification('total', 'ft', 'over', 2.5),
           'gg_ht': specification('btts', 'ht', 'yes')}
 
 
-def universal_profile(league):
-    return {'allowed': True, 'score': 50, 'tier': 'observed',
-            'reason': 'universal_observation_no_competition_exclusion'}
-
-
-def fixture_allowed(row, excluded=()):
-    return (row.get('fixture') or {}).get('id') is not None
+universal_profile = whitelist_profile  # Compatibility alias; admission is strict.
 
 
 def complete_day(ns, client, day, as_of):
     """Keep coverage explicit, including fixtures with failed data or no snapshot."""
     response = client.get('fixtures', {'date': day['date'], 'timezone': 'Europe/Rome'}) if client is not None else None
     rows = (response or {}).get('response', [])
+    enforce_day(day)
     seen = {str(m.get('fixture', {}).get('fixture_id')) for m in day.get('matches', [])}
     for raw in rows:
         fid = str((raw.get('fixture') or {}).get('id'))
@@ -45,17 +42,23 @@ def complete_day(ns, client, day, as_of):
                  'best_candidate': None, 'selected_markets': []}
             result = ns['_result_payload'](raw)
             if result: meta['result'] = result
+            item['display'].update(primary_choice=None, ranked_choices=[], market_candidates=[], markets={})
         item['multimarket'] = a
         meta['data_freshness'] = 'data_unavailable' if future else 'no_prematch_snapshot'
         day.setdefault('matches', []).append(item)
         seen.add(fid)
     day['matches'].sort(key=lambda m: ((m.get('fixture') or {}).get('kickoff') or '', str((m.get('fixture') or {}).get('fixture_id'))))
     day['universal_coverage'] = {'available_fixture_ids': len({str(r.get('fixture', {}).get('id')) for r in rows if fixture_allowed(r)}) if response is not None else None,
-        'displayed_fixtures': len(day['matches']), 'excluded_by_competition': 0,
+        'displayed_fixtures': len(day['matches']),
+        'excluded_by_competition': sum(not fixture_allowed(r) for r in rows),
+        'coverage_basis': 'provider_schedule' if response is not None else 'provider_unavailable',
+        'competition_policy': SCOPE_ID,
         'statistics_without_prices_are_retained': True}
+    enforce_day(day)
 
 
 def build_board(day, as_of):
+    enforce_day(day)
     board = {key: {'label': key, 'selected': [], 'eligible': 0, 'remaining_slots': None, 'started_selections': 0} for key in LEGACY}
     categories = Counter()
     modeled, priced, complete, eligible, proposals = 0, 0, 0, 0, 0
@@ -104,7 +107,10 @@ def build_board(day, as_of):
             old['price_assessment'] = {'reference_source': 'statistics_only',
                 'reference_fair_odd': new['fair_odd'], 'estimated_return_pct': new.get('ev_pct'),
                 'validated_advantage': False}
-            old['market_confirmation'] = {'status': {'convergence': 'confirmed', 'divergence': 'contrary'}.get(new.get('market_behavior'), 'neutral'),
+            old['opportunity'] = deepcopy(new.get('opportunity') or {})
+            old['selection_reasons'] = list(old['opportunity'].get('reasons') or [])
+            old['published_rank'] = old['opportunity'].get('rank')
+            old['market_confirmation'] = {'status': {'convergence': 'confirmed', 'contrarian': 'contrary'}.get(old['opportunity'].get('signal'), 'neutral'),
                                          'scope': 'same_market', 'patterns': [], 'probability_bonus': 0}
             if chosen:
                 a['selected_markets'].append(old['market'])
@@ -112,7 +118,7 @@ def build_board(day, as_of):
                     board[old['market']]['selected'].append({'fixture_id': str(meta['fixture_id']),
                         'market': old['market'], 'kickoff': meta['kickoff'], 'statistical_pct': new['statistical_pct'],
                         'statistical_score': new['low_pct'], 'confirmation': old['market_confirmation']['status']})
-                if a['best_candidate'] is None or new.get('ev_low_pct', -1000) > a['best_candidate'].get('matrix_ev_low_pct', -1000):
+                if new['id'] == policy.get('best_market_id'):
                     old['matrix_ev_low_pct'] = new.get('ev_low_pct')
                     a['best_candidate'] = old
     for key, group in board.items():
@@ -124,6 +130,43 @@ def build_board(day, as_of):
     day['matrix_summary'] = {'model_id': MODEL_ID, 'as_of': as_of, 'analyzed_fixtures': complete,
         'displayed_fixtures': len(day.get('matches', [])), 'modeled_markets': modeled,
         'priced_markets': priced, 'categories': dict(categories), 'selection_limit': None}
-    day['matrix_summary'].update(opportunity_policy=POLICY_ID, eligible_markets=eligible,
+    day['matrix_summary'].update(opportunity_policy=POLICY_ID, competition_policy=SCOPE_ID, eligible_markets=eligible,
                                  upcoming_fixtures_with_proposal=proposals)
+    day.setdefault('multimarket_method', {}).update(model_id=MODEL_ID,
+        competition_policy=SCOPE_ID, opportunity_policy=POLICY_ID)
+    refresh_exports(day, as_of)
     return day['selection_board']
+
+
+def refresh_exports(day, as_of):
+    """Keep legacy display/ranking projections on the exact Gold policy."""
+    rankings = {key: [] for key in LEGACY}
+    for match in day.get('matches', []):
+        a, meta = match.get('multimarket') or {}, match.get('fixture') or {}
+        kickoff = stamp(meta.get('kickoff'))
+        if (a.get('model_id') != MODEL_ID or not kickoff or kickoff <= stamp(as_of)
+                or meta.get('status_short') not in ('NS', 'TBD') or meta.get('result')): continue
+        candidates = []
+        for row in a.get('markets', []):
+            if row.get('market') not in rankings: continue
+            candidate = {**{k: meta.get(k) for k in ('fixture_id', 'match', 'time', 'kickoff', 'league', 'country')},
+                'market': row['market'], 'selection': row['selection'],
+                'probability_pct': row['statistical_pct'], 'odd': row.get('odd'),
+                'gate': {'eligible': row.get('published_selection') is True, 'reasons': row.get('selection_reasons', [])},
+                'ranking_score': row.get('statistical_score'), 'market_confirmation': row.get('market_confirmation'),
+                'published_rank': row.get('published_rank'), 'opportunity': deepcopy(row.get('opportunity'))}
+            candidates.append(candidate)
+            if candidate['gate']['eligible']: rankings[row['market']].append(candidate)
+        match['display'] = {'analysis_engine': MODEL_ID, 'primary_choice': a.get('best_candidate'),
+            'ranked_choices': sorted((r for r in candidates if r['gate']['eligible']), key=lambda r: r['published_rank'] or 999),
+            'market_candidates': candidates, 'markets': {}}
+    for rows in rankings.values(): rows.sort(key=lambda r: (r['published_rank'] or 999, str(r['fixture_id'])))
+    day['market_rankings'] = rankings
+    day['probability_rankings'] = deepcopy(rankings)
+
+
+def selection_export(day, as_of):
+    return {'date': day.get('date'), 'generated_at': as_of,
+        'gold_scope': deepcopy(day.get('gold_scope')), 'opportunity_policy': POLICY_ID,
+        'selection_board': day.get('selection_board', {}), 'rankings': day.get('market_rankings', {}),
+        'probability_rankings': day.get('probability_rankings', {})}

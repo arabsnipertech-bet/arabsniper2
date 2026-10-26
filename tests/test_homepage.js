@@ -17,7 +17,7 @@ async function run(payload,fail=false){
  r=await run(evil);assert(!r.nodes['daily-picks'].innerHTML.includes('<img'));assert(r.nodes['daily-picks'].innerHTML.includes('&lt;img'));
  r=await run(data,true);assert.match(r.nodes['daily-picks'].innerHTML,/temporaneamente/);
  const v5=structuredClone(data);
- for(const row of v5.selections)Object.assign(row,{model_id:'lateral-matrix-v5.0',market_confirmation:'contrarian',opportunity:{policy_id:'playable-value-v1',eligible:true,min_probability_pct:35}});
+ for(const row of v5.selections)Object.assign(row,{model_id:'lateral-matrix-v5.0',market_confirmation:'contrarian',competition_policy:'gold-senior-whitelist-v1',opportunity:{policy_id:'gold-goals-v2',eligible:true,min_probability_pct:35}});
  v5.selections[1].odd=150;v5.selections[2].statistical_pct=34;
  r=await run(v5);assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,1);assert.match(r.nodes['daily-picks'].innerHTML,/Contrarian/);
  const html=fs.readFileSync('web/index.html','utf8');assert(!html.includes('localStorage.clear'));assert(!html.includes('logout=true'));assert(!html.includes('details_day1'));

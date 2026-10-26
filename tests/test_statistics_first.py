@@ -26,6 +26,7 @@ def team_history(side='home', goals=3, conceded=3, ht=1, ht_against=1):
 
 def match(fid='100'):
     return {'fixture':{'fixture_id':fid, 'season':2026, 'home_id':10,'away_id':20,
+            'country':'Italy', 'league':'Serie A',
             'kickoff':KICKOFF, 'status_short':'NS', 'match':'Synthetic home – away'},
         'statistics':{'home':{'last_matches':team_history()},
                       'away':{'last_matches':team_history('away')},
