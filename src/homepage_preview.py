@@ -10,6 +10,7 @@ from matrix_quotes import expire
 from opportunity_policy import POLICY_ID, best_opportunity
 from gold_competitions import output_allowed, SCOPE_ID
 import json
+from copy import deepcopy
 
 ROME = ZoneInfo('Europe/Rome')
 MARKETS = {'over15_ht', 'over25_ht', 'gg_ht', 'over25_ft', 'over35_ft'}
@@ -66,9 +67,10 @@ def build_preview(payload, previous=None, now=None, rng=None):
             if (not kickoff or kickoff <= now or kickoff.astimezone(ROME).date().isoformat() != today
                     or f.get('status_short') not in ('NS', 'TBD') or not output_allowed(match)): continue
             # Preserve the saved snapshot while checking freshness at publication.
-            view = {**a, 'matrix': {'rows': [dict(r) for r in a.get('matrix', {}).get('rows', [])]}}
+            view = {**a, 'matrix': deepcopy(a.get('matrix') or {})}
             expire(view, f, now.isoformat())
-            row = best_opportunity(view['matrix']['rows'], view['matrix'].get('goal_context'))
+            selected = view['matrix']['opportunity_policy']['best_market_id']
+            row = next((r for r in view['matrix']['rows'] if r['id'] == selected), None)
             if row:
                 candidates.append((row.get('ev_low_pct', -100), {'fixture_id': str(f['fixture_id']),
                     'match': f.get('match', ''), 'league': f.get('league', ''), 'kickoff': f['kickoff'],

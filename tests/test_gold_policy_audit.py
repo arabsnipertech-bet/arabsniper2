@@ -34,6 +34,25 @@ def report_row(report, strategy='published', view='latest', cohort='baseline_26'
 
 
 class GoldPolicyAudit(unittest.TestCase):
+    def test_policy_versions_remain_separate_and_old_hashes_are_immutable(self):
+        from hashlib import sha256
+        store = {}; m = fixture(); capture(store, m, NOW)
+        old = store['fixtures']['100']['snapshots'][0]
+        old['policy_id'] = 'gold-goals-v2'
+        old['choices'].pop('without_hysteresis')
+        old.pop('proposal_stability'); old.pop('sha256')
+        old['sha256'] = sha256(json.dumps(old, sort_keys=True, allow_nan=False).encode()).hexdigest()
+        frozen = deepcopy(old)
+        capture(store, m, '2026-10-26T09:00:00Z')
+        report = build_report(store, '2026-10-26T09:00:00Z')
+        self.assertEqual(report['policy_ids'], ['gold-goals-v2', POLICY_ID])
+        self.assertTrue(report['production_policy_changed'])
+        for version in report['policy_ids']:
+            rows = [r for r in report['strategies'] if r['policy_id'] == version and r['strategy'] == 'published' and r['cohort'] == 'baseline_26']
+            self.assertEqual(len(rows), 2)
+            self.assertEqual(rows[0]['observations'], rows[1]['observations'])
+        self.assertEqual(old, frozen)
+
     def test_shadows_cannot_bypass_probability_price_history_or_coherence(self):
         m = fixture(); matrix = m['multimarket']['matrix']
         for change in ({'odd': 150.}, {'statistical_pct': 34.9}, {'quality': 'limited'},

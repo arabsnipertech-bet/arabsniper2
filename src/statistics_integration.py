@@ -14,6 +14,7 @@ def install(ns, matrix_mode=False):
         from matrix_quotes import attach as attach_matrix
         from matrix_pipeline import universal_profile, fixture_allowed, complete_day, build_board, selection_export
         from gold_competitions import SCOPE_ID, output_allowed, fixture_profile
+        from proposal_stability import seed_stability
         ns['DEFAULT_EXCLUDED_COUNTRIES'].clear()
         ns['fixture_allowed'] = fixture_allowed
         ns['output_fixture_allowed'] = output_allowed
@@ -106,6 +107,7 @@ def install(ns, matrix_mode=False):
         assessment = statistical_analysis(output, cutoff)
         assessment['statistics_as_of'] = cutoff
         if matrix_mode:
+            assessment['markets'] = [r for r in assessment['markets'] if r['market'] in ('over15_ht', 'gg_ht', 'over25_ft', 'over35_ft')]
             assessment = build_matrix(assessment, cutoff)
         # 2. Reuse the existing API-Football recovery/catalogue and quote ledger.
         if getattr(client, 'odds_enricher', None) is not None:
@@ -114,21 +116,23 @@ def install(ns, matrix_mode=False):
         observed = ns['iso_now']()
         if stamp(observed) >= kickoff:
             return None
-        markets, validation = ns['extract_bookmaker_markets_with_audit'](payload or {})
         fixture_state = state.setdefault('fixtures', {}).setdefault(str(meta['fixture_id']), {'meta': meta, 'markets': {}})
         fixture_state['meta'] = meta
         book = {}
-        for key in ns['MARKET_SELECTIONS']:
-            consensus = ns['build_market_consensus'](markets, key)
-            if consensus is not None:
-                market_state = fixture_state.setdefault('markets', {}).setdefault(key, {})
-                book[key] = ns['update_market_state'](market_state, consensus, observed)
-        captured = collect_quotes(payload or {}, observed).get(str(meta['fixture_id']), {})
-        quotes = update_ledger(state, meta['fixture_id'], captured, observed, meta['kickoff'])
         assessment['captured_at'] = observed
-        confirm_markets(assessment, quotes, meta, observed)
         if matrix_mode:
             attach_matrix(assessment, payload or {}, state, meta, observed)
+            validation = assessment['matrix']['coverage']['adapters']
+        else:
+            markets, validation = ns['extract_bookmaker_markets_with_audit'](payload or {})
+            for key in ns['MARKET_SELECTIONS']:
+                consensus = ns['build_market_consensus'](markets, key)
+                if consensus is not None:
+                    market_state = fixture_state.setdefault('markets', {}).setdefault(key, {})
+                    book[key] = ns['update_market_state'](market_state, consensus, observed)
+            captured = collect_quotes(payload or {}, observed).get(str(meta['fixture_id']), {})
+            quotes = update_ledger(state, meta['fixture_id'], captured, observed, meta['kickoff'])
+            confirm_markets(assessment, quotes, meta, observed)
         output['multimarket'] = assessment
         output['book'] = {'markets': book, 'market_validation': validation}
         p = {r['market']: {r['selection']: r['probabilities']['statistics']}
@@ -143,15 +147,19 @@ def install(ns, matrix_mode=False):
             total_ht=assessment['rates']['home_ht']+assessment['rates']['away_ht'])
         output['display'] = {'analysis_engine': engine_id, 'primary_choice': None,
                              'ranked_choices': [], 'market_candidates': [], 'markets': {}}
+        if matrix_mode:
+            # Project the matrix into the four legacy exports; no second quote
+            # parser, ledger, OCI or overround calculation is required.
+            build_board({'matches': [output]}, observed)
         return output
     ns['build_fixture_output'] = fixture
 
     old_scan = ns['_scan_dates_before_prematch_audit']
     def scan(client, dates, excluded):
         previous = {}
-        for index, date in enumerate(dates, 1):
+        for index in range(1, 6):
             saved = ns['read_json'](ns['DATA_DIR']/f'arab_quote_day{index}.json', {}) or {}
-            if saved.get('date') == date:
+            if saved.get('date') in dates:
                 previous.update({str(m.get('fixture', {}).get('fixture_id')): m
                                  for m in saved.get('matches', [])})
         output = old_scan(client, dates, excluded)
@@ -171,6 +179,8 @@ def install(ns, matrix_mode=False):
                     restored['fixture'].update({k: meta[k] for k in
                         ('live', 'result', 'status_short', 'status_long', 'elapsed') if k in meta})
                     day['matches'][index] = restored
+                elif matrix_mode and old and kickoff and kickoff > stamp(as_of):
+                    seed_stability(old.get('multimarket') or {}, match.get('multimarket') or {})
             board = build_board(day, as_of) if matrix_mode else build_selection_board(day, as_of)
             if matrix_mode:
                 summary = day['matrix_summary']

@@ -9,12 +9,13 @@ from copy import deepcopy
 from hashlib import sha256
 from math import exp, floor
 import json
+from market_scope import MARKET_SCOPE_ID, FT_TOTALS, ASIAN_FT, ASIAN_HT, HANDICAPS, core_market
 
 MODEL_ID = 'lateral-matrix-v5.0'
 CONFIG = {'tail_tolerance': 1e-11, 'score_ceiling': 48,
           'minimum_team_ft_for_value': 4, 'minimum_team_ht_for_value': 3,
           'maximum_selections': None, 'book_weight_in_statistics': 0,
-          'probability_bonus_from_oci': 0, 'experimental': True}
+          'probability_bonus_from_oci': 0, 'experimental': True, 'market_scope': MARKET_SCOPE_ID}
 CONFIG_ID = sha256(json.dumps(CONFIG, sort_keys=True).encode()).hexdigest()[:16]
 PERIODS = {'ft': 'FT', 'ht': 'PT', 'sh': 'ST'}
 FAMILIES = {'result': '1x2', 'dc': '1x2', 'dnb': 'asian', 'total': 'totals',
@@ -62,51 +63,16 @@ def label(spec):
 
 
 def base_specs():
-    rows = []
-    def add(kind, period, side, line=None, extra=None):
-        rows.append(specification(kind, period, side, line, extra))
-    for period in ('ft', 'ht', 'sh'):
-        for side in ('1', 'x', '2'):
-            add('result', period, side)
-        for side in ('1x', 'x2', '12'):
-            add('dc', period, side)
-        for side in ('1', '2'):
-            add('dnb', period, side)
-        for side in ('yes', 'no'):
-            add('btts', period, side)
-        for line in ([.5, 1.5, 2.5, 3.5, 4.5, 5.5] if period == 'ft' else [.5, 1.5, 2.5, 3.5]):
-            for side in ('over', 'under'):
-                add('total', period, side, line)
-        for line in ([1.75, 2, 2.25, 2.75, 3, 3.25] if period == 'ft' else [.75, 1, 1.25, 1.75, 2, 2.25]):
-            for side in ('over', 'under'):
-                add('asian_total', period, side, line)
-        for team in ('home', 'away'):
-            for line in ([.5, 1.5, 2.5] if period == 'ft' else [.5, 1.5]):
-                for side in ('over', 'under'):
-                    add('team_total', period, side, line, team)
-        for line in (-1, -.75, -.25, .25, .75, 1):
-            for team in ('home', 'away'):
-                add('handicap', period, team, line)
+    rows = [specification('result', 'ft', side) for side in ('1', 'x', '2')]
+    rows += [specification('dnb', 'ft', side) for side in ('1', '2')]
     for period in ('ft', 'ht'):
-        for line in ([1.5, 2.5, 3.5] if period == 'ft' else [.5, 1.5]):
-            for side in ('1', 'x', '2', '1x', 'x2', '12'):
-                for direction in ('over', 'under'):
-                    add('dc_total' if len(side) == 2 else 'result_total', period, side, line, direction)
-            for side in ('yes', 'no'):
-                for direction in ('over', 'under'):
-                    add('btts_total', period, side, line, direction)
-        for side in ('1', 'x', '2', '1x', 'x2', '12'):
-            for gg in ('yes', 'no'):
-                add('dc_btts' if len(side) == 2 else 'result_btts', period, side, extra=gg)
-        for low, high in ([(1, 3), (2, 4), (2, 5), (3, 5), (3, 6)] if period == 'ft' else [(1, 2), (1, 3), (2, 3)]):
-            add('range', period, '', low, high)
-    for ht in ('1', 'x', '2'):
-        for ft in ('1', 'x', '2'):
-            add('htft', 'ft', ht, extra=ft)
-    for ht, sh in ((.5, .5), (1.5, .5), (1.5, 1.5)):
-        add('halves_total', 'ft', '', ht, sh)
-    for team in ('home', 'away', 'both'):
-        add('both_halves', 'ft', team)
+        rows += [specification('btts', period, side) for side in ('yes', 'no')]
+        rows += [specification('total', period, side, line)
+                 for line in (FT_TOTALS if period == 'ft' else (1.5,)) for side in ('over', 'under')]
+        rows += [specification('asian_total', period, side, line)
+                 for line in (ASIAN_FT if period == 'ft' else ASIAN_HT) for side in ('over', 'under')]
+    rows += [specification('handicap', 'ft', side, line)
+             for line in HANDICAPS for side in ('home', 'away')]
     return rows
 
 
@@ -265,21 +231,14 @@ def build_matrix(assessment, as_of, additional_specs=()):
     output['config'] = {**output.get('config', {}), **CONFIG, 'top_per_market': None}
     model = ScoreModel(output['rates'])
     scenarios = [ScoreModel(r) for r in output.get('sensitivity_rates', [])]
-    specs = {market_id(s): s for s in [*base_specs(), *additional_specs]}
-    # The most likely exact scores are useful summaries; any actually priced
-    # exact score is also added by the quote adapter without a display cap.
-    for period in ('ft', 'ht'):
-        for h, a, _ in sorted(model.grids[period], key=lambda x: -x[2])[:6]:
-            s = specification('score', period, f'{h}:{a}')
-            specs[market_id(s)] = s
+    specs = {market_id(s): s for s in [*base_specs(), *additional_specs] if core_market(s)}
     matrix = matrix_rows(output, specs, model, scenarios)
     output['matrix'] = {'schema_version': 1, 'as_of': as_of, 'rows': matrix,
         'coverage': {'modeled_markets': len(matrix), 'priced_markets': 0},
-        'score_tail_probability': model.tail, 'top_scores': {p: [
-            {'score': f'{h}:{a}', 'probability_pct': round(prob*100, 4)}
-            for h, a, prob in sorted(model.grids[p], key=lambda x: -x[2])[:6]] for p in ('ft', 'ht')},
+        'score_tail_probability': model.tail,
+        'market_scope': {'id': MARKET_SCOPE_ID, 'modeled_markets': len(matrix)},
         'assumptions': ['Poisson per squadra con incrementi PT/ST indipendenti.',
-            'Combo sullo stesso punteggio congiunto; nessun prodotto delle quote delle singole gambe.',
+            'Solo mercati core e riferimenti asiatici vicini ai quattro obiettivi gol.',
             'Frequenze storiche descrittive; stime e rendimenti teorici ancora da validare.']}
     output['notes'] = [*output.get('notes', []), 'Tutte le partite disponibili vengono mostrate, anche con dati o quote insufficienti.']
     return output
@@ -291,6 +250,7 @@ def matrix_rows(assessment, specs, model=None, scenarios=None):
         scenarios = [ScoreModel(r) for r in assessment.get('sensitivity_rates', [])]
     matrix = []
     for key, spec in specs.items():
+        if not core_market(spec): continue
         estimate = model.estimate(spec)
         alternatives = [estimate, *[s.estimate(spec) for s in scenarios]]
         row = {'id': key, 'spec': spec, 'family': FAMILIES[spec['kind']], 'label': label(spec),

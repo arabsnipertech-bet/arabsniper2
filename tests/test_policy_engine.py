@@ -111,7 +111,7 @@ class EngineTests(unittest.TestCase):
             def assert_statistics_called(self):
                 if 'statistical_analysis' not in calls:raise AssertionError('odds requested before statistics')
         def analyze(*args):calls.append('statistical_analysis');return statistical_analysis(*args)
-        with patch.object(engine,'iso_now',return_value=NOW), patch.object(engine,'enrich_team_matches_with_xg',side_effect=lambda c,r,t:r), patch('statistics_integration.statistical_analysis',side_effect=analyze), patch.object(engine,'build_lambdas',side_effect=AssertionError('legacy prediction path')):
+        with patch.object(engine,'iso_now',return_value=NOW), patch.object(engine,'enrich_team_matches_with_xg',side_effect=lambda c,r,t:r), patch('statistics_integration.statistical_analysis',side_effect=analyze), patch.object(engine,'build_lambdas',side_effect=AssertionError('legacy prediction path')), patch.object(engine,'extract_bookmaker_markets_with_audit',side_effect=AssertionError('duplicate quote parsing')), patch('statistics_integration.collect_quotes',side_effect=AssertionError('duplicate OCI path')):
             value=engine.build_fixture_output(Client(),upcoming,{}, {})
         self.assertEqual(value['multimarket']['model_id'],MODEL_ID)
         self.assertEqual(value['multimarket']['data_quality']['home']['sample'],8)
@@ -135,7 +135,7 @@ class EngineTests(unittest.TestCase):
         def audit(ns, output, client):
             observed.append(len(output['days'][0]['matches']))
             assert output['days'][0]['selection_board']['max_per_market'] is None
-            assert all(len(m['multimarket']['matrix']['rows'])>200 for m in output['days'][0]['matches'])
+            assert all(len(m['multimarket']['matrix']['rows'])==55 for m in output['days'][0]['matches'])
             return {'cohorts':[], 'status':'experimental'}
         with tempfile.TemporaryDirectory() as folder:
             ns=dict(engine.__dict__)
