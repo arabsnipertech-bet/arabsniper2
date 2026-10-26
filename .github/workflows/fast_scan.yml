@@ -31,6 +31,8 @@ on:
       - 'src/refresh_opportunities.py'
       - 'src/gold_competitions.py'
       - 'src/gold_policy_audit.py'
+      - 'src/market_scope.py'
+      - 'src/proposal_stability.py'
   schedule:
     - cron: "0 6-23 * * *"
       timezone: "Europe/Rome"

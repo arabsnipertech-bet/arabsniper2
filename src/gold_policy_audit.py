@@ -22,7 +22,7 @@ from opportunity_policy import POLICY_ID, evaluate, market_tier, numeric, rankin
 ROME = ZoneInfo('Europe/Rome')
 STUDY_ID = 'gold-prospective-20261026-v1'
 BASELINE, START, END = '2026-10-26', '2026-10-27', '2026-10-29'
-STRATEGIES = ('published', 'shadow_reduced_cushion', 'shadow_sensitivity_minus3', 'without_pt_priority')
+STRATEGIES = ('published', 'shadow_reduced_cushion', 'shadow_sensitivity_minus3', 'without_pt_priority', 'without_hysteresis')
 ROW_FIELDS = ('id', 'label', 'spec', 'family', 'period', 'quality', 'statistical_pct',
     'low_pct', 'high_pct', 'historical_pct', 'fair_odd', 'odd', 'first_odd', 'quote_status',
     'bookmaker', 'bookmaker_id', 'provider_updated_at', 'market_fair_pct',
@@ -46,8 +46,9 @@ def policy_choices(rows, context):
         for original in rows:
             row = deepcopy(original)
             d = row['opportunity']
-            if strategy == 'without_pt_priority':
-                d = evaluate(row)
+            if strategy != 'published':
+                d = evaluate(row, context.get('pt_priority_active', False) if strategy != 'without_pt_priority' else False,
+                             context.get('preferred_pt_market'))
                 # Never erase an independently detected probability incoherence.
                 if 'coherence' in row['opportunity'].get('reasons', []):
                     d['eligible'] = False; d['reasons'].append('coherence')
@@ -66,7 +67,7 @@ def policy_choices(rows, context):
                 if d['eligible']:
                     d['playability_score'] = row['statistical_pct'] * max(0., lower-lower_floor)/(row['odd']-1)
             if d['eligible']: candidates.append(row)
-        best = min(candidates, key=ranking_key, default=None)
+        best = min(candidates, key=(lambda r: r['opportunity']['rank']) if strategy == 'published' else ranking_key, default=None)
         choices[strategy] = best['id'] if best else None
     return choices
 
@@ -94,6 +95,7 @@ def capture(store, match, observed_at):
         'statistics_captured_at': a.get('captured_at'),
         'input_sha256': a.get('input_sha256'), 'model_id': MODEL_ID, 'policy_id': POLICY_ID,
         'scope_id': SCOPE_ID, 'kickoff': meta['kickoff'], 'rows': rows,
+        'proposal_stability': deepcopy(matrix.get('proposal_stability') or {}),
         'goal_context': deepcopy(matrix.get('goal_context') or {}),
         'profiles': deepcopy(a.get('profiles') or {}), 'data_quality': deepcopy(a.get('data_quality') or {})}
     snapshot['choices'] = policy_choices(rows, snapshot['goal_context'])
@@ -237,46 +239,53 @@ def build_report(store, observed_at):
             raw = {k: v for k, v in snapshot.items() if k != 'sha256'}
             if sha256(json.dumps(raw, sort_keys=True, allow_nan=False).encode()).hexdigest() != snapshot['sha256']:
                 raise ValueError('Frozen Gold policy snapshot mismatch')
-        snapshots = [s for s in fixture['snapshots'] if stamp(s['observed_at']) < stamp(s['kickoff'])]
-        if not snapshots: continue
-        # Do not pool the baseline day into the preregistered next-three-day study.
-        cohort = 'baseline_26' if fixture['date'] == BASELINE else 'study_27_29'
-        for view, snapshot in (('first', snapshots[0]), ('latest', snapshots[-1])):
-            indexed = {r['id']: r for r in snapshot['rows']}
-            actual = snapshot['choices']['published']
-            for strategy, selected in snapshot['choices'].items():
-                if selected not in indexed: continue
-                row = indexed[selected]; obs = observation(fid, fixture, snapshot, row)
-                strategies[(cohort, view, strategy)].append(obs)
-                comparisons[(cohort, view, strategy)]['extra' if actual is None else 'same' if actual == selected else 'changed'].append(obs)
-                if strategy == 'published':
-                    for dimension, value in group_dimensions(fixture, snapshot, row).items(): groups[(cohort, view, dimension, str(value))].append(obs)
-            for row in snapshot['rows']:
-                obs = observation(fid, fixture, snapshot, row)
-                groups[(cohort, view, 'all_observed_market', key_for(row))].append(obs)
-                for dimension in ('oci_band', 'flow_confirmed', 'margin_band', 'margin_trend', 'probability_band'):
-                    value = group_dimensions(fixture, snapshot, row)[dimension]
-                    groups[(cohort, view, 'all_'+key_for(row)+'_'+dimension, str(value))].append(obs)
-                for reason in row['opportunity'].get('reasons', []): rejection[(cohort, view, key_for(row), reason)].append(obs)
-                for variant, p in row.get('model_variants', {}).items():
-                    if numeric(p) and 0 <= p <= 1: variants[(cohort, view, key_for(row), variant)].append({**obs, 'p': p})
+        by_policy = defaultdict(list)
+        for snapshot in fixture['snapshots']:
+            if stamp(snapshot['observed_at']) < stamp(snapshot['kickoff']):
+                by_policy[snapshot['policy_id']].append(snapshot)
+        for version, snapshots in by_policy.items():
+            # Do not pool the baseline day into the preregistered next-three-day study.
+            cohort = 'baseline_26' if fixture['date'] == BASELINE else 'study_27_29'
+            for view, snapshot in (('first', snapshots[0]), ('latest', snapshots[-1])):
+                indexed = {r['id']: r for r in snapshot['rows']}
+                actual = snapshot['choices']['published']
+                for strategy, selected in snapshot['choices'].items():
+                    if selected not in indexed: continue
+                    row = indexed[selected]; obs = observation(fid, fixture, snapshot, row)
+                    strategies[(version, cohort, view, strategy)].append(obs)
+                    comparisons[(version, cohort, view, strategy)]['extra' if actual is None else 'same' if actual == selected else 'changed'].append(obs)
+                    if strategy == 'published':
+                        for dimension, value in group_dimensions(fixture, snapshot, row).items(): groups[(version, cohort, view, dimension, str(value))].append(obs)
+                for row in snapshot['rows']:
+                    obs = observation(fid, fixture, snapshot, row)
+                    groups[(version, cohort, view, 'all_observed_market', key_for(row))].append(obs)
+                    for dimension in ('oci_band', 'flow_confirmed', 'margin_band', 'margin_trend', 'probability_band'):
+                        value = group_dimensions(fixture, snapshot, row)[dimension]
+                        groups[(version, cohort, view, 'all_'+key_for(row)+'_'+dimension, str(value))].append(obs)
+                    for reason in row['opportunity'].get('reasons', []): rejection[(version, cohort, view, key_for(row), reason)].append(obs)
+                    for variant, p in row.get('model_variants', {}).items():
+                        if numeric(p) and 0 <= p <= 1: variants[(version, cohort, view, key_for(row), variant)].append({**obs, 'p': p})
     strategy_rows = []
-    for cohort in ('baseline_26', 'study_27_29'):
-        for view in ('first', 'latest'):
-            for strategy in STRATEGIES:
-                key = (cohort, view, strategy)
-                strategy_rows.append({'cohort': cohort, 'snapshot': view, 'strategy': strategy,
-                    **metrics(strategies[key]), 'relative_to_published': {k: metrics(comparisons[key][k]) for k in ('extra', 'same', 'changed')}})
+    versions = sorted({POLICY_ID, *[snap["policy_id"] for f in store.get("fixtures", {}).values() for snap in f["snapshots"]]})
+    for version in versions:
+        for cohort in ('baseline_26', 'study_27_29'):
+            for view in ('first', 'latest'):
+                for strategy in STRATEGIES:
+                    key = (version, cohort, view, strategy)
+                    strategy_rows.append({'policy_id': version, 'cohort': cohort, 'snapshot': view, 'strategy': strategy,
+                        **metrics(strategies[key]), 'relative_to_published': {k: metrics(comparisons[key][k]) for k in ('extra', 'same', 'changed')}})
     return {'study_id': STUDY_ID, 'generated_at': observed_at, 'baseline_date': BASELINE,
         'study_start': START, 'study_end': END, 'model_id': MODEL_ID, 'policy_id': POLICY_ID,
-        'scope_id': SCOPE_ID, 'api_calls': 0, 'production_policy_changed': False,
+        'scope_id': SCOPE_ID, 'api_calls': 0, 'policy_ids': versions,
+        'production_policy_changed': len(versions) > 1,
         'frozen_fixtures': len(store.get('fixtures', {})),
         'snapshots': sum(len(f['snapshots']) for f in store.get('fixtures', {}).values()),
         'coverage': store.get('coverage', {}), 'strategies': strategy_rows,
-        'groups': [dict(zip(('cohort', 'snapshot', 'dimension', 'value'), k), **metrics(v)) for k, v in sorted(groups.items())],
-        'rejections': [dict(zip(('cohort', 'snapshot', 'market', 'reason'), k), **metrics(v)) for k, v in sorted(rejection.items())],
-        'model_variants': [dict(zip(('cohort', 'snapshot', 'market', 'variant'), k), **metrics(v)) for k, v in sorted(variants.items())],
+        'groups': [dict(zip(('policy_id', 'cohort', 'snapshot', 'dimension', 'value'), k), **metrics(v)) for k, v in sorted(groups.items())],
+        'rejections': [dict(zip(('policy_id', 'cohort', 'snapshot', 'market', 'reason'), k), **metrics(v)) for k, v in sorted(rejection.items())],
+        'model_variants': [dict(zip(('policy_id', 'cohort', 'snapshot', 'market', 'variant'), k), **metrics(v)) for k, v in sorted(variants.items())],
         'notes': ['Shadow strategies are frozen research, never Gold recommendations.',
+            'Policies are separate cohorts; v2 frozen choices are never recomputed as v3.',
             'One fixture per proposal strategy/view. First/latest are separate, not independent trials.',
             'Rows of different goal markets are correlated. Missing outcomes remain pending.',
             'Observed closing value uses the last saved same-book quote within three hours, not certified market close.',
@@ -311,7 +320,8 @@ def main(root=Path('.'), observed_at=None):
     root = Path(root); now = observed_at or datetime.now(ROME).isoformat()
     path = root/'data/arab_quote_gold_policy_audit.json'
     store = read_store(path, {'study_id': STUDY_ID, 'policy_id': POLICY_ID, 'fixtures': {}})
-    if store.get('study_id') != STUDY_ID or store.get('policy_id') != POLICY_ID: raise ValueError('Audit study identity mismatch')
+    if store.get('study_id') != STUDY_ID or store.get('policy_id') not in ('gold-goals-v2', POLICY_ID): raise ValueError('Audit study identity mismatch')
+    store['active_policy_id'] = POLICY_ID
     settle_saved_archives(store, root, now)
     coverage, seen, cases = defaultdict(Counter), set(), []
     for day_path in sorted((root/'data').glob('arab_quote_day[1-5].json')):

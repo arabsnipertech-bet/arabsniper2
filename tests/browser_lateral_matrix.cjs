@@ -65,21 +65,48 @@ print(json.dumps({'variants':variants,'contexts':contexts}))
    await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-proposal-${name}.png`});
    await page.locator('[data-mx-open]').first().click();
-   assert((await page.locator('.mx-market-row').count())>250,'Full matrix must remain accessible');
+   assert(await page.locator('dialog.mx-modal').isVisible(),'Matrix must be a native modal');
+   assert.equal(await page.locator('.mx-market-row').count(),4,'Only the four goal targets open by default');
+   assert.equal(await page.locator('.mx-card .mx-detail').count(),0,'No inline expansion');
+   await page.keyboard.press('Shift+Tab');
+   assert(await page.evaluate(()=>!!document.activeElement.closest('dialog.mx-modal')),'Native modal focus trap');
+   for(const [section,count] of [['ft',8],['ht',4],['result',3],['asian',40],['targets',4]]){
+    await page.locator('[data-mx-section="'+section+'"]').click();
+    assert.equal(await page.locator('.mx-market-row').count(),count);
+   }
+   const text=await page.locator('dialog.mx-modal').textContent();
+   assert(!/Risultato esatto|Over 5,5|Under 5,5|Multigol/.test(text),'Dead markets must be absent');
+   assert(await page.evaluate(()=>{const e=document.querySelector('dialog.mx-modal');return e.scrollWidth<=e.clientWidth}),'Modal horizontal overflow');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Matrix overflow '+name);
-   await page.locator('.mx-detail').scrollIntoViewIfNeeded();
+   await page.locator('[data-mx-close]').focus();
    await page.screenshot({path:`test-artifacts/matrix-details-${name}.png`});
+   await page.keyboard.press('Escape');
+   assert.equal(await page.locator('dialog.mx-modal').count(),0);
+   assert(await page.locator('[data-mx-open]').first().evaluate(e=>e===document.activeElement),'Focus restored after Escape');
    await page.locator('[data-mx-open]').first().click();
+   await page.locator('[data-mx-section="ht"]').click();
+   await page.evaluate(()=>renderMatchResearch(currentPayload));
+   assert(await page.locator('dialog.mx-modal').isVisible(),'Fast render preserves modal');
+   assert.equal(await page.locator('[data-mx-section="ht"]').getAttribute('aria-pressed'),'true');
+   assert.equal(await page.locator('.mx-market-row').count(),4);
+   await page.locator('[data-mx-close]').click();
+   assert.equal(await page.locator('dialog.mx-modal').count(),0);
+   await page.locator('[data-mx-open]').first().click();
+   await page.mouse.click(1,1);
+   assert.equal(await page.locator('dialog.mx-modal').count(),0,'Backdrop closes modal');
+   assert(await page.evaluate(()=>document.body.style.overflow!=='hidden'),'Body scrolling restored');
   }
   await page.locator('[data-mx-category="divergence"]').click();
   assert.equal(await page.locator('.mx-card').count(),4);
   await page.locator('[data-mx-category="all"]').click();
-  await page.locator('[data-mx-filter="family"]').selectOption('combo');
+  await page.locator('[data-mx-filter="family"]').selectOption('asian');
   await page.locator('[data-mx-filter="period"]').selectOption('ht');
   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),9,'Matrix filters must not replace the match proposal');
   await page.locator('[data-mx-open]').first().click();
-  assert((await page.locator('.mx-market-row').count())>10);
+  await page.locator('[data-mx-section="ht"]').click();
+  assert.equal(await page.locator('.mx-market-row').count(),4);
   assert((await page.locator('.mx-market-row').first().textContent()).includes('PT'));
+  await page.locator('[data-mx-close]').click();
   await page.locator('[data-mx-filter="family"]').selectOption('all');
   await page.locator('[data-mx-filter="period"]').selectOption('all');
   await page.locator('[data-mx-category="no_quote"]').click();
@@ -103,6 +130,6 @@ print(json.dumps({'variants':variants,'contexts':contexts}))
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Drought priority overflow');
   await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
   await page.screenshot({path:'test-artifacts/matrix-drought-priority-mobile.png'});
-  console.log('PASS V5 browser: full palinsesto, 297-market matrices, desktop/390/360, contrarian and missing-price filters, immutable live overlays');
+  console.log('PASS V5 browser: full palinsesto, 55 core markets, modal tabs/focus/Escape/backdrop and Fast persistence, desktop/390/360, contrarian and missing-price filters, immutable live overlays');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

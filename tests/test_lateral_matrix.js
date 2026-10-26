@@ -1,15 +1,15 @@
 const assert=require('node:assert/strict');
 const api=require('../web/lateral-matrix.js');
-const rows=[{id:'a',family:'totals',period:'ft',category:'mature',market_behavior:'convergence',ev_pct:12,ev_low_pct:5,quote_status:'recent',quality:'supported'},
- {id:'b',family:'combo',period:'ht',category:'contrarian',market_behavior:'divergence',ev_pct:30,ev_low_pct:20,quote_status:'recent',quality:'supported'},
- {id:'c',family:'btts',period:'ht',category:'no_quote',quote_status:'missing'}];
+const rows=[{id:'a',family:'totals',period:'ft',spec:{kind:'total',period:'ft',side:'over',line:2.5},category:'mature',market_behavior:'convergence',ev_pct:12,ev_low_pct:5,quote_status:'recent',quality:'supported'},
+ {id:'b',family:'asian',period:'ht',spec:{kind:'asian_total',period:'ht',side:'over',line:1.25},category:'contrarian',market_behavior:'divergence',ev_pct:30,ev_low_pct:20,quote_status:'recent',quality:'supported'},
+ {id:'c',family:'btts',period:'ht',spec:{kind:'btts',period:'ht',side:'yes'},category:'no_quote',quote_status:'missing'}];
 const matches=Array.from({length:160},(_,i)=>({gold_scope:{policy_id:api.SCOPE,allowed:true},fixture:{fixture_id:String(i+1),kickoff:'2026-10-26T20:00:00Z',match:'Casa '+i+' – Ospite',league:'Serie prova'},multimarket:{model_id:api.MODEL,matrix:{rows:structuredClone(rows)}}}));
 const p={matches,gold_scope:{policy_id:api.SCOPE}},opts={...api.state};
 assert.equal(api.selectMatches(p,opts,0).length,160);
 assert.equal(api.selectMatches({matches:[{...matches[0],gold_scope:null}]},opts,0).length,0);
 assert.equal(api.scopePayload({matches:[{...matches[0],gold_scope:{policy_id:api.SCOPE,allowed:false}}]}).matches.length,0);
 assert.equal(api.matchingRows(matches[0],{...opts,category:'divergence'}).length,1);
-assert.equal(api.matchingRows(matches[0],{...opts,family:'combo'}).length,1);
+assert.equal(api.matchingRows(matches[0],{...opts,family:'asian'}).length,1);
 assert.equal(api.matchingRows(matches[0],{...opts,category:'no_quote'}).length,1);
 assert.equal(api.selectMatches(p,{...opts,search:'Casa 159'},0).length,1);
 const frozen=JSON.stringify(p);api.selectMatches(p,{...opts,sort:'value'},0);assert.equal(JSON.stringify(p),frozen);
@@ -33,7 +33,7 @@ assert(api.movementSignal({...priced,delta_pct:10,quote_status:'stale'}).include
 const cell=api.quoteCell({...priced,first_odd:2.2,delta_pct:-9.09,margin_pct:4,oci:55},'1 · Casa');
 assert(cell.includes('Apertura*'));assert(cell.includes('Attuale'));assert(cell.includes('2,20'));assert(cell.includes('OCI'));assert(cell.includes('Aggio'));
 assert(api.opportunityPanel([priced,asian]).includes('MIGLIOR VALORE STIMATO'));
-const oldHandicap={...asian,spec:{kind:'handicap'},quote_adapter_version:1,odd:12,oci:99,margin_pct:4};
+const oldHandicap={...asian,spec:{kind:'handicap',period:'ft',side:'home',line:.25},quote_adapter_version:1,odd:12,oci:99,margin_pct:4};
 const legacyMatch={multimarket:{matrix:{rows:[oldHandicap,priced]}}};
 const safe=api.rowsOf(legacyMatch);
 assert.equal(safe[0].quote_status,'invalid_adapter');

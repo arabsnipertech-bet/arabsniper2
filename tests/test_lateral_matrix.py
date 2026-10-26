@@ -26,7 +26,7 @@ class MatrixMath(unittest.TestCase):
         cls.model = ScoreModel({'home_ft': 1.7, 'away_ft': 1.2, 'home_ht': .7, 'away_ht': .5})
 
     def test_full_coverage_and_binary_complements(self):
-        self.assertGreater(len(self.a['matrix']['rows']), 250)
+        self.assertEqual(len(self.a['matrix']['rows']), 55)
         for period in ('ft', 'ht', 'sh'):
             self.assertAlmostEqual(sum(self.model.estimate(S('result', period, side))['p'] for side in ('1', 'x', '2')), 1, places=8)
             for line in (.5, 1.5, 2.5):
@@ -53,7 +53,7 @@ class MatrixMath(unittest.TestCase):
 
     def test_missing_history_still_calculated_with_explicit_prior(self):
         a = build_matrix(statistical_analysis({'fixture': match()['fixture'], 'statistics': {}}, NOW), NOW)
-        self.assertGreater(len(a['matrix']['rows']), 250)
+        self.assertEqual(len(a['matrix']['rows']), 55)
         self.assertTrue(all(r['quality'] == 'prior_only' for r in a['matrix']['rows']))
         attach(a, payload(over=100, under=1.01), {}, match()['fixture'], NOW)
         self.assertFalse(any(r.get('category') in ('mature', 'contrarian', 'lateral') for r in a['matrix']['rows']))
@@ -98,7 +98,7 @@ class MatrixMath(unittest.TestCase):
         self.assertEqual(len(day['matches']), 2)
         indexed = {m['fixture']['fixture_id']: m for m in day['matches']}
         future, started = (indexed[k]['multimarket'] for k in ('1', '2'))
-        self.assertGreater(len(future['matrix']['rows']), 250)
+        self.assertEqual(len(future['matrix']['rows']), 55)
         self.assertTrue(all(r['quality'] == 'prior_only' for r in future['matrix']['rows']))
         self.assertEqual(started['matrix']['rows'], [])
         self.assertEqual(started['status'], 'no_prematch_snapshot')
@@ -188,41 +188,40 @@ class MatrixMath(unittest.TestCase):
         self.assertEqual(parse_value(49, 'Over 2.5/Yes'), S('btts_total', 'ft', 'yes', 2.5, 'over'))
         a = deepcopy(self.a)
         attach(a, payload(bid=12, name='Double Chance', values=[{'value': s, 'odd': '1.5'} for s in ('Home/Draw', 'Draw/Away', 'Home/Away')]), {}, match()['fixture'], NOW)
-        row = next(r for r in a['matrix']['rows'] if r['spec'] == S('dc', 'ft', '1x'))
-        self.assertEqual(row['odd'], 1.5)
-        self.assertIsNone(row['margin_pct'])
+        self.assertFalse(any(r['spec']['kind'] in ('dc', 'dc_total', 'btts_total') for r in a['matrix']['rows']))
+        self.assertEqual(a['matrix']['coverage']['adapters']['out_of_scope_bet_types'], 2)
 
     def test_provider_handicap_is_home_anchored_and_partitions_are_complements(self):
         for bid, period in ((4, 'ft'), (19, 'ht'), (104, 'sh')):
             self.assertEqual(parse_value(bid, 'Away -1.5'), S('handicap', period, 'away', 1.5))
             self.assertEqual(parse_value(bid, 'Away +3.5'), S('handicap', period, 'away', -3.5))
-        values = [{'value': 'Home +3.5', 'odd': '1.02'}, {'value': 'Away +3.5', 'odd': '12'},
-                  {'value': 'Home -3.5', 'odd': '13'}, {'value': 'Away -3.5', 'odd': '1.01'},
+        values = [{'value': 'Home +0.75', 'odd': '1.02'}, {'value': 'Away +0.75', 'odd': '12'},
+                  {'value': 'Home -0.75', 'odd': '13'}, {'value': 'Away -0.75', 'odd': '1.01'},
                   {'value': 'Home +0', 'odd': '1.8'}, {'value': 'Away +0', 'odd': '2.1'}]
         a = deepcopy(self.a)
         attach(a, payload(bid=4, name='Asian Handicap', values=values), {}, match()['fixture'], NOW)
         rows = {r['id']: r for r in a['matrix']['rows']}
-        easy = rows[market_id(S('handicap', 'ft', 'away', 3.5))]
-        hard = rows[market_id(S('handicap', 'ft', 'away', -3.5))]
+        easy = rows[market_id(S('handicap', 'ft', 'away', 0.75))]
+        hard = rows[market_id(S('handicap', 'ft', 'away', -0.75))]
         self.assertEqual(easy['odd'], 1.01)
         self.assertEqual(hard['odd'], 12)
         self.assertGreater(easy['statistical_pct'], hard['statistical_pct'])
         self.assertAlmostEqual(hard['margin_pct'], 100*(1/1.02+1/12-1))
         self.assertIsNotNone(rows[market_id(S('handicap', 'ft', 'away', 0))]['margin_pct'])
-        self.assertEqual(payout_weights(hard['spec'], 0, 2), (0, 1))
-        self.assertEqual(payout_weights(easy['spec'], 2, 0), (1, 0))
+        self.assertEqual(payout_weights(hard['spec'], 2, 0), (0, 1))
+        self.assertEqual(payout_weights(easy['spec'], 0, 2), (1, 0))
 
     def test_legacy_handicap_repair_preserves_observations_and_started_forecasts(self):
         early = '2026-10-26T06:00:00Z'
         fixture = {'kickoff': KICKOFF, 'groups': {
-            '4|handicap|ft|3.5|1': [
+            '4|handicap|ft|0.75|1': [
                 {'odds': {'home': 1.02, 'away': 1.01}, 'complete': True, 'provider_updated_at': early, 'observed_at': early}],
-            '4|handicap|ft|-3.5|1': [
+            '4|handicap|ft|-0.75|1': [
                 {'odds': {'home': 13., 'away': 12.}, 'complete': True, 'provider_updated_at': early, 'observed_at': early}]}}
         original = deepcopy(fixture['groups'])
         migrate_handicap_history(fixture)
-        self.assertEqual(fixture['groups']['ah2|4|handicap|ft|3.5|1'][0]['odds'], {'home': 1.02, 'away': 12.})
-        self.assertEqual(fixture['groups']['ah2|4|handicap|ft|-3.5|1'][0]['odds'], {'away': 1.01, 'home': 13.})
+        self.assertEqual(fixture['groups']['ah2|4|handicap|ft|0.75|1'][0]['odds'], {'home': 1.02, 'away': 12.})
+        self.assertEqual(fixture['groups']['ah2|4|handicap|ft|-0.75|1'][0]['odds'], {'away': 1.01, 'home': 13.})
         for key in original: self.assertEqual(fixture['groups'][key], original[key])
         once = deepcopy(fixture); migrate_handicap_history(fixture); self.assertEqual(fixture, once)
         state = {'matrix_quotes': {'100': fixture}}
@@ -231,7 +230,7 @@ class MatrixMath(unittest.TestCase):
         day = {'date': '2026-10-26', 'matches': [m]}
         before_rates = deepcopy(m['multimarket']['rates'])
         self.assertEqual(repair_day(day, state, NOW)[0], 1)
-        easy = next(r for r in m['multimarket']['matrix']['rows'] if r['spec'] == S('handicap', 'ft', 'away', 3.5))
+        easy = next(r for r in m['multimarket']['matrix']['rows'] if r['spec'] == S('handicap', 'ft', 'away', 0.75))
         self.assertEqual(easy['odd'], 1.01)
         self.assertEqual(easy['quote_observed_at'], early)
         self.assertEqual(m['multimarket']['rates'], before_rates)

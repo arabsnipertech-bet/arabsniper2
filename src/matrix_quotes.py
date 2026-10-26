@@ -13,6 +13,7 @@ from multimarket_model import stamp, number, fair, normalized, SPECS
 from context_analysis import movement
 from lateral_matrix import specification, market_id, matrix_rows
 from opportunity_policy import annotate
+from market_scope import CORE_BET_IDS, core_market, trim_matrix
 
 # Verified API-Football prematch catalogue identities. Never identify a market
 # by the presence of 'over' alone (corners/cards/team totals are different).
@@ -151,12 +152,16 @@ def collect(payload, fid, observed_at):
                 except (ValueError, TypeError): continue
                 if bid not in CATALOG:
                     diagnostics['unmodeled_bet_types'] += 1; continue
+                if bid not in CORE_BET_IDS:
+                    diagnostics['out_of_scope_bet_types'] += 1; continue
                 if normalized(bet.get('name')) != normalized(CATALOG[bid][0]):
                     diagnostics['catalog_identity_mismatch'] += 1; continue
                 local = {}
                 for value in bet.get('values', []):
                     odd = number(value.get('odd'))
                     spec = parse_value(bid, value.get('value'))
+                    if spec and not core_market(spec):
+                        diagnostics['out_of_scope_values'] += 1; continue
                     if not spec or odd is None or odd <= 1:
                         diagnostics['unmapped_or_invalid_values'] += 1; continue
                     group, token, expected = partition(spec)
@@ -247,6 +252,7 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
     migrate_handicap_history(fixture)
     offers = defaultdict(list)
     for key, group in captured.items():
+        if not group.get('specs') or not all(core_market(s) for s in group['specs'].values()): continue
         points = fixture['groups'].setdefault(key, [])
         if not points:
             # Preserve valid operator histories already collected by V3/V4.
@@ -281,6 +287,8 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
 
 
 def analyse_prices(row, offers, as_of, kickoff):
+    if not core_market(row.get('spec')):
+        raise ValueError('Price analysis outside the active market scope')
     row['quote_adapter_version'] = HANDICAP_ADAPTER_VERSION
     row.update(selected_margin_pct=None, selected_margin_delta_pp=None,
                selected_movement=None, selected_market_odds=None,
@@ -375,6 +383,7 @@ def attach(assessment, payload, state, meta, as_of):
     captured, diagnostics = collect(payload, meta['fixture_id'], as_of)
     offers = ledger_offers(state, meta['fixture_id'], captured, as_of, meta['kickoff'])
     matrix = assessment['matrix']
+    trim_matrix(matrix)
     existing = {r['id'] for r in matrix['rows']}
     extra = {key: values[0]['spec'] for key, values in offers.items() if key not in existing}
     if extra: matrix['rows'].extend(matrix_rows(assessment, extra))
@@ -397,6 +406,8 @@ def attach(assessment, payload, state, meta, as_of):
 
 def expire(assessment, meta, as_of):
     now, start = stamp(as_of), stamp(meta.get('kickoff'))
+    if meta.get('result') or now and start and now >= start: return
+    trim_matrix(assessment.setdefault('matrix', {}))
     age = 1 if now and start and 0 < (start-now).total_seconds() <= 10800 else 6
     for row in assessment.get('matrix', {}).get('rows', []):
         at = stamp(row.get('provider_updated_at'))

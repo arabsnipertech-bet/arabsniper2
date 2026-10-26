@@ -3,13 +3,16 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from audit_storage import read_store, write_store
-from lateral_matrix import MODEL_ID
+from lateral_matrix import MODEL_ID, CONFIG_ID, base_specs, market_id, matrix_rows
 from matrix_quotes import (CATALOG, partition, migrate_handicap_history, ledger_offers,
                            analyse_prices, expire)
 from matrix_pipeline import build_board, selection_export
 from multimarket_model import stamp
 from opportunity_policy import POLICY_ID
 from gold_competitions import SCOPE_ID, enforce_day
+from market_scope import MARKET_SCOPE_ID, trim_matrix, core_market
+from proposal_stability import seed_stability
+from copy import deepcopy
 
 
 def cached_refresh_safe(paths):
@@ -19,7 +22,11 @@ def cached_refresh_safe(paths):
     """
     price_files = {'src/opportunity_policy.py', 'src/matrix_quotes.py', 'src/matrix_pipeline.py',
                    'src/homepage_preview.py', 'src/context_analysis.py', 'src/refresh_opportunities.py',
-                   'src/gold_competitions.py', 'src/statistics_integration.py', 'src/gold_policy_audit.py'}
+                   'src/gold_competitions.py', 'src/statistics_integration.py', 'src/gold_policy_audit.py',
+                   'src/market_scope.py', 'src/proposal_stability.py'}
+    # This migration changes the computed market universe, not the Poisson
+    # kernel or source statistics; the dedicated tests require identical core probabilities.
+    if 'src/market_scope.py' in paths: price_files.add('src/lateral_matrix.py')
     auxiliary = {'.github/workflows/fast_scan.yml', '.github/workflows/night_scan.yml', '.github/workflows/policy_tests.yml'}
     return bool(set(paths) & price_files) and all(
         p in price_files | auxiliary or p.startswith(('web/', 'tests/', 'docs/')) for p in paths)
@@ -31,7 +38,7 @@ def captured_prices(fixture, rows):
     specs = {}
     for row in rows:
         spec = row.get('spec')
-        if not spec: continue
+        if not core_market(spec): continue
         group, token, _ = partition(spec)
         for bid, (_, kind, period) in CATALOG.items():
             if period == spec['period'] and (kind == spec['kind'] or kind == 'total' and spec['kind'] == 'asian_total'):
@@ -64,7 +71,17 @@ def refresh_day(day, state, as_of):
         if (a.get('model_id') != MODEL_ID or not kickoff or kickoff <= stamp(as_of) or
                 meta.get('status_short') not in ('NS', 'TBD') or meta.get('result')): continue
         matrix = a.get('matrix') or {}
+        if (matrix.get('opportunity_policy') or {}).get('id') != POLICY_ID:
+            seed_stability(deepcopy(a), a)
+        trim_matrix(matrix)
         rows = matrix.get('rows', [])
+        if a.get('rates'):
+            existing = {r['id'] for r in rows}
+            missing = {market_id(s): s for s in base_specs() if market_id(s) not in existing}
+            if missing: rows.extend(matrix_rows(a, missing))
+        matrix['market_scope'] = {'id': MARKET_SCOPE_ID, 'modeled_markets': len(rows)}
+        a['config_id'] = CONFIG_ID
+        a.setdefault('config', {})['market_scope'] = MARKET_SCOPE_ID
         fixture = state.get('matrix_quotes', {}).get(str(meta.get('fixture_id')))
         if fixture:
             captured = captured_prices(fixture, rows)

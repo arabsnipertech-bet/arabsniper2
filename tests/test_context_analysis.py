@@ -168,7 +168,7 @@ class IntegrationTests(unittest.TestCase):
         result=e.build_fixture_output(Client(),fixture(100,now+timedelta(hours=2)),{}, {})
         self.assertIsNotNone(result)
         self.assertEqual(result['multimarket']['model_id'],'lateral-matrix-v5.0')
-        self.assertGreater(len(result['multimarket']['matrix']['rows']), 200)
+        self.assertEqual(len(result['multimarket']['matrix']['rows']), 55)
         self.assertEqual(result['multimarket']['profiles']['home']['for_ft']['sample'],8)
         self.assertTrue(all(r['source']=='analisi statistica' for r in result['multimarket']['markets']))
         self.assertTrue(all(r['odd'] is None for r in result['multimarket']['markets']))

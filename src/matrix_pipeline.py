@@ -86,6 +86,7 @@ def build_board(day, as_of):
         eligible += policy.get('eligible_markets', 0)
         proposals += bool(policy.get('best_market_id'))
         a['selected_markets'], a['best_candidate'] = [], None
+        a['markets'] = [r for r in a.get('markets', []) if r.get('market') in LEGACY]
         # Backward-compatible four-market exports. The dashboard uses the full
         # matrix; these flags no longer restrict fixtures or the other markets.
         for old in a.get('markets', []):

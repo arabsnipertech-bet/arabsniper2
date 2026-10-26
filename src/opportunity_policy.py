@@ -7,7 +7,7 @@ from collections import Counter
 from math import isfinite, sqrt
 from statistics import mean, median
 
-POLICY_ID = 'gold-goals-v2'
+POLICY_ID = 'gold-goals-v3'
 ODDS_MIN, ODDS_MAX = 1.40, 3.50
 GOALS = {('total', 'ht', 'over', 1.5), ('btts', 'ht', 'yes', None),
          ('total', 'ft', 'over', 2.5), ('total', 'ft', 'over', 3.5)}
@@ -131,6 +131,15 @@ def goal_context(assessment, rows):
         'note': 'Priorità sperimentale, non recupero dei gol dovuto. Il flusso 1X2 non conferma da solo il mercato gol.'}
 
 
+def signal_for(row, eligible):
+    if not eligible: return 'excluded'
+    margin, delta, oci = row.get('selected_margin_pct'), row.get('selected_margin_delta_pp'), row.get('oci')
+    if numeric(margin) and confirmed_flow(row):
+        if oci > 0: return 'convergence'
+        if margin <= 9 and not (numeric(delta) and delta >= 1): return 'contrarian'
+    return 'unconfirmed'
+
+
 def evaluate(row, pt_priority=False, preferred_pt=None):
     tier = market_tier(row)
     minimum_p = 35
@@ -169,16 +178,12 @@ def evaluate(row, pt_priority=False, preferred_pt=None):
     if not numeric(ev) or ev < min_ev: reasons.append('edge')
     if not numeric(ev_low) or ev_low <= 0 or ev_low < min_low: reasons.append('sensitivity')
     eligible = not reasons
-    oci = row.get('oci')
-    coherent = confirmed_flow(row)
-    signal = 'excluded' if not eligible else 'unconfirmed'
-    if eligible and margin_known and coherent:
-        if oci > 0: signal = 'convergence'
-        elif margin <= 9 and not (numeric(delta) and delta >= 1): signal = 'contrarian'
+    signal = signal_for(row, eligible)
     # An ordinal risk/value score, never a probability or suggested stake.
     score = p * max(0., ev_low-min_low)/(odd-1) if eligible else None
-    return {'policy_id': POLICY_ID, 'eligible': eligible, 'rank': None, 'priority': tier,
+    return {'policy_id': POLICY_ID, 'eligible': eligible, 'strict_eligible': eligible, 'rank': None, 'priority': tier,
             'min_probability_pct': minimum_p, 'min_ev_pct': min_ev,
+            'entry_min_ev_pct': min_ev, 'entry_min_ev_low_pct': min_low,
             'min_ev_low_pct': min_low, 'margin_band': band,
             'signal': signal, 'label': LABELS[signal], 'reasons': reasons,
             'playability_score': score, 'pt_priority': pt_priority}
@@ -202,9 +207,13 @@ def annotate(matrix, as_of=None, assessment=None):
         a, b = goals.get(subset), goals.get(superset)
         if a and b and numeric(a.get('statistical_pct')) and numeric(b.get('statistical_pct')) and a['statistical_pct'] > b['statistical_pct']+.01:
             for row in (a, b):
-                row['opportunity'].update(eligible=False, rank=None, signal='excluded', label=LABELS['excluded'], playability_score=None)
+                row['opportunity'].update(eligible=False, strict_eligible=False, rank=None, signal='excluded', label=LABELS['excluded'], playability_score=None)
                 row['opportunity']['reasons'].append('coherence')
     eligible = sorted((r for r in rows if r['opportunity']['eligible']), key=ranking_key)
+    from proposal_stability import stabilize
+    best = stabilize(matrix, as_of, eligible)
+    eligible = sorted((r for r in rows if r['opportunity']['eligible']), key=ranking_key)
+    if best: eligible = [best, *[r for r in eligible if r is not best]]
     for rank, row in enumerate(eligible, 1): row['opportunity']['rank'] = rank
     matrix['opportunity_policy'] = {'id': POLICY_ID, 'evaluated_at': as_of,
         'odds_min': ODDS_MIN, 'odds_max': ODDS_MAX, 'min_probability_pct': 35,
