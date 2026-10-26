@@ -3,13 +3,13 @@ import subprocess
 import unittest
 from copy import deepcopy
 from datetime import datetime
-from opportunity_policy import evaluate, annotate, best_opportunity, POLICY_ID
+from opportunity_policy import evaluate, annotate, best_opportunity, POLICY_ID, first_half_evidence
 from refresh_opportunities import refresh_day, cached_refresh_safe
 from homepage_preview import build_preview
 from matrix_quotes import attach, expire
 from lateral_matrix import build_matrix, specification as S
 from statistics_first import statistical_analysis
-from test_statistics_first import match, NOW
+from test_statistics_first import match, NOW, team_history
 from test_lateral_matrix import payload
 
 
@@ -22,6 +22,7 @@ def row(**changes):
         'fair_direction_coherent': True, 'category': 'mature',
         'provider_updated_at': NOW, 'selected_movement': {'delta_pct': -8.,
             'fair_delta_pp': 3., 'persistence': 1., 'reversal': False}}
+    result['ht_evidence'] = first_half_evidence({'inputs': {'histories': {side: team_history(side) for side in ('home','away')}}})
     result.update(changes)
     return result
 
@@ -32,7 +33,7 @@ class PlayableValue(unittest.TestCase):
             self.assertTrue(evaluate(row(statistical_pct=p, odd=q))['eligible'])
         for p, q, reason in [(34.999, 3.5, 'probability'), (80, 1.3999, 'price'), (35, 3.5001, 'price')]:
             self.assertIn(reason, evaluate(row(statistical_pct=p, odd=q))['reasons'])
-        for p, eligible in [(34.999, False), (35, True)]:
+        for p, eligible in [(35, False), (44.999, False), (45, True)]:
             self.assertEqual(evaluate(row(spec=S('total', 'ht', 'over', 1.5), statistical_pct=p))['eligible'], eligible)
 
     def test_nonfinite_missing_or_limited_data_cannot_be_promoted(self):

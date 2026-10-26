@@ -1,6 +1,6 @@
 # Gold: stable proposals and core market matrix
 
-Production policy: `gold-goals-v4`. Stability: `gold-stability-v1`.
+Production policy: `gold-goals-v5`. Stability: `gold-stability-v1`.
 Computed scope: `gold-core-markets-v1`. The Poisson kernel remains V5.0.
 
 ## Entry and maintenance
@@ -25,28 +25,56 @@ Higher overround tiers retain their stronger requirements minus that same
 bounded cushion. Unknown overround, changed bookmaker, missing previously
 available OCI, or a detected price reversal cannot use maintenance tolerance.
 
-Only EV/sensitivity failures may be tolerated. Probability >=35%, the market's
+Only EV/sensitivity failures may be tolerated. The per-market probability floor, the market's
 real-odds range below, supported history, coherent goal probabilities, the competition
 whitelist and quote freshness remain hard gates. The current OCI classification
 is recomputed; a former convergence label is not carried forward without support.
 These are explicit product thresholds, not evidence of calibrated profitability.
 
-| Market | Inclusive odds range |
-|---|---|
-| Over 1.5 HT, Over 2.5 FT | 1.40–3.50 |
-| Goal/BTTS HT Yes, Over 3.5 FT | 1.40–5.50 |
+| Market | Minimum probability | Inclusive odds range |
+|---|---:|---|
+| Over 1.5 HT | 45% | 1.40–3.50 |
+| Goal/BTTS HT Yes | 40% | 1.40–5.50 |
+| Over 2.5 FT | 35% | 1.40–3.50 |
+| Over 3.5 FT | 35% | 1.40–5.50 |
 
 Equivalent Asian **half-lines** use the same limits: 1.5 HT and 2.5 FT at
 3.50, 3.5 FT at 5.50. Integer/quarter lines have different push or split
 settlements and remain matrix references, not additional proposal markets.
-No probability, overround, EV, whitelist, timing-priority or tolerance threshold
-changes. Each row exports `goal_market`, `odds_min`, `odds_max`; the policy
-exports `odds_max_by_market`. These admission rules never remove statistical rows.
+Overround, EV, whitelist, timing-priority and tolerance thresholds stay unchanged. Each row exports `goal_market`, `odds_min`, `odds_max`; the policy
+exports `odds_max_by_market` and `min_probability_pct_by_market`. These admission rules never remove statistical rows.
 
 Among strict candidates of equal priority, replacement requires a score gain
 of at least 15% or 2 score points, whichever is larger. A better PT priority
 still wins immediately. The final saved rank is authoritative for Gold and the
 public preview. UI shows retained status and its maximum expiry time.
+
+## Dedicated first-half admission
+
+The 45% Over 1.5 HT and 40% Goal HT floors are **prudential, unvalidated policy
+choices**, not an empirical calibration or promised success rate. Four valid,
+deduplicated first-half scores per team are required (the same four-match
+window as the model); insufficient evidence blocks only the proposal, never
+the fixture or matrix. Full-time history cannot satisfy this check. Missing,
+inconsistent HT scores and duplicate fixtures cannot manufacture coverage.
+
+`ht_evidence` records per-team observed goals, venue coverage, HT xG sample
+counts/means and HT shots when present, with `prospective_pending` validation.
+Missing HT xG stays null, not zero, and is displayed explicitly. Three actual
+HT xG observations in each attack/defence profile are needed to label the xG
+coverage supported, matching the existing model. This coverage label is not
+an additional probability bonus or an automatic admission override.
+
+The independent HT Poisson rates already use HT goals and HT xG when available;
+this release never scales FT probability, uses FT xG as an HT proxy, or changes
+pure probabilities. The current ordinary collector does not request split HT
+xG; this release does not invent coverage or add collection calls. An empirical
+xG-based calibration requires real split coverage and a larger prospective
+sample. The audits preserve evidence and decisions for that later review.
+
+The same probability/history hard gates apply to retained proposals and exact
+Asian equivalents. The browser independently enforces the per-market floor;
+a stale or malformed decision cannot label a 35% PT outcome playable.
 
 ## Computation and display
 
@@ -73,14 +101,14 @@ The 1X2 three-column opening/current board remains on the match card.
 The compatible release refreshes future matrices from saved statistics and quote
 observations with **zero API-Football calls**. It preserves source timestamps;
 this is not a new quote collection. Scheduled Fast/Night collection is unchanged.
-Started forecasts are immutable. Updated JavaScript assets use cache version 5.6.
+Started forecasts are immutable. Updated JavaScript assets use cache version 5.7.
 
-The prospective audit retains the v2/v3 hashes and choices, separates v2/v3/v4
+The prospective audit retains the v2/v3/v4 hashes and choices, separates v2/v3/v4/v5
 cohorts, and freezes a strict `without_hysteresis` control alongside published
 choices. Asian aliases have separate audit market keys to avoid counting two
 prices for the same event as independent observations. The study dates and
-scheduled collection stay unchanged. This odds-cap change is the user's explicit
-exception to the freeze until 2 November; no other model adjustments are authorized.
+scheduled collection stay unchanged. The odds-cap and subsequent dedicated PT admission changes are the user's explicit
+exceptions to the freeze until 2 November; no other model adjustments are authorized.
 
 Validation covers admission/exit boundaries, non-renewing anchors, cumulative
 drift, expired quotes, persisted Fast/day rollover, unchanged core probabilities,

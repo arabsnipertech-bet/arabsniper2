@@ -38,7 +38,7 @@ for spec,price in [(S('btts','ht','yes'),5.5),(S('total','ft','over',3.5),5.5),
                    (S('total','ft','over',2.5),3.5),(S('total','ht','over',1.5),3.5001),
                    (S('total','ft','over',3.5),5.5001)]:
  b=deepcopy(a)
- b['matrix']['rows']=[row(spec=spec,period=spec['period'],label=label(spec),odd=price,statistical_pct=35)]
+ b['matrix']['rows']=[row(spec=spec,period=spec['period'],label=label(spec),odd=price,statistical_pct=60)]
  annotate(b['matrix'],NOW)
  caps.append(b)
 print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
@@ -137,7 +137,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Live overflow');
   const timed={...payload,matches:contexts.map((a,i)=>({...payload.matches[i],multimarket:a}))};
   await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},timed);
-  const timing=await page.locator('.mx-timing').allTextContents();
+  const timing=await page.locator('.mx-timing:not(.mx-first-half)').allTextContents();
   assert(timing[0].includes('Priorità Over 1,5 PT')&&timing[0].includes('Favorita in casa'));
   assert(timing[1].includes('Priorità Over 1,5 PT')&&timing[1].includes('Favorita in trasferta'));
   assert(timing[2].includes('Priorità Goal PT')&&timing[3].includes('Priorità Goal PT'));
@@ -153,6 +153,10 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5);
    assert.equal(await page.locator('.mx-best[data-opportunity-odd="5.5"]').count(),3);
    assert.equal(await page.locator('.mx-best-empty').count(),2);
+   assert((await page.locator('.mx-best').first().textContent()).includes('minimo 40'));
+   assert((await page.locator('.mx-best').first().textContent()).includes('Over 1,5 PT ≥45%'));
+   assert.equal(await page.locator('.mx-first-half').count(),2);
+   assert((await page.locator('.mx-first-half').first().textContent()).includes('xG PT non disponibili'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Market caps overflow '+name);
    await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-market-caps-${name}.png`});

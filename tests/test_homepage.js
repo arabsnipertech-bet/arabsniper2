@@ -26,6 +26,14 @@ async function run(payload,fail=false){
    r=await run({...v5,selections:[{...selection,...extra}]});assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,ok?1:0);
   }
  }
+ for(const [kind,line,floor] of [['total',1.5,45],['asian_total',1.5,45],['btts',null,40]]){
+  const spec={kind,period:'ht',side:kind==='btts'?'yes':'over',line};
+  const max=kind==='btts'?5.5:3.5;
+  const selection={...v5.selections[0],spec,odd:max,statistical_pct:floor,opportunity:{policy_id:'gold-goals-v5',eligible:true,min_probability_pct:floor,odds_max:max,ht_history_supported:true}};
+  for(const [extra,ok] of [[{},true],[{statistical_pct:floor-.001},false],[{statistical_pct:35,opportunity:{...selection.opportunity,min_probability_pct:35}},false],[{opportunity:{...selection.opportunity,ht_history_supported:false}},false],[{opportunity:{...selection.opportunity,min_probability_pct:null}},false]]){
+   r=await run({...v5,selections:[{...selection,...extra}]});assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,ok?1:0);
+  }
+ }
  const html=fs.readFileSync('web/index.html','utf8');assert(!html.includes('localStorage.clear'));assert(!html.includes('logout=true'));assert(!html.includes('details_day1'));
  for(const plan of ['daily','weekly','monthly']) assert(html.includes("buy('"+plan+"', this)"));
  console.log('PASS: public feed only, three cards, stale day, escaped HTML, unavailable feed, Gold entry links and plan IDs');
