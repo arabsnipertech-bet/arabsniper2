@@ -22,12 +22,28 @@ def number(value, low, high=float('inf')):
             and isfinite(value) and low <= value <= high)
 
 
+def report_snapshot(record):
+    """Retain report fields, not the full operator quote history of a fixture."""
+    assessment = record.get('multimarket') or {}
+    fields = ('market', 'selection', 'odd', 'probabilities', 'book_probability_pct',
+              'missing', 'pros', 'cons', 'price_assessment')
+    return {'fixture': record['fixture'], 'captured_at': record['captured_at'],
+            'forecast_sha256': fingerprint(record),
+            'settlement': {'result': (record.get('settlement') or {}).get('result') or {}},
+            'multimarket': {**{k: assessment.get(k) for k in
+                              ('data_quality', 'selection_diagnostic')},
+                           'best_candidate': {k: (assessment.get('best_candidate') or {}).get(k)
+                                              for k in ('market', 'selection')},
+                           'markets': [{k: m[k] for k in fields if k in m}
+                                       for m in assessment.get('markets', [])]}}
+
+
 def build_daily(store, date, generated_at, source_revision=None):
     snapshots = {'first': {}, 'latest': {}}
     rejected = []
     # First snapshots also provide a fallback where no update was captured.
     for collection in ('multimarket_evaluations', 'analysis_updates'):
-        for source_key, record in sorted(store.get(collection, {}).items()):
+        for source_key, record in store.get(collection, {}).items():
             fixture = record.get('fixture') or {}
             assessment = record.get('multimarket') or {}
             captured, kickoff = stamp(record.get('captured_at')), stamp(fixture.get('kickoff'))
@@ -38,14 +54,25 @@ def build_daily(store, date, generated_at, source_revision=None):
             period = ('retrospective' if record.get('retrospective') else
                       'prospective' if kickoff.date().isoformat() >= VALIDATION_FROM else 'development')
             key = (version, period, str(fid))
-            entry = (record, collection, source_key)
+            # Preserve the original lexical tie-break without sorting/materializing
+            # every historical update. Collection order wins ties across collections.
+            def preferred(old, latest=False):
+                if old is None:
+                    return True
+                previous = stamp(old[0]['captured_at'])
+                if captured != previous:
+                    return captured > previous if latest else captured < previous
+                return collection == old[1] and source_key < old[2]
+            entry = None
             if collection == 'multimarket_evaluations':
                 old = snapshots['first'].get(key)
-                if old is None or captured < stamp(old[0]['captured_at']):
+                if preferred(old):
+                    entry = (report_snapshot(record), collection, source_key)
                     snapshots['first'][key] = entry
             old = snapshots['latest'].get(key)
-            if old is None or captured > stamp(old[0]['captured_at']):
-                snapshots['latest'][key] = entry
+            if preferred(old, latest=True):
+                snapshots['latest'][key] = entry or (report_snapshot(record), collection, source_key)
+    rejected.sort(key=lambda r: (r['collection'] != 'multimarket_evaluations', r['key']))
     rows, fixtures, groups = [], [], defaultdict(list)
     for policy, entries in snapshots.items():
         for (version, period, fid), (record, collection, source_key) in sorted(entries.items()):
@@ -55,7 +82,7 @@ def build_daily(store, date, generated_at, source_revision=None):
             result = (record.get('settlement') or {}).get('result') or {}
             identity = {'snapshot': policy, 'model_id': version, 'period': period,
                         'fixture_id': fid, 'fixture': record['fixture'],
-                        'captured_at': record['captured_at'], 'forecast_sha256': fingerprint(record),
+                        'captured_at': record['captured_at'], 'forecast_sha256': record['forecast_sha256'],
                         'source_collection': collection, 'source_key': source_key}
             candidates = {(m.get('market'), m.get('selection')): m
                           for m in assessment.get('markets', [])}

@@ -1,6 +1,14 @@
 name: Encrypted weekend audit
 on:
   workflow_dispatch:
+    inputs:
+      dates:
+        description: 'Date separate da virgola (YYYY-MM-DD)'
+        required: true
+        default: '2026-10-23,2026-10-24'
+      recipient_public_key:
+        description: 'Chiave pubblica PEM del destinatario (mai la chiave privata)'
+        required: false
 permissions:
   contents: read
 concurrency:
@@ -15,7 +23,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install boto3 cryptography
+      - run: pip install boto3 cryptography ijson==3.6.0
       - name: Read frozen forecasts and verify official outcomes
         env:
           R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -23,6 +31,9 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+          AUDIT_DATES: ${{ inputs.dates }}
+          AUDIT_RECIPIENT_PUBLIC_KEY: ${{ inputs.recipient_public_key }}
+          PYTHONUNBUFFERED: '1'
         run: python auditor/weekend_export.py
       - uses: actions/upload-artifact@v4
         with:

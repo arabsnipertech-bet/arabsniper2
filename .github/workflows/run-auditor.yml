@@ -34,7 +34,8 @@ concurrency:
 jobs:
   auditor:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Measured archive/settlement work exceeds 25 minutes before publication.
+    timeout-minutes: 60
     env:
       GOLD_PRIVATE: ${{ vars.GOLD_PRIVATE }}
       R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -63,8 +64,6 @@ jobs:
 
       - name: Archive forecasts and settle completed matches
         run: python auditor/current_audit.py settle
-      - name: Compare multimarket models
-        run: python src/task_progress.py src/model_research.py
       - name: Build public results from frozen forecasts
         run: python src/task_progress.py src/homepage_results.py
       - name: Save verified state in private storage

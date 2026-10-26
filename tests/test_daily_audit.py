@@ -2,6 +2,8 @@ import copy
 import sys
 from pathlib import Path
 import unittest
+import subprocess
+import os
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 from daily_audit import build_daily, fingerprint, markdown
 
@@ -65,5 +67,34 @@ class DailyTests(unittest.TestCase):
     def test_live_score_does_not_settle(self):
         r = record(); r['settlement']['result']['status'] = '2H'
         self.assertTrue(all(x['outcome'] is None for x in self.report(r)['markets']))
+
+    def test_snapshot_ties_remain_lexical_and_hash_original_input(self):
+        r=record();r['multimarket']['quotes']={'operators':['original evidence']}
+        r['multimarket']['markets'][0]['movement']={'large':'not needed in daily rows'}
+        store={'multimarket_evaluations':{'z':r,'a':r},'analysis_updates':{'0':r}}
+        d=build_daily(store,'2026-10-20','now')
+        self.assertTrue(all(f['source_key']=='a' for f in d['fixtures']))
+        self.assertTrue(all(f['forecast_sha256']==fingerprint(r) for f in d['fixtures']))
+        self.assertEqual(d,build_daily({'analysis_updates':{'0':r},
+            'multimarket_evaluations':{'a':r,'z':r}},'2026-10-20','now'))
+
+    @unittest.skipUnless(sys.platform=='linux','uses Linux address-space limit')
+    def test_daily_report_streams_repeated_large_updates(self):
+        source='''
+import resource
+from daily_audit import build_daily
+resource.setrlimit(resource.RLIMIT_AS,(160*1024**2,160*1024**2))
+class Updates:
+    def items(self):
+        for i in range(180):
+            yield f'{i:04}', {'fixture':{'fixture_id':1,'kickoff':'2026-10-20T18:00:00+00:00'},
+                'captured_at':'2026-10-20T10:00:00+00:00',
+                'multimarket':{'model_id':'v1','markets':[], 'quotes':{'history':'x'*(2*1024**2)+str(i)}}}
+d=build_daily({'analysis_updates':Updates()},'2026-10-20','now')
+assert len(d['fixtures'])==1 and d['fixtures'][0]['source_key']=='0000'
+'''
+        env=dict(os.environ,PYTHONPATH=str(Path(__file__).resolve().parents[1]/'src'))
+        result=subprocess.run([sys.executable,'-c',source],env=env,capture_output=True,text=True,timeout=30)
+        self.assertEqual(result.returncode,0,result.stderr)
 
 if __name__ == '__main__': unittest.main()
