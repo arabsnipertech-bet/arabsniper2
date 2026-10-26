@@ -1,26 +1,12 @@
 #!/usr/bin/env python3
 """
-ARAB SNIPER QUOTE ENGINE V1.1
-============================
+ARAB SNIPER 2.0 — STATISTICS FIRST
 
-Motore autonomo per:
-- estrazione fixture e quote API-Football / API-Sports;
-- storico quota iniziale, attuale e variazioni nel tempo;
-- consenso tra bookmaker tramite mediana;
-- aggio, payout, carico del margine e OCI-AS;
-- profilo statistico squadre, casa/trasferta, forma e scontri diretti;
-- lambda FT e primo tempo;
-- probabilita' ArabSniper pure e calibrate per 1-X-2, Over 2.5 FT,
-  Over 1.5 primo tempo e GG primo tempo;
-- layer xG reali quando forniti dalle statistiche API;
-- validazione rigida e audit dei mercati quota;
-- indicatori grafici pronti per il futuro frontend HTML:
-    cerchio  = scelta ArabSniper
-    quadrato = scelta book
-    doppio   = concordanza ArabSniper + book
-
-Il motore NON usa piu' etichette GOLD, MARKET, BOOST, PROBE ecc.
-Produce dati grezzi per audit e una sezione display semplificata.
+La pipeline attiva è installata da statistics_integration.py:
+statistiche prima, modello statistics-first-v4.0, quote come conferma successiva,
+quattro selettori con astensione, archiviazione immutabile delle decisioni.
+Le funzioni storiche di raccolta restano compatibili con API, cache e storage.
+I vecchi calcoli di confronto con il bookmaker non generano le proposte attive.
 
 Esempi:
     python arab_quote_engine.py --today
@@ -68,7 +54,7 @@ except Exception:  # pragma: no cover
 # =========================================================
 # CONFIGURAZIONE
 # =========================================================
-VERSION = "1.4.0"
+VERSION = "2.0.0"
 API_BASE_URL = "https://v3.football.api-sports.io"
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -1939,7 +1925,7 @@ def scan_dates(
     current_version = str(state.get("version", ""))
     current_family = ".".join(current_version.split(".")[:2])
     target_family = ".".join(VERSION.split(".")[:2])
-    if current_version and current_family != target_family and not {current_family, target_family}.issubset({'1.1', '1.2', '1.4'}):
+    if current_version and current_family != target_family and not {current_family, target_family}.issubset({'1.1', '1.2', '1.4', '2.0'}):
         log(f"♻️ Reset stato quote per cambio schema: {current_version} -> {VERSION}")
         state = default_state()
     elif current_version != VERSION:
@@ -3154,7 +3140,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="ArabSniper Quote Engine V1.1.7")
+    parser = argparse.ArgumentParser(description="ArabSniper Statistics First V4")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--today", action="store_true", help="Scansiona il giorno corrente")
     mode.add_argument("--fast", action="store_true", help="Scansiona oggi e domani riusando la cache xG")
@@ -3258,7 +3244,7 @@ def main() -> None:
 # ENHANCEMENT V1.1.3 — QUALITA' COMPETIZIONI, GATE SEGNALI,
 # STATISTICHE TIRI E AUDIT RISULTATI
 # =========================================================
-VERSION = "1.4.0"
+VERSION = "2.0.0"
 PREDICTION_AUDIT_FILE = DATA_DIR / "arab_quote_prediction_audit.json"
 REMOTE_PREDICTION_AUDIT_FILE = "data/arab_quote_prediction_audit.json"
 STRICT_COMPETITIONS = _bool_env(os.getenv("ARAB_STRICT_COMPETITIONS", "1"), True)
@@ -4135,7 +4121,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 # ENHANCEMENT V1.1.4 — FIRST-HALF INTELLIGENCE
 # Goal PT, Over 1.5 PT, GG PT, favorite trap e inversione quota
 # =========================================================
-VERSION = "1.4.0"
+VERSION = "2.0.0"
 MARKET_O05HT = "over05_ht"
 MARKET_SELECTIONS[MARKET_O05HT] = ("over", "under")
 DISPLAY_MARKET_NAMES[MARKET_O05HT] = "Goal primo tempo (Over 0,5 PT)"
@@ -4961,7 +4947,7 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
 # ENHANCEMENT V1.1.5 — 1X2 -> GOAL REGIME + VALUE SHORTLIST
 # Mantiene lo schema web V1.1.x e aggiunge soltanto campi.
 # =========================================================
-VERSION = "1.4.0"
+VERSION = "2.0.0"
 
 
 def _profile_metric(profile: Mapping[str, Any], key: str) -> float:

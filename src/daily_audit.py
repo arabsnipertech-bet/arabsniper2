@@ -26,7 +26,8 @@ def report_snapshot(record):
     """Retain report fields, not the full operator quote history of a fixture."""
     assessment = record.get('multimarket') or {}
     fields = ('market', 'selection', 'odd', 'probabilities', 'book_probability_pct',
-              'missing', 'pros', 'cons', 'price_assessment')
+              'missing', 'pros', 'cons', 'price_assessment', 'published_selection',
+              'published_rank', 'statistical_candidate', 'market_confirmation', 'sensitivity')
     return {'fixture': record['fixture'], 'captured_at': record['captured_at'],
             'forecast_sha256': fingerprint(record),
             'settlement': {'result': (record.get('settlement') or {}).get('result') or {}},
@@ -52,7 +53,7 @@ def build_daily(store, date, generated_at, source_revision=None):
                 rejected.append({'collection': collection, 'key': source_key, 'reason': 'invalid_prematch_identity_or_timestamp'})
                 continue
             period = ('retrospective' if record.get('retrospective') else
-                      'prospective' if kickoff.date().isoformat() >= VALIDATION_FROM else 'development')
+                      'prospective' if kickoff.date().isoformat() >= assessment.get('validation_from', VALIDATION_FROM) else 'development')
             key = (version, period, str(fid))
             # Preserve the original lexical tie-break without sorting/materializing
             # every historical update. Collection order wins ties across collections.
@@ -73,7 +74,7 @@ def build_daily(store, date, generated_at, source_revision=None):
             if preferred(old, latest=True):
                 snapshots['latest'][key] = entry or (report_snapshot(record), collection, source_key)
     rejected.sort(key=lambda r: (r['collection'] != 'multimarket_evaluations', r['key']))
-    rows, fixtures, groups = [], [], defaultdict(list)
+    rows, fixtures, groups, selection_groups = [], [], defaultdict(list), defaultdict(list)
     for policy, entries in snapshots.items():
         for (version, period, fid), (record, collection, source_key) in sorted(entries.items()):
             assessment = record['multimarket']
@@ -105,9 +106,17 @@ def build_daily(store, date, generated_at, source_revision=None):
                            outcome=y, pending_reason=reason,
                            paper_profit=(odd if y else 0)-1 if y is not None and valid_odd else None,
                            missing=item.get('missing', []), pros=item.get('pros', []),
-                           cons=item.get('cons', []), price_assessment=item.get('price_assessment'))
+                           cons=item.get('cons', []), price_assessment=item.get('price_assessment'),
+                           published_selection=item.get('published_selection'),
+                           published_rank=item.get('published_rank'),
+                           statistical_candidate=item.get('statistical_candidate'),
+                           market_confirmation=item.get('market_confirmation'),
+                           sensitivity=item.get('sensitivity'))
                 rows.append(row)
                 if item and y is not None and number(probability, 0, 1):
+                    if version.startswith('statistics-first-v4'):
+                        status = 'selected' if item.get('published_selection') else 'not_selected'
+                        selection_groups[(policy, version, period, market, status)].append((probability, y, odd if valid_odd else None))
                     group = (policy, version, period, market, 'primary' if selected else 'not_selected')
                     groups[(*group, 'statistics')].append((probability, y, odd if valid_odd else None))
                     if number(book, 0, 100):
@@ -117,6 +126,8 @@ def build_daily(store, date, generated_at, source_revision=None):
             'source_revision': source_revision,
             'note': 'Experimental. First/latest are separate cohorts, never additive. Paper ROI is not executed profit. No forecast is recalculated.',
             'excluded_records': rejected, 'fixtures': fixtures, 'markets': rows,
+            'selection_groups': [dict(zip(('snapshot', 'model_id', 'period', 'market', 'group'), k), **metrics(v))
+                                 for k, v in sorted(selection_groups.items())],
             'groups': [dict(zip(('snapshot', 'model_id', 'period', 'market', 'group', 'variant'), k), **metrics(v))
                        for k, v in sorted(groups.items())]}
 

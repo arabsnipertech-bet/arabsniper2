@@ -11,7 +11,7 @@
    const response=await fetch(endpoint+'?v='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(15000)});
    if(!response.ok)throw Error('feed');
    const p=await response.json();
-   if(!p.available||!Array.isArray(p.all_results)||!p.daily?.settled){panel.innerHTML='<div class="empty">I risultati di ieri sono in verifica. Pubblicheremo gli esiti quando disponibili.</div>';return;}
+   if(!p.available||!Array.isArray(p.all_results)||!p.daily?.settled){panel.innerHTML=p.model_id==='statistics-first-v4.0'?'<div class="empty">Il nuovo modello V4 è in verifica prospettica. Per ieri non sono ancora disponibili selezioni concluse: i risultati del modello precedente restano separati.</div>':'<div class="empty">I risultati di ieri sono in verifica. Pubblicheremo gli esiti quando disponibili.</div>';return;}
    const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
    const expected=new Date(today+'T12:00:00Z');expected.setUTCDate(expected.getUTCDate()-1);
    if(p.date!==expected.toISOString().slice(0,10)){panel.innerHTML='<div class="empty">I risultati di ieri sono in aggiornamento.</div>';return;}

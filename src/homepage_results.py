@@ -1,4 +1,4 @@
-"""Public settled projection of frozen primary forecasts, never a backtest."""
+"""Public outcomes of actually published selections, separated by model version."""
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -6,27 +6,29 @@ import json, math
 from audit_storage import read_store, atomic_bytes
 from homepage_preview import stamp
 
-MODEL = 'context-goals-v3.4'
+from statistics_first import MODEL_ID as MODEL, VALIDATION_FROM
+PREVIOUS_MODEL = 'context-goals-v3.4'
 LABELS = {'over15_ht':'Over 1,5 primo tempo', 'over25_ht':'Over 2,5 primo tempo',
           'over25_ft':'Over 2,5 finale', 'over35_ft':'Over 3,5 finale', 'gg_ht':'Goal primo tempo'}
 ROME = ZoneInfo('Europe/Rome')
 
-def project(report, day):
-    results = {(r['snapshot'], r['model_id'], str(r['fixture_id'])):r.get('result', {}) for r in report.get('fixtures', [])}
+def project(report, day, model=MODEL):
     chosen = {}
     for row in report.get('markets', []):
         fixture = row.get('fixture') or {}
         kickoff, captured = stamp(fixture.get('kickoff')), stamp(row.get('captured_at'))
-        if (row.get('model_id') != MODEL or row.get('period') != 'prospective' or
-            row.get('snapshot') != 'latest' or row.get('primary') is not True or
+        published = row.get('published_selection') if model == MODEL else row.get('primary')
+        if (row.get('model_id') != model or row.get('period') != 'prospective' or
+            row.get('snapshot') != 'latest' or published is not True or
             row.get('market') not in LABELS or not kickoff or not captured or captured >= kickoff or
             kickoff.astimezone(ROME).date().isoformat() != day):
             continue
         fid = str(row['fixture_id'])
-        old = chosen.get(fid)
-        if old is None or captured > stamp(old['captured_at']): chosen[fid] = row
+        key = (fid, row['market'])
+        old = chosen.get(key)
+        if old is None or captured > stamp(old['captured_at']): chosen[key] = row
     output = []
-    for fid, row in chosen.items():
+    for (fid, _), row in chosen.items():
         fixture = row['fixture']
         outcome = row.get('outcome')
         odd = row.get('odd')
@@ -50,8 +52,12 @@ def build(reports, now=None):
     by_day = {day:project(report,day) for day,report in reports.items() if start.isoformat()<=day<=yesterday.isoformat()}
     rows = by_day.get(yesterday.isoformat(),[])
     history = [r for day in sorted(by_day) for r in by_day[day]]
-    return {'schema_version':1,'generated_at':now.isoformat(),'date':yesterday.isoformat(),'model_id':MODEL,
-            'cohort':'Ultima proposta principale registrata prima del calcio d’inizio; Over e Goal PT.',
+    previous = [r for day, report in reports.items() if start.isoformat() <= day <= yesterday.isoformat()
+                for r in project(report, day, PREVIOUS_MODEL)]
+    return {'schema_version':2,'generated_at':now.isoformat(),'date':yesterday.isoformat(),'model_id':MODEL,
+            'validation_from':VALIDATION_FROM,
+            'previous_model':{'model_id':PREVIOUS_MODEL, 'history':totals(previous)},
+            'cohort':'Tutti i mercati selezionati da V4 nell’ultima analisi prima del calcio d’inizio. La stessa partita può avere più mercati; gli esiti sono correlati.',
             'available':yesterday.isoformat() in by_day,'daily':totals(rows),
             'history':dict(totals(history),from_date=start.isoformat(),to_date=yesterday.isoformat(),days_with_data=sum(bool(v) for v in by_day.values())),
             'examples':sorted([r for r in rows if r['outcome']=='won' and r['market'].startswith('over') and r['odd'] is not None], key=lambda r:(-r['odd'],r['kickoff'],r['fixture_id']))[:10],

@@ -9,86 +9,133 @@ sys.modules[spec.name]=engine
 spec.loader.exec_module(engine)
 
 class EngineTests(unittest.TestCase):
-    def gate(self,p=.4,reliability=60,odd=3,valid=True):
-        return engine.recommendation_gate('over15_ht','over',{'over':p},{'over':p},
-            {'current':{'odds':{'over':odd}}},{'usable_for_signals':valid,'bookmakers_found':3},reliability,
-            {'competition_quality_score':64},'contrast',{})
-    def test_threshold_edges_and_recovery(self):
-        self.assertTrue(self.gate()['eligible'])
-        self.assertTrue(self.gate()['recovered'])
-        self.assertFalse(self.gate(p=.399)['eligible'])
-        self.assertFalse(self.gate(reliability=59.9)['eligible'])
-        self.assertFalse(self.gate(odd=2.5)['eligible'])
-        self.assertFalse(self.gate(valid=False)['eligible'])
-    def test_weight_and_egypt(self):
-        self.assertNotIn('Egypt',engine.DEFAULT_EXCLUDED_COUNTRIES)
-        args={'current':{'bookmakers_count':10},'book':{'strength':'strong'},'aggio':{'status':'normal'}}
-        self.assertEqual(engine.market_calibration_weight(args,{'usable_for_signals':True}),.18)
-        self.assertEqual(engine.market_calibration_weight(args,{'usable_for_signals':False}),0)
-    def test_lambda_bonus_keeps_baseline(self):
-        profile=engine.summarize_team_matches([], 'home')
-        profile['goal_drought']={'all':{'bonus_relative':.04}}
-        value=engine.build_lambdas(profile,profile,{}, {})
-        baseline=value['drought_layer']['baseline_lambdas']
-        self.assertAlmostEqual(value['home_ht'],baseline['home_ht']*1.04,places=2)
-        self.assertAlmostEqual(value['total_ft'],value['home_ft']+value['away_ft'],places=2)
+    def test_complete_scan_keeps_quote_history_and_runs_v4(self):
+        from unittest.mock import patch
+        from test_statistics_first import NOW, KICKOFF
+        from contextlib import ExitStack
+        def fixture(fid, date, home=10, away=20, status='FT'):
+            return {'fixture':{'id':fid,'date':date,'status':{'short':status}},
+                'league':{'id':135,'season':2026,'name':'Serie A','country':'Italy','type':'League'},
+                'teams':{'home':{'id':home,'name':'Home'},'away':{'id':away,'name':'Away'}},
+                'goals':{'home':3,'away':2},'score':{'fulltime':{'home':3,'away':2},'halftime':{'home':1,'away':1}}}
+        class Client:
+            last_error=None
+            request_count=0
+            odds_enricher=None
+            def get(self, endpoint, params, **kwargs):
+                if endpoint=='fixtures' and params.get('date'):
+                    return {'response':[fixture(100,KICKOFF,status='NS')]}
+                if endpoint=='fixtures':
+                    team=params.get('team',10)
+                    return {'response':[fixture(team*100+i,f'2026-10-{25-i%8:02}T07:00:00Z',team if i%2==0 else 999,999 if i%2==0 else team) for i in range(8 if 'team' in params else 30)]}
+                return {'response':[]}
+        state={'version':'1.4.0','fixtures':{},'quote_ledger':{'sentinel':'keep'}}
+        written={}
+        with ExitStack() as stack:
+            for name, value in [('iso_now',lambda:NOW),('_existing_day_payload',lambda *a:{}),
+                ('read_json',lambda path,default=None:state if path==engine.STATE_FILE else default),
+                ('atomic_write_json',lambda path,payload:written.update({str(path):payload})),
+                ('save_xg_cache',lambda:None),('enrich_team_matches_with_xg',lambda c,r,t:r)]:
+                stack.enter_context(patch.object(engine,name,value))
+            stack.enter_context(patch('scan_audit.update_audit',return_value={'cohorts':[],'status':'experimental'}))
+            output=engine.scan_dates(Client(),['2026-10-26'],[])
+        self.assertEqual(output['days'][0]['fresh_matches'],1)
+        self.assertEqual(output['days'][0]['matches'][0]['multimarket']['model_id'],'statistics-first-v4.0')
+        self.assertEqual(state['quote_ledger'],{'sentinel':'keep'})
+        self.assertIn('selection_board',output['days'][0])
+        self.assertEqual(output['method']['active_analysis']['book_weight_in_ranking'],0)
+        self.assertNotIn('ft_bridge',output['method'])
 
-class PublicationTests(unittest.TestCase):
-    def test_fixture_convergence_is_distinct_from_value_and_requires_ht_history(self):
-        from copy import deepcopy
-        from policy_integration import install
-        market = {'selections':{'over':{'book_fair_probability_pct':50}},
-                  'empirical_layer':{'poisson_positive':.5,'empirical_positive':.5},
-                  'market_validation':{'usable_for_signals':True}}
-        payload = {'fixture':{'fixture_id':'q'},
-            'model':{'probabilities_raw':{'over15_ht':{'over':.5}},
-                     'probabilities_calibrated':{'over15_ht':{'over':.5}},'reliability_pct':85},
-            'book':{'markets':{'over15_ht':{'current':{'odds':{'over':1.8}}}},
-                    'market_validation':{'over15_ht':{'usable_for_signals':True}}},
-            'display':{'markets':{'over15_ht':market}},
-            'statistics':{'home':{'ht_sample_all':8},'away':{'ht_sample_all':8}}}
-        ns=dict(engine.__dict__)
-        ns['build_fixture_output']=lambda *args:deepcopy(payload)
-        install(ns)
-        result=ns['build_fixture_output'](None,None,None,None)
-        signal=result['display']['first_half_assessment']
-        self.assertTrue(signal['eligible'])
-        self.assertFalse(signal['value_eligible'])
-        self.assertEqual(signal['expected_value_pct'],-10)
-        payload['statistics']['away']['ht_sample_all']=0
-        self.assertFalse(ns['build_fixture_output'](None,None,None,None)['display']['first_half_assessment']['eligible'])
-
-    def test_uncapped_rankings_written_to_local_day_file(self):
+    def test_kickoff_during_scan_preserves_already_published_forecast(self):
         import tempfile
-        import json
-        from datetime import datetime, timezone, timedelta
+        from copy import deepcopy
+        from unittest.mock import patch
         from policy_integration import install
+        from statistics_first import build_selection_board
+        from test_statistics_first import NOW, evaluated
+        old={'date':'2026-10-26','matches':[evaluated()]}
+        old['matches'][0]['fixture']['kickoff']='2026-10-26T09:00:00Z'
+        build_selection_board(old,NOW)
+        after=deepcopy(old)
+        after['day']=1
+        for row in after['matches'][0]['multimarket']['markets']:row['published_selection']=False
         with tempfile.TemporaryDirectory() as folder:
-            now=datetime.now(timezone.utc)
-            rows=[]
-            for i in range(7):
-                rows.append({'fixture':{'fixture_id':str(i),'kickoff':(now+timedelta(hours=2)).isoformat()},
-                    'display':{'market_candidates':[{'market':'over15_ht','fixture_id':str(i),'gate':{'eligible':True},'ranking_score':i,'probability_pct':45}]}})
-            payload={'days':[{'day':1,'date':now.date().isoformat(),'matches':rows}]}
-            kickoff=(now+timedelta(hours=1)).isoformat()
-            rows.append({'fixture':{'fixture_id':'probability_only','kickoff':kickoff},
-                'display':{'market_candidates':[{'market':'over15_ht','fixture_id':'probability_only',
-                    'kickoff':kickoff,'gate':{'eligible':False},'ranking_score':0,'probability_pct':45,
-                    'probability_assessment':{'eligible':True,'value_eligible':False}}]}})
             ns=dict(engine.__dict__)
-            ns['DATA_DIR']=Path(folder)
-            ns['PREMATCH_AUDIT_FILE']=Path(folder)/'frozen.json'
-            ns['OUTPUT_FILE']=Path(folder)/'dashboard.json'
-            ns['_scan_dates_before_prematch_audit']=lambda *args:payload
+            ns.update(DATA_DIR=Path(folder), OUTPUT_FILE=Path(folder)/'out.json',
+                iso_now=lambda:'2026-10-26T10:00:00Z', read_json=lambda *a:old,
+                _scan_dates_before_prematch_audit=lambda *a:{'days':[after]})
             install(ns)
-            result=ns['scan_dates'](None,[],[])
-            ranks=result['days'][0]['market_rankings']['over15_ht']
-            self.assertEqual(len(ranks),7)
-            self.assertEqual(ranks[0]['fixture_id'],'6')
+            with patch('scan_audit.update_audit',return_value={'cohorts':[],'status':'experimental'}):
+                out=ns['scan_dates'](None,['2026-10-26'],[])
+        self.assertEqual(out['days'][0]['matches'][0]['multimarket'],old['matches'][0]['multimarket'])
+        self.assertEqual(out['days'][0]['selection_board']['markets']['over25_ft']['started_selections'],1)
+
+    def test_active_engine_and_independent_statistics(self):
+        from statistics_first import MODEL_ID, CONFIG
+        self.assertEqual(engine.ACTIVE_ANALYSIS_ENGINE, MODEL_ID)
+        self.assertNotIn('Egypt', engine.DEFAULT_EXCLUDED_COUNTRIES)
+        self.assertEqual(CONFIG['book_weight_in_statistics'], 0)
+        self.assertEqual(CONFIG['drought_probability_bonus'], 0)
+
+    def test_real_fixture_pipeline_collects_statistics_before_odds(self):
+        from unittest.mock import patch
+        from statistics_first import statistical_analysis, MODEL_ID
+        from test_statistics_first import NOW, KICKOFF
+        calls=[]
+        def raw(fid, home, away, date, status='FT'):
+            return {'fixture':{'id':fid,'date':date,'status':{'short':status}},
+                    'league':{'id':135,'season':2026,'name':'Serie A','country':'Italy','type':'League'},
+                    'teams':{'home':{'id':home,'name':'Home'},'away':{'id':away,'name':'Away'}},
+                    'goals':{'home':3,'away':2},
+                    'score':{'fulltime':{'home':3,'away':2},'halftime':{'home':1,'away':1}}}
+        upcoming=raw(100,10,20,KICKOFF,'NS')
+        class Client:
+            odds_enricher=None
+            def get(self, endpoint, params, **kwargs):
+                calls.append(endpoint)
+                if endpoint=='odds':
+                    self.assert_statistics_called()
+                    return {'response':[]}
+                if endpoint=='fixtures/headtohead':return {'response':[]}
+                team=params.get('team',10)
+                return {'response':[raw(team*100+i,team if i%2==0 else 999,999 if i%2==0 else team,
+                      f'2026-10-{25-i%8:02}T07:00:00+00:00') for i in range(8 if 'team' in params else 30)]}
+            def assert_statistics_called(self):
+                if 'statistical_analysis' not in calls:raise AssertionError('odds requested before statistics')
+        def analyze(*args):calls.append('statistical_analysis');return statistical_analysis(*args)
+        with patch.object(engine,'iso_now',return_value=NOW), patch.object(engine,'enrich_team_matches_with_xg',side_effect=lambda c,r,t:r), patch('statistics_integration.statistical_analysis',side_effect=analyze), patch.object(engine,'build_lambdas',side_effect=AssertionError('legacy prediction path')):
+            value=engine.build_fixture_output(Client(),upcoming,{}, {})
+        self.assertEqual(value['multimarket']['model_id'],MODEL_ID)
+        self.assertEqual(value['multimarket']['data_quality']['home']['sample'],8)
+        self.assertEqual(value['multimarket']['data_quality']['away']['ht_sample'],4)
+        self.assertEqual(value['model']['probabilities_raw'],value['model']['probabilities_calibrated'])
+        self.assertFalse(value['model']['calibration_applied'])
+        self.assertIsNone(value['multimarket']['markets'][0]['odd'])
+        self.assertLess(calls.index('statistical_analysis'),calls.index('odds'))
+        self.assertAlmostEqual(value['model']['lambdas']['total_ft'],value['model']['lambdas']['home_ft']+value['model']['lambdas']['away_ft'])
+
+    def test_scan_publishes_board_before_single_audit_pass(self):
+        import tempfile, json
+        from unittest.mock import patch
+        from policy_integration import install
+        from test_statistics_first import NOW, evaluated
+        payload={'days':[{'day':1,'date':'2026-10-26','matches':[evaluated(str(i)) for i in range(7)]}]}
+        observed=[]
+        def audit(ns, output, client):
+            observed.append(sum(r['published_selection'] for m in output['days'][0]['matches'] for r in m['multimarket']['markets']))
+            return {'cohorts':[], 'status':'experimental'}
+        with tempfile.TemporaryDirectory() as folder:
+            ns=dict(engine.__dict__)
+            ns.update(DATA_DIR=Path(folder), OUTPUT_FILE=Path(folder)/'dashboard.json',
+                      iso_now=lambda:NOW, _scan_dates_before_prematch_audit=lambda *args:payload)
+            install(ns)
+            with patch('scan_audit.update_audit',side_effect=audit):
+                value=ns['scan_dates'](None,[],[])
+            self.assertEqual(observed,[20])
             day=json.loads((Path(folder)/'arab_quote_day1.json').read_text())
-            self.assertEqual(len(day['market_rankings']['over15_ht']),7)
-            self.assertEqual(day['probability_rankings']['over15_ht'][0]['fixture_id'],'probability_only')
-            self.assertFalse(day['probability_rankings']['over15_ht'][0]['gate']['eligible'])
+            self.assertEqual(len(day['market_rankings']['over25_ft']),5)
+            self.assertEqual(day['selection_board']['book_weight_in_ranking'],0)
+            self.assertEqual(value['method']['active_analysis']['model_id'],'statistics-first-v4.0')
 
 
 class FirstHalfHistoryTests(unittest.TestCase):

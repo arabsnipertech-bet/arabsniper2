@@ -5,6 +5,7 @@ from pathlib import Path
 import math
 import random
 from audit_storage import read_store, atomic_bytes
+from statistics_first import MODEL_ID, TARGETS
 import json
 
 ROME = ZoneInfo('Europe/Rome')
@@ -20,6 +21,32 @@ def stamp(value):
 def number(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
+def statistics_preview(payload, result, now):
+    candidates = []
+    for match in payload.get('matches', []):
+        f, a = match.get('fixture') or {}, match.get('multimarket') or {}
+        kickoff = stamp(f.get('kickoff'))
+        if (a.get('model_id') != MODEL_ID or not kickoff or kickoff <= now or
+                kickoff.astimezone(ROME).date().isoformat() != result['date'] or
+                f.get('status_short') != 'NS' or not f.get('fixture_id')):
+            continue
+        for row in a.get('markets', []):
+            p, odd, score = row.get('statistical_pct'), row.get('odd'), row.get('statistical_score')
+            if (row.get('published_selection') is not True or row.get('market') not in TARGETS or
+                    not all(number(v) for v in (p, odd, score)) or not (0 <= p <= 100 and odd > 1)):
+                continue
+            candidates.append((score, {'fixture_id':str(f['fixture_id']), 'match':f.get('match',''),
+                'league':f.get('league',''), 'kickoff':f['kickoff'], 'label':row.get('label',''),
+                'market':row['market'], 'odd':odd, 'statistical_pct':p,
+                'market_confirmation':(row.get('market_confirmation') or {}).get('status'),
+                'model_id':MODEL_ID, 'captured_at':a.get('captured_at') or payload['updated_at']}))
+    candidates.sort(key=lambda pair:(-pair[0], pair[1]['kickoff'], pair[1]['fixture_id'], pair[1]['market']))
+    unique = {}
+    for _, row in candidates:
+        unique.setdefault(row['fixture_id'], row)
+    result.update(model_id=MODEL_ID, selections=list(unique.values())[:3])
+    return result
+
 def build_preview(payload, previous=None, now=None, rng=None):
     now = now or datetime.now(timezone.utc)
     today = now.astimezone(ROME).date().isoformat()
@@ -28,6 +55,9 @@ def build_preview(payload, previous=None, now=None, rng=None):
     updated = stamp(payload.get('updated_at'))
     if payload.get('date') != today or not updated or not 0 <= (now-updated).total_seconds() <= 86400:
         return result
+    if ((payload.get('multimarket_method') or {}).get('model_id') == MODEL_ID or
+            any((m.get('multimarket') or {}).get('model_id') == MODEL_ID for m in payload.get('matches', []))):
+        return statistics_preview(payload, result, now)
     candidates = []
     for match in payload.get('matches', []):
         f = match.get('fixture', {})
