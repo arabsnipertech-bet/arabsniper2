@@ -73,6 +73,8 @@ print(json.dumps({'variants':variants,'contexts':contexts}))
    for(const [section,count] of [['ft',8],['ht',4],['result',3],['asian',40],['targets',4]]){
     await page.locator('[data-mx-section="'+section+'"]').click();
     assert.equal(await page.locator('.mx-market-row').count(),count);
+    assert.equal(await page.locator('.mx-modal-scroll').evaluate(e=>e.scrollTop),0,'Changing section starts at its first row');
+    if(section==='asian')await page.locator('.mx-modal-scroll').evaluate(e=>{e.scrollTop=e.scrollHeight});
    }
    const text=await page.locator('dialog.mx-modal').textContent();
    assert(!/Risultato esatto|Over 5,5|Under 5,5|Multigol/.test(text),'Dead markets must be absent');

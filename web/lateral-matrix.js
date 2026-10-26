@@ -183,13 +183,13 @@
    '<details class="mx-method"><summary>Statistiche delle squadre</summary>'+teamProfiles(m)+'</details>'+
    '<details class="mx-method"><summary>Come leggere i valori</summary><p>Aggio: competitività dei prezzi, non misura di liquidità. OCI: movimento delle quote, non volume di denaro. La sensibilità prudente non è un intervallo di confidenza. Il valore asiatico include rimborsi e mezzi esiti.</p></details></div>';
  }
- function updateModal(){
+ function updateModal(resetScroll=false){
   if(!dialog)return;
   const m=(payload?.matches||[]).find(x=>String(x.fixture?.fixture_id)===modalFixtureId);
   if(!m){closeModal();return;}
   const focused=dialog.contains(document.activeElement)?document.activeElement?.dataset?.mxSection:null;
   const closeFocused=document.activeElement?.hasAttribute('data-mx-close');
-  const scroll=dialog.querySelector('.mx-modal-scroll')?.scrollTop||0;
+  const scroll=resetScroll?0:dialog.querySelector('.mx-modal-scroll')?.scrollTop||0;
   dialog.innerHTML='<header class="mx-modal-header"><div><span>MATRICE · MERCATI UTILI</span><h2 id="mx-modal-title">'+esc(m.fixture?.match)+'</h2><small>'+esc(m.fixture?.country)+' · '+esc(m.fixture?.league)+'</small></div><button type="button" data-mx-close aria-label="Chiudi matrice" autofocus>×</button></header>'+
    '<nav class="mx-modal-tabs" aria-label="Mercati della matrice">'+Object.entries(MATRIX_SECTIONS).map(([k,l])=>'<button type="button" data-mx-section="'+k+'" aria-pressed="'+(modalSection===k)+'">'+esc(l)+'</button>').join('')+'</nav>'+
    '<div class="mx-modal-scroll">'+matrixDetail(m,sectionRows(rowsOf(m),modalSection),helpers)+'</div>';
@@ -198,7 +198,7 @@
   else if(closeFocused)dialog.querySelector('[data-mx-close]').focus();
  }
  function openModal(id){
-  if(dialog){modalFixtureId=id;modalSection='targets';updateModal();return;}
+  if(dialog){modalFixtureId=id;modalSection='targets';updateModal(true);return;}
   modalFixtureId=id;modalSection='targets';
   dialog=document.createElement('dialog');dialog.className='mx-modal';dialog.setAttribute('aria-labelledby','mx-modal-title');dialog.setAttribute('aria-modal','true');
   document.body.append(dialog);bodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
@@ -208,7 +208,7 @@
   dialog.addEventListener('click',e=>{
    if(e.target.closest?.('[data-mx-close]')){closeModal();return;}
    const tab=e.target.closest?.('[data-mx-section]');
-   if(tab){modalSection=tab.dataset.mxSection;updateModal();return;}
+   if(tab){modalSection=tab.dataset.mxSection;updateModal(true);return;}
    if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}
   });
   dialog.addEventListener('keydown',e=>{
