@@ -6,6 +6,7 @@ import math
 import random
 from audit_storage import read_store, atomic_bytes
 from statistics_first import MODEL_ID, TARGETS
+from matrix_quotes import handicap_price_valid
 import json
 
 ROME = ZoneInfo('Europe/Rome')
@@ -63,7 +64,7 @@ def build_preview(payload, previous=None, now=None, rng=None):
             if (not kickoff or kickoff <= now or kickoff.astimezone(ROME).date().isoformat() != today
                     or f.get('status_short') not in ('NS', 'TBD')): continue
             for row in a.get('matrix', {}).get('rows', []):
-                if (row.get('quote_status') != 'recent' or row.get('quality') != 'supported' or
+                if (not handicap_price_valid(row) or row.get('quote_status') != 'recent' or row.get('quality') != 'supported' or
                         not number(row.get('odd')) or row['odd'] <= 1 or not number(row.get('ev_pct')) or
                         row['ev_pct'] <= 0 or row.get('family') == 'scores'): continue
                 candidates.append((row.get('ev_low_pct', -100), {'fixture_id': str(f['fixture_id']),

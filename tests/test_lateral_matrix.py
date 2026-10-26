@@ -4,7 +4,8 @@ from datetime import datetime, timezone
 
 from lateral_matrix import (ScoreModel, specification as S, market_id, build_matrix,
                             payout_weights, settle_spec, MODEL_ID)
-from matrix_quotes import collect, attach, expire, parse_value
+from matrix_quotes import collect, attach, expire, parse_value, migrate_handicap_history
+from repair_matrix_quotes import repair_day
 from matrix_pipeline import build_board, complete_day, fixture_allowed
 from matrix_audit import MatrixAccumulator
 from statistics_first import statistical_analysis
@@ -187,6 +188,66 @@ class MatrixMath(unittest.TestCase):
         row = next(r for r in a['matrix']['rows'] if r['spec'] == S('dc', 'ft', '1x'))
         self.assertEqual(row['odd'], 1.5)
         self.assertIsNone(row['margin_pct'])
+
+    def test_provider_handicap_is_home_anchored_and_partitions_are_complements(self):
+        for bid, period in ((4, 'ft'), (19, 'ht'), (104, 'sh')):
+            self.assertEqual(parse_value(bid, 'Away -1.5'), S('handicap', period, 'away', 1.5))
+            self.assertEqual(parse_value(bid, 'Away +3.5'), S('handicap', period, 'away', -3.5))
+        values = [{'value': 'Home +3.5', 'odd': '1.02'}, {'value': 'Away +3.5', 'odd': '12'},
+                  {'value': 'Home -3.5', 'odd': '13'}, {'value': 'Away -3.5', 'odd': '1.01'},
+                  {'value': 'Home +0', 'odd': '1.8'}, {'value': 'Away +0', 'odd': '2.1'}]
+        a = deepcopy(self.a)
+        attach(a, payload(bid=4, name='Asian Handicap', values=values), {}, match()['fixture'], NOW)
+        rows = {r['id']: r for r in a['matrix']['rows']}
+        easy = rows[market_id(S('handicap', 'ft', 'away', 3.5))]
+        hard = rows[market_id(S('handicap', 'ft', 'away', -3.5))]
+        self.assertEqual(easy['odd'], 1.01)
+        self.assertEqual(hard['odd'], 12)
+        self.assertGreater(easy['statistical_pct'], hard['statistical_pct'])
+        self.assertAlmostEqual(hard['margin_pct'], 100*(1/1.02+1/12-1))
+        self.assertIsNotNone(rows[market_id(S('handicap', 'ft', 'away', 0))]['margin_pct'])
+        self.assertEqual(payout_weights(hard['spec'], 0, 2), (0, 1))
+        self.assertEqual(payout_weights(easy['spec'], 2, 0), (1, 0))
+
+    def test_legacy_handicap_repair_preserves_observations_and_started_forecasts(self):
+        early = '2026-10-26T06:00:00Z'
+        fixture = {'kickoff': KICKOFF, 'groups': {
+            '4|handicap|ft|3.5|1': [
+                {'odds': {'home': 1.02, 'away': 1.01}, 'complete': True, 'provider_updated_at': early, 'observed_at': early}],
+            '4|handicap|ft|-3.5|1': [
+                {'odds': {'home': 13., 'away': 12.}, 'complete': True, 'provider_updated_at': early, 'observed_at': early}]}}
+        original = deepcopy(fixture['groups'])
+        migrate_handicap_history(fixture)
+        self.assertEqual(fixture['groups']['ah2|4|handicap|ft|3.5|1'][0]['odds'], {'home': 1.02, 'away': 12.})
+        self.assertEqual(fixture['groups']['ah2|4|handicap|ft|-3.5|1'][0]['odds'], {'away': 1.01, 'home': 13.})
+        for key in original: self.assertEqual(fixture['groups'][key], original[key])
+        once = deepcopy(fixture); migrate_handicap_history(fixture); self.assertEqual(fixture, once)
+        state = {'matrix_quotes': {'100': fixture}}
+        m = {'fixture': deepcopy(match()['fixture']), 'multimarket': deepcopy(self.a)}
+        m['fixture']['status_short'] = 'NS'
+        day = {'date': '2026-10-26', 'matches': [m]}
+        before_rates = deepcopy(m['multimarket']['rates'])
+        self.assertEqual(repair_day(day, state, NOW)[0], 1)
+        easy = next(r for r in m['multimarket']['matrix']['rows'] if r['spec'] == S('handicap', 'ft', 'away', 3.5))
+        self.assertEqual(easy['odd'], 1.01)
+        self.assertEqual(easy['quote_observed_at'], early)
+        self.assertEqual(m['multimarket']['rates'], before_rates)
+        frozen = deepcopy(day)
+        self.assertEqual(repair_day(day, state, '2026-10-27T08:00:00Z'), (0, 0))
+        self.assertEqual(day, frozen)
+
+    def test_legacy_handicap_prices_cannot_inflate_audit_returns(self):
+        a = deepcopy(self.a)
+        row = next(r for r in a['matrix']['rows'] if r['spec'] == S('handicap', 'ft', 'away', .75))
+        row.update(odd=12., quote_status='recent', category='value_watch')
+        a['matrix']['rows'] = [row]
+        record = {'fixture': match()['fixture'], 'captured_at': NOW, 'multimarket': a,
+            'settlement': {'result': {'status': 'FT', 'home_ft': 1, 'away_ft': 1}}}
+        audit = MatrixAccumulator(); audit.add(record)
+        g = next(g for g in audit.report()['groups'] if g['dimension'] == 'market')
+        self.assertEqual(g['priced_observations'], 0)
+        self.assertIsNone(g['paper_roi_pct'])
+        self.assertEqual(row['odd'], 12.)
 
     def test_audit_asian_half_loss_and_no_postkickoff_leak(self):
         a = deepcopy(self.a)

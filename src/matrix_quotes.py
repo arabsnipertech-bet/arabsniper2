@@ -52,6 +52,7 @@ SIDE = {'home': '1', '1': '1', 'draw': 'x', 'x': 'x', 'away': '2', '2': '2',
         'home draw': '1x', 'home or draw': '1x', '1x': '1x',
         'draw away': 'x2', 'draw or away': 'x2', 'x2': 'x2',
         'home away': '12', 'home or away': '12', '12': '12'}
+HANDICAP_ADAPTER_VERSION = 2
 
 
 def parse_value(bid, raw):
@@ -81,6 +82,11 @@ def parse_value(bid, raw):
         if not m: return None
         side, line = m[1], float(m[2])
         if abs(line) > 10 or abs(line*4-round(line*4)) > 1e-8: return None
+        # Prematch /odds labels use the HOME handicap for both selections:
+        # Home -1.5 and Away -1.5 are opposite sides of the same line.
+        # Our settlement spec instead stores the selected team's handicap.
+        if side == 'away': line = -line
+        if line == 0: line = 0.0
     elif kind in ('result_total', 'dc_total', 'btts_total'):
         m = re.fullmatch(r'(.+?)\s*[/&,]\s*(over|under)\s+(\d+(?:\.\d+)?)', raw)
         if not m and kind == 'btts_total':
@@ -119,7 +125,7 @@ def partition(spec):
     elif k == 'dnb': expected = {'1', '2'}
     elif k == 'btts': expected = {'yes', 'no'}
     elif k == 'handicap':
-        group += [line if side == 'home' else -line]; expected = {'home', 'away'}
+        group += [(line if side == 'home' else -line) or 0.0]; expected = {'home', 'away'}
     elif k in ('result_total', 'btts_total', 'dc_total'):
         group += [line]; token = side+':'+extra
         if k != 'dc_total': expected = {s+':'+d for s in (('yes', 'no') if k == 'btts_total' else ('1', 'x', '2')) for d in ('over', 'under')}
@@ -159,7 +165,7 @@ def collect(payload, fid, observed_at):
                 for group, item in local.items():
                     if item['ambiguous']:
                         diagnostics['ambiguous_snapshots'] += 1; continue
-                    key = f'{bid}|{group}|{book["id"]}'
+                    key = ('ah2|' if CATALOG[bid][1] == 'handicap' else '') + f'{bid}|{group}|{book["id"]}'
                     complete = item['expected'] is not None and set(item['odds']) == item['expected']
                     candidate = {k: item[k] for k in ('odds', 'specs')}
                     candidate.update(bookmaker_id=str(book['id']), bookmaker=str(book.get('name') or book['id']),
@@ -171,6 +177,63 @@ def collect(payload, fid, observed_at):
     return groups, dict(diagnostics)
 
 
+def migrate_handicap_history(fixture):
+    """Re-pair legacy raw prices only at identical provider/observation times.
+
+    Keep the original ledger for traceability. The versioned keys prevent a
+    formerly mixed pair from contributing to OCI or overround after repair.
+    """
+    if fixture.get('handicap_adapter_version') == HANDICAP_ADAPTER_VERSION: return
+    rebuilt = defaultdict(dict)
+    for key, points in list(fixture.get('groups', {}).items()):
+        parts = key.split('|')
+        if len(parts) != 5 or parts[1] != 'handicap': continue
+        bid, _, period, anchor, book = parts
+        if int(bid) not in (4, 19, 104): continue
+        for point in points:
+            for side, odd in point.get('odds', {}).items():
+                if side not in ('home', 'away'): continue
+                raw_line = float(anchor) * (1 if side == 'home' else -1)
+                spec = parse_value(int(bid), f'{side} {raw_line:g}')
+                if not spec: continue
+                group, _, _ = partition(spec)
+                target = f'ah2|{bid}|{group}|{book}'
+                when = (point.get('provider_updated_at'), point.get('observed_at'))
+                snapshot = rebuilt[target].setdefault(when, {
+                    'odds': {}, 'provider_updated_at': when[0], 'observed_at': when[1]})
+                if side in snapshot['odds'] and snapshot['odds'][side] != odd:
+                    raise ValueError('Conflicting historical handicap prices')
+                snapshot['odds'][side] = odd
+    for key, snapshots in rebuilt.items():
+        if key in fixture['groups']: continue
+        points = sorted(snapshots.values(), key=lambda p: (p['provider_updated_at'] or '', p['observed_at'] or ''))
+        for point in points: point['complete'] = set(point['odds']) == {'home', 'away'}
+        fixture['groups'][key] = points if len(points) <= 48 else [points[0], *points[-47:]]
+    fixture['handicap_adapter_version'] = HANDICAP_ADAPTER_VERSION
+
+
+def handicap_price_valid(row):
+    return (row.get('spec', {}).get('kind') != 'handicap' or
+            row.get('quote_adapter_version') == HANDICAP_ADAPTER_VERSION)
+
+
+def safe_price_row(row):
+    if handicap_price_valid(row): return row
+    # Preserve the original frozen record. Consumers must not evaluate or
+    # promote prices produced by the former handicap adapter.
+    clean = dict(row)
+    for key in ('odd', 'first_odd', 'last_odd', 'ev_pct', 'ev_low_pct', 'ev_high_pct',
+                'oci', 'oci_previous', 'margin_pct', 'margin_delta_pp', 'delta_pct',
+                'market_fair_pct', 'edge_pp', 'implied_pct', 'persistence',
+                'speed_pp_per_hour', 'amplitude_pct', 'fair_delta_pp'):
+        clean[key] = None
+    clean.update(quote_status='invalid_adapter', category='no_quote',
+                 category_reason='Quota handicap della versione precedente: associazione da aggiornare',
+                 market_behavior='unavailable', margin_band='unavailable', margin_trend='unavailable',
+                 theoretical_value=False, stable_value=False, paired_books=0, agreeing_books=0)
+    return clean
+
+
 def ledger_offers(state, fid, captured, observed_at, kickoff):
     now, start = stamp(observed_at), stamp(kickoff)
     if not now or not start or now >= start: return {}
@@ -180,6 +243,7 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
         if old_start and (now-old_start).total_seconds() > 172800: del ledger[key]
     fixture = ledger.setdefault(str(fid), {'kickoff': kickoff, 'groups': {}})
     fixture['kickoff'] = kickoff
+    migrate_handicap_history(fixture)
     offers = defaultdict(list)
     for key, group in captured.items():
         points = fixture['groups'].setdefault(key, [])
@@ -216,6 +280,7 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
 
 
 def analyse_prices(row, offers, as_of, kickoff):
+    row['quote_adapter_version'] = HANDICAP_ADAPTER_VERSION
     now, start = stamp(as_of), stamp(kickoff)
     max_hours = 1 if now and start and 0 < (start-now).total_seconds() <= 10800 else 6
     recent = [o for o in offers if stamp(o.get('provider_updated_at')) and

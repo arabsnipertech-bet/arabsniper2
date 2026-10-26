@@ -7,6 +7,7 @@ from collections import defaultdict
 from math import log
 from lateral_matrix import MODEL_ID, settle_spec
 from multimarket_model import stamp
+from matrix_quotes import safe_price_row
 
 
 class MatrixAccumulator:
@@ -26,6 +27,7 @@ class MatrixAccumulator:
         self.fixtures.add(fid)
         result = record.get('settlement', {}).get('result') or {}
         for row in a.get('matrix', {}).get('rows', []):
+            row = safe_price_row(row)
             if not row.get('spec'): continue
             value = settle_spec(row['spec'], result)
             if value is None: continue
