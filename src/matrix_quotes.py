@@ -351,8 +351,11 @@ def analyse_prices(row, offers, as_of, kickoff):
         movement_volatile=bool(move.get('has_direction_reversal') or (move.get('amplitude_pct') or 0) >= 8))
     operators = move.get('operators') or []
     selected = next((o for o in operators if o.get('bookmaker_id') == best['bookmaker_id']), None)
+    own_trace = best.get('trace') or []
+    own_margin_delta = (fair(own_trace[-1]['odds'])[1] - fair(own_trace[0]['odds'])[1]
+                        if len(own_trace) >= 2 else None)
     row.update(selected_margin_pct=fair(best['odds'])[1] if best['complete'] else None,
-               selected_margin_delta_pp=selected.get('margin_delta_pp') if selected else None,
+               selected_margin_delta_pp=own_margin_delta,
                movement_confirmed=bool(move.get('confirmed')),
                fair_direction_coherent=bool(move.get('fair_direction_coherent')),
                selected_movement={

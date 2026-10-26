@@ -132,5 +132,15 @@ class PlayableValue(unittest.TestCase):
                       ['src/3appdays.py', 'src/matrix_quotes.py'], ['new_unknown.py']):
             self.assertFalse(cached_refresh_safe(paths))
 
+    def test_one_book_margin_expansion_still_requires_extra_value(self):
+        m = match(); a = build_matrix(statistical_analysis(m, NOW), NOW); state = {}
+        attach(a, payload('2026-10-26T06:00:00Z', 2.5, 1.6, books=1), state, m['fixture'], '2026-10-26T06:00:00Z')
+        attach(a, payload(NOW, 2.1, 1.6, books=1), state, m['fixture'], NOW)
+        r = next(r for r in a['matrix']['rows'] if r['spec'] == S('total', 'ft', 'over', 2.5))
+        self.assertGreater(r['selected_margin_delta_pp'], 1)
+        self.assertIsNone(r['oci'])
+        self.assertEqual(r['opportunity']['signal'], 'unconfirmed')
+        self.assertGreater(r['opportunity']['min_ev_pct'], 10)
+
 
 if __name__ == '__main__': unittest.main()
