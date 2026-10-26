@@ -4,6 +4,7 @@ from copy import deepcopy
 from lateral_matrix import MODEL_ID, CONFIG_ID, build_matrix, market_id, specification
 from matrix_quotes import expire, safe_price_row
 from multimarket_model import stamp
+from opportunity_policy import POLICY_ID
 
 LEGACY = {'over25_ft': specification('total', 'ft', 'over', 2.5),
           'over15_ht': specification('total', 'ht', 'over', 1.5),
@@ -57,7 +58,7 @@ def complete_day(ns, client, day, as_of):
 def build_board(day, as_of):
     board = {key: {'label': key, 'selected': [], 'eligible': 0, 'remaining_slots': None, 'started_selections': 0} for key in LEGACY}
     categories = Counter()
-    modeled, priced, complete = 0, 0, 0
+    modeled, priced, complete, eligible, proposals = 0, 0, 0, 0, 0
     for match in day.get('matches', []):
         a, meta = match.get('multimarket') or {}, match.get('fixture') or {}
         kickoff = stamp(meta.get('kickoff'))
@@ -78,6 +79,9 @@ def build_board(day, as_of):
             continue  # Immutable forecast, even when it is no longer upcoming.
         a.get('matrix', {})['summary'] = {'categories': dict(category_counts), 'observed_markets': len(rows),
                                         'priced_markets': sum(r.get('quote_status') == 'recent' for r in rows)}
+        policy = a.get('matrix', {}).get('opportunity_policy') or {}
+        eligible += policy.get('eligible_markets', 0)
+        proposals += bool(policy.get('best_market_id'))
         a['selected_markets'], a['best_candidate'] = [], None
         # Backward-compatible four-market exports. The dashboard uses the full
         # matrix; these flags no longer restrict fixtures or the other markets.
@@ -85,7 +89,7 @@ def build_board(day, as_of):
             if old['market'] not in LEGACY: continue
             new = indexed.get(market_id(LEGACY[old['market']]))
             if not new: continue
-            chosen = bool(new.get('stable_value'))
+            chosen = (new.get('opportunity') or {}).get('eligible') is True
             old.update(statistical_pct=new['statistical_pct'], statistical_candidate=new['quality'] == 'supported',
                        primary_eligible=chosen, published_selection=chosen, published_rank=None,
                        statistical_score=new['low_pct'], selection_reasons=[], odd=new.get('odd'),
@@ -120,4 +124,6 @@ def build_board(day, as_of):
     day['matrix_summary'] = {'model_id': MODEL_ID, 'as_of': as_of, 'analyzed_fixtures': complete,
         'displayed_fixtures': len(day.get('matches', [])), 'modeled_markets': modeled,
         'priced_markets': priced, 'categories': dict(categories), 'selection_limit': None}
+    day['matrix_summary'].update(opportunity_policy=POLICY_ID, eligible_markets=eligible,
+                                 upcoming_fixtures_with_proposal=proposals)
     return day['selection_board']

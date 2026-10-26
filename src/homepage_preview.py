@@ -6,7 +6,8 @@ import math
 import random
 from audit_storage import read_store, atomic_bytes
 from statistics_first import MODEL_ID, TARGETS
-from matrix_quotes import handicap_price_valid
+from matrix_quotes import expire
+from opportunity_policy import POLICY_ID, best_opportunity
 import json
 
 ROME = ZoneInfo('Europe/Rome')
@@ -63,20 +64,23 @@ def build_preview(payload, previous=None, now=None, rng=None):
             kickoff = stamp(f.get('kickoff'))
             if (not kickoff or kickoff <= now or kickoff.astimezone(ROME).date().isoformat() != today
                     or f.get('status_short') not in ('NS', 'TBD')): continue
-            for row in a.get('matrix', {}).get('rows', []):
-                if (not handicap_price_valid(row) or row.get('quote_status') != 'recent' or row.get('quality') != 'supported' or
-                        not number(row.get('odd')) or row['odd'] <= 1 or not number(row.get('ev_pct')) or
-                        row['ev_pct'] <= 0 or row.get('family') == 'scores'): continue
+            # Preserve the saved snapshot while checking freshness at publication.
+            view = {'matrix': {'rows': [dict(r) for r in a.get('matrix', {}).get('rows', [])]}}
+            expire(view, f, now.isoformat())
+            row = best_opportunity(view['matrix']['rows'])
+            if row:
                 candidates.append((row.get('ev_low_pct', -100), {'fixture_id': str(f['fixture_id']),
                     'match': f.get('match', ''), 'league': f.get('league', ''), 'kickoff': f['kickoff'],
                     'label': row['label'], 'market': row['spec']['kind']+'_'+row['period'],
                     'odd': row['odd'], 'statistical_pct': row['statistical_pct'],
-                    'market_confirmation': row.get('market_behavior'), 'category': row['category'],
+                    'market_confirmation': row['opportunity']['signal'], 'category': row['category'],
+                    'opportunity': row['opportunity'], 'oci': row.get('oci'),
+                    'margin_pct': row.get('selected_margin_pct'),
                     'model_id': 'lateral-matrix-v5.0', 'captured_at': a.get('captured_at')}))
         candidates.sort(key=lambda x: (-x[0], x[1]['kickoff'], x[1]['fixture_id'], x[1]['label']))
         unique = {}
         for _, row in candidates: unique.setdefault(row['fixture_id'], row)
-        result.update(model_id='lateral-matrix-v5.0', selections=list(unique.values())[:3],
+        result.update(model_id='lateral-matrix-v5.0', opportunity_policy=POLICY_ID, selections=list(unique.values())[:3],
                       analyzed_fixtures=(payload.get('matrix_summary') or {}).get('analyzed_fixtures', 0),
                       modeled_markets=(payload.get('matrix_summary') or {}).get('modeled_markets', 0))
         return result

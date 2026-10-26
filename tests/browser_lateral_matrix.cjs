@@ -15,8 +15,9 @@ a=build_matrix(statistical_analysis(match(),NOW),NOW)
 variants=[]
 for first,last in [(2.5,2.1),(2.1,2.6)]:
  b=deepcopy(a);state={}
- attach(b,payload('2026-10-26T06:00:00Z',first,2),state,match()['fixture'],'2026-10-26T06:00:00Z')
- attach(b,payload(NOW,last,2),state,match()['fixture'],NOW)
+ attach(b,payload('2026-10-26T06:00:00Z',first,1.6),state,match()['fixture'],'2026-10-26T06:00:00Z')
+ attach(b,payload('2026-10-26T07:00:00Z',(first+last)/2,1.6),state,match()['fixture'],'2026-10-26T07:00:00Z')
+ attach(b,payload(NOW,last,1.6),state,match()['fixture'],NOW)
  variants.append(b)
 print(json.dumps(variants))
 `],{encoding:'utf8',maxBuffer:10*1024*1024});
@@ -41,6 +42,11 @@ print(json.dumps(variants))
    assert.equal(await page.locator('.mx-card').count(),9);
    assert.equal(await page.locator('.mx-1x2 .mx-quote-cell').count(),27);
    assert.equal(await page.locator('.mx-best').count(),9);
+   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),9);
+   const proposals=await page.locator('.mx-best[data-opportunity-id]').evaluateAll(nodes=>nodes.map(n=>({odd:+n.dataset.opportunityOdd,p:+n.dataset.opportunityProbability,text:n.textContent})));
+   assert(proposals.every(r=>r.odd>=1.4&&r.odd<=3.5&&r.p>=35));
+   assert(proposals.some(r=>r.text.includes('Convergenza di Trend')));
+   assert(proposals.some(r=>r.text.includes('Opportunità Contrarian')));
    assert.equal(await page.locator('.mx-1x2 .mx-net-red').count(),27);
    assert((await page.locator('.mx-1x2').first().textContent()).includes('Apertura*'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
@@ -57,6 +63,7 @@ print(json.dumps(variants))
   await page.locator('[data-mx-category="all"]').click();
   await page.locator('[data-mx-filter="family"]').selectOption('combo');
   await page.locator('[data-mx-filter="period"]').selectOption('ht');
+  assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),9,'Matrix filters must not replace the match proposal');
   await page.locator('[data-mx-open]').first().click();
   assert((await page.locator('.mx-market-row').count())>10);
   assert((await page.locator('.mx-market-row').first().textContent()).includes('PT'));
