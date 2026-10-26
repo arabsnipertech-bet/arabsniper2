@@ -40,7 +40,8 @@ def complete_day(ns, client, day, as_of):
         else:
             a = {'model_id': MODEL_ID, 'status': 'no_prematch_snapshot', 'captured_at': None,
                  'matrix': {'rows': [], 'data_status': 'no_prematch_snapshot', 'coverage': {'modeled_markets': 0, 'priced_markets': 0}},
-                 'markets': [], 'profiles': {}, 'data_quality': {}}
+                 'markets': [], 'profiles': {}, 'data_quality': {},
+                 'best_candidate': None, 'selected_markets': []}
             result = ns['_result_payload'](raw)
             if result: meta['result'] = result
         item['multimarket'] = a

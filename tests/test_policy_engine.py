@@ -24,7 +24,8 @@ class EngineTests(unittest.TestCase):
             odds_enricher=None
             def get(self, endpoint, params, **kwargs):
                 if endpoint=='fixtures' and params.get('date'):
-                    return {'response':[fixture(100,KICKOFF,status='NS')]}
+                    return {'response':[fixture(100,KICKOFF,status='NS'),
+                                        fixture(101,'2026-10-26T05:00:00Z',status='FT')]}
                 if endpoint=='fixtures':
                     team=params.get('team',10)
                     return {'response':[fixture(team*100+i,f'2026-10-{25-i%8:02}T07:00:00Z',team if i%2==0 else 999,999 if i%2==0 else team) for i in range(8 if 'team' in params else 30)]}
@@ -41,6 +42,11 @@ class EngineTests(unittest.TestCase):
             output=engine.scan_dates(Client(),['2026-10-26'],[])
         self.assertEqual(output['days'][0]['fresh_matches'],1)
         self.assertEqual(output['days'][0]['matches'][0]['multimarket']['model_id'],'lateral-matrix-v5.0')
+        self.assertEqual(len(output['days'][0]['matches']),2)
+        started=next(m for m in output['days'][0]['matches'] if m['fixture']['fixture_id']=='101')
+        self.assertEqual(started['multimarket']['status'],'no_prematch_snapshot')
+        self.assertEqual(started['multimarket']['matrix']['rows'],[])
+        self.assertIsNone(started['display']['primary_choice'])
         self.assertEqual(state['quote_ledger'],{'sentinel':'keep'})
         self.assertIn('selection_board',output['days'][0])
         self.assertEqual(output['method']['active_analysis']['book_weight_in_ranking'],0)
