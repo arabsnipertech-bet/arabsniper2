@@ -78,7 +78,9 @@ jobs:
           python src/scan_usage.py
 
       - name: Pack and verify publication size
-        run: python src/publication_storage.py
+        run: |
+          python src/gold_policy_audit.py
+          python src/publication_storage.py
 
       - name: Refresh public results for the active model
         run: python src/homepage_results.py

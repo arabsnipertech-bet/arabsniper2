@@ -30,6 +30,7 @@ on:
       - 'src/opportunity_policy.py'
       - 'src/refresh_opportunities.py'
       - 'src/gold_competitions.py'
+      - 'src/gold_policy_audit.py'
   schedule:
     - cron: "0 6-23 * * *"
       timezone: "Europe/Rome"
@@ -126,7 +127,10 @@ jobs:
           if [ "$REFRESH_MODE" != cached ]; then python src/scan_usage.py; fi
 
       - name: Pack and verify publication size
-        run: python src/publication_storage.py
+        # Gold decisions and both shadow variants are frozen before publication.
+        run: |
+          python src/gold_policy_audit.py
+          python src/publication_storage.py
 
       - name: Refresh public results for the active model
         run: python src/homepage_results.py
