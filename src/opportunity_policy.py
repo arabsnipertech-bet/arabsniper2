@@ -7,10 +7,12 @@ from collections import Counter
 from math import isfinite, sqrt
 from statistics import mean, median
 
-POLICY_ID = 'gold-goals-v3'
+POLICY_ID = 'gold-goals-v4'
+SUPPORTED_POLICY_IDS = ('gold-goals-v2', 'gold-goals-v3', POLICY_ID)
 ODDS_MIN, ODDS_MAX = 1.40, 3.50
-GOALS = {('total', 'ht', 'over', 1.5), ('btts', 'ht', 'yes', None),
-         ('total', 'ft', 'over', 2.5), ('total', 'ft', 'over', 3.5)}
+GOALS = {('total', 'ht', 'over', 1.5): 'over15_ht', ('btts', 'ht', 'yes', None): 'gg_ht',
+         ('total', 'ft', 'over', 2.5): 'over25_ft', ('total', 'ft', 'over', 3.5): 'over35_ft'}
+ODDS_MAX_BY_MARKET = {'over15_ht': 3.50, 'over25_ft': 3.50, 'gg_ht': 5.50, 'over35_ft': 5.50}
 LABELS = {'convergence': 'Convergenza di Trend',
           'contrarian': 'Contrarian sano',
           'unconfirmed': 'Valore statistico · flusso non confermato',
@@ -18,7 +20,7 @@ LABELS = {'convergence': 'Convergenza di Trend',
 REASONS = {
     'market': 'Mercato escluso dal box: resta nella matrice',
     'probability': 'Probabilità inferiore alla soglia del mercato',
-    'price': 'Quota fuori dall’intervallo 1,40–3,50',
+    'price': 'Quota fuori dall’intervallo consentito per il mercato',
     'stale': 'Quota recente non disponibile',
     'history': 'Storico statistico insufficiente',
     'adapter': 'Associazione della quota da aggiornare',
@@ -33,10 +35,21 @@ def numeric(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and isfinite(value)
 
 
-def market_tier(row):
+def goal_market(row):
     spec = row.get('spec') or {}
-    key = (spec.get('kind'), spec.get('period'), spec.get('side'), spec.get('line'))
-    return 0 if key in GOALS else None
+    if spec.get('extra') is not None: return None
+    # Only identical half-line settlements are equivalent. Quarter/integer
+    # Asian lines keep their existing reference role, not new proposal rights.
+    kind = 'total' if spec.get('kind') == 'asian_total' else spec.get('kind')
+    return GOALS.get((kind, spec.get('period'), spec.get('side'), spec.get('line')))
+
+
+def odds_max(row):
+    return ODDS_MAX_BY_MARKET.get(goal_market(row), ODDS_MAX)
+
+
+def market_tier(row):
+    return 0 if goal_market(row) is not None else None
 
 
 def confirmed_flow(row):
@@ -168,7 +181,8 @@ def evaluate(row, pt_priority=False, preferred_pt=None):
     reasons = []
     if tier is None: reasons.append('market')
     if not numeric(p) or not minimum_p <= p <= 100: reasons.append('probability')
-    if not numeric(odd) or not ODDS_MIN <= odd <= ODDS_MAX: reasons.append('price')
+    maximum_odd = odds_max(row)
+    if not numeric(odd) or not ODDS_MIN <= odd <= maximum_odd: reasons.append('price')
     if row.get('quote_status') != 'recent': reasons.append('stale')
     if row.get('quality') != 'supported': reasons.append('history')
     if (row.get('spec') or {}).get('kind') == 'handicap' and row.get('quote_adapter_version') != 2:
@@ -182,6 +196,7 @@ def evaluate(row, pt_priority=False, preferred_pt=None):
     # An ordinal risk/value score, never a probability or suggested stake.
     score = p * max(0., ev_low-min_low)/(odd-1) if eligible else None
     return {'policy_id': POLICY_ID, 'eligible': eligible, 'strict_eligible': eligible, 'rank': None, 'priority': tier,
+            'goal_market': goal_market(row), 'odds_min': ODDS_MIN, 'odds_max': maximum_odd,
             'min_probability_pct': minimum_p, 'min_ev_pct': min_ev,
             'entry_min_ev_pct': min_ev, 'entry_min_ev_low_pct': min_low,
             'min_ev_low_pct': min_low, 'margin_band': band,
@@ -200,15 +215,14 @@ def annotate(matrix, as_of=None, assessment=None):
     if assessment is not None: matrix['goal_context'] = goal_context(assessment, rows)
     context = matrix.get('goal_context') or {}
     for row in rows: row['opportunity'] = evaluate(row, context.get('pt_priority_active', False), context.get('preferred_pt_market'))
-    goals = {(r.get('spec', {}).get('kind'), r.get('spec', {}).get('period'),
-              r.get('spec', {}).get('side'), r.get('spec', {}).get('line')): r for r in rows if market_tier(r) is not None}
-    for subset, superset in [(('total', 'ft', 'over', 3.5), ('total', 'ft', 'over', 2.5)),
-                             (('btts', 'ht', 'yes', None), ('total', 'ht', 'over', 1.5))]:
-        a, b = goals.get(subset), goals.get(superset)
-        if a and b and numeric(a.get('statistical_pct')) and numeric(b.get('statistical_pct')) and a['statistical_pct'] > b['statistical_pct']+.01:
-            for row in (a, b):
-                row['opportunity'].update(eligible=False, strict_eligible=False, rank=None, signal='excluded', label=LABELS['excluded'], playability_score=None)
-                row['opportunity']['reasons'].append('coherence')
+    goals = {key: [r for r in rows if goal_market(r) == key] for key in ODDS_MAX_BY_MARKET}
+    for subset, superset in [('over35_ft', 'over25_ft'), ('gg_ht', 'over15_ht')]:
+        for a in goals[subset]:
+            for b in goals[superset]:
+                if numeric(a.get('statistical_pct')) and numeric(b.get('statistical_pct')) and a['statistical_pct'] > b['statistical_pct']+.01:
+                    for row in (a, b):
+                        row['opportunity'].update(eligible=False, strict_eligible=False, rank=None, signal='excluded', label=LABELS['excluded'], playability_score=None)
+                        if 'coherence' not in row['opportunity']['reasons']: row['opportunity']['reasons'].append('coherence')
     eligible = sorted((r for r in rows if r['opportunity']['eligible']), key=ranking_key)
     from proposal_stability import stabilize
     best = stabilize(matrix, as_of, eligible)
@@ -216,7 +230,9 @@ def annotate(matrix, as_of=None, assessment=None):
     if best: eligible = [best, *[r for r in eligible if r is not best]]
     for rank, row in enumerate(eligible, 1): row['opportunity']['rank'] = rank
     matrix['opportunity_policy'] = {'id': POLICY_ID, 'evaluated_at': as_of,
-        'odds_min': ODDS_MIN, 'odds_max': ODDS_MAX, 'min_probability_pct': 35,
+        'odds_min': ODDS_MIN, 'odds_max': max(ODDS_MAX_BY_MARKET.values()),
+        'standard_odds_max': ODDS_MAX, 'odds_max_by_market': dict(ODDS_MAX_BY_MARKET),
+        'asian_equivalence': 'identical_half_line_only', 'min_probability_pct': 35,
         'goal_markets_only': True, 'pt_priority_active': context.get('pt_priority_active', False),
         'eligible_markets': len(eligible),
         'excluded_reasons': dict(Counter(reason for r in rows for reason in r['opportunity']['reasons'])),

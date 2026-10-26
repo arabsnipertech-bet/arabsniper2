@@ -4,7 +4,7 @@ from copy import deepcopy
 from lateral_matrix import MODEL_ID, CONFIG_ID, build_matrix, market_id, specification
 from matrix_quotes import expire, safe_price_row
 from multimarket_model import stamp
-from opportunity_policy import POLICY_ID
+from opportunity_policy import POLICY_ID, goal_market
 from gold_competitions import (SCOPE_ID, profile as whitelist_profile, fixture_allowed,
                                enforce_day, output_allowed)
 
@@ -91,7 +91,9 @@ def build_board(day, as_of):
         # matrix; these flags no longer restrict fixtures or the other markets.
         for old in a.get('markets', []):
             if old['market'] not in LEGACY: continue
-            new = indexed.get(market_id(LEGACY[old['market']]))
+            equivalents = [r for r in rows if goal_market(r) == old['market'] and
+                           (r.get('opportunity') or {}).get('eligible') is True]
+            new = min(equivalents, key=lambda r: r['opportunity']['rank']) if equivalents else indexed.get(market_id(LEGACY[old['market']]))
             if not new: continue
             chosen = (new.get('opportunity') or {}).get('eligible') is True
             old.update(statistical_pct=new['statistical_pct'], statistical_candidate=new['quality'] == 'supported',
@@ -109,6 +111,7 @@ def build_board(day, as_of):
                 'reference_fair_odd': new['fair_odd'], 'estimated_return_pct': new.get('ev_pct'),
                 'validated_advantage': False}
             old['opportunity'] = deepcopy(new.get('opportunity') or {})
+            old['matrix_market_id'] = new['id']
             old['selection_reasons'] = list(old['opportunity'].get('reasons') or [])
             old['published_rank'] = old['opportunity'].get('rank')
             old['market_confirmation'] = {'status': {'convergence': 'confirmed', 'contrarian': 'contrary'}.get(old['opportunity'].get('signal'), 'neutral'),

@@ -43,15 +43,21 @@ class GoldPolicyAudit(unittest.TestCase):
         old.pop('proposal_stability'); old.pop('sha256')
         old['sha256'] = sha256(json.dumps(old, sort_keys=True, allow_nan=False).encode()).hexdigest()
         frozen = deepcopy(old)
+        capture(store, m, '2026-10-26T08:30:00Z')
+        previous = store['fixtures']['100']['snapshots'][1]
+        previous['policy_id'] = 'gold-goals-v3'; previous.pop('sha256')
+        previous['sha256'] = sha256(json.dumps(previous, sort_keys=True, allow_nan=False).encode()).hexdigest()
+        previous_frozen = deepcopy(previous)
         capture(store, m, '2026-10-26T09:00:00Z')
         report = build_report(store, '2026-10-26T09:00:00Z')
-        self.assertEqual(report['policy_ids'], ['gold-goals-v2', POLICY_ID])
+        self.assertEqual(report['policy_ids'], ['gold-goals-v2', 'gold-goals-v3', POLICY_ID])
         self.assertTrue(report['production_policy_changed'])
         for version in report['policy_ids']:
             rows = [r for r in report['strategies'] if r['policy_id'] == version and r['strategy'] == 'published' and r['cohort'] == 'baseline_26']
             self.assertEqual(len(rows), 2)
             self.assertEqual(rows[0]['observations'], rows[1]['observations'])
         self.assertEqual(old, frozen)
+        self.assertEqual(previous, previous_frozen)
 
     def test_shadows_cannot_bypass_probability_price_history_or_coherence(self):
         m = fixture(); matrix = m['multimarket']['matrix']
@@ -158,10 +164,16 @@ class GoldPolicyAudit(unittest.TestCase):
                 first = main(root, NOW)
                 self.assertEqual(first['frozen_fixtures'], 1)
                 self.assertEqual(first['api_calls'], 0)
+                saved_path = root/'data/arab_quote_gold_policy_audit.json'
+                previous_store = read_store(saved_path, {})
+                previous_store['policy_id'] = 'gold-goals-v3'
+                write_store(saved_path, previous_store)
                 result = {'status': 'FT', 'home_ft': 0, 'away_ft': 0, 'home_ht': 0, 'away_ht': 0}
                 archive = {'fixtures': {'100': {'fixture': m['fixture'], 'settlement': {'result': result}}}}
                 write_store(root/'auditarchive/prematch_2026-10-26_results.json', archive)
                 second = main(root, '2026-10-27T10:00:00Z')
+                self.assertEqual(read_store(saved_path, {})['policy_id'], 'gold-goals-v3')
+                self.assertEqual(read_store(saved_path, {})['active_policy_id'], POLICY_ID)
             self.assertEqual(report_row(second)['losses'], 1)
             self.assertEqual(day.read_bytes(), original)
             self.assertTrue((root/'data/arab_quote_gold_policy_report.json').exists())

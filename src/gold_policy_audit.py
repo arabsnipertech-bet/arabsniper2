@@ -1,7 +1,7 @@
 """Prospective Gold policy experiment, using saved inputs/results only.
 
 This module cannot promote a shadow selection or call a football provider.
-Four goal rows per observation are frozen independently of later settlement.
+Four goal targets, including equivalent Asian half-lines, are frozen before settlement.
 """
 from collections import Counter, defaultdict
 from copy import deepcopy
@@ -17,7 +17,8 @@ from gold_competitions import SCOPE_ID, output_allowed, norm
 from lateral_matrix import MODEL_ID, settle_spec
 from matrix_quotes import expire
 from multimarket_model import stamp
-from opportunity_policy import POLICY_ID, evaluate, market_tier, numeric, ranking_key
+from opportunity_policy import (POLICY_ID, SUPPORTED_POLICY_IDS, ODDS_MIN, odds_max,
+                                evaluate, market_tier, goal_market, numeric, ranking_key)
 
 ROME = ZoneInfo('Europe/Rome')
 STUDY_ID = 'gold-prospective-20261026-v1'
@@ -33,9 +34,9 @@ ROW_FIELDS = ('id', 'label', 'spec', 'family', 'period', 'quality', 'statistical
 
 
 def key_for(row):
-    s = row['spec']
-    return 'gg_ht' if s['kind'] == 'btts' else ('over15_ht' if s['period'] == 'ht'
-           else 'over25_ft' if s['line'] == 2.5 else 'over35_ft')
+    # Keep alternate catalogue quotes separate from the ordinary market so
+    # two prices on the same event do not inflate its audit sample.
+    return goal_market(row) + ('_asian' if row['spec']['kind'] == 'asian_total' else '')
 
 
 def policy_choices(rows, context):
@@ -90,7 +91,7 @@ def capture(store, match, observed_at):
     rows = [{k: deepcopy(r.get(k)) for k in ROW_FIELDS} for r in matrix.get('rows', []) if market_tier(r) is not None]
     if not rows: return False
     variants = {r['market']: deepcopy(r.get('probabilities') or {}) for r in a.get('markets', [])}
-    for row in rows: row['model_variants'] = variants.get(key_for(row), {})
+    for row in rows: row['model_variants'] = variants.get(goal_market(row), {})
     snapshot = {'observed_at': observed_at, 'decision_at': matrix['opportunity_policy']['evaluated_at'],
         'statistics_captured_at': a.get('captured_at'),
         'input_sha256': a.get('input_sha256'), 'model_id': MODEL_ID, 'policy_id': POLICY_ID,
@@ -285,7 +286,7 @@ def build_report(store, observed_at):
         'rejections': [dict(zip(('policy_id', 'cohort', 'snapshot', 'market', 'reason'), k), **metrics(v)) for k, v in sorted(rejection.items())],
         'model_variants': [dict(zip(('policy_id', 'cohort', 'snapshot', 'market', 'variant'), k), **metrics(v)) for k, v in sorted(variants.items())],
         'notes': ['Shadow strategies are frozen research, never Gold recommendations.',
-            'Policies are separate cohorts; v2 frozen choices are never recomputed as v3.',
+            'Policies are separate cohorts; frozen choices are never recomputed under a newer policy.',
             'One fixture per proposal strategy/view. First/latest are separate, not independent trials.',
             'Rows of different goal markets are correlated. Missing outcomes remain pending.',
             'Observed closing value uses the last saved same-book quote within three hours, not certified market close.',
@@ -309,7 +310,8 @@ def requested_case(match, observed_at):
         d = row.get('opportunity') or {}
         result['markets'].append({'market': key_for(row), 'eligible': d.get('eligible'), 'reasons': d.get('reasons'),
             'probability_min_met': numeric(row.get('statistical_pct')) and row['statistical_pct'] >= 35,
-            'price_range_met': numeric(row.get('odd')) and 1.4 <= row['odd'] <= 3.5,
+            'price_range_met': numeric(row.get('odd')) and ODDS_MIN <= row['odd'] <= odds_max(row),
+            'odds_min': ODDS_MIN, 'odds_max': odds_max(row),
             'central_ev_positive': numeric(row.get('ev_pct')) and row['ev_pct'] > 0,
             'prudent_ev_positive': numeric(row.get('ev_low_pct')) and row['ev_low_pct'] > 0,
             'flow': d.get('signal')})
@@ -320,7 +322,7 @@ def main(root=Path('.'), observed_at=None):
     root = Path(root); now = observed_at or datetime.now(ROME).isoformat()
     path = root/'data/arab_quote_gold_policy_audit.json'
     store = read_store(path, {'study_id': STUDY_ID, 'policy_id': POLICY_ID, 'fixtures': {}})
-    if store.get('study_id') != STUDY_ID or store.get('policy_id') not in ('gold-goals-v2', POLICY_ID): raise ValueError('Audit study identity mismatch')
+    if store.get('study_id') != STUDY_ID or store.get('policy_id') not in SUPPORTED_POLICY_IDS: raise ValueError('Audit study identity mismatch')
     store['active_policy_id'] = POLICY_ID
     settle_saved_archives(store, root, now)
     coverage, seen, cases = defaultdict(Counter), set(), []

@@ -96,6 +96,21 @@ class ProposalStability(unittest.TestCase):
         r['odd'] *= .98
         self.assertIsNone(annotate(a['matrix'], later(20)))
 
+    def test_market_cap_is_a_hard_stop_even_inside_odds_tolerance(self):
+        for spec, maximum in [(S('total', 'ft', 'over', 2.5), 3.5),
+                              (S('total', 'ht', 'over', 1.5), 3.5),
+                              (S('total', 'ft', 'over', 3.5), 5.5),
+                              (S('btts', 'ht', 'yes'), 5.5),
+                              (S('asian_total', 'ft', 'over', 3.5), 5.5)]:
+            a, r = saved(spec=spec)
+            r['odd'] = maximum-.05
+            annotate(a['matrix'], NOW)
+            r.update(odd=maximum, ev_pct=1.4, ev_low_pct=-.2)
+            self.assertIs(annotate(a['matrix'], later(15)), r)
+            r['odd'] = maximum+.0001
+            self.assertIsNone(annotate(a['matrix'], later(20)))
+            self.assertIn('price', r['opportunity']['reasons'])
+
     def test_renewal_requires_strict_readmission_and_unconfirmed_flow_is_not_frozen(self):
         a, r = saved(); wobble(r)
         r['movement_confirmed'] = False

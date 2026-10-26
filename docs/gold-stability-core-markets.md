@@ -1,6 +1,6 @@
 # Gold: stable proposals and core market matrix
 
-Production policy: `gold-goals-v3`. Stability: `gold-stability-v1`.
+Production policy: `gold-goals-v4`. Stability: `gold-stability-v1`.
 Computed scope: `gold-core-markets-v1`. The Poisson kernel remains V5.0.
 
 ## Entry and maintenance
@@ -25,11 +25,23 @@ Higher overround tiers retain their stronger requirements minus that same
 bounded cushion. Unknown overround, changed bookmaker, missing previously
 available OCI, or a detected price reversal cannot use maintenance tolerance.
 
-Only EV/sensitivity failures may be tolerated. Probability >=35%, real odds
-1.40–3.50, supported history, coherent goal probabilities, the competition
+Only EV/sensitivity failures may be tolerated. Probability >=35%, the market's
+real-odds range below, supported history, coherent goal probabilities, the competition
 whitelist and quote freshness remain hard gates. The current OCI classification
 is recomputed; a former convergence label is not carried forward without support.
 These are explicit product thresholds, not evidence of calibrated profitability.
+
+| Market | Inclusive odds range |
+|---|---|
+| Over 1.5 HT, Over 2.5 FT | 1.40–3.50 |
+| Goal/BTTS HT Yes, Over 3.5 FT | 1.40–5.50 |
+
+Equivalent Asian **half-lines** use the same limits: 1.5 HT and 2.5 FT at
+3.50, 3.5 FT at 5.50. Integer/quarter lines have different push or split
+settlements and remain matrix references, not additional proposal markets.
+No probability, overround, EV, whitelist, timing-priority or tolerance threshold
+changes. Each row exports `goal_market`, `odds_min`, `odds_max`; the policy
+exports `odds_max_by_market`. These admission rules never remove statistical rows.
 
 Among strict candidates of equal priority, replacement requires a score gain
 of at least 15% or 2 score points, whichever is larger. A better PT priority
@@ -61,11 +73,14 @@ The 1X2 three-column opening/current board remains on the match card.
 The compatible release refreshes future matrices from saved statistics and quote
 observations with **zero API-Football calls**. It preserves source timestamps;
 this is not a new quote collection. Scheduled Fast/Night collection is unchanged.
-Started forecasts are immutable. Public assets use cache version 5.5.
+Started forecasts are immutable. Updated JavaScript assets use cache version 5.6.
 
-The prospective audit retains the v2 hashes and choices, separates v2/v3 cohorts,
-and freezes a strict `without_hysteresis` control alongside published v3 choices.
-It never combines the two policies into one performance estimate.
+The prospective audit retains the v2/v3 hashes and choices, separates v2/v3/v4
+cohorts, and freezes a strict `without_hysteresis` control alongside published
+choices. Asian aliases have separate audit market keys to avoid counting two
+prices for the same event as independent observations. The study dates and
+scheduled collection stay unchanged. This odds-cap change is the user's explicit
+exception to the freeze until 2 November; no other model adjustments are authorized.
 
 Validation covers admission/exit boundaries, non-renewing anchors, cumulative
 drift, expired quotes, persisted Fast/day rollover, unchanged core probabilities,
