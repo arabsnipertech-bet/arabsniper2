@@ -206,7 +206,14 @@
    if(tab){modalSection=tab.dataset.mxSection;updateModal();return;}
    if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}
   });
-  updateModal();if(dialog)dialog.showModal();
+  dialog.addEventListener('keydown',e=>{
+   if(e.key!=='Tab')return;
+   const items=[...dialog.querySelectorAll('button:not([disabled]),summary,a[href],input:not([disabled]),select:not([disabled]),[tabindex="0"]')].filter(n=>n.getClientRects().length);
+   const first=items[0],last=items.at(-1),active=document.activeElement;
+   if(e.shiftKey&&(active===first||!dialog.contains(active))){e.preventDefault();last?.focus();}
+   else if(!e.shiftKey&&(active===last||!dialog.contains(active))){e.preventDefault();first?.focus();}
+  });
+  updateModal();if(dialog){dialog.showModal();dialog.querySelector('[data-mx-close]').focus();}
  }
  function card(m,helpers){
   const f=m.fixture||{},a=m.multimarket||{},all=rowsOf(m),fid=String(f.fixture_id);
