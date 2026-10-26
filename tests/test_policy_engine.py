@@ -9,7 +9,7 @@ sys.modules[spec.name]=engine
 spec.loader.exec_module(engine)
 
 class EngineTests(unittest.TestCase):
-    def test_complete_scan_keeps_quote_history_and_runs_v4(self):
+    def test_complete_scan_keeps_quote_history_and_runs_v5(self):
         from unittest.mock import patch
         from test_statistics_first import NOW, KICKOFF
         from contextlib import ExitStack
@@ -40,7 +40,7 @@ class EngineTests(unittest.TestCase):
             stack.enter_context(patch('scan_audit.update_audit',return_value={'cohorts':[],'status':'experimental'}))
             output=engine.scan_dates(Client(),['2026-10-26'],[])
         self.assertEqual(output['days'][0]['fresh_matches'],1)
-        self.assertEqual(output['days'][0]['matches'][0]['multimarket']['model_id'],'statistics-first-v4.0')
+        self.assertEqual(output['days'][0]['matches'][0]['multimarket']['model_id'],'lateral-matrix-v5.0')
         self.assertEqual(state['quote_ledger'],{'sentinel':'keep'})
         self.assertIn('selection_board',output['days'][0])
         self.assertEqual(output['method']['active_analysis']['book_weight_in_ranking'],0)
@@ -71,7 +71,8 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(out['days'][0]['selection_board']['markets']['over25_ft']['started_selections'],1)
 
     def test_active_engine_and_independent_statistics(self):
-        from statistics_first import MODEL_ID, CONFIG
+        from statistics_first import CONFIG
+        from lateral_matrix import MODEL_ID
         self.assertEqual(engine.ACTIVE_ANALYSIS_ENGINE, MODEL_ID)
         self.assertNotIn('Egypt', engine.DEFAULT_EXCLUDED_COUNTRIES)
         self.assertEqual(CONFIG['book_weight_in_statistics'], 0)
@@ -79,7 +80,8 @@ class EngineTests(unittest.TestCase):
 
     def test_real_fixture_pipeline_collects_statistics_before_odds(self):
         from unittest.mock import patch
-        from statistics_first import statistical_analysis, MODEL_ID
+        from statistics_first import statistical_analysis
+        from lateral_matrix import MODEL_ID
         from test_statistics_first import NOW, KICKOFF
         calls=[]
         def raw(fid, home, away, date, status='FT'):
@@ -119,10 +121,15 @@ class EngineTests(unittest.TestCase):
         from unittest.mock import patch
         from policy_integration import install
         from test_statistics_first import NOW, evaluated
-        payload={'days':[{'day':1,'date':'2026-10-26','matches':[evaluated(str(i)) for i in range(7)]}]}
+        from lateral_matrix import build_matrix
+        matches=[evaluated(str(i)) for i in range(7)]
+        for m in matches: m['multimarket']=build_matrix(m['multimarket'],NOW)
+        payload={'days':[{'day':1,'date':'2026-10-26','matches':matches}]}
         observed=[]
         def audit(ns, output, client):
-            observed.append(sum(r['published_selection'] for m in output['days'][0]['matches'] for r in m['multimarket']['markets']))
+            observed.append(len(output['days'][0]['matches']))
+            assert output['days'][0]['selection_board']['max_per_market'] is None
+            assert all(len(m['multimarket']['matrix']['rows'])>200 for m in output['days'][0]['matches'])
             return {'cohorts':[], 'status':'experimental'}
         with tempfile.TemporaryDirectory() as folder:
             ns=dict(engine.__dict__)
@@ -131,11 +138,12 @@ class EngineTests(unittest.TestCase):
             install(ns)
             with patch('scan_audit.update_audit',side_effect=audit):
                 value=ns['scan_dates'](None,[],[])
-            self.assertEqual(observed,[20])
+            self.assertEqual(observed,[7])
             day=json.loads((Path(folder)/'arab_quote_day1.json').read_text())
-            self.assertEqual(len(day['market_rankings']['over25_ft']),5)
+            self.assertEqual(len(day['matches']),7)
+            self.assertIsNone(day['selection_board']['max_per_market'])
             self.assertEqual(day['selection_board']['book_weight_in_ranking'],0)
-            self.assertEqual(value['method']['active_analysis']['model_id'],'statistics-first-v4.0')
+            self.assertEqual(value['method']['active_analysis']['model_id'],'lateral-matrix-v5.0')
 
 
 class FirstHalfHistoryTests(unittest.TestCase):

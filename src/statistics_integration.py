@@ -1,4 +1,4 @@
-"""Active v4 pipeline: collect statistics, estimate, collect quotes, select, freeze."""
+"""Statistics-first pipeline with the active universal V5 matrix and V4 replay."""
 from copy import deepcopy
 
 from selection_policy import competition
@@ -7,13 +7,23 @@ from statistics_first import (statistical_analysis, confirm_markets, history, nu
                               build_selection_board, MODEL_ID, CONFIG, VALIDATION_FROM)
 
 
-def install(ns):
-    ns['ACTIVE_ANALYSIS_ENGINE'] = MODEL_ID
+def install(ns, matrix_mode=False):
+    engine_id = MODEL_ID
+    if matrix_mode:
+        from lateral_matrix import MODEL_ID as engine_id, build_matrix
+        from matrix_quotes import attach as attach_matrix
+        from matrix_pipeline import universal_profile, fixture_allowed, complete_day, build_board
+        ns['DEFAULT_EXCLUDED_COUNTRIES'].clear()
+        ns['fixture_allowed'] = fixture_allowed
+        ns['output_fixture_allowed'] = lambda item, excluded=(): bool(item.get('fixture', {}).get('fixture_id'))
+        ns['fixture_filter_profile'] = lambda row, excluded=(): universal_profile(row.get('league', {}))
+        ns['competition_allowed'] = lambda league, excluded=(): True
+    ns['ACTIVE_ANALYSIS_ENGINE'] = engine_id
     ns['DEFAULT_EXCLUDED_COUNTRIES'].discard('Egypt')
     review, history_context = {}, {}
 
     def competition_profile(league):
-        result = competition(league)
+        result = universal_profile(league) if matrix_mode else competition(league)
         if result.get('reason') == 'unmapped_competition_review':
             review[(str(league.get('country')), str(league.get('name')))] = dict(league)
         return result
@@ -93,6 +103,8 @@ def install(ns):
             'league': cache[league_key], 'h2h': h2h}}
         assessment = statistical_analysis(output, cutoff)
         assessment['statistics_as_of'] = cutoff
+        if matrix_mode:
+            assessment = build_matrix(assessment, cutoff)
         # 2. Reuse the existing API-Football recovery/catalogue and quote ledger.
         if getattr(client, 'odds_enricher', None) is not None:
             client.odds_enricher.register_fixture(meta)
@@ -113,11 +125,13 @@ def install(ns):
         quotes = update_ledger(state, meta['fixture_id'], captured, observed, meta['kickoff'])
         assessment['captured_at'] = observed
         confirm_markets(assessment, quotes, meta, observed)
+        if matrix_mode:
+            attach_matrix(assessment, payload or {}, state, meta, observed)
         output['multimarket'] = assessment
         output['book'] = {'markets': book, 'market_validation': validation}
         p = {r['market']: {r['selection']: r['probabilities']['statistics']}
              for r in assessment['markets']}
-        output['model'] = {'active_engine': MODEL_ID, 'probabilities_raw': p,
+        output['model'] = {'active_engine': engine_id, 'probabilities_raw': p,
             'probabilities_calibrated': deepcopy(p), 'calibration_applied': False,
             'probabilities': deepcopy(p), 'lambdas': deepcopy(assessment['rates']),
             'reliability_pct': 100*min(v['sample']/8 for v in assessment['data_quality'].values()),
@@ -125,7 +139,7 @@ def install(ns):
         output['model']['lambdas'].update(
             total_ft=assessment['rates']['home_ft']+assessment['rates']['away_ft'],
             total_ht=assessment['rates']['home_ht']+assessment['rates']['away_ht'])
-        output['display'] = {'analysis_engine': MODEL_ID, 'primary_choice': None,
+        output['display'] = {'analysis_engine': engine_id, 'primary_choice': None,
                              'ranked_choices': [], 'market_candidates': [], 'markets': {}}
         return output
     ns['build_fixture_output'] = fixture
@@ -142,6 +156,8 @@ def install(ns):
         # 3. Decide which forecasts are actually published BEFORE freezing them.
         as_of = ns['iso_now']()
         for day in output.get('days', []):
+            if matrix_mode:
+                complete_day(ns, client, day, as_of)
             for index, match in enumerate(day.get('matches', [])):
                 meta = match.get('fixture') or {}
                 kickoff = stamp(meta.get('kickoff'))
@@ -153,11 +169,18 @@ def install(ns):
                     restored['fixture'].update({k: meta[k] for k in
                         ('live', 'result', 'status_short', 'status_long', 'elapsed') if k in meta})
                     day['matches'][index] = restored
-            board = build_selection_board(day, as_of)
+            board = build_board(day, as_of) if matrix_mode else build_selection_board(day, as_of)
+            if matrix_mode:
+                summary = day['matrix_summary']
+                coverage = day.get('universal_coverage', {})
+                ns['log'](f"V5 {day['date']}: {summary['displayed_fixtures']} partite visibili / "
+                          f"{coverage.get('available_fixture_ids')} disponibili; "
+                          f"{summary['analyzed_fixtures']} matrici, {summary['modeled_markets']} esiti, "
+                          f"{summary['priced_markets']} quote recenti; categorie {summary['categories']}")
             rankings = {key: [] for key in board['markets']}
             for match in day.get('matches', []):
                 assessment = match.get('multimarket') or {}
-                if assessment.get('model_id') != MODEL_ID:
+                if assessment.get('model_id') != engine_id:
                     continue
                 meta = match['fixture']
                 candidates = []
@@ -175,13 +198,13 @@ def install(ns):
                         rankings[row['market']].append(candidate)
                 for rows in rankings.values():
                     rows.sort(key=lambda r: (r['published_rank'] or 999, str(r['fixture_id'])))
-                match['display'] = {'analysis_engine': MODEL_ID,
+                match['display'] = {'analysis_engine': engine_id,
                     'primary_choice': assessment['best_candidate'],
                     'ranked_choices': [r for r in candidates if r['gate']['eligible']],
                     'market_candidates': candidates, 'markets': {}}
             day['market_rankings'] = rankings
             day['probability_rankings'] = deepcopy(rankings)
-            day['multimarket_method'] = {'model_id': MODEL_ID, 'validation_from': VALIDATION_FROM,
+            day['multimarket_method'] = {'model_id': engine_id, 'validation_from': VALIDATION_FROM,
                                          'experimental': True, 'statistics_first': True}
             ns['atomic_write_json'](ns['DATA_DIR']/f"arab_quote_selections_day{day.get('day', 1)}.json",
                                    {'date': day.get('date'), 'generated_at': as_of, 'selection_board': board,
@@ -189,7 +212,8 @@ def install(ns):
         from scan_audit import update_audit
         research = update_audit(ns, output, client)
         for day in output.get('days', []):
-            day['multimarket_audit'] = {'cohorts': research['cohorts'], 'status': research['status']}
+            day['multimarket_audit'] = {'cohorts': research['cohorts'], 'status': research['status'],
+                'matrix_validation': {k: v for k, v in research.get('matrix_observation', {}).items() if k != 'groups'}}
         output['competition_review'] = list(review.values())
         for key in ('first_half', 'favorite_trap', 'price_gate', 'tipsters', 'market_goal_regime',
                     'ft_bridge', 'focused_shortlist', 'pattern_audit', 'legacy_labels_removed'):
@@ -197,9 +221,9 @@ def install(ns):
         for day in output.get('days', []):
             day.pop('focused_shortlist', None)
         output.setdefault('method', {})['active_analysis'] = {
-            'model_id': MODEL_ID, 'book_weight_in_statistics': 0, 'book_weight_in_ranking': 0,
+            'model_id': engine_id, 'book_weight_in_statistics': 0, 'book_weight_in_ranking': 0,
             'history': CONFIG['history_ft'], 'ht_history': CONFIG['history_ht'],
-            'top_per_market': CONFIG['top_per_market'], 'allow_abstention': True,
+            'top_per_market': None if matrix_mode else CONFIG['top_per_market'], 'allow_abstention': True,
             'snapshot_policy': 'published_selections_and_all_rejected_markets_before_kickoff'}
         output['method']['user_policy'] = {'statistics_first': True,
             'automatic_drought_bonus': False, 'market_confirmation_after_selection': True}
@@ -209,6 +233,12 @@ def install(ns):
             markets='Over 2,5 FT; Over 1,5 PT; Over 3,5 FT; GG PT.',
             markers='Oro: selezione statistica. Azzurro: conferma diretta nelle quote.',
             book='Movimenti osservati sugli stessi operatori, depurati dall’aggio; nessun bonus alle probabilità.')
+        if matrix_mode:
+            output['method']['active_analysis'].update(universal_observation=True, all_supported_score_markets=True)
+            output['method']['user_policy'].update(universal_observation=True, market_confirmation_after_selection=False)
+            output['method'].update(markets='Matrice 1X2, doppia chance, Over/Under, GG/NG, PT/ST, asiatici, multigol e combo.',
+                markers='Convergenza, contrarian, laterali e valore in osservazione: nessun limite di partite.',
+                book='OCI e aggio per esito, linea e periodo; volumi e smart money non osservati.')
         ns['atomic_write_json'](ns['OUTPUT_FILE'], output)
         for day in output.get('days', []):
             number = ns['safe_int'](day.get('day'), 0)

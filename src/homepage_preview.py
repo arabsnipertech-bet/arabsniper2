@@ -55,6 +55,30 @@ def build_preview(payload, previous=None, now=None, rng=None):
     updated = stamp(payload.get('updated_at'))
     if payload.get('date') != today or not updated or not 0 <= (now-updated).total_seconds() <= 86400:
         return result
+    if (payload.get('multimarket_method') or {}).get('model_id') == 'lateral-matrix-v5.0':
+        candidates = []
+        for match in payload.get('matches', []):
+            f, a = match.get('fixture') or {}, match.get('multimarket') or {}
+            kickoff = stamp(f.get('kickoff'))
+            if (not kickoff or kickoff <= now or kickoff.astimezone(ROME).date().isoformat() != today
+                    or f.get('status_short') not in ('NS', 'TBD')): continue
+            for row in a.get('matrix', {}).get('rows', []):
+                if (row.get('quote_status') != 'recent' or row.get('quality') != 'supported' or
+                        not number(row.get('odd')) or row['odd'] <= 1 or not number(row.get('ev_pct')) or
+                        row['ev_pct'] <= 0 or row.get('family') == 'scores'): continue
+                candidates.append((row.get('ev_low_pct', -100), {'fixture_id': str(f['fixture_id']),
+                    'match': f.get('match', ''), 'league': f.get('league', ''), 'kickoff': f['kickoff'],
+                    'label': row['label'], 'market': row['spec']['kind']+'_'+row['period'],
+                    'odd': row['odd'], 'statistical_pct': row['statistical_pct'],
+                    'market_confirmation': row.get('market_behavior'), 'category': row['category'],
+                    'model_id': 'lateral-matrix-v5.0', 'captured_at': a.get('captured_at')}))
+        candidates.sort(key=lambda x: (-x[0], x[1]['kickoff'], x[1]['fixture_id'], x[1]['label']))
+        unique = {}
+        for _, row in candidates: unique.setdefault(row['fixture_id'], row)
+        result.update(model_id='lateral-matrix-v5.0', selections=list(unique.values())[:3],
+                      analyzed_fixtures=(payload.get('matrix_summary') or {}).get('analyzed_fixtures', 0),
+                      modeled_markets=(payload.get('matrix_summary') or {}).get('modeled_markets', 0))
+        return result
     if ((payload.get('multimarket_method') or {}).get('model_id') == MODEL_ID or
             any((m.get('multimarket') or {}).get('model_id') == MODEL_ID for m in payload.get('matches', []))):
         return statistics_preview(payload, result, now)

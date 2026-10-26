@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
   <meta name="application-version" content="2.0.0" />
-  <title>ArabSniper · Statistiche prima · V4</title>
+  <title>ArabSniper · Osservatorio laterale · V5</title>
   <style>
     :root {
       --bg: #05070b;
@@ -840,6 +840,8 @@
 
   <link rel="stylesheet" href="/statistics-first.css?v=4.0">
   <script src="/statistics-first.js?v=4.0"></script>
+  <link rel="stylesheet" href="/lateral-matrix.css?v=5.0">
+  <script src="/lateral-matrix.js?v=5.0"></script>
   <script src="/live-scores.js?v=2"></script>
   <script>
     'use strict';
@@ -1481,6 +1483,14 @@
       const host=document.getElementById('matchResearch');
       if (!host) return;
       const legacy=document.getElementById('legacyDashboard');
+      if (payload.multimarket_method?.model_id==='lateral-matrix-v5.0' ||
+          (payload.matches||[]).some(m=>m.multimarket?.model_id==='lateral-matrix-v5.0')) {
+        if(legacy)legacy.hidden=true;
+        if(!window.ArabMatrix){host.innerHTML='<div class="empty">Interfaccia in aggiornamento. Ricarica la pagina.</div>';return;}
+        window.ArabMatrix.render(payload,host,{phase:contextState,stateLabel:contextStateLabel,
+          liveBadge:contextLiveBadge,livePanel:contextLivePanel,outcome:contextOutcome,timestamp:formatTimestamp});
+        return;
+      }
       if (payload.multimarket_method?.model_id==='statistics-first-v4.0' ||
           (payload.matches||[]).some(m=>m.multimarket?.model_id==='statistics-first-v4.0')) {
         if(legacy)legacy.hidden=true;

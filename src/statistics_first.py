@@ -257,12 +257,15 @@ def statistical_analysis(match, as_of):
     no_peak_control = probabilities(rates_for(histories, league, h2h, as_of, use_robust=False)[0])
     raw = probabilities(rates_for(histories, league, [], as_of, use_xg=False, use_robust=False)[0])
     no_h2h = probabilities(rates_for(histories, league, [], as_of)[0])
+    scenario_rates = [rates_for(histories, league, [], as_of)[0]]
     scenarios = [central, no_h2h]
     # Delete one historical match at a time, not the match being predicted.
     for side in ('home', 'away'):
         for index in range(len(histories[side])):
             trial = {**histories, side: histories[side][:index]+histories[side][index+1:]}
-            scenarios.append(probabilities(rates_for(trial, league, h2h, as_of)[0]))
+            trial_rates = rates_for(trial, league, h2h, as_of)[0]
+            scenario_rates.append(trial_rates)
+            scenarios.append(probabilities(trial_rates))
     base_rates = {s+'_'+p: league_prior(league, s, p)[0]
                   for s in ('home', 'away') for p in ('ft', 'ht')}
     for side in ('home', 'away'):
@@ -330,6 +333,7 @@ def statistical_analysis(match, as_of):
     return {'model_id': MODEL_ID, 'config_id': CONFIG_ID, 'config': deepcopy(CONFIG),
             'captured_at': as_of, 'status': 'experimental', 'validation_from': VALIDATION_FROM,
             'validation_status': 'prospective_pending', 'rates': rates, 'profiles': profiles,
+            'sensitivity_rates': scenario_rates,
             'inputs': inputs, 'input_sha256': sha256(json.dumps(inputs, sort_keys=True, default=str).encode()).hexdigest(),
             'h2h': {'used': len(h2h), 'overlapping_excluded': overlaps, 'effects': h2h_effect},
             'data_quality': {s: {'sample': profiles[s]['for_ft']['sample'],

@@ -175,9 +175,9 @@ class PublicationTests(unittest.TestCase):
         report=build_daily(store,'2026-10-26',NOW)
         rows=[r for r in report['markets'] if r['snapshot']=='latest' and r['published_selection']]
         self.assertEqual(len(rows),4)
-        self.assertEqual(len(project(report,'2026-10-26')),4)
-        self.assertTrue(all(r['outcome']=='won' for r in project(report,'2026-10-26')))
-        self.assertEqual(len({(r['fixture_id'],r['market']) for r in project(report,'2026-10-26')}),4)
+        self.assertEqual(len(project(report,'2026-10-26',model=MODEL_ID)),4)
+        self.assertTrue(all(r['outcome']=='won' for r in project(report,'2026-10-26',model=MODEL_ID)))
+        self.assertEqual(len({(r['fixture_id'],r['market']) for r in project(report,'2026-10-26',model=MODEL_ID)}),4)
         audit=build_report(store)
         self.assertTrue(any(r['group']=='independent_model_variants' for r in audit['groups']))
         self.assertTrue(any(r['feature']=='selected_unavailable' for r in audit['feature_comparisons']))

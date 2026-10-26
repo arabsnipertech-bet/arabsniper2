@@ -80,6 +80,9 @@ jobs:
       - name: Pack and verify publication size
         run: python src/publication_storage.py
 
+      - name: Refresh public results for the active model
+        run: python src/homepage_results.py
+
       - name: Validate generated files
         run: |
           echo "File ArabSniper prodotti:"

@@ -114,7 +114,7 @@ def build_daily(store, date, generated_at, source_revision=None):
                            sensitivity=item.get('sensitivity'))
                 rows.append(row)
                 if item and y is not None and number(probability, 0, 1):
-                    if version.startswith('statistics-first-v4'):
+                    if version.startswith(('statistics-first-v4', 'lateral-matrix-v5')):
                         status = 'selected' if item.get('published_selection') else 'not_selected'
                         selection_groups[(policy, version, period, market, status)].append((probability, y, odd if valid_odd else None))
                     group = (policy, version, period, market, 'primary' if selected else 'not_selected')

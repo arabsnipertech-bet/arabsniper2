@@ -6,8 +6,9 @@ import json, math
 from audit_storage import read_store, atomic_bytes
 from homepage_preview import stamp
 
-from statistics_first import MODEL_ID as MODEL, VALIDATION_FROM
-PREVIOUS_MODEL = 'context-goals-v3.4'
+from lateral_matrix import MODEL_ID as MODEL
+from statistics_first import VALIDATION_FROM
+PREVIOUS_MODEL = 'statistics-first-v4.0'
 LABELS = {'over15_ht':'Over 1,5 primo tempo', 'over25_ht':'Over 2,5 primo tempo',
           'over25_ft':'Over 2,5 finale', 'over35_ft':'Over 3,5 finale', 'gg_ht':'Goal primo tempo'}
 ROME = ZoneInfo('Europe/Rome')
@@ -17,7 +18,7 @@ def project(report, day, model=MODEL):
     for row in report.get('markets', []):
         fixture = row.get('fixture') or {}
         kickoff, captured = stamp(fixture.get('kickoff')), stamp(row.get('captured_at'))
-        published = row.get('published_selection') if model == MODEL else row.get('primary')
+        published = row.get('published_selection') if model.startswith(('statistics-first-v4', 'lateral-matrix-v5')) else row.get('primary')
         if (row.get('model_id') != model or row.get('period') != 'prospective' or
             row.get('snapshot') != 'latest' or published is not True or
             row.get('market') not in LABELS or not kickoff or not captured or captured >= kickoff or
@@ -57,7 +58,7 @@ def build(reports, now=None):
     return {'schema_version':2,'generated_at':now.isoformat(),'date':yesterday.isoformat(),'model_id':MODEL,
             'validation_from':VALIDATION_FROM,
             'previous_model':{'model_id':PREVIOUS_MODEL, 'history':totals(previous)},
-            'cohort':'Tutti i mercati selezionati da V4 nell’ultima analisi prima del calcio d’inizio. La stessa partita può avere più mercati; gli esiti sono correlati.',
+            'cohort':'Mercati principali con valore teorico stabile V5 nell’ultima analisi prima del calcio d’inizio. La stessa partita può avere più mercati; gli esiti sono correlati.',
             'available':yesterday.isoformat() in by_day,'daily':totals(rows),
             'history':dict(totals(history),from_date=start.isoformat(),to_date=yesterday.isoformat(),days_with_data=sum(bool(v) for v in by_day.values())),
             'examples':sorted([r for r in rows if r['outcome']=='won' and r['market'].startswith('over') and r['odd'] is not None], key=lambda r:(-r['odd'],r['kickoff'],r['fixture_id']))[:10],
