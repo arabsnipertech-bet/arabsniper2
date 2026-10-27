@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
 import {authRoute,cleanupAuth} from '../workers/stripe-access/auth.mjs';
-import worker from '../workers/stripe-access/worker.mjs';
+import worker,{access as realAccess} from '../workers/stripe-access/worker.mjs';
 const now=1800000000,origin='https://arabsniperbet.com';
 function setup(){
  const db=new DatabaseSync(':memory:');db.exec(readFileSync(new URL('../workers/stripe-access/auth-schema.sql',import.meta.url),'utf8'));
@@ -40,11 +40,49 @@ test('Resend cooldown, replacement, origins, and no subscription bypass',async()
 });
 test('Session expiry and cleanup; missing config fails closed',async()=>{
  const s=setup(),b=await s.issue(),r=await s.call('/api/auth/verify-code',b),c=r.headers.get('Set-Cookie');
- assert.equal((await s.call('/api/auth/session',null,c,now+604800)).status,401);
- await cleanupAuth(s.env,now+604800);assert.equal(s.db.prepare('SELECT count(*) n FROM gold_sessions').get().n,0);
+ assert.equal((await s.call('/api/auth/session',null,c,now+86400)).status,401);
+ await cleanupAuth(s.env,now+86400);assert.equal(s.db.prepare('SELECT count(*) n FROM gold_sessions').get().n,0);
  delete s.env.RESEND_API_KEY;assert.equal((await s.call('/api/auth/request-code',{email:b.email})).status,503);
 });
 test('Legacy email endpoint cannot grant even VIP when OTP enabled',async()=>{
  const s=setup();s.env.STRIPE_MODE='live';
  const r=await worker.fetch(new Request(origin+'/?email=bruno.pirolo@gmail.com'),s.env);assert.equal(r.status,401);assert.equal((await r.json()).active,false);
 });
+test('24-hour expiry is absolute on session and private feeds, including VIP',async()=>{
+ const s=setup(),b=await s.issue('bruno.pirolo@gmail.com');
+ const r=await s.call('/api/auth/verify-code',b),cookie=r.headers.get('Set-Cookie');
+ assert.match(cookie,/Max-Age=86400(?:;|$)/);
+ assert.equal((await r.json()).session_expires_at,now+86400);
+ for(const t of [now+1,now+43200,now+86399]) {
+  const response=await s.call('/api/auth/session',null,cookie,t);
+  assert.equal(response.status,200);
+  assert.equal((await response.json()).session_expires_at,now+86400);
+  assert.equal(response.headers.get('Set-Cookie'),null);
+ }
+ const req=path=>new Request(origin+path,{headers:{Cookie:cookie}});
+ for(const path of ['/api/auth/session','/api/gold-data/arab_quote_day1.json']) {
+  assert.equal((await authRoute(req(path),s.env,realAccess,now+86399)).status,200);
+  assert.equal((await authRoute(req(path),s.env,realAccess,now+86400)).status,401);
+ }
+ assert.equal(s.db.prepare('SELECT expires_at FROM gold_sessions').get().expires_at,now+86400);
+});
+test('Legacy seven-day token cannot be reused or renamed to the new cookie',async()=>{
+ const s=setup(),token='a'.repeat(64);
+ const digest=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(token))).toString('hex');
+ s.db.prepare('INSERT INTO gold_sessions(digest,email,expires_at) VALUES (?,?,?)').run(digest,'bruno.pirolo@gmail.com',now+604800);
+ for(const name of ['__Host-gold_session','__Host-gold_session_24h']) {
+  const cookie=name+'='+token;
+  assert.equal((await s.call('/api/auth/session',null,cookie)).status,401);
+  assert.equal((await s.call('/api/gold-data/arab_quote_day1.json',null,cookie)).status,401);
+ }
+});
+test('A fresh code after expiry starts a new independent 24-hour session',async()=>{
+ const s=setup(),first=await s.call('/api/auth/verify-code',await s.issue());
+ const oldCookie=first.headers.get('Set-Cookie'),t=now+86400;
+ const body=await s.issue('user@example.com',t);
+ const next=await s.call('/api/auth/verify-code',body,null,t);
+ assert.equal((await next.json()).session_expires_at,t+86400);
+ assert.equal((await s.call('/api/auth/session',null,oldCookie,t)).status,401);
+ assert.equal((await s.call('/api/auth/session',null,next.headers.get('Set-Cookie'),t)).status,200);
+});
+

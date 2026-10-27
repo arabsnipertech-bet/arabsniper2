@@ -1,7 +1,9 @@
 // Production bundle: generated from worker.mjs and auth.mjs. Keep AUTH_ENABLED=false until cutover.
 const {authRoute, cleanupAuth} = (() => {
 // Staged OTP authentication. Activate only after email delivery and private data cutover.
-const COOKIE = '__Host-gold_session';
+// Versioned digest rejects legacy seven-day tokens even if the cookie is renamed.
+const COOKIE = '__Host-gold_session_24h';
+const SESSION_SECONDS = 86400;
 const encoder = new TextEncoder();
 const hex = bytes => Array.from(new Uint8Array(bytes), b=>b.toString(16).padStart(2,'0')).join('');
 const token = () => hex(crypto.getRandomValues(new Uint8Array(32)));
@@ -27,11 +29,14 @@ async function limit(env,key,max,seconds,now) {
  ON CONFLICT(key) DO UPDATE SET hits=hits+1 RETURNING hits`,`${key}:${bucket}`,now+seconds);
  return row.hits<=max;
 }
-async function sessionEmail(request,env,now=Math.floor(Date.now()/1000)) {
+async function sessionRecord(request,env,now=Math.floor(Date.now()/1000)) {
  const t=request.headers.get('Cookie')?.split(';').map(s=>s.trim()).find(s=>s.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);
  if(!t||!/^[a-f0-9]{64}$/.test(t))return null;
- const row=await first(env,'SELECT email FROM gold_sessions WHERE digest=? AND expires_at>?',await hash(t),now);
- return row?.email||null;
+ const row=await first(env,'SELECT email,expires_at FROM gold_sessions WHERE digest=? AND expires_at>?',await hash(COOKIE+':'+t),now);
+ return row||null;
+}
+async function sessionEmail(request,env,now=Math.floor(Date.now()/1000)) {
+ return (await sessionRecord(request,env,now))?.email||null;
 }
 async function authRoute(request,env,access,now=Math.floor(Date.now()/1000)) {
  const url=new URL(request.url),path=url.pathname;
@@ -43,13 +48,13 @@ async function authRoute(request,env,access,now=Math.floor(Date.now()/1000)) {
  if(request.method==='POST'&&request.headers.get('Origin')!==url.origin)return reply({error:'Origine non valida.'},403);
  try {
   if(path==='/api/auth/session'&&request.method==='GET') {
-   const email=await sessionEmail(request,env,now);
-   if(!email)return reply({active:false},401);
-   return reply({...await access(env,email,now),authentication:'email_otp'});
+   const session=await sessionRecord(request,env,now);
+   if(!session)return reply({active:false},401,{'Set-Cookie':cookie('',0)});
+   return reply({...await access(env,session.email,now),authentication:'email_otp',session_expires_at:session.expires_at});
   }
   if(path==='/api/auth/logout'&&request.method==='POST') {
    const t=request.headers.get('Cookie')?.split(';').map(s=>s.trim()).find(s=>s.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);
-   if(t)await env.ACCESS_DB.prepare('DELETE FROM gold_sessions WHERE digest=?').bind(await hash(t)).run();
+   if(t)await env.ACCESS_DB.prepare('DELETE FROM gold_sessions WHERE digest=?').bind(await hash(COOKIE+':'+t)).run();
    return reply({ok:true},200,{'Set-Cookie':cookie('',0)});
   }
   if(path.startsWith('/api/gold-data/')&&request.method==='GET') {
@@ -92,13 +97,14 @@ async function authRoute(request,env,access,now=Math.floor(Date.now()/1000)) {
   if(!row?.consumed)return reply({error:'Codice errato, scaduto o già utilizzato.'},400);
   const entitlement=await access(env,email,now);
   if(!entitlement.active)return reply({error:'Email verificata. Acquista un piano per accedere a Gold.'},403);
-  const t=token();await env.ACCESS_DB.prepare('INSERT INTO gold_sessions(digest,email,expires_at) VALUES (?,?,?)').bind(await hash(t),email,now+604800).run();
-  return reply({...entitlement,authentication:'email_otp'},200,{'Set-Cookie':cookie(t,604800)});
+  const t=token();await env.ACCESS_DB.prepare('INSERT INTO gold_sessions(digest,email,expires_at) VALUES (?,?,?)').bind(await hash(COOKIE+':'+t),email,now+SESSION_SECONDS).run();
+  return reply({...entitlement,authentication:'email_otp',session_expires_at:now+SESSION_SECONDS},200,{'Set-Cookie':cookie(t,SESSION_SECONDS)});
  }catch{return reply({error:'Servizio accessi temporaneamente non disponibile.'},503);}
 }
 async function cleanupAuth(env,now=Math.floor(Date.now()/1000)) {
  for(const table of ['gold_codes','gold_sessions','gold_limits'])await env.ACCESS_DB.prepare(`DELETE FROM ${table} WHERE expires_at<=?`).bind(now).run();
 }
+
 
 return {authRoute,cleanupAuth};
 })();
