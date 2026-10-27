@@ -26,9 +26,10 @@
           const d = row.opportunity;
           const s = row.spec || {}, caps = {over15_ht:3.5,over25_ft:3.5,gg_ht:5.5,over35_ft:5.5};
           const key = s.extra!=null?null:s.kind==='btts'&&s.period==='ht'&&s.side==='yes'&&s.line==null?'gg_ht':['total','asian_total'].includes(s.kind)&&s.side==='over'?(s.period==='ht'&&s.line===1.5?'over15_ht':s.period==='ft'&&s.line===2.5?'over25_ft':s.period==='ft'&&s.line===3.5?'over35_ft':null):null;
-          const current = ['gold-goals-v4','gold-goals-v5'].includes(d?.policy_id), maximum = current ? caps[key] : 3.5;
-          const dedicated = d?.policy_id === 'gold-goals-v5', minimum = dedicated ? ({over15_ht:45,gg_ht:40}[key] || 35) : 35;
-          if (!['gold-goals-v2','gold-goals-v3','gold-goals-v4','gold-goals-v5'].includes(d?.policy_id) || (current && (!key || d.odds_max !== maximum)) || row.competition_policy !== 'gold-senior-whitelist-v1' || d.eligible !== true || row.odd < 1.4 || row.odd > maximum || !numeric(d.min_probability_pct) || !numeric(row.statistical_pct) || row.statistical_pct < Math.max(minimum, d.min_probability_pct) || row.statistical_pct > 100 || (dedicated && ['over15_ht','gg_ht'].includes(key) && d.ht_history_supported !== true)) return false;
+          const current = ['gold-goals-v4','gold-goals-v5','gold-goals-v6'].includes(d?.policy_id), maximum = current ? caps[key] : 3.5;
+          const dedicated = ['gold-goals-v5','gold-goals-v6'].includes(d?.policy_id);
+          const minimum = d?.policy_id === 'gold-goals-v6' ? ({over15_ht:35,gg_ht:30,over25_ft:30,over35_ft:30}[key] ?? 30) : d?.policy_id === 'gold-goals-v5' ? ({over15_ht:45,gg_ht:40}[key] || 35) : 35;
+          if (!['gold-goals-v2','gold-goals-v3','gold-goals-v4','gold-goals-v5','gold-goals-v6'].includes(d?.policy_id) || (current && (!key || d.odds_max !== maximum)) || row.competition_policy !== 'gold-senior-whitelist-v1' || d.eligible !== true || row.odd < 1.4 || row.odd > maximum || !numeric(d.min_probability_pct) || !numeric(row.statistical_pct) || row.statistical_pct < Math.max(minimum, d.min_probability_pct) || row.statistical_pct > 100 || (dedicated && ['over15_ht','gg_ht'].includes(key) && d.ht_history_supported !== true)) return false;
         }
         seen.add(row.fixture_id); return true;
       }).slice(0,3) : [];

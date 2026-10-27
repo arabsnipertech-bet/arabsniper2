@@ -16,18 +16,28 @@ const frozen=JSON.stringify(p);api.selectMatches(p,{...opts,sort:'value'},0);ass
 assert(!api.esc('<img src=x onerror=alert(1)>').includes('<img'));
 const html=api.marketRow({...rows[0],label:'<script>x</script>',statistical_pct:61,odd:2,first_odd:2.2,margin_pct:4,oci:50},{});
 assert(html.includes('&lt;script&gt;'));assert(html.includes('Aggio'));assert(html.includes('OCI'));
-const decision={policy_id:api.POLICY,eligible:true,rank:1,priority:0,min_probability_pct:35,min_ev_pct:2,min_ev_low_pct:0,signal:'convergence',label:'Convergenza di Trend',reasons:[]};
+const decision={policy_id:api.POLICY,eligible:true,rank:1,priority:0,min_probability_pct:30,min_ev_pct:2,min_ev_low_pct:0,signal:'convergence',label:'Convergenza di Trend',reasons:[]};
 const priced={...rows[0],odd:2,statistical_pct:60,id:'regular',spec:{kind:'total',period:'ft',side:'over',line:2.5},opportunity:decision};
 const asian={...priced,id:'asian',family:'asian',spec:{kind:'handicap',period:'ft',side:'home',line:.25},quote_adapter_version:2,ev_pct:30,ev_low_pct:12,opportunity:{...decision,rank:2,priority:1,min_probability_pct:35}};
 const fragile={...priced,id:'fragile',ev_pct:100,ev_low_pct:-20};
 const prior={...priced,id:'prior',quality:'prior_only',ev_pct:200,ev_low_pct:200};
 assert.equal(api.bestOpportunity([priced,asian,fragile,prior]).id,'regular');
 assert.equal(api.bestOpportunity([{...asian,quote_status:'stale'}]),null);
-for(const extra of [{odd:150,statistical_pct:1},{odd:3.51},{odd:1.39},{statistical_pct:34.99},{opportunity:null},{spec:{kind:'score'}},{spec:{kind:'dc',period:'ft',side:'x2'}}])assert.equal(api.bestOpportunity([{...priced,...extra}]),null);
-const high={...priced,odd:5.5,statistical_pct:40,opportunity:{...decision,min_probability_pct:40,ht_history_supported:true},spec:{kind:'btts',period:'ht',side:'yes'}};
+for(const extra of [{odd:150,statistical_pct:1},{odd:3.51},{odd:1.39},{statistical_pct:29.99},{opportunity:null},{spec:{kind:'score'}},{spec:{kind:'dc',period:'ft',side:'x2'}}])assert.equal(api.bestOpportunity([{...priced,...extra}]),null);
+const high={...priced,odd:5.5,statistical_pct:30,opportunity:{...decision,min_probability_pct:30,ht_history_supported:true},spec:{kind:'btts',period:'ht',side:'yes'}};
 assert.equal(api.bestOpportunity([high]).id,'regular');
 assert(api.marketRow(high).includes('Ammissibile · quote 1,40–5,50'));
 assert(api.opportunityPanel([high]).includes('Goal PT / Over 3,5 FT: 1,40–5,50'));
+assert(api.opportunityPanel([high]).includes('Over 1,5 PT ≥35%, Goal PT ≥30%, FT ≥30%'));
+// Frozen v5 keeps its original floors, expanded prices and HT evidence gate.
+for(const [spec,floor,max] of [[{kind:'total',period:'ht',side:'over',line:1.5},45,3.5],[{kind:'btts',period:'ht',side:'yes'},40,5.5],[{kind:'total',period:'ft',side:'over',line:2.5},35,3.5],[{kind:'total',period:'ft',side:'over',line:3.5},35,5.5]]){
+ const archived={...priced,spec,odd:max,statistical_pct:floor,opportunity:{...decision,policy_id:'gold-goals-v5',min_probability_pct:floor,ht_history_supported:true}};
+ assert.equal(api.bestOpportunity([archived])?.id,'regular');
+ assert.equal(api.bestOpportunity([{...archived,statistical_pct:floor-.01,opportunity:{...archived.opportunity,min_probability_pct:30}}]),null);
+ if(spec.period==='ht')assert.equal(api.bestOpportunity([{...archived,opportunity:{...archived.opportunity,ht_history_supported:false}}]),null);
+ assert(api.opportunityPanel([archived]).includes('Proposta archiviata'));
+ assert(api.opportunityPanel([archived]).includes('Over 1,5 PT ≥45%, Goal PT ≥40%, FT ≥35%'));
+}
 assert.equal(api.bestOpportunity([{...high,opportunity:{...decision,policy_id:'gold-goals-v3'}}]),null);
 assert.equal(api.bestOpportunity([{...priced,odd:4.2,opportunity:{...decision,odds_max:5.5}}]),null);
 assert(api.opportunityPanel([{...priced,odd:150}]).includes('Nessuna proposta supera i criteri'));

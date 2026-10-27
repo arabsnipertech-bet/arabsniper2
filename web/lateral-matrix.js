@@ -2,9 +2,11 @@
 (function(root){
  'use strict';
  const MODEL='lateral-matrix-v5.0';
- const POLICY='gold-goals-v5',SCOPE='gold-senior-whitelist-v1';
- const acceptedPolicy=d=>[POLICY,'gold-goals-v4','gold-goals-v3','gold-goals-v2'].includes(d?.policy_id);
- const MIN_P={over15_ht:45,gg_ht:40,over25_ft:35,over35_ft:35};
+ const POLICY='gold-goals-v6',SCOPE='gold-senior-whitelist-v1';
+ const acceptedPolicy=d=>[POLICY,'gold-goals-v5','gold-goals-v4','gold-goals-v3','gold-goals-v2'].includes(d?.policy_id);
+ const MIN_P={over15_ht:35,gg_ht:30,over25_ft:30,over35_ft:30};
+ const PREVIOUS_MIN_P={over15_ht:45,gg_ht:40,over25_ft:35,over35_ft:35};
+ const dedicatedPolicy=id=>[POLICY,'gold-goals-v5'].includes(id);
  const ODDS_MAX={over15_ht:3.5,over25_ft:3.5,gg_ht:5.5,over35_ft:5.5};
  const state={category:'all',family:'all',period:'all',phase:'all',sort:'time',search:''};
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -19,8 +21,8 @@
  const allowedMatch=m=>m.gold_scope?.policy_id===SCOPE&&m.gold_scope.allowed===true;
  const scopePayload=p=>({...p,matches:(p.matches||[]).filter(allowedMatch),gold_scope:{...(p.gold_scope||{}),ready:p.gold_scope?.policy_id===SCOPE}});
  function goalMarket(r){const s=r.spec||{};if(s.extra!=null)return null;return s.kind==='btts'&&s.period==='ht'&&s.side==='yes'&&s.line==null?'gg_ht':['total','asian_total'].includes(s.kind)&&s.side==='over'?(s.period==='ht'&&s.line===1.5?'over15_ht':s.period==='ft'&&s.line===2.5?'over25_ft':s.period==='ft'&&s.line===3.5?'over35_ft':null):null;}
- const minProbability=r=>r.opportunity?.policy_id===POLICY?(MIN_P[goalMarket(r)]??35):35;
- const maxOdd=r=>[POLICY,'gold-goals-v4'].includes(r.opportunity?.policy_id)?(ODDS_MAX[goalMarket(r)]??3.5):3.5;
+ const minProbability=r=>r.opportunity?.policy_id===POLICY?(MIN_P[goalMarket(r)]??30):r.opportunity?.policy_id==='gold-goals-v5'?(PREVIOUS_MIN_P[goalMarket(r)]??35):35;
+ const maxOdd=r=>[POLICY,'gold-goals-v5','gold-goals-v4'].includes(r.opportunity?.policy_id)?(ODDS_MAX[goalMarket(r)]??3.5):3.5;
  function coreMarket(s={}){
   if(!s||s.extra!=null)return false;
   if(s.kind==='result')return s.period==='ft'&&['1','x','2'].includes(s.side)&&s.line==null;
@@ -98,7 +100,7 @@
     r.quote_status==='recent'&&r.quality==='supported'&&Number.isFinite(r.odd)&&r.odd>=1.4&&r.odd<=maxOdd(r)&&
     Number.isFinite(d.min_probability_pct)&&Number.isFinite(r.statistical_pct)&&r.statistical_pct>=Math.max(minProbability(r),d.min_probability_pct)&&r.statistical_pct<=100&&
     Number.isFinite(r.ev_pct)&&r.ev_pct>=d.min_ev_pct&&Number.isFinite(r.ev_low_pct)&&(validHold||r.ev_low_pct>0)&&r.ev_low_pct>=d.min_ev_low_pct&&
-    goalMarket(r)!==null&&(d.policy_id!==POLICY||!['over15_ht','gg_ht'].includes(goalMarket(r))||d.ht_history_supported===true);
+    goalMarket(r)!==null&&(!dedicatedPolicy(d.policy_id)||!['over15_ht','gg_ht'].includes(goalMarket(r))||d.ht_history_supported===true);
   }).sort((a,b)=>a.opportunity.rank-b.opportunity.rank||String(a.id).localeCompare(String(b.id)))[0]||null;
  }
  function movementSignal(row){
@@ -136,8 +138,9 @@
   const checked=rows.filter(r=>acceptedPolicy(r.opportunity)),counts={};
   for(const r of checked)for(const code of r.opportunity.reasons||[])counts[code]=(counts[code]||0)+1;
   const exclusions=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,n])=>n+' '+(REASONS[k]||k)).join(' · ');
-  const legacy=checked.length&&checked.every(r=>r.opportunity.policy_id!==POLICY),extended=checked.some(r=>['gold-goals-v4',POLICY].includes(r.opportunity.policy_id));
-  const rule=(legacy?'Proposta archiviata · ':'')+((!legacy||extended)?'Over 1,5 PT / Over 2,5 FT: 1,40–3,50. Goal PT / Over 3,5 FT: 1,40–5,50.':'Quattro mercati gol · quote 1,40–3,50.')+(legacy?' Probabilità ≥35%.':' Soglie: Over 1,5 PT ≥45%, Goal PT ≥40%, FT ≥35%. PT: almeno 4 primi tempi per squadra. Soglie prudenziali da verificare negli audit.');
+  const rulePolicy=best?.opportunity.policy_id||(checked.length&&checked.every(r=>r.opportunity.policy_id===checked[0].opportunity.policy_id)?checked[0].opportunity.policy_id:POLICY);
+  const legacy=rulePolicy!==POLICY,extended=[POLICY,'gold-goals-v5','gold-goals-v4'].includes(rulePolicy),floors=rulePolicy===POLICY?MIN_P:PREVIOUS_MIN_P;
+  const rule=(legacy?'Proposta archiviata · ':'')+(extended?'Over 1,5 PT / Over 2,5 FT: 1,40–3,50. Goal PT / Over 3,5 FT: 1,40–5,50.':'Quattro mercati gol · quote 1,40–3,50.')+(dedicatedPolicy(rulePolicy)?' Soglie: Over 1,5 PT ≥'+floors.over15_ht+'%, Goal PT ≥'+floors.gg_ht+'%, FT ≥'+floors.over25_ft+'%. PT: almeno 4 primi tempi per squadra. Soglie di ammissione da verificare negli audit.':' Probabilità ≥35%.');
   if(!best)return '<aside class="mx-best mx-best-empty"><span class="mx-section-title">MIGLIOR VALORE STIMATO</span><h4>'+(checked.length?'Nessuna proposta supera i criteri':'Criteri della proposta da aggiornare')+'</h4>'+timingContext(context)+'<p>'+esc(rule)+'</p><p>'+esc(exclusions||'La prossima analisi prepartita applicherà i nuovi criteri.')+'</p><small>'+rows.length+' esiti statistici · '+priced+' con quota recente. La matrice completa resta consultabile; nessuna giocata viene forzata.</small></aside>';
   const d=best.opportunity,signal=d.signal,tag=signal==='convergence'?'mature':signal==='contrarian'?'contrarian':'value_watch',displayLabel=goalMarket(best)==='gg_ht'?'Goal PT':best.label;
   const explanation=signal==='convergence'?'Statistica e movimento concordano sullo stesso mercato gol.':signal==='contrarian'?'Quota gol in salita con vantaggio statistico e margine controllato. Contrarian sano descrive i criteri superati, non un esito sicuro.':'Il prezzo supera i criteri statistici. Flusso del mercato gol non confermato.';

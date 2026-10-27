@@ -163,7 +163,7 @@ class GoalPriority(unittest.TestCase):
 
     def test_preferred_pt_falls_back_only_to_eligible_goal_markets(self):
         a = example('away', '1')
-        gg = a['matrix']['rows'][3]; gg['statistical_pct'] = 34.99
+        gg = a['matrix']['rows'][3]; gg['statistical_pct'] = 29.99
         self.assertEqual(annotate(a['matrix'], NOW, a)['id'], 'ht15')
         a['matrix']['rows'][2]['odd'] = 3.5001
         self.assertEqual(annotate(a['matrix'], NOW, a)['id'], 'ft25')
