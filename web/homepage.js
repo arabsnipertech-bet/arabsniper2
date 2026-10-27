@@ -29,7 +29,7 @@
           const current = ['gold-goals-v4','gold-goals-v5','gold-goals-v6'].includes(d?.policy_id), maximum = current ? caps[key] : 3.5;
           const dedicated = ['gold-goals-v5','gold-goals-v6'].includes(d?.policy_id);
           const minimum = d?.policy_id === 'gold-goals-v6' ? ({over15_ht:35,gg_ht:30,over25_ft:30,over35_ft:30}[key] ?? 30) : d?.policy_id === 'gold-goals-v5' ? ({over15_ht:45,gg_ht:40}[key] || 35) : 35;
-          if (!['gold-goals-v2','gold-goals-v3','gold-goals-v4','gold-goals-v5','gold-goals-v6'].includes(d?.policy_id) || (current && (!key || d.odds_max !== maximum)) || row.competition_policy !== 'gold-senior-whitelist-v1' || d.eligible !== true || row.odd < 1.4 || row.odd > maximum || !numeric(d.min_probability_pct) || !numeric(row.statistical_pct) || row.statistical_pct < Math.max(minimum, d.min_probability_pct) || row.statistical_pct > 100 || (dedicated && ['over15_ht','gg_ht'].includes(key) && d.ht_history_supported !== true)) return false;
+          if (!['gold-goals-v2','gold-goals-v3','gold-goals-v4','gold-goals-v5','gold-goals-v6'].includes(d?.policy_id) || (current && (!key || d.odds_max !== maximum)) || !['gold-senior-whitelist-v1','gold-senior-whitelist-v2'].includes(row.competition_policy) || d.eligible !== true || row.odd < 1.4 || row.odd > maximum || !numeric(d.min_probability_pct) || !numeric(row.statistical_pct) || row.statistical_pct < Math.max(minimum, d.min_probability_pct) || row.statistical_pct > 100 || (dedicated && ['over15_ht','gg_ht'].includes(key) && d.ht_history_supported !== true)) return false;
         }
         seen.add(row.fixture_id); return true;
       }).slice(0,3) : [];
