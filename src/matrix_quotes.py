@@ -311,7 +311,10 @@ def analyse_prices(row, offers, as_of, kickoff):
                    agreeing_books=0, stable_value=False, theoretical_value=False)
         if offers:
             old = max(offers, key=lambda o: o.get('provider_updated_at') or '')
-            row.update(last_odd=old['odd'], provider_updated_at=old.get('provider_updated_at'))
+            row.update(last_odd=old['odd'], provider_updated_at=old.get('provider_updated_at'),
+                       first_odd=old.get('first_odd'), first_observed_at=old.get('first_at'),
+                       bookmaker=old.get('bookmaker'), bookmaker_id=old.get('bookmaker_id'),
+                       quote_observed_at=old.get('observed_at'))
         return
     best = max(recent, key=lambda o: (o['odd'], o['provider_updated_at'], o['bookmaker_id']))
     compatible = [o for o in recent if o['complete'] and o['group'] == best['group']]

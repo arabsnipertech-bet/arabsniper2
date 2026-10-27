@@ -179,3 +179,38 @@ class ProposalStability(unittest.TestCase):
 
 
 if __name__ == '__main__': unittest.main()
+
+class ProposalDisplayHistory(unittest.TestCase):
+    def test_expiry_preserves_last_proposal_without_selecting_it(self):
+        a, r = saved()
+        prior = deepcopy(a['matrix']['last_proposal'])
+        r.update(quote_status='stale', last_odd=r['odd'], odd=None)
+        annotate(a['matrix'], later(70))
+        self.assertIsNone(a['matrix']['opportunity_policy']['best_market_id'])
+        self.assertEqual(a['matrix']['last_proposal']['odd'], prior['odd'])
+        self.assertEqual(a['matrix']['last_proposal']['published_at'], prior['published_at'])
+        self.assertEqual(a['matrix']['last_proposal']['status'], 'awaiting_update')
+
+    def test_missing_scan_preserves_history_across_multiple_refreshes(self):
+        old, r = saved()
+        r.update(first_odd=1.8, bookmaker='Example', provider_updated_at=NOW)
+        for _ in range(2):
+            current = {'matrix': {'rows': [{**deepcopy(r), 'quote_status':'missing', 'odd':None}]}}
+            seed_stability(old, current)
+            annotate(current['matrix'], later(70))
+            restored = current['matrix']['rows'][0]
+            self.assertEqual(restored['last_odd'], 1.7)
+            self.assertEqual(restored['first_odd'], 1.8)
+            self.assertEqual(restored['provider_updated_at'], NOW)
+            self.assertFalse(restored['opportunity']['eligible'])
+            self.assertEqual(current['matrix']['last_proposal']['status'], 'awaiting_update')
+            old = current
+
+    def test_new_ineligible_quote_withdraws_previous_and_stays_withdrawn(self):
+        a, r = saved()
+        r.update(odd=1.4, ev_pct=-10, ev_low_pct=-12)
+        annotate(a['matrix'], later(15))
+        self.assertEqual(a['matrix']['last_proposal']['status'], 'withdrawn')
+        r.update(quote_status='stale', odd=None)
+        annotate(a['matrix'], later(70))
+        self.assertEqual(a['matrix']['last_proposal']['status'], 'withdrawn')

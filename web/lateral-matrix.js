@@ -116,9 +116,9 @@
   row=row||{};
   const recent=row.quote_status==='recent';
   const band={low:'basso',medium:'intermedio',high:'alto'}[row.margin_band]||'';
-  return '<section class="mx-quote-cell"><h4>'+esc(title)+'</h4><div class="mx-quote-pair"><span>Apertura*<b>'+num(row.first_odd,2)+'</b></span><span>'+(recent?'Attuale':'Ultima quota')+'<b>'+num(recent?row.odd:row.last_odd,2)+'</b></span></div>'+movementSignal(row)+
+  return '<section class="mx-quote-cell"><h4>'+esc(title)+'</h4><div class="mx-quote-pair"><span>Apertura*<b>'+num(row.first_odd,2)+'</b></span><span>'+(recent?'Attuale':'Ultima quota · da confermare')+'<b>'+num(recent?row.odd:row.last_odd,2)+'</b></span></div>'+movementSignal(row)+
    '<div class="mx-quote-metrics"><span>Statistica <b>'+pct(row.statistical_pct)+'</b></span><span>OCI <b>'+signed(row.oci)+'</b></span><span>Aggio mediano <b>'+pct(row.margin_pct)+'</b> '+esc(band)+'</span><span>Δ aggio <b>'+signed(row.margin_delta_pp)+' pt</b></span></div>'+
-   '<small class="mx-quote-source">'+esc(row.bookmaker||'Quota non disponibile')+(row.provider_updated_at?' · '+esc(helpers.timestamp?.(row.provider_updated_at)||row.provider_updated_at):'')+'</small>'+
+   '<small class="mx-quote-source">'+esc(row.bookmaker||(Number.isFinite(row.last_odd)?'Ultima quota salvata':'Quota non disponibile'))+(row.provider_updated_at?' · '+esc(helpers.timestamp?.(row.provider_updated_at)||row.provider_updated_at):'')+'</small>'+
    '<small class="mx-quote-consensus">OCI: '+esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi'+(row.oci_previous==null?'':' · prima '+signed(row.oci_previous))+'</small></section>';
  }
  function quoteBoard(rows,helpers){
@@ -137,13 +137,15 @@
  }
  function opportunityPanel(rows,context,options={}){
   const best=bestOpportunity(rows,options),priced=rows.filter(r=>r.quote_status==='recent').length;
-  const checked=rows.filter(r=>acceptedPolicy(r.opportunity)),counts={};
-  for(const r of checked)for(const code of r.opportunity.reasons||[])counts[code]=(counts[code]||0)+1;
+  const checked=rows.filter(r=>goalMarket(r)!==null&&acceptedPolicy(r.opportunity)),counts={};
+  for(const r of checked)for(const code of (r.quote_status!=='recent'?['stale']:r.opportunity.reasons||[]))counts[code]=(counts[code]||0)+1;
   const exclusions=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,n])=>n+' '+(REASONS[k]||k)).join(' · ');
   const rulePolicy=best?.opportunity.policy_id||(checked.length&&checked.every(r=>r.opportunity.policy_id===checked[0].opportunity.policy_id)?checked[0].opportunity.policy_id:POLICY);
   const legacy=rulePolicy!==POLICY,extended=[POLICY,'gold-goals-v5','gold-goals-v4'].includes(rulePolicy),floors=rulePolicy===POLICY?MIN_P:PREVIOUS_MIN_P;
   const rule=(legacy?'Proposta archiviata · ':'')+(extended?'Over 1,5 PT / Over 2,5 FT: 1,40–3,50. Goal PT / Over 3,5 FT: 1,40–5,50.':'Quattro mercati gol · quote 1,40–3,50.')+(dedicatedPolicy(rulePolicy)?' Soglie: Over 1,5 PT ≥'+floors.over15_ht+'%, Goal PT ≥'+floors.gg_ht+'%, FT ≥'+floors.over25_ft+'%. PT: almeno 4 primi tempi per squadra. Soglie di ammissione da verificare negli audit.':' Probabilità ≥35%.');
-  if(!best)return '<aside class="mx-best mx-best-empty"><span class="mx-section-title">MIGLIOR VALORE STIMATO</span><h4>'+(checked.length?'Nessuna proposta supera i criteri':'Criteri della proposta da aggiornare')+'</h4>'+timingContext(context)+'<p>'+esc(rule)+'</p><p>'+esc(exclusions||'La prossima analisi prepartita applicherà i nuovi criteri.')+'</p><small>'+rows.length+' esiti statistici · '+priced+' con quota recente. La matrice completa resta consultabile; nessuna giocata viene forzata.</small></aside>';
+  const last=options.lastProposal;
+  const history=!best&&last&&Number.isFinite(last.odd)?'<section class="mx-timing"><b>Ultima proposta pubblicata · '+esc(last.label||last.market_id)+'</b><strong>'+num(last.odd,2)+'</strong><small>'+esc(last.bookmaker||'')+' · '+esc(last.provider_updated_at||last.published_at||'')+'</small><small>'+(last.status==='withdrawn'?'Proposta ritirata: i dati aggiornati non superano più i criteri.':'In attesa di aggiornamento: conservata come riferimento, quota e validità attuali da confermare.')+'</small></section>':'';
+  if(!best)return '<aside class="mx-best mx-best-empty"><span class="mx-section-title">MIGLIOR VALORE STIMATO</span><h4>'+(checked.length&&checked.every(r=>r.quote_status!=='recent')?'Quote da aggiornare':checked.length?'Nessuna proposta supera i criteri':'Criteri della proposta da aggiornare')+'</h4>'+history+timingContext(context)+'<p>'+esc(rule)+'</p><p>'+esc(exclusions||'La prossima analisi prepartita applicherà i nuovi criteri.')+'</p><small>'+rows.length+' esiti statistici · '+priced+' con quota recente. La matrice completa resta consultabile; nessuna giocata viene forzata.</small></aside>';
   const d=best.opportunity,signal=d.signal,tag=signal==='convergence'?'mature':signal==='contrarian'?'contrarian':'value_watch',displayLabel=goalMarket(best)==='gg_ht'?'Goal PT':best.label;
   const explanation=signal==='convergence'?'Statistica e movimento concordano sullo stesso mercato gol.':signal==='contrarian'?'Quota gol in salita con vantaggio statistico e margine controllato. Contrarian sano descrive i criteri superati, non un esito sicuro.':'Il prezzo supera i criteri statistici. Flusso del mercato gol non confermato.';
   const stability=d.stability?.status==='retained'?'<p class="mx-stability"><b>Proposta mantenuta in tolleranza</b><small>Piccola oscillazione dei valori. Validità massima fino alle '+esc(new Date(d.stability.expires_at).toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit'}))+' con quote aggiornate e limiti rispettati.</small></p>':'';
@@ -240,7 +242,7 @@
   const counts={convergence:all.filter(r=>r.market_behavior==='convergence').length,divergence:all.filter(r=>r.market_behavior==='divergence').length,value:all.filter(r=>r.ev_pct>0).length};
   const noSnapshot=a.status==='no_prematch_snapshot';
   return '<article class="mx-card" data-live-fixture="'+esc(fid)+'"><header><div><time>'+esc(f.time||'')+'</time><small>'+esc(f.country)+' · '+esc(f.league)+'</small><h3>'+esc(f.match)+'</h3></div><div class="mx-live"><span data-live-slot="badge">'+(helpers.liveBadge?.(m)||'')+'</span><span data-live-slot="state">'+esc(helpers.stateLabel?.(m)||'')+'</span></div></header>'+
-   (noSnapshot?'<p class="mx-explanation">Partita presente nel palinsesto. Nessuna previsione salvata prima dell’inizio: gli esiti non vengono usati per ricostruirla a posteriori.</p>':'<div class="mx-match-layout">'+quoteBoard(all,helpers)+opportunityPanel(all,a.matrix?.goal_context,{archived:phase(m)!=='upcoming'})+'</div>')+
+   (noSnapshot?'<p class="mx-explanation">Partita presente nel palinsesto. Nessuna previsione salvata prima dell’inizio: gli esiti non vengono usati per ricostruirla a posteriori.</p>':'<div class="mx-match-layout">'+quoteBoard(all,helpers)+opportunityPanel(all,a.matrix?.goal_context,{archived:phase(m)!=='upcoming',lastProposal:a.matrix?.last_proposal})+'</div>')+
    '<div class="mx-match-summary"><span>'+all.length+' mercati</span><span>'+counts.convergence+' convergenze</span><span>'+counts.divergence+' divergenze</span><span>'+all.filter(r=>r.quote_status==='recent').length+' quote recenti</span></div>'+
    (all.length?'<button class="mx-open" type="button" data-mx-open="'+esc(fid)+'" aria-haspopup="dialog">Apri matrice · mercati utili <span>↗</span></button>':'')+'<footer>Analisi '+esc(helpers.timestamp?.(a.captured_at)||a.captured_at||'non disponibile')+' · '+esc(a.model_id||'')+(f.data_freshness&&f.data_freshness!=='fresh'?' · '+esc(f.data_freshness):'')+'</footer></article>';
  }
