@@ -73,8 +73,8 @@ def refresh_day(day, state, as_of):
         if (a.get('model_id') != MODEL_ID or not kickoff or kickoff <= stamp(as_of) or
                 meta.get('status_short') not in ('NS', 'TBD') or meta.get('result')): continue
         matrix = a.get('matrix') or {}
-        if (matrix.get('opportunity_policy') or {}).get('id') != POLICY_ID:
-            seed_stability(deepcopy(a), a)
+        # Save the published choice before repricing can expire its quote.
+        seed_stability(deepcopy(a), a)
         trim_matrix(matrix)
         rows = matrix.get('rows', [])
         if a.get('rates'):
