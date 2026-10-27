@@ -2,7 +2,9 @@
 (function(root){
  'use strict';
  const MODEL='lateral-matrix-v5.0';
- const POLICY='gold-goals-v6',SCOPE='gold-senior-whitelist-v1';
+ const POLICY='gold-goals-v6',SCOPE='gold-senior-whitelist-v2';
+ // v1 is a strict subset of v2: keep existing data visible during rollout.
+ const acceptedScope=id=>[SCOPE,'gold-senior-whitelist-v1'].includes(id);
  const acceptedPolicy=d=>[POLICY,'gold-goals-v5','gold-goals-v4','gold-goals-v3','gold-goals-v2'].includes(d?.policy_id);
  const MIN_P={over15_ht:35,gg_ht:30,over25_ft:30,over35_ft:30};
  const PREVIOUS_MIN_P={over15_ht:45,gg_ht:40,over25_ft:35,over35_ft:35};
@@ -18,8 +20,8 @@
  const STATUS={mature:'CONVERGENZA STATISTICA',contrarian:'DIVERGENZA STATISTICA',lateral:'LATERALE',value_watch:'VALORE IN OSSERVAZIONE',limited_data:'STORICO LIMITATO',no_edge:'PREZZO SENZA VANTAGGIO',no_quote:'SOLO STATISTICA',previous_version:'VERSIONE PRECEDENTE'};
  const QUALITY={supported:'Storico presente',limited:'Storico limitato',prior_dominant:'Una squadra con dati mancanti',prior_only:'Solo valori di riferimento'};
  const REASONS={market:'fuori dai quattro mercati gol',probability:'probabilità sotto soglia',price:'quota fuori dal range del mercato',stale:'quote da aggiornare',history:'storico insufficiente',ht_history:'meno di 4 primi tempi per squadra',adapter:'associazione quota da aggiornare',margin:'aggio anomalo',edge:'vantaggio insufficiente rispetto all’aggio',sensitivity:'scenario prudente insufficiente',coherence:'probabilità gol incoerenti'};
- const allowedMatch=m=>m.gold_scope?.policy_id===SCOPE&&m.gold_scope.allowed===true;
- const scopePayload=p=>({...p,matches:(p.matches||[]).filter(allowedMatch),gold_scope:{...(p.gold_scope||{}),ready:p.gold_scope?.policy_id===SCOPE}});
+ const allowedMatch=m=>acceptedScope(m.gold_scope?.policy_id)&&m.gold_scope.allowed===true;
+ const scopePayload=p=>({...p,matches:(p.matches||[]).filter(allowedMatch),gold_scope:{...(p.gold_scope||{}),ready:acceptedScope(p.gold_scope?.policy_id)}});
  function goalMarket(r){const s=r.spec||{};if(s.extra!=null)return null;return s.kind==='btts'&&s.period==='ht'&&s.side==='yes'&&s.line==null?'gg_ht':['total','asian_total'].includes(s.kind)&&s.side==='over'?(s.period==='ht'&&s.line===1.5?'over15_ht':s.period==='ft'&&s.line===2.5?'over25_ft':s.period==='ft'&&s.line===3.5?'over35_ft':null):null;}
  const minProbability=r=>r.opportunity?.policy_id===POLICY?(MIN_P[goalMarket(r)]??30):r.opportunity?.policy_id==='gold-goals-v5'?(PREVIOUS_MIN_P[goalMarket(r)]??35):35;
  const maxOdd=r=>[POLICY,'gold-goals-v5','gold-goals-v4'].includes(r.opportunity?.policy_id)?(ODDS_MAX[goalMarket(r)]??3.5):3.5;
