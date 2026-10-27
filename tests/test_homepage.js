@@ -18,6 +18,10 @@ async function run(payload,fail=false){
  r=await run(data,true);assert.match(r.nodes['daily-picks'].innerHTML,/temporaneamente/);
  const v5=structuredClone(data);
  for(const row of v5.selections)Object.assign(row,{model_id:'lateral-matrix-v5.0',market_confirmation:'contrarian',competition_policy:'gold-senior-whitelist-v1',opportunity:{policy_id:'gold-goals-v2',eligible:true,min_probability_pct:35}});
+ for(const scope of ['gold-senior-whitelist-v1','gold-senior-whitelist-v2','unknown']) {
+  const updated=structuredClone(v5);for(const row of updated.selections)row.competition_policy=scope;
+  r=await run(updated);assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,scope==='unknown'?0:3);
+ }
  v5.selections[1].odd=150;v5.selections[2].statistical_pct=34;
  r=await run(v5);assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,1);assert.match(r.nodes['daily-picks'].innerHTML,/Contrarian/);
  for(const [spec,max] of [[{kind:'total',period:'ft',side:'over',line:2.5},3.5],[{kind:'total',period:'ht',side:'over',line:1.5},3.5],[{kind:'total',period:'ft',side:'over',line:3.5},5.5],[{kind:'btts',period:'ht',side:'yes'},5.5],[{kind:'asian_total',period:'ft',side:'over',line:3.5},5.5]]){

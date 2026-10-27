@@ -256,7 +256,7 @@ def install(ns, matrix_mode=False):
                 romania_allowed=True, goals_only_proposals=True, drought_probability_bonus=0,
                 market_confirmation_after_selection=False)
             output['method'].update(markets='Matrice 1X2, doppia chance, Over/Under, GG/NG, PT/ST, asiatici, multigol e combo.',
-                competition_filter='Massime divisioni senior e coppe autorizzate; Romania inclusa; niente giovanili o leghe minori.',
+                competition_filter='Prime tre divisioni senior dei paesi in whitelist e coppe autorizzate; Romania inclusa; esclusi giovanili e livelli inferiori.',
                 markers='Proposte su quattro mercati gol; priorità PT da digiuno nel contesto casa/trasferta e flussi verificabili.',
                 book='OCI e aggio per esito, linea e periodo; volumi e smart money non osservati.')
         ns['atomic_write_json'](ns['OUTPUT_FILE'], output)

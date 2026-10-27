@@ -53,9 +53,9 @@ class GoldScope(unittest.TestCase):
         self.assertTrue(profile({'country': 'South-Korea', 'name': 'K League 1'})['allowed'])
 
     def test_minor_youth_unknown_and_unlisted_cups_are_blocked(self):
-        for country, name in [('Romania', 'Liga II'), ('Cyprus', '1. Division'), ('Latvia', 'Virsliga'),
-            ('Lithuania', 'A Lyga'), ('Italy', 'Serie B'), ('Italy', 'Primavera U19'),
-            ('England', 'Premier League 2'), ('Japan', 'J2 League'), ('USA', 'USL Championship'),
+        for country, name in [('Romania', 'Liga IV'), ('Cyprus', '1. Division'), ('Latvia', 'Virsliga'),
+            ('Lithuania', 'A Lyga'), ('Italy', 'Serie D - Girone A'), ('Italy', 'Primavera U19'),
+            ('England', 'Premier League 2'), ('Japan', 'Japan Football League'), ('USA', 'USL League Two'),
             ('Belgium', 'Jupiler Pro League'), ('Brazil', 'Copa Rio'), ('Brazil', 'Copa do Brasil'),
             ('Australia', 'Australia Cup'), ('World', 'UEFA Youth League'), ('World', 'AFC Cup'),
             ('World', 'Friendlies Clubs'), ('Italy', 'Serie A Women'), ('Unknown', 'Premier League')]:

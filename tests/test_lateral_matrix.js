@@ -12,6 +12,12 @@ assert.equal(api.matchingRows(matches[0],{...opts,category:'divergence'}).length
 assert.equal(api.matchingRows(matches[0],{...opts,family:'asian'}).length,1);
 assert.equal(api.matchingRows(matches[0],{...opts,category:'no_quote'}).length,1);
 assert.equal(api.selectMatches(p,{...opts,search:'Casa 159'},0).length,1);
+for(const scope of ['gold-senior-whitelist-v1','gold-senior-whitelist-v2']) {
+ const mixed={gold_scope:{policy_id:scope},matches:[{...matches[0],gold_scope:{policy_id:scope,allowed:true}}]};
+ assert.equal(api.scopePayload(mixed).matches.length,1);
+ assert.equal(api.scopePayload(mixed).gold_scope.ready,true);
+}
+assert.equal(api.scopePayload({matches:[{...matches[0],gold_scope:{policy_id:'unknown',allowed:true}}]}).matches.length,0);
 const frozen=JSON.stringify(p);api.selectMatches(p,{...opts,sort:'value'},0);assert.equal(JSON.stringify(p),frozen);
 assert(!api.esc('<img src=x onerror=alert(1)>').includes('<img'));
 const html=api.marketRow({...rows[0],label:'<script>x</script>',statistical_pct:61,odd:2,first_odd:2.2,margin_pct:4,oci:50},{});
