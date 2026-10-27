@@ -22,11 +22,13 @@ def cached_refresh_safe(paths):
     """
     price_files = {'src/opportunity_policy.py', 'src/matrix_quotes.py', 'src/matrix_pipeline.py',
                    'src/homepage_preview.py', 'src/context_analysis.py', 'src/refresh_opportunities.py',
-                   'src/gold_competitions.py', 'src/statistics_integration.py', 'src/gold_policy_audit.py',
+                   'src/statistics_integration.py', 'src/gold_policy_audit.py',
                    'src/market_scope.py', 'src/proposal_stability.py'}
     # This migration changes the computed market universe, not the Poisson
     # kernel or source statistics; the dedicated tests require identical core probabilities.
     if 'src/market_scope.py' in paths: price_files.add('src/lateral_matrix.py')
+    # A competition change needs a provider schedule fetch: repricing only the
+    # old snapshot cannot recover fixtures previously excluded by the whitelist.
     auxiliary = {'.github/workflows/fast_scan.yml', '.github/workflows/night_scan.yml', '.github/workflows/policy_tests.yml'}
     return bool(set(paths) & price_files) and all(
         p in price_files | auxiliary or p.startswith(('web/', 'tests/', 'docs/')) for p in paths)
@@ -137,7 +139,7 @@ def main(directory='data'):
         competition_policy=SCOPE_ID, opportunity_policy=POLICY_ID,
         universal_observation=False, all_whitelisted_fixtures=True)
     dashboard['method'].update(
-        competition_filter='Massime divisioni senior e coppe autorizzate; Romania inclusa; niente giovanili o leghe minori.',
+        competition_filter='Prime tre divisioni senior dei paesi in whitelist e coppe autorizzate; Romania inclusa; esclusi giovanili e livelli inferiori.',
         markers='Proposte su quattro mercati gol; priorità PT da digiuno nel contesto casa/trasferta e flussi verificabili.')
     write_store(dashboard_path, dashboard)
     write_store(directory/'arab_quote_state.json', state)
