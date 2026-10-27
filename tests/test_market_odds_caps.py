@@ -35,7 +35,7 @@ class MarketOddsCaps(unittest.TestCase):
                     self.assertEqual(decision['eligible'], eligible)
                     self.assertEqual((decision['odds_min'], decision['odds_max']), (1.4, maximum))
                     self.assertEqual(decision['goal_market'], goal_market({'spec': spec}))
-            for fields, reason in [({'statistical_pct': 34.999}, 'probability'),
+            for fields, reason in [({'statistical_pct': 29.999}, 'probability'),
                                    ({'selected_margin_pct': -1}, 'margin'),
                                    ({'selected_margin_pct': 31}, 'margin'),
                                    ({'selected_margin_pct': 10, 'ev_pct': 8.99}, 'edge'),

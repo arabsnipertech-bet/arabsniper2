@@ -29,11 +29,11 @@ def row(**changes):
 
 class PlayableValue(unittest.TestCase):
     def test_inclusive_probability_and_price_boundaries(self):
-        for p, q in [(35, 3.5), (80, 1.4)]:
+        for p, q in [(30, 3.5), (80, 1.4)]:
             self.assertTrue(evaluate(row(statistical_pct=p, odd=q))['eligible'])
-        for p, q, reason in [(34.999, 3.5, 'probability'), (80, 1.3999, 'price'), (35, 3.5001, 'price')]:
+        for p, q, reason in [(29.999, 3.5, 'probability'), (80, 1.3999, 'price'), (35, 3.5001, 'price')]:
             self.assertIn(reason, evaluate(row(statistical_pct=p, odd=q))['reasons'])
-        for p, eligible in [(35, False), (44.999, False), (45, True)]:
+        for p, eligible in [(30, False), (34.999, False), (35, True)]:
             self.assertEqual(evaluate(row(spec=S('total', 'ht', 'over', 1.5), statistical_pct=p))['eligible'], eligible)
 
     def test_nonfinite_missing_or_limited_data_cannot_be_promoted(self):

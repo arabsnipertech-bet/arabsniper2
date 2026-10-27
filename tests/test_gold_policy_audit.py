@@ -54,9 +54,15 @@ class GoldPolicyAudit(unittest.TestCase):
         v4['sha256'] = sha256(json.dumps(v4, sort_keys=True, allow_nan=False).encode()).hexdigest()
         frozen_v4 = deepcopy(v4)
         capture(store, m, '2026-10-26T09:30:00Z')
-        report = build_report(store, '2026-10-26T09:30:00Z')
-        self.assertEqual(report['policy_ids'], ['gold-goals-v2', 'gold-goals-v3', 'gold-goals-v4', POLICY_ID])
+        v5 = store['fixtures']['100']['snapshots'][3]
+        v5['policy_id'] = 'gold-goals-v5'; v5.pop('sha256')
+        v5['sha256'] = sha256(json.dumps(v5, sort_keys=True, allow_nan=False).encode()).hexdigest()
+        frozen_v5 = deepcopy(v5)
+        capture(store, m, '2026-10-26T10:00:00Z')
+        report = build_report(store, '2026-10-26T10:00:00Z')
+        self.assertEqual(report['policy_ids'], ['gold-goals-v2', 'gold-goals-v3', 'gold-goals-v4', 'gold-goals-v5', POLICY_ID])
         self.assertEqual(v4, frozen_v4)
+        self.assertEqual(v5, frozen_v5)
         self.assertTrue(report['production_policy_changed'])
         for version in report['policy_ids']:
             rows = [r for r in report['strategies'] if r['policy_id'] == version and r['strategy'] == 'published' and r['cohort'] == 'baseline_26']
@@ -67,7 +73,7 @@ class GoldPolicyAudit(unittest.TestCase):
 
     def test_shadows_cannot_bypass_probability_price_history_or_coherence(self):
         m = fixture(); matrix = m['multimarket']['matrix']
-        for change in ({'odd': 150.}, {'statistical_pct': 34.9}, {'quality': 'limited'},
+        for change in ({'odd': 150.}, {'statistical_pct': 29.9}, {'quality': 'limited'},
                        {'quote_status': 'stale'}, {'selected_margin_pct': -2}):
             rows = deepcopy(matrix['rows'][:4])
             for r in rows: r.update(change)

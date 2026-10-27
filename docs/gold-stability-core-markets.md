@@ -1,6 +1,6 @@
 # Gold: stable proposals and core market matrix
 
-Production policy: `gold-goals-v5`. Stability: `gold-stability-v1`.
+Production policy: `gold-goals-v6`. Stability: `gold-stability-v1`.
 Computed scope: `gold-core-markets-v1`. The Poisson kernel remains V5.0.
 
 ## Entry and maintenance
@@ -33,10 +33,10 @@ These are explicit product thresholds, not evidence of calibrated profitability.
 
 | Market | Minimum probability | Inclusive odds range |
 |---|---:|---|
-| Over 1.5 HT | 45% | 1.40–3.50 |
-| Goal/BTTS HT Yes | 40% | 1.40–5.50 |
-| Over 2.5 FT | 35% | 1.40–3.50 |
-| Over 3.5 FT | 35% | 1.40–5.50 |
+| Over 1.5 HT | 35% | 1.40–3.50 |
+| Goal/BTTS HT Yes | 30% | 1.40–5.50 |
+| Over 2.5 FT | 30% | 1.40–3.50 |
+| Over 3.5 FT | 30% | 1.40–5.50 |
 
 Equivalent Asian **half-lines** use the same limits: 1.5 HT and 2.5 FT at
 3.50, 3.5 FT at 5.50. Integer/quarter lines have different push or split
@@ -51,8 +51,9 @@ public preview. UI shows retained status and its maximum expiry time.
 
 ## Dedicated first-half admission
 
-The 45% Over 1.5 HT and 40% Goal HT floors are **prudential, unvalidated policy
-choices**, not an empirical calibration or promised success rate. Four valid,
+The user-authorized v6 floors are 35% for Over 1.5 HT and 30% for Goal HT
+and both FT targets, reduced from v5's 45% / 40% / 35%. They are **unvalidated
+admission choices**, not an empirical calibration or promised success rate. Four valid,
 deduplicated first-half scores per team are required (the same four-match
 window as the model); insufficient evidence blocks only the proposal, never
 the fixture or matrix. Full-time history cannot satisfy this check. Missing,
@@ -74,7 +75,10 @@ sample. The audits preserve evidence and decisions for that later review.
 
 The same probability/history hard gates apply to retained proposals and exact
 Asian equivalents. The browser independently enforces the per-market floor;
-a stale or malformed decision cannot label a 35% PT outcome playable.
+a stale or malformed decision cannot bypass the applicable floor. Archived v5
+rows retain their original 45% / 40% / 35% limits and four-HT-history check;
+v2/v3/v4 rows retain their own historical limits. Lower floors alone cannot
+override price, overround, EV, freshness, history or whitelist failures.
 
 ## Computation and display
 
@@ -101,14 +105,14 @@ The 1X2 three-column opening/current board remains on the match card.
 The compatible release refreshes future matrices from saved statistics and quote
 observations with **zero API-Football calls**. It preserves source timestamps;
 this is not a new quote collection. Scheduled Fast/Night collection is unchanged.
-Started forecasts are immutable. Updated JavaScript assets use cache version 5.7.
+Started forecasts are immutable. Updated JavaScript assets use cache version 5.8.
 
-The prospective audit retains the v2/v3/v4 hashes and choices, separates v2/v3/v4/v5
+The prospective audit retains the v2/v3/v4/v5 hashes and choices, separates v2/v3/v4/v5/v6
 cohorts, and freezes a strict `without_hysteresis` control alongside published
 choices. Asian aliases have separate audit market keys to avoid counting two
 prices for the same event as independent observations. The study dates and
-scheduled collection stay unchanged. The odds-cap and subsequent dedicated PT admission changes are the user's explicit
-exceptions to the freeze until 2 November; no other model adjustments are authorized.
+scheduled collection stay unchanged. The odds-cap, dedicated PT admission and subsequent reduction of probability
+floors are the user's explicit exceptions to the freeze until 2 November; no other model adjustments are authorized.
 
 Validation covers admission/exit boundaries, non-renewing anchors, cumulative
 drift, expired quotes, persisted Fast/day rollover, unchanged core probabilities,

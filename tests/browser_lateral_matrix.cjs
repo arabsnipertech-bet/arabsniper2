@@ -153,8 +153,8 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5);
    assert.equal(await page.locator('.mx-best[data-opportunity-odd="5.5"]').count(),3);
    assert.equal(await page.locator('.mx-best-empty').count(),2);
-   assert((await page.locator('.mx-best').first().textContent()).includes('minimo 40'));
-   assert((await page.locator('.mx-best').first().textContent()).includes('Over 1,5 PT ≥45%'));
+   assert((await page.locator('.mx-best').first().textContent()).includes('minimo 30'));
+   assert((await page.locator('.mx-best').first().textContent()).includes('Over 1,5 PT ≥35%'));
    assert.equal(await page.locator('.mx-first-half').count(),2);
    assert((await page.locator('.mx-first-half').first().textContent()).includes('xG PT non disponibili'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Market caps overflow '+name);

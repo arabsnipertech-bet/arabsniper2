@@ -14,9 +14,10 @@ from test_opportunity_policy import row
 
 class FirstHalfAdmission(unittest.TestCase):
     def test_dedicated_inclusive_thresholds_and_exact_asian_equivalents(self):
-        for spec, floor in [(S('total', 'ht', 'over', 1.5), 45),
-                (S('asian_total', 'ht', 'over', 1.5), 45), (S('btts', 'ht', 'yes'), 40),
-                (S('total', 'ft', 'over', 2.5), 35), (S('total', 'ft', 'over', 3.5), 35)]:
+        for spec, floor in [(S('total', 'ht', 'over', 1.5), 35),
+                (S('asian_total', 'ht', 'over', 1.5), 35), (S('btts', 'ht', 'yes'), 30),
+                (S('total', 'ft', 'over', 2.5), 30), (S('total', 'ft', 'over', 3.5), 30),
+                (S('asian_total', 'ft', 'over', 2.5), 30), (S('asian_total', 'ft', 'over', 3.5), 30)]:
             for p, ok in [(floor-.0001, False), (floor, True), (floor+.0001, True), (101, False)]:
                 with self.subTest(spec=spec, p=p):
                     d = evaluate(row(spec=spec, statistical_pct=p))
@@ -29,13 +30,31 @@ class FirstHalfAdmission(unittest.TestCase):
         for side in ('home', 'away'):
             for r in a['inputs']['histories'][side][3:]: r['halftime_available'] = False
         rs = [row(spec=S('total', 'ht', 'over', 1.5), statistical_pct=90),
-              row(id='ft', statistical_pct=35)]
+              row(id='ft', statistical_pct=30)]
         matrix = {'rows': rs}; best = annotate(matrix, NOW, a)
         self.assertEqual(best['id'], 'ft')
         self.assertIn('ht_history', rs[0]['opportunity']['reasons'])
         self.assertEqual(len(matrix['rows']), 2)  # Observations remain visible.
         rs[0].pop('ht_evidence')
         self.assertIn('ht_history', evaluate(rs[0])['reasons'])
+
+    def test_lower_floors_still_require_real_price_value_and_controlled_margin(self):
+        for spec, p, odd in [(S('total', 'ht', 'over', 1.5), 35., 3.5),
+                (S('btts', 'ht', 'yes'), 30., 5.5),
+                (S('total', 'ft', 'over', 2.5), 30., 3.5),
+                (S('total', 'ft', 'over', 3.5), 30., 5.5)]:
+            r = row(spec=spec, statistical_pct=p, low_pct=p-.5, odd=odd,
+                    ev_pct=p*odd-100, ev_low_pct=(p-.5)*odd-100)
+            before = (r['statistical_pct'], r['low_pct'])
+            self.assertIs(annotate({'rows': [r]}, NOW), r)
+            self.assertEqual((r['statistical_pct'], r['low_pct']), before)
+            self.assertIn('margin', evaluate(dict(r, selected_margin_pct=31.))['reasons'])
+            # An accessible probability is insufficient at a non-value price.
+            r.update(odd=1.4, ev_pct=p*1.4-100, ev_low_pct=(p-.5)*1.4-100)
+            self.assertIn('edge', evaluate(r)['reasons'])
+        r = row(statistical_pct=30., odd=3.5, ev_pct=5., ev_low_pct=3.25,
+                selected_margin_pct=10.)
+        self.assertIn('edge', evaluate(r)['reasons'])
 
     def test_ht_evidence_uses_observations_not_ft_xg_or_fabricated_zeros(self):
         histories = {s: team_history(s) for s in ('home', 'away')}
@@ -68,33 +87,36 @@ class FirstHalfAdmission(unittest.TestCase):
         before = {r['id']: (r['statistical_pct'], r['low_pct'], r['high_pct']) for r in a['matrix']['rows']}
         rates = deepcopy(a['rates'])
         annotate(a['matrix'], NOW, a)
-        a['matrix']['opportunity_policy']['id'] = 'gold-goals-v4'
+        a['matrix']['opportunity_policy']['id'] = 'gold-goals-v5'
         day = {'date': '2026-10-26', 'matches': [m]}
         self.assertEqual(refresh_day(day, {}, NOW), 1)
         self.assertEqual(a['rates'], rates)
         self.assertEqual(before, {r['id']: (r['statistical_pct'], r['low_pct'], r['high_pct']) for r in a['matrix']['rows']})
         policy = a['matrix']['opportunity_policy']
         self.assertEqual(policy['id'], POLICY_ID)
-        self.assertEqual(policy['min_probability_pct_by_market'], {'over15_ht': 45., 'gg_ht': 40., 'over25_ft': 35., 'over35_ft': 35.})
+        self.assertEqual(policy['min_probability_pct'], 30.)
+        self.assertEqual(policy['min_probability_pct_by_market'], {'over15_ht': 35., 'gg_ht': 30., 'over25_ft': 30., 'over35_ft': 30.})
         json.dumps(day, allow_nan=False)
         frozen = deepcopy(day)
         self.assertEqual(refresh_day(day, {}, '2026-10-27T08:00:00Z'), 0)
         self.assertEqual(day, frozen)
 
     def test_hysteresis_preserves_soft_tolerance_but_cannot_relax_pt_floor(self):
-        r = row(spec=S('total', 'ht', 'over', 1.5), statistical_pct=45.1, bookmaker_id='10')
+        r = row(spec=S('total', 'ht', 'over', 1.5), statistical_pct=35.1, bookmaker_id='10')
         matrix = {'rows': [r]}; annotate(matrix, NOW)
-        r.update(ev_pct=1.5, statistical_pct=45.)
+        r.update(ev_pct=1.5, statistical_pct=35.)
         self.assertIs(annotate(matrix, '2026-10-26T08:10:00Z'), r)
         self.assertEqual(r['opportunity']['stability']['status'], 'retained')
-        r['statistical_pct'] = 44.99
+        r['statistical_pct'] = 34.99
         self.assertIsNone(annotate(matrix, '2026-10-26T08:11:00Z'))
         self.assertIn('probability', r['opportunity']['reasons'])
 
     def test_browser_enforces_dedicated_floor_and_evidence_even_with_bad_metadata(self):
         cases = []
-        for spec in [S('total', 'ht', 'over', 1.5), S('btts', 'ht', 'yes'), S('asian_total', 'ht', 'over', 1.5)]:
-            for p in (35, 39.999, 40, 44.999, 45, 60):
+        for spec in [S('total', 'ht', 'over', 1.5), S('btts', 'ht', 'yes'),
+                     S('asian_total', 'ht', 'over', 1.5), S('total', 'ft', 'over', 2.5),
+                     S('total', 'ft', 'over', 3.5), S('asian_total', 'ft', 'over', 3.5)]:
+            for p in (29.999, 30, 34.999, 35, 40, 45, 60):
                 r = row(spec=spec, statistical_pct=p); annotate({'rows': [r]}, NOW); cases.append(r)
         script = "const a=require('./web/lateral-matrix.js');let s='';process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>console.log(JSON.stringify(JSON.parse(s).map(r=>!!a.bestOpportunity([r])))));"
         def browser(rows): return json.loads(subprocess.check_output(['node','-e',script], input=json.dumps(rows).encode()))
@@ -102,9 +124,9 @@ class FirstHalfAdmission(unittest.TestCase):
         invalid = []
         for r in cases:
             if r['statistical_pct'] < min_probability(r):
-                r['opportunity'].update(eligible=True, rank=1, min_probability_pct=35)
+                r['opportunity'].update(eligible=True, rank=1, min_probability_pct=min_probability(r)-1)
                 invalid.append(r)
-        r = deepcopy(cases[-1]); r['opportunity']['ht_history_supported'] = False; invalid.append(r)
+        r = deepcopy(cases[6]); r['opportunity']['ht_history_supported'] = False; invalid.append(r)
         self.assertFalse(any(browser(invalid)))
 
 

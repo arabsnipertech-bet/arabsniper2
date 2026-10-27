@@ -7,15 +7,15 @@ from collections import Counter
 from math import isfinite, sqrt
 from statistics import mean, median
 
-POLICY_ID = 'gold-goals-v5'
-SUPPORTED_POLICY_IDS = ('gold-goals-v2', 'gold-goals-v3', 'gold-goals-v4', POLICY_ID)
+POLICY_ID = 'gold-goals-v6'
+SUPPORTED_POLICY_IDS = ('gold-goals-v2', 'gold-goals-v3', 'gold-goals-v4', 'gold-goals-v5', POLICY_ID)
 ODDS_MIN, ODDS_MAX = 1.40, 3.50
 GOALS = {('total', 'ht', 'over', 1.5): 'over15_ht', ('btts', 'ht', 'yes', None): 'gg_ht',
          ('total', 'ft', 'over', 2.5): 'over25_ft', ('total', 'ft', 'over', 3.5): 'over35_ft'}
 ODDS_MAX_BY_MARKET = {'over15_ht': 3.50, 'over25_ft': 3.50, 'gg_ht': 5.50, 'over35_ft': 5.50}
 # Prudential admission rules, not fitted/calibrated probabilities. The model's
 # independent 45-minute estimates remain untouched, including absent HT xG.
-MIN_PROBABILITY_BY_MARKET = {'over15_ht': 45., 'gg_ht': 40., 'over25_ft': 35., 'over35_ft': 35.}
+MIN_PROBABILITY_BY_MARKET = {'over15_ht': 35., 'gg_ht': 30., 'over25_ft': 30., 'over35_ft': 30.}
 HT_EVIDENCE_ID = 'observed-first-half-v1'
 HT_MIN_MATCHES = 4
 LABELS = {'convergence': 'Convergenza di Trend',
@@ -55,7 +55,7 @@ def odds_max(row):
 
 
 def min_probability(row):
-    return MIN_PROBABILITY_BY_MARKET.get(goal_market(row), 35.)
+    return MIN_PROBABILITY_BY_MARKET.get(goal_market(row), 30.)
 
 
 def first_half_evidence(assessment):
@@ -288,7 +288,7 @@ def annotate(matrix, as_of=None, assessment=None):
     matrix['opportunity_policy'] = {'id': POLICY_ID, 'evaluated_at': as_of,
         'odds_min': ODDS_MIN, 'odds_max': max(ODDS_MAX_BY_MARKET.values()),
         'standard_odds_max': ODDS_MAX, 'odds_max_by_market': dict(ODDS_MAX_BY_MARKET),
-        'asian_equivalence': 'identical_half_line_only', 'min_probability_pct': 35,
+        'asian_equivalence': 'identical_half_line_only', 'min_probability_pct': min(MIN_PROBABILITY_BY_MARKET.values()),
         'min_probability_pct_by_market': dict(MIN_PROBABILITY_BY_MARKET),
         'ht_min_matches_per_team': HT_MIN_MATCHES, 'threshold_status': 'prudential_unvalidated',
         'goal_markets_only': True, 'pt_priority_active': context.get('pt_priority_active', False),

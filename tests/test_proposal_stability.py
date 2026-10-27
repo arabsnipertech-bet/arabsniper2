@@ -82,7 +82,7 @@ class ProposalStability(unittest.TestCase):
                    {'oci': 40.}, {'ev_pct': 1.}, {'ev_low_pct': -.5}]
         rejected = [{'odd': 1.7*.9699}, {'statistical_pct': 58.999}, {'selected_margin_pct': 3.751},
                     {'oci': 39.99}, {'oci': None}, {'ev_pct': .999}, {'ev_low_pct': -.501},
-                    {'odd': 1.399}, {'odd': 3.501}, {'statistical_pct': 34.99},
+                    {'odd': 1.399}, {'odd': 3.501}, {'statistical_pct': 29.99},
                     {'quality': 'limited'}, {'quote_status': 'stale'}, {'selected_margin_pct': -1},
                     {'bookmaker_id': '2'}, {'selected_movement': {'reversal': True}}]
         for changes in allowed+rejected:
