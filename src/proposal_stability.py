@@ -19,6 +19,23 @@ def seed_stability(previous, current):
     """Transfer only a saved published choice, never a fresh unpublished winner."""
     old = previous.get('matrix') or {}
     matrix = current.get('matrix') or {}
+    # Display history is separate from eligibility and never refreshes quote age.
+    if old.get('last_proposal'):
+        matrix['last_proposal'] = deepcopy(old['last_proposal'])
+    old_rows = {r['id']: r for r in old.get('rows', [])}
+    old_best = old_rows.get((old.get('opportunity_policy') or {}).get('best_market_id'))
+    if not old.get('last_proposal') and old_best and (old_best.get('opportunity') or {}).get('eligible'):
+        matrix['last_proposal'] = {key: deepcopy(old_best.get(key)) for key in
+                                   ('label', 'odd', 'bookmaker', 'provider_updated_at')}
+        matrix['last_proposal'].update(market_id=old_best['id'], status='current',
+            published_at=(old.get('opportunity_policy') or {}).get('evaluated_at'))
+    for row in matrix.get('rows', []):
+        prior = old_rows.get(row['id'], {})
+        if row.get('quote_status') == 'missing' and (prior.get('odd') or prior.get('last_odd')) is not None:
+            for key in ('first_odd', 'first_observed_at', 'bookmaker', 'bookmaker_id',
+                        'provider_updated_at', 'quote_observed_at'):
+                row[key] = deepcopy(prior.get(key))
+            row.update(last_odd=prior.get('odd') or prior.get('last_odd'), quote_status='stale')
     matrix.pop('proposal_stability', None)
     state = old.get('proposal_stability') or {}
     if state.get('version') == STABILITY_ID and state.get('market_id'):
@@ -93,5 +110,14 @@ def stabilize(matrix, as_of, strict):
     else:
         matrix['proposal_stability'] = {'version': STABILITY_ID, 'market_id': None,
             'status': 'released' if state.get('market_id') else 'none', 'evaluated_at': as_of}
+    if best and stamp(as_of):
+        matrix['last_proposal'] = {'market_id': best['id'], 'label': best.get('label'),
+            'odd': best.get('odd'), 'bookmaker': best.get('bookmaker'),
+            'provider_updated_at': best.get('provider_updated_at'), 'published_at': as_of,
+            'status': 'current'}
+    elif matrix.get('last_proposal'):
+        history = matrix['last_proposal']
+        current = next((r for r in matrix.get('rows', []) if r['id'] == history['market_id']), None)
+        history['status'] = 'withdrawn' if history.get('status') == 'withdrawn' or current and current.get('quote_status') == 'recent' else 'awaiting_update'
     matrix['proposal_stability']['limits'] = dict(LIMITS)
     return best
