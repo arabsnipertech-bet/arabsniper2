@@ -138,7 +138,7 @@
  function opportunityPanel(rows,context,options={}){
   const best=bestOpportunity(rows,options),priced=rows.filter(r=>r.quote_status==='recent').length;
   const checked=rows.filter(r=>goalMarket(r)!==null&&acceptedPolicy(r.opportunity)),counts={};
-  for(const r of checked)for(const code of (r.quote_status!=='recent'?['freshness']:r.opportunity.reasons||[]))counts[code]=(counts[code]||0)+1;
+  for(const r of checked)for(const code of (r.quote_status!=='recent'?['stale']:r.opportunity.reasons||[]))counts[code]=(counts[code]||0)+1;
   const exclusions=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,n])=>n+' '+(REASONS[k]||k)).join(' · ');
   const rulePolicy=best?.opportunity.policy_id||(checked.length&&checked.every(r=>r.opportunity.policy_id===checked[0].opportunity.policy_id)?checked[0].opportunity.policy_id:POLICY);
   const legacy=rulePolicy!==POLICY,extended=[POLICY,'gold-goals-v5','gold-goals-v4'].includes(rulePolicy),floors=rulePolicy===POLICY?MIN_P:PREVIOUS_MIN_P;
