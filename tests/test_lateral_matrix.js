@@ -6,6 +6,9 @@ const releaseHtml=fs.readFileSync('web/gold-dashboard-live.html','utf8');
 const matrixSrc=releaseHtml.match(/<script src="(\/lateral-matrix\.js[^\"]*)"><\/script>/)?.[1];
 const matrixHash=createHash('sha256').update(fs.readFileSync('web/lateral-matrix.js')).digest('hex').slice(0,12);
 assert.equal(matrixSrc,'/lateral-matrix.js?v='+matrixHash,'Update the Gold script URL to its content hash when the bundle changes');
+const matrixCssSrc=releaseHtml.match(/href="(\/lateral-matrix\.css[^\"]*)"/)?.[1];
+const matrixCssHash=createHash('sha256').update(fs.readFileSync('web/lateral-matrix.css')).digest('hex').slice(0,12);
+assert.equal(matrixCssSrc,'/lateral-matrix.css?v='+matrixCssHash,'Conditional colors must not reuse a cached stylesheet URL');
 assert.match(fs.readFileSync('web/_headers','utf8'),/\/lateral-matrix\.js\n\s+Cache-Control: no-cache, must-revalidate/);
 const rows=[{id:'a',family:'totals',period:'ft',spec:{kind:'total',period:'ft',side:'over',line:2.5},category:'mature',market_behavior:'convergence',ev_pct:12,ev_low_pct:5,quote_status:'recent',quality:'supported'},
  {id:'b',family:'asian',period:'ht',spec:{kind:'asian_total',period:'ht',side:'over',line:1.25},category:'contrarian',market_behavior:'divergence',ev_pct:30,ev_low_pct:20,quote_status:'recent',quality:'supported'},
@@ -39,9 +42,9 @@ assert.equal(api.bestOpportunity([{...asian,quote_status:'stale'}]),null);
 for(const extra of [{odd:150,statistical_pct:1},{odd:3.51},{odd:1.39},{statistical_pct:29.99},{opportunity:null},{spec:{kind:'score'}},{spec:{kind:'dc',period:'ft',side:'x2'}}])assert.equal(api.bestOpportunity([{...priced,...extra}]),null);
 const high={...priced,odd:5.5,statistical_pct:30,opportunity:{...decision,min_probability_pct:26,ht_history_supported:true},spec:{kind:'btts',period:'ht',side:'yes'}};
 assert.equal(api.bestOpportunity([high]).id,'regular');
-assert(api.marketRow(high).includes('Ammissibile · quote 3,50–5,50'));
-assert(api.opportunityPanel([high]).includes('GG PT: 3,50–5,50'));
-assert(api.opportunityPanel([high]).includes('Soglie statistiche e controlli di mercato applicati'));
+assert(api.marketRow(high).includes('Idoneo'));
+assert(!api.opportunityPanel([high]).includes('3,50–5,50'));
+assert(!api.opportunityPanel([high]).includes('Soglie statistiche e controlli di mercato applicati'));
 // Frozen v5 keeps its original floors, expanded prices and HT evidence gate.
 for(const [spec,floor,max] of [[{kind:'total',period:'ht',side:'over',line:1.5},45,3.5],[{kind:'btts',period:'ht',side:'yes'},40,5.5],[{kind:'total',period:'ft',side:'over',line:2.5},35,3.5],[{kind:'total',period:'ft',side:'over',line:3.5},35,5.5]]){
  const archived={...priced,spec,odd:max,statistical_pct:floor,opportunity:{...decision,policy_id:'gold-goals-v5',min_probability_pct:floor,ht_history_supported:true}};
@@ -49,7 +52,7 @@ for(const [spec,floor,max] of [[{kind:'total',period:'ht',side:'over',line:1.5},
  assert.equal(api.bestOpportunity([{...archived,statistical_pct:floor-.01,opportunity:{...archived.opportunity,min_probability_pct:30}}]),null);
  if(spec.period==='ht')assert.equal(api.bestOpportunity([{...archived,opportunity:{...archived.opportunity,ht_history_supported:false}}]),null);
  assert(api.opportunityPanel([archived]).includes('Proposta archiviata'));
- assert(api.opportunityPanel([archived]).includes('Over 1,5 PT ≥45%, Goal PT ≥40%, FT ≥35%'));
+ assert(api.opportunityPanel([archived]).includes('gold-goals-v5'));
 }
 assert.equal(api.bestOpportunity([{...high,opportunity:{...decision,policy_id:'gold-goals-v3'}}]),null);
 assert.equal(api.bestOpportunity([{...priced,odd:4.2,opportunity:{...decision,odds_max:5.5}}]),null);
@@ -60,7 +63,7 @@ assert(api.movementSignal({...priced,delta_pct:5}).includes('↑ +5,0%'));
 assert(api.movementSignal({...priced,delta_pct:1}).includes('mx-net-green'));
 assert(api.movementSignal({...priced,delta_pct:10,quote_status:'stale'}).includes('Storico assente'));
 const cell=api.quoteCell({...priced,first_odd:2.2,delta_pct:-9.09,margin_pct:4,oci:55},'1 · Casa');
-assert(cell.includes('Apertura*'));assert(cell.includes('Attuale'));assert(cell.includes('2,20'));assert(cell.includes('OCI'));assert(cell.includes('Aggio'));
+assert(cell.includes('Apertura'));assert(cell.includes('Attuale'));assert(cell.includes('2,20'));assert(cell.includes('OCI'));assert(cell.includes('Aggio'));
 assert(api.opportunityPanel([priced,asian]).includes('MIGLIOR VALORE STIMATO'));
 const oldHandicap={...asian,spec:{kind:'handicap',period:'ft',side:'home',line:.25},quote_adapter_version:1,odd:12,oci:99,margin_pct:4};
 const legacyMatch={multimarket:{matrix:{rows:[oldHandicap,priced]}}};
@@ -78,7 +81,7 @@ const pending=api.opportunityPanel([stale],null,{lastProposal:remembered});
 assert(pending.includes('Ultima proposta pubblicata'));
 assert(pending.includes('In attesa di aggiornamento'));
 assert(pending.includes('Quote da aggiornare'));
-assert(pending.includes('1 quote da aggiornare'));
+assert(pending.includes('1 quota da aggiornare'));
 assert(!pending.includes('quota fuori dal range'));
 assert(!pending.includes('data-opportunity-id'));
 assert.equal(api.bestOpportunity([stale]),null);
@@ -89,7 +92,8 @@ const combo={id:'combo',family:'combo',period:'ft',spec:{kind:'halves_total',per
  label:'Over 0,5 PT + Over 0,5 ST',quote_status:'missing',statistical_pct:60,fair_odd:100/60,
  combo:{policy_id:api.POLICY,active:true,reasons:[],lambda_ht:1.4,lambda_sh:1.8,over25_ft_oci:20,price_available:false}};
 assert(api.opportunityPanel([priced,combo]).includes('★ Combo Consigliata'));
-assert(api.comboText([combo]).includes('Quota bookmaker non fornita; equa calcolata dal modello'));
+assert(api.comboText([combo]).includes('Quota book n.d.'));
+assert(api.comboText([combo]).includes('<b>Equa 1,67</b>'));
 assert(api.marketRow(combo).includes('EV non calcolabile senza quota reale'));
 assert(api.marketRow(combo).includes('Riferimento Over 2,5 FT'));
 assert.equal(api.bestOpportunity([combo]),null,'An active price-less combo is not a priced main proposal');
@@ -101,22 +105,46 @@ const blockedCombo={...combo,combo:{...combo.combo,active:false,reasons:['combo_
  goal_evidence:{teams:{home:{ft:{goalless_matches:2}},away:{ft:{goalless_matches:0}}}}};
 const blockedPanel=api.opportunityPanel([priced,blockedCombo]);
 assert(blockedPanel.includes('Combo non attiva'));
-assert(blockedPanel.includes('casa 2, ospite 0 (massimo 1 ciascuna)'));
-assert(blockedPanel.includes('OCI Over 2,5 FT -15,0'));
+assert(blockedPanel.includes('gare a zero FT casa/ospite 2/0 (max 1)'));
+assert(blockedPanel.includes('OCI -15,0'));
 assert(!blockedPanel.includes('★ Combo Consigliata'),'Probability above 56% cannot override failed structural/OCI conditions');
 assert(api.marketRow(blockedCombo).includes('Sotto soglia'));
 assert(!api.comboText([{...combo,combo:{...combo.combo,policy_id:'old'}}]).includes('★ Combo Consigliata'));
-assert(api.comboText([]).includes('valutazione non presente'));
+assert(api.comboText([]).includes('Dati assenti'));
 const over25ht={...high,label:'Over 2,5 PT',period:'ht',spec:{kind:'total',period:'ht',side:'over',line:2.5},odd:5,
  opportunity:{...decision,min_probability_pct:18,ht_history_supported:true}};
-assert(api.extraGoalText([over25ht,combo]).includes('Over 2,5 PT: stima'));
-assert(api.extraGoalText([over25ht,combo]).includes('quota bookmaker 5,00'));
+assert(api.extraGoalText([over25ht,combo]).includes('Over 2,5 PT · Stima'));
+assert(api.extraGoalText([over25ht,combo]).includes('Quota book 5,00'));
 assert(api.quoteCell({...stale,last_odd:2.4},'Over 2,5 FT').includes('Ultima quota 2,40 · non valida per la proposta'));
 assert(api.quoteCell({quote_status:'missing'},'GG PT').includes('Quota del mercato non ricevuta'));
 assert(!api.quoteCell({quote_status:'missing'},'GG PT').includes('Ultima quota · da confermare'));
-assert(api.extraGoalText([{...over25ht,quote_status:'missing',odd:null}]).includes('Valutazione sospesa in assenza di una quota utilizzabile'));
-assert(api.timingContext({pt_priority_active:true,preferred_pt_market:'over15_ht'}).includes('soltanto fra quelli idonei'));
+assert(api.extraGoalText([{...over25ht,quote_status:'missing',odd:null}]).includes('Non valutabile'));
+assert(api.timingContext({pt_priority_active:true,preferred_pt_market:'over15_ht'}).includes('Precedenza tra idonei'));
 assert(api.timingContext({pt_priority_active:false}).includes('Confronto dei cinque mercati gol'));
 assert(releaseHtml.includes('<title>ArabSniper · Gold v6.1</title>'));
 console.log('PASS Gold v6.1: visible combo decisions, real quote coverage and explicit evaluation order');
+
+// Proximity is a visual cue only: every eligibility boundary stays strict.
+const near={...combo,statistical_pct:54,fair_odd:100/54,
+ combo:{...combo.combo,active:false,reasons:['combo_probability','combo_rates','combo_oci'],lambda_ht:1.1,lambda_sh:1.35,over25_ft_oci:-12},
+ goal_evidence:{teams:{home:{ft:{goalless_matches:1}},away:{ft:{goalless_matches:0}}}}};
+assert.equal(api.comboTone(combo),'active');
+assert.equal(api.comboTone(near),'near');
+assert.equal(api.comboTone(blockedCombo),'inactive');
+const unchanged=JSON.stringify(near);
+assert(api.comboText([near]).includes('mx-combo-near'));
+assert(api.comboText([near]).includes('Combo vicina · non attiva'));
+assert(!api.comboText([near]).includes('★ Combo Consigliata'));
+assert.equal(api.bestOpportunity([near]),null);
+assert.equal(JSON.stringify(near),unchanged);
+for(const patch of [{statistical_pct:53.999},{combo:{...near.combo,lambda_ht:1.099}},{combo:{...near.combo,lambda_sh:1.349}},
+ {combo:{...near.combo,over25_ft_oci:-12.001}},{combo:{...near.combo,over25_ft_oci:null}},{goal_evidence:{}},
+ {goal_evidence:{teams:{home:{ft:{goalless_matches:2}},away:{ft:{goalless_matches:0}}}}}]){
+ assert.equal(api.comboTone({...near,...patch}),'inactive');
+}
+assert(api.comboText([combo]).includes('<strong class="mx-combo-active"'));
+assert(api.comboText([blockedCombo]).includes('mx-combo-inactive'));
+assert(!api.quoteBoard([priced],{}).includes('Prima quota osservata dello stesso bookmaker'));
+assert(!api.quoteBoard([priced],{}).includes('mx-quote-legend'));
+console.log('PASS Gold cleanup: concise cards, green/yellow/red combo boundaries, unchanged eligibility');
 
