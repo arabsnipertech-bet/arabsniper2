@@ -66,8 +66,8 @@
     quote_status:r.quote_status||'missing',first_odd:r.quote?.movement?.first_odds?.[r.selection],
     bookmaker:r.quote?.bookmaker,category:'previous_version',quality:'limited'}));
  }
- function matchingRows(m,options=state,now=Date.now()){
-  const all=rowsOf(m),source=options.category==='market_signal'?(allowedMatch(m)?marketSignals(all,{now,archived:phase(m,now)!=='upcoming'}):[]):all;
+ function matchingRows(m,options=state,now=Date.now(),lifecycle=phase){
+  const all=rowsOf(m),source=options.category==='market_signal'?(allowedMatch(m)?marketSignals(all,{now,archived:lifecycle(m,now)!=='upcoming'}):[]):all;
   return source.filter(r=>{
    if(options.family!=='all'&&r.family!==options.family)return false;
    if(options.period!=='all'&&r.period!==options.period)return false;
@@ -87,7 +87,7 @@
    seen.add(id);
    if(options.phase!=='all'&&lifecycle(m,now)!==options.phase)return false;
    if(options.search&&![f.match,f.league,f.country].join(' ').toLocaleLowerCase().includes(options.search.toLocaleLowerCase()))return false;
-   return matchingRows(m,options,now).length>0||(options.category==='all'&&options.family==='all'&&options.period==='all');
+   return matchingRows(m,options,now,lifecycle).length>0||(options.category==='all'&&options.family==='all'&&options.period==='all');
   }).sort((a,b)=>{
    if(options.sort==='value'){
     const score=m=>bestOpportunity(rowsOf(m))?.ev_low_pct??-100;
@@ -183,9 +183,9 @@
     goalMarket(r)!==null&&(!dedicatedPolicy(d.policy_id)||!['over15_ht','over25_ht','gg_ht'].includes(goalMarket(r))||d.ht_history_supported===true);
   }).sort((a,b)=>a.opportunity.rank-b.opportunity.rank||String(a.id).localeCompare(String(b.id)))[0]||null;
  }
- function marketSignals(rows,{now=Date.now(),archived=false}={}){
+ function marketSignals(rows,{now=Date.now(),archived=false,monitoringClosed=false}={}){
   // Never replace an official proposal or reinterpret a started fixture.
-  if(archived||bestOpportunity(rows,{now,archived}))return [];
+  if(archived||monitoringClosed||bestOpportunity(rows,{now,archived}))return [];
   const signals=rows.filter(r=>{
    const d=r.opportunity,m=goalMarket(r),move=r.selected_movement;
    if(!m||d?.policy_id!==POLICY||d.eligible!==false||d.strict_eligible!==false||d.rank!=null||d.signal!=='excluded'||
@@ -309,7 +309,7 @@
  function closeModal(){const instance=dialog;if(!instance)return;instance.close();releaseModal(instance);}
  function sectionRows(rows,section){return rows.filter(r=>section==='targets'?goalMarket(r)!==null||isCombo(r):section==='asian'?r.family==='asian':section==='result'?r.spec?.kind==='result':r.period===section&&['total','btts'].includes(r.spec?.kind));}
  function matrixDetail(m,rows,services){
-  const signals=new Set(marketSignals(rowsOf(m),{archived:phase(m)!=='upcoming'}).map(r=>r.id));
+  const signals=new Set(marketSignals(rowsOf(m),{archived:(services.phase||phase)(m)!=='upcoming'}).map(r=>r.id));
   return '<div class="mx-detail"><p class="mx-explanation">'+rows.length+' esiti in questa vista. Quote, OCI e aggio della stessa linea e periodo.</p>'+
    '<div class="mx-table" role="table" aria-label="Matrice delle opportunità"><div class="mx-table-head" role="row">'+['Mercato','Statistica','Prima → attuale','OCI','Aggio','Valore'].map(t=>'<div role="columnheader">'+t+'</div>').join('')+'</div>'+rows.map(r=>marketRow(r,services,{marketSignal:signals.has(r.id)})).join('')+'</div>'+
    '<details class="mx-method"><summary>Statistiche delle squadre</summary>'+teamProfiles(m)+'</details>'+
@@ -357,7 +357,7 @@
   const counts={convergence:all.filter(r=>r.market_behavior==='convergence').length,divergence:all.filter(r=>r.market_behavior==='divergence').length,value:all.filter(r=>r.ev_pct>0).length};
   const noSnapshot=a.status==='no_prematch_snapshot';
   return '<article class="mx-card" data-live-fixture="'+esc(fid)+'"><header><div><time>'+esc(f.time||'')+'</time><small>'+esc(f.country)+' · '+esc(f.league)+'</small><h3>'+esc(f.match)+'</h3></div><div class="mx-live"><span data-live-slot="badge">'+(helpers.liveBadge?.(m)||'')+'</span><span data-live-slot="state">'+esc(helpers.stateLabel?.(m)||'')+'</span></div></header>'+
-   (noSnapshot?'<p class="mx-explanation">Partita presente nel palinsesto. Nessuna previsione salvata prima dell’inizio: gli esiti non vengono usati per ricostruirla a posteriori.</p>':'<div class="mx-match-layout">'+quoteBoard(all,helpers)+opportunityPanel(all,a.matrix?.goal_context,{archived:phase(m)!=='upcoming',lastProposal:a.matrix?.last_proposal})+'</div>')+
+   (noSnapshot?'<p class="mx-explanation">Partita presente nel palinsesto. Nessuna previsione salvata prima dell’inizio: gli esiti non vengono usati per ricostruirla a posteriori.</p>':'<div class="mx-match-layout">'+quoteBoard(all,helpers)+opportunityPanel(all,a.matrix?.goal_context,{archived:phase(m)!=='upcoming',monitoringClosed:(helpers.phase||phase)(m)!=='upcoming',lastProposal:a.matrix?.last_proposal})+'</div>')+
    '<div class="mx-match-summary"><span>'+all.length+' mercati</span><span>'+counts.convergence+' convergenze</span><span>'+counts.divergence+' divergenze</span><span>'+all.filter(r=>priced(r)).length+' quote utilizzabili · '+all.filter(r=>r.quote_status==='cached_stable').length+' da cache</span></div>'+
    (all.length?'<button class="mx-open" type="button" data-mx-open="'+esc(fid)+'" aria-haspopup="dialog">Apri matrice · mercati utili <span>↗</span></button>':'')+'<footer>Analisi '+esc(helpers.timestamp?.(a.captured_at)||a.captured_at||'non disponibile')+' · Regole '+esc(a.matrix?.opportunity_policy?.id||'non disponibili')+' · Modello statistico '+esc(a.model_id||'non disponibile')+(f.data_freshness&&f.data_freshness!=='fresh'?' · '+esc(f.data_freshness):'')+'</footer></article>';
  }
@@ -365,7 +365,7 @@
  function render(p,h,services={}){
   p=scopePayload(p);payload=p;host=h;helpers=services;
   const all=p.matches||[],rows=all.flatMap(rowsOf),matches=selectMatches(p,state,Date.now(),services.phase||phase);
-  const count=key=>key==='all'?all.length:all.filter(m=>matchingRows(m,{...state,category:key,family:'all',period:'all'}).length).length;
+  const count=key=>key==='all'?all.length:all.filter(m=>matchingRows(m,{...state,category:key,family:'all',period:'all'},Date.now(),services.phase||phase).length).length;
   const options=(items,chosen)=>Object.entries(items).map(([v,l])=>'<option value="'+v+'" '+(v===chosen?'selected':'')+'>'+esc(l)+'</option>').join('');
   h.innerHTML='<section class="mx-dashboard"><header class="mx-heading"><div><span>ARABSNIPER · GOLD</span><h2>Campionati scelti. Focus sui gol.</h2><p>Regole Gold v6.1 · cinque mercati gol e Combo PT+ST · modello statistico V5.</p></div><b>GOLD v6.1</b></header>'+
    '<div class="mx-counters"><span><b>'+all.length+'</b> partite in whitelist</span><span><b>'+rows.length+'</b> mercati calcolati</span><span><b>'+rows.filter(r=>priced(r)).length+'</b> quote utilizzabili · '+rows.filter(r=>r.quote_status==='cached_stable').length+' da cache</span><span>Proposte su 5 mercati gol · Combo PT+ST</span></div>'+(!p.gold_scope.ready?'<p class="mx-caption">Dati in aggiornamento alla whitelist: i campionati della versione precedente restano nascosti.</p>':'')+

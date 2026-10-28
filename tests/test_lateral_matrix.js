@@ -160,6 +160,7 @@ assert.deepEqual(api.marketSignals([signal],signalOptions),[signal]);
 assert.equal(api.bestOpportunity([signal],signalOptions),null);
 assert.deepEqual(api.marketSignals([signal,priced],signalOptions),[],'A Gold proposal takes precedence over blue monitoring');
 assert.deepEqual(api.marketSignals([signal],{...signalOptions,archived:true}),[],'Never reclassify started/archived forecasts');
+assert.deepEqual(api.marketSignals([signal],{...signalOptions,monitoringClosed:true}),[],'A live overlay can close monitoring without changing Gold');
 const bluePanel=api.opportunityPanel([signal],null,signalOptions);
 assert(bluePanel.includes('mx-best-market'));
 assert(bluePanel.includes('Segnale di mercato forte (Statistica insufficiente / Mercato concorde)'));
@@ -207,6 +208,7 @@ assert.deepEqual(api.marketSignals([equivalent,signal],signalOptions),api.market
 const futureSignal={...matches[0],fixture:{...matches[0].fixture,kickoff:'2026-10-28T20:00:00Z',status_short:'NS'},multimarket:{matrix:{rows:[signal]}}};
 const signalFilter={...opts,category:'market_signal'};
 assert.equal(api.selectMatches({matches:[futureSignal]},signalFilter,signalOptions.now).length,1);
+assert.equal(api.selectMatches({matches:[futureSignal]},signalFilter,signalOptions.now,()=> 'live').length,0,'Use the displayed live lifecycle even before the scheduled kickoff');
 assert.equal(api.selectMatches({matches:[futureSignal]},signalFilter,Date.parse('2026-10-28T20:00:00Z')).length,0);
 assert.equal(api.selectMatches({matches:[{...futureSignal,gold_scope:{policy_id:api.SCOPE,allowed:false}}]},signalFilter,signalOptions.now).length,0);
 assert.equal(api.matchingRows(futureSignal,{...signalFilter,period:'ht'},signalOptions.now).length,0);

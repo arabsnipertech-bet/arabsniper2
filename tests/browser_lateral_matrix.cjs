@@ -270,7 +270,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert(await page.evaluate(()=>{const e=document.querySelector('dialog.mx-modal');return e.scrollWidth<=e.clientWidth}),'Market caps modal overflow');
    await page.locator('[data-mx-close]').click();
   }
-  const monitored={...payload,matches:monitor.map((a,i)=>({...payload.matches[i],multimarket:a}))};
+  const monitored={...payload,matches:monitor.map((a,i)=>({...payload.matches[i],fixture:{...payload.matches[i].fixture,fixture_id:String(101+i)},multimarket:a}))};
   await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},monitored);
   const monitorBefore=await page.evaluate(()=>JSON.stringify(currentPayload));
   for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
@@ -307,8 +307,13 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),1);
    assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),monitorBefore,'Monitoring leaves backend decisions and ranks unchanged');
   }
-  await page.evaluate(()=>{currentPayload.matches[0].fixture.kickoff=new Date(Date.now()-1000).toISOString();currentPayload.matches[0].fixture.status_short='1H';renderMatchResearch(currentPayload)});
-  assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),1,'Started matches leave live monitoring');
+  await page.evaluate(()=>{ArabLive.accept({schema_version:1,enabled:true,fixtures:{'101':{fixture_id:'101',status:'1H',elapsed:1,goals:{home:0,away:0},observed_at:new Date(Date.now()+1000).toISOString()}}});renderMatchResearch(currentPayload)});
+  assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),1,'A live overlay closes monitoring even before the scheduled kickoff');
+  assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),monitorBefore,'The live lifecycle never rewrites prematch decisions');
+  assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),1);
+  await page.locator('[data-mx-open]').first().click();
+  assert.equal(await page.locator('dialog .mx-market-signal').count(),0,'The matrix also respects the live lifecycle');
+  await page.locator('[data-mx-close]').click();
   await page.locator('[data-mx-category="market_signal"]').click();
   assert.equal(await page.locator('.mx-card').count(),1);
   console.log('PASS blue market signals: backend-generated decisions, separate category/counts, official Gold unchanged, blue desktop/mobile cards and matrix, no live reclassification');
