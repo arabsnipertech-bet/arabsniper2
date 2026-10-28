@@ -150,7 +150,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
    assert(proposals.some(r=>r.text.includes('Convergenza di Trend')));
    assert(!proposals.some(r=>r.text.includes('Contrarian sano')));
    assert.equal(await page.locator('.mx-1x2 .mx-net-red').count(),27);
-   assert((await page.locator('.mx-1x2').first().textContent()).includes('Apertura*'));
+   assert((await page.locator('.mx-1x2').first().textContent()).includes('Apertura'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
    await page.screenshot({path:`test-artifacts/matrix-${name}.png`});
    await page.locator('.mx-best').first().scrollIntoViewIfNeeded();

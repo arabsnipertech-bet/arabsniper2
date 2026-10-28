@@ -190,7 +190,7 @@
   row=row||{};
   const recent=priced(row);
   const band={low:'basso',medium:'intermedio',high:'alto'}[row.margin_band]||'';
-  return '<section class="mx-quote-cell"><h4>'+esc(title)+'</h4><div class="mx-quote-pair"><span>Apertura*<b>'+num(row.first_odd,2)+'</b></span><span>'+(row.quote_status==='cached_stable'?'Quota stabile da cache':recent?'Attuale':Number.isFinite(row.last_odd)?'Ultima quota · da confermare':'Quota non ricevuta')+'<b>'+num(recent?row.odd:row.last_odd,2)+'</b></span></div>'+movementSignal(row)+
+  return '<section class="mx-quote-cell"><h4>'+esc(title)+'</h4><div class="mx-quote-pair"><span title="Quota iniziale rilevata presso lo stesso operatore">Apertura<b>'+num(row.first_odd,2)+'</b></span><span>'+(row.quote_status==='cached_stable'?'Quota stabile da cache':recent?'Attuale':Number.isFinite(row.last_odd)?'Ultima quota · da confermare':'Quota non ricevuta')+'<b>'+num(recent?row.odd:row.last_odd,2)+'</b></span></div>'+movementSignal(row)+
    '<div class="mx-quote-metrics"><span>Statistica <b>'+pct(row.statistical_pct)+'</b></span><span>OCI <b>'+signed(row.oci)+'</b></span><span>Aggio mediano <b>'+pct(row.margin_pct)+'</b> '+esc(band)+'</span><span>Δ aggio <b>'+signed(row.margin_delta_pp)+' pt</b></span></div>'+
    '<small class="mx-quote-source">'+(!recent?esc(quoteAvailability(row))+' · ':'')+esc(row.bookmaker||'Fonte non disponibile')+(row.provider_updated_at?' · '+esc(helpers.timestamp?.(row.provider_updated_at)||row.provider_updated_at):'')+'</small>'+
    '<small class="mx-quote-consensus">'+(Number.isFinite(row.oci)?'OCI: ':'OCI non disponibile · ')+esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi'+(row.oci_previous==null?'':' · prima '+signed(row.oci_previous))+'</small></section>';
