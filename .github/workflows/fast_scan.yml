@@ -112,8 +112,9 @@ jobs:
         if: steps.refresh.outputs.mode != 'cached'
         run: python src/3appdays_runner.py --fast
 
-      - name: Refresh opportunity policy from cached observations (zero API calls)
-        if: steps.refresh.outputs.mode == 'cached'
+      # A full Fast scan recollects only days 1-2. Migrate saved days 3-5 too,
+      # or a model/policy release leaves the later tabs on the previous policy.
+      - name: Refresh all five saved days to the active Gold policy (zero API calls)
         run: python src/refresh_opportunities.py
 
       - name: Preserve legacy model comparison archive
@@ -221,5 +222,6 @@ jobs:
           path: |
             data/arab_quote_*.json
             data/_audit_parts/
+
 
 
