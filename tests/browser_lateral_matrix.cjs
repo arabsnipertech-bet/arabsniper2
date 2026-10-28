@@ -19,9 +19,9 @@ a=build_matrix(statistical_analysis(match(),NOW),NOW)
 variants=[]
 for first,last in [(2.5,2.1),(2.1,2.6)]:
  b=deepcopy(a);state={}
- attach(b,payload('2026-10-26T06:00:00Z',first,1.6),state,match()['fixture'],'2026-10-26T06:00:00Z')
- attach(b,payload('2026-10-26T07:00:00Z',(first+last)/2,1.6),state,match()['fixture'],'2026-10-26T07:00:00Z')
- attach(b,payload(NOW,last,1.6),state,match()['fixture'],NOW)
+ attach(b,payload('2026-10-26T06:00:00Z',first,1.8),state,match()['fixture'],'2026-10-26T06:00:00Z')
+ attach(b,payload('2026-10-26T07:00:00Z',(first+last)/2,1.8),state,match()['fixture'],'2026-10-26T07:00:00Z')
+ attach(b,payload(NOW,last,1.8),state,match()['fixture'],NOW)
  variants.append(b)
 contexts=[]
 for args in [('home','1',None),('away','2',None),('away','1',None),('home','2',None),('home','1',.4)]:
@@ -33,17 +33,23 @@ for args in [('home','1',None),('away','2',None),('away','1',None),('home','2',N
  annotate(b['matrix'],NOW,b)
  contexts.append(b)
 caps=[]
-for spec,price in [(S('btts','ht','yes'),5.5),(S('total','ft','over',3.5),5.5),
-                   (S('asian_total','ft','over',3.5),5.5),(S('total','ht','over',1.5),3.5),
-                   (S('total','ft','over',2.5),3.5),(S('total','ht','over',1.5),3.5001),
-                   (S('total','ft','over',3.5),5.5001)]:
+for spec,price in [(S('btts','ht','yes'),5.5),(S('total','ft','over',3.5),4.5),
+                   (S('asian_total','ft','over',3.5),4.5),(S('total','ht','over',1.5),3.5),
+                   (S('total','ft','over',2.5),2.6),(S('total','ht','over',1.5),3.5001),
+                   (S('total','ft','over',3.5),4.5001)]:
  b=deepcopy(a)
  b['matrix']['rows']=[row(spec=spec,period=spec['period'],label=label(spec),odd=price,statistical_pct=60)]
  annotate(b['matrix'],NOW)
  caps.append(b)
+combo=deepcopy(next(r for r in a['matrix']['rows'] if r['spec']['kind']=='halves_total'))
+reference=deepcopy(next(r for r in a['matrix']['rows'] if r['spec']==S('total','ft','over',2.5)))
+reference['oci']=20
+caps[0]['matrix']['rows'].extend([reference,combo])
+annotate(caps[0]['matrix'],NOW,caps[0])
 print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
 `],{encoding:'utf8',maxBuffer:10*1024*1024});
  const {variants,contexts,caps}=JSON.parse(raw),now=Date.now();
+ Object.assign(caps[4].matrix.rows[0],{quote_status:'cached_stable',cache_source_at:new Date(now-2*3600000).toISOString(),cache_expires_at:new Date(now+10*3600000).toISOString()});
  const payload={gold_scope:{policy_id:'gold-senior-whitelist-v1'},updated_at:new Date(now).toISOString(),multimarket_method:{model_id:'lateral-matrix-v5.0'},matches:Array.from({length:9},(_,i)=>({gold_scope:{policy_id:'gold-senior-whitelist-v1',allowed:true},fixture:{fixture_id:String(i+1),home:'Squadra casa',away:'Squadra ospite',
   kickoff:new Date(now+7200000+i*60000).toISOString(),status_short:'NS',time:'20:45',country:'Italia',league:'DATI SINTETICI DI VERIFICA',match:i===8?'Nome squadra molto lungo per verificare la visualizzazione da telefono – Avversaria':'Squadra '+(i+1)+' – Avversaria'},multimarket:structuredClone(variants[i%2])}))};
  // UI-only price fixtures exercise all three result cells and movement colors.
@@ -64,11 +70,11 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
    assert.equal(await page.locator('.mx-card').count(),9);
    assert.equal(await page.locator('.mx-1x2 .mx-quote-cell').count(),27);
    assert.equal(await page.locator('.mx-best').count(),9);
-   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),9);
+   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5);
    const proposals=await page.locator('.mx-best[data-opportunity-id]').evaluateAll(nodes=>nodes.map(n=>({odd:+n.dataset.opportunityOdd,max:+n.dataset.opportunityMaxOdd,p:+n.dataset.opportunityProbability,text:n.textContent})));
-   assert(proposals.every(r=>r.odd>=1.4&&r.odd<=r.max&&[3.5,5.5].includes(r.max)&&r.p>=35));
+   assert(proposals.every(r=>r.odd>=1.85&&r.odd<=r.max&&[2.6,3.5,4.5,5.5,7.5].includes(r.max)&&r.p>=18));
    assert(proposals.some(r=>r.text.includes('Convergenza di Trend')));
-   assert(proposals.some(r=>r.text.includes('Contrarian sano')));
+   assert(!proposals.some(r=>r.text.includes('Contrarian sano')));
    assert.equal(await page.locator('.mx-1x2 .mx-net-red').count(),27);
    assert((await page.locator('.mx-1x2').first().textContent()).includes('Apertura*'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
@@ -77,11 +83,11 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
    await page.screenshot({path:`test-artifacts/matrix-proposal-${name}.png`});
    await page.locator('[data-mx-open]').first().click();
    assert(await page.locator('dialog.mx-modal').isVisible(),'Matrix must be a native modal');
-   assert.equal(await page.locator('.mx-market-row').count(),4,'Only the four goal targets open by default');
+   assert.equal(await page.locator('.mx-market-row').count(),6,'Five goal targets and the half-time combo open by default');
    assert.equal(await page.locator('.mx-card .mx-detail').count(),0,'No inline expansion');
    await page.keyboard.press('Shift+Tab');
    assert(await page.evaluate(()=>!!document.activeElement.closest('dialog.mx-modal')),'Native modal focus trap');
-   for(const [section,count] of [['ft',8],['ht',4],['result',3],['asian',40],['targets',4]]){
+   for(const [section,count] of [['ft',8],['ht',6],['result',3],['asian',40],['targets',6]]){
     await page.locator('[data-mx-section="'+section+'"]').click();
     assert.equal(await page.locator('.mx-market-row').count(),count);
     assert.equal(await page.locator('.mx-modal-scroll').evaluate(e=>e.scrollTop),0,'Changing section starts at its first row');
@@ -102,7 +108,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
    await page.evaluate(()=>renderMatchResearch(currentPayload));
    assert(await page.locator('dialog.mx-modal').isVisible(),'Fast render preserves modal');
    assert.equal(await page.locator('[data-mx-section="ht"]').getAttribute('aria-pressed'),'true');
-   assert.equal(await page.locator('.mx-market-row').count(),4);
+   assert.equal(await page.locator('.mx-market-row').count(),6);
    await page.locator('[data-mx-close]').click();
    await page.locator('dialog.mx-modal').waitFor({state:'detached',timeout:5000});
    assert.equal(await page.locator('dialog.mx-modal').count(),0);
@@ -117,10 +123,10 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
   await page.locator('[data-mx-category="all"]').click();
   await page.locator('[data-mx-filter="family"]').selectOption('asian');
   await page.locator('[data-mx-filter="period"]').selectOption('ht');
-  assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),9,'Matrix filters must not replace the match proposal');
+  assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5,'Matrix filters must not replace the match proposal');
   await page.locator('[data-mx-open]').first().click();
   await page.locator('[data-mx-section="ht"]').click();
-  assert.equal(await page.locator('.mx-market-row').count(),4);
+  assert.equal(await page.locator('.mx-market-row').count(),6);
   assert((await page.locator('.mx-market-row').first().textContent()).includes('PT'));
   await page.locator('[data-mx-close]').click();
   await page.locator('[data-mx-filter="family"]').selectOption('all');
@@ -151,20 +157,23 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
   for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
    await page.setViewportSize({width,height:844});
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5);
-   assert.equal(await page.locator('.mx-best[data-opportunity-odd="5.5"]').count(),3);
+   assert.equal(await page.locator('.mx-best[data-opportunity-odd="5.5"]').count(),1);
    assert.equal(await page.locator('.mx-best-empty').count(),2);
-   assert((await page.locator('.mx-best').first().textContent()).includes('minimo 30'));
-   assert((await page.locator('.mx-best').first().textContent()).includes('Over 1,5 PT ≥35%'));
+   assert((await page.locator('.mx-best').nth(4).textContent()).includes('Quota stabile da cache'));
+   assert((await page.locator('.mx-best').first().textContent()).includes('minimo 26'));
+   assert((await page.locator('.mx-best').first().textContent()).includes('Over 1,5 PT: 2,10–3,50'));
    assert.equal(await page.locator('.mx-first-half').count(),2);
+   assert((await page.locator('.mx-best').first().textContent()).includes('★ Combo Consigliata'));
    assert((await page.locator('.mx-first-half').first().textContent()).includes('xG PT non disponibili'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Market caps overflow '+name);
    await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-market-caps-${name}.png`});
    await page.locator('[data-mx-open]').first().click();
-   assert((await page.locator('.mx-market-row').textContent()).includes('Ammissibile · quote 1,40–5,50'));
+   assert((await page.locator('.mx-market-row').first().textContent()).includes('Ammissibile · quote 3,50–5,50'));
    assert(await page.evaluate(()=>{const e=document.querySelector('dialog.mx-modal');return e.scrollWidth<=e.clientWidth}),'Market caps modal overflow');
    await page.locator('[data-mx-close]').click();
   }
-  console.log('PASS V5 browser: full palinsesto, 55 core markets, modal tabs/focus/Escape/backdrop and Fast persistence, desktop/390/360, contrarian and missing-price filters, immutable live overlays');
+  console.log('PASS V5 browser: full palinsesto, 58 core markets, modal tabs/focus/Escape/backdrop and Fast persistence, desktop/390/360, contrarian and missing-price filters, immutable live overlays');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
+

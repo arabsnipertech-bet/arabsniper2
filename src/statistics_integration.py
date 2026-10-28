@@ -257,7 +257,7 @@ def install(ns, matrix_mode=False):
                 market_confirmation_after_selection=False)
             output['method'].update(markets='Matrice 1X2, doppia chance, Over/Under, GG/NG, PT/ST, asiatici, multigol e combo.',
                 competition_filter='Prime tre divisioni senior dei paesi in whitelist e coppe autorizzate; Romania inclusa; esclusi giovanili e livelli inferiori.',
-                markers='Proposte su quattro mercati gol; priorità PT da digiuno nel contesto casa/trasferta e flussi verificabili.',
+                markers='Proposte su cinque mercati gol, controlli OCI/aggio e Combo PT+ST; soglie gold-goals-v6.1.',
                 book='OCI e aggio per esito, linea e periodo; volumi e smart money non osservati.')
         ns['atomic_write_json'](ns['OUTPUT_FILE'], output)
         for day in output.get('days', []):
@@ -266,3 +266,4 @@ def install(ns, matrix_mode=False):
                 ns['atomic_write_json'](ns['DATA_DIR']/ns['REMOTE_DAY_FILES'][number].split('/')[-1], day)
         return output
     ns['scan_dates'] = scan
+

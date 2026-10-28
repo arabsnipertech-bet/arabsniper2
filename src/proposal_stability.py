@@ -36,6 +36,10 @@ def seed_stability(previous, current):
                         'provider_updated_at', 'quote_observed_at'):
                 row[key] = deepcopy(prior.get(key))
             row.update(last_odd=prior.get('odd') or prior.get('last_odd'), quote_status='stale')
+            from quote_cache import remember
+            saved = deepcopy(prior)
+            remember(saved)
+            if saved.get('cached_quote'): row['cached_quote'] = saved['cached_quote']
     matrix.pop('proposal_stability', None)
     state = old.get('proposal_stability') or {}
     if state.get('version') == STABILITY_ID and state.get('market_id'):
@@ -54,6 +58,9 @@ def strict_state(row, as_of):
 
 
 def retain(row, state, as_of):
+    # v6.1 thresholds are mandatory, including GG PT's explicit negative floor.
+    # Hysteresis may choose between eligible rows, never relax admission.
+    if row.get('opportunity', {}).get('policy_id') == 'gold-goals-v6.1': return False
     now, start = stamp(as_of), stamp(state.get('last_strict_at'))
     d, anchor = row['opportunity'], state.get('anchor') or {}
     if not now or not start or not 0 <= (now-start).total_seconds() <= LIMITS['max_hold_minutes']*60: return False
@@ -109,7 +116,7 @@ def stabilize(matrix, as_of, strict):
         matrix['proposal_stability']['evaluated_at'] = as_of
     else:
         matrix['proposal_stability'] = {'version': STABILITY_ID, 'market_id': None,
-            'status': 'released' if state.get('market_id') else 'none', 'evaluated_at': as_of}
+            'status': 'released' if state.get('market_id') or state.get('status') == 'released' else 'none', 'evaluated_at': as_of}
     if best and stamp(as_of):
         matrix['last_proposal'] = {'market_id': best['id'], 'label': best.get('label'),
             'odd': best.get('odd'), 'bookmaker': best.get('bookmaker'),
@@ -121,3 +128,4 @@ def stabilize(matrix, as_of, strict):
         history['status'] = 'withdrawn' if history.get('status') == 'withdrawn' or current and current.get('quote_status') == 'recent' else 'awaiting_update'
     matrix['proposal_stability']['limits'] = dict(LIMITS)
     return best
+

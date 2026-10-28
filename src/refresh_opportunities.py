@@ -89,11 +89,11 @@ def refresh_day(day, state, as_of):
             captured = captured_prices(fixture, rows)
             offers = ledger_offers(state, meta['fixture_id'], captured, as_of, meta['kickoff'])
             for row in rows:
-                analyse_prices(row, offers.get(row['id'], []), as_of, meta['kickoff'])
+                analyse_prices(row, offers.get(row['id'], []), as_of, meta['kickoff'], allow_cached=True)
         expire(a, meta, as_of)
         matrix['opportunity_refreshed_at'] = as_of
         matrix.setdefault('coverage', {}).update(modeled_markets=len(rows),
-            priced_markets=sum(r.get('quote_status') == 'recent' for r in rows),
+            priced_markets=sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows),
             movement_markets=sum(r.get('oci') is not None for r in rows),
             categories=dict(Counter(r.get('category', 'no_quote') for r in rows)))
         count += 1
@@ -151,3 +151,4 @@ if __name__ == '__main__':
     if '--classify-push' in sys.argv:
         print('cached' if cached_refresh_safe(sys.stdin.read().splitlines()) else 'full')
     else: main()
+

@@ -21,14 +21,14 @@ def later(minutes):
 
 
 def saved(**changes):
-    r = row(bookmaker_id='1', ev_pct=2.2, ev_low_pct=.2, odd=1.7, **changes)
+    r = row(bookmaker_id='1', ev_pct=20., ev_low_pct=3., odd=2., **changes)
     a = {'model_id': MODEL_ID, 'captured_at': NOW, 'matrix': {'rows': [r]}}
     annotate(a['matrix'], NOW)
     return a, r
 
 
 def wobble(r):
-    r.update(odd=1.69, ev_pct=1.4, ev_low_pct=-.2, oci=50., selected_margin_pct=3.1)
+    r.update(odd=1.99, ev_pct=1.4, ev_low_pct=1.9, oci=50., selected_margin_pct=3.1)
 
 
 class ProposalStability(unittest.TestCase):
@@ -51,87 +51,64 @@ class ProposalStability(unittest.TestCase):
             with patch('scan_audit.update_audit', return_value={'cohorts': [], 'status': 'experimental'}):
                 ns['scan_dates'](None, ['2026-10-26'], [])
             published = json.loads((folder/'arab_quote_day1.json').read_text())['matches'][0]['multimarket']['matrix']
-            self.assertEqual(published['proposal_stability']['last_strict_at'], NOW)
-            self.assertEqual(published['proposal_stability']['status'], 'retained')
+            self.assertIsNone(published['proposal_stability']['market_id'])
+            self.assertEqual(published['last_proposal']['status'], 'withdrawn')
             self.assertFalse(published['rows'][0]['opportunity']['strict_eligible'])
 
     def test_entry_is_strict_and_only_published_choice_can_be_retained(self):
-        a, r = saved(); wobble(r)
-        fresh = {'rows': [deepcopy(r)]}
-        self.assertIsNone(annotate(fresh, later(15)))
-        self.assertEqual(annotate(a['matrix'], later(15))['id'], r['id'])
-        self.assertFalse(r['opportunity']['strict_eligible'])
-        self.assertEqual(r['opportunity']['stability']['status'], 'retained')
-        self.assertEqual(policy_choices([r], {})['published'], r['id'])
-        self.assertIsNone(policy_choices([r], {})['without_hysteresis'])
+        a,r=saved();self.assertIsNotNone(a['matrix']['opportunity_policy']['best_market_id']);wobble(r)
+        self.assertIsNone(annotate({'rows':[deepcopy(r)]},later(15)))
+        self.assertIsNone(annotate(a['matrix'],later(15)))
+        self.assertFalse(r['opportunity']['eligible']);self.assertIn('sensitivity',r['opportunity']['reasons'])
 
     def test_retention_does_not_reset_anchor_or_mutate_probabilities(self):
-        a, r = saved(); wobble(r)
-        for minutes in (15, 60, 90):
-            p = r['statistical_pct']
-            self.assertIs(annotate(a['matrix'], later(minutes)), r)
-            self.assertEqual(a['matrix']['proposal_stability']['last_strict_at'], NOW)
-            self.assertEqual(r['statistical_pct'], p)
-            frozen = deepcopy(a)
-            annotate(a['matrix'], later(minutes))
-            self.assertEqual(a, frozen)
-        self.assertIsNone(annotate(a['matrix'], later(90.01)))
+        a,r=saved();wobble(r);p=r['statistical_pct']
+        for minute in (15,60,90):
+            self.assertIsNone(annotate(a['matrix'],later(minute)))
+            self.assertEqual(r['statistical_pct'],p)
+            frozen=deepcopy(a);annotate(a['matrix'],later(minute));self.assertEqual(a,frozen)
 
     def test_tolerance_boundaries_and_hard_stops(self):
-        allowed = [{'odd': 1.7*.97}, {'statistical_pct': 59.}, {'selected_margin_pct': 3.75},
-                   {'oci': 40.}, {'ev_pct': 1.}, {'ev_low_pct': -.5}]
-        rejected = [{'odd': 1.7*.9699}, {'statistical_pct': 58.999}, {'selected_margin_pct': 3.751},
-                    {'oci': 39.99}, {'oci': None}, {'ev_pct': .999}, {'ev_low_pct': -.501},
-                    {'odd': 1.399}, {'odd': 3.501}, {'statistical_pct': 29.99},
-                    {'quality': 'limited'}, {'quote_status': 'stale'}, {'selected_margin_pct': -1},
-                    {'bookmaker_id': '2'}, {'selected_movement': {'reversal': True}}]
-        for changes in allowed+rejected:
-            with self.subTest(changes=changes):
-                a, r = saved(); wobble(r); r.update(changes)
-                self.assertEqual(annotate(a['matrix'], later(15)) is not None, changes in allowed)
+        rejected=[{'odd':1.8499},{'odd':2.6001},{'statistical_pct':47.999},{'oci':-20.01},
+                  {'delta_pct':2.001},{'selected_margin_pct':8.001},{'ev_low_pct':1.999},
+                  {'quote_status':'stale'},{'quality':'limited'}]
+        for changes in rejected:
+            a,r=saved();r.update(changes)
+            with self.subTest(changes=changes): self.assertIsNone(annotate(a['matrix'],later(15)))
 
     def test_cumulative_drift_is_measured_from_strict_anchor(self):
-        a, r = saved(); wobble(r); r['odd'] = 1.7*.98
-        self.assertIsNotNone(annotate(a['matrix'], later(10)))
-        r['odd'] *= .98
-        self.assertIsNone(annotate(a['matrix'], later(20)))
+        a,r=saved();r['ev_low_pct']=2.01
+        self.assertIsNotNone(annotate(a['matrix'],later(10)))
+        r['ev_low_pct']=1.999
+        self.assertIsNone(annotate(a['matrix'],later(20)))
 
     def test_market_cap_is_a_hard_stop_even_inside_odds_tolerance(self):
-        for spec, maximum in [(S('total', 'ft', 'over', 2.5), 3.5),
-                              (S('total', 'ht', 'over', 1.5), 3.5),
-                              (S('total', 'ft', 'over', 3.5), 5.5),
-                              (S('btts', 'ht', 'yes'), 5.5),
-                              (S('asian_total', 'ft', 'over', 3.5), 5.5)]:
-            a, r = saved(spec=spec)
-            r['odd'] = maximum-.05
-            annotate(a['matrix'], NOW)
-            r.update(odd=maximum, ev_pct=1.4, ev_low_pct=-.2)
-            self.assertIs(annotate(a['matrix'], later(15)), r)
-            r['odd'] = maximum+.0001
-            self.assertIsNone(annotate(a['matrix'], later(20)))
-            self.assertIn('price', r['opportunity']['reasons'])
+        from opportunity_policy import odds_max
+        for spec in (S('total','ft','over',2.5),S('total','ht','over',1.5),S('total','ft','over',3.5),S('btts','ht','yes')):
+            a,r=saved(spec=spec);maximum=odds_max(r);r.update(odd=maximum,ev_pct=20,ev_low_pct=3)
+            self.assertIs(annotate(a['matrix'],later(15)),r)
+            r['odd']=maximum+.0001
+            self.assertIsNone(annotate(a['matrix'],later(20)));self.assertIn('price',r['opportunity']['reasons'])
 
     def test_renewal_requires_strict_readmission_and_unconfirmed_flow_is_not_frozen(self):
-        a, r = saved(); wobble(r)
-        r['movement_confirmed'] = False
-        annotate(a['matrix'], later(20))
-        self.assertEqual(r['opportunity']['signal'], 'unconfirmed')
-        r.update(ev_pct=2.1, ev_low_pct=.1)
-        annotate(a['matrix'], later(30))
-        self.assertEqual(a['matrix']['proposal_stability']['last_strict_at'], later(30))
-        self.assertTrue(r['opportunity']['strict_eligible'])
+        a,r=saved();wobble(r);r['movement_confirmed']=False
+        self.assertIsNone(annotate(a['matrix'],later(20)))
+        r.update(ev_pct=10,ev_low_pct=2.1)
+        annotate(a['matrix'],later(30))
+        self.assertEqual(r['opportunity']['signal'],'unconfirmed')
+        self.assertEqual(a['matrix']['proposal_stability']['last_strict_at'],later(30))
 
     def test_small_rank_noise_does_not_replace_incumbent_but_large_gain_does(self):
-        a = {'rows': [row(bookmaker_id='1'), row(id='other', spec=S('total', 'ft', 'over', 3.5), ev_low_pct=7.9)]}
+        a = {'rows': [row(bookmaker_id='1'), row(id='other', spec=S('total', 'ft', 'over', 3.5), ev_low_pct=7.5)]}
         self.assertEqual(annotate(a, NOW)['id'], 'primary')
-        a['rows'][1]['ev_low_pct'] = 8.1
+        a['rows'][1]['ev_low_pct'] = 7.7
         self.assertEqual(annotate(a, later(5))['id'], 'primary')
         a['rows'][1]['ev_low_pct'] = 10.
         self.assertEqual(annotate(a, later(10))['id'], 'other')
 
     def test_pt_priority_and_coherence_remain_hard(self):
         a, r = saved(); wobble(r)
-        a['matrix']['rows'].append(row(id='pt', spec=S('total', 'ht', 'over', 1.5), ev_low_pct=.1))
+        a['matrix']['rows'].append(row(id='pt', spec=S('total', 'ht', 'over', 1.5), ev_low_pct=2.1))
         a['matrix']['goal_context'] = {'pt_priority_active': True, 'preferred_pt_market': 'over15_ht'}
         self.assertEqual(annotate(a['matrix'], later(5))['id'], 'pt')
         self.assertFalse(r['opportunity']['eligible'])
@@ -150,7 +127,7 @@ class ProposalStability(unittest.TestCase):
         self.assertFalse(r['opportunity']['strict_eligible'])
         frozen = deepcopy(day)
         preview = build_preview(day, now=datetime.fromisoformat(later(15)))
-        self.assertEqual(preview['selections'][0]['odd'], r['odd'])
+        self.assertEqual(preview['selections'], [])
         self.assertEqual(day, frozen)
         seed_stability({}, fresh)
         self.assertIsNone(annotate(fresh['matrix'], later(20)))
@@ -172,10 +149,9 @@ class ProposalStability(unittest.TestCase):
         frozen = deepcopy(a); expire(a, meta, later(121)); self.assertEqual(a, frozen)
 
     def test_frontend_accepts_only_explicit_unexpired_bounded_hold(self):
-        a, r = saved(); wobble(r); annotate(a['matrix'], later(15))
-        script = "const a=require('./web/lateral-matrix.js');let s='';process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>{let r=JSON.parse(s);const o={now:Date.parse('"+later(15)+"')};let good=a.bestOpportunity([r],o)?.id;r.opportunity.stability.expires_at='2026-10-26T08:01:00Z';let expired=a.bestOpportunity([r],o);delete r.opportunity.stability;let forged=a.bestOpportunity([r],o);console.log(JSON.stringify({good,expired,forged}));});"
-        result = json.loads(subprocess.check_output(['node', '-e', script], input=json.dumps(r).encode()))
-        self.assertEqual(result, {'good': r['id'], 'expired': None, 'forged': None})
+        a,r=saved();r['opportunity']['stability']={'version':'gold-stability-v1','status':'retained','last_strict_at':NOW,'expires_at':later(90)}
+        script="const a=require('./web/lateral-matrix.js');let s='';process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>console.log(JSON.stringify(a.bestOpportunity([JSON.parse(s)],{archived:true}))));"
+        self.assertIsNone(json.loads(subprocess.check_output(['node','-e',script],input=json.dumps(r).encode())))
 
 
 if __name__ == '__main__': unittest.main()
@@ -193,14 +169,14 @@ class ProposalDisplayHistory(unittest.TestCase):
 
     def test_missing_scan_preserves_history_across_multiple_refreshes(self):
         old, r = saved()
-        r.update(first_odd=1.8, bookmaker='Example', provider_updated_at=NOW)
+        r.update(first_odd=2.1, bookmaker='Example', provider_updated_at=NOW)
         for _ in range(2):
             current = {'matrix': {'rows': [{**deepcopy(r), 'quote_status':'missing', 'odd':None}]}}
             seed_stability(old, current)
             annotate(current['matrix'], later(70))
             restored = current['matrix']['rows'][0]
-            self.assertEqual(restored['last_odd'], 1.7)
-            self.assertEqual(restored['first_odd'], 1.8)
+            self.assertEqual(restored['last_odd'], 2.)
+            self.assertEqual(restored['first_odd'], 2.1)
             self.assertEqual(restored['provider_updated_at'], NOW)
             self.assertFalse(restored['opportunity']['eligible'])
             self.assertEqual(current['matrix']['last_proposal']['status'], 'awaiting_update')
@@ -214,3 +190,4 @@ class ProposalDisplayHistory(unittest.TestCase):
         r.update(quote_status='stale', odd=None)
         annotate(a['matrix'], later(70))
         self.assertEqual(a['matrix']['last_proposal']['status'], 'withdrawn')
+

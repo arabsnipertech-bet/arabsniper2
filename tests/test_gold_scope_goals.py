@@ -15,7 +15,7 @@ from matrix_pipeline import build_board, selection_export
 
 
 def history_for(side, gap=False):
-    goals = [0, 0, 0, 2, 2, 2, 2, 2] if gap else [2]*8
+    goals = [1, 1, 1, 3, 3, 3, 3, 3] if gap else [2]*8
     return [{'fixture_id': f'{side}-{i}', 'side': side if i % 2 == 0 else ('away' if side == 'home' else 'home'),
         'team_goals_ft': g, 'team_conceded_ft': 2, 'team_conceded_ht': 1, 'team_goals_ht': min(1, g), 'halftime_available': True}
         for i, g in enumerate(goals)]
@@ -30,14 +30,14 @@ def flow(favorite='1', balanced_gap=None):
 
 
 def goal_rows():
-    return [row(id='ft25', odd=1.8, statistical_pct=70., ev_pct=26., ev_low_pct=12.),
+    return [row(id='ft25', odd=2.0, statistical_pct=70., ev_pct=26., ev_low_pct=12.),
         row(id='ft35', spec=S('total', 'ft', 'over', 3.5), odd=2.7, statistical_pct=45., ev_pct=21.5, ev_low_pct=8.),
-        row(id='ht15', spec=S('total', 'ht', 'over', 1.5), period='ht', odd=2., statistical_pct=55., ev_pct=10., ev_low_pct=5.),
-        row(id='gght', spec=S('btts', 'ht', 'yes'), period='ht', odd=3., statistical_pct=40., ev_pct=20., ev_low_pct=6.)]
+        row(id='ht15', spec=S('total', 'ht', 'over', 1.5), period='ht', odd=2.1, statistical_pct=55., ev_pct=10., ev_low_pct=5.),
+        row(id='gght', spec=S('btts', 'ht', 'yes'), period='ht', odd=3.5, statistical_pct=40., ev_pct=20., ev_low_pct=6.)]
 
 
 def example(gap_side='home', favorite='1', balanced_gap=None):
-    a = {'inputs': {'histories': {s: history_for(s, s == gap_side) for s in ('home', 'away')}},
+    a = {'rates': {'home_ft': 2., 'away_ft': 2., 'home_ht': 1., 'away_ht': 1.}, 'inputs': {'histories': {s: history_for(s, s == gap_side) for s in ('home', 'away')}},
          'matrix': {'rows': goal_rows()+[flow(favorite, balanced_gap)]}}
     return a
 
@@ -163,7 +163,7 @@ class GoalPriority(unittest.TestCase):
 
     def test_preferred_pt_falls_back_only_to_eligible_goal_markets(self):
         a = example('away', '1')
-        gg = a['matrix']['rows'][3]; gg['statistical_pct'] = 29.99
+        gg = a['matrix']['rows'][3]; gg['statistical_pct'] = 25.99
         self.assertEqual(annotate(a['matrix'], NOW, a)['id'], 'ht15')
         a['matrix']['rows'][2]['odd'] = 3.5001
         self.assertEqual(annotate(a['matrix'], NOW, a)['id'], 'ft25')
@@ -196,9 +196,10 @@ class GoalPriority(unittest.TestCase):
     def test_contrarian_requires_controlled_margin_not_expansion(self):
         r = goal_rows()[0]
         r.update(oci=-60, selected_movement={'delta_pct': 5, 'fair_delta_pp': -2, 'persistence': 1, 'reversal': False})
-        self.assertEqual(evaluate(r)['signal'], 'contrarian')
+        self.assertIn('oci_negative', evaluate(r)['reasons'])
         r['selected_margin_pct'] = 10
-        self.assertEqual(evaluate(r)['signal'], 'unconfirmed')
+        self.assertIn('margin', evaluate(r)['reasons'])
 
 
 if __name__ == '__main__': unittest.main()
+

@@ -135,7 +135,7 @@ class EngineTests(unittest.TestCase):
         def audit(ns, output, client):
             observed.append(len(output['days'][0]['matches']))
             assert output['days'][0]['selection_board']['max_per_market'] is None
-            assert all(len(m['multimarket']['matrix']['rows'])==55 for m in output['days'][0]['matches'])
+            assert all(len(m['multimarket']['matrix']['rows'])==58 for m in output['days'][0]['matches'])
             return {'cohorts':[], 'status':'experimental'}
         with tempfile.TemporaryDirectory() as folder:
             ns=dict(engine.__dict__)
@@ -198,3 +198,4 @@ class FirstHalfHistoryTests(unittest.TestCase):
         p = engine._binary_empirical(team, team,
                 {'ht_sample': 40, 'over15ht_rate': .35}, {'ht_sample': 0}, 'over15ht_rate')
         self.assertAlmostEqual(p, .35)
+

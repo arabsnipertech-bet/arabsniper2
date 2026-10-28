@@ -26,7 +26,7 @@ class MatrixMath(unittest.TestCase):
         cls.model = ScoreModel({'home_ft': 1.7, 'away_ft': 1.2, 'home_ht': .7, 'away_ht': .5})
 
     def test_full_coverage_and_binary_complements(self):
-        self.assertEqual(len(self.a['matrix']['rows']), 55)
+        self.assertEqual(len(self.a['matrix']['rows']), 58)
         for period in ('ft', 'ht', 'sh'):
             self.assertAlmostEqual(sum(self.model.estimate(S('result', period, side))['p'] for side in ('1', 'x', '2')), 1, places=8)
             for line in (.5, 1.5, 2.5):
@@ -53,7 +53,7 @@ class MatrixMath(unittest.TestCase):
 
     def test_missing_history_still_calculated_with_explicit_prior(self):
         a = build_matrix(statistical_analysis({'fixture': match()['fixture'], 'statistics': {}}, NOW), NOW)
-        self.assertEqual(len(a['matrix']['rows']), 55)
+        self.assertEqual(len(a['matrix']['rows']), 58)
         self.assertTrue(all(r['quality'] == 'prior_only' for r in a['matrix']['rows']))
         attach(a, payload(over=100, under=1.01), {}, match()['fixture'], NOW)
         self.assertFalse(any(r.get('category') in ('mature', 'contrarian', 'lateral') for r in a['matrix']['rows']))
@@ -98,7 +98,7 @@ class MatrixMath(unittest.TestCase):
         self.assertEqual(len(day['matches']), 2)
         indexed = {m['fixture']['fixture_id']: m for m in day['matches']}
         future, started = (indexed[k]['multimarket'] for k in ('1', '2'))
-        self.assertEqual(len(future['matrix']['rows']), 55)
+        self.assertEqual(len(future['matrix']['rows']), 58)
         self.assertTrue(all(r['quality'] == 'prior_only' for r in future['matrix']['rows']))
         self.assertEqual(started['matrix']['rows'], [])
         self.assertEqual(started['status'], 'no_prematch_snapshot')
@@ -158,18 +158,18 @@ class MatrixMath(unittest.TestCase):
         a = deepcopy(self.a)
         attach(a, payload('2026-10-25T21:00:00Z'), {}, match()['fixture'], NOW)
         row = next(r for r in a['matrix']['rows'] if r['spec'] == S('total', 'ft', 'over', 2.5))
-        self.assertEqual(row['quote_status'], 'stale')
-        self.assertIsNone(row['odd'])
+        self.assertEqual(row['quote_status'], 'cached_stable')
+        self.assertIsNotNone(row['odd'])
         state = {}
         attach(a, payload('2026-10-26T06:00:00Z', books=1), state, match()['fixture'], '2026-10-26T06:00:00Z')
         attach(a, payload(NOW, over=1.7, books=1), state, match()['fixture'], NOW)
         self.assertIsNone(row.get('oci'))
         expire(a, match()['fixture'], '2026-10-26T18:00:00Z')
-        self.assertEqual(row['quote_status'], 'stale')
-        self.assertIsNone(row['ev_pct'])
-        self.assertIsNone(row['margin_pct'])
-        self.assertIsNone(row['oci_previous'])
-        self.assertFalse(row['theoretical_value'])
+        self.assertEqual(row['quote_status'], 'cached_stable')
+        self.assertIsNotNone(row['ev_pct'])
+        self.assertIsNotNone(row['selected_margin_pct'])
+        self.assertIsNone(row['oci'])
+        self.assertFalse(row['opportunity']['eligible'])  # Price below 1.85 remains blocked.
 
     def test_compatible_old_quote_history_is_preserved(self):
         from multimarket_model import collect_quotes, update_ledger
@@ -268,3 +268,4 @@ class MatrixMath(unittest.TestCase):
 
 
 if __name__ == '__main__': unittest.main()
+
