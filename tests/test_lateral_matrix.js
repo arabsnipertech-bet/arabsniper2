@@ -1,5 +1,12 @@
 const assert=require('node:assert/strict');
 const api=require('../web/lateral-matrix.js');
+// A changed whitelist cannot be shipped under an already cached script URL.
+const fs=require('node:fs'),{createHash}=require('node:crypto');
+const releaseHtml=fs.readFileSync('web/gold-dashboard-live.html','utf8');
+const matrixSrc=releaseHtml.match(/<script src="(\/lateral-matrix\.js[^\"]*)"><\/script>/)?.[1];
+const matrixHash=createHash('sha256').update(fs.readFileSync('web/lateral-matrix.js')).digest('hex').slice(0,12);
+assert.equal(matrixSrc,'/lateral-matrix.js?v='+matrixHash,'Update the Gold script URL to its content hash when the bundle changes');
+assert.match(fs.readFileSync('web/_headers','utf8'),/\/lateral-matrix\.js\n\s+Cache-Control: no-cache, must-revalidate/);
 const rows=[{id:'a',family:'totals',period:'ft',spec:{kind:'total',period:'ft',side:'over',line:2.5},category:'mature',market_behavior:'convergence',ev_pct:12,ev_low_pct:5,quote_status:'recent',quality:'supported'},
  {id:'b',family:'asian',period:'ht',spec:{kind:'asian_total',period:'ht',side:'over',line:1.25},category:'contrarian',market_behavior:'divergence',ev_pct:30,ev_low_pct:20,quote_status:'recent',quality:'supported'},
  {id:'c',family:'btts',period:'ht',spec:{kind:'btts',period:'ht',side:'yes'},category:'no_quote',quote_status:'missing'}];

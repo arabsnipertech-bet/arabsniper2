@@ -1,6 +1,60 @@
 // End-to-end UI on synthetic backend output. No account or provider calls.
 const {chromium}=require('playwright');
 const fs=require('node:fs'),assert=require('node:assert/strict'),cp=require('node:child_process');
+async function verifyCachedRelease(browser,payload){
+ const http=require('node:http'),requests=[];
+ const html=fs.readFileSync('web/gold-dashboard-live.html','utf8');
+ const script=html.match(/<script src="(\/lateral-matrix\.js[^\"]*)"><\/script>/)[1];
+ const assets=new Set(['statistics-first.js','statistics-first.css','lateral-matrix.js','lateral-matrix.css','live-scores.js']);
+ const oldScript='/lateral-matrix.js?v=5.10';
+ const server=http.createServer((req,res)=>{
+  requests.push(req.url);
+  const url=new URL(req.url,'http://127.0.0.1');
+  res.setHeader('Cache-Control','no-store');
+  if(url.pathname==='/prime-cached-v6'){
+   res.setHeader('Content-Type','text/html; charset=utf-8');
+   return res.end('<!doctype html><script src="'+oldScript+'"></script>');
+  }
+  if(req.url===oldScript){
+   res.setHeader('Cache-Control','public, max-age=31536000');
+   res.setHeader('Content-Type','text/javascript');
+   return res.end('window.ArabMatrix={POLICY:"gold-goals-v6",SCOPE:"gold-senior-whitelist-v2"};');
+  }
+  if(url.pathname==='/gold-dashboard-live'){
+   res.setHeader('Content-Type','text/html; charset=utf-8');return res.end(html);
+  }
+  if(url.pathname==='/api/auth/session'){
+   res.setHeader('Content-Type','application/json');return res.end('{"active":false}');
+  }
+  const file=url.pathname.slice(1);
+  if(assets.has(file)){
+   res.setHeader('Content-Type',file.endsWith('.css')?'text/css':'text/javascript');
+   if(file==='lateral-matrix.js')res.setHeader('Cache-Control','no-cache, must-revalidate');
+   return res.end(fs.readFileSync('web/'+file));
+  }
+  res.statusCode=404;res.end();
+ });
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const origin='http://127.0.0.1:'+server.address().port,page=await browser.newPage();
+ try{
+  // Real HTTP cache, with no route interception or direct script injection.
+  await page.goto(origin+'/prime-cached-v6');
+  await page.goto(origin+'/prime-cached-v6?second=1');
+  assert.equal(requests.filter(url=>url===oldScript).length,1,'Previous bundle is genuinely cached');
+  assert.equal(await page.evaluate(()=>ArabMatrix.POLICY),'gold-goals-v6');
+  await page.goto(origin+'/gold-dashboard-live');
+  assert.equal(await page.evaluate(()=>ArabMatrix.POLICY),'gold-goals-v6.1','Production HTML must replace the cached client');
+  assert.equal(await page.evaluate(()=>ArabMatrix.SCOPE),payload.gold_scope.policy_id);
+  assert.equal(requests.filter(url=>url===script).length,1,'Current content-versioned bundle requested');
+  await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;renderMatchResearch(p)},payload);
+  assert.equal(await page.locator('.mx-card').count(),payload.matches.length,'Current whitelist fixtures remain visible');
+  assert((await page.locator('.mx-counters').textContent()).includes('Proposte su 5 mercati gol · Combo PT+ST'));
+  assert(!(await page.locator('.mx-dashboard').textContent()).includes('Dati in aggiornamento alla whitelist'));
+  fs.mkdirSync('test-artifacts',{recursive:true});
+  await page.screenshot({path:'test-artifacts/matrix-cache-rollout.png'});
+  console.log('PASS Gold release: cached v6 bundle replaced by versioned v6.1, current whitelist fixtures visible');
+ }finally{await page.close();await new Promise(resolve=>server.close(resolve));}
+}
 (async()=>{
  const raw=cp.execFileSync('python',['-c',`
 import sys,json
@@ -15,6 +69,7 @@ from test_gold_scope_goals import example
 from opportunity_policy import annotate
 from test_opportunity_policy import row
 from lateral_matrix import specification as S, label
+from gold_competitions import SCOPE_ID
 a=build_matrix(statistical_analysis(match(),NOW),NOW)
 variants=[]
 for first,last in [(2.5,2.1),(2.1,2.6)]:
@@ -46,11 +101,11 @@ reference=deepcopy(next(r for r in a['matrix']['rows'] if r['spec']==S('total','
 reference['oci']=20
 caps[0]['matrix']['rows'].extend([reference,combo])
 annotate(caps[0]['matrix'],NOW,caps[0])
-print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
+print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SCOPE_ID}))
 `],{encoding:'utf8',maxBuffer:10*1024*1024});
- const {variants,contexts,caps}=JSON.parse(raw),now=Date.now();
+ const {variants,contexts,caps,scope}=JSON.parse(raw),now=Date.now();
  Object.assign(caps[4].matrix.rows[0],{quote_status:'cached_stable',cache_source_at:new Date(now-2*3600000).toISOString(),cache_expires_at:new Date(now+10*3600000).toISOString()});
- const payload={gold_scope:{policy_id:'gold-senior-whitelist-v1'},updated_at:new Date(now).toISOString(),multimarket_method:{model_id:'lateral-matrix-v5.0'},matches:Array.from({length:9},(_,i)=>({gold_scope:{policy_id:'gold-senior-whitelist-v1',allowed:true},fixture:{fixture_id:String(i+1),home:'Squadra casa',away:'Squadra ospite',
+ const payload={gold_scope:{policy_id:scope},updated_at:new Date(now).toISOString(),multimarket_method:{model_id:'lateral-matrix-v5.0'},matches:Array.from({length:9},(_,i)=>({gold_scope:{policy_id:scope,allowed:true},fixture:{fixture_id:String(i+1),home:'Squadra casa',away:'Squadra ospite',
   kickoff:new Date(now+7200000+i*60000).toISOString(),status_short:'NS',time:'20:45',country:'Italia',league:'DATI SINTETICI DI VERIFICA',match:i===8?'Nome squadra molto lungo per verificare la visualizzazione da telefono – Avversaria':'Squadra '+(i+1)+' – Avversaria'},multimarket:structuredClone(variants[i%2])}))};
  // UI-only price fixtures exercise all three result cells and movement colors.
  for(const m of payload.matches)for(const row of m.multimarket.matrix.rows){
@@ -58,6 +113,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps}))
  }
  const browser=await chromium.launch({headless:true});
  try{
+  await verifyCachedRelease(browser,payload);
   const page=await browser.newPage();await page.route('**/*',r=>r.abort());
   await page.setContent(fs.readFileSync('web/gold-dashboard-live.html','utf8'));
   await page.addStyleTag({content:fs.readFileSync('web/lateral-matrix.css','utf8')});
