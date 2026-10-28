@@ -133,6 +133,18 @@ const near={...combo,statistical_pct:54,fair_odd:100/54,
 assert.equal(api.comboTone(combo),'active');
 assert.equal(api.comboTone(near),'near');
 assert.equal(api.comboTone(blockedCombo),'inactive');
+// The Combo category follows the existing active decision, not Radar or quote availability.
+const comboFilter={...opts,category:'combo'};
+const comboCases=[[priced,combo],[combo],[priced,near],[priced,blockedCombo],[priced],
+ [{...combo,combo:{...combo.combo,policy_id:'old'}}],[{...priced,combo:combo.combo}]]
+ .map((rows,i)=>({...matches[i],multimarket:{matrix:{rows}}}));
+const comboFrozen=JSON.stringify(comboCases);
+assert.deepEqual(api.selectMatches({matches:comboCases},comboFilter,0).map(m=>m.fixture.fixture_id),['1','2']);
+assert.deepEqual(api.matchingRows(comboCases[0],comboFilter,0),[combo]);
+assert.equal(api.selectMatches({matches:comboCases},{...comboFilter,search:'Casa 1'},0).length,1);
+assert.equal(api.selectMatches({matches:comboCases},{...comboFilter,phase:'finished'},0).length,0);
+assert.equal(JSON.stringify(comboCases),comboFrozen);
+assert.equal(api.bestOpportunity(api.rowsOf(comboCases[0])),priced);
 const unchanged=JSON.stringify(near);
 assert(api.comboText([near]).includes('mx-combo-near'));
 assert(api.comboText([near]).includes('Combo vicina · non attiva'));

@@ -59,6 +59,20 @@ segnali è OCI decrescente, calo quota più marcato e
 ID stabile; non modifica l'ordine delle giocate ufficiali. Gli equivalenti
 asiatici della stessa linea non raddoppiano i mercati in monitoraggio.
 
+## Filtro Combo
+
+Il pulsante «Combo», con contatore, mostra tutte le partite con
+«Over 0,5 PT + Over 0,5 ST» attiva secondo la decisione v6.1 già pubblicata.
+Include le Combo verdi anche senza Radar Blu o senza una quota reale del
+bookmaker. Esclude Combo gialle, rosse, assenti o di una policy precedente.
+
+Il filtro non cambia attivazione, colori, decisioni Gold o graduatorie. Le
+partite già iniziate mantengono la valutazione prematch salvata; il selettore
+«Stato» permette di distinguere quelle da iniziare, in corso e terminate.
+Selezionando «Combo» si azzerano i filtri famiglia/periodo per evitare che una
+precedente scelta, come «Asiatici / Primo tempo», nasconda le Combo PT+ST.
+Ricerca e stato rimangono selezionati. Griglia e CSS restano invariati.
+
 ## Risultato del primo tempo
 
 Nell'intestazione della scheda compare il punteggio PT ricevuto dal feed live:

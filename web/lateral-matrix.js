@@ -26,7 +26,7 @@
  const pct=v=>typeof v==='number'&&Number.isFinite(v)?num(v)+'%':'—';
  const signed=v=>typeof v==='number'&&Number.isFinite(v)?(v>0?'+':'')+num(v):'—';
  const FAMILIES={all:'Mercati utili', '1x2':'1X2',totals:'Over / Under',btts:'Goal / No Goal',asian:'Riferimenti asiatici'};
- const CATEGORIES={all:'Tutte le analisi',market_signal:'Radar di Mercato',convergence:'Convergenza',divergence:'Contrarian',lateral:'Riferimenti asiatici',value:'Valore teorico positivo',no_quote:'Quote mancanti o scadute'};
+ const CATEGORIES={all:'Tutte le analisi',market_signal:'Radar di Mercato',combo:'Combo',convergence:'Convergenza',divergence:'Contrarian',lateral:'Riferimenti asiatici',value:'Valore teorico positivo',no_quote:'Quote mancanti o scadute'};
  const STATUS={mature:'CONVERGENZA STATISTICA',contrarian:'DIVERGENZA STATISTICA',lateral:'LATERALE',value_watch:'VALORE IN OSSERVAZIONE',limited_data:'STORICO LIMITATO',no_edge:'PREZZO SENZA VANTAGGIO',no_quote:'SOLO STATISTICA',previous_version:'VERSIONE PRECEDENTE'};
  const QUALITY={supported:'Storico presente',limited:'Storico limitato',prior_dominant:'Una squadra con dati mancanti',prior_only:'Solo valori di riferimento'};
  const REASONS={market:'mercato escluso',probability:'stima bassa',price:'quota fuori range',stale:'quota da aggiornare',history:'storico insufficiente',ht_history:'meno di 4 PT per squadra',adapter:'quota da verificare',margin:'aggio oltre limite',edge:'EV insufficiente',sensitivity:'EV prudente basso',coherence:'stime incoerenti'};
@@ -71,6 +71,7 @@
   return source.filter(r=>{
    if(options.family!=='all'&&r.family!==options.family)return false;
    if(options.period!=='all'&&r.period!==options.period)return false;
+   if(options.category==='combo')return isCombo(r)&&comboActive(r);
    if(options.category==='convergence')return r.market_behavior==='convergence';
    if(options.category==='divergence')return r.market_behavior==='divergence';
    if(options.category==='lateral')return r.family==='asian';
@@ -381,7 +382,7 @@
   h.onclick=e=>{
    const expand=e.target.closest?.('[data-mx-open]'),category=e.target.closest?.('[data-mx-category]');
    if(expand){openModal(expand.dataset.mxOpen);}
-   else if(category){state.category=category.dataset.mxCategory;render(payload,host,helpers);}
+   else if(category){state.category=category.dataset.mxCategory;if(state.category==='combo'){state.family='all';state.period='all';}render(payload,host,helpers);}
    else if(e.target.closest?.('[data-mx-reset]')){Object.assign(state,{category:'all',family:'all',period:'all',phase:'all',sort:'time',search:''});render(payload,host,helpers);}
   };
   h.onchange=e=>{const key=e.target.dataset?.mxFilter;if(key&&key in state){state[key]=e.target.value;render(payload,host,helpers);}};
