@@ -102,8 +102,9 @@ reference['oci']=20
 caps[0]['matrix']['rows'].extend([reference,combo])
 annotate(caps[0]['matrix'],NOW,caps[0])
 monitor=[]
-watch=row(id='watch-ft',label='Over 2,5 FT',statistical_pct=45,odd=2.5,first_odd=2.5/.92,
-          ev_pct=12.5,ev_low_pct=4,oci=45,bookmaker='OPERATORE SINTETICO')
+watch=row(id='watch-ft',label='Over 2,5 FT',statistical_pct=43,odd=2.5,first_odd=2.5/.98,
+          ev_pct=7.5,ev_low_pct=4,oci=25,delta_pct=-2,bookmaker='OPERATORE SINTETICO',
+          selected_movement={'delta_pct':-2,'fair_delta_pp':1,'persistence':.5,'reversal':False})
 pt=row(id='watch-ht',spec=S('total','ht','over',1.5),period='ht',label='Over 1,5 PT',
        statistical_pct=37,odd=3,first_odd=3/.92,ev_pct=11,ev_low_pct=4,oci=45,bookmaker='OPERATORE SINTETICO')
 for rows in [[watch],[pt],[dict(watch,statistical_pct=44.9)],
@@ -231,11 +232,25 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   assert.equal(await page.locator('.mx-card').count(),9);
   await page.locator('[data-mx-category="all"]').click();
   await page.evaluate(()=>{currentPayload.matches[0].fixture.kickoff=new Date(Date.now()-3600000).toISOString();currentPayload.matches[0].fixture.status_short='HT';currentPayload.matches[0].fixture.live={status:'HT',elapsed:45,goals:{home:1,away:1},halftime:{home:1,away:1},observed_at:new Date().toISOString()};renderMatchResearch(currentPayload)});
+  assert.equal(await page.locator('[data-live-fixture="1"] [data-live-slot="halftime"]').textContent(),'PT 1–1 · concluso');
   const frozen=await page.evaluate(()=>{window.savedMatrixCard=document.querySelector('.mx-card');return JSON.stringify(currentPayload)});
   await page.evaluate(()=>{ArabLive.accept({schema_version:1,enabled:true,fixtures:{'1':{fixture_id:'1',status:'2H',elapsed:62,goals:{home:2,away:1},halftime:{home:1,away:1},observed_at:new Date(Date.now()+1000).toISOString()}}});window.dispatchEvent(new Event('arabsniper-live-update'))});
   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozen);
   assert(await page.evaluate(()=>savedMatrixCard===document.querySelector('.mx-card')));
   assert((await page.locator('.mx-card').first().textContent()).includes('2–1'));
+  assert.equal(await page.locator('[data-live-fixture="1"] [data-live-slot="halftime"]').textContent(),'PT 1–1 · concluso','The second-half score never replaces PT');
+  for(const [status,goals,halftime,offset,expected] of [
+   ['1H',{home:1,away:0},{home:0,away:0},2000,'PT 1–0 · in corso'],
+   ['HT',{home:0,away:0},{home:0,away:0},3000,'PT 0–0 · concluso'],
+   ['2H',{home:2,away:0},null,4000,'PT 0–0 · concluso']
+  ]){
+   await page.evaluate(({status,goals,halftime,offset})=>{ArabLive.accept({schema_version:1,enabled:true,fixtures:{'2':{fixture_id:'2',status,elapsed:status==='1H'?25:status==='HT'?45:60,goals,halftime,observed_at:new Date(Date.now()+offset).toISOString()}}});window.dispatchEvent(new Event('arabsniper-live-update'))},{status,goals,halftime,offset});
+   assert.equal(await page.locator('[data-live-fixture="2"] [data-live-slot="halftime"]').textContent(),expected);
+   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozen);
+   assert(await page.evaluate(()=>savedMatrixCard===document.querySelector('.mx-card')));
+  }
+  await page.locator('[data-live-fixture="2"] header').scrollIntoViewIfNeeded();
+  await page.screenshot({path:'test-artifacts/matrix-halftime-live-small-mobile.png'});
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Live overflow');
   const timed={...payload,matches:contexts.map((a,i)=>({...payload.matches[i],multimarket:a}))};
   await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},timed);
@@ -275,9 +290,9 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   const monitorBefore=await page.evaluate(()=>JSON.stringify(currentPayload));
   for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
    await page.setViewportSize({width,height:844});
-   assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),2);
+   assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),4);
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),1);
-   assert.equal(await page.locator('.mx-best-empty').count(),6);
+   assert.equal(await page.locator('.mx-best-empty').count(),4);
    const blue=page.locator('.mx-best-market').first();
    assert((await blue.textContent()).includes('Segnale di mercato forte (Statistica insufficiente / Mercato concorde)'));
    assert((await blue.textContent()).includes('Solo studio · esclusa dalle giocate Gold ufficiali.'));
@@ -288,9 +303,9 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await blue.scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-market-signal-${name}.png`});
    await page.locator('[data-mx-category="market_signal"]').click();
-   assert.equal(await page.locator('.mx-card').count(),2);
+   assert.equal(await page.locator('.mx-card').count(),4);
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),0);
-   assert.equal(await page.locator('[data-mx-category="market_signal"] b').textContent(),'2');
+   assert.equal(await page.locator('[data-mx-category="market_signal"] b').textContent(),'4');
    await page.locator('[data-mx-filter="period"]').selectOption('ht');
    assert.equal(await page.locator('.mx-card').count(),1);
    assert((await page.locator('.mx-best h4').textContent()).includes('Over 1,5 PT'));
@@ -308,14 +323,14 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),monitorBefore,'Monitoring leaves backend decisions and ranks unchanged');
   }
   await page.evaluate(()=>{ArabLive.accept({schema_version:1,enabled:true,fixtures:{'101':{fixture_id:'101',status:'1H',elapsed:1,goals:{home:0,away:0},observed_at:new Date(Date.now()+1000).toISOString()}}});renderMatchResearch(currentPayload)});
-  assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),1,'A live overlay closes monitoring even before the scheduled kickoff');
+  assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),3,'A live overlay closes monitoring even before the scheduled kickoff');
   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),monitorBefore,'The live lifecycle never rewrites prematch decisions');
   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),1);
   await page.locator('[data-mx-open]').first().click();
   assert.equal(await page.locator('dialog .mx-market-signal').count(),0,'The matrix also respects the live lifecycle');
   await page.locator('[data-mx-close]').click();
   await page.locator('[data-mx-category="market_signal"]').click();
-  assert.equal(await page.locator('.mx-card').count(),1);
+  assert.equal(await page.locator('.mx-card').count(),3);
   console.log('PASS blue market signals: backend-generated decisions, separate category/counts, official Gold unchanged, blue desktop/mobile cards and matrix, no live reclassification');
   console.log('PASS Gold v6.1 browser: concise cards, green/yellow/red combos, versions, quote coverage, unchanged desktop/390/360 grid, modal and immutable live overlays');
  }finally{await browser.close()}

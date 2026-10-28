@@ -1,0 +1,38 @@
+name: Encrypted published Gold check
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Giorno da verificare (vuoto = oggi, Europe/Rome)'
+        required: false
+  push:
+    branches: [main]
+    paths:
+      - 'auditor/published_gold_export.py'
+      - '.github/workflows/published-gold-check.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3 cryptography
+      - name: Read the authenticated Gold feeds without recalculating them
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          PUBLICATION_DATE: ${{ inputs.date }}
+        run: python auditor/published_gold_export.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: encrypted-published-gold
+          path: encrypted-review/published-gold.enc.json
+          retention-days: 1
+          if-no-files-found: error

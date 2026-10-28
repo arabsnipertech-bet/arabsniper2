@@ -2,6 +2,8 @@
 (function(root){
   const ACTIVE=new Set(['1H','HT','2H','ET','BT','P','LIVE']);
   const FINAL=new Set(['FT','AET','PEN']);
+  const HALF_COMPLETE=new Set(['HT','2H','ET','BT','P','FT','AET','PEN']);
+  const validScore=s=>s&&Number.isInteger(s.home)&&Number.isInteger(s.away)&&s.home>=0&&s.away>=0;
   let scores={},enabled=false,polling=false;
   function fixture(match) {
     const f=match.fixture||{},candidate=scores[String(f.fixture_id)];
@@ -26,9 +28,25 @@
     const next={};
     for(const [id,row] of Object.entries(data.fixtures)) {
       if(!/^\d+$/.test(id)||String(row.fixture_id)!==id||typeof row.status!=='string'||!Number.isFinite(Date.parse(row.observed_at)))continue;
-      next[id]=row;
+      const previous=scores[id];
+      // Keep an already confirmed half-time score when a later poll omits it.
+      // Never carry forward a provisional 1H score or replace a newer correction.
+      const preserve=HALF_COMPLETE.has(row.status)&&!validScore(row.halftime)&&
+        HALF_COMPLETE.has(previous?.status)&&validScore(previous?.halftime)&&
+        Date.parse(row.observed_at)>Date.parse(previous.observed_at);
+      next[id]=preserve?{...row,halftime:{...previous.halftime},halftime_observed_at:previous.halftime_observed_at||previous.observed_at}:row;
     }
     scores=next;
+  }
+  function firstHalf(match,now=Date.now()) {
+    const f=fixture(match),l=f.live||{},status=l.status||f.status_short||f.result?.status;
+    if(status==='1H')return {status:'in_progress',score:validScore(l.goals)?`${l.goals.home}–${l.goals.away}`:null,stale:view(match,now).stale};
+    if(!HALF_COMPLETE.has(status))return {status:'pending',score:null};
+    const saved=match.fixture||{},r=f.result||{};
+    const candidates=[l.halftime,{home:r.home_ht,away:r.away_ht}];
+    if(HALF_COMPLETE.has(saved.live?.status))candidates.push(saved.live.halftime);
+    const half=candidates.find(validScore);
+    return {status:'complete',score:half?`${half.home}–${half.away}`:null};
   }
   async function poll() {
     if(polling||root.document?.hidden)return;
@@ -40,7 +58,7 @@
     } catch(_) { /* Retain last observation; view() marks it stale after 5 min. */ }
     finally {polling=false;root.dispatchEvent(new Event('arabsniper-live-update'));}
   }
-  root.ArabLive={fixture,view,accept,poll};
+  root.ArabLive={fixture,view,firstHalf,accept,poll};
   if(root.document){
     root.setInterval(poll,120000);
     root.document.addEventListener('visibilitychange',()=>{if(!root.document.hidden)poll();});
@@ -48,3 +66,4 @@
     root.addEventListener('focus',poll);
   }
 })(typeof window==='undefined'?globalThis:window);
+

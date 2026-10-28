@@ -65,3 +65,32 @@ test('overlay keeps prematch immutable, uses newer score and marks stale states'
  assert.equal(JSON.stringify(match),before);
  scope.ArabLive.accept({schema_version:1,enabled:false,fixtures:{}});assert.equal(scope.ArabLive.fixture(match),match.fixture);
 });
+
+test('half-time distinguishes provisional scores, confirmed zeroes and absent data',()=>{
+ const scope={console,Date,Number,Set,Object,AbortSignal};vm.createContext(scope);
+ vm.runInContext(fs.readFileSync('web/live-scores.js','utf8'),scope);
+ const match={fixture:{fixture_id:'123',kickoff:new Date(now-3600000).toISOString(),status_short:'NS'}};
+ const before=JSON.stringify(match);
+ const send=(status,goals,halftime,offset=0)=>scope.ArabLive.accept({schema_version:1,enabled:true,fixtures:{'123':{fixture_id:'123',status,goals,halftime,observed_at:new Date(now+offset).toISOString()}}});
+ assert.equal(scope.ArabLive.firstHalf(match,now).status,'pending');
+ send('1H',{home:1,away:0},{home:0,away:0});
+ assert.equal(scope.ArabLive.firstHalf(match,now).status,'in_progress');
+ assert.equal(scope.ArabLive.firstHalf(match,now).score,'1–0','Ignore the provider halftime placeholder during 1H');
+ assert(scope.ArabLive.firstHalf(match,now+301000).stale);
+ send('2H',{home:2,away:0},null,1000);
+ assert.equal(scope.ArabLive.firstHalf(match,now+1000).score,null,'Never infer the halftime score from 2H goals');
+ send('HT',{home:0,away:0},{home:0,away:0},2000);
+ assert.equal(scope.ArabLive.firstHalf(match,now+2000).score,'0–0');
+ assert.equal(scope.ArabLive.firstHalf(match,now+2000).status,'complete');
+ send('2H',{home:2,away:0},{home:null,away:null},3000);
+ assert.equal(scope.ArabLive.firstHalf(match,now+3000).score,'0–0','Preserve confirmed halftime when a poll omits it');
+ send('FT',{home:3,away:1},{home:1,away:0},4000);
+ assert.equal(scope.ArabLive.firstHalf(match,now+4000).score,'1–0','A provider correction supersedes the earlier result');
+ assert.equal(JSON.stringify(match),before);
+ scope.ArabLive.accept({schema_version:1,enabled:false,fixtures:{}});
+ for(const half of [{home:null,away:0},{home:'0',away:0},{home:-1,away:0},{home:.5,away:0}]){
+  assert.equal(scope.ArabLive.firstHalf({fixture:{status_short:'FT',live:{halftime:half}}},now).score,null);
+ }
+ assert.equal(scope.ArabLive.firstHalf({fixture:{status_short:'FT',result:{home_ht:0,away_ht:1}}},now).score,'0–1');
+});
+

@@ -13,7 +13,7 @@
  const dedicatedPolicy=id=>[POLICY,'gold-goals-v6','gold-goals-v5'].includes(id);
  const ODDS_MAX={over15_ht:3.5,over25_ht:7.5,over25_ft:2.6,gg_ht:5.5,over35_ft:4.5};
  // Display-only monitoring. These limits never enter the Gold scoring policy.
- const MARKET_SIGNAL=Object.freeze({max_probability_gap_pp:3,min_oci:30,max_delta_pct:-3,max_margin_pct:8});
+ const MARKET_SIGNAL=Object.freeze({max_probability_gap_pp:5,min_oci:25,max_delta_pct:-2,max_margin_pct:9});
  const MARKET_SIGNAL_TEXT='Segnale di mercato forte (Statistica insufficiente / Mercato concorde)';
  const LEGACY_MAX={over15_ht:3.5,over25_ft:3.5,gg_ht:5.5,over35_ft:5.5};
  const priced=r=>['recent','cached_stable'].includes(r?.quote_status);
@@ -189,18 +189,25 @@
   const signals=rows.filter(r=>{
    const d=r.opportunity,m=goalMarket(r),move=r.selected_movement;
    if(!m||d?.policy_id!==POLICY||d.eligible!==false||d.strict_eligible!==false||d.rank!=null||d.signal!=='excluded'||
-      !Array.isArray(d.reasons)||d.reasons.length!==1||d.reasons[0]!=='probability')return false;
+      !Array.isArray(d.reasons)||!d.reasons.includes('probability')||
+      d.reasons.some(code=>code!=='probability'&&!(code==='margin'&&r.selected_margin_pct>8&&r.selected_margin_pct<=MARKET_SIGNAL.max_margin_pct)))return false;
    const floor=Math.max(MIN_P[m],d.min_probability_pct),gap=floor-r.statistical_pct;
    if(!Number.isFinite(d.min_probability_pct)||!Number.isFinite(floor)||!Number.isFinite(r.statistical_pct)||gap<=0||gap>MARKET_SIGNAL.max_probability_gap_pp+1e-9)return false;
-   // Only the probability gate may fail: keep price, EV, history, structural,
-   // divergence, margin and cached-quote expiry checks as strict as Gold.
-   if(d.structural_supported!==true||d.market_checks_passed!==true||!v61Valid(r,now,false)||!priced(r)||r.quality!=='supported'||
+   // Study-only margin extension. Never pass relaxed parameters to Gold checks
+   // or rewrite the backend decision. Keep the high-margin prudential surcharge.
+   const lowFloor=({over15_ht:2,over25_ht:0,over25_ft:2,over35_ft:1,gg_ht:-1})[m]+(r.selected_margin_pct>=6.5?1.5:0);
+   if(d.structural_supported!==true||(d.market_checks_passed!==true&&!d.reasons.includes('margin'))||
+      d.stability?.status==='retained'||!priced(r)||r.quality!=='supported'||
       !Number.isFinite(r.odd)||r.odd<minOdd(r)||r.odd>maxOdd(r)||
-      !Number.isFinite(r.ev_pct)||!Number.isFinite(d.min_ev_pct)||r.ev_pct<d.min_ev_pct||
-      !Number.isFinite(r.ev_low_pct)||!Number.isFinite(d.min_ev_low_pct)||r.ev_low_pct<d.min_ev_low_pct||
+      !Number.isFinite(r.ev_pct)||!Number.isFinite(d.min_ev_pct)||r.ev_pct<Math.max(d.min_ev_pct,m==='gg_ht'?6:0)||
+      !Number.isFinite(r.ev_low_pct)||!Number.isFinite(d.min_ev_low_pct)||r.ev_low_pct<Math.max(d.min_ev_low_pct,lowFloor)||
       (r.spec.period==='ht'&&d.ht_history_supported!==true))return false;
+   if(r.quote_status==='cached_stable'){
+    const at=Date.parse(r.cache_source_at),end=Date.parse(r.cache_expires_at);
+    if(!Number.isFinite(at)||!Number.isFinite(end)||end-at!==12*3600000||now<at||now>end)return false;
+   }
    if(!Number.isFinite(r.oci)||r.oci<MARKET_SIGNAL.min_oci||r.oci>100||
-      !Number.isFinite(r.selected_margin_pct)||r.selected_margin_pct>MARKET_SIGNAL.max_margin_pct||
+      !Number.isFinite(r.selected_margin_pct)||r.selected_margin_pct<0||r.selected_margin_pct>MARKET_SIGNAL.max_margin_pct||
       !Number.isFinite(r.first_odd)||r.first_odd<=1||!r.bookmaker||
       !Number.isFinite(r.delta_pct)||r.delta_pct>MARKET_SIGNAL.max_delta_pct+1e-9||
       Math.abs(r.delta_pct-100*(r.odd/r.first_odd-1))>.01)return false;
@@ -356,12 +363,17 @@
   const f=m.fixture||{},a=m.multimarket||{},all=rowsOf(m),fid=String(f.fixture_id);
   const counts={convergence:all.filter(r=>r.market_behavior==='convergence').length,divergence:all.filter(r=>r.market_behavior==='divergence').length,value:all.filter(r=>r.ev_pct>0).length};
   const noSnapshot=a.status==='no_prematch_snapshot';
-  return '<article class="mx-card" data-live-fixture="'+esc(fid)+'"><header><div><time>'+esc(f.time||'')+'</time><small>'+esc(f.country)+' · '+esc(f.league)+'</small><h3>'+esc(f.match)+'</h3></div><div class="mx-live"><span data-live-slot="badge">'+(helpers.liveBadge?.(m)||'')+'</span><span data-live-slot="state">'+esc(helpers.stateLabel?.(m)||'')+'</span></div></header>'+
+  return '<article class="mx-card" data-live-fixture="'+esc(fid)+'"><header><div><time>'+esc(f.time||'')+'</time><small>'+esc(f.country)+' · '+esc(f.league)+'</small><h3>'+esc(f.match)+'</h3></div><div class="mx-live"><span data-live-slot="badge">'+(helpers.liveBadge?.(m)||'')+'</span><span data-live-slot="state">'+esc(helpers.stateLabel?.(m)||'')+'</span><span data-live-slot="halftime">'+halfTimeText(helpers.firstHalf?.(m))+'</span></div></header>'+
    (noSnapshot?'<p class="mx-explanation">Partita presente nel palinsesto. Nessuna previsione salvata prima dell’inizio: gli esiti non vengono usati per ricostruirla a posteriori.</p>':'<div class="mx-match-layout">'+quoteBoard(all,helpers)+opportunityPanel(all,a.matrix?.goal_context,{archived:phase(m)!=='upcoming',monitoringClosed:(helpers.phase||phase)(m)!=='upcoming',lastProposal:a.matrix?.last_proposal})+'</div>')+
    '<div class="mx-match-summary"><span>'+all.length+' mercati</span><span>'+counts.convergence+' convergenze</span><span>'+counts.divergence+' divergenze</span><span>'+all.filter(r=>priced(r)).length+' quote utilizzabili · '+all.filter(r=>r.quote_status==='cached_stable').length+' da cache</span></div>'+
    (all.length?'<button class="mx-open" type="button" data-mx-open="'+esc(fid)+'" aria-haspopup="dialog">Apri matrice · mercati utili <span>↗</span></button>':'')+'<footer>Analisi '+esc(helpers.timestamp?.(a.captured_at)||a.captured_at||'non disponibile')+' · Regole '+esc(a.matrix?.opportunity_policy?.id||'non disponibili')+' · Modello statistico '+esc(a.model_id||'non disponibile')+(f.data_freshness&&f.data_freshness!=='fresh'?' · '+esc(f.data_freshness):'')+'</footer></article>';
  }
  let payload,host,helpers;
+ function halfTimeText(half){
+  if(!half||half.status==='pending')return '';
+  if(!half.score)return 'PT · dato non disponibile';
+  return '<b>PT '+esc(half.score)+'</b> · '+(half.status==='complete'?'concluso':half.stale?'ultimo rilevato':'in corso');
+ }
  function render(p,h,services={}){
   p=scopePayload(p);payload=p;host=h;helpers=services;
   const all=p.matches||[],rows=all.flatMap(rowsOf),matches=selectMatches(p,state,Date.now(),services.phase||phase);
@@ -386,7 +398,7 @@
   h.onchange=e=>{const key=e.target.dataset?.mxFilter;if(key&&key in state){state[key]=e.target.value;render(payload,host,helpers);}};
   updateModal();
  }
- const api={MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
+ const api={halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.ArabMatrix=api;
 })(typeof window!=='undefined'?window:globalThis);
