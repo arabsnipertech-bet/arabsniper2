@@ -148,3 +148,72 @@ assert(!api.quoteBoard([priced],{}).includes('Prima quota osservata dello stesso
 assert(!api.quoteBoard([priced],{}).includes('mx-quote-legend'));
 console.log('PASS Gold cleanup: concise cards, green/yellow/red combo boundaries, unchanged eligibility');
 
+// Blue monitoring is disjoint from official Gold, with strict boundary checks.
+const signal={...priced,id:'monitor-ft',label:'Over 2,5 FT',statistical_pct:45,odd:2.5,first_odd:2.5/.97,
+ fair_odd:100/45,delta_pct:-3,oci:30,selected_margin_pct:8,bookmaker:'OPERATORE SINTETICO',
+ ev_pct:12.5,ev_low_pct:4,paired_books:3,agreeing_books:2,movement_confirmed:true,fair_direction_coherent:true,
+ selected_movement:{delta_pct:-3,fair_delta_pp:1,persistence:.5,reversal:false},
+ opportunity:{...decision,eligible:false,strict_eligible:false,rank:null,signal:'excluded',min_ev_low_pct:3.5,reasons:['probability']}};
+const signalOptions={now:Date.parse('2026-10-28T10:00:00Z')};
+const signalSnapshot=JSON.stringify(signal);
+assert.deepEqual(api.marketSignals([signal],signalOptions),[signal]);
+assert.equal(api.bestOpportunity([signal],signalOptions),null);
+assert.deepEqual(api.marketSignals([signal,priced],signalOptions),[],'A Gold proposal takes precedence over blue monitoring');
+assert.deepEqual(api.marketSignals([signal],{...signalOptions,archived:true}),[],'Never reclassify started/archived forecasts');
+assert.deepEqual(api.marketSignals([signal],{...signalOptions,monitoringClosed:true}),[],'A live overlay can close monitoring without changing Gold');
+const bluePanel=api.opportunityPanel([signal],null,signalOptions);
+assert(bluePanel.includes('mx-best-market'));
+assert(bluePanel.includes('Segnale di mercato forte (Statistica insufficiente / Mercato concorde)'));
+assert(bluePanel.includes('Solo studio · esclusa dalle giocate Gold ufficiali.'));
+assert(bluePanel.includes('0 proposte Gold'));
+assert(!bluePanel.includes('data-opportunity-id'));
+assert(!bluePanel.includes('Nessuna proposta supera i criteri'));
+assert(!api.opportunityPanel([signal,priced],null,signalOptions).includes('data-market-signal-id'));
+assert(api.marketRow(signal,{}, {marketSignal:true}).includes('Scartato · stima bassa'));
+assert(api.marketRow(signal,{}, {marketSignal:true}).includes('Segnale di mercato · Solo studio'));
+assert.equal(JSON.stringify(signal),signalSnapshot,'Display and classification cannot mutate the stored decision');
+const excludedPatches=[
+ {statistical_pct:44.999},{statistical_pct:48},{statistical_pct:null},{oci:29.999},{oci:-48},{oci:null},{oci:101},
+ {delta_pct:-2.999},{delta_pct:3},{delta_pct:null},{first_odd:null},{first_odd:3},{bookmaker:''},
+ {selected_margin_pct:8.001},{selected_margin_pct:-.1},{selected_margin_pct:null},
+ {odd:1.84},{odd:2.61},{ev_low_pct:3.499},{ev_pct:-.01},{ev_pct:null},{ev_low_pct:null},
+ {quote_status:'stale'},{quote_status:'missing'},{quality:'limited'},
+ {paired_books:1,agreeing_books:1},{paired_books:4,agreeing_books:2},{agreeing_books:4},
+ {movement_confirmed:false},{fair_direction_coherent:false},{selected_movement:null},
+ ...[{delta_pct:-2.999},{fair_delta_pp:0},{persistence:.499},{persistence:null},{reversal:true}].map(move=>({selected_movement:{...signal.selected_movement,...move}})),
+ ...[{policy_id:'gold-goals-v6'},{eligible:true},{strict_eligible:true},{rank:1},{structural_supported:false},
+  {market_checks_passed:false},{min_probability_pct:null},{min_ev_pct:null},{min_ev_low_pct:null},
+  {reasons:[]},{reasons:['probability','isolated_peak']},{reasons:['probability','ht_history']},
+  {reasons:['probability','coherence']},{reasons:['probability','sensitivity']}].map(d=>({opportunity:{...signal.opportunity,...d}}))
+];
+for(const patch of excludedPatches)assert.equal(api.marketSignals([{...signal,...patch}],signalOptions).length,0,JSON.stringify(patch));
+const cachedSignal={...signal,quote_status:'cached_stable',cache_source_at:'2026-10-28T00:00:00Z',cache_expires_at:'2026-10-28T12:00:00Z'};
+assert.equal(api.marketSignals([cachedSignal],signalOptions).length,1);
+assert.equal(api.marketSignals([cachedSignal],{now:Date.parse('2026-10-28T12:00:00.001Z')}).length,0);
+assert.equal(api.marketSignals([cachedSignal],{now:Date.parse('2026-10-27T23:59:59Z')}).length,0);
+assert.equal(api.marketSignals([{...cachedSignal,cache_expires_at:null}],signalOptions).length,0);
+for(const [kind,period,line,p,odd,minEV,minLow] of [
+ ['total','ht',1.5,37,3,0,3.5],['total','ht',2.5,15,7,0,1.5],
+ ['total','ft',3.5,32,3.5,0,2.5],['btts','ht',null,23,5,6,.5]
+]){
+ const s={...signal,period,spec:{kind,period,line,side:kind==='btts'?'yes':'over'},statistical_pct:p,odd,first_odd:odd/.97,
+  opportunity:{...signal.opportunity,min_probability_pct:p+3,min_ev_pct:minEV,min_ev_low_pct:minLow,ht_history_supported:true}};
+ assert.equal(api.marketSignals([s],signalOptions).length,1,JSON.stringify(s.spec));
+ assert.equal(api.bestOpportunity([s],signalOptions),null);
+ if(period==='ht')assert.equal(api.marketSignals([{...s,opportunity:{...s.opportunity,ht_history_supported:false}}],signalOptions).length,0);
+}
+const equivalent={...signal,id:'monitor-asian',family:'asian',spec:{...signal.spec,kind:'asian_total'}};
+assert.equal(api.marketSignals([signal,equivalent],signalOptions).length,1,'Equivalent half-lines do not double count');
+assert.deepEqual(api.marketSignals([equivalent,signal],signalOptions),api.marketSignals([signal,equivalent],signalOptions),'Stable order independent of feed order');
+const futureSignal={...matches[0],fixture:{...matches[0].fixture,kickoff:'2026-10-28T20:00:00Z',status_short:'NS'},multimarket:{matrix:{rows:[signal]}}};
+const signalFilter={...opts,category:'market_signal'};
+assert.equal(api.selectMatches({matches:[futureSignal]},signalFilter,signalOptions.now).length,1);
+assert.equal(api.selectMatches({matches:[futureSignal]},signalFilter,signalOptions.now,()=> 'live').length,0,'Use the displayed live lifecycle even before the scheduled kickoff');
+assert.equal(api.selectMatches({matches:[futureSignal]},signalFilter,Date.parse('2026-10-28T20:00:00Z')).length,0);
+assert.equal(api.selectMatches({matches:[{...futureSignal,gold_scope:{policy_id:api.SCOPE,allowed:false}}]},signalFilter,signalOptions.now).length,0);
+assert.equal(api.matchingRows(futureSignal,{...signalFilter,period:'ht'},signalOptions.now).length,0);
+assert.equal(api.matchingRows({...futureSignal,multimarket:{matrix:{rows:[signal,priced]}}},signalFilter,signalOptions.now).length,0);
+const escapedBlue=api.opportunityPanel([{...signal,label:'<img src=x onerror=alert(1)>',bookmaker:'<script>x</script>'}],null,signalOptions);
+assert(escapedBlue.includes('&lt;img'));assert(!escapedBlue.includes('<img'));assert(!escapedBlue.includes('<script>'));
+console.log('PASS blue market signals: probability-only misses, confirmed same-book flow, cache TTL, strict Gold gates, filters and immutable decisions');
+
