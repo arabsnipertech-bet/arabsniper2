@@ -113,6 +113,8 @@ assert(api.extraGoalText([over25ht,combo]).includes('Over 2,5 PT: stima'));
 assert(api.extraGoalText([over25ht,combo]).includes('quota bookmaker 5,00'));
 assert(api.quoteCell({...stale,last_odd:2.4},'Over 2,5 FT').includes('Ultima quota 2,40 · non valida per la proposta'));
 assert(api.quoteCell({quote_status:'missing'},'GG PT').includes('Quota del mercato non ricevuta'));
+assert(!api.quoteCell({quote_status:'missing'},'GG PT').includes('Ultima quota · da confermare'));
+assert(api.extraGoalText([{...over25ht,quote_status:'missing',odd:null}]).includes('Valutazione sospesa in assenza di una quota utilizzabile'));
 assert(api.timingContext({pt_priority_active:true,preferred_pt_market:'over15_ht'}).includes('soltanto fra quelli idonei'));
 assert(api.timingContext({pt_priority_active:false}).includes('Confronto dei cinque mercati gol'));
 assert(releaseHtml.includes('<title>ArabSniper · Gold v6.1</title>'));
