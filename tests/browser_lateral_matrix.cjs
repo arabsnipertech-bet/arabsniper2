@@ -214,6 +214,23 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await page.locator('dialog.mx-modal').waitFor({state:'detached',timeout:5000});
    assert.equal(await page.locator('dialog.mx-modal').count(),0,'Backdrop closes modal');
    assert(await page.evaluate(()=>document.body.style.overflow!=='hidden'),'Body scrolling restored');
+   const beforeComboFilter=await page.evaluate(()=>JSON.stringify(currentPayload));
+   await page.locator('[data-mx-filter="family"]').selectOption('asian');
+   await page.locator('[data-mx-filter="period"]').selectOption('ht');
+   await page.getByRole('button',{name:'Combo 5',exact:true}).click();
+   assert.equal(await page.locator('[data-mx-category="combo"]').getAttribute('aria-pressed'),'true');
+   assert.equal(await page.locator('[data-mx-filter="family"]').inputValue(),'all');
+   assert.equal(await page.locator('[data-mx-filter="period"]').inputValue(),'all');
+   assert.equal(await page.locator('.mx-card').count(),5);
+   assert.equal(await page.locator('.mx-best .mx-combo-active').count(),5);
+   assert.equal(await page.locator('.mx-best .mx-combo-near,.mx-best .mx-combo-inactive').count(),0);
+   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5,'Combo filtering cannot replace official proposals');
+   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),beforeComboFilter);
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Combo filter overflow '+name);
+   await page.locator('[data-mx-category="combo"]').scrollIntoViewIfNeeded();
+   await page.screenshot({path:`test-artifacts/matrix-combo-filter-${name}.png`});
+   await page.locator('[data-mx-category="all"]').click();
+   assert.equal(await page.locator('.mx-card').count(),9);
   }
   await page.locator('[data-mx-category="divergence"]').click();
   assert.equal(await page.locator('.mx-card').count(),4);
