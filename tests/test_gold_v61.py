@@ -4,6 +4,10 @@ from math import exp
 import json
 import subprocess
 import unittest
+from datetime import datetime, timedelta
+from pathlib import Path
+import tempfile
+from unittest.mock import patch
 from goal_evidence import evidence
 from gold_competitions import fixture_profile
 from lateral_matrix import ScoreModel, build_matrix, specification as S, settle_spec
@@ -141,6 +145,56 @@ class GoldV61(unittest.TestCase):
         output=json.loads(subprocess.check_output(['node','-e',script],input=json.dumps([r,combo]).encode()))
         self.assertIn('★ Combo Consigliata',output['panel']);self.assertIn('Combo Attiva',output['row'])
         self.assertEqual(output['targets'],2)
+
+    def test_release_migrates_all_five_saved_days_without_rewriting_started_forecasts(self):
+        from audit_storage import write_store, read_store
+        from refresh_opportunities import main
+        from opportunity_policy import POLICY_ID
+        a=build_matrix(statistical_analysis(match(),NOW),NOW)
+        annotate(a['matrix'],NOW,a)
+        a['matrix']['rows']=[r for r in a['matrix']['rows'] if r['spec']['kind']!='halves_total'
+            and not (r['spec']['period']=='ht' and r['spec'].get('line')==2.5)]
+        a['matrix']['opportunity_policy']['id']='gold-goals-v6'
+        for r in a['matrix']['rows']:r['opportunity']['policy_id']='gold-goals-v6'
+        probabilities={r['id']:r['statistical_pct'] for r in a['matrix']['rows']}
+        frozen=deepcopy(a)
+        start=datetime.fromisoformat(NOW.replace('Z','+00:00'))
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            write_store(root/'arab_quote_state.json',{})
+            write_store(root/'arab_quote_dashboard.json',{'days':[]})
+            for i in range(1,6):
+                m=match(str(i));m['multimarket']=deepcopy(a)
+                kickoff=start+timedelta(days=i-1,hours=12)
+                m['fixture']['kickoff']=kickoff.isoformat()
+                started=deepcopy(m);started['fixture'].update(fixture_id='started-'+str(i),kickoff=(start-timedelta(hours=1)).isoformat())
+                write_store(root/f'arab_quote_day{i}.json',{'date':kickoff.date().isoformat(),'matches':[m,started]})
+            with patch('refresh_opportunities.datetime') as clock, patch('socket.socket',side_effect=AssertionError('No provider calls')):
+                clock.now.return_value=start
+                main(root)
+            for i in range(1,6):
+                day=read_store(root/f'arab_quote_day{i}.json')
+                by_id={m['fixture']['fixture_id']:m for m in day['matches']}
+                updated=by_id[str(i)]['multimarket']
+                self.assertEqual(by_id['started-'+str(i)]['multimarket'],frozen)
+                self.assertEqual(updated['matrix']['opportunity_policy']['id'],POLICY_ID)
+                self.assertEqual(updated['captured_at'],a['captured_at'])
+                self.assertEqual(updated['inputs'],a['inputs'])
+                current={r['id']:r['statistical_pct'] for r in updated['matrix']['rows']}
+                self.assertEqual(probabilities,{k:current[k] for k in probabilities})
+                combo=next(r for r in updated['matrix']['rows'] if r['spec']['kind']=='halves_total')
+                self.assertEqual(combo['combo']['policy_id'],POLICY_ID)
+                self.assertTrue(any(r['spec']==S('total','ht','over',2.5) for r in updated['matrix']['rows']))
+                export=read_store(root/f'arab_quote_selections_day{i}.json')
+                self.assertEqual(export['opportunity_policy'],POLICY_ID)
+            dashboard=read_store(root/'arab_quote_dashboard.json')
+            self.assertEqual(len(dashboard['days']),5)
+            self.assertEqual(dashboard['opportunity_refresh']['api_calls'],0)
+
+    def test_fast_scan_refreshes_later_tabs_after_full_collection_too(self):
+        workflow=Path('.github/workflows/fast_scan.yml').read_text()
+        step=next(part for part in workflow.split('      - name: ') if 'run: python src/refresh_opportunities.py\n' in part)
+        self.assertNotIn('        if:',step,'Full Fast scans must also migrate days 3-5')
 
 
 if __name__ == '__main__': unittest.main()

@@ -119,8 +119,23 @@ def main(directory='data'):
                     selection_export(day, as_of))
         refreshed[day['date']] = day
         summary = day.get('matrix_summary') or {}
+        upcoming = [m['multimarket'] for m in day.get('matches', [])
+            if m.get('multimarket', {}).get('model_id') == MODEL_ID
+            and m.get('fixture', {}).get('status_short') in ('NS', 'TBD')
+            and not m['fixture'].get('result') and stamp(m['fixture'].get('kickoff'))
+            and stamp(m['fixture']['kickoff']) > stamp(as_of)]
+        policies = Counter(a.get('matrix', {}).get('opportunity_policy', {}).get('id') for a in upcoming)
+        required = {market_id(s) for s in base_specs()}
+        for a in upcoming:
+            if a.get('matrix', {}).get('opportunity_policy', {}).get('id') != POLICY_ID:
+                raise RuntimeError('Incomplete Gold policy migration; refusing publication')
+            if a.get('rates') and not required.issubset({r['id'] for r in a['matrix']['rows']}):
+                raise RuntimeError('Incomplete Gold market migration; refusing publication')
         counters[path.name] = {'fixtures': count, 'eligible_markets': summary.get('eligible_markets', 0),
             'fixtures_with_proposal': summary.get('upcoming_fixtures_with_proposal', 0),
+            'saved_policy_versions': dict(policies),
+            'fixtures_with_combo': sum(any(r.get('spec', {}).get('kind') == 'halves_total'
+                for r in a.get('matrix', {}).get('rows', [])) for a in upcoming),
             'allowed_fixtures': len(day.get('matches', [])),
             'excluded_fixtures': (day.get('gold_scope') or {}).get('excluded_fixtures', 0)}
         print(f'{path.name}: {counters[path.name]}; policy {POLICY_ID}; API calls: 0', flush=True)
@@ -140,7 +155,7 @@ def main(directory='data'):
         universal_observation=False, all_whitelisted_fixtures=True)
     dashboard['method'].update(
         competition_filter='Prime tre divisioni senior dei paesi in whitelist e coppe autorizzate; Romania inclusa; esclusi giovanili e livelli inferiori.',
-        markers='Proposte su quattro mercati gol; priorità PT da digiuno nel contesto casa/trasferta e flussi verificabili.')
+        markers='Gold v6.1: cinque mercati gol e Combo PT+ST; ordine di valutazione fra mercati idonei.')
     write_store(dashboard_path, dashboard)
     write_store(directory/'arab_quote_state.json', state)
     print('Policy refresh complete: statistics, source timestamps and started forecasts preserved', flush=True)
