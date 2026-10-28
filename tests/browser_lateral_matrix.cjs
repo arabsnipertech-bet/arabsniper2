@@ -111,6 +111,9 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
  for(const m of payload.matches)for(const row of m.multimarket.matrix.rows){
   if(row.spec.kind==='result'&&row.period==='ft')Object.assign(row,{quote_status:'recent',first_odd:2.5,odd:2.2,delta_pct:-12,bookmaker:'OPERATORE SINTETICO',oci:55,paired_books:3,agreeing_books:3,margin_pct:4,margin_delta_pp:-1,margin_band:'low',ev_pct:-1,ev_low_pct:-2});
  }
+ const nearCombo=payload.matches[3].multimarket.matrix.rows.find(r=>r.spec.kind==='halves_total');
+ Object.assign(nearCombo,{statistical_pct:55,fair_odd:100/55});
+ Object.assign(nearCombo.combo,{active:false,reasons:['combo_probability','combo_rates'],lambda_ht:1.12,lambda_sh:1.8,over25_ft_oci:0});
  const browser=await chromium.launch({headless:true});
  try{
   await verifyCachedRelease(browser,payload);
@@ -129,10 +132,17 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
    assert.equal(await page.locator('.mx-1x2 .mx-quote-cell').count(),27);
    assert.equal(await page.locator('.mx-best').count(),9);
    const summaries=await page.locator('.mx-best').allTextContents();
-   assert(summaries.every(t=>t.includes('Over 0,5 PT + Over 0,5 ST')&&t.includes('Quota bookmaker non fornita')));
+   assert(summaries.every(t=>t.includes('Over 0,5 PT + Over 0,5 ST')&&t.includes('Quota book n.d.')));
    assert.equal(summaries.filter(t=>t.includes('★ Combo Consigliata')).length,5);
-   assert.equal(summaries.filter(t=>t.includes('Combo non attiva')&&t.includes('OCI Over 2,5 FT -92,5')).length,4);
-   assert(summaries.every(t=>t.includes('Over 2,5 PT: stima')));
+   assert.equal(summaries.filter(t=>t.includes('Combo non attiva')&&t.includes('OCI -92,5')).length,3);
+   assert.equal(summaries.filter(t=>t.includes('Combo vicina · non attiva')).length,1);
+   assert(summaries.every(t=>t.includes('Over 2,5 PT · Stima')));
+   assert(summaries.every(t=>!t.includes('1,85–2,60')&&!t.includes('Soglie statistiche e controlli')));
+   assert.equal(await page.locator('.mx-quote-legend').count(),0);
+   const tones=await page.locator('.mx-best [class^="mx-combo-"]').evaluateAll(nodes=>nodes.map(n=>({tone:n.className,color:getComputedStyle(n).color,bold:+getComputedStyle(n).fontWeight})));
+   assert.equal(tones.filter(t=>t.tone==='mx-combo-active'&&t.color==='rgb(129, 225, 180)'&&t.bold>=700).length,5);
+   assert.equal(tones.filter(t=>t.tone==='mx-combo-near'&&t.color==='rgb(255, 224, 128)').length,1);
+   assert.equal(tones.filter(t=>t.tone==='mx-combo-inactive'&&t.color==='rgb(255, 157, 144)').length,3);
    assert(!summaries.some(t=>t.includes('Confronto dei quattro mercati')));
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5);
    const proposals=await page.locator('.mx-best[data-opportunity-id]').evaluateAll(nodes=>nodes.map(n=>({odd:+n.dataset.opportunityOdd,max:+n.dataset.opportunityMaxOdd,p:+n.dataset.opportunityProbability,text:n.textContent})));
@@ -145,6 +155,10 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
    await page.screenshot({path:`test-artifacts/matrix-${name}.png`});
    await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-proposal-${name}.png`});
+   await page.locator('.mx-best').nth(3).scrollIntoViewIfNeeded();
+   await page.screenshot({path:`test-artifacts/matrix-combo-near-${name}.png`});
+   await page.locator('.mx-best').nth(1).scrollIntoViewIfNeeded();
+   await page.screenshot({path:`test-artifacts/matrix-combo-inactive-${name}.png`});
    await page.locator('[data-mx-open]').first().click();
    assert(await page.locator('dialog.mx-modal').isVisible(),'Matrix must be a native modal');
    assert.equal(await page.locator('.mx-market-row').count(),6,'Five goal targets and the half-time combo open by default');
@@ -214,7 +228,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
   assert(timing[0].includes('Ordine di valutazione: Over 1,5 PT')&&timing[0].includes('Favorita in casa'));
   assert(timing[1].includes('Ordine di valutazione: Over 1,5 PT')&&timing[1].includes('Favorita in trasferta'));
   assert(timing[2].includes('Ordine di valutazione: Goal PT')&&timing[3].includes('Ordine di valutazione: Goal PT'));
-  assert(timing[0].includes('soltanto fra quelli idonei'));
+  assert(timing[0].includes('Precedenza tra idonei'));
   assert(timing[4].includes('Quote bilanciate')&&timing[4].includes('0,40'));
   assert((await page.locator('.mx-best h4').allTextContents())[2].includes('Goal'));
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Drought priority overflow');
@@ -229,7 +243,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
    assert.equal(await page.locator('.mx-best-empty').count(),2);
    assert((await page.locator('.mx-best').nth(4).textContent()).includes('Quota stabile da cache'));
    assert((await page.locator('.mx-best').first().textContent()).includes('minimo 26'));
-   assert((await page.locator('.mx-best').first().textContent()).includes('Over 1,5 PT: 2,10–3,50'));
+   assert(!(await page.locator('.mx-best').first().textContent()).includes('2,10–3,50'));
    assert.equal(await page.locator('.mx-first-half').count(),2);
    assert((await page.locator('.mx-best').first().textContent()).includes('★ Combo Consigliata'));
    assert((await page.locator('.mx-first-half').first().textContent()).includes('xG PT non disponibili'));
@@ -237,11 +251,11 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
    await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-market-caps-${name}.png`});
    await page.locator('[data-mx-open]').first().click();
-   assert((await page.locator('.mx-market-row').first().textContent()).includes('Ammissibile · quote 3,50–5,50'));
+   assert((await page.locator('.mx-market-row').first().textContent()).includes('Idoneo'));
    assert(await page.evaluate(()=>{const e=document.querySelector('dialog.mx-modal');return e.scrollWidth<=e.clientWidth}),'Market caps modal overflow');
    await page.locator('[data-mx-close]').click();
   }
-  console.log('PASS Gold v6.1 browser: versions, active/inactive combos, quote coverage, five targets, unchanged desktop/390/360 grid, modal and immutable live overlays');
+  console.log('PASS Gold v6.1 browser: concise cards, green/yellow/red combos, versions, quote coverage, unchanged desktop/390/360 grid, modal and immutable live overlays');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
 
