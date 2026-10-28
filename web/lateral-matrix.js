@@ -13,8 +13,8 @@
  const dedicatedPolicy=id=>[POLICY,'gold-goals-v6','gold-goals-v5'].includes(id);
  const ODDS_MAX={over15_ht:3.5,over25_ht:7.5,over25_ft:2.6,gg_ht:5.5,over35_ft:4.5};
  // Display-only monitoring. These limits never enter the Gold scoring policy.
- const MARKET_SIGNAL=Object.freeze({max_probability_gap_pp:5,min_oci:25,max_delta_pct:-2,max_margin_pct:9});
- const MARKET_SIGNAL_TEXT='Segnale di mercato forte (Statistica insufficiente / Mercato concorde)';
+ const MARKET_SIGNAL=Object.freeze({min_oci:30,max_delta_pct:-2,max_margin_pct:9,min_persistence:.5,min_agreeing_books:2});
+ const MARKET_SIGNAL_TEXT='Radar di Mercato · Statistica debole o assente · Solo studio';
  const LEGACY_MAX={over15_ht:3.5,over25_ft:3.5,gg_ht:5.5,over35_ft:5.5};
  const priced=r=>['recent','cached_stable'].includes(r?.quote_status);
  const isCombo=r=>r.spec?.kind==='halves_total'&&r.spec.line===.5&&r.spec.extra===.5;
@@ -26,7 +26,7 @@
  const pct=v=>typeof v==='number'&&Number.isFinite(v)?num(v)+'%':'—';
  const signed=v=>typeof v==='number'&&Number.isFinite(v)?(v>0?'+':'')+num(v):'—';
  const FAMILIES={all:'Mercati utili', '1x2':'1X2',totals:'Over / Under',btts:'Goal / No Goal',asian:'Riferimenti asiatici'};
- const CATEGORIES={all:'Tutte le analisi',market_signal:'Segnali di Mercato',convergence:'Convergenza',divergence:'Contrarian',lateral:'Riferimenti asiatici',value:'Valore teorico positivo',no_quote:'Quote mancanti o scadute'};
+ const CATEGORIES={all:'Tutte le analisi',market_signal:'Radar di Mercato',convergence:'Convergenza',divergence:'Contrarian',lateral:'Riferimenti asiatici',value:'Valore teorico positivo',no_quote:'Quote mancanti o scadute'};
  const STATUS={mature:'CONVERGENZA STATISTICA',contrarian:'DIVERGENZA STATISTICA',lateral:'LATERALE',value_watch:'VALORE IN OSSERVAZIONE',limited_data:'STORICO LIMITATO',no_edge:'PREZZO SENZA VANTAGGIO',no_quote:'SOLO STATISTICA',previous_version:'VERSIONE PRECEDENTE'};
  const QUALITY={supported:'Storico presente',limited:'Storico limitato',prior_dominant:'Una squadra con dati mancanti',prior_only:'Solo valori di riferimento'};
  const REASONS={market:'mercato escluso',probability:'stima bassa',price:'quota fuori range',stale:'quota da aggiornare',history:'storico insufficiente',ht_history:'meno di 4 PT per squadra',adapter:'quota da verificare',margin:'aggio oltre limite',edge:'EV insufficiente',sensitivity:'EV prudente basso',coherence:'stime incoerenti'};
@@ -187,36 +187,25 @@
   // Never replace an official proposal or reinterpret a started fixture.
   if(archived||monitoringClosed||bestOpportunity(rows,{now,archived}))return [];
   const signals=rows.filter(r=>{
-   const d=r.opportunity,m=goalMarket(r),move=r.selected_movement;
-   if(!m||d?.policy_id!==POLICY||d.eligible!==false||d.strict_eligible!==false||d.rank!=null||d.signal!=='excluded'||
-      !Array.isArray(d.reasons)||!d.reasons.includes('probability')||
-      d.reasons.some(code=>code!=='probability'&&!(code==='margin'&&r.selected_margin_pct>8&&r.selected_margin_pct<=MARKET_SIGNAL.max_margin_pct)))return false;
-   const floor=Math.max(MIN_P[m],d.min_probability_pct),gap=floor-r.statistical_pct;
-   if(!Number.isFinite(d.min_probability_pct)||!Number.isFinite(floor)||!Number.isFinite(r.statistical_pct)||gap<=0||gap>MARKET_SIGNAL.max_probability_gap_pp+1e-9)return false;
-   // Study-only margin extension. Never pass relaxed parameters to Gold checks
-   // or rewrite the backend decision. Keep the high-margin prudential surcharge.
-   const lowFloor=({over15_ht:2,over25_ht:0,over25_ft:2,over35_ft:1,gg_ht:-1})[m]+(r.selected_margin_pct>=6.5?1.5:0);
-   if(d.structural_supported!==true||(d.market_checks_passed!==true&&!d.reasons.includes('margin'))||
-      d.stability?.status==='retained'||!priced(r)||r.quality!=='supported'||
-      !Number.isFinite(r.odd)||r.odd<minOdd(r)||r.odd>maxOdd(r)||
-      !Number.isFinite(r.ev_pct)||!Number.isFinite(d.min_ev_pct)||r.ev_pct<Math.max(d.min_ev_pct,m==='gg_ht'?6:0)||
-      !Number.isFinite(r.ev_low_pct)||!Number.isFinite(d.min_ev_low_pct)||r.ev_low_pct<Math.max(d.min_ev_low_pct,lowFloor)||
-      (r.spec.period==='ht'&&d.ht_history_supported!==true))return false;
+   const move=r.selected_movement;
+   // Pure price monitoring: no model probability, history, EV, Gold odds range
+   // or backend exclusion reason can veto the radar. Gold has precedence above.
+   if(!goalMarket(r)||!priced(r)||!Number.isFinite(r.odd)||r.odd<=1)return false;
    if(r.quote_status==='cached_stable'){
     const at=Date.parse(r.cache_source_at),end=Date.parse(r.cache_expires_at);
     if(!Number.isFinite(at)||!Number.isFinite(end)||end-at!==12*3600000||now<at||now>end)return false;
    }
    if(!Number.isFinite(r.oci)||r.oci<MARKET_SIGNAL.min_oci||r.oci>100||
       !Number.isFinite(r.selected_margin_pct)||r.selected_margin_pct<0||r.selected_margin_pct>MARKET_SIGNAL.max_margin_pct||
-      !Number.isFinite(r.first_odd)||r.first_odd<=1||!r.bookmaker||
+      !Number.isFinite(r.first_odd)||r.first_odd<=1||typeof r.bookmaker!=='string'||!r.bookmaker.trim()||
       !Number.isFinite(r.delta_pct)||r.delta_pct>MARKET_SIGNAL.max_delta_pct+1e-9||
       Math.abs(r.delta_pct-100*(r.odd/r.first_odd-1))>.01)return false;
    return r.movement_confirmed===true&&r.fair_direction_coherent===true&&
-    Number.isInteger(r.paired_books)&&Number.isInteger(r.agreeing_books)&&r.paired_books>=2&&
-    r.agreeing_books>=2&&r.agreeing_books<=r.paired_books&&r.agreeing_books>r.paired_books/2&&
+    Number.isInteger(r.paired_books)&&Number.isInteger(r.agreeing_books)&&r.paired_books>=MARKET_SIGNAL.min_agreeing_books&&
+    r.agreeing_books>=MARKET_SIGNAL.min_agreeing_books&&r.agreeing_books<=r.paired_books&&r.agreeing_books>r.paired_books/2&&
     Number.isFinite(move?.delta_pct)&&move.delta_pct<=MARKET_SIGNAL.max_delta_pct+1e-9&&
     Number.isFinite(move.fair_delta_pp)&&move.fair_delta_pp>0&&
-    Number.isFinite(move.persistence)&&move.persistence>=.5&&move.persistence<=1&&move.reversal===false;
+    Number.isFinite(move.persistence)&&move.persistence>=MARKET_SIGNAL.min_persistence&&move.persistence<=1&&move.reversal===false;
   }).sort((a,b)=>b.oci-a.oci||a.delta_pct-b.delta_pct||String(a.id).localeCompare(String(b.id)));
   // Equivalent Asian half-lines remain a single monitored goal market.
   const seen=new Set();return signals.filter(r=>{const key=goalMarket(r);if(seen.has(key))return false;seen.add(key);return true;});
@@ -261,8 +250,8 @@
   const last=options.lastProposal;
   const history=!best&&last&&Number.isFinite(last.odd)?'<section class="mx-timing"><b>Ultima proposta pubblicata · '+esc(last.label||last.market_id)+'</b><strong>'+num(last.odd,2)+'</strong><small>'+esc(last.bookmaker||'')+' · '+esc(last.provider_updated_at||last.published_at||'')+'</small><small>'+(last.status==='withdrawn'?'Proposta ritirata: i dati aggiornati non superano più i criteri.':'In attesa di aggiornamento: conservata come riferimento, quota e validità attuali da confermare.')+'</small></section>':'';
   const signals=!best?marketSignals(rows,options):[],watch=signals[0];
-  if(watch)return '<aside class="mx-best mx-best-market" data-market-signal-id="'+esc(watch.id)+'"><span class="mx-section-title">SEGNALI DI MERCATO</span><h4>'+esc(watch.label)+'</h4><span class="mx-badge mx-market-signal">STUDIO / ALTA ATTENZIONE</span><p>'+MARKET_SIGNAL_TEXT+'</p><div class="mx-best-price">'+num(watch.odd,2)+'<small>'+(watch.quote_status==='cached_stable'?'Quota stabile da cache':'QUOTA OSSERVATA')+' · '+esc(watch.bookmaker)+'</small></div><dl>'+[
-   ['Statistica / minimo Gold',pct(watch.statistical_pct)+' / '+pct(watch.opportunity.min_probability_pct)],
+  if(watch)return '<aside class="mx-best mx-best-market" data-market-signal-id="'+esc(watch.id)+'"><span class="mx-section-title">RADAR DI MERCATO</span><h4>'+esc(watch.label)+'</h4><span class="mx-badge mx-market-signal">STUDIO / ALTA ATTENZIONE</span><p>'+MARKET_SIGNAL_TEXT+'</p><div class="mx-best-price">'+num(watch.odd,2)+'<small>'+(watch.quote_status==='cached_stable'?'Quota stabile da cache':'QUOTA OSSERVATA')+' · '+esc(watch.bookmaker)+'</small></div><dl>'+[
+   ['Persistenza del movimento',pct(100*watch.selected_movement.persistence)],
    ['OCI / variazione quota',signed(watch.oci)+' / '+signed(watch.delta_pct)+'%'],
    ['Aggio / operatori concordi',pct(watch.selected_margin_pct)+' / '+watch.agreeing_books+'/'+watch.paired_books]
   ].map(([label,value])=>'<div><dt>'+esc(label)+'</dt><dd>'+esc(value)+'</dd></div>').join('')+'</dl><p><b>Solo studio · esclusa dalle giocate Gold ufficiali.</b></p>'+history+timingContext(context)+'<p>'+extraGoalText(rows)+'</p><small>'+signals.length+' '+(signals.length===1?'mercato in monitoraggio':'mercati in monitoraggio')+' · 0 proposte Gold</small></aside>';
@@ -286,7 +275,7 @@
   const asian=['asian_total','handicap','dnb'].includes(row.spec?.kind);
   const d=row.opportunity,range=goalMarket(row)&&acceptedPolicy(d)?'<small title="'+esc('Quote '+num(minOdd(row),2)+'–'+num(maxOdd(row),2)+' · soglia '+pct(d.min_probability_pct))+'">'+(d.eligible?'Idoneo':'Scartato · '+esc((d.reasons||[]).map(code=>REASONS[code]||code).join(' · ')||'criteri non superati'))+'</small>':'';
   const tone=isCombo(row)?comboTone(row):null;
-  return '<div class="mx-market-row" role="row"><div class="mx-market-name" role="cell"><b>'+esc(row.label)+'</b>'+(isCombo(row)?'<span class="mx-badge mx-combo-'+tone+'">'+(tone==='active'?'Combo Attiva':tone==='near'?'Sotto soglia · Vicina':row.combo?.policy_id===POLICY?'Sotto soglia':'Dati assenti')+'</span>'+(!comboActive(row)?'<small>'+esc(comboReasons(row))+'</small>':''):options.marketSignal?'<span class="mx-badge mx-market-signal" title="'+MARKET_SIGNAL_TEXT+'">Segnale di mercato · Solo studio</span>':badge(row))+range+'</div>'+
+  return '<div class="mx-market-row" role="row"><div class="mx-market-name" role="cell"><b>'+esc(row.label)+'</b>'+(isCombo(row)?'<span class="mx-badge mx-combo-'+tone+'">'+(tone==='active'?'Combo Attiva':tone==='near'?'Sotto soglia · Vicina':row.combo?.policy_id===POLICY?'Sotto soglia':'Dati assenti')+'</span>'+(!comboActive(row)?'<small>'+esc(comboReasons(row))+'</small>':''):options.marketSignal?'<span class="mx-badge mx-market-signal" title="'+MARKET_SIGNAL_TEXT+'">Radar di Mercato · Solo studio</span>':badge(row))+range+'</div>'+
    '<div role="cell" data-title="Statistica"><strong>'+pct(row.statistical_pct)+'</strong><small>Equa '+num(row.fair_odd,2)+' · '+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>'+(asian?'<small>Rimborsi inclusi nel valore</small>':'')+'</div>'+
    '<div role="cell" data-title="Prima → attuale">'+price(row)+(row.provider_updated_at?'<small>'+esc(helpers.timestamp?.(row.provider_updated_at)||row.provider_updated_at)+'</small>':'')+'</div>'+
    '<div role="cell" data-title="OCI"><b>'+signed(isCombo(row)?row.combo?.over25_ft_oci:row.oci)+'</b><small>'+(isCombo(row)?'Riferimento Over 2,5 FT':esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi')+'</small></div>'+
@@ -385,7 +374,7 @@
    '<div class="mx-controls"><label>Mercati<select data-mx-filter="family">'+options(FAMILIES,state.family)+'</select></label><label>Periodo<select data-mx-filter="period">'+options({all:'Tutti i periodi',ft:'Finale',ht:'Primo tempo'},state.period)+'</select></label>'+
    '<label>Stato<select data-mx-filter="phase">'+options({all:'Tutte le partite',upcoming:'Da iniziare',live:'In corso',finished:'Terminate',other:'Rinviate / altri stati'},state.phase)+'</select></label><label>Ordine<select data-mx-filter="sort">'+options({time:'Orario',value:'Valore teorico più stabile'},state.sort)+'</select></label>'+
    '<label class="mx-search">Cerca<input type="search" data-mx-filter="search" value="'+esc(state.search)+'" placeholder="Squadra o campionato"></label></div>'+
-   '<p class="mx-caption">Segnali di Mercato (blu): solo studio, esclusi dalle giocate Gold. Quote mancanti o scadute: partite con almeno un mercato senza prezzo utilizzabile; la Combo solo statistica è esclusa dal conteggio. Quota equa = prezzo calcolato dal modello, non una quota offerta. OCI e aggio non sono volumi di denaro.</p>'+
+   '<p class="mx-caption">Radar di Mercato (blu): movimenti delle quote, anche con statistica debole o assente. Solo studio, escluso dalle giocate Gold. Quote mancanti o scadute: partite con almeno un mercato senza prezzo utilizzabile; la Combo solo statistica è esclusa dal conteggio. Quota equa = prezzo calcolato dal modello, non una quota offerta. OCI e aggio non sono volumi di denaro.</p>'+
    '<div class="mx-results" aria-live="polite"><p class="mx-results-count">'+matches.length+' di '+all.length+' partite · '+esc(CATEGORIES[state.category])+'</p>'+
    (matches.length?matches.map(m=>card(m,services)).join(''):'<div class="mx-empty">Nessuna partita con questi filtri. <button type="button" data-mx-reset>Mostra tutto il palinsesto</button></div>')+'</div>'+
    '<p class="mx-caption">Ogni Fast ricalcola le analisi prepartita. Gli aggiornamenti del fornitore possono essere meno frequenti; la data delle quote è sempre indicata. Le partite iniziate conservano la previsione prepartita, con punteggio live separato.</p></section>';

@@ -103,13 +103,13 @@ caps[0]['matrix']['rows'].extend([reference,combo])
 annotate(caps[0]['matrix'],NOW,caps[0])
 monitor=[]
 watch=row(id='watch-ft',label='Over 2,5 FT',statistical_pct=43,odd=2.5,first_odd=2.5/.98,
-          ev_pct=7.5,ev_low_pct=4,oci=25,delta_pct=-2,bookmaker='OPERATORE SINTETICO',
+          ev_pct=7.5,ev_low_pct=4,oci=30,delta_pct=-2,bookmaker='OPERATORE SINTETICO',
           selected_movement={'delta_pct':-2,'fair_delta_pp':1,'persistence':.5,'reversal':False})
 pt=row(id='watch-ht',spec=S('total','ht','over',1.5),period='ht',label='Over 1,5 PT',
        statistical_pct=37,odd=3,first_odd=3/.92,ev_pct=11,ev_low_pct=4,oci=45,bookmaker='OPERATORE SINTETICO')
-for rows in [[watch],[pt],[dict(watch,statistical_pct=44.9)],
+for rows in [[watch],[pt],[dict(watch,statistical_pct=10,ev_pct=-75,ev_low_pct=-90)],
              [dict(watch,oci=-45)],[dict(watch,selected_margin_pct=8.1)],
-             [dict(watch,quality='limited')],[watch,row(id='official',statistical_pct=60)],
+             [dict(watch,quality='prior_only',statistical_pct=None,ev_pct=None,ev_low_pct=None,fair_odd=None,ht_evidence=None,goal_evidence=None)],[watch,row(id='official',statistical_pct=60)],
              [dict(watch,quote_status='stale')],[dict(watch,selected_movement=None)]]:
  b=deepcopy(a);b['matrix']['rows']=deepcopy(rows)
  annotate(b['matrix'],NOW)
@@ -290,29 +290,35 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   const monitorBefore=await page.evaluate(()=>JSON.stringify(currentPayload));
   for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
    await page.setViewportSize({width,height:844});
-   assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),4);
+   assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),5);
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),1);
-   assert.equal(await page.locator('.mx-best-empty').count(),4);
+   assert.equal(await page.locator('.mx-best-empty').count(),3);
    const blue=page.locator('.mx-best-market').first();
-   assert((await blue.textContent()).includes('Segnale di mercato forte (Statistica insufficiente / Mercato concorde)'));
+   assert((await blue.textContent()).includes('Radar di Mercato · Statistica debole o assente · Solo studio'));
    assert((await blue.textContent()).includes('Solo studio · esclusa dalle giocate Gold ufficiali.'));
    assert.equal(await blue.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(16, 47, 80)');
    assert.equal(await blue.locator('h4').evaluate(e=>getComputedStyle(e).color),'rgb(158, 216, 255)');
    assert.equal(await blue.getAttribute('data-opportunity-id'),null);
+   const missingStats=page.locator('[data-live-fixture="106"] .mx-best-market');
+   assert((await missingStats.textContent()).includes('Radar di Mercato · Statistica debole o assente · Solo studio'));
+   assert((await missingStats.textContent()).includes('Persistenza del movimento'));
+   assert(!(await missingStats.textContent()).includes('minimo Gold'));
+   assert(!/NaN|undefined/.test(await missingStats.textContent()));
+   assert.equal(await page.locator('[data-live-fixture="103"] .mx-best-market').count(),1,'Negative model EV cannot veto price monitoring');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Blue signals overflow '+name);
    await blue.scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-market-signal-${name}.png`});
    await page.locator('[data-mx-category="market_signal"]').click();
-   assert.equal(await page.locator('.mx-card').count(),4);
+   assert.equal(await page.locator('.mx-card').count(),5);
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),0);
-   assert.equal(await page.locator('[data-mx-category="market_signal"] b').textContent(),'4');
+   assert.equal(await page.locator('[data-mx-category="market_signal"] b').textContent(),'5');
    await page.locator('[data-mx-filter="period"]').selectOption('ht');
    assert.equal(await page.locator('.mx-card').count(),1);
    assert((await page.locator('.mx-best h4').textContent()).includes('Over 1,5 PT'));
    await page.locator('[data-mx-filter="period"]').selectOption('all');
    await page.locator('[data-mx-open]').first().click();
    const signalRow=page.locator('.mx-market-row').first();
-   assert((await signalRow.textContent()).includes('Segnale di mercato · Solo studio'));
+   assert((await signalRow.textContent()).includes('Radar di Mercato · Solo studio'));
    assert((await signalRow.textContent()).includes('Scartato · stima bassa'));
    assert(!/Idoneo/.test(await signalRow.textContent()));
    assert(await page.evaluate(()=>{const e=document.querySelector('dialog.mx-modal');return e.scrollWidth<=e.clientWidth}),'Blue modal overflow '+name);
@@ -323,15 +329,15 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),monitorBefore,'Monitoring leaves backend decisions and ranks unchanged');
   }
   await page.evaluate(()=>{ArabLive.accept({schema_version:1,enabled:true,fixtures:{'101':{fixture_id:'101',status:'1H',elapsed:1,goals:{home:0,away:0},observed_at:new Date(Date.now()+1000).toISOString()}}});renderMatchResearch(currentPayload)});
-  assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),3,'A live overlay closes monitoring even before the scheduled kickoff');
+  assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),4,'A live overlay closes monitoring even before the scheduled kickoff');
   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),monitorBefore,'The live lifecycle never rewrites prematch decisions');
   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),1);
   await page.locator('[data-mx-open]').first().click();
   assert.equal(await page.locator('dialog .mx-market-signal').count(),0,'The matrix also respects the live lifecycle');
   await page.locator('[data-mx-close]').click();
   await page.locator('[data-mx-category="market_signal"]').click();
-  assert.equal(await page.locator('.mx-card').count(),3);
-  console.log('PASS blue market signals: backend-generated decisions, separate category/counts, official Gold unchanged, blue desktop/mobile cards and matrix, no live reclassification');
+  assert.equal(await page.locator('.mx-card').count(),4);
+  console.log('PASS market radar: absent statistics and negative EV, separate category/counts, official Gold unchanged, blue desktop/mobile cards and matrix, no live reclassification');
   console.log('PASS Gold v6.1 browser: concise cards, green/yellow/red combos, versions, quote coverage, unchanged desktop/390/360 grid, modal and immutable live overlays');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
