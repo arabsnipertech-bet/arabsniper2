@@ -23,18 +23,24 @@ def row(**changes):
         'provider_updated_at': NOW, 'selected_movement': {'delta_pct': -8.,
             'fair_delta_pp': 3., 'persistence': 1., 'reversal': False}}
     result['ht_evidence'] = first_half_evidence({'inputs': {'histories': {side: team_history(side) for side in ('home','away')}}})
+    from goal_evidence import evidence
+    result['goal_evidence'] = evidence(statistical_analysis(match(), NOW))
+    result['market_fair_pct'] = 50.
+    result['delta_pct'] = -8.
     result.update(changes)
+    if 'odd' not in changes:
+        from opportunity_policy import goal_market, ODDS_MIN_BY_MARKET
+        result['odd'] = max(result['odd'], ODDS_MIN_BY_MARKET.get(goal_market(result), 1.85))
     return result
 
 
 class PlayableValue(unittest.TestCase):
     def test_inclusive_probability_and_price_boundaries(self):
-        for p, q in [(30, 3.5), (80, 1.4)]:
-            self.assertTrue(evaluate(row(statistical_pct=p, odd=q))['eligible'])
-        for p, q, reason in [(29.999, 3.5, 'probability'), (80, 1.3999, 'price'), (35, 3.5001, 'price')]:
-            self.assertIn(reason, evaluate(row(statistical_pct=p, odd=q))['reasons'])
-        for p, eligible in [(30, False), (34.999, False), (35, True)]:
-            self.assertEqual(evaluate(row(spec=S('total', 'ht', 'over', 1.5), statistical_pct=p))['eligible'], eligible)
+        for p,q in [(48,2.6),(80,1.85)]: self.assertTrue(evaluate(row(statistical_pct=p,odd=q))['eligible'])
+        for p,q,reason in [(47.999,2.6,'probability'),(80,1.8499,'yield_floor'),(60,2.6001,'price')]:
+            self.assertIn(reason,evaluate(row(statistical_pct=p,odd=q))['reasons'])
+        for p,ok in [(39.999,False),(40,True)]:
+            self.assertEqual(evaluate(row(spec=S('total','ht','over',1.5),statistical_pct=p))['eligible'],ok)
 
     def test_nonfinite_missing_or_limited_data_cannot_be_promoted(self):
         for key in ('statistical_pct', 'odd', 'ev_pct', 'ev_low_pct'):
@@ -59,29 +65,18 @@ class PlayableValue(unittest.TestCase):
         self.assertIsNone(best_opportunity([dict(secondary, quote_adapter_version=1)]))
 
     def test_margin_tiers_expansion_and_selected_operator_anomaly(self):
-        self.assertTrue(evaluate(row(ev_pct=3., ev_low_pct=.1))['eligible'])
-        self.assertFalse(evaluate(row(ev_pct=3., selected_margin_pct=6.))['eligible'])
-        self.assertFalse(evaluate(row(ev_pct=8.9, selected_margin_pct=10.))['eligible'])
-        self.assertTrue(evaluate(row(ev_pct=9., ev_low_pct=2., selected_margin_pct=10.))['eligible'])
-        d = evaluate(row(selected_margin_pct=10., selected_margin_delta_pp=1.))
-        self.assertEqual((d['min_ev_pct'], d['min_ev_low_pct']), (11., 3.))
-        for margin in (-.01, 30.01):
-            self.assertIn('margin', evaluate(row(selected_margin_pct=margin, margin_pct=3.))['reasons'])
-        unknown = evaluate(row(selected_margin_pct=None, ev_pct=10., ev_low_pct=3.))
-        self.assertTrue(unknown['eligible']); self.assertEqual(unknown['signal'], 'unconfirmed')
-        self.assertFalse(evaluate(row(selected_margin_pct=None, ev_pct=9.9))['eligible'])
+        for margin, low, ok in [(6.499,2,True),(6.5,3.499,False),(6.5,3.5,True),(8,3.5,True),(8.001,20,False)]:
+            self.assertEqual(evaluate(row(selected_margin_pct=margin,ev_low_pct=low))['eligible'],ok)
+        for margin in (-.01,30.01): self.assertIn('margin',evaluate(row(selected_margin_pct=margin))['reasons'])
+        self.assertIn('margin_missing',evaluate(row(selected_margin_pct=None))['reasons'])
 
     def test_convergence_and_contrarian_require_credible_same_book_flow(self):
-        self.assertEqual(evaluate(row())['signal'], 'convergence')
-        contrary = row(oci=-60., selected_movement={'delta_pct': 8., 'fair_delta_pp': -3., 'persistence': 1., 'reversal': False})
-        self.assertEqual(evaluate(contrary)['signal'], 'contrarian')
-        for fields in ({'oci': 39.9}, {'paired_books': 1, 'agreeing_books': 1},
-                       {'agreeing_books': 1}, {'fair_direction_coherent': False},
-                       {'selected_movement': None}, {'movement_confirmed': False},
-                       {'selected_movement': {**contrary['selected_movement'], 'reversal': True}},
-                       {'selected_movement': {**contrary['selected_movement'], 'persistence': 0.}},
-                       {'selected_movement': row()['selected_movement']}):
-            self.assertEqual(evaluate({**contrary, **fields})['signal'], 'unconfirmed')
+        self.assertEqual(evaluate(row())['signal'],'convergence')
+        for oci in (-46.8,-48.8,-58.3):
+            d=evaluate(row(oci=oci));self.assertFalse(d['eligible']);self.assertIn('oci_negative',d['reasons'])
+        for fields in ({'oci':39.9},{'paired_books':1,'agreeing_books':1},{'agreeing_books':1},
+                       {'fair_direction_coherent':False},{'selected_movement':None},{'movement_confirmed':False}):
+            self.assertEqual(evaluate(row(**fields))['signal'],'unconfirmed')
 
     def test_frontend_consumes_same_rank_and_fails_closed(self):
         matrix = {'rows': [row(), row(id='distant', odd=150, statistical_pct=1),
@@ -106,7 +101,7 @@ class PlayableValue(unittest.TestCase):
         self.assertEqual(build_preview(p, now=datetime.fromisoformat('2026-10-26T18:00:00+00:00'))['selections'], [])
 
     def test_real_adapter_refresh_and_expiry_preserve_statistics_and_started(self):
-        for first, middle, last, signal in [(2.5, 2.3, 2.1, 'convergence'), (2.1, 2.35, 2.6, 'contrarian')]:
+        for first, middle, last, signal in [(2.5, 2.3, 2.1, 'excluded'), (2.1, 2.35, 2.6, 'excluded')]:
             m = match(); a = build_matrix(statistical_analysis(m, NOW), NOW); state = {}
             for when, price in [('2026-10-26T06:00:00Z', first), ('2026-10-26T07:00:00Z', middle), (NOW, last)]:
                 attach(a, payload(when, price, 1.6), state, m['fixture'], when)
@@ -137,14 +132,14 @@ class PlayableValue(unittest.TestCase):
             self.assertFalse(cached_refresh_safe(paths))
 
     def test_one_book_margin_expansion_still_requires_extra_value(self):
-        m = match(); a = build_matrix(statistical_analysis(m, NOW), NOW); state = {}
-        attach(a, payload('2026-10-26T06:00:00Z', 2.5, 1.6, books=1), state, m['fixture'], '2026-10-26T06:00:00Z')
-        attach(a, payload(NOW, 2.1, 1.6, books=1), state, m['fixture'], NOW)
-        r = next(r for r in a['matrix']['rows'] if r['spec'] == S('total', 'ft', 'over', 2.5))
-        self.assertGreater(r['selected_margin_delta_pp'], 1)
+        m=match();a=build_matrix(statistical_analysis(m,NOW),NOW);state={}
+        attach(a,payload('2026-10-26T06:00:00Z',2.5,1.6,books=1),state,m['fixture'],'2026-10-26T06:00:00Z')
+        attach(a,payload(NOW,2.1,1.6,books=1),state,m['fixture'],NOW)
+        r=next(r for r in a['matrix']['rows'] if r['spec']==S('total','ft','over',2.5))
+        self.assertGreater(r['selected_margin_pct'],8)
+        self.assertIn('margin',r['opportunity']['reasons'])
         self.assertIsNone(r['oci'])
-        self.assertEqual(r['opportunity']['signal'], 'unconfirmed')
-        self.assertGreater(r['opportunity']['min_ev_pct'], 10)
 
 
 if __name__ == '__main__': unittest.main()
+

@@ -5,7 +5,7 @@ import unittest
 from copy import deepcopy
 from datetime import datetime
 
-from opportunity_policy import annotate, evaluate, goal_market, POLICY_ID
+from opportunity_policy import annotate, evaluate, goal_market, POLICY_ID, ODDS_MIN_BY_MARKET, ODDS_MAX_BY_MARKET, MIN_PROBABILITY_BY_MARKET
 from lateral_matrix import specification as S, build_matrix
 from statistics_first import statistical_analysis
 from matrix_quotes import attach
@@ -20,30 +20,21 @@ from test_gold_policy_audit import fixture
 
 class MarketOddsCaps(unittest.TestCase):
     def test_boundaries_on_every_target_and_exact_asian_equivalent(self):
-        for kind, period, line, maximum in [
-            ('total', 'ht', 1.5, 3.5), ('total', 'ft', 2.5, 3.5),
-            ('total', 'ft', 3.5, 5.5), ('btts', 'ht', None, 5.5),
-            ('asian_total', 'ht', 1.5, 3.5), ('asian_total', 'ft', 2.5, 3.5),
-            ('asian_total', 'ft', 3.5, 5.5),
-        ]:
+        for kind, period, line in [('total','ht',1.5),('total','ht',2.5),('total','ft',2.5),
+                                  ('total','ft',3.5),('btts','ht',None),('asian_total','ht',1.5),
+                                  ('asian_total','ft',2.5),('asian_total','ft',3.5)]:
             spec = S(kind, period, 'yes' if kind == 'btts' else 'over', line)
-            for price, eligible in [(1.3999, False), (1.4, True), (3.5, True),
-                                    (3.5001, maximum == 5.5), (5.5, maximum == 5.5),
-                                    (maximum+.0001, False), (150, False)]:
-                with self.subTest(spec=spec, price=price):
-                    decision = evaluate(row(spec=spec, odd=price, statistical_pct=60))
-                    self.assertEqual(decision['eligible'], eligible)
-                    self.assertEqual((decision['odds_min'], decision['odds_max']), (1.4, maximum))
-                    self.assertEqual(decision['goal_market'], goal_market({'spec': spec}))
-            for fields, reason in [({'statistical_pct': 29.999}, 'probability'),
-                                   ({'selected_margin_pct': -1}, 'margin'),
-                                   ({'selected_margin_pct': 31}, 'margin'),
-                                   ({'selected_margin_pct': 10, 'ev_pct': 8.99}, 'edge'),
-                                   ({'selected_margin_pct': 10, 'ev_low_pct': 1.99}, 'sensitivity'),
-                                   ({'ev_pct': 1.99}, 'edge'), ({'ev_low_pct': 0}, 'sensitivity'),
-                                   ({'quality': 'limited'}, 'history'), ({'quote_status': 'stale'}, 'stale')]:
-                decision = evaluate(row(spec=spec, odd=maximum, **fields))
-                self.assertIn(reason, decision['reasons'])
+            key = goal_market({'spec': spec}); minimum, maximum = ODDS_MIN_BY_MARKET[key], ODDS_MAX_BY_MARKET[key]
+            for price, eligible in [(minimum-.0001, False),(minimum, True),(maximum, True),(maximum+.0001,False)]:
+                r = row(spec=spec, odd=price, statistical_pct=60)
+                for t in r['goal_evidence']['teams'].values(): t['ht']['expected_goals'] = 1.
+                with self.subTest(key=key,price=price):
+                    d = evaluate(r)
+                    self.assertEqual(d['eligible'],eligible,d)
+                    self.assertEqual((d['odds_min'],d['odds_max']),(minimum,maximum))
+            for fields, reason in [({'statistical_pct':MIN_PROBABILITY_BY_MARKET[key]-.01},'probability'),
+                    ({'selected_margin_pct':8.001},'margin'),({'quality':'limited'},'history'),({'quote_status':'stale'},'stale')]:
+                self.assertIn(reason,evaluate(row(spec=spec,odd=maximum,**fields))['reasons'])
 
     def test_unrelated_and_partial_settlement_markets_stay_excluded(self):
         for spec in [S('btts', 'ft', 'yes'), S('btts', 'ht', 'no'),
@@ -53,7 +44,7 @@ class MarketOddsCaps(unittest.TestCase):
                      S('total', 'ft', 'over', 3.5, extra='combo')]:
             d = evaluate(row(spec=spec, odd=4.2))
             self.assertIn('market', d['reasons'])
-            self.assertEqual(d['odds_max'], 3.5)
+            self.assertEqual(d['odds_max'], 7.5)
 
     def test_backend_and_gold_browser_agree_on_all_boundaries_and_legacy(self):
         cases = []
@@ -84,7 +75,7 @@ class MarketOddsCaps(unittest.TestCase):
         attach(a, payload, state, m['fixture'], NOW)
         r = next(r for r in a['matrix']['rows'] if r['spec'] == S('asian_total', 'ft', 'over', 3.5))
         # The model is unchanged; use its genuine probability/EV in both paths.
-        self.assertEqual(r['opportunity']['odds_max'], 5.5)
+        self.assertEqual(r['opportunity']['odds_max'], 4.5)
         self.assertNotIn('price', r['opportunity']['reasons'])
         self.assertAlmostEqual(r['selected_margin_pct'], (1/4.2+1/1.25-1)*100)
         old_probabilities = {r['id']: r['statistical_pct'] for r in a['matrix']['rows']}
@@ -95,7 +86,7 @@ class MarketOddsCaps(unittest.TestCase):
         self.assertEqual(old_probabilities, {r['id']: r['statistical_pct'] for r in a['matrix']['rows']})
         self.assertEqual(state, old_ledger)
         self.assertEqual(a['matrix']['opportunity_policy']['id'], POLICY_ID)
-        self.assertEqual(r['opportunity']['odds_max'], 5.5)
+        self.assertEqual(r['opportunity']['odds_max'], 4.5)
         # A supported synthetic admission verifies legacy/public consumers too.
         r.update(statistical_pct=35., low_pct=30., quality='supported', ev_pct=47., ev_low_pct=26.)
         annotate(a['matrix'], NOW, a); build_board(day, NOW)
@@ -103,7 +94,7 @@ class MarketOddsCaps(unittest.TestCase):
         self.assertEqual(a['best_candidate']['odd'], 4.2)
         preview = build_preview(day, now=datetime.fromisoformat(NOW))
         self.assertEqual(preview['selections'][0]['spec'], r['spec'])
-        self.assertEqual(preview['selections'][0]['opportunity']['odds_max'], 5.5)
+        self.assertEqual(preview['selections'][0]['opportunity']['odds_max'], 4.5)
         frozen = deepcopy(day)
         self.assertEqual(refresh_day(day, state, '2026-10-27T08:00:00Z'), 0)
         self.assertEqual(day, frozen)
@@ -137,3 +128,4 @@ class MarketOddsCaps(unittest.TestCase):
 
 
 if __name__ == '__main__': unittest.main()
+

@@ -10,6 +10,7 @@ from gold_competitions import (SCOPE_ID, profile as whitelist_profile, fixture_a
 
 LEGACY = {'over25_ft': specification('total', 'ft', 'over', 2.5),
           'over15_ht': specification('total', 'ht', 'over', 1.5),
+          'over25_ht': specification('total', 'ht', 'over', 2.5),
           'over35_ft': specification('total', 'ft', 'over', 3.5),
           'gg_ht': specification('btts', 'ht', 'yes')}
 
@@ -74,19 +75,22 @@ def build_board(day, as_of):
         rows = [safe_price_row(r) for r in a.get('matrix', {}).get('rows', [])]
         indexed = {r['id']: r for r in rows}
         modeled += len(rows)
-        priced += sum(r.get('quote_status') == 'recent' for r in rows)
+        priced += sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)
         complete += bool(rows)
         category_counts = Counter(r.get('category', 'no_quote') for r in rows)
         categories.update(category_counts)
         if kickoff and kickoff <= stamp(as_of) or meta.get('result'):
             continue  # Immutable forecast, even when it is no longer upcoming.
         a.get('matrix', {})['summary'] = {'categories': dict(category_counts), 'observed_markets': len(rows),
-                                        'priced_markets': sum(r.get('quote_status') == 'recent' for r in rows)}
+                                        'priced_markets': sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)}
         policy = a.get('matrix', {}).get('opportunity_policy') or {}
         eligible += policy.get('eligible_markets', 0)
         proposals += bool(policy.get('best_market_id'))
         a['selected_markets'], a['best_candidate'] = [], None
         a['markets'] = [r for r in a.get('markets', []) if r.get('market') in LEGACY]
+        if market_id(LEGACY['over25_ht']) in indexed and not any(r.get('market') == 'over25_ht' for r in a['markets']):
+            a['markets'].append({'market': 'over25_ht', 'selection': 'over',
+                                'label': 'Over 2,5 primo tempo', 'source': 'analisi statistica', 'probabilities': {}})
         # Backward-compatible four-market exports. The dashboard uses the full
         # matrix; these flags no longer restrict fixtures or the other markets.
         for old in a.get('markets', []):
@@ -174,3 +178,4 @@ def selection_export(day, as_of):
         'gold_scope': deepcopy(day.get('gold_scope')), 'opportunity_policy': POLICY_ID,
         'selection_board': day.get('selection_board', {}), 'rankings': day.get('market_rankings', {}),
         'probability_rankings': day.get('probability_rankings', {})}
+

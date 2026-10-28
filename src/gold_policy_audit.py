@@ -17,7 +17,7 @@ from gold_competitions import SCOPE_ID, output_allowed, norm
 from lateral_matrix import MODEL_ID, settle_spec
 from matrix_quotes import expire
 from multimarket_model import stamp
-from opportunity_policy import (POLICY_ID, SUPPORTED_POLICY_IDS, ODDS_MIN, odds_max,
+from opportunity_policy import (POLICY_ID, SUPPORTED_POLICY_IDS, ODDS_MIN, odds_max, odds_min,
                                 evaluate, market_tier, goal_market, numeric, ranking_key, min_probability)
 
 ROME = ZoneInfo('Europe/Rome')
@@ -30,7 +30,9 @@ ROW_FIELDS = ('id', 'label', 'spec', 'family', 'period', 'quality', 'statistical
     'selected_margin_pct', 'selected_margin_delta_pp', 'margin_pct', 'margin_delta_pp',
     'oci', 'oci_previous', 'paired_books', 'agreeing_books', 'selected_movement',
     'movement_confirmed', 'fair_direction_coherent', 'amplitude_pct', 'speed_pp_per_hour',
-    'persistence', 'ev_pct', 'ev_low_pct', 'ev_high_pct', 'opportunity', 'ht_evidence')
+    'persistence', 'ev_pct', 'ev_low_pct', 'ev_high_pct', 'opportunity', 'ht_evidence',
+    'goal_evidence', 'delta_pct', 'selected_market_fair_pct', 'quote_observed_at',
+    'cache_source_at', 'cache_expires_at')
 
 
 def key_for(row):
@@ -213,7 +215,7 @@ def observation(fid, fixture, snapshot, row):
     book = 100/q/(1+margin/100) if numeric(q) and q > 1 and numeric(margin) and 0 <= margin <= 30 else None
     return {'fixture_id': fid, 'market': key_for(row), 'outcome': outcome(row, result),
         'p': p/100 if numeric(p) else None, 'book_p': book/100 if numeric(book) else None,
-        'odd': row.get('odd') if row.get('quote_status') == 'recent' else None,
+        'odd': row.get('odd') if row.get('quote_status') in ('recent', 'cached_stable') else None,
         'closing_odd': closing_price(fixture, row), 'snapshot': snapshot['observed_at']}
 
 
@@ -311,8 +313,8 @@ def requested_case(match, observed_at):
         result['markets'].append({'market': key_for(row), 'eligible': d.get('eligible'), 'reasons': d.get('reasons'),
             'probability_min_met': numeric(row.get('statistical_pct')) and min_probability(row) <= row['statistical_pct'] <= 100,
             'min_probability_pct': min_probability(row), 'ht_history_supported': d.get('ht_history_supported'),
-            'price_range_met': numeric(row.get('odd')) and ODDS_MIN <= row['odd'] <= odds_max(row),
-            'odds_min': ODDS_MIN, 'odds_max': odds_max(row),
+            'price_range_met': numeric(row.get('odd')) and odds_min(row) <= row['odd'] <= odds_max(row),
+            'odds_min': odds_min(row), 'odds_max': odds_max(row),
             'central_ev_positive': numeric(row.get('ev_pct')) and row['ev_pct'] > 0,
             'prudent_ev_positive': numeric(row.get('ev_low_pct')) and row['ev_low_pct'] > 0,
             'flow': d.get('signal')})
@@ -360,3 +362,4 @@ def main(root=Path('.'), observed_at=None):
 
 
 if __name__ == '__main__': main()
+

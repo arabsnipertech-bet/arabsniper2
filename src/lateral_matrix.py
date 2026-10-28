@@ -9,7 +9,7 @@ from copy import deepcopy
 from hashlib import sha256
 from math import exp, floor
 import json
-from market_scope import MARKET_SCOPE_ID, FT_TOTALS, ASIAN_FT, ASIAN_HT, HANDICAPS, core_market
+from market_scope import MARKET_SCOPE_ID, FT_TOTALS, HT_TOTALS, ASIAN_FT, ASIAN_HT, HANDICAPS, core_market
 
 MODEL_ID = 'lateral-matrix-v5.0'
 CONFIG = {'tail_tolerance': 1e-11, 'score_ceiling': 48,
@@ -55,7 +55,7 @@ def label(spec):
     if k in ('result_btts', 'dc_btts'): return f"{s.upper()} + {'GG' if extra == 'yes' else 'No Goal'} {p}"
     if k == 'btts_total': return f"{'GG' if s == 'yes' else 'No Goal'} + {'Over' if extra == 'over' else 'Under'} {line} {p}"
     if k == 'htft': return f'{s.upper()}/{str(extra).upper()} parziale/finale'
-    if k == 'halves_total': return f"Over {line} PT + Over {float(extra):g} ST"
+    if k == 'halves_total': return f"Over {line} PT + Over {str(float(extra)).replace('.', ',')} ST"
     if k == 'range': return f'Multigol {line}–{extra} {p}'
     if k == 'score': return f'Risultato {s} {p}'
     if k == 'both_halves': return f"{'Casa' if s == 'home' else 'Ospite' if s == 'away' else 'Entrambe'} a segno in entrambi i tempi"
@@ -68,11 +68,12 @@ def base_specs():
     for period in ('ft', 'ht'):
         rows += [specification('btts', period, side) for side in ('yes', 'no')]
         rows += [specification('total', period, side, line)
-                 for line in (FT_TOTALS if period == 'ft' else (1.5,)) for side in ('over', 'under')]
+                 for line in (FT_TOTALS if period == 'ft' else HT_TOTALS) for side in ('over', 'under')]
         rows += [specification('asian_total', period, side, line)
                  for line in (ASIAN_FT if period == 'ft' else ASIAN_HT) for side in ('over', 'under')]
     rows += [specification('handicap', 'ft', side, line)
              for line in HANDICAPS for side in ('home', 'away')]
+    rows.append(specification('halves_total', 'ft', 'over', .5, .5))
     return rows
 
 
@@ -160,8 +161,13 @@ class ScoreModel:
             return {(1., 0.): chance, (0., 1.): 1-chance}
         if kind in ('halves_total', 'both_halves'):
             if kind == 'halves_total':
-                a = sum(p for h, away, p in self.grids['ht'] if h+away > spec['line'])
-                b = sum(p for h, away, p in self.grids['sh'] if h+away > spec['extra'])
+                if spec['line'] == .5 and spec['extra'] == .5:
+                    ht = self.rates['home_ht']+self.rates['away_ht']
+                    sh = max(.30, self.rates['home_ft']+self.rates['away_ft']-ht)
+                    a, b = 1-exp(-ht), 1-exp(-sh)
+                else:
+                    a = sum(p for h, away, p in self.grids['ht'] if h+away > spec['line'])
+                    b = sum(p for h, away, p in self.grids['sh'] if h+away > spec['extra'])
                 chance = a*b  # Disjoint increments only.
             else:
                 r = self.rates
@@ -238,7 +244,7 @@ def build_matrix(assessment, as_of, additional_specs=()):
         'score_tail_probability': model.tail,
         'market_scope': {'id': MARKET_SCOPE_ID, 'modeled_markets': len(matrix)},
         'assumptions': ['Poisson per squadra con incrementi PT/ST indipendenti.',
-            'Solo mercati core e riferimenti asiatici vicini ai quattro obiettivi gol.',
+            'Mercati core, Over 2,5 PT e combo gol nei due tempi; ST combo con minimo 0,30 gol attesi.',
             'Frequenze storiche descrittive; stime e rendimenti teorici ancora da validare.']}
     output['notes'] = [*output.get('notes', []), 'Tutte le partite disponibili vengono mostrate, anche con dati o quote insufficienti.']
     return output
@@ -264,3 +270,4 @@ def matrix_rows(assessment, specs, model=None, scenarios=None):
                'empirical': empirical(assessment, spec), 'quote_status': 'missing', 'category': 'no_quote'}
         matrix.append(row)
     return matrix
+

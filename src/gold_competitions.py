@@ -8,7 +8,7 @@ from collections import Counter
 import re
 import unicodedata
 
-SCOPE_ID = 'gold-senior-whitelist-v2'
+SCOPE_ID = 'gold-senior-whitelist-v2.1'
 
 
 def norm(value):
@@ -141,6 +141,9 @@ COUNTRY_ALIASES = {'united states': 'usa', 'united states of america': 'usa',
     'republic of ireland': 'ireland', 'turkiye': 'turkey'}
 FORBIDDEN = re.compile(r'\b(?:u\s*\d{1,2}|under\s*\d*|youth|junior|juniors|reserve|reserves|academy|women|womens|femenina|feminino|femminile|frauen)\b')
 TEAM_FORBIDDEN = re.compile(r'\b(?:u\s*\d{1,2}|under\s*\d+|youth|reserve|reserves|academy|jong)\b|\b(?:ii|iii|b)\s*$')
+# Exact senior identities only. A whitelisted league can also contain genuine
+# reserve teams (e.g. Dortmund II), so league membership cannot waive all suffixes.
+SENIOR_ROMAN_NAMES = frozenset(('willem ii',))
 TOP_NAMES = {k: {norm(n) for n in names} for k, names in TOP.items()}
 LOWER_NAMES = {level: {k: {norm(n) for n in names} for k, names in mapping.items()}
                for level, mapping in ((2, SECOND), (3, THIRD))}
@@ -170,7 +173,10 @@ def profile(league):
 def fixture_profile(raw):
     result = profile(raw.get('league') or {})
     teams = raw.get('teams') or {}
-    if any(TEAM_FORBIDDEN.search(norm((teams.get(side) or {}).get('name'))) for side in ('home', 'away')):
+    def reserve(side):
+        name = norm((teams.get(side) or {}).get('name'))
+        return bool(TEAM_FORBIDDEN.search(name)) and not (result['allowed'] and name in SENIOR_ROMAN_NAMES)
+    if any(reserve(side) for side in ('home', 'away')):
         result.update(allowed=False, score=0, tier='blocked', reason='youth_or_reserve_fixture')
     return result
 
@@ -212,3 +218,4 @@ def enforce_day(day):
     coverage.update(displayed_fixtures=len(kept), competition_policy=SCOPE_ID,
                     excluded_from_saved_schedule=sum(removed.values()))
     return sum(removed.values())
+

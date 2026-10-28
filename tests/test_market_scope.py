@@ -26,10 +26,10 @@ class CoreMarketScope(unittest.TestCase):
                 a = build_matrix(statistical_analysis(m, NOW), NOW,
                     [S('score', side='6:5'), S('total', side='over', line=5.5), S('dc', side='x2')])
             rows = a['matrix']['rows']
-            self.assertEqual(len(rows), 55)
+            self.assertEqual(len(rows), 58)
             self.assertNotIn('top_scores', a['matrix'])
             self.assertEqual(a['matrix']['market_scope']['id'], MARKET_SCOPE_ID)
-            self.assertEqual(len({r['id'] for r in rows}), 55)
+            self.assertEqual(len({r['id'] for r in rows}), 58)
             self.assertEqual(sum(r['family'] == 'asian' for r in rows), 40)
         self.assertTrue(seen)
 
@@ -95,3 +95,4 @@ class CoreMarketScope(unittest.TestCase):
 
 
 if __name__ == '__main__': unittest.main()
+

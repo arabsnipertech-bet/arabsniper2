@@ -45,7 +45,7 @@ class MatrixAccumulator:
                 group['win_stake_sum'] += win; group['loss_stake_sum'] += loss
                 group['push_n'] += win == 0 and loss == 0
                 odd = row.get('odd')
-                if isinstance(odd, (int, float)) and odd > 1 and row.get('quote_status') == 'recent':
+                if isinstance(odd, (int, float)) and odd > 1 and row.get('quote_status') in ('recent', 'cached_stable'):
                     group['priced_n'] += 1
                     group['return_sum'] += win*(odd-1)-loss
                 if row['spec']['kind'] not in ('handicap', 'asian_total', 'dnb'):
@@ -69,3 +69,4 @@ class MatrixAccumulator:
         return {'model_id': MODEL_ID, 'frozen_fixtures': len(self.fixtures),
             'settled_fixtures': len(self.settled), 'groups': groups,
             'note': 'Future frozen inputs only. Markets within a fixture are correlated, not independent trials. Returns are theoretical with Asian refunds. First/latest snapshots remain separate.'}
+

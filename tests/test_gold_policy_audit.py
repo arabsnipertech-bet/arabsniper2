@@ -73,7 +73,7 @@ class GoldPolicyAudit(unittest.TestCase):
 
     def test_shadows_cannot_bypass_probability_price_history_or_coherence(self):
         m = fixture(); matrix = m['multimarket']['matrix']
-        for change in ({'odd': 150.}, {'statistical_pct': 29.9}, {'quality': 'limited'},
+        for change in ({'odd': 150.}, {'statistical_pct': 17.9}, {'quality': 'limited'},
                        {'quote_status': 'stale'}, {'selected_margin_pct': -2}):
             rows = deepcopy(matrix['rows'][:4])
             for r in rows: r.update(change)
@@ -91,7 +91,7 @@ class GoldPolicyAudit(unittest.TestCase):
         choices = policy_choices([r], {})
         self.assertIsNone(choices['published'])
         self.assertEqual(choices['shadow_reduced_cushion'], r['id'])
-        self.assertIsNone(choices['shadow_sensitivity_minus3'])
+        self.assertEqual(choices['shadow_sensitivity_minus3'], r['id'])
         self.assertEqual(r, before)
         r.update(ev_pct=7, ev_low_pct=-2)
         annotate({'rows': [r]})
@@ -214,7 +214,7 @@ class GoldPolicyAudit(unittest.TestCase):
         self.assertEqual(report_row(report)['losses'], 1)
         ablation = report_row(report, 'without_pt_priority')
         self.assertEqual(ablation['wins'], 1)
-        self.assertAlmostEqual(ablation['paper_profit_units'], .8)
+        self.assertAlmostEqual(ablation['paper_profit_units'], 1.)
         self.assertEqual(ablation['matched_book_n'], 1)
         variant = next(r for r in report['model_variants'] if r['snapshot'] == 'latest')
         self.assertAlmostEqual(variant['brier'], .16)
@@ -223,3 +223,4 @@ class GoldPolicyAudit(unittest.TestCase):
 
 
 if __name__ == '__main__': unittest.main()
+
