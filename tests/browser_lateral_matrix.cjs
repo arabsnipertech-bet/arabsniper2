@@ -124,8 +124,16 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
   for(const [name,width,height] of [['desktop',1280,1000],['mobile',390,844],['small-mobile',360,800]]){
    await page.setViewportSize({width,height});
    assert.equal(await page.locator('.mx-card').count(),9);
+   assert.equal(await page.locator('.mx-heading > b').textContent(),'GOLD v6.1');
+   assert((await page.locator('.mx-card footer').first().textContent()).includes('Regole gold-goals-v6.1 · Modello statistico lateral-matrix-v5.0'));
    assert.equal(await page.locator('.mx-1x2 .mx-quote-cell').count(),27);
    assert.equal(await page.locator('.mx-best').count(),9);
+   const summaries=await page.locator('.mx-best').allTextContents();
+   assert(summaries.every(t=>t.includes('Over 0,5 PT + Over 0,5 ST')&&t.includes('Quota bookmaker non fornita')));
+   assert.equal(summaries.filter(t=>t.includes('★ Combo Consigliata')).length,5);
+   assert.equal(summaries.filter(t=>t.includes('Combo non attiva')&&t.includes('OCI Over 2,5 FT -92,5')).length,4);
+   assert(summaries.every(t=>t.includes('Over 2,5 PT: stima')));
+   assert(!summaries.some(t=>t.includes('Confronto dei quattro mercati')));
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5);
    const proposals=await page.locator('.mx-best[data-opportunity-id]').evaluateAll(nodes=>nodes.map(n=>({odd:+n.dataset.opportunityOdd,max:+n.dataset.opportunityMaxOdd,p:+n.dataset.opportunityProbability,text:n.textContent})));
    assert(proposals.every(r=>r.odd>=1.85&&r.odd<=r.max&&[2.6,3.5,4.5,5.5,7.5].includes(r.max)&&r.p>=18));
@@ -140,6 +148,9 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
    await page.locator('[data-mx-open]').first().click();
    assert(await page.locator('dialog.mx-modal').isVisible(),'Matrix must be a native modal');
    assert.equal(await page.locator('.mx-market-row').count(),6,'Five goal targets and the half-time combo open by default');
+   const comboRow=page.locator('.mx-market-row').filter({hasText:'Over 0,5 PT + Over 0,5 ST'});
+   assert((await comboRow.textContent()).includes('Combo Attiva'));
+   assert((await comboRow.textContent()).includes('EV non calcolabile senza quota reale'));
    assert.equal(await page.locator('.mx-card .mx-detail').count(),0,'No inline expansion');
    await page.keyboard.press('Shift+Tab');
    assert(await page.evaluate(()=>!!document.activeElement.closest('dialog.mx-modal')),'Native modal focus trap');
@@ -200,9 +211,10 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
   const timed={...payload,matches:contexts.map((a,i)=>({...payload.matches[i],multimarket:a}))};
   await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},timed);
   const timing=await page.locator('.mx-timing:not(.mx-first-half)').allTextContents();
-  assert(timing[0].includes('Priorità Over 1,5 PT')&&timing[0].includes('Favorita in casa'));
-  assert(timing[1].includes('Priorità Over 1,5 PT')&&timing[1].includes('Favorita in trasferta'));
-  assert(timing[2].includes('Priorità Goal PT')&&timing[3].includes('Priorità Goal PT'));
+  assert(timing[0].includes('Ordine di valutazione: Over 1,5 PT')&&timing[0].includes('Favorita in casa'));
+  assert(timing[1].includes('Ordine di valutazione: Over 1,5 PT')&&timing[1].includes('Favorita in trasferta'));
+  assert(timing[2].includes('Ordine di valutazione: Goal PT')&&timing[3].includes('Ordine di valutazione: Goal PT'));
+  assert(timing[0].includes('soltanto fra quelli idonei'));
   assert(timing[4].includes('Quote bilanciate')&&timing[4].includes('0,40'));
   assert((await page.locator('.mx-best h4').allTextContents())[2].includes('Goal'));
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Drought priority overflow');
@@ -229,7 +241,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'scope':SC
    assert(await page.evaluate(()=>{const e=document.querySelector('dialog.mx-modal');return e.scrollWidth<=e.clientWidth}),'Market caps modal overflow');
    await page.locator('[data-mx-close]').click();
   }
-  console.log('PASS V5 browser: full palinsesto, 58 core markets, modal tabs/focus/Escape/backdrop and Fast persistence, desktop/390/360, contrarian and missing-price filters, immutable live overlays');
+  console.log('PASS Gold v6.1 browser: versions, active/inactive combos, quote coverage, five targets, unchanged desktop/390/360 grid, modal and immutable live overlays');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
 
