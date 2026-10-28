@@ -14,11 +14,12 @@ from test_statistics_first import NOW
 
 
 class ReadOnlyStore:
-    def __init__(self, split=False):
+    def __init__(self, split=False, transform=None):
         self.objects, self.calls = {}, []
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); (root/'data').mkdir()
             m = fixture(); m['fixture'].update(home='Odense', country='Denmark', league='Superliga', match='Odense - Opponent')
+            if transform: transform(m)
             for day in range(1, 6):
                 write_store(root/f'data/arab_quote_day{day}.json', {'matches': [m] if day == 1 else []}, chunk_bytes=200 if split else 4*1024*1024)
             files = {}
@@ -64,5 +65,25 @@ class GoldPolicyDiagnostics(unittest.TestCase):
         del s3.objects[key]
         with self.assertRaises(KeyError): inspect_checkpoint(s3, 'test', NOW)
 
+    def test_combo_estimate_is_not_a_missing_quote_and_versions_are_observed(self):
+        from opportunity_policy import POLICY_ID
+        def transform(m):
+            matrix = m['multimarket']['matrix']
+            matrix['rows'].append({'id': 'halves_total:ft:over:.5:.5', 'spec': {
+                'kind': 'halves_total', 'period': 'ft', 'side': 'over', 'line': .5, 'extra': .5},
+                'period': 'ft', 'quote_status': 'missing', 'statistical_pct': 55,
+                'fair_odd': 100/55, 'quality': 'supported'})
+        s3 = ReadOnlyStore(transform=transform); before = deepcopy(s3.objects)
+        report = inspect_checkpoint(s3, 'test', NOW)
+        count = report['counts']['2026-10-26']
+        self.assertEqual(report['saved_policy_versions']['2026-10-26'], {POLICY_ID: 1})
+        self.assertEqual(count['with_combo_estimate'], 1)
+        self.assertEqual(count['inactive_combos_now'], 1)
+        self.assertEqual(count.get('missing_quote_filter_matches', 0), 0)
+        self.assertNotIn('missing', report['goal_quote_statuses']['2026-10-26'])
+        self.assertEqual(report['combo_exclusion_reasons']['2026-10-26']['combo_probability'], 1)
+        self.assertEqual(s3.objects, before)
+
 
 if __name__ == '__main__': unittest.main()
+

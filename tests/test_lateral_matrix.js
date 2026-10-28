@@ -84,3 +84,39 @@ assert(!pending.includes('data-opportunity-id'));
 assert.equal(api.bestOpportunity([stale]),null);
 assert(api.opportunityPanel([stale],null,{lastProposal:{...remembered,status:'withdrawn'}}).includes('Proposta ritirata'));
 
+// A statistical combo must be visible without pretending to have bookmaker odds.
+const combo={id:'combo',family:'combo',period:'ft',spec:{kind:'halves_total',period:'ft',side:'over',line:.5,extra:.5},
+ label:'Over 0,5 PT + Over 0,5 ST',quote_status:'missing',statistical_pct:60,fair_odd:100/60,
+ combo:{policy_id:api.POLICY,active:true,reasons:[],lambda_ht:1.4,lambda_sh:1.8,over25_ft_oci:20,price_available:false}};
+assert(api.opportunityPanel([priced,combo]).includes('★ Combo Consigliata'));
+assert(api.comboText([combo]).includes('Quota bookmaker non fornita; equa calcolata dal modello'));
+assert(api.marketRow(combo).includes('EV non calcolabile senza quota reale'));
+assert(api.marketRow(combo).includes('Riferimento Over 2,5 FT'));
+assert.equal(api.bestOpportunity([combo]),null,'An active price-less combo is not a priced main proposal');
+const complete={...matches[0],multimarket:{matrix:{rows:[priced,combo]}}};
+assert.equal(api.matchingRows(complete,{...opts,category:'no_quote'}).length,0,'A model-only combo does not flag an otherwise fully priced match');
+assert.equal(api.matchingRows({...complete,multimarket:{matrix:{rows:[priced,combo,stale]}}},{...opts,category:'no_quote'}).length,1);
+assert.equal(api.missingQuote({...priced,quote_status:'cached_stable'}),false);
+const blockedCombo={...combo,combo:{...combo.combo,active:false,reasons:['combo_goalless','combo_oci'],over25_ft_oci:-15},
+ goal_evidence:{teams:{home:{ft:{goalless_matches:2}},away:{ft:{goalless_matches:0}}}}};
+const blockedPanel=api.opportunityPanel([priced,blockedCombo]);
+assert(blockedPanel.includes('Combo non attiva'));
+assert(blockedPanel.includes('casa 2, ospite 0 (massimo 1 ciascuna)'));
+assert(blockedPanel.includes('OCI Over 2,5 FT -15,0'));
+assert(!blockedPanel.includes('★ Combo Consigliata'),'Probability above 56% cannot override failed structural/OCI conditions');
+assert(api.marketRow(blockedCombo).includes('Sotto soglia'));
+assert(!api.comboText([{...combo,combo:{...combo.combo,policy_id:'old'}}]).includes('★ Combo Consigliata'));
+assert(api.comboText([]).includes('valutazione non presente'));
+const over25ht={...high,label:'Over 2,5 PT',period:'ht',spec:{kind:'total',period:'ht',side:'over',line:2.5},odd:5,
+ opportunity:{...decision,min_probability_pct:18,ht_history_supported:true}};
+assert(api.extraGoalText([over25ht,combo]).includes('Over 2,5 PT: stima'));
+assert(api.extraGoalText([over25ht,combo]).includes('quota bookmaker 5,00'));
+assert(api.quoteCell({...stale,last_odd:2.4},'Over 2,5 FT').includes('Ultima quota 2,40 · non valida per la proposta'));
+assert(api.quoteCell({quote_status:'missing'},'GG PT').includes('Quota del mercato non ricevuta'));
+assert(!api.quoteCell({quote_status:'missing'},'GG PT').includes('Ultima quota · da confermare'));
+assert(api.extraGoalText([{...over25ht,quote_status:'missing',odd:null}]).includes('Valutazione sospesa in assenza di una quota utilizzabile'));
+assert(api.timingContext({pt_priority_active:true,preferred_pt_market:'over15_ht'}).includes('soltanto fra quelli idonei'));
+assert(api.timingContext({pt_priority_active:false}).includes('Confronto dei cinque mercati gol'));
+assert(releaseHtml.includes('<title>ArabSniper · Gold v6.1</title>'));
+console.log('PASS Gold v6.1: visible combo decisions, real quote coverage and explicit evaluation order');
+
