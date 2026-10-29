@@ -9,6 +9,7 @@ from matrix_quotes import (CATALOG, partition, migrate_handicap_history, ledger_
 from matrix_pipeline import build_board, selection_export
 from multimarket_model import stamp
 from opportunity_policy import POLICY_ID
+from platinum_policy import POLICY_ID as PLATINUM_POLICY_ID
 from gold_competitions import SCOPE_ID, enforce_day
 from market_scope import MARKET_SCOPE_ID, trim_matrix, core_market
 from proposal_stability import seed_stability
@@ -23,7 +24,8 @@ def cached_refresh_safe(paths):
     price_files = {'src/opportunity_policy.py', 'src/matrix_quotes.py', 'src/matrix_pipeline.py',
                    'src/homepage_preview.py', 'src/context_analysis.py', 'src/refresh_opportunities.py',
                    'src/statistics_integration.py', 'src/gold_policy_audit.py',
-                   'src/market_scope.py', 'src/proposal_stability.py'}
+                   'src/market_scope.py', 'src/proposal_stability.py',
+                   'src/platinum_policy.py', 'src/platinum_audit.py'}
     # This migration changes the computed market universe, not the Poisson
     # kernel or source statistics; the dedicated tests require identical core probabilities.
     if 'src/market_scope.py' in paths: price_files.add('src/lateral_matrix.py')
@@ -127,12 +129,15 @@ def main(directory='data'):
         policies = Counter(a.get('matrix', {}).get('opportunity_policy', {}).get('id') for a in upcoming)
         required = {market_id(s) for s in base_specs()}
         for a in upcoming:
+            if a.get('matrix', {}).get('platinum_policy', {}).get('id') != PLATINUM_POLICY_ID:
+                raise RuntimeError('Incomplete Platinum migration; refusing publication')
             if a.get('matrix', {}).get('opportunity_policy', {}).get('id') != POLICY_ID:
                 raise RuntimeError('Incomplete Gold policy migration; refusing publication')
             if a.get('rates') and not required.issubset({r['id'] for r in a['matrix']['rows']}):
                 raise RuntimeError('Incomplete Gold market migration; refusing publication')
         counters[path.name] = {'fixtures': count, 'eligible_markets': summary.get('eligible_markets', 0),
             'fixtures_with_proposal': summary.get('upcoming_fixtures_with_proposal', 0),
+            'fixtures_with_platinum': summary.get('upcoming_fixtures_with_platinum', 0),
             'saved_policy_versions': dict(policies),
             'fixtures_with_combo': sum(any(r.get('spec', {}).get('kind') == 'halves_total'
                 for r in a.get('matrix', {}).get('rows', [])) for a in upcoming),

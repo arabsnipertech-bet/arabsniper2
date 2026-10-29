@@ -358,6 +358,9 @@ def main(root=Path('.'), observed_at=None):
         'frozen_fixtures', 'snapshots', 'coverage', 'api_calls', 'production_policy_changed', 'strategies')}
     print('GOLD_POLICY_AUDIT_SUMMARY='+json.dumps(summary, ensure_ascii=False, separators=(',', ':')), flush=True)
     print('REQUESTED_CASE_DIAGNOSTICS='+json.dumps(cases, ensure_ascii=False, separators=(',', ':')), flush=True)
+    # Independent, ongoing tier: no end date and no changes to the Gold study.
+    from platinum_audit import main as audit_platinum
+    audit_platinum(root, now)
     return report
 
 

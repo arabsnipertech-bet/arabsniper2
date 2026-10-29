@@ -262,3 +262,37 @@ assert(api.halfTimeText({status:'complete',score:'1–0'}).includes('PT 1–0</b
 assert(api.halfTimeText({status:'complete',score:null}).includes('dato non disponibile'));
 assert(api.halfTimeText({status:'in_progress',score:'1–0',stale:true}).includes('ultimo rilevato'));
 
+
+// Shared boundary cases verify Python/client parity without changing Gold.
+const platinumCases=JSON.parse(fs.readFileSync('tests/platinum_cases.json','utf8'));
+const platinumNow=Date.parse(platinumCases.now),platinumOptions={now:platinumNow,kickoff:platinumCases.kickoff};
+const platinumDecision={policy_id:api.PLATINUM_POLICY,eligible:true,rank:1,evaluated_at:platinumCases.now};
+for(const test of platinumCases.cases){
+ const r={...structuredClone(platinumCases.base),...test.patch,platinum:platinumDecision};
+ assert.equal(api.platinumSignals([r],platinumOptions).length>0,test.eligible,test.name);
+}
+const platinum={...structuredClone(platinumCases.base),platinum:platinumDecision};
+assert.equal(api.platinumSignals([platinumCases.base],platinumOptions).length,0,'Old snapshots cannot acquire a new tier');
+assert.equal(api.platinumSignals([platinum],{...platinumOptions,now:platinumNow-1}).length,0);
+assert.equal(api.platinumSignals([platinum],{...platinumOptions,kickoff:platinumCases.now}).length,0);
+const cachedPlatinum={...platinum,quote_status:'cached_stable',cache_source_at:'2026-10-29T00:00:00Z',cache_expires_at:'2026-10-29T12:00:00Z'};
+assert.equal(api.platinumSignals([cachedPlatinum],platinumOptions).length,1);
+assert.equal(api.platinumSignals([cachedPlatinum],{...platinumOptions,now:Date.parse('2026-10-29T13:00:00Z')}).length,0);
+assert.equal(api.platinumSignals([cachedPlatinum],{...platinumOptions,now:Date.parse('2026-10-30T13:00:00Z'),archived:true}).length,1,'Preserve the actual prematch tier after kickoff');
+const tierMatch={...matches[0],fixture:{...matches[0].fixture,kickoff:platinumCases.kickoff},multimarket:{matrix:{rows:[platinum]}}};
+assert.equal(api.matchingRows(tierMatch,{...opts,category:'platinum'},platinumNow).length,1);
+assert.equal(api.matchingRows(tierMatch,{...opts,category:'market_signal'},platinumNow).length,0,'Silver is distinct from blue in category navigation');
+assert.equal(api.marketSignals([platinum],platinumOptions).length,1,'The underlying Radar thresholds remain unchanged');
+const both=[platinum,priced],bothBefore=JSON.stringify(both),goldBefore=api.bestOpportunity(both,platinumOptions);
+const silverPanel=api.opportunityPanel(both,null,platinumOptions);
+assert(silverPanel.includes('data-platinum-id'));
+assert(silverPanel.includes('<strong>PLATINUM</strong>'));
+assert(silverPanel.includes('Top Pick'));
+assert(silverPanel.includes('Giocata ufficiale Gold v6.1'));
+assert(silverPanel.includes('data-opportunity-id'));
+assert.equal(api.bestOpportunity(both,platinumOptions),goldBefore);
+assert.equal(JSON.stringify(both),bothBefore);
+assert(api.marketRow(platinum,{}, {platinum:true,marketSignal:true}).includes('<strong>PLATINUM</strong>'));
+assert(!api.marketRow(platinum,{}, {platinum:true,marketSignal:true}).includes('Radar di Mercato · Solo studio'));
+assert(!/undefined|NaN/.test(silverPanel));
+console.log('PASS Platinum: shared flow/value boundaries, missing statistics, separate silver filter, frozen archive and unchanged Gold decisions/ranking');

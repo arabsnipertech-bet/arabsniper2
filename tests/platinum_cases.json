@@ -1,0 +1,293 @@
+{
+  "now": "2026-10-29T10:00:00Z",
+  "kickoff": "2026-10-29T18:00:00Z",
+  "base": {
+    "id": "total|ft|over|3.5",
+    "label": "Over 3,5 FT",
+    "spec": {
+      "kind": "total",
+      "period": "ft",
+      "side": "over",
+      "line": 3.5
+    },
+    "family": "totals",
+    "period": "ft",
+    "quote_status": "recent",
+    "odd": 2.5,
+    "first_odd": 2.577319587628866,
+    "delta_pct": -3,
+    "oci": 30,
+    "selected_margin_pct": 9,
+    "bookmaker": "BOOK SINTETICO",
+    "paired_books": 3,
+    "agreeing_books": 2,
+    "movement_confirmed": true,
+    "fair_direction_coherent": true,
+    "selected_movement": {
+      "delta_pct": -3,
+      "fair_delta_pp": 1,
+      "persistence": 0.5,
+      "reversal": false
+    },
+    "quality": "prior_only",
+    "statistical_pct": null,
+    "ev_pct": null,
+    "ev_low_pct": null,
+    "opportunity": {
+      "policy_id": "gold-goals-v6.1",
+      "eligible": false,
+      "rank": null,
+      "reasons": [
+        "history",
+        "probability"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "name": "high_odds_without_statistics",
+      "patch": {},
+      "eligible": true
+    },
+    {
+      "name": "oci_below",
+      "patch": {
+        "oci": 29.999
+      },
+      "eligible": false
+    },
+    {
+      "name": "oci_absent",
+      "patch": {
+        "oci": null
+      },
+      "eligible": false
+    },
+    {
+      "name": "margin_above",
+      "patch": {
+        "selected_margin_pct": 9.001
+      },
+      "eligible": false
+    },
+    {
+      "name": "margin_absent",
+      "patch": {
+        "selected_margin_pct": null
+      },
+      "eligible": false
+    },
+    {
+      "name": "drop_below",
+      "patch": {
+        "delta_pct": -2.999,
+        "first_odd": 2.5772930175977566
+      },
+      "eligible": false
+    },
+    {
+      "name": "wrong_opening",
+      "patch": {
+        "first_odd": 3
+      },
+      "eligible": false
+    },
+    {
+      "name": "book_absent",
+      "patch": {
+        "bookmaker": ""
+      },
+      "eligible": false
+    },
+    {
+      "name": "not_majority",
+      "patch": {
+        "paired_books": 4,
+        "agreeing_books": 2
+      },
+      "eligible": false
+    },
+    {
+      "name": "one_book",
+      "patch": {
+        "paired_books": 1,
+        "agreeing_books": 1
+      },
+      "eligible": false
+    },
+    {
+      "name": "bad_integer",
+      "patch": {
+        "agreeing_books": 2.5
+      },
+      "eligible": false
+    },
+    {
+      "name": "more_than_total",
+      "patch": {
+        "agreeing_books": 4
+      },
+      "eligible": false
+    },
+    {
+      "name": "not_confirmed",
+      "patch": {
+        "movement_confirmed": false
+      },
+      "eligible": false
+    },
+    {
+      "name": "unfair_direction",
+      "patch": {
+        "fair_direction_coherent": false
+      },
+      "eligible": false
+    },
+    {
+      "name": "stale",
+      "patch": {
+        "quote_status": "stale"
+      },
+      "eligible": false
+    },
+    {
+      "name": "no_price",
+      "patch": {
+        "odd": null
+      },
+      "eligible": false
+    },
+    {
+      "name": "low_odds_no_value",
+      "patch": {
+        "odd": 2.49,
+        "first_odd": 2.5670103092783507
+      },
+      "eligible": false
+    },
+    {
+      "name": "outside_market",
+      "patch": {
+        "spec": {
+          "kind": "total",
+          "period": "ft",
+          "side": "under",
+          "line": 3.5
+        }
+      },
+      "eligible": false
+    },
+    {
+      "name": "movement_delta_pct-2.999",
+      "patch": {
+        "selected_movement": {
+          "delta_pct": -2.999,
+          "fair_delta_pp": 1,
+          "persistence": 0.5,
+          "reversal": false
+        }
+      },
+      "eligible": false
+    },
+    {
+      "name": "movement_fair_delta_pp0",
+      "patch": {
+        "selected_movement": {
+          "delta_pct": -3,
+          "fair_delta_pp": 0,
+          "persistence": 0.5,
+          "reversal": false
+        }
+      },
+      "eligible": false
+    },
+    {
+      "name": "movement_persistence0.499",
+      "patch": {
+        "selected_movement": {
+          "delta_pct": -3,
+          "fair_delta_pp": 1,
+          "persistence": 0.499,
+          "reversal": false
+        }
+      },
+      "eligible": false
+    },
+    {
+      "name": "movement_persistence1.001",
+      "patch": {
+        "selected_movement": {
+          "delta_pct": -3,
+          "fair_delta_pp": 1,
+          "persistence": 1.001,
+          "reversal": false
+        }
+      },
+      "eligible": false
+    },
+    {
+      "name": "movement_reversalTrue",
+      "patch": {
+        "selected_movement": {
+          "delta_pct": -3,
+          "fair_delta_pp": 1,
+          "persistence": 0.5,
+          "reversal": true
+        }
+      },
+      "eligible": false
+    },
+    {
+      "name": "ev_route",
+      "patch": {
+        "odd": 1.9,
+        "first_odd": 1.958762886597938,
+        "ev_pct": 10
+      },
+      "eligible": true
+    },
+    {
+      "name": "ev_below",
+      "patch": {
+        "odd": 1.9,
+        "first_odd": 1.958762886597938,
+        "ev_pct": 9.999
+      },
+      "eligible": false
+    },
+    {
+      "name": "negative_ev_high_odds",
+      "patch": {
+        "ev_pct": -80,
+        "ev_low_pct": -95
+      },
+      "eligible": true
+    },
+    {
+      "name": "weak_statistics",
+      "patch": {
+        "statistical_pct": 5,
+        "quality": "limited"
+      },
+      "eligible": true
+    },
+    {
+      "name": "no_gold_decision",
+      "patch": {
+        "opportunity": null
+      },
+      "eligible": true
+    },
+    {
+      "name": "gold_eligible",
+      "patch": {
+        "opportunity": {
+          "policy_id": "gold-goals-v6.1",
+          "eligible": true,
+          "rank": 1
+        }
+      },
+      "eligible": true
+    }
+  ]
+}

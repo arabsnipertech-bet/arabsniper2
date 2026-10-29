@@ -132,6 +132,7 @@ from matrix_quotes import attach
 from copy import deepcopy
 from test_gold_scope_goals import example
 from opportunity_policy import annotate
+from platinum_policy import annotate as annotate_platinum
 from test_opportunity_policy import row
 from lateral_matrix import specification as S, label
 from gold_competitions import SCOPE_ID
@@ -182,9 +183,23 @@ for rows in [[watch],[pt],[dict(watch,statistical_pct=10,ev_pct=-75,ev_low_pct=-
 assert monitor[0]['matrix']['rows'][0]['opportunity']['reasons']==['probability']
 assert monitor[1]['matrix']['rows'][0]['opportunity']['reasons']==['probability']
 assert sum(r['opportunity']['eligible'] for b in monitor for r in b['matrix']['rows'])==1
-print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':monitor,'scope':SCOPE_ID}))
+elite=[]
+strong=dict(watch,odd=2.5,first_odd=2.5/.96,delta_pct=-4,statistical_pct=None,ev_pct=None,
+            ev_low_pct=None,quality='prior_only',ht_evidence=None,goal_evidence=None,
+            selected_movement={'delta_pct':-4,'fair_delta_pp':1,'persistence':.75,'reversal':False})
+excellent=dict(strong,id='elite-ht',spec=S('total','ht','over',1.5),period='ht',label='Over 1,5 PT',
+               odd=1.9,first_odd=1.9/.96,ev_pct=10)
+both=row(id='both',odd=2.5,first_odd=2.5/.92,bookmaker='BOOK SINTETICO')
+for r in [strong,excellent,both,row(id='gold-only',oci=0),dict(strong,delta_pct=-2,first_odd=2.5/.98,
+          selected_movement={'delta_pct':-2,'fair_delta_pp':1,'persistence':.75,'reversal':False}),dict(strong,oci=0)]:
+ b=deepcopy(a);b['matrix']['rows']=[deepcopy(r)]
+ annotate(b['matrix'],NOW,b)
+ annotate_platinum(b['matrix'],match()['fixture'],NOW)
+ elite.append(b)
+assert sum(bool(b['matrix']['platinum_policy']['best_market_id']) for b in elite)==3
+print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':monitor,'elite':elite,'scope':SCOPE_ID}))
 `],{encoding:'utf8',maxBuffer:10*1024*1024});
- const {variants,contexts,caps,monitor,scope}=JSON.parse(raw),now=Date.now();
+ const {variants,contexts,caps,monitor,elite,scope}=JSON.parse(raw),now=Date.now();
  Object.assign(caps[4].matrix.rows[0],{quote_status:'cached_stable',cache_source_at:new Date(now-2*3600000).toISOString(),cache_expires_at:new Date(now+10*3600000).toISOString()});
  const payload={gold_scope:{policy_id:scope},updated_at:new Date(now).toISOString(),multimarket_method:{model_id:'lateral-matrix-v5.0'},matches:Array.from({length:9},(_,i)=>({gold_scope:{policy_id:scope,allowed:true},fixture:{fixture_id:String(i+1),home:'Squadra casa',away:'Squadra ospite',
   kickoff:new Date(now+7200000+i*60000).toISOString(),status_short:'NS',time:'20:45',country:'Italia',league:'DATI SINTETICI DI VERIFICA',match:i===8?'Nome squadra molto lungo per verificare la visualizzazione da telefono – Avversaria':'Squadra '+(i+1)+' – Avversaria'},multimarket:structuredClone(variants[i%2])}))};
@@ -421,6 +436,56 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   await page.locator('[data-mx-category="market_signal"]').click();
   assert.equal(await page.locator('.mx-card').count(),4);
   console.log('PASS market radar: absent statistics and negative EV, separate category/counts, official Gold unchanged, blue desktop/mobile cards and matrix, no live reclassification');
+  const tiered={...payload,matches:elite.map((a,i)=>({...payload.matches[i],fixture:{...payload.matches[i].fixture,fixture_id:String(501+i),match:'Verifica Platinum '+(i+1)},multimarket:structuredClone(a)}))};
+  for(const m of tiered.matches){
+   m.multimarket.matrix.platinum_policy.evaluated_at=new Date(now).toISOString();
+   for(const r of m.multimarket.matrix.rows)r.platinum.evaluated_at=new Date(now).toISOString();
+  }
+  await page.evaluate(p=>{Object.assign(ArabMatrix.state,{category:'all',period:'all',family:'all',phase:'all',search:''});currentPayload=p;renderMatchResearch(p)},tiered);
+  const frozenTiers=await page.evaluate(()=>JSON.stringify(currentPayload));
+  for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
+   await page.setViewportSize({width,height:844});
+   assert.equal(await page.locator('.mx-card-platinum').count(),3);
+   assert.equal(await page.locator('.mx-match-layout > .mx-best-platinum').count(),3);
+   assert.equal(await page.locator('.mx-match-layout > .mx-best-stable').count(),1,'Official Gold remains available');
+   assert.equal(await page.locator('.mx-best-market').count(),1);
+   const silver=page.locator('[data-live-fixture="501"]');
+   assert.equal(await silver.locator('header .mx-tier-label').textContent(),'PLATINUM');
+   assert.equal(await silver.locator('header .mx-tier-label').evaluate(e=>getComputedStyle(e).color),'rgb(237, 243, 250)');
+   assert(+await silver.locator('header .mx-tier-label strong').evaluate(e=>getComputedStyle(e).fontWeight)>=700);
+   assert.equal(await silver.locator('.mx-best-platinum').getAttribute('data-opportunity-id'),null);
+   assert(!(await silver.locator('.mx-best-platinum').textContent()).includes('Nessuna proposta supera'));
+   assert(!/NaN|undefined/.test(await silver.textContent()));
+   await page.locator('[data-mx-category="platinum"]').click();
+   assert.equal(await page.locator('.mx-card').count(),3);
+   assert.equal(await page.locator('[data-mx-category="platinum"] b').textContent(),'3');
+   assert.equal(await page.locator('[data-mx-category="market_signal"] b').textContent(),'1');
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Platinum overflow '+name);
+   await page.locator('[data-mx-category="platinum"]').scrollIntoViewIfNeeded();
+   await page.screenshot({path:`test-artifacts/matrix-platinum-${name}.png`});
+   await page.locator('[data-mx-filter="period"]').selectOption('ht');
+   assert.equal(await page.locator('.mx-card').count(),1);
+   assert((await page.locator('.mx-best-platinum h4').textContent()).includes('Over 1,5 PT'));
+   await page.locator('[data-mx-filter="period"]').selectOption('all');
+   await page.locator('[data-mx-open]').first().click();
+   assert.equal(await page.locator('dialog .mx-market-row .mx-platinum').count(),1);
+   assert.equal(await page.locator('dialog .mx-market-row .mx-market-signal').count(),0);
+   assert((await page.locator('dialog .mx-market-row').textContent()).includes('Gold: Scartato'));
+   await page.locator('[data-mx-close]').click();
+   const official=page.locator('[data-live-fixture="503"] .mx-platinum-gold');
+   await official.locator('summary').click();
+   assert.equal(await official.locator('[data-opportunity-id]').count(),1);
+   await official.locator('summary').click();
+   await page.locator('[data-mx-category="all"]').click();
+   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozenTiers);
+  }
+  await page.evaluate(()=>{ArabLive.accept({schema_version:1,enabled:true,fixtures:{'501':{fixture_id:'501',status:'1H',elapsed:1,goals:{home:0,away:0},observed_at:new Date(Date.now()+1000).toISOString()}}});renderMatchResearch(currentPayload)});
+  await page.locator('[data-mx-category="platinum"]').click();
+  assert.equal(await page.locator('.mx-card').count(),3,'A stored prematch Platinum stays visible live');
+  await page.locator('[data-mx-filter="phase"]').selectOption('upcoming');
+  assert.equal(await page.locator('.mx-card').count(),2);
+  assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozenTiers);
+  console.log('PASS Platinum browser: backend decisions, silver title/cards/filter, no-statistics and EV routes, separate Gold, immutable live, desktop/390/360');
   console.log('PASS Gold v6.1 browser: concise cards, green/yellow/red combos, versions, quote coverage, unchanged desktop/390/360 grid, modal and immutable live overlays');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
