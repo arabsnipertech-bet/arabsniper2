@@ -38,6 +38,7 @@ jobs:
           node tests/test_homepage.js
           node tests/test_results.js
       - run: node tests/test_dashboard.js
+      - run: node tests/test_gold_calendar.cjs
       - run: node tests/test_statistics_first.js
       - run: node tests/test_lateral_matrix.js
       - run: node tests/test_storage_loader.cjs
@@ -68,3 +69,4 @@ jobs:
           name: context-dashboard-previews
           path: test-artifacts/
           if-no-files-found: ignore
+

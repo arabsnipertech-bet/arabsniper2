@@ -55,6 +55,71 @@ async function verifyCachedRelease(browser,payload){
   console.log('PASS Gold release: cached v6 bundle replaced by versioned v6.1, current whitelist fixtures visible');
  }finally{await page.close();await new Promise(resolve=>server.close(resolve));}
 }
+async function verifyCalendarRollover(browser,payload){
+ const http=require('node:http');
+ let dates=['2026-10-28','2026-10-29','2026-10-30','2026-10-31','2026-11-01'];
+ const assets=new Set(['statistics-first.js','statistics-first.css','lateral-matrix.js','lateral-matrix.css','live-scores.js']);
+ const server=http.createServer((req,res)=>{
+  const url=new URL(req.url,'http://127.0.0.1');
+  res.setHeader('Cache-Control','no-store');
+  if(url.pathname==='/gold-dashboard-live'){
+   res.setHeader('Content-Type','text/html; charset=utf-8');return res.end(fs.readFileSync('web/gold-dashboard-live.html'));
+  }
+  if(url.pathname==='/api/auth/session'){
+   res.setHeader('Content-Type','application/json');return res.end('{"active":true}');
+  }
+  if(url.pathname.startsWith('/api/gold-data/')){
+   const slot=url.pathname.match(/arab_quote_day([1-5])\.json$/);
+   res.setHeader('Content-Type','application/json');
+   if(!slot)return res.end('{}');
+   const date=dates[Number(slot[1])-1],match=structuredClone(payload.matches[0]);
+   match.fixture={...match.fixture,fixture_id:date,match:'Partita di prova '+date,
+    date,kickoff:date+'T18:00:00Z',status_short:'NS',time:'19:00'};
+   return res.end(JSON.stringify({...payload,date,updated_at:'2026-10-28T23:22:00Z',matches:[match]}));
+  }
+  const file=url.pathname.slice(1);
+  if(assets.has(file)){
+   res.setHeader('Content-Type',file.endsWith('.css')?'text/css':'text/javascript');return res.end(fs.readFileSync('web/'+file));
+  }
+  res.statusCode=404;res.end();
+ });
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const context=await browser.newContext({timezoneId:'America/Los_Angeles'});
+ const page=await context.newPage();
+ try{
+  await page.clock.install({time:new Date('2026-10-29T05:30:00Z')});
+  await page.goto('http://127.0.0.1:'+server.address().port+'/gold-dashboard-live');
+  await page.waitForFunction(()=>document.getElementById('selectedDay').textContent==='Giorno 1 · 29/10'&&document.querySelectorAll('.mx-card').length===1);
+  assert((await page.locator('#fileSource').textContent()).includes('day2.json'));
+  assert((await page.locator('.mx-card').textContent()).includes('Partita di prova 2026-10-29'));
+  assert(!(await page.locator('#matchResearch').textContent()).includes('2026-10-28'));
+  assert((await page.locator('#liveStatus').textContent()).includes('in attesa della nuova scansione'));
+  for(const [name,width,height] of [['desktop',1280,1000],['mobile',360,800]]){
+   await page.setViewportSize({width,height});
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   await page.screenshot({path:`test-artifacts/calendar-${name}.png`,fullPage:true});
+  }
+  await page.locator('.day-btn[data-day="2"]').click();
+  await page.waitForFunction(()=>document.getElementById('fileSource').textContent.includes('day3.json'));
+  assert((await page.locator('.mx-card').textContent()).includes('2026-10-30'));
+  await page.locator('.day-btn[data-day="5"]').click();
+  await page.waitForFunction(()=>document.getElementById('liveStatus').textContent==='Giornata in aggiornamento');
+  assert.equal(await page.locator('.mx-card').count(),0);
+  assert((await page.locator('#matchResearch').textContent()).includes('02/11 non ancora pubblicati'));
+  // New Night publication: the same calendar selection now resolves to day1.
+  dates=['2026-10-29','2026-10-30','2026-10-31','2026-11-01','2026-11-02'];
+  await page.locator('.day-btn[data-day="1"]').click();
+  await page.waitForFunction(()=>document.getElementById('liveStatus').textContent==='Dati caricati · scansione separata');
+  assert((await page.locator('#fileSource').textContent()).includes('day1.json'));
+  // An already-open page rolls forward in Rome, independently of browser timezone.
+  await page.clock.setFixedTime(new Date('2026-10-29T23:01:00Z'));
+  await page.clock.runFor(60000);
+  await page.waitForFunction(()=>document.getElementById('selectedDay').textContent==='Giorno 1 · 30/10'&&document.getElementById('fileSource').textContent.includes('day2.json'));
+  assert((await page.locator('.day-btn.active').textContent()).includes('30/10'));
+  assert((await page.locator('.mx-card').textContent()).includes('2026-10-30'));
+  console.log('PASS Gold calendar: real HTTP stale/current feeds, desktop/mobile, missing date and open-page Rome midnight');
+ }finally{await context.close();await new Promise(resolve=>server.close(resolve));}
+}
 (async()=>{
  const raw=cp.execFileSync('python',['-c',`
 import sys,json
@@ -133,6 +198,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
  const browser=await chromium.launch({headless:true});
  try{
   await verifyCachedRelease(browser,payload);
+  await verifyCalendarRollover(browser,payload);
   const page=await browser.newPage();await page.route('**/*',r=>r.abort());
   await page.setContent(fs.readFileSync('web/gold-dashboard-live.html','utf8'));
   await page.addStyleTag({content:fs.readFileSync('web/lateral-matrix.css','utf8')});

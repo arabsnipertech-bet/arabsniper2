@@ -878,7 +878,8 @@
     let currentMatches = [];
     let filteredMatches = [];
     let relationFilter = 'all';
-    let refreshTimer = null; // mantenuto solo per compatibilità; nessun timer viene avviato
+    let calendarBase = calendarDate();
+    let dayLoadSequence = 0;
     let hourMenuReady = false;
     let initialHourScrollDone = false;
 
@@ -934,11 +935,28 @@
       return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString('it-IT');
     }
 
+    function calendarDate(offset = 0, now = new Date()) {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).formatToParts(now);
+      const value = type => parts.find(part => part.type === type).value;
+      return new Date(Date.UTC(Number(value('year')), Number(value('month')) - 1,
+        Number(value('day')) + offset)).toISOString().slice(0, 10);
+    }
+
     function dayDate(offset) {
-      const date = new Date();
-      date.setHours(12, 0, 0, 0);
-      date.setDate(date.getDate() + offset);
-      return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
+      const date = new Date(`${calendarBase}T12:00:00Z`);
+      date.setUTCDate(date.getUTCDate() + offset);
+      return date.toLocaleDateString('it-IT', { timeZone: 'Europe/Rome', day: '2-digit', month: '2-digit' });
+    }
+
+    function checkCalendarRollover() {
+      if (document.hidden || document.getElementById('app').hidden || calendarBase === calendarDate()) return;
+      currentDay = 1;
+      contextDetailId = null;
+      initialHourScrollDone = false;
+      setDefaultHourForDay();
+      return loadCurrentDay();
     }
 
     let loginChallenge = null;
@@ -1018,6 +1036,7 @@
     }
 
     function buildDayButtons() {
+      calendarBase = calendarDate();
       const container = document.getElementById('dayButtons');
       container.innerHTML = '';
       for (let day = 1; day <= 5; day += 1) {
@@ -1059,7 +1078,9 @@
     function setDefaultHourForDay() {
       const select = document.getElementById('hourSelect');
       if (!select) return;
-      const hour = currentDay === 1 ? new Date().getHours() : 0;
+      const hour = currentDay === 1 ? Number(new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Rome', hour: '2-digit', hourCycle: 'h23'
+      }).format(new Date())) : 0;
       select.value = String(hour).padStart(2, '0');
     }
 
@@ -1181,16 +1202,58 @@
       return JSON.parse(new TextDecoder('utf-8', {fatal:true}).decode(joined));
     }
 
+    async function loadCalendarDay(day, targetDate) {
+      // File positions belong to the last scan, not necessarily to today's date.
+      // Follow the date offset without changing forecasts or their timestamps.
+      const visited = new Set();
+      let slot = day;
+      while (slot >= 1 && slot <= 5 && !visited.has(slot)) {
+        visited.add(slot);
+        const file = `arab_quote_day${slot}.json`;
+        const payload = await loadJson(file);
+        const date = payload?.date;
+        if (!Array.isArray(payload?.matches) || typeof date !== 'string' ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date)) ||
+            new Date(date).toISOString().slice(0, 10) !== date) {
+          throw new Error('Data della giornata non valida. Ricarica i dati.');
+        }
+        if (date === targetDate) return {payload, file, shifted: slot !== day};
+        slot += (Date.parse(targetDate) - Date.parse(date)) / 86400000;
+      }
+      const error = new Error(`Dati del ${formatDateIt(targetDate)} non ancora pubblicati. Ricarica dopo la prossima scansione.`);
+      error.code = 'GOLD_DAY_PENDING';
+      throw error;
+    }
+
     async function loadCurrentDay(options = {}) {
+      const request = ++dayLoadSequence;
+      buildDayButtons();
+      const day = currentDay;
+      const baseDate = calendarBase;
+      const targetDate = calendarDate(day - 1);
       const preservePosition = Boolean(options.preservePosition);
       const anchor = preservePosition ? captureViewportAnchor() : null;
-      const file = `arab_quote_day${currentDay}.json`;
       const grid = document.getElementById('matchesGrid');
       document.getElementById('liveStatus').textContent = 'Sincronizzazione in corso...';
-      if (!preservePosition) grid.innerHTML = '<div class="empty">Caricamento dati...</div>';
+      if (!preservePosition || currentPayload?.date !== targetDate) {
+        currentPayload = null;
+        currentMatches = [];
+        filteredMatches = [];
+        closeDetail();
+        document.getElementById('marketRankings')?.remove();
+        document.getElementById('matchCount').textContent = '0 partite';
+        document.getElementById('matchResearch').innerHTML = '<div class="empty">Caricamento dati...</div>';
+        grid.innerHTML = '<div class="empty">Caricamento dati...</div>';
+        document.getElementById('selectedDay').textContent = `Giorno ${day} · ${formatDateIt(targetDate)}`;
+        document.getElementById('fileSource').textContent = 'Fonte: in verifica';
+        document.getElementById('updatedAt').textContent = 'Ultima scansione: —';
+      }
       try {
-        let payload = await loadJson(file);
-        if (!payload || !Array.isArray(payload.matches)) throw new Error(`Formato JSON non valido in ${file}`);
+        const loaded = await loadCalendarDay(day, targetDate);
+        if (request !== dayLoadSequence) return;
+        if (baseDate !== calendarDate()) { await checkCalendarRollover(); return; }
+        const {file, shifted} = loaded;
+        let payload = loaded.payload;
         if(window.ArabMatrix)payload=window.ArabMatrix.scopePayload(payload);
         currentPayload = payload;
         window.ArabLive?.poll();
@@ -1198,23 +1261,30 @@
         renderMatchResearch(payload);
         loadModelResearch();
         currentMatches = [...payload.matches];
-        document.getElementById('selectedDay').textContent = `Giorno ${currentDay} · ${formatDateIt(payload.date)}`;
+        document.getElementById('selectedDay').textContent = `Giorno ${day} · ${formatDateIt(payload.date)}`;
         document.getElementById('fileSource').textContent = `Fonte: ${file}`;
         document.getElementById('updatedAt').textContent = `Ultima scansione: ${formatTimestamp(payload.updated_at)}`;
-        document.getElementById('liveStatus').textContent = currentDay === 1
-          ? 'Dati caricati · scansione separata'
-          : `Snapshot Day ${currentDay} · aggiornamento manuale`;
+        document.getElementById('liveStatus').textContent = shifted
+          ? `Dati del ${formatDateIt(targetDate)} · in attesa della nuova scansione`
+          : day === 1 ? 'Dati caricati · scansione separata' : `Snapshot Day ${day} · aggiornamento manuale`;
         applyFilters();
         if (preservePosition) restoreViewportAnchor(anchor);
         else if (!payload.multimarket_method) maybeAutoScrollToHour(false);
       } catch (err) {
+        if (request !== dayLoadSequence) return;
+        if (baseDate !== calendarDate()) { await checkCalendarRollover(); return; }
         console.error(err);
+        currentPayload = null;
         currentMatches = [];
+        filteredMatches = [];
+        const pending = err.code === 'GOLD_DAY_PENDING';
         document.getElementById('marketRankings')?.remove();
-        document.getElementById('matchResearch').innerHTML = '<div class="empty">Analisi non disponibile. Ricarica i dati.</div>';
-        grid.innerHTML = `<div class="error">${escapeHtml(err.message)}. Verifica che il nuovo script abbia pubblicato il file nel repository.</div>`;
+        document.getElementById('matchResearch').innerHTML = `<div class="empty">${pending ? escapeHtml(err.message) : 'Analisi non disponibile. Ricarica i dati.'}</div>`;
+        grid.innerHTML = `<div class="${pending ? 'empty' : 'error'}">${escapeHtml(err.message)}</div>`;
+        document.getElementById('fileSource').textContent = 'Fonte: in attesa di dati validi';
+        document.getElementById('updatedAt').textContent = 'Ultima scansione: —';
         document.getElementById('matchCount').textContent = '0 partite';
-        document.getElementById('liveStatus').textContent = 'Errore caricamento';
+        document.getElementById('liveStatus').textContent = pending ? 'Giornata in aggiornamento' : 'Errore caricamento';
         if (preservePosition) restoreViewportAnchor(anchor);
       }
     }
@@ -2391,6 +2461,10 @@
       });
     }
     window.addEventListener('arabsniper-live-update',updateLiveFields);
+    // Only the calendar changes here; ordinary quote refresh remains manual.
+    document.addEventListener('visibilitychange', checkCalendarRollover);
+    window.addEventListener('focus', checkCalendarRollover);
+    window.setInterval(checkCalendarRollover, 60000);
     initializeAccess();
   </script>
 </body>
