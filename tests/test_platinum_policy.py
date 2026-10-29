@@ -5,7 +5,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'src'))
-from platinum_policy import evaluate, annotate, POLICY_ID
+from platinum_policy import evaluate, annotate, POLICY_ID, LEGACY_POLICY_ID
 from platinum_audit import capture, report
 from gold_policy_audit import attach_result
 from lateral_matrix import MODEL_ID
@@ -32,6 +32,35 @@ class PlatinumPolicy(unittest.TestCase):
                 row = {**deepcopy(CASES['base']), **case['patch']}; before = deepcopy(row)
                 self.assertEqual(evaluate(row, NOW)['eligible'], case['eligible'])
                 self.assertEqual(row, before)
+
+    def test_ev_floor_reasons_and_invalid_values(self):
+        row = deepcopy(CASES['base'])
+        self.assertEqual(evaluate({**row, 'ev_pct': -15}, NOW)['qualification'], 'high_odds')
+        self.assertEqual(evaluate({**row, 'ev_pct': -15.0001}, NOW)['reasons'], ['ev_floor'])
+        for invalid in (float('nan'), float('inf'), float('-inf'), True, '-15'):
+            with self.subTest(ev=invalid):
+                self.assertEqual(evaluate({**row, 'ev_pct': invalid}, NOW)['reasons'], ['ev_unavailable'])
+        row.pop('ev_pct'); row.pop('statistical_pct')
+        self.assertTrue(evaluate(row, NOW)['eligible'])
+
+    def test_excluded_primary_falls_back_without_changing_gold_or_combo(self):
+        m = fixture(); matrix = m['multimarket']['matrix']
+        rejected = matrix['rows'][0]
+        rejected.update(oci=80, ev_pct=-15.0001, combo={'active': False, 'reasons': ['example']})
+        alternate = {**deepcopy(CASES['base']), 'id': 'over25', 'ev_pct': -15,
+                     'spec': {**CASES['base']['spec'], 'line': 2.5}}
+        matrix['rows'].append(alternate)
+        before = deepcopy(matrix)
+        annotate(matrix, m['fixture'], NOW)
+        self.assertEqual(matrix['platinum_policy']['best_market_id'], 'over25')
+        self.assertEqual(matrix['platinum_policy']['eligible_markets'], 1)
+        self.assertEqual(rejected['platinum']['reasons'], ['ev_floor'])
+        self.assertIsNone(rejected['platinum']['rank'])
+        self.assertEqual(alternate['platinum']['rank'], 1)
+        for old, new in zip(before['rows'], matrix['rows']):
+            self.assertEqual({k: v for k, v in old.items() if k != 'platinum'},
+                             {k: v for k, v in new.items() if k != 'platinum'})
+        self.assertEqual(matrix['opportunity_policy'], before['opportunity_policy'])
 
     def test_cache_window_never_renews(self):
         row = {**CASES['base'], 'quote_status': 'cached_stable',
@@ -117,6 +146,33 @@ class PlatinumPolicy(unittest.TestCase):
             first = read_store(root/'data/arab_quote_platinum_audit.json')
             main(root, now)
             self.assertEqual(read_store(root/'data/arab_quote_platinum_audit.json'), first)
+
+    def test_audit_migrates_ledger_without_rewriting_legacy_snapshots(self):
+        import contextlib, io, tempfile
+        from platinum_audit import main
+        from audit_storage import read_store, write_store
+        store = {'schema_version': 1, 'policy_id': LEGACY_POLICY_ID}
+        capture(store, fixture(), NOW)
+        legacy = store['fixtures']['100']['snapshots'][0]
+        legacy['policy_id'] = LEGACY_POLICY_ID
+        legacy['choice']['platinum']['policy_id'] = LEGACY_POLICY_ID
+        # Treat the earlier snapshot, including its stored digest, as immutable.
+        before = deepcopy(legacy)
+        m = fixture(); later = '2026-10-29T11:00:00Z'
+        annotate(m['multimarket']['matrix'], m['fixture'], later)
+        with tempfile.TemporaryDirectory() as folder, contextlib.redirect_stdout(io.StringIO()):
+            root = Path(folder)
+            write_store(root/'data/arab_quote_platinum_audit.json', store)
+            write_store(root/'data/arab_quote_day1.json', {'matches': [m]})
+            result = main(root, later)
+            saved = read_store(root/'data/arab_quote_platinum_audit.json')
+            self.assertEqual(saved['policy_id'], POLICY_ID)
+            self.assertEqual(saved['fixtures']['100']['snapshots'][0], before)
+            self.assertEqual(len(saved['fixtures']['100']['snapshots']), 2)
+            self.assertEqual({(g['policy_id'], g['snapshot']) for g in result['groups']},
+                             {(LEGACY_POLICY_ID, 'first'), (POLICY_ID, 'latest')})
+            main(root, later)
+            self.assertEqual(read_store(root/'data/arab_quote_platinum_audit.json'), saved)
 
 
 if __name__ == '__main__': unittest.main()
