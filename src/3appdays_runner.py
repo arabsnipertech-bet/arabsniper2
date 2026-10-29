@@ -184,7 +184,13 @@ def stream_process(command: list[str], *, heartbeat_seconds: float = 60,
     return subprocess.CompletedProcess(command, code, tails["stdout"], tails["stderr"])
 
 
-def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "") -> int:
+def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "", force_night: bool = False) -> int:
+    if mode == "night":
+        from night_scan_guard import completed_today
+        force_night = force_night or os.getenv("ARAB_FORCE_NIGHT") == "true"
+        if not force_night and completed_today(PROJECT_ROOT):
+            log("Night Scan già completato oggi (Europe/Rome): nessuna nuova chiamata API")
+            return 0
     engine_file = resolve_engine_file()
     if not engine_file.exists():
         log(f"❌ Motore non trovato. Cercati: {', '.join(str(path) for path in ENGINE_CANDIDATES)}")
@@ -194,6 +200,7 @@ def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "") ->
         log(f"⚠️ Uso copia fallback {engine_file.name}; online è preferibile rinominarla 3appdays.py")
     command = build_command(mode, github=github, days=days, audit_date=audit_date)
     log(f"🚀 Avvio: {' '.join(command)}")
+    started_at = now_iso()
     report = {
         "mode": mode,
         "github": github,
@@ -202,10 +209,18 @@ def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "") ->
         "command": command,
         "returncode": None,
         "status": "running",
-        "generated_at": now_iso(),
+        "generated_at": started_at,
+        "started_at": started_at,
     }
     atomic_write_json(RUN_STATE_FILE, report)
     result = stream_process(command)
+    if mode == "night" and result.returncode == 0:
+        from night_scan_guard import record_completion
+        try:
+            record_completion(PROJECT_ROOT, started_at, now_iso())
+        except (ValueError, OSError) as error:
+            log(f"❌ Verifica Night Scan fallita: {error}")
+            result = subprocess.CompletedProcess(command, 3, result.stdout, str(error))
     report.update(
         returncode=result.returncode,
         status="ok" if result.returncode == 0 else "error",
@@ -232,6 +247,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--audit-date", type=str, default="", help="Data audit YYYY-MM-DD, default oggi")
     parser.add_argument("--days", type=int, default=5, help="Giorni del night, massimo 7")
     parser.add_argument("--github", action="store_true", help="Pubblica i JSON dedicati")
+    parser.add_argument("--force-night", action="store_true", help="Ripeti esplicitamente il Night Scan già completato")
     return parser.parse_args()
 
 
@@ -240,9 +256,11 @@ def main() -> None:
     mode = "fast" if args.fast else "night" if args.night else "catalog" if args.catalog else "audit"
     raise SystemExit(run(
         mode, github=args.github, days=max(1, min(args.days, 7)), audit_date=args.audit_date,
+        force_night=args.force_night,
     ))
 
 
 if __name__ == "__main__":
     main()
+
 
