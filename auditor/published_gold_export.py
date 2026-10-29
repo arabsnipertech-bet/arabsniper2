@@ -30,6 +30,7 @@ def collect_published(s3, bucket, date, observed_at):
         if not isinstance(data, dict) or not isinstance(data.get('matches'), list):
             raise ValueError('Invalid published Gold feed')
         sources[key] = {'sha256': sha(raw), 'bytes': len(raw),
+            'date': data.get('date'), 'matches': len(data['matches']),
             'generated_at': data.get('generated_at') or data.get('updated_at'),
             'last_modified': response['LastModified'].isoformat() if response.get('LastModified') else None}
         for match in data['matches']:

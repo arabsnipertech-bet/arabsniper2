@@ -16,7 +16,7 @@ class PublishedFeed:
             'gold_scope': {'allowed': True}, 'multimarket': {'model_id': 'lateral-matrix-v5.0', 'matrix': {
                 'rows': [{'id': 'goal', 'spec': {'kind': 'total', 'period': 'ft', 'side': 'over', 'line': 2.5},
                     'opportunity': {'eligible': False, 'rank': None}, 'statistical_pct': 43, 'odd': 2.5}]}}}
-        self.data = {'matches': [self.match], 'generated_at': '2026-10-28T10:00:00Z', 'gold_scope': {'policy_id': 'published'}}
+        self.data = {'date': '2026-10-28', 'matches': [self.match], 'generated_at': '2026-10-28T10:00:00Z', 'gold_scope': {'policy_id': 'published'}}
 
     def get_object(self, Bucket, Key):
         self.calls.append(Key)
@@ -39,6 +39,8 @@ class PublishedGoldExport(unittest.TestCase):
         self.assertEqual(result['provider_calls'], 0)
         self.assertEqual(result['checkpoint_writes'], 0)
         self.assertEqual(len(result['sources']), 5)
+        self.assertEqual(result['sources']['arab_quote_day1.json']['date'], '2026-10-28')
+        self.assertEqual(result['sources']['arab_quote_day1.json']['matches'], 1)
 
     def test_rome_date_and_invalid_dates(self):
         source = PublishedFeed()
