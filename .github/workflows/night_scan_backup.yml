@@ -1,0 +1,35 @@
+name: ArabSniper Night Backup
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Controlla senza avviare il Night Scan'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+  actions: write
+
+# Separate from the data writers: a wake-up must not replace a pending scan.
+concurrency:
+  group: arabsniper-night-backup
+  cancel-in-progress: false
+
+jobs:
+  check-and-wake:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Check Night status and wake only when necessary
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NIGHT_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+        run: python3 src/night_backup_dispatch.py

@@ -7,6 +7,7 @@ on:
       - 'tests/**'
       - 'auditor/current_audit.py'
       - '.github/workflows/policy_tests.yml'
+      - '.github/workflows/night_scan_backup.yml'
       - 'web/gold-dashboard-live.html'
       - 'web/index.html'
       - 'web/homepage.js'
@@ -19,7 +20,7 @@ on:
       - 'workers/live-scores/**'
   push:
     branches: [main]
-    paths: ['src/**', 'tests/**', 'auditor/current_audit.py', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'web/index.html', 'web/homepage.js', 'web/statistics-first.js', 'web/statistics-first.css', 'web/lateral-matrix.js', 'web/lateral-matrix.css', 'web/results.js', '.github/workflows/policy_tests.yml', 'workers/live-scores/**']
+    paths: ['src/**', 'tests/**', 'auditor/current_audit.py', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'web/index.html', 'web/homepage.js', 'web/statistics-first.js', 'web/statistics-first.css', 'web/lateral-matrix.js', 'web/lateral-matrix.css', 'web/results.js', '.github/workflows/policy_tests.yml', '.github/workflows/night_scan_backup.yml', 'workers/live-scores/**']
 permissions:
   contents: read
 jobs:
