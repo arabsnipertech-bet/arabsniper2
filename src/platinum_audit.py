@@ -11,7 +11,7 @@ from gold_competitions import output_allowed
 from gold_policy_audit import attach_result, settle_saved_archives, valid_result
 from lateral_matrix import MODEL_ID, settle_spec
 from multimarket_model import stamp
-from platinum_policy import POLICY_ID, evaluate
+from platinum_policy import POLICY_ID, LEGACY_POLICY_ID, evaluate
 
 FIELDS = ('id', 'label', 'spec', 'odd', 'first_odd', 'quote_status', 'bookmaker',
           'bookmaker_id', 'provider_updated_at', 'quote_observed_at', 'cache_source_at',
@@ -86,8 +86,11 @@ def report(store, observed_at):
 def main(root, observed_at):
     root = Path(root); path = root/'data/arab_quote_platinum_audit.json'
     store = read_store(path, {'schema_version': 1, 'policy_id': POLICY_ID, 'fixtures': {}})
-    if store.get('schema_version') != 1 or store.get('policy_id') != POLICY_ID:
+    if store.get('schema_version') != 1 or store.get('policy_id') not in (POLICY_ID, LEGACY_POLICY_ID):
         raise ValueError('Platinum audit identity mismatch')
+    # Advance the ledger's active policy without rewriting frozen v1 choices.
+    # Each snapshot retains its policy ID, so reports keep the cohorts separate.
+    store['policy_id'] = POLICY_ID
     settle_saved_archives(store, root, observed_at)
     added, seen = 0, set()
     for day_path in sorted((root/'data').glob('arab_quote_day[1-5].json')):

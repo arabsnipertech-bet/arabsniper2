@@ -14,8 +14,8 @@
  const ODDS_MAX={over15_ht:3.5,over25_ht:7.5,over25_ft:2.6,gg_ht:5.5,over35_ft:4.5};
  // Display-only monitoring. These limits never enter the Gold scoring policy.
  const MARKET_SIGNAL=Object.freeze({min_oci:30,max_delta_pct:-2,max_margin_pct:9,min_persistence:.5,min_agreeing_books:2});
- const PLATINUM_POLICY='platinum-flow-v1';
- const PLATINUM=Object.freeze({...MARKET_SIGNAL,max_delta_pct:-3,min_odd:2.5,min_ev_pct:10});
+ const LEGACY_PLATINUM_POLICY='platinum-flow-v1',PLATINUM_POLICY='platinum-flow-v1.1';
+ const PLATINUM=Object.freeze({...MARKET_SIGNAL,max_delta_pct:-3,min_odd:2.5,min_ev_pct:10,min_high_odds_ev_pct:-15});
  const MARKET_SIGNAL_TEXT='Radar di Mercato · Statistica debole o assente · Solo studio';
  const LEGACY_MAX={over15_ht:3.5,over25_ft:3.5,gg_ht:5.5,over35_ft:5.5};
  const priced=r=>['recent','cached_stable'].includes(r?.quote_status);
@@ -220,10 +220,14 @@
   const start=Date.parse(kickoff);
   const candidates=rows.filter(r=>{
    const d=r.platinum,at=Date.parse(d?.evaluated_at);
-   if(d?.policy_id!==PLATINUM_POLICY||d.eligible!==true||!Number.isInteger(d.rank)||d.rank<1||
+   const legacy=(archived||monitoringClosed)&&d?.policy_id===LEGACY_PLATINUM_POLICY;
+   if((d?.policy_id!==PLATINUM_POLICY&&!legacy)||d.eligible!==true||!Number.isInteger(d.rank)||d.rank<1||
       !Number.isFinite(at)||at>now||(Number.isFinite(start)&&at>=start))return false;
    return flowSignalValid(r,PLATINUM,archived||monitoringClosed?at:now)&&
-    (r.odd>=PLATINUM.min_odd||(Number.isFinite(r.ev_pct)&&r.ev_pct>=PLATINUM.min_ev_pct));
+    ((Number.isFinite(r.ev_pct)&&r.ev_pct>=PLATINUM.min_ev_pct)||
+     (r.odd>=PLATINUM.min_odd&&(legacy||
+      (Number.isFinite(r.ev_pct)&&r.ev_pct>=PLATINUM.min_high_odds_ev_pct)||
+      (r.ev_pct==null&&r.statistical_pct==null))));
   }).sort((a,b)=>a.platinum.rank-b.platinum.rank||String(a.id).localeCompare(String(b.id)));
   const seen=new Set();return candidates.filter(r=>{const key=goalMarket(r);if(seen.has(key))return false;seen.add(key);return true;});
  }

@@ -1,6 +1,6 @@
 # Platinum: quota e flusso
 
-`platinum-flow-v1` aggiunge una classificazione indipendente ai cinque obiettivi
+`platinum-flow-v1.1` aggiunge una classificazione indipendente ai cinque obiettivi
 gol già osservati, comprese le equivalenti linee asiatiche a mezzo gol. Non
 cambia la whitelist, le probabilità, i criteri, le scelte o le graduatorie Gold
 `gold-goals-v6.1`. La Combo PT+ST conserva la propria logica.
@@ -14,11 +14,16 @@ Tutti i controlli di flusso sono obbligatori:
 - Almeno due operatori concordi e maggioranza stretta degli operatori abbinati.
 - Movimento confermato, persistenza almeno 50%, nessuna inversione.
 - Aggio dello stesso operatore compreso fra 0% e 9%.
-- Quota almeno 2,50 **oppure** EV stimato almeno +10%.
+- **Via A:** EV stimato almeno +10%, con qualsiasi quota valida.
+- **Oppure via B:** quota almeno 2,50 e EV stimato almeno −15%; resta ammesso
+  l'EV non calcolabile quando manca anche la stima statistica per storico assente.
 
-Le ultime due soglie numeriche specificano i termini “quota alta” ed “EV
-eccellente” della richiesta. La via della quota resta disponibile anche con
-EV assente o negativo, statistica assente, storico breve o non lineare. Platinum
+Il pavimento della via B è inclusivo: −15% passa, valori inferiori sono esclusi
+da Platinum e rimangono nel Radar se ne rispettano i controlli già esistenti.
+EV nullo con una stima statistica presente, valori non finiti e tipi errati non
+vengono interpretati come storico assente. Qualità, linearità e numerosità
+statistica non aggiungono blocchi: un EV noto viene confrontato con il pavimento
+anche quando la statistica è debole. Platinum
 non attesta una probabilità di vittoria superiore al Gold: OCI descrive le
 variazioni delle quote, non volumi di denaro misurati.
 
@@ -42,6 +47,11 @@ Prima della pubblicazione Fast/Night/Auditor, il passaggio di audit registra
 separatamente `arab_quote_platinum_audit.json` e il relativo report privato.
 La raccolta Platinum non termina alla fine del precedente studio Gold del 29
 ottobre. Non richiama API sportive e non ricalcola le scelte storiche.
+
+La versione `platinum-flow-v1.1` identifica il nuovo pavimento EV. Il registro
+conserva integralmente gli snapshot `platinum-flow-v1`, distinguendoli nei report.
+Le classificazioni v1 di partite già iniziate rimangono leggibili con le regole
+originali; soltanto le partite ancora future vengono rivalutate con v1.1.
 
 Ogni rilevazione conserva la scelta principale, prezzo effettivo, operatore,
 OCI, movimento, aggio, statistiche disponibili, decisione e orari. Registra anche

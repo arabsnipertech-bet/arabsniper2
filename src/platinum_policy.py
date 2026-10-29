@@ -3,10 +3,11 @@ from math import isfinite
 from opportunity_policy import goal_market
 from multimarket_model import stamp
 
-POLICY_ID = 'platinum-flow-v1'
+LEGACY_POLICY_ID = 'platinum-flow-v1'
+POLICY_ID = 'platinum-flow-v1.1'
 LIMITS = {'min_oci': 30, 'max_delta_pct': -3, 'max_margin_pct': 9,
           'min_persistence': .5, 'min_agreeing_books': 2,
-          'min_odd': 2.5, 'min_ev_pct': 10}
+          'min_odd': 2.5, 'min_ev_pct': 10, 'min_high_odds_ev_pct': -15}
 
 
 def numeric(value):
@@ -14,7 +15,7 @@ def numeric(value):
 
 
 def evaluate(row, as_of):
-    """Missing statistics never veto the high-odds route. EV is optional."""
+    """Protect high odds with an EV floor; absent history keeps its exception."""
     reasons = []
     if goal_market(row) is None: reasons.append('market')
     odd, first = row.get('odd'), row.get('first_odd')
@@ -42,9 +43,15 @@ def evaluate(row, as_of):
             or not numeric(move.get('fair_delta_pp')) or move['fair_delta_pp'] <= 0
             or not numeric(move.get('persistence')) or not .5 <= move['persistence'] <= 1
             or move.get('reversal') is not False): reasons.append('persistence')
-    high_odds = numeric(odd) and odd >= LIMITS['min_odd']
-    excellent_ev = numeric(row.get('ev_pct')) and row['ev_pct'] >= LIMITS['min_ev_pct']
-    if not high_odds and not excellent_ev: reasons.append('odds_or_value')
+    ev = row.get('ev_pct')
+    high_price = numeric(odd) and odd >= LIMITS['min_odd']
+    missing_history_ev = ev is None and row.get('statistical_pct') is None
+    high_odds = high_price and (missing_history_ev or
+        numeric(ev) and ev >= LIMITS['min_high_odds_ev_pct'])
+    excellent_ev = numeric(ev) and ev >= LIMITS['min_ev_pct']
+    if not high_odds and not excellent_ev:
+        reasons.append('ev_floor' if high_price and numeric(ev) else
+                       'ev_unavailable' if high_price else 'odds_or_value')
     return {'policy_id': POLICY_ID, 'eligible': not reasons, 'rank': None,
             'evaluated_at': as_of, 'reasons': reasons,
             'qualification': 'odds_and_value' if high_odds and excellent_ev else 'high_odds' if high_odds else 'expected_value' if excellent_ev else None,

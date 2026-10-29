@@ -191,7 +191,8 @@ excellent=dict(strong,id='elite-ht',spec=S('total','ht','over',1.5),period='ht',
                odd=1.9,first_odd=1.9/.96,ev_pct=10)
 both=row(id='both',odd=2.5,first_odd=2.5/.92,bookmaker='BOOK SINTETICO')
 for r in [strong,excellent,both,row(id='gold-only',oci=0),dict(strong,delta_pct=-2,first_odd=2.5/.98,
-          selected_movement={'delta_pct':-2,'fair_delta_pp':1,'persistence':.75,'reversal':False}),dict(strong,oci=0)]:
+          selected_movement={'delta_pct':-2,'fair_delta_pp':1,'persistence':.75,'reversal':False}),dict(strong,oci=0),
+          dict(strong,ev_pct=-15.0001,statistical_pct=33.99996)]:
  b=deepcopy(a);b['matrix']['rows']=[deepcopy(r)]
  annotate(b['matrix'],NOW,b)
  annotate_platinum(b['matrix'],match()['fixture'],NOW)
@@ -448,7 +449,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.locator('.mx-card-platinum').count(),3);
    assert.equal(await page.locator('.mx-match-layout > .mx-best-platinum').count(),3);
    assert.equal(await page.locator('.mx-match-layout > .mx-best-stable').count(),1,'Official Gold remains available');
-   assert.equal(await page.locator('.mx-best-market').count(),1);
+   assert.equal(await page.locator('.mx-best-market').count(),2);
    const silver=page.locator('[data-live-fixture="501"]');
    assert.equal(await silver.locator('header .mx-tier-label').textContent(),'PLATINUM');
    assert.equal(await silver.locator('header .mx-tier-label').evaluate(e=>getComputedStyle(e).color),'rgb(237, 243, 250)');
@@ -459,7 +460,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await page.locator('[data-mx-category="platinum"]').click();
    assert.equal(await page.locator('.mx-card').count(),3);
    assert.equal(await page.locator('[data-mx-category="platinum"] b').textContent(),'3');
-   assert.equal(await page.locator('[data-mx-category="market_signal"] b').textContent(),'1');
+   assert.equal(await page.locator('[data-mx-category="market_signal"] b').textContent(),'2');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Platinum overflow '+name);
    await page.locator('[data-mx-category="platinum"]').scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-platinum-${name}.png`});
@@ -476,6 +477,12 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await official.locator('summary').click();
    assert.equal(await official.locator('[data-opportunity-id]').count(),1);
    await official.locator('summary').click();
+   await page.locator('[data-mx-category="market_signal"]').click();
+   assert.equal(await page.locator('.mx-card').count(),2);
+   const rejected=page.locator('[data-live-fixture="507"]');
+   assert.equal(await rejected.count(),1);
+   assert.equal(await rejected.locator('.mx-best-platinum').count(),0);
+   assert((await rejected.textContent()).includes('Radar di Mercato'));
    await page.locator('[data-mx-category="all"]').click();
    assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozenTiers);
   }

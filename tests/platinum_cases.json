@@ -261,12 +261,13 @@
         "ev_pct": -80,
         "ev_low_pct": -95
       },
-      "eligible": true
+      "eligible": false
     },
     {
       "name": "weak_statistics",
       "patch": {
         "statistical_pct": 5,
+        "ev_pct": -12,
         "quality": "limited"
       },
       "eligible": true
@@ -286,6 +287,80 @@
           "eligible": true,
           "rank": 1
         }
+      },
+      "eligible": true
+    },
+    {
+      "name": "ev_floor_exact",
+      "patch": {
+        "ev_pct": -15
+      },
+      "eligible": true
+    },
+    {
+      "name": "ev_floor_just_below",
+      "patch": {
+        "ev_pct": -15.0001
+      },
+      "eligible": false
+    },
+    {
+      "name": "ev_floor_just_above",
+      "patch": {
+        "ev_pct": -14.9999
+      },
+      "eligible": true
+    },
+    {
+      "name": "ev_zero",
+      "patch": {
+        "ev_pct": 0
+      },
+      "eligible": true
+    },
+    {
+      "name": "ev_floor_ignores_lower_bound",
+      "patch": {
+        "ev_pct": -15,
+        "ev_low_pct": -80
+      },
+      "eligible": true
+    },
+    {
+      "name": "ev_absent_with_statistics",
+      "patch": {
+        "ev_pct": null,
+        "statistical_pct": 40
+      },
+      "eligible": false
+    },
+    {
+      "name": "ev_string",
+      "patch": {
+        "ev_pct": "-15"
+      },
+      "eligible": false
+    },
+    {
+      "name": "ev_boolean",
+      "patch": {
+        "ev_pct": true
+      },
+      "eligible": false
+    },
+    {
+      "name": "below_high_odds_with_negative_ev",
+      "patch": {
+        "odd": 2.49,
+        "first_odd": 2.5670103092783507,
+        "ev_pct": -15
+      },
+      "eligible": false
+    },
+    {
+      "name": "high_odds_and_value",
+      "patch": {
+        "ev_pct": 10
       },
       "eligible": true
     }
