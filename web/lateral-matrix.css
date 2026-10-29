@@ -17,3 +17,15 @@
 @media(max-width:1050px){.mx-modal .mx-market-row{grid-template-columns:repeat(3,minmax(0,1fr))}.mx-modal .mx-market-name{grid-column:1/-1}}
 @media(max-width:600px){.mx-modal{width:calc(100vw - 16px);max-height:calc(100dvh - 20px);border-radius:10px}.mx-modal-header{padding:16px 12px 12px}.mx-modal-header h2{font-size:1.12rem}.mx-modal-tabs{gap:6px;padding:0 12px 12px}.mx-modal-tabs button{font-size:.65rem;padding:8px}.mx-modal .mx-detail{padding:12px}.mx-modal .mx-market-row{grid-template-columns:repeat(2,minmax(0,1fr))}.mx-modal .mx-market-name{grid-column:1/-1}.mx-modal .mx-explanation{font-size:.65rem}.mx-modal .mx-teams{margin:12px 0}}
 
+
+/* Platinum changes colors only; the existing grid and responsive rules stay intact. */
+.mx-best-platinum{border-color:#b7c3d1;background:linear-gradient(130deg,#35414e,#172934)}
+.mx-best-platinum>.mx-section-title,.mx-best-platinum h4,.mx-best-platinum>.mx-best-price,.mx-best-platinum>dl dd{color:#edf3fa}
+.mx-best-platinum>p{color:#d4dfeb}
+.mx-platinum{color:#edf3fa;border-color:#b7c3d1;background:#35414e;font-weight:800}
+.mx-tier-label{margin:8px 0 0 10px}.mx-card-platinum{border-color:#a7b8c9}
+.mx-card-platinum>header time{color:#edf3fa}.mx-platinum-gold>summary{color:#e7ce82}
+.mx-categories button[data-mx-category=platinum]{color:#edf3fa;border-color:#a7b8c9;font-weight:800}
+.mx-categories button[data-mx-category=platinum][aria-pressed=true]{background:#35414e;border-color:#edf3fa;color:#fff}
+
+.mx-platinum strong{color:inherit;font-weight:800}

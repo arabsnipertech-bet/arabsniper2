@@ -4,7 +4,8 @@ from copy import deepcopy
 from lateral_matrix import MODEL_ID, CONFIG_ID, build_matrix, market_id, specification
 from matrix_quotes import expire, safe_price_row
 from multimarket_model import stamp
-from opportunity_policy import POLICY_ID, goal_market
+from opportunity_policy import POLICY_ID, goal_market, numeric
+from platinum_policy import annotate as annotate_platinum, POLICY_ID as PLATINUM_POLICY_ID
 from gold_competitions import (SCOPE_ID, profile as whitelist_profile, fixture_allowed,
                                enforce_day, output_allowed)
 
@@ -62,7 +63,7 @@ def build_board(day, as_of):
     enforce_day(day)
     board = {key: {'label': key, 'selected': [], 'eligible': 0, 'remaining_slots': None, 'started_selections': 0} for key in LEGACY}
     categories = Counter()
-    modeled, priced, complete, eligible, proposals = 0, 0, 0, 0, 0
+    modeled, priced, complete, eligible, proposals, platinum = 0, 0, 0, 0, 0, 0
     for match in day.get('matches', []):
         a, meta = match.get('multimarket') or {}, match.get('fixture') or {}
         kickoff = stamp(meta.get('kickoff'))
@@ -81,6 +82,8 @@ def build_board(day, as_of):
         categories.update(category_counts)
         if kickoff and kickoff <= stamp(as_of) or meta.get('result'):
             continue  # Immutable forecast, even when it is no longer upcoming.
+        annotate_platinum(a.get('matrix', {}), meta, as_of)
+        platinum += bool(a.get('matrix', {}).get('platinum_policy', {}).get('best_market_id'))
         a.get('matrix', {})['summary'] = {'categories': dict(category_counts), 'observed_markets': len(rows),
                                         'priced_markets': sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)}
         policy = a.get('matrix', {}).get('opportunity_policy') or {}
@@ -100,19 +103,22 @@ def build_board(day, as_of):
             new = min(equivalents, key=lambda r: r['opportunity']['rank']) if equivalents else indexed.get(market_id(LEGACY[old['market']]))
             if not new: continue
             chosen = (new.get('opportunity') or {}).get('eligible') is True
-            old.update(statistical_pct=new['statistical_pct'], statistical_candidate=new['quality'] == 'supported',
+            probability = new.get('statistical_pct')
+            known_probability = numeric(probability) and 0 <= probability <= 100
+            old.update(statistical_pct=probability if known_probability else None,
+                       statistical_candidate=new.get('quality') == 'supported' and known_probability,
                        primary_eligible=chosen, published_selection=chosen, published_rank=None,
-                       statistical_score=new['low_pct'], selection_reasons=[], odd=new.get('odd'),
+                       statistical_score=new.get('low_pct'), selection_reasons=[], odd=new.get('odd'),
                        matrix_category=new.get('category'))
-            old['probabilities']['statistics'] = new['statistical_pct']/100
-            old['probabilities']['selection_reference'] = new['statistical_pct']/100
+            old['probabilities']['statistics'] = probability/100 if known_probability else None
+            old['probabilities']['selection_reference'] = probability/100 if known_probability else None
             old['quote_status'] = new['quote_status']
             old['book_probability_pct'] = new.get('market_fair_pct')
             old['quote'] = {'bookmaker': new.get('bookmaker'), 'bookmaker_id': new.get('bookmaker_id'),
                 'provider_updated_at': new.get('provider_updated_at'),
                 'movement': {'first_odds': {old['selection']: new.get('first_odd')}}} if new.get('odd') else None
             old['price_assessment'] = {'reference_source': 'statistics_only',
-                'reference_fair_odd': new['fair_odd'], 'estimated_return_pct': new.get('ev_pct'),
+                'reference_fair_odd': new.get('fair_odd'), 'estimated_return_pct': new.get('ev_pct'),
                 'validated_advantage': False}
             old['opportunity'] = deepcopy(new.get('opportunity') or {})
             old['matrix_market_id'] = new['id']
@@ -139,7 +145,8 @@ def build_board(day, as_of):
         'displayed_fixtures': len(day.get('matches', [])), 'modeled_markets': modeled,
         'priced_markets': priced, 'categories': dict(categories), 'selection_limit': None}
     day['matrix_summary'].update(opportunity_policy=POLICY_ID, competition_policy=SCOPE_ID, eligible_markets=eligible,
-                                 upcoming_fixtures_with_proposal=proposals)
+                                 upcoming_fixtures_with_proposal=proposals,
+                                 platinum_policy=PLATINUM_POLICY_ID, upcoming_fixtures_with_platinum=platinum)
     day.setdefault('multimarket_method', {}).update(model_id=MODEL_ID,
         competition_policy=SCOPE_ID, opportunity_policy=POLICY_ID)
     refresh_exports(day, as_of)
