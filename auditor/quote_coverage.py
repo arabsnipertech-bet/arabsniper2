@@ -53,7 +53,7 @@ def measurements(groups, now, kickoff):
     usable = real|synthetic
     return {'real':len(real), 'standard_rows':len(native), 'synthetic':len(synthetic-real),
             'usable':len(usable), 'valid_operator_markets':len(pairs),
-            'asian_fallback_rows':len(aliases), 'stale':len(stale-usable),
+            'asian_fallback_rows':len(aliases), 'direct_combo':int('combo' in real), 'stale':len(stale-usable),
             'missing':5-len(seen), 'invalid_or_stale':5-len(usable), 'books':sorted(books)}
 
 

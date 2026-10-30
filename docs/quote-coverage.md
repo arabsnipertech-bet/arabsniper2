@@ -14,7 +14,11 @@ so that the per-fixture cap does not starve catalogue expansion. Complete pairs
 remain mandatory for margin validation. An expanded catalogue cannot create
 prices that the provider does not actually supply.
 
-The Combo fallback multiplies HT Over 0.5 and SH Over 0.5 from the same operator
+Catalogue ID 184, `To Score in Both Halves`, supplies the direct Combo through
+its explicit Yes/No pair. Team-specific and BTTS-in-both-halves markets are
+excluded. A fresh complete direct market takes precedence over any product.
+
+When it is absent, the Combo fallback multiplies HT Over 0.5 and SH Over 0.5 from the same operator
 and provider snapshot. Each source pair must be fresh and have 0–9% overround.
 The maximum constituent margin is displayed with both underlying margins; no
 combined opposite outcome or combined overround is invented. The price and

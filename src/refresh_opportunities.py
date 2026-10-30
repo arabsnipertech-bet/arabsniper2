@@ -56,6 +56,15 @@ def captured_prices(fixture, rows):
         if normal.startswith('asian'): normal = normal.split('|', 1)[1]
         group, book = normal.rsplit('|', 1)
         point = points[-1]
+        if key.startswith('direct_combo_v1|'):
+            from quote_sources import number
+            if (point.get('bet_id') == 184 and point.get('complete') and point.get('specs') and
+                    set(point.get('odds', {})) == {'over', 'not_over'} and
+                    all(number(v) is not None and number(v) > 1 for v in point['odds'].values()) and
+                    all(core_market(s) for s in point['specs'].values())):
+                captured[key] = {**point, 'bookmaker_id':book,
+                    'bookmaker':point.get('bookmaker') or names.get(book) or f'Operatore {book}'}
+            continue
         if key.startswith('synthetic_combo_v1|'):
             from quote_sources import synthetic_margin
             if synthetic_margin(point) is not None and all(core_market(s) for s in point.get('specs', {}).values()):

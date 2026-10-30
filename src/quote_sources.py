@@ -160,6 +160,48 @@ def synthetic_combo_groups(payload, fid, observed_at):
     return result
 
 
+def direct_combo_groups(payload, fid, observed_at):
+    """Prematch catalogue 184: To Score in Both Halves, explicit Yes/No pair.
+
+    Team-specific IDs 48/111/112 and BTTS-in-both-halves ID 113 are different
+    settlements and cannot price this match-total Combo.
+    """
+    result = {}
+    ambiguous = set()
+    now = stamp(observed_at)
+    for record in (payload or {}).get('response', []):
+        fixture = record.get('fixture') or {}
+        at, start = stamp(record.get('update')), stamp(fixture.get('date'))
+        if str(fixture.get('id')) != str(fid) or not all((at, start, now)) or at > now or now >= start: continue
+        for book in record.get('bookmakers', []):
+            if book.get('id') is None: continue
+            for bet in book.get('bets', []):
+                if str(bet.get('id')) != '184' or norm(bet.get('name')) != 'to score in both halves': continue
+                odds, invalid = {}, False
+                for value in bet.get('values', []):
+                    token = {'yes':'over', 'no':'not_over'}.get(norm(value.get('value')))
+                    odd = number(value.get('odd'))
+                    if token is None or odd is None or odd <= 1 or token in odds and odds[token] != odd:
+                        invalid = True; continue
+                    odds[token] = odd
+                if invalid or set(odds) != {'over', 'not_over'}: continue
+                group = '184|halves_total|ft|0.5|0.5'
+                key = f'direct_combo_v1|{group}|{book["id"]}'
+                candidate = {'odds':odds, 'specs':{'over':{'kind':'halves_total','period':'ft','side':'over','line':.5,'extra':.5}},
+                    'complete':True, 'bookmaker_id':str(book['id']), 'bookmaker':str(book.get('name') or book['id']),
+                    'bet_id':184, 'group':group, 'observed_at':observed_at, 'provider_updated_at':record['update'],
+                    'quote_source':'bookmaker', 'quote_executable':True,
+                    'quote_provenance':{'version':SOURCE_VERSION, 'kind':'direct_combo', 'source_bet_id':184,
+                        'source_bet_name':bet['name'], 'source_outcome':'Yes', 'opposite_outcome':'No'}}
+                old = result.get(key)
+                snapshot = (key, at)
+                if snapshot in ambiguous: continue
+                if old and at == stamp(old['provider_updated_at']) and old['odds'] != odds:
+                    ambiguous.add(snapshot); result.pop(key); continue
+                if old is None or at > stamp(old['provider_updated_at']): result[key] = candidate
+    return result
+
+
 def synthetic_margin(offer):
     parts = (offer.get('quote_provenance') or {}).get('components') or []
     if offer.get('quote_source') != 'synthetic_combo' or len(parts) != 2: return None

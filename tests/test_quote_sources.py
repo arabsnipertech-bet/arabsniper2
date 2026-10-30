@@ -5,7 +5,7 @@ from copy import deepcopy
 from pathlib import Path
 from unittest.mock import Mock, patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'src'))
-from quote_sources import normalize_payload, synthetic_combo_groups, synthetic_margin
+from quote_sources import normalize_payload, synthetic_combo_groups, synthetic_margin, direct_combo_groups
 from matrix_quotes import collect, ledger_offers, analyse_prices, attach
 from refresh_opportunities import captured_prices
 from near_kickoff_quotes import NearKickoffRefresher, needs_refresh
@@ -86,6 +86,35 @@ class ExactSources(unittest.TestCase):
 
 
 class ComboSources(unittest.TestCase):
+    def direct(self):
+        return {'id':184,'name':'To Score in Both Halves','values':[{'value':'Yes','odd':1.9},{'value':'No','odd':1.9}]}
+
+    def test_real_provider_combo_precedes_product_and_keeps_actual_complement(self):
+        raw=feed([self.direct(),bet(6),bet(26)])
+        groups,_=collect(raw,100,NOW)
+        self.assertFalse(any(g.get('quote_source')=='synthetic_combo' for g in groups.values()))
+        direct=next(g for g in groups.values() if g.get('bet_id')==184)
+        self.assertEqual(direct['odds'],{'over':1.9,'not_over':1.9})
+        a=build_matrix(statistical_analysis(match(),NOW),NOW);state={}
+        attach(a,raw,state,META,NOW)
+        row=next(r for r in a['matrix']['rows'] if r['spec']['kind']=='halves_total')
+        self.assertEqual(row['odd'],1.9);self.assertTrue(row['quote_executable'])
+        self.assertAlmostEqual(row['selected_margin_pct'],5.263157894736836)
+        restored=captured_prices(state['matrix_quotes']['100'],a['matrix']['rows'])
+        self.assertTrue(any(g.get('bet_id')==184 for g in restored.values()))
+
+    def test_team_specific_both_halves_never_prices_match_combo(self):
+        for bid in (48,111,112,113):
+            item=self.direct();item['id']=bid
+            self.assertEqual(direct_combo_groups(feed([item]),100,NOW),{})
+        item=self.direct();item['name']='Home team will score in both halves'
+        self.assertEqual(direct_combo_groups(feed([item]),100,NOW),{})
+        item=self.direct();item['values'][0]['odd']=2.1
+        self.assertEqual(direct_combo_groups(feed([self.direct(),item,self.direct()]),100,NOW),{})
+        item=self.direct();item['values'].pop()
+        groups,_=collect(feed([item,bet(6),bet(26)]),100,NOW)
+        self.assertTrue(any(g.get('quote_source')=='synthetic_combo' for g in groups.values()))
+
     def combo(self, raw=None):
         groups=synthetic_combo_groups(normalize_payload(raw or feed([bet(6),bet(26)]),NOW),100,NOW)
         return next(iter(groups.values())) if groups else None

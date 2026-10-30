@@ -15,7 +15,7 @@ from lateral_matrix import specification, market_id, matrix_rows
 from opportunity_policy import annotate
 from market_scope import CORE_BET_IDS, core_market, trim_matrix
 from quote_sources import (normalize_payload, synthetic_combo_groups, synthetic_margin,
-                           synthetic_fair)
+                           synthetic_fair, direct_combo_groups, fresh)
 
 # Verified API-Football prematch catalogue identities. Never identify a market
 # by the presence of 'over' alone (corners/cards/team totals are different).
@@ -187,10 +187,15 @@ def collect(payload, fid, observed_at):
                     old = groups.get(key)
                     if old and stamp(old['provider_updated_at']) and (not updated or updated < stamp(old['provider_updated_at'])): continue
                     groups[key] = candidate
-    synthetic = synthetic_combo_groups(payload, fid, observed_at)
+    direct = direct_combo_groups(payload, fid, observed_at)
+    groups.update(direct)
+    starts = {str(r.get('fixture', {}).get('id')):r.get('fixture', {}).get('date') for r in payload.get('response', [])}
+    has_direct = any(fresh(g['provider_updated_at'], observed_at, starts.get(str(fid))) for g in direct.values())
+    synthetic = {} if has_direct else synthetic_combo_groups(payload, fid, observed_at)
     groups.update(synthetic)
     diagnostics['asian_halfline_fallbacks'] = sum(g.get('quote_source') == 'asian_halfline' for g in groups.values())
     diagnostics['synthetic_combos'] = len(synthetic)
+    diagnostics['direct_combos'] = len(direct)
     return groups, dict(diagnostics)
 
 
