@@ -1,98 +1,17 @@
 name: Freeze Audit Source
 
+# Compatibility entry point only: each scan freezes its own new evidence.
+# No hourly writer and no second historical audit process.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '37 * * * *'
-      timezone: 'Europe/Rome'
 
 permissions:
-  contents: write
-
-concurrency:
-  group: arabsniper-quote-data-writer
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  freeze:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    env:
-      GOLD_PRIVATE: ${{ vars.GOLD_PRIVATE }}
-      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
-      R2_BUCKET: arabsniper-gold
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-      PYTHONUNBUFFERED: '1'
-
+  retired-hourly-freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 1
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install streaming archive parser
-        run: pip install ijson==3.6.0
-
-      - name: Prepare private storage client
-        if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
-        run: pip install boto3 ijson==3.6.0
-
-      - name: Restore authoritative private checkpoint
-        if: vars.GOLD_PRIVATE == 'true'
-        run: python src/gold_storage.py restore
-
-      - name: Run freeze script
-        run: |
-          python auditor/current_audit.py freeze
-
-      - name: Save verified state in private storage
-        if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
-        run: python src/gold_storage.py publish
-
-      - name: Publish only public projections
-        if: vars.GOLD_PRIVATE == 'true'
-        run: python src/private_publication.py
-
-      - name: Commit and push freeze
-        if: vars.GOLD_PRIVATE != 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          if [ -d auditordata/_audit_parts ]; then git add auditordata/_audit_parts; fi
-          if [ -d auditarchive/_audit_parts ]; then git add auditarchive/_audit_parts; fi
-          git add auditordata/prematch_*.json
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git commit -m "Freeze audit source"
-          for attempt in 1 2 3; do
-            git fetch origin main
-            # Replay the snapshot commit without overwriting newer remote files.
-            # Conflicts fail visibly and the recovery artifact preserves the work.
-            git rebase origin/main
-            if git push origin HEAD:main; then exit 0; fi
-          done
-          exit 1
-
-      - name: Preserve freeze if publication fails
-        if: failure() && vars.GOLD_PRIVATE != 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: freeze-recovery-${{ github.run_id }}
-          retention-days: 14
-          path: |
-            auditordata/prematch_*.json
-            auditordata/_audit_parts/
-            auditarchive/_audit_parts/
-
+      - name: Explain the nightly archive schedule
+        run: echo 'Each scan freezes new evidence; historical processing runs at 00:30 Europe/Rome in Run Auditor.'

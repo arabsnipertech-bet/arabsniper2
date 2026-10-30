@@ -2,40 +2,42 @@ name: Run Auditor
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'src/audit_storage.py'
-      - 'src/audit_ledger.py'
-      - 'src/scan_audit.py'
-      - 'auditor/current_audit.py'
-      - 'src/task_progress.py'
-      - 'src/prematch_audit.py'
-      - 'src/daily_audit.py'
-      - 'src/homepage_results.py'
-      - 'src/selection_studies.py'
-      - 'src/filter_audit.py'
-      - 'src/first_half_quality.py'
-      - 'src/multimarket_model.py'
-      - 'src/multimarket_audit.py'
-      - 'src/model_research.py'
-      - '.github/workflows/run-auditor.yml'
   schedule:
-    - cron: '7 9 * * *'
+    - cron: '30 0 * * *'
       timezone: 'Europe/Rome'
 
 permissions:
   contents: write
+  actions: read
 
-concurrency:
-  group: arabsniper-quote-data-writer
-  cancel-in-progress: false
-
+# Admission never joins the writer queue. Delayed daytime triggers exit first.
 jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.window.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Admit only the protected nightly window
+        id: window
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 src/auditor_schedule.py
+
   auditor:
-    runs-on: ubuntu-latest
-    # Measured archive/settlement work exceeds 25 minutes before publication.
-    timeout-minutes: 60
+    needs: admission
+    if: needs.admission.outputs.run == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 85
+    # Final checkpoint mutex; the runner also enforces an absolute 01:50 cutoff.
+    concurrency:
+      group: arabsniper-quote-data-writer
+      cancel-in-progress: false
+      queue: max
     env:
       GOLD_PRIVATE: ${{ vars.GOLD_PRIVATE }}
       R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -51,44 +53,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install streaming archive parser
-        run: pip install ijson==3.6.0
-
-      - name: Prepare private storage client
-        if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
-        run: pip install boto3 ijson==3.6.0
-
-      - name: Restore authoritative private checkpoint
-        if: vars.GOLD_PRIVATE == 'true'
-        run: python src/gold_storage.py restore
-
-      - name: Archive forecasts and settle completed matches
-        run: python auditor/current_audit.py settle
-      - name: Build public results from frozen forecasts
-        run: python src/task_progress.py src/homepage_results.py
-      - name: Save verified state in private storage
-        if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
-        run: python src/gold_storage.py publish
-
-      - name: Publish only public projections
-        if: vars.GOLD_PRIVATE == 'true'
-        run: python src/private_publication.py
-
-      - name: Save current audit archive and report
-        if: vars.GOLD_PRIVATE != 'true'
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          if [ -d auditordata/_audit_parts ]; then git add auditordata/_audit_parts; fi
-          if [ -d auditarchive/_audit_parts ]; then git add auditarchive/_audit_parts; fi
-          git add auditordata/prematch_*.json auditarchive/prematch_*.json auditarchive/prematch_*_daily.md
-          git add data/arab_quote_multimarket_report.json data/arab_quote_model_research.json data/arab_quote_results_public.json
-          if git diff --cached --quiet; then
-            echo "No audit changes"
-            exit 0
-          fi
-          git commit -m "Update current prematch audit"
-          git pull --rebase origin main
-          git push origin HEAD:main
-
-
+      - name: Install archive and storage dependencies
+        run: pip install requests boto3 ijson==3.6.0
+      - name: Run and publish the daily Auditor before 01:50 Rome
+        run: python src/nightly_auditor.py
