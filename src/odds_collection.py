@@ -7,17 +7,21 @@ from copy import deepcopy
 from datetime import datetime, timezone
 import time
 from multimarket_model import collect_quotes, stamp
+from quote_sources import direct_combo_groups
 
-TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht', 'over05_ht', 'over05_sh')
+TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht', 'over05_ht', 'over05_sh', 'combo_ht_sh')
 BET_IDS = {'1x2_ft':(1,), 'over25_ft':(5,50,336), 'over35_ft':(5,50,336),
            'over15_ht':(6,72), 'over25_ht':(6,72), 'gg_ht':(34,),
-           'over05_ht':(6,72), 'over05_sh':(26,)}
+           'over05_ht':(6,72), 'over05_sh':(26,), 'combo_ht_sh':(184,)}
 
 
 def coverage(payload, fid, now, target_only=True):
     quotes = collect_quotes(payload or {}, now)
-    return {(market, book) for market, books in quotes.get(str(fid), {}).items()
-            if not target_only or market in TARGETS for book in books}
+    result = {(market, book) for market, books in quotes.get(str(fid), {}).items()
+              if not target_only or market in TARGETS for book in books}
+    result.update(('combo_ht_sh', group['bookmaker_id'])
+                  for group in direct_combo_groups(payload, fid, now).values())
+    return result
 
 
 def merge_payload(base, extra, fid, now):

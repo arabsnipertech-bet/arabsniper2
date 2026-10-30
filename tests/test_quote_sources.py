@@ -115,6 +115,15 @@ class ComboSources(unittest.TestCase):
         groups,_=collect(feed([item,bet(6),bet(26)]),100,NOW)
         self.assertTrue(any(g.get('quote_source')=='synthetic_combo' for g in groups.values()))
 
+    def test_partial_refresh_cannot_drop_a_complete_direct_combo(self):
+        from odds_collection import coverage, merge_payload, BET_IDS
+        raw=feed([self.direct()]);partial=self.direct();partial['values'].pop()
+        later=feed([partial],at='2026-10-26T18:01:00+00:00')
+        merged=merge_payload(raw,later,100,'2026-10-26T18:02:00+00:00')
+        self.assertIn(184,BET_IDS['combo_ht_sh'])
+        self.assertIn(('combo_ht_sh','999'),coverage(raw,100,NOW,False))
+        self.assertFalse(coverage(raw,100,NOW,False) <= coverage(merged,100,'2026-10-26T18:02:00+00:00',False))
+
     def combo(self, raw=None):
         groups=synthetic_combo_groups(normalize_payload(raw or feed([bet(6),bet(26)]),NOW),100,NOW)
         return next(iter(groups.values())) if groups else None
