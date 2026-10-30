@@ -8,11 +8,32 @@ from datetime import datetime, timezone
 import time
 from multimarket_model import collect_quotes, stamp
 from quote_sources import direct_combo_groups
+from market_discovery import identify, clean, VERSION as DISCOVERY_VERSION
 
 TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht', 'over05_ht', 'over05_sh', 'combo_ht_sh')
 BET_IDS = {'1x2_ft':(1,), 'over25_ft':(5,50,336), 'over35_ft':(5,50,336),
            'over15_ht':(6,72), 'over25_ht':(6,72), 'gg_ht':(34,),
            'over05_ht':(6,72), 'over05_sh':(26,), 'combo_ht_sh':(184,)}
+# Compatibility export only. Runtime routes are discovered from the catalogue
+# and the entire fixture payload; these historical IDs are not admission rules.
+SEMANTIC_TARGETS = {('result','ft'):('1x2_ft',),
+    ('total','ft'):('over25_ft','over35_ft'), ('asian_total','ft'):('over25_ft','over35_ft'),
+    ('total','ht'):('over15_ht','over25_ht','over05_ht'),
+    ('asian_total','ht'):('over15_ht','over25_ht','over05_ht'),
+    ('btts','ht'):('gg_ht',), ('total','sh'):('over05_sh',),
+    ('halves_total','ft'):('combo_ht_sh',)}
+
+
+def discovery_routes(catalog, rows, counts):
+    routes={}
+    observed=[bet for row in rows for book in row.get('bookmakers',[]) for bet in book.get('bets',[])]
+    for bet in [*catalog,*observed]:
+        identity=identify(bet.get('name'))
+        if not identity or bet.get('id') is None: continue
+        targets=SEMANTIC_TARGETS.get((identity['kind'],identity['period']),())
+        if targets and min(counts[t] for t in targets)<8:
+            routes[bet['id']]=min(counts[t] for t in targets)
+    return sorted(routes,key=lambda bid:(routes[bid],str(bid)))
 
 
 def coverage(payload, fid, now, target_only=True):
@@ -40,7 +61,7 @@ def merge_payload(base, extra, fid, now):
                 continue
             for book in row.get('bookmakers', []):
                 for bet in book.get('bets', []):
-                    key = (str(book.get('id')), str(bet.get('id')))
+                    key = (str(book.get('id')), str(bet.get('id')) if bet.get('id') is not None else 'name:'+clean(bet.get('name')))
                     previous = records.get(key)
                     if previous and (not updated or previous[0] and updated <= previous[0]):
                         continue
@@ -58,7 +79,7 @@ def merge_payload(base, extra, fid, now):
 
 
 class OddsEnricher:
-    def __init__(self, client, state, now=None, max_calls=1200, max_seconds=300):
+    def __init__(self, client, state, now=None, max_calls=1200, max_seconds=300, market_catalog=None):
         self.client, self.state = client, state
         self.fixed_now = now
         self.now = now or datetime.now(timezone.utc).isoformat()
@@ -77,6 +98,9 @@ class OddsEnricher:
                           odds_targeted_fixtures=0, odds_targeted_unproductive_skips=0)
         self.report = []
         self.catalog = state.get('bookmakers', [])
+        self.market_catalog = market_catalog if market_catalog is not None else state.get('market_catalog', [])
+        if market_catalog is not None: state['market_catalog']=deepcopy(market_catalog)
+        state['discovery_version']=DISCOVERY_VERSION
 
     def allowed(self, check_limits=True):
         if check_limits and (self.calls >= self.max_calls or self.elapsed >= self.max_seconds):
@@ -125,8 +149,7 @@ class OddsEnricher:
         present_books = {str(b['id']) for r in rows for b in r.get('bookmakers', [])}
         counts = {k:sum(m==k for m,b in before) for k in TARGETS}
         # Query sparsest goal markets first, but do not alter eligibility thresholds.
-        markets = list(dict.fromkeys(bid for k in sorted(TARGETS,key=lambda k:counts[k])
-                                    if counts[k] < 8 for bid in BET_IDS[k]))
+        markets = discovery_routes(self.market_catalog,rows,counts)
         history = self.state.setdefault('queries', {})
         cursor = self.state.setdefault('cursors', {}).get(str(fid), 0)
         missing = [b['id'] for b in self.catalog if str(b['id']) not in present_books]
@@ -138,6 +161,8 @@ class OddsEnricher:
             if index < len(markets): queries.append(('bet', markets[index]))
             if index < len(missing): queries.append(('bookmaker', missing[index]))
         uncovered = not before
+        if uncovered and not queries:
+            queries.append(('fixture',fid))  # Unfiltered discovery when even the catalogue is unavailable.
         if uncovered and all(meta.get(k) is not None for k in ('league_id','season','date')):
             queries.insert(0, ('league_date', meta['date']))
         result = base
@@ -165,14 +190,17 @@ class OddsEnricher:
                       if kind == 'league_date' else {'fixture':fid,kind:value})
             started = time.monotonic()
             try:
-                extra = self.client.get('odds', params, use_cache=False)
+                if callable(getattr(type(self.client),'get_bounded',None)):
+                    extra,_ = self.client.get_bounded('odds',params,self.max_calls-self.calls)
+                else:
+                    extra = self.client.get('odds', params, use_cache=False)
             finally:
                 self.elapsed += time.monotonic()-started
             used = self.client.request_count-start_calls
             self.calls += max(1,used)
             self.stats['odds_targeted_requests'] += max(1,used)
             attempts += 1
-            if extra is None:
+            if extra is None or extra.get('collection',{}).get('complete') is False:
                 self.stats['odds_targeted_errors'] += 1
                 continue  # Failed request is not cached as an empty result.
             history[key] = self.now

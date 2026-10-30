@@ -2,7 +2,7 @@
 from collections import Counter
 from copy import deepcopy
 from lateral_matrix import MODEL_ID, CONFIG_ID, build_matrix, market_id, specification
-from matrix_quotes import expire, safe_price_row
+from matrix_quotes import expire, safe_price_row, attach
 from multimarket_model import stamp
 from opportunity_policy import POLICY_ID, goal_market, numeric
 from platinum_policy import annotate as annotate_platinum, POLICY_ID as PLATINUM_POLICY_ID
@@ -17,6 +17,28 @@ LEGACY = {'over25_ft': specification('total', 'ft', 'over', 2.5),
 
 
 universal_profile = whitelist_profile  # Compatibility alias; admission is strict.
+
+
+def quote_monitoring(matrix, as_of):
+    """Observation metadata only: never an OCI, Gold or Platinum decision."""
+    groups={key:[] for key in LEGACY}
+    groups['combo_ht_sh']=[]
+    for row in matrix.get('rows',[]):
+        key=goal_market(row)
+        if row.get('spec',{}).get('kind')=='halves_total': key='combo_ht_sh'
+        if key in groups: groups[key].append(row)
+    waiting=[]
+    for key,rows in groups.items():
+        valid=[r for r in rows if r.get('quote_status') in ('recent','cached_stable') and
+               numeric(r.get('odd')) and r['odd']>1 and numeric(r.get('selected_margin_pct')) and
+               0 <= r['selected_margin_pct'] <= 9+1e-9]
+        if not valid:
+            waiting.append({'market':key,'row_ids':[r['id'] for r in rows],
+                'reason':'stale' if any(r.get('quote_status')=='stale' for r in rows) else
+                         'incomplete_or_invalid_pair' if any(r.get('odd') for r in rows) else 'missing'})
+    matrix['quote_monitoring']={'version':'quote-monitoring-v1','as_of':as_of,'study_only':True,
+        'state':'waiting_quotes' if waiting else 'observing_flow','waiting_markets':waiting,
+        'row_ids':[r['id'] for rows in groups.values() for r in rows]}
 
 
 def complete_day(ns, client, day, as_of):
@@ -37,6 +59,19 @@ def complete_day(ns, client, day, as_of):
             a = build_matrix(statistical_analysis(item, as_of), as_of)
             a['matrix']['data_status'] = 'prior_only_after_missing_inputs'
             a['notes'].append('Raccolta dei dati della partita incompleta: valori di riferimento, non storico squadra inventato.')
+            # A statistics failure must not prevent independent odds collection.
+            state=ns['read_json'](ns['STATE_FILE'],{}) if all(k in ns for k in ('read_json','STATE_FILE')) else {}
+            if getattr(client,'odds_enricher',None) is not None: client.odds_enricher.register_fixture(meta)
+            try:
+                payload=client.get('odds',{'fixture':int(meta['fixture_id'])}) if client is not None else None
+            except Exception as exc:
+                payload=None
+                a['notes'].append('Quote temporaneamente non disponibili: '+type(exc).__name__)
+            observed=ns['iso_now']() if 'iso_now' in ns else as_of
+            if stamp(observed) < kickoff:
+                attach(a,payload or {},state,meta,observed)
+                if all(k in ns for k in ('atomic_write_json','STATE_FILE')):
+                    ns['atomic_write_json'](ns['STATE_FILE'],state)
         else:
             a = {'model_id': MODEL_ID, 'status': 'no_prematch_snapshot', 'captured_at': None,
                  'matrix': {'rows': [], 'data_status': 'no_prematch_snapshot', 'coverage': {'modeled_markets': 0, 'priced_markets': 0}},
@@ -83,6 +118,7 @@ def build_board(day, as_of):
         if kickoff and kickoff <= stamp(as_of) or meta.get('result'):
             continue  # Immutable forecast, even when it is no longer upcoming.
         annotate_platinum(a.get('matrix', {}), meta, as_of)
+        quote_monitoring(a.get('matrix',{}),as_of)
         platinum += bool(a.get('matrix', {}).get('platinum_policy', {}).get('best_market_id'))
         a.get('matrix', {})['summary'] = {'categories': dict(category_counts), 'observed_markets': len(rows),
                                         'priced_markets': sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)}

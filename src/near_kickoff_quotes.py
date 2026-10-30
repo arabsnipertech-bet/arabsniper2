@@ -29,7 +29,7 @@ def needs_refresh(payload, state, meta, now):
 class NearKickoffRefresher:
     def __init__(self, client, state, max_calls=40):
         self.client, self.state = client, state
-        self.max_calls = max(0, min(200, int(max_calls)))
+        self.max_calls = max(0, min(40, int(max_calls)))
         self.calls, self.attempted = 0, set()
         self.quota, self.quota_at, self.checked = None, 0, None
         self.reserve = 7500

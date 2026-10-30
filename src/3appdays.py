@@ -3240,11 +3240,11 @@ def main() -> None:
     from multimarket_model import stamp
     catalog_at = stamp(catalog.get("updated_at"))
     if not catalog_at or (now_rome()-catalog_at).total_seconds() >= 86400:
-        fetch_bet_catalog(client)
+        catalog = fetch_bet_catalog(client)
     if os.getenv("ARAB_DEEP_ODDS_ENABLED", "1").lower() not in {"0", "false", "no"}:
         from odds_collection import OddsEnricher
         collection_state = read_json(DATA_DIR / "arab_quote_odds_collection.json", {})
-        client.odds_enricher = OddsEnricher(client, collection_state)
+        client.odds_enricher = OddsEnricher(client, collection_state, market_catalog=catalog.get('bets', []))
         client.odds_enricher.refresh_catalog()
     output = scan_dates(client, get_target_dates(start, days), excluded)
     log(f"✅ Output scritto: {OUTPUT_FILE}")

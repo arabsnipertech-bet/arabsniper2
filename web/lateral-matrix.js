@@ -69,9 +69,9 @@
     bookmaker:r.quote?.bookmaker,category:'previous_version',quality:'limited'}));
  }
  function matchingRows(m,options=state,now=Date.now(),lifecycle=phase){
-  const all=rowsOf(m),tierOptions={now,archived:lifecycle(m,now)!=='upcoming',kickoff:m.fixture?.kickoff};
+  const all=rowsOf(m),tierOptions={now,archived:lifecycle(m,now)!=='upcoming',kickoff:m.fixture?.kickoff,monitoring:m.multimarket?.matrix?.quote_monitoring};
   const platinum=allowedMatch(m)?platinumSignals(all,tierOptions):[];
-  const source=options.category==='platinum'?platinum:options.category==='market_signal'?(allowedMatch(m)&&!platinum.length?marketSignals(all,tierOptions):[]):all;
+  const source=options.category==='platinum'?platinum:options.category==='market_signal'?(allowedMatch(m)&&!platinum.length?[...marketSignals(all,tierOptions),...monitoringRows(all,tierOptions)]:[]):all;
   return source.filter(r=>{
    if(options.family!=='all'&&r.family!==options.family)return false;
    if(options.period!=='all'&&r.period!==options.period)return false;
@@ -195,6 +195,12 @@
   // Equivalent Asian half-lines remain a single monitored goal market.
   const seen=new Set();return signals.filter(r=>{const key=goalMarket(r);if(seen.has(key))return false;seen.add(key);return true;});
  }
+ function monitoringRows(rows,options={}){
+  const m=options.monitoring;
+  if(!m||m.version!=='quote-monitoring-v1'||m.study_only!==true||options.archived||options.monitoringClosed||bestOpportunity(rows,options)||platinumSignals(rows,options).length)return [];
+  const confirmed=new Set(marketSignals(rows,options).map(r=>r.id)),ids=new Set(m.row_ids||[]);
+  return rows.filter(r=>ids.has(r.id)&&!confirmed.has(r.id));
+ }
  function flowSignalValid(r,limits,now){
    const move=r.selected_movement;
    // Shared quote checks only; statistical quality never enters this predicate.
@@ -288,6 +294,8 @@
    ['OCI / variazione quota',signed(watch.oci)+' / '+signed(watch.delta_pct)+'%'],
    ['Aggio / operatori concordi',pct(watch.selected_margin_pct)+' / '+watch.agreeing_books+'/'+watch.paired_books]
   ].map(([label,value])=>'<div><dt>'+esc(label)+'</dt><dd>'+esc(value)+'</dd></div>').join('')+'</dl><p><b>Solo studio · esclusa dalle giocate Gold ufficiali.</b></p>'+history+timingContext(context)+'<p>'+extraGoalText(rows)+'</p><small>'+signals.length+' '+(signals.length===1?'mercato in monitoraggio':'mercati in monitoraggio')+' · 0 proposte Gold</small></aside>';
+  const waiting=!best&&monitoringRows(rows,options);
+  if(waiting?.length)return '<aside class="mx-best mx-best-market" data-market-monitoring="'+esc(options.monitoring.state)+'"><span class="mx-section-title">RADAR BLU · MONITORAGGIO</span><h4>'+(options.monitoring.state==='waiting_quotes'?'In attesa di quote':'In attesa di flusso confermato')+'</h4><span class="mx-badge mx-market-signal">SOLO STUDIO</span><p>Partita mantenuta in osservazione. Nessun segnale di flusso confermato e nessuna proposta Gold o Platinum.</p><p>'+((options.monitoring.waiting_markets||[]).length)+' mercati in attesa di una quota completa e valida. Il prossimo Fast rivaluterà quote e concordanza tra operatori.</p>'+history+timingContext(context)+'</aside>';
   if(!best)return '<aside class="mx-best mx-best-empty"><span class="mx-section-title">MIGLIOR VALORE STIMATO</span><h4>'+(checked.length&&checked.every(r=>!priced(r))?'Quote da aggiornare':checked.length?'Nessuna proposta supera i criteri':'Valutazione da aggiornare')+'</h4>'+history+timingContext(context)+'<p>'+archive+extraGoalText(rows)+'</p><p>'+esc(exclusions||'Dati insufficienti')+'</p><small>'+rows.length+' esiti · '+pricedCount+' quote utilizzabili</small></aside>';
   const d=best.opportunity,signal=d.signal,tag=signal==='convergence'?'mature':signal==='contrarian'?'contrarian':'value_watch',displayLabel=goalMarket(best)==='gg_ht'?'Goal PT':best.label;
   const stability=d.stability?.status==='retained'?'<p class="mx-stability"><b>Proposta mantenuta in tolleranza</b><small>Piccola oscillazione dei valori. Validità massima fino alle '+esc(new Date(d.stability.expires_at).toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit'}))+' con quote aggiornate e limiti rispettati.</small></p>':'';
@@ -339,7 +347,7 @@
  function closeModal(){const instance=dialog;if(!instance)return;instance.close();releaseModal(instance);}
  function sectionRows(rows,section){return rows.filter(r=>section==='targets'?goalMarket(r)!==null||isCombo(r):section==='asian'?r.family==='asian':section==='result'?r.spec?.kind==='result':r.period===section&&['total','btts'].includes(r.spec?.kind));}
  function matrixDetail(m,rows,services){
-  const tierOptions={archived:(services.phase||phase)(m)!=='upcoming',kickoff:m.fixture?.kickoff};
+  const tierOptions={archived:(services.phase||phase)(m)!=='upcoming',kickoff:m.fixture?.kickoff,monitoring:m.multimarket?.matrix?.quote_monitoring};
   const signals=new Set(marketSignals(rowsOf(m),tierOptions).map(r=>r.id));
   const platinum=new Set(platinumSignals(rowsOf(m),tierOptions).map(r=>r.id));
   return '<div class="mx-detail"><p class="mx-explanation">'+rows.length+' esiti in questa vista. Quote, OCI e aggio della stessa linea e periodo.</p>'+
@@ -388,7 +396,7 @@
   const f=m.fixture||{},a=m.multimarket||{},all=rowsOf(m),fid=String(f.fixture_id);
   const counts={convergence:all.filter(r=>r.market_behavior==='convergence').length,divergence:all.filter(r=>r.market_behavior==='divergence').length,value:all.filter(r=>r.ev_pct>0).length};
   const noSnapshot=a.status==='no_prematch_snapshot';
-  const tierOptions={archived:phase(m)!=='upcoming',monitoringClosed:(helpers.phase||phase)(m)!=='upcoming',kickoff:f.kickoff,lastProposal:a.matrix?.last_proposal};
+  const tierOptions={archived:phase(m)!=='upcoming',monitoringClosed:(helpers.phase||phase)(m)!=='upcoming',kickoff:f.kickoff,lastProposal:a.matrix?.last_proposal,monitoring:a.matrix?.quote_monitoring};
   const elite=!noSnapshot&&platinumSignals(all,tierOptions)[0];
   return '<article class="mx-card'+(elite?' mx-card-platinum':'')+'" data-live-fixture="'+esc(fid)+'"><header><div><time>'+esc(f.time||'')+'</time><small>'+esc(f.country)+' · '+esc(f.league)+'</small>'+(elite?'<span class="mx-badge mx-platinum mx-tier-label"><strong>PLATINUM</strong></span>':'')+'<h3>'+esc(f.match)+'</h3></div><div class="mx-live"><span data-live-slot="badge">'+(helpers.liveBadge?.(m)||'')+'</span><span data-live-slot="state">'+esc(helpers.stateLabel?.(m)||'')+'</span><span data-live-slot="halftime">'+halfTimeText(helpers.firstHalf?.(m))+'</span></div></header>'+
    (noSnapshot?'<p class="mx-explanation">Partita presente nel palinsesto. Nessuna previsione salvata prima dell’inizio: gli esiti non vengono usati per ricostruirla a posteriori.</p>':'<div class="mx-match-layout">'+quoteBoard(all,helpers)+opportunityPanel(all,a.matrix?.goal_context,tierOptions)+'</div>')+
@@ -412,7 +420,7 @@
    '<div class="mx-controls"><label>Mercati<select data-mx-filter="family">'+options(FAMILIES,state.family)+'</select></label><label>Periodo<select data-mx-filter="period">'+options({all:'Tutti i periodi',ft:'Finale',ht:'Primo tempo'},state.period)+'</select></label>'+
    '<label>Stato<select data-mx-filter="phase">'+options({all:'Tutte le partite',upcoming:'Da iniziare',live:'In corso',finished:'Terminate',other:'Rinviate / altri stati'},state.phase)+'</select></label><label>Ordine<select data-mx-filter="sort">'+options({time:'Orario',value:'Valore teorico più stabile'},state.sort)+'</select></label>'+
    '<label class="mx-search">Cerca<input type="search" data-mx-filter="search" value="'+esc(state.search)+'" placeholder="Squadra o campionato"></label></div>'+
-   '<p class="mx-caption">Platinum (argento): quota alta o EV elevato, sostenuti da movimenti concordi. Gold v6.1 conserva i propri criteri statistici. Radar di Mercato (blu): movimenti delle quote, anche con statistica debole o assente. Solo studio, escluso dalle giocate Gold. Quote mancanti o scadute: partite con almeno un mercato senza prezzo utilizzabile; la Combo solo statistica è esclusa dal conteggio. Quota equa = prezzo calcolato dal modello, non una quota offerta. OCI e aggio non sono volumi di denaro.</p>'+
+   '<p class="mx-caption">Platinum (argento): quota alta o EV elevato, sostenuti da movimenti concordi. Gold v6.1 conserva i propri criteri statistici. Radar di Mercato (blu): segnali di flusso e partite in attesa di quote o di conferma, indicati separatamente. La presenza nel Radar non equivale a un segnale confermato. Solo studio, escluso dalle giocate Gold. Quote mancanti o scadute: partite con almeno un mercato senza prezzo utilizzabile; la Combo solo statistica è esclusa dal conteggio. Quota equa = prezzo calcolato dal modello, non una quota offerta. OCI e aggio non sono volumi di denaro.</p>'+
    '<div class="mx-results" aria-live="polite"><p class="mx-results-count">'+matches.length+' di '+all.length+' partite · '+esc(CATEGORIES[state.category])+'</p>'+
    (matches.length?matches.map(m=>card(m,services)).join(''):'<div class="mx-empty">Nessuna partita con questi filtri. <button type="button" data-mx-reset>Mostra tutto il palinsesto</button></div>')+'</div>'+
    '<p class="mx-caption">Ogni Fast ricalcola le analisi prepartita. Gli aggiornamenti del fornitore possono essere meno frequenti; la data delle quote è sempre indicata. Le partite iniziate conservano la previsione prepartita, con punteggio live separato.</p></section>';
@@ -425,7 +433,7 @@
   h.onchange=e=>{const key=e.target.dataset?.mxFilter;if(key&&key in state){state[key]=e.target.value;render(payload,host,helpers);}};
   updateModal();
  }
- const api={PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
+ const api={monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.ArabMatrix=api;
 })(typeof window!=='undefined'?window:globalThis);

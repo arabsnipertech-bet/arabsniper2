@@ -318,3 +318,17 @@ assert(api.marketRow(platinum,{}, {platinum:true,marketSignal:true}).includes('<
 assert(!api.marketRow(platinum,{}, {platinum:true,marketSignal:true}).includes('Radar di Mercato · Solo studio'));
 assert(!/undefined|NaN/.test(silverPanel));
 console.log('PASS Platinum: shared flow/value boundaries, missing statistics, separate silver filter, frozen archive and unchanged Gold decisions/ranking');
+// Waiting for quotes is visible in Radar without acquiring a confirmed signal.
+const waitingRow={...signal,id:'pending-quote',odd:null,first_odd:null,oci:null,quote_status:'missing',opportunity:null};
+const waitingOptions={...signalOptions,monitoring:{version:'quote-monitoring-v1',study_only:true,state:'waiting_quotes',row_ids:['pending-quote'],waiting_markets:[{market:'over35_ft'}]}};
+assert.equal(api.marketSignals([waitingRow],waitingOptions).length,0);
+assert.equal(api.monitoringRows([waitingRow],waitingOptions).length,1);
+const waitingPanel=api.opportunityPanel([waitingRow],null,waitingOptions);
+assert(waitingPanel.includes('data-market-monitoring="waiting_quotes"'));
+assert(waitingPanel.includes('In attesa di quote'));
+assert(!waitingPanel.includes('data-market-signal-id'));
+assert(!waitingPanel.includes('data-platinum-id'));
+assert.equal(api.monitoringRows([waitingRow],{...waitingOptions,archived:true}).length,0);
+assert.equal(api.monitoringRows([waitingRow],{...waitingOptions,monitoringClosed:true}).length,0);
+assert.equal(api.monitoringRows([waitingRow,priced],waitingOptions).length,0);
+assert.equal(api.monitoringRows([waitingRow,platinum],{...waitingOptions,...platinumOptions}).length,0);

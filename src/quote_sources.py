@@ -6,6 +6,7 @@ from copy import deepcopy
 from datetime import datetime
 from math import isfinite
 import re
+from market_discovery import discover_payload
 
 SOURCE_VERSION = 'quote-sources-v1'
 TOTALS = {
@@ -51,12 +52,13 @@ def fresh(updated, now, kickoff):
 
 def total_pairs(payload):
     """Yield only whole, unambiguous Over/Under pairs from one raw bet."""
-    for record in (payload or {}).get('response', []):
+    for record in discover_payload(payload).get('response', []):
         fixture = record.get('fixture') or {}
         if fixture.get('id') is None: continue
         for book in record.get('bookmakers', []):
             if book.get('id') is None: continue
             for bet in book.get('bets', []):
+                if bet.get('_discovery_rejected'): continue
                 try: bid = int(bet.get('id'))
                 except (TypeError, ValueError): continue
                 if bid not in TOTALS: continue
@@ -82,6 +84,7 @@ def total_pairs(payload):
                            'asian': asian, 'line': line, 'odds': odds,
                            'provider_updated_at': record.get('update'),
                            'source': deepcopy(bet.get('_quote_provenance') or {}),
+                           'discovery': deepcopy(bet.get('_market_discovery') or {}),
                            '_record': record, '_book': book}
 
 
@@ -93,6 +96,7 @@ def normalize_payload(payload, observed_at):
     """
     result = deepcopy(payload or {})
     result['response'] = [r for r in result.get('response', []) if not r.get('_halfline_fallback')]
+    result = discover_payload(result)
     pairs = list(total_pairs(result))
     native = {(p['fixture_id'], p['bookmaker_id'], p['period'], p['line'])
               for p in pairs if not p['asian'] and fresh(p['provider_updated_at'], observed_at, p['kickoff'])}
@@ -108,7 +112,9 @@ def normalize_payload(payload, observed_at):
     for pair in candidates.values():
         bid = 6 if pair['period'] == 'ht' else 5
         provenance = {'version': SOURCE_VERSION, 'kind': 'asian_halfline',
-                      'source_bet_id': pair['bet_id'], 'source_bet_name': pair['bet_name'],
+                      'source_bet_id': pair['discovery'].get('source_bet_id',pair['bet_id']),
+                      'source_bet_name': pair['discovery'].get('source_bet_name',pair['bet_name']),
+                      'discovery': pair['discovery'],
                       'source_period': pair['period'], 'source_line': pair['line'],
                       'provider_updated_at': pair['provider_updated_at']}
         bet = {'id': bid, 'name': TOTALS[bid][2][0], '_quote_provenance': provenance,
@@ -146,6 +152,9 @@ def synthetic_combo_groups(payload, fid, observed_at):
         if not isfinite(odd): continue
         spec = {'kind': 'halves_total', 'period': 'ft', 'side': 'over', 'line': .5, 'extra': .5}
         key = f'synthetic_combo_v1|halves_total|ft|0.5|0.5|{book}'
+        if any(str(p.get('discovery',{}).get('source_bet_id',p['bet_id']))!=str(p['bet_id']) for p in (ht,sh)):
+            tokens='_'.join(p.get('discovery',{}).get('source_token',str(p['bet_id'])) for p in (ht,sh))
+            key=f'synthetic_combo_discovery_v1|{tokens}|halves_total|ft|0.5|0.5|{book}'
         value = {'odds': {'over': odd}, 'specs': {'over': spec}, 'complete': False,
                  'bookmaker_id': book, 'bookmaker': ht['bookmaker'], 'bet_id': 0,
                  'group': 'synthetic_combo_v1|halves_total|ft|0.5|0.5',
@@ -161,21 +170,22 @@ def synthetic_combo_groups(payload, fid, observed_at):
 
 
 def direct_combo_groups(payload, fid, observed_at):
-    """Prematch catalogue 184: To Score in Both Halves, explicit Yes/No pair.
+    """Semantic match-total both-halves market, with an explicit Yes/No pair.
 
-    Team-specific IDs 48/111/112 and BTTS-in-both-halves ID 113 are different
-    settlements and cannot price this match-total Combo.
+    Team-specific and BTTS-in-both-halves settlements are rejected by discovery.
+    The canonical 184 adapter preserves the actual complement and source ID.
     """
     result = {}
     ambiguous = set()
     now = stamp(observed_at)
-    for record in (payload or {}).get('response', []):
+    for record in discover_payload(payload).get('response', []):
         fixture = record.get('fixture') or {}
         at, start = stamp(record.get('update')), stamp(fixture.get('date'))
         if str(fixture.get('id')) != str(fid) or not all((at, start, now)) or at > now or now >= start: continue
         for book in record.get('bookmakers', []):
             if book.get('id') is None: continue
             for bet in book.get('bets', []):
+                if bet.get('_discovery_rejected'): continue
                 if str(bet.get('id')) != '184' or norm(bet.get('name')) != 'to score in both halves': continue
                 odds, invalid = {}, False
                 for value in bet.get('values', []):
@@ -187,12 +197,16 @@ def direct_combo_groups(payload, fid, observed_at):
                 if invalid or set(odds) != {'over', 'not_over'}: continue
                 group = '184|halves_total|ft|0.5|0.5'
                 key = f'direct_combo_v1|{group}|{book["id"]}'
+                discovery=bet.get('_market_discovery') or {}
+                if discovery and str(discovery.get('source_bet_id'))!='184':
+                    key=f'direct_combo_discovery_v1|{discovery["source_token"]}|{group}|{book["id"]}'
                 candidate = {'odds':odds, 'specs':{'over':{'kind':'halves_total','period':'ft','side':'over','line':.5,'extra':.5}},
                     'complete':True, 'bookmaker_id':str(book['id']), 'bookmaker':str(book.get('name') or book['id']),
                     'bet_id':184, 'group':group, 'observed_at':observed_at, 'provider_updated_at':record['update'],
                     'quote_source':'bookmaker', 'quote_executable':True,
-                    'quote_provenance':{'version':SOURCE_VERSION, 'kind':'direct_combo', 'source_bet_id':184,
-                        'source_bet_name':bet['name'], 'source_outcome':'Yes', 'opposite_outcome':'No'}}
+                    'quote_provenance':{'version':SOURCE_VERSION, 'kind':'direct_combo',
+                        'source_bet_id':discovery.get('source_bet_id',184), 'discovery':discovery,
+                        'source_bet_name':discovery.get('source_bet_name',bet['name']), 'source_outcome':'Yes', 'opposite_outcome':'No'}}
                 old = result.get(key)
                 snapshot = (key, at)
                 if snapshot in ambiguous: continue
