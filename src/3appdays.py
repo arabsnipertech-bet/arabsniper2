@@ -48,6 +48,7 @@ from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional,
 
 import requests
 from first_half_quality import valid_ht_row, ht_context_sample
+from quote_sources import normalize_payload
 
 try:
     from zoneinfo import ZoneInfo
@@ -279,6 +280,7 @@ class APIClient:
         self.cache: Dict[str, Any] = {}
         self.request_count = 0
         self.odds_enricher = None
+        self.history_cache = None
         self._http_remaining = None
         self.odds_extra_pages = 0
         self.odds_books_recovered = 0
@@ -301,7 +303,15 @@ class APIClient:
 
     def get(self, path: str, params: Mapping[str, Any], use_cache: bool = True) -> Optional[Dict[str, Any]]:
         if path != "odds" or "page" in params:
-            return self._get_page(path, params, use_cache)
+            if self.history_cache is not None and use_cache:
+                from history_cache import descriptor
+                if descriptor(path, params) is not None:
+                    return self.history_cache.get(path, params,
+                        lambda endpoint, query: self._get_page(endpoint, query, use_cache=False))
+            result = self._get_page(path, params, use_cache)
+            if self.history_cache is not None and path == 'fixtures' and 'date' in params:
+                self.history_cache.observe(result)
+            return result
         # Collect every advertised page, never publish a truncated response as complete.
         first = self._get_page(path, params, use_cache=False)
         if first is None:
@@ -518,6 +528,7 @@ def _is_team_specific_goal_market(bet_name: str) -> bool:
 
 def extract_bookmaker_markets(odds_payload: Mapping[str, Any]) -> Dict[str, Dict[str, Any]]:
     """Restituisce quote complete per bookmaker e mercato."""
+    odds_payload = normalize_payload(odds_payload, iso_now())
     output: Dict[str, Dict[str, Any]] = {}
 
     for response_row in odds_payload.get("response", []) or []:
@@ -533,6 +544,8 @@ def extract_bookmaker_markets(odds_payload: Mapping[str, Any]) -> Dict[str, Dict
             })
 
             for bet in bookmaker.get("bets", []) or []:
+                if bet.get('_discovery_rejected'):
+                    continue
                 bet_id = safe_int(bet.get("id"), 0)
                 bet_name = normalized_text(bet.get("name"))
                 values = _parse_market_values(bet)
@@ -2688,6 +2701,7 @@ def _new_market_audit() -> Dict[str, Any]:
 def extract_bookmaker_markets_with_audit(
     odds_payload: Mapping[str, Any],
 ) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Any]]:
+    odds_payload = normalize_payload(odds_payload, iso_now())
     rules = _catalog_rules()
     output: Dict[str, Dict[str, Any]] = {}
     audit = _new_market_audit()
@@ -2711,6 +2725,8 @@ def extract_bookmaker_markets_with_audit(
                 "bookmaker_id": bookmaker.get("id"), "bookmaker_name": bookmaker_name, "markets": {},
             })
             for bet in bookmaker.get("bets", []) or []:
+                if bet.get('_discovery_rejected'):
+                    continue
                 bid = safe_int(bet.get("id"), 0)
                 raw_name = str(bet.get("name", ""))
                 name = normalized_text(raw_name)
@@ -3158,6 +3174,8 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
         "total_output_matches": total_matches,
         "guard": "passed",
     }
+    if getattr(client, 'history_cache', None) is not None:
+        output['api_health']['history_cache'] = dict(client.history_cache.report)
     output["method"] = {
         "book": "mediana multi-bookmaker + validazione bet_id/catalogo + probabilita fair + aggio + OCI-AS",
         "model": "Poisson con casa/trasferta, forma, campionato, H2H max 5% e xG reali dinamici",
@@ -3246,7 +3264,14 @@ def main() -> None:
         collection_state = read_json(DATA_DIR / "arab_quote_odds_collection.json", {})
         client.odds_enricher = OddsEnricher(client, collection_state, market_catalog=catalog.get('bets', []))
         client.odds_enricher.refresh_catalog()
-    output = scan_dates(client, get_target_dates(start, days), excluded)
+    from history_cache import HistoryCache
+    client.history_cache = HistoryCache(DATA_DIR / 'arab_quote_history_cache.json',
+                                       clock=now_rome, reuse=bool(args.fast or args.today))
+    try:
+        output = scan_dates(client, get_target_dates(start, days), excluded)
+    finally:
+        client.history_cache.save()
+        log('History cache: ' + json.dumps(client.history_cache.report, sort_keys=True))
     log(f"✅ Output scritto: {OUTPUT_FILE}")
     log(f"✅ Stato quote scritto: {STATE_FILE}")
     log(f"✅ Cache xG scritta: {XG_CACHE_FILE}")
@@ -4385,6 +4410,7 @@ _extract_bookmaker_markets_with_audit_v113 = extract_bookmaker_markets_with_audi
 
 def extract_bookmaker_markets_with_audit(odds_payload: Mapping[str, Any]) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Any]]:
     """Estende l'audit al mercato Over/Under 0.5 primo tempo."""
+    odds_payload = normalize_payload(odds_payload, iso_now())
     output, audit = _extract_bookmaker_markets_with_audit_v113(odds_payload)
     audit.setdefault(MARKET_O05HT, {
         "accepted": [], "rejected": [], "accepted_bet_ids": [],
@@ -4403,6 +4429,8 @@ def extract_bookmaker_markets_with_audit(odds_payload: Mapping[str, Any]) -> Tup
                 "bookmaker_id": bookmaker.get("id"), "bookmaker_name": bookmaker_name, "markets": {},
             })
             for bet in bookmaker.get("bets", []) or []:
+                if bet.get('_discovery_rejected'):
+                    continue
                 bid = safe_int(bet.get("id"), 0)
                 raw_name = str(bet.get("name", ""))
                 name = normalized_text(raw_name)
