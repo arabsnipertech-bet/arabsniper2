@@ -156,7 +156,7 @@
   const name=active?'★ Combo Consigliata':tone==='near'?'Combo vicina · non attiva':'Combo non attiva';
   const title=tone==='near'?'Vicino alle soglie: massimo 2 punti % di probabilità, 0,05 gol PT/ST e 2 punti OCI. Gare a zero già nei limiti.':active?'Tutti i criteri Combo superati. La quota equa è calcolata dal modello.':comboReasons(row);
   return '<br><'+tag+' class="mx-combo-'+tone+'" title="'+esc(title)+'">'+name+': Over 0,5 PT + Over 0,5 ST · Stima '+pct(row.statistical_pct)+' · <b>Equa '+num(row.fair_odd,2)+'</b> · '+
-   (priced(row)?'<b>Quota book '+num(row.odd,2)+'</b>':'Quota book n.d.')+(active?'':'<br>'+esc(comboReasons(row)))+'</'+tag+'>';
+   (priced(row)?'<b>'+(row.quote_source==='synthetic_combo'?'Quota sintetica PT × ST ':'Quota book ')+num(row.odd,2)+'</b>':'Quota book n.d.')+(active?'':'<br>'+esc(comboReasons(row)))+'</'+tag+'>';
  }
  function extraGoalText(rows){
   const row=rows.find(r=>r.spec?.kind==='total'&&goalMarket(r)==='over25_ht');
@@ -301,6 +301,7 @@
  }
  function price(row){
   if(!priced(row))return '<span class="mx-missing">'+(isCombo(row)?'Quota bookmaker non fornita':esc(quoteAvailability(row)))+'</span>'+(isCombo(row)?'<small>Equa calcolata dal modello</small>':'');
+  if(row.quote_source==='synthetic_combo')return '<span class="mx-price"><b>'+num(row.odd,2)+'</b></span><small>Quota sintetica PT × ST · '+esc(row.bookmaker)+'</small><small>Stima; quota Combo non offerta dal book</small>';
   const arrow=row.odd<row.first_odd?'↘':row.odd>row.first_odd?'↗':'→';
   return (row.quote_status==='cached_stable'?'<small>Quota stabile da cache</small>':'')+'<span class="mx-price">'+num(row.first_odd,2)+' <i>'+arrow+'</i> <b>'+num(row.odd,2)+'</b></span><small>'+esc(row.bookmaker)+' · '+signed(row.delta_pct)+'%</small>';
  }
@@ -312,7 +313,7 @@
    '<div role="cell" data-title="Statistica"><strong>'+pct(row.statistical_pct)+'</strong><small>Equa '+num(row.fair_odd,2)+' · '+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>'+(asian?'<small>Rimborsi inclusi nel valore</small>':'')+'</div>'+
    '<div role="cell" data-title="Prima → attuale">'+price(row)+(row.provider_updated_at?'<small>'+esc(helpers.timestamp?.(row.provider_updated_at)||row.provider_updated_at)+'</small>':'')+'</div>'+
    '<div role="cell" data-title="OCI"><b>'+signed(isCombo(row)?row.combo?.over25_ft_oci:row.oci)+'</b><small>'+(isCombo(row)?'Riferimento Over 2,5 FT':esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi')+'</small></div>'+
-   '<div role="cell" data-title="Aggio"><b>'+pct(row.selected_margin_pct)+'</b><small>'+(isCombo(row)&&!priced(row)?'Richiede una quota bookmaker':'Book selezionato · Δ '+signed(row.selected_margin_delta_pp)+' pt')+'</small>'+(!isCombo(row)?'<small>Mediana '+pct(row.margin_pct)+'</small>':'')+'</div>'+
+   '<div role="cell" data-title="Aggio"><b>'+pct(row.selected_margin_pct)+'</b><small>'+(row.quote_source==='synthetic_combo'?'Massimo sui singoli PT/ST · '+(row.quote_provenance?.component_margins_pct||[]).map(pct).join(' / '):isCombo(row)&&!priced(row)?'Richiede una quota bookmaker':'Book selezionato · Δ '+signed(row.selected_margin_delta_pp)+' pt')+'</small>'+(!isCombo(row)?'<small>Mediana '+pct(row.margin_pct)+'</small>':'')+'</div>'+
    '<div role="cell" data-title="Valore"><b class="'+(row.ev_pct>0?'mx-positive':'')+'">'+(row.ev_pct==null?'—':signed(row.ev_pct)+'%')+'</b><small>'+(isCombo(row)&&!priced(row)?'EV non calcolabile senza quota reale':'Prudente '+(row.ev_low_pct==null?'—':signed(row.ev_low_pct)+'%'))+'</small></div></div>';
  }
  function teamProfiles(m){

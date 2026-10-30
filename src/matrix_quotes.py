@@ -14,6 +14,8 @@ from context_analysis import movement
 from lateral_matrix import specification, market_id, matrix_rows
 from opportunity_policy import annotate
 from market_scope import CORE_BET_IDS, core_market, trim_matrix
+from quote_sources import (normalize_payload, synthetic_combo_groups, synthetic_margin,
+                           synthetic_fair)
 
 # Verified API-Football prematch catalogue identities. Never identify a market
 # by the presence of 'over' alone (corners/cards/team totals are different).
@@ -139,6 +141,7 @@ def partition(spec):
 
 
 def collect(payload, fid, observed_at):
+    payload = normalize_payload(payload, observed_at)
     now = stamp(observed_at)
     groups, diagnostics = {}, Counter()
     for record in (payload or {}).get('response', []):
@@ -172,14 +175,22 @@ def collect(payload, fid, observed_at):
                     if item['ambiguous']:
                         diagnostics['ambiguous_snapshots'] += 1; continue
                     key = ('ah2|' if CATALOG[bid][1] == 'handicap' else '') + f'{bid}|{group}|{book["id"]}'
+                    source = bet.get('_quote_provenance') or {}
+                    if source: key = f'asian{source["source_bet_id"]}|' + key
                     complete = item['expected'] is not None and set(item['odds']) == item['expected']
                     candidate = {k: item[k] for k in ('odds', 'specs')}
                     candidate.update(bookmaker_id=str(book['id']), bookmaker=str(book.get('name') or book['id']),
                         bet_id=bid, observed_at=observed_at, provider_updated_at=updated.isoformat() if updated else None,
                         complete=complete, group=f'{bid}|{group}')
+                    candidate.update(quote_source='asian_halfline' if source else 'bookmaker',
+                                     quote_executable=True, quote_provenance=deepcopy(source))
                     old = groups.get(key)
                     if old and stamp(old['provider_updated_at']) and (not updated or updated < stamp(old['provider_updated_at'])): continue
                     groups[key] = candidate
+    synthetic = synthetic_combo_groups(payload, fid, observed_at)
+    groups.update(synthetic)
+    diagnostics['asian_halfline_fallbacks'] = sum(g.get('quote_source') == 'asian_halfline' for g in groups.values())
+    diagnostics['synthetic_combos'] = len(synthetic)
     return groups, dict(diagnostics)
 
 
@@ -254,7 +265,7 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
     for key, group in captured.items():
         if not group.get('specs') or not all(core_market(s) for s in group['specs'].values()): continue
         points = fixture['groups'].setdefault(key, [])
-        if not points:
+        if not points and group.get('quote_source', 'bookmaker') == 'bookmaker':
             # Preserve valid operator histories already collected by V3/V4.
             # New markets start empty; no synthetic opening price is created.
             sample = next(iter(group['specs'].values()))
@@ -272,6 +283,8 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
         if points and stamp(points[-1].get('provider_updated_at')) and (not at or at < stamp(points[-1]['provider_updated_at'])):
             continue  # A delayed provider response must not reverse time.
         snap = {k: deepcopy(group[k]) for k in ('odds', 'observed_at', 'provider_updated_at', 'complete')}
+        for field in ('quote_source', 'quote_executable', 'quote_provenance', 'specs', 'group', 'bet_id', 'bookmaker'):
+            if field in group: snap[field] = deepcopy(group[field])
         if not points or (points[-1]['odds'], points[-1]['provider_updated_at'], points[-1]['complete']) != (snap['odds'], snap['provider_updated_at'], snap['complete']):
             points.append(snap)
         if len(points) > 48: points[:] = [points[0], *points[-47:]]
@@ -299,16 +312,22 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     now, start = stamp(as_of), stamp(kickoff)
     max_hours = 1 if now and start and 0 < (start-now).total_seconds() <= 10800 else 6
     offers = [o for o in offers if number(o.get('odd')) is not None and o['odd'] > 1 and
-              (not stamp(o.get('observed_at')) or now and stamp(o['observed_at']) <= now)]
+              (not stamp(o.get('observed_at')) or now and stamp(o['observed_at']) <= now) and
+              (o.get('quote_source') != 'synthetic_combo' or synthetic_margin(o) is not None)]
     recent = [o for o in offers if now and stamp(o.get('provider_updated_at')) and
               0 <= (now-stamp(o['provider_updated_at'])).total_seconds() <= max_hours*3600]
+    # Derived prices are a fallback, never a competing executable bookmaker offer.
+    recent = [o for o in recent if o.get('quote_source') != 'synthetic_combo' or synthetic_margin(o) is not None]
+    direct = [o for o in recent if o.get('quote_source') != 'synthetic_combo']
+    if direct: recent = direct
     cached = False
     if not recent and allow_cached:
         recent = [o for o in offers if within_window({**o, 'quote_observed_at': o.get('observed_at')}, as_of, kickoff)]
         cached = bool(recent)
     # Multiple provider bet IDs for the same settlement do not count as more books.
     unique = {}
-    for offer in sorted(recent, key=lambda o: (o.get('provider_updated_at') or o.get('observed_at') or '', o['odd'], -o['bet_id'])):
+    for offer in sorted(recent, key=lambda o: (2 if o['complete'] and o.get('quote_source', 'bookmaker') == 'bookmaker' else 1 if o['complete'] else 0,
+                       o.get('provider_updated_at') or o.get('observed_at') or '', o['odd'], -o['bet_id'])):
         unique[offer['bookmaker_id']] = offer
     recent = list(unique.values())
     if not recent:
@@ -328,6 +347,9 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         restore(row, as_of, kickoff, allow_cached)
         return
     best = max(recent, key=lambda o: (o['odd'], o.get('provider_updated_at') or o.get('observed_at') or '', o['bookmaker_id']))
+    synthetic = best.get('quote_source') == 'synthetic_combo'
+    row.update(quote_source=best.get('quote_source', 'bookmaker'),
+               quote_executable=not synthetic, quote_provenance=deepcopy(best.get('quote_provenance') or {}))
     compatible = [o for o in recent if o['complete'] and o['group'] == best['group']]
     # OCI is calculated separately per market partition: no mixed lines,
     # bookmakers, timestamps, partial markets or synthetic best-price overround.
@@ -336,6 +358,9 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     margins = [fair(o['odds'])[1] for o in compatible]
     book_p = median(fair(o['odds'])[0][best['token']] for o in compatible) if compatible else None
     margin = median(margins) if margins else None
+    if synthetic:
+        margin = median(synthetic_margin(o) for o in recent)
+        book_p = median(synthetic_fair(o) for o in recent)
     odd = best['odd']
     ev = row['win_weight']*(odd-1)-row['loss_weight']
     evs = [w*(odd-1)-lost for w, lost in row.get('sensitivity_weights', [[row['win_weight'], row['loss_weight']]])]
@@ -350,7 +375,7 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         elif robust_value:
             if behavior == 'convergence': category, reason = 'mature', 'Valore statistico stabile e movimento concorde sullo stesso mercato'
             elif behavior == 'divergence': category, reason = 'contrarian', 'Valore statistico stabile, movimento contrario: ipotesi da verificare'
-            elif row['family'] == 'combo': category, reason = 'lateral', 'Combo con prezzo reale e valore teorico stabile; conferma diretta non disponibile'
+            elif row['family'] == 'combo': category, reason = 'lateral', ('Combo con quota sintetica PT × ST; valore teorico stimato, conferma diretta non disponibile' if synthetic else 'Combo con prezzo reale e valore teorico stabile; conferma diretta non disponibile')
     low_margin = 5 if row['family'] in ('1x2', 'totals') and row['period'] == 'ft' else 7
     margin_band = 'unavailable' if margin is None else 'low' if margin < low_margin else 'high' if margin > 9 else 'medium'
     margin_delta = move.get('median_overround_delta_pp')
@@ -360,7 +385,7 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         first_observed_at=best['first_at'], provider_updated_at=best['provider_updated_at'],
         quote_observed_at=best['observed_at'], bookmakers_count=len(recent),
         implied_pct=100/odd, market_fair_pct=100*book_p if book_p is not None else None,
-        fair_basis='settlement_weight' if row['spec']['kind'] in ('dnb', 'handicap', 'asian_total') else 'outcome',
+        fair_basis='independent_disjoint_halves' if synthetic else 'settlement_weight' if row['spec']['kind'] in ('dnb', 'handicap', 'asian_total') else 'outcome',
         edge_pp=100*(row['win_weight']/(row['win_weight']+row['loss_weight'])-book_p) if book_p is not None and row['win_weight']+row['loss_weight'] else None,
         ev_pct=round(ev*100, 4), ev_low_pct=round(min(evs)*100, 4), ev_high_pct=round(max(evs)*100, 4),
         oci=oci, oci_previous=move.get('oci_previous'), oci_direction=move.get('direction'),
@@ -377,8 +402,8 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     own_trace = best.get('trace') or []
     own_margin_delta = (fair(own_trace[-1]['odds'])[1] - fair(own_trace[0]['odds'])[1]
                         if len(own_trace) >= 2 else None)
-    row.update(selected_margin_pct=fair(best['odds'])[1] if best['complete'] else None,
-               selected_market_fair_pct=100*fair(best['odds'])[0][best['token']] if best['complete'] else None,
+    row.update(selected_margin_pct=synthetic_margin(best) if synthetic else fair(best['odds'])[1] if best['complete'] else None,
+               selected_market_fair_pct=100*synthetic_fair(best) if synthetic else 100*fair(best['odds'])[0][best['token']] if best['complete'] else None,
                selected_margin_delta_pp=own_margin_delta,
                selected_market_odds=deepcopy(best['odds']) if best['complete'] and row['spec']['kind'] == 'result' and row['period'] == 'ft' else None,
                movement_confirmed=bool(move.get('confirmed')),

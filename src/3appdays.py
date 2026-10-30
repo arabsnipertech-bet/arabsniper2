@@ -279,6 +279,7 @@ class APIClient:
         self.cache: Dict[str, Any] = {}
         self.request_count = 0
         self.odds_enricher = None
+        self._http_remaining = None
         self.odds_extra_pages = 0
         self.odds_books_recovered = 0
         self.odds_pagination_incomplete = 0
@@ -343,6 +344,21 @@ class APIClient:
         log(f"Quote non pubblicabili: {reason}; paginazione incompleta.")
         return None
 
+    def get_bounded(self, path, params, max_calls):
+        """Hard HTTP budget including retries, status checks and every odds page."""
+        previous, enricher = self._http_remaining, self.odds_enricher
+        started = self.request_count
+        self._http_remaining = max(0, int(max_calls))
+        if previous is not None: self._http_remaining = min(previous, self._http_remaining)
+        self.odds_enricher = None
+        try:
+            result = self.get(path, params, use_cache=False)
+            return result, self.request_count-started
+        finally:
+            used = self.request_count-started
+            self._http_remaining = None if previous is None else max(0, previous-used)
+            self.odds_enricher = enricher
+
     def _get_page(self, path: str, params: Mapping[str, Any], use_cache: bool = True) -> Optional[Dict[str, Any]]:
         key = self._cache_key(path, params)
         if use_cache and key in self.cache:
@@ -351,10 +367,14 @@ class APIClient:
 
         headers = {"x-apisports-key": self.api_key}
         for delay in API_RETRIES:
+            if self._http_remaining is not None and self._http_remaining <= 0:
+                self.last_error = {"path": path, "errors": "hard_http_budget", "at": iso_now()}
+                return None
             if delay:
                 time.sleep(delay)
             try:
                 self._throttle()
+                if self._http_remaining is not None: self._http_remaining -= 1
                 self.request_count += 1
                 response = self.session.get(
                     f"{API_BASE_URL}/{path}",

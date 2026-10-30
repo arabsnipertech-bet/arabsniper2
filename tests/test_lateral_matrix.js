@@ -113,6 +113,12 @@ assert(!blockedPanel.includes('★ Combo Consigliata'),'Probability above 56% ca
 assert(api.marketRow(blockedCombo).includes('Sotto soglia'));
 assert(!api.comboText([{...combo,combo:{...combo.combo,policy_id:'old'}}]).includes('★ Combo Consigliata'));
 assert(api.comboText([]).includes('Dati assenti'));
+const estimatedCombo={...combo,quote_status:'recent',odd:3.61,quote_source:'synthetic_combo',
+ bookmaker:'Sample',selected_margin_pct:5.263,quote_provenance:{component_margins_pct:[5.263,5.263]}};
+assert(api.comboText([estimatedCombo]).includes('Quota sintetica PT × ST'));
+assert(!api.comboText([estimatedCombo]).includes('Quota book'));
+assert(api.marketRow(estimatedCombo).includes('Massimo sui singoli PT/ST'));
+assert(api.marketRow(estimatedCombo).includes('quota Combo non offerta dal book'));
 const over25ht={...high,label:'Over 2,5 PT',period:'ht',spec:{kind:'total',period:'ht',side:'over',line:2.5},odd:5,
  opportunity:{...decision,min_probability_pct:18,ht_history_supported:true}};
 assert(api.extraGoalText([over25ht,combo]).includes('Over 2,5 PT · Stima'));

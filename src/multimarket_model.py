@@ -65,6 +65,8 @@ def fair(odds):
 
 def collect_quotes(payload, observed_at):
     """Use the existing odds response; never request additional odds endpoints."""
+    from quote_sources import normalize_payload
+    payload = normalize_payload(payload, observed_at)
     now = stamp(observed_at)
     collected = {}
     if not now:
