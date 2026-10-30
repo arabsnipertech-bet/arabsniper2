@@ -27,7 +27,7 @@ CANONICAL = {
 PERIODS = {
     'ht': r'\b(?:1st\s*half|first\s*half|half\s*1|half\s*time|1\s*h|h\s*1|primo\s*tempo|1[oa]?\s*tempo|1[oa]?\s*parte|pt|ht|1t)\b',
     'sh': r'\b(?:2nd\s*half|second\s*half|half\s*2|2\s*h|h\s*2|secondo\s*tempo|2[oa]?\s*tempo|2[oa]?\s*parte|st|2t)\b',
-    'ft': r'\b(?:full\s*time|fulltime|ft|finale|tempo\s*regolamentare|90\s*(?:min|minutes|minuti))\b',
+    'ft': r'\b(?:full\s*(?:time|match)|(?:regular|regulation)\s*time|ft|finale|tempo\s*regolamentare|90\s*(?:min|minutes|minuti))\b',
 }
 EXCLUDED = re.compile(r'\b(?:corners?|corner\s*kicks?|angoli|calci\s*d\s*angolo|cards?|cartellini|bookings?|'
     r'offsides?|fuorigioco|shots?|tiri|fouls?|falli|possession|possesso|saves?|parate|throw\s*ins?|'
@@ -37,7 +37,7 @@ EXCLUDED = re.compile(r'\b(?:corners?|corner\s*kicks?|angoli|calci\s*d\s*angolo|
     r'double\s*chance|doppia\s*chance|result\s*total|result\s*goals|highest\s*scoring|most\s*goals|'
     r'clean\s*sheet|win\s*to\s*nil|race\s*to|fantasy|virtual|esports)\b')
 TEAM = re.compile(r'\b(?:home|away|host|hosts|visitor|visitors|casa|ospite|ospiti|team|teams|squadra|squadre)\b')
-TOTAL_WORDS = frozenset('goals goal gol reti totale totali total totals over under o u ou asian asiatic asiatico asiatica asiatici line linea lines match partita game number of numero di the nel nella incontro punti 1st first half second 2nd full time'.split()) - {'punti'}
+TOTAL_WORDS = frozenset('goals goal gol reti totale totali total totals over under o u ou asian asiatic asiatico asiatica asiatici line linea lines match partita game number of numero di the nel nella incontro'.split())
 
 
 def clean(value):

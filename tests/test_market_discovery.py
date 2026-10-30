@@ -36,7 +36,8 @@ class DiscoveryTests(unittest.TestCase):
                'Over/Under first 15 minutes','Total Goals including extra time','Goals odd/even',
                'Over/Under 1h and match winner','Two goals in both halves','Both teams score in both halves',
                'Home team to score in both halves','Away to score in each half','Total Shots',
-               'Exact Goals','Next Goal','Asian Goal Line (extra time)','Total goals 1st quarter']
+               'Exact Goals','Next Goal','Asian Goal Line (extra time)','Total goals 1st quarter',
+               'Total Goals Half','Total Goals First','Goals Second','Total Goals 2nd']
         for name in names:
             with self.subTest(name=name):
                 self.assertIsNone(identify(name))
