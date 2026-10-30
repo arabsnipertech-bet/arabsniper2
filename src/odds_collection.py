@@ -7,7 +7,7 @@ from copy import deepcopy
 from datetime import datetime, timezone
 import time
 from multimarket_model import collect_quotes, stamp
-from quote_sources import direct_combo_groups
+from quote_sources import direct_combo_groups, normalize_payload
 from market_discovery import identify, clean, VERSION as DISCOVERY_VERSION
 
 TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht', 'over05_ht', 'over05_sh', 'combo_ht_sh')
@@ -37,17 +37,18 @@ def discovery_routes(catalog, rows, counts):
 
 
 def coverage(payload, fid, now, target_only=True):
-    quotes = collect_quotes(payload or {}, now)
+    normalized = normalize_payload(payload or {}, now)
+    quotes = collect_quotes(normalized, now)
     result = {(market, book) for market, books in quotes.get(str(fid), {}).items()
               if not target_only or market in TARGETS for book in books}
     result.update(('combo_ht_sh', group['bookmaker_id'])
-                  for group in direct_combo_groups(payload, fid, now).values())
+                  for group in direct_combo_groups(normalized, fid, now).values())
     return result
 
 
 def merge_payload(base, extra, fid, now):
     """Keep each bet whole, newest provider snapshot wins; never join odds sides."""
-    result = deepcopy(base)
+    result = {key: deepcopy(value) for key, value in base.items() if key != 'response'}
     current = stamp(now)
     records = {}
     for supplemental, payload in ((False, base), (True, extra or {})):
@@ -71,7 +72,10 @@ def merge_payload(base, extra, fid, now):
         # Group only identical snapshot timestamps, retaining whole markets.
         key = (row.get('update'), str(book.get('id')))
         if key not in groups:
-            groups[key] = {**deepcopy(row), 'bookmakers':[{**deepcopy(book), 'bets':[]}]}
+            # Copy each selected subtree once, excluding the arrays rebuilt here.
+            # No full-feed or full-book copies inside the per-market loop.
+            groups[key] = {**{k: deepcopy(v) for k, v in row.items() if k != 'bookmakers'},
+                           'bookmakers': [{**{k: deepcopy(v) for k, v in book.items() if k != 'bets'}, 'bets': []}]}
         groups[key]['bookmakers'][0]['bets'].append(deepcopy(bet))
     result['response'] = list(groups.values())
     result['results'] = len(groups)
@@ -100,6 +104,11 @@ class OddsEnricher:
         self.catalog = state.get('bookmakers', [])
         self.market_catalog = market_catalog if market_catalog is not None else state.get('market_catalog', [])
         if market_catalog is not None: state['market_catalog']=deepcopy(market_catalog)
+        if state.get('discovery_version') and state['discovery_version'] != DISCOVERY_VERSION:
+            # Old no-gain decisions used stricter market labels. Let the
+            # bounded collector reassess them without touching prices or history.
+            state.pop('route_health', None)
+            state.pop('queries', None)
         state['discovery_version']=DISCOVERY_VERSION
 
     def allowed(self, check_limits=True):
@@ -145,7 +154,9 @@ class OddsEnricher:
             starts = [stamp(meta.get("kickoff"))]
         if not starts or any(t is None or t <= stamp(self.now) for t in starts):
             return base
-        before = coverage(base, fid, self.now)
+        before_all = coverage(base, fid, self.now, target_only=False)
+        before = {item for item in before_all if item[0] in TARGETS}
+        current_all, current = before_all, before
         present_books = {str(b['id']) for r in rows for b in r.get('bookmakers', [])}
         counts = {k:sum(m==k for m,b in before) for k in TARGETS}
         # Query sparsest goal markets first, but do not alter eligibility thresholds.
@@ -212,19 +223,20 @@ class OddsEnricher:
             if not extra.get('response'):
                 self.stats['odds_targeted_empty'] += 1
                 continue
-            previous = coverage(result,fid,self.now)
             candidate = merge_payload(result,extra,fid,self.now)
-            after = coverage(candidate,fid,self.now)
+            candidate_all = coverage(candidate,fid,self.now,target_only=False)
+            after = {item for item in candidate_all if item[0] in TARGETS}
             # Don't discard a usable market in favour of a partial targeted response.
-            if not coverage(result, fid, self.now, target_only=False) <= coverage(candidate, fid, self.now, target_only=False):
+            if not current_all <= candidate_all:
                 self.stats['odds_targeted_no_gain'] += 1
                 continue
             result = candidate
-            if not after-previous:
+            if not after-current:
                 self.stats['odds_targeted_no_gain'] += 1
             else:
                 health.clear()
-        after = coverage(result,fid,self.now)
+            current_all, current = candidate_all, after
+        after = current
         new_books = {b for m,b in after}-{b for m,b in before}
         self.stats['odds_targeted_books_recovered'] += len(new_books)
         self.stats['odds_targeted_markets_recovered'] += len(after-before)

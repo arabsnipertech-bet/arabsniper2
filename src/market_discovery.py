@@ -8,7 +8,7 @@ from hashlib import sha256
 import re
 import unicodedata
 
-VERSION = 'football-market-discovery-v1'
+VERSION = 'football-market-discovery-v2'
 CANONICAL = {
     ('total','ft'): (5,'Goals Over/Under'), ('total','ht'): (6,'Goals Over/Under First Half'),
     ('total','sh'): (26,'Goals Over/Under - Second Half'),
@@ -38,6 +38,13 @@ EXCLUDED = re.compile(r'\b(?:corners?|corner\s*kicks?|angoli|calci\s*d\s*angolo|
     r'clean\s*sheet|win\s*to\s*nil|race\s*to|fantasy|virtual|esports)\b')
 TEAM = re.compile(r'\b(?:home|away|host|hosts|visitor|visitors|casa|ospite|ospiti|team|teams|squadra|squadre)\b')
 TOTAL_WORDS = frozenset('goals goal gol reti totale totali total totals over under o u ou asian asiatic asiatico asiatica asiatici line linea lines match partita game number of numero di the nel nella incontro'.split())
+NEUTRAL_WORDS = frozenset('main alternative alt regular regulation time standard markets market full'.split())
+
+
+def without_qualifiers(text):
+    # A two-way label describes the partition, not the numeric goal line.
+    text = re.sub(r'\b2\s*way\b', ' ', text)
+    return ' '.join(word for word in text.split() if word not in NEUTRAL_WORDS)
 
 
 def clean(value):
@@ -71,7 +78,7 @@ def identify(name):
     period = next(iter(periods), 'ft')
     base = text
     for pattern in PERIODS.values(): base = re.sub(pattern,' ',base)
-    base = re.sub(r'\s+',' ',base).strip()
+    base = without_qualifiers(base)
     kind = None
     if re.search(r'\b(?:both\s*teams?\s*(?:to\s*)?scor(?:e|ing)|btts|gg\s*ng|goal\s*no\s*goal|gol\s*no\s*gol|entrambe\s*(?:le\s*)?squadre\s*(?:a\s*segno|segnano))\b|^gg$',base):
         if re.search(r'\b(?:result|winner|and|con|over|under|home|away|handicap)\b',base): return None
@@ -110,6 +117,7 @@ def normalize_values(bet, identity):
     kind=identity['kind']; result=[]
     name=clean(bet.get('name'))
     for pattern in PERIODS.values(): name=re.sub(pattern,' ',name)
+    name=without_qualifiers(name)
     named_lines=re.findall(r'(?<![\w.])(\d+(?:\.\d+)?)(?![\w.])',name)
     named_line=float(named_lines[0]) if len(named_lines)==1 and kind in ('total','asian_total','team_home','team_away') else None
     for value in bet.get('values', []):
