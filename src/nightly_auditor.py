@@ -61,5 +61,14 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
     return 'complete'
 
 
+def main():
+    result = run(Path(__file__).resolve().parents[1])
+    # The external watchdog must distinguish a skipped admission from a real
+    # published completion. Emit proof only after the runner verified it.
+    if os.getenv('GITHUB_OUTPUT'):
+        with Path(os.environ['GITHUB_OUTPUT']).open('a') as out:
+            out.write('completed=' + str(result in ('complete', 'already_completed')).lower() + '\n')
+
+
 if __name__ == '__main__':
-    run(Path(__file__).resolve().parents[1])
+    main()
