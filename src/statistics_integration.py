@@ -8,6 +8,8 @@ from statistics_first import (statistical_analysis, confirm_markets, history, nu
 
 
 def install(ns, matrix_mode=False):
+    # Scans freeze new evidence only. Historical settlement/reporting is nightly.
+    ns['DEFER_AUDIT'] = True
     engine_id = MODEL_ID
     if matrix_mode:
         from lateral_matrix import MODEL_ID as engine_id, build_matrix

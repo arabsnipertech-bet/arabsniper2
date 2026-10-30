@@ -4,6 +4,13 @@ from task_progress import TaskProgress
 
 
 def update_audit(ns, output, client):
+    if ns.get('DEFER_AUDIT'):
+        from audit_journal import capture_forecasts
+        from audit_storage import read_store
+        capture_forecasts(ns, output)
+        research = read_store(ns['DATA_DIR']/'arab_quote_multimarket_report.json', {})
+        return {**research, 'cohorts': research.get('cohorts', []),
+                'status': 'nightly_audit_pending'}
     from prematch_audit import build_report
     from multimarket_audit import build_report as multimarket_report
     with TaskProgress('Archivio scan') as progress:

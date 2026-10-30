@@ -4,11 +4,17 @@ from pathlib import Path
 from audit_storage import read_store, write_store, FORMAT, validate_store
 
 
-def prepare(directory):
+def prepare(directory, scan_only=False):
     directory = Path(directory)
     from homepage_preview import publish
     publish(directory)
     for path in sorted(directory.glob('arab_quote_*.json')):
+        if scan_only and (path.name.startswith('arab_quote_scan_journal_') or path.name in {
+                'arab_quote_prematch_audit.json', 'arab_quote_prematch_report.json',
+                'arab_quote_multimarket_report.json', 'arab_quote_model_research.json',
+                'arab_quote_gold_policy_audit.json', 'arab_quote_gold_policy_report.json',
+                'arab_quote_platinum_audit.json', 'arab_quote_platinum_report.json'}):
+            continue  # History is checked by the nightly Auditor/storage checkpoint.
         # Scan writers already produce checksummed chunks. Validate them once:
         # do not recompress or hold two complete parsed archives for comparison.
         with path.open(encoding='utf-8') as handle:
@@ -30,5 +36,6 @@ def prepare(directory):
 
 if __name__ == '__main__':
     import sys
-    prepare(sys.argv[1] if len(sys.argv) > 1 else 'data')
+    args = [arg for arg in sys.argv[1:] if arg != '--scan-only']
+    prepare(args[0] if args else 'data', scan_only='--scan-only' in sys.argv)
 

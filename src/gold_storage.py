@@ -10,8 +10,12 @@ def sha(data): return hashlib.sha256(data).hexdigest()
 def allowed(path):
     return path not in PUBLIC and bool(re.fullmatch(r'(data/arab_quote_[a-zA-Z0-9_]+\.json|(auditordata|auditarchive)/prematch_[a-zA-Z0-9_.-]+\.(json|md)|(data|auditordata|auditarchive)/_audit_parts/[a-f0-9]{64}\.json\.gz)',path))
 
-def collect(root):
+def collect(root, verified=None):
     root=Path(root); files={}
+    verified=verified or {}
+    def unchanged(key, raw):
+        item=verified.get(key, {})
+        return item.get('bytes')==len(raw) and item.get('sha256')==sha(raw)
     for pattern in ('data/arab_quote_*.json','auditordata/prematch_*.json','auditarchive/prematch_*'):
         for p in root.glob(pattern):
             key=p.relative_to(root).as_posix()
@@ -20,28 +24,40 @@ def collect(root):
             if p.suffix=='.json':
                 value=json.loads(files[key])
                 if isinstance(value,dict) and value.get('_storage')==FORMAT:
-                    validate_store(p) # Validate tokens/checksums without materializing the archive.
+                    trusted=unchanged(key,files[key])
                     for part in value['parts']:
+                        if not re.fullmatch('[a-f0-9]{64}',part['sha256']):
+                            raise ValueError('Invalid audit part identifier')
                         chunk=p.parent/'_audit_parts'/(part['sha256']+'.json.gz')
-                        files[chunk.relative_to(root).as_posix()]=chunk.read_bytes()
+                        chunk_key=chunk.relative_to(root).as_posix()
+                        files[chunk_key]=chunk.read_bytes()
+                        trusted=unchanged(chunk_key,files[chunk_key]) and trusted
+                    # Unchanged pointers AND compressed parts were verified in the
+                    # published checkpoint. Do not reparse historical JSON hourly.
+                    if not trusted:
+                        validate_store(p)
     return files
 
-def previous_objects(s3,bucket):
+def previous_manifest(s3,bucket):
     try:
         value=json.loads(s3.get_object(Bucket=bucket,Key='state/current.json')['Body'].read())
     except Exception as error:
         code=getattr(error,'response',{}).get('Error',{}).get('Code')
-        if code in ('NoSuchKey','404'):return set()
+        if code in ('NoSuchKey','404'):return {}
         raise
     if value.get('version')!=1 or not isinstance(value.get('files'),dict):raise ValueError('Invalid checkpoint')
-    return {item['sha256'] for item in value['files'].values()}
+    return value['files']
+
+def previous_objects(s3,bucket):
+    return {item['sha256'] for item in previous_manifest(s3,bucket).values()}
 
 def publish(s3,bucket,root):
     root=Path(root)
     # Validate every Gold file before writing anything, avoiding partial corrupt releases.
     gold={name:json.dumps(read_store(root/'data'/name),ensure_ascii=False,separators=(',',':')).encode() for name in GOLD if (root/'data'/name).exists()}
     if len(gold)!=len(GOLD): raise ValueError('Missing Gold files; publication aborted')
-    files=collect(root); index={}; known=previous_objects(s3,bucket)
+    verified=previous_manifest(s3,bucket)
+    files=collect(root,verified); index={}; known={item['sha256'] for item in verified.values()}
     uploads={}
     for path,data in files.items():
         digest=sha(data)
