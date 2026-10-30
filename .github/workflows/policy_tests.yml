@@ -8,6 +8,8 @@ on:
       - 'auditor/current_audit.py'
       - '.github/workflows/policy_tests.yml'
       - '.github/workflows/night_scan_backup.yml'
+      - '.github/workflows/fast_scan_backup.yml'
+      - '.github/workflows/fast_scan.yml'
       - 'web/gold-dashboard-live.html'
       - 'web/index.html'
       - 'web/homepage.js'
@@ -70,4 +72,5 @@ jobs:
           name: context-dashboard-previews
           path: test-artifacts/
           if-no-files-found: ignore
+
 

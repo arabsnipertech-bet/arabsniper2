@@ -194,7 +194,9 @@ class GoldV61(unittest.TestCase):
     def test_fast_scan_refreshes_later_tabs_after_full_collection_too(self):
         workflow=Path('.github/workflows/fast_scan.yml').read_text()
         step=next(part for part in workflow.split('      - name: ') if 'run: python src/refresh_opportunities.py\n' in part)
-        self.assertNotIn('        if:',step,'Full Fast scans must also migrate days 3-5')
+        self.assertIn("if: steps.fast_guard.outputs.run == 'true'",step)
+        self.assertNotIn('steps.refresh.outputs.mode',step,'Every full Fast must also migrate days 3-5')
 
 
 if __name__ == '__main__': unittest.main()
+
