@@ -172,6 +172,9 @@ def install(ns, matrix_mode=False):
         for day in output.get('days', []):
             if matrix_mode:
                 complete_day(ns, client, day, as_of)
+                # Schedule completion can now collect odds after a statistics
+                # failure. Assess freshness/freeze boundaries after those reads.
+                as_of = ns['iso_now']()
             for index, match in enumerate(day.get('matches', [])):
                 meta = match.get('fixture') or {}
                 kickoff = stamp(meta.get('kickoff'))

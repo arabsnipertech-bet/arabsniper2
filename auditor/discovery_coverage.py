@@ -118,24 +118,28 @@ for line in sys.stdin:
             results={'before':measurements(old,now,meta['kickoff']),'discovery_same_feed':measurements(new,now,meta['kickoff'])}
             rows.append({'date':date,'meta':meta,'payload':payload,'now':now,'results':results})
             if len(rows)%40==0: print(f'Paired snapshots: {len(rows)}/{len(fixtures)}; HTTP {api.request_count}/{cap}',flush=True)
+        # Allocate the bounded extra probes fairly across both dates, poorest first.
+        pending={d:sorted([r for r in rows if r['date']==d],key=lambda r:(r['results']['discovery_same_feed']['usable'],r['meta']['kickoff'])) for d in dates}
+        for index in range(max((len(v) for v in pending.values()),default=0)):
+            for date in dates:
+                if index>=len(pending[date]): continue
+                row=pending[date][index];meta=row['meta'];now=row['now'];fid=meta['fixture_id']
+                enricher.register_fixture(meta)
+                candidate=enricher.enrich(row['payload'],fid) if api.request_count<cap-40 else row['payload']
+                current=datetime.now(timezone.utc).isoformat()
+                latest=refresh.recover(candidate,meta,current) if api.request_count<cap else candidate
+                # Identical clock for every stage of this fixture. Otherwise future
+                # provider timestamps becoming current can masquerade as recovery.
+                current=datetime.now(timezone.utc).isoformat()
+                worker.stdin.write(json.dumps({'payload':row['payload'],'fid':fid,'now':current})+'\n');worker.stdin.flush()
+                old=json.loads(worker.stdout.readline())
+                original,_=collect(row['payload'],fid,current)
+                acquired,_=collect(candidate,fid,current)
+                recovered,_=collect(latest,fid,current)
+                row['results']={stage:measurements(groups,current,meta['kickoff']) for stage,groups in
+                    (('before',old),('discovery_same_feed',original),('after_acquisition',acquired),('after_refresh',recovered))}
     finally:
         worker.stdin.close();worker.wait(timeout=30)
-    # Allocate the bounded extra probes fairly across both dates, poorest first.
-    pending={d:sorted([r for r in rows if r['date']==d],key=lambda r:(r['results']['discovery_same_feed']['usable'],r['meta']['kickoff'])) for d in dates}
-    for index in range(max((len(v) for v in pending.values()),default=0)):
-        for date in dates:
-            if index>=len(pending[date]): continue
-            row=pending[date][index];meta=row['meta'];now=row['now'];fid=meta['fixture_id']
-            enricher.register_fixture(meta)
-            candidate=enricher.enrich(row['payload'],fid) if api.request_count<cap-40 else row['payload']
-            # Both sides use the same observation instant for parser comparability;
-            # extra API snapshots are measured at their actual observation time.
-            current=datetime.now(timezone.utc).isoformat()
-            groups,_=collect(candidate,fid,current)
-            row['results']['after_acquisition']=measurements(groups,current,meta['kickoff'])
-            latest=refresh.recover(candidate,meta,current) if api.request_count<cap else candidate
-            groups,_=collect(latest,fid,current)
-            row['results']['after_refresh']=measurements(groups,current,meta['kickoff'])
     per_day={}
     for date in dates:
         selected=[r for r in rows if r['date']==date];stages={}
@@ -149,7 +153,7 @@ for line in sys.stdin:
                 'real_pct':round(100*totals['real']/denom,4) if denom else None}
         per_day[date]={**schedule[date],'audited_fixtures':len(selected),'api_errors':errors[date],
             'not_audited':schedule[date]['upcoming']-len(selected),'market_denominator':6*len(selected),'stages':stages}
-    report={'version':VERSION,'baseline_revision':BASELINE,'source_revision':os.environ.get('GITHUB_SHA'),
+    report={'version':VERSION,'evaluation_clock':'Identical per-fixture timestamp for all four stages, after both recovery attempts','baseline_revision':BASELINE,'source_revision':os.environ.get('GITHUB_SHA'),
         'read_only':True,'started_at':started.isoformat(),'completed_at':datetime.now(timezone.utc).isoformat(),
         'scope':'Official whitelisted NS/TBD upcoming fixtures today and tomorrow in Europe/Rome; started matches excluded from prematch coverage',
         'definition':'Six exact requested goal settlements. Fresh whole same-book pairs, overround 0–9%; synthetic Combo validates both legs separately. No cached prices; Asian equivalents deduplicated. Gold/Platinum/Radar eligibility is not quote coverage.',
