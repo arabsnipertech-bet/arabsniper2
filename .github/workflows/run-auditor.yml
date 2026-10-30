@@ -56,4 +56,8 @@ jobs:
       - name: Install archive and storage dependencies
         run: pip install requests boto3 ijson==3.6.0
       - name: Run and publish the daily Auditor before 01:50 Rome
+        id: nightly
         run: python src/nightly_auditor.py
+      - name: Record verified daily Auditor completion
+        if: steps.nightly.outputs.completed == 'true'
+        run: echo "Daily Auditor completion verified in the published checkpoint."
