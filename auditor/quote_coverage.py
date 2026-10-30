@@ -108,6 +108,7 @@ for line in sys.stdin:
                               stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,cwd=baseline_root)
     sums={name:Counter() for name in ('before','after_same_feed','after_refresh')}
     books={name:set() for name in sums};completed=errors=0
+    direct_labels=Counter();direct_fixtures=set()
     baseline_groups_hashes=[]
     try:
         for match in ordered:
@@ -117,6 +118,12 @@ for line in sys.stdin:
             now=datetime.now(timezone.utc).isoformat()
             if not payload or not payload.get('collection',{}).get('complete'):
                 errors+=1;continue
+            for record in payload.get('response',[]):
+                for book in record.get('bookmakers',[]):
+                    for bet in book.get('bets',[]):
+                        if bet.get('id') == 184:
+                            direct_fixtures.add(str(fid))
+                            direct_labels.update(str(v.get('value')) for v in bet.get('values',[]))
             baseline.stdin.write(json.dumps({'payload':payload,'fid':fid,'now':now})+'\n');baseline.stdin.flush()
             old=json.loads(baseline.stdout.readline())
             baseline_groups_hashes.append(sha(json.dumps(payload,sort_keys=True).encode()))
@@ -136,6 +143,7 @@ for line in sys.stdin:
         'not_audited':len(ordered)-completed,'market_denominator':5*completed,
         'api_calls':api.request_count,'api_call_cap':cap,'near_kickoff_refresh':refresh.report,
         'halves_market_catalog':halves_catalog,
+        'catalog_184_observed':{'fixtures':len(direct_fixtures),'outcome_labels':dict(direct_labels)},
         'sources':sources,'paired_snapshot_sha256':sha(json.dumps(baseline_groups_hashes).encode()),
         'definition':'Fresh complete same-book pairs with 0–9% overround; synthetic Combo validates each leg. No cached prices. Four equivalent Asian settlements deduplicated.',
         'stages':{name:{**dict(total),'unique_books':len(books[name]),
