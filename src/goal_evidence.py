@@ -82,5 +82,7 @@ def combo_status(row, rows):
     if not numeric(oci) or oci < -10: reasons.append('combo_oci')
     return {'active': not reasons, 'status': 'Combo Attiva' if not reasons else 'Sotto soglia',
             'reasons': reasons, 'lambda_ht': ht, 'lambda_sh': sh, 'over25_ft_oci': oci,
-            'reference_market_id': ref.get('id'), 'price_available': False,
+            'reference_market_id': ref.get('id'),
+            'price_available': row.get('quote_status') in ('recent', 'cached_stable') and numeric(row.get('odd')) and row['odd'] > 1,
+            'quote_source': row.get('quote_source'),
             'assumption': 'independent_disjoint_halves', 'policy_id': 'gold-goals-v6.1'}

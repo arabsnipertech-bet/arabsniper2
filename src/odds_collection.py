@@ -7,15 +7,21 @@ from copy import deepcopy
 from datetime import datetime, timezone
 import time
 from multimarket_model import collect_quotes, stamp
+from quote_sources import direct_combo_groups
 
-TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht')
-BET_IDS = {'1x2_ft':1, 'over25_ft':5, 'over35_ft':5, 'over15_ht':6, 'over25_ht':6, 'gg_ht':34}
+TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht', 'over05_ht', 'over05_sh', 'combo_ht_sh')
+BET_IDS = {'1x2_ft':(1,), 'over25_ft':(5,50,336), 'over35_ft':(5,50,336),
+           'over15_ht':(6,72), 'over25_ht':(6,72), 'gg_ht':(34,),
+           'over05_ht':(6,72), 'over05_sh':(26,), 'combo_ht_sh':(184,)}
 
 
 def coverage(payload, fid, now, target_only=True):
     quotes = collect_quotes(payload or {}, now)
-    return {(market, book) for market, books in quotes.get(str(fid), {}).items()
-            if not target_only or market in TARGETS for book in books}
+    result = {(market, book) for market, books in quotes.get(str(fid), {}).items()
+              if not target_only or market in TARGETS for book in books}
+    result.update(('combo_ht_sh', group['bookmaker_id'])
+                  for group in direct_combo_groups(payload, fid, now).values())
+    return result
 
 
 def merge_payload(base, extra, fid, now):
@@ -95,7 +101,8 @@ class OddsEnricher:
             return
         payload = self.client.get('odds/bookmakers', {}, use_cache=False)
         if payload and payload.get('response'):
-            self.catalog = [{'id':b['id'],'name':b['name']} for b in payload['response'] if b.get('id') and b.get('name')]
+            self.catalog = [{'id':b['id'],'name':b.get('name') or str(b['id'])}
+                            for b in payload['response'] if b.get('id') is not None]
             self.state.update(bookmakers=self.catalog, catalog_at=self.now)
 
     def register_fixture(self, meta):
@@ -118,12 +125,18 @@ class OddsEnricher:
         present_books = {str(b['id']) for r in rows for b in r.get('bookmakers', [])}
         counts = {k:sum(m==k for m,b in before) for k in TARGETS}
         # Query sparsest goal markets first, but do not alter eligibility thresholds.
-        markets = list(dict.fromkeys(BET_IDS[k] for k in sorted(TARGETS,key=lambda k:counts[k]) if counts[k] < 8))
+        markets = list(dict.fromkeys(bid for k in sorted(TARGETS,key=lambda k:counts[k])
+                                    if counts[k] < 8 for bid in BET_IDS[k]))
         history = self.state.setdefault('queries', {})
         cursor = self.state.setdefault('cursors', {}).get(str(fid), 0)
         missing = [b['id'] for b in self.catalog if str(b['id']) not in present_books]
         missing = missing[cursor % len(missing):]+missing[:cursor % len(missing)] if missing else []
-        queries = [('bet',b) for b in markets] + [('bookmaker',b) for b in missing]
+        # Keep catalogue expansion reachable even when all eight query slots have
+        # sparse markets: interleave unknown operators and exact market routes.
+        queries = []
+        for index in range(max(len(markets), len(missing))):
+            if index < len(markets): queries.append(('bet', markets[index]))
+            if index < len(missing): queries.append(('bookmaker', missing[index]))
         uncovered = not before
         if uncovered and all(meta.get(k) is not None for k in ('league_id','season','date')):
             queries.insert(0, ('league_date', meta['date']))

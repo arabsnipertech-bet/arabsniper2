@@ -11,7 +11,8 @@ PRICE_FIELDS = ('odd', 'first_odd', 'first_observed_at', 'bookmaker', 'bookmaker
     'market_fair_pct', 'margin_pct', 'margin_delta_pp', 'margin_band', 'margin_trend',
     'delta_pct', 'oci', 'oci_previous', 'oci_direction', 'selected_movement',
     'movement_confirmed', 'fair_direction_coherent', 'paired_books', 'agreeing_books',
-    'market_behavior', 'category', 'category_reason', 'quote_adapter_version')
+    'market_behavior', 'category', 'category_reason', 'quote_adapter_version',
+    'quote_source', 'quote_executable', 'quote_provenance', 'fair_basis')
 
 
 def valid_number(value):

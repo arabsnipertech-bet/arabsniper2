@@ -114,6 +114,10 @@ def install(ns, matrix_mode=False):
             client.odds_enricher.register_fixture(meta)
         payload = client.get('odds', {'fixture': ns['safe_int'](meta['fixture_id'])})
         observed = ns['iso_now']()
+        if matrix_mode:
+            from near_kickoff_quotes import recover_near_kickoff
+            payload = recover_near_kickoff(client, payload, state, meta, observed)
+            observed = ns['iso_now']()
         if stamp(observed) >= kickoff:
             return None
         fixture_state = state.setdefault('fixtures', {}).setdefault(str(meta['fixture_id']), {'meta': meta, 'markets': {}})
