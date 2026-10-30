@@ -104,8 +104,9 @@ class ComboSources(unittest.TestCase):
         self.assertTrue(any(g.get('bet_id')==184 for g in restored.values()))
 
     def test_team_specific_both_halves_never_prices_match_combo(self):
-        for bid in (48,111,112,113):
-            item=self.direct();item['id']=bid
+        for bid,name in ((48,'To Score in Both Halves - Home'),(111,'Home team to score in both halves'),
+                         (112,'Away team to score in both halves'),(113,'Both teams to score in both halves')):
+            item=self.direct();item.update(id=bid,name=name)
             self.assertEqual(direct_combo_groups(feed([item]),100,NOW),{})
         item=self.direct();item['name']='Home team will score in both halves'
         self.assertEqual(direct_combo_groups(feed([item]),100,NOW),{})

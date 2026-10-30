@@ -144,6 +144,7 @@ def collect(payload, fid, observed_at):
     payload = normalize_payload(payload, observed_at)
     now = stamp(observed_at)
     groups, diagnostics = {}, Counter()
+    ambiguous_snapshots=set()
     for record in (payload or {}).get('response', []):
         if str((record.get('fixture') or {}).get('id')) != str(fid): continue
         updated, kickoff = stamp(record.get('update')), stamp((record.get('fixture') or {}).get('date'))
@@ -153,6 +154,13 @@ def collect(payload, fid, observed_at):
             for bet in book.get('bets', []):
                 try: bid = int(bet.get('id'))
                 except (ValueError, TypeError): continue
+                discovered = bet.get('_market_discovery') or {}
+                if bet.get('_discovery_rejected'):
+                    diagnostics['discovery_rejected_markets'] += 1
+                    diagnostics['out_of_scope_bet_types' if bid in CATALOG and bid not in CORE_BET_IDS else 'catalog_identity_mismatch' if bid in CATALOG else 'unmodeled_bet_types'] += 1
+                    continue
+                if discovered and discovered.get('source_bet_id') in CORE_BET_IDS and bid not in CORE_BET_IDS:
+                    diagnostics['catalog_identity_mismatch'] += 1
                 if bid not in CATALOG:
                     diagnostics['unmodeled_bet_types'] += 1; continue
                 if bid not in CORE_BET_IDS:
@@ -176,15 +184,28 @@ def collect(payload, fid, observed_at):
                         diagnostics['ambiguous_snapshots'] += 1; continue
                     key = ('ah2|' if CATALOG[bid][1] == 'handicap' else '') + f'{bid}|{group}|{book["id"]}'
                     source = bet.get('_quote_provenance') or {}
-                    if source: key = f'asian{source["source_bet_id"]}|' + key
+                    if source:
+                        source_key=source.get('source_bet_id')
+                        if source_key is None: source_key=(source.get('discovery') or {}).get('source_token','unknown')
+                        key = f'asian{source_key}|' + key
+                    elif discovered and str(discovered.get('source_bet_id')) != str(bid):
+                        key = f'discovery1_{discovered["source_token"]}|' + key
                     complete = item['expected'] is not None and set(item['odds']) == item['expected']
                     candidate = {k: item[k] for k in ('odds', 'specs')}
                     candidate.update(bookmaker_id=str(book['id']), bookmaker=str(book.get('name') or book['id']),
                         bet_id=bid, observed_at=observed_at, provider_updated_at=updated.isoformat() if updated else None,
                         complete=complete, group=f'{bid}|{group}')
                     candidate.update(quote_source='asian_halfline' if source else 'bookmaker',
-                                     quote_executable=True, quote_provenance=deepcopy(source))
+                                     quote_executable=True, quote_provenance=deepcopy(source or discovered))
+                    if discovered and (str(discovered.get('source_bet_id')) != str(bid) or normalized(discovered.get('source_bet_name')) != normalized(bet.get('name'))):
+                        diagnostics['discovered_market_groups'] += 1
                     old = groups.get(key)
+                    snapshot=(key,candidate['provider_updated_at'])
+                    if snapshot in ambiguous_snapshots: continue
+                    if old and old['provider_updated_at']==candidate['provider_updated_at'] and old['odds']!=candidate['odds']:
+                        ambiguous_snapshots.add(snapshot);groups.pop(key)
+                        diagnostics['ambiguous_snapshots']+=1
+                        continue
                     if old and stamp(old['provider_updated_at']) and (not updated or updated < stamp(old['provider_updated_at'])): continue
                     groups[key] = candidate
     direct = direct_combo_groups(payload, fid, observed_at)
@@ -270,7 +291,9 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
     for key, group in captured.items():
         if not group.get('specs') or not all(core_market(s) for s in group['specs'].values()): continue
         points = fixture['groups'].setdefault(key, [])
-        if not points and group.get('quote_source', 'bookmaker') == 'bookmaker':
+        provenance = group.get('quote_provenance') or {}
+        same_source = provenance.get('kind') != 'market_discovery' or str(provenance.get('source_bet_id')) == str(group['bet_id'])
+        if not points and group.get('quote_source', 'bookmaker') == 'bookmaker' and same_source:
             # Preserve valid operator histories already collected by V3/V4.
             # New markets start empty; no synthetic opening price is created.
             sample = next(iter(group['specs'].values()))

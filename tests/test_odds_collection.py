@@ -35,7 +35,9 @@ class RecoveryTests(unittest.TestCase):
             if path=='status':return {'response':{'requests':{'current':quota,'limit_day':75000}}}
             return deepcopy(response)
         client.get.side_effect=get
-        return OddsEnricher(client,state or {},now=NOW,max_calls=2),client
+        return OddsEnricher(client,state or {},now=NOW,max_calls=2,market_catalog=[
+            {'id':903,'name':'Over/Under primo tempo'}, {'id':904,'name':'BTTS 1h'},
+            {'id':905,'name':'Total Goals Asian FT'}, {'id':906,'name':'Over/Under 2h'}]),client
     def test_counts_real_recovery_and_caps_calls(self):
         c,client=self.collector(payload(2));result=c.enrich(payload(),100)
         self.assertEqual(c.stats['odds_targeted_books_recovered'],1)

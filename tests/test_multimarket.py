@@ -104,10 +104,12 @@ class ModelTests(unittest.TestCase):
         p=goal_probabilities([.5,.5,1,1])
         self.assertAlmostEqual(p['1x2_ft']['1'],p['1x2_ft']['2'],places=10)
 
-    def test_strict_market_id_line_and_operator(self):
+    def test_semantic_market_identity_and_strict_line_and_operator(self):
         result=collect_quotes(payload(),NOW)['1']
         self.assertEqual(set(result),{'over35_ft','home15_ft'})
         bad=payload();bad['response'][0]['bookmakers'][0]['bets'][0]['id']=45
+        self.assertEqual(len(collect_quotes(bad,NOW)['1']['over35_ft']),2)
+        bad['response'][0]['bookmakers'][0]['bets'][0]['name']='Corners Over/Under'
         self.assertEqual(len(collect_quotes(bad,NOW)['1']['over35_ft']),1)
         bad=payload();bad['response'][0]['bookmakers'][0]['bets'][0]['values'][1]['value']='Under 2.5'
         self.assertEqual(len(collect_quotes(bad,NOW)['1']['over35_ft']),1)

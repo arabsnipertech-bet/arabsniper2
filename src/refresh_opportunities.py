@@ -51,12 +51,13 @@ def captured_prices(fixture, rows):
     for key, points in fixture.get('groups', {}).items():
         if not points: continue
         parts = key.split('|')
-        if 'handicap' in parts and parts[0] != 'ah2': continue
+        if 'handicap' in parts and parts[0] != 'ah2' and not (parts[0].startswith('discovery1_') and parts[1]=='ah2'): continue
         normal = key.removeprefix('ah2|')
+        if normal.startswith('discovery1_'): normal = normal.split('|',1)[1].removeprefix('ah2|')
         if normal.startswith('asian'): normal = normal.split('|', 1)[1]
         group, book = normal.rsplit('|', 1)
         point = points[-1]
-        if key.startswith('direct_combo_v1|'):
+        if key.startswith(('direct_combo_v1|','direct_combo_discovery_v1|')):
             from quote_sources import number
             if (point.get('bet_id') == 184 and point.get('complete') and point.get('specs') and
                     set(point.get('odds', {})) == {'over', 'not_over'} and
@@ -65,7 +66,7 @@ def captured_prices(fixture, rows):
                 captured[key] = {**point, 'bookmaker_id':book,
                     'bookmaker':point.get('bookmaker') or names.get(book) or f'Operatore {book}'}
             continue
-        if key.startswith('synthetic_combo_v1|'):
+        if key.startswith(('synthetic_combo_v1|','synthetic_combo_discovery_v1|')):
             from quote_sources import synthetic_margin
             if synthetic_margin(point) is not None and all(core_market(s) for s in point.get('specs', {}).values()):
                 captured[key] = {**point, 'bookmaker_id': book, 'bookmaker': point.get('bookmaker') or names.get(book) or f'Operatore {book}'}
