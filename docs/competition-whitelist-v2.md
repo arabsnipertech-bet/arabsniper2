@@ -1,4 +1,27 @@
-# Competition whitelist: first three divisions
+# Perimetro competizioni Gold
+
+## Versione attiva v2.2 · 31 ottobre 2026
+
+La policy `gold-senior-whitelist-v2.2` in `src/gold_competitions.py` controlla la competizione prima di acquisire statistiche e quote della singola partita. Fast e Night applicano la stessa decisione al calendario già salvato, alla matrice e alla lista live. Gli archivi prematch già congelati conservano la classificazione originaria.
+
+| Paese | Famiglia esclusa |
+|---|---|
+| Ucraina | Persha Liga e categorie inferiori |
+| Polonia | II Liga e categorie inferiori |
+| Norvegia | 2. Division e categorie inferiori |
+| Slovacchia | 2. liga, 3. liga e categorie inferiori |
+| Bulgaria | Third League e categorie inferiori |
+| Repubblica Ceca | 3. liga, ČFL e MSFL, inclusi i gruppi |
+| Austria | Regionalliga, compresi i gironi territoriali |
+| Romania | Liga III, comprese tutte le serie e i playoff |
+
+I nomi sono normalizzati per paese, accenti, maiuscole e punteggiatura. Le famiglie esplicitamente escluse coprono anche suffissi e gruppi nuovi. Per i paesi europei o UEFA del catalogo, le eccezioni di terzo livello sono la Serie C italiana e la League One inglese. La League Two inglese è ammessa al quarto livello, con gli alias English, EFL, Sky Bet e Football League Two. Le altre seconde divisioni già ammesse e le coppe autorizzate seguono il catalogo per paese.
+
+L’ammissione permette l’osservazione. Le stesse regole Gold e Platinum verificano disponibilità della quota, aggio, valore e flusso di ciascun mercato. Un’autorizzazione di lega non promuove automaticamente una partita.
+
+Durante il passaggio di versione, il browser verifica i feed già salvati con `web/competition-scope.js`. Per aggiornare la parte dati di questo asset dopo una modifica della policy eseguire `python src/gold_competitions.py --sync-browser`. Il test di parità controlla la corrispondenza con il backend e i riferimenti versionati delle due pagine.
+
+## Perimetro storico v2
 
 Effective change requested 27 October 2026. This is an explicit exception to the
 code freeze through 2 November; no scheduled monitoring is added or changed.

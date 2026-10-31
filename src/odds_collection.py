@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 import time
 from multimarket_model import collect_quotes, stamp
 from quote_sources import direct_combo_groups, normalize_payload
+from gold_competitions import excluded_known_meta
 from market_discovery import identify, clean, VERSION as DISCOVERY_VERSION
 
 TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht', 'over05_ht', 'over05_sh', 'combo_ht_sh')
@@ -179,6 +180,7 @@ class OddsEnricher:
     def reserve_priority(self, prior_matches, now):
         self.priority_fixtures = {str(m['fixture']['fixture_id']) for m in prior_matches
             if (m.get('fixture') or {}).get('status_short') in ('NS', 'TBD')
+            and not excluded_known_meta(m['fixture'])
             and (hours_to_kickoff(m['fixture'], now) or 0) > 0
             and fixture_priority(m['fixture'].get('kickoff'), m, now)[0] == 0}
 
@@ -194,6 +196,8 @@ class OddsEnricher:
             return base
         rows = base.get('response', [])
         meta = self.fixtures.get(str(fid), {})
+        if excluded_known_meta(meta):
+            return base
         # Verify kickoff from independently fetched fixture metadata for empty odds.
         starts = [stamp(r.get('fixture', {}).get('date')) for r in rows if str(r.get('fixture', {}).get('id'))==str(fid)]
         if not starts and meta:

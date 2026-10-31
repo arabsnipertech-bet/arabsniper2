@@ -4,7 +4,7 @@ async function run(payload,fail=false){
  const nodes=Object.fromEntries(['daily-picks','preview-date'].map(id=>[id,{textContent:'',innerHTML:''}]));
  const calls=[];let pending;
  class Clock extends Date{constructor(...a){super(...(a.length?a:['2026-10-22T12:00:00Z']));}static now(){return +new Clock();}}
- const ctx={Date:Clock,Intl,Set,Number,String,AbortSignal,handleUrlMessages(){},setInterval(){},document:{getElementById:id=>nodes[id],addEventListener(){}},fetch:async(url)=>{calls.push(url);return {ok:!fail,json:async()=>payload}}};
+ const ctx={ArabCompetitionScope:require('../web/competition-scope.js'),Date:Clock,Intl,Set,Number,String,AbortSignal,handleUrlMessages(){},setInterval(){},document:{getElementById:id=>nodes[id],addEventListener(){}},fetch:async(url)=>{calls.push(url);return {ok:!fail,json:async()=>payload}}};
  vm.runInNewContext(code,ctx);await new Promise(r=>setImmediate(r));return {nodes,calls};
 }
 (async()=>{
@@ -69,6 +69,17 @@ async function run(payload,fail=false){
    r=await run({...data,selections:[{...row,...changes}]});
    assert.equal(r.nodes['daily-picks'].innerHTML.includes('class="pick"'),visible,JSON.stringify({market,changes}));
   }
+ }
+ const currentScope=require('../web/competition-scope.js').id;
+ const pick={...data.selections[0],model_id:'lateral-matrix-v5.0',country:'England',league:'League Two',
+  spec:{kind:'total',period:'ft',side:'over',line:2.5},odd:2,statistical_pct:60,competition_policy:currentScope,
+  opportunity:{policy_id:'gold-goals-v6.1',eligible:true,goal_market:'over25_ft',odds_min:1.85,odds_max:2.6,
+   min_probability_pct:48,structural_supported:true,market_checks_passed:true},quote_executable:true};
+ for(const [country,league,scope,visible] of [['England','League Two',currentScope,true],['Romania','Liga III - Serie 1',currentScope,false],
+  ['Austria','Regionalliga - West','gold-senior-whitelist-v2.1',false],[null,'II Liga - East','gold-senior-whitelist-v2.1',false],
+  ['Poland','I Liga',currentScope,true]]){
+  r=await run({...data,selections:[{...pick,country,league,competition_policy:scope}]});
+  assert.equal(r.nodes['daily-picks'].innerHTML.includes('class="pick"'),visible);
  }
  for(const plan of ['daily','weekly','monthly']) assert(html.includes("buy('"+plan+"', this)"));
  console.log('PASS: public feed only, three cards, stale day, escaped HTML, unavailable feed, Gold entry links and plan IDs');

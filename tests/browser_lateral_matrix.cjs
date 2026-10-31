@@ -5,7 +5,7 @@ async function verifyCachedRelease(browser,payload){
  const http=require('node:http'),requests=[];
  const html=fs.readFileSync('web/gold-dashboard-live.html','utf8');
  const script=html.match(/<script src="(\/lateral-matrix\.js[^\"]*)"><\/script>/)[1];
- const assets=new Set(['statistics-first.js','statistics-first.css','lateral-matrix.js','lateral-matrix.css','live-scores.js']);
+ const assets=new Set(['competition-scope.js','statistics-first.js','statistics-first.css','lateral-matrix.js','lateral-matrix.css','live-scores.js']);
  const oldScript='/lateral-matrix.js?v=5.10';
  const server=http.createServer((req,res)=>{
   requests.push(req.url);
@@ -58,7 +58,7 @@ async function verifyCachedRelease(browser,payload){
 async function verifyCalendarRollover(browser,payload){
  const http=require('node:http');
  let dates=['2026-10-28','2026-10-29','2026-10-30','2026-10-31','2026-11-01'];
- const assets=new Set(['statistics-first.js','statistics-first.css','lateral-matrix.js','lateral-matrix.css','live-scores.js']);
+ const assets=new Set(['competition-scope.js','statistics-first.js','statistics-first.css','lateral-matrix.js','lateral-matrix.css','live-scores.js']);
  const server=http.createServer((req,res)=>{
   const url=new URL(req.url,'http://127.0.0.1');
   res.setHeader('Cache-Control','no-store');
@@ -218,6 +218,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   const page=await browser.newPage();await page.route('**/*',r=>r.abort());
   await page.setContent(fs.readFileSync('web/gold-dashboard-live.html','utf8'));
   await page.addStyleTag({content:fs.readFileSync('web/lateral-matrix.css','utf8')});
+  await page.addScriptTag({content:fs.readFileSync('web/competition-scope.js','utf8')});
   await page.addScriptTag({content:fs.readFileSync('web/lateral-matrix.js','utf8')});
   await page.addScriptTag({content:fs.readFileSync('web/live-scores.js','utf8')});
   await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;renderMatchResearch(p)},payload);

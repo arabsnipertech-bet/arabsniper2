@@ -374,3 +374,16 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  assert(!panel('radar_watch',{now:now+3600001}).includes('FLUSSO IN FORMAZIONE'));
  assert(!panel('radar_watch',{archived:true}).includes('FLUSSO IN FORMAZIONE'));
 }
+
+// A saved positive decision on the former scope must not leak into any Gold
+// or Radar view while a new five-day projection is being published.
+{
+ const stale=(country,league,id)=>({...matches[0],gold_scope:{policy_id:'gold-senior-whitelist-v2.1',allowed:true},
+  fixture:{...matches[0].fixture,country,league,fixture_id:id}});
+ const keep=stale('England','League Two','42'),remove=stale('Romania','Liga III - Serie 1','43');
+ const persisted={matches:[remove,keep],gold_scope:{policy_id:'gold-senior-whitelist-v2.1'}};
+ assert.deepEqual(api.scopePayload(persisted).matches.map(m=>m.fixture.fixture_id),['42']);
+ assert.deepEqual(api.selectMatches(persisted,{...api.state,category:'all'},0).map(m=>m.fixture.fixture_id),['42']);
+ for(const category of ['platinum','market_signal']) assert.equal(api.matchingRows(remove,{...api.state,category},0).length,0);
+ assert.equal(api.scopePayload({matches:[stale('England','League One','44'),stale('Scotland','League One','45')]}).matches.length,1);
+}

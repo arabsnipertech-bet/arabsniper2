@@ -1,7 +1,7 @@
 import unittest
 from copy import deepcopy
 
-from gold_competitions import TOP, SECOND, THIRD, SCOPE_ID, profile, fixture_allowed, enforce_day
+from gold_competitions import TOP, SECOND, THIRD, EUROPEAN, SCOPE_ID, profile, fixture_allowed, enforce_day
 from matrix_pipeline import complete_day, build_board
 from refresh_opportunities import cached_refresh_safe
 from test_statistics_first import NOW, KICKOFF
@@ -17,14 +17,16 @@ class ThreeDivisionScope(unittest.TestCase):
                 for name in names:
                     with self.subTest(country=country, name=name):
                         result = profile({'country': country, 'name': name})
-                        self.assertTrue(result['allowed'])
-                        self.assertEqual(result['tier'], f'senior_division_{level}')
+                        excluded = (level == 2 and country in ('ukraine', 'slovakia') or
+                                    level == 3 and country in EUROPEAN and country not in ('italy', 'england'))
+                        self.assertEqual(result['allowed'], not excluded)
+                        self.assertEqual(result['tier'], 'blocked' if excluded else f'senior_division_{level}')
                         self.assertEqual(result['policy_id'], SCOPE_ID)
 
     def test_numeric_names_do_not_admit_fourth_tiers_or_other_countries(self):
         blocked = [('Italy', 'Serie D - Girone A'), ('Italy', 'Serie C - Girone D'),
                    ('Italy', 'Coppa Italia Serie C'), ('Italy', 'Serie C - Supercoppa Lega Finals'),
-                   ('England', 'League Two'), ('Germany', 'Regionalliga - West'),
+                   ('England', 'National League'), ('Germany', 'Regionalliga - West'),
                    ('France', 'National 2 - Group A'), ('Finland', 'Kakkonen - Lohko A'),
                    ('Croatia', 'Third NL - Istok'), ('Poland', 'III Liga - Group 1'),
                    ('Norway', '3. Division - Girone 1'), ('Turkey', '3. Lig - Group 1'),

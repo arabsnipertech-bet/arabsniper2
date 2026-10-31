@@ -15,7 +15,7 @@ def install(ns, matrix_mode=False):
         from lateral_matrix import MODEL_ID as engine_id, build_matrix
         from matrix_quotes import attach as attach_matrix
         from matrix_pipeline import universal_profile, fixture_allowed, complete_day, build_board, selection_export
-        from gold_competitions import SCOPE_ID, output_allowed, fixture_profile
+        from gold_competitions import SCOPE_ID, SCOPE_DESCRIPTION, output_allowed, fixture_profile
         from proposal_stability import seed_stability
         ns['DEFAULT_EXCLUDED_COUNTRIES'].clear()
         ns['fixture_allowed'] = fixture_allowed
@@ -286,7 +286,7 @@ def install(ns, matrix_mode=False):
                 romania_allowed=True, goals_only_proposals=True, drought_probability_bonus=0,
                 market_confirmation_after_selection=False)
             output['method'].update(markets='Matrice 1X2, doppia chance, Over/Under, GG/NG, PT/ST, asiatici, multigol e combo.',
-                competition_filter='Prime tre divisioni senior dei paesi in whitelist e coppe autorizzate; Romania inclusa; esclusi giovanili e livelli inferiori.',
+                competition_filter=SCOPE_DESCRIPTION,
                 markers='Proposte su cinque mercati gol, controlli OCI/aggio e Combo PT+ST; soglie gold-goals-v6.1.',
                 book='OCI e aggio per esito, linea e periodo; volumi e smart money non osservati.')
         ns['atomic_write_json'](ns['OUTPUT_FILE'], output)

@@ -2,9 +2,9 @@
 (function(root){
  'use strict';
  const MODEL='lateral-matrix-v5.0';
- const POLICY='gold-goals-v6.1',SCOPE='gold-senior-whitelist-v2.1';
- // v1 is a strict subset of v2: keep existing data visible during rollout.
- const acceptedScope=id=>[SCOPE,'gold-senior-whitelist-v2','gold-senior-whitelist-v1'].includes(id);
+ const competition=typeof module==='object'&&module.exports?require('./competition-scope.js'):globalThis.ArabCompetitionScope;
+ const POLICY='gold-goals-v6.1',SCOPE=competition.id;
+ const acceptedScope=competition.accepts;
  const acceptedPolicy=d=>[POLICY,'gold-goals-v6','gold-goals-v5','gold-goals-v4','gold-goals-v3','gold-goals-v2'].includes(d?.policy_id);
  const MIN_P={over15_ht:40,over25_ht:18,gg_ht:26,over25_ft:48,over35_ft:35};
  const V6_MIN_P={over15_ht:35,gg_ht:30,over25_ft:30,over35_ft:30};
@@ -33,7 +33,7 @@
  const QUALITY={supported:'Storico presente',limited:'Storico limitato',prior_dominant:'Una squadra con dati mancanti',prior_only:'Solo valori di riferimento'};
  const REASONS={market:'mercato escluso',probability:'stima bassa',price:'quota fuori range',stale:'quota da aggiornare',history:'storico insufficiente',ht_history:'meno di 4 PT per squadra',adapter:'quota da verificare',margin:'aggio oltre limite',edge:'EV insufficiente',sensitivity:'EV prudente basso',coherence:'stime incoerenti'};
  Object.assign(REASONS,{yield_floor:'quota sotto 1,85',oci_negative:'OCI < −20',odds_rising:'salita quota >2%',suspicious_divergence:'divergenza non confermata',margin_missing:'aggio assente',ht_oci:'OCI PT < +15',structural_missing:'statistiche mancanti',isolated_peak:'media senza ultima <80%',ht_symmetry:'PT asimmetrici',ht_expected:'gol attesi PT bassi',ht_frequency:'frequenza PT <75%'});
- const allowedMatch=m=>acceptedScope(m.gold_scope?.policy_id)&&m.gold_scope.allowed===true;
+ const allowedMatch=m=>m.gold_scope?.allowed===true&&competition.allows(m.gold_scope.policy_id,m.fixture?.country,m.fixture?.league);
  const scopePayload=p=>({...p,matches:(p.matches||[]).filter(allowedMatch),gold_scope:{...(p.gold_scope||{}),ready:acceptedScope(p.gold_scope?.policy_id)}});
  function goalMarket(r){const s=r.spec||{};if(s.extra!=null)return null;return s.kind==='btts'&&s.period==='ht'&&s.side==='yes'&&s.line==null?'gg_ht':['total','asian_total'].includes(s.kind)&&s.side==='over'?(s.period==='ht'&&s.line===1.5?'over15_ht':s.period==='ht'&&s.line===2.5?'over25_ht':s.period==='ft'&&s.line===2.5?'over25_ft':s.period==='ft'&&s.line===3.5?'over35_ft':null):null;}
  const minProbability=r=>r.opportunity?.policy_id===POLICY?(MIN_P[goalMarket(r)]??30):r.opportunity?.policy_id==='gold-goals-v6'?(V6_MIN_P[goalMarket(r)]??30):r.opportunity?.policy_id==='gold-goals-v5'?(PREVIOUS_MIN_P[goalMarket(r)]??35):35;
