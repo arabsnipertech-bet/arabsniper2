@@ -52,6 +52,13 @@ async function verifyCachedRelease(browser,payload){
   assert(!(await page.locator('.mx-dashboard').textContent()).includes('Dati in aggiornamento alla whitelist'));
   fs.mkdirSync('test-artifacts',{recursive:true});
   await page.screenshot({path:'test-artifacts/matrix-cache-rollout.png'});
+  const legacy=await page.evaluate(()=>buildMatchCard({
+   fixture:{fixture_id:999,home:'Casa',away:'Ospite'},model:{probabilities_poisson:{over15_ht:{over:.5}}},
+   statistics:{xg_layer:{home:{available:true,sample_all:3,xg_for_ft:1.5}},shots_layer:{home:{shots_on_target_for_sample:3,shots_on_target_for:0}}},
+   display:{markets:{over15_ht:{model_pick:'over',selection_order:['over'],recommendation_gate:{eligible:false},
+    selections:{over:{open_odd:2.5,current_odd:2,oci_as:0,delta_odd:-.5,model_probability_pct:60,marker:{shape:'circle'}}}}}}
+  },0));
+  for(const text of ['In osservazione','Poisson prematch<b>50.0%','Quota equa Poisson<b>2.00','xG medio FT 1.50','tiri in porta medi FT 0.0','OCI-AS<b>0'])assert(legacy.includes(text),text);
   console.log('PASS Gold release: cached v6 bundle replaced by versioned v6.1, current whitelist fixtures visible');
  }finally{await page.close();await new Promise(resolve=>server.close(resolve));}
 }
@@ -405,6 +412,11 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert(!(await missingStats.textContent()).includes('minimo Gold'));
    assert(!/NaN|undefined/.test(await missingStats.textContent()));
    assert.equal(await page.locator('[data-live-fixture="103"] .mx-best-market').count(),1,'Negative model EV cannot veto price monitoring');
+   const studyCard=page.locator('[data-live-fixture="103"]');
+   assert(await studyCard.locator('.mx-study-base').isVisible());
+   assert((await studyCard.locator('.mx-quote-board').textContent()).includes('Poisson prematch'));
+   assert((await studyCard.locator('.mx-quote-cell').first().textContent()).includes('Quota equa Poisson'));
+   assert.equal(await page.locator('.mx-card:has([data-opportunity-id]) .mx-study-base').count(),0);
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Blue signals overflow '+name);
    await blue.scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-market-signal-${name}.png`});
@@ -452,6 +464,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.locator('.mx-match-layout > .mx-best-stable').count(),1,'Official Gold remains available');
    assert.equal(await page.locator('.mx-best-market').count(),2);
    const silver=page.locator('[data-live-fixture="501"]');
+   assert.equal(await silver.locator('.mx-study-base').count(),0);
    assert.equal(await silver.locator('header .mx-tier-label').textContent(),'PLATINUM');
    assert.equal(await silver.locator('header .mx-tier-label').evaluate(e=>getComputedStyle(e).color),'rgb(237, 243, 250)');
    assert(+await silver.locator('header .mx-tier-label strong').evaluate(e=>getComputedStyle(e).fontWeight)>=700);

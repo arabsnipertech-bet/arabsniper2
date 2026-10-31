@@ -215,10 +215,13 @@ def install(ns, matrix_mode=False):
             if matrix_mode:
                 summary = day['matrix_summary']
                 coverage = day.get('universal_coverage', {})
+                league_two = sum((m.get('gold_scope') or {}).get('tier') == 'senior_division_4'
+                                 for m in day.get('matches', []))
                 ns['log'](f"V5 {day['date']}: {summary['displayed_fixtures']} partite visibili / "
                           f"{coverage.get('available_fixture_ids')} disponibili; "
                           f"{summary['analyzed_fixtures']} matrici, {summary['modeled_markets']} esiti, "
-                          f"{summary['priced_markets']} quote recenti; categorie {summary['categories']}")
+                          f"{summary['priced_markets']} quote recenti; categorie {summary['categories']}; "
+                          f"perimetro {SCOPE_ID}, League Two {league_two}")
             if matrix_mode:
                 rankings = day['market_rankings']
             else:

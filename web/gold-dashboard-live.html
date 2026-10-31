@@ -840,8 +840,8 @@
 
   <link rel="stylesheet" href="/statistics-first.css?v=4.0">
   <script src="/statistics-first.js?v=4.0"></script>
-  <link rel="stylesheet" href="/lateral-matrix.css?v=d57d77ecb676">
-  <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=0035b9609cba"></script>
+  <link rel="stylesheet" href="/lateral-matrix.css?v=1a13812b0516">
+  <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=dc89cd4a9fd2"></script>
   <script src="/live-scores.js?v=8415d2038a5f"></script>
   <script>
     'use strict';
@@ -2035,7 +2035,9 @@
       return `shape-${shape} marker-${color}`;
     }
 
-    function buildSelection(marketKey, selectionKey, selection) {
+    function buildSelection(marketKey, selectionKey, selection, studyPoisson) {
+      const study = studyPoisson !== undefined;
+      const poisson = Number.isFinite(studyPoisson) && studyPoisson >= 0 && studyPoisson <= 1 ? studyPoisson : null;
       const marker = selection?.marker || {};
       const shapeTitle = marker.shape === 'circle_square'
         ? 'ArabSniper puro e Book concordano'
@@ -2051,7 +2053,7 @@
       const bookFairProbability = selection?.book_fair_probability_pct;
       const oci = selection?.oci_as;
       return `
-        <div class="selection" title="${escapeHtml(shapeTitle)}">
+        <div class="selection" title="${escapeHtml(study ? 'In osservazione · indicazione statistica' : shapeTitle)}">
           <div class="selection-name">${escapeHtml(SELECTION_LABELS[selectionKey] || selectionKey)}</div>
           <div class="quote-zone">
             <div class="quote-marker ${markerClasses(marker)}">
@@ -2059,18 +2061,19 @@
               <div class="quote-open">ap. ${escapeHtml(formatOdd(openOdd))}</div>
             </div>
           </div>
-          ${movementDescription(selection)}
+          ${study && (selection?.delta_odd == null || !(openOdd > 1 && currentOdd > 1)) ? '<span class="movement-badge">Movimento non disponibile</span>' : movementDescription(selection)}
           <div class="selection-metrics">
-            <span>AS calibrata<b>${escapeHtml(formatPct(calibratedProbability))}</b></span>
-            <span>AS pura<b>${escapeHtml(formatPct(rawProbability))}</b></span>
-            <span>Book fair<b>${escapeHtml(formatPct(bookFairProbability))}</b></span>
-            <span>OCI-AS<b>${escapeHtml(Number.isFinite(num(oci, NaN)) ? num(oci).toFixed(0) : '—')}</b></span>
+            <span>AS calibrata<b>${escapeHtml(study && calibratedProbability == null ? '—' : formatPct(calibratedProbability))}</b></span>
+            <span>${study ? 'AS pre-calibrazione' : 'AS pura'}<b>${escapeHtml(study && rawProbability == null ? '—' : formatPct(rawProbability))}</b></span>
+            ${study ? `<span>Poisson prematch<b>${poisson != null ? escapeHtml(formatPct(poisson * 100)) : '—'}</b></span><span>Quota equa Poisson<b>${poisson > 0 ? escapeHtml(formatOdd(1 / poisson)) : '—'}</b></span>` : ''}
+            <span>Book fair<b>${escapeHtml(study && !(currentOdd > 1) ? '—' : formatPct(bookFairProbability))}</b></span>
+            <span>OCI-AS<b>${escapeHtml(oci != null && oci !== '' && Number.isFinite(num(oci, NaN)) && (!study || oci !== 0 || (openOdd > 1 && currentOdd > 1)) ? num(oci).toFixed(0) : '—')}</b></span>
           </div>
         </div>
       `;
     }
 
-    function buildMarketPanel(marketKey, market) {
+    function buildMarketPanel(marketKey, market, poisson = {}) {
       if (!market) return '';
       let keys = selectionKeys(marketKey, market);
       if (marketKey === 'gg_ht') {
@@ -2095,7 +2098,7 @@
       const gate = market.recommendation_gate || {};
       const gateLabel = gate.eligible
         ? `Consigliato ${gate.grade || ''} · ${num(gate.score).toFixed(0)}/100`
-        : `Non consigliato${Array.isArray(gate.reasons) && gate.reasons.length ? ` · ${gate.reasons.join(', ').replaceAll('_', ' ')}` : ''}`;
+        : `In osservazione · Analisi Statistica di Base${Array.isArray(gate.reasons) && gate.reasons.length ? ` · ${gate.reasons.join(', ').replaceAll('_', ' ')}` : ''}`;
       return `
         <section class="market-panel ${usable ? '' : 'market-unverified'}">
           <div class="market-head">
@@ -2106,7 +2109,7 @@
             <span class="relation-pill ${relationClass(relation)}">${escapeHtml(RELATION_LABELS[relation] || RELATION_LABELS.neutral)}</span>
           </div>
           <div class="selection-grid ${cols}">
-            ${keys.map(key => buildSelection(marketKey, key, market.selections[key])).join('')}
+            ${keys.map(key => buildSelection(marketKey, key, market.selections[key], gate.eligible !== true ? (poisson?.[key] ?? null) : undefined)).join('')}
           </div>
           <div class="market-foot">
             <span>ArabSniper puro: <b>${escapeHtml(modelPick)}</b></span>
@@ -2169,6 +2172,14 @@
       const xgText = xgAvailable
         ? `xG reali: ${hxg.sample_all || 0} casa · ${axg.sample_all || 0} ospite`
         : 'xG reali non disponibili · fallback goal';
+      const studyTeams = !display.primary_choice ? ['home','away'].map(side => {
+        const xg = xgLayer[side] || {};
+        const shots = match.statistics?.shots_layer?.[side] || match.statistics?.[side]?.shot_quality || {};
+        const fields = [];
+        if (xg.available && xg.sample_all > 0 && Number.isFinite(xg.xg_for_ft)) fields.push('xG medio FT ' + xg.xg_for_ft.toFixed(2));
+        if (shots.shots_on_target_for_sample > 0 && Number.isFinite(shots.shots_on_target_for)) fields.push('tiri in porta medi FT ' + shots.shots_on_target_for.toFixed(1));
+        return fields.length ? `<p><b>${escapeHtml(fixture[side] || (side === 'home' ? 'Casa' : 'Ospite'))}</b> · ${escapeHtml(fields.join(' · '))}</p>` : '';
+      }).join('') : '';
       const fixtureId = String(fixture.fixture_id ?? index);
       return `
         <article class="match-card" id="match-${escapeHtml(fixtureId)}" data-fixture-id="${escapeHtml(fixtureId)}" data-kickoff-time="${escapeHtml(fixture.time || '')}">
@@ -2185,9 +2196,10 @@
           </div>
 
           ${buildPrimaryChoice(display)}
+          ${studyTeams ? `<section class="mx-study-base"><h4>Analisi Statistica di Base</h4>${studyTeams}</section>` : ''}
 
           <div class="markets">
-            ${MARKET_ORDER.map(key => buildMarketPanel(key, markets[key])).join('')}
+            ${MARKET_ORDER.map(key => buildMarketPanel(key, markets[key], match.model?.probabilities_poisson?.[key])).join('')}
           </div>
 
           <div class="card-actions">

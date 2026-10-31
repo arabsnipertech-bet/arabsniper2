@@ -288,8 +288,49 @@
   return '<aside class="mx-best mx-best-market" data-market-monitoring="'+esc(state)+'" data-radar-state="'+esc(fallback||state)+'"><span class="mx-section-title">RADAR BLU · MONITORAGGIO</span><h4>'+title+'</h4><span class="mx-badge mx-market-signal">SOLO STUDIO</span><p>'+ready.size+' dei 6 mercati gol hanno una quota idonea. Il flusso richiesto dal Radar è ancora da confermare.</p>'+
    (issues.length?'<p>'+issues.join('<br>')+'</p>':'')+history+timingContext(context)+'</aside>';
  }
- function movementSignal(row){
-  const delta=priced(row)&&Number.isFinite(row.delta_pct)?row.delta_pct:null;
+ function poissonEstimate(row={}){
+  // Frozen V5 rows predate blending, or retain the untouched statistical base.
+  const base=row.calibration_base||row;
+  const p=base.statistical_pct;
+  const probability=Number.isFinite(p)&&p>=0&&p<=100?p:null;
+  const spec=row.spec||{};
+  const binary=spec.kind==='result'||spec.kind==='btts'||isCombo(row)||
+   (['total','asian_total'].includes(spec.kind)&&Number.isFinite(spec.line)&&spec.line%1===.5);
+  const fair=Number.isFinite(base.fair_odd)&&base.fair_odd>=1?base.fair_odd:
+   binary&&probability>0?100/probability:null;
+  return {probability,fair};
+ }
+ function studyObservation(row,study,ociOnly=false){
+  if(!study||!['recent','cached_stable','stale','missing'].includes(row.quote_status)||(!ociOnly&&priced(row)))return null;
+  const start=Date.parse(study.kickoff),now=study.now??Date.now();
+  const snapshots=[row.cached_quote,row.study_flow];
+  if(!priced(row)&&Number.isFinite(row.last_odd))snapshots.push({...row,odd:row.last_odd});
+  let last=null,time=-Infinity;
+  for(const source of snapshots){
+   if(!source||!Number.isFinite(source.odd)||source.odd<=1||!(source.bookmaker_id||source.bookmaker)||(ociOnly&&!Number.isFinite(source.oci)))continue;
+   const seen=Date.parse(source.quote_observed_at),provider=Date.parse(source.provider_updated_at);
+   if(!Number.isFinite(seen)||!Number.isFinite(provider)||!Number.isFinite(start)||provider>seen||seen>=start||seen>now||seen<=time)continue;
+   last=source;time=seen;
+  }
+  if(!last)return null;
+  const first=last.first_odd,delta=Number.isFinite(first)&&first>1?100*(last.odd/first-1):null;
+  return {...last,delta_pct:Number.isFinite(last.delta_pct)?last.delta_pct:delta};
+ }
+ function studyHeader(study){
+  const teams=['home','away'].map(side=>{
+   const fields=[];
+   for(const [period,tag] of [['ft','FT'],['ht','PT']]){
+    const p=study.profiles?.[side]?.['for_'+period];
+    if(Number.isFinite(p?.xg_mean)&&p.xg_mean>=0&&p.xg_sample>0)fields.push('xG medio '+tag+' '+num(p.xg_mean,2)+' ('+num(p.xg_sample,0)+' gare)');
+    if(Number.isFinite(p?.shots_mean)&&p.shots_mean>=0)fields.push('tiri in porta medi '+tag+' '+num(p.shots_mean,1));
+   }
+   return fields.length?'<p><b>'+esc(study[side]||(side==='home'?'Casa':'Ospite'))+'</b> · '+esc(fields.join(' · '))+'</p>':'';
+  }).join('');
+  return '<section class="mx-study-base" aria-label="Analisi Statistica di Base"><h4>Analisi Statistica di Base</h4><span>In osservazione · stime Poisson prematch</span>'+
+   (teams||'<p>xG e tiri in porta non disponibili nello storico osservato.</p>')+'</section>';
+ }
+ function movementSignal(row,saved=false){
+  const delta=(priced(row)||saved)&&Number.isFinite(row.delta_pct)?row.delta_pct:null;
   const first=Date.parse(row.first_observed_at),last=Date.parse(row.quote_observed_at);
   if(delta===0&&Number.isFinite(first)&&first===last&&row.first_odd===row.odd){
    return '<div class="mx-net mx-net-unknown"><b>Prima rilevazione</b><small>In attesa di una seconda osservazione dello stesso bookmaker.</small></div>';
@@ -299,24 +340,37 @@
   const arrow=delta==null?'—':Math.abs(delta)<.005?'→':delta<0?'↓':'↑';
   return '<div class="mx-net mx-net-'+level+'" aria-label="'+esc(direction+(delta==null?'':' '+signed(delta)+'%'))+'"><b>'+arrow+' '+(delta==null?'—':signed(delta)+'%')+'</b><small>'+direction+' · '+(level==='red'?'forte':level==='yellow'?'media':level==='green'?'lieve':'da osservare')+'</small></div>';
  }
- function quoteCell(row,title,helpers={}){
+ function quoteCell(row,title,helpers={},study=null){
   row=row||{};
-  const recent=priced(row);
-  const band={low:'basso',medium:'intermedio',high:'alto'}[row.margin_band]||'';
-  return '<section class="mx-quote-cell"><h4>'+esc(title)+'</h4><div class="mx-quote-pair"><span title="Quota iniziale rilevata presso lo stesso operatore">Apertura<b>'+num(row.first_odd,2)+'</b></span><span>'+(row.quote_status==='cached_stable'?'Quota stabile da cache':recent?'Attuale':Number.isFinite(row.last_odd)?'Ultima quota · da confermare':'Quota non ricevuta')+'<b>'+num(recent?row.odd:row.last_odd,2)+'</b></span></div>'+movementSignal(row)+
-   '<div class="mx-quote-metrics"><span>Statistica <b>'+pct(row.statistical_pct)+'</b></span><span>OCI <b>'+signed(row.oci)+'</b></span><span>Aggio mediano <b>'+pct(row.margin_pct)+'</b> '+esc(band)+'</span><span>Δ aggio <b>'+signed(row.margin_delta_pp)+' pt</b></span></div>'+
-   '<small class="mx-quote-source">'+(!recent?esc(quoteAvailability(row))+' · ':'')+esc(row.bookmaker||'Fonte non disponibile')+(row.provider_updated_at?' · '+esc(helpers.timestamp?.(row.provider_updated_at)||row.provider_updated_at):'')+'</small>'+
-   '<small class="mx-quote-consensus">'+(Number.isFinite(row.oci)?'OCI: ':'OCI non disponibile · ')+esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi'+(row.oci_previous==null?'':' · prima '+signed(row.oci_previous))+'</small></section>';
+  const saved=studyObservation(row,study),flow=saved||row,recent=priced(row);
+  const older=study&&!Number.isFinite(flow.oci)?studyObservation(row,study,true):null;
+  const pressure=older||flow;
+  const band={low:'basso',medium:'intermedio',high:'alto'}[flow.margin_band]||'';
+  const base=study?poissonEstimate(row):null;
+  const statistics=base?'<span>Poisson prematch <b>'+pct(base.probability)+'</b></span><span>Quota equa Poisson <b>'+num(base.fair,2)+'</b></span>':
+   '<span>Statistica <b>'+pct(row.statistical_pct)+'</b></span>';
+  const priceLabel=saved?'Ultima osservata':row.quote_status==='cached_stable'?'Quota stabile da cache':recent?'Attuale':Number.isFinite(row.last_odd)?'Ultima quota · da confermare':'Quota non ricevuta';
+  const observed=saved?flow.quote_observed_at:flow.provider_updated_at;
+  return '<section class="mx-quote-cell"><h4>'+esc(title)+'</h4><div class="mx-quote-pair"><span title="Quota iniziale rilevata presso lo stesso operatore">Apertura<b>'+num(flow.first_odd,2)+'</b></span><span>'+priceLabel+'<b>'+num(saved||recent?flow.odd:row.last_odd,2)+'</b></span></div>'+movementSignal(flow,!!saved)+
+   '<div class="mx-quote-metrics">'+statistics+'<span>'+(saved||older?'Ultimo OCI osservato':'OCI')+' <b>'+signed(pressure.oci)+'</b></span><span>Aggio mediano <b>'+pct(flow.margin_pct)+'</b> '+esc(band)+'</span><span>Δ aggio <b>'+signed(flow.margin_delta_pp)+' pt</b></span>'+
+   (study&&row.quality&&QUALITY[row.quality]?'<span>'+esc(QUALITY[row.quality])+'</span>':'')+
+   (study&&Number.isFinite(flow.speed_pp_per_hour)?'<span>Velocità <b>'+num(flow.speed_pp_per_hour,1)+' pp/ora</b></span>':'')+
+   (study&&Number.isFinite(flow.fair_delta_pp)?'<span>Δ fair <b>'+signed(flow.fair_delta_pp)+' pp</b></span>':'')+'</div>'+
+   '<small class="mx-quote-source">'+(saved?'Flusso storico · ':!recent?esc(quoteAvailability(row))+' · ':'')+(study&&flow.quote_source==='synthetic_combo'?'Combo stimata · ':'')+esc(flow.bookmaker||'Fonte non disponibile')+(observed?' · '+esc(helpers.timestamp?.(observed)||observed):'')+'</small>'+
+   '<small class="mx-quote-consensus">'+(Number.isFinite(pressure.oci)?'OCI: ':'OCI non disponibile · ')+esc(pressure.agreeing_books??0)+'/'+esc(pressure.paired_books??0)+' operatori concordi'+(pressure.oci_previous==null?'':' · prima '+signed(pressure.oci_previous))+(older?' · '+esc(older.bookmaker||older.bookmaker_id)+' · '+esc(helpers.timestamp?.(older.quote_observed_at)||older.quote_observed_at):'')+'</small></section>';
  }
- function quoteBoard(rows,helpers){
+ function quoteBoard(rows,helpers,study=null){
   const find=(kind,period,side,line)=>{
    const exact=r=>r.period===period&&r.spec?.side===side&&(line==null||r.spec.line===line)&&r.spec.extra==null;
    const direct=rows.find(r=>r.spec?.kind===kind&&exact(r));
    if(kind!=='total'||priced(direct))return direct;
    return rows.find(r=>r.spec?.kind==='asian_total'&&exact(r)&&priced(r))||direct;
   };
-  return '<section class="mx-quote-board" aria-label="Quote 1X2 apertura e attuale"><h4 class="mx-section-title">QUOTE 1 · X · 2 — APERTURA E ATTUALE</h4><div class="mx-1x2">'+[['1','1 · Casa'],['x','X · Pareggio'],['2','2 · Ospite']].map(([s,l])=>quoteCell(find('result','ft',s),l,helpers)).join('')+'</div>'+
-   '<div class="mx-goal-quotes">'+[['total','ht','over',1.5,'Over 1,5 PT'],['total','ft','over',2.5,'Over 2,5 FT'],['total','ft','over',3.5,'Over 3,5 FT'],['btts','ht','yes',null,'GG PT']].map(([k,p,s,l,t])=>quoteCell(find(k,p,s,l),t,helpers)).join('')+'</div></section>';
+  const goals=[['total','ht','over',1.5,'Over 1,5 PT'],['total','ft','over',2.5,'Over 2,5 FT'],['total','ft','over',3.5,'Over 3,5 FT'],['btts','ht','yes',null,'GG PT']];
+  if(study)goals.splice(1,0,['total','ht','over',2.5,'Over 2,5 PT']);
+  const combo=study&&rows.find(isCombo);
+  return '<section class="mx-quote-board" aria-label="Quote 1X2 apertura e attuale">'+(study?studyHeader(study):'')+'<h4 class="mx-section-title">QUOTE 1 · X · 2 — APERTURA E ATTUALE</h4><div class="mx-1x2">'+[['1','1 · Casa'],['x','X · Pareggio'],['2','2 · Ospite']].map(([s,l])=>quoteCell(find('result','ft',s),l,helpers,study)).join('')+'</div>'+
+   '<div class="mx-goal-quotes">'+goals.map(([k,p,s,l,t])=>quoteCell(find(k,p,s,l),t,helpers,study)).join('')+(combo?quoteCell(combo,'Combo Over 0,5 PT + Over 0,5 ST',helpers,study):'')+'</div></section>';
  }
  function timingContext(context){
   if(!context)return '';
@@ -377,10 +431,19 @@
   const asian=['asian_total','handicap','dnb'].includes(row.spec?.kind);
   const d=row.opportunity,range=goalMarket(row)&&acceptedPolicy(d)?'<small title="'+esc('Quote '+num(minOdd(row),2)+'–'+num(maxOdd(row),2)+' · soglia '+pct(d.min_probability_pct))+'">'+(options.platinum?'Gold: ':'')+(d.eligible?'Idoneo':'Scartato · '+esc((d.reasons||[]).map(code=>REASONS[code]||code).join(' · ')||'criteri non superati'))+'</small>':'';
   const tone=isCombo(row)?comboTone(row):null;
+  const base=options.study?poissonEstimate(row):null;
+  const observed=studyObservation(row,options.study);
+  const stats=base?'<strong>'+pct(base.probability)+'</strong><small>Poisson prematch · Quota equa '+num(base.fair,2)+' · '+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>':
+   '<strong>'+pct(row.statistical_pct)+'</strong><small>Equa '+num(row.fair_odd,2)+' · '+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>';
+  const prices=observed?'<strong>'+num(observed.odd,2)+'</strong><small>Ultima osservata · apertura '+num(observed.first_odd,2)+' · '+signed(observed.delta_pct)+'%</small>':price(row);
+  const priceTime=observed?.quote_observed_at||row.provider_updated_at;
+  const reading=options.study&&!Number.isFinite((observed||row).oci)?studyObservation(row,options.study,true):null;
+  const flow=reading||observed||row;
+  const studyFlowLabel=reading||observed?'Ultimo OCI osservato · '+esc(flow.bookmaker||flow.bookmaker_id)+' · '+esc(helpers.timestamp?.(flow.quote_observed_at)||flow.quote_observed_at):'OCI del mercato';
   return '<div class="mx-market-row" role="row"><div class="mx-market-name" role="cell"><b>'+esc(row.label)+'</b>'+(isCombo(row)?'<span class="mx-badge mx-combo-'+tone+'">'+(tone==='active'?'Combo Attiva':tone==='near'?'Sotto soglia · Vicina':row.combo?.policy_id===POLICY?'Sotto soglia':'Dati assenti')+'</span>'+(!comboActive(row)?'<small>'+esc(comboReasons(row))+'</small>':''):options.platinum?'<span class="mx-badge mx-platinum"><strong>PLATINUM</strong></span>':options.marketSignal?'<span class="mx-badge mx-market-signal" title="'+MARKET_SIGNAL_TEXT+'">Radar di Mercato · Solo studio</span>':badge(row))+range+'</div>'+
-   '<div role="cell" data-title="Statistica"><strong>'+pct(row.statistical_pct)+'</strong><small>Equa '+num(row.fair_odd,2)+' · '+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>'+(asian?'<small>Rimborsi inclusi nel valore</small>':'')+'</div>'+
-   '<div role="cell" data-title="Prima → attuale">'+price(row)+(row.provider_updated_at?'<small>'+esc(helpers.timestamp?.(row.provider_updated_at)||row.provider_updated_at)+'</small>':'')+'</div>'+
-   '<div role="cell" data-title="OCI"><b>'+signed(isCombo(row)?row.combo?.over25_ft_oci:row.oci)+'</b><small>'+(isCombo(row)?'Riferimento Over 2,5 FT':esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi')+'</small></div>'+
+   '<div role="cell" data-title="Statistica">'+stats+(asian?'<small>Rimborsi inclusi nel valore</small>':'')+'</div>'+
+   '<div role="cell" data-title="Prima → attuale">'+prices+(priceTime?'<small>'+esc(helpers.timestamp?.(priceTime)||priceTime)+'</small>':'')+'</div>'+
+   '<div role="cell" data-title="OCI"><b>'+signed(options.study?flow.oci:isCombo(row)?row.combo?.over25_ft_oci:row.oci)+'</b><small>'+(options.study?studyFlowLabel+' · '+esc(flow.agreeing_books??0)+'/'+esc(flow.paired_books??0)+' operatori concordi'+(isCombo(row)?' · Rif. Over 2,5 FT '+signed(row.combo?.over25_ft_oci):''):isCombo(row)?'Riferimento Over 2,5 FT':esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi')+'</small></div>'+
    '<div role="cell" data-title="Aggio"><b>'+pct(row.selected_margin_pct)+'</b><small>'+(row.quote_source==='synthetic_combo'?'Massimo sui singoli PT/ST · '+(row.quote_provenance?.component_margins_pct||[]).map(pct).join(' / '):isCombo(row)&&!priced(row)?'Richiede una quota bookmaker':'Book selezionato · Δ '+signed(row.selected_margin_delta_pp)+' pt')+'</small>'+(!isCombo(row)?'<small>Mediana '+pct(row.margin_pct)+'</small>':'')+'</div>'+
    '<div role="cell" data-title="Valore"><b class="'+(row.ev_pct>0?'mx-positive':'')+'">'+(row.ev_pct==null?'—':signed(row.ev_pct)+'%')+'</b><small>'+(isCombo(row)&&!priced(row)?'EV non calcolabile senza quota reale':'Prudente '+(row.ev_low_pct==null?'—':signed(row.ev_low_pct)+'%'))+'</small></div></div>';
  }
@@ -410,8 +473,9 @@
   const tierOptions={archived:(services.phase||phase)(m)!=='upcoming',kickoff:m.fixture?.kickoff,monitoring:m.multimarket?.matrix?.quote_monitoring};
   const signals=new Set(marketSignals(rowsOf(m),tierOptions).map(r=>r.id));
   const platinum=new Set(platinumSignals(rowsOf(m),tierOptions).map(r=>r.id));
+  const study=!platinum.size&&!bestOpportunity(rowsOf(m),tierOptions)?{kickoff:m.fixture?.kickoff}:null;
   return '<div class="mx-detail"><p class="mx-explanation">'+rows.length+' esiti in questa vista. Quote, OCI e aggio della stessa linea e periodo.</p>'+
-   '<div class="mx-table" role="table" aria-label="Matrice delle opportunità"><div class="mx-table-head" role="row">'+['Mercato','Statistica','Prima → attuale','OCI','Aggio','Valore'].map(t=>'<div role="columnheader">'+t+'</div>').join('')+'</div>'+rows.map(r=>marketRow(r,services,{marketSignal:signals.has(r.id),platinum:platinum.has(r.id)})).join('')+'</div>'+
+   '<div class="mx-table" role="table" aria-label="Matrice delle opportunità"><div class="mx-table-head" role="row">'+['Mercato','Statistica','Prima → attuale','OCI','Aggio','Valore'].map(t=>'<div role="columnheader">'+t+'</div>').join('')+'</div>'+rows.map(r=>marketRow(r,services,{study,marketSignal:signals.has(r.id),platinum:platinum.has(r.id)})).join('')+'</div>'+
    '<details class="mx-method"><summary>Statistiche delle squadre</summary>'+teamProfiles(m)+'</details>'+
    '<details class="mx-method"><summary>Come leggere i valori</summary><p>Aggio: competitività dei prezzi, non misura di liquidità. OCI: movimento delle quote, non volume di denaro. La sensibilità prudente non è un intervallo di confidenza. Il valore asiatico include rimborsi e mezzi esiti.</p></details></div>';
  }
@@ -458,8 +522,9 @@
   const noSnapshot=a.status==='no_prematch_snapshot';
   const tierOptions={archived:phase(m)!=='upcoming',monitoringClosed:(helpers.phase||phase)(m)!=='upcoming',kickoff:f.kickoff,lastProposal:a.matrix?.last_proposal,monitoring:a.matrix?.quote_monitoring};
   const elite=!noSnapshot&&platinumSignals(all,tierOptions)[0];
+  const study=!noSnapshot&&!elite&&!bestOpportunity(all,tierOptions)?{profiles:a.profiles,home:f.home,away:f.away,kickoff:f.kickoff}:null;
   return '<article class="mx-card'+(elite?' mx-card-platinum':'')+'" data-live-fixture="'+esc(fid)+'"><header><div><time>'+esc(f.time||'')+'</time><small>'+esc(f.country)+' · '+esc(f.league)+'</small>'+(elite?'<span class="mx-badge mx-platinum mx-tier-label"><strong>PLATINUM</strong></span>':'')+'<h3>'+esc(f.match)+'</h3></div><div class="mx-live"><span data-live-slot="badge">'+(helpers.liveBadge?.(m)||'')+'</span><span data-live-slot="state">'+esc(helpers.stateLabel?.(m)||'')+'</span><span data-live-slot="halftime">'+halfTimeText(helpers.firstHalf?.(m))+'</span></div></header>'+
-   (noSnapshot?'<p class="mx-explanation">Partita presente nel palinsesto. Nessuna previsione salvata prima dell’inizio: gli esiti non vengono usati per ricostruirla a posteriori.</p>':'<div class="mx-match-layout">'+quoteBoard(all,helpers)+opportunityPanel(all,a.matrix?.goal_context,tierOptions)+'</div>')+
+   (noSnapshot?'<p class="mx-explanation">Partita presente nel palinsesto. Nessuna previsione salvata prima dell’inizio: gli esiti non vengono usati per ricostruirla a posteriori.</p>':'<div class="mx-match-layout">'+quoteBoard(all,helpers,study)+opportunityPanel(all,a.matrix?.goal_context,tierOptions)+'</div>')+
    '<div class="mx-match-summary"><span>'+all.length+' mercati</span><span>'+counts.convergence+' convergenze</span><span>'+counts.divergence+' divergenze</span><span>'+all.filter(r=>priced(r)).length+' quote utilizzabili · '+all.filter(r=>r.quote_status==='cached_stable').length+' da cache</span></div>'+
    (all.length?'<button class="mx-open" type="button" data-mx-open="'+esc(fid)+'" aria-haspopup="dialog">Apri matrice · mercati utili <span>↗</span></button>':'')+'<footer>Analisi '+esc(helpers.timestamp?.(a.captured_at)||a.captured_at||'non disponibile')+' · Regole '+esc(a.matrix?.opportunity_policy?.id||'non disponibili')+' · Modello statistico '+esc(a.model_id||'non disponibile')+(f.data_freshness&&f.data_freshness!=='fresh'?' · '+esc(f.data_freshness):'')+'</footer></article>';
  }
@@ -493,7 +558,7 @@
   h.onchange=e=>{const key=e.target.dataset?.mxFilter;if(key&&key in state){state[key]=e.target.value;render(payload,host,helpers);}};
   updateModal();
  }
- const api={monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
+ const api={poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.ArabMatrix=api;
 })(typeof window!=='undefined'?window:globalThis);
