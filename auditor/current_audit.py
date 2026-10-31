@@ -161,7 +161,12 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
         progress(f'salvataggio esiti {date}')
         day.write(results_path)
         progress(f'costruzione rapporto giornaliero {date}')
-        daily = build_daily(day, str(date), now.isoformat(), os.environ.get('GITHUB_SHA'))
+        from adaptive_calibration import Evidence, WINDOW
+        evidence = Evidence() if (now.astimezone(TZ).date()-date).days <= WINDOW else None
+        daily = build_daily(day, str(date), now.isoformat(), os.environ.get('GITHUB_SHA'),
+                            observe=evidence.observe if evidence is not None else None)
+        if evidence is not None:
+            write(root / f'auditarchive/prematch_{date}_calibration.json', evidence.samples())
         daily['selection_studies'] = build_studies(daily)
         write(root / f'auditarchive/prematch_{date}_daily.json', daily)
         atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md',

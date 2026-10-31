@@ -92,7 +92,7 @@ class NightlySchedule(unittest.TestCase):
             ['src/private_publication.py', '--results-only'],
             ['auditor/current_audit.py', 'history', '--date', '2026-10-30'],
             ['src/gold_storage.py', 'publish'], ['src/gold_policy_audit.py'],
-            ['src/gold_storage.py', 'publish']])
+            ['src/adaptive_calibration.py', '--as-of', '2026-10-31'], ['src/gold_storage.py', 'publish']])
 
     def test_interrupted_history_resumes_the_committed_day_before_new_journals(self):
         now = datetime.fromisoformat('2026-10-31T00:40:00+01:00')

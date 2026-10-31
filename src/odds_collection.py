@@ -24,7 +24,43 @@ SEMANTIC_TARGETS = {('result','ft'):('1x2_ft',),
     ('halves_total','ft'):('combo_ht_sh',)}
 
 
-def discovery_routes(catalog, rows, counts):
+def hours_to_kickoff(meta, now):
+    start, current = stamp(meta.get('kickoff')), stamp(now)
+    return (start-current).total_seconds()/3600 if start and current else None
+
+
+def secondary_competition(meta):
+    score = meta.get('competition_quality_score')
+    # The current whitelist assigns the same admission score (84) to every
+    # allowed division. Use its explicit lower-division tier for polling only.
+    return (type(score) in (int, float) and score < 70 or
+            score in (None, 84) and meta.get('competition_tier') in ('senior_division_2', 'senior_division_3'))
+
+
+def adaptive_cooldown(meta, market_kind, period, now):
+    hours = hours_to_kickoff(meta, now)
+    if hours is not None and 0 < hours <= 6:
+        return 2700
+    if (hours is not None and hours > 18 and secondary_competition(meta)
+            and (period in ('ht', 'sh') or market_kind == 'halves_total')):
+        return 28800
+    return 10800
+
+
+def fixture_priority(kickoff, previous, now):
+    hours = hours_to_kickoff({'kickoff': kickoff}, now)
+    rows = ((previous.get('multimarket') or {}).get('matrix') or {}).get('rows', [])
+    priced = [r.get('spec', {}) for r in rows if r.get('quote_status') in ('recent', 'cached_stable')
+              and isinstance(r.get('odd'), (float, int)) and r['odd'] > 1]
+    result = any(s.get('kind') == 'result' and s.get('period') == 'ft' for s in priced)
+    goals = {(s.get('period'), s.get('line')) for s in priced
+             if s.get('kind') in ('total', 'asian_total') and s.get('side') == 'over'}
+    gaps = result and not {('ht', 1.5), ('ft', 2.5), ('ft', 3.5)} <= goals
+    return (0 if hours is not None and 0 < hours <= 12 or gaps else 1,
+            hours if hours is not None else float('inf'))
+
+
+def discovery_routes(catalog, rows, counts, *, with_identity=False):
     routes={}
     observed=[bet for row in rows for book in row.get('bookmakers',[]) for bet in book.get('bets',[])]
     for bet in [*catalog,*observed]:
@@ -32,8 +68,9 @@ def discovery_routes(catalog, rows, counts):
         if not identity or bet.get('id') is None: continue
         targets=SEMANTIC_TARGETS.get((identity['kind'],identity['period']),())
         if targets and min(counts[t] for t in targets)<8:
-            routes[bet['id']]=min(counts[t] for t in targets)
-    return sorted(routes,key=lambda bid:(routes[bid],str(bid)))
+            routes[bet['id']]=(min(counts[t] for t in targets), identity['kind'], identity['period'])
+    ordered = sorted(routes, key=lambda bid: (routes[bid][0], str(bid)))
+    return [(bid, *routes[bid][1:]) for bid in ordered] if with_identity else ordered
 
 
 def coverage(payload, fid, now, target_only=True):
@@ -89,6 +126,7 @@ class OddsEnricher:
         self.now = now or datetime.now(timezone.utc).isoformat()
         self.elapsed = 0.0
         self.fixtures = {}
+        self.priority_fixtures = set()
         self.max_calls, self.max_seconds = max_calls, max_seconds
         self.calls = 0
         self.quota_remaining = None
@@ -138,12 +176,20 @@ class OddsEnricher:
                             for b in payload['response'] if b.get('id') is not None]
             self.state.update(bookmakers=self.catalog, catalog_at=self.now)
 
+    def reserve_priority(self, prior_matches, now):
+        self.priority_fixtures = {str(m['fixture']['fixture_id']) for m in prior_matches
+            if (m.get('fixture') or {}).get('status_short') in ('NS', 'TBD')
+            and (hours_to_kickoff(m['fixture'], now) or 0) > 0
+            and fixture_priority(m['fixture'].get('kickoff'), m, now)[0] == 0}
+
     def register_fixture(self, meta):
         """Trusted fixture metadata from the fixtures endpoint, never inferred odds."""
         self.fixtures[str(meta["fixture_id"])] = dict(meta)
 
     def enrich(self, base, fid):
         self.now = self.fixed_now or datetime.now(timezone.utc).isoformat()
+        prioritized = str(fid) in self.priority_fixtures
+        self.priority_fixtures.discard(str(fid))
         if not base or not base.get('collection', {}).get('complete'):
             return base
         rows = base.get('response', [])
@@ -160,10 +206,21 @@ class OddsEnricher:
         present_books = {str(b['id']) for r in rows for b in r.get('bookmakers', [])}
         counts = {k:sum(m==k for m,b in before) for k in TARGETS}
         # Query sparsest goal markets first, but do not alter eligibility thresholds.
-        markets = discovery_routes(self.market_catalog,rows,counts)
+        start = stamp(meta.get('kickoff')) or min(starts)
+        meta = {**meta, 'kickoff': start.isoformat()}
+        hours = hours_to_kickoff(meta, self.now)
+        if hours <= 0:
+            return base
+        if hours > 30 and not present_books:
+            self.stats['odds_targeted_unproductive_skips'] += 1
+            return base
+        distant = hours > 18 and secondary_competition(meta)
+        routes = discovery_routes(self.market_catalog, rows, counts, with_identity=True)
+        identities = {bid: (kind, period) for bid, kind, period in routes}
+        markets = list(identities)
         history = self.state.setdefault('queries', {})
         cursor = self.state.setdefault('cursors', {}).get(str(fid), 0)
-        missing = [b['id'] for b in self.catalog if str(b['id']) not in present_books]
+        missing = [b['id'] for b in self.catalog if not distant and str(b['id']) not in present_books]
         missing = missing[cursor % len(missing):]+missing[:cursor % len(missing)] if missing else []
         # Keep catalogue expansion reachable even when all eight query slots have
         # sparse markets: interleave unknown operators and exact market routes.
@@ -172,28 +229,39 @@ class OddsEnricher:
             if index < len(markets): queries.append(('bet', markets[index]))
             if index < len(missing): queries.append(('bookmaker', missing[index]))
         uncovered = not before
-        if uncovered and not queries:
+        if uncovered and not distant and not queries:
             queries.append(('fixture',fid))  # Unfiltered discovery when even the catalogue is unavailable.
-        if uncovered and all(meta.get(k) is not None for k in ('league_id','season','date')):
+        if uncovered and not distant and all(meta.get(k) is not None for k in ('league_id','season','date')):
             queries.insert(0, ('league_date', meta['date']))
         result = base
         attempts = 0
+        # Retain bounded calls for known priority fixtures on subsequent calendar days.
+        call_limit = self.max_calls
+        if not prioritized and hours > 12 and not (counts['1x2_ft'] and any(not counts[k] for k in ('over15_ht','over25_ft','over35_ft'))):
+            call_limit = max(0, self.max_calls - 8*len(self.priority_fixtures))
         for kind, value in queries:
-            health = self.state.setdefault('route_health', {}).setdefault(kind, {})
-            paused = stamp(health.get('paused_at'))
-            if not uncovered and paused and 0 <= (stamp(self.now)-paused).total_seconds() < 21600:
-                self.stats['odds_targeted_unproductive_skips'] += 1
-                continue
-            if paused:
-                health.clear()
+            route_kind, period = identities[value] if kind == 'bet' else (kind, 'ft')
+            cooldown = adaptive_cooldown(meta, route_kind, period, self.now)
             key = f'{fid}:{kind}:{value}'
             checked = stamp(history.get(key))
-            if checked and 0 <= (stamp(self.now)-checked).total_seconds() < 10800:
+            if distant and cooldown == 28800 and not checked:
+                # Start the eight-hour observation window without spending a call.
+                deferred = self.state.setdefault('deferred_since', {})
+                checked = stamp(deferred.setdefault(key, self.now))
+            if checked and (stamp(self.now)-checked).total_seconds() < cooldown:
                 self.stats['odds_targeted_cooldown_skips'] += 1
                 continue
+            health = self.state.setdefault('route_health', {}).setdefault(kind, {})
+            paused = stamp(health.get('paused_at'))
+            if paused and 0 <= (stamp(self.now)-paused).total_seconds() < 21600:
+                if not uncovered and hours > 6:
+                    self.stats['odds_targeted_unproductive_skips'] += 1
+                    continue
+            elif paused:
+                health.clear()
             if attempts >= 8:
                 break
-            if not self.allowed():
+            if self.calls >= call_limit or not self.allowed():
                 self.stats['odds_targeted_budget_stops'] += 1
                 break
             start_calls = self.client.request_count
@@ -202,7 +270,7 @@ class OddsEnricher:
             started = time.monotonic()
             try:
                 if callable(getattr(type(self.client),'get_bounded',None)):
-                    extra,_ = self.client.get_bounded('odds',params,self.max_calls-self.calls)
+                    extra,_ = self.client.get_bounded('odds',params,call_limit-self.calls)
                 else:
                     extra = self.client.get('odds', params, use_cache=False)
             finally:
@@ -252,6 +320,7 @@ class OddsEnricher:
     def finish(self):
         cutoff = stamp(self.now).timestamp()-7*86400
         self.state['queries'] = {k:v for k,v in self.state.get('queries',{}).items() if stamp(v) and stamp(v).timestamp() >= cutoff}
+        self.state['deferred_since'] = {k:v for k,v in self.state.get('deferred_since',{}).items() if k not in self.state['queries'] and stamp(v) and stamp(v).timestamp() >= cutoff}
         active = {k.split(':')[0] for k in self.state['queries']}
         self.state['cursors'] = {k:v for k,v in self.state.get('cursors',{}).items() if k in active}
         self.state.update(updated_at=self.now, last_run=dict(self.stats), coverage=self.report)

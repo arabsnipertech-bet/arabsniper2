@@ -140,7 +140,7 @@ def partition(spec):
     return '|'.join(map(str, group)), token, expected
 
 
-def collect(payload, fid, observed_at):
+def collect(payload, fid, observed_at, ht_half=None):
     payload = normalize_payload(payload, observed_at)
     now = stamp(observed_at)
     groups, diagnostics = {}, Counter()
@@ -171,7 +171,8 @@ def collect(payload, fid, observed_at):
                 for value in bet.get('values', []):
                     odd = number(value.get('odd'))
                     spec = parse_value(bid, value.get('value'))
-                    if spec and not core_market(spec):
+                    calibration_leg = ht_half is not None and spec and spec['kind'] in ('total', 'asian_total') and spec['period'] == 'ht' and spec.get('line') == .5
+                    if spec and not calibration_leg and not core_market(spec):
                         diagnostics['out_of_scope_values'] += 1; continue
                     if not spec or odd is None or odd <= 1:
                         diagnostics['unmapped_or_invalid_values'] += 1; continue
@@ -214,6 +215,11 @@ def collect(payload, fid, observed_at):
     has_direct = any(fresh(g['provider_updated_at'], observed_at, starts.get(str(fid))) for g in direct.values())
     synthetic = {} if has_direct else synthetic_combo_groups(payload, fid, observed_at)
     groups.update(synthetic)
+    if ht_half is not None:
+        for key, item in list(groups.items()):
+            sample = next(iter(item.get('specs', {}).values()), {})
+            if sample.get('kind') in ('total', 'asian_total') and sample.get('period') == 'ht' and sample.get('line') == .5:
+                ht_half.append(groups.pop(key))
     diagnostics['asian_halfline_fallbacks'] = sum(g.get('quote_source') == 'asian_halfline' for g in groups.values())
     diagnostics['synthetic_combos'] = len(synthetic)
     diagnostics['direct_combos'] = len(direct)
@@ -328,14 +334,29 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
     return offers
 
 
+def value_profile(row, ev, low, strong, oci, synthetic):
+    behavior = 'convergence' if ev > 0 and strong and oci > 0 else 'divergence' if ev > 0 and strong and oci < 0 else 'neutral' if oci is not None else 'unavailable'
+    robust_value = ev > 0 and low > 0 and row['quality'] == 'supported'
+    category = 'no_edge'
+    reason = 'Il prezzo non supera la quota di equilibrio del modello'
+    if ev > 0:
+        category, reason = 'value_watch', 'Valore teorico positivo, conferma o stabilità ancora insufficienti'
+        if row['quality'] != 'supported': category, reason = 'limited_data', 'Valore teorico con storico limitato: osservazione, non segnale consolidato'
+        elif robust_value:
+            if behavior == 'convergence': category, reason = 'mature', 'Valore statistico stabile e movimento concorde sullo stesso mercato'
+            elif behavior == 'divergence': category, reason = 'contrarian', 'Valore statistico stabile, movimento contrario: ipotesi da verificare'
+            elif row['family'] == 'combo': category, reason = 'lateral', ('Combo con quota sintetica PT × ST; valore teorico stimato, conferma diretta non disponibile' if synthetic else 'Combo con prezzo reale e valore teorico stabile; conferma diretta non disponibile')
+    return behavior, robust_value, category, reason
+
+
 def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     if not core_market(row.get('spec')):
         raise ValueError('Price analysis outside the active market scope')
     from quote_cache import remember, restore, within_window
     remember(row)
     row['quote_adapter_version'] = HANDICAP_ADAPTER_VERSION
-    row.update(selected_margin_pct=None, selected_margin_delta_pp=None, selected_market_fair_pct=None,
-               selected_movement=None, selected_market_odds=None,
+    row.update(speed_pp_per_hour=None, selected_margin_pct=None, selected_margin_delta_pp=None, selected_market_fair_pct=None,
+               selected_movement=None, selected_market_odds=None, opening_market_odds=None,
                movement_confirmed=False, fair_direction_coherent=False)
     now, start = stamp(as_of), stamp(kickoff)
     max_hours = 1 if now and start and 0 < (start-now).total_seconds() <= 10800 else 6
@@ -393,17 +414,7 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     ev = row['win_weight']*(odd-1)-row['loss_weight']
     evs = [w*(odd-1)-lost for w, lost in row.get('sensitivity_weights', [[row['win_weight'], row['loss_weight']]])]
     strong = bool(move.get('confirmed') and move.get('fair_direction_coherent') and oci is not None and abs(oci) >= 40)
-    behavior = 'convergence' if ev > 0 and strong and oci > 0 else 'divergence' if ev > 0 and strong and oci < 0 else 'neutral' if oci is not None else 'unavailable'
-    robust_value = ev > 0 and min(evs) > 0 and row['quality'] == 'supported'
-    category = 'no_edge'
-    reason = 'Il prezzo non supera la quota di equilibrio del modello'
-    if ev > 0:
-        category, reason = 'value_watch', 'Valore teorico positivo, conferma o stabilità ancora insufficienti'
-        if row['quality'] != 'supported': category, reason = 'limited_data', 'Valore teorico con storico limitato: osservazione, non segnale consolidato'
-        elif robust_value:
-            if behavior == 'convergence': category, reason = 'mature', 'Valore statistico stabile e movimento concorde sullo stesso mercato'
-            elif behavior == 'divergence': category, reason = 'contrarian', 'Valore statistico stabile, movimento contrario: ipotesi da verificare'
-            elif row['family'] == 'combo': category, reason = 'lateral', ('Combo con quota sintetica PT × ST; valore teorico stimato, conferma diretta non disponibile' if synthetic else 'Combo con prezzo reale e valore teorico stabile; conferma diretta non disponibile')
+    behavior, robust_value, category, reason = value_profile(row, ev, min(evs), strong, oci, synthetic)
     low_margin = 5 if row['family'] in ('1x2', 'totals') and row['period'] == 'ft' else 7
     margin_band = 'unavailable' if margin is None else 'low' if margin < low_margin else 'high' if margin > 9 else 'medium'
     margin_delta = move.get('median_overround_delta_pp')
@@ -428,6 +439,8 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     operators = move.get('operators') or []
     selected = next((o for o in operators if o.get('bookmaker_id') == best['bookmaker_id']), None)
     own_trace = best.get('trace') or []
+    if row['spec']['kind'] == 'result' and row['period'] == 'ft' and best['complete'] and own_trace:
+        row['opening_market_odds'] = dict(own_trace[0]['odds'])
     own_margin_delta = (fair(own_trace[-1]['odds'])[1] - fair(own_trace[0]['odds'])[1]
                         if len(own_trace) >= 2 else None)
     row.update(selected_margin_pct=synthetic_margin(best) if synthetic else fair(best['odds'])[1] if best['complete'] else None,
@@ -458,7 +471,8 @@ def attach(assessment, payload, state, meta, as_of):
     from gold_competitions import output_allowed
     from refresh_opportunities import captured_prices
     allowed = output_allowed({'fixture': meta})
-    captured, diagnostics = collect(payload, meta['fixture_id'], as_of)
+    ht_half = []
+    captured, diagnostics = collect(payload, meta['fixture_id'], as_of, ht_half)
     previous = state.get('matrix_quotes', {}).get(str(meta['fixture_id']))
     if previous and allowed:
         saved = captured_prices(previous, assessment.get('matrix', {}).get('rows', []))
@@ -473,8 +487,19 @@ def attach(assessment, payload, state, meta, as_of):
     existing = {r['id'] for r in matrix['rows']}
     extra = {key: values[0]['spec'] for key, values in offers.items() if key not in existing}
     if extra: matrix['rows'].extend(matrix_rows(assessment, extra))
+    from adaptive_calibration import closing_prices, market_of
     for row in matrix['rows']:
-        analyse_prices(row, offers.get(row['id'], []), as_of, meta['kickoff'], allow_cached=allowed)
+        prices = offers.get(row['id'], [])
+        analyse_prices(row, prices, as_of, meta['kickoff'], allow_cached=allowed)
+        if prices and market_of(row['spec']):
+            closes = closing_prices(prices, prices[0]['token'], as_of, meta['kickoff'])
+            if closes:
+                row['calibration_closes'] = closes
+    from adaptive_pricing import apply_matrix, ht_reference
+    reference = ht_reference(assessment, ht_half, as_of, meta.get('kickoff'))
+    if reference:
+        matrix['calibration_reference'] = reference
+    apply_matrix(assessment, meta, as_of)
     matrix['as_of'] = as_of
     matrix['coverage'] = {'modeled_markets': len(matrix['rows']),
         'priced_markets': sum(r['quote_status'] in ('recent', 'cached_stable') for r in matrix['rows']),
@@ -498,7 +523,9 @@ def expire(assessment, meta, as_of):
     if meta.get('result') or now and start and now >= start: return
     trim_matrix(assessment.setdefault('matrix', {}))
     age = 1 if now and start and 0 < (start-now).total_seconds() <= 10800 else 6
-    for row in assessment.get('matrix', {}).get('rows', []):
+    matrix = assessment.get('matrix', {})
+    reference = matrix.get('calibration_reference')
+    for row in [*matrix.get('rows', []), *([reference] if reference else [])]:
         at = stamp(row.get('provider_updated_at'))
         remember(row)
         if row.get('quote_status') in ('stale', 'missing', 'cached_stable') or row.get('quote_status') == 'recent' and (not at or not now or not 0 <= (now-at).total_seconds() <= age*3600):
@@ -516,5 +543,7 @@ def expire(assessment, meta, as_of):
                        selected_movement=None, selected_market_odds=None,
                        movement_confirmed=False, fair_direction_coherent=False,
                        market_behavior='unavailable', stable_value=False)
+    from adaptive_pricing import apply_matrix
+    apply_matrix(assessment, meta, as_of)
     annotate(assessment.get('matrix', {}), as_of, assessment)
 

@@ -354,3 +354,23 @@ const target=monitoredGoals.find(r=>r.id==='over35_ft');
 const asianBoard=api.quoteBoard([{...target,odd:null,quote_status:'missing'},
  {...target,id:'asian35',spec:{...target.spec,kind:'asian_total'},bookmaker:'Book della linea 3,5',odd:2.88,first_odd:2.75}],{});
 assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&&asianBoard.includes('2,75'));
+
+// The same 54 visible prices yield three distinct V5.1 states. Pressure on the
+// away side is study-only and must expire even on a dashboard left open.
+{
+ const now=Date.parse('2026-10-31T08:00:00Z'),kickoff='2026-10-31T10:00:00Z';
+ const wide=Array.from({length:54},(_,i)=>({id:'watch-'+i,spec:{kind:'result',period:'ft',side:'2'},
+  quote_status:'recent',odd:1.9,ev_pct:3,quality:'supported',oci:34.2,agreeing_books:4,paired_books:6,
+  speed_pp_per_hour:.8,provider_updated_at:new Date(now).toISOString(),quote_observed_at:new Date(now).toISOString()}));
+ const monitor={version:'quote-monitoring-v1',study_only:true,state:'observing_flow',priced_markets:54,
+  row_ids:[wide[0].id],priced_core:['over15_ht','over25_ft'],watch_id:wide[0].id};
+ const panel=(state,extra={})=>api.opportunityPanel(wide,null,{now,kickoff,monitoring:{...monitor,radar_state:state},...extra});
+ assert(panel('balanced').includes('Mercato in equilibrio · Monitoraggio attivo'));
+ assert(panel('waiting_quotes').includes('<h4>In attesa di quote</h4>'));
+ const forming=panel('radar_watch');
+ assert(forming.includes('RADAR WATCH · FLUSSO IN FORMAZIONE'));
+ assert(forming.includes('2 · Ospite')&&forming.includes('4/6 operatori')&&forming.includes('+34,2'));
+ assert(!forming.includes('data-opportunity-id')&&!forming.includes('data-platinum-id'));
+ assert(!panel('radar_watch',{now:now+3600001}).includes('FLUSSO IN FORMAZIONE'));
+ assert(!panel('radar_watch',{archived:true}).includes('FLUSSO IN FORMAZIONE'));
+}

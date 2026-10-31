@@ -229,7 +229,9 @@ def evaluate(row, pt_priority=False, preferred_pt=None):
     margin, oci = row.get('selected_margin_pct'), row.get('oci')
     margin_known = numeric(margin)
     band = 'unknown' if not margin_known else 'anomalous' if not 0 <= margin <= 8 else 'high' if margin >= 6.5 else 'low'
-    min_ev = 6. if market == 'gg_ht' else 0.
+    from adaptive_pricing import gate_passes, threshold
+    base_ev = 6. if market == 'gg_ht' else 0.
+    min_ev = max(0., base_ev + threshold(row))
     min_low = MIN_EV_LOW_BY_MARKET.get(market, 0.) + (1.5 if margin_known and 6.5 <= margin <= 8 else 0.)
     reasons = []
     if tier is None: reasons.append('market')
@@ -255,7 +257,7 @@ def evaluate(row, pt_priority=False, preferred_pt=None):
         reasons.append('ht_history')
     if market: reasons.extend(structural_reasons(row, market))
     ev, ev_low = row.get('ev_pct'), row.get('ev_low_pct')
-    if not numeric(ev) or ev + 1e-9 < min_ev: reasons.append('edge')
+    if not numeric(ev) or ev + 1e-9 < min_ev or not gate_passes(row, base_ev): reasons.append('edge')
     if not numeric(ev_low) or ev_low + 1e-9 < min_low: reasons.append('sensitivity')
     reasons = list(dict.fromkeys(reasons))
     eligible = not reasons

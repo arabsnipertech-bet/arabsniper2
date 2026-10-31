@@ -128,6 +128,8 @@ def install(ns, matrix_mode=False):
         assessment['captured_at'] = observed
         if matrix_mode:
             attach_matrix(assessment, payload or {}, state, meta, observed)
+            from adaptive_pricing import freeze_pattern
+            freeze_pattern(ns, output, assessment, observed)
             validation = assessment['matrix']['coverage']['adapters']
         else:
             markets, validation = ns['extract_bookmaker_markets_with_audit'](payload or {})
@@ -157,6 +159,22 @@ def install(ns, matrix_mode=False):
             # Project the matrix into the four legacy exports; no second quote
             # parser, ledger, OCI or overround calculation is required.
             build_board({'matches': [output]}, observed)
+            if assessment['matrix'].get('calibration'):
+                output['model']['calibration_applied'] = True
+                output['model']['calibration'] = assessment['matrix']['calibration']
+                from adaptive_calibration import market_of
+                reference = assessment['matrix'].get('calibration_reference')
+                calibrated = output['model']['probabilities_calibrated']
+                raw = output['model']['probabilities_raw']
+                for leg in [*assessment['matrix']['rows'], *([reference] if reference else [])]:
+                    market = market_of(leg.get('spec') or {})
+                    if market and leg.get('calibration'):
+                        side = leg['spec']['side']
+                        raw.setdefault(market, {})[side] = (leg.get('calibration_base') or leg)['win_weight']
+                        calibrated.setdefault(market, {})[side] = leg['win_weight']
+                output['model']['probabilities'] = deepcopy(calibrated)
+            if assessment.get('favorite_trap_pattern'):
+                output['model']['favorite_trap_pattern'] = assessment['favorite_trap_pattern']
         return output
     ns['build_fixture_output'] = fixture
 
@@ -168,6 +186,9 @@ def install(ns, matrix_mode=False):
             if saved.get('date') in dates:
                 previous.update({str(m.get('fixture', {}).get('fixture_id')): m
                                  for m in saved.get('matches', [])})
+        enricher = getattr(client, 'odds_enricher', None)
+        if matrix_mode and enricher is not None:
+            enricher.reserve_priority(previous.values(), ns['iso_now']())
         output = old_scan(client, dates, excluded)
         # 3. Decide which forecasts are actually published BEFORE freezing them.
         as_of = ns['iso_now']()
