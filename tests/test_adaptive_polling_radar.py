@@ -1,7 +1,11 @@
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+import sys
 from unittest import TestCase
 from unittest.mock import Mock
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
 from lateral_matrix import specification as S
 from matrix_pipeline import quote_monitoring

@@ -2,8 +2,11 @@ from copy import deepcopy
 from datetime import date
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import sys
 import unittest
 from unittest.mock import patch
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
 from adaptive_calibration import Evidence, WEIGHTS, cohort, fit, neutral, nightly_state
 from adaptive_pricing import apply_matrix, gate_passes
