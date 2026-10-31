@@ -365,14 +365,15 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
               (o.get('quote_source') != 'synthetic_combo' or synthetic_margin(o) is not None)]
     recent = [o for o in offers if now and stamp(o.get('provider_updated_at')) and
               0 <= (now-stamp(o['provider_updated_at'])).total_seconds() <= max_hours*3600]
-    # Derived prices are a fallback, never a competing executable bookmaker offer.
-    recent = [o for o in recent if o.get('quote_source') != 'synthetic_combo' or synthetic_margin(o) is not None]
-    direct = [o for o in recent if o.get('quote_source') != 'synthetic_combo']
-    if direct: recent = direct
     cached = False
     if not recent and allow_cached:
         recent = [o for o in offers if within_window({**o, 'quote_observed_at': o.get('observed_at')}, as_of, kickoff)]
         cached = bool(recent)
+    # Select the source after choosing the fresh or cached time window.
+    # Direct and derived offers have different fair-price and margin inputs.
+    direct = [o for o in recent if o.get('quote_source') != 'synthetic_combo']
+    if direct:
+        recent = direct
     # Multiple provider bet IDs for the same settlement do not count as more books.
     unique = {}
     for offer in sorted(recent, key=lambda o: (2 if o['complete'] and o.get('quote_source', 'bookmaker') == 'bookmaker' else 1 if o['complete'] else 0,

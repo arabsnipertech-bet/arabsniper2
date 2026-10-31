@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'src'))
 from quote_sources import normalize_payload, synthetic_combo_groups, synthetic_margin, direct_combo_groups
 from matrix_quotes import collect, ledger_offers, analyse_prices, attach
-from refresh_opportunities import captured_prices
+from refresh_opportunities import captured_prices, refresh_day
 from near_kickoff_quotes import NearKickoffRefresher, needs_refresh
 from lateral_matrix import build_matrix, base_specs
 from statistics_first import statistical_analysis
@@ -178,6 +178,22 @@ class ComboSources(unittest.TestCase):
                 'quote_provenance':{},'bookmaker_id':'1','bookmaker':'Direct','bet_id':999}
         analyse_prices(row,[synthetic,direct],NOW,START)
         self.assertEqual(row['odd'],2.5);self.assertEqual(row['quote_source'],'bookmaker')
+
+
+    def test_refresh_day_prefers_cached_direct_combo_over_larger_product_from_another_book(self):
+        assessment = build_matrix(statistical_analysis(match(), NOW), NOW)
+        state = {}
+        direct, _ = collect(feed([self.direct()], book=7), 100, NOW)
+        derived, _ = collect(feed([bet(6), bet(26)], book=8), 100, NOW)
+        ledger_offers(state, 100, {**direct, **derived}, NOW, START)
+        day = {'date': '2026-10-26', 'matches': [{'fixture': dict(META), 'multimarket': assessment}]}
+        refresh_day(day, state, '2026-10-26T19:30:00+00:00')
+        combo = next(row for row in assessment['matrix']['rows'] if row['spec']['kind'] == 'halves_total')
+        self.assertEqual((combo['quote_status'], combo['quote_source'], combo['bookmaker_id']),
+                         ('cached_stable', 'bookmaker', '7'))
+        self.assertAlmostEqual(combo['odd'], 1.9)
+        self.assertAlmostEqual(combo['selected_margin_pct'], (2/1.9-1)*100)
+        self.assertTrue(combo['quote_executable'])
 
 
 class TargetedRefresh(unittest.TestCase):
