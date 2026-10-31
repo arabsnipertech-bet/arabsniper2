@@ -1,14 +1,16 @@
 """Strict senior competition scope, separate from statistical confidence.
 
-Exact country/name aliases admit tiers 1-3, including their regional groups.
-Unknown competitions and tiers 4+ fail closed; country and cup scope is unchanged.
+European lower tiers require an explicit quality exception.
+Group labels are country-scoped. Unknown domestic leagues fail closed.
 Domestic cups are admitted only where explicitly requested. Romania is allowed.
 """
 from collections import Counter
+import json
 import re
 import unicodedata
 
-SCOPE_ID = 'gold-senior-whitelist-v2.1'
+SCOPE_ID = 'gold-senior-whitelist-v2.2'
+SCOPE_DESCRIPTION = 'Divisioni senior e coppe autorizzate, con eccezioni selezionate per le serie inferiori europee.'
 
 
 def norm(value):
@@ -114,6 +116,27 @@ THIRD = {
     'venezuela': ('Tercera Division',),
 }
 
+# The historical tier catalogue above also identifies old saved fixtures during migration.
+EUROPEAN = frozenset(('austria','azerbaijan','bulgaria','croatia','denmark','finland','france',
+    'germany','england','ireland','northern ireland','italy','kazakhstan','norway','netherlands',
+    'poland','portugal','czech republic','romania','scotland','serbia','slovakia','spain','sweden',
+    'switzerland','turkey','ukraine'))
+QUALITY_THIRDS = frozenset(('italy', 'england'))
+FOURTH = {'england': ('League Two', 'EFL League Two', 'English League Two',
+                      'Sky Bet League Two', 'Football League Two')}
+# These whole-token families are blocked before admission. Unknown lower levels
+# already fail the exact positive catalogue, including future group numbers.
+BLOCKED_FAMILIES = {
+    'ukraine': ('Persha Liga','Persha Liha','Druha Liga','Druha Liha'),
+    'poland': ('II Liga','2 Liga','III Liga','IV Liga'),
+    'norway': ('2 Division','2 Divisjon','PostNord-ligaen','3 Division','3 Divisjon'),
+    'slovakia': ('2 Liga','II Liga','3 Liga','III Liga'),
+    'bulgaria': ('Third League','3rd League','Treta Liga'),
+    'czech republic': ('3 Liga','CFL','MSFL'),
+    'austria': ('Regionalliga',),
+    'romania': ('Liga III','Liga 3'),
+}
+
 CUPS = {
     'austria': ('Cup', 'OFB Cup'), 'azerbaijan': ('Cup',), 'bulgaria': ('Cup', 'Super Cup'),
     'croatia': ('Cup', 'Super Cup'), 'denmark': ('DBU Pokalen',),
@@ -146,9 +169,25 @@ TEAM_FORBIDDEN = re.compile(r'\b(?:u\s*\d{1,2}|under\s*\d+|youth|reserve|reserve
 SENIOR_ROMAN_NAMES = frozenset(('willem ii',))
 TOP_NAMES = {k: {norm(n) for n in names} for k, names in TOP.items()}
 LOWER_NAMES = {level: {k: {norm(n) for n in names} for k, names in mapping.items()}
-               for level, mapping in ((2, SECOND), (3, THIRD))}
+               for level, mapping in ((2, SECOND), (3, THIRD), (4, FOURTH))}
 CUP_NAMES = {k: {norm(n) for n in names} for k, names in CUPS.items()}
 INTERNATIONAL_NAMES = {norm(n) for n in INTERNATIONAL}
+
+
+BLOCKED_NAMES = {country: tuple(norm(name) for name in families)
+                 for country, families in BLOCKED_FAMILIES.items()}
+
+
+def excluded_family(country, name):
+    return any(name == family or name.startswith(family+' ') for family in BLOCKED_NAMES.get(country, ()))
+
+
+def browser_exclusions():
+    """Names old versions could show, plus vendor variants of the explicit bans."""
+    result = {country: set(names) for country, names in BLOCKED_NAMES.items()}
+    for country in EUROPEAN-QUALITY_THIRDS:
+        result.setdefault(country, set()).update(LOWER_NAMES[3].get(country, ()))
+    return {country: sorted(names) for country, names in sorted(result.items())}
 
 
 def profile(league):
@@ -156,6 +195,7 @@ def profile(league):
     country = COUNTRY_ALIASES.get(country, country)
     allowed, tier, reason = False, 'blocked', 'competition_not_whitelisted'
     if FORBIDDEN.search(name): reason = 'youth_reserve_or_nonlisted_senior_category'
+    elif excluded_family(country, name): reason = 'excluded_lower_division'
     elif name in INTERNATIONAL_NAMES and country in ('world', 'europe', 'asia', 'international', 'north america', 'south america'):
         allowed, tier, reason = True, 'international_cup', 'whitelisted_international_cup'
     elif name in TOP_NAMES.get(country, set()):
@@ -163,7 +203,12 @@ def profile(league):
     elif country in TOP_NAMES and name in LOWER_NAMES[2].get(country, set()):
         allowed, tier, reason = True, 'senior_division_2', 'whitelisted_second_division'
     elif country in TOP_NAMES and name in LOWER_NAMES[3].get(country, set()):
-        allowed, tier, reason = True, 'senior_division_3', 'whitelisted_third_division'
+        if country in EUROPEAN and country not in QUALITY_THIRDS:
+            reason = 'excluded_lower_division'
+        else:
+            allowed, tier, reason = True, 'senior_division_3', 'whitelisted_third_division'
+    elif name in LOWER_NAMES[4].get(country, ()):
+        allowed, tier, reason = True, 'senior_division_4', 'whitelisted_quality_exception'
     elif name in CUP_NAMES.get(country, set()):
         allowed, tier, reason = True, 'national_cup', 'whitelisted_national_cup'
     return {'allowed': allowed, 'score': 84 if allowed else 0, 'tier': tier, 'reason': reason,
@@ -195,6 +240,11 @@ def output_allowed(item, excluded=()):
     return (item.get('fixture') or {}).get('fixture_id') is not None and output_profile(item)['allowed']
 
 
+def excluded_known_meta(meta):
+    """Older callers sometimes know only fixture ID and kickoff."""
+    return bool(meta.get('country') and meta.get('league') and not output_allowed({'fixture': meta}))
+
+
 def enforce_day(day):
     kept, removed = [], Counter()
     previous = day.get('gold_scope') or {}
@@ -209,7 +259,7 @@ def enforce_day(day):
         removed.update(previous.get('exclusion_reasons') or {})
     day['gold_scope'] = {'policy_id': SCOPE_ID, 'allowed_fixtures': len(kept),
         'excluded_fixtures': sum(removed.values()), 'exclusion_reasons': dict(removed),
-        'romania_allowed': True, 'scope': 'senior_first_three_divisions_and_explicit_cups'}
+        'romania_allowed': True, 'scope': 'selected_senior_divisions_and_explicit_cups'}
     coverage = day.setdefault('universal_coverage', {})
     if coverage.get('competition_policy') != SCOPE_ID:
         # A saved schedule cannot establish the size of a fresh provider list.
@@ -219,3 +269,27 @@ def enforce_day(day):
                     excluded_from_saved_schedule=sum(removed.values()))
     return sum(removed.values())
 
+
+
+def browser_data():
+    return {'id': SCOPE_ID, 'aliases': COUNTRY_ALIASES, 'retired': browser_exclusions()}
+
+
+if __name__ == '__main__':
+    import hashlib
+    from pathlib import Path
+    import sys
+    if sys.argv[1:] != ['--sync-browser']:
+        raise SystemExit('Usage: python src/gold_competitions.py --sync-browser')
+    web = Path(__file__).resolve().parents[1] / 'web'
+    asset = web / 'competition-scope.js'
+    data = json.dumps(browser_data(), sort_keys=True, separators=(',', ':'))
+    script, changed = re.subn(r'^  const rules = .*?;$', lambda _: '  const rules = '+data+';',
+                              asset.read_text(), flags=re.M)
+    if changed != 1:
+        raise ValueError('Missing competition manifest in browser asset')
+    asset.write_text(script)
+    digest = hashlib.sha256(asset.read_bytes()).hexdigest()[:12]
+    for page in ('index.html', 'gold-dashboard-live.html'):
+        path = web / page
+        path.write_text(re.sub(r'competition-scope\.js\?v=[a-f0-9]+', 'competition-scope.js?v='+digest, path.read_text()))

@@ -5,8 +5,8 @@ ARAB SNIPER 3.0 — OSSERVATORIO UNIVERSALE V5
 Il percorso attivo, installato prima di main() in fondo a questo file, è:
 policy_integration.install -> statistics_integration.install(matrix_mode=True).
 Modello: lateral-matrix-v5.0. Ogni futura partita NS/TBD del palinsesto
-disponibile viene analizzata, senza esclusioni per competizione e senza tetti
-di selezioni. matrix_pipeline sostituisce i filtri storici sotto riportati.
+autorizzato da gold_competitions viene analizzata prima di selezionare le proposte.
+matrix_pipeline applica la policy attiva.
 
 statistics_first calcola i tassi indipendenti da quote e bookmaker;
 lateral_matrix produce probabilità congiunte FT/PT/ST, asiatici e combo;
@@ -2950,27 +2950,32 @@ def simplified_market_display_v110(
     open_odds = ((market_analysis or {}).get("open", {}) or {}).get("odds", {}) or {}
     selection_rows = ((market_analysis or {}).get("selections", {}) or {})
     fair = ((market_analysis or {}).get("current", {}) or {}).get("math", {}).get("fair_probabilities", {}) or {}
+    # An unavailable observation is distinct from a measured zero in the study view.
+    def observed(value, scale=1.0):
+        number = safe_float(value, math.nan)
+        return round(number * scale, 3) if math.isfinite(number) else None
+
     selections: Dict[str, Any] = {}
     for selection in MARKET_SELECTIONS[market_key]:
         movement = selection_rows.get(selection, {}) or {}
         selections[selection] = {
-            "open_odd": round3(open_odds.get(selection)),
-            "current_odd": round3(current_odds.get(selection)),
-            "model_probability_pct": round3(safe_float(calibrated_probabilities.get(selection)) * 100.0),
-            "model_probability_raw_pct": round3(safe_float(raw_probabilities.get(selection)) * 100.0),
-            "book_fair_probability_pct": round3(safe_float(fair.get(selection)) * 100.0),
-            "delta_odd": round3(movement.get("delta_odd")),
-            "delta_fair_pp": round3(movement.get("delta_fair_pp")),
+            "open_odd": observed(open_odds.get(selection)),
+            "current_odd": observed(current_odds.get(selection)),
+            "model_probability_pct": observed(calibrated_probabilities.get(selection), 100),
+            "model_probability_raw_pct": observed(raw_probabilities.get(selection), 100),
+            "book_fair_probability_pct": observed(fair.get(selection), 100),
+            "delta_odd": observed(movement.get("delta_odd")),
+            "delta_fair_pp": observed(movement.get("delta_fair_pp")),
             "movement_color": (movement.get("movement", {}) or {}).get("color", "gray"),
             "movement_level": (movement.get("movement", {}) or {}).get("level", "stable"),
-            "oci_as": round3((movement.get("oci_as", {}) or {}).get("value")),
+            "oci_as": observed((movement.get("oci_as", {}) or {}).get("value")),
             "marker": (markers.get("selections", {}) or {}).get(selection, {}),
         }
     return {
         "name": DISPLAY_MARKET_NAMES[market_key], "selection_order": list(MARKET_SELECTIONS[market_key]),
         "selections": selections, "model_pick": (markers.get("model", {}) or {}).get("pick"),
         "book_pick": (markers.get("book", {}) or {}).get("pick"), "relation": markers.get("relation"),
-        "aggio_pct": round3(((market_analysis or {}).get("aggio", {}) or {}).get("current_pct")),
+        "aggio_pct": observed(((market_analysis or {}).get("aggio", {}) or {}).get("current_pct")),
         "aggio_status": ((market_analysis or {}).get("aggio", {}) or {}).get("status"),
         "protection_pick": ((market_analysis or {}).get("book", {}) or {}).get("protection_pick"),
         "market_validation": dict(validation), "market_calibration_weight": round4(calibration_weight),
@@ -3929,29 +3934,6 @@ def recommendation_gate(
     }
 
 
-def suppress_model_marker(marker_pack: MutableMapping[str, Any]) -> None:
-    model = marker_pack.setdefault("model", {})
-    model["pick"] = None
-    model["strength"] = "none"
-    model["color"] = "none"
-    model["marker_shape"] = "none"
-    book = marker_pack.get("book", {}) or {}
-    book_pick = book.get("pick")
-    for selection, marker in (marker_pack.get("selections", {}) or {}).items():
-        if not isinstance(marker, dict):
-            continue
-        marker["model"] = False
-        marker["agreement"] = False
-        if selection == book_pick:
-            marker["shape"] = "square"
-            marker["book"] = True
-            marker["color"] = book.get("color", "yellow")
-        else:
-            marker["shape"] = "none"
-            marker["color"] = "none"
-    marker_pack["relation"] = "book_only" if book_pick else "neutral"
-
-
 def build_fixture_output(client: APIClient, fixture_row: Mapping[str, Any], state: MutableMapping[str, Any], league_cache: MutableMapping[str, Any]) -> Optional[Dict[str, Any]]:
     output = _build_fixture_output_v112(client, fixture_row, state, league_cache)
     if not output:
@@ -3986,8 +3968,7 @@ def build_fixture_output(client: APIClient, fixture_row: Mapping[str, Any], stat
             validation.get(market_key, {}) or {}, reliability, meta,
             marker_pack.get("relation", "neutral"), empirical_layer,
         )
-        if not gate.get("eligible"):
-            suppress_model_marker(marker_pack)
+        marker_pack["study_only"] = not gate.get("eligible")
         markers[market_key] = marker_pack
         market_display = simplified_market_display_v110(
             market_key, market_analyses.get(market_key), marker_pack, raw, calibrated,
@@ -4919,8 +4900,7 @@ def build_fixture_output(client: APIClient, fixture_row: Mapping[str, Any], stat
             validation.get(market_key, {}) or {}, reliability, meta,
             marker_pack.get("relation", "neutral"), empirical_layer,
         )
-        if not gate.get("eligible"):
-            suppress_model_marker(marker_pack)
+        marker_pack["study_only"] = not gate.get("eligible")
         markers[market_key] = marker_pack
         market_display = simplified_market_display_v110(
             market_key, market_analyses.get(market_key), marker_pack, raw, calibrated,

@@ -374,3 +374,55 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  assert(!panel('radar_watch',{now:now+3600001}).includes('FLUSSO IN FORMAZIONE'));
  assert(!panel('radar_watch',{archived:true}).includes('FLUSSO IN FORMAZIONE'));
 }
+
+// A saved positive decision on the former scope must not leak into any Gold
+// or Radar view while a new five-day projection is being published.
+{
+ const stale=(country,league,id)=>({...matches[0],gold_scope:{policy_id:'gold-senior-whitelist-v2.1',allowed:true},
+  fixture:{...matches[0].fixture,country,league,fixture_id:id}});
+ const keep=stale('England','League Two','42'),remove=stale('Romania','Liga III - Serie 1','43');
+ const persisted={matches:[remove,keep],gold_scope:{policy_id:'gold-senior-whitelist-v2.1'}};
+ assert.deepEqual(api.scopePayload(persisted).matches.map(m=>m.fixture.fixture_id),['42']);
+ assert.deepEqual(api.selectMatches(persisted,{...api.state,category:'all'},0).map(m=>m.fixture.fixture_id),['42']);
+ for(const category of ['platinum','market_signal']) assert.equal(api.matchingRows(remove,{...api.state,category},0).length,0);
+ assert.equal(api.scopePayload({matches:[stale('England','League One','44'),stale('Scotland','League One','45')]}).matches.length,1);
+}
+
+// A study card can expose model and quote evidence without feeding it back to eligibility.
+{
+ const kickoff='2026-10-31T13:00:00+01:00',now=Date.parse('2026-10-31T11:30:00+01:00');
+ const at='2026-10-31T09:20:00+01:00',blank={kickoff,now};
+ const study={...blank,home:'Casa <A>',profiles:{home:{for_ft:{xg_sample:3,xg_mean:1.2,shots_mean:0}}}};
+ const r={...rows[0],statistical_pct:65,fair_odd:1.54,calibration_base:{statistical_pct:50,fair_odd:2},
+  first_odd:2.4,odd:2.1,delta_pct:-12.5,oci:0,bookmaker:'Nuovo',paired_books:4,agreeing_books:2,
+  opportunity:{...decision,eligible:false},platinum:{...platinumDecision,eligible:false}};
+ const before=JSON.stringify(r),board=api.quoteBoard([r],{},study);
+ for(const t of ['Analisi Statistica di Base','50,0%','Quota equa Poisson <b>2,00','xG medio FT 1,20','tiri in porta medi FT 0,0','&lt;A&gt;','OCI <b>0,0','-12,5%','2/4'])assert(board.includes(t),t);
+ assert(!board.includes('65,0%'));
+ assert(!api.quoteBoard([r],{}).includes('Analisi Statistica di Base'));
+ assert.deepEqual(api.poissonEstimate({spec:r.spec,statistical_pct:25}),{probability:25,fair:4});
+ assert.deepEqual(api.poissonEstimate({spec:r.spec,statistical_pct:null}),{probability:null,fair:null});
+ assert.equal(api.poissonEstimate({spec:{kind:'asian_total',line:2.25},statistical_pct:50,fair_odd:1.72}).fair,1.72);
+ assert.equal(api.poissonEstimate({spec:{kind:'handicap',line:.25},statistical_pct:50}).fair,null);
+ const snapshot={first_odd:2.4,odd:2.04,oci:32,first_observed_at:'2026-10-31T08:00:00+01:00',quote_observed_at:at,
+  provider_updated_at:at,bookmaker:'Archivio',paired_books:6,agreeing_books:4,speed_pp_per_hour:1.2,fair_delta_pp:1.4};
+ const stale={...r,odd:null,oci:null,quote_status:'stale',cached_quote:snapshot};
+ const stored=api.quoteCell(stale,'Over 2,5 FT',{},study);
+ for(const t of ['Ultima osservata','Ultimo OCI osservato','+32,0','-15,0%','4/6','Archivio',at,'Flusso storico','1,2 pp/ora'])assert(stored.includes(t),t);
+ const partial={...r,oci:null,study_flow:snapshot};
+ const newer=api.quoteCell(partial,'Over 2,5 FT',{},study);
+ for(const t of ['Attuale<b>2,10','Ultimo OCI osservato','Nuovo','Archivio','4/6',at])assert(newer.includes(t),t);
+ assert(!newer.includes('Ultima osservata<b>2,04'));
+ assert(api.marketRow(partial,{}, {study}).includes('Ultimo OCI osservato · Archivio'));
+ assert(api.marketRow(stale,{}, {study}).includes('apertura 2,40'));
+ assert.equal(api.studyObservation(stale,{...blank,now:Date.parse(at)-1}),null);
+ assert.equal(api.studyObservation(stale,{...blank,kickoff:at}),null);
+ const invalid={...stale,quote_status:'invalid_adapter'};
+ assert.equal(api.studyObservation(invalid,study),null);
+ assert(!api.quoteCell({...r,oci:null,odd:null,quote_status:'missing'},'studio',{},study).includes('Ultimo OCI osservato'));
+ for(const row of [r,partial,stale]){
+  assert.equal(api.bestOpportunity([row],blank),null);
+  assert.equal(api.platinumSignals([row],blank).length,0);
+ }
+ assert.equal(JSON.stringify(r),before);
+}

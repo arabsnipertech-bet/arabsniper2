@@ -29,3 +29,8 @@
 .mx-categories button[data-mx-category=platinum][aria-pressed=true]{background:#35414e;border-color:#edf3fa;color:#fff}
 
 .mx-platinum strong{color:inherit;font-weight:800}
+
+
+.mx-study-base{grid-column:1/-1;border-left:3px solid #64beff;border-radius:8px;background:#102f50;color:#cceaff;padding:10px 12px;margin-bottom:8px}
+.mx-study-base h4{margin:0 0 3px;color:#b5e2ff;font-size:1rem}
+.mx-study-base span,.mx-study-base p{display:block;margin:3px 0;font-size:.8rem;line-height:1.4;overflow-wrap:anywhere}

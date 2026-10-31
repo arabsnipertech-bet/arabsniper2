@@ -21,7 +21,7 @@
     const kind = s.kind === 'asian_total' ? 'total' : s.kind;
     if (s.extra != null || (s.line != null && !numeric(s.line))) return false;
     const rule = gold61Markets[[kind, s.period, s.side, s.line].join('/')];
-    if (!rule || row.competition_policy !== 'gold-senior-whitelist-v2.1') return false;
+    if (!rule || ![globalThis.ArabCompetitionScope.id, 'gold-senior-whitelist-v2.1'].includes(row.competition_policy)) return false;
     const [market, minOdd, maxOdd, minProbability] = rule;
     return d.eligible === true && d.goal_market === market && row.quote_executable === true
       && d.structural_supported === true && d.market_checks_passed === true
@@ -45,6 +45,7 @@
       const rows = payload.date === dateKey(now) && Array.isArray(payload.selections) ? payload.selections.filter(row => {
         const kickoff = new Date(row.kickoff);
         if (!row.fixture_id || seen.has(row.fixture_id) || !Number.isFinite(+kickoff) || +kickoff <= +now || dateKey(kickoff) !== dateKey(now) || !numeric(row.odd) || row.odd <= 1 || !Number.isFinite(Date.parse(row.captured_at))) return false;
+        if (row.model_id === 'lateral-matrix-v5.0' && !globalThis.ArabCompetitionScope.allows(row.competition_policy,row.country,row.league)) return false;
         if (row.model_id === 'lateral-matrix-v5.0' && row.opportunity?.policy_id === 'gold-goals-v6.1') {
           if (!gold61Visible(row)) return false;
         } else if (row.model_id === 'lateral-matrix-v5.0') {

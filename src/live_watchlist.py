@@ -2,6 +2,7 @@
 from pathlib import Path
 from datetime import datetime, timezone
 from audit_storage import read_store, atomic_bytes
+from gold_competitions import excluded_known_meta
 import json
 
 
@@ -11,7 +12,7 @@ def build(root=Path('.')):
         for match in read_store(path, {}).get('matches', []):
             f = match.get('fixture') or {}
             fid, kickoff = str(f.get('fixture_id', '')), f.get('kickoff')
-            if fid.isdigit() and kickoff:
+            if fid.isdigit() and kickoff and not excluded_known_meta(f):
                 records[fid] = {'fixture_id': fid, 'kickoff': kickoff}
     return {'schema_version': 1, 'generated_at': datetime.now(timezone.utc).isoformat(),
             'fixtures': list(records.values())}

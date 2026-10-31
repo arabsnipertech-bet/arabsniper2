@@ -73,7 +73,7 @@ def build_preview(payload, previous=None, now=None, rng=None):
             row = next((r for r in view['matrix']['rows'] if r['id'] == selected), None)
             if row:
                 candidates.append((row.get('ev_low_pct', -100), {'fixture_id': str(f['fixture_id']),
-                    'match': f.get('match', ''), 'league': f.get('league', ''), 'kickoff': f['kickoff'],
+                    'match': f.get('match', ''), 'league': f.get('league', ''), 'country': f.get('country'), 'kickoff': f['kickoff'],
                     'label': row['label'], 'market': row['spec']['kind']+'_'+row['period'], 'spec': deepcopy(row['spec']),
                     'odd': row['odd'], 'statistical_pct': row['statistical_pct'],
                     'market_confirmation': row['opportunity']['signal'], 'category': row['category'],
@@ -125,7 +125,7 @@ def build_preview(payload, previous=None, now=None, rng=None):
             continue
         if (r.get('coverage') or 0) < .75:
             continue
-        row = {'fixture_id': str(f['fixture_id']), 'match': f.get('match', ''), 'league': f.get('league', ''), 'kickoff': f['kickoff'],
+        row = {'fixture_id': str(f['fixture_id']), 'match': f.get('match', ''), 'league': f.get('league', ''), 'country': f.get('country'), 'kickoff': f['kickoff'],
                'label': r.get('label', ''), 'market': r['market'], 'odd': odd, 'statistical_pct': p, 'book_probability_pct': b,
                'captured_at': a.get('captured_at') or payload['updated_at']}
         candidates.append((min(p,b), r.get('support_score') or 0, row))

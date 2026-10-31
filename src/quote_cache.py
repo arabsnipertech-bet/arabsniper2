@@ -37,6 +37,30 @@ def remember(row):
         row['cached_quote'] = {k: deepcopy(row.get(k)) for k in PRICE_FIELDS}
 
 
+def preserve_study_flow(previous, current):
+    """Keep the last measured OCI for display only when a new scan lacks a reading."""
+    if valid_number(current.get('oci')) or current.get('quote_status') not in ('recent', 'cached_stable', 'missing', 'stale'):
+        current.pop('study_flow', None)
+        return
+    candidates = [previous.get('study_flow'), previous.get('cached_quote')]
+    if previous.get('quote_status') in ('recent', 'cached_stable'):
+        candidates.append(previous)
+    snapshots = [s for s in candidates if s and valid_number(s.get('oci')) and
+                 valid_number(s.get('odd')) and s['odd'] > 1 and (s.get('bookmaker_id') or s.get('bookmaker')) and
+                 stamp(s.get('quote_observed_at')) and stamp(s.get('provider_updated_at'))]
+    if not snapshots:
+        return
+    last = max(snapshots, key=lambda s: stamp(s['quote_observed_at']))
+    cached = current.get('cached_quote') or {}
+    if valid_number(cached.get('oci')) and stamp(cached.get('quote_observed_at')) and stamp(cached['quote_observed_at']) >= stamp(last['quote_observed_at']):
+        current.pop('study_flow', None)
+        return
+    fields = ('odd', 'first_odd', 'first_observed_at', 'delta_pct', 'bookmaker', 'bookmaker_id',
+              'quote_observed_at', 'provider_updated_at', 'oci', 'oci_previous', 'paired_books',
+              'agreeing_books', 'fair_delta_pp', 'speed_pp_per_hour', 'quote_source')
+    current['study_flow'] = {k: last[k] for k in fields if last.get(k) is not None}
+
+
 def recalculate(row):
     odd, win, loss = row.get('odd'), row.get('win_weight'), row.get('loss_weight')
     if not all(valid_number(v) for v in (odd, win, loss)): return False

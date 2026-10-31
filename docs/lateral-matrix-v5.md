@@ -34,3 +34,9 @@ First and latest snapshots are versioned separately. The matrix audit evaluates 
 References: [API-Football odds update/pagination](https://www.api-football.com/news/post/how-to-get-started-with-api-football-the-complete-beginners-guide), [overround calculation](https://help.smarkets.com/hc/en-gb/articles/214180145-How-to-calculate-betting-margins), [Asian quarter-stake settlement](https://support.betfair.com/app/answers/detail/a_id/6418).
 
 Handicap quote adapter v2 corrects the pre-match provider convention: the numeric line in both Home and Away labels refers to the home team. Away -1.5 is normalized to away +1.5. Original observations remain traceable; historical pairs are reconstructed only at identical operator/provider/observation times under versioned ledger keys. Previous incorrectly paired handicap prices are excluded from promoted opportunities and priced audit returns. The repair workflow regenerates upcoming price readings from existing observations with zero API calls; started forecasts and statistical capture times stay frozen.
+
+## Osservazione prematch
+
+La card Solo Studio mostra la probabilità della matrice Poisson prima della calibrazione e la relativa quota equa. Sulle linee asiatiche la quota equa tiene conto dei rimborsi. Gli xG e i tiri in porta medi provengono dagli incontri osservati e sono distinti per squadra e periodo. Il livello di copertura accompagna la stima anche quando deriva prevalentemente dai valori di riferimento del campionato.
+
+Apertura, ultima quota e scostamento appartengono alla stessa linea e allo stesso operatore. Se manca un OCI corrente, la card può mostrare l’ultimo OCI prematch con fonte, orario e concordanza degli operatori. Il campo storico `study_flow` alimenta esclusivamente la visualizzazione. Le regole di promozione leggono i campi correnti.

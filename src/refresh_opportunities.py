@@ -10,7 +10,7 @@ from matrix_pipeline import build_board, selection_export
 from multimarket_model import stamp
 from opportunity_policy import POLICY_ID
 from platinum_policy import POLICY_ID as PLATINUM_POLICY_ID
-from gold_competitions import SCOPE_ID, enforce_day
+from gold_competitions import SCOPE_ID, SCOPE_DESCRIPTION, enforce_day
 from market_scope import MARKET_SCOPE_ID, trim_matrix, core_market
 from proposal_stability import seed_stability
 from copy import deepcopy
@@ -182,7 +182,7 @@ def main(directory='data'):
         competition_policy=SCOPE_ID, opportunity_policy=POLICY_ID,
         universal_observation=False, all_whitelisted_fixtures=True)
     dashboard['method'].update(
-        competition_filter='Prime tre divisioni senior dei paesi in whitelist e coppe autorizzate; Romania inclusa; esclusi giovanili e livelli inferiori.',
+        competition_filter=SCOPE_DESCRIPTION,
         markers='Gold v6.1: cinque mercati gol e Combo PT+ST; ordine di valutazione fra mercati idonei.')
     write_store(dashboard_path, dashboard)
     write_store(directory/'arab_quote_state.json', state)

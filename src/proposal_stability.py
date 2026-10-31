@@ -29,6 +29,7 @@ def seed_stability(previous, current):
                                    ('label', 'odd', 'bookmaker', 'provider_updated_at')}
         matrix['last_proposal'].update(market_id=old_best['id'], status='current',
             published_at=(old.get('opportunity_policy') or {}).get('evaluated_at'))
+    from quote_cache import preserve_study_flow, remember
     for row in matrix.get('rows', []):
         prior = old_rows.get(row['id'], {})
         if row.get('quote_status') == 'missing' and (prior.get('odd') or prior.get('last_odd')) is not None:
@@ -36,10 +37,10 @@ def seed_stability(previous, current):
                         'provider_updated_at', 'quote_observed_at'):
                 row[key] = deepcopy(prior.get(key))
             row.update(last_odd=prior.get('odd') or prior.get('last_odd'), quote_status='stale')
-            from quote_cache import remember
             saved = deepcopy(prior)
             remember(saved)
             if saved.get('cached_quote'): row['cached_quote'] = saved['cached_quote']
+        preserve_study_flow(prior, row)
     matrix.pop('proposal_stability', None)
     state = old.get('proposal_stability') or {}
     if state.get('version') == STABILITY_ID and state.get('market_id'):

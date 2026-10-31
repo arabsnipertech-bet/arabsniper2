@@ -9,6 +9,9 @@ from quote_sources import fresh, number, stamp, synthetic_margin
 from refresh_opportunities import captured_prices
 
 
+from gold_competitions import excluded_known_meta
+
+
 def needs_refresh(payload, state, meta, now):
     start, observed = stamp(meta.get('kickoff')), stamp(now)
     if not start or not observed or not 0 < (start-observed).total_seconds() <= 14400: return False
@@ -51,6 +54,8 @@ class NearKickoffRefresher:
             self.report['http_calls'] = self.calls
 
     def recover(self, payload, meta, now):
+        if excluded_known_meta(meta):
+            return payload
         fid = str(meta['fixture_id'])
         if fid in self.attempted or not needs_refresh(payload, self.state, meta, now): return payload
         self.attempted.add(fid)

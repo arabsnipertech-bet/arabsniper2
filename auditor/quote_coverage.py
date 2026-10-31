@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
+from gold_competitions import output_allowed
 from gold_storage import client as storage_client, sha
 from matrix_quotes import collect, partition
 from quote_sources import fresh, number, TARGETS, synthetic_margin
@@ -80,6 +81,7 @@ def main():
         name=f'arab_quote_day{index}.json';raw=s3.get_object(Bucket=bucket,Key=name)['Body'].read()
         day=json.loads(raw);sources[name]={'sha256':sha(raw),'date':day.get('date')}
         for match in day.get('matches',[]):
+            if not output_allowed(match): continue
             meta=match['fixture'];kickoff=datetime.fromisoformat(meta['kickoff'].replace('Z','+00:00'))
             if kickoff>started and kickoff.astimezone(ZoneInfo('Europe/Rome')).date().isoformat()==date:
                 matches[str(meta['fixture_id'])]=match
