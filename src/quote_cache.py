@@ -10,7 +10,7 @@ PRICE_FIELDS = ('odd', 'first_odd', 'first_observed_at', 'bookmaker', 'bookmaker
     'selected_margin_delta_pp', 'selected_market_fair_pct', 'selected_market_odds',
     'market_fair_pct', 'margin_pct', 'margin_delta_pp', 'margin_band', 'margin_trend',
     'delta_pct', 'oci', 'oci_previous', 'oci_direction', 'selected_movement',
-    'movement_confirmed', 'fair_direction_coherent', 'paired_books', 'agreeing_books',
+    'movement_confirmed', 'fair_direction_coherent', 'speed_pp_per_hour', 'fair_delta_pp', 'paired_books', 'agreeing_books',
     'market_behavior', 'category', 'category_reason', 'quote_adapter_version',
     'quote_source', 'quote_executable', 'quote_provenance', 'fair_basis')
 

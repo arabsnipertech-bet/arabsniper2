@@ -39,7 +39,7 @@ def report_snapshot(record):
                                        for m in assessment.get('markets', [])]}}
 
 
-def build_daily(store, date, generated_at, source_revision=None):
+def build_daily(store, date, generated_at, source_revision=None, observe=None):
     snapshots = {'first': {}, 'latest': {}}
     rejected = []
     # First snapshots also provide a fallback where no update was captured.
@@ -54,6 +54,8 @@ def build_daily(store, date, generated_at, source_revision=None):
                 continue
             period = ('retrospective' if record.get('retrospective') else
                       'prospective' if kickoff.date().isoformat() >= assessment.get('validation_from', VALIDATION_FROM) else 'development')
+            if observe is not None and period == 'prospective':
+                observe(record)
             key = (version, period, str(fid))
             # Preserve the original lexical tie-break without sorting/materializing
             # every historical update. Collection order wins ties across collections.

@@ -106,6 +106,16 @@
   return '<span class="mx-badge mx-'+esc(row.category||'no_quote')+'">'+esc(STATUS[row.category]||'IN OSSERVAZIONE')+'</span>'+
    (behavior==='convergence'&&row.category!=='mature'?'<span class="mx-behavior">↘ Convergenza</span>':behavior==='divergence'&&row.category!=='contrarian'?'<span class="mx-behavior">↗ Divergenza</span>':'');
  }
+ function calibrationDelta(r){
+  const c=r.calibration;
+  return c?.version==='adaptive-calibration-v5.1'&&Number.isInteger(c.n)&&c.n>=50&&Number.isFinite(c.threshold_delta_pp)
+   ?Math.max(-.5,Math.min(2.5,c.threshold_delta_pp)):0;
+ }
+ function adaptiveValue(r,floor){
+  const delta=calibrationDelta(r);
+  return Number.isFinite(r.ev_pct)&&r.ev_pct>=Math.max(0,floor+delta)&&(!delta||
+    (Number.isFinite(r.edge_pp)&&r.edge_pp>=delta&&(delta>=0||r.ev_pct>0)));
+ }
  function v61Valid(r,now,archived){
   const d=r.opportunity;if(d?.policy_id!==POLICY)return true;
   const m=goalMarket(r),margin=r.selected_margin_pct,delta=Number.isFinite(r.delta_pct)?r.delta_pct:r.selected_movement?.delta_pct;
@@ -115,7 +125,7 @@
   if(!d.structural_supported||!d.market_checks_passed||!Number.isFinite(margin)||margin<0||margin>8||r.oci< -20||delta>2+1e-9)return false;
   if(m==='over25_ht'&&(!Number.isFinite(r.oci)||r.oci<15))return false;
   if(Number.isFinite(book)&&r.statistical_pct-book>15+1e-9&&!(delta<0&&r.oci>0))return false;
-  if(r.ev_low_pct<minimum||r.ev_pct<(m==='gg_ht'?6:0)||d.stability?.status==='retained')return false;
+  if(r.ev_low_pct<minimum||!adaptiveValue(r,m==='gg_ht'?6:0)||d.stability?.status==='retained')return false;
   if(r.quote_status==='cached_stable'){
    const at=Date.parse(r.cache_source_at),end=Date.parse(r.cache_expires_at);
    if(!Number.isFinite(at)||!Number.isFinite(end)||end-at!==12*3600000||(!archived&&(now<at||now>end)))return false;
@@ -230,9 +240,9 @@
    if((d?.policy_id!==PLATINUM_POLICY&&!legacy)||d.eligible!==true||!Number.isInteger(d.rank)||d.rank<1||
       !Number.isFinite(at)||at>now||(Number.isFinite(start)&&at>=start))return false;
    return flowSignalValid(r,PLATINUM,archived||monitoringClosed?at:now)&&
-    ((Number.isFinite(r.ev_pct)&&r.ev_pct>=PLATINUM.min_ev_pct)||
+    (adaptiveValue(r,PLATINUM.min_ev_pct)||
      (r.odd>=PLATINUM.min_odd&&(legacy||
-      (Number.isFinite(r.ev_pct)&&r.ev_pct>=PLATINUM.min_high_odds_ev_pct)||
+      (Number.isFinite(r.ev_pct)&&r.ev_pct>=PLATINUM.min_high_odds_ev_pct+Math.max(0,calibrationDelta(r))&&(calibrationDelta(r)<=0||r.edge_pp>=calibrationDelta(r)))||
       (r.ev_pct==null&&r.statistical_pct==null))));
   }).sort((a,b)=>a.platinum.rank-b.platinum.rank||String(a.id).localeCompare(String(b.id)));
   const seen=new Set();return candidates.filter(r=>{const key=goalMarket(r);if(seen.has(key))return false;seen.add(key);return true;});
@@ -241,12 +251,33 @@
   over15_ht:'Over 1,5 PT',over25_ht:'Over 2,5 PT',over25_ft:'Over 2,5 FT',
   over35_ft:'Over 3,5 FT',gg_ht:'GG PT',combo_ht_sh:'Combo Over 0,5 PT + Over 0,5 ST'
  };
- function monitoringPanel(rows,monitor,history,context){
+ function formingPressure(r,{now=Date.now(),kickoff,archived=false,monitoringClosed=false}={}){
+  const end=Date.parse(kickoff),at=Date.parse(r?.provider_updated_at),seen=Date.parse(r?.quote_observed_at);
+  const s=r?.spec||{};
+  if(!r||archived||monitoringClosed||!Number.isFinite(end)||now>=end||!priced(r)||!Number.isFinite(r.odd)||r.odd<=1||
+     r.quote_executable===false||r.quality!=='supported'||!(goalMarket(r)||isCombo(r)||(s.kind==='result'&&s.period==='ft')))return false;
+  const cache=Date.parse(r.cache_source_at),expiry=Date.parse(r.cache_expires_at);
+  const fresh=r.quote_status==='cached_stable'?expiry-cache===12*3600000&&cache<=now&&now<=expiry:
+   Number.isFinite(at)&&at<=now&&now-at<=(end-now<=3*3600000?1:6)*3600000;
+  return fresh&&(!Number.isFinite(seen)||seen<=now)&&Number.isFinite(r.ev_pct)&&r.ev_pct>0&&
+   Number.isInteger(r.agreeing_books)&&Number.isInteger(r.paired_books)&&r.paired_books>=2&&r.agreeing_books<=r.paired_books&&
+   r.agreeing_books/r.paired_books>=.6&&Number.isFinite(r.speed_pp_per_hour)&&r.speed_pp_per_hour>=.8&&
+   ((Number.isFinite(r.oci)&&Math.abs(r.oci)>=25&&Math.abs(r.oci)<40)||(Number.isFinite(r.fair_delta_pp)&&Math.abs(r.fair_delta_pp)>=1.2));
+ }
+ function monitoringPanel(rows,monitor,history,context,options={}){
   const key=r=>isCombo(r)?'combo_ht_sh':goalMarket(r);
   const quoted=rows.filter(r=>key(r)&&priced(r)&&Number.isFinite(r.odd)&&r.odd>1);
   const waiting=new Map((monitor.waiting_markets||[]).filter(m=>Object.hasOwn(MONITORED_GOALS,m.market)).map(m=>[m.market,m.reason]));
   const ready=new Set(quoted.filter(r=>!waiting.has(key(r))).map(key));
-  const title=ready.size?'Quote disponibili · flusso da confermare':quoted.length?'Quote presenti · nessun mercato gol idoneo al Radar':'In attesa di quote sui mercati gol';
+  const pressure=monitor.radar_state==='radar_watch'&&rows.find(r=>r.id===monitor.watch_id&&formingPressure(r,options));
+  if(pressure){
+   const s=pressure.spec,market=s.kind==='result'?({'1':'1 · Casa','x':'X · Pareggio','2':'2 · Ospite'}[s.side]):pressure.label;
+   const movement=Number.isFinite(pressure.oci)?'OCI '+signed(pressure.oci):'Variazione fair '+signed(pressure.fair_delta_pp)+' pp';
+   return '<aside class="mx-best mx-best-market" data-radar-state="radar_watch"><span class="mx-badge mx-market-signal">RADAR WATCH · FLUSSO IN FORMAZIONE</span><h4>Pressione in formazione su '+esc(market)+'</h4><p>'+movement+' · '+pressure.agreeing_books+'/'+pressure.paired_books+' operatori concordi · '+num(pressure.speed_pp_per_hour,1)+' pp/ora.</p><p>Solo studio · nessuna proposta confermata.</p>'+history+timingContext(context)+'</aside>';
+  }
+  const fallback=monitor.radar_state==='radar_watch'?(monitor.priced_core?.some(k=>k.endsWith('_ht'))&&monitor.priced_core?.some(k=>k.endsWith('_ft'))&&monitor.priced_markets>=20?'balanced':'waiting_quotes'):monitor.radar_state;
+  const titles={balanced:'Mercato in equilibrio · Monitoraggio attivo',waiting_quotes:'In attesa di quote',observing_flow:'Movimento di mercato · Monitoraggio attivo'};
+  const title=titles[fallback]||(ready.size?'Quote disponibili · flusso da confermare':quoted.length?'Quote presenti · nessun mercato gol idoneo al Radar':'In attesa di quote sui mercati gol');
   const state=ready.size&&waiting.size?'partial_quotes':monitor.state;
   const issues=Array.from(waiting,([market,reason])=>{
    const offers=quoted.filter(r=>key(r)===market);
@@ -254,7 +285,7 @@
     offers.length?'aggio o coppia da verificare':reason==='stale'?'quota da aggiornare':reason==='incomplete_or_invalid_pair'?'coppia da verificare':'quota mancante';
    return esc(MONITORED_GOALS[market])+' · '+detail;
   });
-  return '<aside class="mx-best mx-best-market" data-market-monitoring="'+esc(state)+'"><span class="mx-section-title">RADAR BLU · MONITORAGGIO</span><h4>'+title+'</h4><span class="mx-badge mx-market-signal">SOLO STUDIO</span><p>'+ready.size+' dei 6 mercati gol hanno una quota idonea. Il flusso richiesto dal Radar è ancora da confermare.</p>'+
+  return '<aside class="mx-best mx-best-market" data-market-monitoring="'+esc(state)+'" data-radar-state="'+esc(fallback||state)+'"><span class="mx-section-title">RADAR BLU · MONITORAGGIO</span><h4>'+title+'</h4><span class="mx-badge mx-market-signal">SOLO STUDIO</span><p>'+ready.size+' dei 6 mercati gol hanno una quota idonea. Il flusso richiesto dal Radar è ancora da confermare.</p>'+
    (issues.length?'<p>'+issues.join('<br>')+'</p>':'')+history+timingContext(context)+'</aside>';
  }
  function movementSignal(row){
@@ -324,7 +355,7 @@
    ['Aggio / operatori concordi',pct(watch.selected_margin_pct)+' / '+watch.agreeing_books+'/'+watch.paired_books]
   ].map(([label,value])=>'<div><dt>'+esc(label)+'</dt><dd>'+esc(value)+'</dd></div>').join('')+'</dl><p><b>Solo studio · esclusa dalle giocate Gold ufficiali.</b></p>'+history+timingContext(context)+'<p>'+extraGoalText(rows)+'</p><small>'+signals.length+' '+(signals.length===1?'mercato in monitoraggio':'mercati in monitoraggio')+' · 0 proposte Gold</small></aside>';
   const waiting=!best&&monitoringRows(rows,options);
-  if(waiting?.length)return monitoringPanel(rows,options.monitoring,history,context);
+  if(waiting?.length||(!best&&options.monitoring?.radar_state&&!options.archived&&!options.monitoringClosed))return monitoringPanel(rows,options.monitoring,history,context,options);
   if(!best)return '<aside class="mx-best mx-best-empty"><span class="mx-section-title">MIGLIOR VALORE STIMATO</span><h4>'+(checked.length&&checked.every(r=>!priced(r))?'Quote da aggiornare':checked.length?'Nessuna proposta supera i criteri':'Valutazione da aggiornare')+'</h4>'+history+timingContext(context)+'<p>'+archive+extraGoalText(rows)+'</p><p>'+esc(exclusions||'Dati insufficienti')+'</p><small>'+rows.length+' esiti · '+pricedCount+' quote utilizzabili</small></aside>';
   const d=best.opportunity,signal=d.signal,tag=signal==='convergence'?'mature':signal==='contrarian'?'contrarian':'value_watch',displayLabel=goalMarket(best)==='gg_ht'?'Goal PT':best.label;
   const stability=d.stability?.status==='retained'?'<p class="mx-stability"><b>Proposta mantenuta in tolleranza</b><small>Piccola oscillazione dei valori. Validità massima fino alle '+esc(new Date(d.stability.expires_at).toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit'}))+' con quote aggiornate e limiti rispettati.</small></p>':'';

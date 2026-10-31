@@ -19,7 +19,31 @@ LEGACY = {'over25_ft': specification('total', 'ft', 'over', 2.5),
 universal_profile = whitelist_profile  # Compatibility alias; admission is strict.
 
 
-def quote_monitoring(matrix, as_of):
+def radar_watch(row, as_of, kickoff=None):
+    from quote_cache import within_window
+    from adaptive_calibration import market_of
+    spec = row.get('spec') or {}
+    if not (market_of(spec) or goal_market(row)) or row.get('quality') != 'supported':
+        return False
+    paired, agreeing = row.get('paired_books'), row.get('agreeing_books')
+    ev, speed = row.get('ev_pct'), row.get('speed_pp_per_hour')
+    oci, delta = row.get('oci'), row.get('fair_delta_pp')
+    if not (type(paired) is int and type(agreeing) is int and 2 <= paired and .6*paired <= agreeing <= paired
+            and numeric(ev) and ev > 0 and numeric(speed) and speed >= .8
+            and (numeric(oci) and 25 <= abs(oci) < 40 or numeric(delta) and abs(delta) >= 1.2)
+            and numeric(row.get('odd')) and row['odd'] > 1 and row.get('quote_executable') is not False):
+        return False
+    now, start = stamp(as_of), stamp(kickoff)
+    if not now or not start or now >= start:
+        return False
+    if row.get('quote_status') == 'cached_stable':
+        return within_window(row, as_of, kickoff)
+    updated = stamp(row.get('provider_updated_at'))
+    return bool(row.get('quote_status') == 'recent' and updated and
+                0 <= (now-updated).total_seconds() <= (3600 if (start-now).total_seconds() <= 10800 else 21600))
+
+
+def quote_monitoring(matrix, as_of, kickoff=None):
     """Observation metadata only: never an OCI, Gold or Platinum decision."""
     groups={key:[] for key in LEGACY}
     groups['combo_ht_sh']=[]
@@ -36,9 +60,27 @@ def quote_monitoring(matrix, as_of):
             waiting.append({'market':key,'row_ids':[r['id'] for r in rows],
                 'reason':'stale' if any(r.get('quote_status')=='stale' for r in rows) else
                          'incomplete_or_invalid_pair' if any(r.get('odd') for r in rows) else 'missing'})
-    matrix['quote_monitoring']={'version':'quote-monitoring-v1','as_of':as_of,'study_only':True,
-        'state':'waiting_quotes' if waiting else 'observing_flow','waiting_markets':waiting,
-        'row_ids':[r['id'] for rows in groups.values() for r in rows]}
+    rows = matrix.get('rows', [])
+    priced = [r for r in rows if r.get('quote_status') in ('recent', 'cached_stable')
+              and numeric(r.get('odd')) and r['odd'] > 1]
+    # Positive price availability and an admissible margin answer different questions.
+    core = {goal_market(r) for r in priced if numeric(r.get('selected_margin_pct'))} - {None}
+    both_periods = any(m.endswith('_ht') for m in core) and any(m.endswith('_ft') for m in core)
+    broad = len(core) == len(LEGACY) or len(priced) >= 20 and both_periods
+    watch = sorted((r for r in rows if radar_watch(r, as_of, kickoff)),
+                   key=lambda r: (-r['speed_pp_per_hour'], -r['agreeing_books']/r['paired_books'], r['id']))
+    moving = any(r.get('movement_confirmed') and numeric(r.get('oci')) and abs(r['oci']) >= 40
+                 for r in priced if goal_market(r) or (r.get('spec') or {}).get('kind') == 'result')
+    state = 'radar_watch' if watch else 'waiting_quotes' if not broad else (
+        'observing_flow' if moving or (matrix.get('goal_context') or {}).get('imbalance') else 'balanced')
+    ids = [r['id'] for group in groups.values() for r in group]
+    if watch and watch[0]['id'] not in ids:
+        ids.append(watch[0]['id'])
+    matrix['quote_monitoring'] = {'version':'quote-monitoring-v1','as_of':as_of,'study_only':True,
+        'state':'waiting_quotes' if waiting else 'observing_flow', 'waiting_markets':waiting, 'row_ids':ids,
+        'radar_state':state, 'priced_markets':len(priced), 'priced_core':sorted(core),
+        'watch_id':watch[0]['id'] if watch else None}
+
 
 
 def complete_day(ns, client, day, as_of):
@@ -118,7 +160,7 @@ def build_board(day, as_of):
         if kickoff and kickoff <= stamp(as_of) or meta.get('result'):
             continue  # Immutable forecast, even when it is no longer upcoming.
         annotate_platinum(a.get('matrix', {}), meta, as_of)
-        quote_monitoring(a.get('matrix',{}),as_of)
+        quote_monitoring(a.get('matrix',{}),as_of,meta.get('kickoff'))
         platinum += bool(a.get('matrix', {}).get('platinum_policy', {}).get('best_market_id'))
         a.get('matrix', {})['summary'] = {'categories': dict(category_counts), 'observed_markets': len(rows),
                                         'priced_markets': sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)}

@@ -89,6 +89,8 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
             phase('auditor/current_audit.py', 'history', '--date', report_date)
             checkpoint(work_date, 'history')
         phase('src/gold_policy_audit.py')
+        if work_date == today:
+            phase('src/adaptive_calibration.py', '--as-of', today.isoformat())
         (root / PROGRESS).unlink(missing_ok=True)
         if work_date == today:
             marker = {'schema_version': 1, 'status': 'complete', 'date': gate['date'],

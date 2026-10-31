@@ -2047,13 +2047,12 @@ def scan_dates(
                 continue
             fixtures.append(fixture_row)
 
-        # Give the bounded recovery budget to fixtures without usable prices first.
+        from odds_collection import fixture_priority
+        order_time = iso_now()
         def recovery_order(row):
-            fid = str((row.get("fixture") or {}).get("id"))
-            previous = existing_by_id.get(fid, {})
-            markets = (previous.get("multimarket") or {}).get("markets", [])
-            priced = any(r.get("market") in ("1x2_ft", "over25_ft", "over15_ht") and safe_float(r.get("odd")) > 1 for r in markets)
-            return (priced, (row.get("fixture") or {}).get("date") or "")
+            fixture = row.get("fixture") or {}
+            previous = existing_by_id.get(str(fixture.get("id")), {})
+            return fixture_priority(fixture.get("date"), previous, order_time)
         fixtures.sort(key=recovery_order)
         log(f"⚽ Fixture pre-match valide: {len(fixtures)}")
         refreshed_matches: List[Dict[str, Any]] = []
@@ -4648,7 +4647,15 @@ def recommendation_gate(
         reasons.append("competizione_debole")
     if probability < floor:
         reasons.append("probabilita_assoluta_insufficiente")
-    if expected_value < edge_required:
+    from adaptive_calibration import cohort, load_weights, usable_entry
+    from adaptive_pricing import gate_passes
+    key = cohort(market_key, odd, meta.get("competition_tier")) if pick in ("1", "2", "x", "yes", "over") else None
+    state = load_weights() if key else {}
+    learned = usable_entry(state, key, iso_now()) if key else {}
+    calibrated_gate = {"ev_pct": expected_value*100, "edge_pp": (probability-market_break_even)*100,
+                       "calibration": {**learned, "version": state.get("version")}}
+    if ((not learned or not learned.get("threshold_delta_pp")) and expected_value < edge_required
+            or not gate_passes(calibrated_gate, edge_required*100)):
         reasons.append("nessun_valore_sulla_quota")
     if disagreement_pp > 22:
         reasons.append("modello_book_troppo_distanti")

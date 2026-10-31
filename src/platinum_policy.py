@@ -44,11 +44,15 @@ def evaluate(row, as_of):
             or not numeric(move.get('persistence')) or not .5 <= move['persistence'] <= 1
             or move.get('reversal') is not False): reasons.append('persistence')
     ev = row.get('ev_pct')
+    from adaptive_pricing import threshold, gate_passes
+    delta = threshold(row)
     high_price = numeric(odd) and odd >= LIMITS['min_odd']
     missing_history_ev = ev is None and row.get('statistical_pct') is None
     high_odds = high_price and (missing_history_ev or
-        numeric(ev) and ev >= LIMITS['min_high_odds_ev_pct'])
-    excellent_ev = numeric(ev) and ev >= LIMITS['min_ev_pct']
+        numeric(ev) and ev >= LIMITS['min_high_odds_ev_pct']+max(0., delta))
+    if delta > 0 and not missing_history_ev and (not numeric(row.get('edge_pp')) or row['edge_pp'] < delta):
+        high_odds = False
+    excellent_ev = numeric(ev) and ev >= LIMITS['min_ev_pct']+delta and gate_passes(row, LIMITS['min_ev_pct'])
     if not high_odds and not excellent_ev:
         reasons.append('ev_floor' if high_price and numeric(ev) else
                        'ev_unavailable' if high_price else 'odds_or_value')
