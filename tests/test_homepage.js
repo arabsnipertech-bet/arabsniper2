@@ -46,6 +46,30 @@ async function run(payload,fail=false){
    r=await run({...v5,selections:[{...selection,...extra}]});assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,ok?1:0,JSON.stringify({spec,extra}));
   }
  }
+ const releaseHash=require('node:crypto').createHash('sha256').update(code).digest('hex').slice(0,12);
+ assert(html.includes('src="homepage.js?v='+releaseHash+'"'));
+ const currentMarkets=[
+  ['total','ht','over',1.5,'over15_ht',2.1,3.5,40],
+  ['total','ht','over',2.5,'over25_ht',4.5,7.5,18],
+  ['total','ft','over',2.5,'over25_ft',1.85,2.6,48],
+  ['asian_total','ft','over',3.5,'over35_ft',2.1,4.5,35],
+  ['btts','ht','yes',undefined,'gg_ht',3.5,5.5,26]
+ ];
+ for(const [kind,period,side,line,market,lo,hi,floor] of currentMarkets){
+  const spec={kind,period,side,line};
+  const opportunity={policy_id:'gold-goals-v6.1',eligible:true,goal_market:market,odds_min:lo,odds_max:hi,
+   min_probability_pct:floor,ht_history_supported:true,structural_supported:true,market_checks_passed:true};
+  const row={...data.selections[0],model_id:'lateral-matrix-v5.0',competition_policy:'gold-senior-whitelist-v2.1',
+   spec,odd:lo,statistical_pct:floor,opportunity,quote_executable:true};
+  for(const [changes,visible] of [[{},true],[{odd:hi},true],[{odd:hi+.01},false],[{odd:lo-.01},false],
+   [{competition_policy:'unknown'},false],[{quote_executable:false},false],[{statistical_pct:floor-.01},false],
+   [{spec:{...spec,extra:'home'}},false],[{opportunity:{...opportunity,eligible:false}},false],
+   [{opportunity:{...opportunity,market_checks_passed:false}},false],[{opportunity:{...opportunity,structural_supported:false}},false],
+   [{opportunity:{...opportunity,ht_history_supported:false}},period==='ft'],[{opportunity:{...opportunity,odds_max:200}},false]]){
+   r=await run({...data,selections:[{...row,...changes}]});
+   assert.equal(r.nodes['daily-picks'].innerHTML.includes('class="pick"'),visible,JSON.stringify({market,changes}));
+  }
+ }
  for(const plan of ['daily','weekly','monthly']) assert(html.includes("buy('"+plan+"', this)"));
  console.log('PASS: public feed only, three cards, stale day, escaped HTML, unavailable feed, Gold entry links and plan IDs');
 })();
