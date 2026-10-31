@@ -3,19 +3,19 @@
 The marker is written only after a verified refresh of both current dates and
 travels with the checkpoint's last-write pointer. A failed Gold publication
 therefore leaves the previous marker authoritative. Prediction rules are not
-changed. A successful scan is fresh for 60 minutes from its collection start.
+changed. A completed scan covers its hourly slot, with a minimum interval across slots.
 """
 import argparse
 import json
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 from audit_storage import atomic_bytes, read_store
 from night_scan_guard import TZ, timestamp, valid_window, window
+from fast_backup_dispatch import fresh_for_hour
 
 MARKER = 'data/arab_quote_fast_status.json'
-INTERVAL = timedelta(minutes=60)
 
 
 def completed_recently(root, now=None):
@@ -26,7 +26,7 @@ def completed_recently(root, now=None):
     started, completed = timestamp(marker.get('started_at')), timestamp(marker.get('completed_at'))
     dates = window(now)[:2]
     if (not started or not completed or not started <= completed <= now
-            or now - started >= INTERVAL or marker.get('dates') != dates
+            or not fresh_for_hour(started, now) or marker.get('dates') != dates
             or window(started)[:2] != dates or window(completed)[:2] != dates):
         return False
     return valid_window(root, dates)
@@ -66,7 +66,7 @@ def main():
     # Code releases must still refresh their policy even when prices are fresh.
     run = (os.getenv('EVENT_NAME') == 'push' or os.getenv('ARAB_FORCE_FAST') == 'true'
            or not completed_recently(root, now))
-    message = 'Fast Scan required' if run else 'Fast already published within 60 minutes of collection start; skipped'
+    message = 'Fast Scan required' if run else 'Fast already published for this hour or within the minimum interval; skipped'
     print(message)
     if os.getenv('GITHUB_OUTPUT'):
         with open(os.environ['GITHUB_OUTPUT'], 'a') as out:

@@ -1,5 +1,5 @@
 """Run the entire historical pipeline once, with a hard 01:50 Rome deadline."""
-from datetime import datetime
+from datetime import date, datetime, timedelta
 import json
 import os
 from pathlib import Path
@@ -7,7 +7,7 @@ import signal
 import subprocess
 import sys
 
-from audit_storage import atomic_bytes
+from audit_storage import atomic_bytes, read_store
 from auditor_schedule import ROME, MARKER, admission, already_completed
 
 
@@ -28,6 +28,22 @@ def run_command(root, command, deadline, clock=lambda: datetime.now(ROME)):
         raise subprocess.CalledProcessError(code, command)
 
 
+PROGRESS = 'data/arab_quote_auditor_progress.json'
+
+
+def saved_batch(root, today):
+    checkpoint = read_store(root / PROGRESS)
+    if checkpoint is None:
+        return None
+    if (not isinstance(checkpoint, dict) or checkpoint.get('version') != 1
+            or checkpoint.get('stage') not in ('daily', 'history')):
+        raise ValueError('Invalid nightly Auditor checkpoint')
+    day = date.fromisoformat(checkpoint['work_date'])
+    if day > today:
+        raise ValueError('Future nightly Auditor checkpoint')
+    return day, checkpoint['stage']
+
+
 def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
     root = Path(root)
     started = clock()
@@ -38,26 +54,49 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
     if os.getenv('GOLD_PRIVATE') != 'true':
         raise ValueError('Nightly Auditor requires the authoritative private checkpoint')
     deadline = datetime.fromisoformat(gate['deadline'])
+    today = date.fromisoformat(gate['date'])
 
     def phase(*args):
         command_runner(root, [sys.executable, *args], deadline, clock)
 
+    def checkpoint(work_date, stage):
+        value = {'version': 1, 'work_date': work_date.isoformat(), 'stage': stage}
+        atomic_bytes(root / PROGRESS, json.dumps(value).encode())
+        phase('src/gold_storage.py', 'publish')
+        print(f'Auditor checkpoint saved: {work_date} {stage}', flush=True)
+
     phase('src/gold_storage.py', 'restore')
-    if already_completed(root, clock()):
+    pending = saved_batch(root, today)
+    if pending is None and already_completed(root, clock()):
         print('Nightly Auditor already published for this Rome date', flush=True)
         return 'already_completed'
-    phase('src/audit_journal.py', 'ingest')
-    phase('auditor/current_audit.py', 'settle')
-    phase('src/gold_policy_audit.py')
-    phase('src/task_progress.py', 'src/homepage_results.py')
-    # Completion is durable only if the checkpoint's final pointer is published.
-    marker = {'schema_version': 1, 'status': 'complete', 'date': gate['date'],
-              'started_at': started.isoformat(), 'completed_at': clock().isoformat(),
-              'run_id': os.getenv('GITHUB_RUN_ID')}
-    atomic_bytes(root/MARKER, json.dumps(marker, separators=(',', ':')).encode()+b'\n')
-    phase('src/gold_storage.py', 'publish')
-    phase('src/private_publication.py')
-    print('Nightly Auditor completed and published', flush=True)
+
+    # Scans append new immutable journals while an older batch is suspended.
+    # Finish its frozen input before consuming those new journals.
+    batches = [pending] if pending is not None else []
+    if pending is None or pending[0] != today:
+        batches.append((today, None))
+    for work_date, stage in batches:
+        report_date = (work_date - timedelta(days=1)).isoformat()
+        if stage is None:
+            phase('auditor/current_audit.py', 'prepare')
+            phase('auditor/current_audit.py', 'daily', '--date', report_date)
+            checkpoint(work_date, 'daily')
+        # Public projections are not in R2. Rebuild on resume if git failed.
+        phase('src/homepage_results.py')
+        phase('src/private_publication.py', '--results-only')
+        if stage != 'history':
+            phase('auditor/current_audit.py', 'history', '--date', report_date)
+            checkpoint(work_date, 'history')
+        phase('src/gold_policy_audit.py')
+        (root / PROGRESS).unlink(missing_ok=True)
+        if work_date == today:
+            marker = {'schema_version': 1, 'status': 'complete', 'date': gate['date'],
+                      'started_at': started.isoformat(), 'completed_at': clock().isoformat(),
+                      'run_id': os.getenv('GITHUB_RUN_ID')}
+            atomic_bytes(root / MARKER, json.dumps(marker, separators=(',', ':')).encode()+b'\n')
+        phase('src/gold_storage.py', 'publish')
+        print(f'Nightly Auditor batch completed and published: {work_date}', flush=True)
     return 'complete'
 
 

@@ -21,7 +21,7 @@ def jobs(started=None, overrides=None):
     steps = [{'name': name, 'conclusion': 'success'} for name in (
         'Run Fast Scan', 'Record verified Fast completion', 'Validate generated files',
         'Save verified state in private storage')]
-    steps[0]['started_at'] = (started or NOW - timedelta(minutes=50)).isoformat()
+    steps[0]['started_at'] = (started or NOW - timedelta(minutes=40)).isoformat()
     for name, value in (overrides or {}).items():
         for step in steps:
             if step['name'] == name:
@@ -124,6 +124,37 @@ class FastBackupTests(unittest.TestCase):
                       {'total_count': False, 'workflow_runs': []}):
             with patch.object(backup.GitHub, 'request', return_value=value):
                 with self.assertRaises(RuntimeError): backup.GitHub('test-placeholder').active_runs('queued')
+
+    def test_transient_count_mismatch_repeats_the_get_only(self):
+        api = backup.GitHub('test')
+        busy = {'path': '.github/workflows/fast_scan.yml', 'id': 7}
+        with patch.object(api, 'recent_fast_runs', return_value=[]), patch.object(api, 'request', side_effect=[
+                {'total_count': 1, 'workflow_runs': []},
+                {'total_count': 1, 'workflow_runs': [busy]}]) as get, patch.object(backup, 'sleep'):
+            self.assertEqual(backup.wake_fast(api, NOW)['action'], 'writer_busy')
+            self.assertEqual(get.call_count, 2)
+            self.assertTrue(all(len(c.args) == 1 for c in get.call_args_list))
+
+    def test_a_verified_fresh_fast_does_not_need_queue_listings(self):
+        api = FakeAPI([run()])
+        with patch.object(api, 'active_runs', side_effect=AssertionError('unnecessary queue read')):
+            self.assertEqual(backup.wake_fast(api, NOW)['action'], 'already_published')
+
+    def test_pagination_requires_all_distinct_jobs(self):
+        api = backup.GitHub('test')
+        first = {'total_count': 101, 'jobs': [{'id': n} for n in range(1, 101)]}
+        with patch.object(api, 'request', side_effect=[first, {'total_count': 101, 'jobs': [{'id': 101}]}]) as get:
+            self.assertEqual(len(api.jobs({'id': 42})), 101)
+            self.assertIn('&page=2', get.call_args.args[0])
+        with patch.object(api, 'request', side_effect=[first, {'total_count': 101, 'jobs': [{'id': 1}]}]*3), patch.object(backup, 'sleep'):
+            with self.assertRaises(backup.IncompleteListing): api.jobs({'id': 42})
+
+    def test_hourly_wake_does_not_drift_with_runner_setup(self):
+        start = backup.instant('2026-10-31T06:09:14+01:00')
+        self.assertFalse(backup.fresh_for_hour(start, backup.instant('2026-10-31T07:05:23+01:00')))
+        self.assertTrue(backup.fresh_for_hour(start, backup.instant('2026-10-31T06:55:00+01:00')))
+        late = backup.instant('2026-10-31T06:48:00+01:00')
+        self.assertTrue(backup.fresh_for_hour(late, backup.instant('2026-10-31T07:05:00+01:00')))
 
     def test_auth_errors_do_not_print_tokens_or_response_bodies(self):
         error = HTTPError('https://api.github.com', 403, 'secret', {}, io.BytesIO(b'secret'))

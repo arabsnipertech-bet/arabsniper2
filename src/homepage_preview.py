@@ -80,10 +80,26 @@ def build_preview(payload, previous=None, now=None, rng=None):
                     'opportunity': row['opportunity'], 'oci': row.get('oci'),
                     'competition_policy': SCOPE_ID,
                     'margin_pct': row.get('selected_margin_pct'),
-                    'model_id': 'lateral-matrix-v5.0', 'captured_at': a.get('captured_at')}))
+                    'model_id': 'lateral-matrix-v5.0', 'captured_at': a.get('captured_at'),
+                    'provider_updated_at': row.get('provider_updated_at'),
+                    'quote_executable': row.get('quote_executable', True)}))
         candidates.sort(key=lambda x: (-x[0], x[1]['kickoff'], x[1]['fixture_id'], x[1]['label']))
         unique = {}
         for _, row in candidates: unique.setdefault(row['fixture_id'], row)
+        fields = ('fixture_id', 'match', 'league', 'kickoff', 'label', 'odd', 'captured_at', 'provider_updated_at')
+        social = []
+        for pick in unique.values():
+            observed = stamp(pick.get('provider_updated_at'))
+            captured = stamp(pick.get('captured_at'))
+            if (pick['quote_executable'] is not True or not observed or not captured
+                    or not captured <= now < stamp(pick['kickoff'])
+                    or pick['opportunity'].get('policy_id') != POLICY_ID
+                    or not pick['opportunity'].get('eligible')):
+                continue
+            social.append({field: pick[field] for field in fields})
+            if len(social) == 4:
+                break
+        result['social_selections'] = social if len(social) == 4 else []
         result.update(model_id='lateral-matrix-v5.0', opportunity_policy=POLICY_ID,
                       competition_policy=SCOPE_ID, selections=list(unique.values())[:3],
                       analyzed_fixtures=(payload.get('matrix_summary') or {}).get('analyzed_fixtures', 0),

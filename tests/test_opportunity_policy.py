@@ -100,6 +100,24 @@ class PlayableValue(unittest.TestCase):
         self.assertEqual(p, frozen)
         self.assertEqual(build_preview(p, now=datetime.fromisoformat('2026-10-26T18:00:00+00:00'))['selections'], [])
 
+    def test_social_feed_requires_four_distinct_fresh_prematch_official_picks(self):
+        matches = []
+        for fid in (1, 1, 2, 3, 4):
+            m = match()
+            m['fixture']['fixture_id'] = fid
+            m['multimarket'] = {'model_id':'lateral-matrix-v5.0','captured_at':NOW,
+                                'matrix':{'rows':[row()]}}
+            matches.append(m)
+        payload = {'date':'2026-10-26','updated_at':NOW,'matches':matches,
+                   'multimarket_method':{'model_id':'lateral-matrix-v5.0'}}
+        view = lambda: build_preview(payload, now=datetime.fromisoformat(NOW))
+        self.assertEqual(len(view()['selections']), 3)
+        self.assertEqual([r['fixture_id'] for r in view()['social_selections']], ['1','2','3','4'])
+        matches[-1]['multimarket']['matrix']['rows'][0]['quote_executable'] = False
+        self.assertEqual(view()['social_selections'], [])
+        matches[-1]['fixture']['status_short'] = '1H'
+        self.assertEqual(view()['social_selections'], [])
+
     def test_real_adapter_refresh_and_expiry_preserve_statistics_and_started(self):
         for first, middle, last, signal in [(2.5, 2.3, 2.1, 'excluded'), (2.1, 2.35, 2.6, 'excluded')]:
             m = match(); a = build_matrix(statistical_analysis(m, NOW), NOW); state = {}

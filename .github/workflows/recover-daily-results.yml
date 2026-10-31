@@ -1,0 +1,81 @@
+name: Recover verified daily results
+on:
+  workflow_run:
+    workflows: [Run Auditor]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Giornata chiusa da recuperare (vuoto = ieri, ora italiana)'
+        required: false
+  push:
+    branches: [main]
+    paths: ['.github/workflows/recover-daily-results.yml']
+permissions:
+  contents: read
+env:
+  GOLD_PRIVATE: ${{ vars.GOLD_PRIVATE }}
+  R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+  R2_BUCKET: arabsniper-gold
+  PYTHONUNBUFFERED: '1'
+jobs:
+  prepare:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main' && vars.GOLD_PRIVATE == 'true' && (github.event_name != 'workflow_run' || (github.event.workflow_run.head_repository.full_name == github.repository && contains(fromJSON('["failure","timed_out"]'), github.event.workflow_run.conclusion)))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    outputs:
+      date: ${{ steps.day.outputs.date }}
+      digest: ${{ steps.recover.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests boto3 ijson==3.6.0
+      - id: day
+        env:
+          REQUESTED_DAY: ${{ inputs.date }}
+        run: |
+          python - <<'PY'
+          from datetime import date, datetime, timedelta
+          from zoneinfo import ZoneInfo
+          import os
+          today = datetime.now(ZoneInfo('Europe/Rome')).date()
+          day = date.fromisoformat(os.environ['REQUESTED_DAY']) if os.environ.get('REQUESTED_DAY') else today - timedelta(days=1)
+          if not 1 <= (today-day).days <= 14: raise ValueError('Expected a closed day within 14 days')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out: print(f'date={day}', file=out)
+          PY
+      - name: Verify frozen observations and official scores for one day
+        id: recover
+        env:
+          DAY: ${{ steps.day.outputs.date }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+        run: python auditor/recover_daily.py prepare --date "$DAY"
+  publish:
+    needs: prepare
+    permissions:
+      contents: write
+    concurrency:
+      group: arabsniper-quote-data-writer
+      cancel-in-progress: false
+      queue: max
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests boto3 ijson==3.6.0
+      - name: Commit verified daily report to latest checkpoint and publish results
+        env:
+          DAY: ${{ needs.prepare.outputs.date }}
+          REPORT_DIGEST: ${{ needs.prepare.outputs.digest }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python auditor/recover_daily.py publish --date "$DAY"
