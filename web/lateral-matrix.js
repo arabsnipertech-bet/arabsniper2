@@ -237,8 +237,32 @@
   }).sort((a,b)=>a.platinum.rank-b.platinum.rank||String(a.id).localeCompare(String(b.id)));
   const seen=new Set();return candidates.filter(r=>{const key=goalMarket(r);if(seen.has(key))return false;seen.add(key);return true;});
  }
+ const MONITORED_GOALS={
+  over15_ht:'Over 1,5 PT',over25_ht:'Over 2,5 PT',over25_ft:'Over 2,5 FT',
+  over35_ft:'Over 3,5 FT',gg_ht:'GG PT',combo_ht_sh:'Combo Over 0,5 PT + Over 0,5 ST'
+ };
+ function monitoringPanel(rows,monitor,history,context){
+  const key=r=>isCombo(r)?'combo_ht_sh':goalMarket(r);
+  const quoted=rows.filter(r=>key(r)&&priced(r)&&Number.isFinite(r.odd)&&r.odd>1);
+  const waiting=new Map((monitor.waiting_markets||[]).filter(m=>Object.hasOwn(MONITORED_GOALS,m.market)).map(m=>[m.market,m.reason]));
+  const ready=new Set(quoted.filter(r=>!waiting.has(key(r))).map(key));
+  const title=ready.size?'Quote disponibili · flusso da confermare':quoted.length?'Quote presenti · nessun mercato gol idoneo al Radar':'In attesa di quote sui mercati gol';
+  const state=ready.size&&waiting.size?'partial_quotes':monitor.state;
+  const issues=Array.from(waiting,([market,reason])=>{
+   const offers=quoted.filter(r=>key(r)===market);
+   const detail=offers.length&&offers.every(r=>Number.isFinite(r.selected_margin_pct)&&r.selected_margin_pct>9+1e-9)?'aggio oltre il 9%':
+    offers.length?'aggio o coppia da verificare':reason==='stale'?'quota da aggiornare':reason==='incomplete_or_invalid_pair'?'coppia da verificare':'quota mancante';
+   return esc(MONITORED_GOALS[market])+' · '+detail;
+  });
+  return '<aside class="mx-best mx-best-market" data-market-monitoring="'+esc(state)+'"><span class="mx-section-title">RADAR BLU · MONITORAGGIO</span><h4>'+title+'</h4><span class="mx-badge mx-market-signal">SOLO STUDIO</span><p>'+ready.size+' dei 6 mercati gol hanno una quota idonea. Il flusso richiesto dal Radar è ancora da confermare.</p>'+
+   (issues.length?'<p>'+issues.join('<br>')+'</p>':'')+history+timingContext(context)+'</aside>';
+ }
  function movementSignal(row){
   const delta=priced(row)&&Number.isFinite(row.delta_pct)?row.delta_pct:null;
+  const first=Date.parse(row.first_observed_at),last=Date.parse(row.quote_observed_at);
+  if(delta===0&&Number.isFinite(first)&&first===last&&row.first_odd===row.odd){
+   return '<div class="mx-net mx-net-unknown"><b>Prima rilevazione</b><small>In attesa di una seconda osservazione dello stesso bookmaker.</small></div>';
+  }
   const magnitude=delta==null?null:Math.abs(delta),level=magnitude==null?'unknown':magnitude>=8?'red':magnitude>=3?'yellow':'green';
   const direction=delta==null?'Storico assente':Math.abs(delta)<.005?'Invariata':delta<0?'Discesa':'Salita';
   const arrow=delta==null?'—':Math.abs(delta)<.005?'→':delta<0?'↓':'↑';
@@ -254,7 +278,12 @@
    '<small class="mx-quote-consensus">'+(Number.isFinite(row.oci)?'OCI: ':'OCI non disponibile · ')+esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi'+(row.oci_previous==null?'':' · prima '+signed(row.oci_previous))+'</small></section>';
  }
  function quoteBoard(rows,helpers){
-  const find=(kind,period,side,line)=>rows.find(r=>r.spec?.kind===kind&&r.period===period&&r.spec.side===side&&(line==null||r.spec.line===line));
+  const find=(kind,period,side,line)=>{
+   const exact=r=>r.period===period&&r.spec?.side===side&&(line==null||r.spec.line===line)&&r.spec.extra==null;
+   const direct=rows.find(r=>r.spec?.kind===kind&&exact(r));
+   if(kind!=='total'||priced(direct))return direct;
+   return rows.find(r=>r.spec?.kind==='asian_total'&&exact(r)&&priced(r))||direct;
+  };
   return '<section class="mx-quote-board" aria-label="Quote 1X2 apertura e attuale"><h4 class="mx-section-title">QUOTE 1 · X · 2 — APERTURA E ATTUALE</h4><div class="mx-1x2">'+[['1','1 · Casa'],['x','X · Pareggio'],['2','2 · Ospite']].map(([s,l])=>quoteCell(find('result','ft',s),l,helpers)).join('')+'</div>'+
    '<div class="mx-goal-quotes">'+[['total','ht','over',1.5,'Over 1,5 PT'],['total','ft','over',2.5,'Over 2,5 FT'],['total','ft','over',3.5,'Over 3,5 FT'],['btts','ht','yes',null,'GG PT']].map(([k,p,s,l,t])=>quoteCell(find(k,p,s,l),t,helpers)).join('')+'</div></section>';
  }
@@ -295,7 +324,7 @@
    ['Aggio / operatori concordi',pct(watch.selected_margin_pct)+' / '+watch.agreeing_books+'/'+watch.paired_books]
   ].map(([label,value])=>'<div><dt>'+esc(label)+'</dt><dd>'+esc(value)+'</dd></div>').join('')+'</dl><p><b>Solo studio · esclusa dalle giocate Gold ufficiali.</b></p>'+history+timingContext(context)+'<p>'+extraGoalText(rows)+'</p><small>'+signals.length+' '+(signals.length===1?'mercato in monitoraggio':'mercati in monitoraggio')+' · 0 proposte Gold</small></aside>';
   const waiting=!best&&monitoringRows(rows,options);
-  if(waiting?.length)return '<aside class="mx-best mx-best-market" data-market-monitoring="'+esc(options.monitoring.state)+'"><span class="mx-section-title">RADAR BLU · MONITORAGGIO</span><h4>'+(options.monitoring.state==='waiting_quotes'?'In attesa di quote':'In attesa di flusso confermato')+'</h4><span class="mx-badge mx-market-signal">SOLO STUDIO</span><p>Partita mantenuta in osservazione. Nessun segnale di flusso confermato e nessuna proposta Gold o Platinum.</p><p>'+((options.monitoring.waiting_markets||[]).length)+' mercati in attesa di una quota completa e valida. Il prossimo Fast rivaluterà quote e concordanza tra operatori.</p>'+history+timingContext(context)+'</aside>';
+  if(waiting?.length)return monitoringPanel(rows,options.monitoring,history,context);
   if(!best)return '<aside class="mx-best mx-best-empty"><span class="mx-section-title">MIGLIOR VALORE STIMATO</span><h4>'+(checked.length&&checked.every(r=>!priced(r))?'Quote da aggiornare':checked.length?'Nessuna proposta supera i criteri':'Valutazione da aggiornare')+'</h4>'+history+timingContext(context)+'<p>'+archive+extraGoalText(rows)+'</p><p>'+esc(exclusions||'Dati insufficienti')+'</p><small>'+rows.length+' esiti · '+pricedCount+' quote utilizzabili</small></aside>';
   const d=best.opportunity,signal=d.signal,tag=signal==='convergence'?'mature':signal==='contrarian'?'contrarian':'value_watch',displayLabel=goalMarket(best)==='gg_ht'?'Goal PT':best.label;
   const stability=d.stability?.status==='retained'?'<p class="mx-stability"><b>Proposta mantenuta in tolleranza</b><small>Piccola oscillazione dei valori. Validità massima fino alle '+esc(new Date(d.stability.expires_at).toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit'}))+' con quote aggiornate e limiti rispettati.</small></p>':'';

@@ -3,6 +3,7 @@ import json
 import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from time import sleep
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -31,6 +32,20 @@ def instant(value):
     raise ValueError('Invalid GitHub timestamp')
 
 
+def fresh_for_hour(started, now):
+    """Keep one collection per Rome hour, with a 50-minute floor at boundaries."""
+    start = started.astimezone(timezone.utc)
+    end = now.astimezone(timezone.utc)
+    age = end - start
+    same_hour = (start.replace(minute=0, second=0, microsecond=0) ==
+                 end.replace(minute=0, second=0, microsecond=0))
+    return timedelta() <= age < INTERVAL and (same_hour or age < timedelta(minutes=50))
+
+
+class IncompleteListing(RuntimeError):
+    pass
+
+
 class GitHub:
     def __init__(self, token):
         if not token:
@@ -53,12 +68,40 @@ class GitHub:
             raise RuntimeError('GitHub unavailable or invalid response; no dispatch retry') from None
 
     def listing(self, suffix, key):
-        data = self.request(suffix)
-        if (not isinstance(data, dict) or not isinstance(data.get(key), list)
-                or type(data.get('total_count')) is not int or data['total_count'] != len(data[key])):
-            # Incomplete/paginated responses must never look like an empty queue.
-            raise RuntimeError('Incomplete GitHub listing; no dispatch')
-        return data[key]
+        # Actions can change state between counting and returning the rows.
+        # Only repeat read requests. Never retry a dispatch with an unknown outcome.
+        for delay in (0, 1, 2):
+            if delay:
+                sleep(delay)
+            try:
+                return self._read_listing(suffix, key)
+            except IncompleteListing:
+                if delay == 2:
+                    raise
+
+    def _read_listing(self, suffix, key):
+        rows = []
+        total = None
+        for page in range(1, 6):
+            query = suffix if page == 1 else f'{suffix}&page={page}'
+            data = self.request(query)
+            if (not isinstance(data, dict) or not isinstance(data.get(key), list)
+                    or type(data.get('total_count')) is not int or data['total_count'] < 0):
+                raise RuntimeError('Invalid GitHub listing; no dispatch')
+            if total is None:
+                total = data['total_count']
+            if total != data['total_count'] or total > 500:
+                break
+            batch = data[key]
+            rows.extend(batch)
+            if len(rows) == total:
+                ids = [row.get('id') for row in rows if isinstance(row, dict)]
+                if len(ids) == total and all(type(i) is int and i > 0 for i in ids) and len(set(ids)) == total:
+                    return rows
+                break
+            if len(batch) != 100 or len(rows) > total:
+                break
+        raise IncompleteListing('Incomplete GitHub listing; no dispatch')
 
     def active_runs(self, status):
         return self.listing('runs?' + urlencode({'status': status, 'per_page': 100}), 'workflow_runs')
@@ -96,13 +139,6 @@ def wake_fast(api, now=None, dry_run=False):
               'football_calls': 0, 'dispatched': False}
     if not 6 <= now.hour <= 23:
         return dict(result, action='outside_fast_window')
-    # Do not replace a pending writer: all these workflows share one mutex.
-    for status in ACTIVE:
-        for run in api.active_runs(status):
-            if not isinstance(run, dict) or not isinstance(run.get('path'), str):
-                raise RuntimeError('Invalid active run; no dispatch')
-            if run['path'].split('@')[0] in WRITERS:
-                return dict(result, action='writer_busy', run_id=run.get('id'))
     failures = []
     for run in api.recent_fast_runs(now):
         if not isinstance(run, dict) or run.get('head_branch') != 'main':
@@ -119,7 +155,7 @@ def wake_fast(api, now=None, dry_run=False):
         if started:
             if not started <= finished:
                 raise RuntimeError('Inconsistent Fast times; no dispatch')
-            if started.astimezone(ROME).date() == now.date() and now - started < INTERVAL:
+            if started.astimezone(ROME).date() == now.date() and fresh_for_hour(started, now):
                 return dict(result, action='already_published', run_id=run.get('id'),
                             collection_started_at=started.isoformat())
         elif run.get('conclusion') in ('failure', 'cancelled', 'timed_out', 'startup_failure', 'action_required'):
@@ -128,6 +164,13 @@ def wake_fast(api, now=None, dry_run=False):
         return dict(result, action='retry_limit', failed_attempts=len(failures))
     if failures and now - max(failures) < RETRY_DELAY:
         return dict(result, action='retry_cooldown')
+    # Do not replace a pending writer: all these workflows share one mutex.
+    for status in ACTIVE:
+        for run in api.active_runs(status):
+            if not isinstance(run, dict) or not isinstance(run.get('path'), str):
+                raise RuntimeError('Invalid active run; no dispatch')
+            if run['path'].split('@')[0] in WRITERS:
+                return dict(result, action='writer_busy', run_id=run.get('id'))
     if dry_run:
         return dict(result, action='would_dispatch')
     api.dispatch()

@@ -159,6 +159,13 @@ def main(directory='data'):
                 for r in a.get('matrix', {}).get('rows', [])) for a in upcoming),
             'allowed_fixtures': len(day.get('matches', [])),
             'excluded_fixtures': (day.get('gold_scope') or {}).get('excluded_fixtures', 0)}
+        coverage = Counter()
+        for analysis in upcoming:
+            monitor = analysis.get('matrix', {}).get('quote_monitoring') or {}
+            if monitor.get('version') == 'quote-monitoring-v1':
+                missing = len(monitor['waiting_markets'])
+                coverage['all_six' if missing == 0 else 'none' if missing == 6 else 'partial'] += 1
+        counters[path.name]['radar_goal_quote_coverage'] = dict(coverage)
         print(f'{path.name}: {counters[path.name]}; policy {POLICY_ID}; API calls: 0', flush=True)
     if not refreshed: raise RuntimeError('No day files restored; refusing publication')
     dashboard_path = directory/'arab_quote_dashboard.json'

@@ -29,9 +29,11 @@ def stage_public(root, snapshot):
         raise ValueError('Unexpected staged file; refusing publication')
 
 
-def publish(root):
+def publish(root, paths=PUBLIC_FILES):
     root = Path(root)
-    snapshot = {p: (root / p).read_bytes() for p in PUBLIC_FILES if (root / p).is_file()}
+    if not set(paths) <= PUBLIC_FILES:
+        raise ValueError('Unexpected public projection')
+    snapshot = {p: (root / p).read_bytes() for p in paths if (root / p).is_file()}
     git(root, 'config', 'user.name', 'github-actions[bot]')
     git(root, 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com')
     for attempt in range(3):
@@ -51,4 +53,8 @@ def publish(root):
 
 
 if __name__ == '__main__':
-    publish(Path(__file__).resolve().parents[1])
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--results-only', action='store_true')
+    args = parser.parse_args()
+    publish(Path(__file__).resolve().parents[1], {'data/arab_quote_results_public.json'} if args.results_only else PUBLIC_FILES)

@@ -75,11 +75,14 @@ def publish(s3,bucket,root):
     # Gold uses its existing names and requires authenticated Worker access.
     for name,data in gold.items():
         s3.put_object(Bucket=bucket,Key=name,Body=data,ContentType='application/json',CacheControl='private, no-store')
-    manifest=json.dumps({'version':1,'files':index},sort_keys=True,separators=(',',':')).encode()
-    s3.put_object(Bucket=bucket,Key='state/manifests/'+sha(manifest)+'.json',Body=manifest)
-    # Pointer last: a failed upload leaves the previous checkpoint recoverable.
-    s3.put_object(Bucket=bucket,Key='state/current.json',Body=manifest,ContentType='application/json')
+    write_manifest(s3,bucket,index)
     print(f'Private checkpoint saved: {len(index)} files; {len(gold)} Gold feeds')
+
+def write_manifest(s3, bucket, index):
+    manifest = json.dumps({'version': 1, 'files': index}, sort_keys=True, separators=(',', ':')).encode()
+    s3.put_object(Bucket=bucket, Key='state/manifests/'+sha(manifest)+'.json', Body=manifest)
+    # Pointer last: a failed upload leaves the previous checkpoint recoverable.
+    s3.put_object(Bucket=bucket, Key='state/current.json', Body=manifest, ContentType='application/json')
 
 def restore(s3,bucket,root):
     root=Path(root)

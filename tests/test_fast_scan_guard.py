@@ -50,7 +50,8 @@ class FastGuardTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             feeds(root); guard.record_completion(root, START, NOW)
             self.assertTrue(guard.completed_recently(root, NOW))
-            self.assertTrue(guard.completed_recently(root, guard.timestamp('2026-10-30T10:04:59+01:00')))
+            self.assertTrue(guard.completed_recently(root, guard.timestamp('2026-10-30T09:59:59+01:00')))
+            self.assertFalse(guard.completed_recently(root, guard.timestamp('2026-10-30T10:00:00+01:00')))
             self.assertFalse(guard.completed_recently(root, guard.timestamp('2026-10-30T10:05:00+01:00')))
 
     def test_cached_refresh_and_stale_failed_or_partial_feeds_cannot_record(self):

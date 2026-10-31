@@ -84,7 +84,25 @@ def merge_policy(target, incoming, kind):
         destination['snapshots'].sort(key=lambda s: stamp(s['observed_at']))
 
 
-def ingest(root):
+def merge_forecast(ledger, collection, key, record):
+    if collection == 'analysis_updates' and key not in ledger.get(collection, {}):
+        # This descriptive label depends on earlier scans; derive
+        # it at ingestion without changing any frozen prediction.
+        previous = [r for c, _, r in ledger.records(
+            fixture_id=record.get('fixture', {}).get('fixture_id'))
+            if c == collection and r.get('model_version') == record.get('model_version')
+            and stamp(r.get('captured_at')) < stamp(record.get('captured_at'))]
+        old = max(previous, key=lambda r: stamp(r['captured_at']), default={})
+        first = (old.get('multimarket') or {}).get('best_candidate') or {}
+        last = (record.get('multimarket') or {}).get('best_candidate') or {}
+        record['update_reason'] = ('prima_analisi' if not previous else
+            'proposta_cambiata' if (first.get('market'), first.get('selection')) !=
+            (last.get('market'), last.get('selection')) else 'aggiornamento_dati_e_quote')
+    # First forecast is immutable; later observations have unique keys.
+    ledger.put(collection, key, record, overwrite=False)
+
+
+def ingest(root, after_forecasts=None):
     """Merge in observation order; reruns preserve first forecasts and deduplicate."""
     from gold_policy_audit import STUDY_ID, POLICY_ID as GOLD_POLICY
     from platinum_policy import POLICY_ID as PLATINUM_POLICY
@@ -104,23 +122,11 @@ def ingest(root):
                     if journal.metadata.get('journal_type') != 'forecasts':
                         raise ValueError('Invalid forecast journal')
                     for collection, key, record in journal.records():
-                        if collection == 'analysis_updates' and key not in ledger.get(collection, {}):
-                            # This descriptive label depends on earlier scans; derive
-                            # it at ingestion without changing any frozen prediction.
-                            previous = [r for c, _, r in ledger.records(
-                                fixture_id=record.get('fixture', {}).get('fixture_id'))
-                                if c == collection and r.get('model_version') == record.get('model_version')
-                                and stamp(r.get('captured_at')) < stamp(record.get('captured_at'))]
-                            old = max(previous, key=lambda r: stamp(r['captured_at']), default={})
-                            first = (old.get('multimarket') or {}).get('best_candidate') or {}
-                            last = (record.get('multimarket') or {}).get('best_candidate') or {}
-                            record['update_reason'] = ('prima_analisi' if not previous else
-                                'proposta_cambiata' if (first.get('market'), first.get('selection')) !=
-                                (last.get('market'), last.get('selection')) else 'aggiornamento_dati_e_quote')
-                        # First forecast is immutable; later observations have unique keys.
-                        ledger.put(collection, key, record, overwrite=False)
+                        merge_forecast(ledger, collection, key, record)
                     ledger.metadata['updated_at'] = journal.metadata['updated_at']
             ledger.write(target)
+            if after_forecasts is not None:
+                after_forecasts(ledger)
     if policies:
         targets = {'gold': root/'data/arab_quote_gold_policy_audit.json',
                    'platinum': root/'data/arab_quote_platinum_audit.json'}

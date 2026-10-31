@@ -332,3 +332,25 @@ assert.equal(api.monitoringRows([waitingRow],{...waitingOptions,archived:true}).
 assert.equal(api.monitoringRows([waitingRow],{...waitingOptions,monitoringClosed:true}).length,0);
 assert.equal(api.monitoringRows([waitingRow,priced],waitingOptions).length,0);
 assert.equal(api.monitoringRows([waitingRow,platinum],{...waitingOptions,...platinumOptions}).length,0);
+
+// One unavailable goal market must not hide the other quoted goals or label the entire fixture missing.
+const monitoredGoals=[
+ ['over15_ht','total','ht','over',1.5],['over25_ht','total','ht','over',2.5],
+ ['over25_ft','total','ft','over',2.5],['over35_ft','total','ft','over',3.5],
+ ['gg_ht','btts','ht','yes',null],['combo_ht_sh','halves_total','ft','over',.5]
+].map(([id,kind,period,side,line])=>({...waitingRow,id,period,spec:{kind,period,side,line,...(kind==='halves_total'?{extra:.5}:{})},odd:2,quote_status:'recent',selected_margin_pct:6}));
+const partialOptions={...waitingOptions,monitoring:{...waitingOptions.monitoring,row_ids:monitoredGoals.map(r=>r.id),waiting_markets:[{market:'over35_ft',reason:'incomplete_or_invalid_pair'}]}};
+const partialPanel=api.opportunityPanel(monitoredGoals.map(r=>r.id==='over35_ft'?{...r,selected_margin_pct:10}:r),null,partialOptions);
+assert(partialPanel.includes('5 dei 6 mercati gol'));
+assert(partialPanel.includes('Over 3,5 FT · aggio oltre il 9%'));
+assert(partialPanel.includes('data-market-monitoring="partial_quotes"'));
+assert(!partialPanel.includes('In attesa di quote'));
+assert(!/data-(market-signal|platinum|opportunity)-id/.test(partialPanel));
+
+const firstObservation={...priced,odd:2,first_odd:2,delta_pct:0,first_observed_at:'2026-10-31T06:00:00Z',quote_observed_at:'2026-10-31T06:00:00Z'};
+assert(api.movementSignal(firstObservation).includes('Prima rilevazione'));
+assert(api.movementSignal({...firstObservation,quote_observed_at:'2026-10-31T07:00:00Z'}).includes('Invariata'));
+const target=monitoredGoals.find(r=>r.id==='over35_ft');
+const asianBoard=api.quoteBoard([{...target,odd:null,quote_status:'missing'},
+ {...target,id:'asian35',spec:{...target.spec,kind:'asian_total'},bookmaker:'Book della linea 3,5',odd:2.88,first_odd:2.75}],{});
+assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&&asianBoard.includes('2,75'));

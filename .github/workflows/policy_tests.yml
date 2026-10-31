@@ -6,6 +6,8 @@ on:
       - 'src/**'
       - 'tests/**'
       - 'auditor/current_audit.py'
+      - 'auditor/recover_daily.py'
+      - '.github/workflows/recover-daily-results.yml'
       - '.github/workflows/policy_tests.yml'
       - '.github/workflows/night_scan_backup.yml'
       - '.github/workflows/fast_scan_backup.yml'
@@ -26,7 +28,7 @@ on:
       - 'workers/live-scores/**'
   push:
     branches: [main]
-    paths: ['src/**', 'tests/**', 'auditor/current_audit.py', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'web/index.html', 'web/homepage.js', 'web/statistics-first.js', 'web/statistics-first.css', 'web/lateral-matrix.js', 'web/lateral-matrix.css', 'web/results.js', '.github/workflows/policy_tests.yml', '.github/workflows/night_scan_backup.yml', '.github/workflows/auditor_backup.yml', '.github/workflows/run-auditor.yml', 'workers/live-scores/**']
+    paths: ['src/**', 'tests/**', 'auditor/current_audit.py', 'auditor/recover_daily.py', '.github/workflows/recover-daily-results.yml', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'web/index.html', 'web/homepage.js', 'web/statistics-first.js', 'web/statistics-first.css', 'web/lateral-matrix.js', 'web/lateral-matrix.css', 'web/results.js', '.github/workflows/policy_tests.yml', '.github/workflows/night_scan_backup.yml', '.github/workflows/auditor_backup.yml', '.github/workflows/run-auditor.yml', 'workers/live-scores/**']
 permissions:
   contents: read
 jobs:

@@ -13,7 +13,7 @@ from unittest.mock import Mock, patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
 from auditor_schedule import admission, preflight, already_completed, MARKER
-from nightly_auditor import run, run_command
+from nightly_auditor import PROGRESS, run, run_command
 from audit_journal import capture_forecasts, capture_policies, ingest, PREFIX
 from audit_storage import read_store, write_store
 
@@ -85,10 +85,44 @@ class NightlySchedule(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {'GOLD_PRIVATE': 'true'}):
             self.assertEqual(run(folder, lambda: now, runner), 'complete')
             self.assertTrue(already_completed(folder, now))
-        self.assertEqual(calls, [['src/gold_storage.py', 'restore'], ['src/audit_journal.py', 'ingest'],
-            ['auditor/current_audit.py', 'settle'], ['src/gold_policy_audit.py'],
-            ['src/task_progress.py', 'src/homepage_results.py'], ['src/gold_storage.py', 'publish'],
-            ['src/private_publication.py']])
+        self.assertEqual(calls, [
+            ['src/gold_storage.py', 'restore'], ['auditor/current_audit.py', 'prepare'],
+            ['auditor/current_audit.py', 'daily', '--date', '2026-10-30'],
+            ['src/gold_storage.py', 'publish'], ['src/homepage_results.py'],
+            ['src/private_publication.py', '--results-only'],
+            ['auditor/current_audit.py', 'history', '--date', '2026-10-30'],
+            ['src/gold_storage.py', 'publish'], ['src/gold_policy_audit.py'],
+            ['src/gold_storage.py', 'publish']])
+
+    def test_interrupted_history_resumes_the_committed_day_before_new_journals(self):
+        now = datetime.fromisoformat('2026-10-31T00:40:00+01:00')
+        remote = {}
+        calls = []
+        def runner(root, command, deadline, clock):
+            args = command[1:]
+            calls.append(args)
+            if args == ['src/gold_storage.py', 'restore']:
+                for path, raw in remote.items(): write_store(root/path, raw)
+            elif args == ['src/gold_storage.py', 'publish']:
+                remote.clear()
+                for path in (PROGRESS, MARKER):
+                    if (root/path).exists(): remote[path] = read_store(root/path)
+            elif args[:2] == ['auditor/current_audit.py', 'history'] and not remote.get(MARKER) and fail[0]:
+                fail[0] = False
+                raise TimeoutError('protected cutoff')
+        fail = [True]
+        with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second, patch.dict(os.environ, {'GOLD_PRIVATE':'true'}):
+            with self.assertRaises(TimeoutError): run(first, lambda: now, runner)
+            self.assertEqual(remote[PROGRESS]['stage'], 'daily')
+            self.assertNotIn(MARKER, remote)
+            calls.clear()
+            next_night = datetime.fromisoformat('2026-11-01T00:40:00+01:00')
+            self.assertEqual(run(second, lambda: next_night, runner), 'complete')
+            self.assertLess(calls.index(['auditor/current_audit.py','history','--date','2026-10-30']),
+                            calls.index(['auditor/current_audit.py','prepare']))
+            self.assertNotIn(['auditor/current_audit.py','daily','--date','2026-10-30'], calls)
+            self.assertEqual(remote[MARKER]['date'],'2026-11-01')
+            self.assertNotIn(PROGRESS, remote)
 
     def test_deadline_does_not_start_another_phase(self):
         now = datetime.fromisoformat('2026-10-31T01:50:00+01:00')
