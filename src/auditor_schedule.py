@@ -10,8 +10,7 @@ from audit_storage import read_store
 ROME = ZoneInfo('Europe/Rome')
 MARKER = 'data/arab_quote_auditor_status.json'
 START = time(0, 30)
-LAST_START = time(1, 0)
-STOP = time(1, 50)  # Ten minutes for cleanup before the 02:00 Night window.
+STOP = time(5, 30)
 
 
 def admission(now):
@@ -19,9 +18,15 @@ def admission(now):
         raise ValueError('Auditor clock must have a timezone')
     local = now.astimezone(ROME)
     deadline = datetime.combine(local.date(), STOP, ROME)
-    allowed = START <= local.time().replace(tzinfo=None) < LAST_START
+    allowed = START <= local.time().replace(tzinfo=None) < STOP
     return {'run': allowed, 'reason': 'night_window' if allowed else 'outside_audit_window',
             'date': local.date().isoformat(), 'deadline': deadline.isoformat()}
+
+
+def has_daily_report(root, work_date):
+    report_date = (work_date - timedelta(days=1)).isoformat()
+    report = read_store(Path(root) / f'auditarchive/prematch_{report_date}_daily.json', {})
+    return isinstance(report, dict) and report.get('audit_date') == report_date
 
 
 def already_completed(root, now):
@@ -35,7 +40,8 @@ def already_completed(root, now):
                 and started.tzinfo is not None and started <= completed <= now
                 and marker.get('date') == now.astimezone(ROME).date().isoformat()
                 and started.astimezone(ROME).date() == completed.astimezone(ROME).date()
-                == now.astimezone(ROME).date())
+                == now.astimezone(ROME).date()
+                and has_daily_report(root, now.astimezone(ROME).date()))
     except (KeyError, ValueError, TypeError):
         return False
 

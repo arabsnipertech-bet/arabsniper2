@@ -1,10 +1,10 @@
 # Auditor notturno e Fast leggeri
 
-Configurazione del 30 ottobre 2026, fuso `Europe/Rome`.
+Configurazione del 1 novembre 2026, fuso `Europe/Rome`.
 
 | Processo | Pianificazione | Protezioni |
 | --- | --- | --- |
-| Auditor storico | `30 0 * * *`, una volta al giorno alle 00:30 | Ammissione 00:30–00:59; stop assoluto 01:50; marcatore giornaliero nel checkpoint pubblicato |
+| Auditor storico | `30 0 * * *`, una volta al giorno alle 00:30 | Ammissione dalle 00:30 fino alle 05:30 escluse; stop assoluto 05:30; marcatore giornaliero nel checkpoint pubblicato |
 | Backup Auditor esterno | cron-job.org: `40,50 0 * * *`, tutti i giorni | Avvio solo se assente, nessun writer attivo e nessun completamento verificato; configurazione del servizio esterno separata dal repository |
 | Night Scan | `0 2 * * *`, dalle 02:00 | Guardiano giornaliero esistente; backup esterno delle 02:20 invariato |
 | Fast Scan | `0 6-23 * * *`, ogni ora dalle 06:00 alle 23:00 | Guardiano e backup esterno esistenti; nessuna elaborazione storica in coda allo scan |
@@ -14,7 +14,7 @@ GitHub Actions può consegnare un evento cron in ritardo. Le 00:30 sono l'orario
 configurato, non una garanzia del provider al minuto. Un evento Auditor fuori
 finestra viene scartato prima di accedere alla coda dei writer o ai dati privati.
 Se un altro writer è già attivo, l'Auditor non si accoda. Un secondo controllo
-all'avvio effettivo e il limite assoluto delle 01:50 proteggono il Night delle 02:00.
+all'avvio effettivo applica la scadenza delle 05:30. Se il Night delle 02:00 arriva durante un audit, il mutex condiviso serializza le scritture.
 Un ciclo interrotto fallisce visibilmente, senza essere registrato come completato.
 
 ## Risveglio esterno dell'Auditor
@@ -22,7 +22,8 @@ Un ciclo interrotto fallisce visibilmente, senza essere registrato come completa
 Il workflow `auditor_backup.yml` è richiamato da cron-job.org alle **00:40 e 00:50
 Europe/Rome**, fine settimana inclusi. Lo scheduler principale resta alle 00:30.
 Il controllo esterno non legge archivi, non usa API-Football e non entra nel mutex
-dei writer. Fuori dalla finestra 00:40–00:59 termina prima di interrogare GitHub.
+dei writer. GitHub richiama inoltre il backup alle 01:10, 02:10, 03:10, 04:10 e 05:10.
+Fuori dalla finestra 00:40–05:29 termina prima di interrogare GitHub.
 
 Se un Auditor o un altro writer è attivo/in coda, il backup non avvia nulla. Se
 l'Auditor di oggi ha il passaggio `Record verified daily Auditor completion`
@@ -32,7 +33,7 @@ pubblicazione completa o la verifica del marcatore nel checkpoint già pubblicat
 Il marcatore giornaliero e il mutex restano la protezione finale contro le corse
 fra scheduler principale e backup. Gli errori attendono almeno 10 minuti prima
 del tentativo successivo e, dopo due fallimenti nella stessa notte, il controllo
-si ferma con errore visibile. Non forza mai un avvio dopo le 01:00.
+si ferma con errore visibile. Dalle 05:30 il backup non avvia altri tentativi. Il controllo dei duplicati richiede anche il rapporto datato della giornata precedente nel checkpoint.
 
 Configurazione del job esterno (da salvare nel pannello cron-job.org):
 

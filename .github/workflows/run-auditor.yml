@@ -27,13 +27,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 src/auditor_schedule.py
+      - name: Report an unadmitted audit
+        if: steps.window.outputs.run == 'false'
+        run: exit 1
 
   auditor:
     needs: admission
     if: needs.admission.outputs.run == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 85
-    # Final checkpoint mutex; the runner also enforces an absolute 01:50 cutoff.
+    timeout-minutes: 360
+    # Final checkpoint mutex; the runner also enforces an absolute 05:30 cutoff.
     concurrency:
       group: arabsniper-quote-data-writer
       cancel-in-progress: false
@@ -55,7 +58,7 @@ jobs:
           python-version: '3.11'
       - name: Install archive and storage dependencies
         run: pip install requests boto3 ijson==3.6.0
-      - name: Run and publish the daily Auditor before 01:50 Rome
+      - name: Run and publish the daily Auditor
         id: nightly
         run: python src/nightly_auditor.py
       - name: Record verified daily Auditor completion

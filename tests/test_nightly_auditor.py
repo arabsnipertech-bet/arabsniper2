@@ -18,20 +18,25 @@ from audit_journal import capture_forecasts, capture_policies, ingest, PREFIX
 from audit_storage import read_store, write_store
 
 
+def daily_report(root, day='2026-10-30'):
+    write_store(Path(root)/f'auditarchive/prematch_{day}_daily.json', {'audit_date': day})
+
+
 class NightlySchedule(unittest.TestCase):
     def test_rome_window_boundaries_and_summer_time(self):
         for value, allowed in [
                 ('2026-10-31T00:29:59+01:00', False),
                 ('2026-10-30T23:30:00Z', True),
                 ('2026-10-31T00:59:59+01:00', True),
-                ('2026-10-31T01:00:00+01:00', False),
-                ('2026-10-31T01:55:00+01:00', False),
+                ('2026-10-31T03:28:00+01:00', True),
+                ('2026-10-31T05:29:59+01:00', True),
+                ('2026-10-31T05:30:00+01:00', False),
                 ('2026-10-31T16:30:00+01:00', False),
                 ('2026-07-30T22:30:00Z', True)]:
             with self.subTest(value=value):
                 result = admission(datetime.fromisoformat(value.replace('Z', '+00:00')))
                 self.assertEqual(result['run'], allowed)
-                self.assertIn('T01:50:00', result['deadline'])
+                self.assertIn('T05:30:00', result['deadline'])
         with self.assertRaises(ValueError):
             admission(datetime(2026, 10, 31, 0, 30))
 
@@ -60,6 +65,8 @@ class NightlySchedule(unittest.TestCase):
             marker = {'schema_version': 1, 'status': 'complete', 'date': '2026-10-31',
                       'started_at': '2026-10-31T00:30:00+01:00', 'completed_at': now.isoformat()}
             write_store(path, marker)
+            self.assertFalse(already_completed(folder, now))
+            daily_report(folder)
             self.assertTrue(already_completed(folder, now))
             self.assertFalse(already_completed(folder, datetime.fromisoformat('2026-11-01T00:45:00+01:00')))
             marker['completed_at'] = '2026-10-31T01:30:00+01:00'
@@ -72,6 +79,7 @@ class NightlySchedule(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {'GOLD_PRIVATE': 'true'}):
             write_store(Path(folder)/MARKER, {'schema_version': 1, 'status': 'complete',
                 'date': '2026-10-31', 'started_at': '2026-10-31T00:30:00+01:00', 'completed_at': now.isoformat()})
+            daily_report(folder)
             self.assertEqual(run(folder, lambda: now, runner), 'already_completed')
         self.assertEqual(len(runner.call_args_list), 1)
         self.assertEqual(runner.call_args.args[1][-1], 'restore')
@@ -80,8 +88,10 @@ class NightlySchedule(unittest.TestCase):
         now = datetime.fromisoformat('2026-10-31T00:35:00+01:00')
         calls = []
         def runner(root, command, deadline, clock):
-            self.assertEqual(deadline.isoformat(), '2026-10-31T01:50:00+01:00')
+            self.assertEqual(deadline.isoformat(), '2026-10-31T05:30:00+01:00')
             calls.append(command[1:])
+            if command[1:3] == ['auditor/current_audit.py', 'daily']:
+                daily_report(root, command[-1])
         with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {'GOLD_PRIVATE': 'true'}):
             self.assertEqual(run(folder, lambda: now, runner), 'complete')
             self.assertTrue(already_completed(folder, now))
@@ -103,9 +113,11 @@ class NightlySchedule(unittest.TestCase):
             calls.append(args)
             if args == ['src/gold_storage.py', 'restore']:
                 for path, raw in remote.items(): write_store(root/path, raw)
+            elif args[:2] == ['auditor/current_audit.py', 'daily']:
+                daily_report(root, args[-1])
             elif args == ['src/gold_storage.py', 'publish']:
                 remote.clear()
-                for path in (PROGRESS, MARKER):
+                for path in (PROGRESS, MARKER, *(p.relative_to(root) for p in root.glob('auditarchive/*_daily.json'))):
                     if (root/path).exists(): remote[path] = read_store(root/path)
             elif args[:2] == ['auditor/current_audit.py', 'history'] and not remote.get(MARKER) and fail[0]:
                 fail[0] = False
@@ -124,16 +136,33 @@ class NightlySchedule(unittest.TestCase):
             self.assertEqual(remote[MARKER]['date'],'2026-11-01')
             self.assertNotIn(PROGRESS, remote)
 
+    def test_late_retry_after_timeout_certifies_only_after_report_and_publication(self):
+        retry = datetime.fromisoformat('2026-11-01T03:28:00+01:00')
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {'GOLD_PRIVATE': 'true'}):
+            runner = Mock(side_effect=TimeoutError)
+            with self.assertRaises(TimeoutError):
+                run(folder, lambda: retry, runner)
+            self.assertFalse(already_completed(folder, retry))
+            with self.assertRaisesRegex(ValueError, 'daily Auditor report'):
+                run(folder, lambda: retry, Mock())
+            self.assertFalse(already_completed(folder, retry))
+            self.assertFalse((Path(folder)/PROGRESS).exists())
+            def phases(root, command, deadline, clock):
+                if command[1:3] == ['auditor/current_audit.py', 'daily']:
+                    daily_report(root, command[-1])
+            self.assertEqual(run(folder, lambda: retry, phases), 'complete')
+            self.assertTrue(already_completed(folder, retry))
+
     def test_deadline_does_not_start_another_phase(self):
-        now = datetime.fromisoformat('2026-10-31T01:50:00+01:00')
+        now = datetime.fromisoformat('2026-10-31T05:30:00+01:00')
         with patch('nightly_auditor.subprocess.Popen') as process:
             with self.assertRaises(TimeoutError):
                 run_command(ROOT, ['unused'], now, lambda: now)
             process.assert_not_called()
 
     def test_deadline_terminates_the_entire_phase(self):
-        now = datetime.fromisoformat('2026-10-31T01:49:59+01:00')
-        end = datetime.fromisoformat('2026-10-31T01:50:00+01:00')
+        now = datetime.fromisoformat('2026-10-31T05:29:59+01:00')
+        end = datetime.fromisoformat('2026-10-31T05:30:00+01:00')
         child = Mock(pid=1234)
         child.wait.side_effect = [subprocess.TimeoutExpired('unused', 1), 0]
         with patch('nightly_auditor.subprocess.Popen', return_value=child), patch('nightly_auditor.os.killpg') as kill:

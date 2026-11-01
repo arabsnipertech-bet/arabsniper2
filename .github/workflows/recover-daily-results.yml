@@ -20,8 +20,29 @@ env:
   R2_BUCKET: arabsniper-gold
   PYTHONUNBUFFERED: '1'
 jobs:
-  prepare:
+  eligibility:
     if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main' && vars.GOLD_PRIVATE == 'true' && (github.event_name != 'workflow_run' || (github.event.workflow_run.head_repository.full_name == github.repository && contains(fromJSON('["failure","timed_out"]'), github.event.workflow_run.conclusion)))
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+    outputs:
+      recover: ${{ steps.check.outputs.recover }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUDIT_ID: ${{ github.event.workflow_run.id }}
+          AUDIT_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+        run: |
+          recover=true
+          if [ "$GITHUB_EVENT_NAME" = workflow_run ]; then
+            recover=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$AUDIT_ID/attempts/$AUDIT_ATTEMPT/jobs" \
+              --jq 'any(.jobs[]; .name == "auditor" and (.conclusion == "failure" or .conclusion == "timed_out"))')
+          fi
+          echo "recover=$recover" >> "$GITHUB_OUTPUT"
+  prepare:
+    needs: eligibility
+    if: needs.eligibility.outputs.recover == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     outputs:

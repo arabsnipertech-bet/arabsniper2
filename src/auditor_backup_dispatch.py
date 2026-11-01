@@ -12,7 +12,7 @@ WORKFLOW = 'run-auditor.yml'
 BACKUP_START = time(0, 40)
 RETRY_DELAY = timedelta(minutes=10)
 MAX_FAILED_ATTEMPTS = 2
-RUN_STEP = 'Run and publish the daily Auditor before 01:50 Rome'
+RUN_STEP = 'Run and publish the daily Auditor'
 VERIFIED_STEP = 'Record verified daily Auditor completion'
 FAILED = {'failure', 'cancelled', 'timed_out', 'startup_failure', 'action_required'}
 
@@ -76,9 +76,11 @@ def wake_auditor(api, now=None, dry_run=False):
             return dict(result, action='auditor_active', run_id=run.get('id'))
         if created < since:
             continue
-        if verified_completion(api.jobs(run), now):
+        jobs = api.jobs(run)
+        if verified_completion(jobs, now):
             return dict(result, action='already_completed', run_id=run.get('id'))
-        if run.get('conclusion') in FAILED:
+        if run.get('conclusion') in FAILED and any(
+                job.get('name') == 'auditor' and job.get('conclusion') in FAILED for job in jobs):
             failures.append(finished)
     if len(failures) >= MAX_FAILED_ATTEMPTS:
         return dict(result, action='retry_limit', failed_attempts=len(failures))

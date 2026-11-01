@@ -1,4 +1,4 @@
-"""Run the entire historical pipeline once, with a hard 01:50 Rome deadline."""
+"""Run the entire historical pipeline once, with a hard 05:30 Rome deadline."""
 from datetime import date, datetime, timedelta
 import json
 import os
@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 from audit_storage import atomic_bytes, read_store
-from auditor_schedule import ROME, MARKER, admission, already_completed
+from auditor_schedule import ROME, MARKER, admission, already_completed, has_daily_report
 
 
 def run_command(root, command, deadline, clock=lambda: datetime.now(ROME)):
@@ -67,6 +67,8 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
 
     phase('src/gold_storage.py', 'restore')
     pending = saved_batch(root, today)
+    if pending is not None and not has_daily_report(root, pending[0]):
+        pending = (pending[0], None)  # Rebuild an incomplete legacy checkpoint.
     if pending is None and already_completed(root, clock()):
         print('Nightly Auditor already published for this Rome date', flush=True)
         return 'already_completed'
@@ -81,6 +83,9 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
         if stage is None:
             phase('auditor/current_audit.py', 'prepare')
             phase('auditor/current_audit.py', 'daily', '--date', report_date)
+        if not has_daily_report(root, work_date):
+            raise ValueError(f'Missing or mismatched daily Auditor report for batch {work_date}')
+        if stage is None:
             checkpoint(work_date, 'daily')
         # Public projections are not in R2. Rebuild on resume if git failed.
         phase('src/homepage_results.py')
@@ -106,9 +111,11 @@ def main():
     result = run(Path(__file__).resolve().parents[1])
     # The external watchdog must distinguish a skipped admission from a real
     # published completion. Emit proof only after the runner verified it.
+    if result not in ('complete', 'already_completed'):
+        raise SystemExit(f'Auditor did not certify: {result}')
     if os.getenv('GITHUB_OUTPUT'):
         with Path(os.environ['GITHUB_OUTPUT']).open('a') as out:
-            out.write('completed=' + str(result in ('complete', 'already_completed')).lower() + '\n')
+            out.write('completed=true\n')
 
 
 if __name__ == '__main__':

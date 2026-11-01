@@ -54,7 +54,7 @@ class AuditorBackupTests(unittest.TestCase):
 
     def test_before_backup_and_after_window_never_touch_network(self):
         for at in ('2026-10-31T00:30:00+01:00', '2026-10-31T00:39:59+01:00',
-                   '2026-10-31T01:00:00+01:00', '2026-10-31T02:00:00+01:00',
+                   '2026-10-31T05:30:00+01:00', '2026-10-31T06:00:00+01:00',
                    '2026-10-31T18:00:00+01:00'):
             api = Mock()
             self.assertEqual(backup.wake_auditor(api, backup.instant(at))['action'],
@@ -63,7 +63,7 @@ class AuditorBackupTests(unittest.TestCase):
 
     def test_rome_summer_winter_and_utc_date_boundary(self):
         for at in ('2026-10-30T23:40:00Z', '2026-10-30T23:59:59Z',
-                   '2026-07-30T22:40:00Z'):
+                   '2026-10-31T03:28:00+01:00', '2026-07-30T22:40:00Z'):
             self.assertEqual(backup.wake_auditor(FakeAPI(), backup.instant(at))['action'], 'dispatched')
         with self.assertRaises(ValueError):
             backup.wake_auditor(FakeAPI(), NOW.replace(tzinfo=None))
@@ -106,12 +106,14 @@ class AuditorBackupTests(unittest.TestCase):
         self.assertEqual(backup.wake_auditor(api, NOW)['action'], 'dispatched')
 
     def test_failed_attempt_cooldown_and_two_failure_limit(self):
-        api = FakeAPI([run(conclusion='failure')], [])
+        failed_jobs = [{'name': 'auditor', 'conclusion': 'failure', 'steps': []}]
+        self.assertEqual(backup.wake_auditor(FakeAPI([run(conclusion='failure')], []), NOW)['action'], 'dispatched')
+        api = FakeAPI([run(conclusion='failure')], failed_jobs)
         self.assertEqual(backup.wake_auditor(api, NOW)['action'], 'retry_cooldown')
         failed = run(NOW - timedelta(minutes=10), 'failure')
-        api = FakeAPI([failed], [])
+        api = FakeAPI([failed], failed_jobs)
         self.assertEqual(backup.wake_auditor(api, NOW)['action'], 'dispatched')
-        api = FakeAPI([failed, run(NOW - timedelta(minutes=15), 'timed_out', id=13)], [])
+        api = FakeAPI([failed, run(NOW - timedelta(minutes=15), 'timed_out', id=13)], failed_jobs)
         self.assertEqual(backup.wake_auditor(api, NOW)['action'], 'retry_limit')
         self.assertEqual(api.dispatched, 0)
 
@@ -160,8 +162,12 @@ class AuditorBackupTests(unittest.TestCase):
             with tempfile.TemporaryDirectory() as folder:
                 output = Path(folder)/'outputs'
                 with patch.dict(os.environ, {'GITHUB_OUTPUT': str(output)}), patch.object(nightly_auditor, 'run', return_value=result):
-                    nightly_auditor.main()
-                self.assertEqual(output.read_text(), 'completed=' + str(result != 'outside_audit_window').lower() + '\n')
+                    if result == 'outside_audit_window':
+                        with self.assertRaises(SystemExit): nightly_auditor.main()
+                        self.assertFalse(output.exists())
+                    else:
+                        nightly_auditor.main()
+                        self.assertEqual(output.read_text(), 'completed=true\n')
 
     def test_failed_publication_never_emits_completion(self):
         with tempfile.TemporaryDirectory() as folder:
