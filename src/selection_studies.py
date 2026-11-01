@@ -93,29 +93,47 @@ def study_contract(row):
     return key if key in MARKETS | {'gg_ht'} else None
 
 
+STAR_MIN_POISSON = 32
+FLOW_MIN_POISSON = 40
+
+
 def rank_study_ideas(ideas):
-    """Rank priced observations by independent confirmations, then EV and probability."""
+    """Order by risk-adjusted Poisson, then confirmations; EV magnitude has no vote."""
     def priority(item):
-        odd, probability = item.get('odd'), item['poisson_pct']
+        item.pop('best_study', None)
+        odd, probability = item.get('odd'), item.get('poisson_pct')
         priced = valid(odd, 1, float('inf')) and odd > 1
-        ev = odd * probability - 100 if priced else None
+        ev = odd * probability - 100 if priced and valid(probability) else None
+        eligible = priced and valid(probability, STAR_MIN_POISSON)
+        credible = valid(probability, FLOW_MIN_POISSON)
         low = item.get('poisson_low_pct')
         agreeing, paired = item.get('agreeing_books'), item.get('paired_books')
+        agreement = type(agreeing) is int and type(paired) is int and 2 <= agreeing <= paired and agreeing * 2 > paired
+        strong_oci = valid(item.get('oci'), 35, 100) and not item.get('historical_oci')
+        falling = valid(item.get('delta_pct'), -100, -2)
+        unanimous = (credible and agreement and agreeing == paired and paired >= 4
+                     and strong_oci and item['oci'] >= 60 and falling
+                     and valid(item.get('fair_delta_pp'), 1.5, 100))
         signals = []
-        if priced and ev > 0:
+        if ev is not None and ev > 0:
             signals.append('positive_ev')
-        if valid(item.get('oci'), 35, 100) and not item.get('historical_oci'):
-            signals.append('strong_oci')
         if priced and valid(low) and low * odd > 100:
             signals.append('robust_poisson')
-        if type(agreeing) is int and type(paired) is int and 2 <= agreeing <= paired and agreeing * 2 > paired:
+        if credible and strong_oci:
+            signals.append('strong_oci')
+        if credible and falling:
+            signals.append('falling_price')
+        if credible and agreement:
             signals.append('agreement')
         item['study_signals'] = signals
         item['poisson_ev_pct'] = ev
-        return (not priced, -len(signals), -(ev if priced else 0), -probability, item['market'], item['type'])
+        score = probability if valid(probability) else -1
+        if priced and odd > 4 and not unanimous:
+            score *= .8
+        return (not eligible, -score, -len(signals), item['market'], item['type'])
 
     ranked = sorted(ideas, key=priority)
-    if ranked and ranked[0]['poisson_ev_pct'] is not None:
+    if ranked and ranked[0]['poisson_ev_pct'] is not None and valid(ranked[0].get('poisson_pct'), STAR_MIN_POISSON):
         ranked[0]['best_study'] = True
     return ranked
 

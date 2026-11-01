@@ -436,8 +436,15 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
   "import sys,json;sys.path[:0]=['src','tests'];from test_selection_studies import perth_fixture; print(json.dumps(perth_fixture()))"],{encoding:'utf8'}));
  const monitor=m.multimarket.matrix.quote_monitoring;
  const html=api.opportunityPanel(m.multimarket.matrix.rows,null,{now:Date.parse(monitor.as_of),kickoff:m.fixture.kickoff,monitoring:monitor});
- for(const label of ['RADAR BLU · MONITORAGGIO','SOLO STUDIO','Spunti di studio','1X2 · valore e flusso','Flusso gol','Forzatura PT','1 + Over 2,5','1X + Over 2,5','Quota equa Poisson','⭐ Miglior spunto di studio','EV Poisson'])assert(html.includes(label),label);
+ for(const label of ['RADAR BLU · MONITORAGGIO','SOLO STUDIO','Spunti di studio','1X2 · valore e flusso','Flusso gol','Forzatura PT','1 + Over 2,5','1X + Over 2,5','Quota equa Poisson','⭐ Miglior spunto di studio','Poisson'])assert(html.includes(label),label);
  assert(!html.includes('data-opportunity-id')&&!html.includes('data-platinum-id'));
  assert(!/Fuori Gold|mercato escluso|sotto soglia/i.test(html));
  assert.equal((html.match(/data-best-study/g)||[]).length,1);
+ // Even an old feed with a stale backend badge cannot star a remote outsider.
+ const outsider={...monitor.studio_ideas[0],label:'Venezia 2',odd:9.50,poisson_pct:31.999,best_study:true};
+ const panel=i=>api.opportunityPanel(m.multimarket.matrix.rows,null,{now:Date.parse(monitor.as_of),kickoff:m.fixture.kickoff,monitoring:{...monitor,studio_ideas:[i]}});
+ assert(panel(outsider).includes('Venezia 2'));
+ assert(!panel(outsider).includes('data-best-study'));
+ assert(panel({...outsider,poisson_pct:32}).includes('data-best-study'));
+
 }

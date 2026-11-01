@@ -278,11 +278,11 @@
    return '<li><b>'+esc(names[i.type])+' · '+esc(i.label)+'</b><br>'+esc('Poisson '+pct(i.poisson_pct)+' · Quota equa Poisson '+num(i.fair_odd,2)+' · '+(Number.isFinite(i.odd)?'Quota osservata '+num(i.odd,2):'Quota bookmaker non disponibile'))+
     (extra.length?'<br>'+esc(extra.join(' · ')):'')+'</li>';
   };
-  const best=ideas.find(i=>i.best_study===true&&Number.isFinite(i.odd)&&i.odd>1);
-  const signals=best?{positive_ev:'EV Poisson '+signed(best.poisson_ev_pct)+'%',strong_oci:'OCI '+signed(best.oci),
+  const best=ideas.find(i=>i.best_study===true&&Number.isFinite(i.poisson_pct)&&i.poisson_pct>=32&&i.poisson_pct<=100&&Number.isFinite(i.odd)&&i.odd>1);
+  const signals=best?{falling_price:'Variazione quota '+signed(best.delta_pct)+'%',positive_ev:'EV Poisson '+signed(best.poisson_ev_pct)+'%',strong_oci:'OCI '+signed(best.oci),
    robust_poisson:'valore positivo anche con Poisson prudente',agreement:best.agreeing_books+'/'+best.paired_books+' operatori concordi'}:{};
   const why=best?(best.study_signals||[]).map(key=>signals[key]).filter(Boolean).join(' · '):'';
-  const badge=best?'<div data-best-study><strong class="mx-badge mx-market-signal">⭐ Miglior spunto di studio · '+esc(best.label)+' a '+num(best.odd,2)+'</strong><small>'+esc(why||'Poisson '+pct(best.poisson_pct)+' · quota equa '+num(best.fair_odd,2))+'</small></div>':'';
+  const badge=best?'<div data-best-study><strong class="mx-badge mx-market-signal">⭐ Miglior spunto di studio · '+esc(best.label)+' a '+num(best.odd,2)+'</strong><small>'+esc('Poisson '+pct(best.poisson_pct)+(why?' · '+why:''))+'</small></div>':'';
   return '<section class="mx-timing" data-study-ideas><b>Spunti di studio</b>'+badge+'<ul>'+ideas.map(details).join('')+'</ul></section>';
  }
  function monitoringPanel(rows,monitor,history,context,options={}){

@@ -169,3 +169,33 @@ class PerthStudyTests(unittest.TestCase):
             self.assertEqual(len(ranked[0]['study_signals']), 4)
         self.assertFalse(rank_study_ideas([unpriced])[0].get('best_study'))
         self.assertEqual(rank_study_ideas([]), [])
+
+    def test_como_venezia_outsider_cannot_take_star_even_with_unanimous_flow(self):
+        from selection_studies import rank_study_ideas
+        outsider = dict(type='studio_1x2_value_flow', market='1x2_2', odd=9.50, poisson_pct=16,
+                        oci=95, delta_pct=-8, fair_delta_pp=4, paired_books=8, agreeing_books=8, best_study=True)
+        favorite = dict(type='studio_1x2_value_flow', market='1x2_1', odd=1.35, poisson_pct=75)
+        over = dict(type='studio_goal_flow_near_miss', market='over25_ft', odd=1.9, poisson_pct=58)
+        for solid in (favorite, over):
+            ranked = rank_study_ideas([outsider, solid])
+            self.assertEqual([i['market'] for i in ranked if i.get('best_study')], [solid['market']])
+            self.assertIn(outsider, ranked)
+        for p in (None, float('nan'), 31.999, 32, 39.99, 40):
+            item = dict(outsider, poisson_pct=p, best_study=True)
+            rank_study_ideas([item])
+            self.assertEqual(bool(item.get('best_study')), p in (32, 39.99, 40))
+            self.assertEqual('strong_oci' in item['study_signals'], p == 40)
+            self.assertEqual('falling_price' in item['study_signals'], p == 40)
+
+    def test_price_penalty_only_waived_for_unanimous_current_flow(self):
+        from selection_studies import rank_study_ideas
+        long = dict(type='goal', market='long', odd=4.01, poisson_pct=55, oci=60,
+                    paired_books=5, agreeing_books=5, delta_pct=-2, fair_delta_pp=1.5)
+        short = dict(type='goal', market='short', odd=2, poisson_pct=50)
+        for change, winner in [({}, 'long'), ({'agreeing_books':4}, 'short'),
+                              ({'historical_oci':True}, 'short'), ({'delta_pct':0}, 'short'),
+                              ({'paired_books':2,'agreeing_books':2}, 'short'),
+                              ({'fair_delta_pp':0}, 'short'), ({'oci':59}, 'short'),
+                              ({'odd':4,'oci':0}, 'long')]:
+            ranked = rank_study_ideas([dict(long, **change), short.copy()])
+            self.assertEqual(ranked[0]['market'], winner, change)
