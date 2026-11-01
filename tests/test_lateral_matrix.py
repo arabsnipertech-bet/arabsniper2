@@ -169,7 +169,7 @@ class MatrixMath(unittest.TestCase):
         self.assertIsNotNone(row['ev_pct'])
         self.assertIsNotNone(row['selected_margin_pct'])
         self.assertIsNone(row['oci'])
-        self.assertFalse(row['opportunity']['eligible'])  # Price below 1.85 remains blocked.
+        self.assertFalse(row['opportunity']['eligible'])
 
     def test_compatible_old_quote_history_is_preserved(self):
         from multimarket_model import collect_quotes, update_ledger

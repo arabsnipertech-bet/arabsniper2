@@ -61,7 +61,7 @@ class GoldV61(unittest.TestCase):
         self.assertIn('ht_oci',evaluate(r)['reasons'])
 
     def test_low_price_upgrade_prefers_35_then_15_without_forcing_bad_pick(self):
-        ft=row(id='low',odd=1.84)
+        ft=row(id='low',odd=1.69)
         over35=row(id='upgrade',spec=S('total','ft','over',3.5),odd=2.1,statistical_pct=40)
         ht=row(id='ht',spec=S('total','ht','over',1.5),odd=2.1,statistical_pct=50,ev_low_pct=50)
         matrix={'rows':[ft,over35,ht]}

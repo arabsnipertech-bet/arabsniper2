@@ -69,7 +69,7 @@ class ProposalStability(unittest.TestCase):
             frozen=deepcopy(a);annotate(a['matrix'],later(minute));self.assertEqual(a,frozen)
 
     def test_tolerance_boundaries_and_hard_stops(self):
-        rejected=[{'odd':1.8499},{'odd':2.6001},{'statistical_pct':47.999},{'oci':-20.01},
+        rejected=[{'odd':1.6999},{'odd':2.6001},{'statistical_pct':47.999},{'oci':-20.01},
                   {'delta_pct':2.001},{'selected_margin_pct':8.001},{'ev_low_pct':1.999},
                   {'quote_status':'stale'},{'quality':'limited'}]
         for changes in rejected:

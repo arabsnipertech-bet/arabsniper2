@@ -252,7 +252,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert(!summaries.some(t=>t.includes('Confronto dei quattro mercati')));
    assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5);
    const proposals=await page.locator('.mx-best[data-opportunity-id]').evaluateAll(nodes=>nodes.map(n=>({odd:+n.dataset.opportunityOdd,max:+n.dataset.opportunityMaxOdd,p:+n.dataset.opportunityProbability,text:n.textContent})));
-   assert(proposals.every(r=>r.odd>=1.85&&r.odd<=r.max&&[2.6,3.5,4.5,5.5,7.5].includes(r.max)&&r.p>=18));
+   assert(proposals.every(r=>r.odd>=1.70&&r.odd<=r.max&&[2.6,3.5,4.5,5.5,7.5].includes(r.max)&&r.p>=18));
    assert(proposals.some(r=>r.text.includes('Convergenza di Trend')));
    assert(!proposals.some(r=>r.text.includes('Contrarian sano')));
    assert.equal(await page.locator('.mx-1x2 .mx-net-red').count(),27);

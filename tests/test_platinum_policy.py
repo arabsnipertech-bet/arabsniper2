@@ -33,6 +33,14 @@ class PlatinumPolicy(unittest.TestCase):
                 self.assertEqual(evaluate(row, NOW)['eligible'], case['eligible'])
                 self.assertEqual(row, before)
 
+    def test_over25_at_new_gold_floor_still_needs_platinum_flow_and_ev(self):
+        row = deepcopy(CASES['base'])
+        row['spec']['line'] = 2.5
+        row.update(odd=1.70, first_odd=1.70/.97, ev_pct=10)
+        self.assertTrue(evaluate(row, NOW)['eligible'])
+        self.assertFalse(evaluate(dict(row, ev_pct=9.99), NOW)['eligible'])
+        self.assertFalse(evaluate(dict(row, oci=29), NOW)['eligible'])
+
     def test_ev_floor_reasons_and_invalid_values(self):
         row = deepcopy(CASES['base'])
         self.assertEqual(evaluate({**row, 'ev_pct': -15}, NOW)['qualification'], 'high_odds')

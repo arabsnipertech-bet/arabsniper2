@@ -51,7 +51,7 @@ async function run(payload,fail=false){
  const currentMarkets=[
   ['total','ht','over',1.5,'over15_ht',2.1,3.5,40],
   ['total','ht','over',2.5,'over25_ht',4.5,7.5,18],
-  ['total','ft','over',2.5,'over25_ft',1.85,2.6,48],
+  ['total','ft','over',2.5,'over25_ft',1.70,2.6,48],
   ['asian_total','ft','over',3.5,'over35_ft',2.1,4.5,35],
   ['btts','ht','yes',undefined,'gg_ht',3.5,5.5,26]
  ];

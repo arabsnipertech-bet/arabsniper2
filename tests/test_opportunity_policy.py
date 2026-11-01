@@ -30,14 +30,14 @@ def row(**changes):
     result.update(changes)
     if 'odd' not in changes:
         from opportunity_policy import goal_market, ODDS_MIN_BY_MARKET
-        result['odd'] = max(result['odd'], ODDS_MIN_BY_MARKET.get(goal_market(result), 1.85))
+        result['odd'] = max(result['odd'], ODDS_MIN_BY_MARKET.get(goal_market(result), 1.70))
     return result
 
 
 class PlayableValue(unittest.TestCase):
     def test_inclusive_probability_and_price_boundaries(self):
-        for p,q in [(48,2.6),(80,1.85)]: self.assertTrue(evaluate(row(statistical_pct=p,odd=q))['eligible'])
-        for p,q,reason in [(47.999,2.6,'probability'),(80,1.8499,'yield_floor'),(60,2.6001,'price')]:
+        for p,q in [(48,2.6),(80,1.70),(80,1.84),(80,1.85)]: self.assertTrue(evaluate(row(statistical_pct=p,odd=q))['eligible'])
+        for p,q,reason in [(47.999,2.6,'probability'),(80,1.69,'yield_floor'),(60,2.6001,'price')]:
             self.assertIn(reason,evaluate(row(statistical_pct=p,odd=q))['reasons'])
         for p,ok in [(39.999,False),(40,True)]:
             self.assertEqual(evaluate(row(spec=S('total','ht','over',1.5),statistical_pct=p))['eligible'],ok)

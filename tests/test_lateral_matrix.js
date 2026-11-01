@@ -36,6 +36,8 @@ const html=api.marketRow({...rows[0],label:'<script>x</script>',statistical_pct:
 assert(html.includes('&lt;script&gt;'));assert(html.includes('Aggio'));assert(html.includes('OCI'));
 const decision={policy_id:api.POLICY,eligible:true,rank:1,priority:0,min_probability_pct:48,min_ev_pct:0,min_ev_low_pct:2,structural_supported:true,market_checks_passed:true,signal:'convergence',label:'Convergenza di Trend',reasons:[]};
 const priced={...rows[0],selected_margin_pct:3,oci:30,delta_pct:-1,odd:2,statistical_pct:60,id:'regular',spec:{kind:'total',period:'ft',side:'over',line:2.5},opportunity:decision};
+assert.equal(api.bestOpportunity([{...priced,odd:1.69}]),null);
+assert.equal(api.bestOpportunity([{...priced,odd:1.70}]).id,'regular');
 const asian={...priced,id:'asian',family:'asian',spec:{kind:'handicap',period:'ft',side:'home',line:.25},quote_adapter_version:2,ev_pct:30,ev_low_pct:12,opportunity:{...decision,rank:2,priority:1,min_probability_pct:35}};
 const fragile={...priced,id:'fragile',ev_pct:100,ev_low_pct:-20};
 const prior={...priced,id:'prior',quality:'prior_only',ev_pct:200,ev_low_pct:200};
@@ -434,6 +436,8 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
   "import sys,json;sys.path[:0]=['src','tests'];from test_selection_studies import perth_fixture; print(json.dumps(perth_fixture()))"],{encoding:'utf8'}));
  const monitor=m.multimarket.matrix.quote_monitoring;
  const html=api.opportunityPanel(m.multimarket.matrix.rows,null,{now:Date.parse(monitor.as_of),kickoff:m.fixture.kickoff,monitoring:monitor});
- for(const label of ['RADAR BLU · MONITORAGGIO','SOLO STUDIO','Spunti di studio','1X2 · valore e flusso','Flusso gol','Forzatura PT','1 + Over 2,5','1X + Over 2,5','Quota equa Poisson','quota 1,69 sotto soglia 1,85'])assert(html.includes(label),label);
+ for(const label of ['RADAR BLU · MONITORAGGIO','SOLO STUDIO','Spunti di studio','1X2 · valore e flusso','Flusso gol','Forzatura PT','1 + Over 2,5','1X + Over 2,5','Quota equa Poisson','⭐ Miglior spunto di studio','EV Poisson'])assert(html.includes(label),label);
  assert(!html.includes('data-opportunity-id')&&!html.includes('data-platinum-id'));
+ assert(!/Fuori Gold|mercato escluso|sotto soglia/i.test(html));
+ assert.equal((html.match(/data-best-study/g)||[]).length,1);
 }

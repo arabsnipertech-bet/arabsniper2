@@ -12,7 +12,7 @@
   const gold61Markets = {
     'total/ht/over/1.5': ['over15_ht', 2.10, 3.50, 40],
     'total/ht/over/2.5': ['over25_ht', 4.50, 7.50, 18],
-    'total/ft/over/2.5': ['over25_ft', 1.85, 2.60, 48],
+    'total/ft/over/2.5': ['over25_ft', 1.70, 2.60, 48],
     'total/ft/over/3.5': ['over35_ft', 2.10, 4.50, 35],
     'btts/ht/yes/': ['gg_ht', 3.50, 5.50, 26]
   };
@@ -26,7 +26,7 @@
     return d.eligible === true && d.goal_market === market && row.quote_executable === true
       && d.structural_supported === true && d.market_checks_passed === true
       && (s.period !== 'ht' || d.ht_history_supported === true)
-      && d.odds_min === minOdd && d.odds_max === maxOdd && row.odd >= minOdd && row.odd <= maxOdd
+      && (d.odds_min === minOdd || (market === 'over25_ft' && d.odds_min === 1.85)) && row.odd >= d.odds_min && d.odds_max === maxOdd && row.odd >= minOdd && row.odd <= maxOdd
       && numeric(d.min_probability_pct) && d.min_probability_pct >= minProbability
       && numeric(row.statistical_pct) && row.statistical_pct >= d.min_probability_pct && row.statistical_pct <= 100;
   }

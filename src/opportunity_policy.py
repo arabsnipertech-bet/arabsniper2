@@ -9,11 +9,11 @@ from statistics import mean, median
 
 POLICY_ID = 'gold-goals-v6.1'
 SUPPORTED_POLICY_IDS = ('gold-goals-v2', 'gold-goals-v3', 'gold-goals-v4', 'gold-goals-v5', 'gold-goals-v6', POLICY_ID)
-ODDS_MIN, ODDS_MAX = 1.85, 7.50
+ODDS_MIN, ODDS_MAX = 1.70, 7.50
 GOALS = {('total', 'ht', 'over', 1.5): 'over15_ht', ('btts', 'ht', 'yes', None): 'gg_ht',
          ('total', 'ht', 'over', 2.5): 'over25_ht',
          ('total', 'ft', 'over', 2.5): 'over25_ft', ('total', 'ft', 'over', 3.5): 'over35_ft'}
-ODDS_MIN_BY_MARKET = {'over15_ht': 2.10, 'over25_ht': 4.50, 'over25_ft': 1.85, 'gg_ht': 3.50, 'over35_ft': 2.10}
+ODDS_MIN_BY_MARKET = {'over15_ht': 2.10, 'over25_ht': 4.50, 'over25_ft': ODDS_MIN, 'gg_ht': 3.50, 'over35_ft': 2.10}
 ODDS_MAX_BY_MARKET = {'over15_ht': 3.50, 'over25_ht': 7.50, 'over25_ft': 2.60, 'gg_ht': 5.50, 'over35_ft': 4.50}
 MIN_EV_LOW_BY_MARKET = {'over15_ht': 2., 'over25_ht': 0., 'over25_ft': 2., 'gg_ht': -1., 'over35_ft': 1.}
 # Prudential admission rules, not fitted/calibrated probabilities. The model's
@@ -245,7 +245,7 @@ def evaluate(row, pt_priority=False, preferred_pt=None):
     if tier is None: reasons.append('market')
     if not numeric(p) or not minimum_p <= p <= 100: reasons.append('probability')
     if not numeric(odd) or not minimum_odd <= odd <= maximum_odd:
-        reasons.append('yield_floor' if market == 'over25_ft' and numeric(odd) and odd < 1.85 else 'price')
+        reasons.append('yield_floor' if market == 'over25_ft' and numeric(odd) and odd < minimum_odd else 'price')
     if row.get('quote_status') not in ('recent', 'cached_stable'): reasons.append('stale')
     if row.get('quality') != 'supported': reasons.append('history')
     if not margin_known: reasons.append('margin_missing')
@@ -314,7 +314,7 @@ def annotate(matrix, as_of=None, assessment=None):
     for row in rows:
         if row.get('spec', {}).get('kind') == 'halves_total': row['combo'] = combo_status(row, rows)
     ft_prices = [r['odd'] for r in goals['over25_ft'] if r.get('quote_status') in ('recent', 'cached_stable') and numeric(r.get('odd'))]
-    upgrade = bool(ft_prices and max(ft_prices) < 1.85)
+    upgrade = bool(ft_prices and max(ft_prices) < ODDS_MIN_BY_MARKET['over25_ft'])
     if upgrade:
         for row in rows:
             if row['opportunity']['eligible'] and goal_market(row) in ('over35_ft', 'over15_ht'):

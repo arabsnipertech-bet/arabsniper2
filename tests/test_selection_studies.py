@@ -60,7 +60,7 @@ def perth_fixture():
         return dict(id=market_id(spec), spec=spec, label=label(spec), statistical_pct=probability,
                     odd=price, oci=40, delta_pct=-3, bookmaker_id='9', quote_status='recent',
                     quote_executable=True, provider_updated_at=at, quote_observed_at=at,
-                    opportunity=dict(eligible=False, reasons=blockers, odds_min=1.85, odds_max=2.6))
+                    opportunity=dict(eligible=False, reasons=blockers, odds_min=1.70, odds_max=2.6))
     rows = [observed(specification('result','ft','1'), 45, 2.4, ['market']),
             observed(specification('total','ft','over',2.5), 100/1.84, 1.69, ['yield_floor']),
             observed(specification('total','ht','over',1.5), 31, 2.5, ['history','edge'])]
@@ -155,3 +155,17 @@ class PerthStudyTests(unittest.TestCase):
             self.assertAlmostEqual(idea['fair_odd'],1/p)
             self.assertEqual(settle_spec(idea['spec'],dict(status='AET',home_ft=2,away_ft=2))[0],
                              int(select(2,2)))
+
+    def test_highest_convergence_wins_independently_of_row_order(self):
+        from selection_studies import rank_study_ideas
+        base = dict(type='goal', market='over25_ft', odd=2., poisson_pct=58, oci=40,
+                    paired_books=5, agreeing_books=4, poisson_low_pct=52)
+        higher_price = dict(base, market='over35_ft', odd=2.5, historical_oci=True,
+                            agreeing_books=1, poisson_low_pct=35)
+        unpriced = dict(base, market='combo', odd=None)
+        for items in ([base,higher_price,unpriced],[unpriced,higher_price,base]):
+            ranked = rank_study_ideas(copy.deepcopy(items))
+            self.assertEqual([i['market'] for i in ranked if i.get('best_study')], ['over25_ft'])
+            self.assertEqual(len(ranked[0]['study_signals']), 4)
+        self.assertFalse(rank_study_ideas([unpriced])[0].get('best_study'))
+        self.assertEqual(rank_study_ideas([]), [])

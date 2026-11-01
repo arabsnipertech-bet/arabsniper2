@@ -93,6 +93,33 @@ def study_contract(row):
     return key if key in MARKETS | {'gg_ht'} else None
 
 
+def rank_study_ideas(ideas):
+    """Rank priced observations by independent confirmations, then EV and probability."""
+    def priority(item):
+        odd, probability = item.get('odd'), item['poisson_pct']
+        priced = valid(odd, 1, float('inf')) and odd > 1
+        ev = odd * probability - 100 if priced else None
+        low = item.get('poisson_low_pct')
+        agreeing, paired = item.get('agreeing_books'), item.get('paired_books')
+        signals = []
+        if priced and ev > 0:
+            signals.append('positive_ev')
+        if valid(item.get('oci'), 35, 100) and not item.get('historical_oci'):
+            signals.append('strong_oci')
+        if priced and valid(low) and low * odd > 100:
+            signals.append('robust_poisson')
+        if type(agreeing) is int and type(paired) is int and 2 <= agreeing <= paired and agreeing * 2 > paired:
+            signals.append('agreement')
+        item['study_signals'] = signals
+        item['poisson_ev_pct'] = ev
+        return (not priced, -len(signals), -(ev if priced else 0), -probability, item['market'], item['type'])
+
+    ranked = sorted(ideas, key=priority)
+    if ranked and ranked[0]['poisson_ev_pct'] is not None:
+        ranked[0]['best_study'] = True
+    return ranked
+
+
 def generate_ideas(assessment, as_of, kickoff):
     from lateral_matrix import ScoreModel, label, market_id, study_result_totals
     from opportunity_policy import study_blockers
@@ -138,7 +165,8 @@ def generate_ideas(assessment, as_of, kickoff):
         item = dict(market=market, spec=row['spec'], label=row['label'], odd=odd,
                     poisson_pct=pct, fair_odd=100/pct, oci=oci, historical_oci=historical and oci is not None,
                     flow_at=(source if historical else row).get('quote_observed_at'),
-                    delta_pct=delta, fair_delta_pp=fair_delta, agreeing_books=row.get('agreeing_books'),
+                    delta_pct=delta, fair_delta_pp=fair_delta, agreeing_books=row.get('agreeing_books') if live else None,
+                    paired_books=row.get('paired_books') if live else None, poisson_low_pct=base.get('low_pct'),
                     bookmaker_id=row.get('bookmaker_id') if odd else None, updated=row.get('provider_updated_at') if odd else None,
                     blocking_reasons=blockers, odds_min=policy.get('odds_min'), odds_max=policy.get('odds_max'))
         if down < 0 or value or flow >= 30:
@@ -166,7 +194,7 @@ def generate_ideas(assessment, as_of, kickoff):
                 add('studio_combo_1x2_over25', dict(market=spec['side']+'_over25_ft', spec=spec, label=label(spec),
                     odd=offer.get('odd'), bookmaker_id=offer.get('bookmaker_id'), updated=offer.get('updated'),
                     poisson_pct=p*100, fair_odd=1/p, oci=None, blocking_reasons=['market']))
-    return list(ideas.values())
+    return rank_study_ideas(ideas.values())
 
 
 def freeze_study(match, at):
