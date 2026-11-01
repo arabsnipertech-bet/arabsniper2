@@ -17,7 +17,7 @@ def git(root, *args):
 def stage_public(root, snapshot):
     root = Path(root)
     tracked = git(root, 'ls-files', '-z').decode().split('\0')
-    private = [path for path in tracked if path and allowed(path)]
+    private = [path for path in tracked if path and allowed(path) and path != CALIBRATION_FILE]
     if private:
         git(root, 'rm', '-f', '--ignore-unmatch', '--', *private)
     for path, raw in snapshot.items():

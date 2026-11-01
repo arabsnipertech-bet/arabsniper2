@@ -137,6 +137,8 @@ def complete_day(ns, client, day, as_of):
 
 
 def build_board(day, as_of):
+    from adaptive_calibration import calibration_status
+    day['calibration_status'] = calibration_status(as_of=as_of)
     enforce_day(day)
     board = {key: {'label': key, 'selected': [], 'eligible': 0, 'remaining_slots': None, 'started_selections': 0} for key in LEGACY}
     categories = Counter()

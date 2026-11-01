@@ -519,3 +519,43 @@ def build_selection_board(day, as_of):
         'as_of': as_of, 'max_per_market': CONFIG['top_per_market'], 'markets': board,
         'ranking': 'statistical_sensitivity_floor', 'book_weight_in_ranking': 0}
     return day['selection_board']
+
+
+def market_anchored_rates(rates, prices, factor=.15):
+    """Fit a market-prior scoring share at fixed total, then shrink towards it.
+
+    This leaves the statistical source untouched and keeps each team's HT/FT
+    fraction. A 1X2 prior alone cannot identify a new total goal expectation.
+    """
+    from lateral_matrix import poisson
+    from multimarket_model import fair
+    if (set(prices) != {'1', 'x', '2'} or
+            not all(numeric(v) and v > 1 for v in prices.values())):
+        return dict(rates), None
+    probabilities, margin = fair(prices)
+    if not 0 <= margin <= 9:
+        return dict(rates), None
+    side = max(('1', '2'), key=lambda k: probabilities[k])
+    fav, other = ('home', 'away') if side == '1' else ('away', 'home')
+    target = probabilities[side]
+    total = rates['home_ft']+rates['away_ft']
+    def win(rate):
+        f, u = poisson(rate), poisson(total-rate)
+        return sum(p*sum(u[:i]) for i,p in enumerate(f))
+    original = win(rates[fav+'_ft'])
+    if not (target >= .58 or prices[side] <= 1.60) or abs(original-target) <= .15:
+        return dict(rates), None
+    lo, hi = .01, total-.01
+    for _ in range(36):
+        mid = (lo+hi)/2
+        if win(mid) < target: lo = mid
+        else: hi = mid
+    alpha = clamp(factor, 0., .35)
+    new_fav = (1-alpha)*rates[fav+'_ft']+alpha*(lo+hi)/2
+    output = dict(rates)
+    for team, value in ((fav, new_fav), (other, total-new_fav)):
+        output[team+'_ft'] = value
+        output[team+'_ht'] = min(value, rates[team+'_ht']*value/rates[team+'_ft'])
+    return output, dict(favorite=side, raw_favorite_probability=original,
+                        fair_favorite_probability=target, factor=alpha,
+                        total_goals_preserved=total)

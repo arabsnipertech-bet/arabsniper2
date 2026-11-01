@@ -8,6 +8,7 @@ GOLD = [f'arab_quote_day{i}.json' for i in range(1,6)]+['arab_quote_prediction_a
 
 def sha(data): return hashlib.sha256(data).hexdigest()
 def allowed(path):
+    if path == 'data/arab_calibration_weights.json': return True
     return path not in PUBLIC and bool(re.fullmatch(r'(data/arab_quote_[a-zA-Z0-9_]+\.json|(auditordata|auditarchive)/prematch_[a-zA-Z0-9_.-]+\.(json|md)|(data|auditordata|auditarchive)/_audit_parts/[a-f0-9]{64}\.json\.gz)',path))
 
 def collect(root, verified=None):
@@ -16,7 +17,7 @@ def collect(root, verified=None):
     def unchanged(key, raw):
         item=verified.get(key, {})
         return item.get('bytes')==len(raw) and item.get('sha256')==sha(raw)
-    for pattern in ('data/arab_quote_*.json','auditordata/prematch_*.json','auditarchive/prematch_*'):
+    for pattern in ('data/arab_calibration_weights.json','data/arab_quote_*.json','auditordata/prematch_*.json','auditarchive/prematch_*'):
         for p in root.glob(pattern):
             key=p.relative_to(root).as_posix()
             if not allowed(key) or not p.is_file() or p.is_symlink(): continue
@@ -109,6 +110,20 @@ def restore(s3,bucket,root):
             if count%25==0 or count==len(tasks):print(f'Restored {count}/{len(tasks)} objects',flush=True)
     for path,item in manifest['files'].items():pending[path]=downloaded[item['sha256']]
     if not pending:raise ValueError('Empty checkpoint')
+    # Weights are also certified in git: retain the newer certified publication
+    # across a crash between the git and private-checkpoint writes.
+    weights = 'data/arab_calibration_weights.json'
+    local = root/weights
+    if local.is_file():
+        from adaptive_calibration import VERSION
+        from multimarket_model import stamp
+        current = json.loads(local.read_bytes())
+        remote = json.loads(pending.get(weights, b'{}'))
+        at, before = stamp(current.get('trained_at')), stamp(remote.get('trained_at'))
+        if current.get('version') == VERSION and at and (not before or at > before):
+            pending[weights] = local.read_bytes()
+        elif weights not in pending:
+            pending[weights] = local.read_bytes()  # migration from pre-calibration checkpoints
     # Validate/download all objects first. No fallback to stale public data.
     for path in collect(root):
         if path not in pending: (root/path).unlink()

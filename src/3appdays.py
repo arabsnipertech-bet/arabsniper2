@@ -192,6 +192,10 @@ def weighted_mean(values: Sequence[float], weights: Sequence[float]) -> float:
 
 
 def atomic_write_json(path: Path, payload: Any) -> None:
+    if path.name == 'arab_quote_dashboard.json' or path.name.startswith('arab_quote_day'):
+        from adaptive_calibration import calibration_status
+        from datetime import datetime, timezone
+        payload['calibration_status'] = calibration_status(as_of=datetime.now(timezone.utc).isoformat())
     if path.name.startswith("arab_quote_"):
         from audit_storage import write_store
         write_store(path, payload)

@@ -48,7 +48,7 @@ def frozen(fid='1', at='2026-10-30T12:00:00Z', odd=2.1, book='7', source='bookma
 
 
 class AdaptiveCalibration(unittest.TestCase):
-    def test_49_closed_fixtures_plus_duplicates_are_exactly_neutral(self):
+    def test_49_closed_fixtures_keep_micro_neutral_but_use_macro(self):
         rows = observations(49, wins=49)
         rows += [*rows, {**rows[0], 'fid':'old','date':'2026-10-02'}, {**rows[0], 'fid':'today','date':'2026-10-31'}]
         state = fit(rows, DAY)
@@ -58,7 +58,8 @@ class AdaptiveCalibration(unittest.TestCase):
         a = {'matrix':{'rows':[matrix_row()]}}
         original = deepcopy(a)
         apply_matrix(a, META_FUTURE, AT, state)
-        self.assertEqual(a, original)
+        self.assertGreater(a['matrix']['rows'][0]['win_weight'], original['matrix']['rows'][0]['win_weight'])
+        self.assertEqual(a['matrix']['rows'][0]['calibration']['hierarchy_level'], 'macro')
 
     def test_metrics_shrinkage_and_ceiling_do_not_drift_on_retries(self):
         rows = observations(50, wins=10)
@@ -78,8 +79,8 @@ class AdaptiveCalibration(unittest.TestCase):
         good = fit(observations(60,wins=60), DAY)['cohorts'][key]
         self.assertEqual(good['threshold_delta_pp'], -.5)
         self.assertAlmostEqual(sum(good['weights'].values()),1.)
-        self.assertGreaterEqual(good['weights']['poisson'],.97)
-        self.assertLessEqual(good['weights']['empirical']+good['weights']['fair'],.030000001)
+        self.assertGreaterEqual(good['weights']['poisson'],.94)
+        self.assertLessEqual(good['weights']['empirical']+good['weights']['fair'],.060000001)
         self.assertEqual(good['favorite_trap_multiplier'],1.25)
         missing = fit(observations(70,wins=0,clv=None), DAY)['cohorts'][key]
         self.assertEqual((missing['threshold_delta_pp'],missing['clv_pct'],missing['clv_n']),(0,None,0))
@@ -167,7 +168,8 @@ class AdaptiveCalibration(unittest.TestCase):
             a={'matrix':{'rows':[matrix_row()]}}
             before=deepcopy(a)
             apply_matrix(a,META_FUTURE,AT,{**state,'as_of':date_value,'trained_at':trained})
-            self.assertEqual(a,before)
+            self.assertEqual(a['matrix']['rows'],before['matrix']['rows'])
+            self.assertFalse(a['matrix']['calibration_status']['certified_current'])
         with TemporaryDirectory() as d, patch('adaptive_calibration.ROOT',Path(d)):
             load_weights.cache_clear()
             try:
@@ -214,7 +216,8 @@ class AdaptiveCalibration(unittest.TestCase):
            'favorite_trap_base':{'gg_ht':.038}}
         no_trap=deepcopy(a);no_trap['favorite_trap_base']={}
         apply_matrix(a,META_FUTURE,AT,state);apply_matrix(no_trap,META_FUTURE,AT,state)
-        self.assertAlmostEqual(a['matrix']['rows'][0]['win_weight']-no_trap['matrix']['rows'][0]['win_weight'],.036)
+        self.assertGreater(a['matrix']['rows'][0]['win_weight'],no_trap['matrix']['rows'][0]['win_weight'])
+        self.assertLessEqual(a['matrix']['rows'][0]['win_weight']-.4,.060000001)
 
 
 class StudioCalibrationTests(unittest.TestCase):

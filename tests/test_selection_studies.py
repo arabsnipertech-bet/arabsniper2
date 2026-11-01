@@ -123,10 +123,11 @@ class PerthStudyTests(unittest.TestCase):
             del matrix[official]
         ht=matrix['rows'][2]
         ht['study_flow']=dict(oci=35,quote_observed_at=at,provider_updated_at=at)
-        ht.update(oci=None,statistical_pct=65,calibration_base=dict(statistical_pct=31))
+        ht.update(oci=None,statistical_pct=31,calibration_base=dict(statistical_pct=29), pure_poisson=dict(statistical_pct=29))
         forcing=next(i for i in ideas() if i['type']=='studio_ht_flow_forcing')
         self.assertTrue(forcing['historical_oci'])
         self.assertEqual(forcing['poisson_pct'],31)
+        self.assertEqual(forcing['raw_poisson_pct'],29)
         for row in matrix['rows']:
             row.update(oci=0,odd=1.1, delta_pct=0, fair_delta_pp=0)
         self.assertEqual(ideas(),[])

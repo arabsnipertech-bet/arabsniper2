@@ -164,9 +164,8 @@ def generate_ideas(assessment, as_of, kickoff, suppressed=None):
     from quote_cache import within_window
     from quote_sources import fresh
     matrix = assessment.get('matrix') or {}
-    if any((matrix.get(policy) or {}).get('best_market_id')
-           for policy in ('opportunity_policy', 'platinum_policy')):
-        return []
+    official_selection = any((matrix.get(policy) or {}).get('best_market_id')
+                             for policy in ('opportunity_policy', 'platinum_policy'))
     suppressed = suppressed if suppressed is not None else []
     positive, all_items = {}, {}
     ideas = {}
@@ -211,7 +210,7 @@ def generate_ideas(assessment, as_of, kickoff, suppressed=None):
         blockers = study_blockers(row)
         if not market or not blockers:
             continue
-        base = row.get('calibration_base') or row
+        base = row
         pct = base.get('statistical_pct')
         if not valid(pct) or pct <= 0:
             continue
@@ -240,6 +239,8 @@ def generate_ideas(assessment, as_of, kickoff, suppressed=None):
                     blocking_reasons=blockers, odds_min=policy.get('odds_min'), odds_max=policy.get('odds_max'))
         if down < 0 or value or flow >= 30:
             positive.setdefault(market, item)
+        item['raw_poisson_pct'] = (row.get('pure_poisson') or row.get('calibration_base') or base).get('statistical_pct')
+        item['calibrated_pct'] = row.get('statistical_pct')
         item['market_fair_pct'] = fairs.get(row['spec'].get('side')) if market.startswith('1x2_') else row.get('market_fair_pct')
         item['real_flow'] = down < 0 and (down <= -2 or valid(fair_delta, 1.5))
         all_items[market] = item
@@ -311,7 +312,7 @@ def generate_ideas(assessment, as_of, kickoff, suppressed=None):
             if has_alternative or item is not fallback or not valid(item.get('blended_pct'), 48.000000001):
                 reject(item['type'], item, ['unpriced_combo'])
                 del ideas[key]
-    return rank_study_ideas(ideas.values())
+    return [] if official_selection else rank_study_ideas(ideas.values())
 
 
 def freeze_study(match, at):
@@ -372,7 +373,8 @@ class StudyEvidence:
             key = (fid, idea['type'], idea['market'], bool(idea.get('suppressed')))
             payout = settle_spec(idea['spec'], result)
             row = dict(idea, fid=fid, date=start.astimezone(ZoneInfo('Europe/Rome')).date().isoformat(),
-                       at=at.isoformat(), p=idea['poisson_pct']/100, y=None if payout is None else int(payout[0]))
+                       at=at.isoformat(), p=idea.get('raw_poisson_pct', idea['poisson_pct'])/100,
+                       calibrated=idea.get('calibrated_pct', idea['poisson_pct'])/100, y=None if payout is None else int(payout[0]))
             if key not in self.first or at < stamp(self.first[key]['at']):
                 self.first[key] = row
 

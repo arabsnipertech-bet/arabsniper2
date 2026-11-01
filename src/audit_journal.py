@@ -45,7 +45,7 @@ def capture_policies(root, observed_at=None):
     if path.exists():
         raise ValueError('Refusing to overwrite frozen policy evidence')
     from selection_studies import freeze_study
-    studies = {}
+    studies, publications = {}, {}
     gold, platinum, seen = {'fixtures': {}}, {'fixtures': {}}, set()
     for day in sorted((root/'data').glob('arab_quote_day[1-5].json')):
         for match in read_store(day, {}).get('matches', []):
@@ -57,10 +57,17 @@ def capture_policies(root, observed_at=None):
             study = freeze_study(match, now)
             if study:
                 studies[f'{fid}::{now}'] = study
+            meta, assessment = match.get('fixture') or {}, match.get('multimarket') or {}
+            at, kickoff = stamp(now), stamp(meta.get('kickoff'))
+            if (at and kickoff and at < kickoff and meta.get('status_short') in ('NS','TBD')
+                    and not meta.get('result') and assessment.get('model_id')):
+                key = f"{assessment['model_id']}::{fid}::publication::{now}"
+                publications[key] = deepcopy(dict(fixture=meta, captured_at=now,
+                    model_version=assessment['model_id'], multimarket=assessment, publication_snapshot=True))
             gold_capture(gold, match, now)
             platinum_capture(platinum, match, now)
     write_store(path, {'schema_version': 1, 'journal_type': 'policies',
-                      'observed_at': now, 'gold': gold, 'platinum': platinum, 'study_observations': studies})
+                      'observed_at': now, 'gold': gold, 'platinum': platinum, 'study_observations': studies, 'analysis_updates': publications})
     print(f'Frozen current policy evidence: Gold {len(gold["fixtures"])}; '
           f'Platinum {len(platinum["fixtures"])}; no historical reports', flush=True)
     return path
@@ -131,6 +138,8 @@ def ingest(root, after_forecasts=None):
                     ledger.metadata['updated_at'] = journal.metadata['updated_at']
             for path in policies:
                 journal = read_store(path)
+                for key, record in journal.get('analysis_updates', {}).items():
+                    merge_forecast(ledger, 'analysis_updates', key, record)
                 for key, record in journal.get('study_observations', {}).items():
                     ledger.put('study_observations', key, record, overwrite=False)
             ledger.write(target)

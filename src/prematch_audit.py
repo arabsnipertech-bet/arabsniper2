@@ -1,4 +1,5 @@
 """Evaluate frozen pre-match probabilities; missing scores never count as losses."""
+from calibration_benchmark import build_benchmark
 from collections import defaultdict
 from math import sqrt
 from filter_audit import build_filter_comparison
@@ -91,7 +92,7 @@ def build_report(store):
         profile = (record.get('first_half_assessment') or {}).get('profile_id', 'unknown')
         quality_versions[(record.get('model_version', 'unknown'), profile)][key] = record
     from selection_studies import study_audit
-    return {'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'signal_research': signal_report(store), 'quote_groups': quote_report(store), 'filter_comparison': build_filter_comparison(store),
+    return {'four_level_benchmark': build_benchmark(store), 'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'signal_research': signal_report(store), 'quote_groups': quote_report(store), 'filter_comparison': build_filter_comparison(store),
         'first_half_quality_by_version': [{'model_version': version, 'profile_id': profile,
             'comparison': build_filter_comparison({'fixtures': records})['over15_ht_probability_comparison']}
             for (version, profile), records in sorted(quality_versions.items())]}

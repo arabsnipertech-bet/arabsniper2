@@ -100,7 +100,10 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
         if work_date == today:
             marker = {'schema_version': 1, 'status': 'complete', 'date': gate['date'],
                       'started_at': started.isoformat(), 'completed_at': clock().isoformat(),
-                      'run_id': os.getenv('GITHUB_RUN_ID')}
+                      'run_id': os.getenv('GITHUB_RUN_ID'),
+                      'validation_cycle': 'validation_freeze_v5.1_2026-11-01',
+                      'calibration_status': __import__('adaptive_calibration').calibration_status(
+                          read_store(root/'data/arab_calibration_weights.json', {}), clock().isoformat())}
             atomic_bytes(root / MARKER, json.dumps(marker, separators=(',', ':')).encode()+b'\n')
         phase('src/gold_storage.py', 'publish')
         print(f'Nightly Auditor batch completed and published: {work_date}', flush=True)

@@ -30,14 +30,15 @@ def blend(row, entry, bonus):
     weights = entry.get('weights') or {}
     empirical = (row.get('empirical') or {}).get('win_stake_pct')
     fair = row.get('market_fair_pct')
-    left, p = .03, base
+    cap = .06 if entry.get('correction_cap') == .06 else .03
+    left, p = cap, base
     for name, pct in [('empirical', empirical), ('fair', fair)]:
         weight = weights.get(name)
         if number(pct) and 0 <= pct <= 100 and number(weight):
             w = bound(weight, 0., left)
             p += w*(pct/100-base)
             left -= w
-    return bound(p+bonus, .01, .99)
+    return bound(bound(p+bonus, base-cap, base+cap), .01, .99)
 
 
 def set_probability(row, p):
@@ -71,11 +72,12 @@ def reprice(row):
 def apply_matrix(assessment, meta, as_of, state=None):
     matrix = assessment.get('matrix') or {}
     state = load_weights() if state is None else state
-    if not state.get('cohorts') and not matrix.get('calibration'):
-        return
     when, start = stamp(as_of), stamp(meta.get('kickoff'))
     if not when or not start or when >= start or meta.get('result'):
         return
+    anchor_matrix(assessment, meta, as_of, state)
+    from adaptive_calibration import calibration_status
+    matrix['calibration_status'] = calibration_status(state, as_of)
     current = current_state(state, as_of)
     reference = matrix.get('calibration_reference')
     rows = [*matrix.get('rows', []), *([reference] if reference else [])]
@@ -103,7 +105,7 @@ def apply_matrix(assessment, meta, as_of, state=None):
         if data and row.get('quote_status') in ('recent', 'cached_stable'):
             params[id(row)] = data
             row['calibration'] = {'version': VERSION, 'cohort': key, 'as_of': state['as_of'], 'n': data['n'],
-                                  'threshold_delta_pp': data['threshold_delta_pp']}
+                                  'threshold_delta_pp': data['threshold_delta_pp'], 'hierarchy_level': data.get('hierarchy_level')}
             dirty.append(row)
     values, active = {}, set()
     pattern = assessment.get('favorite_trap_pattern') or {}
@@ -217,3 +219,69 @@ def freeze_pattern(ns, output, assessment, as_of):
     pattern = ns['analyze_favorite_market_pattern']({**output, 'book': {'markets': {'1x2_ft': book}}})
     assessment['favorite_trap_pattern'] = {**pattern, 'captured_at': as_of, 'bookmaker_id': ref['bookmaker_id']}
     assessment['favorite_trap_base'] = ns['_apply_favorite_trap_adjustment']({}, pattern)
+
+
+def anchor_matrix(assessment, meta, as_of, state):
+    """Rebuild joint probabilities before pricing, always from frozen raw rates."""
+    from copy import deepcopy
+    from statistics_first import market_anchored_rates
+    from lateral_matrix import matrix_rows
+    from adaptive_calibration import calibration_status
+    from adaptive_calibration import ROME_ZONE
+    from datetime import date
+    if stamp(as_of).astimezone(ROME_ZONE).date() < date(2026,11,1):
+        return
+    matrix = assessment.get('matrix') or {}
+    rates = assessment.get('pure_poisson_rates') or assessment.get('rates')
+    if not rates or not all(number(rates.get(s+'_'+p)) and rates[s+'_'+p] > 0
+                            for s in ('home','away') for p in ('ht','ft')):
+        return
+    assessment.setdefault('pure_poisson_rates', deepcopy(rates))
+    assessment.setdefault('pure_poisson_sensitivity_rates', deepcopy(assessment.get('sensitivity_rates', [])))
+    prices = None
+    for row in matrix.get('rows', []):
+        if market_of(row.get('spec', {})) != '1x2_ft' or row.get('quote_status') != 'recent':
+            continue
+        from quote_sources import fresh
+        if fresh(row.get('provider_updated_at'), as_of, meta.get('kickoff')):
+            candidate = row.get('selected_market_odds') or {}
+            if set(candidate) == {'1','x','2'}:
+                prices = candidate
+                break
+    factor = calibration_status(state, as_of)['mismatch_shrinkage_factor']
+    adjusted, details = market_anchored_rates(rates, prices or {}, factor)
+    if not details and not matrix.get('lambda_shrinkage'):
+        return
+    signature = (tuple(sorted(rates.items())), tuple(sorted((prices or {}).items())), factor)
+    if matrix.get('_anchor_signature') == list(map(str, signature)):
+        return
+    matrix['_anchor_signature'] = list(map(str, signature))
+    assessment['rates'] = adjusted
+    assessment['sensitivity_rates'] = [market_anchored_rates(r, prices or {}, factor)[0]
+                                      for r in assessment['pure_poisson_sensitivity_rates']]
+    specs = {r['id']: r['spec'] for r in matrix.get('rows', [])}
+    raw = dict(assessment, rates=rates, sensitivity_rates=assessment['pure_poisson_sensitivity_rates'])
+    originals = {r['id']: r for r in matrix_rows(raw, specs)}
+    estimates = {r['id']: r for r in matrix_rows(assessment, specs)}
+    for row in matrix.get('rows', []):
+        if row['id'] not in estimates: continue
+        row['pure_poisson'] = {k: originals[row['id']][k] for k in BASE_FIELDS if k in originals[row['id']]}
+        row.pop('calibration_base', None)
+        row.pop('calibration', None)
+        row.update({k: estimates[row['id']][k] for k in BASE_FIELDS if k in estimates[row['id']]})
+        reprice(row)
+    matrix['lambda_shrinkage'] = details
+    reference = matrix.get('calibration_reference')
+    if reference:
+        from math import expm1
+        def fields(source):
+            chance = lambda r: -expm1(-r['home_ht']-r['away_ht'])
+            p = chance(source['rates'])
+            scenarios = [p, *(chance(r) for r in source.get('sensitivity_rates', []))]
+            return dict(win_weight=p, loss_weight=1-p, statistical_pct=100*p, fair_odd=1/p,
+                        low_pct=100*min(scenarios), high_pct=100*max(scenarios),
+                        sensitivity_weights=[[q,1-q] for q in scenarios])
+        reference['pure_poisson'] = fields(raw)
+        reference.pop('calibration_base', None)
+        reference.pop('calibration', None)
+        reference.update(fields(assessment))

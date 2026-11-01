@@ -15,6 +15,8 @@ WEIGHTS = 'data/arab_calibration_weights.json'
 ROOT = Path(__file__).resolve().parents[1]
 ROME_ZONE = ZoneInfo('Europe/Rome')
 MIN_N, WINDOW, HALF_LIFE, PRIOR = 50, 28, 14, 50
+MIN_N_MACRO = 25
+VALIDATION_CYCLE = 'validation_freeze_v5.1_2026-11-01'
 LINES = {('ft', 2.5): 'over25_ft', ('ft', 3.5): 'over35_ft',
          ('ht', 1.5): 'over15_ht', ('ht', .5): 'over05_ht'}
 TRAPS = ('strong_favorite_trap', 'possible_favorite_trap', 'multi_signal_goal_pressure',
@@ -35,8 +37,8 @@ def market_of(spec):
         return '1x2_ft'
     if kind in ('total', 'asian_total') and side == 'over':
         return LINES.get((period, spec.get('line')))
-    if kind == 'btts' and period == 'ht' and side == 'yes':
-        return 'gg_ht'
+    if kind == 'btts' and period in ('ht','ft') and side == 'yes':
+        return 'gg_'+period
     if kind == 'halves_total' and period == 'ft' and side == 'over' and spec.get('line') == spec.get('extra') == .5:
         return 'combo_ht_sh'
     return None
@@ -52,26 +54,30 @@ def cohort(market, odd, tier):
 def neutral():
     return {'schema_version': 1, 'version': VERSION, 'as_of': None, 'window_days': WINDOW,
             'half_life_days': HALF_LIFE, 'minimum_fixtures': MIN_N, 'prior_strength': PRIOR, 'cohorts': {},
+            'validation_cycle': VALIDATION_CYCLE, 'macro_cohorts': {},
+            'sub_threshold_progress': {}, 'mismatch_shrinkage_factor': .15,
             'studio_cohorts': {}, 'blocker_diagnostics': {}, 'contrarian_poisson_trap': {}}
 
 
-@lru_cache(maxsize=1)
-def load_weights():
-    try:
-        state = json.loads((ROOT / WEIGHTS).read_bytes())
-        if isinstance(state, dict) and state.get('version') == VERSION and isinstance(state.get('cohorts'), dict):
-            # Keep the daytime lookup empty during cold start even when the
-            # overnight report already contains many sub-threshold cohorts.
-            state['cohorts'] = {k:v for k,v in state['cohorts'].items() if usable_entry(state, k)}
-            return state
-    except (OSError, ValueError):
-        pass
+@lru_cache(maxsize=2)
+def _read_weights(path, mtime_ns, size):
+    state = json.loads(Path(path).read_bytes())
+    if isinstance(state, dict) and state.get('version') == VERSION and isinstance(state.get('cohorts'), dict):
+        return state
     return neutral()
 
 
+def load_weights():
+    """Invalidate on atomic replacement, not only at process restart."""
+    path = ROOT / WEIGHTS
+    try:
+        stat = path.stat()
+        return _read_weights(str(path), stat.st_mtime_ns, stat.st_size)
+    except (OSError, ValueError):
+        return neutral()
+
+
 def current_state(state, as_of):
-    if not state.get('cohorts'):
-        return False
     try:
         day = stamp(as_of).astimezone(ROME_ZONE).date()
         trained_at = stamp(state.get('trained_at'))
@@ -84,11 +90,30 @@ def usable_entry(state, key, as_of=None):
     if as_of and not current_state(state, as_of):
         return {}
     data = state.get('cohorts', {}).get(key)
-    if not isinstance(data, dict) or type(data.get('n')) is not int or data['n'] < MIN_N:
+    level, minimum = 'micro', MIN_N
+    if not isinstance(data, dict) or not number(data.get('n')) or data['n'] < MIN_N:
+        data = state.get('macro_cohorts', {}).get('|'.join(key.split('|')[:2])) if key else None
+        level, minimum = 'macro', MIN_N_MACRO
+    if (not isinstance(data, dict) or type(data.get('n')) is not int or data['n'] < minimum
+            or not isinstance(data.get('weights'), dict) or not number(data.get('threshold_delta_pp'))):
         return {}
-    if not isinstance(data.get('weights'), dict) or not number(data.get('threshold_delta_pp')):
-        return {}
-    return data
+    return dict(data, hierarchy_level=level)
+
+
+# Compatibility with callers that explicitly invalidate the former process cache.
+load_weights.cache_clear = _read_weights.cache_clear
+
+
+def calibration_status(state=None, as_of=None):
+    state = load_weights() if state is None else state
+    valid = current_state(state, as_of) if as_of else bool(state.get('as_of'))
+    active = sum(bool(usable_entry(state, k)) for k in state.get('cohorts', {})) if valid else 0
+    factor = state.get('mismatch_shrinkage_factor', .15)
+    factor = bound(factor, 0., .35) if valid and number(factor) else .15
+    return dict(version=VERSION, as_of=state.get('as_of'), validation_cycle=VALIDATION_CYCLE,
+                active_cohorts=active, warming_up_cohorts=len(state.get('sub_threshold_progress', {})),
+                mismatch_shrinkage_factor=factor,
+                certified_current=valid)
 
 
 def closing_prices(offers, token, as_of, kickoff):
@@ -178,7 +203,7 @@ class Evidence:
                 continue
             empirical = (row.get('empirical') or {}).get('win_stake_pct')
             fair = row.get('market_fair_pct')
-            baseline = (row.get('calibration_base') or {}).get('win_weight', p/100)
+            baseline = (row.get('pure_poisson') or row.get('calibration_base') or {}).get('win_weight', p/100)
             pattern = (forecast.get('favorite_trap_pattern') or {}).get('classification')
             self.first[contract] = (rank, {'fid': str(fid), 'market': market, 'side': spec['side'],
                 'cohort': key, 'date': start.astimezone(ROME_ZONE).date().isoformat(), 'at': at.isoformat(),
@@ -211,7 +236,7 @@ def weighted(pairs):
     return avg, stderr
 
 
-def fit(samples, as_of, previous=None):
+def fit(samples, as_of, previous=None, _minimum=MIN_N, _macro=False):
     result = neutral()
     result['as_of'] = as_of.isoformat()
     from selection_studies import study_summary
@@ -229,6 +254,10 @@ def fit(samples, as_of, previous=None):
             old = grouped[key[0]].get(key[1])
             if old is None or rank < old[0]:
                 grouped[key[0]][key[1]] = (rank, 2**(-age/HALF_LIFE), row)
+    unique_studies = {}
+    for row in sorted(studies, key=lambda r: r['at']):
+        unique_studies.setdefault((row['fid'], row['type'], row['market'], bool(row.get('suppressed'))), row)
+    studies = list(unique_studies.values())
     diagnostics = study_summary(studies, MIN_N)
     result['studio_cohorts'] = diagnostics['by_type']
     result['blocker_diagnostics'] = diagnostics['by_blocking_reason']
@@ -246,20 +275,26 @@ def fit(samples, as_of, previous=None):
         matched_roi, roi_se = avg(profit, paired)
         clv, clv_se = avg(lambda r: r['clv'], paired)
         empirical = fair = offset = 0.
+        budget = .03
         trap_scale = 1.
         pattern_obs = [(w, r) for w, r in obs if r.get('pattern') in TRAPS]
         signature = sha256(json.dumps([(r['fid'], r['y'], r['odd'], r['clv']) for _, r in paired],
                                       separators=(',', ':')).encode()).hexdigest()
-        if n >= MIN_N:
+        if n >= _minimum:
             # Positive improvement in squared error relative to the frozen Poisson
-            # prior earns a share of a single three-point budget.
+            # prior earns a share of the evidence-limited common budget.
             gains = []
+            supported_gain = False
             for field in ('empirical', 'fair'):
                 pairs = [(w, r) for w, r in obs if number(r.get(field)) and 0 <= r[field] <= 1]
-                gain, _ = avg(lambda r: (r['base']-r['y'])**2-(r[field]-r['y'])**2, pairs)
+                gain, gain_se = avg(lambda r: (r['base']-r['y'])**2-(r[field]-r['y'])**2, pairs)
+                supported_gain |= len(pairs) >= _minimum and gain is not None and gain > max(0., gain_se or 0.)
                 mass = sum(w for w, _ in pairs)
-                gains.append(max(0., gain or 0.)*mass/(mass+PRIOR) if len(pairs) >= MIN_N else 0.)
-            scale = min(1., .03/sum(gains)) if sum(gains) else 0.
+                gains.append(max(0., gain or 0.)*mass/(mass+PRIOR) if len(pairs) >= _minimum else 0.)
+            confirmed = (supported_gain and ((len(paired) >= _minimum and clv is not None and clv > max(.001, clv_se or 0))
+                         or roi > max(.005, avg(profit)[1] or 0.)))
+            budget = .06 if confirmed else .03
+            scale = min(1., budget/sum(gains)) if sum(gains) else 0.
             empirical, fair = (v*scale for v in gains)
             if len(paired) >= MIN_N:
                 old = (previous or {}).get('cohorts', {}).get(key, {})
@@ -283,12 +318,42 @@ def fit(samples, as_of, previous=None):
                                  'multiplier': bound(1+2*error*mass/(mass+PRIOR), .5, 1.25)
                                  if len(trials) >= MIN_N else 1.}
         result['cohorts'][key] = {'n': n, 'clv_n': len(paired), 'pattern_n': len(pattern_obs),
-            'by_market_pattern': by_pattern,
+            'by_market_pattern': by_pattern, 'correction_cap': budget,
             'pattern_hit_rate': avg(lambda r: r['y'], pattern_obs)[0],
             'brier': brier, 'log_loss': loss, 'roi_pct': 100*roi, 'clv_pct': 100*clv if clv is not None else None,
             'paired_roi_pct': 100*matched_roi if matched_roi is not None else None,
             'weights': {'poisson': 1-empirical-fair, 'empirical': empirical, 'fair': fair},
             'threshold_delta_pp': offset, 'favorite_trap_multiplier': trap_scale, 'evidence_sha256': signature}
+    if not _macro:
+        macro_samples = []
+        for key, fixtures in grouped.items():
+            for _, _, row in fixtures.values():
+                macro_samples.append(dict(row, cohort='|'.join(key.split('|')[:2])+'|macro'))
+        macro = fit(macro_samples, as_of, _minimum=MIN_N_MACRO, _macro=True)
+        result['macro_cohorts'] = {'|'.join(k.split('|')[:2]): dict(v, threshold_delta_pp=0.)
+                                   for k, v in macro['cohorts'].items()}
+        result['sub_threshold_progress'] = {k: dict(v) for k, v in result['cohorts'].items() if v['n'] < MIN_N}
+        # One first frozen divergent contract per fixture; no retry/day-age ratchet.
+        traps = {}
+        for row in sorted(studies, key=lambda r: (r['at'], r['market'], r['type'])):
+            if row.get('suppressed') and 'model_market_divergence' in row.get('suppression_reasons', []):
+                traps.setdefault(row['fid'], row)
+        evidence = sorted((fid, v['y'], v.get('odd'), v['p'], v.get('market_fair_pct')) for fid,v in traps.items())
+        signature = sha256(json.dumps(evidence, separators=(',', ':')).encode()).hexdigest()
+        old = previous or {}
+        factor = old.get('mismatch_shrinkage_factor', .15)
+        factor = bound(factor, 0., .35) if number(factor) else .15
+        priced = [v for v in traps.values() if number(v.get('odd')) and v['odd'] > 1]
+        fair_rows = [v for v in traps.values() if number(v.get('market_fair_pct'))]
+        roi = sum(v['odd']*v['y']-1 for v in priced)/len(priced) if priced else None
+        gain = sum((v['p']-v['y'])**2-(v['market_fair_pct']/100-v['y'])**2 for v in fair_rows)/len(fair_rows) if fair_rows else None
+        seen = set(old.get('mismatch_seen_fixtures', []))
+        if (len(traps) >= MIN_N_MACRO and set(traps)-seen and signature != old.get('mismatch_evidence_sha256')
+                and (roi is not None and roi < 0 or gain is not None and gain > 0)):
+            factor = min(.35, factor+.02*len(traps)/(len(traps)+PRIOR))
+        result.update(mismatch_shrinkage_factor=factor, mismatch_evidence_sha256=signature,
+                      mismatch_seen_fixtures=sorted(seen | set(traps)),
+                      mismatch_evidence=dict(n=len(traps), roi=roi, brier_gain_fair=gain))
     return result
 
 

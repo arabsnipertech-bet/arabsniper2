@@ -1,4 +1,5 @@
 """Read-only, reproducible ledger of frozen proposals and their outcomes."""
+from calibration_benchmark import build_benchmark
 from collections import defaultdict
 from hashlib import sha256
 import json
@@ -128,7 +129,7 @@ def build_daily(store, date, generated_at, source_revision=None, observe=None):
     for record in store.get('study_observations', {}).values():
         if observe is not None:
             observe(record)
-    return {'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'audit_date': date, 'generated_at': generated_at,
+    return {'four_level_benchmark': build_benchmark(store), 'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'audit_date': date, 'generated_at': generated_at,
             'source_revision': source_revision,
             'note': 'Experimental. First/latest are separate cohorts, never additive. Paper ROI is not executed profit. No forecast is recalculated.',
             'excluded_records': rejected, 'fixtures': fixtures, 'markets': rows,
@@ -164,4 +165,7 @@ def markdown(report):
         lines.append('| ' + ' | '.join(str(v).replace('|', '/') if v is not None else '—' for v in values) + ' |')
     lines += ['', 'See the adjacent JSON for every frozen source key, SHA-256, quote, probability, missing field and result.',
               'A missing result is pending, never a loss. A missing quote is excluded from paper ROI.', '']
+    from calibration_benchmark import markdown as benchmark_markdown
+    if report.get('four_level_benchmark'):
+        lines.append(benchmark_markdown(report['four_level_benchmark']))
     return '\n'.join(lines)

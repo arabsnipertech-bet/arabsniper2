@@ -87,3 +87,19 @@ Resta il mutex finale fra writer per evitare perdite di aggiornamenti concorrent
 - Sintassi YAML verificata; filtri Gold, Platinum, Combo e Radar invariati.
 - Il tempo del primo Fast e il primo Auditor delle 00:30 devono essere misurati
   in produzione; i test non dimostrano da soli la puntualità del servizio cron.
+
+## Consolidamento V5.1 e freeze di validazione
+
+Ciclo `validation_freeze_v5.1_2026-11-01`, osservazione 7–14 giorni a formule e
+soglie ferme. Nella finestra **00:30–05:30 Europe/Rome**, dopo gli esiti e prima
+del marcatore, l'Auditor aggiorna `arab_calibration_weights.json`, compreso il
+progresso sotto soglia, e lo pubblica in Git e nel checkpoint privato. Fast e
+Night ricaricano la versione più recente e dichiarano `calibration_status`.
+
+Il fallback gerarchico usa 50 fixture per micro-coorte e 25 per macro-coorte,
+con prior 50. Le trappole modello/mercato possono aumentare lo shrinkage dei
+lambda, entro 0,35, senza riapplicarlo cumulativamente durante i refresh.
+I rapporti giornalieri e cumulativi includono `four_level_benchmark`: fair,
+Poisson grezzo, V5.1 calibrato e categorie operative separate, con quote,
+Brier/log-loss, ROI, CLV e perdite/vincite delle trappole soppresse.
+La specifica completa e i limiti sono in [adaptive-calibration.md](adaptive-calibration.md).

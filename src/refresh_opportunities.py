@@ -174,6 +174,8 @@ def main(directory='data'):
     # an excluded competition or an old recommendation into the dashboard.
     dashboard['days'] = sorted(refreshed.values(), key=lambda d: d['date'])
     dashboard['updated_at'] = as_of
+    from adaptive_calibration import calibration_status
+    dashboard['calibration_status'] = calibration_status(as_of=as_of)
     dashboard['opportunity_refresh'] = {'policy_id': POLICY_ID, 'at': as_of, 'api_calls': 0, 'days': counters}
     dashboard.setdefault('method', {}).setdefault('user_policy', {}).update(
         competition_policy=SCOPE_ID, universal_observation=False, romania_allowed=True,
