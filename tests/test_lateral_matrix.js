@@ -467,3 +467,16 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
   assert(html.includes('Over 1,5 PT')||html.includes('Over 3,5 FT')||html.includes('GG FT'));
  }
 }
+
+// Even a stale real_flow=true flag cannot label a flat/rising quote as flow.
+{
+ const idea={type:'studio_1x2_value_flow',market:'1x2_1',label:'1 FT',odd:2.4,
+  poisson_pct:45,market_fair_pct:42,fair_delta_pp:3,real_flow:true};
+ const options={now:Date.parse('2026-11-01T07:00:00Z'),kickoff:'2026-11-01T09:00:00Z'};
+ for(const delta of [0,6.1,-.5]){
+  const html=api.opportunityPanel([],null,{...options,monitoring:{studio_ideas:[{...idea,delta_pct:delta}]}});
+  assert.equal(html.includes('valore e flusso'),delta<0);
+ }
+ const html=api.opportunityPanel([],null,{...options,monitoring:{studio_ideas:[{...idea,market_fair_pct:null}]}});
+ assert(!html.includes('Quota 2,40'));
+}

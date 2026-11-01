@@ -270,7 +270,7 @@
   ideas=ideas.filter(i=>!i.suppressed&&(!i.market?.startsWith('1x2_')||
    Number.isFinite(i.odd)&&i.odd>1&&i.odd<=4.5&&Number.isFinite(i.poisson_pct)&&
    i.poisson_pct>=(i.market==='1x2_x'||i.odd>3.6?35:32)&&
-   (!Number.isFinite(i.market_fair_pct)||(i.market_fair_pct>=18&&(i.poisson_pct-i.market_fair_pct<=18||Number.isFinite(i.delta_pct)&&i.delta_pct<=-3)))&&
+   (Number.isFinite(i.market_fair_pct)&&i.market_fair_pct>=18&&(i.poisson_pct-i.market_fair_pct<=18||Number.isFinite(i.delta_pct)&&i.delta_pct<=-3))&&
    (!(i.market==='1x2_x'||i.odd>4)||Number.isFinite(i.delta_pct)&&i.delta_pct<=-2.5)));
   const alternatives=ideas.some(i=>i.type!=='studio_combo_1x2_over25'||Number.isFinite(i.odd)&&i.odd>1);
   ideas=ideas.filter(i=>i.type!=='studio_combo_1x2_over25'||Number.isFinite(i.odd)&&i.odd>1||
@@ -286,7 +286,7 @@
   }
   const rows=Array.from(secondary.values(),i=>{
    const note=i.type==='studio_ht_flow_forcing'?'pressione book, statistica debole':
-    i.type==='studio_combo_1x2_over25'?'combo correlata':i.type==='studio_1x2_value_flow'?(i.real_flow===true?'valore e flusso':'valore statistico'):
+    i.type==='studio_combo_1x2_over25'?'combo correlata':i.type==='studio_1x2_value_flow'?(i.real_flow===true&&Number.isFinite(i.delta_pct)&&i.delta_pct<0&&(i.delta_pct<=-2||i.fair_delta_pp>=1.5)?'valore e flusso':'valore statistico'):
     i.study_note==='goal_context'?'scenario gol':
     i.historical_oci?'flusso osservato in precedenza':'flusso gol';
    const quote=Number.isFinite(i.odd)&&i.odd>1?'Quota '+num(i.odd,2):'Quota non disponibile';
@@ -437,7 +437,7 @@
      (options.now??Date.now())<Date.parse(options.kickoff)){
    return '<aside class="mx-best mx-best-market"><span class="mx-section-title">RADAR BLU · MONITORAGGIO</span><span class="mx-badge mx-market-signal">SOLO STUDIO</span>'+studyIdeaPanel(ideas)+history+'</aside>';
   }
-  const signals=!best?marketSignals(rows,options):[],watch=signals[0];
+  const signals=!best&&!Array.isArray(ideas)?marketSignals(rows,options):[],watch=signals[0];
   if(watch)return '<aside class="mx-best mx-best-market" data-market-signal-id="'+esc(watch.id)+'"><span class="mx-section-title">RADAR DI MERCATO</span><h4>'+esc(watch.label)+'</h4><span class="mx-badge mx-market-signal">STUDIO / ALTA ATTENZIONE</span><p>'+MARKET_SIGNAL_TEXT+'</p><div class="mx-best-price">'+num(watch.odd,2)+'<small>'+(watch.quote_status==='cached_stable'?'Quota stabile da cache':'QUOTA OSSERVATA')+' · '+esc(watch.bookmaker)+'</small></div><dl>'+[
    ['Persistenza del movimento',pct(100*watch.selected_movement.persistence)],
    ['OCI / variazione quota',signed(watch.oci)+' / '+signed(watch.delta_pct)+'%'],

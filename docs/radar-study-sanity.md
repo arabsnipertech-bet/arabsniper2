@@ -43,3 +43,9 @@ Regression scenarios use user-reported Santander/Real and Elfsborg/Orgryte price
 and probabilities with controlled rates and results. They are not historical feed
 replays. Tests cover both directions, thresholds, missing prices, rebound flow,
 full nightly archive/calibration traversal and compact browser rendering.
+
+Follow-up integrity checks: a flat/rising own price never receives the flow label,
+even when fair probability rises or an older feed claims `real_flow=true`. Missing
+fair probabilities fail result admission; fallback normalization requires a complete
+single-book 1X2, rather than unrelated best prices. Eligible goal-context studies
+precede the cheap main goal line in the star ranking, retaining the 32% star floor.

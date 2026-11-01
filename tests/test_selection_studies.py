@@ -58,7 +58,7 @@ def perth_fixture():
     at, kickoff = '2026-11-01T07:08:59Z', '2026-11-01T08:00:00Z'
     def observed(spec, probability, price, blockers):
         return dict(id=market_id(spec), spec=spec, label=label(spec), statistical_pct=probability,
-                    odd=price, oci=40, delta_pct=-3, bookmaker_id='9', quote_status='recent',
+                    odd=price, market_fair_pct=42, oci=40, delta_pct=-3, bookmaker_id='9', quote_status='recent',
                     quote_executable=True, provider_updated_at=at, quote_observed_at=at,
                     opportunity=dict(eligible=False, reasons=blockers, odds_min=1.70, odds_max=2.6))
     rows = [observed(specification('result','ft','1'), 45, 2.4, ['market']),
@@ -333,3 +333,33 @@ class DistortionTests(unittest.TestCase):
         a['profiles']['home']['for_ft']={'shots_mean':5}
         ideas=generate_ideas(a,matrix['quote_monitoring']['as_of'],m['fixture']['kickoff'])
         self.assertNotIn('over15_ht',{i['market'] for i in ideas})
+
+    def test_fair_delta_cannot_label_flat_or_rising_price_as_flow(self):
+        from selection_studies import generate_ideas
+        m=perth_fixture();a=m['multimarket'];matrix=a['matrix'];at=matrix['quote_monitoring']['as_of']
+        result=matrix['rows'][0]
+        for delta,expected in [(0,False),(6.1,False),(-.5,True),(-2,True)]:
+            result.update(delta_pct=delta,fair_delta_pp=2,oci=95)
+            ideas=generate_ideas(a,at,m['fixture']['kickoff'])
+            one=next(i for i in ideas if i['market']=='1x2_1')
+            self.assertEqual(one['real_flow'],expected)
+
+    def test_missing_market_fair_and_mixed_books_cannot_pass_sanity(self):
+        from selection_studies import generate_ideas,result_gate
+        for p in (None,float('nan'),40):
+            self.assertIn('market_fair_missing',result_gate(dict(market='1x2_1',odd=2.5,poisson_pct=p,delta_pct=-3)))
+        m=distortion_fixture('santander');a=m['multimarket'];matrix=a['matrix'];at=matrix['quote_monitoring']['as_of']
+        for index,r in enumerate(matrix['rows'][:3]):
+            r.update(bookmaker_id=str(index),market_fair_pct=None)
+        hidden=[]
+        ideas=generate_ideas(a,at,m['fixture']['kickoff'],hidden)
+        self.assertTrue(any('market_fair_missing' in i['suppression_reasons'] for i in hidden))
+        self.assertFalse(any(i['market'].startswith('1x2_') for i in ideas))
+
+    def test_goal_channel_precedes_cheap_over_without_breaking_star_floor(self):
+        m=distortion_fixture('elfsborg')
+        ideas=m['multimarket']['matrix']['quote_monitoring']['studio_ideas']
+        best=next(i for i in ideas if i.get('best_study'))
+        self.assertIn(best['market'],('gg_ft','gg_ht','over15_ht','over35_ft','combo_ht_sh'))
+        self.assertEqual(best.get('study_note'),'goal_context')
+        self.assertGreaterEqual(best['poisson_pct'],32)

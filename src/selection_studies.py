@@ -132,7 +132,7 @@ def rank_study_ideas(ideas):
         score = probability if valid(probability) else -1
         if priced and odd > 4 and not unanimous:
             score *= .8
-        return (not eligible, -score, -len(signals), item['market'], item['type'])
+        return (not eligible, item.get('study_note') != 'goal_context', -score, -len(signals), item['market'], item['type'])
 
     ranked = sorted(ideas, key=priority)
     if ranked and ranked[0]['poisson_ev_pct'] is not None and valid(ranked[0].get('poisson_pct'), STAR_MIN_POISSON):
@@ -149,7 +149,9 @@ def result_gate(item):
         reasons.append('probability_floor')
     if not valid(odd, 1.000000001, 4.5):
         reasons.append('outsider_price_cap')
-    if valid(fair) and (fair < 18 or p - fair > 18 and not valid(item.get('delta_pct'), -100, -3)):
+    if not valid(fair, .000000001):
+        reasons.append('market_fair_missing')
+    elif fair < 18 or valid(p) and p - fair > 18 and not valid(item.get('delta_pct'), -100, -3):
         reasons.append('model_market_divergence')
     if (item['market'] == '1x2_x' or valid(odd, 4.000000001, float('inf'))) and not valid(item.get('delta_pct'), -100, -2.5):
         reasons.append('oci_rebound')
@@ -176,10 +178,13 @@ def generate_ideas(assessment, as_of, kickoff, suppressed=None):
                 and row.get('quote_executable') is not False and within_window(row, as_of, kickoff)
                 and valid(row.get('odd'), 1.000000001, float('inf'))):
             results[row['spec']['side']] = row
-    total = sum(1/r['odd'] for r in results.values()) if set(results) == {'1','x','2'} else None
+    books = {str(r.get('bookmaker_id')) for r in results.values()}
+    total = (sum(1/r['odd'] for r in results.values())
+             if set(results) == {'1','x','2'} and len(books) == 1 and 'None' not in books else None)
     fairs = {side: (r['market_fair_pct'] if valid(r.get('market_fair_pct'), .000000001) else
                     100/r['odd']/total if total else None) for side, r in results.items()}
-    if total:
+    complete_fair = set(fairs) == {'1','x','2'} and all(valid(p, .000000001) for p in fairs.values())
+    if complete_fair:
         fair_total = sum(fairs.values())
         fairs = {side: p*100/fair_total for side,p in fairs.items()}
     favorites = [side for side in ('1','2') if side in results and
@@ -198,7 +203,7 @@ def generate_ideas(assessment, as_of, kickoff, suppressed=None):
     def add(kind, item):
         key = (kind, item['market'])
         old = ideas.get(key)
-        if old is None or (item['odd'] or 0) > (old['odd'] or 0):
+        if old is None or item.get('study_note') == 'goal_context' or (item['odd'] or 0) > (old['odd'] or 0):
             ideas[key] = dict(item, type=kind)
     for row in matrix.get('rows', []):
         market = study_contract(row)
@@ -236,7 +241,7 @@ def generate_ideas(assessment, as_of, kickoff, suppressed=None):
         if down < 0 or value or flow >= 30:
             positive.setdefault(market, item)
         item['market_fair_pct'] = fairs.get(row['spec'].get('side')) if market.startswith('1x2_') else row.get('market_fair_pct')
-        item['real_flow'] = down <= -2 or valid(fair_delta, 1.5)
+        item['real_flow'] = down < 0 and (down <= -2 or valid(fair_delta, 1.5))
         all_items[market] = item
         if market.startswith('1x2_'):
             if value and (down <= -2 or (fair_delta or 0) >= 1.5 or flow > 0):
@@ -285,7 +290,7 @@ def generate_ideas(assessment, as_of, kickoff, suppressed=None):
                     poisson_pct=p*100, fair_odd=1/p, oci=None, blocking_reasons=['market'])
                 # Reweight result cells, retaining P(over|result). Never multiply unrelated marginals.
                 blended = None
-                if total:
+                if complete_fair:
                     model_mass = {s: sum(q for h,a,q in model.grids['ft'] if ('1' if h>a else '2' if a>h else 'x') == s) for s in ('1','x','2')}
                     blended = sum(q * (.5 + .5 * fairs[s]/100/model_mass[s])
                                   for h,a,q in model.grids['ft']
