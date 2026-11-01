@@ -267,23 +267,22 @@
    ((Number.isFinite(r.oci)&&Math.abs(r.oci)>=25&&Math.abs(r.oci)<40)||(Number.isFinite(r.fair_delta_pp)&&Math.abs(r.fair_delta_pp)>=1.2));
  }
  function studyIdeaPanel(ideas){
-  const names={studio_1x2_value_flow:'1X2 · valore e flusso',studio_goal_flow_near_miss:'Flusso gol',studio_ht_flow_forcing:'Forzatura PT',studio_combo_1x2_over25:'Combo correlata'};
-  const details=i=>{
-   const flow=Number.isFinite(i.oci)?(i.historical_oci?'Ultimo OCI osservato':'OCI')+' '+signed(i.oci):'';
-   const extra=[flow,Number.isFinite(i.delta_pct)?'Variazione quota '+signed(i.delta_pct)+'%':'',
-    Number.isFinite(i.fair_delta_pp)?'Variazione fair '+signed(i.fair_delta_pp)+' pp':'',
-    Number.isInteger(i.agreeing_books)?i.agreeing_books+' operatori concordi':'',
-    i.type==='studio_ht_flow_forcing'?'Pressione dei bookmaker in contrasto con Poisson sotto il 32%':'',
-    Number.isFinite(i.odd)&&i.odd<i.fair_odd?'Quota sotto la quota equa Poisson':''].filter(Boolean);
-   return '<li><b>'+esc(names[i.type])+' · '+esc(i.label)+'</b><br>'+esc('Poisson '+pct(i.poisson_pct)+' · Quota equa Poisson '+num(i.fair_odd,2)+' · '+(Number.isFinite(i.odd)?'Quota osservata '+num(i.odd,2):'Quota bookmaker non disponibile'))+
-    (extra.length?'<br>'+esc(extra.join(' · ')):'')+'</li>';
-  };
   const best=ideas.find(i=>i.best_study===true&&Number.isFinite(i.poisson_pct)&&i.poisson_pct>=32&&i.poisson_pct<=100&&Number.isFinite(i.odd)&&i.odd>1);
-  const signals=best?{falling_price:'Variazione quota '+signed(best.delta_pct)+'%',positive_ev:'EV Poisson '+signed(best.poisson_ev_pct)+'%',strong_oci:'OCI '+signed(best.oci),
-   robust_poisson:'valore positivo anche con Poisson prudente',agreement:best.agreeing_books+'/'+best.paired_books+' operatori concordi'}:{};
-  const why=best?(best.study_signals||[]).map(key=>signals[key]).filter(Boolean).join(' · '):'';
-  const badge=best?'<div data-best-study><strong class="mx-badge mx-market-signal">⭐ Miglior spunto di studio · '+esc(best.label)+' a '+num(best.odd,2)+'</strong><small>'+esc('Poisson '+pct(best.poisson_pct)+(why?' · '+why:''))+'</small></div>':'';
-  return '<section class="mx-timing" data-study-ideas><b>Spunti di studio</b>'+badge+'<ul>'+ideas.map(details).join('')+'</ul></section>';
+  const badge=best?'<strong class="mx-badge mx-market-signal" data-best-study>⭐ Miglior Spunto: '+esc(best.label)+' a '+num(best.odd,2)+'</strong>':'';
+  const secondary=new Map();
+  for(const idea of ideas){
+   const key=idea.market||idea.label;
+   if(best&&key===(best.market||best.label))continue;
+   if(!secondary.has(key)||idea.type==='studio_ht_flow_forcing')secondary.set(key,idea);
+  }
+  const rows=Array.from(secondary.values(),i=>{
+   const note=i.type==='studio_ht_flow_forcing'?'pressione book, statistica debole':
+    i.type==='studio_combo_1x2_over25'?'combo correlata':i.type==='studio_1x2_value_flow'?'valore e flusso':
+    i.historical_oci?'flusso osservato in precedenza':'flusso gol';
+   const quote=Number.isFinite(i.odd)&&i.odd>1?'Quota '+num(i.odd,2):'Quota non disponibile';
+   return '<li>'+esc(i.label)+' · '+quote+' ('+note+')</li>';
+  });
+  return '<section class="mx-timing" data-study-ideas>'+badge+(rows.length?'<ul>'+rows.join('')+'</ul>':'')+'</section>';
  }
  function monitoringPanel(rows,monitor,history,context,options={}){
   const key=r=>isCombo(r)?'combo_ht_sh':goalMarket(r);

@@ -270,7 +270,15 @@ class StudioCalibrationTests(unittest.TestCase):
             for path in ('auditarchive/prematch_2026-11-01_daily.json','auditarchive/prematch_last_report.json',
                          'data/arab_quote_prematch_report.json'):
                 report=read_store(root/path)['studio_ideas_audit']
+                archived = {(r['type'], r['market']): r for r in report['selections']}
+                self.assertEqual(len(archived), len(record['studio_ideas']))
+                for idea in record['studio_ideas']:
+                    saved = archived[idea['type'], idea['market']]
+                    for field in ('poisson_pct', 'odd', 'oci', 'delta_pct', 'blocking_reasons'):
+                        self.assertEqual(saved.get(field), idea.get(field))
                 self.assertEqual(report['by_type']['studio_combo_1x2_over25']['wins'],2)
             state=nightly_state(root,now.date())
+            self.assertEqual(set(state['studio_cohorts']), {idea['type'] for idea in record['studio_ideas']})
+            self.assertFalse(state['cohorts'])
             self.assertAlmostEqual(state['blocker_diagnostics']['yield_floor']['roi'],.69)
             self.assertFalse(state['studio_cohorts']['studio_goal_flow_near_miss']['promotion_candidate'])
