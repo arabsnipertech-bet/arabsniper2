@@ -267,6 +267,15 @@
    ((Number.isFinite(r.oci)&&Math.abs(r.oci)>=25&&Math.abs(r.oci)<40)||(Number.isFinite(r.fair_delta_pp)&&Math.abs(r.fair_delta_pp)>=1.2));
  }
  function studyIdeaPanel(ideas){
+  ideas=ideas.filter(i=>!i.suppressed&&(!i.market?.startsWith('1x2_')||
+   Number.isFinite(i.odd)&&i.odd>1&&i.odd<=4.5&&Number.isFinite(i.poisson_pct)&&
+   i.poisson_pct>=(i.market==='1x2_x'||i.odd>3.6?35:32)&&
+   (!Number.isFinite(i.market_fair_pct)||(i.market_fair_pct>=18&&(i.poisson_pct-i.market_fair_pct<=18||Number.isFinite(i.delta_pct)&&i.delta_pct<=-3)))&&
+   (!(i.market==='1x2_x'||i.odd>4)||Number.isFinite(i.delta_pct)&&i.delta_pct<=-2.5)));
+  const alternatives=ideas.some(i=>i.type!=='studio_combo_1x2_over25'||Number.isFinite(i.odd)&&i.odd>1);
+  ideas=ideas.filter(i=>i.type!=='studio_combo_1x2_over25'||Number.isFinite(i.odd)&&i.odd>1||
+   !alternatives&&Number.isFinite(i.blended_pct)&&i.blended_pct>48);
+
   const best=ideas.find(i=>i.best_study===true&&Number.isFinite(i.poisson_pct)&&i.poisson_pct>=32&&i.poisson_pct<=100&&Number.isFinite(i.odd)&&i.odd>1);
   const badge=best?'<strong class="mx-badge mx-market-signal" data-best-study>⭐ Miglior Spunto: '+esc(best.label)+' a '+num(best.odd,2)+'</strong>':'';
   const secondary=new Map();
@@ -277,7 +286,8 @@
   }
   const rows=Array.from(secondary.values(),i=>{
    const note=i.type==='studio_ht_flow_forcing'?'pressione book, statistica debole':
-    i.type==='studio_combo_1x2_over25'?'combo correlata':i.type==='studio_1x2_value_flow'?'valore e flusso':
+    i.type==='studio_combo_1x2_over25'?'combo correlata':i.type==='studio_1x2_value_flow'?(i.real_flow===true?'valore e flusso':'valore statistico'):
+    i.study_note==='goal_context'?'scenario gol':
     i.historical_oci?'flusso osservato in precedenza':'flusso gol';
    const quote=Number.isFinite(i.odd)&&i.odd>1?'Quota '+num(i.odd,2):'Quota non disponibile';
    return '<li>'+esc(i.label)+' · '+quote+' ('+note+')</li>';

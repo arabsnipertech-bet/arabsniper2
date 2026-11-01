@@ -440,16 +440,30 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  assert.equal(JSON.stringify(monitor),frozen);
  for(const label of ['RADAR BLU · MONITORAGGIO','SOLO STUDIO','⭐ Miglior Spunto: Over 2,5 FT a 1,69',
   '<li>1 FT · Quota 2,40 (valore e flusso)</li>','<li>Over 1,5 PT · Quota 2,50 (pressione book, statistica debole)</li>',
-  '<li>1X + Over 2,5 FT · Quota non disponibile (combo correlata)</li>'])assert(html.includes(label),label);
+  '<li>1X + Over 2,5 FT · Quota 3,20 (combo correlata)</li>'])assert(html.includes(label),label);
  assert.equal((html.match(/<li>/g)||[]).length,4);
  assert(!html.includes('<li>Over 2,5 FT'));
  assert(!/data-opportunity-id|data-platinum-id|Fuori Gold|mercato escluso|Poisson|OCI|EV [%P]|%|<br>/i.test(html));
  assert.equal((html.match(/data-best-study/g)||[]).length,1);
  // Even an old feed with a stale backend badge cannot star a remote outsider.
- const outsider={...monitor.studio_ideas[0],label:'Venezia 2',odd:9.50,poisson_pct:31.999,best_study:true};
+ const outsider={...monitor.studio_ideas[0],label:'Venezia 2',market:'1x2_2',odd:9.50,poisson_pct:31.999,best_study:true};
  const panel=i=>api.opportunityPanel(m.multimarket.matrix.rows,null,{now:Date.parse(monitor.as_of),kickoff:m.fixture.kickoff,monitoring:{...monitor,studio_ideas:[i]}});
- assert(panel(outsider).includes('Venezia 2'));
+ assert(!panel(outsider).includes('Venezia 2'));
  assert(!panel(outsider).includes('data-best-study'));
- assert(panel({...outsider,poisson_pct:32}).includes('data-best-study'));
+ assert(!panel({...outsider,poisson_pct:32}).includes('data-best-study'));
+ assert(panel({...outsider,market:'1x2_1',odd:2,poisson_pct:40}).includes('data-best-study'));
 
+}
+
+{
+ const {execFileSync}=require('node:child_process');
+ for(const name of ['santander','elfsborg']){
+  const m=JSON.parse(execFileSync('python',['-c',"import sys,json;sys.path[:0]=['src','tests'];from test_selection_studies import distortion_fixture;print(json.dumps(distortion_fixture('"+name+"')))"],{encoding:'utf8'}));
+  const monitor=m.multimarket.matrix.quote_monitoring, frozen=JSON.stringify(monitor);
+  const html=api.opportunityPanel(m.multimarket.matrix.rows,null,{now:Date.parse(monitor.as_of),kickoff:m.fixture.kickoff,monitoring:monitor});
+  assert.equal(JSON.stringify(monitor),frozen);
+  assert(!html.includes('Quota non disponibile (combo correlata)'));
+  assert(!html.includes('a 7,50')&&!html.includes('a 12,00')&&!html.includes('a 5,20'));
+  assert(html.includes('Over 1,5 PT')||html.includes('Over 3,5 FT')||html.includes('GG FT'));
+ }
 }

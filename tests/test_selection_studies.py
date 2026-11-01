@@ -68,6 +68,10 @@ def perth_fixture():
                           kickoff=kickoff, status_short='NS'),
              multimarket=dict(rates=dict(home_ft=1.6,away_ft=1.2,home_ht=.6,away_ht=.5),
                               matrix=dict(rows=rows)))
+    # Direct controlled bookmaker offers, never products of marginal odds.
+    m['multimarket']['matrix']['study_combo_quotes'] = {
+        market_id(specification(kind,'ft',side,2.5,'over')): dict(odd=3.2, bookmaker_id='9', updated=at)
+        for kind,side in [('result_total','1'),('dc_total','1x'),('result_total','2'),('dc_total','x2')]}
     m['multimarket']['matrix']['quote_monitoring'] = dict(as_of=at, studio_ideas=generate_ideas(m['multimarket'], at, kickoff))
     return m
 
@@ -102,7 +106,7 @@ class PerthStudyTests(unittest.TestCase):
             study = report['studio_ideas_audit']
             combos = {r['market']:r for r in study['selections'] if r['type']=='studio_combo_1x2_over25'}
             self.assertEqual(tuple(combos[k]['y'] for k in ('1_over25_ft','1x_over25_ft')), expected)
-            self.assertIsNone(study['by_type']['studio_combo_1x2_over25']['roi'])
+            self.assertAlmostEqual(study['by_type']['studio_combo_1x2_over25']['roi'], 3.2*sum(expected)/2-1)
             self.assertEqual(study['by_type']['studio_ht_flow_forcing']['pending'],1)
             self.assertNotIn('history',study['by_blocking_reason'])
             self.assertAlmostEqual(study['by_blocking_reason']['yield_floor']['roi'], .69 if home+away>2 else -1.)
@@ -199,3 +203,133 @@ class PerthStudyTests(unittest.TestCase):
                               ({'odd':4,'oci':0}, 'long')]:
             ranked = rank_study_ideas([dict(long, **change), short.copy()])
             self.assertEqual(ranked[0]['market'], winner, change)
+
+
+def distortion_fixture(name):
+    """User-reported prices/probabilities; controlled supporting rates, not a historical replay."""
+    from lateral_matrix import specification, label, market_id
+    from selection_studies import generate_ideas
+    m = perth_fixture()
+    a=m['multimarket']; matrix=a['matrix']; at=matrix['quote_monitoring']['as_of']
+    matrix['study_combo_quotes'] = {}
+    if name == 'santander':
+        m['fixture'].update(home='Racing Santander', away='Real Madrid')
+        prices, probabilities, changes = [12.,6.,1.26], [33.3,22.3,44.4], [-3.,0.,-2.]
+        o25, ht, o35 = 1.22, 1.74, 2.1
+        a['rates'].update(home_ft=1.52,away_ft=2.2,home_ht=.65,away_ht=1.)
+    else:
+        m['fixture'].update(home='IF Elfsborg', away='Orgryte IS')
+        prices, probabilities, changes = [1.4,5.2,7.5], [52.2,23.4,24.4], [100*(1.4/1.36-1),6.1,0.]
+        o25, ht, o35 = 1.57, 2.2, 2.49
+        a['rates'].update(home_ft=2.1,away_ft=1.2,home_ht=.9,away_ht=.5)
+    def row(spec, p, odd, delta=0):
+        return dict(spec=spec,id=market_id(spec),label=label(spec),statistical_pct=p,
+                    odd=odd,oci=60,delta_pct=delta,quote_status='recent',quote_executable=True,
+                    provider_updated_at=at,quote_observed_at=at,bookmaker_id='9',
+                    opportunity=dict(eligible=False,reasons=['market']))
+    matrix['rows'] = [row(specification('result','ft',side),p,odd,d)
+                      for side,p,odd,d in zip(('1','x','2'),probabilities,prices,changes)]
+    matrix['rows'] += [row(specification('total','ft','over',2.5),75,o25),
+                       row(specification('total','ht','over',1.5),40,ht),
+                       row(specification('total','ft','over',3.5),45,o35)]
+    suppressed=[]
+    ideas=generate_ideas(a,at,m['fixture']['kickoff'],suppressed)
+    matrix['quote_monitoring']=dict(as_of=at,studio_ideas=ideas,suppressed_study_candidates=suppressed)
+    return m
+
+
+class DistortionTests(unittest.TestCase):
+    def test_santander_and_elfsborg(self):
+        for name, forbidden in [('santander', {'1x2_1','1_over25_ft','1x_over25_ft'}),
+                                 ('elfsborg', {'1x2_x','1x2_2','2_over25_ft','x2_over25_ft'})]:
+            m=distortion_fixture(name)
+            monitor=m['multimarket']['matrix']['quote_monitoring']
+            visible={i['market'] for i in monitor['studio_ideas']}
+            self.assertFalse(visible & forbidden)
+            self.assertTrue({'gg_ft','over15_ht','over35_ft'} <= visible)
+            self.assertFalse(any(i['type']=='studio_combo_1x2_over25' for i in monitor['studio_ideas']))
+            hidden={i['market'] for i in monitor['suppressed_study_candidates']}
+            self.assertTrue(forbidden <= hidden)
+            for i in monitor['studio_ideas']:
+                if i['market'].startswith('1x2_') and i.get('real_flow'):
+                    self.assertTrue(i['delta_pct'] <= -2 or (i.get('fair_delta_pp') or 0) >= 1.5)
+
+    def test_gate_boundaries_and_rebound(self):
+        from selection_studies import result_gate
+        base=dict(market='1x2_1',odd=3.6,poisson_pct=32,market_fair_pct=30,delta_pct=-3)
+        self.assertEqual(result_gate(base), [])
+        for changes, reason in [({'poisson_pct':31.99},'probability_floor'),
+                                ({'odd':3.61},'probability_floor'),
+                                ({'market':'1x2_x'},'probability_floor'),
+                                ({'odd':4.51,'poisson_pct':40},'outsider_price_cap'),
+                                ({'market_fair_pct':17.99},'model_market_divergence'),
+                                ({'poisson_pct':49,'delta_pct':-2.99},'model_market_divergence'),
+                                ({'market':'1x2_x','poisson_pct':35,'delta_pct':0},'oci_rebound')]:
+            self.assertIn(reason,result_gate(dict(base,**changes)))
+        self.assertEqual(result_gate(dict(base,odd=4.5,poisson_pct=35)), [])
+        self.assertEqual(result_gate(dict(base,poisson_pct=49)), [])
+        self.assertEqual(result_gate(dict(base,poisson_pct=48,delta_pct=0)), [])
+
+    def test_suppression_survives_freeze_settlement_and_calibration(self):
+        from selection_studies import freeze_study, StudyEvidence, study_audit
+        from adaptive_calibration import Evidence, fit
+        from datetime import date
+        m=distortion_fixture('santander')
+        record=freeze_study(m,'2026-11-01T07:12:00Z')
+        self.assertTrue(record['suppressed_study_candidates'])
+        record['settlement']={'result':dict(status='FT',home_ft=1,away_ft=3,home_ht=0,away_ht=2)}
+        report=study_audit({'study_observations':{'1':record,'duplicate':record}})
+        self.assertEqual(len(report['suppressed_study_candidates']),len(record['suppressed_study_candidates']))
+        trap=next(i for i in report['suppressed_study_candidates'] if i['market']=='1x2_1')
+        self.assertEqual(trap['outcome'],'lost')
+        self.assertEqual(trap['poisson_pct'],33.3)
+        e=Evidence(); e.observe(record)
+        state=fit(e.samples(),date(2026,11,2))
+        self.assertFalse(state['cohorts'])
+        self.assertTrue(state['contrarian_poisson_trap'])
+        self.assertTrue(all(not r['promotion_candidate'] for r in state['contrarian_poisson_trap'].values()))
+        self.assertNotIn('studio_1x2_value_flow', state['studio_cohorts'])
+
+    def test_only_favorite_quoted_combos_and_blended_bounds(self):
+        from selection_studies import generate_ideas
+        from lateral_matrix import market_id,specification
+        m=distortion_fixture('santander'); a=m['multimarket']; at=a['matrix']['quote_monitoring']['as_of']
+        for side in ('1','2'):
+            spec=specification('result_total','ft',side,2.5,'over')
+            a['matrix']['study_combo_quotes'][market_id(spec)]=dict(odd=2.,bookmaker_id='9',updated=at)
+        ideas=generate_ideas(a,at,m['fixture']['kickoff'])
+        combos=[i for i in ideas if i['type']=='studio_combo_1x2_over25']
+        self.assertEqual([i['market'] for i in combos],['2_over25_ft'])
+        self.assertTrue(0 < combos[0]['blended_pct'] < 100)
+        self.assertNotEqual(combos[0]['blended_pct'],combos[0]['poisson_pct'])
+
+
+    def test_unpriced_fallback_requires_blended_probability_and_no_alternatives(self):
+        from selection_studies import generate_ideas
+        m=distortion_fixture('santander'); a=m['multimarket']; matrix=a['matrix']
+        a['rates'].update(home_ft=.9,away_ft=3.,home_ht=.3,away_ht=1.1)
+        matrix['rows']=matrix['rows'][:4]
+        for row in matrix['rows']:
+            row.update(oci=30,delta_pct=0)
+        matrix['rows'][3]['odd']=None
+        def generate():
+            return generate_ideas(a,matrix['quote_monitoring']['as_of'],m['fixture']['kickoff'])
+        ideas=generate()
+        self.assertEqual(len(ideas),1)
+        self.assertEqual(ideas[0]['market'],'x2_over25_ft')
+        self.assertGreater(ideas[0]['blended_pct'],48)
+        matrix['rows'][3]['oci']=35
+        self.assertFalse(any(i['type']=='studio_combo_1x2_over25' for i in generate()))
+
+    def test_xg_can_support_goal_context_but_shots_cannot(self):
+        from selection_studies import generate_ideas
+        m=distortion_fixture('santander'); a=m['multimarket']; matrix=a['matrix']
+        a['rates']['home_ft']=.8
+        for row in matrix['rows']:
+            row['oci']=0
+        a['profiles']={'home':{'for_ft':{'xg_mean':1.15}}}
+        ideas=generate_ideas(a,matrix['quote_monitoring']['as_of'],m['fixture']['kickoff'])
+        self.assertIn('over15_ht',{i['market'] for i in ideas})
+        a['profiles']['home']['for_ft']={'shots_mean':5}
+        ideas=generate_ideas(a,matrix['quote_monitoring']['as_of'],m['fixture']['kickoff'])
+        self.assertNotIn('over15_ht',{i['market'] for i in ideas})

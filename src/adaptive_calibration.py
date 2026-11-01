@@ -52,7 +52,7 @@ def cohort(market, odd, tier):
 def neutral():
     return {'schema_version': 1, 'version': VERSION, 'as_of': None, 'window_days': WINDOW,
             'half_life_days': HALF_LIFE, 'minimum_fixtures': MIN_N, 'prior_strength': PRIOR, 'cohorts': {},
-            'studio_cohorts': {}, 'blocker_diagnostics': {}}
+            'studio_cohorts': {}, 'blocker_diagnostics': {}, 'contrarian_poisson_trap': {}}
 
 
 @lru_cache(maxsize=1)
@@ -232,6 +232,7 @@ def fit(samples, as_of, previous=None):
     diagnostics = study_summary(studies, MIN_N)
     result['studio_cohorts'] = diagnostics['by_type']
     result['blocker_diagnostics'] = diagnostics['by_blocking_reason']
+    result['contrarian_poisson_trap'] = diagnostics['contrarian_poisson_trap']
     for key, fixtures in sorted(grouped.items()):
         obs = [(w, r) for _, w, r in (fixtures[f] for f in sorted(fixtures))]
         n = len(obs)

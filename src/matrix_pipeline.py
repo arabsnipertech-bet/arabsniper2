@@ -163,7 +163,8 @@ def build_board(day, as_of):
         quote_monitoring(a.get('matrix',{}),as_of,meta.get('kickoff'))
         from selection_studies import generate_ideas
         matrix = a.get('matrix', {})
-        matrix['quote_monitoring']['studio_ideas'] = generate_ideas(a, as_of, meta.get('kickoff')) if meta.get('status_short') in ('NS', 'TBD') else []
+        matrix['quote_monitoring']['suppressed_study_candidates'] = []
+        matrix['quote_monitoring']['studio_ideas'] = generate_ideas(a, as_of, meta.get('kickoff'), matrix['quote_monitoring']['suppressed_study_candidates']) if meta.get('status_short') in ('NS', 'TBD') else []
         platinum += bool(a.get('matrix', {}).get('platinum_policy', {}).get('best_market_id'))
         a.get('matrix', {})['summary'] = {'categories': dict(category_counts), 'observed_markets': len(rows),
                                         'priced_markets': sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)}

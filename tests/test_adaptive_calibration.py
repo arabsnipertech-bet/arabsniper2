@@ -282,3 +282,37 @@ class StudioCalibrationTests(unittest.TestCase):
             self.assertFalse(state['cohorts'])
             self.assertAlmostEqual(state['blocker_diagnostics']['yield_floor']['roi'],.69)
             self.assertFalse(state['studio_cohorts']['studio_goal_flow_near_miss']['promotion_candidate'])
+
+    def test_suppressed_traps_reach_daily_archive_and_nightly_diagnostics(self):
+        import importlib.util
+        from datetime import datetime
+        from test_selection_studies import distortion_fixture
+        from selection_studies import freeze_study
+        from audit_storage import read_store
+        from audit_ledger import AuditLedger
+        spec=importlib.util.spec_from_file_location('trap_current_audit',Path(__file__).resolve().parents[1]/'auditor/current_audit.py')
+        audit=importlib.util.module_from_spec(spec); spec.loader.exec_module(audit)
+        m=distortion_fixture('elfsborg')
+        record=freeze_study(m,'2026-11-01T07:12:00Z')
+        now=datetime.fromisoformat('2026-11-02T01:30:00+01:00')
+        result=dict(status='FT',home_ft=3,away_ft=1,home_ht=1,away_ht=1)
+        provider=lambda *_: {'days':[{'matches':[{'fixture':dict(m['fixture'],result=result)}]}]}
+        with TemporaryDirectory() as temp, patch.dict('os.environ',{'API_SPORTS_KEY':'test'}):
+            root=Path(temp)
+            with AuditLedger() as ledger:
+                ledger.add_collection('fixtures')
+                ledger.put('study_observations',str(record['fixture']['fixture_id'])+'::'+record['captured_at'],record)
+                audit.archive_ledger(root,now,ledger,lambda _:None)
+            audit.settle_day(root,date(2026,11,1),now,provider)
+            audit.settle(root,now,provider,prepared_date=date(2026,11,1))
+            for path in ('auditarchive/prematch_2026-11-01_daily.json','auditarchive/prematch_last_report.json',
+                         'data/arab_quote_prematch_report.json'):
+                report=read_store(root/path)['studio_ideas_audit']
+                suppressed=report['suppressed_study_candidates']
+                self.assertEqual(len(suppressed),len(record['suppressed_study_candidates']))
+                self.assertTrue(all(r['outcome']=='lost' for r in suppressed if r['market'].startswith('1x2_')))
+                self.assertFalse(any(r.get('suppressed') for r in report['selections']))
+            state=nightly_state(root,now.date())
+            self.assertEqual(state['contrarian_poisson_trap']['outsider_price_cap']['losses'],2)
+            self.assertFalse(state['cohorts'])
+            self.assertNotIn('studio_1x2_value_flow',state['studio_cohorts'])

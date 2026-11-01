@@ -29,9 +29,9 @@ def settle_predictions(store, output):
         result = results.get(str(record['fixture']['fixture_id'])) or {}
         if result.get('status') in ('FT', 'AET', 'PEN'):
             outcomes = {}
-            for idea in record['studio_ideas']:
+            for idea in [*record['studio_ideas'], *record.get('suppressed_study_candidates', [])]:
                 payout = settle_spec(idea['spec'], result)
-                outcomes[idea['type']+'|'+idea['market']] = None if payout is None else bool(payout[0])
+                outcomes[('suppressed|' if idea.get('suppressed') else '')+idea['type']+'|'+idea['market']] = None if payout is None else bool(payout[0])
             record['settlement'] = dict(result=dict(result), outcomes=outcomes or {'closed': True})
     indexed = defaultdict(list)
     for record in store.get('quality_evaluations', {}).values():

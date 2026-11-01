@@ -87,6 +87,8 @@ def study_contract(row):
     spec = row.get('spec') or {}
     if spec.get('kind') == 'result' and spec.get('period') == 'ft':
         return '1x2_' + spec['side']
+    if spec.get('kind') == 'btts' and spec.get('side') == 'yes':
+        return 'gg_' + spec['period']
     if spec.get('kind') == 'halves_total':
         return 'combo_ht_sh'
     key = goal_market(row)
@@ -138,8 +140,24 @@ def rank_study_ideas(ideas):
     return ranked
 
 
-def generate_ideas(assessment, as_of, kickoff):
-    from lateral_matrix import ScoreModel, label, market_id, study_result_totals
+def result_gate(item):
+    """Publication gate only; rejected candidates remain available to the audit."""
+    p, odd, fair = item.get('poisson_pct'), item.get('odd'), item.get('market_fair_pct')
+    reasons = []
+    minimum = 35 if item['market'] == '1x2_x' or valid(odd, 3.600000001, float('inf')) else 32
+    if not valid(p, minimum):
+        reasons.append('probability_floor')
+    if not valid(odd, 1.000000001, 4.5):
+        reasons.append('outsider_price_cap')
+    if valid(fair) and (fair < 18 or p - fair > 18 and not valid(item.get('delta_pct'), -100, -3)):
+        reasons.append('model_market_divergence')
+    if (item['market'] == '1x2_x' or valid(odd, 4.000000001, float('inf'))) and not valid(item.get('delta_pct'), -100, -2.5):
+        reasons.append('oci_rebound')
+    return reasons
+
+
+def generate_ideas(assessment, as_of, kickoff, suppressed=None):
+    from lateral_matrix import ScoreModel, label, market_id, study_result_totals, specification
     from opportunity_policy import study_blockers
     from quote_cache import within_window
     from quote_sources import fresh
@@ -147,8 +165,36 @@ def generate_ideas(assessment, as_of, kickoff):
     if any((matrix.get(policy) or {}).get('best_market_id')
            for policy in ('opportunity_policy', 'platinum_policy')):
         return []
-    positive = {}
+    suppressed = suppressed if suppressed is not None else []
+    positive, all_items = {}, {}
     ideas = {}
+    # Fair market probabilities are normalized only with a complete fresh 1X2.
+    results = {}
+    for row in matrix.get('rows', []):
+        if (row.get('spec', {}).get('kind') == 'result' and row['spec'].get('period') == 'ft'
+                and row.get('quote_status') in ('recent', 'cached_stable')
+                and row.get('quote_executable') is not False and within_window(row, as_of, kickoff)
+                and valid(row.get('odd'), 1.000000001, float('inf'))):
+            results[row['spec']['side']] = row
+    total = sum(1/r['odd'] for r in results.values()) if set(results) == {'1','x','2'} else None
+    fairs = {side: (r['market_fair_pct'] if valid(r.get('market_fair_pct'), .000000001) else
+                    100/r['odd']/total if total else None) for side, r in results.items()}
+    if total:
+        fair_total = sum(fairs.values())
+        fairs = {side: p*100/fair_total for side,p in fairs.items()}
+    favorites = [side for side in ('1','2') if side in results and
+                 (results[side]['odd'] <= 1.75 or valid(fairs[side], 53))]
+    favorite = min(favorites, key=lambda side: results[side]['odd']) if favorites else None
+    rates = assessment.get('rates') or {}
+    fav_team, dog_team = ('home','away') if favorite == '1' else ('away','home')
+    dog_side = '2' if favorite == '1' else '1'
+    dog_profile = ((assessment.get('profiles') or {}).get(dog_team) or {}).get('for_ft') or {}
+    goal_context = bool(favorite and dog_side in results and results[dog_side]['odd'] > 3.8
+                        and rates.get(fav_team+'_ft', 0) >= 1.5
+                        and (rates.get(dog_team+'_ft', 0) >= .95 or valid(dog_profile.get('xg_mean'), 1.15, float('inf'))))
+    def reject(kind, item, reasons):
+        suppressed.append(dict(item, type=kind, suppression_reasons=reasons,
+                               cohort_tag='contrarian_poisson_trap', suppressed=True))
     def add(kind, item):
         key = (kind, item['market'])
         old = ideas.get(key)
@@ -189,18 +235,43 @@ def generate_ideas(assessment, as_of, kickoff):
                     blocking_reasons=blockers, odds_min=policy.get('odds_min'), odds_max=policy.get('odds_max'))
         if down < 0 or value or flow >= 30:
             positive.setdefault(market, item)
+        item['market_fair_pct'] = fairs.get(row['spec'].get('side')) if market.startswith('1x2_') else row.get('market_fair_pct')
+        item['real_flow'] = down <= -2 or valid(fair_delta, 1.5)
+        all_items[market] = item
         if market.startswith('1x2_'):
             if value and (down <= -2 or (fair_delta or 0) >= 1.5 or flow > 0):
-                add('studio_1x2_value_flow', item)
+                reasons = result_gate(item)
+                if reasons:
+                    reject('studio_1x2_value_flow', item, reasons)
+                else:
+                    add('studio_1x2_value_flow', item)
         else:
             if flow >= 35 or down <= -2.5 and (row.get('agreeing_books') or 0) >= 4:
                 add('studio_goal_flow_near_miss', item)
             if market == 'over15_ht' and flow >= 35 and pct < 32:
                 add('studio_ht_flow_forcing', item)
+    if goal_context:
+        over = all_items.get('over25_ft', {})
+        cheap = valid(over.get('odd'), 1, 1.649999) and valid(over.get('poisson_pct'), 55)
+        for market, item in all_items.items():
+            p, odd = item['poisson_pct'], item['odd']
+            coherent = ((market in ('gg_ft','gg_ht') and p >= 52)
+                        or (market == 'over15_ht' and valid(odd, 1.65, 3.2) and (p >= 30 or rates.get('home_ht', 0)+rates.get('away_ht', 0) >= 1.10))
+                        or (market in ('over35_ft','combo_ht_sh') and cheap and valid(odd, 1.7, 2.6)))
+            if coherent:
+                add('studio_goal_flow_near_miss', dict(item, study_note='goal_context'))
+        if 'gg_ft' not in all_items:
+            model = ScoreModel(rates)
+            spec = specification('btts','ft','yes')
+            p = model.settlement_distribution(spec).get((1.,0.), 0)
+            if p >= .52:
+                add('studio_goal_flow_near_miss', dict(market='gg_ft', spec=spec, label=label(spec),
+                    odd=None, poisson_pct=p*100, fair_odd=1/p, oci=None, blocking_reasons=['market'],
+                    study_note='goal_context', real_flow=False))
     if 'over25_ft' in positive and assessment.get('rates'):
         model = None
         for side in ('1', '2'):
-            if '1x2_'+side not in positive:
+            if '1x2_'+side not in positive and not (goal_context and side == favorite):
                 continue
             model = model or ScoreModel(assessment['rates'])
             for spec, p in study_result_totals(model, side):
@@ -209,9 +280,32 @@ def generate_ideas(assessment, as_of, kickoff):
                 offer = (matrix.get('study_combo_quotes') or {}).get(market_id(spec), {})
                 if not fresh(offer.get('updated'), as_of, kickoff):
                     offer = {}
-                add('studio_combo_1x2_over25', dict(market=spec['side']+'_over25_ft', spec=spec, label=label(spec),
+                item = dict(market=spec['side']+'_over25_ft', spec=spec, label=label(spec),
                     odd=offer.get('odd'), bookmaker_id=offer.get('bookmaker_id'), updated=offer.get('updated'),
-                    poisson_pct=p*100, fair_odd=1/p, oci=None, blocking_reasons=['market']))
+                    poisson_pct=p*100, fair_odd=1/p, oci=None, blocking_reasons=['market'])
+                # Reweight result cells, retaining P(over|result). Never multiply unrelated marginals.
+                blended = None
+                if total:
+                    model_mass = {s: sum(q for h,a,q in model.grids['ft'] if ('1' if h>a else '2' if a>h else 'x') == s) for s in ('1','x','2')}
+                    blended = sum(q * (.5 + .5 * fairs[s]/100/model_mass[s])
+                                  for h,a,q in model.grids['ft']
+                                  for s in [('1' if h>a else '2' if a>h else 'x')]
+                                  if s in spec['side'] and h+a > 2.5 and model_mass[s] > 0)
+                item['blended_pct'] = blended*100 if blended is not None else None
+                if favorite and side != favorite:
+                    reject('studio_combo_1x2_over25', item, ['against_market_favorite'])
+                else:
+                    add('studio_combo_1x2_over25', item)
+    has_alternative = any(i['type'] != 'studio_combo_1x2_over25' or
+                          valid(i.get('odd'), 1.000000001, float('inf')) for i in ideas.values())
+    unpriced = [i for i in ideas.values() if i['type'] == 'studio_combo_1x2_over25'
+                and not valid(i.get('odd'), 1.000000001, float('inf'))]
+    fallback = max(unpriced, key=lambda i: (i.get('blended_pct') or 0, i['market']), default=None)
+    for key, item in list(ideas.items()):
+        if item['type'] == 'studio_combo_1x2_over25' and not valid(item.get('odd'), 1.000000001, float('inf')):
+            if has_alternative or item is not fallback or not valid(item.get('blended_pct'), 48.000000001):
+                reject(item['type'], item, ['unpriced_combo'])
+                del ideas[key]
     return rank_study_ideas(ideas.values())
 
 
@@ -241,10 +335,11 @@ def freeze_study(match, at):
             closes.extend([key, *point] for point in offer.get('closes', []))
     closes = [point for point in closes if stamp(point[2]) and
               0 < (start - stamp(point[2])).total_seconds() <= 10800]
-    if not monitor['studio_ideas'] and not closes:
+    if not monitor['studio_ideas'] and not monitor.get('suppressed_study_candidates') and not closes:
         return None
     return dict(fixture={k: meta.get(k) for k in ('fixture_id', 'kickoff', 'home', 'away')},
-                captured_at=at, studio_ideas=monitor['studio_ideas'], closes=closes)
+                captured_at=at, studio_ideas=monitor['studio_ideas'],
+                suppressed_study_candidates=monitor.get('suppressed_study_candidates', []), closes=closes)
 
 
 class StudyEvidence:
@@ -268,8 +363,8 @@ class StudyEvidence:
             key = (fid, spec_id, book)
             self.last[key] = max(self.last.get(key, (u, s, odd)), (u, s, odd))
         result = (record.get('settlement') or {}).get('result') or {}
-        for idea in record['studio_ideas']:
-            key = (fid, idea['type'], idea['market'])
+        for idea in [*record.get('studio_ideas', []), *record.get('suppressed_study_candidates', [])]:
+            key = (fid, idea['type'], idea['market'], bool(idea.get('suppressed')))
             payout = settle_spec(idea['spec'], result)
             row = dict(idea, fid=fid, date=start.astimezone(ZoneInfo('Europe/Rome')).date().isoformat(),
                        at=at.isoformat(), p=idea['poisson_pct']/100, y=None if payout is None else int(payout[0]))
@@ -291,8 +386,12 @@ class StudyEvidence:
 
 def study_summary(rows, min_n=50):
     from statistics import mean, stdev
-    groups, blockers = defaultdict(list), defaultdict(list)
+    groups, blockers, traps = defaultdict(list), defaultdict(list), defaultdict(list)
     for row in rows:
+        if row.get('suppressed'):
+            for reason in row.get('suppression_reasons', []):
+                traps[reason].append(row)
+            continue
         groups[row['type']].append(row)
         reasons = row['blocking_reasons']
         if len(reasons) == 1:
@@ -326,7 +425,8 @@ def study_summary(rows, min_n=50):
         for row in items:
             markets[row['market']].append(row)
         by_type[kind] = dict(metrics(items), by_market={k: metrics(v) for k, v in markets.items()})
-    return {'by_type': by_type, 'by_blocking_reason': {k: metrics(v) for k, v in blockers.items()}}
+    return {'by_type': by_type, 'by_blocking_reason': {k: metrics(v) for k, v in blockers.items()},
+            'contrarian_poisson_trap': {k: dict(metrics(v), promotion_candidate=False) for k,v in traps.items()}}
 
 
 def study_audit(store):
@@ -334,4 +434,5 @@ def study_audit(store):
     for record in store.get('study_observations', {}).values():
         evidence.observe(record)
     rows = list(evidence.samples())
-    return {**study_summary(rows), 'selections': rows}
+    return {**study_summary(rows), 'selections': [r for r in rows if not r.get('suppressed')],
+            'suppressed_study_candidates': [r for r in rows if r.get('suppressed')]}
