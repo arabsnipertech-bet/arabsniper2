@@ -191,6 +191,13 @@ class ScoreModel:
                 'half_loss_probability': bins.get((0., .5), 0.)}
 
 
+def study_result_totals(model, side):
+    double = {'1': '1x', '2': 'x2'}[side]
+    for kind, leg in [('result_total', side), ('dc_total', double)]:
+        spec = specification(kind, 'ft', leg, 2.5, 'over')
+        yield spec, model.estimate(spec)['p']
+
+
 def quality(assessment, period):
     period = 'ht' if period == 'sh' else period
     profiles = assessment.get('profiles') or {}

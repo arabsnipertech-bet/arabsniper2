@@ -478,6 +478,21 @@ def main():
     output_filename = f"freeze_for_audit_{main_date}.json"
     output_path = os.path.join(OUTPUT_DIR, output_filename)
 
+    from pathlib import Path
+    import sys
+    sys.path.insert(0, str(Path(BASE_DIR) / 'src'))
+    from audit_storage import read_store
+    from selection_studies import freeze_study
+    prior = read_store(Path(output_path), {}).get('study_observations', {})
+    published = read_store(Path(DATA_DIR) / 'arab_quote_day1.json', {})
+    observed_at = datetime.now(ITALY_TZ).isoformat()
+    if published.get('date') == main_date:
+        for match in published.get('matches', []):
+            record = freeze_study(match, observed_at)
+            if record:
+                fid = record['fixture']['fixture_id']
+                prior.setdefault(f'{fid}::{observed_at}', record)
+    output_data['study_observations'] = prior
     save_json_file(output_path, output_data)
 
     print(f"[OK] Freeze creato: {output_path}")

@@ -51,7 +51,8 @@ def cohort(market, odd, tier):
 
 def neutral():
     return {'schema_version': 1, 'version': VERSION, 'as_of': None, 'window_days': WINDOW,
-            'half_life_days': HALF_LIFE, 'minimum_fixtures': MIN_N, 'prior_strength': PRIOR, 'cohorts': {}}
+            'half_life_days': HALF_LIFE, 'minimum_fixtures': MIN_N, 'prior_strength': PRIOR, 'cohorts': {},
+            'studio_cohorts': {}, 'blocker_diagnostics': {}}
 
 
 @lru_cache(maxsize=1)
@@ -118,6 +119,8 @@ def closing_prices(offers, token, as_of, kickoff):
 class Evidence:
     """One prospective execution and a later same-book closing observation per contract."""
     def __init__(self):
+        from selection_studies import StudyEvidence
+        self.study = StudyEvidence()
         self.first, self.last = {}, {}
 
     def closing(self, key, point, at, start):
@@ -132,6 +135,9 @@ class Evidence:
             self.last[key] = (updated.isoformat(), seen.isoformat(), odd)
 
     def observe(self, record):
+        if 'studio_ideas' in record:
+            self.study.observe(record)
+            return
         from lateral_matrix import MODEL_ID, settle_spec
         forecast = record.get('multimarket') or {}
         meta = record.get('fixture') or {}
@@ -193,7 +199,7 @@ class Evidence:
             rank = (stamp(row['at']), -row['p'], row['side'])
             if key not in by_fixture or rank < by_fixture[key][0]:
                 by_fixture[key] = (rank, row)
-        return [by_fixture[k][1] for k in sorted(by_fixture)]
+        return [by_fixture[k][1] for k in sorted(by_fixture)] + list(self.study.samples())
 
 
 def weighted(pairs):
@@ -208,15 +214,24 @@ def weighted(pairs):
 def fit(samples, as_of, previous=None):
     result = neutral()
     result['as_of'] = as_of.isoformat()
+    from selection_studies import study_summary
+    studies = []
     grouped = defaultdict(dict)
     for row in samples:
         age = (as_of-date.fromisoformat(row['date'])).days
         if 0 < age <= WINDOW:
+            if row.get('type', '').startswith('studio_'):
+                if row.get('y') is not None:
+                    studies.append(row)
+                continue
             key = (row['cohort'], row['fid'])
             rank = (stamp(row['at']), -row['p'], row['side'])
             old = grouped[key[0]].get(key[1])
             if old is None or rank < old[0]:
                 grouped[key[0]][key[1]] = (rank, 2**(-age/HALF_LIFE), row)
+    diagnostics = study_summary(studies, MIN_N)
+    result['studio_cohorts'] = diagnostics['by_type']
+    result['blocker_diagnostics'] = diagnostics['by_blocking_reason']
     for key, fixtures in sorted(grouped.items()):
         obs = [(w, r) for _, w, r in (fixtures[f] for f in sorted(fixtures))]
         n = len(obs)
@@ -290,7 +305,8 @@ def nightly_state(root, as_of):
     predictions = root/'data/arab_quote_prediction_audit.json'
     pending = defaultdict(list)
     for row in rows:
-        pending[row['fid']].append(row)
+        if 'cohort' in row:
+            pending[row['fid']].append(row)
     if predictions.is_file() and pending:
         with open_verified_json(predictions) as stream:
             for fid, item in ijson.kvitems(stream, 'fixtures', use_float=True):

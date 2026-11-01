@@ -15,8 +15,7 @@ from audit_storage import read_store, write_store
 from daily_audit import build_daily, markdown, fingerprint
 
 TZ = ZoneInfo('Europe/Rome')
-COLLECTIONS = ('fixtures', 'quality_evaluations', 'multimarket_evaluations',
-               'signal_observations', 'analysis_updates')
+from audit_ledger import COLLECTIONS
 
 
 def read(path, default):
@@ -57,6 +56,8 @@ def forecast_day(collection, key, record, now):
         expected_key = f"{record.get('model_version')}::{profile}::{expected_key}"
     elif collection == 'multimarket_evaluations':
         expected_key = f"{record.get('model_version')}::{expected_key}"
+    elif collection == 'study_observations':
+        expected_key = f"{expected_key}::{record.get('captured_at')}"
     elif collection == 'analysis_updates':
         expected_key = f"{record.get('model_version')}::{expected_key}::{record.get('captured_at')}"
     elif collection == 'signal_observations':
@@ -212,6 +213,7 @@ def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, p
                        'archived_forecasts': len(combined['fixtures']),
                        'archived_quality_evaluations': len(combined['quality_evaluations'])})
         progress('salvataggio rapporto complessivo')
+        write_store(root / 'data/arab_quote_prematch_report.json', report)
         write(root / 'auditarchive/prematch_last_report.json', report)
     return {'results_dates_queried': queried, 'settled_report_groups': len(report['groups'])}
 

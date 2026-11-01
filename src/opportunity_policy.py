@@ -64,6 +64,14 @@ def goal_market(row):
     return GOALS.get((kind, spec.get('period'), spec.get('side'), spec.get('line')))
 
 
+def study_blockers(row):
+    """Read exactly the published decision, including any stability adjustment."""
+    decision = row.get('opportunity') or {}
+    if decision.get('eligible') is not False:
+        return []
+    return list(decision.get('reasons') or [])
+
+
 def odds_max(row):
     return ODDS_MAX_BY_MARKET.get(goal_market(row), ODDS_MAX)
 

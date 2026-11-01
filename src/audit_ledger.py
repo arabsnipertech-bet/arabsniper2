@@ -14,7 +14,7 @@ from zoneinfo import ZoneInfo
 from audit_storage import open_verified_json, publish_spool
 
 COLLECTIONS = ('fixtures', 'quality_evaluations', 'multimarket_evaluations',
-               'signal_observations', 'analysis_updates')
+               'signal_observations', 'analysis_updates', 'study_observations')
 
 
 def encoded(value):

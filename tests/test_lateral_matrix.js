@@ -426,3 +426,14 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  }
  assert.equal(JSON.stringify(r),before);
 }
+
+// Real fixture identity, controlled quotes shared with the Python settlement test.
+{
+ const {execFileSync}=require('node:child_process');
+ const m=JSON.parse(execFileSync('python',['-c',
+  "import sys,json;sys.path[:0]=['src','tests'];from test_selection_studies import perth_fixture; print(json.dumps(perth_fixture()))"],{encoding:'utf8'}));
+ const monitor=m.multimarket.matrix.quote_monitoring;
+ const html=api.opportunityPanel(m.multimarket.matrix.rows,null,{now:Date.parse(monitor.as_of),kickoff:m.fixture.kickoff,monitoring:monitor});
+ for(const label of ['RADAR BLU · MONITORAGGIO','SOLO STUDIO','Spunti di studio','1X2 · valore e flusso','Flusso gol','Forzatura PT','1 + Over 2,5','1X + Over 2,5','Quota equa Poisson','quota 1,69 sotto soglia 1,85'])assert(html.includes(label),label);
+ assert(!html.includes('data-opportunity-id')&&!html.includes('data-platinum-id'));
+}

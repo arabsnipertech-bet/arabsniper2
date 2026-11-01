@@ -71,7 +71,9 @@
  function matchingRows(m,options=state,now=Date.now(),lifecycle=phase){
   const all=rowsOf(m),tierOptions={now,archived:lifecycle(m,now)!=='upcoming',kickoff:m.fixture?.kickoff,monitoring:m.multimarket?.matrix?.quote_monitoring};
   const platinum=allowedMatch(m)?platinumSignals(all,tierOptions):[];
-  const source=options.category==='platinum'?platinum:options.category==='market_signal'?(allowedMatch(m)&&!platinum.length?[...marketSignals(all,tierOptions),...monitoringRows(all,tierOptions)]:[]):all;
+  const studyRows=options.category==='market_signal'&&!tierOptions.archived&&Array.isArray(tierOptions.monitoring?.studio_ideas)
+   ?all.filter(row=>tierOptions.monitoring.studio_ideas.some(idea=>idea.spec?.kind===row.spec?.kind&&idea.spec?.side===row.spec?.side&&idea.spec?.period===row.spec?.period&&idea.spec?.line===row.spec?.line)):[];
+  const source=options.category==='platinum'?platinum:options.category==='market_signal'?(allowedMatch(m)&&!platinum.length?[...marketSignals(all,tierOptions),...monitoringRows(all,tierOptions),...studyRows]:[]):all;
   return source.filter(r=>{
    if(options.family!=='all'&&r.family!==options.family)return false;
    if(options.period!=='all'&&r.period!==options.period)return false;
@@ -264,6 +266,25 @@
    r.agreeing_books/r.paired_books>=.6&&Number.isFinite(r.speed_pp_per_hour)&&r.speed_pp_per_hour>=.8&&
    ((Number.isFinite(r.oci)&&Math.abs(r.oci)>=25&&Math.abs(r.oci)<40)||(Number.isFinite(r.fair_delta_pp)&&Math.abs(r.fair_delta_pp)>=1.2));
  }
+ function studyIdeaPanel(ideas){
+  const names={studio_1x2_value_flow:'1X2 · valore e flusso',studio_goal_flow_near_miss:'Flusso gol',studio_ht_flow_forcing:'Forzatura PT',studio_combo_1x2_over25:'Combo correlata'};
+  const details=i=>{
+   const reasons=(i.blocking_reasons||[]).map(code=>{
+    if(code==='yield_floor'&&Number.isFinite(i.odd)&&Number.isFinite(i.odds_min))return 'quota '+num(i.odd,2)+' sotto soglia '+num(i.odds_min,2);
+    if(code==='price'&&Number.isFinite(i.odds_min)&&Number.isFinite(i.odds_max))return 'quota fuori intervallo '+num(i.odds_min,2)+'–'+num(i.odds_max,2);
+    return REASONS[code]||code;
+   });
+   const flow=Number.isFinite(i.oci)?(i.historical_oci?'Ultimo OCI osservato':'OCI')+' '+signed(i.oci):'';
+   const extra=[flow,Number.isFinite(i.delta_pct)?'Variazione quota '+signed(i.delta_pct)+'%':'',
+    Number.isFinite(i.fair_delta_pp)?'Variazione fair '+signed(i.fair_delta_pp)+' pp':'',
+    Number.isInteger(i.agreeing_books)?i.agreeing_books+' operatori concordi':'',
+    i.type==='studio_ht_flow_forcing'?'Pressione dei bookmaker in contrasto con Poisson sotto il 32%':'',
+    Number.isFinite(i.odd)&&i.odd<i.fair_odd?'Quota sotto la quota equa Poisson':''].filter(Boolean);
+   return '<li><b>'+esc(names[i.type])+' · '+esc(i.label)+'</b><br>'+esc('Poisson '+pct(i.poisson_pct)+' · Quota equa Poisson '+num(i.fair_odd,2)+' · '+(Number.isFinite(i.odd)?'Quota osservata '+num(i.odd,2):'Quota bookmaker non disponibile'))+
+    (extra.length?'<br>'+esc(extra.join(' · ')):'')+'<br>Fuori Gold · '+esc(reasons.join(' · '))+'</li>';
+  };
+  return '<section class="mx-timing" data-study-ideas><b>Spunti di studio</b><ul>'+ideas.map(details).join('')+'</ul></section>';
+ }
  function monitoringPanel(rows,monitor,history,context,options={}){
   const key=r=>isCombo(r)?'combo_ht_sh':goalMarket(r);
   const quoted=rows.filter(r=>key(r)&&priced(r)&&Number.isFinite(r.odd)&&r.odd>1);
@@ -376,9 +397,9 @@
   if(!context)return '';
   const f=context.imbalance,active=context.pt_priority_active;
   const preference=context.preferred_pt_market==='over15_ht'?'Over 1,5 PT':context.preferred_pt_market==='gg_ht'?'Goal PT':'Over 1,5 PT / Goal PT';
-  const setting=f?.regime==='balanced'?'Quote bilanciate · distanza 1–2 '+num(f.home_away_odds_gap,2):f?'Favorita '+(f.favorite_venue==='home'?'in casa':'in trasferta')+' · quota '+num(f.favorite_odd,2):'Sbilanciamento non confermato';
+  const setting=f?.regime==='balanced'?'Quote bilanciate · distanza 1–2 '+num(f.home_away_odds_gap,2):f?'Favorita '+(f.favorite_venue==='home'?'in casa':'in trasferta')+' · quota '+num(f.favorite_odd,2):'';
   const gaps=['home','away'].map(s=>{const t=context.trends?.[s],g=t?.venue?.ft;return g?.sufficient?'<small>'+(s==='home'?'Casa, in casa':'Ospite, fuori casa')+': media recente '+num(g.recent_mean,2)+' / riferimento '+num(g.reference_mean,2)+' · digiuno '+num(g.drought_matches,0)+' gare</small>':'';}).join('');
-  return '<section class="mx-timing"><b>'+(active?'Ordine di valutazione: '+preference:'Confronto dei cinque mercati gol')+'</b><small>'+esc(setting)+'</small>'+gaps+(f?'<small>OCI 1X2 '+signed(f.oci)+' · aggio '+pct(f.margin_pct)+' · '+esc(f.bookmaker)+'</small>':'')+(active?'<small>Precedenza tra idonei · probabilità invariata.</small>':'')+'</section>';
+  return '<section class="mx-timing"><b>'+(active?'Ordine di valutazione: '+preference:'Confronto dei cinque mercati gol')+'</b>'+(setting?'<small>'+esc(setting)+'</small>':'')+gaps+(f?'<small>OCI 1X2 '+signed(f.oci)+' · aggio '+pct(f.margin_pct)+' · '+esc(f.bookmaker)+'</small>':'')+(active?'<small>Precedenza tra idonei · probabilità invariata.</small>':'')+'</section>';
  }
  function platinumPanel(rows,context,options,elite,best){
   const gold=best?'<details class="mx-method mx-platinum-gold"><summary>Giocata ufficiale Gold v6.1 · '+esc(best.label)+' · '+num(best.odd,2)+'</summary>'+opportunityPanel(rows,context,{...options,suppressPlatinum:true})+'</details>':'<p>Categoria Platinum · distinta dalle giocate Gold ufficiali.</p>';
@@ -402,6 +423,11 @@
   const archive=rulePolicy===POLICY?'':'Proposta archiviata · '+esc(rulePolicy)+'<br>';
   const last=options.lastProposal;
   const history=!best&&last&&Number.isFinite(last.odd)?'<section class="mx-timing"><b>Ultima proposta pubblicata · '+esc(last.label||last.market_id)+'</b><strong>'+num(last.odd,2)+'</strong><small>'+esc(last.bookmaker||'')+' · '+esc(last.provider_updated_at||last.published_at||'')+'</small><small>'+(last.status==='withdrawn'?'Proposta ritirata: i dati aggiornati non superano più i criteri.':'In attesa di aggiornamento: conservata come riferimento, quota e validità attuali da confermare.')+'</small></section>':'';
+  const ideas=options.monitoring?.studio_ideas;
+  if(!best&&!options.archived&&!options.monitoringClosed&&Array.isArray(ideas)&&ideas.length&&
+     (options.now??Date.now())<Date.parse(options.kickoff)){
+   return '<aside class="mx-best mx-best-market"><span class="mx-section-title">RADAR BLU · MONITORAGGIO</span><span class="mx-badge mx-market-signal">SOLO STUDIO</span>'+studyIdeaPanel(ideas)+history+'</aside>';
+  }
   const signals=!best?marketSignals(rows,options):[],watch=signals[0];
   if(watch)return '<aside class="mx-best mx-best-market" data-market-signal-id="'+esc(watch.id)+'"><span class="mx-section-title">RADAR DI MERCATO</span><h4>'+esc(watch.label)+'</h4><span class="mx-badge mx-market-signal">STUDIO / ALTA ATTENZIONE</span><p>'+MARKET_SIGNAL_TEXT+'</p><div class="mx-best-price">'+num(watch.odd,2)+'<small>'+(watch.quote_status==='cached_stable'?'Quota stabile da cache':'QUOTA OSSERVATA')+' · '+esc(watch.bookmaker)+'</small></div><dl>'+[
    ['Persistenza del movimento',pct(100*watch.selected_movement.persistence)],

@@ -215,3 +215,62 @@ class AdaptiveCalibration(unittest.TestCase):
         no_trap=deepcopy(a);no_trap['favorite_trap_base']={}
         apply_matrix(a,META_FUTURE,AT,state);apply_matrix(no_trap,META_FUTURE,AT,state)
         self.assertAlmostEqual(a['matrix']['rows'][0]['win_weight']-no_trap['matrix']['rows'][0]['win_weight'],.036)
+
+
+class StudioCalibrationTests(unittest.TestCase):
+    def test_promotion_requires_fifty_distinct_paired_fixtures_and_positive_clv(self):
+        from test_selection_studies import perth_fixture
+        from selection_studies import freeze_study
+        record = freeze_study(perth_fixture(), '2026-11-01T07:12:00Z')
+        record['settlement'] = {'result':dict(status='FT',home_ft=2,away_ft=1,home_ht=1,away_ht=0)}
+        ev = Evidence()
+        ev.observe(record)
+        later = deepcopy(record)
+        later.update(captured_at='2026-11-01T07:55:00Z', studio_ideas=[])
+        later['closes'] = [[spec, book, '2026-11-01T07:54:00Z', later['captured_at'], 1.50]
+                           for spec,book,*_ in later['closes']]
+        ev.observe(later)
+        row = next(r for r in ev.samples() if r['market']=='over25_ft')
+        self.assertAlmostEqual(row['clv'],1.69/1.5-1)
+        day = date(2026,11,2)
+        for n, clv, promoted in [(49,.01,False),(50,.01,True),(50,-.01,False),(50,None,False)]:
+            samples=[dict(row,fid=str(i),clv=clv) for i in range(n)]
+            state=fit(samples,day)
+            for group in (state['studio_cohorts'][row['type']],state['blocker_diagnostics']['yield_floor']):
+                self.assertEqual(group['promotion_candidate'],promoted)
+                self.assertAlmostEqual(group['brier_score'],(row['p']-1)**2)
+            self.assertEqual(state['cohorts'],{})
+        self.assertFalse(fit([row]*50,day)['studio_cohorts'][row['type']]['promotion_candidate'])
+
+    def test_daily_archive_and_nightly_state_use_the_published_study_track(self):
+        import importlib.util
+        from datetime import datetime
+        from test_selection_studies import perth_fixture
+        from selection_studies import freeze_study
+        from audit_storage import read_store
+        from audit_ledger import AuditLedger
+        spec=importlib.util.spec_from_file_location('study_current_audit',Path(__file__).resolve().parents[1]/'auditor/current_audit.py')
+        audit=importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(audit)
+        m=perth_fixture()
+        day=date(2026,11,1)
+        at='2026-11-01T07:12:00Z'
+        record=freeze_study(m,at)
+        now=datetime.fromisoformat('2026-11-02T01:30:00+01:00')
+        result=dict(status='FT',home_ft=2,away_ft=1,home_ht=1,away_ht=0)
+        provider=lambda *_: {'days':[{'matches':[{'fixture':dict(m['fixture'],result=result)}]}]}
+        with TemporaryDirectory() as temp, patch.dict('os.environ',{'API_SPORTS_KEY':'test'}):
+            root=Path(temp)
+            with AuditLedger() as ledger:
+                ledger.add_collection('fixtures')
+                ledger.put('study_observations','perth-test::'+at,record)
+                audit.archive_ledger(root,now,ledger,lambda _:None)
+            audit.settle_day(root,day,now,provider)
+            audit.settle(root,now,provider,prepared_date=day)
+            for path in ('auditarchive/prematch_2026-11-01_daily.json','auditarchive/prematch_last_report.json',
+                         'data/arab_quote_prematch_report.json'):
+                report=read_store(root/path)['studio_ideas_audit']
+                self.assertEqual(report['by_type']['studio_combo_1x2_over25']['wins'],2)
+            state=nightly_state(root,now.date())
+            self.assertAlmostEqual(state['blocker_diagnostics']['yield_floor']['roi'],.69)
+            self.assertFalse(state['studio_cohorts']['studio_goal_flow_near_miss']['promotion_candidate'])

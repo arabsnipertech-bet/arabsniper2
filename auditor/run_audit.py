@@ -80,6 +80,7 @@ def fetch_fixture_result(fixture_id: int | str):
 
         return {
             "status": status,
+            "regulation": score.get("fulltime") or {},
             "ht_home": halftime.get("home"),
             "ht_away": halftime.get("away"),
             "ft_home": goals.get("home"),
@@ -323,12 +324,14 @@ def main():
         "skipped_no_result": 0,
     }
 
+    fetched_results = {}
     for m in matches:
         fixture_id = m.get("fixture_id")
         canonical = m.get("canonical", {}) or {}
         legacy_tags = set(m.get("legacy_tags", []) or [])
 
         result = fetch_fixture_result(fixture_id)
+        fetched_results[str(fixture_id)] = result
         if not result:
             counts["skipped_no_result"] += 1
             continue
@@ -555,6 +558,21 @@ def main():
             "drop_trap": "Controllo warning: valore basso è positivo perché segnala partite da evitare",
         },
     }
+
+    from pathlib import Path
+    import sys
+    sys.path.insert(0, str(Path(BASE_DIR) / 'src'))
+    from selection_studies import study_audit
+    study_records = freeze.get('study_observations', {})
+    for record in study_records.values():
+        fid = str(record['fixture']['fixture_id'])
+        if fid not in fetched_results:
+            fetched_results[fid] = fetch_fixture_result(fid)
+        result = fetched_results[fid] or {}
+        ft = result.get('regulation') or {}
+        record['settlement'] = {'result': dict(status=result.get('status'), home_ft=ft.get('home'),
+            away_ft=ft.get('away'), home_ht=result.get('ht_home'), away_ht=result.get('ht_away'))}
+    summary_output['studio_ideas_audit'] = study_audit({'study_observations': study_records})
 
     details_output = {
         "audit_date": audit_date,

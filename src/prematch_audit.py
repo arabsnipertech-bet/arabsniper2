@@ -22,6 +22,17 @@ def settle_predictions(store, output):
     settle_multimarket(store, {str(m.get('fixture',{}).get('fixture_id')):m.get('fixture',{}).get('result') for d in output.get('days',[]) for m in d.get('matches',[])})
     from signal_research import settle as settle_signals
     settle_signals(store, {str(m.get('fixture',{}).get('fixture_id')):m.get('fixture',{}).get('result') for d in output.get('days',[]) for m in d.get('matches',[])})
+    from lateral_matrix import settle_spec
+    results = {str(m['fixture']['fixture_id']): m['fixture'].get('result')
+               for d in output.get('days', []) for m in d.get('matches', []) if (m.get('fixture') or {}).get('fixture_id') is not None}
+    for record in store.get('study_observations', {}).values():
+        result = results.get(str(record['fixture']['fixture_id'])) or {}
+        if result.get('status') in ('FT', 'AET', 'PEN'):
+            outcomes = {}
+            for idea in record['studio_ideas']:
+                payout = settle_spec(idea['spec'], result)
+                outcomes[idea['type']+'|'+idea['market']] = None if payout is None else bool(payout[0])
+            record['settlement'] = dict(result=dict(result), outcomes=outcomes or {'closed': True})
     indexed = defaultdict(list)
     for record in store.get('quality_evaluations', {}).values():
         indexed[str((record.get('fixture') or {}).get('fixture_id'))].append(record)
@@ -79,7 +90,8 @@ def build_report(store):
     for key, record in store.get('quality_evaluations', {}).items():
         profile = (record.get('first_half_assessment') or {}).get('profile_id', 'unknown')
         quality_versions[(record.get('model_version', 'unknown'), profile)][key] = record
-    return {'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'signal_research': signal_report(store), 'quote_groups': quote_report(store), 'filter_comparison': build_filter_comparison(store),
+    from selection_studies import study_audit
+    return {'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'note': 'First observed pre-match forecasts only. ROI uses recorded quotes, not executed bets. No automatic threshold fitting.', 'groups': report, 'signal_research': signal_report(store), 'quote_groups': quote_report(store), 'filter_comparison': build_filter_comparison(store),
         'first_half_quality_by_version': [{'model_version': version, 'profile_id': profile,
             'comparison': build_filter_comparison({'fixtures': records})['over15_ht_probability_comparison']}
             for (version, profile), records in sorted(quality_versions.items())]}

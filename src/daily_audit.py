@@ -124,7 +124,11 @@ def build_daily(store, date, generated_at, source_revision=None, observe=None):
                     if number(book, 0, 100):
                         groups[(*group, 'matched_statistics')].append((probability, y, odd if valid_odd else None))
                         groups[(*group, 'matched_book')].append((book/100, y, odd if valid_odd else None))
-    return {'schema_version': 1, 'audit_date': date, 'generated_at': generated_at,
+    from selection_studies import study_audit
+    for record in store.get('study_observations', {}).values():
+        if observe is not None:
+            observe(record)
+    return {'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'audit_date': date, 'generated_at': generated_at,
             'source_revision': source_revision,
             'note': 'Experimental. First/latest are separate cohorts, never additive. Paper ROI is not executed profit. No forecast is recalculated.',
             'excluded_records': rejected, 'fixtures': fixtures, 'markets': rows,

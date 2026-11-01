@@ -13,7 +13,7 @@ from multimarket_model import stamp, number, fair, normalized, SPECS
 from context_analysis import movement
 from lateral_matrix import specification, market_id, matrix_rows
 from opportunity_policy import annotate
-from market_scope import CORE_BET_IDS, core_market, trim_matrix
+from market_scope import CORE_BET_IDS, STUDY_RESULT_TOTAL_IDS, core_market, trim_matrix
 from quote_sources import (normalize_payload, synthetic_combo_groups, synthetic_margin,
                            synthetic_fair, direct_combo_groups, fresh)
 
@@ -468,6 +468,41 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     remember(row)
 
 
+def study_combo_quotes(payload, meta, as_of):
+    """Direct executable combo prices only, outside the official market universe."""
+    offers = defaultdict(dict)
+    for record in (payload or {}).get('response', []):
+        fixture = record.get('fixture') or {}
+        updated = record.get('update')
+        if str(fixture.get('id')) != str(meta['fixture_id']) or not fresh(updated, as_of, meta['kickoff']):
+            continue
+        for book in record.get('bookmakers', []):
+            if book.get('id') is None:
+                continue
+            for bet in book.get('bets', []):
+                bid = number(bet.get('id'))
+                if bid not in STUDY_RESULT_TOTAL_IDS or normalized(bet.get('name')) != normalized(CATALOG[bid][0]):
+                    continue
+                for value in bet.get('values', []):
+                    spec = parse_value(int(bid), value.get('value'))
+                    odd = number(value.get('odd'))
+                    if spec and spec.get('line') == 2.5 and spec.get('extra') == 'over' and odd and odd > 1:
+                        prices = offers[market_id(spec)].setdefault((str(book['id']), updated), set())
+                        prices.add(odd)
+    result = {}
+    for key, observations in offers.items():
+        latest = {}
+        for (book, updated), prices in observations.items():
+            if book not in latest or stamp(updated) > stamp(latest[book][0]):
+                latest[book] = (updated, prices)
+        clean = [(next(iter(prices)), book, updated) for book, (updated, prices) in latest.items() if len(prices) == 1]
+        if clean:
+            odd, book, updated = max(clean)
+            result[key] = dict(odd=odd, bookmaker_id=book, updated=updated, observed_at=as_of,
+                               closes=[[b, u, as_of, o] for o, b, u in clean])
+    return result
+
+
 def attach(assessment, payload, state, meta, as_of):
     from gold_competitions import output_allowed
     from refresh_opportunities import captured_prices
@@ -484,6 +519,7 @@ def attach(assessment, payload, state, meta, as_of):
             if not fresh or before and (not at or at < before): captured[key] = prior
     offers = ledger_offers(state, meta['fixture_id'], captured, as_of, meta['kickoff'])
     matrix = assessment['matrix']
+    matrix['study_combo_quotes'] = study_combo_quotes(payload, meta, as_of)
     trim_matrix(matrix)
     existing = {r['id'] for r in matrix['rows']}
     extra = {key: values[0]['spec'] for key, values in offers.items() if key not in existing}

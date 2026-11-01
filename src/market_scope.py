@@ -7,6 +7,7 @@ FT_TOTALS = (1.5, 2.5, 3.5)
 ASIAN_FT = (1.75, 2., 2.25, 2.75, 3., 3.25)
 ASIAN_HT = (1., 1.25, 1.75, 2.)
 HANDICAPS = (-1., -.75, -.5, -.25, 0., .25, .5, .75, 1.)
+STUDY_RESULT_TOTAL_IDS = frozenset((25, 183))
 CORE_BET_IDS = frozenset((1, 2, 4, 5, 6, 8, 34, 50, 72, 336))
 
 
