@@ -146,11 +146,24 @@ def wake_fast(api, now=None, dry_run=False):
         if run.get('status') != 'completed':
             return dict(result, action='fast_active', run_id=run.get('id'))
         finished = instant(run.get('updated_at'))
+        jobs = None
         if finished > now:
-            raise RuntimeError('Future GitHub run; no dispatch')
+            # The run envelope can disagree with the runner timestamps. Use
+            # the terminal step only when the Fast job independently confirms it.
+            jobs = api.jobs(run)
+            fast_jobs = [job for job in jobs if job.get('name') == 'fast-scan'
+                         and job.get('status') == 'completed' and job.get('conclusion') == run.get('conclusion')]
+            terminal = [step for job in fast_jobs for step in job.get('steps', [])
+                        if step.get('name') == 'Complete job' and step.get('status') == 'completed']
+            if len(terminal) != 1 or not terminal[0].get('completed_at'):
+                raise RuntimeError('Future GitHub run; no dispatch')
+            finished = instant(terminal[0]['completed_at'])
+            if finished > now:
+                raise RuntimeError('Future GitHub run; no dispatch')
         if now - finished >= INTERVAL:
             continue
-        jobs = api.jobs(run)
+        if jobs is None:
+            jobs = api.jobs(run)
         started = published_start(jobs)
         if started:
             if not started <= finished:

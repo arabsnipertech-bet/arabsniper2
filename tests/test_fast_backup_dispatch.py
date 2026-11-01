@@ -113,6 +113,18 @@ class FastBackupTests(unittest.TestCase):
         with self.assertRaises(RuntimeError): backup.wake_fast(api, NOW)
         self.assertEqual(api.dispatched, 0)
 
+    def test_future_run_envelope_with_completed_runner_steps(self):
+        evidence = jobs()
+        evidence[0].update(name='fast-scan', status='completed', conclusion='success')
+        terminal = dict(name='Complete job', status='completed', completed_at=(NOW-timedelta(minutes=2)).isoformat())
+        evidence[0]['steps'].append(terminal)
+        api = FakeAPI([run(NOW+timedelta(minutes=58))], evidence)
+        self.assertEqual(backup.wake_fast(api, NOW)['action'], 'already_published')
+        terminal['completed_at'] = (NOW+timedelta(seconds=1)).isoformat()
+        with self.assertRaises(RuntimeError):
+            backup.wake_fast(api, NOW)
+        self.assertEqual(api.dispatched, 0)
+
     def test_http_payload_does_not_force_or_change_branch(self):
         with patch.object(backup.GitHub, 'request', return_value={}) as request:
             backup.GitHub('test-placeholder').dispatch()
