@@ -1,0 +1,42 @@
+name: Telegram one-time delivery verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/telegram-once-verification.yml'
+permissions: {}
+jobs:
+  verify_delivery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Send a one-time out-of-schedule Telegram verification
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.parse, urllib.request, urllib.error
+          token = os.environ.get("BOT_TOKEN", "")
+          if not token:
+              raise SystemExit("Telegram secret missing")
+          channel="@arabsniper_signals"
+          caption=("🎯 ArabSniperBet · TEST TECNICO STRAORDINARIO\n\n"
+                   "Verifica del collegamento automatico al canale Telegram.\n"
+                   "Non è un pronostico né un segnale Gold.\n\n"
+                   "Studiamo quote, statistiche e movimenti del mercato per selezionare le opportunità.\n\n"
+                   "👑 Area Gold: https://arabsniperbet.com/gold\n"
+                   "📲 Canale: https://t.me/arabsniper_signals")
+          request=urllib.request.Request("https://api.telegram.org/bot"+token+"/sendMessage",
+                  data=urllib.parse.urlencode({"chat_id":channel,"text":caption}).encode("utf-8"))
+          try:
+              with urllib.request.urlopen(request,timeout=20) as response:
+                  payload=json.load(response)
+          except urllib.error.HTTPError as exc:
+              raise SystemExit("Telegram delivery HTTP "+str(exc.code))
+          if not payload.get("ok"):
+              raise SystemExit("Telegram did not confirm delivery")
+          message=payload["result"]
+          if message["chat"].get("username","").lower()!=channel[1:]:
+              raise SystemExit("Wrong Telegram channel")
+          print("VERIFIED_TELEGRAM_POST=https://t.me/arabsniper_signals/"+str(message["message_id"]))
+          PY
