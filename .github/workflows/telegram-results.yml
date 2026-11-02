@@ -1,0 +1,54 @@
+name: Audit published Telegram predictions
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Closed match date in Rome (YYYY-MM-DD); blank means yesterday'
+        required: false
+  schedule:
+    - cron: '30 9 * * *'
+      timezone: Europe/Rome
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: telegram-results-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify result settlement logic
+        run: python3 -m unittest discover -s tests -p test_telegram_results.py -v
+      - name: Choose the last completed Rome date
+        id: day
+        env:
+          REQUESTED_DAY: ${{ inputs.date }}
+        run: |
+          python3 - <<'PY'
+          from datetime import datetime, timedelta, date
+          from zoneinfo import ZoneInfo
+          import os
+          today = datetime.now(ZoneInfo("Europe/Rome")).date()
+          day = date.fromisoformat(os.environ["REQUESTED_DAY"]) if os.environ.get("REQUESTED_DAY") else today-timedelta(days=1)
+          if not 1 <= (today-day).days <= 3:
+              raise SystemExit("Only closed dates within 3 days can be audited")
+          with open(os.environ["GITHUB_OUTPUT"],"a") as f:
+              print("day="+day.isoformat(),file=f)
+          PY
+      - name: Compare sent receipts with official final and halftime scores
+        env:
+          GH_TOKEN: ${{ github.token }}
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+        run: python3 src/telegram_results.py --date "${{ steps.day.outputs.day }}"
+      - name: Preserve report for 90 days
+        uses: actions/upload-artifact@v4
+        with:
+          name: telegram-audit-${{ steps.day.outputs.day }}-${{ github.run_id }}
+          path: telegram-audit/
+          retention-days: 90
+          if-no-files-found: error
