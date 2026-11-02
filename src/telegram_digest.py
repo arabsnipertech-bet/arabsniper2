@@ -156,6 +156,11 @@ def prepare():
                  f"{instant(p['kickoff']).astimezone(ROME):%H:%M} · {p['match']}",
                  f"{p['label']} · quota {p['odd']:.2f}",
                  f"Segnale: {p['signal']}"]
+    lines.extend(["", "🎯 Prono gratuito da ArabSniperBet.com",
+                  "Studiamo quote, statistiche e movimenti di mercato.",
+                  "👑 Area Gold: https://arabsniperbet.com/gold",
+                  "📲 Canale: https://t.me/arabsniper_signals",
+                  "Le analisi non garantiscono il risultato."])
     Path("post.json").write_text(json.dumps(
         dict(picks=chosen, text="\n".join(lines).strip()), ensure_ascii=False))
     with open(os.environ["GITHUB_OUTPUT"], "a") as out:
