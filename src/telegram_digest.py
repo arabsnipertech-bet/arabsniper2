@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import urlencode
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 from zoneinfo import ZoneInfo
 
 ROME = ZoneInfo("Europe/Rome")
@@ -38,7 +38,7 @@ def picks(feed, now, window=None, limit=3, exclude=None):
         policy = row.get("opportunity") or {}
         start, at = instant(row.get("kickoff")), instant(row.get("captured_at"))
         market = policy.get("goal_market")
-        if (not start or not at or not at <= now < start or
+        if (not start or not at or not at <= now < start or now-at > timedelta(minutes=90) or
                 start.astimezone(ROME).date() != now.date() or
                 not policy.get("eligible") or market not in MARKETS or
                 row.get("quote_executable") is False or
@@ -55,10 +55,17 @@ def picks(feed, now, window=None, limit=3, exclude=None):
                          market=market, odd=row["odd"], kickoff=row["kickoff"],
                          captured_at=row["captured_at"],
                          score=float(policy.get("playability_score") or 0),
-                         signal=policy.get("signal") or "unconfirmed")
+                         signal=policy.get("signal") or "unconfirmed",
+                         strict=bool(policy.get("strict_eligible", False)),
+                         stable=(policy.get("stability") or {}).get("status") == "strict",
+                         market_confirmed=row.get("market_confirmation") == "confirmed",
+                         model_probability=row.get("statistical_pct"))
         if fixture not in result or candidate["score"] > result[fixture]["score"]:
             result[fixture] = candidate
-    return sorted(result.values(), key=lambda r:(r["score"],r["kickoff"]), reverse=True)[:limit]
+    return sorted(result.values(), key=lambda r:(
+        r["strict"], r["stable"], r["market_confirmed"],
+        r["signal"] == "confirmed", r["score"], -instant(r["kickoff"]).timestamp()
+    ), reverse=True)[:limit]
 
 def verdict(pick, score, now):
     if now < instant(pick["kickoff"]):
@@ -167,21 +174,34 @@ def prepare():
         print(f"name={name}", file=out)
 
 def send():
+    """Send the image and its caption as one verified Telegram message."""
     token = os.environ["BOT_TOKEN"]
     if not token:
         raise SystemExit("Missing bot token")
     post = json.loads(Path("post.json").read_text())
+    image = Path("telegram-card.png")
+    if not image.is_file():
+        raise SystemExit("Missing Telegram image card")
+    caption = post["text"]
+    if len(caption) > 1024:
+        raise SystemExit("Telegram photo caption exceeds 1024 characters")
+    import requests
     try:
-        data = urlencode(dict(chat_id=CHANNEL,text=post["text"])).encode()
-        with urlopen(f"https://api.telegram.org/bot{token}/sendMessage",data=data,timeout=20) as response:
-            message = json.load(response)["result"]
-    except HTTPError as exc:
-        raise SystemExit(f"Telegram HTTP {exc.code}") from None
-    except Exception:
-        raise SystemExit("Telegram delivery unconfirmed") from None
-    if message["chat"].get("username","").lower() != CHANNEL[1:]:
-        raise SystemExit("Unexpected destination")
-    print(f"Telegram message {message['message_id']}")
+        with image.open("rb") as handle:
+            response = requests.post(
+                f"https://api.telegram.org/bot{token}/sendPhoto",
+                data={"chat_id": CHANNEL, "caption": caption},
+                files={"photo": ("card.png", handle, "image/png")},
+                timeout=30)
+        if response.status_code != 200:
+            raise SystemExit(f"Telegram photo HTTP {response.status_code}")
+        payload = response.json()
+        message = payload["result"]
+    except (requests.RequestException, ValueError, KeyError):
+        raise SystemExit("Telegram photo delivery unconfirmed") from None
+    if not payload.get("ok") or message["chat"].get("username","").lower()!=CHANNEL[1:] or not message.get("photo"):
+        raise SystemExit("Unexpected Telegram photo destination")
+    print(f"Telegram photo message {message['message_id']}")
 
 if __name__ == "__main__":
     {"prepare":prepare,"send":send}[sys.argv[1]]()

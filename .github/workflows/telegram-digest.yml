@@ -29,12 +29,19 @@ jobs:
           persist-credentials: false
       - name: Check Telegram selection and score tests
         run: python3 -m unittest discover -s tests -p test_telegram_digest.py -v
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install Pillow==11.3.0 requests==2.32.5
       - id: prepare
         env:
           GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}
           CRON: ${{ github.event.schedule }}
         run: python3 src/telegram_digest.py prepare
+      - name: Render selected prediction as a graphical card
+        if: steps.prepare.outputs.name != ''
+        run: python3 src/telegram_card.py post.json telegram-card.png
       - uses: actions/upload-artifact@v4
         if: steps.prepare.outputs.name != ''
         with:
