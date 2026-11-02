@@ -185,22 +185,19 @@ def send():
     caption = post["text"]
     if len(caption) > 1024:
         raise SystemExit("Telegram photo caption exceeds 1024 characters")
-    boundary = "ArabSniperTelegramPictureBoundary"
-    body = bytearray()
-    for name,value in (("chat_id",CHANNEL),("caption",caption)):
-        body.extend(("--"+boundary+"\\r\\nContent-Disposition: form-data; name=\\\""+name+"\\\"\\r\\n\\r\\n"+value+"\\r\\n").encode())
-    body.extend(("--"+boundary+"\\r\\nContent-Disposition: form-data; name=\\\"photo\\\"; filename=\\\"card.png\\\"\\r\\nContent-Type: image/png\\r\\n\\r\\n").encode())
-    body.extend(image.read_bytes())
-    body.extend(("\\r\\n--"+boundary+"--\\r\\n").encode())
+    import requests
     try:
-        request = Request(f"https://api.telegram.org/bot{token}/sendPhoto",
-                          data=bytes(body),headers={"Content-Type":"multipart/form-data; boundary="+boundary})
-        with urlopen(request,timeout=30) as response:
-            payload=json.load(response)
-            message=payload["result"]
-    except HTTPError as exc:
-        raise SystemExit(f"Telegram HTTP {exc.code}") from None
-    except Exception:
+        with image.open("rb") as handle:
+            response = requests.post(
+                f"https://api.telegram.org/bot{token}/sendPhoto",
+                data={"chat_id": CHANNEL, "caption": caption},
+                files={"photo": ("card.png", handle, "image/png")},
+                timeout=30)
+        if response.status_code != 200:
+            raise SystemExit(f"Telegram photo HTTP {response.status_code}")
+        payload = response.json()
+        message = payload["result"]
+    except (requests.RequestException, ValueError, KeyError):
         raise SystemExit("Telegram photo delivery unconfirmed") from None
     if not payload.get("ok") or message["chat"].get("username","").lower()!=CHANNEL[1:] or not message.get("photo"):
         raise SystemExit("Unexpected Telegram photo destination")
