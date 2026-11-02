@@ -12,8 +12,10 @@ from zoneinfo import ZoneInfo
 
 ROME = ZoneInfo("Europe/Rome")
 CHANNEL = "@arabsniper_signals"
-SLOTS = {"0 13 * * *": "13:00", "30 17 * * *": "17:30", "0 19 * * *": "19:00",
-         "30 20 * * *": "20:30", "0 22 * * *": "22:00"}
+SLOTS = {"0 13 * * *": "13:00", "30 17 * * *": "17:30",
+         "0 19 * * *": "19:00", "0 20 * * *": "20:00"}
+WINDOWS = {"17:30": ("18:00", "19:00"), "19:00": ("19:30", "21:00"),
+           "20:00": ("20:30", "22:00")}
 MARKETS = {"over15_ht": ("ht", 2), "over25_ht": ("ht", 3), "gg_ht": ("ht", "gg"),
            "over25_ft": ("ft", 3), "over35_ft": ("ft", 4)}
 FINAL = {"FT", "AET", "PEN"}
@@ -26,21 +28,37 @@ def instant(value):
     except (ValueError, TypeError):
         return None
 
-def picks(feed, now):
+def picks(feed, now, window=None, limit=3, exclude=None):
+    """Rank valid, unstarted fixtures and optionally restrict their Rome kickoff."""
     if feed.get("date") != now.date().isoformat():
         return []
+    excluded = set(exclude or [])
     result = {}
     for row in feed.get("selections", []):
         policy = row.get("opportunity") or {}
         start, at = instant(row.get("kickoff")), instant(row.get("captured_at"))
         market = policy.get("goal_market")
-        if (not start or not at or not at <= now < start or start.astimezone(ROME).date() != now.date()
-                or not policy.get("eligible") or market not in MARKETS or row.get("quote_executable") is False
-                or not isinstance(row.get("odd"), (int, float)) or row["odd"] <= 1 or not row.get("fixture_id")):
+        if (not start or not at or not at <= now < start or
+                start.astimezone(ROME).date() != now.date() or
+                not policy.get("eligible") or market not in MARKETS or
+                row.get("quote_executable") is False or
+                not isinstance(row.get("odd"), (int, float)) or row["odd"] <= 1 or
+                not row.get("fixture_id")):
             continue
-        result.setdefault(str(row["fixture_id"]), dict(id=str(row["fixture_id"]), match=row["match"],
-            label=row["label"], market=market, odd=row["odd"], kickoff=row["kickoff"], captured_at=row["captured_at"]))
-    return list(result.values())[:3]
+        kickoff_local = start.astimezone(ROME)
+        if window and not (window[0] <= kickoff_local.strftime("%H:%M") <= window[1]):
+            continue
+        fixture = str(row["fixture_id"])
+        if fixture in excluded:
+            continue
+        candidate = dict(id=fixture, match=row["match"], label=row["label"],
+                         market=market, odd=row["odd"], kickoff=row["kickoff"],
+                         captured_at=row["captured_at"],
+                         score=float(policy.get("playability_score") or 0),
+                         signal=policy.get("signal") or "unconfirmed")
+        if fixture not in result or candidate["score"] > result[fixture]["score"]:
+            result[fixture] = candidate
+    return sorted(result.values(), key=lambda r:(r["score"],r["kickoff"]), reverse=True)[:limit]
 
 def verdict(pick, score, now):
     if now < instant(pick["kickoff"]):
@@ -78,43 +96,70 @@ def artifact(name):
     data = json.loads(gh("api", f"repos/{repo}/actions/artifacts?name={name}&per_page=100"))
     return next((a for a in data["artifacts"] if a["name"] == name and not a["expired"]), None)
 
+def prior_ids(day, slot):
+    """Load earlier confirmed posts to prevent repeating the same fixture."""
+    previous = ["13:00", "17:30", "19:00"]
+    seen = set()
+    for previous_slot in previous:
+        if previous_slot == slot:
+            break
+        name = f"tg-{day}-{previous_slot.replace(':','')}-sent"
+        record = artifact(name)
+        if not record:
+            continue
+        folder = Path("prior") / previous_slot.replace(":", "")
+        folder.mkdir(parents=True, exist_ok=True)
+        gh("run", "download", str(record["workflow_run"]["id"]),
+           "-n", name, "-D", str(folder))
+        for p in json.loads((folder / "post.json").read_text())["picks"]:
+            seen.add(p["id"])
+    return seen
+
+
 def prepare():
     now = datetime.now(ROME)
-    dry = os.environ.get("EVENT") != "schedule"
-    slot = "13:00" if dry else SLOTS[os.environ["CRON"]]
-    due = datetime.combine(now.date(), datetime.strptime(slot,"%H:%M").time(), ROME)
-    if not dry and not timedelta(0) <= now-due < timedelta(minutes=85):
+    if os.environ.get("EVENT") != "schedule":
+        print("Manual/push run: validation only, no channel publication")
+        return
+    slot = SLOTS.get(os.environ.get("CRON"))
+    if slot is None:
+        raise SystemExit("Unrecognized Telegram schedule")
+    due = datetime.combine(now.date(), datetime.strptime(slot, "%H:%M").time(), ROME)
+    if not timedelta(0) <= now-due < timedelta(minutes=25):
+        print("Outside the publication window")
         return
     day = now.date().isoformat()
     name = f"tg-{day}-{slot.replace(':','')}"
-    if not dry and artifact(name+"-claim"):
-        print("Slot already reserved")
+    if artifact(name+"-claim") or artifact(name+"-sent"):
+        print("Slot already reserved or posted")
         return
+    feed = json.loads(Path("data/arab_quote_homepage.json").read_text())
     if slot == "13:00":
-        chosen = picks(json.loads(Path("data/arab_quote_homepage.json").read_text()),now)
-        if not chosen:
-            print("No eligible upcoming picks")
+        chosen = picks(feed, now, limit=3)
+        if len(chosen) != 3:
+            print("Insufficient verified upcoming picks for a triple")
             return
-        lines = [f"ArabSniper · Scelte del {now:%d/%m}", ""]
+        lines = [f"ArabSniper · Tripla del {now:%d/%m}", ""]
+        total = 1
         for p in chosen:
-            price = f"{p['odd']:.2f}".replace(".",",")
-            lines.append(f"{instant(p['kickoff']).astimezone(ROME):%H:%M} · {p['match']}\n{p['label']} · quota {price}\n")
+            total *= p["odd"]
+            lines.append(f"{instant(p['kickoff']).astimezone(ROME):%H:%M} · {p['match']}\n{p['label']} · quota {p['odd']:.2f}\n")
+        lines.append(f"Quota combinata indicativa {total:.2f}")
     else:
-        receipt = artifact(f"tg-{day}-1300-sent")
-        if not receipt:
-            print("No confirmed midday post")
+        chosen = picks(feed, now, window=WINDOWS[slot], limit=1,
+                       exclude=prior_ids(day, slot))
+        if not chosen:
+            print(f"No qualifying pre-match pick for {slot}")
             return
-        gh("run","download",str(receipt["workflow_run"]["id"]),"-n",receipt["name"],"-D","midday")
-        chosen = json.loads(Path("midday/post.json").read_text())["picks"]
-        with urlopen("https://arabsniperbet.com/api/live-scores",timeout=20) as response:
-            scores = json.load(response)["fixtures"]
-        lines = [f"ArabSniper · Aggiornamento {now:%d/%m %H:%M}", ""]
-        for p in chosen:
-            lines.append(f"{p['match']} · {p['label']}\n{verdict(p,scores.get(p['id'],{}),now)}\n")
-    Path("post.json").write_text(json.dumps(dict(picks=chosen,text="\n".join(lines).strip()),ensure_ascii=False))
-    if not dry:
-        with open(os.environ["GITHUB_OUTPUT"],"a") as out:
-            print(f"name={name}",file=out)
+        p = chosen[0]
+        lines = [f"ArabSniper · Pronostico singolo {slot}", "",
+                 f"{instant(p['kickoff']).astimezone(ROME):%H:%M} · {p['match']}",
+                 f"{p['label']} · quota {p['odd']:.2f}",
+                 f"Segnale: {p['signal']}"]
+    Path("post.json").write_text(json.dumps(
+        dict(picks=chosen, text="\n".join(lines).strip()), ensure_ascii=False))
+    with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+        print(f"name={name}", file=out)
 
 def send():
     token = os.environ["BOT_TOKEN"]

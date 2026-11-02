@@ -11,9 +11,7 @@ on:
       timezone: Europe/Rome
     - cron: '0 19 * * *'
       timezone: Europe/Rome
-    - cron: '30 20 * * *'
-      timezone: Europe/Rome
-    - cron: '0 22 * * *'
+    - cron: '0 20 * * *'
       timezone: Europe/Rome
 permissions:
   contents: read
@@ -29,7 +27,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Check score settlement
+      - name: Check Telegram selection and score tests
         run: python3 -m unittest discover -s tests -p test_telegram_digest.py -v
       - id: prepare
         env:
