@@ -1,0 +1,96 @@
+name: One-time Telegram Japan multipla posts 03 Nov
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/telegram-japan-multiple-20261103.yml']
+permissions:
+  contents: read
+concurrency:
+  group: telegram-channel-publication
+  cancel-in-progress: false
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install Pillow==11.3.0 requests==2.32.5
+      - name: Publish the two user-supplied special multiples with branded artwork
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json,os,sys
+          from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          import requests
+          sys.path.insert(0,"src")
+          from telegram_special_cards import render
+          now=datetime.now(ZoneInfo("Europe/Rome"))
+          if now.date().isoformat()!="2026-11-02" or now.hour<22:
+              raise SystemExit("Outside authorized prematch window for 03-Nov matches")
+          token=os.environ.get("TELEGRAM_TOKEN")
+          if not token:raise SystemExit("Missing Telegram token")
+          channel="@arabsniper_signals"
+          sets=[
+              dict(market="OVER 1,5 • PRIMO TEMPO",
+                   picks=[dict(home="Kochi United",away="Ehime",odd=2.40,label="OVER 1,5 PT"),
+                          dict(home="Giravanz Kitakyushu",away="Reilac Shiga",odd=2.15,label="OVER 1,5 PT")]),
+              dict(market="OVER 2,5 • FINALE",
+                   picks=[dict(home="Ventforet Kofu",away="Albirex",odd=2.00,label="OVER 2,5 FT"),
+                          dict(home="Kochi United",away="Ehime",odd=1.60,label="OVER 2,5 FT"),
+                          dict(home="Zweigen Kanazawa",away="Nagano Parceiro",odd=1.60,label="OVER 2,5 FT"),
+                          dict(home="Gainare Tottori",away="Sagamihara",odd=1.65,label="OVER 2,5 FT")])]
+          ]
+          for i,ticket in enumerate(sets,1):
+              odd=1
+              for pick in ticket["picks"]:odd*=pick["odd"]
+              image=Path(f"japan-special-{i}.png")
+              render(ticket,str(image))
+              label="PRIMO TEMPO · OVER 1,5" if i==1 else "FINALE · OVER 2,5"
+              lines=[f"⚽ ArabSniperBet | MULTIPLA SPECIALE {i}/2",
+                     "🇯🇵 Giappone · 3 novembre 2026 · ore 06:00 italiane",
+                     f"🎯 {label}", ""]
+              for k,p in enumerate(ticket["picks"],1):
+                  lines.append(f"{k}. {p['home']} – {p['away']} · {p['odd']:.2f}")
+              lines.extend(["",f"💰 Quota complessiva indicativa: {odd:.2f}",
+                  "📌 Selezioni condivise per il canale: non classificate Gold/Platinum.",
+                  "Quote osservate nelle ricevute, soggette a variazione.",
+                  "📊 Scopri le nostre analisi: https://arabsniperbet.com",
+                  "📲 https://t.me/arabsniper_signals",
+                  "⚠️ Nessun esito garantito. Solo maggiorenni."])
+              caption="\n".join(lines)
+              if len(caption)>1024:raise SystemExit("Photo caption too long")
+              with image.open("rb") as handle:
+                  response=requests.post(f"https://api.telegram.org/bot{token}/sendPhoto",
+                      data={"chat_id":channel,"caption":caption},
+                      files={"photo":(image.name,handle,"image/png")},timeout=35)
+              if response.status_code!=200:
+                  raise SystemExit("Telegram delivery HTTP "+str(response.status_code))
+              result=response.json()
+              if not result.get("ok") or (result.get("result",{}).get("chat",{}).get("username") or "").lower()!="arabsniper_signals":
+                  raise SystemExit("Telegram response did not certify channel delivery")
+              msg=result["result"]
+              if not msg.get("photo"):
+                  raise SystemExit("Telegram did not confirm photo")
+              print(f"PUBLISHED_MULTIPLA_{i} https://t.me/arabsniper_signals/{msg['message_id']}",flush=True)
+              Path(f"japan-special-{i}.json").write_text(json.dumps(
+                  {"date":"2026-11-03","source":"user_supplied_ticket_not_model",
+                   "telegram_message_id":msg["message_id"],"selections":ticket["picks"],
+                   "market":ticket["market"],"combined_odd":odd},ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: telegram-community-multiples-20261103-${{ github.run_id }}
+          path: |
+            japan-special-*.json
+            japan-special-*.png
+          retention-days: 30
+          if-no-files-found: warn
