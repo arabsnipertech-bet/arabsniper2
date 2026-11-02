@@ -38,3 +38,18 @@ class TelegramTest(unittest.TestCase):
 
     def test_four_scheduled_posts(self):
         self.assertEqual(set(SLOTS.values()), {'13:00','17:30','19:00','20:00'})
+
+    def test_freshness_and_market_corrob(self):
+        now=datetime(2026,11,2,19,0,tzinfo=ROME)
+        def row(fid,score,confirmed,mins):
+            from datetime import timedelta
+            return dict(fixture_id=fid,match=f"Team {fid} - Opponent",label="Over 2,5 FT",
+                kickoff="2026-11-02T20:00:00+01:00",
+                captured_at=(now-timedelta(minutes=mins)).isoformat(),
+                odd=1.9,market_confirmation="confirmed" if confirmed else "unconfirmed",
+                opportunity=dict(eligible=True,strict_eligible=True,goal_market="over25_ft",
+                    playability_score=score,stability={"status":"strict"}))
+        feed=dict(date="2026-11-02",selections=[
+             row("old",900,True,120),row("unconfirmed",200,False,10),row("confirmed",100,True,10)])
+        result=picks(feed,now,WINDOWS["19:00"],limit=2)
+        self.assertEqual([r["id"] for r in result],["confirmed","unconfirmed"])
