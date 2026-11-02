@@ -36,11 +36,12 @@ def picks(feed, now, window=None, limit=3, exclude=None):
     result = {}
     for row in feed.get("selections", []):
         policy = row.get("opportunity") or {}
+        private = row.get("source_tier") in ("platinum", "gold")
         start, at = instant(row.get("kickoff")), instant(row.get("captured_at"))
-        market = policy.get("goal_market")
+        market = row.get("market") if private else policy.get("goal_market")
         if (not start or not at or not at <= now < start or now-at > timedelta(minutes=90) or
                 start.astimezone(ROME).date() != now.date() or
-                not policy.get("eligible") or market not in MARKETS or
+                (not private and not policy.get("eligible")) or market not in MARKETS or
                 row.get("quote_executable") is False or
                 not isinstance(row.get("odd"), (int, float)) or row["odd"] <= 1 or
                 not row.get("fixture_id")):
@@ -54,16 +55,17 @@ def picks(feed, now, window=None, limit=3, exclude=None):
         candidate = dict(id=fixture, match=row["match"], label=row["label"],
                          market=market, odd=row["odd"], kickoff=row["kickoff"],
                          captured_at=row["captured_at"],
-                         score=float(policy.get("playability_score") or 0),
-                         signal=policy.get("signal") or "unconfirmed",
-                         strict=bool(policy.get("strict_eligible", False)),
-                         stable=(policy.get("stability") or {}).get("status") == "strict",
-                         market_confirmed=row.get("market_confirmation") == "confirmed",
-                         model_probability=row.get("statistical_pct"))
+                         score=float(row.get("score") if private else policy.get("playability_score") or 0),
+                         signal=row.get("signal") if private else policy.get("signal") or "unconfirmed",
+                         tier=row.get("source_tier") or "gold",
+                         strict=bool(row.get("strict") if private else policy.get("strict_eligible", False)),
+                         stable=bool(row.get("stable")) if private else (policy.get("stability") or {}).get("status") == "strict",
+                         market_confirmed=bool(row.get("market_confirmed")) if private else row.get("market_confirmation") == "confirmed",
+                         model_probability=row.get("model_probability") if private else row.get("statistical_pct"))
         if fixture not in result or candidate["score"] > result[fixture]["score"]:
             result[fixture] = candidate
     return sorted(result.values(), key=lambda r:(
-        r["strict"], r["stable"], r["market_confirmed"],
+        r["tier"] == "platinum", r["strict"], r["stable"], r["market_confirmed"],
         r["signal"] == "confirmed", r["score"], -instant(r["kickoff"]).timestamp()
     ), reverse=True)[:limit]
 
@@ -140,7 +142,10 @@ def prepare():
     if artifact(name+"-claim") or artifact(name+"-sent"):
         print("Slot already reserved or posted")
         return
-    feed = json.loads(Path("data/arab_quote_homepage.json").read_text())
+    from telegram_private_feed import fetch_current_private
+    private_choices = fetch_current_private(now)
+    feed = {"date":day, "selections": private_choices}
+    print(f"Private daily board: {len(private_choices)} Gold/Platinum candidates")
     if slot == "13:00":
         chosen = picks(feed, now, limit=3)
         if len(chosen) != 3:
@@ -159,7 +164,7 @@ def prepare():
             print(f"No qualifying pre-match pick for {slot}")
             return
         p = chosen[0]
-        lines = [f"ArabSniper · Pronostico singolo {slot}", "",
+        lines = [f"ArabSniper · {p['tier'].upper()} · Pronostico singolo {slot}", "",
                  f"{instant(p['kickoff']).astimezone(ROME):%H:%M} · {p['match']}",
                  f"{p['label']} · quota {p['odd']:.2f}",
                  f"Segnale: {p['signal']}"]

@@ -2,7 +2,7 @@ name: Telegram daily picks and scores
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/telegram-digest.yml', 'src/telegram_digest.py']
+    paths: ['.github/workflows/telegram-digest.yml', 'src/telegram_digest.py', 'src/telegram_private_feed.py']
   workflow_dispatch:
   schedule:
     - cron: '0 13 * * *'
@@ -32,12 +32,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install Pillow==11.3.0 requests==2.32.5
+      - run: pip install Pillow==11.3.0 requests==2.32.5 boto3
       - id: prepare
         env:
           GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}
           CRON: ${{ github.event.schedule }}
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: python3 src/telegram_digest.py prepare
       - name: Render selected prediction as a graphical card
         if: steps.prepare.outputs.name != ''
