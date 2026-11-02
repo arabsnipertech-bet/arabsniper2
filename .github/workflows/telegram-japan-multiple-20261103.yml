@@ -46,7 +46,7 @@ jobs:
                    picks=[dict(home="Ventforet Kofu",away="Albirex",odd=2.00,label="OVER 2,5 FT"),
                           dict(home="Kochi United",away="Ehime",odd=1.60,label="OVER 2,5 FT"),
                           dict(home="Zweigen Kanazawa",away="Nagano Parceiro",odd=1.60,label="OVER 2,5 FT"),
-                          dict(home="Gainare Tottori",away="Sagamihara",odd=1.65,label="OVER 2,5 FT")])]
+                          dict(home="Gainare Tottori",away="Sagamihara",odd=1.65,label="OVER 2,5 FT")])
           ]
           for i,ticket in enumerate(sets,1):
               odd=1
