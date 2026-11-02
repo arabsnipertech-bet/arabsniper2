@@ -1,0 +1,57 @@
+name: Telegram daily picks and scores
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/telegram-digest.yml', 'src/telegram_digest.py']
+  workflow_dispatch:
+  schedule:
+    - cron: '0 13 * * *'
+      timezone: Europe/Rome
+    - cron: '30 17 * * *'
+      timezone: Europe/Rome
+    - cron: '0 19 * * *'
+      timezone: Europe/Rome
+    - cron: '30 20 * * *'
+      timezone: Europe/Rome
+    - cron: '0 22 * * *'
+      timezone: Europe/Rome
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: telegram-channel-publication
+  cancel-in-progress: false
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check score settlement
+        run: python3 -m unittest discover -s tests -p test_telegram_digest.py -v
+      - id: prepare
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          CRON: ${{ github.event.schedule }}
+        run: python3 src/telegram_digest.py prepare
+      - uses: actions/upload-artifact@v4
+        if: steps.prepare.outputs.name != ''
+        with:
+          name: ${{ steps.prepare.outputs.name }}-claim
+          path: post.json
+          retention-days: 3
+          if-no-files-found: error
+      - name: Send to the channel
+        if: steps.prepare.outputs.name != ''
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python3 src/telegram_digest.py send
+      - uses: actions/upload-artifact@v4
+        if: steps.prepare.outputs.name != ''
+        with:
+          name: ${{ steps.prepare.outputs.name }}-sent
+          path: post.json
+          retention-days: 3
