@@ -37,3 +37,5 @@ jobs:
           # A valid empty feed is allowed; absence and invalid input throw.
           assert all(x['market'] in ('over15_ht','over25_ht','gg_ht','over25_ft','over35_ft') for x in picks)
           PY
+
+# Verify current private board size after reader fix
