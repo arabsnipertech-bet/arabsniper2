@@ -107,6 +107,6 @@ def fetch_current_private(now):
     # The dashboard's 'day1' is today's board; do not expose raw payload.
     response=s3.get_object(Bucket=bucket,Key="arab_quote_day1.json")
     raw=response["Body"].read()
-    if len(raw)>24*1024*1024:
+    if len(raw)>160*1024*1024:
         raise ValueError("Unexpected oversized private daily feed")
     return from_private_day(json.loads(raw),now)
