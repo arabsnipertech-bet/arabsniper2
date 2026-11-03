@@ -1,0 +1,42 @@
+name: Telegram Gold free trial promotion
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '45 12 * * *'
+      timezone: Europe/Rome
+    - cron: '15 17 * * *'
+      timezone: Europe/Rome
+    - cron: '15 21 * * *'
+      timezone: Europe/Rome
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: telegram-channel-publication
+  cancel-in-progress: false
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify promotion schedule and one-time trial messaging
+        run: python3 -m unittest discover -s tests -p test_telegram_gold_promo.py -v
+      - name: Publish independent promo (scheduled events only)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python3 src/telegram_gold_promo.py
+      - name: Retain publication receipt for de-duplication
+        if: hashFiles('promo-receipt.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: telegram-gold-promo-${{ github.run_id }}-sent
+          path: promo-receipt.json
+          retention-days: 14
