@@ -21,7 +21,7 @@ class TelegramWatchdogTests(unittest.TestCase):
     def test_due_slots_backup_and_time_constraints(self):
         at=datetime(2026,11,3,17,44,tzinfo=ROME)
         self.assertEqual([(x,y) for x,y,_ in due_slots(at)],
-                         [("telegram-digest.yml","17:30")])
+                         [("telegram-gold-promo.yml","17:15"),("telegram-digest.yml","17:30")])
         at=datetime(2026,11,3,21,25,tzinfo=ROME)
         self.assertEqual([(x,y) for x,y,_ in due_slots(at)],
                          [("telegram-gold-promo.yml","21:15")])
@@ -33,8 +33,8 @@ class TelegramWatchdogTests(unittest.TestCase):
         now=datetime(2026,11,3,17,44,tzinfo=ROME)
         api=FakeApi()
         r=wake(api,now)
-        self.assertEqual(api.dispatched,[("telegram-digest.yml","17:30")])
-        self.assertEqual(r[0]["action"],"dispatched")
+        self.assertEqual(api.dispatched,[("telegram-gold-promo.yml","17:15"),("telegram-digest.yml","17:30")])
+        self.assertTrue(all(entry["action"]=="dispatched" for entry in r))
 
     def test_existing_successful_attempt_prevents_duplicates(self):
         now=datetime(2026,11,3,17,44,tzinfo=ROME)
