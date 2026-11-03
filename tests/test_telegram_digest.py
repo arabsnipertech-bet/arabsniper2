@@ -61,6 +61,14 @@ class TelegramTest(unittest.TestCase):
         self.assertIsNone(slot_for_schedule(datetime.fromisoformat(
             "2026-11-03T12:00:00+01:00"), "schedule", "0 11 * * *"))
 
+    def test_external_backup_dispatch_is_strictly_gated(self):
+        now=datetime.fromisoformat("2026-11-03T17:44:00+01:00")
+        self.assertEqual(slot_for_schedule(now,"workflow_dispatch","", "17:30"),"17:30")
+        self.assertIsNone(slot_for_schedule(now,"workflow_dispatch","", "19:00"))
+        self.assertIsNone(slot_for_schedule(now,"workflow_dispatch","", "13:00"))
+        self.assertIsNone(slot_for_schedule(datetime.fromisoformat("2026-11-03T17:59:00+01:00"),
+                                             "workflow_dispatch","", "17:30"))
+
     def test_evening_rationale_real_movement_and_statistics(self):
         pick=dict(model_probability=58.2,odd=1.80,first_odd=1.95,
                   delta_pct=100*(1.80/1.95-1),oci=36.2,margin_pct=5.6,
