@@ -54,20 +54,56 @@ def spunti(feed, now):
             or type(odd) not in (int,float) or not math.isfinite(odd) or odd<=1
             or not isinstance(label,str) or not label.strip() or not public.get("match")):
             continue
-        confirmed = full.get("market_confirmation") if full else None
-        probability = full.get("statistical_pct") if full else None
-        margin = full.get("margin_pct") if full else None
-        reasons = ["Quote rilevata nel feed pubblico con orario di aggiornamento verificabile"]
+        # Prefer the exact public social-selection snapshot, including the fourth
+        # Facebook candidate. The compact top-three homepage projection is fallback.
+        def field(key):
+            return public[key] if key in public else full.get(key)
+
+        confirmed=field("market_confirmation")
+        probability=field("statistical_pct")
+        margin=field("margin_pct")
+        first_odd=field("first_odd")
+        delta=field("delta_pct")
+        oci=field("oci")
+        bookmaker=field("bookmaker")
+        movement_confirmed=field("movement_confirmed")
+        books=field("bookmakers_count")
+        reasons=[]
         if type(probability) in (float,int) and math.isfinite(probability) and 0<=probability<=100:
-            reasons.append(f"Stima statistica del modello: {probability:.1f}% (non garanzia)")
-        if type(margin) in (float,int) and math.isfinite(margin) and 0<=margin<=100:
-            reasons.append(f"Margine mercato stimato: {margin:.1f}%")
-        if confirmed == "unconfirmed":
-            reasons.append("Flusso di mercato non confermato: proposta in osservazione")
-        elif confirmed == "confirmed":
-            reasons.append("Conferma di mercato indicata dal modello")
+            # A model-derived rate is not empirical accuracy or guaranteed success.
+            reasons.append(f"Statistica del modello per questo mercato: {probability:.1f}%")
+            implied=100/odd
+            reasons.append(f"Probabilità implicita della quota: {implied:.1f}% (senza correzione dell'aggio)")
+            reasons.append(f"Differenza modello/implicita: {probability-implied:+.1f} punti; valutazione da verificare")
         else:
-            reasons.append("Nessuna conferma aggiuntiva di mercato disponibile")
+            reasons.append("Stima statistica numerica non disponibile in questo snapshot")
+        if (type(first_odd) in (float,int) and math.isfinite(first_odd) and first_odd>1
+            and type(delta) in (float,int) and math.isfinite(delta)
+            and abs(delta - 100*(odd/first_odd-1)) < 0.3):
+            direction="in discesa" if delta< -0.05 else "in salita" if delta>0.05 else "stabile"
+            reasons.append(f"Movimento verificato: prima quota {first_odd:.2f} → ora {odd:.2f} ({delta:+.1f}%, {direction})")
+            if movement_confirmed is True:
+                reasons.append("Movimento confermato dalle verifiche del motore")
+            else:
+                reasons.append("Variazione osservata, ma conferma del flusso NON disponibile")
+        else:
+            reasons.append("Movimento apertura/attuale non verificabile: non attribuiamo cali o rialzi")
+        if type(oci) in (float,int) and math.isfinite(oci):
+            reasons.append(f"OCI osservato: {oci:+.1f} (indice di mercato, non probabilità)")
+        else:
+            reasons.append("OCI non disponibile: nessuna conferma di direzione basata su OCI")
+        if type(margin) in (float,int) and math.isfinite(margin) and 0<=margin<=100:
+            reasons.append(f"Aggio/margine osservato: {margin:.1f}%")
+        if isinstance(bookmaker,str) and bookmaker.strip():
+            reasons.append(f"Quota osservata presso: {bookmaker.strip()}")
+        if type(books) is int and books>0:
+            reasons.append(f"Operatori nel campione: {books}")
+        if confirmed == "unconfirmed":
+            reasons.append("Segnale del flusso NON confermato; spunto di osservazione, non Gold certificato")
+        elif confirmed == "confirmed":
+            reasons.append("Conferma di mercato segnalata dal modello")
+        else:
+            reasons.append("Conferma ulteriore di mercato non disponibile")
         found.append(dict(fixture_id=fid,match=public["match"],kickoff=start,
                           odd=odd,label=label.strip(),quote_time=quote_time,
                           reasons=reasons))
@@ -81,8 +117,8 @@ def message_for(items,now):
         return None
     now=now.astimezone(ROME)
     lines=[f"🔎 ARABSNIPER · 3 SPUNTI DEL GIORNO · {now:%d/%m %H:%M}",
-           "Tre analisi indipendenti dal feed pubblico, NON una multipla e NON selezioni Gold/Platinum certificate.",
-           "Quote osservate, soggette a cambiamenti. Le motivazioni spiegano i dati, non garantiscono l'esito.",""]
+           "Tre analisi indipendenti dal feed pubblico, NON una multipla né certificazioni Platinum. Statistiche e quote sono osservazioni, non risultati futuri.",
+           "Per ogni partita: statistica del modello, confronto con la quota e movimento di mercato solo quando verificabile.",""]
     for i,item in enumerate(items,1):
         kickoff=item["kickoff"].astimezone(ROME)
         quote_at=item["quote_time"].astimezone(ROME)
