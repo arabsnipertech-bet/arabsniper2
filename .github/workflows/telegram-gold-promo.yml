@@ -1,6 +1,11 @@
 name: Telegram Gold free trial promotion
 on:
   workflow_dispatch:
+    inputs:
+      recovery_slot:
+        description: 'Guarded backup slot'
+        type: string
+        required: false
   pull_request:
     paths:
       - '.github/workflows/telegram-gold-promo.yml'
@@ -45,6 +50,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule }}
+          RECOVERY_SLOT: ${{ inputs.recovery_slot }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python3 src/telegram_gold_promo.py
       - name: Retain publication receipt for de-duplication
