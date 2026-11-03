@@ -4,15 +4,22 @@ on:
     branches: [main]
     paths: ['.github/workflows/telegram-digest.yml', 'src/telegram_digest.py', 'src/telegram_private_feed.py']
   workflow_dispatch:
+  # UTC cron, CET/CEST primary and 13-minute fallback; script gates by Rome local time.
   schedule:
-    - cron: '0 13 * * *'
-      timezone: Europe/Rome
-    - cron: '30 17 * * *'
-      timezone: Europe/Rome
+    - cron: '0 11 * * *'
+    - cron: '13 11 * * *'
+    - cron: '0 12 * * *'
+    - cron: '13 12 * * *'
+    - cron: '30 15 * * *'
+    - cron: '43 15 * * *'
+    - cron: '30 16 * * *'
+    - cron: '43 16 * * *'
+    - cron: '0 17 * * *'
+    - cron: '13 17 * * *'
+    - cron: '0 18 * * *'
+    - cron: '13 18 * * *'
     - cron: '0 19 * * *'
-      timezone: Europe/Rome
-    - cron: '0 20 * * *'
-      timezone: Europe/Rome
+    - cron: '13 19 * * *'
 permissions:
   contents: read
   actions: read
