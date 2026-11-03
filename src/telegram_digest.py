@@ -156,6 +156,10 @@ def prepare():
     if artifact(name+"-claim") or artifact(name+"-sent"):
         print("Slot already reserved or posted")
         return
+    if slot == "13:00":
+        # Dedicated public-feed spunti workflow owns this slot. Keep evening Gold unchanged.
+        print("13:00 handled by independent public analytical spunti workflow")
+        return
     from telegram_private_feed import fetch_current_private
     private_choices = fetch_current_private(now)
     feed = {"date":day, "selections": private_choices}
