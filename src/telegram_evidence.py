@@ -20,26 +20,32 @@ SLOTS={
 LABELS={"over15_ht":"Over 1,5 PT","over25_ht":"Over 2,5 PT","gg_ht":"Goal PT","over25_ft":"Over 2,5 FT","over35_ft":"Over 3,5 FT"}
 
 
-def choose_slot(now,event,cron):
-    if event!="schedule" or cron not in SLOTS:
+def choose_slot(now,event,cron,recovery_slot=None):
+    if event=="schedule":
+        if cron not in SLOTS:
+            return None
+        selected=SLOTS[cron]
+    elif event=="workflow_dispatch":
+        if recovery_slot not in ("audit","market"):
+            return None
+        selected=recovery_slot
+    else:
         return None
     local=now.astimezone(ROME)
-    scheduled_hour,scheduled_minute=(10,45) if SLOTS[cron]=="audit" else (16,45)
+    scheduled_hour,scheduled_minute=(10,45) if selected=="audit" else (16,45)
     due=datetime.combine(local.date(),time(scheduled_hour,scheduled_minute),tzinfo=ROME)
     if not timedelta(0)<=local-due<=timedelta(minutes=38):
         return None
-    # Discard the wrong seasonal UTC schedule; accept only a cron that resolves
-    # to the due Rome slot (+13m fallback). Prevent CEST/CET duplicates.
-    minute,hour=map(int,cron.split()[:2])
-    actual_utc=now.astimezone(timezone.utc)
-    expected_utc=due.astimezone(timezone.utc)
-    expected_minutes={expected_utc.minute,(expected_utc+timedelta(minutes=13)).minute}
-    expected_pairs={(expected_utc.hour,expected_utc.minute),
-                    ((expected_utc+timedelta(minutes=13)).hour,
-                     (expected_utc+timedelta(minutes=13)).minute)}
-    if (hour,minute) not in expected_pairs:
-        return None
-    return SLOTS[cron]
+    if event=="schedule":
+        # Reject a cron intended for the wrong CET/CEST season.
+        minute,hour=map(int,cron.split()[:2])
+        expected_utc=due.astimezone(timezone.utc)
+        expected_pairs={(expected_utc.hour,expected_utc.minute),
+                        ((expected_utc+timedelta(minutes=13)).hour,
+                         (expected_utc+timedelta(minutes=13)).minute)}
+        if (hour,minute) not in expected_pairs:
+            return None
+    return selected
 
 
 def audit_message(report):
@@ -152,7 +158,7 @@ def load_audit(day):
 
 def main():
     now=datetime.now(ROME)
-    slot=choose_slot(now,os.environ.get("GITHUB_EVENT_NAME"),os.environ.get("GITHUB_EVENT_SCHEDULE"))
+    slot=choose_slot(now,os.environ.get("GITHUB_EVENT_NAME"),os.environ.get("GITHUB_EVENT_SCHEDULE"),os.environ.get("RECOVERY_SLOT"))
     if not slot:
         print("Not an eligible scheduled execution; no publication")
         return
