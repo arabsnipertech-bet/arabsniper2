@@ -1,0 +1,53 @@
+name: Telegram daily three analytical spunti (public feed)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/telegram-daily-spunti.yml'
+      - 'src/telegram_daily_spunti.py'
+  pull_request:
+    paths:
+      - '.github/workflows/telegram-daily-spunti.yml'
+      - 'src/telegram_daily_spunti.py'
+      - 'tests/test_telegram_daily_spunti.py'
+  workflow_dispatch:
+  # UTC cron for 13:00/13:13 Rome, CET and CEST.
+  schedule:
+    - cron: '0 11 * * *'
+    - cron: '13 11 * * *'
+    - cron: '0 12 * * *'
+    - cron: '13 12 * * *'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: telegram-channel-publication
+  cancel-in-progress: false
+jobs:
+  spunti:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test public data guards
+        run: python3 -m unittest discover -s tests -p test_telegram_daily_spunti.py -v
+      - name: Publish verified public pre-match spunti
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule }}
+          ALLOW_ONEOFF: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Publish Telegram public spunti once 2026-11-03') }}
+        run: python3 src/telegram_daily_spunti.py
+      - name: Retain daily receipt
+        if: hashFiles('spunti-receipt.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.publish.outputs.artifact }}
+          path: spunti-receipt.json
+          retention-days: 30
