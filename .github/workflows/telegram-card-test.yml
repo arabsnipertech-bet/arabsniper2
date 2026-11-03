@@ -4,6 +4,8 @@ on:
     paths:
       - 'src/telegram_card.py'
       - 'src/telegram_digest.py'
+      - 'src/telegram_private_feed.py'
+      - 'tests/test_telegram_private_feed.py'
       - '.github/workflows/telegram-digest.yml'
       - '.github/workflows/telegram-card-test.yml'
   workflow_dispatch:
@@ -19,6 +21,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install Pillow==11.3.0 requests==2.32.5
+      - name: Verify cached Gold/Platinum selection and stale-data safeguards
+        run: python3 -m unittest discover -s tests -p test_telegram_private_feed.py -v
       - name: Test real image generation with synthetic fixture inputs
         run: |
           python3 - <<'PY'
