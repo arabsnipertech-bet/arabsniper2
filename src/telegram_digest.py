@@ -1,5 +1,6 @@
 """Publish the public ArabSniper picks and follow the same fixtures in Rome time."""
 import json
+import math
 import os
 import subprocess
 import sys
@@ -69,13 +70,66 @@ def picks(feed, now, window=None, limit=3, exclude=None):
                          strict=bool(row.get("strict") if private else policy.get("strict_eligible", False)),
                          stable=bool(row.get("stable")) if private else (policy.get("stability") or {}).get("status") == "strict",
                          market_confirmed=bool(row.get("market_confirmed")) if private else row.get("market_confirmation") == "confirmed",
-                         model_probability=row.get("model_probability") if private else row.get("statistical_pct"))
+                         model_probability=row.get("model_probability") if private else row.get("statistical_pct"),
+                         first_odd=row.get("first_odd"), delta_pct=row.get("delta_pct"),
+                         oci=row.get("oci"), ev_pct=row.get("ev_pct"),
+                         margin_pct=row.get("margin_pct"),bookmaker=row.get("bookmaker"),
+                         movement_confirmed=row.get("movement_confirmed"),
+                         bookmakers_count=row.get("bookmakers_count"))
         if fixture not in result or candidate["score"] > result[fixture]["score"]:
             result[fixture] = candidate
     return sorted(result.values(), key=lambda r:(
         r["tier"] == "platinum", r["strict"], r["stable"], r["market_confirmed"],
         r["signal"] == "confirmed", r["score"], -instant(r["kickoff"]).timestamp()
     ), reverse=True)[:limit]
+
+def finite_number(value):
+    return type(value) in (int, float) and math.isfinite(value)
+
+
+def evening_rationale(p):
+    """Explain observed statistical and market evidence without fabricated signals.
+
+    Kept concise for Telegram photo's 1,024-character caption limit.
+    """
+    lines = []
+    probability = p.get("model_probability")
+    odd = p.get("odd")
+    if finite_number(probability) and 0 <= probability <= 100 and finite_number(odd) and odd > 1:
+        implied = 100 / odd
+        lines.append(f"📊 Modello {probability:.1f}% · quota implica {implied:.1f}% (aggio escluso)")
+        lines.append(f"Scarto stimato {probability-implied:+.1f} p.p.; non è una certezza")
+    else:
+        lines.append("📊 Probabilità del modello non verificabile nel feed")
+    opening = p.get("first_odd")
+    delta = p.get("delta_pct")
+    if (finite_number(opening) and opening > 1 and finite_number(odd) and
+        finite_number(delta) and abs(delta-100*(odd/opening-1)) <= 0.3):
+        direction = "in calo" if delta < -0.05 else "in rialzo" if delta > 0.05 else "stabile"
+        confirmation = "confermato" if p.get("movement_confirmed") is True else "non confermato"
+        lines.append(f"📉 Quota {opening:.2f} → {odd:.2f} ({delta:+.1f}%, {direction}; flusso {confirmation})")
+    else:
+        lines.append("📉 Apertura/variazione non verificata: nessun trend attribuito")
+    oci = p.get("oci")
+    margin = p.get("margin_pct")
+    details = []
+    if finite_number(oci):
+        details.append(f"OCI {oci:+.1f}")
+    if finite_number(margin) and 0 <= margin <= 100:
+        details.append(f"aggio {margin:.1f}%")
+    if p.get("market_confirmed"):
+        details.append("concordanza modello/mercato")
+    elif not p.get("movement_confirmed"):
+        details.append("conferma mercato assente")
+    if details:
+        lines.append("🔎 " + " · ".join(details))
+    if p.get("stable"):
+        lines.append("✓ Stabilità del segnale rilevata")
+    bookmaker = p.get("bookmaker")
+    if isinstance(bookmaker, str) and bookmaker.strip():
+        lines.append(f"Fonte quota: {bookmaker.strip()[:55]}")
+    return lines
+
 
 def verdict(pick, score, now):
     if now < instant(pick["kickoff"]):
@@ -182,15 +236,14 @@ def prepare():
             print(f"No qualifying pre-match pick for {slot}")
             return
         p = chosen[0]
-        lines = [f"ArabSniper · {p['tier'].upper()} · Pronostico singolo {slot}", "",
+        lines = [f"ArabSniper · {p['tier'].upper()} · Singolo delle {slot}", "",
                  f"{instant(p['kickoff']).astimezone(ROME):%H:%M} · {p['match']}",
-                 f"{p['label']} · quota {p['odd']:.2f}",
-                 f"Segnale: {p['signal']}"]
-    lines.extend(["", "🎯 Prono gratuito da ArabSniperBet.com",
-                  "Studiamo quote, statistiche e movimenti di mercato.",
-                  "👑 Area Gold: https://arabsniperbet.com/gold",
-                  "📲 Canale: https://t.me/arabsniper_signals",
-                  "Le analisi non garantiscono il risultato."])
+                 f"{p['label']} · quota osservata {p['odd']:.2f}",
+                 "PERCHÉ SELEZIONATA:"]
+        lines.extend(evening_rationale(p))
+    lines.extend(["", "🎯 ArabSniperBet · Analisi, non garanzie.",
+                  "👑 https://arabsniperbet.com/gold",
+                  "18+ · Gioca responsabilmente."])
     Path("post.json").write_text(json.dumps(
         dict(picks=chosen, text="\n".join(lines).strip()), ensure_ascii=False))
     with open(os.environ["GITHUB_OUTPUT"], "a") as out:
