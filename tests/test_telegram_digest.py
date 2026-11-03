@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
-from telegram_digest import verdict, picks, ROME, WINDOWS, SLOTS, UTC_CRONS, slot_for_schedule
+from telegram_digest import verdict, picks, ROME, WINDOWS, SLOTS, UTC_CRONS, slot_for_schedule, evening_rationale
 
 class TelegramTest(unittest.TestCase):
     now = datetime(2026,11,2,20,tzinfo=ROME)
@@ -60,6 +60,34 @@ class TelegramTest(unittest.TestCase):
         self.assertEqual(len(UTC_CRONS), 14)
         self.assertIsNone(slot_for_schedule(datetime.fromisoformat(
             "2026-11-03T12:00:00+01:00"), "schedule", "0 11 * * *"))
+
+    def test_evening_rationale_real_movement_and_statistics(self):
+        pick=dict(model_probability=58.2,odd=1.80,first_odd=1.95,
+                  delta_pct=100*(1.80/1.95-1),oci=36.2,margin_pct=5.6,
+                  market_confirmed=True,movement_confirmed=True,
+                  stable=True,bookmaker="Book A")
+        msg="\\n".join(evening_rationale(pick))
+        for piece in ("58.2%", "55.6%", "Scarto stimato", "1.95", "1.80",
+                      "in calo", "flusso confermato", "OCI +36.2", "aggio 5.6%",
+                      "Book A"):
+            self.assertIn(piece,msg)
+
+    def test_evening_rationale_missing_movement_never_invents(self):
+        pick=dict(model_probability=49.3,odd=2.20,first_odd=3.2,
+                  delta_pct=-1.0,oci=None,margin_pct=None,
+                  market_confirmed=False,movement_confirmed=False)
+        msg="\\n".join(evening_rationale(pick))
+        self.assertIn("Apertura/variazione non verificata",msg)
+        self.assertIn("conferma mercato assente",msg)
+        self.assertNotIn("flusso confermato",msg)
+
+    def test_evening_rationale_fits_photo_caption(self):
+        pick=dict(model_probability=50.0,odd=2.1,first_odd=2.4,
+                  delta_pct=100*(2.1/2.4-1),oci=31.0,margin_pct=6.0,
+                  market_confirmed=True,movement_confirmed=True,
+                  stable=True,bookmaker="B"*55)
+        text="\\n".join(evening_rationale(pick))
+        self.assertLess(len(text),700)
 
     def test_freshness_and_market_corrob(self):
         now=datetime(2026,11,2,19,0,tzinfo=ROME)
