@@ -1,0 +1,47 @@
+name: One-time recovery of 21:15 Gold promotion on 2026-11-03
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/telegram-promo-2115-recover-once-20261103.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: telegram-channel-publication
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Recover only today's 21:15 promotion with normal deduplication
+        id: promote
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_NAME: schedule
+          GITHUB_EVENT_SCHEDULE: '15 20 * * *'
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          now=datetime.now(ZoneInfo("Europe/Rome"))
+          if now.date().isoformat()!='2026-11-03' or not (21<=now.hour<22):
+              raise SystemExit("Recovery not eligible for this date/time")
+          PY
+          python3 src/telegram_gold_promo.py
+      - name: Save normal 21:15 sent receipt
+        if: hashFiles('promo-receipt.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: telegram-gold-promo-2026-11-03-2115-sent
+          path: promo-receipt.json
+          retention-days: 14
+          if-no-files-found: error
