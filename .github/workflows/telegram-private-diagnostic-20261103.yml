@@ -1,4 +1,5 @@
 name: One-time Telegram private selection diagnostic Nov 3
+# Recheck after cached_stable compatibility fix
 on:
   push:
     branches: [main]
