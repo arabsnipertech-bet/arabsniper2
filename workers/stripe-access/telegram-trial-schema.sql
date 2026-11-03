@@ -15,3 +15,7 @@ CREATE TABLE IF NOT EXISTS telegram_trial_claims (
  subscription_id TEXT UNIQUE
 );
 CREATE INDEX IF NOT EXISTS telegram_trial_claims_status ON telegram_trial_claims(status);
+CREATE TABLE IF NOT EXISTS telegram_trial_limits (
+ key TEXT PRIMARY KEY, hits INTEGER NOT NULL, expires_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS telegram_trial_limits_expiry ON telegram_trial_limits(expires_at);
