@@ -1,0 +1,58 @@
+name: One-time active Gold trial /prova Telegram promo Nov3
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/telegram-active-gold-promo-once-20261103.yml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: telegram-channel-publication
+  cancel-in-progress: false
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Post verified Gold /prova instructions exactly once
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import os,sys,json
+          from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          sys.path.insert(0,"src")
+          from telegram_gold_promo import telegram,posted_before,MESSAGES
+          now=datetime.now(ZoneInfo("Europe/Rome"))
+          if now.date().isoformat()!="2026-11-03" or not 19<=now.hour<21:
+              raise SystemExit("Outside promotional release window")
+          name="telegram-active-trial-2026-11-03-promo"
+          if posted_before(name):
+              print("ALREADY_PUBLISHED_PROMO")
+              raise SystemExit(0)
+          token=os.environ.get("TELEGRAM_BOT_TOKEN")
+          if not token:raise RuntimeError("Bot token not configured")
+          bot=telegram("getMe",token)
+          if bot.get("username","").lower()!="arabsniperbot":raise RuntimeError("Wrong bot")
+          chat=telegram("getChat",token,chat_id="@arabsniper_signals")
+          member=telegram("getChatMember",token,chat_id=chat["id"],user_id=bot["id"])
+          if chat.get("username","").lower()!="arabsniper_signals" or member.get("status")!="administrator" or not member.get("can_post_messages"):
+              raise RuntimeError("Bot is not admin")
+          message=MESSAGES[1]
+          sent=telegram("sendMessage",token,chat_id=chat["id"],text=message,disable_web_page_preview="true")
+          if sent.get("chat",{}).get("id")!=chat["id"]:raise RuntimeError("Delivery not confirmed")
+          Path("promo-active-receipt.json").write_text(json.dumps({"message_id":sent["message_id"],"date":now.date().isoformat(),"kind":"active_gold_trial"}))
+          print(f"PROMO_ACTIVE_SENT https://t.me/arabsniper_signals/{sent['message_id']}",flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: hashFiles('promo-active-receipt.json') != ''
+        with:
+          name: telegram-active-trial-2026-11-03-promo
+          path: promo-active-receipt.json
+          retention-days: 14
