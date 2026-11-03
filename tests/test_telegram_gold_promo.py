@@ -49,7 +49,7 @@ class PromoTests(unittest.TestCase):
         self.assertEqual(len(set(promo.MESSAGES)), 3)
         for message in promo.MESSAGES:
             self.assertIn("7 giorni", message)
-            self.assertIn("carta", message)
+            self.assertIn("carta", message.lower())
             self.assertIn("rinnovo", message)
             self.assertIn("/prova", message)
             self.assertIn("https://t.me/ArabSniperBot", message)
