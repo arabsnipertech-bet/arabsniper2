@@ -76,3 +76,26 @@ test('Wrong OTP does not grant; a different Telegram ID cannot reuse claimed ema
   assert.equal(s.calls.filter(x=>x.url==='/v1/subscriptions').length,1);
   assert.equal(s.db.prepare('SELECT COUNT(*) AS n FROM telegram_trial_claims').get().n,1);
 });
+
+test('Unexpected Stripe renewal state triggers immediate cancellation and never grants',async()=>{
+  const s=setup();
+  const original=globalThis.fetch;
+  const canceled=[];
+  globalThis.fetch=async(url,opts={})=>{
+    const path=new URL(url).pathname;
+    if(path==='/v1/subscriptions'&&opts.method==='POST')
+      return Response.json({id:'sub_unsafe',status:'trialing',
+        trial_end:Number(opts.body.get('trial_end')),cancel_at:null});
+    if(path==='/v1/subscriptions/sub_unsafe'&&opts.method==='DELETE') {
+      canceled.push(path);return Response.json({id:'sub_unsafe',status:'canceled'});
+    }
+    return original(url,opts);
+  };
+  const check=async(request)=>telegramTrialRoute(request,s.env,async()=>({active:false}),'price_monthly',START);
+  await check(s.request(44,'person@example.com'));
+  const code=s.outs.find(x=>x.type==='email').code;
+  await check(s.request(44,code));
+  assert.equal(canceled.length,1);
+  assert.equal(s.db.prepare('SELECT status FROM telegram_trial_claims').get().status,'reserved');
+  assert.match(s.outs.at(-1).message,/Riprova/);
+});
