@@ -11,6 +11,11 @@ on:
       - 'src/telegram_daily_spunti.py'
       - 'tests/test_telegram_daily_spunti.py'
   workflow_dispatch:
+    inputs:
+      recovery_slot:
+        description: 'Guarded backup slot; no forced selections'
+        required: false
+        type: string
   # UTC cron for 13:00/13:13 Rome, CET and CEST.
   schedule:
     - cron: '0 11 * * *'
@@ -42,6 +47,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule }}
+          RECOVERY_SLOT: ${{ inputs.recovery_slot }}
           ALLOW_ONEOFF: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Publish Telegram public spunti once 2026-11-03') }}
         run: python3 src/telegram_daily_spunti.py
       - name: Retain daily receipt
