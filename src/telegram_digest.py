@@ -14,6 +14,14 @@ ROME = ZoneInfo("Europe/Rome")
 CHANNEL = "@arabsniper_signals"
 SLOTS = {"0 13 * * *": "13:00", "30 17 * * *": "17:30",
          "0 19 * * *": "19:00", "0 20 * * *": "20:00"}
+# UTC GitHub Actions primary/backup triggers for both CET and CEST.
+# UTC events only qualify when their actual Rome-local slot is due.
+UTC_CRONS = {
+    "0 11 * * *", "13 11 * * *", "0 12 * * *", "13 12 * * *",
+    "30 15 * * *", "43 15 * * *", "30 16 * * *", "43 16 * * *",
+    "0 17 * * *", "13 17 * * *", "0 18 * * *", "13 18 * * *",
+    "0 19 * * *", "13 19 * * *",
+}
 WINDOWS = {"17:30": ("18:00", "19:00"), "19:00": ("19:30", "21:00"),
            "20:00": ("20:30", "22:00")}
 MARKETS = {"over15_ht": ("ht", 2), "over25_ht": ("ht", 3), "gg_ht": ("ht", "gg"),
@@ -125,17 +133,23 @@ def prior_ids(day, slot):
     return seen
 
 
+def slot_for_schedule(now, event, cron):
+    """Allow only timely GitHub scheduled runs matching a due local slot."""
+    if event != "schedule" or cron not in UTC_CRONS:
+        return None
+    now = now.astimezone(ROME)
+    for slot in SLOTS.values():
+        due = datetime.combine(now.date(), datetime.strptime(slot, "%H:%M").time(), ROME)
+        if timedelta(0) <= now-due < timedelta(minutes=25):
+            return slot
+    return None
+
+
 def prepare():
     now = datetime.now(ROME)
-    if os.environ.get("EVENT") != "schedule":
-        print("Manual/push run: validation only, no channel publication")
-        return
-    slot = SLOTS.get(os.environ.get("CRON"))
+    slot = slot_for_schedule(now, os.environ.get("EVENT"), os.environ.get("CRON"))
     if slot is None:
-        raise SystemExit("Unrecognized Telegram schedule")
-    due = datetime.combine(now.date(), datetime.strptime(slot, "%H:%M").time(), ROME)
-    if not timedelta(0) <= now-due < timedelta(minutes=25):
-        print("Outside the publication window")
+        print("No due Rome-local Telegram slot, or not a scheduled event; skip publication")
         return
     day = now.date().isoformat()
     name = f"tg-{day}-{slot.replace(':','')}"
