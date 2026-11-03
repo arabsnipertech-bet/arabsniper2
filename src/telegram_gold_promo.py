@@ -110,6 +110,8 @@ def main():
         "date": day, "slot": slot, "message_id": sent["message_id"],
         "channel": CHANNEL
     }), encoding="utf-8")
+    with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+        print(f"artifact={artifact}", file=output)
     print(f"Published promo: https://t.me/arabsniper_signals/{sent['message_id']}")
 
 
