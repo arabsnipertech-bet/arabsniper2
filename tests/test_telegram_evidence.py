@@ -14,7 +14,7 @@ ROME=ZoneInfo("Europe/Rome")
 class EvidenceTests(unittest.TestCase):
     def test_only_valid_scheduled_slots(self):
         for cron, expected in module.SLOTS.items():
-            h,m=map(int,cron.split()[:2])
+            m,h=map(int,cron.split()[:2])
             now=datetime(2026,11,4,h,m,tzinfo=ROME)
             self.assertEqual(module.choose_slot(now,"schedule",cron),expected)
             self.assertIsNone(module.choose_slot(now,"workflow_dispatch",cron))
