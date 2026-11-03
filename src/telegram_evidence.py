@@ -45,7 +45,8 @@ def audit_message(report):
         lines.append(f"Saldo teorico (1 unità/selezione): {pnl:+.2f} unità, senza commissioni")
     ticket=report.get("triple") or {}
     if ticket.get("status") in ("won","lost","pending"):
-        lines.append("Tripla ore 13: "+"{'won':'✅ centrata','lost':'❌ non centrata','pending':'⏳ in attesa'}"[ticket["status"]])
+        verdict={"won":"✅ centrata","lost":"❌ non centrata","pending":"⏳ in attesa"}[ticket["status"]]
+        lines.append("Tripla ore 13: "+verdict)
     lines+=["Non nascondiamo le selezioni non riuscite. Le quote e i risultati passati non garantiscono risultati futuri.",
             "🎁 Gold 7 giorni senza carta, addebiti o rinnovo: https://t.me/ArabSniperBot",
             "18+ · Gioca responsabilmente."]
