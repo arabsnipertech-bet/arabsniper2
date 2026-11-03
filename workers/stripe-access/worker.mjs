@@ -1,4 +1,5 @@
 import {authRoute, cleanupAuth} from './auth.mjs';
+import {telegramTrialRoute} from './telegram-trial.mjs';
 // OTP remains disabled until its staged deployment requirements are satisfied.
 const API_VERSION = '2026-08-26.dahlia';
 const ORIGINS = new Set(['https://arabsniperbet.com','https://www.arabsniperbet.com']);
@@ -120,6 +121,8 @@ export async function access(env,email,now=Math.floor(Date.now()/1000)) {
 export default {
   async scheduled(event,env) { if(env.AUTH_ENABLED==='true')await cleanupAuth(env); },
   async fetch(request,env) {
+    const trialResponse=await telegramTrialRoute(request,env,access,plans(env).monthly.price);
+    if(trialResponse)return trialResponse;
     const authResponse=await authRoute(request,env,access);
     if(authResponse)return authResponse;
     const u=new URL(request.url),origin=request.headers.get('Origin');
