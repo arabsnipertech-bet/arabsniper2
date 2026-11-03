@@ -44,6 +44,12 @@ async function sendEmail(env,email,code) {
     signal:AbortSignal.timeout(10000)});
   if(!r.ok)throw Error('resend_unavailable');
 }
+async function otpLimit(env,key,max,expiresAt) {
+  const row=await first(env,
+    'INSERT INTO telegram_trial_limits(key,hits,expires_at) VALUES (?,1,?) '+
+    'ON CONFLICT(key) DO UPDATE SET hits=hits+1 RETURNING hits',key,expiresAt);
+  return row&&row.hits<=max;
+}
 async function tryGrant(env,access,email,tgid,now,monthlyPrice) {
   // Never issue extra free weeks to accounts that already have an entitlement.
   if((await access(env,email,now)).active)return {type:'already_active'};
@@ -113,6 +119,14 @@ async function processPrivateMessage(env,access,msg,monthlyPrice,now) {
     const previous=await first(env,'SELECT sent_at FROM telegram_trial_codes WHERE telegram_id=?',tgid);
     if(previous&&previous.sent_at>now-120){
       await sendTelegram(env,tgid,'Attendi almeno due minuti prima di richiedere un altro codice.');
+      return;
+    }
+    const hour=Math.floor(now/3600),day=Math.floor(now/86400);
+    const emailHash=(await mac(env.TELEGRAM_TRIAL_HMAC_SECRET,'limit-email:'+email)).slice(0,24);
+    if(!await otpLimit(env,'chat:'+tgid+':'+hour,5,(hour+1)*3600)||
+       !await otpLimit(env,'email:'+emailHash+':'+day,3,(day+1)*86400)||
+       !await otpLimit(env,'global:'+hour,200,(hour+1)*3600)) {
+      await sendTelegram(env,tgid,'Limite di richieste raggiunto. Riprova più tardi o contatta il supporto.');
       return;
     }
     const code=otp();
