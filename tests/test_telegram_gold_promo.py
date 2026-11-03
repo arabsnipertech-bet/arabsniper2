@@ -51,7 +51,9 @@ class PromoTests(unittest.TestCase):
             self.assertIn("7 giorni", message)
             self.assertIn("carta", message)
             self.assertIn("rinnovo", message)
-            self.assertNotIn("scrivi /prova", message.lower())
+            self.assertIn("/prova", message)
+            self.assertIn("https://t.me/ArabSniperBot", message)
+            self.assertNotIn("in preparazione", message.lower())
             self.assertNotIn("Ora puoi accedere", message)
 
     def test_external_recovery_due_only(self):
