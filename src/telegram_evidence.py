@@ -18,7 +18,7 @@ LABELS={"over15_ht":"Over 1,5 PT","over25_ht":"Over 2,5 PT","gg_ht":"Goal PT","o
 def choose_slot(now,event,cron):
     if event!="schedule" or cron not in SLOTS:
         return None
-    hour,minute=map(int,cron.split()[:2])
+    minute,hour=map(int,cron.split()[:2])
     due=datetime.combine(now.date(),time(hour,minute),tzinfo=ROME)
     if not timedelta(0)<=now-due<=timedelta(minutes=35):
         return None
