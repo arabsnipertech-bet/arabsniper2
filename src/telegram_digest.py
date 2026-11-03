@@ -72,6 +72,8 @@ def picks(feed, now, window=None, limit=3, exclude=None):
                          market_confirmed=bool(row.get("market_confirmed")) if private else row.get("market_confirmation") == "confirmed",
                          model_probability=row.get("model_probability") if private else row.get("statistical_pct"),
                          first_odd=row.get("first_odd"), delta_pct=row.get("delta_pct"),
+                         provider_updated_at=row.get("provider_updated_at"),
+                         quote_status=row.get("quote_status"),
                          oci=row.get("oci"), ev_pct=row.get("ev_pct"),
                          margin_pct=row.get("margin_pct"),bookmaker=row.get("bookmaker"),
                          movement_confirmed=row.get("movement_confirmed"),
@@ -125,6 +127,12 @@ def evening_rationale(p):
         lines.append("🔎 " + " · ".join(details))
     if p.get("stable"):
         lines.append("✓ Stabilità del segnale rilevata")
+    observed = instant(p.get("provider_updated_at"))
+    if observed:
+        local = observed.astimezone(ROME)
+        lines.append(f"🕒 Quota rilevata {local:%d/%m alle %H:%M} (da verificare prima di giocare)")
+        if p.get("quote_status") == "cached_stable":
+            lines.append("Fonte: ultima quota conservata, non aggiornamento in tempo reale")
     bookmaker = p.get("bookmaker")
     if isinstance(bookmaker, str) and bookmaker.strip():
         lines.append(f"Fonte quota: {bookmaker.strip()[:55]}")
