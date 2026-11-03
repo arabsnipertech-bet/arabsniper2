@@ -1,6 +1,11 @@
 name: Telegram Gold free trial promotion
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/telegram-gold-promo.yml'
+      - 'src/telegram_gold_promo.py'
+      - 'tests/test_telegram_gold_promo.py'
   schedule:
     - cron: '45 12 * * *'
       timezone: Europe/Rome
@@ -28,6 +33,7 @@ jobs:
       - name: Verify promotion schedule and one-time trial messaging
         run: python3 -m unittest discover -s tests -p test_telegram_gold_promo.py -v
       - name: Publish independent promo (scheduled events only)
+        id: promote
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule }}
@@ -37,6 +43,6 @@ jobs:
         if: hashFiles('promo-receipt.json') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: telegram-gold-promo-${{ github.run_id }}-sent
+          name: ${{ steps.promote.outputs.artifact }}
           path: promo-receipt.json
           retention-days: 14
