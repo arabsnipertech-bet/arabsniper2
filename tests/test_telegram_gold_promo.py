@@ -47,13 +47,18 @@ class PromoTests(unittest.TestCase):
     def test_three_messages_accurate_and_distinct(self):
         self.assertEqual(len(promo.MESSAGES), 3)
         self.assertEqual(len(set(promo.MESSAGES)), 3)
-        for text in promo.MESSAGES:
-            self.assertIn("https://t.me/ArabSniperBot", text)
-            self.assertIn("/prova", text)
-            self.assertIn("7 giorni", text.lower())
-            self.assertIn("email", text.lower())
-            self.assertIn("rinnovo", text.lower())
-            self.assertIn("carta", text.lower())
+        for message in promo.MESSAGES:
+            self.assertIn("7 giorni", message)
+            self.assertIn("carta", message)
+            self.assertIn("rinnovo", message)
+            self.assertNotIn("scrivi /prova", message.lower())
+            self.assertNotIn("Ora puoi accedere", message)
+
+    def test_external_recovery_due_only(self):
+        due=datetime.fromisoformat("2026-11-03T21:25:00+01:00")
+        self.assertEqual(promo.selected(due,"workflow_dispatch","", "21:15"),"21:15")
+        self.assertIsNone(promo.selected(due,"workflow_dispatch","", "17:15"))
+        self.assertIsNone(promo.selected(due+timedelta(minutes=45),"workflow_dispatch","","21:15"))
 
 
 if __name__ == "__main__":
