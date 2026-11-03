@@ -76,8 +76,16 @@ async function tryGrant(env,access,email,tgid,now,monthlyPrice) {
   };
   const subscription=await api(env,'/subscriptions',params,'POST','as-tg-trial-'+claimKey.slice(0,32));
   if(subscription.status!=='trialing'||Number(subscription.trial_end)!==Number(claim.expires_at)||
-     Number(subscription.cancel_at)!==Number(claim.expires_at))
+     Number(subscription.cancel_at)!==Number(claim.expires_at)) {
+    // Stripe returned an unexpected billing state: cancel immediately, never leave an
+    // uncapped paid renewal behind. Failed cancellation needs operator intervention.
+    if(subscription.id) {
+      try {await api(env,'/subscriptions/'+encodeURIComponent(subscription.id),{},'DELETE',
+        'as-tg-unsafe-cancel-'+claimKey.slice(0,32));}
+      catch {throw Error('unsafe_subscription_manual_cancellation_required');}
+    }
     throw Error('trial_safety_not_confirmed');
+  }
   await env.ACCESS_DB.prepare(
     "UPDATE telegram_trial_claims SET status='granted',subscription_id=? WHERE email=? AND telegram_id=? AND status='reserved'"
   ).bind(subscription.id,email,tgid).run();
