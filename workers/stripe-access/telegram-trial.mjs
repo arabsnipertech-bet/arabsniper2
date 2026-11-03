@@ -2,7 +2,7 @@
    Disabled unless explicitly enabled on the production Cloudflare Worker.
    Never activate trials from channel messages, unverified emails, or arbitrary web requests. */
 const DAYS7=7*86400;
-const EMAIL=/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+const EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const lower=s=>String(s||'').trim().toLowerCase();
 const enc=new TextEncoder();
 const nowSeconds=()=>Math.floor(Date.now()/1000);
@@ -40,7 +40,7 @@ async function sendEmail(env,email,code) {
     body:JSON.stringify({from:env.EMAIL_FROM,to:[email],
       subject:'ArabSniperBet Gold · conferma i tuoi 7 giorni gratuiti',
       text:'Il tuo codice per la prova Gold gratuita di 7 giorni è: '+code+
-           '\\nScade tra 10 minuti. Non condividerlo. Non è richiesto alcun pagamento né un rinnovo automatico.'}),
+           '\nScade tra 10 minuti. Non condividerlo. Non è richiesto alcun pagamento né un rinnovo automatico.'}),
     signal:AbortSignal.timeout(10000)});
   if(!r.ok)throw Error('resend_unavailable');
 }
@@ -87,11 +87,11 @@ async function processPrivateMessage(env,access,msg,monthlyPrice,now) {
   const chat=msg?.chat;
   if(chat?.type!=='private'||String(chat?.id)!==String(msg?.from?.id))return;
   const tgid=String(chat.id),text=String(msg.text||'').trim();
-  if(!/^\\d{1,18}$/.test(tgid)||text.length>254)return;
-  if(/^\\/(start|prova)(?:@\\w+)?(?:\\s.*)?$/i.test(text)) {
-    await sendTelegram(env,tgid,'🎁 ArabSniperBet Gold · 7 giorni gratis!\\n\\n' +
-      'Inviami qui in privato la tua email. Riceverai un codice per confermarla.\\n' +
-      'Una sola prova per persona/email. Nessuna carta, nessun addebito e nessun rinnovo automatico.\\n' +
+  if(!/^\d{1,18}$/.test(tgid)||text.length>254)return;
+  if(/^\/(start|prova)(?:@\w+)?(?:\s.*)?$/i.test(text)) {
+    await sendTelegram(env,tgid,'🎁 ArabSniperBet Gold · 7 giorni gratis!\n\n' +
+      'Inviami qui in privato la tua email. Riceverai un codice per confermarla.\n' +
+      'Una sola prova per persona/email. Nessuna carta, nessun addebito e nessun rinnovo automatico.\n' +
       'Accesso al sito: https://arabsniperbet.com/gold-dashboard-live.html');
     return;
   }
@@ -121,7 +121,7 @@ async function processPrivateMessage(env,access,msg,monthlyPrice,now) {
     await sendTelegram(env,tgid,'📩 Codice inviato alla tua email. Scrivi qui le 6 cifre ricevute entro 10 minuti. Non inoltrarle ad altri.');
     return;
   }
-  if(/^\\d{6}$/.test(text)) {
+  if(/^\d{6}$/.test(text)) {
     const record=await first(env,'SELECT * FROM telegram_trial_codes WHERE telegram_id=?',tgid);
     if(!record||record.expires_at<=now||record.attempts>=5){
       await sendTelegram(env,tgid,'Codice assente o scaduto. Inviami nuovamente la tua email per richiederne uno.');
@@ -142,9 +142,9 @@ async function processPrivateMessage(env,access,msg,monthlyPrice,now) {
       if(grant.type==='granted') {
         await env.ACCESS_DB.prepare('DELETE FROM telegram_trial_codes WHERE telegram_id=?').bind(tgid).run();
         await sendTelegram(env,tgid,
-          '✅ Prova Gold attivata per 7 giorni!\\n\\n' +
-          'Accedi con questa email: '+record.email+'\\n' +
-          'https://arabsniperbet.com/gold-dashboard-live.html\\n\\n' +
+          '✅ Prova Gold attivata per 7 giorni!\n\n' +
+          'Accedi con questa email: '+record.email+'\n' +
+          'https://arabsniperbet.com/gold-dashboard-live.html\n\n' +
           'Usa il codice email richiesto dal sito per accedere. Nessun addebito o rinnovo automatico.');
       } else {
         await sendTelegram(env,tgid,grant.type==='already_active'?
