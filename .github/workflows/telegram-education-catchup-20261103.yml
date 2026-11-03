@@ -1,0 +1,63 @@
+name: One-time Telegram educational catch-up 2026-11-03
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/telegram-education-catchup-20261103.yml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: telegram-channel-publication
+  cancel-in-progress: false
+jobs:
+  catchup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Publish the missed education slot only once
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json,os,sys
+          from pathlib import Path
+          from datetime import datetime,date
+          from zoneinfo import ZoneInfo
+          sys.path.insert(0,"src")
+          from telegram_gold_promo import telegram,posted_before
+          from telegram_evidence import educational_message
+          now=datetime.now(ZoneInfo("Europe/Rome"))
+          if now.date()!=date(2026,11,3) or not (17<=now.hour<21):
+              raise SystemExit("Outside one-time catch-up window")
+          name="telegram-evidence-2026-11-03-market-sent"
+          if posted_before(name):
+              print("Already posted: skipping catch-up")
+              raise SystemExit(0)
+          token=os.environ["TELEGRAM_BOT_TOKEN"]
+          bot=telegram("getMe",token)
+          if bot.get("username","").lower()!="arabsniperbot":
+              raise RuntimeError("Unexpected Telegram bot")
+          channel=telegram("getChat",token,chat_id="@arabsniper_signals")
+          member=telegram("getChatMember",token,chat_id=channel["id"],user_id=bot["id"])
+          if channel.get("username","").lower()!="arabsniper_signals" or member.get("status")!="administrator" or not member.get("can_post_messages"):
+              raise RuntimeError("Bot lacks publish privileges")
+          msg=telegram("sendMessage",token,chat_id=channel["id"],text=educational_message(now.date()),disable_web_page_preview="true")
+          if msg.get("chat",{}).get("id")!=channel["id"]:
+              raise RuntimeError("Telegram delivery not confirmed")
+          Path("evidence-receipt.json").write_text(json.dumps({"slot":"market","date":"2026-11-03","message_id":msg["message_id"],"catchup":True}),encoding="utf8")
+          print(f"PUBLISHED_CATCHUP https://t.me/arabsniper_signals/{msg['message_id']}",flush=True)
+          PY
+      - name: Retain publication receipt
+        if: hashFiles('evidence-receipt.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: telegram-evidence-2026-11-03-market-sent
+          path: evidence-receipt.json
+          retention-days: 14
