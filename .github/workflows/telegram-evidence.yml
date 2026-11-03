@@ -1,0 +1,51 @@
+name: Telegram evidence-led education and audit
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/telegram-evidence.yml'
+      - 'src/telegram_evidence.py'
+      - 'tests/test_telegram_evidence.py'
+  schedule:
+    - cron: '45 10 * * *'
+      timezone: Europe/Rome
+    - cron: '45 16 * * *'
+      timezone: Europe/Rome
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: telegram-channel-publication
+  cancel-in-progress: false
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify data-backed content and no-post safeguards
+        run: python3 -m unittest discover -s tests -p test_telegram_evidence.py -v
+      - run: pip install boto3 requests==2.32.5
+      - name: Publish only when fresh evidence is available
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python3 src/telegram_evidence.py
+      - name: Retain dedup receipt
+        if: hashFiles('evidence-receipt.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.publish.outputs.artifact }}
+          path: evidence-receipt.json
+          retention-days: 14
