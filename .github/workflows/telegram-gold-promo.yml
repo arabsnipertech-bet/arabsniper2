@@ -6,13 +6,21 @@ on:
       - '.github/workflows/telegram-gold-promo.yml'
       - 'src/telegram_gold_promo.py'
       - 'tests/test_telegram_gold_promo.py'
+  # GitHub cron interpreted as UTC; the script validates Rome-local due slot.
+  # Primary + backup runs across both CET and CEST, deduplicated by receipt.
   schedule:
-    - cron: '45 12 * * *'
-      timezone: Europe/Rome
-    - cron: '15 17 * * *'
-      timezone: Europe/Rome
-    - cron: '15 21 * * *'
-      timezone: Europe/Rome
+    - cron: '45 10 * * *'
+    - cron: '58 10 * * *'
+    - cron: '45 11 * * *'
+    - cron: '58 11 * * *'
+    - cron: '15 15 * * *'
+    - cron: '28 15 * * *'
+    - cron: '15 16 * * *'
+    - cron: '28 16 * * *'
+    - cron: '15 19 * * *'
+    - cron: '28 19 * * *'
+    - cron: '15 20 * * *'
+    - cron: '28 20 * * *'
 permissions:
   contents: read
   actions: read
