@@ -27,7 +27,7 @@ class TelegramWatchdogTests(unittest.TestCase):
                          [("telegram-gold-promo.yml","21:15")])
         at=datetime(2026,11,3,17,59,tzinfo=ROME)
         self.assertEqual(list(due_slots(at)),[])
-        self.assertEqual(list(due_slots(datetime(2026,11,3,17,30,tzinfo=ROME))),[])
+        self.assertEqual([(x,y) for x,y,_ in due_slots(datetime(2026,11,3,17,30,tzinfo=ROME))],\n                         [("telegram-gold-promo.yml","17:15")])
 
     def test_missing_workflow_gets_recovery_dispatch(self):
         now=datetime(2026,11,3,17,44,tzinfo=ROME)
