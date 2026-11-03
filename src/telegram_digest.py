@@ -187,12 +187,22 @@ def prior_ids(day, slot):
     return seen
 
 
-def slot_for_schedule(now, event, cron):
-    """Allow only timely GitHub scheduled runs matching a due local slot."""
-    if event != "schedule" or cron not in UTC_CRONS:
+def slot_for_schedule(now, event, cron, recovery_slot=None):
+    """Allow only due Rome-local slots, scheduled or backup-dispatched."""
+    if event == "schedule":
+        if cron not in UTC_CRONS:
+            return None
+    elif event == "workflow_dispatch":
+        # An external watchdog may recover evening slots but cannot manufacture
+        # a signal, change market eligibility or publish after the due window.
+        if recovery_slot not in WINDOWS:
+            return None
+    else:
         return None
     now = now.astimezone(ROME)
     for slot in SLOTS.values():
+        if event == "workflow_dispatch" and slot != recovery_slot:
+            continue
         due = datetime.combine(now.date(), datetime.strptime(slot, "%H:%M").time(), ROME)
         if timedelta(0) <= now-due < timedelta(minutes=25):
             return slot
@@ -201,7 +211,7 @@ def slot_for_schedule(now, event, cron):
 
 def prepare():
     now = datetime.now(ROME)
-    slot = slot_for_schedule(now, os.environ.get("EVENT"), os.environ.get("CRON"))
+    slot = slot_for_schedule(now, os.environ.get("EVENT"), os.environ.get("CRON"), os.environ.get("RECOVERY_SLOT"))
     if slot is None:
         print("No due Rome-local Telegram slot, or not a scheduled event; skip publication")
         return

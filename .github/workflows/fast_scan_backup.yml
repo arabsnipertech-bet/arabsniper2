@@ -32,3 +32,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
         run: python3 src/fast_backup_dispatch.py
+      - name: Recover missing Telegram publication windows
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+        run: python3 src/telegram_watchdog.py
