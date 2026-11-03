@@ -16,6 +16,7 @@ REPO="arabsnipertech-bet/arabsniper2"
 SLOTS=(
     ("telegram-evidence.yml","10:45","audit",38),
     ("telegram-gold-promo.yml","12:45","12:45",40),
+    ("telegram-daily-spunti.yml","13:00","13:00",25),
     ("telegram-evidence.yml","16:45","market",38),
     ("telegram-gold-promo.yml","17:15","17:15",40),
     ("telegram-digest.yml","17:30","17:30",25),

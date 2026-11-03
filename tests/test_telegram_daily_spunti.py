@@ -35,7 +35,7 @@ class PublicSpuntiTests(unittest.TestCase):
         self.assertIn("Segnale del flusso NON confermato",msg)
         self.assertIn("1️⃣",msg)
         self.assertIn("3️⃣",msg)
-        self.assertIn("https://t.me/ArabSniperBot",msg)
+        self.assertIn("https://arabsniperbet.com/gold",msg)
         self.assertNotIn("Quota combinata",msg)
 
     def test_verified_movement_is_explained_but_not_guaranteed(self):
@@ -82,6 +82,12 @@ class PublicSpuntiTests(unittest.TestCase):
                                  "schedule","13 11 * * *"))
         self.assertFalse(eligible(datetime.fromisoformat("2026-11-03T13:00:00+01:00"),
                                   "workflow_dispatch","0 12 * * *"))
+        self.assertTrue(eligible(datetime.fromisoformat("2026-11-03T13:14:00+01:00"),
+                                 "workflow_dispatch","",recovery_slot="13:00"))
+        self.assertFalse(eligible(datetime.fromisoformat("2026-11-03T13:14:00+01:00"),
+                                  "workflow_dispatch","",recovery_slot="17:30"))
+        self.assertFalse(eligible(datetime.fromisoformat("2026-11-03T13:26:00+01:00"),
+                                  "workflow_dispatch","",recovery_slot="13:00"))
         self.assertFalse(eligible(datetime.fromisoformat("2026-11-04T13:40:00+01:00"),
                                   "push","",oneoff=True))
         self.assertTrue(eligible(datetime.fromisoformat("2026-11-03T13:30:00+01:00"),

@@ -51,6 +51,13 @@ class TelegramWatchdogTests(unittest.TestCase):
         wake(api,now)
         self.assertEqual(api.dispatched,[("telegram-digest.yml","19:00")])
 
+    def test_public_1300_backup_slot(self):
+        now=datetime(2026,11,3,13,14,tzinfo=ROME)
+        self.assertIn(("telegram-daily-spunti.yml","13:00"),
+                      [(workflow,slot) for workflow,slot,_ in due_slots(now)])
+        self.assertNotIn(("telegram-daily-spunti.yml","13:00"),
+                         [(workflow,slot) for workflow,slot,_ in due_slots(now+timedelta(minutes=20))])
+
     def test_cest(self):
         now=datetime(2026,7,3,16,54,tzinfo=ROME)
         self.assertEqual([(x,y) for x,y,_ in due_slots(now)],

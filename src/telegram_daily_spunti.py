@@ -21,12 +21,14 @@ def instant(value):
     except (ValueError, TypeError):
         return None
 
-def eligible(now, event, cron, oneoff=False):
+def eligible(now, event, cron, oneoff=False, recovery_slot=None):
     now = now.astimezone(ROME)
     due = datetime.combine(now.date(), time(13), tzinfo=ROME)
     if oneoff:
         return now.date().isoformat()=="2026-11-03" and timedelta(0)<=now-due<timedelta(minutes=90)
-    return event=="schedule" and cron in UTC_CRONS and timedelta(0)<=now-due<timedelta(minutes=25)
+    allowed=(event=="schedule" and cron in UTC_CRONS) or (
+        event=="workflow_dispatch" and recovery_slot=="13:00")
+    return allowed and timedelta(0)<=now-due<timedelta(minutes=25)
 
 def spunti(feed, now):
     """Only today's fresh public social projection; 3 distinct unstarted selections."""
@@ -126,7 +128,7 @@ def message_for(items,now):
                       f"{item['label']} · quota {item['odd']:.2f} (rilevata {quote_at:%H:%M})"])
         lines += ["• "+why for why in item["reasons"]]
         lines.append("")
-    lines.extend(["🎁 Vuoi vedere le analisi Gold? 7 giorni gratis, senza carta, addebiti o rinnovo: https://t.me/ArabSniperBot",
+    lines.extend(["👑 Scopri le analisi Gold: https://arabsniperbet.com/gold",
                   "18+ · Gioca responsabilmente."])
     return "\n".join(lines)
 
@@ -134,7 +136,8 @@ def main():
     now=datetime.now(ROME)
     oneoff=os.environ.get("ALLOW_ONEOFF")=="true" and os.environ.get("GITHUB_EVENT_NAME")=="push"
     if not eligible(now,os.environ.get("GITHUB_EVENT_NAME"),
-                    os.environ.get("GITHUB_EVENT_SCHEDULE"),oneoff=oneoff):
+                    os.environ.get("GITHUB_EVENT_SCHEDULE"),oneoff=oneoff,
+                    recovery_slot=os.environ.get("RECOVERY_SLOT")):
         print("No authorized timely 13:00 spunti slot")
         return
     name=f"tg-spunti-{now:%Y-%m-%d}-1300-sent"
