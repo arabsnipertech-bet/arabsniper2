@@ -1,0 +1,61 @@
+name: One-time Telegram Gold communication recovery Nov 3
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/telegram-promo-recovery-20261103.yml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: telegram-channel-publication
+  cancel-in-progress: false
+jobs:
+  recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish verified honest Gold promo once
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import os,sys,json
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          from pathlib import Path
+          sys.path.insert(0,"src")
+          from telegram_gold_promo import telegram,posted_before
+          now=datetime.now(ZoneInfo("Europe/Rome"))
+          if now.date().isoformat()!="2026-11-03" or not (19<=now.hour<=20):
+              raise SystemExit("Out of authorized special recovery window")
+          artifact="telegram-promo-extra-2026-11-03-1915-sent"
+          if posted_before(artifact):
+              print("Already published extra promo")
+              raise SystemExit(0)
+          token=os.environ["TELEGRAM_BOT_TOKEN"]
+          bot=telegram("getMe",token)
+          if bot.get("username","").lower()!="arabsniperbot":raise RuntimeError("Unexpected bot")
+          chat=telegram("getChat",token,chat_id="@arabsniper_signals")
+          member=telegram("getChatMember",token,chat_id=chat["id"],user_id=bot["id"])
+          if chat.get("username","").lower()!="arabsniper_signals" or member.get("status")!="administrator" or not member.get("can_post_messages"):
+              raise RuntimeError("Channel permissions missing")
+          msg=("💛 ARABSNIPERBET · SCOPRI L'AREA GOLD\n\n"
+               "Non soltanto pronostici: statistiche, evoluzione delle quote, OCI, aggio, segnali di mercato e confronti prepartita.\n\n"
+               "La selezione dei segnali Gold/Platinum resta rigorosa: una quota interessante da sola non garantisce l'ingresso in Gold.\n\n"
+               "🎁 Stiamo ultimando l'attivazione della prova gratuita Gold di 7 giorni, senza carta né rinnovo automatico. Annunceremo la disponibilità dopo il collaudo completo.\n\n"
+               "🔎 https://arabsniperbet.com\n"
+               "📲 Condividi il canale: https://t.me/arabsniper_signals\n\n"
+               "18+ · Le analisi non garantiscono risultati.")
+          sent=telegram("sendMessage",token,chat_id=chat["id"],text=msg,disable_web_page_preview="true")
+          if sent.get("chat",{}).get("id")!=chat["id"]:raise RuntimeError("Unconfirmed delivery")
+          Path("telegram-receipt.json").write_text(json.dumps({"message_id":sent["message_id"],"type":"promo_extra","day":now.date().isoformat()}))
+          print(f"PROMO_SENT https://t.me/arabsniper_signals/{sent['message_id']}",flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: hashFiles('telegram-receipt.json') != ''
+        with:
+          name: telegram-promo-extra-2026-11-03-1915-sent
+          path: telegram-receipt.json
+          retention-days: 14
