@@ -39,6 +39,12 @@ class EvidenceTests(unittest.TestCase):
         self.assertGreater(len(msg),100)
         self.assertLess(len(msg),1024)
 
+    def test_external_recovery_only_accepts_due_slot(self):
+        at=datetime.fromisoformat("2026-11-03T16:58:00+01:00")
+        self.assertEqual(module.choose_slot(at,"workflow_dispatch","", "market"),"market")
+        self.assertIsNone(module.choose_slot(at,"workflow_dispatch","", "audit"))
+        self.assertIsNone(module.choose_slot(at+timedelta(minutes=29),"workflow_dispatch","", "market"))
+
     def test_audit_includes_all_outcomes(self):
         report={"date":"2026-11-03",
                 "selections_total":{"total":8,"won":3,"lost":4,"pending":1,"theoretical_pnl":-1.4},
