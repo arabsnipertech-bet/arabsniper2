@@ -10,7 +10,14 @@ from zoneinfo import ZoneInfo
 
 ROME = ZoneInfo("Europe/Rome")
 CHANNEL = "@arabsniper_signals"
-SLOTS = {"45 12 * * *": "12:45", "15 17 * * *": "17:15", "15 21 * * *": "21:15"}
+SLOTS = ("12:45", "17:15", "21:15")
+# Explicit UTC schedules: CET/CEST primary plus 13-minute fallbacks.
+# Only the currently due Europe/Rome slot may send.
+UTC_CRONS = {
+    "45 10 * * *", "58 10 * * *", "45 11 * * *", "58 11 * * *",
+    "15 15 * * *", "28 15 * * *", "15 16 * * *", "28 16 * * *",
+    "15 19 * * *", "28 19 * * *", "15 20 * * *", "28 20 * * *",
+}
 MESSAGES = (
     "🎁 ARABSNIPERBET GOLD · 7 GIORNI GRATIS!\n\n"
     "Prova l'accesso completo all'Area Gold per 7 giorni: nessuna carta di credito, "
@@ -37,14 +44,15 @@ MESSAGES = (
 
 def selected(now, event, schedule):
     """Never send on push/manual events; skip delayed schedules."""
-    if event != "schedule" or schedule not in SLOTS:
+    if event != "schedule" or schedule not in UTC_CRONS:
         return None
-    slot = SLOTS[schedule]
-    h, m = map(int, slot.split(":"))
-    expected = datetime.combine(now.date(), time(h, m), tzinfo=ROME)
-    if not timedelta(0) <= now - expected <= timedelta(minutes=45):
-        return None
-    return slot
+    now = now.astimezone(ROME)
+    for slot in SLOTS:
+        h, m = map(int, slot.split(":"))
+        expected = datetime.combine(now.date(), time(h, m), tzinfo=ROME)
+        if timedelta(0) <= now - expected <= timedelta(minutes=40):
+            return slot
+    return None
 
 
 def name_for(day, slot):
@@ -101,7 +109,7 @@ def main():
         member.get("status") != "administrator" or
         not member.get("can_post_messages")):
         raise RuntimeError("Bot is not authorized to post in expected channel")
-    index = list(SLOTS.values()).index(slot)
+    index = SLOTS.index(slot)
     sent = telegram("sendMessage", token, chat_id=channel["id"], text=MESSAGES[index],
                     disable_web_page_preview="true")
     if sent.get("chat", {}).get("id") != channel["id"]:
