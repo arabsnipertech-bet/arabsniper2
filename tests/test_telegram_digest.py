@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
-from telegram_digest import verdict, picks, ROME, WINDOWS, SLOTS
+from telegram_digest import verdict, picks, ROME, WINDOWS, SLOTS, UTC_CRONS, slot_for_schedule
 
 class TelegramTest(unittest.TestCase):
     now = datetime(2026,11,2,20,tzinfo=ROME)
@@ -38,6 +38,28 @@ class TelegramTest(unittest.TestCase):
 
     def test_four_scheduled_posts(self):
         self.assertEqual(set(SLOTS.values()), {'13:00','17:30','19:00','20:00'})
+
+    def test_utc_primary_and_backup_cet_cest(self):
+        cases = [
+            ("2026-11-03T13:00:00+01:00", "0 12 * * *", "13:00"),
+            ("2026-11-03T13:13:00+01:00", "13 12 * * *", "13:00"),
+            ("2026-07-03T13:00:00+02:00", "0 11 * * *", "13:00"),
+            ("2026-07-03T13:13:00+02:00", "13 11 * * *", "13:00"),
+            ("2026-11-03T17:30:00+01:00", "30 16 * * *", "17:30"),
+            ("2026-07-03T17:30:00+02:00", "30 15 * * *", "17:30"),
+            ("2026-11-03T19:00:00+01:00", "0 18 * * *", "19:00"),
+            ("2026-07-03T19:00:00+02:00", "0 17 * * *", "19:00"),
+            ("2026-11-03T20:00:00+01:00", "0 19 * * *", "20:00"),
+            ("2026-07-03T20:00:00+02:00", "0 18 * * *", "20:00"),
+        ]
+        for instant, cron, expected in cases:
+            now = datetime.fromisoformat(instant)
+            self.assertEqual(slot_for_schedule(now, "schedule", cron), expected)
+            self.assertIsNone(slot_for_schedule(now, "workflow_dispatch", cron))
+            self.assertIsNone(slot_for_schedule(now, "push", cron))
+        self.assertEqual(len(UTC_CRONS), 14)
+        self.assertIsNone(slot_for_schedule(datetime.fromisoformat(
+            "2026-11-03T12:00:00+01:00"), "schedule", "0 11 * * *"))
 
     def test_freshness_and_market_corrob(self):
         now=datetime(2026,11,2,19,0,tzinfo=ROME)
