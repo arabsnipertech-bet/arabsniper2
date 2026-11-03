@@ -6,11 +6,17 @@ on:
       - '.github/workflows/telegram-evidence.yml'
       - 'src/telegram_evidence.py'
       - 'tests/test_telegram_evidence.py'
+  # GitHub schedules are UTC; schedule both CET and CEST, with fallback +13 min.
+  # The sender checks the precise Europe/Rome slot and deduplicates.
   schedule:
-    - cron: '45 10 * * *'
-      timezone: Europe/Rome
-    - cron: '45 16 * * *'
-      timezone: Europe/Rome
+    - cron: '45 8 * * *'
+    - cron: '58 8 * * *'
+    - cron: '45 9 * * *'
+    - cron: '58 9 * * *'
+    - cron: '45 14 * * *'
+    - cron: '58 14 * * *'
+    - cron: '45 15 * * *'
+    - cron: '58 15 * * *'
 permissions:
   contents: read
   actions: read

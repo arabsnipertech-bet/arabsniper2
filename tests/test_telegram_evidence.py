@@ -13,13 +13,31 @@ ROME=ZoneInfo("Europe/Rome")
 
 class EvidenceTests(unittest.TestCase):
     def test_only_valid_scheduled_slots(self):
-        for cron, expected in module.SLOTS.items():
-            m,h=map(int,cron.split()[:2])
-            now=datetime(2026,11,4,h,m,tzinfo=ROME)
-            self.assertEqual(module.choose_slot(now,"schedule",cron),expected)
-            self.assertIsNone(module.choose_slot(now,"workflow_dispatch",cron))
-            self.assertIsNone(module.choose_slot(now,"pull_request",cron))
-            self.assertIsNone(module.choose_slot(now+timedelta(minutes=40),"schedule",cron))
+        from datetime import timezone
+        for month, offset in ((11,1),(7,2)):
+            for slot, kind in (("audit",(10,45)),("market",(16,45))):
+                due=datetime(2026,month,4,*kind,tzinfo=ROME)
+                expected=due.astimezone(timezone.utc)
+                for minutes in (0,13):
+                    utc=expected+timedelta(minutes=minutes)
+                    cron=f"{utc.minute} {utc.hour} * * *"
+                    self.assertEqual(module.choose_slot(utc,"schedule",cron),slot)
+                    self.assertIsNone(module.choose_slot(utc,"workflow_dispatch",cron))
+                self.assertIsNone(module.choose_slot(expected+timedelta(minutes=40),
+                                                     "schedule",f"{expected.minute} {expected.hour} * * *"))
+        # Wrong seasonal schedule is ignored.
+        self.assertIsNone(module.choose_slot(datetime(2026,11,4,16,45,tzinfo=ROME),
+                         "schedule","45 14 * * *"))
+        self.assertIsNone(module.choose_slot(datetime(2026,7,4,16,45,tzinfo=ROME),
+                         "schedule","45 15 * * *"))
+
+    def test_education_always_available_even_without_gold(self):
+        msg=module.educational_message(datetime(2026,11,3).date())
+        self.assertIn("UN MINUTO DI ANALISI",msg)
+        self.assertIn("arabsniperbet.com",msg)
+        self.assertNotIn("7 GIORNI GRATIS",msg)
+        self.assertGreater(len(msg),100)
+        self.assertLess(len(msg),1024)
 
     def test_audit_includes_all_outcomes(self):
         report={"date":"2026-11-03",
