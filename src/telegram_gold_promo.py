@@ -42,12 +42,20 @@ MESSAGES = (
 )
 
 
-def selected(now, event, schedule):
-    """Never send on push/manual events; skip delayed schedules."""
-    if event != "schedule" or schedule not in UTC_CRONS:
+def selected(now, event, schedule, recovery_slot=None):
+    """Publish only due Rome-local slots, including a guarded watchdog recovery."""
+    if event == "schedule":
+        if schedule not in UTC_CRONS:
+            return None
+    elif event == "workflow_dispatch":
+        if recovery_slot not in SLOTS:
+            return None
+    else:
         return None
     now = now.astimezone(ROME)
     for slot in SLOTS:
+        if event == "workflow_dispatch" and slot != recovery_slot:
+            continue
         h, m = map(int, slot.split(":"))
         expected = datetime.combine(now.date(), time(h, m), tzinfo=ROME)
         if timedelta(0) <= now - expected <= timedelta(minutes=40):
@@ -87,7 +95,7 @@ def telegram(method, token, **fields):
 
 def main():
     now = datetime.now(ROME)
-    slot = selected(now, os.environ.get("GITHUB_EVENT_NAME"), os.environ.get("GITHUB_EVENT_SCHEDULE"))
+    slot = selected(now, os.environ.get("GITHUB_EVENT_NAME"), os.environ.get("GITHUB_EVENT_SCHEDULE"), os.environ.get("RECOVERY_SLOT"))
     if slot is None:
         print("Not a timely scheduled promotion: no publication")
         return
