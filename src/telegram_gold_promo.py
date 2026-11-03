@@ -39,7 +39,7 @@ MESSAGES = (
     "Puoi richiedere una settimana di accesso Gold e vedere in dettaglio i mercati e le variazioni di quota delle singole partite.\n\n"
     "✅ Gratis, senza inserire una carta\n"
     "✅ Nessun addebito alla fine dei 7 giorni\n"
-    "✅ Nessuna disdetta necessaria\n\n"
+    "✅ Nessuna disdetta necessaria e nessun rinnovo automatico\n\n"
     "📲 https://t.me/ArabSniperBot — invia /prova in privato e conferma l'email.\n"
     "🌐 https://arabsniperbet.com/gold-dashboard-live.html\n"
     "Un solo accesso di prova per email/account Telegram. Solo 18+."
