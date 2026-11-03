@@ -1,4 +1,6 @@
 import importlib.util
+import sys
+sys.path.insert(0,'src')
 import unittest
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
