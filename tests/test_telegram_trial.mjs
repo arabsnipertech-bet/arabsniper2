@@ -25,8 +25,8 @@ function setup(){
       outs.push({type:'telegram',message:JSON.parse(body).text});
       return Response.json({ok:true});
     }
-    if(u.pathname==='/v1/customers')return Response.json({data:[],has_more:false});
     if(u.pathname==='/v1/customers'&&options.method==='POST')return Response.json({id:'cus_trial'});
+    if(u.pathname==='/v1/customers')return Response.json({data:[],has_more:false});
     if(u.pathname==='/v1/subscriptions')return Response.json({
       id:'sub_trial',status:'trialing',trial_end:Number(fields.get('trial_end')),cancel_at:Number(fields.get('cancel_at'))
     });
