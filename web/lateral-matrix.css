@@ -68,3 +68,9 @@
 
 .mx-card header .mx-category.mx-tier-label{margin-left:0}
 .mx-card .mx-best-market{background-color:#102f50}.mx-card .mx-best-market h4{color:#9ed8ff}
+
+/* Always-visible instruments directly below the proposal on the main page. */
+.mx-card>.mx-cockpit{margin:16px 20px 20px;padding:18px;max-width:100%;box-sizing:border-box}
+.mx-card>.mx-cockpit .mx-instruments{max-width:760px;margin:auto;padding:18px 0}
+.mx-card>.mx-cockpit .mx-cockpit-pick h3{margin:8px 0}
+@media(max-width:600px){.mx-card>.mx-cockpit{margin:12px;padding:14px 10px}.mx-card>.mx-cockpit .mx-instruments{gap:4px}}
