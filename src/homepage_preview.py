@@ -78,6 +78,9 @@ def build_preview(payload, previous=None, now=None, rng=None):
                     'odd': row['odd'], 'statistical_pct': row['statistical_pct'],
                     'market_confirmation': row['opportunity']['signal'], 'category': row['category'],
                     'opportunity': row['opportunity'], 'oci': row.get('oci'),
+                    'first_odd': row.get('first_odd'), 'delta_pct': row.get('delta_pct'),
+                    'bookmaker': row.get('bookmaker'), 'bookmakers_count': row.get('bookmakers_count'),
+                    'movement_confirmed': row.get('movement_confirmed'),
                     'competition_policy': SCOPE_ID,
                     'margin_pct': row.get('selected_margin_pct'),
                     'model_id': 'lateral-matrix-v5.0', 'captured_at': a.get('captured_at'),
@@ -86,7 +89,9 @@ def build_preview(payload, previous=None, now=None, rng=None):
         candidates.sort(key=lambda x: (-x[0], x[1]['kickoff'], x[1]['fixture_id'], x[1]['label']))
         unique = {}
         for _, row in candidates: unique.setdefault(row['fixture_id'], row)
-        fields = ('fixture_id', 'match', 'league', 'kickoff', 'label', 'odd', 'captured_at', 'provider_updated_at')
+        fields = ('fixture_id', 'match', 'league', 'kickoff', 'label', 'odd', 'captured_at', 'provider_updated_at',
+                  'statistical_pct', 'margin_pct', 'market_confirmation', 'first_odd', 'delta_pct',
+                  'bookmaker', 'bookmakers_count', 'movement_confirmed', 'oci')
         social = []
         for pick in unique.values():
             observed = stamp(pick.get('provider_updated_at'))
