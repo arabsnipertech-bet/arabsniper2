@@ -45,6 +45,27 @@ class PrivateTelegramReader(unittest.TestCase):
         day,now=self.fixture()
         day["matches"][0]["fixture"]["status_short"]="1H"
         self.assertEqual(from_private_day(day,now),[])
+    def test_cached_stable_dashboard_gold_is_visible_with_timestamp(self):
+        day,now=self.fixture()
+        row=day["matches"][0]["multimarket"]["matrix"]["rows"][0]
+        row["quote_status"]="cached_stable"
+        row["provider_updated_at"]=(now-timedelta(hours=6)).isoformat()
+        row["platinum"]={"eligible":False}
+        row["opportunity"]={"eligible":True,"policy_id":"gold-goals-v6.1"}
+        day["matches"][0]["multimarket"]["matrix"]["platinum_policy"]["best_market_id"]=None
+        day["matches"][0]["multimarket"]["matrix"]["opportunity_policy"]["best_market_id"]="p1"
+        choices=from_private_day(day,now)
+        self.assertEqual(len(choices),1)
+        self.assertEqual(choices[0]["source_tier"],"gold")
+        self.assertEqual(choices[0]["quote_status"],"cached_stable")
+        self.assertEqual(choices[0]["provider_updated_at"],row["provider_updated_at"])
+        self.assertEqual(len(picks({"date":day["date"],"selections":choices},now,("20:30","22:00"),1)),1)
+        row["provider_updated_at"]=(now-timedelta(hours=8,minutes=1)).isoformat()
+        self.assertEqual(from_private_day(day,now),[])
+        row["quote_status"]="recent"
+        row["provider_updated_at"]=(now-timedelta(hours=2)).isoformat()
+        self.assertEqual(from_private_day(day,now),[])
+
     def test_no_private_feed_leak(self):
         day,now=self.fixture()
         out=from_private_day(day,now)
