@@ -19,26 +19,30 @@ UTC_CRONS = {
     "15 19 * * *", "28 19 * * *", "15 20 * * *", "28 20 * * *",
 }
 MESSAGES = (
-    "🎁 ARABSNIPERBET GOLD · 7 GIORNI GRATIS!\n\n"
-    "Prova l'accesso completo all'Area Gold per 7 giorni: nessuna carta di credito, "
-    "nessun addebito e nessun rinnovo automatico.\n\n"
-    "👉 https://t.me/ArabSniperBot\n"
-    "Apri il bot in privato, scrivi /prova e verifica la tua email con il codice ricevuto.\n\n"
-    "Una sola prova gratuita per email/account Telegram. 18+ · Gioca responsabilmente.",
-    "⚽ Vuoi scoprire le analisi Gold di ArabSniperBet?\n\n"
-    "🎁 Ora puoi accedere per 7 giorni gratuitamente, senza carta, senza addebiti "
-    "e senza rinnovo automatico. Nessun limite aggiuntivo di utilizzo Gold durante la prova.\n\n"
-    "✅ Avvia @ArabSniperBot: https://t.me/ArabSniperBot\n"
-    "Invia /prova, conferma la tua email e accedi all'Area Gold.\n\n"
-    "L'offerta è utilizzabile una sola volta per email/account Telegram. 18+ · Gioca responsabilmente.",
-    "🎁 GOLD GRATIS PER 7 GIORNI · ARABSNIPERBET\n\n"
-    "Analisi e selezioni Gold con accesso completo per 7 giorni. "
-    "Non devi inserire una carta di credito, non paghi nulla e la prova termina "
-    "senza rinnovo automatico.\n\n"
-    "👉 https://t.me/ArabSniperBot — scrivi /prova in privato.\n"
-    "Conferma l'email con il codice ricevuto, poi accedi a "
-    "https://arabsniperbet.com/gold-dashboard-live.html\n\n"
-    "Una prova per email/account Telegram. 18+ · Le analisi non garantiscono risultati."
+    "🔎 ARABSNIPERBET GOLD · COSA OSSERVIAMO?\\n\\n"
+    "Statistiche, evoluzione delle quote, segnali di mercato e selezioni Gold/Platinum "
+    "vengono confrontati prima del calcio d'inizio. Ogni segnale richiede conferme: "
+    "nessun risultato è garantito.\\n\\n"
+    "🎁 Stiamo preparando l'accesso dimostrativo Gold gratuito per 7 giorni, "
+    "senza carta, addebiti né rinnovo automatico. Annunceremo l'attivazione dopo il collaudo.\\n"
+    "🌐 https://arabsniperbet.com\\n📲 https://t.me/arabsniper_signals\\n"
+    "18+ · Gioca responsabilmente.",
+    "📊 ARABSNIPERBET · LA QUOTA NON È UN PRONOSTICO\\n\\n"
+    "L'apertura e la quota aggiornata raccontano come cambia il mercato. "
+    "ArabSniper studia i movimenti insieme alle statistiche, all'OCI e all'aggio. "
+    "Se mancano conferme attendibili, nessun segnale Gold viene forzato.\\n\\n"
+    "🎁 Prova Gold gratuita di 7 giorni in preparazione: "
+    "nessuna carta, nessun addebito e nessun rinnovo automatico quando sarà attivata.\\n"
+    "🌐 https://arabsniperbet.com\\n"
+    "18+ · Le analisi non garantiscono risultati.",
+    "💛 ARABSNIPERBET GOLD · STUDIA PRIMA DI SCEGLIERE\\n\\n"
+    "Le opportunità più interessanti nascono dall'incrocio tra statistiche "
+    "e quote, non dal numero di pronostici pubblicati. "
+    "Seguici per gli aggiornamenti Gold/Platinum e per i riscontri verificati.\\n\\n"
+    "🎁 Accesso dimostrativo Gold di 7 giorni senza carta, addebiti o rinnovo: "
+    "offerta in preparazione e non ancora disponibile tramite il bot.\\n"
+    "🌐 https://arabsniperbet.com\\n"
+    "18+ · Gioca responsabilmente."
 )
 
 
