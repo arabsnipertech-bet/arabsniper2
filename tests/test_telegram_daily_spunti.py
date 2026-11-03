@@ -31,12 +31,37 @@ class PublicSpuntiTests(unittest.TestCase):
         self.assertEqual(len(items),3)
         msg=message_for(items,now)
         self.assertIn("NON una multipla",msg)
-        self.assertIn("Stima statistica",msg)
-        self.assertIn("Flusso di mercato non confermato",msg)
+        self.assertIn("Statistica del modello",msg)
+        self.assertIn("Segnale del flusso NON confermato",msg)
         self.assertIn("1️⃣",msg)
         self.assertIn("3️⃣",msg)
         self.assertIn("https://t.me/ArabSniperBot",msg)
         self.assertNotIn("Quota combinata",msg)
+
+    def test_verified_movement_is_explained_but_not_guaranteed(self):
+        now=datetime(2026,11,3,13,2,tzinfo=ROME)
+        data=self.fixture(now)
+        data["social_selections"][0].update({
+            "statistical_pct":56.4, "first_odd":2.10,
+            "odd":1.85, "delta_pct":100*(1.85/2.10-1),
+            "oci":32.5, "bookmaker":"Book A", "bookmakers_count":4,
+            "movement_confirmed":False, "margin_pct":5.5,
+            "market_confirmation":"unconfirmed"})
+        msg=message_for(spunti(data,now),now)
+        for phrase in ("56.4%", "Probabilità implicita", "Differenza modello/implicita",
+                       "2.10 → ora 1.85", "in discesa", "OCI osservato: +32.5",
+                       "NON disponibile", "Book A"):
+            self.assertIn(phrase,msg)
+
+    def test_unverified_or_inconsistent_movement_is_not_claimed(self):
+        now=datetime(2026,11,3,13,2,tzinfo=ROME)
+        data=self.fixture(now)
+        data["social_selections"][0].update({
+            "first_odd":2.40, "delta_pct":-2.0, "oci":None, "movement_confirmed":True})
+        msg=message_for(spunti(data,now),now)
+        self.assertIn("Movimento apertura/attuale non verificabile",msg)
+        self.assertIn("OCI non disponibile",msg)
+        self.assertNotIn("Movimento verificato",msg)
 
     def test_no_started_or_stale_quotes_or_duplicates(self):
         now=datetime(2026,11,3,13,0,tzinfo=ROME)
