@@ -18,7 +18,7 @@ function setup(){
     const u=new URL(url);const body=options.body,fields=body instanceof URLSearchParams?body:null;
     calls.push({url:u.pathname,fields});
     if(u.hostname==='api.resend.com') {
-      const message=JSON.parse(body);outs.push({type:'email',code:message.text.match(/\\d{6}/)?.[0]});
+      const message=JSON.parse(body);outs.push({type:'email',code:message.text.match(/\d{6}/)?.[0]});
       return Response.json({id:'email-example'});
     }
     if(u.hostname==='api.telegram.org') {
@@ -51,7 +51,7 @@ test('Verified email issues one 7-day trial, never configures recurring renewal'
   assert.equal((await check(s.request(42,'/prova'))).status,200);
   assert.equal((await check(s.request(42,'person@example.com'))).status,200);
   const code=s.outs.find(x=>x.type==='email').code;
-  assert.match(code,/^\\d{6}$/);
+  assert.match(code,/^\d{6}$/);
   assert.equal((await check(s.request(42,code))).status,200);
   const sub=s.calls.find(x=>x.url==='/v1/subscriptions');
   assert(sub);
