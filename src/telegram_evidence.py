@@ -3,7 +3,7 @@ import json
 import math
 import os
 import subprocess
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -11,16 +11,33 @@ from telegram_gold_promo import telegram, posted_before
 
 ROME=ZoneInfo("Europe/Rome")
 CHANNEL="@arabsniper_signals"
-SLOTS={"45 10 * * *":"audit","45 16 * * *":"market"}
+SLOTS={
+    "45 8 * * *":"audit","58 8 * * *":"audit",
+    "45 9 * * *":"audit","58 9 * * *":"audit",
+    "45 14 * * *":"market","58 14 * * *":"market",
+    "45 15 * * *":"market","58 15 * * *":"market"
+}
 LABELS={"over15_ht":"Over 1,5 PT","over25_ht":"Over 2,5 PT","gg_ht":"Goal PT","over25_ft":"Over 2,5 FT","over35_ft":"Over 3,5 FT"}
 
 
 def choose_slot(now,event,cron):
     if event!="schedule" or cron not in SLOTS:
         return None
+    local=now.astimezone(ROME)
+    scheduled_hour,scheduled_minute=(10,45) if SLOTS[cron]=="audit" else (16,45)
+    due=datetime.combine(local.date(),time(scheduled_hour,scheduled_minute),tzinfo=ROME)
+    if not timedelta(0)<=local-due<=timedelta(minutes=38):
+        return None
+    # Discard the wrong seasonal UTC schedule; accept only a cron that resolves
+    # to the due Rome slot (+13m fallback). Prevent CEST/CET duplicates.
     minute,hour=map(int,cron.split()[:2])
-    due=datetime.combine(now.date(),time(hour,minute),tzinfo=ROME)
-    if not timedelta(0)<=now-due<=timedelta(minutes=35):
+    actual_utc=now.astimezone(timezone.utc)
+    expected_utc=due.astimezone(timezone.utc)
+    expected_minutes={expected_utc.minute,(expected_utc+timedelta(minutes=13)).minute}
+    expected_pairs={(expected_utc.hour,expected_utc.minute),
+                    ((expected_utc+timedelta(minutes=13)).hour,
+                     (expected_utc+timedelta(minutes=13)).minute)}
+    if (hour,minute) not in expected_pairs:
         return None
     return SLOTS[cron]
 
@@ -87,6 +104,35 @@ def market_message(selections):
     return "\n".join(lines)
 
 
+EDUCATIONAL_THEMES=(
+    ("CHE COSA SIGNIFICA OCI?",
+     "L'OCI è un indicatore interno usato per interpretare la direzione e la coerenza dei movimenti delle quote. Non è una probabilità di vincita e da solo non giustifica una selezione."),
+    ("PERCHÉ L'AGGIO CONTA?",
+     "L'aggio rappresenta il margine implicito del bookmaker. Due mercati possono avere quote apparentemente interessanti ma margini diversi: confrontarli aiuta a leggere meglio i prezzi."),
+    ("QUOTA DI APERTURA E QUOTA ATTUALE",
+     "Una quota che scende indica una variazione del prezzo offerto. Non dimostra che l'esito avverrà: conta il contesto, la freschezza del dato e la concordanza tra operatori."),
+    ("PRIMO TEMPO E RISULTATO FINALE",
+     "Un Over 1,5 nel primo tempo e un Over 2,5 finale sono mercati differenti. Studiare separatamente i dati dei primi 45 minuti evita di confonderli con le medie sull'intera gara."),
+    ("PERCHÉ NON PUBBLICHIAMO SEMPRE UN PRONOSTICO?",
+     "Quando quote, statistiche e flussi di mercato non sono sufficientemente coerenti, la scelta più corretta è non pubblicare un segnale. L'assenza di una Gold non è un errore."),
+    ("COSA CONFRONTIAMO NEGLI AUDIT?",
+     "Confrontiamo le selezioni registrate prima della partita con gli esiti reali, comprese quelle perse. Le statistiche hanno valore solo se considerano anche gli errori."),
+    ("PERCHÉ CONTA LA FRESCHEZZA DELLE QUOTE?",
+     "Una quota vecchia può non essere più disponibile. Per valutare una segnalazione servono ora di rilevazione, mercato esatto e verifica prima del calcio d'inizio."),
+)
+
+def educational_message(day):
+    title,body=EDUCATIONAL_THEMES[day.toordinal()%len(EDUCATIONAL_THEMES)]
+    return (
+      "📚 ARABSNIPER · UN MINUTO DI ANALISI\\n\\n"
+      f"🔎 {title}\\n\\n{body}\\n\\n"
+      "La rubrica educativa è indipendente dalla presenza di pronostici Gold/Platinum oggi.\\n"
+      "📊 Approfondisci sul sito: https://arabsniperbet.com\\n"
+      "📲 Condividi il canale: https://t.me/arabsniper_signals\\n"
+      "Solo maggiorenni · Le analisi non garantiscono risultati."
+    )
+
+
 def load_audit(day):
     repo=os.environ["GITHUB_REPOSITORY"]
     res=json.loads(subprocess.check_output(
@@ -118,8 +164,10 @@ def main():
         report=load_audit((now.date()-timedelta(days=1)).isoformat())
         message=audit_message(report) if report else None
     else:
-        from telegram_private_feed import fetch_current_private
-        message=market_message(fetch_current_private(now))
+        # Education always has an evergreen, accurate topic even when the live
+        # private board has no qualified market. Avoid fragile 160 MB R2 reads
+        # and never invent live signals or odds.
+        message=educational_message(now.date())
     if not message:
         print("Verified inputs insufficient; skip publication")
         return
