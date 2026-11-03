@@ -1,0 +1,19 @@
+name: Telegram watchdog one-time dry run
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/telegram-watchdog-smoke-once.yml']
+permissions:
+  contents: read
+  actions: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read actual GitHub scheduled publications without dispatching
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          FAST_BACKUP_DRY_RUN: 'true'
+        run: python3 src/telegram_watchdog.py
