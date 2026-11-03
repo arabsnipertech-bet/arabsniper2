@@ -67,11 +67,19 @@ def from_private_day(day, now):
                 market=goal_market(row)
                 odd=row.get("odd")
                 at=stamp(row.get("provider_updated_at"))
+                status=row.get("quote_status")
+                # The dashboard regards cached_stable as a legitimate saved
+                # bookmaker snapshot. It must not be silently discarded by the
+                # Telegram-only 90-minute rule for recent quotes. The snapshot
+                # is explicitly timestamped on the outbound card.
+                max_quote_age=(timedelta(minutes=90) if status=="recent"
+                               else timedelta(hours=8) if status=="cached_stable"
+                               else None)
                 if (decision.get("eligible") is not True or market not in ALLOWED or
                     row.get("quote_executable") is not True or
-                    row.get("quote_status") not in ("recent","cached_stable") or
+                    max_quote_age is None or
                     not good_number(odd) or odd <= 1 or
-                    not at or not timedelta(0)<= now-at <= timedelta(minutes=90)):
+                    not at or not timedelta(0)<= now-at <= max_quote_age):
                     continue
                 if tier=="platinum" and (
                     row.get("movement_confirmed") is not True or
@@ -83,7 +91,7 @@ def from_private_day(day, now):
                 choices_for_fixture.append(dict(
                     fixture_id=str(fid),match=f.get("match",""),league=f.get("league",""),
                     kickoff=start.isoformat(),captured_at=captured.isoformat(),
-                    provider_updated_at=at.isoformat(),odd=odd,label=row.get("label") or market,
+                    provider_updated_at=at.isoformat(),quote_status=status,odd=odd,label=row.get("label") or market,
                     market=market,source_tier=tier,model_probability=row.get("statistical_pct"),
                     oci=row.get("oci"),delta_pct=row.get("delta_pct"),
                     ev_pct=row.get("ev_pct"),bookmaker=row.get("bookmaker"),
