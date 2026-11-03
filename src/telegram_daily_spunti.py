@@ -136,7 +136,8 @@ def main():
     now=datetime.now(ROME)
     oneoff=os.environ.get("ALLOW_ONEOFF")=="true" and os.environ.get("GITHUB_EVENT_NAME")=="push"
     if not eligible(now,os.environ.get("GITHUB_EVENT_NAME"),
-                    os.environ.get("GITHUB_EVENT_SCHEDULE"),oneoff=oneoff,\n                    recovery_slot=os.environ.get("RECOVERY_SLOT")):
+                    os.environ.get("GITHUB_EVENT_SCHEDULE"),oneoff=oneoff,
+                    recovery_slot=os.environ.get("RECOVERY_SLOT")):
         print("No authorized timely 13:00 spunti slot")
         return
     name=f"tg-spunti-{now:%Y-%m-%d}-1300-sent"
