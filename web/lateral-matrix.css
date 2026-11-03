@@ -34,3 +34,34 @@
 .mx-study-base{grid-column:1/-1;border-left:3px solid #64beff;border-radius:8px;background:#102f50;color:#cceaff;padding:10px 12px;margin-bottom:8px}
 .mx-study-base h4{margin:0 0 3px;color:#b5e2ff;font-size:1rem}
 .mx-study-base span,.mx-study-base p{display:block;margin:3px 0;font-size:.8rem;line-height:1.4;overflow-wrap:anywhere}
+
+/* Dynamic cockpit: presentation only, shared by desktop and mobile. */
+.mx-tone-gold{--mx-accent:#f1cf78;--mx-soft:#c8a85c;--mx-tint:#2c2617}
+.mx-tone-studio{--mx-accent:#82d6ff;--mx-soft:#498cbd;--mx-tint:#132733}
+.mx-tone-platinum{--mx-accent:#e6edf8;--mx-soft:#9daec7;--mx-tint:#252c37}
+.mx-card{background:linear-gradient(135deg,#151e28,#0d151e);border:1px solid var(--mx-soft,#415563);border-radius:18px;box-shadow:0 12px 30px #0002;margin:24px 0}
+.mx-card>header{border-bottom:1px solid #ffffff10;background:linear-gradient(115deg,var(--mx-tint,#192735),transparent);padding:20px 22px}
+.mx-category{display:block!important;color:var(--mx-accent,#f1cf78)!important;font-size:1.12rem!important;letter-spacing:.19em!important;font-weight:850;margin-bottom:12px}
+.mx-card h3{font-size:1.4rem;letter-spacing:-.025em}.mx-card time{color:#f0f5fc;font-size:.9rem}.mx-card .mx-match-layout{padding-top:16px;gap:14px}
+.mx-card .mx-quote-cell{background:#101c27;border-color:#314655;border-top-width:2px;border-radius:10px}.mx-card .mx-goal-quotes .mx-quote-cell{background:#131f2c;border-color:#394860}
+.mx-card .mx-best{background:linear-gradient(145deg,var(--mx-tint),#101922);border-color:var(--mx-soft);border-left-color:var(--mx-accent);border-radius:12px}
+.mx-card .mx-best h4,.mx-card .mx-best>.mx-section-title{color:var(--mx-accent)}
+.mx-card .mx-quote-metrics{gap:4px 9px}.mx-card .mx-quote-pair span:last-child b{color:#ecf6ff}.mx-card .mx-quote-source{font-size:.6rem}
+.mx-open{background:linear-gradient(100deg,var(--mx-tint),#15212d);color:var(--mx-accent);font-weight:700;border-top-color:var(--mx-soft);min-height:52px}.mx-open:hover{filter:brightness(1.2)}
+.mx-card>footer{background:#0b131c;color:#9aadbc}.mx-heading h2{letter-spacing:-.045em}.mx-controls{background:#101c28;border-radius:12px}.mx-categories button{border-radius:20px}
+.mx-modal{background:#0b141e;border-color:var(--mx-soft);border-radius:20px}.mx-modal-header{background:linear-gradient(120deg,var(--mx-tint),#101b27)}.mx-modal-header h2{font-size:1.55rem}.mx-modal .mx-category{margin-bottom:8px}
+.mx-cockpit{margin:20px 24px;padding:22px;border:1px solid var(--mx-soft);border-radius:16px;background:radial-gradient(ellipse at 50% 75%,var(--mx-tint),#0c141d 75%);color:#e9f1f8}
+.mx-cockpit-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}.mx-cockpit-heading>span:last-child{font-size:.6rem;letter-spacing:.12em;color:#a5b7c8}.mx-cockpit-heading .mx-category{margin:0}
+.mx-instrument-select{display:flex;align-items:center;gap:14px;font-size:.7rem;color:#adbecf;margin:18px 0}.mx-instrument-select select{flex:1;min-width:0;min-height:44px;border:1px solid #526273;border-radius:8px;background:#111f2d;color:#f2f6fc;padding:8px;font:inherit;font-size:.8rem}
+.mx-cockpit-pick{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;border-block:1px solid #ffffff18}.mx-cockpit-pick small{color:#afc0d2;font-size:.65rem;display:block}.mx-cockpit-pick h3{font-size:1.5rem;margin:8px 0;color:var(--mx-accent);letter-spacing:-.02em}.mx-cockpit-price{text-align:right;flex-shrink:0}.mx-cockpit-price .mx-price{font-size:1.1rem}.mx-cockpit-price b{font-size:2rem;color:var(--mx-accent)}
+.mx-instruments{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:12px;align-items:center;padding:24px 0 18px}.mx-instrument{min-width:0;text-align:center}.mx-instrument svg{width:100%;display:block;overflow:visible}.mx-dial-track{fill:none;stroke:#31404d;stroke-width:9}.mx-dial-fill{fill:none;stroke:var(--mx-accent);stroke-width:9}.mx-dial-ticks{stroke:#9aaab6;stroke-width:1}.mx-needle{fill:var(--mx-accent);filter:drop-shadow(0 0 3px var(--mx-soft))}.mx-instrument svg text{fill:#9eafbc;font-size:10px;font-family:inherit}.mx-instrument>strong{display:block;font-size:2.15rem;line-height:1;color:var(--mx-accent);font-variant-numeric:tabular-nums}.mx-instrument:nth-child(2)>strong{font-size:3rem}.mx-instrument>b{display:block;font-size:.73rem;margin:9px 0 6px}.mx-instrument>small{display:block;font-size:.65rem;color:#a7bacb;line-height:1.4}.mx-instrument-empty .mx-dial-track{stroke-dasharray:3 4}
+.mx-cockpit-evidence{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px;border-top:1px solid #ffffff18;padding-top:16px;align-items:center}.mx-cockpit-evidence>.mx-net{margin:0}.mx-cockpit-evidence>div{min-width:0}.mx-cockpit-evidence small{display:block;font-size:.6rem;color:#a7bacb;overflow-wrap:anywhere}.mx-cockpit-evidence b{display:block;font-size:.9rem;margin:6px 0;overflow-wrap:anywhere}.mx-cockpit-note{font-size:.66rem;line-height:1.6;color:#9cb0c0;margin:18px 0 0}.mx-cockpit-empty{font-size:.85rem;line-height:1.6;color:#b7c8d7}
+.mx-modal-scroll>.mx-best{margin:0 24px 20px}.mx-modal-scroll>.mx-best dl{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+@media(max-width:600px){.mx-card>header{padding:16px 12px}.mx-card h3{font-size:1.2rem}.mx-category{font-size:1rem!important}.mx-cockpit{margin:12px;padding:14px 10px}.mx-cockpit-heading{gap:8px}.mx-cockpit-heading>span:last-child{font-size:.5rem}.mx-instrument-select{display:block}.mx-instrument-select select{display:block;width:100%;margin-top:7px}.mx-cockpit-pick{gap:10px}.mx-cockpit-pick h3{font-size:1.1rem}.mx-cockpit-price .mx-price{font-size:.85rem}.mx-cockpit-price b{font-size:1.5rem}.mx-instruments{gap:4px;padding-top:20px}.mx-instrument>strong{font-size:1.45rem}.mx-instrument:nth-child(2)>strong{font-size:1.9rem}.mx-instrument>b{font-size:.61rem}.mx-instrument>small{font-size:.56rem}.mx-cockpit-evidence{grid-template-columns:1fr 1fr}.mx-cockpit-evidence>div:last-child{grid-column:1/-1}.mx-modal-scroll>.mx-best{margin:0 12px 14px}.mx-modal-scroll>.mx-best dl{display:block}.mx-modal-header h2{font-size:1.2rem}}
+@media(prefers-reduced-motion:reduce){.mx-cockpit *{animation:none!important;transition:none!important}}
+/* Keep the list scannable; complete figures remain in the match dialog. */
+.mx-card .mx-quote-metrics,.mx-card .mx-quote-consensus{display:none}
+.mx-card .mx-best>dl,.mx-card .mx-best>.mx-timing:not([data-study-ideas]){display:none}
+.mx-modal-scroll>.mx-quote-board{margin:20px 24px}.mx-modal-scroll>.mx-quote-board .mx-quote-metrics{display:flex}
+.mx-card .mx-net{margin:7px 0}.mx-card .mx-best-price{margin-bottom:8px}
+@media(max-width:600px){.mx-modal-scroll>.mx-quote-board{margin:12px}.mx-card .mx-quote-pair{grid-template-columns:1fr 1fr}.mx-card .mx-quote-pair span{display:block;font-size:.58rem}.mx-card .mx-quote-pair b{margin-top:4px}.mx-card .mx-quote-source{font-size:.56rem}}
