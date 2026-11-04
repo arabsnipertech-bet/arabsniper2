@@ -71,6 +71,7 @@ def graph(path, data=None):
 
 def main(mode):
     now = datetime.now(ROME)
+    card = None
     if mode == "results":
         if now.hour != 11:
             return
@@ -79,7 +80,14 @@ def main(mode):
         receipts = list(Path("receipts").glob("**/post.json"))
         if len(receipts) > 1:
             raise ValueError("Ambiguous slot receipts")
-        post = selection(json.loads(receipts[0].read_text()), now) if receipts else None
+        receipt = json.loads(receipts[0].read_text()) if receipts else None
+        post = selection(receipt, now) if receipt else None
+        if post:
+            card = receipts[0].with_name("social-card.jpg")
+            if not card.exists() or post[1] != receipt["text"]:
+                from social_card import render
+                current = dict(receipt, text=post[1], picks=[p for p in receipt["picks"] if moment(p["kickoff"]) > now])
+                render(current, card)
     if not post:
         print("No eligible Facebook post")
         return
@@ -92,8 +100,19 @@ def main(mode):
     if any(p.get("message") == message or p.get("message", "").split("\n")[0] == title for p in posts["data"]):
         print("Already published")
         return
-    response = graph(PAGE + "/feed", {"message": message})
-    post_id = response["id"]
+    if card:
+        import requests
+        try:
+            with card.open("rb") as image:
+                upload = requests.post(f"https://graph.facebook.com/v25.0/{PAGE}/photos",
+                    headers={"Authorization":"Bearer "+os.environ["FACEBOOK_PAGE_ACCESS_TOKEN"]},
+                    data={"message":message},files={"source":("social-card.jpg",image,"image/jpeg")},timeout=30)
+            upload.raise_for_status()
+            post_id = upload.json()["post_id"]
+        except (requests.RequestException, ValueError, KeyError):
+            raise SystemExit("Facebook photo publication unconfirmed") from None
+    else:
+        post_id = graph(PAGE + "/feed", {"message": message})["id"]
     if not post_id.startswith(PAGE + "_") or graph(post_id + "?fields=id")["id"] != post_id:
         raise ValueError("Facebook publication not confirmed")
     print("Confirmed Facebook post", post_id)

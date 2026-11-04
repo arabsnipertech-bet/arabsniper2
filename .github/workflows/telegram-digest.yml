@@ -95,5 +95,7 @@ jobs:
         if: steps.prepare.outputs.name != ''
         with:
           name: ${{ steps.prepare.outputs.name }}-sent
-          path: post.json
+          path: |
+            post.json
+            social-card.jpg
           retention-days: 3

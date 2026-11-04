@@ -275,6 +275,7 @@ def prepare():
 
 
 def reserve(name, post):
+    post.setdefault("day", datetime.now(ROME).date().isoformat())
     post["text"] = slot_message(post)
     Path("post.json").write_text(json.dumps(post, ensure_ascii=False))
     with open(os.environ["GITHUB_OUTPUT"], "a") as out:
@@ -319,10 +320,25 @@ def send():
         raise SystemExit("Missing bot token")
     post = json.loads(Path("post.json").read_text())
     if "slot" in post:
-        from telegram_gold_promo import telegram
+        import requests
+        from social_card import render
         post["picks"] = [p for p in post["picks"] if instant(p["kickoff"]) > datetime.now(ROME)]
         post["text"] = slot_message(post)
-        result = telegram("sendMessage", token, chat_id=CHANNEL, text=post["text"], disable_web_page_preview="true")
+        render(post, "social-card.jpg")
+        caption = post["text"]
+        if len(caption.encode("utf-16-le")) // 2 > 1024:
+            caption = caption[:950].rsplit("\n", 1)[0] + "\n18+ · arabsniperbet.com"
+        try:
+            with open("social-card.jpg", "rb") as photo:
+                response = requests.post(f"https://api.telegram.org/bot{token}/sendPhoto",
+                                         data={"chat_id":CHANNEL,"caption":caption},
+                                         files={"photo":("social-card.jpg",photo,"image/jpeg")},timeout=30)
+            payload = response.json()
+        except (requests.RequestException,ValueError):
+            raise SystemExit("Telegram photo delivery unconfirmed") from None
+        result = payload.get("result") or {}
+        if not payload.get("ok") or not result.get("photo"):
+            raise SystemExit("Telegram photo not confirmed")
         if result.get("chat", {}).get("username", "").lower() != CHANNEL[1:] or not result.get("message_id"):
             raise SystemExit("Unexpected Telegram receipt")
         post["message_id"] = result["message_id"]

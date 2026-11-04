@@ -144,11 +144,11 @@ EDUCATIONAL_THEMES=(
 def educational_message(day):
     title,body=EDUCATIONAL_THEMES[day.toordinal()%len(EDUCATIONAL_THEMES)]
     return (
-      "📚 ARABSNIPER · UN MINUTO DI ANALISI\\n\\n"
-      f"🔎 {title}\\n\\n{body}\\n\\n"
-      "La rubrica educativa è indipendente dalla presenza di pronostici Gold/Platinum oggi.\\n"
-      "📊 Approfondisci sul sito: https://arabsniperbet.com\\n"
-      "📲 Condividi il canale: https://t.me/arabsniper_signals\\n"
+      "📚 ARABSNIPER · UN MINUTO DI ANALISI\n\n"
+      f"🔎 {title}\n\n{body}\n\n"
+      "La rubrica educativa è indipendente dalla presenza di pronostici Gold/Platinum oggi.\n"
+      "📊 Approfondisci sul sito: https://arabsniperbet.com\n"
+      "📲 Condividi il canale: https://t.me/arabsniper_signals\n"
       "Solo maggiorenni · Le analisi non garantiscono risultati."
     )
 
