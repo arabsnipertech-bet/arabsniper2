@@ -9,9 +9,11 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
+from telegram_slots import CHANNEL_SLOTS
+
 ROME = ZoneInfo("Europe/Rome")
 PAGE = "604216843376166"
-SLOTS = {"00:30", "04:30", "12:30", "17:30", "18:30", "20:00", "22:00"}
+
 
 
 def moment(value):
@@ -23,24 +25,22 @@ def moment(value):
 
 def selection(receipt, now):
     slot = receipt.get("slot")
-    if not receipt.get("message_id") or slot not in SLOTS or receipt["day"] != now.date().isoformat():
+    if not receipt.get("message_id") or slot not in CHANNEL_SLOTS or receipt["day"] != now.date().isoformat():
         return
     scheduled = moment(f"{receipt['day']}T{slot}{now.strftime('%z')}")
     if not timedelta(0) <= now - scheduled < timedelta(minutes=30):
         return
-    rows = []
-    for pick in receipt["picks"]:
-        start = moment(pick["kickoff"]).astimezone(ROME)
-        if start <= now or pick["tier"].lower() not in {"platinum", "gold", "blu"}:
-            continue
-        at = moment(pick["provider_updated_at"]).astimezone(ROME)
-        label = "Blu · Solo Studio" if pick["tier"].lower() == "blu" else pick["tier"].title()
-        rows.append(f"{label} · {start:%H:%M} · {pick['match']}\n{pick['label']} · quota {pick['odd']:.2f} (rilevata {at:%d/%m %H:%M})")
-    if not rows:
-        if slot != "22:00":
+    text = receipt["text"]
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("Telegram receipt has no message text")
+    picks = receipt["picks"]
+    future = [p for p in picks if moment(p["kickoff"]) > now]
+    if len(future) != len(picks):
+        if not future:
             return
-        rows = ["Scopri il cruscotto Gold e confronta statistiche e movimenti delle quote: https://arabsniperbet.com/gold"]
-    return f"ArabSniperBet · {now:%d/%m/%Y} · fascia {slot}", "\n\n".join(rows)
+        from telegram_digest import slot_message
+        text = slot_message(dict(receipt, picks=future))
+    return f"ArabSniperBet · {now:%d/%m/%Y} · fascia {slot}", text
 
 
 def results(feed, now):
@@ -86,11 +86,13 @@ def main(mode):
     if graph("me?fields=id")["id"] != PAGE:
         raise ValueError("Token belongs to another identity")
     title, body = post
-    posts = graph(PAGE + "/published_posts?fields=message&limit=100")
-    if any(p.get("message", "").split("\n")[0] == title for p in posts["data"]):
+    message = body if mode != "results" else f"{title}\n\n{body}\n\n18+ · Le analisi non garantiscono risultati."
+    since = int(now.replace(hour=0, minute=0, second=0, microsecond=0).timestamp())
+    posts = graph(f"{PAGE}/published_posts?fields=message&limit=100&since={since}")
+    if any(p.get("message") == message or p.get("message", "").split("\n")[0] == title for p in posts["data"]):
         print("Already published")
         return
-    response = graph(PAGE + "/feed", {"message": title + "\n\n" + body + "\n\n18+ · Le analisi non garantiscono risultati."})
+    response = graph(PAGE + "/feed", {"message": message})
     post_id = response["id"]
     if not post_id.startswith(PAGE + "_") or graph(post_id + "?fields=id")["id"] != post_id:
         raise ValueError("Facebook publication not confirmed")
