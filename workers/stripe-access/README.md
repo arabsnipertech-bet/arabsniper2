@@ -2,11 +2,16 @@
 
 Codice destinato al Worker esistente `stripe-checker`, account Stripe `acct_1T6rVoH763HaPm5U` (Aransniperbet). Non eseguire deploy automatici prima della configurazione e dei test Stripe sandbox. Nessuna chiave nel repository.
 
+## Distribuzione dei pass Gold di novembre 2026
+1. Sul database D1 già collegato come ACCESS_DB applicare `migrate-gold-passes.sql` come migrazione unica transazionale. Per un database vuoto usare invece `schema.sql`.
+2. Distribuire `production-bundle.mjs` sul Worker esistente `stripe-checker`, conservando binding, segreti e route. I tre nuovi prezzi live sono nel catalogo PLANS. In sandbox configurare TEST_PRICE_PASS3D, TEST_PRICE_PASS14D e TEST_PRICE_PASS1M come prezzi una tantum. TEST_PRICE_MONTHLY resta ricorrente per le prove.
+3. Pubblicare la homepage insieme al Worker. Le chiavi pass3d, pass14d e pass1m impediscono a una pagina nuova di aprire per errore un vecchio checkout ricorrente. Controllare tutti i pulsanti in produzione e le condizioni del checkout senza effettuare addebiti di prova.
+
 ## Cosa cambia
 
-- POST `/api/create-checkout-session`: Checkout ospitato Stripe, prezzo controllato dal server, pagamento singolo Daily/Weekly e ricorrenza mensile. Ripara l'endpoint già chiamato dalla homepage. Usa Checkout invece di creare tre Payment Links: permette di riusare i pulsanti esistenti e mantenere i prezzi sul server.
+- POST `/api/create-checkout-session`: Checkout ospitato Stripe, prezzo controllato dal server, tre pagamenti singoli da 5/15/29 €. Ripara l'endpoint già chiamato dalla homepage. Usa Checkout invece di creare tre Payment Links: permette di riusare i pulsanti esistenti e mantenere i prezzi sul server.
 - POST `/api/stripe-webhook`: firma HMAC verificata sul corpo originale con tolleranza 5 minuti. `checkout.session.completed` e `checkout.session.async_payment_succeeded` attivano solo pagamenti confermati per prezzi consentiti. ID Checkout univoco, mai estensione da duplicati.
-- Archivio D1: Daily 24h / Weekly 168h dalla conferma di pagamento, non dalla creazione del checkout. Gli acquisti sovrapposti hanno ciascuno la propria scadenza; non si sommano.
+- Archivio D1: 3 giorni, 14 giorni o un mese di calendario (Europe/Rome). Con la stessa email il nuovo pass inizia alla scadenza di prove, pass o periodi pagati già validi. Le vecchie sessioni vengono riconosciute con le condizioni originarie.
 - GET `/?email=...` oppure `/api/check-access?email=...`: mantiene la compatibilità della dashboard; legge i pass e verifica lo stato delle transazioni Stripe. Per mensili controlla tutti i customer con la stessa email, solo prezzi Gold conosciuti, stato e scadenza, ultima fattura pagata (oppure trial in corso).
 - Revoca pass per rimborso anche parziale o contestazione. Le verifiche al login controllano anche Stripe, per coprire un webhook in ritardo. La revoca mensile segue stato/scadenza della subscription: un rimborso di fattura, da solo, non cancella un abbonamento.
 - VIP Bruno/Manuel preservati. Rimosso il falso token condiviso basato sull'orario.

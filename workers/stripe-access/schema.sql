@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS passes (
  checkout_id TEXT PRIMARY KEY,
  email TEXT NOT NULL,
- plan TEXT NOT NULL CHECK(plan IN ('daily','weekly')),
+ plan TEXT NOT NULL CHECK(plan IN ('daily','weekly','pass3d','pass14d','pass1m')),
  payment_intent TEXT NOT NULL,
  starts_at INTEGER NOT NULL,
  expires_at INTEGER NOT NULL,
