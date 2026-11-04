@@ -81,7 +81,7 @@ async function run(payload,fail=false){
   r=await run({...data,selections:[{...pick,country,league,competition_policy:scope}]});
   assert.equal(r.nodes['daily-picks'].innerHTML.includes('class="pick"'),visible);
  }
- for(const plan of ['daily','weekly','monthly']) assert(html.includes("buy('"+plan+"', this)"));
+ for(const plan of ['pass3d','pass14d','pass1m']) assert(html.includes("buy('"+plan+"', this)"));
  console.log('PASS: public feed only, three cards, stale day, escaped HTML, unavailable feed, Gold entry links and plan IDs');
 })();
 

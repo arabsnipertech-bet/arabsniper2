@@ -21,39 +21,39 @@
 <section id="selezioni" aria-labelledby="picks-title"><div class="section-head"><div><span class="eyebrow">L’anteprima gratuita</span><h2 id="picks-title">Le selezioni di oggi.</h2><p>Tre esempi gratuiti. In Gold trovi tutte le partite della whitelist, Romania inclusa, con proposte sui cinque mercati gol e la matrice completa.</p></div><div class="date" id="preview-date"></div></div><div class="picks" id="daily-picks" aria-live="polite"><div class="empty">Caricamento delle selezioni giornaliere…</div></div><p class="note" id="preview-note">Quote e stime prematch. Le percentuali sono stime sperimentali, non garanzie di vincita.</p>
 <div class="gold-panel"><div><span class="eyebrow">Il quadro completo</span><h2>La tua analisi continua in Gold.</h2><p class="muted">Tutte le partite autorizzate e la matrice di probabilità, prezzi, OCI e aggio: 1X2, Over/Under, Goal/No Goal, parziali, asiatici e combo.</p><div class="actions"><a class="button gold" href="gold-dashboard-live.html">Accedi alla dashboard ↗</a><a class="button" href="#piani">Scegli il tuo accesso</a></div></div><div class="features"><div><span>↗</span> Quote osservate e movimenti di mercato</div><div><span>◎</span> Convergenza, contrarian e mercati laterali</div><div><span>＋</span> Dettagli squadra, primo tempo e finale</div><div><span>⌑</span> Area riservata con verifica dell’accesso</div></div></div></section>
 <section id="risultati" aria-labelledby="results-title"><div class="section-head"><div><span class="eyebrow">Dalle analisi agli esiti</span><h2 id="results-title">Selezione di pronostici vincenti.</h2><p>Gli Over centrati di ieri con le quote prematch più alte registrate.</p></div></div><div class="results-panel" id="results-content" aria-live="polite"><div class="empty">Caricamento dei risultati verificati…</div></div></section>
-<section id="piani"><span class="eyebrow">Scegli quanto approfondire</span><h2>Un accesso, tutte le analisi Gold.</h2><p class="muted">Hai già un accesso attivo? <a href="gold-dashboard-live.html" style="color:var(--gold)">Entra nella dashboard con la tua email →</a></p>
+<section id="piani"><span class="eyebrow">Scegli quanto approfondire</span><h2>Un accesso, tutte le analisi Gold.</h2><p class="muted">Ogni pass scade senza rinnovo automatico. Se hai già una prova o un pass attivo, acquista con la stessa email: il nuovo periodo parte dalla scadenza già prevista. <br>Hai già un accesso attivo? <a href="gold-dashboard-live.html" style="color:var(--gold)">Entra nella dashboard con la tua email →</a></p>
             <div class="plans-grid">
                 <div class="plan-card">
-                    <div class="plan-badge">DAY PASS</div>
-                    <div class="plan-title">Arab Sniper Daily</div>
+                    <div class="plan-badge">PASS 3 GIORNI</div>
+                    <div class="plan-title">Gold 3 giorni</div>
                     <div class="plan-price">€5</div>
-                    <div class="plan-sub">24 ore · pagamento unico</div>
+                    <div class="plan-sub">72 ore · pagamento unico</div>
                     <div class="plan-desc">
-                        Ideale per testare il servizio in una giornata live con accesso rapido all’area premium.
+                        Tre giorni consecutivi per consultare tutte le analisi Gold.
                     </div>
-                    <button class="plan-btn" onclick="buy('daily', this)">SBLOCCA DAILY</button>
+                    <button class="plan-btn" onclick="buy('pass3d', this)">ACQUISTA 3 GIORNI</button>
                 </div>
 
                 <div class="plan-card">
-                    <div class="plan-badge">WEEK PASS</div>
-                    <div class="plan-title">Arab Sniper Weekly</div>
+                    <div class="plan-badge">PASS 14 GIORNI</div>
+                    <div class="plan-title">Gold 14 giorni</div>
                     <div class="plan-price">€15</div>
-                    <div class="plan-sub">7 giorni · pagamento unico</div>
+                    <div class="plan-sub">14 giorni · pagamento unico</div>
                     <div class="plan-desc">
-                        Pensato per chi vuole seguire più scan e più giornate senza entrare nel mensile.
+                        Due settimane di accesso completo alla dashboard Gold.
                     </div>
-                    <button class="plan-btn" onclick="buy('weekly', this)">SBLOCCA WEEKLY</button>
+                    <button class="plan-btn" onclick="buy('pass14d', this)">ACQUISTA 14 GIORNI</button>
                 </div>
 
                 <div class="plan-card featured">
-                    <div class="plan-badge">MONTHLY GOLD</div>
-                    <div class="plan-title">Arab Sniper Gold</div>
+                    <div class="plan-badge">PASS MENSILE</div>
+                    <div class="plan-title">Gold 1 mese</div>
                     <div class="plan-price">€29</div>
-                    <div class="plan-sub">29 € al mese · rinnovo automatico</div>
+                    <div class="plan-sub">1 mese di calendario · pagamento unico</div>
                     <div class="plan-desc">
-                        Accesso completo continuativo all’area Gold, soluzione principale per utenti registrati premium.
+                        Un mese di accesso completo alla dashboard Gold.
                     </div>
-                    <button class="plan-btn" onclick="buy('monthly', this)">ATTIVA GOLD</button>
+                    <button class="plan-btn" onclick="buy('pass1m', this)">ACQUISTA 1 MESE</button>
                 </div>
             </div>
 
@@ -97,9 +97,9 @@
 
             allButtons.forEach(btn => btn.disabled = false);
             if (buttonEl) {
-                if (plan === "daily") buttonEl.textContent = "SBLOCCA DAILY";
-                if (plan === "weekly") buttonEl.textContent = "SBLOCCA WEEKLY";
-                if (plan === "monthly") buttonEl.textContent = "ATTIVA GOLD";
+                if (plan === "pass3d") buttonEl.textContent = "ACQUISTA 3 GIORNI";
+                if (plan === "pass14d") buttonEl.textContent = "ACQUISTA 14 GIORNI";
+                if (plan === "pass1m") buttonEl.textContent = "ACQUISTA 1 MESE";
             }
 
         } catch (error) {
@@ -107,9 +107,9 @@
             setCheckoutStatus(error.message || "Errore di connessione al checkout.", "error");
             allButtons.forEach(btn => btn.disabled = false);
             if (buttonEl) {
-                if (plan === "daily") buttonEl.textContent = "SBLOCCA DAILY";
-                if (plan === "weekly") buttonEl.textContent = "SBLOCCA WEEKLY";
-                if (plan === "monthly") buttonEl.textContent = "ATTIVA GOLD";
+                if (plan === "pass3d") buttonEl.textContent = "ACQUISTA 3 GIORNI";
+                if (plan === "pass14d") buttonEl.textContent = "ACQUISTA 14 GIORNI";
+                if (plan === "pass1m") buttonEl.textContent = "ACQUISTA 1 MESE";
             }
         }
     }

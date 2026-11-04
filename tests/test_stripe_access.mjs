@@ -6,14 +6,14 @@ import worker,{PLANS,fulfill,access,verifySignature} from '../workers/stripe-acc
 const clock=Math.floor(Date.now()/1000);
 function database(){const db=new DatabaseSync(':memory:');db.exec(readFileSync(new URL('../workers/stripe-access/schema.sql',import.meta.url),'utf8'));return {prepare(sql){return {bind(...args){return {run:async()=>db.prepare(sql).run(...args),all:async()=>({results:db.prepare(sql).all(...args)})}}}},db};}
 function mock(routes){globalThis.fetch=async(url,opts)=>{const u=new URL(url);const value=routes[u.pathname];assert(value,'Unexpected request '+url);return Response.json(typeof value==='function'?value(u,opts):value);};}
-function setup(plan='daily'){
+function setup(plan='pass3d'){
  const env={STRIPE_MODE:'live',STRIPE_SECRET_KEY:'test-only',ACCESS_DB:database()};
  const event={type:'checkout.session.completed',created:clock,livemode:true,data:{object:{id:'cs_example',payment_status:'paid'}}};
  const session={id:'cs_example',mode:'payment',status:'complete',payment_status:'paid',livemode:true,created:clock-10,currency:'eur',amount_total:PLANS[plan].amount,customer_details:{email:'User@Example.com'},payment_intent:'pi_example',line_items:{has_more:false,data:[{quantity:1,price:{id:PLANS[plan].price}}]}};
  const routes={'/v1/checkout/sessions/cs_example':session,'/v1/payment_intents/pi_example':{status:'succeeded',latest_charge:{refunded:false,amount_refunded:0,disputed:false}},'/v1/customers':{data:[],has_more:false}};mock(routes);return {env,event,session,routes};
 }
 test('Daily/weekly pass, duplicate delivery, exact expiry',async()=>{
- for(const plan of ['daily','weekly']){const {env,event}=setup(plan);await fulfill(env,event);await fulfill(env,{...event,created:clock+60});let row=env.ACCESS_DB.db.prepare('SELECT * FROM passes').get();assert.equal(row.expires_at,clock+PLANS[plan].seconds);assert.equal((await access(env,'user@example.com',clock+10)).active,true);assert.equal((await access(env,'user@example.com',row.expires_at)).active,false);}
+ for(const plan of ['pass3d','pass14d']){const {env,event}=setup(plan);await fulfill(env,event);await fulfill(env,{...event,created:clock+60});let row=env.ACCESS_DB.db.prepare('SELECT * FROM passes').get();assert.equal(row.expires_at,clock+PLANS[plan].seconds);assert.equal((await access(env,'user@example.com',clock+10)).active,true);assert.equal((await access(env,'user@example.com',row.expires_at)).active,false);}
 });
 test('Wrong price, unpaid, wrong total, unrelated product never grants',async()=>{
  for(const change of [s=>s.payment_status='unpaid',s=>s.amount_total=1,s=>s.line_items.data[0].price.id='price_other',s=>s.line_items.data[0].quantity=2]){const {env,event,session}=setup();change(session);await fulfill(env,event);assert.equal(env.ACCESS_DB.db.prepare('SELECT COUNT(*) n FROM passes').get().n,0);}
@@ -22,6 +22,41 @@ test('Delayed payment waits for success event',async()=>{const {env,event}=setup
 test('Refunds revoke and late success cannot regrant',async()=>{const {env,event,routes}=setup();await fulfill(env,event);await fulfill(env,{type:'charge.refunded',data:{object:{payment_intent:'pi_example'}}});await fulfill(env,event);assert.equal((await access(env,'user@example.com',clock+1)).active,false);});
 test('Refund before first fulfillment still revoked',async()=>{const {env,event,routes}=setup();routes['/v1/payment_intents/pi_example'].latest_charge.refunded=true;await fulfill(env,event);assert.equal((await access(env,'user@example.com',clock+1)).active,false);});
 test('Signature valid, tamper, expiry, multiple v1 values',async()=>{const raw='{"hello":true}',secret='whsec_test';const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);const sig=Buffer.from(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(clock+'.'+raw))).toString('hex');const h=`t=${clock},v1=${'0'.repeat(64)},v1=${sig}`;assert(await verifySignature(raw,h,secret,clock));assert(!await verifySignature(raw+'x',h,secret,clock));assert(!await verifySignature(raw,h,secret,clock+301));});
-test('Monthly examines all same-email customers and allowlists prices',async()=>{const env={STRIPE_MODE:'live',STRIPE_SECRET_KEY:'test-only'};const sub={status:'active',items:{data:[{price:{id:PLANS.monthly.price},current_period_end:clock+500}]},latest_invoice:'in_paid'};const routes={'/v1/customers':{data:[{id:'cus_one'},{id:'cus_two'}],has_more:false},'/v1/subscriptions':u=>({data:u.searchParams.get('customer')==='cus_two'?[sub]:[],has_more:false}),'/v1/invoices/in_paid':{status:'paid'}};mock(routes);assert.equal((await access(env,'user@example.com',clock)).active,true);sub.items.data[0].price.id='price_unrelated';assert.equal((await access(env,'user@example.com',clock)).active,false);sub.items.data[0].price.id=PLANS.monthly.price;routes['/v1/invoices/in_paid'].status='open';assert.equal((await access(env,'user@example.com',clock)).active,false);});
+test('Monthly examines all same-email customers and allowlists prices',async()=>{const env={STRIPE_MODE:'live',STRIPE_SECRET_KEY:'test-only'};const sub={status:'active',items:{data:[{price:{id:'price_1UTM5yH763HaPm5Uo2hm0Ped'},current_period_end:clock+500}]},latest_invoice:'in_paid'};const routes={'/v1/customers':{data:[{id:'cus_one'},{id:'cus_two'}],has_more:false},'/v1/subscriptions':u=>({data:u.searchParams.get('customer')==='cus_two'?[sub]:[],has_more:false}),'/v1/invoices/in_paid':{status:'paid'}};mock(routes);assert.equal((await access(env,'user@example.com',clock)).active,true);sub.items.data[0].price.id='price_unrelated';assert.equal((await access(env,'user@example.com',clock)).active,false);sub.items.data[0].price.id='price_1UTM5yH763HaPm5Uo2hm0Ped';routes['/v1/invoices/in_paid'].status='open';assert.equal((await access(env,'user@example.com',clock)).active,false);});
 test('Preserves VIP, no predictable token and no checkout before setup',async()=>{const env={STRIPE_MODE:'live'};assert.equal((await access(env,'bruno.pirolo@gmail.com')).active,true);assert.equal((await access(env,'bruno.pirolo@gmail.com')).session,undefined);const r=await worker.fetch(new Request('https://worker/api/create-checkout-session',{method:'POST',headers:{Origin:'https://arabsniperbet.com','Content-Type':'application/json'},body:'{"plan":"daily"}'}),env);assert.equal(r.status,503);});
-test('Checkout server controls price; bad origin rejected',async()=>{const {env,routes}=setup();Object.assign(env,{CHECKOUT_ENABLED:'true',STRIPE_WEBHOOK_SECRET:'whsec_test'});routes['/v1/checkout/sessions']=(u,o)=>{assert.equal(o.body.get('line_items[0][price]'),PLANS.daily.price);assert.equal(o.body.get('line_items[0][quantity]'),'1');assert(!o.body.has('payment_method_types'));return {livemode:true,url:'https://checkout.stripe.com/c/pay/example'};};const request=origin=>new Request('https://worker/api/create-checkout-session',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({plan:'daily',price:'price_fake',amount:1})});assert.equal((await worker.fetch(request('https://arabsniperbet.com'),env)).status,200);assert.equal((await worker.fetch(request('https://evil.example'),env)).status,403);});
+test('Checkout server controls price; bad origin rejected',async()=>{const {env,routes}=setup();Object.assign(env,{CHECKOUT_ENABLED:'true',STRIPE_WEBHOOK_SECRET:'whsec_test'});routes['/v1/checkout/sessions']=(u,o)=>{assert.equal(o.body.get('line_items[0][price]'),PLANS.pass3d.price);assert.equal(o.body.get('line_items[0][quantity]'),'1');assert(!o.body.has('payment_method_types'));return {livemode:true,url:'https://checkout.stripe.com/c/pay/example'};};const request=origin=>new Request('https://worker/api/create-checkout-session',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({plan:'pass3d',price:'price_fake',amount:1})});assert.equal((await worker.fetch(request('https://arabsniperbet.com'),env)).status,200);assert.equal((await worker.fetch(request('https://evil.example'),env)).status,403);});
+test('Paid time stacks after a Telegram trial and concurrent purchases grant each pass once',async()=>{
+ const {env,event,session,routes}=setup('pass3d');
+ const until=clock+3600;
+ routes['/v1/customers']={data:[{id:'cus_trial'}],has_more:false};
+ routes['/v1/subscriptions']={data:[{status:'trialing',trial_end:until,items:{data:[{price:'price_1UTM5yH763HaPm5Uo2hm0Ped'}]}}],has_more:false};
+ const other={...session,id:'cs_other',payment_intent:'pi_other'};
+ routes['/v1/checkout/sessions/cs_other']=other;
+ routes['/v1/payment_intents/pi_other']=routes['/v1/payment_intents/pi_example'];
+ const next={...event,data:{object:{id:'cs_other',payment_status:'paid'}}};
+ await Promise.all([fulfill(env,event),fulfill(env,next),fulfill(env,next)]);
+ const rows=env.ACCESS_DB.db.prepare('SELECT starts_at,expires_at FROM passes ORDER BY starts_at').all();
+ assert.deepEqual(rows.map(r=>[r.starts_at,r.expires_at]),[[until,until+3*86400],[until+3*86400,until+6*86400]]);
+ assert.equal((await access(env,'user@example.com',until-1)).source,'stripe_subscription');
+ assert.equal((await access(env,'user@example.com',until)).source,'stripe_pass');
+});
+test('Calendar month clamps January 31 to February 28',async()=>{
+ const {env,event,session}=setup('pass1m');
+ event.created=Date.parse('2027-01-31T11:30:00Z')/1000;
+ session.created=event.created-5;
+ await fulfill(env,event);
+ const row=env.ACCESS_DB.db.prepare('SELECT expires_at FROM passes').get();
+ assert.equal(new Date(row.expires_at*1000).toISOString(),'2027-02-28T11:30:00.000Z');
+});
+test('Checkout creates a single payment for every new price',async()=>{
+ const {env,routes}=setup();Object.assign(env,{CHECKOUT_ENABLED:'true',STRIPE_WEBHOOK_SECRET:'test'});
+ for(const [plan,offer] of Object.entries(PLANS)){
+  routes['/v1/checkout/sessions']=(_,o)=>{
+   assert.equal(o.body.get('mode'),'payment');
+   assert.equal(o.body.get('line_items[0][price]'),offer.price);
+   return {livemode:true,url:'https://checkout.stripe.com/c/pay/example'};
+  };
+  const req=new Request('https://worker/api/create-checkout-session',{method:'POST',headers:{Origin:'https://arabsniperbet.com'},body:JSON.stringify({plan})});
+  assert.equal((await worker.fetch(req,env)).status,200);
+ }
+});
