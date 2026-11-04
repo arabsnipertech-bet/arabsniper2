@@ -1,0 +1,23 @@
+name: Verify published fixture scores
+on:
+  push:
+    branches: ['audit/social-results-20261104-live']
+permissions: {}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read API-Football score by fixture
+        env:
+          KEY: ${{ secrets.API_SPORTS_KEY }}
+        run: |
+          python3 - <<'PY'
+          from urllib.request import Request,urlopen
+          import os,json
+          ids="1563250-1635656-1635606-1635658-1635745-1632051"
+          req=Request("https://v3.football.api-sports.io/fixtures?ids="+ids,headers={"x-apisports-key":os.environ["KEY"]})
+          d=json.load(urlopen(req,timeout=30))
+          assert not d["errors"] and len(d["response"])==6
+          for x in d["response"]:
+              print("SCORE",x["fixture"]["id"],x["teams"]["home"]["name"],x["teams"]["away"]["name"],x["fixture"]["status"],x["goals"],x["score"]["halftime"])
+          PY
