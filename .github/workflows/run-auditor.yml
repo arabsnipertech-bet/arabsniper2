@@ -27,9 +27,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 src/auditor_schedule.py
-      - name: Report an unadmitted audit
+      - name: Record intentionally skipped duplicate or out-of-window Auditor
         if: steps.window.outputs.run == 'false'
-        run: exit 1
+        run: |
+          echo "Auditor was not admitted: another data writer is running or the protected nightly window has passed."
+          echo "The admission guard succeeded by preventing a redundant Auditor run."
+          echo "Skipped admission is NOT a failed Auditor execution. Actual errors in admission or the Auditor job still fail the workflow." >> "$GITHUB_STEP_SUMMARY"
 
   auditor:
     needs: admission
