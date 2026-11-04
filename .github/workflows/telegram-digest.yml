@@ -22,6 +22,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   digest:
+    outputs:
+      slot_artifact: ${{ steps.prepare.outputs.name }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -99,3 +101,28 @@ jobs:
             post.json
             social-card.jpg
           retention-days: 3
+
+  facebook:
+    needs: digest
+    if: needs.digest.outputs.slot_artifact != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: facebook-page-publication
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install Pillow==11.3.0 requests==2.32.5
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.digest.outputs.slot_artifact }}-sent
+          path: receipts
+      - name: Publish this confirmed slot directly via Meta
+        env:
+          FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+        run: python src/facebook_page.py selections
