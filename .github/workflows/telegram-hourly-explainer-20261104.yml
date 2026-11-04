@@ -1,0 +1,36 @@
+name: Telegram hourly analysis explainer
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/telegram-hourly-explainer-20261104.yml']
+permissions: {}
+concurrency: telegram-channel-publication
+jobs:
+  publish:
+    if: github.run_attempt == 1 && github.event.head_commit.message == 'Publish hourly analysis explainer on Telegram once'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send educational post and record Telegram confirmation
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          test "$(TZ=Europe/Rome date +%F)" = 2026-11-04
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          text = (
+              "⏱ Perché una selezione ArabSniperBet può cambiare prima della partita?\n\n"
+              "Ogni ora ArabSniperBet rilegge le quote disponibili, le confronta con le statistiche delle squadre e rivaluta le partite in programma.\n\n"
+              "Più ci avviciniamo al calcio d’inizio, più conta l’ultimo aggiornamento. Se le nuove quote rafforzano la lettura iniziale, la probabilità stimata può salire. Se i dati la indeboliscono, può scendere e la partita può uscire dalle selezioni.\n\n"
+              "📊 Quando consulti una proposta, guarda insieme la percentuale stimata, la quota osservata e l’ora della rilevazione."
+          )
+          payload = json.dumps({"chat_id": "@arabsniper_signals", "text": text}).encode()
+          request = urllib.request.Request("https://api.telegram.org/bot" + os.environ["TOKEN"] + "/sendMessage", data=payload, headers={"Content-Type": "application/json"})
+          with urllib.request.urlopen(request, timeout=25) as response:
+              result = json.load(response)
+          if not result.get("ok"):
+              raise RuntimeError("Delivery unconfirmed")
+          print("Confirmed Telegram message", result["result"]["message_id"])
+          PY
