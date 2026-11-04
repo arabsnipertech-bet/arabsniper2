@@ -38,6 +38,18 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           pattern: '*-sent'
           path: receipts
+      - name: Recover the latest confirmed Telegram slot on manual check
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          prefix="tg-$(TZ=Europe/Rome date +%F)-"
+          item=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?per_page=100" | jq -r --arg prefix "$prefix" '[.artifacts[] | select(.expired == false and (.name|startswith($prefix)) and (.name|endswith("-sent")))] | sort_by(.created_at) | last | select(.!=null) | [.workflow_run.id,.name] | @tsv')
+          if [ -n "$item" ]; then
+            read -r run_id artifact_name <<< "$item"
+            gh run download "$run_id" -R "$GITHUB_REPOSITORY" -n "$artifact_name" -D receipts
+          fi
       - name: Check Page identity or publish eligible content
         env:
           FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
@@ -45,6 +57,7 @@ jobs:
         run: |
           if [ "$EVENT" = workflow_dispatch ] || [ "$EVENT" = push ]; then
             PYTHONPATH=src python -c 'from facebook_page import graph, PAGE; assert graph("me?fields=id")["id"] == PAGE; assert "data" in graph(PAGE + "/published_posts?fields=id&limit=1"); print("Page identity and published-post access verified")'
+            python src/facebook_page.py selections
           elif [ "$EVENT" = schedule ]; then
             python src/facebook_page.py results
           else
