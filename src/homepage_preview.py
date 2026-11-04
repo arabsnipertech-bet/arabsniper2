@@ -7,7 +7,7 @@ import random
 from audit_storage import read_store, atomic_bytes
 from statistics_first import MODEL_ID, TARGETS
 from matrix_quotes import expire
-from opportunity_policy import POLICY_ID, best_opportunity
+from opportunity_policy import POLICY_ID, best_opportunity, goal_market
 from gold_competitions import output_allowed, SCOPE_ID
 import json
 from copy import deepcopy
@@ -85,7 +85,8 @@ def board_spunti(fixture, assessment, now):
                                        'movement_confirmed','bookmakers_count','oci')}
         if row.get('historical_oci'):
             pick['oci'] = None
-        pick.update(tier=tier, fixture_id=str(fixture['fixture_id']), match=fixture['match'],
+        pick.update(market=row.get("market") if field == "study" else goal_market(row),
+                    quote_status=row.get("quote_status"), tier=tier, fixture_id=str(fixture['fixture_id']), match=fixture['match'],
                     kickoff=fixture['kickoff'], captured_at=assessment['captured_at'],
                     provider_updated_at=observed, statistical_pct=probability,
                     margin_pct=row.get('selected_margin_pct'),
@@ -95,7 +96,7 @@ def board_spunti(fixture, assessment, now):
                fixture['kickoff'], pick['fixture_id']), pick
 
 
-def social_board(payload, now):
+def social_board(payload, now, *, kickoff_until=None, exclude=(), limit=3):
     today = now.astimezone(ROME).date().isoformat()
     updated = stamp(payload.get('updated_at'))
     if payload.get('date') != today or not updated or not 0 <= (now-updated).total_seconds() <= 5400:
@@ -107,11 +108,13 @@ def social_board(payload, now):
         if (not kickoff or kickoff <= now or kickoff.astimezone(ROME).date().isoformat() != today
                 or fixture.get('status_short') not in ('NS', 'TBD') or not output_allowed(match)):
             continue
+        if (kickoff_until and kickoff > kickoff_until) or str(fixture.get('fixture_id')) in exclude:
+            continue
         ranked.extend(board_spunti(fixture, match.get('multimarket') or {}, now))
     distinct = {}
     for _, pick in sorted(ranked, key=lambda item: item[0]):
         distinct.setdefault(pick['fixture_id'], pick)
-    return list(distinct.values())[:3]
+    return list(distinct.values())[:limit]
 
 
 def build_preview(payload, previous=None, now=None, rng=None):

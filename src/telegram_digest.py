@@ -23,8 +23,8 @@ UTC_CRONS = {
     "0 17 * * *", "13 17 * * *", "0 18 * * *", "13 18 * * *",
     "0 19 * * *", "13 19 * * *",
 }
-WINDOWS = {"17:30": ("18:00", "19:00"), "19:00": ("19:30", "21:00"),
-           "20:00": ("20:30", "22:00")}
+WINDOWS = {"17:30": ("17:30", "18:30"), "19:00": ("19:00", "20:00"),
+           "20:00": ("20:00", "21:00")}
 MARKETS = {"over15_ht": ("ht", 2), "over25_ht": ("ht", 3), "gg_ht": ("ht", "gg"),
            "over25_ft": ("ft", 3), "over35_ft": ("ft", 4)}
 FINAL = {"FT", "AET", "PEN"}
@@ -179,6 +179,13 @@ def prior_ids(day, slot):
     """Load earlier confirmed posts to prevent repeating the same fixture."""
     previous = ["13:00", "17:30", "19:00"]
     seen = set()
+    midday = f"tg-spunti-{day}-1300-sent"
+    record = artifact(midday)
+    if record:
+        folder = Path("prior/spunti")
+        folder.mkdir(parents=True, exist_ok=True)
+        gh("run", "download", str(record["workflow_run"]["id"]), "-n", midday, "-D", str(folder))
+        seen.update(str(fid) for fid in json.loads((folder/"spunti-receipt.json").read_text())["fixtures"])
     for previous_slot in previous:
         if previous_slot == slot:
             break
@@ -232,33 +239,27 @@ def prepare():
         # Dedicated public-feed spunti workflow owns this slot. Keep evening Gold unchanged.
         print("13:00 handled by independent public analytical spunti workflow")
         return
-    from telegram_private_feed import fetch_current_private
-    private_choices = fetch_current_private(now)
-    feed = {"date":day, "selections": private_choices}
-    print(f"Private daily board: {len(private_choices)} Gold/Platinum candidates")
-    if slot == "13:00":
-        chosen = picks(feed, now, limit=3)
-        if len(chosen) != 3:
-            print("Insufficient verified upcoming picks for a triple")
-            return
-        lines = [f"ArabSniper · Tripla del {now:%d/%m}", ""]
-        total = 1
-        for p in chosen:
-            total *= p["odd"]
-            lines.append(f"{instant(p['kickoff']).astimezone(ROME):%H:%M} · {p['match']}\n{p['label']} · quota {p['odd']:.2f}\n")
-        lines.append(f"Quota combinata indicativa {total:.2f}")
-    else:
-        chosen = picks(feed, now, window=WINDOWS[slot], limit=1,
-                       exclude=prior_ids(day, slot))
-        if not chosen:
-            print(f"No qualifying pre-match pick for {slot}")
-            return
-        p = chosen[0]
-        lines = [f"ArabSniper · {p['tier'].upper()} · Singolo delle {slot}", "",
-                 f"{instant(p['kickoff']).astimezone(ROME):%H:%M} · {p['match']}",
-                 f"{p['label']} · quota osservata {p['odd']:.2f}",
-                 "PERCHÉ SELEZIONATA:"]
-        lines.extend(evening_rationale(p))
+    from gold_storage import client
+    from homepage_preview import social_board
+
+    obj = client().get_object(Bucket=os.environ["R2_BUCKET"], Key="arab_quote_day1.json")
+    board = json.load(obj["Body"])
+    excluded = prior_ids(day, slot)
+    now = datetime.now(ROME)
+    end = datetime.combine(now.date(), datetime.strptime(WINDOWS[slot][1], "%H:%M").time(), ROME)
+    candidates = social_board(board, now, kickoff_until=end, exclude=excluded, limit=1)
+    if not candidates:
+        print(f"No qualifying upcoming single for {slot} through {end:%H:%M}")
+        return
+    row = candidates[0]
+    p = dict(row, id=row["fixture_id"], tier=row["tier"].lower(),
+             model_probability=row.get("statistical_pct"),
+             market_confirmed=row.get("market_confirmation") in ("confirmed", "convergence"))
+    chosen = [p]
+    lines = [f"ArabSniper · {p['tier'].upper()} · Singola delle {slot}", "",
+             f"{instant(p['kickoff']).astimezone(ROME):%H:%M} · {p['match']}",
+             f"{p['label']} · quota osservata {p['odd']:.2f}", "Perché è stata selezionata"]
+    lines.extend(evening_rationale(p))
     lines.extend(["", "🎯 ArabSniperBet · Analisi, non garanzie.",
                   "👑 https://arabsniperbet.com/gold",
                   "18+ · Gioca responsabilmente."])
@@ -273,6 +274,8 @@ def send():
     if not token:
         raise SystemExit("Missing bot token")
     post = json.loads(Path("post.json").read_text())
+    if any(instant(p["kickoff"]) <= datetime.now(ROME) for p in post["picks"]):
+        raise SystemExit("Kickoff already reached; do not send")
     image = Path("telegram-card.png")
     if not image.is_file():
         raise SystemExit("Missing Telegram image card")

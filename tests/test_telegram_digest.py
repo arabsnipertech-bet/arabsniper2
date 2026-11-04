@@ -31,10 +31,28 @@ class TelegramTest(unittest.TestCase):
                         captured_at='2026-11-02T18:50:00+01:00', odd=1.9,
                         opportunity=dict(eligible=True, goal_market='over25_ft',
                                          playability_score=score))
-        feed = dict(date='2026-11-02', selections=[row('1','19:20',200),
+        feed = dict(date='2026-11-02', selections=[row('1','18:59',200),
                      row('2','19:30',100), row('3','20:00',150), row('4','21:15',300)])
         self.assertEqual([p['id'] for p in picks(feed,now,WINDOWS['19:00'],limit=1)], ['3'])
         self.assertEqual([p['id'] for p in picks(feed,now,WINDOWS['19:00'],limit=1,exclude={'3'})], ['2'])
+
+    def test_single_filters_before_ranking_in_recovery(self):
+        from homepage_preview import social_board
+        from unittest.mock import patch
+        now = datetime.fromisoformat("2026-11-04T19:10:00+01:00")
+        end = now.replace(hour=20, minute=0)
+        def fixture(i, clock):
+            return {"fixture":{"fixture_id":i, "kickoff":f"2026-11-04T{clock}:00+01:00",
+                               "status_short":"NS"}}
+        board = {"date":"2026-11-04", "updated_at":now.isoformat(),
+                 "matches":[fixture("1","19:08"), fixture("2","20:01"),
+                            fixture("3","19:25"), fixture("4","20:00")]}
+        def candidate(fixture, assessment, now):
+            fid = fixture["fixture_id"]
+            return [(int(fid), {"fixture_id":fid})]
+        with patch("homepage_preview.output_allowed", return_value=True), patch("homepage_preview.board_spunti", candidate):
+            self.assertEqual(social_board(board, now, kickoff_until=end, exclude={"3"}, limit=1),
+                             [{"fixture_id":"4"}])
 
     def test_four_scheduled_posts(self):
         self.assertEqual(set(SLOTS.values()), {'13:00','17:30','19:00','20:00'})
