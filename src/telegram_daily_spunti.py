@@ -24,6 +24,8 @@ def instant(value):
 def eligible(now, event, cron, oneoff=False, recovery_slot=None):
     now = now.astimezone(ROME)
     due = datetime.combine(now.date(), time(13), tzinfo=ROME)
+    if oneoff and now.date().isoformat()=="2026-11-04":
+        return os.environ.get("SPUNTI_MIGRATION")=="2026-11-04" and timedelta(0)<=now-due<timedelta(hours=1)
     if oneoff:
         return now.date().isoformat()=="2026-11-03" and timedelta(0)<=now-due<timedelta(minutes=90)
     allowed=(event=="schedule" and cron in UTC_CRONS) or (
@@ -41,9 +43,9 @@ def spunti(feed, now):
     by_id = {str(x.get("fixture_id")):x for x in feed.get("selections",[]) if isinstance(x,dict)}
     found=[]
     seen=set()
-    for public in feed.get("social_selections",[]):
+    for public in feed.get("social_spunti",feed.get("social_selections",[])):
         fid=str(public.get("fixture_id") or "")
-        full=by_id.get(fid) or {}
+        full={} if "social_spunti" in feed else by_id.get(fid) or {}
         start=instant(public.get("kickoff"))
         captured=instant(public.get("captured_at"))
         quote_time=instant(public.get("provider_updated_at"))
@@ -106,7 +108,7 @@ def spunti(feed, now):
             reasons.append("Conferma di mercato segnalata dal modello")
         else:
             reasons.append("Conferma ulteriore di mercato non disponibile")
-        found.append(dict(fixture_id=fid,match=public["match"],kickoff=start,
+        found.append(dict(tier=public.get("tier"),fixture_id=fid,match=public["match"],kickoff=start,
                           odd=odd,label=label.strip(),quote_time=quote_time,
                           reasons=reasons))
         seen.add(fid)
@@ -115,16 +117,16 @@ def spunti(feed, now):
     return found
 
 def message_for(items,now):
-    if len(items)!=3:
+    if not items or len(items)>3:
         return None
     now=now.astimezone(ROME)
-    lines=[f"🔎 ARABSNIPER · 3 SPUNTI DEL GIORNO · {now:%d/%m %H:%M}",
-           "Tre analisi indipendenti dal feed pubblico, NON una multipla né certificazioni Platinum. Statistiche e quote sono osservazioni, non risultati futuri.",
+    lines=[f"🔎 ARABSNIPER · SPUNTI DEL GIORNO · {now:%d/%m %H:%M}",
+           "Selezioni indipendenti dalla pagina Gold, NON una multipla. Solo Studio indica una proposta di osservazione. Statistiche e quote sono osservazioni, non risultati futuri.",
            "Per ogni partita: statistica del modello, confronto con la quota e movimento di mercato solo quando verificabile.",""]
     for i,item in enumerate(items,1):
         kickoff=item["kickoff"].astimezone(ROME)
         quote_at=item["quote_time"].astimezone(ROME)
-        lines.extend([f"{i}️⃣ {item['match']} · ore {kickoff:%H:%M}",
+        lines.extend([f"{i}️⃣ {item.get('tier') or 'Spunto'} · {item['match']} · ore {kickoff:%H:%M}",
                       f"{item['label']} · quota {item['odd']:.2f} (rilevata {quote_at:%H:%M})"])
         lines += ["• "+why for why in item["reasons"]]
         lines.append("")
@@ -144,9 +146,14 @@ def main():
     if posted_before(name):
         print("Spunti were already posted; no duplicate")
         return
-    feed=json.loads(Path("data/arab_quote_homepage.json").read_text(encoding="utf-8"))
+    from gold_storage import client
+    from homepage_preview import social_board
+    obj = client().get_object(Bucket=os.environ["R2_BUCKET"], Key="arab_quote_day1.json")
+    board = json.load(obj["Body"])
+    feed = {"date": board.get("date"), "updated_at": board.get("updated_at"),
+            "social_spunti": social_board(board, now)}
     selected=spunti(feed,now)
-    if len(selected)!=3:
+    if not selected:
         print(f"Only {len(selected)} verified pre-match public selections; skip")
         return
     content=message_for(selected,now)

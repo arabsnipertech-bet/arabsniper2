@@ -51,6 +51,69 @@ def statistics_preview(payload, result, now):
     result.update(model_id=MODEL_ID, selections=list(unique.values())[:3])
     return result
 
+def board_spunti(fixture, assessment, now):
+    """Project only the board's selected markets and published Studio star."""
+    matrix = assessment.get('matrix') or {}
+    captured = stamp(assessment.get('captured_at'))
+    if not captured or not 0 <= (now-captured).total_seconds() <= 5400 or fixture.get('result'):
+        return
+    rows = {row.get('id'): row for row in matrix.get('rows', [])}
+    for priority, tier, field in ((0, 'Platinum', 'platinum'), (1, 'Gold', 'opportunity'),
+                                  (2, 'Solo Studio', 'study')):
+        if field == 'study':
+            ideas = (matrix.get('quote_monitoring') or {}).get('studio_ideas', [])
+            row = next((idea for idea in ideas if idea.get('best_study') is True and not idea.get('suppressed')), {})
+            observed = row.get('updated')
+            score = row.get('poisson_pct')
+            probability = score
+        else:
+            policy = matrix.get(field+'_policy') or {}
+            row = rows.get(policy.get('best_market_id')) or {}
+            decision = row.get(field) or {}
+            if (decision.get('eligible') is not True or row.get('quote_executable') is not True
+                    or row.get('quote_status') not in ('recent', 'cached_stable')):
+                continue
+            observed = row.get('provider_updated_at')
+            score = row.get('oci') if priority == 0 else decision.get('playability_score')
+            probability = row.get('statistical_pct')
+        quote_time = stamp(observed)
+        if (not quote_time or not 0 <= (now-quote_time).total_seconds() <= 28800
+                or not number(row.get('odd')) or row['odd'] <= 1 or not row.get('label')
+                or not fixture.get('match') or not str(fixture.get('fixture_id', '')).isdigit()):
+            continue
+        pick = {k:row.get(k) for k in ('label','odd','first_odd','delta_pct','bookmaker',
+                                       'movement_confirmed','bookmakers_count','oci')}
+        if row.get('historical_oci'):
+            pick['oci'] = None
+        pick.update(tier=tier, fixture_id=str(fixture['fixture_id']), match=fixture['match'],
+                    kickoff=fixture['kickoff'], captured_at=assessment['captured_at'],
+                    provider_updated_at=observed, statistical_pct=probability,
+                    margin_pct=row.get('selected_margin_pct'),
+                    market_confirmation='confirmed' if priority == 0 else
+                    (row.get('opportunity') or {}).get('signal'))
+        yield (priority, -score if number(score) else float('inf'),
+               fixture['kickoff'], pick['fixture_id']), pick
+
+
+def social_board(payload, now):
+    today = now.astimezone(ROME).date().isoformat()
+    updated = stamp(payload.get('updated_at'))
+    if payload.get('date') != today or not updated or not 0 <= (now-updated).total_seconds() <= 5400:
+        return []
+    ranked = []
+    for match in payload.get('matches', []):
+        fixture = match.get('fixture') or {}
+        kickoff = stamp(fixture.get('kickoff'))
+        if (not kickoff or kickoff <= now or kickoff.astimezone(ROME).date().isoformat() != today
+                or fixture.get('status_short') not in ('NS', 'TBD') or not output_allowed(match)):
+            continue
+        ranked.extend(board_spunti(fixture, match.get('multimarket') or {}, now))
+    distinct = {}
+    for _, pick in sorted(ranked, key=lambda item: item[0]):
+        distinct.setdefault(pick['fixture_id'], pick)
+    return list(distinct.values())[:3]
+
+
 def build_preview(payload, previous=None, now=None, rng=None):
     now = now or datetime.now(timezone.utc)
     today = now.astimezone(ROME).date().isoformat()
@@ -104,6 +167,7 @@ def build_preview(payload, previous=None, now=None, rng=None):
             social.append({field: pick[field] for field in fields})
             if len(social) == 4:
                 break
+        result['social_spunti'] = social_board(payload, now)
         result['social_selections'] = social if len(social) == 4 else []
         result.update(model_id='lateral-matrix-v5.0', opportunity_policy=POLICY_ID,
                       competition_policy=SCOPE_ID, selections=list(unique.values())[:3],
