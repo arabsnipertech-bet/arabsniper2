@@ -16,9 +16,9 @@ REPO="arabsnipertech-bet/arabsniper2"
 from telegram_slots import CHANNEL_SLOTS
 
 SLOTS = tuple(("telegram-digest.yml", clock, clock, 24) for clock in CHANNEL_SLOTS)
-# Allow GitHub's primary cron a moment to start. External watchdog runs every
-# ten minutes, so a single check within the window is sufficient.
-MINIMUM_DELAY=timedelta(minutes=3)
+# Check during the first external tick at :05/:15/:25/:35/:45/:55.
+# Active runs, receipts and the publisher's reservation prevent duplicates.
+MINIMUM_DELAY=timedelta(seconds=1)
 
 
 def due_slots(now):
