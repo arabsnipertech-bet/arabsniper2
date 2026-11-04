@@ -125,6 +125,20 @@ EDUCATIONAL_THEMES=(
      "Confrontiamo le selezioni registrate prima della partita con gli esiti reali, comprese quelle perse. Le statistiche hanno valore solo se considerano anche gli errori."),
     ("PERCHÉ CONTA LA FRESCHEZZA DELLE QUOTE?",
      "Una quota vecchia può non essere più disponibile. Per valutare una segnalazione servono ora di rilevazione, mercato esatto e verifica prima del calcio d'inizio."),
+    ("COME LEGGERE UNA QUOTA DECIMALE", "Una quota di 2,00 corrisponde a una probabilità implicita del 50% prima di togliere il margine. Si calcola dividendo 1 per la quota."),
+    ("COSA MISURA IL POISSON", "Il modello usa i gol attesi delle due squadre per stimare la frequenza dei possibili punteggi. La somma dei punteggi compatibili dà la probabilità stimata di un mercato."),
+    ("CASA E TRASFERTA", "Separare le gare giocate in casa da quelle fuori aiuta a confrontare contesti simili. Poche trasferte osservate rendono la stima più incerta."),
+    ("PERCHÉ CONFRONTARE PIÙ BOOKMAKER", "Un calo su un solo operatore può dipendere da un aggiustamento locale. Se più operatori si muovono nella stessa direzione, la variazione ha un riscontro più ampio."),
+    ("LEGGERE UN SEGNALE BLU", "Nel Radar Blu osserviamo la direzione della quota e quanti operatori la confermano. Il colore descrive un movimento di mercato; la probabilità statistica va letta separatamente."),
+    ("CHE COSA SIGNIFICA OVER 3,5", "Servono almeno quattro gol nel periodo indicato. Un 2–1 finale totalizza tre gol; un 2–2 ne totalizza quattro."),
+    ("QUANDO UN CAMPIONE È PICCOLO", "Tre vittorie su quattro fanno il 75%. Un solo risultato in più può cambiare molto quella percentuale: conta anche quante gare ci sono dietro il numero."),
+    ("PROBABILITÀ E FREQUENZA OSSERVATA", "Per verificare una stima del 60% si raggruppano molte previsioni simili e si conta quante si realizzano. Una singola gara racconta poco sulla precisione di quella stima."),
+    ("RISULTATI AL PRIMO TEMPO", "Per verificare un mercato PT si usa il punteggio all’intervallo. Un gol al 46° del secondo tempo può cambiare il risultato finale, ma non la lettura del primo tempo."),
+    ("COME RICONOSCERE UN’INVERSIONE", "Una quota può scendere e poi risalire. Confrontare più rilevazioni e i rispettivi orari permette di distinguere il movimento iniziale da quello più recente."),
+    ("SINGOLE E MULTIPLE", "Tre singole si verificano separatamente. In una multipla, invece, tutti gli esiti richiesti devono realizzarsi per vincere."),
+    ("COME LEGGERE UNA QUOTA CONSERVATA", "L’orario accanto alla quota identifica l’ultima osservazione disponibile. È utile controllarlo anche quando la scheda della partita è stata aggiornata più di recente."),
+    ("CHE COSA SIGNIFICA GOAL PT", "Per il Goal nel primo tempo entrambe le squadre devono segnare prima dell’intervallo. Un 2–0 e un 1–1 producono lo stesso totale di gol, ma soltanto il secondo soddisfa il mercato."),
+    ("DUE SEGNALI SULLA STESSA PARTITA", "Più mercati della stessa gara possono dipendere dagli stessi gol. Valutare separatamente le proposte aiuta a capire quando due risultati sono collegati."),
 )
 
 def educational_message(day):

@@ -96,11 +96,11 @@ class FastBackupTests(unittest.TestCase):
         self.assertEqual(backup.wake_fast(api, NOW)['action'], 'dispatched')
 
     def test_window_rome_summer_winter_and_midnight(self):
-        for hour in (0, 2, 5):
+        for hour in (1, 2, 5):
             api = FakeAPI()
             self.assertEqual(backup.wake_fast(api, NOW.replace(hour=hour))['action'], 'outside_fast_window')
             self.assertEqual(api.dispatched, 0)
-        for at in ('2026-07-11T04:05:00Z', '2026-10-30T05:05:00Z', '2026-10-30T22:55:00Z'):
+        for at in ('2026-11-03T23:05:00Z', '2026-11-04T03:05:00Z', '2026-07-11T04:05:00Z', '2026-10-30T05:05:00Z', '2026-10-30T22:55:00Z'):
             self.assertEqual(backup.wake_fast(FakeAPI(), backup.instant(at))['action'], 'dispatched')
 
     def test_active_race_and_malformed_data_fail_closed(self):

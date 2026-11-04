@@ -14,8 +14,7 @@ def numeric(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and isfinite(value)
 
 
-def evaluate(row, as_of):
-    """Protect high odds with an EV floor; absent history keeps its exception."""
+def flow_rejections(row, as_of, max_drop):
     reasons = []
     if goal_market(row) is None: reasons.append('market')
     odd, first = row.get('odd'), row.get('first_odd')
@@ -29,7 +28,7 @@ def evaluate(row, as_of):
     if not numeric(oci) or not LIMITS['min_oci'] <= oci <= 100: reasons.append('oci')
     if not numeric(margin) or not 0 <= margin <= LIMITS['max_margin_pct']: reasons.append('margin')
     if (not numeric(first) or first <= 1 or not numeric(odd) or not numeric(delta)
-            or delta > LIMITS['max_delta_pct']+1e-9
+            or delta > max_drop+1e-9
             or numeric(first) and first > 1 and numeric(odd) and numeric(delta)
             and abs(delta-100*(odd/first-1)) > .01): reasons.append('price_drop')
     if not isinstance(row.get('bookmaker'), str) or not row['bookmaker'].strip(): reasons.append('bookmaker')
@@ -39,10 +38,16 @@ def evaluate(row, as_of):
             or paired < 2 or agreeing < 2 or agreeing > paired or agreeing <= paired/2):
         reasons.append('operator_agreement')
     move = row.get('selected_movement') or {}
-    if (not numeric(move.get('delta_pct')) or move['delta_pct'] > LIMITS['max_delta_pct']+1e-9
+    if (not numeric(move.get('delta_pct')) or move['delta_pct'] > max_drop+1e-9
             or not numeric(move.get('fair_delta_pp')) or move['fair_delta_pp'] <= 0
             or not numeric(move.get('persistence')) or not .5 <= move['persistence'] <= 1
             or move.get('reversal') is not False): reasons.append('persistence')
+    return reasons
+
+
+def evaluate(row, as_of):
+    reasons = flow_rejections(row, as_of, LIMITS['max_delta_pct'])
+    odd = row.get('odd')
     ev = row.get('ev_pct')
     from adaptive_pricing import threshold, gate_passes
     delta = threshold(row)

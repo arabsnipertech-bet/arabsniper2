@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
-from telegram_digest import verdict, picks, ROME, WINDOWS, SLOTS, UTC_CRONS, slot_for_schedule, evening_rationale
+from telegram_digest import verdict, picks, ROME, WINDOWS, UTC_CRONS, slot_for_schedule, evening_rationale
 
 class TelegramTest(unittest.TestCase):
     now = datetime(2026,11,2,20,tzinfo=ROME)
@@ -33,8 +33,8 @@ class TelegramTest(unittest.TestCase):
                                          playability_score=score))
         feed = dict(date='2026-11-02', selections=[row('1','18:59',200),
                      row('2','19:30',100), row('3','20:00',150), row('4','21:15',300)])
-        self.assertEqual([p['id'] for p in picks(feed,now,WINDOWS['19:00'],limit=1)], ['3'])
-        self.assertEqual([p['id'] for p in picks(feed,now,WINDOWS['19:00'],limit=1,exclude={'3'})], ['2'])
+        self.assertEqual([p['id'] for p in picks(feed,now,WINDOWS['18:30'][:2],limit=1)], ['3'])
+        self.assertEqual([p['id'] for p in picks(feed,now,WINDOWS['18:30'][:2],limit=1,exclude={'3'})], ['2'])
 
     def test_single_filters_before_ranking_in_recovery(self):
         from homepage_preview import social_board
@@ -47,37 +47,35 @@ class TelegramTest(unittest.TestCase):
         board = {"date":"2026-11-04", "updated_at":now.isoformat(),
                  "matches":[fixture("1","19:08"), fixture("2","20:01"),
                             fixture("3","19:25"), fixture("4","20:00")]}
-        def candidate(fixture, assessment, now):
+        def candidate(fixture, assessment, now, **kwargs):
             fid = fixture["fixture_id"]
             return [(int(fid), {"fixture_id":fid})]
         with patch("homepage_preview.output_allowed", return_value=True), patch("homepage_preview.board_spunti", candidate):
             self.assertEqual(social_board(board, now, kickoff_until=end, exclude={"3"}, limit=1),
                              [{"fixture_id":"4"}])
 
-    def test_four_scheduled_posts(self):
-        self.assertEqual(set(SLOTS.values()), {'13:00','17:30','19:00','20:00'})
+    def test_all_seven_slots_have_primary_cron_in_both_seasons(self):
+        from datetime import timedelta, timezone
+        for day in ("2026-11-04", "2026-07-04"):
+            from telegram_slots import CHANNEL_SLOTS
+            for slot in CHANNEL_SLOTS:
+                now = datetime.fromisoformat(day+"T"+slot).replace(tzinfo=ROME)
+                utc = now.astimezone(timezone.utc)
+                cron = next(c for c in UTC_CRONS if int(c.split()[0]) == utc.minute
+                            and str(utc.hour) in c.split()[1].split(","))
+                self.assertEqual(slot_for_schedule(now, "schedule", cron), slot)
+                self.assertEqual(slot_for_schedule(now+timedelta(minutes=15), "workflow_dispatch", "", slot), slot)
+        self.assertEqual(len(WINDOWS),7)
 
-    def test_utc_primary_and_backup_cet_cest(self):
-        cases = [
-            ("2026-11-03T13:00:00+01:00", "0 12 * * *", "13:00"),
-            ("2026-11-03T13:13:00+01:00", "13 12 * * *", "13:00"),
-            ("2026-07-03T13:00:00+02:00", "0 11 * * *", "13:00"),
-            ("2026-07-03T13:13:00+02:00", "13 11 * * *", "13:00"),
-            ("2026-11-03T17:30:00+01:00", "30 16 * * *", "17:30"),
-            ("2026-07-03T17:30:00+02:00", "30 15 * * *", "17:30"),
-            ("2026-11-03T19:00:00+01:00", "0 18 * * *", "19:00"),
-            ("2026-07-03T19:00:00+02:00", "0 17 * * *", "19:00"),
-            ("2026-11-03T20:00:00+01:00", "0 19 * * *", "20:00"),
-            ("2026-07-03T20:00:00+02:00", "0 18 * * *", "20:00"),
-        ]
-        for instant, cron, expected in cases:
-            now = datetime.fromisoformat(instant)
-            self.assertEqual(slot_for_schedule(now, "schedule", cron), expected)
-            self.assertIsNone(slot_for_schedule(now, "workflow_dispatch", cron))
-            self.assertIsNone(slot_for_schedule(now, "push", cron))
-        self.assertEqual(len(UTC_CRONS), 14)
-        self.assertIsNone(slot_for_schedule(datetime.fromisoformat(
-            "2026-11-03T12:00:00+01:00"), "schedule", "0 11 * * *"))
+    def test_editorial_rotation_and_no_pick_messages(self):
+        from datetime import date, timedelta
+        from telegram_evidence import EDUCATIONAL_THEMES, educational_message
+        from telegram_digest import slot_message
+        base = date(2026,11,4)
+        self.assertEqual(len({educational_message(base+timedelta(days=i))
+                              for i in range(len(EDUCATIONAL_THEMES))}),len(EDUCATIONAL_THEMES))
+        self.assertIn("/prova",slot_message(dict(slot="22:00",picks=[])))
+        self.assertIn("Nessuna nuova",slot_message(dict(slot="18:30",first="19:00",last="20:00",picks=[])))
 
     def test_external_backup_dispatch_is_strictly_gated(self):
         now=datetime.fromisoformat("2026-11-03T17:44:00+01:00")
@@ -127,5 +125,5 @@ class TelegramTest(unittest.TestCase):
                     playability_score=score,stability={"status":"strict"}))
         feed=dict(date="2026-11-02",selections=[
              row("old",900,True,120),row("unconfirmed",200,False,10),row("confirmed",100,True,10)])
-        result=picks(feed,now,WINDOWS["19:00"],limit=2)
+        result=picks(feed,now,WINDOWS["18:30"][:2],limit=2)
         self.assertEqual([r["id"] for r in result],["confirmed","unconfirmed"])

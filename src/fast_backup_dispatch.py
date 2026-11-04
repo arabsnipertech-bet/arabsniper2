@@ -137,7 +137,7 @@ def wake_fast(api, now=None, dry_run=False):
     now = (now or datetime.now(ROME)).astimezone(ROME)
     result = {'observed_at': now.isoformat(), 'dry_run': dry_run,
               'football_calls': 0, 'dispatched': False}
-    if not 6 <= now.hour <= 23:
+    if now.hour not in (0, 4) and not 6 <= now.hour <= 23:
         return dict(result, action='outside_fast_window')
     failures = []
     for run in api.recent_fast_runs(now):

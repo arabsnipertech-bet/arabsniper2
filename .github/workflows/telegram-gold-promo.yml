@@ -1,31 +1,10 @@
 name: Telegram Gold free trial promotion
 on:
-  workflow_dispatch:
-    inputs:
-      recovery_slot:
-        description: 'Guarded backup slot'
-        type: string
-        required: false
   pull_request:
     paths:
       - '.github/workflows/telegram-gold-promo.yml'
       - 'src/telegram_gold_promo.py'
       - 'tests/test_telegram_gold_promo.py'
-  # GitHub cron interpreted as UTC; the script validates Rome-local due slot.
-  # Primary + backup runs across both CET and CEST, deduplicated by receipt.
-  schedule:
-    - cron: '45 10 * * *'
-    - cron: '58 10 * * *'
-    - cron: '45 11 * * *'
-    - cron: '58 11 * * *'
-    - cron: '15 15 * * *'
-    - cron: '28 15 * * *'
-    - cron: '15 16 * * *'
-    - cron: '28 16 * * *'
-    - cron: '15 19 * * *'
-    - cron: '28 19 * * *'
-    - cron: '15 20 * * *'
-    - cron: '28 20 * * *'
 permissions:
   contents: read
   actions: read
@@ -45,18 +24,3 @@ jobs:
           python-version: '3.11'
       - name: Verify promotion schedule and one-time trial messaging
         run: python3 -m unittest discover -s tests -p test_telegram_gold_promo.py -v
-      - name: Publish independent promo (scheduled events only)
-        id: promote
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule }}
-          RECOVERY_SLOT: ${{ inputs.recovery_slot }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        run: python3 src/telegram_gold_promo.py
-      - name: Retain publication receipt for de-duplication
-        if: hashFiles('promo-receipt.json') != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.promote.outputs.artifact }}
-          path: promo-receipt.json
-          retention-days: 14

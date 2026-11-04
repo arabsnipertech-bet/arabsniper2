@@ -11,7 +11,8 @@ from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 ROME = ZoneInfo("Europe/Rome")
-SLOTS = ("13:00", "17:30", "19:00", "20:00")
+from telegram_slots import WINDOWS
+SLOTS = sorted(set(WINDOWS) | {"13:00", "19:00"})
 FINISHED = {"FT", "AET", "PEN"}
 HALF_FINISHED = FINISHED | {"HT", "2H", "ET", "BT", "P"}
 MARKETS = {"over15_ht": ("ht", 2), "over25_ht": ("ht", 3),

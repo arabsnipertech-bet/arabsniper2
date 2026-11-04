@@ -13,56 +13,27 @@ class FakeApi:
         self.dispatched=[]
     def runs(self,workflow,due):
         return self.data
+    def slot_recorded(self,day,slot):
+        return getattr(self,"receipt",False)
     def dispatch(self,workflow,slot):
         self.dispatched.append((workflow,slot))
 
 
 class TelegramWatchdogTests(unittest.TestCase):
-    def test_due_slots_backup_and_time_constraints(self):
-        at=datetime(2026,11,3,17,44,tzinfo=ROME)
-        self.assertEqual([(x,y) for x,y,_ in due_slots(at)],
-                         [("telegram-gold-promo.yml","17:15"),("telegram-digest.yml","17:30")])
-        at=datetime(2026,11,3,21,25,tzinfo=ROME)
-        self.assertEqual([(x,y) for x,y,_ in due_slots(at)],
-                         [("telegram-gold-promo.yml","21:15")])
-        at=datetime(2026,11,3,17,59,tzinfo=ROME)
-        self.assertEqual(list(due_slots(at)),[])
-        self.assertEqual([(x,y) for x,y,_ in due_slots(datetime(2026,11,3,17,30,tzinfo=ROME))],
-                         [("telegram-gold-promo.yml","17:15")])
+    def test_recovery_checks_actual_receipt_for_every_slot(self):
+        from telegram_slots import CHANNEL_SLOTS
+        for slot in CHANNEL_SLOTS:
+            now = datetime.fromisoformat("2026-11-04T"+slot).replace(tzinfo=ROME)
+            api = FakeApi([{"head_branch":"main","status":"completed","conclusion":"success"}])
+            self.assertNotIn(slot,[s for _,s,_ in due_slots(now)])
+            wake(api,now+timedelta(minutes=5))
+            self.assertIn(("telegram-digest.yml",slot),api.dispatched)
+            api.receipt=True
+            self.assertEqual(wake(api,now+timedelta(minutes=15))[0]["action"],"already_attempted")
+            self.assertNotIn(slot,[s for _,s,_ in due_slots(now+timedelta(minutes=25))])
 
-    def test_missing_workflow_gets_recovery_dispatch(self):
-        now=datetime(2026,11,3,17,44,tzinfo=ROME)
-        api=FakeApi()
-        r=wake(api,now)
-        self.assertEqual(api.dispatched,[("telegram-gold-promo.yml","17:15"),("telegram-digest.yml","17:30")])
-        self.assertTrue(all(entry["action"]=="dispatched" for entry in r))
-
-    def test_existing_successful_attempt_prevents_duplicates(self):
-        now=datetime(2026,11,3,17,44,tzinfo=ROME)
-        api=FakeApi([{"event":"schedule","status":"completed","conclusion":"success","head_branch":"main"}])
+    def test_no_old_slots_and_no_duplicate_while_active(self):
+        now = datetime.fromisoformat("2026-11-04T17:35:00+01:00")
+        api = FakeApi([{"head_branch":"main","status":"in_progress"}])
         self.assertEqual(wake(api,now)[0]["action"],"already_attempted")
-        self.assertFalse(api.dispatched)
-
-    def test_failed_attempt_recovered_and_dry_run_safe(self):
-        now=datetime(2026,11,3,19,14,tzinfo=ROME)
-        api=FakeApi([{"event":"schedule","status":"completed","conclusion":"failure","head_branch":"main"}])
-        self.assertEqual(wake(api,now,dry_run=True)[0]["action"],"would_dispatch")
-        self.assertFalse(api.dispatched)
-        wake(api,now)
-        self.assertEqual(api.dispatched,[("telegram-digest.yml","19:00")])
-
-    def test_public_1300_backup_slot(self):
-        now=datetime(2026,11,3,13,14,tzinfo=ROME)
-        self.assertIn(("telegram-daily-spunti.yml","13:00"),
-                      [(workflow,slot) for workflow,slot,_ in due_slots(now)])
-        self.assertNotIn(("telegram-daily-spunti.yml","13:00"),
-                         [(workflow,slot) for workflow,slot,_ in due_slots(now+timedelta(minutes=20))])
-
-    def test_cest(self):
-        now=datetime(2026,7,3,16,54,tzinfo=ROME)
-        self.assertEqual([(x,y) for x,y,_ in due_slots(now)],
-                         [("telegram-evidence.yml","market")])
-
-
-if __name__=="__main__":
-    unittest.main()
+        self.assertNotIn("13:00", [slot for _,slot,_ in due_slots(now.replace(hour=13,minute=5))])

@@ -4,7 +4,7 @@ import math
 import os
 import subprocess
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import urlencode
@@ -13,18 +13,10 @@ from zoneinfo import ZoneInfo
 
 ROME = ZoneInfo("Europe/Rome")
 CHANNEL = "@arabsniper_signals"
-SLOTS = {"0 13 * * *": "13:00", "30 17 * * *": "17:30",
-         "0 19 * * *": "19:00", "0 20 * * *": "20:00"}
-# UTC GitHub Actions primary/backup triggers for both CET and CEST.
-# UTC events only qualify when their actual Rome-local slot is due.
-UTC_CRONS = {
-    "0 11 * * *", "13 11 * * *", "0 12 * * *", "13 12 * * *",
-    "30 15 * * *", "43 15 * * *", "30 16 * * *", "43 16 * * *",
-    "0 17 * * *", "13 17 * * *", "0 18 * * *", "13 18 * * *",
-    "0 19 * * *", "13 19 * * *",
-}
-WINDOWS = {"17:30": ("17:30", "18:30"), "19:00": ("19:00", "20:00"),
-           "20:00": ("20:00", "21:00")}
+from telegram_slots import WINDOWS, EDITORIAL, CHANNEL_SLOTS
+
+UTC_CRONS = {"30 22,23,2,3,10,11,15,16,17 * * *", "0 18,19,20,21 * * *",
+             "45 10,11,14,15 * * *", "15 15,16 * * *"}
 MARKETS = {"over15_ht": ("ht", 2), "over25_ht": ("ht", 3), "gg_ht": ("ht", "gg"),
            "over25_ft": ("ft", 3), "over35_ft": ("ft", 4)}
 FINAL = {"FT", "AET", "PEN"}
@@ -177,7 +169,7 @@ def artifact(name):
 
 def prior_ids(day, slot):
     """Load earlier confirmed posts to prevent repeating the same fixture."""
-    previous = ["13:00", "17:30", "19:00"]
+    previous = sorted(set(WINDOWS) | {"13:00", "19:00"})
     seen = set()
     midday = f"tg-spunti-{day}-1300-sent"
     record = artifact(midday)
@@ -210,15 +202,20 @@ def slot_for_schedule(now, event, cron, recovery_slot=None):
     elif event == "workflow_dispatch":
         # An external watchdog may recover evening slots but cannot manufacture
         # a signal, change market eligibility or publish after the due window.
-        if recovery_slot not in WINDOWS:
+        if recovery_slot not in CHANNEL_SLOTS:
             return None
     else:
         return None
     now = now.astimezone(ROME)
-    for slot in SLOTS.values():
+    for slot in CHANNEL_SLOTS:
         if event == "workflow_dispatch" and slot != recovery_slot:
             continue
         due = datetime.combine(now.date(), datetime.strptime(slot, "%H:%M").time(), ROME)
+        if event == "schedule":
+            utc = due.astimezone(timezone.utc)
+            minute, hours, *_ = cron.split()
+            if int(minute) != utc.minute or str(utc.hour) not in hours.split(","):
+                continue
         if timedelta(0) <= now-due < timedelta(minutes=25):
             return slot
     return None
@@ -232,41 +229,88 @@ def prepare():
         return
     day = now.date().isoformat()
     name = f"tg-{day}-{slot.replace(':','')}"
-    if artifact(name+"-claim") or artifact(name+"-sent"):
+    if artifact(name+"-sent"):
         print("Slot already reserved or posted")
         return
-    if slot == "13:00":
-        # Dedicated public-feed spunti workflow owns this slot. Keep evening Gold unchanged.
-        print("13:00 handled by independent public analytical spunti workflow")
+    if artifact(name+"-claim"):
+        raise RuntimeError("Unconfirmed previous delivery; inspect Telegram before resending")
+    if slot in EDITORIAL:
+        legacy = (f"telegram-evidence-{day}-market-sent" if EDITORIAL[slot] == "education"
+                  else f"telegram-gold-promo-{day}-{slot.replace(':','')}-sent")
+        if artifact(legacy):
+            print("Editorial already delivered by previous schedule")
+            return
+        post = {"slot":slot, "picks":[], "day":day}
+        reserve(name, post)
         return
     from gold_storage import client
-    from homepage_preview import social_board
+    from homepage_preview import social_board, stamp
 
-    obj = client().get_object(Bucket=os.environ["R2_BUCKET"], Key="arab_quote_day1.json")
-    board = json.load(obj["Body"])
+    s3 = client()
+    def load_board(key):
+        obj = s3.get_object(Bucket=os.environ["R2_BUCKET"], Key=key)
+        return json.load(obj["Body"])
+    board = load_board("arab_quote_day1.json")
+    if slot == "00:30" and board.get("date") != day:
+        board = load_board("arab_quote_day2.json")
     excluded = prior_ids(day, slot)
     now = datetime.now(ROME)
-    end = datetime.combine(now.date(), datetime.strptime(WINDOWS[slot][1], "%H:%M").time(), ROME)
-    candidates = social_board(board, now, kickoff_until=end, exclude=excluded, limit=1)
-    if not candidates:
-        print(f"No qualifying upcoming single for {slot} through {end:%H:%M}")
+    first, last, limit = WINDOWS[slot]
+    start = datetime.fromisoformat(f"{day}T{first}").replace(tzinfo=ROME)
+    end = datetime.fromisoformat(f"{day}T{last}").replace(tzinfo=ROME)
+    updated = stamp(board.get("updated_at"))
+    if board.get("date") != day or not updated or not timedelta(0) <= now-updated <= timedelta(minutes=90):
+        scheduled = datetime.fromisoformat(f"{day}T{slot}").replace(tzinfo=ROME)
+        if now-scheduled < timedelta(minutes=14):
+            raise RuntimeError("Missing current private board; retry this slot")
+        reserve(name, dict(slot=slot, picks=[], first=first, last=last, stale=True))
         return
-    row = candidates[0]
-    p = dict(row, id=row["fixture_id"], tier=row["tier"].lower(),
-             model_probability=row.get("statistical_pct"),
-             market_confirmed=row.get("market_confirmation") in ("confirmed", "convergence"))
-    chosen = [p]
-    lines = [f"ArabSniper · {p['tier'].upper()} · Singola delle {slot}", "",
-             f"{instant(p['kickoff']).astimezone(ROME):%H:%M} · {p['match']}",
-             f"{p['label']} · quota osservata {p['odd']:.2f}", "Perché è stata selezionata"]
-    lines.extend(evening_rationale(p))
-    lines.extend(["", "🎯 ArabSniperBet · Analisi, non garanzie.",
-                  "👑 https://arabsniperbet.com/gold",
-                  "18+ · Gioca responsabilmente."])
-    Path("post.json").write_text(json.dumps(
-        dict(picks=chosen, text="\n".join(lines).strip()), ensure_ascii=False))
+    candidates = social_board(board, now, kickoff_from=start, kickoff_until=end, exclude=excluded,
+                              limit=limit, blue_only=True)
+    chosen = [dict(row, id=row["fixture_id"], model_probability=row.get("statistical_pct"),
+                   market_confirmed=row.get("market_confirmation") in ("confirmed", "convergence"))
+              for row in candidates]
+    post = dict(slot=slot, picks=chosen, first=first, last=last)
+    reserve(name, post)
+
+
+def reserve(name, post):
+    post["text"] = slot_message(post)
+    Path("post.json").write_text(json.dumps(post, ensure_ascii=False))
     with open(os.environ["GITHUB_OUTPUT"], "a") as out:
         print(f"name={name}", file=out)
+
+def slot_message(post):
+    slot = post["slot"]
+    picks = post["picks"]
+    if slot in EDITORIAL:
+        if EDITORIAL[slot] == "education":
+            from telegram_evidence import educational_message
+            return educational_message(datetime.fromisoformat(post["day"]).date())
+        from telegram_gold_promo import MESSAGES
+        return MESSAGES[0 if slot == "12:45" else 1]
+    if not picks:
+        if post.get("stale"):
+            note = f"Controllo delle {slot}: dati Gold non aggiornati per questa fascia."
+            if slot != "22:00":
+                return note
+            from telegram_gold_promo import MESSAGES
+            return note + "\n\n" + MESSAGES[-1]
+        if slot == "22:00":
+            from telegram_gold_promo import MESSAGES
+            return MESSAGES[-1]
+        return (f"ArabSniper · Controllo delle {slot} completato. "
+                f"Nessuna nuova selezione valida da pubblicare per le gare {post['first']}–{post['last']}.")
+    lines = [f"ArabSniper · {'Singola' if len(picks)==1 else 'Selezioni singole'} delle {slot}"]
+    for pick in picks:
+        start = instant(pick["kickoff"]).astimezone(ROME)
+        at = instant(pick["provider_updated_at"]).astimezone(ROME)
+        tier = "BLU · segnale di mercato valido" if pick["tier"] == "Blu" else pick["tier"].upper()
+        lines += ["", f"{tier} · {start:%H:%M} · {pick['match']}",
+                  f"{pick['label']} · quota {pick['odd']:.2f} rilevata alle {at:%H:%M}"]
+        if len(picks)==1:
+            lines.extend(evening_rationale(pick))
+    return "\n".join(lines + ["", "18+ · Analisi ArabSniperBet"])
 
 def send():
     """Send the image and its caption as one verified Telegram message."""
@@ -274,6 +318,17 @@ def send():
     if not token:
         raise SystemExit("Missing bot token")
     post = json.loads(Path("post.json").read_text())
+    if "slot" in post:
+        from telegram_gold_promo import telegram
+        post["picks"] = [p for p in post["picks"] if instant(p["kickoff"]) > datetime.now(ROME)]
+        post["text"] = slot_message(post)
+        result = telegram("sendMessage", token, chat_id=CHANNEL, text=post["text"], disable_web_page_preview="true")
+        if result.get("chat", {}).get("username", "").lower() != CHANNEL[1:] or not result.get("message_id"):
+            raise SystemExit("Unexpected Telegram receipt")
+        post["message_id"] = result["message_id"]
+        Path("post.json").write_text(json.dumps(post, ensure_ascii=False))
+        print("Confirmed Telegram message", post["message_id"])
+        return
     if any(instant(p["kickoff"]) <= datetime.now(ROME) for p in post["picks"]):
         raise SystemExit("Kickoff already reached; do not send")
     image = Path("telegram-card.png")

@@ -13,17 +13,9 @@ from zoneinfo import ZoneInfo
 
 ROME=ZoneInfo("Europe/Rome")
 REPO="arabsnipertech-bet/arabsniper2"
-SLOTS=(
-    ("telegram-evidence.yml","10:45","audit",38),
-    ("telegram-gold-promo.yml","12:45","12:45",40),
-    ("telegram-daily-spunti.yml","13:00","13:00",25),
-    ("telegram-evidence.yml","16:45","market",38),
-    ("telegram-gold-promo.yml","17:15","17:15",40),
-    ("telegram-digest.yml","17:30","17:30",25),
-    ("telegram-digest.yml","19:00","19:00",25),
-    ("telegram-digest.yml","20:00","20:00",25),
-    ("telegram-gold-promo.yml","21:15","21:15",40),
-)
+from telegram_slots import CHANNEL_SLOTS
+
+SLOTS = tuple(("telegram-digest.yml", clock, clock, 24) for clock in CHANNEL_SLOTS)
 # Allow GitHub's primary cron a moment to start. External watchdog runs every
 # ten minutes, so a single check within the window is sufficient.
 MINIMUM_DELAY=timedelta(minutes=3)
@@ -71,6 +63,18 @@ class GitHub:
         if int(payload.get("total_count",-1))>len(payload["workflow_runs"]):
             raise RuntimeError("GitHub run listing incomplete")
         return payload["workflow_runs"]
+    def slot_recorded(self, day, slot):
+        names = [f"tg-{day}-{slot.replace(':','')}-sent"]
+        if slot in ("12:45","17:15"):
+            names.append(f"telegram-gold-promo-{day}-{slot.replace(':','')}-sent")
+        elif slot == "16:45":
+            names.append(f"telegram-evidence-{day}-market-sent")
+        for name in names:
+            result = self.request("artifacts?" + urlencode({"name":name}))
+            if any(a["name"] == name and not a["expired"] for a in result["artifacts"]):
+                return True
+        return False
+
     def dispatch(self,workflow,slot):
         self.request(f"workflows/{workflow}/dispatches",
                      {"ref":"main","inputs":{"recovery_slot":slot}})
@@ -80,15 +84,9 @@ def wake(api,now,dry_run=False):
     planned=[]
     for workflow,slot,due in due_slots(now):
         attempts=api.runs(workflow,due-timedelta(minutes=1))
-        # A successful scheduled run may have had no eligible Gold pick; that's
-        # an intentional absence, not a transport failure. Do not spam retries.
-        already=any(
-            row.get("event") in ("schedule","workflow_dispatch") and
-            row.get("status") in ("queued","in_progress","waiting","pending","completed") and
-            row.get("conclusion") in (None,"success") and
-            row.get("head_branch")=="main"
-            for row in attempts
-        )
+        active = any(row.get("status") in ("queued","in_progress","waiting","pending")
+                     for row in attempts if row.get("head_branch") == "main")
+        already = active or api.slot_recorded(due.date().isoformat(),slot)
         if already:
             planned.append({"workflow":workflow,"slot":slot,"action":"already_attempted"})
             continue

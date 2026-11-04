@@ -51,7 +51,7 @@ def statistics_preview(payload, result, now):
     result.update(model_id=MODEL_ID, selections=list(unique.values())[:3])
     return result
 
-def board_spunti(fixture, assessment, now):
+def board_spunti(fixture, assessment, now, *, blue_only=False):
     """Project only the board's selected markets and published Studio star."""
     matrix = assessment.get('matrix') or {}
     captured = stamp(assessment.get('captured_at'))
@@ -60,7 +60,20 @@ def board_spunti(fixture, assessment, now):
     rows = {row.get('id'): row for row in matrix.get('rows', [])}
     for priority, tier, field in ((0, 'Platinum', 'platinum'), (1, 'Gold', 'opportunity'),
                                   (2, 'Solo Studio', 'study')):
-        if field == 'study':
+        if field == 'study' and blue_only:
+            from platinum_policy import flow_rejections
+            eligible = [r for r in rows.values() if r.get('quote_executable') is True
+                        and not flow_rejections(r, now.isoformat(), -2)
+                        and stamp(r.get('provider_updated_at'))
+                        and 0 <= (now-stamp(r['provider_updated_at'])).total_seconds() <= 28800]
+            if not eligible:
+                continue
+            row = min(eligible, key=lambda r: (-r['oci'], r['delta_pct'], str(r['id'])))
+            tier = 'Blu'
+            observed = row['provider_updated_at']
+            probability = row.get('statistical_pct')
+            score = row['oci']
+        elif field == 'study':
             ideas = (matrix.get('quote_monitoring') or {}).get('studio_ideas', [])
             row = next((idea for idea in ideas if idea.get('best_study') is True and not idea.get('suppressed')), {})
             observed = row.get('updated')
@@ -85,7 +98,7 @@ def board_spunti(fixture, assessment, now):
                                        'movement_confirmed','bookmakers_count','oci')}
         if row.get('historical_oci'):
             pick['oci'] = None
-        pick.update(market=row.get("market") if field == "study" else goal_market(row),
+        pick.update(market=row.get("market") if tier == "Solo Studio" else goal_market(row),
                     quote_status=row.get("quote_status"), tier=tier, fixture_id=str(fixture['fixture_id']), match=fixture['match'],
                     kickoff=fixture['kickoff'], captured_at=assessment['captured_at'],
                     provider_updated_at=observed, statistical_pct=probability,
@@ -96,7 +109,7 @@ def board_spunti(fixture, assessment, now):
                fixture['kickoff'], pick['fixture_id']), pick
 
 
-def social_board(payload, now, *, kickoff_until=None, exclude=(), limit=3):
+def social_board(payload, now, *, kickoff_from=None, kickoff_until=None, exclude=(), limit=3, blue_only=False):
     today = now.astimezone(ROME).date().isoformat()
     updated = stamp(payload.get('updated_at'))
     if payload.get('date') != today or not updated or not 0 <= (now-updated).total_seconds() <= 5400:
@@ -108,9 +121,9 @@ def social_board(payload, now, *, kickoff_until=None, exclude=(), limit=3):
         if (not kickoff or kickoff <= now or kickoff.astimezone(ROME).date().isoformat() != today
                 or fixture.get('status_short') not in ('NS', 'TBD') or not output_allowed(match)):
             continue
-        if (kickoff_until and kickoff > kickoff_until) or str(fixture.get('fixture_id')) in exclude:
+        if (kickoff_from and kickoff < kickoff_from) or (kickoff_until and kickoff > kickoff_until) or str(fixture.get('fixture_id')) in exclude:
             continue
-        ranked.extend(board_spunti(fixture, match.get('multimarket') or {}, now))
+        ranked.extend(board_spunti(fixture, match.get('multimarket') or {}, now, blue_only=blue_only))
     distinct = {}
     for _, pick in sorted(ranked, key=lambda item: item[0]):
         distinct.setdefault(pick['fixture_id'], pick)
