@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 from zoneinfo import ZoneInfo
 
 from telegram_slots import CHANNEL_SLOTS
@@ -65,8 +66,21 @@ def graph(path, data=None):
     request = Request("https://graph.facebook.com/v25.0/" + path,
                       data=urlencode(data).encode() if data else None,
                       headers={"Authorization": "Bearer " + os.environ["FACEBOOK_PAGE_ACCESS_TOKEN"]})
-    with urlopen(request, timeout=25) as response:
-        return json.load(response)
+    try:
+        with urlopen(request, timeout=25) as response:
+            return json.load(response)
+    except HTTPError as exc:
+        try:
+            error = json.load(exc).get("error", {})
+        except ValueError:
+            error = {}
+        message = str(error.get("message", "")).lower()
+        reason = next((label for needle, label in (
+            ("expired", "expired"), ("cannot parse", "malformed"), ("invalidated", "invalidated"),
+            ("revoked", "revoked"), ("permission", "permissions")) if needle in message), "unspecified")
+        code, subcode = error.get("code"), error.get("error_subcode")
+        raise RuntimeError(f"Meta HTTP {exc.code}; code={code if type(code) is int else None}; "
+                           f"subcode={subcode if type(subcode) is int else None}; reason={reason}") from None
 
 
 def main(mode):
