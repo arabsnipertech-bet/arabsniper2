@@ -1,0 +1,66 @@
+name: Private board verification
+on:
+  push:
+    branches: ['check/telegram-gold-20261104']
+    paths: ['.github/workflows/private-board-verification.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: pip install boto3
+      - name: Read board and return encrypted summary
+        env:
+          PYTHONPATH: src
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          set -eu
+          cat > cert.pem <<'CERT'
+          -----BEGIN CERTIFICATE-----
+          MIIDATCCAemgAwIBAgIUeJ+ZraCYt20O7hnxgWlkdYELJoMwDQYJKoZIhvcNAQEL
+          BQAwEDEOMAwGA1UEAwwFY2hlY2swHhcNMjYxMTA0MTIxODM5WhcNMjYxMTA1MTIx
+          ODM5WjAQMQ4wDAYDVQQDDAVjaGVjazCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+          AQoCggEBALDEvYJKGd7cAlTKzE/6PAqfhqSLf2Oz5LW0G5M75vrt5P+yyvl+OkP3
+          Vvq3md/qbG/HC8577aGRy4pmyATNXwLY4tDB7Ecg908SgZRUD9/clIn1dT0cU0sQ
+          UYf6XN8s0VNlJyFEu5/xuk2pPRmaxtpqu7edatcj6mJxzJmQlTprPCKuqDUyyNjV
+          Uus57rKalTuo8vbwIZJkI70cGA8TeACbdA5WNoHckksmyDgrtddAnCBPa8UoZo0t
+          l83YQgf4JrtY8SG+89vYl+MmxTBccH85og4ovQkQWJP9u4cw/0LUTy2912ldd11E
+          S16s7JYsfhW0GrgTa8Rg6s0mczBiC2ECAwEAAaNTMFEwHQYDVR0OBBYEFIS03yS3
+          fZ/pHrvzwE3aAUNGgTk+MB8GA1UdIwQYMBaAFIS03yS3fZ/pHrvzwE3aAUNGgTk+
+          MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAEX1iSzE8g6BrU/2
+          Ds8uNEVWaf38MwElqVFitvOSLoTKWcpseCurhJsf0fXJo8aExlG/HTp/fcxt7/B6
+          rwubbl+nuvtIArUGXQfievbldUe7L1d0JkPeen+Y+bCkp7ukB+bagbpp0EAoEP5c
+          KhsEaMVwKDrlfJUzz8xYX1CIsgtcfsuv3s92D5FGYkHDd3sFpEYVGkgJa7glTZ0q
+          XDLRy/astGUefwm2wg2TDut4eb+cbGS3uwMLxiLr8JhIAakeEgn7hlhx0JLHBkNt
+          akSybgyYkVmUI70iv2wtkYmRnQB9nOmhL51vrGd9j9DlyFYYvDiTU1PfW7zhdHvd
+          ZFhitc0=
+          -----END CERTIFICATE-----
+          CERT
+          python - <<'PY'
+          from telegram_private_feed import from_private_day, ROME
+          from gold_storage import client
+          from datetime import datetime
+          import json, os
+          d=json.load(client().get_object(Bucket=os.environ['R2_BUCKET'],Key='arab_quote_day1.json')['Body'])
+          now=datetime.now(ROME)
+          rows=[]
+          for m in d['matches']:
+           f=m.get('fixture') or {}
+           if not f.get('kickoff') or datetime.fromisoformat(f['kickoff'])<=now or f.get('status_short') not in ('NS','TBD'):continue
+           matrix=(m.get('multimarket') or {}).get('matrix') or {}
+           for tier,field in [('platinum','platinum_policy'),('opportunity','opportunity_policy')]:
+            best=(matrix.get(field) or {}).get('best_market_id')
+            for row in matrix.get('rows') or []:
+             if best and row.get('id')==best and (row.get(tier) or {}).get('eligible') is True:
+              rows.append([tier,f.get('match'),f.get('kickoff'),row.get('label'),row.get('odd'),row.get('provider_updated_at')])
+          with open('check.json','w') as out:json.dump([now.isoformat(),d['updated_at'],rows,from_private_day(d,now)],out)
+          PY
+          openssl cms -encrypt -binary -aes256 -in check.json -outform DER -out cipher cert.pem
+          echo "RESULT=$(base64 -w0 cipher)"
