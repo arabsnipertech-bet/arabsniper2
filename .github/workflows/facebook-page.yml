@@ -1,5 +1,8 @@
 name: Facebook Page publication
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/facebook-page.yml', 'src/facebook_page.py']
   workflow_run:
     workflows: ["Telegram daily picks and scores"]
     types: [completed]
@@ -36,8 +39,8 @@ jobs:
           FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
           EVENT: ${{ github.event_name }}
         run: |
-          if [ "$EVENT" = workflow_dispatch ]; then
-            PYTHONPATH=src python -c 'from facebook_page import graph, PAGE; assert graph("me?fields=id")["id"] == PAGE; print("Page identity verified")'
+          if [ "$EVENT" = workflow_dispatch ] || [ "$EVENT" = push ]; then
+            PYTHONPATH=src python -c 'from facebook_page import graph, PAGE; assert graph("me?fields=id")["id"] == PAGE; assert "data" in graph(PAGE + "/published_posts?fields=id&limit=1"); print("Page identity and published-post access verified")'
           elif [ "$EVENT" = schedule ]; then
             python src/facebook_page.py results
           else
