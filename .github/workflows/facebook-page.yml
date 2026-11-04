@@ -1,0 +1,45 @@
+name: Facebook Page publication
+on:
+  workflow_run:
+    workflows: ["Telegram daily picks and scores"]
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: '30 9,10 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: facebook-page-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.event != 'pull_request')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Read sent selection receipts
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          pattern: '*-sent'
+          path: receipts
+      - name: Check Page identity or publish eligible content
+        env:
+          FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = workflow_dispatch ]; then
+            PYTHONPATH=src python -c 'from facebook_page import graph, PAGE; assert graph("me?fields=id")["id"] == PAGE; print("Page identity verified")'
+          elif [ "$EVENT" = schedule ]; then
+            python src/facebook_page.py results
+          else
+            python src/facebook_page.py selections
+          fi
