@@ -38,3 +38,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
         run: python3 src/telegram_watchdog.py
+      - name: Wake or recover the daily Telegram live
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+        run: python3 src/telegram_live.py dispatch
