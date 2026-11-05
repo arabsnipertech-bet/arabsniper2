@@ -19,6 +19,7 @@ permissions:
 concurrency:
   group: arabsniper-quote-data-writer
   cancel-in-progress: false
+  queue: max
 
 jobs:
   night-scan:

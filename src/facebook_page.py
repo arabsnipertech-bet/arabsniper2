@@ -10,7 +10,7 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 from zoneinfo import ZoneInfo
 
-from telegram_slots import CHANNEL_SLOTS
+from telegram_slots import CHANNEL_SLOTS, WINDOWS
 
 ROME = ZoneInfo("Europe/Rome")
 PAGE = "604216843376166"
@@ -113,7 +113,11 @@ def main(mode):
     message = body if mode != "results" else f"{title}\n\n{body}\n\n18+ · Le analisi non garantiscono risultati."
     since = int(now.replace(hour=0, minute=0, second=0, microsecond=0).timestamp())
     posts = graph(f"{PAGE}/published_posts?fields=id,message&limit=100&since={since}")
+    original = receipt['text'] if mode != 'results' else message
+    slot_heading = original.split('\n')[0] if mode != 'results' and receipt['slot'] in WINDOWS else None
     existing = next((p for p in posts['data'] if p.get('message') == message
+                     or p.get('message') == original
+                     or (slot_heading and p.get('message', '').split('\n')[0] == slot_heading)
                      or p.get('message', '').split('\n')[0] == title), None)
     if existing:
         record_receipt(existing['id'], receipt if mode != 'results' else None, now)
