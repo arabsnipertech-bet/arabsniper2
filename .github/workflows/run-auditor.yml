@@ -3,7 +3,7 @@ name: Run Auditor
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 0 * * *'
+    - cron: '30 0,4 * * *'
       timezone: 'Europe/Rome'
 
 permissions:
@@ -38,7 +38,7 @@ jobs:
     needs: admission
     if: needs.admission.outputs.run == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 360
+    timeout-minutes: 85
     # Final checkpoint mutex; the runner also enforces an absolute 05:30 cutoff.
     concurrency:
       group: arabsniper-quote-data-writer
@@ -67,3 +67,6 @@ jobs:
       - name: Record verified daily Auditor completion
         if: steps.nightly.outputs.completed == 'true'
         run: echo "Daily Auditor completion verified in the published checkpoint."
+      - name: Record saved partial progress
+        if: steps.nightly.outputs.paused == 'true'
+        run: echo "Historical chunk saved. More dates remain; this is NOT full Auditor certification."

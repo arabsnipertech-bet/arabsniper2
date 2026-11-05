@@ -63,7 +63,7 @@ class AuditorBackupTests(unittest.TestCase):
 
     def test_rome_summer_winter_and_utc_date_boundary(self):
         for at in ('2026-10-30T23:40:00Z', '2026-10-30T23:59:59Z',
-                   '2026-10-31T03:28:00+01:00', '2026-07-30T22:40:00Z'):
+                   '2026-10-31T04:28:00+01:00', '2026-07-30T22:40:00Z'):
             self.assertEqual(backup.wake_auditor(FakeAPI(), backup.instant(at))['action'], 'dispatched')
         with self.assertRaises(ValueError):
             backup.wake_auditor(FakeAPI(), NOW.replace(tzinfo=None))
@@ -158,16 +158,14 @@ class AuditorBackupTests(unittest.TestCase):
                 request.assert_not_called()
 
     def test_only_verified_runner_outcomes_emit_completion(self):
-        for result in ('complete', 'already_completed', 'outside_audit_window'):
+        for result in ('complete', 'already_completed', 'outside_audit_window', 'paused'):
             with tempfile.TemporaryDirectory() as folder:
                 output = Path(folder)/'outputs'
                 with patch.dict(os.environ, {'GITHUB_OUTPUT': str(output)}), patch.object(nightly_auditor, 'run', return_value=result):
-                    if result == 'outside_audit_window':
-                        with self.assertRaises(SystemExit): nightly_auditor.main()
-                        self.assertFalse(output.exists())
-                    else:
-                        nightly_auditor.main()
-                        self.assertEqual(output.read_text(), 'completed=true\n')
+                    nightly_auditor.main()
+                    values = dict(line.split('=') for line in output.read_text().splitlines())
+                    self.assertEqual(values['completed'], str(result in ('complete', 'already_completed')).lower())
+                    self.assertEqual(values['paused'], str(result == 'paused').lower())
 
     def test_failed_publication_never_emits_completion(self):
         with tempfile.TemporaryDirectory() as folder:

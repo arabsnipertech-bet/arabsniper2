@@ -32,7 +32,7 @@ class NightlySchedule(unittest.TestCase):
                'GITHUB_REPOSITORY': 'arabsnipertech-bet/arabsniper2'}
         with patch.dict(os.environ, env):
             gate = recovery_admission(now, '2026-11-05')
-            self.assertEqual(gate['deadline'], '2026-11-06T00:00:00+01:00')
+            self.assertFalse(gate['run'])
             with self.assertRaises(ValueError):
                 recovery_admission(now, '2026-11-04')
 
@@ -60,15 +60,19 @@ class NightlySchedule(unittest.TestCase):
                 ('2026-10-31T00:29:59+01:00', False),
                 ('2026-10-30T23:30:00Z', True),
                 ('2026-10-31T00:59:59+01:00', True),
-                ('2026-10-31T03:28:00+01:00', True),
-                ('2026-10-31T05:29:59+01:00', True),
+                ('2026-10-31T03:28:00+01:00', False),
+                ('2026-10-31T01:30:00+01:00', False),
+                ('2026-10-31T04:00:00+01:00', True),
+                ('2026-10-31T05:10:00+01:00', False),
+                ('2026-10-31T05:29:59+01:00', False),
                 ('2026-10-31T05:30:00+01:00', False),
                 ('2026-10-31T16:30:00+01:00', False),
                 ('2026-07-30T22:30:00Z', True)]:
             with self.subTest(value=value):
                 result = admission(datetime.fromisoformat(value.replace('Z', '+00:00')))
                 self.assertEqual(result['run'], allowed)
-                self.assertIn('T05:30:00', result['deadline'])
+                if allowed:
+                    self.assertLessEqual((datetime.fromisoformat(result['deadline'])-datetime.fromisoformat(value.replace('Z', '+00:00'))).total_seconds(), 75*60)
         with self.assertRaises(ValueError):
             admission(datetime(2026, 10, 31, 0, 30))
 
@@ -120,7 +124,7 @@ class NightlySchedule(unittest.TestCase):
         now = datetime.fromisoformat('2026-10-31T00:35:00+01:00')
         calls = []
         def runner(root, command, deadline, clock):
-            self.assertEqual(deadline.isoformat(), '2026-10-31T05:30:00+01:00')
+            self.assertEqual(deadline.isoformat(), '2026-10-31T01:50:00+01:00')
             calls.append(command[1:])
             if command[1:3] == ['auditor/current_audit.py', 'daily']:
                 daily_report(root, command[-1])
@@ -128,12 +132,12 @@ class NightlySchedule(unittest.TestCase):
             self.assertEqual(run(folder, lambda: now, runner), 'complete')
             self.assertTrue(already_completed(folder, now))
         self.assertEqual(calls, [
-            ['src/gold_storage.py', 'restore'], ['auditor/current_audit.py', 'prepare'],
+            ['src/gold_storage.py', 'restore'], ['auditor/current_audit.py', 'prepare', '--journal-limit', '8', '--delta-archive', '--journal-before', '2026-10-31T00:00:00+01:00'], ['src/gold_storage.py', 'publish'],
             ['auditor/current_audit.py', 'daily', '--date', '2026-10-30'],
             ['src/adaptive_calibration.py', '--as-of', '2026-10-31'],
             ['src/gold_storage.py', 'publish'], ['src/homepage_results.py'],
             ['src/private_publication.py', '--results-only'],
-            ['auditor/current_audit.py', 'history', '--date', '2026-10-30'],
+            ['auditor/current_audit.py', 'history', '--date', '2026-10-30', '--assemble-only', '--as-of', now.isoformat()],
             ['src/gold_storage.py', 'publish'], ['src/gold_policy_audit.py'],
             ['src/adaptive_calibration.py', '--as-of', '2026-10-31'], ['src/gold_storage.py', 'publish']])
 
@@ -163,14 +167,14 @@ class NightlySchedule(unittest.TestCase):
             calls.clear()
             next_night = datetime.fromisoformat('2026-11-01T00:40:00+01:00')
             self.assertEqual(run(second, lambda: next_night, runner), 'complete')
-            self.assertLess(calls.index(['auditor/current_audit.py','history','--date','2026-10-30']),
-                            calls.index(['auditor/current_audit.py','prepare']))
+            self.assertLess(next(i for i, c in enumerate(calls) if c[:4] == ['auditor/current_audit.py','history','--date','2026-10-30']),
+                            next(i for i,c in enumerate(calls) if c[:2] == ['auditor/current_audit.py','prepare']))
             self.assertNotIn(['auditor/current_audit.py','daily','--date','2026-10-30'], calls)
             self.assertEqual(remote[MARKER]['date'],'2026-11-01')
             self.assertNotIn(PROGRESS, remote)
 
     def test_late_retry_after_timeout_certifies_only_after_report_and_publication(self):
-        retry = datetime.fromisoformat('2026-11-01T03:28:00+01:00')
+        retry = datetime.fromisoformat('2026-11-01T04:00:00+01:00')
         with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {'GOLD_PRIVATE': 'true'}):
             runner = Mock(side_effect=TimeoutError)
             with self.assertRaises(TimeoutError):
@@ -179,7 +183,7 @@ class NightlySchedule(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'daily Auditor report'):
                 run(folder, lambda: retry, Mock())
             self.assertFalse(already_completed(folder, retry))
-            self.assertFalse((Path(folder)/PROGRESS).exists())
+            self.assertEqual(read_store(Path(folder)/PROGRESS)['stage'], 'preparing')
             def phases(root, command, deadline, clock):
                 if command[1:3] == ['auditor/current_audit.py', 'daily']:
                     daily_report(root, command[-1])
