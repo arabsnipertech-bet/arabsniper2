@@ -1,0 +1,40 @@
+name: Gold yesterday integration
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/gold-history.yml'
+      - 'src/gold_history.py'
+      - 'src/gold_history_display.cjs'
+      - 'src/gold_history_publish.py'
+permissions:
+  contents: read
+concurrency:
+  group: arabsniper-quote-data-writer
+  cancel-in-progress: false
+jobs:
+  archive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3 ijson==3.6.0
+      - name: Test additive archive and unchanged current analysis
+        run: |
+          python -m unittest discover -s tests -p test_gold_history.py -v
+          node tests/test_gold_history.cjs
+          node tests/test_gold_calendar.cjs
+          node tests/test_lateral_matrix.js
+      - name: Preserve yesterday and publish archive only
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python src/gold_history_publish.py
