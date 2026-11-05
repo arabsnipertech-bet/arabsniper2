@@ -12,7 +12,7 @@ from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
-from auditor_schedule import admission, preflight, already_completed, MARKER
+from auditor_schedule import admission, recovery_admission, preflight, already_completed, MARKER
 from nightly_auditor import PROGRESS, run, run_command
 from audit_journal import capture_forecasts, capture_policies, ingest, PREFIX
 from audit_storage import read_store, write_store
@@ -23,6 +23,38 @@ def daily_report(root, day='2026-10-30'):
 
 
 class NightlySchedule(unittest.TestCase):
+    def test_recovery_is_date_bound_and_requires_its_production_workflow(self):
+        now = datetime.fromisoformat('2026-11-05T20:00:00+01:00')
+        with self.assertRaises(ValueError):
+            recovery_admission(now, '2026-11-05')
+        env = {'GITHUB_WORKFLOW': 'Recover Auditor checkpoint',
+               'GITHUB_REF': 'refs/heads/main',
+               'GITHUB_REPOSITORY': 'arabsnipertech-bet/arabsniper2'}
+        with patch.dict(os.environ, env):
+            gate = recovery_admission(now, '2026-11-05')
+            self.assertEqual(gate['deadline'], '2026-11-06T00:00:00+01:00')
+            with self.assertRaises(ValueError):
+                recovery_admission(now, '2026-11-04')
+
+    def test_resumed_daily_saves_learning_before_history_can_timeout(self):
+        now = datetime.fromisoformat('2026-11-05T01:00:00+01:00')
+        calls = []
+        def runner(root, command, deadline, clock):
+            args = command[1:]
+            calls.append(args)
+            if args[:2] == ['auditor/current_audit.py', 'history']:
+                raise TimeoutError('history timeout')
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {'GOLD_PRIVATE': 'true'}):
+            root = Path(folder)
+            daily_report(root, '2026-11-04')
+            write_store(root/PROGRESS, {'version': 1, 'work_date': '2026-11-05', 'stage': 'daily'})
+            with self.assertRaises(TimeoutError):
+                run(root, lambda: now, runner)
+            self.assertLess(calls.index(['src/adaptive_calibration.py', '--as-of', '2026-11-05']),
+                            calls.index(['src/gold_storage.py', 'publish']))
+            self.assertFalse((root/MARKER).exists())
+            self.assertEqual(read_store(root/PROGRESS)['stage'], 'daily')
+
     def test_rome_window_boundaries_and_summer_time(self):
         for value, allowed in [
                 ('2026-10-31T00:29:59+01:00', False),
@@ -98,6 +130,7 @@ class NightlySchedule(unittest.TestCase):
         self.assertEqual(calls, [
             ['src/gold_storage.py', 'restore'], ['auditor/current_audit.py', 'prepare'],
             ['auditor/current_audit.py', 'daily', '--date', '2026-10-30'],
+            ['src/adaptive_calibration.py', '--as-of', '2026-10-31'],
             ['src/gold_storage.py', 'publish'], ['src/homepage_results.py'],
             ['src/private_publication.py', '--results-only'],
             ['auditor/current_audit.py', 'history', '--date', '2026-10-30'],

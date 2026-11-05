@@ -13,6 +13,19 @@ START = time(0, 30)
 STOP = time(5, 30)
 
 
+def recovery_admission(now, work_date):
+    """Explicit, date-bound recovery under the same data-writer mutex."""
+    local = now.astimezone(ROME)
+    if (work_date != local.date().isoformat()
+            or os.getenv('GITHUB_WORKFLOW') != 'Recover Auditor checkpoint'
+            or os.getenv('GITHUB_REF') != 'refs/heads/main'
+            or os.getenv('GITHUB_REPOSITORY') != 'arabsnipertech-bet/arabsniper2'):
+        raise ValueError('Recovery requires the authorized workflow on today production main')
+    midnight = datetime.combine(local.date()+timedelta(days=1), time(0), ROME)
+    return {'run': True, 'reason': 'authorized_recovery', 'date': work_date,
+            'deadline': min(local+timedelta(hours=5, minutes=30), midnight).isoformat()}
+
+
 def admission(now):
     if now.tzinfo is None:
         raise ValueError('Auditor clock must have a timezone')

@@ -16,7 +16,7 @@ ACTIVE = ('in_progress', 'queued', 'waiting', 'pending', 'requested')
 WRITERS = {'.github/workflows/' + name for name in (
     'fast_scan.yml', 'night_scan.yml', 'freeze-audit-source.yml', 'gold-storage-check.yml',
     'manual-auditor.yml', 'odds-probe.yml', 'repair-matrix-quotes.yml',
-    'run-auditor.yml', 'storage-cleanup.yml')}
+    'run-auditor.yml', 'recover-auditor.yml', 'storage-cleanup.yml')}
 INTERVAL = timedelta(minutes=60)
 RETRY_DELAY = timedelta(minutes=10)
 MAX_FAILED_ATTEMPTS = 2

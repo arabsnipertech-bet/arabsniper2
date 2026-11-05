@@ -407,9 +407,14 @@ def main():
     from private_publication import publish
     parser = argparse.ArgumentParser()
     parser.add_argument('--as-of', type=date.fromisoformat, required=True)
+    parser.add_argument('--recovery-date')
     args = parser.parse_args()
     now = datetime.now(ROME)
-    if (os.getenv('GOLD_PRIVATE') != 'true' or not START <= now.time() < STOP
+    recovery = False
+    if args.recovery_date:
+        from auditor_schedule import recovery_admission
+        recovery = recovery_admission(now, args.recovery_date)['run']
+    if (os.getenv('GOLD_PRIVATE') != 'true' or (not recovery and not START <= now.time() < STOP)
             or args.as_of != now.date()):
         parser.error('calibration requires the active nightly Auditor window')
     state = nightly_state(ROOT, args.as_of)
