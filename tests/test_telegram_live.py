@@ -83,3 +83,45 @@ class LiveTest(unittest.TestCase):
         self.assertEqual(s['receipts'][0]['message_id'],77)
 
 if __name__=='__main__':unittest.main()
+
+class PublicationTest(unittest.TestCase):
+    now=LiveTest.now
+    pick=LiveTest.pick
+    def test_reserved_fallback_free_priority_and_no_secret_in_post(self):
+        from telegram_live import reserve_publication
+        import hashlib
+        saved=[]
+        class Store:
+            def __init__(self,day):pass
+            def read(self):return None
+            def write(self,state):saved.append(state)
+        def api(path):
+            if path.startswith('fixtures'):return [dict(fixture=dict(status=dict(short='NS')),league=dict(id=1,season=2026))]
+            return [dict(seasons=[dict(year=2026,coverage=dict(fixtures=dict(events=True)))])]
+        with patch('telegram_live.Store',Store),patch('telegram_live.api',api):
+            post=dict(slot='18:30',picks=[self.pick(market='over15_ht')])
+            reserve_publication(post,[self.pick(id='999')],self.now)
+            self.assertEqual(post['live']['origin'],'gold')
+            self.assertNotIn('market',post['live']);self.assertNotIn('odd',post['live'])
+            self.assertEqual(hashlib.sha256(saved[-1]['proof'].encode()).hexdigest(),post['live']['commitment'])
+            post=dict(slot='18:30',picks=[self.pick()])
+            reserve_publication(post,[self.pick(id='999',model_probability=99)],self.now)
+            self.assertEqual(post['live']['origin'],'free')
+    def test_existing_reservation_prevents_second_live(self):
+        from telegram_live import reserve_publication
+        with patch('telegram_live.Store') as factory,patch('telegram_live.api') as api:
+            factory.return_value.read.return_value=dict(source_slot='17:30',pending_publication=True)
+            post=dict(slot='18:30',picks=[self.pick()])
+            reserve_publication(post,[],self.now)
+            self.assertNotIn('live',post);api.assert_not_called();factory.return_value.write.assert_not_called()
+    def test_live_requires_matching_confirmed_announcement(self):
+        from telegram_live import select
+        state=dict(pick=self.pick(),source_slot='18:30',pending_publication=True,announcement=dict(commitment='abc'))
+        with patch('telegram_live.Store') as factory,patch('telegram_live.receipts',return_value=[]) as get:
+            factory.return_value.read.side_effect=[None,state]
+            self.assertIsNone(select(self.now)[1])
+            factory.return_value.read.side_effect=[None,state]
+            get.return_value=[dict(day='2026-11-05',slot='18:30',message_id=80,live=dict(commitment='abc'))]
+            result=select(self.now)[1]
+            self.assertFalse(result['pending_publication'])
+            self.assertEqual(result['pick']['source_message_id'],80)

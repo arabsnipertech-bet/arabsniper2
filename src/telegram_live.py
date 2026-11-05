@@ -1,5 +1,7 @@
 """One receipt-backed, full-time Telegram live per Rome day. No model mutations."""
 import io
+import hashlib
+import secrets
 import json
 import math
 import os
@@ -102,11 +104,13 @@ def dispatch():
     runs=gh('workflows/'+WORKFLOW+'/runs?per_page=20').get('workflow_runs',[])
     if any(r.get('status') in ('queued','in_progress','waiting','pending') for r in runs):
         print('Live monitor already active'); return
-    if candidates(receipts(now_local()),now_local(),upcoming=False):
+    now=now_local()
+    announced=[r.get('live',{}) for r in receipts(now) if r.get('message_id')]
+    if any(moment(p.get('kickoff')) and now-timedelta(hours=6) <= moment(p['kickoff']) <= now+timedelta(minutes=20) for p in announced):
         gh('workflows/'+WORKFLOW+'/dispatches',{'ref':'main'})
-        print('Live monitor dispatched')
+        print('Announced live monitor dispatched')
     else:
-        print('No published full-time live candidate near kickoff')
+        print('No announced live near kickoff')
 
 def api(path):
     req=Request('https://v3.football.api-sports.io/'+path,
@@ -157,7 +161,7 @@ def advance(state, obs, now):
     if state.pop('paused',False):
         messages.append(('notice','PARTITA RIPRESA · monitoraggio nuovamente in corso.'))
     if not state.get('started'):
-        messages.append(('live','LIVE IN CORSO · seguiamo la singola gratuita.'))
+        messages.append(('live','LIVE IN CORSO · '+('selezione riservata dell’area Gold.' if state.get('announcement',{}).get('origin')=='gold' else 'seguiamo la singola gratuita.')))
         state['started']=True
         state.setdefault('score',[0,0])
     seen=state.setdefault('missed_seen',{})
@@ -238,9 +242,13 @@ def deliver(state,store,events,obs):
     for kind,detail in events:
         p=state['pick'];minute=obs.get('minute')
         phase='FT' if obs['status'] in CLOSED else (str(minute)+'′' if minute is not None else obs['status'])
+        reserved=state.get('announcement',{}).get('origin')=='gold'
+        if reserved and kind=='win': detail='ArabCassaaaaaa GOLD! · selezione riservata centrata.'
+        if reserved and kind=='lose': detail='ESITO GOLD · selezione riservata non centrata.'
+        prediction=('Selezione riservata dell’area Gold · registrata prima del calcio d’inizio.' if reserved else f"{p['label']} · quota pubblicata {p['odd']:.2f}")
         caption=(f"{detail}\n\n{p['match']}\n{obs['home']}–{obs['away']} · {phase}\n"
-                 f"{p['label']} · quota pubblicata {p['odd']:.2f}\n"
-                 f"Pronostico originale: https://t.me/arabsniper_signals/{p['source_message_id']}\n"
+                 f"{prediction}\n"
+                 f"Annuncio originale: https://t.me/arabsniper_signals/{p['source_message_id']}\n"
                  "Dati API-Football · 18+ · Le analisi non garantiscono risultati.")
         event=dict(kind=kind,caption=caption,created_at=now_local().isoformat())
         state['outbox']=event;store.write(state)
@@ -257,23 +265,59 @@ def deliver(state,store,events,obs):
         store.write(state)
         print('Live notification confirmed',kind,result['message_id'],flush=True)
 
+def reserve_publication(post, hidden, now):
+    """Freeze a qualified prediction privately BEFORE announcing it publicly."""
+    day=now.date().isoformat()
+    store=Store(day);state=store.read()
+    if state:
+        if state.get('source_slot')==post['slot'] and state.get('pending_publication'):
+            post['live']=state['announcement']
+        return
+    # Prefer the free match. Only then consider the two actual reserved matches.
+    groups=[(post.get('picks',[]),'free'),(hidden,'gold')]
+    for rows,origin in groups:
+        valid=[]
+        for row in rows:
+            p=dict(row,id=str(row.get('id',row.get('fixture_id',''))))
+            start=moment(p.get('kickoff'))
+            if start and start>now and eligible(p,start): valid.append(p)
+        valid.sort(key=lambda p:(-p.get('model_probability',p.get('statistical_pct')),abs(p['odd']-2)))
+        for p in valid:
+            rows=api('fixtures?id='+p['id'])
+            if len(rows)!=1 or rows[0]['fixture']['status']['short']!='NS': continue
+            league=rows[0].get('league',{})
+            coverage=api('leagues?'+urlencode({'id':league['id'],'season':league['season']}))
+            seasons=[v for l in coverage for v in l.get('seasons',[]) if v.get('year')==league['season']]
+            if not seasons or not seasons[0].get('coverage',{}).get('fixtures',{}).get('events'): continue
+            # Salt keeps the hidden market from being guessed from the public hash.
+            proof=json.dumps(dict(id=p['id'],market=p['market'],odd=p['odd'],nonce=secrets.token_hex(32)),sort_keys=True,separators=(',',':'))
+            commitment=hashlib.sha256(proof.encode()).hexdigest()
+            announcement=dict(id=p['id'],match=p['match'],kickoff=p['kickoff'],origin=origin,commitment=commitment)
+            state=dict(pick=p,chosen_at=now.isoformat(),source_slot=post['slot'],
+                       announcement=announcement,proof=proof,pending_publication=True,receipts=[],done=False)
+            store.write(state)
+            post['live']=announcement
+            return
+
 def select(now):
-    # Resume yesterday if a late fixture crosses midnight.
+    # Never invent a live choice after kickoff or without its public announcement.
     for day in ((now.date()-timedelta(days=1)).isoformat(),now.date().isoformat()):
         store=Store(day);state=store.read()
-        if state and not state.get('done'): return store,state
-        if day==now.date().isoformat() and state: return store,state
-    store=Store(now.date().isoformat());store.read()
-    for p in candidates(receipts(now),now):
-        rows=api('fixtures?id='+p['id'])
-        if len(rows)!=1 or rows[0]['fixture']['status']['short']!='NS': continue
-        league=rows[0].get('league',{})
-        coverage=api('leagues?'+urlencode({'id':league['id'],'season':league['season']}))
-        seasons=[s for l in coverage for s in l.get('seasons',[]) if s.get('year')==league['season']]
-        if not seasons or not seasons[0].get('coverage',{}).get('fixtures',{}).get('events'): continue
-        state={'pick':p,'chosen_at':now.isoformat(),'receipts':[],'done':False}
-        store.write(state);print('Daily live selected',p['id'],flush=True);return store,state
-    return store,None
+        if not state: continue
+        if state.get('done'):
+            if day==now.date().isoformat(): return store,state
+            continue
+        if state.get('pending_publication'):
+            matches=[r for r in receipts(now) if r.get('day')==day and r.get('slot')==state['source_slot']
+                     and type(r.get('message_id')) is int and r['message_id']>0
+                     and r.get('live',{}).get('commitment')==state['announcement']['commitment']]
+            if not matches: continue
+            state['pick']['source_message_id']=min(r['message_id'] for r in matches)
+            state['pending_publication']=False;store.write(state)
+        start=moment(state['pick']['kickoff'])
+        if start>now+timedelta(minutes=20): return store,None
+        return store,state
+    return Store(now.date().isoformat()),None
 
 def monitor():
     store,state=select(now_local())

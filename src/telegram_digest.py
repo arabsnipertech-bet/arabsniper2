@@ -274,6 +274,13 @@ def prepare():
     reserved = [dict(id=row["fixture_id"], kickoff=row["kickoff"])
                 for row in candidates[1:3]]
     post = dict(slot=slot, picks=chosen, reserved=reserved, first=first, last=last)
+    try:
+        from telegram_live import reserve_publication
+        reserve_publication(post, candidates[1:3], now)
+    except Exception as error:
+        # A provider/conditional-write failure must never invent a live promise.
+        post.pop('live', None)
+        print('Live reservation unavailable:', type(error).__name__)
     reserve(name, post)
 
 
@@ -286,6 +293,8 @@ def reserve(name, post):
 
 def refresh_reserved(post, now):
     """Remove expired previews before each channel sends its image."""
+    if post.get('live') and instant(post['live']['kickoff']) <= now:
+        post.pop('live')
     public_ids = {str(p.get("id", p.get("fixture_id"))) for p in post.get("picks", [])}
     seen = set(public_ids)
     valid = []
@@ -306,6 +315,11 @@ def social_cta(post):
     else:
         lines.append("🔎 Esplora l’area Gold per consultare le analisi disponibili e i prossimi aggiornamenti.")
     lines.append("🎁 Gold gratis 7 giorni: scrivi /prova a @ArabSniperBot")
+    if post.get('live'):
+        live=post['live'];start=instant(live['kickoff']).astimezone(ROME)
+        kind='dalla Gold · pronostico riservato' if live['origin']=='gold' else 'della singola gratuita'
+        lines.append(f"🟠 LIVE DEL GIORNO {kind}: {live['match']} · {start:%H:%M}. Seguiremo gol ed esito su Telegram.")
+        lines.append('Selezione registrata prima del via · rif. '+live['commitment'][:12])
     return "\n".join(lines)
 
 

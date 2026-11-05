@@ -74,6 +74,7 @@ jobs:
           PYTHON
       - id: prepare
         env:
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
           GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}
           CRON: ${{ github.event.schedule }}
