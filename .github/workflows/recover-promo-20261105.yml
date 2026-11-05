@@ -1,0 +1,85 @@
+name: Recover verified 1715 promotion
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/recover-promo-20261105.yml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: telegram-prediction-publication
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install Pillow==11.3.0 requests==2.32.5
+      - id: check
+        name: Reconcile uncertain delivery against public channel
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          PYTHONPATH: src
+        run: |
+          python - <<'PY'
+          import json, re, html, os
+          from pathlib import Path
+          from datetime import datetime
+          import requests
+          from telegram_digest import ROME, artifact, gh, send
+          from social_card import render
+          now=datetime.now(ROME)
+          if now.date().isoformat()!='2026-11-05' or now.hour!=17 or now.minute>=44:
+              raise SystemExit('Recovery window closed')
+          name='tg-2026-11-05-1715'
+          if artifact(name+'-sent'):
+              print('Already confirmed; no resend');raise SystemExit(0)
+          gh('run','download','42062544269','-n',name+'-claim','-D','claim')
+          post=json.loads(Path('claim/post.json').read_text())
+          response=requests.get('https://t.me/s/arabsniper_signals',timeout=25)
+          response.raise_for_status()
+          page=response.text
+          markers=list(re.finditer(r'data-post="arabsniper_signals/(\d+)"',page))
+          if not markers: raise SystemExit('Public channel unavailable; do not blindly resend')
+          norm=lambda s:' '.join(html.unescape(re.sub('<[^>]+>',' ',s)).split())
+          target=norm(post['text'])
+          latest=0
+          found=None
+          for i,m in enumerate(markers):
+              message_id=int(m.group(1));latest=max(latest,message_id)
+              block=page[m.start():markers[i+1].start() if i+1<len(markers) else len(page)]
+              if target in norm(block) and '2026-11-05T16:' in block:
+                  found=message_id
+          print('Public channel latest message',latest,'matching promotion',found)
+          if latest<57: raise SystemExit('Channel view too old for safe recovery')
+          Path('post.json').write_text(json.dumps(post,ensure_ascii=False))
+          if found:
+              post['message_id']=found
+              Path('post.json').write_text(json.dumps(post,ensure_ascii=False))
+              render(post,'social-card.jpg')
+          else:
+              send()
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:print('recovered=true',file=f)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: steps.check.outputs.recovered == 'true'
+        with:
+          name: tg-2026-11-05-1715-sent
+          path: |
+            post.json
+            social-card.jpg
+          retention-days: 3
+      - name: Publish recovered promotion on Facebook
+        if: steps.check.outputs.recovered == 'true'
+        env:
+          FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+        run: |
+          mkdir receipts
+          cp post.json social-card.jpg receipts/
+          python src/facebook_page.py selections

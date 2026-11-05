@@ -367,8 +367,8 @@ def send():
                                          data={"chat_id":CHANNEL,"caption":caption},
                                          files={"photo":("social-card.jpg",photo,"image/jpeg")},timeout=30)
             payload = response.json()
-        except (requests.RequestException,ValueError):
-            raise SystemExit("Telegram photo delivery unconfirmed") from None
+        except (requests.RequestException,ValueError) as exc:
+            raise SystemExit("Telegram photo delivery unconfirmed; category="+type(exc).__name__) from None
         result = payload.get("result") or {}
         if not payload.get("ok") or not result.get("photo"):
             raise SystemExit("Telegram photo not confirmed")
