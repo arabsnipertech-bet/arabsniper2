@@ -63,3 +63,25 @@ class SocialRecovery(unittest.TestCase):
                 self.assertIn('fb-2026-11-05-1715-sent', Path('output').read_text())
             finally:
                 os.chdir(previous)
+
+    def test_facebook_retry_recognizes_slot_after_expired_preview_changes(self):
+        import facebook_page
+        from unittest.mock import Mock
+        heading = 'ArabSniper · Singola delle 17:30'
+        post = {'day': '2026-11-05', 'slot': '17:30', 'message_id': 70,
+                'text': heading+'\nOriginal preview', 'picks': []}
+        graph = Mock(side_effect=[{'id': facebook_page.PAGE}, {'data': [
+            {'id': facebook_page.PAGE+'_123', 'message': heading+'\nEarlier filtered preview'}]}])
+        with tempfile.TemporaryDirectory() as folder:
+            previous = os.getcwd()
+            try:
+                os.chdir(folder)
+                Path('receipts').mkdir()
+                Path('receipts/post.json').write_text(json.dumps(post))
+                with patch('facebook_page.graph', graph), patch('facebook_page.selection',
+                        return_value=('Slot title', heading+'\nUpdated preview')), patch('social_card.render'):
+                    facebook_page.main('selections')
+                self.assertEqual(graph.call_count, 2)
+                self.assertTrue(Path('facebook-receipt.json').is_file())
+            finally:
+                os.chdir(previous)
