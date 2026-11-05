@@ -1,0 +1,125 @@
+name: Gold efficiency snapshots 5 November
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/gold_efficiency_20261105.yml']
+  schedule:
+    - cron: '30 11 5 11 *'
+    - cron: '0 14,17,19 5 11 *'
+permissions:
+  contents: read
+concurrency:
+  group: gold-efficiency-20261105
+  cancel-in-progress: false
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3 ijson==3.6.0
+      - name: Capture current checkpoint and archived publication records
+        shell: python
+        run: |
+          import hashlib, json, os, re, sys
+          from collections import Counter
+          from datetime import datetime
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+          import ijson
+          sys.path.insert(0, 'src')
+          from gold_storage import client, allowed
+          from audit_storage import read_store, open_verified_json, FORMAT
+          
+          now = datetime.now(ZoneInfo('Europe/Rome'))
+          if now.date().isoformat() != '2026-11-05':
+              print('One-day observation finished')
+              sys.exit(0)
+          s3 = client()
+          bucket = os.environ['R2_BUCKET']
+          prefix = 'diagnostics/gold-efficiency/2026-11-05/'
+          raw_manifest = s3.get_object(Bucket=bucket, Key='state/current.json')['Body'].read()
+          manifest = json.loads(raw_manifest)
+          assert manifest['version'] == 1
+          files = manifest['files']
+          root = Path('/tmp/gold-efficiency')
+          root.mkdir(exist_ok=True)
+          
+          def download(name):
+              assert allowed(name)
+              item = files[name]
+              raw = s3.get_object(Bucket=bucket, Key='state/objects/'+item['sha256'])['Body'].read()
+              assert len(raw) == item['bytes'] and hashlib.sha256(raw).hexdigest() == item['sha256']
+              path = root/name
+              path.parent.mkdir(parents=True, exist_ok=True)
+              path.write_bytes(raw)
+              if name.endswith('.json') and len(raw) < 1048576:
+                  value = json.loads(raw)
+                  if value.get('_storage') == FORMAT:
+                      for part in value['parts']:
+                          download(str(Path(name).parent/'_audit_parts'/(part['sha256']+'.json.gz')))
+              return path
+          
+          feeds = {}
+          for name in sorted(files):
+              if re.fullmatch(r'data/arab_quote_day[1-5].json', name):
+                  feeds[name] = read_store(download(name))
+          if len(feeds) != 5:
+              raise ValueError('Incomplete Gold checkpoint')
+          stamp = now.strftime('%H%M%S')
+          s3.put_object(Bucket=bucket, Key=prefix+stamp+'-snapshot.json',
+              Body=json.dumps({'observed_at':now.isoformat(), 'checkpoint_sha256':hashlib.sha256(raw_manifest).hexdigest(),
+              'feeds':feeds},ensure_ascii=False).encode(), ContentType='application/json')
+          matches = {}
+          for feed in feeds.values():
+              for match in feed.get('matches', []):
+                  meta = match.get('fixture') or {}
+                  matches[str(meta.get('fixture_id'))] = match
+          current = Counter()
+          for match in matches.values():
+              meta = match.get('fixture') or {}
+              if str(meta.get('kickoff',''))[:10] != '2026-11-05':
+                  continue
+              current['partite_oggi'] += 1
+              current['stato_'+str(meta.get('status_short'))] += 1
+              rows = ((match.get('multimarket') or {}).get('matrix') or {}).get('rows', [])
+              for row in rows:
+                  current['righe_quote_'+str(row.get('quote_status'))] += 1
+          summary = {'captured_at':now.isoformat(), 'current':dict(current),
+              'feed_timestamps':{k:{f:v.get(f) for f in ('date','updated_at','generated_at')} for k,v in feeds.items()}}
+          # Extract only original publication records for the requested three days.
+          counts = Counter()
+          times = {}
+          history_path = root/'history.jsonl'
+          with history_path.open('w') as out:
+              candidates = [name for name in files if name == 'data/arab_quote_prematch_audit.json' or
+                  re.fullmatch(r'data/arab_quote_scan_journal_2026110[345].*_policies.json', name)]
+              for name in candidates:
+                  path = download(name)
+                  with open_verified_json(path) as stream:
+                      for key, record in ijson.kvitems(stream, 'analysis_updates', use_float=True):
+                          at = record.get('captured_at','')
+                          if not at or datetime.fromisoformat(at).astimezone(ZoneInfo('Europe/Rome')).date().isoformat() not in ('2026-11-03','2026-11-04','2026-11-05'):
+                              continue
+                          if not record.get('publication_snapshot'):
+                              continue
+                          day = datetime.fromisoformat(at).astimezone(ZoneInfo('Europe/Rome')).date().isoformat()
+                          counts[day] += 1
+                          times.setdefault(day, set()).add(at)
+                          out.write(json.dumps(record,ensure_ascii=False)+'\n')
+          summary['history_records'] = dict(counts)
+          summary['history_times'] = {day:sorted(values) for day,values in times.items()}
+          s3.upload_file(str(history_path),bucket,prefix+stamp+'-history.jsonl')
+          s3.put_object(Bucket=bucket, Key=prefix+stamp+'-summary.json',Body=json.dumps(summary).encode(),ContentType='application/json')
+          print('GOLD_EFFICIENCY_SUMMARY '+json.dumps(summary),flush=True)
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('## Gold efficiency snapshot\n\n'+json.dumps(summary,indent=2))
+          
