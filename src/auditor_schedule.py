@@ -21,19 +21,23 @@ def recovery_admission(now, work_date):
             or os.getenv('GITHUB_REF') != 'refs/heads/main'
             or os.getenv('GITHUB_REPOSITORY') != 'arabsnipertech-bet/arabsniper2'):
         raise ValueError('Recovery requires the authorized workflow on today production main')
-    midnight = datetime.combine(local.date()+timedelta(days=1), time(0), ROME)
-    return {'run': True, 'reason': 'authorized_recovery', 'date': work_date,
-            'deadline': min(local+timedelta(hours=5, minutes=30), midnight).isoformat()}
+    return admission(now)  # Recovery never bypasses protected scan hours.
+
 
 
 def admission(now):
     if now.tzinfo is None:
         raise ValueError('Auditor clock must have a timezone')
     local = now.astimezone(ROME)
-    deadline = datetime.combine(local.date(), STOP, ROME)
-    allowed = START <= local.time().replace(tzinfo=None) < STOP
+    clock = local.time().replace(tzinfo=None)
+    # Leave the 02:00 Night Scan its full two-hour budget, and finish before Fast.
+    stop = time(1, 50) if clock < time(2) else STOP
+    boundary = datetime.combine(local.date(), stop, ROME)
+    allowed = (START <= clock < time(1, 30)) or (time(4) <= clock < time(5, 10))
+    deadline = min(local + timedelta(minutes=75), boundary)
     return {'run': allowed, 'reason': 'night_window' if allowed else 'outside_audit_window',
             'date': local.date().isoformat(), 'deadline': deadline.isoformat()}
+
 
 
 def has_daily_report(root, work_date):

@@ -1,5 +1,5 @@
-"""Run the entire historical pipeline once, with a hard 05:30 Rome deadline."""
-from datetime import date, datetime, timedelta
+"""Resume bounded nighttime audit chunks under the shared data-writer mutex."""
+from datetime import date, datetime, timedelta, time
 import json
 import os
 from pathlib import Path
@@ -36,7 +36,7 @@ def saved_batch(root, today):
     if checkpoint is None:
         return None
     if (not isinstance(checkpoint, dict) or checkpoint.get('version') != 1
-            or checkpoint.get('stage') not in ('daily', 'history')):
+            or checkpoint.get('stage') not in ('preparing', 'daily', 'history')):
         raise ValueError('Invalid nightly Auditor checkpoint')
     day = date.fromisoformat(checkpoint['work_date'])
     if day > today:
@@ -73,8 +73,10 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
 
     phase('src/gold_storage.py', 'restore')
     pending = saved_batch(root, today)
-    if pending is not None and not has_daily_report(root, pending[0]):
+    if pending is not None and pending[1] != 'preparing' and not has_daily_report(root, pending[0]):
         pending = (pending[0], None)  # Rebuild an incomplete legacy checkpoint.
+    if pending is not None and pending[1] in ('daily', 'history'):
+        deadline = min(deadline, started+timedelta(minutes=45))
     if pending is None and already_completed(root, clock()):
         print('Nightly Auditor already published for this Rome date', flush=True)
         return 'already_completed'
@@ -86,9 +88,16 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
         batches.append((today, None))
     for work_date, stage in batches:
         report_date = (work_date - timedelta(days=1)).isoformat()
-        if stage is None:
-            phase('auditor/current_audit.py', 'prepare')
+        if stage in (None, 'preparing'):
+            from audit_journal import pending_journals
+            cutoff = datetime.combine(work_date, time(), ROME)
+            phase('auditor/current_audit.py', 'prepare', '--journal-limit', '8', '--delta-archive',
+                  '--journal-before', cutoff.isoformat())
+            checkpoint(work_date, 'preparing')
+            if pending_journals(root, cutoff):
+                return 'paused'
             phase('auditor/current_audit.py', 'daily', '--date', report_date)
+            stage = None
         if not has_daily_report(root, work_date):
             raise ValueError(f'Missing or mismatched daily Auditor report for batch {work_date}')
         # Save today's certified learning before the expensive historical pass.
@@ -101,7 +110,9 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
         phase('src/homepage_results.py')
         phase('src/private_publication.py', '--results-only')
         if stage != 'history':
-            phase('auditor/current_audit.py', 'history', '--date', report_date)
+            from auditor_history_chunks import advance
+            if not advance(root, work_date, phase, deadline, clock):
+                return 'paused'
             checkpoint(work_date, 'history')
         phase('src/gold_policy_audit.py')
         if work_date == today:
@@ -128,11 +139,12 @@ def main(argv=()):
     result = run(Path(__file__).resolve().parents[1], recovery_date=args.recovery_date)
     # The external watchdog must distinguish a skipped admission from a real
     # published completion. Emit proof only after the runner verified it.
-    if result not in ('complete', 'already_completed'):
+    if result not in ('complete', 'already_completed', 'paused', 'outside_audit_window'):
         raise SystemExit(f'Auditor did not certify: {result}')
     if os.getenv('GITHUB_OUTPUT'):
         with Path(os.environ['GITHUB_OUTPUT']).open('a') as out:
-            out.write('completed=true\n')
+            out.write('completed=' + str(result in ('complete', 'already_completed')).lower() + '\n')
+            out.write('paused=' + str(result == 'paused').lower() + '\n')
 
 
 if __name__ == '__main__':

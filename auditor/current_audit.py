@@ -172,6 +172,11 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
         write(root / f'auditarchive/prematch_{date}_daily.json', daily)
         atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md',
                      (markdown(daily)+study_markdown(daily['selection_studies'])).encode())
+        from auditor_history_chunks import seal_day
+        unresolved = any(not (r.get('settlement') or {}).get('outcomes') or
+                         any(v is None for v in r['settlement']['outcomes'].values())
+                         for _, _, r in day.records())
+        seal_day(root, date, now, unresolved, queried)
         del daily
         if combined is not None:
             for collection, key, record in day.records():
@@ -188,7 +193,7 @@ def settle_history_day(arguments):
         return settle_day(Path(root), day, now, progress=progress.update)
 
 
-def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, prepared_date=None, workers=1):
+def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, prepared_date=None, workers=1, assemble_only=False):
     from audit_ledger import AuditLedger
     from multimarket_audit import build_report as multimarket_report
     queried = []
@@ -198,7 +203,13 @@ def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, p
     dates = [datetime.strptime(path.stem.removeprefix('prematch_'), '%Y-%m-%d').date()
              for path in sorted((root / 'auditordata').glob('prematch_????-??-??.json'))]
     dates = [day for day in dates if day < end]
-    if workers == 2:
+    if assemble_only:
+        from auditor_history_chunks import receipt_path
+        for day in dates:
+            receipt = read_store(receipt_path(root, day), {})
+            if receipt.get('checked_at') == now.isoformat() and receipt.get('results_queried'):
+                queried.append(str(day))
+    if workers == 2 and not assemble_only:
         if fetcher is not fetch_results:
             raise ValueError('Custom result providers require serial execution')
         from concurrent.futures import ProcessPoolExecutor
@@ -215,7 +226,7 @@ def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, p
         for collection in COLLECTIONS:
             combined.add_collection(collection)
         for date in dates:
-            if date == prepared_date or workers == 2:
+            if date == prepared_date or workers == 2 or assemble_only:
                 # The priority report and settled ledger were published together.
                 result = root / f'auditarchive/prematch_{date}_results.json'
                 if not result.is_file():
@@ -244,8 +255,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['freeze', 'settle', 'prepare', 'daily', 'history'])
     parser.add_argument('--date', type=lambda value: datetime.strptime(value, '%Y-%m-%d').date())
+    parser.add_argument('--journal-before', type=datetime.fromisoformat)
+    parser.add_argument('--journal-limit', type=int)
+    parser.add_argument('--delta-archive', action='store_true')
+    parser.add_argument('--assemble-only', action='store_true')
+    parser.add_argument('--as-of', type=datetime.fromisoformat)
     args = parser.parse_args()
-    now = datetime.now(TZ)
+    now = args.as_of or datetime.now(TZ)
+    if now.tzinfo is None:
+        parser.error('as-of requires a timezone')
     from task_progress import TaskProgress
     with TaskProgress('Auditor') as progress:
         if args.mode == 'prepare':
@@ -253,8 +271,9 @@ def main():
             summary = {}
             def partition(ledger):
                 summary['archive'] = archive_ledger(ROOT, now, ledger, progress.update)
-            summary['journals'] = ingest(ROOT, after_forecasts=partition)
-            if 'archive' not in summary:
+            summary['journals'] = ingest(ROOT, after_forecasts=partition, limit=args.journal_limit,
+                                         partition_delta=args.delta_archive, before=args.journal_before)
+            if 'archive' not in summary and not args.delta_archive:
                 summary['archive'] = archive(ROOT, now, progress=progress.update)
         elif args.mode == 'daily':
             if args.date is None:
@@ -263,7 +282,7 @@ def main():
                        settle_day(ROOT, args.date, now, progress=progress.update)}
         elif args.mode == 'history':
             summary = {'settlement': settle(ROOT, now, progress=progress.update, prepared_date=args.date,
-                                           workers=2)}
+                                           workers=2, assemble_only=args.assemble_only)}
         else:
             summary = {'archive': archive(ROOT, now, progress=progress.update)}
             if args.mode == 'settle':

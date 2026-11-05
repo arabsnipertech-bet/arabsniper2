@@ -114,19 +114,34 @@ def merge_forecast(ledger, collection, key, record):
     ledger.put(collection, key, record, overwrite=False)
 
 
-def ingest(root, after_forecasts=None):
+def pending_journals(root, before=None):
+    paths = sorted((Path(root)/'data').glob(PREFIX+'*.json'))
+    if before is not None:
+        if before.tzinfo is None:
+            raise ValueError('Journal cutoff requires a timezone')
+        cutoff = PREFIX+before.astimezone(ZoneInfo('UTC')).strftime('%Y%m%dT%H%M%S%f')
+        paths = [p for p in paths if p.name < cutoff]
+    return paths
+
+
+def ingest(root, after_forecasts=None, *, limit=None, partition_delta=False, before=None):
     """Merge in observation order; reruns preserve first forecasts and deduplicate."""
     from gold_policy_audit import STUDY_ID, POLICY_ID as GOLD_POLICY
     from platinum_policy import POLICY_ID as PLATINUM_POLICY
     root = Path(root)
-    paths = sorted((root/'data').glob(PREFIX+'*.json'))
+    paths = pending_journals(root, before)
+    if limit is not None:
+        if limit < 1:
+            raise ValueError('Journal limit must be positive')
+        paths = paths[:limit]
     forecasts = [p for p in paths if p.name.endswith('_forecasts.json')]
     policies = [p for p in paths if p.name.endswith('_policies.json')]
     if len(forecasts) + len(policies) != len(paths):
         raise ValueError('Unknown audit journal phase')
     if forecasts or policies:
         target = root/'data/arab_quote_prematch_audit.json'
-        with AuditLedger(target) as ledger:
+        with AuditLedger(target) as ledger, AuditLedger() as delta:
+            delta.add_collection('fixtures')
             ledger.metadata.setdefault('schema_version', 1)
             ledger.add_collection('fixtures')
             for path in forecasts:
@@ -135,16 +150,19 @@ def ingest(root, after_forecasts=None):
                         raise ValueError('Invalid forecast journal')
                     for collection, key, record in journal.records():
                         merge_forecast(ledger, collection, key, record)
+                        delta.put(collection, key, ledger[collection][key], overwrite=False)
                     ledger.metadata['updated_at'] = journal.metadata['updated_at']
             for path in policies:
                 journal = read_store(path)
                 for key, record in journal.get('analysis_updates', {}).items():
                     merge_forecast(ledger, 'analysis_updates', key, record)
+                    delta.put('analysis_updates', key, ledger['analysis_updates'][key], overwrite=False)
                 for key, record in journal.get('study_observations', {}).items():
                     ledger.put('study_observations', key, record, overwrite=False)
+                    delta.put('study_observations', key, ledger['study_observations'][key], overwrite=False)
             ledger.write(target)
             if after_forecasts is not None:
-                after_forecasts(ledger)
+                after_forecasts(delta if partition_delta else ledger)
     if policies:
         targets = {'gold': root/'data/arab_quote_gold_policy_audit.json',
                    'platinum': root/'data/arab_quote_platinum_audit.json'}
