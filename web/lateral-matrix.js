@@ -73,7 +73,9 @@
   const platinum=allowedMatch(m)?platinumSignals(all,tierOptions):[];
   const studyRows=options.category==='market_signal'&&!tierOptions.archived&&Array.isArray(tierOptions.monitoring?.studio_ideas)
    ?all.filter(row=>tierOptions.monitoring.studio_ideas.some(idea=>idea.spec?.kind===row.spec?.kind&&idea.spec?.side===row.spec?.side&&idea.spec?.period===row.spec?.period&&idea.spec?.line===row.spec?.line)):[];
-  const source=options.category==='platinum'?platinum:options.category==='market_signal'?(allowedMatch(m)&&!platinum.length?[...marketSignals(all,tierOptions),...monitoringRows(all,tierOptions),...studyRows]:[]):all;
+  const frozen=m._gold_history?.version==='gold-history-v1'?m._gold_history:null;
+  const historicalIds=frozen&&(options.category==='platinum'?frozen.platinum_ids:options.category==='market_signal'?frozen.radar_ids:null);
+  const source=Array.isArray(historicalIds)?all.filter(r=>historicalIds.includes(r.id)):options.category==='platinum'?platinum:options.category==='market_signal'?(allowedMatch(m)&&!platinum.length?[...marketSignals(all,tierOptions),...monitoringRows(all,tierOptions),...studyRows]:[]):all;
   return source.filter(r=>{
    if(options.family!=='all'&&r.family!==options.family)return false;
    if(options.period!=='all'&&r.period!==options.period)return false;
@@ -506,11 +508,29 @@
  function sectionRows(rows,section){return rows.filter(r=>section==='targets'?goalMarket(r)!==null||isCombo(r):section==='asian'?r.family==='asian':section==='result'?r.spec?.kind==='result':r.period===section&&['total','btts'].includes(r.spec?.kind));}
  // Presentation-only instruments: no scoring, filtering or payload mutation.
  function cockpitTier(m,services={}){
+  const history=m._gold_history;
+  if(history?.version==='gold-history-v1'){
+   const row=rowsOf(m).find(r=>r.id===history.proposal_id)||null;
+   return history.verified_prematch?{name:history.name||'STUDIO',tone:history.tone||'studio',row}:
+    {name:'ARCHIVIO',tone:'studio',row:null};
+  }
   const a=m.multimarket||{},rows=rowsOf(m);
   const options={archived:phase(m)!=='upcoming',monitoringClosed:(services.phase||phase)(m)!=='upcoming',kickoff:m.fixture?.kickoff,monitoring:a.matrix?.quote_monitoring};
   if(a.status==='no_prematch_snapshot')return {name:'STUDIO',tone:'studio',row:null};
   const elite=platinumSignals(rows,options)[0],gold=bestOpportunity(rows,options);
   return elite?{name:'PLATINUM',tone:'platinum',row:elite}:gold?{name:'GOLD',tone:'gold',row:gold}:{name:'STUDIO',tone:'studio',row:null};
+ }
+ function historyProposal(m,services,options){
+  const h=m._gold_history;
+  if(h?.version!=='gold-history-v1')return opportunityPanel(rowsOf(m),m.multimarket?.matrix?.goal_context,options);
+  const tier=cockpitTier(m,services),row=tier.row,market=row&&goalMarket(row);
+  const f=root.ArabLive?.fixture?.(m)||m.fixture||{},status=f.live?.status||f.result?.status||f.status_short;
+  const outcome=['CANC'].includes(status)?'Annullata': ['PST','ABD','AWD','WO','SUSP','INT'].includes(status)?'Da verificare · '+status:
+    market?(services.outcome?.(m,market)||'Esito in attesa'):'Nessuna proposta ufficiale da valutare';
+  return '<section class="mx-opportunity"><h3>Proposta prematch conservata</h3>'+
+   (row?'<p><b>'+esc(row.label)+'</b> · quota '+num(row.odd,2)+' · '+esc(tier.name)+'</p><p data-live-slot="outcome" data-market="'+esc(market||'')+'">'+esc(outcome)+'</p>':
+    '<p>'+(!h.verified_prematch?'Snapshot prematch non verificabile: nessun pronostico ricostruito dopo il risultato.':h.category==='radar'?'Radar Blu: osservazione di mercato, esclusa dalle proposte Gold.':'Solo Studio: nessuna proposta ufficiale salvata.')+'</p>')+
+   '<small>Analisi del '+esc(services.timestamp?.(h.captured_at)||h.captured_at||'non disponibile')+'. Quote e probabilità originali, senza ricalcolo.</small></section>';
  }
  function instrument(label,value,min,max,suffix,note){
   const valid=Number.isFinite(value),ratio=valid?Math.max(0,Math.min(1,(value-min)/(max-min))):0;
@@ -555,7 +575,7 @@
   const tier=cockpitTier(m,helpers);dialog.className='mx-modal mx-tone-'+tier.tone;
   dialog.innerHTML='<header class="mx-modal-header"><div><span class="mx-category">'+tier.name+'</span><h2 id="mx-modal-title">'+esc(m.fixture?.match)+'</h2><small>'+esc(m.fixture?.country)+' · '+esc(m.fixture?.league)+'</small></div><button type="button" data-mx-close aria-label="Chiudi matrice" autofocus>×</button></header>'+
    '<nav class="mx-modal-tabs" aria-label="Mercati della matrice">'+Object.entries(MATRIX_SECTIONS).map(([k,l])=>'<button type="button" data-mx-section="'+k+'" aria-pressed="'+(modalSection===k)+'">'+esc(l)+'</button>').join('')+'</nav>'+
-   '<div class="mx-modal-scroll">'+cockpit(m,helpers)+opportunityPanel(rowsOf(m),m.multimarket?.matrix?.goal_context,{archived:phase(m)!=='upcoming',monitoringClosed:(helpers.phase||phase)(m)!=='upcoming',kickoff:m.fixture?.kickoff,monitoring:m.multimarket?.matrix?.quote_monitoring,lastProposal:m.multimarket?.matrix?.last_proposal})+quoteBoard(rowsOf(m),helpers,tier.tone==='studio'?{profiles:m.multimarket?.profiles,home:m.fixture?.home,away:m.fixture?.away,kickoff:m.fixture?.kickoff}:null)+matrixDetail(m,sectionRows(rowsOf(m),modalSection),helpers)+'</div>';
+   '<div class="mx-modal-scroll">'+cockpit(m,helpers)+(m._gold_history?'<div data-live-slot="panel">'+(helpers.livePanel?.(m)||'')+'</div>':'')+historyProposal(m,helpers,{archived:phase(m)!=='upcoming',monitoringClosed:(helpers.phase||phase)(m)!=='upcoming',kickoff:m.fixture?.kickoff,monitoring:m.multimarket?.matrix?.quote_monitoring,lastProposal:m.multimarket?.matrix?.last_proposal})+quoteBoard(rowsOf(m),helpers,tier.tone==='studio'?{profiles:m.multimarket?.profiles,home:m.fixture?.home,away:m.fixture?.away,kickoff:m.fixture?.kickoff}:null)+matrixDetail(m,sectionRows(rowsOf(m),modalSection),helpers)+'</div>';
   dialog.querySelector('.mx-modal-scroll').scrollTop=scroll;
   if(focused)dialog.querySelector('[data-mx-section="'+focused+'"]').focus();
   else if(closeFocused)dialog.querySelector('[data-mx-close]').focus();
@@ -591,11 +611,12 @@
   const counts={convergence:all.filter(r=>r.market_behavior==='convergence').length,divergence:all.filter(r=>r.market_behavior==='divergence').length,value:all.filter(r=>r.ev_pct>0).length};
   const noSnapshot=a.status==='no_prematch_snapshot';
   const tierOptions={archived:phase(m)!=='upcoming',monitoringClosed:(helpers.phase||phase)(m)!=='upcoming',kickoff:f.kickoff,lastProposal:a.matrix?.last_proposal,monitoring:a.matrix?.quote_monitoring};
-  const elite=!noSnapshot&&platinumSignals(all,tierOptions)[0];
+  const elite=m._gold_history? (m._gold_history.category==='platinum'?cockpitTier(m,helpers).row:null):!noSnapshot&&platinumSignals(all,tierOptions)[0];
   const study=!noSnapshot&&!elite&&!bestOpportunity(all,tierOptions)?{profiles:a.profiles,home:f.home,away:f.away,kickoff:f.kickoff}:null;
   const tier=cockpitTier(m,helpers);
   return '<article class="mx-card mx-tone-'+tier.tone+(elite?' mx-card-platinum':'')+'" data-live-fixture="'+esc(fid)+'"><header><div><span class="mx-category'+(elite?' mx-tier-label':'')+'"><strong>'+tier.name+'</strong></span><time>'+esc(f.time||'')+'</time><small>'+esc(f.country)+' · '+esc(f.league)+'</small>'+'<h3>'+esc(f.match)+'</h3></div><div class="mx-live"><span data-live-slot="badge">'+(helpers.liveBadge?.(m)||'')+'</span><span data-live-slot="state">'+esc(helpers.stateLabel?.(m)||'')+'</span><span data-live-slot="halftime">'+halfTimeText(helpers.firstHalf?.(m))+'</span></div></header>'+
-   (noSnapshot?'<p class="mx-explanation">Partita presente nel palinsesto. Nessuna previsione salvata prima dell’inizio: gli esiti non vengono usati per ricostruirla a posteriori.</p>':'<div class="mx-match-layout">'+quoteBoard(all,helpers,study)+opportunityPanel(all,a.matrix?.goal_context,tierOptions)+'</div>'+cockpit(m,helpers,true))+
+   (m._gold_history?'<div data-live-slot="panel">'+(helpers.livePanel?.(m)||'')+'</div>':'')+
+   (noSnapshot?'<p class="mx-explanation">Partita presente nel palinsesto. Nessuna previsione salvata prima dell’inizio: gli esiti non vengono usati per ricostruirla a posteriori.</p>':'<div class="mx-match-layout">'+quoteBoard(all,helpers,study)+historyProposal(m,helpers,tierOptions)+'</div>'+cockpit(m,helpers,true))+
    '<div class="mx-match-summary"><span>'+all.length+' mercati</span><span>'+counts.convergence+' convergenze</span><span>'+counts.divergence+' divergenze</span><span>'+all.filter(r=>priced(r)).length+' quote utilizzabili · '+all.filter(r=>r.quote_status==='cached_stable').length+' da cache</span></div>'+
    (all.length?'<button class="mx-open" type="button" data-mx-open="'+esc(fid)+'" aria-haspopup="dialog">Apri cruscotto e analisi <span>↗</span></button>':'')+'<footer>Analisi '+esc(helpers.timestamp?.(a.captured_at)||a.captured_at||'non disponibile')+' · Regole '+esc(a.matrix?.opportunity_policy?.id||'non disponibili')+' · Modello statistico '+esc(a.model_id||'non disponibile')+(f.data_freshness&&f.data_freshness!=='fresh'?' · '+esc(f.data_freshness):'')+'</footer></article>';
  }
@@ -619,7 +640,7 @@
    '<p class="mx-caption">Platinum (argento): quota alta o EV elevato, sostenuti da movimenti concordi. Gold v6.1 conserva i propri criteri statistici. Radar di Mercato (blu): segnali di flusso e partite in attesa di quote o di conferma, indicati separatamente. La presenza nel Radar non equivale a un segnale confermato. Solo studio, escluso dalle giocate Gold. Quote mancanti o scadute: partite con almeno un mercato senza prezzo utilizzabile; la Combo solo statistica è esclusa dal conteggio. Quota equa = prezzo calcolato dal modello, non una quota offerta. OCI e aggio non sono volumi di denaro.</p>'+
    '<div class="mx-results" aria-live="polite"><p class="mx-results-count">'+matches.length+' di '+all.length+' partite · '+esc(CATEGORIES[state.category])+'</p>'+
    (matches.length?matches.map(m=>card(m,services)).join(''):'<div class="mx-empty">Nessuna partita con questi filtri. <button type="button" data-mx-reset>Mostra tutto il palinsesto</button></div>')+'</div>'+
-   '<p class="mx-caption">Ogni Fast ricalcola le analisi prepartita. Gli aggiornamenti del fornitore possono essere meno frequenti; la data delle quote è sempre indicata. Le partite iniziate conservano la previsione prepartita, con punteggio live separato.</p></section>';
+   '<p class="mx-caption">'+(p.history_view?'Archivio di ieri: analisi, quote e categorie prematch conservate. Si aggiornano solo i risultati disponibili; le partite senza risultato restano in attesa.':'Ogni Fast ricalcola le analisi prepartita. Gli aggiornamenti del fornitore possono essere meno frequenti; la data delle quote è sempre indicata. Le partite iniziate conservano la previsione prepartita, con punteggio live separato.')+'</p></section>';
   h.onclick=e=>{
    const expand=e.target.closest?.('[data-mx-open]'),category=e.target.closest?.('[data-mx-category]');
    if(expand){openModal(expand.dataset.mxOpen);}
@@ -629,7 +650,7 @@
   h.onchange=e=>{const fid=e.target.dataset?.mxInlineInstrument;if(fid!==undefined){inlineInstruments.set(fid,e.target.value||null);const m=(payload.matches||[]).find(x=>String(x.fixture?.fixture_id)===fid);if(m){e.target.closest('.mx-cockpit').outerHTML=cockpit(m,helpers,true);[...h.querySelectorAll('[data-mx-inline-instrument]')].find(x=>x.dataset.mxInlineInstrument===fid)?.focus();}return;}const key=e.target.dataset?.mxFilter;if(key&&key in state){state[key]=e.target.value;render(payload,host,helpers);}};
   updateModal();
  }
- const api={cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
+ const api={historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.ArabMatrix=api;
 })(typeof window!=='undefined'?window:globalThis);

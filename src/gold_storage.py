@@ -58,6 +58,13 @@ def publish(s3,bucket,root):
     gold={name:json.dumps(read_store(root/'data'/name),ensure_ascii=False,separators=(',',':')).encode() for name in GOLD if (root/'data'/name).exists()}
     if len(gold)!=len(GOLD): raise ValueError('Missing Gold files; publication aborted')
     verified=previous_manifest(s3,bucket)
+    # Optional display archive: the scan files and decision engine stay untouched.
+    try:
+        from gold_history import project
+        projection=project(root,json.loads(gold['arab_quote_day1.json']))
+        gold['arab_quote_day1.json']=json.dumps(projection,ensure_ascii=False,separators=(',',':')).encode()
+    except Exception as error:
+        print('Gold yesterday archive deferred: '+type(error).__name__,flush=True)
     files=collect(root,verified); index={}; known={item['sha256'] for item in verified.values()}
     uploads={}
     for path,data in files.items():

@@ -841,7 +841,7 @@
   <link rel="stylesheet" href="/statistics-first.css?v=4.0">
   <script src="/statistics-first.js?v=4.0"></script>
   <link rel="stylesheet" href="/lateral-matrix.css?v=4cc7dbed738b">
-  <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=19ebae74589f"></script>
+  <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=3ff907a27dc5"></script>
   <script src="/live-scores.js?v=8415d2038a5f"></script>
   <script>
     'use strict';
@@ -1039,19 +1039,20 @@
       calendarBase = calendarDate();
       const container = document.getElementById('dayButtons');
       container.innerHTML = '';
-      for (let day = 1; day <= 5; day += 1) {
+      for (let day = 0; day <= 5; day += 1) {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = `day-btn${day === currentDay ? ' active' : ''}`;
         button.dataset.day = String(day);
-        button.textContent = dayDate(day - 1);
-        button.title = day === 1 ? 'Oggi' : `Giorno +${day - 1}`;
+        button.textContent = day === 0 ? 'Ieri · ' + dayDate(-1) : day === 1 ? 'Oggi · ' + dayDate(0) : dayDate(day - 1);
+        button.title = day === 0 ? 'Ieri · analisi prematch e risultati' : day === 1 ? 'Oggi' : `Giorno +${day - 1}`;
         button.addEventListener('click', () => changeDay(day));
         container.appendChild(button);
       }
     }
 
     function changeDay(day) {
+      if (day === 0 && window.ArabMatrix) Object.assign(window.ArabMatrix.state,{category:'all',family:'all',period:'all',phase:'all',search:''});
       currentDay = day;
       initialHourScrollDone = false;
       document.querySelectorAll('.day-btn').forEach(button => {
@@ -1205,6 +1206,16 @@
     async function loadCalendarDay(day, targetDate) {
       // File positions belong to the last scan, not necessarily to today's date.
       // Follow the date offset without changing forecasts or their timestamps.
+      if (day === 0) {
+        const latest = await loadJson('arab_quote_day1.json');
+        const archived = [latest?.previous_day, latest?.current_day_archive].find(item => item?.date === targetDate);
+        if (archived?.history_version === 'gold-history-v1' && archived.date === targetDate && Array.isArray(archived.matches)) {
+          return {payload:archived,file:'Archivio privato · '+targetDate,shifted:false};
+        }
+        const error = new Error('Archivio di ieri non ancora disponibile. Le analisi non vengono ricostruite dopo i risultati.');
+        error.code = 'GOLD_DAY_PENDING';
+        throw error;
+      }
       const visited = new Set();
       let slot = day;
       while (slot >= 1 && slot <= 5 && !visited.has(slot)) {
@@ -1244,7 +1255,7 @@
         document.getElementById('matchCount').textContent = '0 partite';
         document.getElementById('matchResearch').innerHTML = '<div class="empty">Caricamento dati...</div>';
         grid.innerHTML = '<div class="empty">Caricamento dati...</div>';
-        document.getElementById('selectedDay').textContent = `Giorno ${day} · ${formatDateIt(targetDate)}`;
+        document.getElementById('selectedDay').textContent = `${day === 0 ? 'Ieri' : day === 1 ? 'Oggi' : 'Giorno '+day} · ${formatDateIt(targetDate)}`;
         document.getElementById('fileSource').textContent = 'Fonte: in verifica';
         document.getElementById('updatedAt').textContent = 'Ultima scansione: —';
       }
@@ -1261,10 +1272,10 @@
         renderMatchResearch(payload);
         loadModelResearch();
         currentMatches = [...payload.matches];
-        document.getElementById('selectedDay').textContent = `Giorno ${day} · ${formatDateIt(payload.date)}`;
+        document.getElementById('selectedDay').textContent = `${day === 0 ? 'Ieri' : day === 1 ? 'Oggi' : 'Giorno '+day} · ${formatDateIt(payload.date)}`;
         document.getElementById('fileSource').textContent = `Fonte: ${file}`;
         document.getElementById('updatedAt').textContent = `Ultima scansione: ${formatTimestamp(payload.updated_at)}`;
-        document.getElementById('liveStatus').textContent = shifted
+        document.getElementById('liveStatus').textContent = day === 0 ? 'Archivio di ieri · analisi prematch conservate · risultati aggiornati separatamente' : shifted
           ? `Dati del ${formatDateIt(targetDate)} · in attesa della nuova scansione`
           : day === 1 ? 'Dati caricati · scansione separata' : `Snapshot Day ${day} · aggiornamento manuale`;
         applyFilters();
@@ -1741,6 +1752,8 @@
     }
     function contextOutcome(match,market) {
       const f=contextFixture(match),l=f.live||{},s=l.status||f.status_short||f.result?.status;
+      if(match._gold_history&&s==='CANC')return 'Annullata';
+      if(match._gold_history&&['PST','ABD','AWD','WO','SUSP','INT'].includes(s))return 'Esito da verificare · '+s;
       const ht=market.endsWith('_ht');
       const htFinal=['HT','2H','ET','BT','P','FT','AET','PEN'].includes(s);
       const ftFinal=['FT','AET','PEN'].includes(s);
