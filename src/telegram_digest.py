@@ -293,7 +293,7 @@ def reserve(name, post):
 
 def refresh_reserved(post, now):
     """Remove expired previews before each channel sends its image."""
-    if post.get('live') and instant(post['live']['kickoff']) <= now:
+    if post.get('live') and (not post.get('picks') or instant(post['live']['kickoff']) <= now):
         post.pop('live')
     public_ids = {str(p.get("id", p.get("fixture_id"))) for p in post.get("picks", [])}
     seen = set(public_ids)

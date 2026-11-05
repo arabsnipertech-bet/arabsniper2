@@ -38,6 +38,11 @@ class ReservedTest(unittest.TestCase):
         self.assertLessEqual(len(text.encode('utf-16-le'))//2,1024)
         post['reserved']=[]
         self.assertNotIn('Altre partite selezionabili',slot_message(post))
+    def test_live_announcement_removed_when_free_post_expires(self):
+        post=self.post();post['picks']=[]
+        post['live']=dict(kickoff='2026-11-05T18:30:00+01:00')
+        refresh_reserved(post,self.now)
+        self.assertNotIn('live',post)
     def test_facebook_rechecks_reserved(self):
         post=self.post();post['reserved']=post['reserved'][:1];post['text']=slot_message(post)
         _,text=selection(post,self.now)
