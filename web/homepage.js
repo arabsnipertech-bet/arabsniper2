@@ -30,6 +30,34 @@
       && numeric(d.min_probability_pct) && d.min_probability_pct >= minProbability
       && numeric(row.statistical_pct) && row.statistical_pct >= d.min_probability_pct && row.statistical_pct <= 100;
   }
+
+  function renderCockpit(rows) {
+    const panel = document.getElementById('cruscotto');
+    if (!panel) return;
+    const selected = document.getElementById('preview-fixture')?.value;
+    const row = rows.find(item => String(item.fixture_id) === selected) || rows[0];
+    if (!row) {
+      panel.innerHTML = '<span class="eyebrow">Il cruscotto di oggi</span><h2 id="match-title">In attesa della prossima analisi</h2><p>Le partite disponibili compariranno qui al prossimo aggiornamento.</p>';
+      return;
+    }
+    const odd = value => numeric(value) && value > 1 ? value.toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2}) : 'n/d';
+    const first = numeric(row.first_odd) && row.first_odd > 1 ? row.first_odd : null;
+    const delta = first === null ? null : (row.odd / first - 1) * 100;
+    const direction = delta === null ? 'Apertura non disponibile' : Math.abs(delta) < .005 ? 'Quota invariata' : (delta < 0 ? '↓ Quota in calo' : '↑ Quota in salita');
+    const change = delta === null ? '' : ' · ' + (delta > 0 ? '+' : '') + pct(delta);
+    const yStart = delta === null || Math.abs(delta) < .005 ? 40 : delta < 0 ? 12 : 68;
+    const yEnd = delta === null || Math.abs(delta) < .005 ? 40 : delta < 0 ? 68 : 12;
+    panel.innerHTML = `<div class="match-top"><span class="eyebrow">Il cruscotto di oggi</span><span class="demo-tag">Anteprima reale</span></div>
+      <div class="match-board"><div><span class="league">${escape(row.league)} · ${time(row.kickoff)}</span><h2 id="match-title">${escape(row.match)}</h2></div></div>
+      ${rows.length > 1 ? `<label for="preview-fixture">Esplora un’altra partita</label><select id="preview-fixture">${rows.map(item => `<option value="${escape(item.fixture_id)}"${item === row ? ' selected' : ''}>${escape(item.match)}</option>`).join('')}</select>` : ''}
+      <h3>${escape(row.label)}</h3><dl class="metrics"><div><dt>Quota apertura</dt><dd>${odd(first)}</dd></div><div><dt>Quota osservata</dt><dd>${odd(row.odd)}</dd></div><div><dt>Probabilità modello</dt><dd>${pct(row.statistical_pct)}</dd></div></dl>
+      ${first === null ? '' : `<svg class="preview-quote" viewBox="0 0 420 80" preserveAspectRatio="none" aria-hidden="true"><line x1="8" y1="${yStart}" x2="412" y2="${yEnd}" stroke="currentColor" stroke-width="3"/><circle cx="8" cy="${yStart}" r="4" fill="currentColor"/><circle cx="412" cy="${yEnd}" r="4" fill="currentColor"/></svg>`}
+      <div class="chart-key"><span>Apertura</span><b>${direction}${change}</b><span>Ultimo dato</span></div>
+      <figcaption>Confronto tra quota di apertura e ultima osservazione${row.bookmaker ? ' · ' + escape(row.bookmaker) : ''}. Analisi delle ${time(row.captured_at)}.${Number.isFinite(Date.parse(row.provider_updated_at)) ? ' Quota bookmaker delle ' + time(row.provider_updated_at) + '.' : ''} Orari italiani.</figcaption>`;
+    const selector = document.getElementById('preview-fixture');
+    if (selector) selector.onchange = () => renderCockpit(rows);
+  }
+
   let busy = false;
   async function refresh() {
     if (busy) return;
@@ -59,8 +87,11 @@
         }
         seen.add(row.fixture_id); return true;
       }).slice(0,3) : [];
+      renderCockpit(rows);
       target.innerHTML = rows.length ? rows.map((row, i) => `<article class="pick"><div class="pick-top"><span>ANALISI ${String(i+1).padStart(2,'0')}</span><time datetime="${escape(row.kickoff)}">${time(row.kickoff)} · ${Date.parse(row.kickoff)>+now?'In programma':'Orario di inizio trascorso'}</time></div><div class="league">${escape(row.league)}</div><h3>${escape(row.match)}</h3><div class="target"><strong>${escape(row.label)}</strong><div class="odd">${row.odd.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})}<small>QUOTA PREMATCH</small></div></div><div class="probabilities"><span>Stima statistica<b>${pct(row.statistical_pct)}</b></span><span>Lettura mercato<b>${row.model_id==='lateral-matrix-v5.0'?({convergence:'Convergenza',contrarian:'Contrarian sano',divergence:'Contrarian',unconfirmed:'Flusso non confermato'}[row.market_confirmation]||'In osservazione'):row.model_id==='statistics-first-v4.0'?({confirmed:'Oro + azzurro',context:'Scenario indiretto',contrary:'In contrasto'}[row.market_confirmation]||'Da confermare'):'Versione precedente'}</b></span></div><span class="snapshot">Analisi delle ${time(row.captured_at)} · orari italiani</span></article>`).join('') : '<div class="empty">Nessuna selezione pubblicata per oggi con questi criteri. La dashboard Gold contiene tutte le analisi, anche quelle senza quote o con dati limitati.</div>';
     } catch (_) {
+      const panel = document.getElementById('cruscotto');
+      if (panel) panel.innerHTML = '<h2 id="match-title">Anteprima temporaneamente non disponibile</h2><p>Nuovo tentativo automatico tra un minuto.</p>';
       target.innerHTML = '<div class="empty">Selezioni temporaneamente non disponibili. Riproviamo automaticamente tra un minuto.</div>';
     } finally { busy = false; }
   }
