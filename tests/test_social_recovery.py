@@ -79,7 +79,8 @@ class SocialRecovery(unittest.TestCase):
                 Path('receipts').mkdir()
                 Path('receipts/post.json').write_text(json.dumps(post))
                 with patch('facebook_page.graph', graph), patch('facebook_page.selection',
-                        return_value=('Slot title', heading+'\nUpdated preview')), patch('social_card.render'):
+                        return_value=('Slot title', heading+'\nUpdated preview')), patch.dict(
+                            sys.modules, {'social_card': Mock()}):
                     facebook_page.main('selections')
                 self.assertEqual(graph.call_count, 2)
                 self.assertTrue(Path('facebook-receipt.json').is_file())
