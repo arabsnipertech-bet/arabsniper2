@@ -79,6 +79,11 @@ class GitHub:
         self.request(f"workflows/{workflow}/dispatches",
                      {"ref":"main","inputs":{"recovery_slot":slot}})
 
+    def facebook_recorded(self, day, slot):
+        name = f"fb-{day}-{slot.replace(':', '')}-sent"
+        result = self.request('artifacts?' + urlencode({'name': name}))
+        return any(a['name'] == name and not a['expired'] for a in result['artifacts'])
+
 
 def wake(api,now,dry_run=False):
     planned=[]
@@ -111,5 +116,30 @@ def main():
                 r["slot"]+" "+r["action"] for r in result) if result else "no due slot")+"\\n")
 
 
+def wake_facebook(api, now, dry_run=False):
+    """A Telegram receipt is the input, never proof of Facebook completion."""
+    result = []
+    for _, slot, due in due_slots(now):
+        day = due.date().isoformat()
+        if not api.slot_recorded(day, slot) or api.facebook_recorded(day, slot):
+            continue
+        runs = api.runs('facebook-recovery.yml', due-timedelta(minutes=1))
+        if any(r.get('status') in ('queued', 'in_progress', 'waiting', 'pending') for r in runs):
+            continue
+        if not dry_run:
+            api.dispatch('facebook-recovery.yml', slot)
+        result.append({'slot': slot, 'action': 'would_dispatch' if dry_run else 'dispatched'})
+    return result
+
+
+def facebook_main():
+    if os.environ.get('GITHUB_REPOSITORY') != REPO or os.environ.get('GITHUB_REF') != 'refs/heads/main':
+        raise RuntimeError('Production main only')
+    result = wake_facebook(GitHub(os.environ.get('GITHUB_TOKEN')), datetime.now(ROME),
+                           dry_run=os.environ.get('FAST_BACKUP_DRY_RUN') == 'true')
+    print(json.dumps({'facebook_watchdog': result}))
+
+
 if __name__=="__main__":
-    main()
+    import sys
+    facebook_main() if sys.argv[1:] == ['facebook'] else main()

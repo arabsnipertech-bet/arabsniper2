@@ -8,6 +8,7 @@ on:
       - .github/workflows/publish-site.yml
       - web/gold-dashboard-live.html
       - web/index.html
+      - web/_redirects
       - web/homepage.js
       - web/competition-scope.js
       - 'web/lateral-matrix.js'

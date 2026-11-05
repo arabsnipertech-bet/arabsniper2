@@ -232,8 +232,13 @@ def prepare():
     if artifact(name+"-sent"):
         print("Slot already reserved or posted")
         return
-    if artifact(name+"-claim"):
-        raise RuntimeError("Unconfirmed previous delivery; inspect Telegram before resending")
+    previous_claim = artifact(name+"-claim")
+    if previous_claim:
+        from telegram_reconcile import recover
+        recover(previous_claim, name, now)
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+            print('name=' + name, file=out)
+        return
     if slot in EDITORIAL:
         legacy = (f"telegram-evidence-{day}-market-sent" if slot == "16:45"
                   else f"telegram-gold-promo-{day}-{slot.replace(':','')}-sent")
@@ -365,6 +370,9 @@ def send():
     if not token:
         raise SystemExit("Missing bot token")
     post = json.loads(Path("post.json").read_text())
+    if post.get('message_id'):
+        print('Existing Telegram receipt recovered; delivery already confirmed')
+        return
     if "slot" in post:
         import requests
         from social_card import render
@@ -373,8 +381,8 @@ def send():
         post["text"] = slot_message(post)
         render(post, "social-card.jpg")
         caption = post["text"]
-        if len(caption.encode("utf-16-le")) // 2 > 1024:
-            caption = caption[:950].rsplit("\n", 1)[0] + "\n18+ · arabsniperbet.com"
+        from telegram_reconcile import caption as bounded_caption
+        caption = bounded_caption(caption)
         try:
             with open("social-card.jpg", "rb") as photo:
                 response = requests.post(f"https://api.telegram.org/bot{token}/sendPhoto",
