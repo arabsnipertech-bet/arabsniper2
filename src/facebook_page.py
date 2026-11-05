@@ -112,9 +112,12 @@ def main(mode):
     title, body = post
     message = body if mode != "results" else f"{title}\n\n{body}\n\n18+ · Le analisi non garantiscono risultati."
     since = int(now.replace(hour=0, minute=0, second=0, microsecond=0).timestamp())
-    posts = graph(f"{PAGE}/published_posts?fields=message&limit=100&since={since}")
-    if any(p.get("message") == message or p.get("message", "").split("\n")[0] == title for p in posts["data"]):
-        print("Already published")
+    posts = graph(f"{PAGE}/published_posts?fields=id,message&limit=100&since={since}")
+    existing = next((p for p in posts['data'] if p.get('message') == message
+                     or p.get('message', '').split('\n')[0] == title), None)
+    if existing:
+        record_receipt(existing['id'], receipt if mode != 'results' else None, now)
+        print("Already published", existing['id'])
         return
     if card:
         import requests
@@ -131,7 +134,22 @@ def main(mode):
         post_id = graph(PAGE + "/feed", {"message": message})["id"]
     if not post_id.startswith(PAGE + "_") or graph(post_id + "?fields=id")["id"] != post_id:
         raise ValueError("Facebook publication not confirmed")
+    record_receipt(post_id, receipt if mode != 'results' else None, now)
     print("Confirmed Facebook post", post_id)
+
+
+def record_receipt(post_id, receipt, now):
+    if not isinstance(post_id, str) or not post_id.startswith(PAGE + '_'):
+        raise ValueError('Invalid Facebook receipt')
+    if receipt is None:
+        return
+    name = f"fb-{receipt['day']}-{receipt['slot'].replace(':', '')}-sent"
+    Path('facebook-receipt.json').write_text(json.dumps({
+        'day': receipt['day'], 'slot': receipt['slot'], 'post_id': post_id,
+        'telegram_message_id': receipt['message_id'], 'verified_at': now.isoformat()}))
+    if os.getenv('GITHUB_OUTPUT'):
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+            print('name=' + name, file=out)
 
 
 if __name__ == "__main__":
