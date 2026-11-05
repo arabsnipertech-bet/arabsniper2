@@ -1,0 +1,89 @@
+name: Verified Chindia result animation
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/telegram-result-1602542.yml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: arabsniper-telegram-live
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+      BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests Pillow==11.3.0
+      - name: Check original receipt and two official score observations
+        run: |
+          python - <<'PY'
+          import json,time
+          from pathlib import Path
+          from telegram_digest import gh,artifact
+          from telegram_live import now_local,api,observation
+          if now_local().date().isoformat()!='2026-11-05':raise SystemExit('One-off date closed')
+          for suffix in ('claim','sent'):
+              if artifact('tg-settled-1602542-over35-'+suffix):raise SystemExit('Existing result reservation; no duplicate')
+          gh('run','download','42020210622','-n','tg-2026-11-05-1230-sent','-D','original')
+          original=json.loads(Path('original/post.json').read_text())
+          assert original['message_id']==55
+          pick=next(p for p in original['picks'] if p['id']=='1602542')
+          assert pick['market']=='over35_ft' and pick['odd']==2.42
+          def check():
+              rows=api('fixtures?id=1602542')
+              assert len(rows)==1 and rows[0]['fixture']['id']==1602542
+              o=observation(rows[0]);assert o and o['status'] in ('1H','HT','2H','FT','AET','PEN')
+              assert type(o['home']) is int and type(o['away']) is int and o['home']+o['away']>=4
+              print('Verified official score',o['status'],o['home'],o['away'],o['minute'],flush=True)
+              return o
+          first=check();time.sleep(60);second=check()
+          assert (second['home'],second['away'])==(first['home'],first['away']), 'Score changed: verify again before publication'
+          Path('result.json').write_text(json.dumps(dict(pick=pick,score=second,source_message_id=55),ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tg-settled-1602542-over35-claim
+          path: result.json
+          retention-days: 90
+      - name: Render and send the verified green animation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from telegram_live import telegram
+          from telegram_live_art import render_all
+          render_all()
+          result=json.loads(Path('result.json').read_text());o=result['score']
+          phase='Finale' if o['status'] in ('FT','AET','PEN') else f"LIVE · {o['minute']}′"
+          text=(f"🟢 ArabCassaaaaaa!\n\nChindia Targoviste – Popești-Leordeni\n"
+                f"⚽ {o['home']}–{o['away']} · {phase}\n"
+                "✅ Over 3,5 finale · quota pubblicata 2,42\n\n"
+                "Soglia raggiunta: almeno quattro gol nei 90 minuti più recupero.\n"
+                "Era la singola gratuita delle 12:30, pubblicata prima del calcio d’inizio.\n\n"
+                "📌 Pronostico originale: https://t.me/arabsniper_signals/55\n"
+                "🎁 Esplora la Gold gratis per 7 giorni: /prova su @ArabSniperBot\n"
+                "Fonte API-Football · 18+ · I risultati passati non garantiscono quelli futuri.")
+          with open('assets/telegram-live/win.gif','rb') as f:
+              message=telegram('sendAnimation',{'chat_id':'@arabsniper_signals','caption':text,
+                  'reply_parameters':json.dumps({'message_id':55,'allow_sending_without_reply':True})},
+                  {'animation':('ArabCassa.gif',f,'image/gif')})
+          assert message.get('message_id') and message.get('chat',{}).get('username','').lower()=='arabsniper_signals'
+          result['message_id']=message['message_id'];result['text']=text
+          Path('result.json').write_text(json.dumps(result,ensure_ascii=False))
+          print('Confirmed Chindia Telegram message',message['message_id'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tg-settled-1602542-over35-sent
+          path: result.json
+          retention-days: 90
