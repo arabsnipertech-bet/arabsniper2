@@ -10,7 +10,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: gold-efficiency-20261105
+  group: gold-efficiency-snapshots-20261105
   cancel-in-progress: false
 jobs:
   snapshot:
@@ -140,29 +140,9 @@ jobs:
               summary['comparison'] = {'baseline_at':baseline['observed_at'],'counts':dict(changes),'matches':changed_matches}
           print('GOLD_EFFICIENCY_CURRENT '+json.dumps(summary),flush=True)
           
-          # Extract only original publication records for the requested three days.
-          counts = Counter()
-          times = {}
-          history_path = root/'history.jsonl'
-          with history_path.open('w') as out:
-              candidates = [name for name in files if name == 'data/arab_quote_prematch_audit.json' or
-                  re.fullmatch(r'data/arab_quote_scan_journal_2026110[345].*_policies.json', name)]
-              for name in candidates:
-                  path = download(name)
-                  with open_verified_json(path) as stream:
-                      for key, record in ijson.kvitems(stream, 'analysis_updates', use_float=True):
-                          at = record.get('captured_at','')
-                          if not at or datetime.fromisoformat(at).astimezone(ZoneInfo('Europe/Rome')).date().isoformat() not in ('2026-11-03','2026-11-04','2026-11-05'):
-                              continue
-                          if not record.get('publication_snapshot'):
-                              continue
-                          day = datetime.fromisoformat(at).astimezone(ZoneInfo('Europe/Rome')).date().isoformat()
-                          counts[day] += 1
-                          times.setdefault(day, set()).add(at)
-                          out.write(json.dumps(record,ensure_ascii=False)+'\n')
-          summary['history_records'] = dict(counts)
-          summary['history_times'] = {day:sorted(values) for day,values in times.items()}
-          s3.upload_file(str(history_path),bucket,prefix+stamp+'-history.jsonl')
+          
+          summary['history_exports'] = [obj['Key'] for page in s3.get_paginator('list_objects_v2').paginate(Bucket=bucket,Prefix=prefix)
+              for obj in page.get('Contents',[]) if obj['Key'].endswith('-history.jsonl')]
           s3.put_object(Bucket=bucket, Key=prefix+stamp+'-summary.json',Body=json.dumps(summary).encode(),ContentType='application/json')
           print('GOLD_EFFICIENCY_SUMMARY '+json.dumps(summary),flush=True)
           Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('## Gold efficiency snapshot\n\n'+json.dumps(summary,indent=2))
