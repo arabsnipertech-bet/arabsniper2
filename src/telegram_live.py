@@ -322,7 +322,13 @@ def check():
     bot=telegram('getMe',{})
     member=telegram('getChatMember',{'chat_id':CHANNEL,'user_id':bot['id']})
     assert member.get('can_post_messages') and bot.get('username','').lower()=='arabsniperbot'
-    Store(now_local().date().isoformat()).read()
+    probe=Store(now_local().date().isoformat())
+    probe.read()
+    # Verify conditional persistence on an isolated health key, never a daily claim.
+    key='telegram-live/health/'+os.environ['GITHUB_RUN_ID']+'.json'
+    write=probe.s3.put_object(Bucket=probe.bucket,Key=key,Body=b'{}',IfNoneMatch='*')
+    probe.s3.put_object(Bucket=probe.bucket,Key=key,Body=b'{\"ok\":true}',IfMatch=write['ETag'])
+    probe.s3.delete_object(Bucket=probe.bucket,Key=key)
     values=receipts(now_local())
     ids=[str(p.get('id',p.get('fixture_id',''))) for r in values for p in r.get('picks',[]) if re.fullmatch(r'\d+',str(p.get('id',p.get('fixture_id',''))))]
     if ids:
@@ -333,3 +339,4 @@ if __name__=='__main__':
     if os.environ.get('GITHUB_REPOSITORY')!=REPO or os.environ.get('GITHUB_REF')!='refs/heads/main':
         raise SystemExit('Production main only')
     {'dispatch':dispatch,'monitor':monitor,'check':check}[sys.argv[1]]()
+
