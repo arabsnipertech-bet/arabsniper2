@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 from audit_storage import atomic_bytes, read_store
-from auditor_schedule import ROME, MARKER, admission, already_completed, has_daily_report
+from auditor_schedule import ROME, MARKER, admission, recovery_admission, already_completed, has_daily_report
 
 
 def run_command(root, command, deadline, clock=lambda: datetime.now(ROME)):
@@ -44,10 +44,10 @@ def saved_batch(root, today):
     return day, checkpoint['stage']
 
 
-def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
+def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, recovery_date=None):
     root = Path(root)
     started = clock()
-    gate = admission(started)
+    gate = recovery_admission(started, recovery_date) if recovery_date else admission(started)
     if not gate['run']:
         print('Nightly Auditor skipped: ' + gate['reason'], flush=True)
         return gate['reason']
@@ -58,6 +58,12 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
 
     def phase(*args):
         command_runner(root, [sys.executable, *args], deadline, clock)
+
+    def calibrate():
+        args = ['src/adaptive_calibration.py', '--as-of', today.isoformat()]
+        if recovery_date:
+            args.extend(['--recovery-date', recovery_date])
+        phase(*args)
 
     def checkpoint(work_date, stage):
         value = {'version': 1, 'work_date': work_date.isoformat(), 'stage': stage}
@@ -85,7 +91,11 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
             phase('auditor/current_audit.py', 'daily', '--date', report_date)
         if not has_daily_report(root, work_date):
             raise ValueError(f'Missing or mismatched daily Auditor report for batch {work_date}')
-        if stage is None:
+        # Save today's certified learning before the expensive historical pass.
+        # Retain the daily progress marker so a timeout never claims full completion.
+        if work_date == today and stage != 'history':
+            calibrate()
+        if stage is None or (work_date == today and stage != 'history'):
             checkpoint(work_date, 'daily')
         # Public projections are not in R2. Rebuild on resume if git failed.
         phase('src/homepage_results.py')
@@ -95,7 +105,7 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
             checkpoint(work_date, 'history')
         phase('src/gold_policy_audit.py')
         if work_date == today:
-            phase('src/adaptive_calibration.py', '--as-of', today.isoformat())
+            calibrate()
         (root / PROGRESS).unlink(missing_ok=True)
         if work_date == today:
             marker = {'schema_version': 1, 'status': 'complete', 'date': gate['date'],
@@ -110,8 +120,12 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command):
     return 'complete'
 
 
-def main():
-    result = run(Path(__file__).resolve().parents[1])
+def main(argv=()):
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--recovery-date')
+    args = parser.parse_args(argv)
+    result = run(Path(__file__).resolve().parents[1], recovery_date=args.recovery_date)
     # The external watchdog must distinguish a skipped admission from a real
     # published completion. Emit proof only after the runner verified it.
     if result not in ('complete', 'already_completed'):
@@ -122,4 +136,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
