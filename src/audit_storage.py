@@ -21,8 +21,16 @@ def digest(data): return hashlib.sha256(data).hexdigest()
 
 def atomic_bytes(path, data):
     path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
-    temporary=path.with_name(path.name+'.tmp')
-    temporary.write_bytes(data);os.replace(temporary,path)
+    # Separate dates can produce the same content-addressed audit part.
+    # Each writer owns its temporary file until the atomic replacement.
+    with tempfile.NamedTemporaryFile(dir=path.parent, prefix=path.name+'.', suffix='.tmp', delete=False) as stream:
+        temporary = Path(stream.name)
+        try:
+            stream.write(data)
+            stream.close()
+            os.replace(temporary, path)
+        finally:
+            temporary.unlink(missing_ok=True)
 
 
 @contextmanager

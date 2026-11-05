@@ -180,20 +180,42 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
     return queried
 
 
-def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, prepared_date=None):
+def settle_history_day(arguments):
+    """Each worker owns one date and writes only that date's report and ledger."""
+    from task_progress import TaskProgress
+    root, day, now = arguments
+    with TaskProgress(f'Auditor {day}') as progress:
+        return settle_day(Path(root), day, now, progress=progress.update)
+
+
+def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, prepared_date=None, workers=1):
     from audit_ledger import AuditLedger
     from multimarket_audit import build_report as multimarket_report
     queried = []
+    if workers not in (1, 2):
+        raise ValueError('Historical Auditor supports one or two workers')
+    end = prepared_date + timedelta(days=1) if prepared_date else now.astimezone(TZ).date()
+    dates = [datetime.strptime(path.stem.removeprefix('prematch_'), '%Y-%m-%d').date()
+             for path in sorted((root / 'auditordata').glob('prematch_????-??-??.json'))]
+    dates = [day for day in dates if day < end]
+    if workers == 2:
+        if fetcher is not fetch_results:
+            raise ValueError('Custom result providers require serial execution')
+        from concurrent.futures import ProcessPoolExecutor
+        from multiprocessing import get_context
+        pending_dates = [day for day in dates if day != prepared_date]
+        progress('rapporti giornalieri indipendenti: due processi, pubblicazione unica finale')
+        with ProcessPoolExecutor(max_workers=2, mp_context=get_context('spawn')) as pool:
+            results = pool.map(settle_history_day, ((str(root), day, now) for day in pending_dates))
+            for day, queried_api in zip(pending_dates, results, strict=True):
+                if queried_api:
+                    queried.append(str(day))
     with AuditLedger(progress=progress) as combined:
         combined.metadata['schema_version'] = 1
         for collection in COLLECTIONS:
             combined.add_collection(collection)
-        end = prepared_date + timedelta(days=1) if prepared_date else now.astimezone(TZ).date()
-        for path in sorted((root / 'auditordata').glob('prematch_????-??-??.json')):
-            date = datetime.strptime(path.stem.removeprefix('prematch_'), '%Y-%m-%d').date()
-            if date >= end:
-                continue
-            if date == prepared_date:
+        for date in dates:
+            if date == prepared_date or workers == 2:
                 # The priority report and settled ledger were published together.
                 result = root / f'auditarchive/prematch_{date}_results.json'
                 if not result.is_file():
@@ -240,7 +262,8 @@ def main():
             summary = {'daily': str(args.date), 'results_queried':
                        settle_day(ROOT, args.date, now, progress=progress.update)}
         elif args.mode == 'history':
-            summary = {'settlement': settle(ROOT, now, progress=progress.update, prepared_date=args.date)}
+            summary = {'settlement': settle(ROOT, now, progress=progress.update, prepared_date=args.date,
+                                           workers=2)}
         else:
             summary = {'archive': archive(ROOT, now, progress=progress.update)}
             if args.mode == 'settle':
