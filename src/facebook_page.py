@@ -36,10 +36,12 @@ def selection(receipt, now):
         raise ValueError("Telegram receipt has no message text")
     picks = receipt["picks"]
     future = [p for p in picks if moment(p["kickoff"]) > now]
-    if len(future) != len(picks):
-        if not future:
-            return
-        from telegram_digest import slot_message
+    if picks and not future:
+        return
+    from telegram_digest import refresh_reserved, slot_message
+    before = receipt.get("reserved", [])
+    refresh_reserved(receipt, now)
+    if len(future) != len(picks) or before != receipt.get("reserved", []):
         text = slot_message(dict(receipt, picks=future))
     return f"ArabSniperBet · {now:%d/%m/%Y} · fascia {slot}", text
 
@@ -98,7 +100,7 @@ def main(mode):
         post = selection(receipt, now) if receipt else None
         if post:
             card = receipts[0].with_name("social-card.jpg")
-            if not card.exists() or post[1] != receipt["text"]:
+            if not card.exists() or post[1] != receipt["text"] or "reserved" in receipt:
                 from social_card import render
                 current = dict(receipt, text=post[1], picks=[p for p in receipt["picks"] if moment(p["kickoff"]) > now])
                 render(current, card)

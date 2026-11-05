@@ -266,11 +266,14 @@ def prepare():
         reserve(name, dict(slot=slot, picks=[], first=first, last=last, stale=True))
         return
     candidates = social_board(board, now, kickoff_from=start, kickoff_until=end, exclude=excluded,
-                              limit=limit, blue_only=True)
+                              limit=3, blue_only=True, tier_order=("Gold", "Blu", "Platinum"))
     chosen = [dict(row, id=row["fixture_id"], model_probability=row.get("statistical_pct"),
                    market_confirmed=row.get("market_confirmation") in ("confirmed", "convergence"))
-              for row in candidates]
-    post = dict(slot=slot, picks=chosen, first=first, last=last)
+              for row in candidates[:1]]
+    # Store no teams, markets or odds for the reserved cards in public receipts.
+    reserved = [dict(id=row["fixture_id"], kickoff=row["kickoff"])
+                for row in candidates[1:3]]
+    post = dict(slot=slot, picks=chosen, reserved=reserved, first=first, last=last)
     reserve(name, post)
 
 
@@ -280,6 +283,31 @@ def reserve(name, post):
     Path("post.json").write_text(json.dumps(post, ensure_ascii=False))
     with open(os.environ["GITHUB_OUTPUT"], "a") as out:
         print(f"name={name}", file=out)
+
+def refresh_reserved(post, now):
+    """Remove expired previews before each channel sends its image."""
+    public_ids = {str(p.get("id", p.get("fixture_id"))) for p in post.get("picks", [])}
+    seen = set(public_ids)
+    valid = []
+    for row in post.get("reserved", []):
+        start = instant(row.get("kickoff"))
+        fid = str(row.get("id", ""))
+        if start and start > now and fid and fid not in seen:
+            valid.append(dict(id=fid, kickoff=row["kickoff"]))
+            seen.add(fid)
+    post["reserved"] = valid[:2] if post.get("picks") else []
+    return post
+
+
+def social_cta(post):
+    lines = ["🎯 Questa è una delle selezioni gratuite del canale."]
+    if post.get("reserved"):
+        lines.append("🔒 Altre partite selezionabili nell’area Gold: scopri le analisi riservate.")
+    else:
+        lines.append("🔎 Esplora l’area Gold per consultare le analisi disponibili e i prossimi aggiornamenti.")
+    lines.append("🎁 Gold gratis 7 giorni: scrivi /prova a @ArabSniperBot")
+    return "\n".join(lines)
+
 
 def slot_message(post):
     slot = post["slot"]
@@ -311,7 +339,11 @@ def slot_message(post):
                   f"{pick['label']} · quota {pick['odd']:.2f} rilevata alle {at:%H:%M}"]
         if len(picks)==1:
             lines.extend(evening_rationale(pick))
-    return "\n".join(lines + ["", "18+ · Analisi ArabSniperBet"])
+    # Reserve caption space for the free/Gold distinction and the trial CTA.
+    footer = "\n\n" + social_cta(post) + "\n18+ · Le analisi non garantiscono risultati."
+    while lines and len(("\n".join(lines) + footer).encode("utf-16-le")) // 2 > 1024:
+        lines.pop()
+    return "\n".join(lines) + footer
 
 def send():
     """Send the image and its caption as one verified Telegram message."""
@@ -323,6 +355,7 @@ def send():
         import requests
         from social_card import render
         post["picks"] = [p for p in post["picks"] if instant(p["kickoff"]) > datetime.now(ROME)]
+        refresh_reserved(post, datetime.now(ROME))
         post["text"] = slot_message(post)
         render(post, "social-card.jpg")
         caption = post["text"]

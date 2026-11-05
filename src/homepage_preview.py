@@ -109,7 +109,7 @@ def board_spunti(fixture, assessment, now, *, blue_only=False):
                fixture['kickoff'], pick['fixture_id']), pick
 
 
-def social_board(payload, now, *, kickoff_from=None, kickoff_until=None, exclude=(), limit=3, blue_only=False):
+def social_board(payload, now, *, kickoff_from=None, kickoff_until=None, exclude=(), limit=3, blue_only=False, tier_order=None):
     today = now.astimezone(ROME).date().isoformat()
     updated = stamp(payload.get('updated_at'))
     if payload.get('date') != today or not updated or not 0 <= (now-updated).total_seconds() <= 5400:
@@ -124,6 +124,11 @@ def social_board(payload, now, *, kickoff_from=None, kickoff_until=None, exclude
         if (kickoff_from and kickoff < kickoff_from) or (kickoff_until and kickoff > kickoff_until) or str(fixture.get('fixture_id')) in exclude:
             continue
         ranked.extend(board_spunti(fixture, match.get('multimarket') or {}, now, blue_only=blue_only))
+    # Social-only ordering; model qualification and other callers are unchanged.
+    if tier_order:
+        priorities = {tier: i for i, tier in enumerate(tier_order)}
+        ranked = [((priorities.get(pick['tier'], len(priorities)), *key[1:]), pick)
+                  for key, pick in ranked]
     distinct = {}
     for _, pick in sorted(ranked, key=lambda item: item[0]):
         distinct.setdefault(pick['fixture_id'], pick)

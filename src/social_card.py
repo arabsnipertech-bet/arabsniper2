@@ -35,6 +35,26 @@ def paragraph(draw, x, y, value, size, width, height, style='regular', color=WHI
     return y
 
 
+def render_reserved(draw, pick, count):
+    gold = '#EAC070'
+    draw.text((55,615),'Una singola gratuita',font=font(65,'serif'),fill=WHITE,anchor='lt')
+    start = datetime.fromisoformat(pick['kickoff']).astimezone(ROME)
+    draw.text((55,709),f"GRATUITA  /  {pick['tier'].upper()}  /  {start:%H:%M}",
+              font=font(24,'mono'),fill=gold,anchor='lt')
+    paragraph(draw,55,757,pick['match'],43,750,110,'bold')
+    draw.text((1025,763),f"{pick['odd']:.2f}".replace('.',','),font=font(55,'serif'),fill=gold,anchor='rt')
+    paragraph(draw,55,878,pick['label'],32,940,45,color=MUTED)
+    for n in range(min(count,2)):
+        y = 947 + n*100
+        draw.rounded_rectangle((55,y,1025,y+85),radius=14,fill='#162B39',outline='#40525D',width=2)
+        draw.text((78,y+17),'RISERVATA GOLD',font=font(23,'bold'),fill=gold,anchor='lt')
+        # Opaque bars provide the masked appearance without encoding a prediction.
+        draw.rounded_rectangle((370,y+17,730,y+33),radius=8,fill='#425460')
+        draw.rounded_rectangle((370,y+47,605,y+61),radius=7,fill='#344853')
+        draw.text((990,y+31),'SOLO IN GOLD',font=font(19,'mono'),fill=MUTED,anchor='rt')
+    draw.text((55,1176),'7 giorni gratis · /prova su @ArabSniperBot',font=font(32,'bold'),fill=gold,anchor='lt')
+
+
 def render(post, path):
     picks = post.get('picks', [])
     slot = post.get('slot','')
@@ -52,7 +72,9 @@ def render(post, path):
     day = post.get('day','')
     stamp = datetime.fromisoformat(day).strftime('%d.%m.%Y') if day else ''
     draw.text((1024,556),f'{stamp}   /   {slot}',font=font(21,'mono'),fill=MUTED,anchor='rt')
-    if picks:
+    if len(picks) == 1:
+        render_reserved(draw, picks[0], len(post.get('reserved', [])))
+    elif picks:
         draw.text((55,617),'La singola' if len(picks)==1 else 'Le singole',font=font(77,'serif'),fill=WHITE,anchor='lt')
         step = min(272,510//len(picks))
         for n,p in enumerate(picks):
