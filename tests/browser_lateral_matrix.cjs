@@ -82,7 +82,11 @@ async function verifyCalendarRollover(browser,payload){
    const date=dates[Number(slot[1])-1],match=structuredClone(payload.matches[0]);
    match.fixture={...match.fixture,fixture_id:date,match:'Partita di prova '+date,
     date,kickoff:date+'T18:00:00Z',status_short:'NS',time:'19:00'};
-   return res.end(JSON.stringify({...payload,date,updated_at:'2026-10-28T23:22:00Z',matches:[match]}));
+   const archived=structuredClone(match);
+   archived.fixture.status_short='FT';archived.fixture.result={status:'FT',home_ft:2,away_ft:1,home_ht:1,away_ht:0};
+   archived._gold_history={version:'gold-history-v1',verified_prematch:true,name:'GOLD',tone:'gold',category:'gold',proposal_id:archived.multimarket.matrix.rows[0].id,captured_at:date+'T10:00:00Z',platinum_ids:[],radar_ids:[]};
+   const current_day_archive={...payload,date,history_view:true,history_version:'gold-history-v1',matches:[archived]};
+   return res.end(JSON.stringify({...payload,date,updated_at:'2026-10-28T23:22:00Z',matches:[match],current_day_archive}));
   }
   const file=url.pathname.slice(1);
   if(assets.has(file)){
@@ -96,7 +100,7 @@ async function verifyCalendarRollover(browser,payload){
  try{
   await page.clock.install({time:new Date('2026-10-29T05:30:00Z')});
   await page.goto('http://127.0.0.1:'+server.address().port+'/gold-dashboard-live');
-  await page.waitForFunction(()=>document.getElementById('selectedDay').textContent==='Giorno 1 · 29/10'&&document.querySelectorAll('.mx-card').length===1);
+  await page.waitForFunction(()=>document.getElementById('selectedDay').textContent==='Oggi · 29/10'&&document.querySelectorAll('.mx-card').length===1);
   assert((await page.locator('#fileSource').textContent()).includes('day2.json'));
   assert((await page.locator('.mx-card').textContent()).includes('Partita di prova 2026-10-29'));
   assert(!(await page.locator('#matchResearch').textContent()).includes('2026-10-28'));
@@ -106,6 +110,12 @@ async function verifyCalendarRollover(browser,payload){
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
    await page.screenshot({path:`test-artifacts/calendar-${name}.png`,fullPage:true});
   }
+  await page.locator('.day-btn[data-day="0"]').click();
+  await page.waitForFunction(()=>document.getElementById('selectedDay').textContent==='Ieri · 28/10'&&document.querySelectorAll('.mx-card').length===1);
+  assert((await page.locator('.mx-card').textContent()).includes('Proposta prematch conservata'));
+  assert((await page.locator('.mx-card').textContent()).includes('Partita di prova 2026-10-28'));
+  assert((await page.locator('.mx-card').textContent()).includes('FT (90 minuti): 2'));
+  await page.screenshot({path:'test-artifacts/gold-yesterday-mobile.png',fullPage:true});
   await page.locator('.day-btn[data-day="2"]').click();
   await page.waitForFunction(()=>document.getElementById('fileSource').textContent.includes('day3.json'));
   assert((await page.locator('.mx-card').textContent()).includes('2026-10-30'));
@@ -121,7 +131,7 @@ async function verifyCalendarRollover(browser,payload){
   // An already-open page rolls forward in Rome, independently of browser timezone.
   await page.clock.setFixedTime(new Date('2026-10-29T23:01:00Z'));
   await page.clock.runFor(60000);
-  await page.waitForFunction(()=>document.getElementById('selectedDay').textContent==='Giorno 1 · 30/10'&&document.getElementById('fileSource').textContent.includes('day2.json'));
+  await page.waitForFunction(()=>document.getElementById('selectedDay').textContent==='Oggi · 30/10'&&document.getElementById('fileSource').textContent.includes('day2.json'));
   assert((await page.locator('.day-btn.active').textContent()).includes('30/10'));
   assert((await page.locator('.mx-card').textContent()).includes('2026-10-30'));
   console.log('PASS Gold calendar: real HTTP stale/current feeds, desktop/mobile, missing date and open-page Rome midnight');
