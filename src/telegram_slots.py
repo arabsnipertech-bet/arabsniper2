@@ -9,5 +9,5 @@ WINDOWS = {
     '22:00': ('22:00', '23:59', 1),
 }
 
-EDITORIAL = {'12:45': 'promo', '16:45': 'education', '17:15': 'promo'}
+EDITORIAL = {'10:30': 'education', '12:45': 'promo', '16:45': 'education', '17:15': 'promo'}
 CHANNEL_SLOTS = sorted((*WINDOWS, *EDITORIAL))

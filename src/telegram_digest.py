@@ -15,7 +15,7 @@ ROME = ZoneInfo("Europe/Rome")
 CHANNEL = "@arabsniper_signals"
 from telegram_slots import WINDOWS, EDITORIAL, CHANNEL_SLOTS
 
-UTC_CRONS = {"30 22,23,2,3,10,11,15,16,17 * * *", "0 18,19,20,21 * * *",
+UTC_CRONS = {"30 22,23,2,3,8,9,10,11,15,16,17 * * *", "0 18,19,20,21 * * *",
              "45 10,11,14,15 * * *", "15 15,16 * * *"}
 MARKETS = {"over15_ht": ("ht", 2), "over25_ht": ("ht", 3), "gg_ht": ("ht", "gg"),
            "over25_ft": ("ft", 3), "over35_ft": ("ft", 4)}
@@ -235,7 +235,7 @@ def prepare():
     if artifact(name+"-claim"):
         raise RuntimeError("Unconfirmed previous delivery; inspect Telegram before resending")
     if slot in EDITORIAL:
-        legacy = (f"telegram-evidence-{day}-market-sent" if EDITORIAL[slot] == "education"
+        legacy = (f"telegram-evidence-{day}-market-sent" if slot == "16:45"
                   else f"telegram-gold-promo-{day}-{slot.replace(':','')}-sent")
         if artifact(legacy):
             print("Editorial already delivered by previous schedule")
@@ -287,7 +287,7 @@ def slot_message(post):
     if slot in EDITORIAL:
         if EDITORIAL[slot] == "education":
             from telegram_evidence import educational_message
-            return educational_message(datetime.fromisoformat(post["day"]).date())
+            return educational_message(datetime.fromisoformat(post["day"]).date(), slot=slot)
         from telegram_gold_promo import MESSAGES
         return MESSAGES[0 if slot == "12:45" else 1]
     if not picks:

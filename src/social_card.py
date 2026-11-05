@@ -39,7 +39,7 @@ def render(post, path):
     picks = post.get('picks', [])
     slot = post.get('slot','')
     promo = not picks and slot in ('12:45','17:15','22:00')
-    edu = slot=='16:45'
+    edu = slot in ('10:30', '16:45')
     accent = '#EAC070' if promo or picks else '#77DCD2' if edu else '#A8BFD8'
     image = Image.open(ROOT/'assets/social/stadium.jpg').convert('RGB').resize((1080,1350),Image.Resampling.LANCZOS)
     draw = ImageDraw.Draw(image)

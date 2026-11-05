@@ -141,8 +141,13 @@ EDUCATIONAL_THEMES=(
     ("DUE SEGNALI SULLA STESSA PARTITA", "Più mercati della stessa gara possono dipendere dagli stessi gol. Valutare separatamente le proposte aiuta a capire quando due risultati sono collegati."),
 )
 
-def educational_message(day):
-    title,body=EDUCATIONAL_THEMES[day.toordinal()%len(EDUCATIONAL_THEMES)]
+def educational_message(day, slot=None):
+    # Consecutive topics across both daily editions, starting 5 November 2026.
+    index = day.toordinal()
+    if slot is not None:
+        anchor = datetime(2026, 11, 5).date().toordinal()
+        index = anchor + 2 * (index - anchor) + (1 if slot == "16:45" else 0)
+    title,body=EDUCATIONAL_THEMES[index%len(EDUCATIONAL_THEMES)]
     return (
       "📚 ARABSNIPER · UN MINUTO DI ANALISI\n\n"
       f"🔎 {title}\n\n{body}\n\n"

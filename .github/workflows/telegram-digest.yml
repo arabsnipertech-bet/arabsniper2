@@ -10,7 +10,7 @@ on:
         required: false
         type: string
   schedule:
-    - cron: '30 22,23,2,3,10,11,15,16,17 * * *'
+    - cron: '30 22,23,2,3,8,9,10,11,15,16,17 * * *'
     - cron: '0 18,19,20,21 * * *'
     - cron: '45 10,11,14,15 * * *'
     - cron: '15 15,16 * * *'
@@ -68,7 +68,7 @@ jobs:
           for slot in CHANNEL_SLOTS:
               first,last,_ = WINDOWS.get(slot, ('','',0))
               assert slot_message(dict(slot=slot,picks=[],first=first,last=last,day=board['date']))
-          print('Channel posting rights and private Gold source verified for all ten slots')
+          print('Channel posting rights and private Gold source verified for all configured slots')
           PYTHON
       - id: prepare
         env:
