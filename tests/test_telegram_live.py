@@ -22,6 +22,19 @@ class LiveTest(unittest.TestCase):
                        {'model_probability':None},{'model_probability':float('nan')},
                        {'kickoff':'2026-11-05T18:00:00+01:00'}):
             self.assertFalse(eligible(self.pick(**change),self.now))
+    def test_gold_only_and_italian_kickoff_window(self):
+        for tier in ('Blu','Platinum','Studio',None):
+            self.assertFalse(eligible(self.pick(tier=tier),self.now))
+        for stamp,expected in (
+            ('2026-11-06T00:30:00+01:00',False),
+            ('2026-11-06T04:30:00+01:00',False),
+            ('2026-11-06T12:29:00+01:00',False),
+            ('2026-11-06T12:30:00+01:00',True),
+            ('2026-11-06T23:59:00+01:00',True),
+            ('2026-11-06T23:30:00+00:00',False),
+            ('2026-07-06T10:30:00+00:00',True)):
+            start=datetime.fromisoformat(stamp)
+            self.assertEqual(eligible(self.pick(kickoff=stamp),start),expected,stamp)
     def test_only_published_and_best_probability(self):
         r=[dict(day='2026-11-05',message_id=55,picks=[self.pick(),self.pick(id='124',model_probability=65)])]
         self.assertEqual(candidates(r,self.now)[0]['id'],'124')
@@ -99,7 +112,7 @@ class PublicationTest(unittest.TestCase):
             if path.startswith('fixtures'):return [dict(fixture=dict(status=dict(short='NS')),league=dict(id=1,season=2026))]
             return [dict(seasons=[dict(year=2026,coverage=dict(fixtures=dict(events=True)))])]
         with patch('telegram_live.Store',Store),patch('telegram_live.api',api):
-            post=dict(slot='18:30',picks=[self.pick(market='over15_ht')])
+            post=dict(slot='18:30',picks=[self.pick(tier='Blu')])
             reserve_publication(post,[self.pick(id='999')],self.now)
             self.assertEqual(post['live']['origin'],'gold')
             self.assertNotIn('market',post['live']);self.assertNotIn('odd',post['live'])

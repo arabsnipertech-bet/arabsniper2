@@ -41,3 +41,6 @@ is the external trigger, so there is no additional cron to configure.
 ## Annuncio prima del calcio d’inizio
 La scelta viene riservata in R2 durante la preparazione del post: prima la singola gratuita, poi le due riservate effettive, con probabilità stimata decrescente. Restano i mercati FT supportati e quote 1,70–3,00. Il monitor parte solo dopo una ricevuta Telegram che corrisponde all’annuncio. Nessuna scelta retroattiva.
 Le riservate mostrano numero e orario nella grafica. Il live Gold annuncia squadre e orario, ma non mercato o quota: la selezione originale rimane nel registro privato, con un impegno SHA-256 salato nell’annuncio. Si comunicano sia esiti positivi sia negativi. Le ricevute pubbliche non contengono mercato, quota o sale delle riservate.
+
+## Filtro live dal 6 novembre 2026
+Solo selezioni con categoria Gold e calcio d’inizio dalle 12:30 alle 23:59 Europe/Rome (ora legale inclusa). Esclusi Radar Blu, Studio, Platinum e orari notturni/mattutini. Il filtro vale sia per la gratuita sia per le riservate e per la ripresa di prenotazioni precedenti. Se non ci sono Gold idonee non si forza un live. Restano una partita al giorno, quote 1,70–3,00 e mercati FT già supportati. Nessuna modifica al modello o alle pubblicazioni ordinarie.

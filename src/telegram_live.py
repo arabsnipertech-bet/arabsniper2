@@ -35,11 +35,20 @@ def moment(value):
     except (AttributeError, ValueError, TypeError):
         return None
 
+def live_policy(p):
+    """Only Gold kickoffs in the afternoon/evening in Italy (12:30–23:59)."""
+    start = moment(p.get('kickoff'))
+    if not start or p.get('tier') != 'Gold':
+        return False
+    local = start.astimezone(ROME)
+    return local.hour * 60 + local.minute >= 12 * 60 + 30
+
+
 def eligible(p, now, upcoming=True):
     start = moment(p.get('kickoff'))
     probability = p.get('model_probability', p.get('statistical_pct'))
     odd = p.get('odd')
-    return bool(start and p.get('market') in TARGETS and
+    return bool(start and live_policy(p) and p.get('market') in TARGETS and
         type(odd) in (int,float) and math.isfinite(odd) and 1.7 <= odd <= 3 and
         type(probability) in (int,float) and math.isfinite(probability) and 0 < probability <= 100 and
         re.fullmatch(r'\d+', str(p.get('id', p.get('fixture_id', '')))) and
@@ -270,7 +279,8 @@ def reserve_publication(post, hidden, now):
     day=now.date().isoformat()
     store=Store(day);state=store.read()
     if state:
-        if state.get('source_slot')==post['slot'] and state.get('pending_publication'):
+        if (state.get('source_slot')==post['slot'] and state.get('pending_publication')
+                and live_policy(state.get('pick',{}))):
             post['live']=state['announcement']
         return
     # Prefer the free match. Only then consider the two actual reserved matches.
@@ -306,6 +316,9 @@ def select(now):
         if not state: continue
         if state.get('done'):
             if day==now.date().isoformat(): return store,state
+            continue
+        if not live_policy(state.get('pick',{})):
+            print('Saved live excluded by Gold/daytime policy')
             continue
         if state.get('pending_publication'):
             matches=[r for r in receipts(now) if r.get('day')==day and r.get('slot')==state['source_slot']
