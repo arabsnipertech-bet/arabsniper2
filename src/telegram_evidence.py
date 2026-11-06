@@ -110,36 +110,111 @@ def market_message(selections):
     return "\n".join(lines)
 
 
-EDUCATIONAL_THEMES=(
-    ("CHE COSA SIGNIFICA OCI?",
-     "L'OCI è un indicatore interno usato per interpretare la direzione e la coerenza dei movimenti delle quote. Non è una probabilità di vincita e da solo non giustifica una selezione."),
-    ("PERCHÉ L'AGGIO CONTA?",
-     "L'aggio rappresenta il margine implicito del bookmaker. Due mercati possono avere quote apparentemente interessanti ma margini diversi: confrontarli aiuta a leggere meglio i prezzi."),
-    ("QUOTA DI APERTURA E QUOTA ATTUALE",
-     "Una quota che scende indica una variazione del prezzo offerto. Non dimostra che l'esito avverrà: conta il contesto, la freschezza del dato e la concordanza tra operatori."),
-    ("PRIMO TEMPO E RISULTATO FINALE",
-     "Un Over 1,5 nel primo tempo e un Over 2,5 finale sono mercati differenti. Studiare separatamente i dati dei primi 45 minuti evita di confonderli con le medie sull'intera gara."),
-    ("PERCHÉ NON PUBBLICHIAMO SEMPRE UN PRONOSTICO?",
-     "Quando quote, statistiche e flussi di mercato non sono sufficientemente coerenti, la scelta più corretta è non pubblicare un segnale. L'assenza di una Gold non è un errore."),
-    ("COSA CONFRONTIAMO NEGLI AUDIT?",
-     "Confrontiamo le selezioni registrate prima della partita con gli esiti reali, comprese quelle perse. Le statistiche hanno valore solo se considerano anche gli errori."),
-    ("PERCHÉ CONTA LA FRESCHEZZA DELLE QUOTE?",
-     "Una quota vecchia può non essere più disponibile. Per valutare una segnalazione servono ora di rilevazione, mercato esatto e verifica prima del calcio d'inizio."),
-    ("COME LEGGERE UNA QUOTA DECIMALE", "Una quota di 2,00 corrisponde a una probabilità implicita del 50% prima di togliere il margine. Si calcola dividendo 1 per la quota."),
-    ("COSA MISURA IL POISSON", "Il modello usa i gol attesi delle due squadre per stimare la frequenza dei possibili punteggi. La somma dei punteggi compatibili dà la probabilità stimata di un mercato."),
-    ("CASA E TRASFERTA", "Separare le gare giocate in casa da quelle fuori aiuta a confrontare contesti simili. Poche trasferte osservate rendono la stima più incerta."),
-    ("PERCHÉ CONFRONTARE PIÙ BOOKMAKER", "Un calo su un solo operatore può dipendere da un aggiustamento locale. Se più operatori si muovono nella stessa direzione, la variazione ha un riscontro più ampio."),
-    ("LEGGERE UN SEGNALE BLU", "Nel Radar Blu osserviamo la direzione della quota e quanti operatori la confermano. Il colore descrive un movimento di mercato; la probabilità statistica va letta separatamente."),
-    ("CHE COSA SIGNIFICA OVER 3,5", "Servono almeno quattro gol nel periodo indicato. Un 2–1 finale totalizza tre gol; un 2–2 ne totalizza quattro."),
-    ("QUANDO UN CAMPIONE È PICCOLO", "Tre vittorie su quattro fanno il 75%. Un solo risultato in più può cambiare molto quella percentuale: conta anche quante gare ci sono dietro il numero."),
-    ("PROBABILITÀ E FREQUENZA OSSERVATA", "Per verificare una stima del 60% si raggruppano molte previsioni simili e si conta quante si realizzano. Una singola gara racconta poco sulla precisione di quella stima."),
-    ("RISULTATI AL PRIMO TEMPO", "Per verificare un mercato PT si usa il punteggio all’intervallo. Un gol al 46° del secondo tempo può cambiare il risultato finale, ma non la lettura del primo tempo."),
-    ("COME RICONOSCERE UN’INVERSIONE", "Una quota può scendere e poi risalire. Confrontare più rilevazioni e i rispettivi orari permette di distinguere il movimento iniziale da quello più recente."),
-    ("SINGOLE E MULTIPLE", "Tre singole si verificano separatamente. In una multipla, invece, tutti gli esiti richiesti devono realizzarsi per vincere."),
-    ("COME LEGGERE UNA QUOTA CONSERVATA", "L’orario accanto alla quota identifica l’ultima osservazione disponibile. È utile controllarlo anche quando la scheda della partita è stata aggiornata più di recente."),
-    ("CHE COSA SIGNIFICA GOAL PT", "Per il Goal nel primo tempo entrambe le squadre devono segnare prima dell’intervallo. Un 2–0 e un 1–1 producono lo stesso totale di gol, ma soltanto il secondo soddisfa il mercato."),
-    ("DUE SEGNALI SULLA STESSA PARTITA", "Più mercati della stessa gara possono dipendere dagli stessi gol. Valutare separatamente le proposte aiuta a capire quando due risultati sono collegati."),
-)
+EDUCATIONAL_THEMES=(('OCI: CONFERMA O CONTRADDIZIONE?',
+  'Un OCI positivo descrive un segnale interno sui movimenti di mercato: non significa che la probabilità di '
+  'vincita sia pari al suo valore. Se la quota scende ma la stima statistica resta debole, abbiamo una '
+  'divergenza da approfondire. Leggiamo insieme OCI, prezzo disponibile e probabilità, senza trasformare un '
+  'solo indicatore in un pronostico.'),
+ ('AGGIO: IL MARGINE NASCOSTO NELLE QUOTE',
+  'Esempio su un mercato a due esiti: quote 1,80 e 2,10 implicano 55,56% e 47,62%. La somma è 103,18%: '
+  'l’eccedenza di 3,18 punti è l’overround, spesso chiamato aggio. Non è il profitto garantito del '
+  'bookmaker. Confrontarlo nel tempo aiuta a capire se è cambiata la valutazione della partita oppure anche '
+  'il margine applicato.'),
+ ('DROP: PREZZO E PROBABILITÀ NON SONO LA STESSA COSA',
+  'Da 2,00 a 1,80 la quota perde il 10%. La probabilità implicita passa però dal 50% al 55,56%: +5,56 punti '
+  'percentuali, prima del margine. Un drop misura il cambiamento del prezzo; non basta a dimostrare che oggi '
+  'ci sia valore. Se il mercato ha già corretto molto la quota, il vantaggio iniziale potrebbe essere '
+  'scomparso.'),
+ ('LAMBDA: COME LEGGERE I GOL ATTESI',
+  'Nella Poisson, lambda è il numero medio di gol atteso dal modello nel periodo considerato. Lambda casa '
+  '1,6 e ospite 1,0 danno un totale medio di 2,6, sotto l’ipotesi di indipendenza. Non prevedono un '
+  'risultato di 2,6 gol: descrivono una distribuzione di punteggi possibili. La qualità dipende da come '
+  'stimiamo attacco, difesa e contesto.'),
+ ('VALUE BET: IL PREZZO CONTA QUANTO LA SCELTA',
+  'Con probabilità stimata del 55%, la quota equa teorica è 1/0,55 = 1,82 circa. A quota 2,00 il rendimento '
+  'atteso teorico è 0,55 × 2 − 1 = +10%; a 1,70 diventa −6,5%. È la stessa previsione, ma cambia il prezzo. '
+  'Il valore esiste soltanto se la probabilità stimata è attendibile: un errore del modello può '
+  'cancellarlo.'),
+ ('AUDIT: VERIFICARE IL MODELLO SENZA RISCRIVERE IL PASSATO',
+  'Una verifica utile conserva prima del calcio d’inizio mercato, quota, probabilità e orario. Poi confronta '
+  'quelle previsioni con gli esiti, includendo gli errori e separando primo tempo e finale. Scegliere '
+  'soltanto a posteriori il mercato riuscito non misura la capacità predittiva. Per valutare un '
+  'miglioramento servono nuovi dati, non solo quelli usati per correggere il modello.'),
+ ('QUOTA VECCHIA, VALORE APPARENTE',
+  'Il modello stima il 50% e mostra una quota 2,20 osservata due ore fa: il vantaggio teorico sarebbe +10%. '
+  'Se ora il prezzo disponibile è 1,90, diventa −5%. Una scheda aggiornata non implica che ogni quota al suo '
+  'interno sia nuova. Prima di interpretare il vantaggio confrontiamo l’orario del prezzo, il mercato esatto '
+  'e l’offerta attuale.'),
+ ('TOGLIERE IL MARGINE: UNA STIMA, NON LA VERITÀ',
+  'Su due esiti a quota 1,80 e 2,10, le probabilità implicite sommano al 103,18%. Normalizzarle dividendo '
+  'ciascuna per la somma dà circa 53,85% e 46,15%. È un metodo semplice per rimuovere proporzionalmente '
+  'l’aggio, ma presuppone come sia distribuito il margine. La probabilità ottenuta resta una stima del '
+  'mercato, non la probabilità vera.'),
+ ('POISSON: DAI GOL ATTESI A UNA PROBABILITÀ',
+  'Con un totale di gol modellato da una Poisson di lambda 2,6, la probabilità di superare 2 gol è 1 − P(0) '
+  '− P(1) − P(2), circa 48,2%. La media di 2,6 non equivale quindi a una probabilità del 60% di Over 2,5. Il '
+  'calcolo dipende dalle ipotesi: espulsioni, ritmi e dipendenza tra le squadre possono rendere il modello '
+  'meno aderente alla gara.'),
+ ('CASA E TRASFERTA: EVITARE MEDIE FUORVIANTI',
+  'Una squadra può segnare molto in casa e poco in trasferta. Usare soltanto la sua media complessiva può '
+  'sovrastimarne l’attacco fuori casa. Servono anche forza degli avversari e numerosità del campione: una '
+  'serie contro difese deboli non vale automaticamente contro una difesa forte. Separare i contesti aiuta, '
+  'ma pochi dati aumentano l’incertezza.'),
+ ('PIÙ BOOKMAKER: CONFERME DAVVERO INDIPENDENTI?',
+  'Un calo osservato su diversi operatori è più ampio di un movimento isolato, ma non tutte le conferme sono '
+  'indipendenti: alcuni prezzi seguono gli stessi fornitori o operatori di riferimento. Conta anche la '
+  'sequenza temporale. Un movimento persistente su più rilevazioni è diverso da dieci quote copiate quasi '
+  'simultaneamente.'),
+ ('RADAR BLU: MOVIMENTO FORTE, STATISTICA DEBOLE',
+  'Un mercato può registrare un forte calo della quota mentre il modello resta prudente. Le due letture non '
+  'sono necessariamente un errore: possono riflettere notizie recenti, limiti statistici o semplice domanda. '
+  'Il Radar Blu segnala una dinamica da studiare; non trasforma automaticamente quel mercato in Gold. Serve '
+  'capire la divergenza, non nasconderla.'),
+ ('PERCHÉ IL BOOKMAKER CAMBIA LE QUOTE?',
+  'Una quota può cambiare per nuove informazioni, puntate ricevute, gestione dell’esposizione o allineamento '
+  'agli altri operatori. Formazioni, assenze e meteo possono incidere sulle stime. Dal solo drop non '
+  'possiamo sapere quale causa abbia prevalso, né concludere che il bookmaker conosca un esito certo. Il '
+  'movimento è un dato; la sua spiegazione va verificata.'),
+ ('POCHI DATI: PERCHÉ LE STIME VANNO RIDIMENSIONATE',
+  'Una media gol molto alta in quattro gare può dipendere dal caso o dagli avversari affrontati. Una tecnica '
+  'statistica è avvicinare le stime più incerte a una media di riferimento, dando più autonomia ai campioni '
+  'robusti. Non significa ignorare la forma recente: significa evitare che pochi risultati estremi dominino '
+  'la previsione.'),
+ ('CALIBRAZIONE: QUANDO UN 60% È CREDIBILE?',
+  'Raggruppiamo molte previsioni registrate intorno al 60% e controlliamo quante si realizzano. Se il '
+  'risultato osservato resta molto distante, il modello può essere troppo ottimista o prudente. La verifica '
+  'va fatta anche per mercato e fascia di quota, con campioni adeguati. Una buona calibrazione non assicura '
+  'profitto: conta anche il prezzo a cui si gioca.'),
+ ('FORMAZIONI UFFICIALI: COSA CAMBIA DAVVERO?',
+  'L’assenza di un attaccante non implica automaticamente meno gol: contano sostituto, sistema di gioco e '
+  'avversario. Inoltre il mercato potrebbe aver già incorporato la notizia prima dell’annuncio ufficiale. '
+  'Confrontare l’orario della notizia con quello del movimento aiuta a evitare di interpretare come nuova '
+  'un’informazione già inclusa nella quota.'),
+ ('INVERSIONE DELLA QUOTA: IL PRIMO SEGNALE REGGE?',
+  'Una quota scende da 2,20 a 1,90 e poi risale a 2,10. Rispetto all’apertura è ancora più bassa, ma il '
+  'movimento recente va nella direzione opposta. Guardare solo apertura e ultimo prezzo nasconde questa '
+  'inversione. Per interpretarla servono rilevazioni intermedie, orari e confronto tra operatori: il '
+  'percorso può contare quanto il punto di arrivo.'),
+ ('QUOTA DI CHIUSURA E CLV',
+  'Prendere 2,10 su un esito che chiude a 1,90 significa aver ottenuto un prezzo migliore rispetto alla '
+  'chiusura; il rapporto 2,10/1,90 − 1 è circa +10,5%. È una misura di CLV sullo stesso mercato e con '
+  'condizioni confrontabili. Non garantisce che la giocata vinca e la chiusura non è infallibile, ma su '
+  'molte osservazioni può aiutare a valutare la qualità del prezzo.'),
+ ('LIQUIDITÀ: LO STESSO DROP NON PESA SEMPRE UGUALE',
+  'In un mercato poco liquido può bastare una puntata contenuta per spostare il prezzo. Un movimento analogo '
+  'in un mercato più liquido può avere una dinamica diversa. Se non disponiamo dei volumi, però, non '
+  'possiamo dedurli dalla sola quota. Per questo leggiamo ampiezza, persistenza e diffusione del movimento '
+  'senza inventare quanto denaro sia entrato.'),
+ ('SENSIBILITÀ: QUANTO CAMBIA LA STIMA SE CAMBIA LAMBDA?',
+  'Nel modello Poisson, un piccolo cambiamento dei gol attesi può modificare sensibilmente la probabilità di '
+  'un mercato. Se il vantaggio teorico sparisce appena riduciamo leggermente lambda, la proposta è fragile '
+  'rispetto alle ipotesi. Confrontare scenari plausibili aiuta a distinguere un margine robusto da uno che '
+  'dipende da una singola stima molto precisa.'),
+ ('MERCATI CORRELATI: DUE SEGNALI NON SONO DUE CONFERME',
+  'Over 2,5 e Over 3,5 della stessa partita dipendono dagli stessi gol: se si verifica il secondo, si '
+  'verifica anche il primo. Non sono due prove indipendenti della qualità dell’analisi. Anche una combo va '
+  'valutata con una probabilità congiunta: moltiplicare le probabilità dei singoli esiti è corretto solo '
+  'quando si può assumere indipendenza.'))
 
 def educational_message(day, slot=None):
     # Consecutive topics across both daily editions, starting 5 November 2026.
