@@ -480,3 +480,26 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  const html=api.opportunityPanel([],null,{...options,monitoring:{studio_ideas:[{...idea,market_fair_pct:null}]}});
  assert(!html.includes('Quota 2,40'));
 }
+
+{
+ const a={id:'pt',label:'Over 2,5 PT',spec:{kind:'total',period:'ht',side:'over',line:2.5},odd:2,quote_status:'recent',statistical_pct:40,oci:0,selected_margin_pct:5};
+ const b={...a,id:'ft',label:'Over 2,5 FT',spec:{...a.spec,period:'ft'},statistical_pct:55};
+ const idea={spec:b.spec,label:b.label,market:'over25_ft',odd:2,poisson_pct:55,best_study:true};
+ const m={fixture:{fixture_id:909,kickoff:'2099-01-01T20:00:00Z'},multimarket:{matrix:{rows:[a,b],quote_monitoring:{studio_ideas:[idea]}}}};
+ const frozen=JSON.stringify(m);
+ assert.equal(api.studyDefaultRow(m),b,'Select the existing starred market, including its period');
+ const html=api.cockpit(m,{},true);
+ assert(html.includes('Miglior spunto · Over 2,5 FT'));
+ assert(html.includes('MIGLIOR SPUNTO · SOLO STUDIO'));
+ assert(!html.includes('mx-instrument-empty'),'Zero OCI is available data');
+ assert.equal(api.cockpitTier(m).name,'STUDIO');
+ assert.equal(JSON.stringify(m),frozen,'Display default cannot mutate feed or ranking');
+ for(const change of [{suppressed:true},{best_study:false},{poisson_pct:31},{spec:{...b.spec,line:3.5}}]){
+  const copy=structuredClone(m);Object.assign(copy.multimarket.matrix.quote_monitoring.studio_ideas[0],change);
+  assert.equal(api.studyDefaultRow(copy),null,'No guessed alternative when the best study is absent or excluded');
+ }
+ const missing=structuredClone(m);missing.multimarket.matrix.rows[1].oci=null;
+ assert(api.cockpit(missing,{},true).includes('mx-instrument-empty'),'Missing OCI stays missing');
+ const absent=structuredClone(m);absent.multimarket.status='no_prematch_snapshot';assert.equal(api.studyDefaultRow(absent),null);
+ console.log('PASS Study cockpit: existing best study selected, exact market, zero/missing data, no invented fallback or payload changes');
+}
