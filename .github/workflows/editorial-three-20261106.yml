@@ -1,0 +1,55 @@
+name: Inspect editorial football fixtures
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/editorial-three-20261106.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests boto3
+      - env:
+          PYTHONPATH: src
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          python - <<'PY'
+          import json,os,requests,unicodedata
+          from pathlib import Path
+          from gold_storage import client
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          assert datetime.now(ZoneInfo('Europe/Rome')).date().isoformat()=='2026-11-06'
+          r=requests.get('https://v3.football.api-sports.io/fixtures',params={'date':'2026-11-06','timezone':'Europe/Rome'},headers={'x-apisports-key':os.environ['API_SPORTS_KEY']},timeout=45)
+          r.raise_for_status();v=r.json();assert not v.get('errors')
+          norm=lambda s:unicodedata.normalize('NFKD',s).encode('ascii','ignore').decode().lower()
+          found=[]
+          for m in v['response']:
+              n=norm(m['teams']['home']['name']+' '+m['teams']['away']['name'])
+              if ('septemvri' in n and 'lokomotiv' in n) or ('uta arad' in n and 'petrolul' in n) or ('jihlava' in n and 'karvin' in n): found.append(m)
+          assert len(found)==3
+          s3=client();feed=json.loads(s3.get_object(Bucket=os.environ['R2_BUCKET'],Key='arab_quote_day1.json')['Body'].read())
+          out=[]
+          for m in found:
+              f=m['fixture'];fid=str(f['id'])
+              match=next((p for p in feed.get('matches',[]) if str(p.get('fixture',{}).get('fixture_id'))==fid),{})
+              a=match.get('multimarket') or {}
+              out.append(dict(id=fid,home=m['teams']['home']['name'],away=m['teams']['away']['name'],kickoff=f['date'],status=f['status'],score=m['goals'],league=m['league']['name'],country=m['league']['country'],rates=a.get('rates'),captured_at=a.get('captured_at'),gold_present=bool(match)))
+          Path('editorial-data.json').write_text(json.dumps(out,ensure_ascii=False,indent=2))
+          print(json.dumps(out,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editorial-three-data
+          path: editorial-data.json
+          retention-days: 7
