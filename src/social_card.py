@@ -102,6 +102,14 @@ def render(post, path):
         title=parts[1].lstrip('🔎 ').capitalize().replace('oci','OCI')
         y=paragraph(draw,55,625,title,76,955,215,'serif')
         paragraph(draw,58,y+48,parts[2],41,940,380)
+    elif promo and post.get('successes'):
+        report=post['successes']
+        draw.text((55,604),f"{len(report['examples'])} successi selezionati · {report['date']}",font=font(30,'bold'),fill=accent,anchor='lt')
+        for n,row in enumerate(report['examples']):
+            y=660+n*56
+            paragraph(draw,55,y,f"{n+1:02d}  {row['match']}",24,950,27,'bold')
+            detail=f"{competition(row)} · {row['tier']} · {row['label']} · quota {row['odd']:.2f} · OK"
+            paragraph(draw,55,y+28,detail,19,950,24,color=MUTED)
     elif promo:
         draw.text((50,616),'7 giorni',font=font(134,'serif'),fill=WHITE,anchor='lt')
         draw.text((58,797),'ACCESSO GOLD GRATUITO',font=font(43,'bold'),fill=accent,anchor='lt')

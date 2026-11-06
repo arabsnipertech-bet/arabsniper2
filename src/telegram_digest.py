@@ -246,6 +246,13 @@ def prepare():
             print("Editorial already delivered by previous schedule")
             return
         post = {"slot":slot, "picks":[], "day":day}
+        if slot in ('12:45','17:15'):
+            try:
+                from promo_successes import load_yesterday
+                report=load_yesterday(now)
+                if report: post['successes']=report
+            except Exception as error:
+                print('Verified successes unavailable; standard promotion:',type(error).__name__)
         reserve(name, post)
         return
     from gold_storage import client
@@ -332,6 +339,9 @@ def slot_message(post):
     slot = post["slot"]
     picks = post["picks"]
     if slot in EDITORIAL:
+        if post.get('successes') and EDITORIAL[slot]=='promo':
+            from promo_successes import message
+            return message(post['successes'])
         if EDITORIAL[slot] == "education":
             from telegram_evidence import educational_message
             return educational_message(datetime.fromisoformat(post["day"]).date(), slot=slot)

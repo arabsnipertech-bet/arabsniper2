@@ -34,6 +34,7 @@ jobs:
         run: |
           python3 -m unittest discover -s tests -p test_telegram_digest.py -v
           python3 -m unittest discover -s tests -p test_social_reserved.py -v
+          python3 -m unittest discover -s tests -p test_promo_successes.py -v
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

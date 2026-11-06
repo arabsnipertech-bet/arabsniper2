@@ -168,6 +168,13 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
                             observe=evidence.observe if evidence is not None else None)
         if evidence is not None:
             write(root / f'auditarchive/prematch_{date}_calibration.json', evidence.samples())
+        try:
+            from promo_successes import build as build_promo
+            promo = build_promo(day, str(date))
+        except Exception as error:
+            progress('Promotional projection unavailable: '+type(error).__name__)
+            promo = dict(schema_version=1, date=str(date), ready=False, examples=[])
+        write(root / f'auditarchive/prematch_{date}_promo.json', promo)
         daily['selection_studies'] = build_studies(daily)
         write(root / f'auditarchive/prematch_{date}_daily.json', daily)
         atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md',
