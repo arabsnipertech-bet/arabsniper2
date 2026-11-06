@@ -28,15 +28,22 @@ if len(raw)<1024*1024:
         for part in v['parts']:download('auditordata/_audit_parts/'+part['sha256']+'.json.gz')
 first={};count=0
 for collection,key,record in entries(name):
-    if collection not in ('multimarket_evaluations','analysis_updates') or not record:continue
+    if collection not in ('multimarket_evaluations','analysis_updates','study_observations') or not record:continue
     f=record.get('fixture') or {};at=stamp(record.get('captured_at'));start=stamp(f.get('kickoff'));fid=str(f.get('fixture_id') or '')
     if not fid or not at or not start or at>=start or record.get('retrospective') or start.astimezone(ROME).date().isoformat()!=DAY:continue
-    for row in (record.get('multimarket') or {}).get('matrix',{}).get('rows',[]):
+    if collection=='study_observations':
+        rows=[('Studio',r) for r in record.get('studio_ideas',[]) if not r.get('suppressed')]
+    else:
+        rows=[]
+        for r in (record.get('multimarket') or {}).get('matrix',{}).get('rows',[]):
+            tier='Gold' if (r.get('opportunity') or {}).get('eligible') is True else 'Platinum' if (r.get('platinum') or {}).get('eligible') is True else None
+            if tier and r.get('quote_executable') is True:rows.append((tier,r))
+    for tier,row in rows:
         odd=row.get('odd');spec=row.get('spec')
-        if row.get('quote_executable') is not True or (row.get('opportunity') or {}).get('eligible') is not True or not spec or type(odd) not in (float,int) or not 1<odd<1000:continue
+        if not spec or type(odd) not in (float,int) or not 1<odd<1000:continue
         k=(fid,json.dumps(spec,sort_keys=True));count+=1
         if k in first and at>=stamp(first[k]['captured_at']):continue
-        first[k]=dict(fixture_id=fid,spec=spec,tier='Gold',label=row.get('label') or row.get('market'),odd=odd,captured_at=at.isoformat(),kickoff=start.isoformat(),forecast_sha256=fingerprint(record))
+        first[k]=dict(fixture_id=fid,spec=spec,tier=tier,label=row.get('label') or row.get('market'),odd=odd,captured_at=at.isoformat(),kickoff=start.isoformat(),forecast_sha256=fingerprint(record))
 r=requests.get('https://v3.football.api-sports.io/fixtures',params={'date':DAY,'timezone':'Europe/Rome'},headers={'x-apisports-key':os.environ['API_SPORTS_KEY']},timeout=60)
 r.raise_for_status();payload=r.json();assert not payload.get('errors') and isinstance(payload.get('response'),list)
 results={str(x['fixture']['id']):x for x in payload['response']}
@@ -51,6 +58,6 @@ for row in sorted(first.values(),key=lambda x:(-x['odd'],x['fixture_id'],x['labe
     if not outcome or outcome[0]!=1 or outcome[1]!=0:continue
     row=dict(row,match=m['teams']['home']['name']+' - '+m['teams']['away']['name'],country=m['league']['country'],league=m['league']['name'],result=result)
     verified.append(row);best.setdefault(row['fixture_id'],row)
-report=dict(date=DAY,ready=len(best)>=5,examples=list(best.values())[:10] if len(best)>=5 else [],gold_winning_fixtures=len(best),gold_unique_markets=len(first),gold_observations=count,verified_at=datetime.now(ROME).isoformat(),source_archive_sha256=manifest[name]['sha256'],source='API-Football final results + frozen pre-match Gold archive')
+report=dict(date=DAY,ready=len(best)>=5,examples=list(best.values())[:10] if len(best)>=5 else [],winning_fixtures=len(best),winning_by_tier={t:len({r['fixture_id'] for r in verified if r['tier']==t}) for t in ('Gold','Platinum','Studio')},unique_markets=len(first),observations=count,verified_winners=verified,verified_at=datetime.now(ROME).isoformat(),source_archive_sha256=manifest[name]['sha256'],source='API-Football final results + frozen pre-match Gold archive')
 Path('verified-gold.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
 print(json.dumps(report,ensure_ascii=False))
