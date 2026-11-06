@@ -25,28 +25,31 @@ def seed(root):
 
 
 class HistoryChunks(unittest.TestCase):
-    def test_two_dates_then_resume_without_repeating_saved_days_and_same_report(self):
+    def test_time_budget_then_resume_without_repeating_saved_days_and_same_report(self):
         with tempfile.TemporaryDirectory() as folder, tempfile.TemporaryDirectory() as expected:
             root, serial = Path(folder), Path(expected)
             seed(root); seed(serial)
             current_audit.settle(serial, NOW, prepared_date=NOW.date()-timedelta(days=1))
             calls, checkpoints = [], []
+            tick = [NOW]
             def phase(*args):
                 calls.append(args)
                 if args == ('src/gold_storage.py', 'publish'):
                     checkpoints.append({p.relative_to(root): p.read_bytes() for p in root.rglob('*') if p.is_file()})
+                    tick[0] += timedelta(minutes=13)
                 elif args[1] == 'daily':
                     current_audit.settle_day(root, date.fromisoformat(args[3]), datetime.fromisoformat(args[5]))
                 else:
                     current_audit.settle(root, datetime.fromisoformat(args[-1]),
                                          prepared_date=date.fromisoformat(args[3]), assemble_only=True)
             end = NOW+timedelta(minutes=45)
-            self.assertFalse(advance(root, NOW.date(), phase, end, lambda: NOW))
+            self.assertFalse(advance(root, NOW.date(), phase, end, lambda: tick[0]))
             self.assertEqual(len(checkpoints), 2)
             self.assertFalse((root/'data/arab_quote_prematch_report.json').exists())
             saved = receipt_path(root, '2026-10-20').read_bytes()
             calls.clear()
-            self.assertTrue(advance(root, NOW.date(), phase, end, lambda: NOW))
+            end = tick[0]+timedelta(minutes=45)
+            self.assertTrue(advance(root, NOW.date(), phase, end, lambda: tick[0]))
             self.assertEqual([c[3] for c in calls if c[0] == 'auditor/current_audit.py' and c[1] == 'daily'], ['2026-10-22'])
             self.assertEqual(saved, receipt_path(root, '2026-10-20').read_bytes())
             for path in ('data/arab_quote_prematch_report.json', 'data/arab_quote_multimarket_report.json'):
@@ -112,7 +115,7 @@ class JournalChunks(unittest.TestCase):
         from audit_journal import PREFIX
         from unittest.mock import patch
         import os
-        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ,{'GOLD_PRIVATE':'true'}):
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ,{'GOLD_PRIVATE':'true'}), patch('auditor_daily_priority.ensure_priority'):
             root=Path(folder)
             write_store(root/'data'/f'{PREFIX}20261109T100000_forecasts.json',{'pending':True})
             calls=[]

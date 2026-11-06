@@ -6,7 +6,6 @@ from pathlib import Path
 from audit_storage import read_store, write_store
 
 CURSOR = 'data/arab_quote_auditor_history_progress.json'
-MAX_DAYS = 2
 RESERVE = timedelta(minutes=20)
 
 
@@ -70,16 +69,22 @@ def advance(root, work_date, phase, deadline, clock):
     days = [date.fromisoformat(p.stem.removeprefix('prematch_'))
             for p in sorted((root/'auditordata').glob('prematch_????-??-??.json'))]
     pending = [day for day in days if day < report_date and not reusable(root, day, as_of)]
-    for day in pending[:MAX_DAYS]:
-        if deadline-clock() < RESERVE:
+    needed = max(RESERVE.total_seconds(), cursor.get('largest_block_seconds', 0)*1.25+300)
+    for day in pending:
+        if (deadline-clock()).total_seconds() < needed:
             return False
+        block_started = clock()
         phase('auditor/current_audit.py', 'daily', '--date', str(day), '--as-of', as_of.isoformat())
         if not reusable(root, day, as_of):
             raise ValueError('Historical day did not produce a verified receipt')
+        elapsed = max(0, (clock()-block_started).total_seconds())
+        cursor['largest_block_seconds'] = max(cursor.get('largest_block_seconds', 0), elapsed)
         write_store(root/CURSOR, cursor)
         phase('src/gold_storage.py', 'publish')
+        elapsed = max(0, (clock()-block_started).total_seconds())
+        needed = max(needed, elapsed*1.25+300)
         print(f'Historical day saved independently: {day}', flush=True)
-    if len(pending) > MAX_DAYS or deadline-clock() < RESERVE:
+    if (deadline-clock()).total_seconds() < max(RESERVE.total_seconds(), needed):
         return False
     phase('auditor/current_audit.py', 'history', '--date', str(report_date),
           '--assemble-only', '--as-of', as_of.isoformat())

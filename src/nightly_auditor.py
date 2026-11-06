@@ -75,11 +75,14 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
     pending = saved_batch(root, today)
     if pending is not None and pending[1] != 'preparing' and not has_daily_report(root, pending[0]):
         pending = (pending[0], None)  # Rebuild an incomplete legacy checkpoint.
-    if pending is not None and pending[1] in ('daily', 'history'):
-        deadline = min(deadline, started+timedelta(minutes=45))
     if pending is None and already_completed(root, clock()):
         print('Nightly Auditor already published for this Rome date', flush=True)
         return 'already_completed'
+
+    from auditor_daily_priority import ensure_priority
+    ensure_priority(root, today, phase, calibrate)
+    if deadline-clock() < timedelta(minutes=20):
+        return 'paused'
 
     # Scans append new immutable journals while an older batch is suspended.
     # Finish its frozen input before consuming those new journals.
