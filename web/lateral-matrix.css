@@ -100,7 +100,7 @@
 .mx-card>header{background:linear-gradient(110deg,var(--mx-tint),#142334 75%);border-bottom-color:#ffffff14;padding:22px}
 .mx-card>header .mx-category,.mx-modal-header .mx-category{display:inline-flex!important;align-items:center;padding:7px 11px;border:1px solid var(--mx-soft);border-radius:7px;background:var(--mx-tint);font-size:.78rem!important;letter-spacing:.12em!important;line-height:1.25;margin-bottom:13px}
 .mx-card.mx-tone-gold>header .mx-category{background:linear-gradient(135deg,#f6dfa0,#d7b35f);color:#24251f!important;border-color:#f3d484}
-.mx-card.mx-tone-platinum>header .mx-category{background:linear-gradient(135deg,#edf3fa,#aebed2);color:#172536!important;border-color:#e2ebf5}
+.mx-card.mx-tone-platinum>header .mx-category{background:linear-gradient(135deg,#46576c,#27364a);color:#edf3fa!important;border-color:#e2ebf5}
 .mx-card.mx-tone-studio>header .mx-category{background:#14334b;color:#a3dfff!important;border-color:#559ac5}
 .mx-card h3{font-size:1.45rem;line-height:1.3;margin-top:11px}
 .mx-card header small{color:#bbccda;line-height:1.5}
@@ -112,7 +112,7 @@
 .mx-card .mx-best{padding:20px;border-left-width:4px;box-shadow:0 8px 20px #0002;background:linear-gradient(140deg,var(--mx-tint),#111e2b)}
 .mx-card .mx-best-stable{border-color:#b79a56;border-left-color:#f3d484;background:linear-gradient(140deg,#342e1d,#172333)}
 .mx-card .mx-best-platinum{border-color:#b5c3d5;border-left-color:#edf3fa;background:linear-gradient(140deg,#303c4d,#172333)}
-.mx-card .mx-best-market{border-color:#508fbd;border-left-color:#83cfff;background:linear-gradient(140deg,#153954,#122334)}
+.mx-card .mx-best-market{border-color:#508fbd;border-left-color:#83cfff;background:#102f50 linear-gradient(140deg,#153954,#122334)}
 .mx-card .mx-best h4{font-size:1.35rem;line-height:1.3;margin:12px 0}
 .mx-card .mx-best-price{font-size:2.5rem;letter-spacing:-.035em;color:#f4dfab;margin-bottom:12px}
 .mx-card .mx-best-platinum .mx-best-price{color:#edf3fa}
