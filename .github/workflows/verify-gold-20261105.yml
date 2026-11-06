@@ -1,0 +1,34 @@
+name: Verify Gold successes 5 November
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-gold-20261105.yml']
+permissions:
+  contents: read
+concurrency:
+  group: verify-gold-20261105
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests boto3 ijson
+      - name: Verify frozen Gold proposals against final scores
+        env:
+          PYTHONPATH: src
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python src/verify_gold_20261105.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-gold-20261105
+          path: verified-gold.json
+          retention-days: 90
