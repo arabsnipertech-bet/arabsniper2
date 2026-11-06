@@ -35,8 +35,12 @@ def paragraph(draw, x, y, value, size, width, height, style='regular', color=WHI
     return y
 
 
+from social_labels import competition
+
+
 def render_reserved(draw, pick, reserved):
     gold = '#EAC070'
+    paragraph(draw,55,589,competition(pick),21,970,25,color=MUTED)
     draw.text((55,615),'Una singola gratuita',font=font(65,'serif'),fill=WHITE,anchor='lt')
     start = datetime.fromisoformat(pick['kickoff']).astimezone(ROME)
     draw.text((55,709),f"GRATUITA  /  {pick['tier'].upper()}  /  {start:%H:%M}",
@@ -89,6 +93,7 @@ def render(post, path):
             start=datetime.fromisoformat(p['kickoff']).astimezone(ROME)
             draw.text((55,y+18),f"{n+1:02d}   /   {p['tier'].upper()}   /   {start:%H:%M}",font=font(23,'mono'),fill=shade,anchor='lt')
             paragraph(draw,55,y+58,p['match'],54 if len(picks)==1 else 38,757,step-107,'bold')
+            paragraph(draw,55,y+step-73,competition(p),18,760,23,color=MUTED)
             paragraph(draw,55,y+step-46,p['label'],32,760,42,color=MUTED)
             draw.text((1025,y+60),f"{p['odd']:.2f}".replace('.',','),font=font(54,'serif'),fill=shade,anchor='rt')
             draw.text((1025,y+121),'QUOTA',font=font(17,'mono'),fill=MUTED,anchor='rt')

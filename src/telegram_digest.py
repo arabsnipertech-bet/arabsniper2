@@ -354,7 +354,8 @@ def slot_message(post):
         start = instant(pick["kickoff"]).astimezone(ROME)
         at = instant(pick["provider_updated_at"]).astimezone(ROME)
         tier = "BLU · segnale di mercato valido" if pick["tier"] == "Blu" else pick["tier"].upper()
-        lines += ["", f"{tier} · {start:%H:%M} · {pick['match']}",
+        from social_labels import competition
+        lines += ["", competition(pick), f"{tier} · {start:%H:%M} · {pick['match']}",
                   f"{pick['label']} · quota {pick['odd']:.2f} rilevata alle {at:%H:%M}"]
         if len(picks)==1:
             lines.extend(evening_rationale(pick))

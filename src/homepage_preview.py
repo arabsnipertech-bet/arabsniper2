@@ -100,7 +100,7 @@ def board_spunti(fixture, assessment, now, *, blue_only=False):
             pick['oci'] = None
         pick.update(market=row.get("market") if tier == "Solo Studio" else goal_market(row),
                     quote_status=row.get("quote_status"), tier=tier, fixture_id=str(fixture['fixture_id']), match=fixture['match'],
-                    kickoff=fixture['kickoff'], captured_at=assessment['captured_at'],
+                    kickoff=fixture['kickoff'], country=fixture.get('country',''), league=fixture.get('league',''), captured_at=assessment['captured_at'],
                     provider_updated_at=observed, statistical_pct=probability,
                     margin_pct=row.get('selected_margin_pct'),
                     market_confirmation='confirmed' if priority == 0 else

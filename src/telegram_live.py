@@ -255,7 +255,8 @@ def deliver(state,store,events,obs):
         if reserved and kind=='win': detail='ArabCassaaaaaa GOLD! · selezione riservata centrata.'
         if reserved and kind=='lose': detail='ESITO GOLD · selezione riservata non centrata.'
         prediction=('Selezione riservata dell’area Gold · registrata prima del calcio d’inizio.' if reserved else f"{p['label']} · quota pubblicata {p['odd']:.2f}")
-        caption=(f"{detail}\n\n{p['match']}\n{obs['home']}–{obs['away']} · {phase}\n"
+        from social_labels import competition
+        caption=(f"{detail}\n\n{competition(p)}\n{p['match']}\n{obs['home']}–{obs['away']} · {phase}\n"
                  f"{prediction}\n"
                  f"Annuncio originale: https://t.me/arabsniper_signals/{p['source_message_id']}\n"
                  "Dati API-Football · 18+ · Le analisi non garantiscono risultati.")
