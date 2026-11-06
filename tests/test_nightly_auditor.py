@@ -23,6 +23,12 @@ def daily_report(root, day='2026-10-30'):
 
 
 class NightlySchedule(unittest.TestCase):
+    def setUp(self):
+        # Priority is integration-tested separately; isolate legacy history sequencing.
+        priority = patch('auditor_daily_priority.ensure_priority')
+        priority.start()
+        self.addCleanup(priority.stop)
+
     def test_recovery_is_date_bound_and_requires_its_production_workflow(self):
         now = datetime.fromisoformat('2026-11-05T20:00:00+01:00')
         with self.assertRaises(ValueError):
