@@ -74,3 +74,76 @@
 .mx-card>.mx-cockpit .mx-instruments{max-width:760px;margin:auto;padding:18px 0}
 .mx-card>.mx-cockpit .mx-cockpit-pick h3{margin:8px 0}
 @media(max-width:600px){.mx-card>.mx-cockpit{margin:12px;padding:14px 10px}.mx-card>.mx-cockpit .mx-instruments{gap:4px}}
+
+/* Pre-weekend visual polish: existing content, order and controls are preserved. */
+.topbar{border-color:#3b4654;background:linear-gradient(115deg,#172536,#0b1420 72%);box-shadow:0 14px 38px #0004,inset 0 1px #ffffff08}
+.brand h1{color:#f3d484;letter-spacing:-.025em}
+.brand p{color:#b2c0d0}
+.btn,.day-btn{transition:background-color .18s ease,border-color .18s ease}
+.btn-gold{color:#f3d484;border-color:#8a7543;background:#25271f}
+.day-btn.active{color:#18202a;background:linear-gradient(135deg,#f8e3a1,#dfba60);border-color:#f8e3a1;box-shadow:0 4px 14px #e6c16b18}
+.mx-heading{padding-bottom:4px}
+.mx-heading>div>span{color:#f0d18a;font-weight:700}
+.mx-heading h2{font-size:clamp(1.65rem,2.8vw,2.2rem);line-height:1.18}
+.mx-heading>b{color:#f3d484;border-color:#776640;background:#27271e;border-radius:8px;padding:10px 12px}
+.mx-counters{gap:12px 24px;border-color:#334454;color:#bed0de}
+.mx-counters b{font-variant-numeric:tabular-nums}
+.mx-categories button{background:#122233;border-color:#3c5267;color:#c2d4e2;border-radius:12px;font-weight:600}
+.mx-categories button[aria-pressed=true]{color:#ffe5a3;background:#373021;border-color:#e3c37b;box-shadow:inset 0 0 0 1px #e3c37b30}
+.mx-categories b{display:inline-block;min-width:1.35em;padding:2px 5px;background:#ffffff0c;border-radius:5px;font-variant-numeric:tabular-nums}
+.mx-controls{background:linear-gradient(135deg,#142334,#101b28);border-color:#354a5e;padding:18px}
+.mx-controls label{color:#c0cedc;font-weight:600}
+.mx-controls select,.mx-controls input{background:#0b1724;border-color:#486077;border-radius:8px;min-height:44px}
+.mx-controls input::placeholder{color:#98adbf}
+.mx-results-count{color:#bfceda;margin-top:22px}
+.mx-card{background:linear-gradient(150deg,#142131,#0b1420 65%);box-shadow:0 12px 30px #0003,inset 0 1px #ffffff08;border-radius:18px}
+.mx-card>header{background:linear-gradient(110deg,var(--mx-tint),#142334 75%);border-bottom-color:#ffffff14;padding:22px}
+.mx-card>header .mx-category,.mx-modal-header .mx-category{display:inline-flex!important;align-items:center;padding:7px 11px;border:1px solid var(--mx-soft);border-radius:7px;background:var(--mx-tint);font-size:.78rem!important;letter-spacing:.12em!important;line-height:1.25;margin-bottom:13px}
+.mx-card.mx-tone-gold>header .mx-category{background:linear-gradient(135deg,#f6dfa0,#d7b35f);color:#24251f!important;border-color:#f3d484}
+.mx-card.mx-tone-platinum>header .mx-category{background:linear-gradient(135deg,#edf3fa,#aebed2);color:#172536!important;border-color:#e2ebf5}
+.mx-card.mx-tone-studio>header .mx-category{background:#14334b;color:#a3dfff!important;border-color:#559ac5}
+.mx-card h3{font-size:1.45rem;line-height:1.3;margin-top:11px}
+.mx-card header small{color:#bbccda;line-height:1.5}
+.mx-live{color:#c0d3e0;line-height:1.45}
+.mx-card .mx-quote-cell{background:#0e1c2b;border-color:#3d5266;box-shadow:inset 0 1px #ffffff05}
+.mx-card .mx-goal-quotes .mx-quote-cell{background:#142032;border-color:#455570}
+.mx-card .mx-quote-pair span{color:#b5c7d6}
+.mx-card .mx-quote-pair span:last-child b{color:#f4f8ff;font-weight:800}
+.mx-card .mx-best{padding:20px;border-left-width:4px;box-shadow:0 8px 20px #0002;background:linear-gradient(140deg,var(--mx-tint),#111e2b)}
+.mx-card .mx-best-stable{border-color:#b79a56;border-left-color:#f3d484;background:linear-gradient(140deg,#342e1d,#172333)}
+.mx-card .mx-best-platinum{border-color:#b5c3d5;border-left-color:#edf3fa;background:linear-gradient(140deg,#303c4d,#172333)}
+.mx-card .mx-best-market{border-color:#508fbd;border-left-color:#83cfff;background:linear-gradient(140deg,#153954,#122334)}
+.mx-card .mx-best h4{font-size:1.35rem;line-height:1.3;margin:12px 0}
+.mx-card .mx-best-price{font-size:2.5rem;letter-spacing:-.035em;color:#f4dfab;margin-bottom:12px}
+.mx-card .mx-best-platinum .mx-best-price{color:#edf3fa}
+.mx-card .mx-best-market .mx-best-price{color:#a3e0ff}
+.mx-card .mx-best-price small{letter-spacing:0;color:#b6cbd9;font-size:.65rem}
+.mx-card .mx-best>.mx-section-title{font-size:.68rem;line-height:1.5;letter-spacing:.08em}
+.mx-card .mx-best-empty{border-color:#4d6478;background:#142333;box-shadow:none}
+.mx-card>.mx-cockpit{background:radial-gradient(ellipse at 50% 80%,var(--mx-tint),#0d1825 80%);border-color:var(--mx-soft);box-shadow:inset 0 1px #ffffff05}
+.mx-instrument-select select{background:#112235;border-color:#587189;border-radius:9px}
+.mx-cockpit-pick h3{line-height:1.3}
+.mx-open{background:linear-gradient(100deg,var(--mx-tint),#152538);padding-block:16px;font-size:.82rem}
+.mx-card>footer{color:#a9bbca;background:#0b1420;line-height:1.6}
+.mx-modal-tabs button{border-radius:9px}
+.mx-modal-tabs button[aria-pressed=true]{background:#373021;border-color:#e3c37b;color:#ffe5a3}
+.mx-opportunity{padding:18px;border:1px solid var(--mx-soft,#637185);border-left:4px solid var(--mx-accent,#e3c37b);border-radius:12px;background:linear-gradient(140deg,var(--mx-tint,#242b34),#111e2b);min-width:0;overflow-wrap:anywhere}
+.mx-opportunity h3{color:var(--mx-accent,#f3d484);font-size:1.15rem;margin:0 0 14px}
+.mx-opportunity p{line-height:1.6;color:#d7e4ee}
+.mx-opportunity small{color:#afc3d3;line-height:1.5;display:block}
+@media(hover:hover){.mx-categories button:hover,.mx-modal-tabs button:hover{border-color:#b8cbdc;background:#24364a}.mx-open:hover{filter:brightness(1.12)}}
+@media(max-width:600px){
+ .mx-controls{padding:12px;gap:12px}
+ .mx-card>header{padding:18px 14px;gap:10px}
+ .mx-card h3{font-size:1.22rem}
+ .mx-card>header .mx-category{font-size:.72rem!important;padding:6px 9px}
+ .mx-card header small{font-size:.66rem}
+ .mx-card .mx-best{padding:16px 14px}
+ .mx-card .mx-best h4{font-size:1.25rem}
+ .mx-card .mx-best-price{font-size:2.2rem}
+ .mx-card .mx-best-price small{font-size:.61rem}
+ .mx-card .mx-quote-pair span:last-child b{font-size:1.15rem}
+ .mx-open{font-size:.75rem;padding:15px 12px}
+ .mx-opportunity{padding:15px 12px}
+}
+@media(prefers-reduced-motion:reduce){.btn,.day-btn{transition:none}}
