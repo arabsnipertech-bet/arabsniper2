@@ -516,6 +516,32 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   await page.locator('[data-mx-filter="phase"]').selectOption('upcoming');
   assert.equal(await page.locator('.mx-card').count(),2);
   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozenTiers);
+  // The cockpit opens on the existing star; selecting a different market survives rendering.
+  const studyExample=JSON.parse(cp.execFileSync('python',['-c',"import sys,json;sys.path[:0]=['src','tests'];from test_selection_studies import perth_fixture;print(json.dumps(perth_fixture()))"],{encoding:'utf8'}));
+  const studyPreview={...payload,matches:[{...payload.matches[0],fixture:{...payload.matches[0].fixture,fixture_id:909,kickoff:'2099-01-01T20:00:00Z'},multimarket:studyExample.multimarket}]};
+  await page.evaluate(p=>{Object.assign(ArabMatrix.state,{category:'all',phase:'all',family:'all',period:'all',search:''});currentPayload=p;renderMatchResearch(p)},studyPreview);
+  const studyOriginal=await page.evaluate(()=>JSON.stringify(currentPayload));
+  for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
+   await page.setViewportSize({width,height:844});
+   const cockpit=page.locator('.mx-card>.mx-cockpit');
+   const select=cockpit.locator('select');
+   await select.selectOption('');
+   assert((await cockpit.textContent()).includes('MIGLIOR SPUNTO · SOLO STUDIO'));
+   assert((await cockpit.locator('.mx-cockpit-pick h3').textContent()).includes('Over 2,5 FT'));
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   await cockpit.scrollIntoViewIfNeeded();
+   await page.screenshot({path:`test-artifacts/studio-default-${name}.png`});
+   const other=await select.locator('option').evaluateAll(opts=>opts.find(o=>o.value&&o.textContent.includes('Over 1,5 PT')).value);
+   await select.selectOption(other);
+   await page.evaluate(()=>renderMatchResearch(currentPayload));
+   assert.equal(await select.inputValue(),other);
+   assert((await cockpit.locator('.mx-cockpit-pick h3').textContent()).includes('Over 1,5 PT'));
+   await page.locator('[data-mx-open]').click();
+   assert((await page.locator('.mx-modal .mx-cockpit-pick h3').textContent()).includes('Over 2,5 FT'));
+   await page.locator('[data-mx-close]').click();
+  }
+  assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),studyOriginal);
+  console.log('PASS Studio default browser: starred market, retained manual choice, modal, immutable data, desktop/390/360');
   console.log('PASS Platinum browser: backend decisions, silver title/cards/filter, no-statistics and EV routes, separate Gold, immutable live, desktop/390/360');
   console.log('PASS Gold v6.1 browser: concise cards, green/yellow/red combos, versions, quote coverage, unchanged desktop/390/360 grid, modal and immutable live overlays');
  }finally{await browser.close()}
