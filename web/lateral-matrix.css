@@ -98,7 +98,7 @@
 .mx-results-count{color:#bfceda;margin-top:22px}
 .mx-card{background:linear-gradient(150deg,#142131,#0b1420 65%);box-shadow:0 12px 30px #0003,inset 0 1px #ffffff08;border-radius:18px}
 .mx-card>header{background:linear-gradient(110deg,var(--mx-tint),#142334 75%);border-bottom-color:#ffffff14;padding:22px}
-.mx-card>header .mx-category,.mx-modal-header .mx-category{display:inline-flex!important;align-items:center;padding:7px 11px;border:1px solid var(--mx-soft);border-radius:7px;background:var(--mx-tint);font-size:.78rem!important;letter-spacing:.12em!important;line-height:1.25;margin-bottom:13px}
+.mx-card>header .mx-category,.mx-modal-header .mx-category{display:inline-flex!important;align-items:center;padding:7px 11px;border:1px solid var(--mx-soft);border-radius:7px;background:var(--mx-tint);font-size:.78rem!important;letter-spacing:.12em!important;line-height:1.25;margin:0 10px 13px 0}
 .mx-card.mx-tone-gold>header .mx-category{background:linear-gradient(135deg,#f6dfa0,#d7b35f);color:#24251f!important;border-color:#f3d484}
 .mx-card.mx-tone-platinum>header .mx-category{background:linear-gradient(135deg,#46576c,#27364a);color:#edf3fa!important;border-color:#e2ebf5}
 .mx-card.mx-tone-studio>header .mx-category{background:#14334b;color:#a3dfff!important;border-color:#559ac5}
