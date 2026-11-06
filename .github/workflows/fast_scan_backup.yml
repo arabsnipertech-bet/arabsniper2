@@ -50,3 +50,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
         run: python3 src/telegram_watchdog.py facebook
+      - name: Recover authorized three-match sports coverage on 6 November
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+        run: python3 src/editorial_live_three_20261106.py dispatch
