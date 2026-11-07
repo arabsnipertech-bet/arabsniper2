@@ -114,13 +114,19 @@ def publish_spool(path, spool, chunk_bytes=CHUNK_BYTES):
     atomic_bytes(path, json.dumps(manifest, separators=(',', ':')).encode()+b'\n')
 
 
+MAX_MATERIALIZED_AUDIT_BYTES = 64*1024*1024
+
+
 def read_store(path, default=None):
     path=Path(path)
     if not path.exists():return deepcopy(default)
-    if path.stat().st_size > 64*1024*1024:
+    # Live feeds/state have separate bounded schemas and legitimately exceed
+    # 64 MiB. Only the unbounded historical master requires the disk ledger.
+    historical_master = path.name == 'arab_quote_prematch_audit.json'
+    if historical_master and path.stat().st_size > MAX_MATERIALIZED_AUDIT_BYTES:
         raise ValueError('Use AuditLedger/open_verified_json for large audit files')
     value=json.loads(path.read_bytes())
-    if isinstance(value,dict) and value.get('_storage')==FORMAT and value['bytes']>64*1024*1024:
+    if historical_master and isinstance(value,dict) and value.get('_storage')==FORMAT and value['bytes']>MAX_MATERIALIZED_AUDIT_BYTES:
         raise ValueError('Use AuditLedger/open_verified_json for large audit files')
     if not isinstance(value,dict) or value.get('_storage')!=FORMAT:return value
     checksum=hashlib.sha256()

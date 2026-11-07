@@ -416,6 +416,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await blue.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(16, 47, 80)');
    assert.equal(await blue.locator('h4').evaluate(e=>getComputedStyle(e).color),'rgb(158, 216, 255)');
    assert.equal(await blue.getAttribute('data-opportunity-id'),null);
+   assert(await page.locator('.mx-card .mx-quote-cell').evaluateAll(cells=>cells.every(e=>e.scrollWidth<=e.clientWidth+1)),'Quote cells must not clip their contents '+name);
    const missingStats=page.locator('[data-live-fixture="106"] .mx-best-market');
    assert((await missingStats.textContent()).includes('Radar di Mercato · Statistica debole o assente · Solo studio'));
    assert((await missingStats.textContent()).includes('Persistenza del movimento'));

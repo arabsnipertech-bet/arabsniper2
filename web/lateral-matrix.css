@@ -197,3 +197,8 @@ body[data-gold-ui="2026-11"] .mx-modal-header{background:#172331}
 body[data-gold-ui="2026-11"] :focus-visible{outline:2px solid #e8c783;outline-offset:3px}
 @media(max-width:1100px){body[data-gold-ui="2026-11"] .mx-results{grid-template-columns:1fr}body[data-gold-ui="2026-11"] .page{width:calc(100% - 40px)}}
 @media(max-width:600px){body[data-gold-ui="2026-11"] .page{width:calc(100% - 24px);padding-top:18px}body[data-gold-ui="2026-11"] .topbar{display:block;padding-bottom:18px}body[data-gold-ui="2026-11"] .top-actions{justify-content:flex-start;margin-top:18px}body[data-gold-ui="2026-11"] .toolbar{padding:10px;gap:12px}body[data-gold-ui="2026-11"] .day-btn{padding:8px 10px;font-size:11px}body[data-gold-ui="2026-11"] .mx-counters{padding:14px;gap:12px 18px}body[data-gold-ui="2026-11"] .mx-card>header{padding:16px 14px}body[data-gold-ui="2026-11"] .mx-card h3{font-size:20px}body[data-gold-ui="2026-11"] .mx-card>.mx-cockpit{margin:12px;padding:12px 8px}body[data-gold-ui="2026-11"] .mx-results{gap:16px}body[data-gold-ui="2026-11"] .mx-heading>b{display:none}}
+
+/* Cards have their own width; viewport breakpoints alone are insufficient. */
+body[data-gold-ui="2026-11"] .mx-card .mx-match-layout{grid-template-columns:minmax(0,1fr)}
+body[data-gold-ui="2026-11"] .mx-card .mx-goal-quotes{grid-template-columns:repeat(2,minmax(0,1fr))}
+body[data-gold-ui="2026-11"] .mx-card .mx-quote-cell{min-width:0;overflow-wrap:anywhere}

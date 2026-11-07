@@ -45,6 +45,17 @@ class ChainTests(unittest.TestCase):
             p=Path(d)/'arab_quote_prematch_audit.json'
             p.write_text(json.dumps(dict(_storage='arabsniper-audit-parts-v1',bytes=28_000_000_000,parts=[])))
             with self.assertRaisesRegex(ValueError,'AuditLedger'):read_store(p)
+    def test_live_feeds_remain_readable_above_the_historical_master_limit(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as d, patch('audit_storage.MAX_MATERIALIZED_AUDIT_BYTES',64):
+            root=Path(d);value={'matches':[{'fixture_id':1,'label':'a'*200}]}
+            for chunk_bytes in (50,10000):
+                for name in ('arab_quote_day1.json','arab_quote_state.json'):
+                    p=root/name;write_store(p,value,chunk_bytes=chunk_bytes)
+                    self.assertEqual(read_store(p),value)
+                p=root/'arab_quote_prematch_audit.json';write_store(p,value,chunk_bytes=chunk_bytes)
+                with self.assertRaisesRegex(ValueError,'AuditLedger'):read_store(p)
+
     def test_shadow_is_prematch_only_and_does_not_mutate(self):
         from test_opportunity_policy import row
         from opportunity_policy import annotate
