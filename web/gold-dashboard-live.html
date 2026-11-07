@@ -755,15 +755,16 @@
     .cx-home-band{border-left:3px solid #b1d4ec;background:#1b303d;padding:12px;display:grid;gap:6px}.cx-home-band>strong{color:#d4ebfa;font-size:.8rem}.cx-home-focus{display:flex;flex-wrap:wrap;gap:8px;margin-top:3px}.cx-home-focus>span{flex:1 1 130px;border:1px solid #597182;padding:8px;border-radius:5px}.cx-home-focus b,.cx-home-focus small{display:block}.cx-home-focus small{margin-top:5px;color:#c1ccd4;line-height:1.5}
   </style>
 </head>
-<body data-gold-ui="2026-11">
+<body data-gold-ui="2026-11" data-gold-design="matchroom-v6">
   <div class="page" id="app" hidden>
+    <aside class="gold-sidebar" aria-label="Navigazione Gold"><a class="gold-sidebar-brand" href="/gold-dashboard-live.html">ARABSNIPER<small>GOLD / MATCHROOM</small></a><nav><a class="active" href="#matchResearch">◈ &nbsp; Partite</a><button type="button" onclick="ArabMatrix.state.category='saved';renderMatchResearch(currentPayload||{})">☆ &nbsp; Osservate</button><button type="button" onclick="document.querySelectorAll('.day-btn')[0]?.click()">↶ &nbsp; Riscontri di ieri</button><a href="#goldGuide" onclick="document.getElementById('goldGuide').open=true">◎ &nbsp; Come leggere i dati</a></nav><div class="gold-sidebar-foot">LA TUA RICERCA<p>Quote, movimento e modello.<br>Una lettura più chiara.</p><small>18+ · Le stime possono essere sbagliate.</small></div></aside>
     <header class="topbar">
       <div class="brand">
         <span class="gold-brand-label">ARABSNIPER</span><h1>Gold<span class="gold-brand-mark" aria-hidden="true"> / </span>Matchroom</h1>
         <p>Il quadro delle partite. Quote, statistiche e segnali a confronto.</p>
         <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
       </div>
-      <div class="top-actions">
+      <div class="top-actions"><button class="btn" type="button" onclick="document.body.classList.toggle('gold-light');this.textContent=document.body.classList.contains('gold-light')?'☾ Tema scuro':'☼ Tema chiaro'">☼ Tema chiaro</button><button class="btn" type="button" onclick="document.body.classList.toggle('gold-compact');this.textContent=document.body.classList.contains('gold-compact')?'Vista espansa':'Vista compatta'">Vista compatta</button>
         <button class="btn btn-gold" type="button" onclick="manualRefresh()">Ricarica dati</button>
         <a class="btn" href="index.html" style="text-decoration:none">Home</a>
         <button class="btn btn-danger" type="button" onclick="logoutGold()">Logout</button>
@@ -779,7 +780,7 @@
       </div>
     </section>
 
-    <section id="matchResearch" class="ranking-section" aria-live="polite"></section>
+    <div class="gold-workspace"><section id="matchResearch" class="ranking-section" aria-live="polite"></section><aside class="gold-reading"><span>IL METODO ARABSNIPER</span><h2>Il movimento è un indizio.<br>Il contesto fa la differenza.</h2><p>Confronta sempre quote, campioni osservati e gol attesi.</p><ol><li>Leggi apertura e quota attuale.</li><li>Controlla OCI e aggio.</li><li>Apri il cruscotto e confronta i mercati.</li></ol><details id="goldGuide"><summary>Come leggere i dati</summary><p><b>Gol attesi (λ)</b>: stima dei gol nel periodo.</p><p><b>Medie</b>: gol fatti e subiti nelle gare osservate.</p><p><b>Poisson</b>: trasforma i gol attesi in probabilità.</p><p><b>Fair mercato</b>: probabilità delle quote, tolto il margine dello stesso operatore.</p><p><b>OCI</b>: indice del movimento, su scala −100 / +100. Non è una probabilità.</p><p>Le partite osservate con la stella restano salvate per questa sessione. Un dato mancante non vale zero.</p></details></aside></div>
 
     <details class="legacy-dashboard" id="legacyDashboard">
       <summary>Dashboard dettagliata e filtri precedenti</summary>
@@ -859,8 +860,8 @@
 
   <link rel="stylesheet" href="/statistics-first.css?v=4.0">
   <script src="/statistics-first.js?v=4.0"></script>
-  <link rel="stylesheet" href="/lateral-matrix.css?v=8e2ae417f35f">
-  <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=356644d1fba7"></script>
+  <link rel="stylesheet" href="/lateral-matrix.css?v=c4be763def04">
+  <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=b129ffd61251"></script>
   <script src="/vendor/fflate-0.8.2.js"></script>
   <script src="/live-scores.js?v=a17ad119a2d0"></script>
   <script>

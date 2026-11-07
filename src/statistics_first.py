@@ -130,7 +130,7 @@ def component(rows, side, direction, period, prior, use_xg=True, use_robust=True
     values = [float(r[field]) for r in pool]
     if not values:
         return {'rate': prior, 'sample': 0, 'context_sample': 0,
-                'mean': None, 'last': None, 'without_last': None,
+                'mean': None, 'last': None, 'without_last': None, 'without_peak': None,
                 'xg_sample': 0, 'xg_mean': None, 'xg_adjustment': 0.,
                 'drought': 0, 'under_conversion': False, 'pressure': False,
                 'peak_reduction': 0., 'last_state': 'unavailable', 'prior_weight': 1.}
@@ -167,7 +167,9 @@ def component(rows, side, direction, period, prior, use_xg=True, use_robust=True
             'context_sample': sum(r.get('side') == side for r in pool),
             'mean': mean(values), 'context_mean': mean([r[field] for r in pool if r.get('side') == side]) if any(r.get('side') == side for r in pool) else None,
             'weighted_mean': raw, 'robust_mean': goal_rate, 'robust_cap': cap,
-            'last': last, 'without_last': reference, 'last_deviation': deviation,
+            'last': last, 'without_last': reference,
+            'without_peak': (sum(values)-max(values))/(len(values)-1) if len(values)>1 else None,
+            'last_deviation': deviation,
             'last_state': 'above' if deviation is not None and deviation > .75 else
                           'below' if deviation is not None and deviation < -.75 else 'in_line',
             'peak_reduction': raw-goal_rate,
@@ -244,6 +246,41 @@ def probabilities(rates):
     return goal_probabilities([rates['home_ht'], rates['away_ht'],
                                rates['home_ft']-rates['home_ht'],
                                rates['away_ft']-rates['away_ht']])
+
+
+def frozen_goal_observations(histories, profiles, as_of):
+    """Observed scores only; ST uses paired 90-minute/HT scores of the same game."""
+    means, peak_teams = {}, {}
+    for side in ('home', 'away'):
+        means[side], peak_teams[side] = {}, {}
+        for period in ('ft', 'ht'):
+            pool = period_rows(histories.get(side, []), period)
+            pair = [r for r in pool if all(numeric(r.get('team_'+k+'_'+period))
+                    for k in ('goals', 'conceded'))]
+            means[side][period] = dict(sample=len(pair),
+                scored=mean(r['team_goals_'+period] for r in pair) if pair else None,
+                conceded=mean(r['team_conceded_'+period] for r in pair) if pair else None)
+            profile = profiles.get(side, {}).get('for_'+period, {})
+            peak_teams[side][period] = {k: profile.get(k) for k in ('sample', 'mean', 'without_peak')}
+        paired = [r for r in period_rows(histories.get(side, []), 'ht')
+                  if all(numeric(r.get('team_'+k+'_'+period)) for k in ('goals', 'conceded') for period in ('ft','ht'))
+                  and all(r['team_'+k+'_ft'] >= r['team_'+k+'_ht'] for k in ('goals', 'conceded'))]
+        means[side]['st'] = dict(sample=len(paired),
+            scored=mean(r['team_goals_ft']-r['team_goals_ht'] for r in paired) if paired else None,
+            conceded=mean(r['team_conceded_ft']-r['team_conceded_ht'] for r in paired) if paired else None)
+    periods = {}
+    for period in ('ft','ht'):
+        pair = [peak_teams[s][period] for s in ('home','away')]
+        available = all(numeric(t.get(k)) for t in pair for k in ('mean','without_peak'))
+        baseline = sum(t['mean'] for t in pair) if available else None
+        without = sum(t['without_peak'] for t in pair) if available else None
+        periods[period] = dict(available=available, combined_mean=baseline, combined_without_peak=without,
+            passes_80pct=(without+1e-9 >= .8*baseline) if available else None,
+            reason=None if available else 'fewer_than_two_observed_games_for_a_team')
+    return (dict(version='observed-goal-means-v1', captured_at=as_of,
+                 basis='observed_regular_time_scores; ST_from_same_game_FT_minus_HT', teams=means),
+            dict(version='anti-peak-most-prolific-v1', captured_at=as_of, production_applied=False,
+                 method='remove_one_highest_scoring_match_per_team_and_period', teams=peak_teams, periods=periods))
 
 
 def statistical_analysis(match, as_of):
@@ -331,10 +368,12 @@ def statistical_analysis(match, as_of):
                     'avg_away_goals', 'avg_home_ht', 'avg_away_ht', 'source', 'ht_source', 'as_of')
                     if k in league}
     inputs = {'histories': histories, 'league': compact_league, 'h2h': h2h}
+    observed_means, peak_indicator = frozen_goal_observations(histories, profiles, as_of)
     return {'model_id': MODEL_ID, 'config_id': CONFIG_ID, 'config': deepcopy(CONFIG),
             'captured_at': as_of, 'status': 'experimental', 'validation_from': VALIDATION_FROM,
             'validation_status': 'prospective_pending', 'rates': rates, 'profiles': profiles,
             'sensitivity_rates': scenario_rates,
+            'observed_goal_means': observed_means, 'anti_peak_most_prolific': peak_indicator,
             'inputs': inputs, 'input_sha256': sha256(json.dumps(inputs, sort_keys=True, default=str).encode()).hexdigest(),
             'h2h': {'used': len(h2h), 'overlapping_excluded': overlaps, 'effects': h2h_effect},
             'data_quality': {s: {'sample': profiles[s]['for_ft']['sample'],

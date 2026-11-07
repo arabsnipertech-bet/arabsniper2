@@ -226,7 +226,7 @@ def signal_for(row, eligible):
     return 'unconfirmed'
 
 
-def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None, over25_floor=None):
+def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None, over25_floor=None, comparison_basis=None):
     from goal_evidence import structural_reasons
     market = goal_market(row)
     tier = market_tier(row)
@@ -266,12 +266,16 @@ def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None,
         reasons.append('ht_history')
     if market: reasons.extend(structural_reasons(row, market))
     ev, ev_low = row.get('ev_pct'), row.get('ev_low_pct')
-    if not numeric(ev) or ev + 1e-9 < min_ev or not gate_passes(row, base_ev): reasons.append('edge')
-    if not numeric(ev_low) or ev_low + 1e-9 < min_low: reasons.append('sensitivity')
+    fair_comparison = comparison_basis == 'fair_quote_probability_flow_v1'
+    # Explicitly isolated benchmark: a fair quote has zero central EV by identity.
+    # Published calls never pass comparison_basis and retain every value gate.
+    if not fair_comparison:
+        if not numeric(ev) or ev + 1e-9 < min_ev or not gate_passes(row, base_ev): reasons.append('edge')
+        if not numeric(ev_low) or ev_low + 1e-9 < min_low: reasons.append('sensitivity')
     reasons = list(dict.fromkeys(reasons))
     eligible = not reasons
     signal = signal_for(row, eligible)
-    score = p * max(0., ev_low-min_low)/(odd-1) if eligible else None
+    score = (p if fair_comparison else p * max(0., ev_low-min_low)/(odd-1)) if eligible else None
     return {'policy_id': POLICY_ID, 'eligible': eligible, 'strict_eligible': eligible, 'rank': None, 'priority': tier,
             'goal_market': market, 'odds_min': minimum_odd, 'odds_max': maximum_odd,
             'min_probability_pct': minimum_p, 'min_ev_pct': min_ev,
@@ -282,7 +286,8 @@ def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None,
             'entry_min_ev_pct': min_ev, 'entry_min_ev_low_pct': min_low,
             'min_ev_low_pct': min_low, 'margin_band': band,
             'signal': signal, 'label': LABELS[signal], 'reasons': reasons,
-            'playability_score': score, 'pt_priority': pt_priority}
+            'playability_score': score, 'pt_priority': pt_priority,
+            **({'comparison_basis': comparison_basis, 'value_gates_applied': False} if fair_comparison else {})}
 
 
 def ranking_key(row):
@@ -291,7 +296,7 @@ def ranking_key(row):
             -row['ev_pct'], -row['statistical_pct'], str(row['id']))
 
 
-def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, divergence_caps=None, over25_floor=None):
+def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, divergence_caps=None, over25_floor=None, comparison_basis=None):
     rows = matrix.get('rows', [])
     if assessment is not None and (assessment.get('inputs') or assessment.get('profiles')):
         matrix['goal_context'] = goal_context(assessment, rows)
@@ -302,7 +307,7 @@ def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, div
             row['goal_evidence'] = structure
             if goal_market(row) in ('over15_ht', 'over25_ht', 'gg_ht'): row['ht_evidence'] = evidence
     context = matrix.get('goal_context') or {}
-    for row in rows: row['opportunity'] = evaluate(row, context.get('pt_priority_active', False), context.get('preferred_pt_market'), divergence_caps=divergence_caps, over25_floor=over25_floor)
+    for row in rows: row['opportunity'] = evaluate(row, context.get('pt_priority_active', False), context.get('preferred_pt_market'), divergence_caps=divergence_caps, over25_floor=over25_floor, comparison_basis=comparison_basis)
     goals = {key: [r for r in rows if goal_market(r) == key] for key in ODDS_MAX_BY_MARKET}
     for subset, superset in [('over35_ft', 'over25_ft'), ('gg_ht', 'over15_ht'), ('over25_ht', 'over15_ht')]:
         for a in goals[subset]:

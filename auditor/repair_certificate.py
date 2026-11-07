@@ -34,6 +34,10 @@ def build(root, index, state, dates, weights_sha256):
             raise ValueError('Incorrect report date: '+day)
         benchmark = report.get('four_level_benchmark') or {}
         decision = benchmark.get('decision_benchmark') or {}
+        pending_summary = report.get('pending_summary')
+        if pending_summary is not None and (pending_summary.get('pending') is not receipt.get('pending') or
+                receipt.get('pending_summary') is not None and pending_summary != receipt['pending_summary']):
+            raise ValueError('Pending counts do not match sealed day: '+day)
         versions = {}
         for snapshot in decision.get('snapshots', []):
             if snapshot.get('snapshot') == 'first':
@@ -43,7 +47,10 @@ def build(root, index, state, dates, weights_sha256):
             decision_path_comparison=decision.get('decision_path_comparison', {}),
             experiments=decision.get('experiments', {}), platinum_value_cohorts=decision.get('platinum_value_cohorts', {}),
             snapshot_count=decision.get('snapshot_count'), unavailable_snapshots=decision.get('unavailable_snapshots'),
-            first_snapshot_versions=versions)
+            first_snapshot_versions=versions,
+            pending_summary=pending_summary or dict(available=False, reason='legacy_sealed_day_without_pending_counts'),
+            market_fair_protocols=decision.get('market_fair_protocols', {}),
+            experiment_availability=decision.get('experiment_availability', {}))
     return dict(version=1, r2_chain_complete=True, dates=days,
         weights=dict(sha256=weights_sha256, trained_at=state.get('trained_at'), as_of=state.get('as_of'),
             evidence_provenance=provenance, mismatch_shrinkage_factor=state.get('mismatch_shrinkage_factor'),

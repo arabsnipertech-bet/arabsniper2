@@ -141,7 +141,8 @@ def build_daily(store, date, generated_at, source_revision=None, observe=None):
         if observe is not None:
             observe(record)
     benchmark = build_benchmark(store)
-    return {**benchmark['observed_populations'], 'four_level_benchmark': benchmark, 'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'audit_date': date, 'generated_at': generated_at,
+    from audit_pending import summarize as pending_counts
+    return {**benchmark['observed_populations'], 'pending_summary': pending_counts(store), 'four_level_benchmark': benchmark, 'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'audit_date': date, 'generated_at': generated_at,
             'source_revision': source_revision, 'policy_id': __import__('opportunity_policy').POLICY_ID,
             'published_social_picks': {'available': False, 'reason': 'delivery_receipts_not_loaded; never inferred from eligibility'},
             'evidence_provenance': {'forecast_sha256': sorted({r['forecast_sha256'] for r in fixtures}),
@@ -167,6 +168,11 @@ def markdown(report):
               'SHA-256 input: '+json.dumps(report.get('evidence_provenance', {}).get('input_files', {}), sort_keys=True), '',
               '| Snapshot | Model | Period | Fixtures | With primary | Primary settled | Primary pending |',
               '|---|---|---|---:|---:|---:|---:|']
+    pending = report.get('pending_summary') or {}
+    if pending.get('available'):
+        lines[7:7] = [f"Pending giornaliero: {pending['pending_records_count']} record su {pending['pending_fixtures_count']} match distinti; "
+                      f"non Gold: {pending['non_gold_pending_fixtures_count']}; Gold: {pending['gold_pending_fixtures_count']}; "
+                      f"record senza fixture_id: {pending['pending_records_without_fixture_id']}. Distinto da pending_choices.", '']
     cohorts = defaultdict(list)
     for f in report['fixtures']:
         cohorts[(f['snapshot'], f['model_id'], f['period'])].append(f)
