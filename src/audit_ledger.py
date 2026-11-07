@@ -21,22 +21,37 @@ def encoded(value):
     return json.dumps(value, ensure_ascii=False, separators=(',', ':'), allow_nan=False)
 
 
-def entries(path):
-    """Yield metadata or one forecast at a time, including keys containing dots."""
+def entries(path, *, fixture_date=None):
+    """Yield one forecast at a time, optionally retaining only a Rome fixture date.
+
+    Filtering avoids constructing irrelevant nested payloads. Every JSON token
+    and every original chunk is still read and verified, including the tail.
+    Records with unknown/naive dates remain available for caller validation.
+    """
     import ijson
     from ijson.common import ObjectBuilder
 
-    def value(events, first):
+    skipped = object()
+
+    def value(events, first, filter_date=False):
         builder = ObjectBuilder()
-        _, event, item = first
+        record_prefix, event, item = first
         builder.event(event, item)
         depth = int(event in ('start_map', 'start_array'))
         while depth:
-            _, event, item = next(events)
-            builder.event(event, item)
+            prefix, event, item = next(events)
+            if filter_date and builder is not None and prefix == record_prefix+'.fixture.kickoff' and event == 'string':
+                try:
+                    kickoff = datetime.fromisoformat(item.replace('Z', '+00:00'))
+                    if kickoff.tzinfo and kickoff.astimezone(ZoneInfo('Europe/Rome')).date().isoformat() != fixture_date:
+                        builder = None
+                except ValueError:
+                    pass
+            if builder is not None:
+                builder.event(event, item)
             depth += int(event in ('start_map', 'start_array'))
             depth -= int(event in ('end_map', 'end_array'))
-        return builder.value
+        return builder.value if builder is not None else skipped
 
     with open_verified_json(path) as stream:
         events = iter(ijson.parse(stream, use_float=True))
@@ -64,7 +79,9 @@ def entries(path):
                     break
                 if prefix != name or event != 'map_key':
                     raise ValueError('Invalid audit record key')
-                record = value(events, next(events))
+                record = value(events, next(events), filter_date=fixture_date is not None)
+                if record is skipped:
+                    continue
                 if not isinstance(record, dict):
                     raise ValueError('Audit record must be an object')
                 yield name, item, record

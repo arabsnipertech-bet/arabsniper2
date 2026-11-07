@@ -130,3 +130,31 @@ class QuantFinalization(unittest.TestCase):
         self.assertEqual(result['baseline_on_same_snapshots']['first_choices_activated'],1)
         self.assertEqual(result['changed_vs_baseline'],1)
         self.assertEqual(result['first_choices_activated'],0)
+
+    def test_inactive_lambda_experiment_is_exactly_anchored_baseline(self):
+        from lateral_matrix import build_matrix
+        from adaptive_pricing import apply_matrix
+        at='2026-11-07T08:00:00Z';meta=dict(fixture_id=1,kickoff='2026-11-07T20:00:00Z',status_short='NS')
+        a=build_matrix(dict(rates=dict(home_ft=3.,away_ft=1.,home_ht=1.3,away_ht=.4),
+            sensitivity_rates=[dict(home_ft=.6,away_ft=3.,home_ht=.25,away_ht=1.2)]),at)
+        for r in a['matrix']['rows']:
+            if r['spec']['kind']=='result' and r['period']=='ft':
+                r.update(selected_market_odds={'1':1.3,'x':5.,'2':9.},provider_updated_at=at,quote_status='recent')
+            else:
+                r.update(odd=2.,selected_margin_pct=3.,quote_status='recent',quote_executable=True)
+        apply_matrix(a,meta,at);annotate(a['matrix'],at)
+        result=capture(a,meta,at,{})
+        self.assertFalse(result['lambda_expansion_study']['applied'])
+        self.assertEqual(result['experiments']['lambda_total_expansion'], result['paths']['favorite_anchor_only'])
+
+    def test_lambda_skips_partial_1x2_before_complete_operator_partition(self):
+        from lateral_matrix import build_matrix
+        from adaptive_pricing import apply_matrix
+        at='2026-11-07T08:00:00Z';meta=dict(fixture_id=1,kickoff='2026-11-07T20:00:00Z',status_short='NS')
+        a=build_matrix(dict(rates=dict(home_ft=.8,away_ft=1.5,home_ht=.35,away_ht=.6)),at)
+        candidates=[r for r in a['matrix']['rows'] if r['spec']['kind']=='result' and r['period']=='ft']
+        for i,r in enumerate(candidates):
+            r.update(selected_market_odds={'1':1.3} if i==0 else {'1':1.3,'x':5.,'2':9.},provider_updated_at=at,quote_status='recent')
+        apply_matrix(a,meta,at);annotate(a['matrix'],at)
+        result=capture(a,meta,at,{})
+        self.assertTrue(result['lambda_expansion_study']['applied'])

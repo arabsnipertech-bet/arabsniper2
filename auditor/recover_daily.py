@@ -124,9 +124,10 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
         original = {(c,k): fingerprint(r) for c,k,r in ledger.records()}
         paths = ([FORECASTS] if FORECASTS in sources else []) + pending
         for path in paths:
+            print('Verifying original source for '+str(day)+': '+path, flush=True)
             journal = path != FORECASTS
             verified_type = not journal
-            for collection, key, record in entries(root / path):
+            for collection, key, record in entries(root / path, fixture_date=day.isoformat()):
                 if collection is None:
                     if journal and key == 'journal_type':
                         if record != 'forecasts':
@@ -241,10 +242,14 @@ def main():
             digest = prepare(storage, bucket, root, args.date, now, refresh=os.getenv("RECOVERY_REFRESH") == "true")
             with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
                 out.write('digest='+digest+'\n')
+            from auditor_history_chunks import receipt_path
+            print(json.dumps({'verified_receipt': read_store(receipt_path(root, args.date), {})}, sort_keys=True), flush=True)
             print(f'Verified recovery input ready for {args.date}', flush=True)
         else:
             from private_publication import publish
             report = install(storage, bucket, root, args.date, os.environ['REPORT_DIGEST'], now)
+            from auditor_history_chunks import receipt_path
+            print(json.dumps({'published_receipt': read_store(receipt_path(root, args.date), {})}, sort_keys=True), flush=True)
             atomic_bytes(ROOT / PUBLIC_RESULTS, (root / PUBLIC_RESULTS).read_bytes())
             publish(ROOT, {PUBLIC_RESULTS})
             print(f'Published verified results for {args.date}; homepage date {report["date"]}, '

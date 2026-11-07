@@ -30,3 +30,11 @@ Fixed-contract ROI is intentionally not a policy comparison. Decision ROI uses e
 Historical frozen shadow-v1 decisions remain v1. New hypotheses are frozen prospectively in v2; an explicitly labelled replay is used only when the historical shadow snapshot is absent. Social picks require actual delivery receipts and remain explicitly unavailable in the audit when those receipts have not been loaded. Eligibility is never equated with a social publication.
 
 Recovery workflow contains no Telegram/Facebook posting steps. Live numerical promotion and Gold restyling are separate from this update.
+
+## Recovery and shadow follow-through
+
+The date-aware AuditLedger reader verifies the complete original JSON/chunk stream but stops constructing nested record payloads once an observed kickoff belongs to another Rome date. Unknown dates still reach the existing strict identity/date validator. Recovery logs identify each original source and print the verified/published seal hashes and pending status; no prediction payload or credential is logged.
+
+Shadow v2.1 chooses the same complete, fresh 1X2 partition as the published anchor. If the central expansion condition is inactive, it reuses the anchored decision path exactly; uncertainty scenarios cannot introduce an expansion on their own. Historical frozen shadow versions remain identifiable and unchanged.
+
+The final calibration job verifies the requested dates against the live R2 manifest, sealed outputs and the exact calibration hashes read by training before publishing weights. It exports alpha, evidence provenance and aggregate first/latest decision/variant/cohort metrics as an authenticated encrypted artifact. Raw forecasts are excluded. Only the public recipient key is committed; the private key is kept outside the repository.
