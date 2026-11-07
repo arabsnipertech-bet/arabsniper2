@@ -1991,6 +1991,7 @@
     }
     function renderMarketRankings(payload) {
       document.getElementById('marketRankings')?.remove();
+      if(payload.gold_scope||payload.multimarket_method?.model_id?.startsWith('lateral-matrix'))return;
       const section = document.createElement('section');
       section.id = 'marketRankings';
       section.className = 'ranking-section';
@@ -2078,6 +2079,12 @@
     }
 
     function applyFilters() {
+      if(document.getElementById('legacyDashboard')?.hidden){
+        filteredMatches=currentMatches;
+        document.getElementById('matchesGrid').innerHTML='';
+        document.getElementById('matchCount').textContent=currentMatches.length+' partite';
+        return;
+      }
       const search = normalizeText(document.getElementById('searchInput').value.trim());
       const sortMode = document.getElementById('sortSelect').value;
       filteredMatches = currentMatches.filter(match => {

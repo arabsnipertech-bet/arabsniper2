@@ -17,3 +17,10 @@ vm.createContext(context);vm.runInContext(source,context);
  assert(!calls.some(([url])=>!url.startsWith('/api/auth/')),'No account or entitlement changes');
  console.log('PASS Login UI: blocked storage, separate success/error, code validation, resend cooldown and successful access');
 })().catch(error=>{console.error(error);process.exitCode=1;});
+
+{
+ const elements={legacyDashboard:{hidden:true},matchesGrid:{innerHTML:'old'},matchCount:{textContent:''}};
+ const isolated={document:{getElementById:id=>elements[id]},currentMatches:[{fixture:{id:1}}],filteredMatches:[],renderMatches(){throw Error('Hidden legacy cards must not render');}};
+ vm.createContext(isolated);vm.runInContext(html.slice(html.indexOf('    function applyFilters()'),html.indexOf('    function relationClass')),isolated);
+ isolated.applyFilters();assert.equal(elements.matchesGrid.innerHTML,'');assert.equal(elements.matchCount.textContent,'1 partite');
+}
