@@ -79,7 +79,7 @@ def history(rows, as_of, season=None):
 
 def period_rows(rows, period):
     if period == 'ft':
-        return rows
+        return rows[:CONFIG['history_ft']]
     return [r for r in rows if r.get('halftime_available') is True and
             all(numeric(r.get(k)) and 0 <= r[k] <= r[k.replace('_ht', '_ft')] for k in
                 ('team_goals_ht', 'team_conceded_ht'))][:CONFIG['history_ht']]
@@ -171,6 +171,7 @@ def component(rows, side, direction, period, prior, use_xg=True, use_robust=True
             'last_state': 'above' if deviation is not None and deviation > .75 else
                           'below' if deviation is not None and deviation < -.75 else 'in_line',
             'peak_reduction': raw-goal_rate,
+            'xg_basis': 'observed_ht_only' if period == 'ht' else 'observed_ft',
             'xg_mean': xmean, 'xg_sample': len(paired), 'xg_weight': xweight,
             'xg_adjustment': potential-goal_rate,
             'prior_weight': prior_weight, 'drought': drought,

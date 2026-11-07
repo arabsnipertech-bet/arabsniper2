@@ -18,6 +18,17 @@ def fingerprint(record):
                              ensure_ascii=False, allow_nan=False).encode()).hexdigest()
 
 
+def same_frozen_forecast(left, right):
+    """Ingestion may label an update; no numerical/identity field is ignored.
+
+    Keep fingerprint() unchanged: already-issued SHA-256 certificates retain
+    their original byte-independent canonical identity.
+    """
+    def identity(record):
+        return {k: v for k, v in record.items() if k not in ('settlement', 'update_reason')}
+    return fingerprint(identity(left)) == fingerprint(identity(right))
+
+
 def number(value, low, high=float('inf')):
     return (isinstance(value, (int, float)) and not isinstance(value, bool)
             and isfinite(value) and low <= value <= high)
@@ -129,8 +140,10 @@ def build_daily(store, date, generated_at, source_revision=None, observe=None):
     for record in store.get('study_observations', {}).values():
         if observe is not None:
             observe(record)
-    return {'four_level_benchmark': build_benchmark(store), 'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'audit_date': date, 'generated_at': generated_at,
-            'source_revision': source_revision,
+    benchmark = build_benchmark(store)
+    return {**benchmark['observed_populations'], 'four_level_benchmark': benchmark, 'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'audit_date': date, 'generated_at': generated_at,
+            'source_revision': source_revision, 'policy_id': __import__('opportunity_policy').POLICY_ID,
+            'published_social_picks': {'available': False, 'reason': 'delivery_receipts_not_loaded; never inferred from eligibility'},
             'evidence_provenance': {'forecast_sha256': sorted({r['forecast_sha256'] for r in fixtures}),
                 'official_gold': 'gold_certificate = first eligible rank 1 observed',
                 'latest_gold': 'latest prematch snapshot, distinct from first certificate',
@@ -147,9 +160,13 @@ def build_daily(store, date, generated_at, source_revision=None, observe=None):
 def markdown(report):
     lines = [f"# Audit {report['audit_date']}", '', report['note'], '',
              f"Generated: {report['generated_at']} | Revision: {report['source_revision']}", '',
-             f"Invalid records excluded: {len(report['excluded_records'])}", '',
-             '| Snapshot | Model | Period | Fixtures | With primary | Primary settled | Primary pending |',
-             '|---|---|---|---:|---:|---:|---:|']
+             f"Invalid records excluded: {len(report['excluded_records'])}", '']
+    lines += [f"Policy: {report.get('policy_id', 'unavailable')}",
+              'gold_certificate: prima Gold di rango 1 osservata; latest_prematch_gold: ultima proposta prematch.',
+              'all_eligible_markets: tutti i ranghi ammissibili; published_social_picks: solo ricevute di invio.',
+              'SHA-256 input: '+json.dumps(report.get('evidence_provenance', {}).get('input_files', {}), sort_keys=True), '',
+              '| Snapshot | Model | Period | Fixtures | With primary | Primary settled | Primary pending |',
+              '|---|---|---|---:|---:|---:|---:|']
     cohorts = defaultdict(list)
     for f in report['fixtures']:
         cohorts[(f['snapshot'], f['model_id'], f['period'])].append(f)

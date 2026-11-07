@@ -63,6 +63,9 @@ def evaluate(row, as_of):
                        'ev_unavailable' if high_price else 'odds_or_value')
     return {'policy_id': POLICY_ID, 'eligible': not reasons, 'rank': None,
             'evaluated_at': as_of, 'reasons': reasons,
+            'value_cohort': ('platinum_positive_ev' if all(numeric(row.get(k)) and row[k] >= 0 for k in ('ev_pct','ev_low_pct'))
+                             else 'platinum_flow_only_negative_ev') if not reasons else None,
+            'positive_ev_shadow_eligible': not reasons and all(numeric(row.get(k)) and row[k] >= 0 for k in ('ev_pct','ev_low_pct')),
             'qualification': 'odds_and_value' if high_odds and excellent_ev else 'high_odds' if high_odds else 'expected_value' if excellent_ev else None,
             'gold_eligible': (row.get('opportunity') or {}).get('eligible') is True}
 

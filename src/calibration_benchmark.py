@@ -15,7 +15,8 @@ def metrics(rows, probability=None):
     priced = [r for r in rows if number(r.get('odd')) and r['odd'] > 1]
     closes = [r['clv'] for r in rows if number(r.get('clv'))]
     mean = lambda xs: sum(xs)/len(xs) if xs else None
-    out = dict(n=n, fixtures=len({r['fid'] for r in rows}), hit_rate=mean([r['y'] for r in rows]),
+    out = dict(contracts_count=n, distinct_fixtures_count=len({r['fid'] for r in rows}),
+               net_units=sum(r['odd']*r['y']-1 for r in priced), n=n, fixtures=len({r['fid'] for r in rows}), hit_rate=mean([r['y'] for r in rows]),
                mean_odd=mean([r['odd'] for r in priced]), priced_n=len(priced),
                roi_pct=100*mean([r['odd']*r['y']-1 for r in priced]) if priced else None,
                clv_n=len(closes), clv_pct=100*mean(closes) if closes else None)
@@ -29,6 +30,8 @@ def build_benchmark(store):
     first, operations, closes = {}, {}, {}
     from decision_shadow import DecisionAudit
     decisions = DecisionAudit()
+    from official_selections import OfficialSelections
+    official = OfficialSelections()
     studies = StudyEvidence()
     excluded = 0
     for collection in ('multimarket_evaluations', 'analysis_updates'):
@@ -40,6 +43,7 @@ def build_benchmark(store):
                     or start.date().isoformat() < a.get('validation_from', '2026-10-26')):
                 continue
             decisions.observe(record)
+            official.observe(record)
             fid = str(meta['fixture_id'])
             result = (record.get('settlement') or {}).get('result') or {}
             matrix = a.get('matrix') or {}
@@ -128,7 +132,8 @@ def build_benchmark(store):
         pending=len(suppressed_pending), saved_losses=sum(1-r['y'] for r in traps),
         saved_loss_rate=sum(1-r['y'] for r in traps)/len(traps) if traps else None,
         avoided_net_units=-sum(r['odd']*r['y']-1 for r in priced))
-    return dict(decision_benchmark=decisions.report(), version=VERSION, validation_cycle=VALIDATION_CYCLE, snapshot='first_executable_prematch',
+    decision_report = decisions.report()
+    return dict(observed_populations=official.report(), decision_benchmark=decision_report, decision_path_comparison=decision_report['decision_path_comparison'], version=VERSION, validation_cycle=VALIDATION_CYCLE, snapshot='first_executable_prematch',
                 matched_contracts=len(matched), matched_fixtures=len({r['fid'] for r in matched}),
                 excluded_incomplete_probabilities=excluded, levels=levels(matched),
                 by_odds_band={label: levels([r for r in matched if lo <= r['odd'] < hi]) for lo,hi,label in BANDS},
@@ -159,4 +164,22 @@ def markdown(benchmark):
             lines.append('| '+' | '.join(str(v) if v is not None else '—' for v in [category,name,*(g.get(k) for k in ('n','fixtures','hit_rate','roi_pct','clv_pct'))])+' |')
     traps=benchmark['operational_selections']['suppressed_traps']
     lines += ['', f"Trappole: {traps['saved_losses']} perdite evitate, tasso {traps['saved_loss_rate']}; saldo teorico evitato {traps['avoided_net_units']} unità (incluse vincite escluse).", 'Campioni operativi sovrapposti non sommabili.', '']
+    decision = benchmark.get('decision_benchmark') or {}
+    lines += ['', '## Decisioni effettive sui medesimi snapshot', '',
+              '| Snapshot | Percorso | Attivate | Cambiate vs Poisson | Chiuse | Pendenti | Unità | ROI % | IC 95% ROI per fixture |',
+              '|---|---|---:|---:|---:|---:|---:|---:|---|']
+    for snapshot, paths in (decision.get('decision_path_comparison') or {}).items():
+        for name, value in paths.items():
+            values=[snapshot,name,*(value.get(k) for k in ('first_choices_activated','changed_vs_pure_poisson','n','pending_choices','net_units','roi_pct')),
+                    (value.get('uncertainty') or {}).get('roi_pct_interval')]
+            lines.append('| '+' | '.join('—' if x is None else str(x) for x in values)+' |')
+    lines += ['', '## Varianti isolate (solo shadow)', '', '| Snapshot | Variante | Gare confrontate | Scelte cambiate | Attivate | ROI % | Differenza ROI pp |', '|---|---|---:|---:|---:|---:|---:|']
+    for snapshot, variants in (decision.get('experiments') or {}).items():
+        for name,value in variants.items():
+            lines.append('| '+' | '.join(str(v) if v is not None else '—' for v in
+                (snapshot,name,value['compared_fixtures_count'],value['changed_vs_baseline'],value['first_choices_activated'],value['roi_pct'],value['roi_difference_pp']))+' |')
+    lines += ['', '## Coorti Platinum (contratti, non pubblicazioni)', '', '| Snapshot | Coorte | Contratti | Gare distinte | ROI % |', '|---|---|---:|---:|---:|']
+    for snapshot, groups in (decision.get('platinum_value_cohorts') or {}).items():
+        for name,value in groups.items():
+            lines.append('| '+' | '.join(str(v) if v is not None else '—' for v in (snapshot,name,value['n'],value['fixtures'],value['roi_pct']))+' |')
     return '\n'.join(lines)

@@ -28,6 +28,7 @@ def evidence(assessment):
                 'sample': observed('sample', len(values)),
                 'mean': observed('mean', mean(values) if values else None),
                 'without_last': observed('without_last', mean(values[1:]) if len(values) > 1 else None),
+                'without_peak': (sum(values)-max(values))/(len(values)-1) if len(values)>1 else None,
                 'conceded_mean': defense.get('mean') if numeric(defense.get('mean')) else mean(conceded) if conceded else None,
                 'frequency': observed('frequency', mean(v > 0 for v in values) if values else None),
                 # Count the whole observed window, not only the current drought.
@@ -35,7 +36,12 @@ def evidence(assessment):
                 'expected_goals': rates.get(side+'_'+period),
             }
         teams[side] = team
-    return {'id': EVIDENCE_ID, 'teams': teams, 'combined_basis': 'home_and_away_goals_scored_in_period'}
+    return {'id': EVIDENCE_ID, 'teams': teams, 'combined_basis': 'home_and_away_goals_scored_in_period',
+            'peak_shadow': {'production_applied': False, 'periods': {period: (
+                sum(teams[s][period]['without_peak'] for s in ('home','away')) >=
+                .8*sum(teams[s][period]['mean'] for s in ('home','away'))
+                if all(numeric(teams[s][period].get(k)) for s in ('home','away') for k in ('without_peak','mean')) else None)
+                for period in ('ft','ht')}}}
 
 
 def structural_reasons(row, market):

@@ -226,7 +226,7 @@ def signal_for(row, eligible):
     return 'unconfirmed'
 
 
-def evaluate(row, pt_priority=False, preferred_pt=None):
+def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None, over25_floor=None):
     from goal_evidence import structural_reasons
     market = goal_market(row)
     tier = market_tier(row)
@@ -234,6 +234,7 @@ def evaluate(row, pt_priority=False, preferred_pt=None):
         tier = 2 if row.get('spec', {}).get('period') != 'ht' else 0 if market == preferred_pt else 1
     p, odd = row.get('statistical_pct'), row.get('odd')
     minimum_p, minimum_odd, maximum_odd = min_probability(row), ODDS_MIN_BY_MARKET.get(market, ODDS_MIN), odds_max(row)
+    if market == 'over25_ft' and over25_floor is not None: minimum_odd = over25_floor
     margin, oci = row.get('selected_margin_pct'), row.get('oci')
     margin_known = numeric(margin)
     band = 'unknown' if not margin_known else 'anomalous' if not 0 <= margin <= 8 else 'high' if margin >= 6.5 else 'low'
@@ -258,7 +259,7 @@ def evaluate(row, pt_priority=False, preferred_pt=None):
     if not numeric(book) and numeric(odd) and odd > 1 and margin_known and margin > -100:
         book = 100/odd/(1+margin/100)
     if not numeric(book): book = row.get('market_fair_pct')
-    if numeric(p) and numeric(book) and p-book > 15.+1e-9 and not (numeric(delta) and delta < 0 and numeric(oci) and oci > 0):
+    if numeric(p) and numeric(book) and p-book > (divergence_caps or {}).get(row.get('spec', {}).get('period'), 15.)+1e-9 and not (numeric(delta) and delta < 0 and numeric(oci) and oci > 0 and confirmed_flow(row)):
         reasons.append('suspicious_divergence')
     if market == 'over25_ht' and (not numeric(oci) or oci < 15): reasons.append('ht_oci')
     if market in ('over15_ht', 'over25_ht', 'gg_ht') and not supported_first_half(row.get('ht_evidence')):
@@ -290,7 +291,7 @@ def ranking_key(row):
             -row['ev_pct'], -row['statistical_pct'], str(row['id']))
 
 
-def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True):
+def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, divergence_caps=None, over25_floor=None):
     rows = matrix.get('rows', [])
     if assessment is not None and (assessment.get('inputs') or assessment.get('profiles')):
         matrix['goal_context'] = goal_context(assessment, rows)
@@ -301,7 +302,7 @@ def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True):
             row['goal_evidence'] = structure
             if goal_market(row) in ('over15_ht', 'over25_ht', 'gg_ht'): row['ht_evidence'] = evidence
     context = matrix.get('goal_context') or {}
-    for row in rows: row['opportunity'] = evaluate(row, context.get('pt_priority_active', False), context.get('preferred_pt_market'))
+    for row in rows: row['opportunity'] = evaluate(row, context.get('pt_priority_active', False), context.get('preferred_pt_market'), divergence_caps=divergence_caps, over25_floor=over25_floor)
     goals = {key: [r for r in rows if goal_market(r) == key] for key in ODDS_MAX_BY_MARKET}
     for subset, superset in [('over35_ft', 'over25_ft'), ('gg_ht', 'over15_ht'), ('over25_ht', 'over15_ht')]:
         for a in goals[subset]:
