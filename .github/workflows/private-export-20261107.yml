@@ -1,7 +1,7 @@
 name: Private R2 encrypted export 20261107
 on:
   push:
-    branches: ['export/private-r2-20261107']
+    branches: ['export/private-r2-compact-20261107']
 permissions:
   contents: read
 concurrency:
@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install boto3 ijson==3.6.0
+      - run: pip install boto3 ijson==3.6.0 simplejson
       - name: Read and verify fixed private checkpoint
         env:
           R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -29,7 +29,7 @@ jobs:
         run: python tools/export_private_r2_20261107.py
       - name: Encrypt export for its owner
         run: |
-          openssl cms -encrypt -aes-256-cbc -binary -outform DER -in export-out/ArabSniper_Archivio_R2.zip -out export-out/ArabSniper_Archivio_R2.zip.enc tools/export_20261107_public.pem
+          openssl cms -encrypt -stream -aes-256-cbc -binary -outform DER -in export-out/ArabSniper_Archivio_R2.zip -out export-out/ArabSniper_Archivio_R2.zip.enc tools/export_20261107_public.pem
           rm export-out/ArabSniper_Archivio_R2.zip
       - uses: actions/upload-artifact@v4
         with:

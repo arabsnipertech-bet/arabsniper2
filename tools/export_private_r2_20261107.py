@@ -22,21 +22,62 @@ def fetch(pair):
 with ThreadPoolExecutor(max_workers=12) as pool:
  for n,_ in enumerate(pool.map(fetch,files.items()),1):
   if n%1000==0:print('Verified objects:',n,flush=True)
+
+import sqlite3,zlib,ijson,simplejson
+from ijson.common import ObjectBuilder
 out=Path('export-out');out.mkdir()
-meta={'exported_at':datetime.now(timezone.utc).isoformat(),'source_commit':os.environ['GITHUB_SHA'],'manifest_sha256':hashlib.sha256(raw).hexdigest(),'files':len(files),'bytes':sum(x['bytes'] for x in files.values()),'scope':'All files referenced by the fixed current R2 checkpoint. Unreferenced old object versions and unrelated bucket prefixes are not included. No outcomes recalculated.'}
-(root/'EXPORT_METADATA.json').write_text(json.dumps(meta,indent=2))
-(root/'CHECKPOINT_MANIFEST.json').write_bytes(raw)
-with open(root/'FILE_INVENTORY.csv','w') as f:
- w=csv.writer(f);w.writerow(['path','bytes','sha256']);w.writerows((p,x['bytes'],x['sha256']) for p,x in sorted(files.items()))
-(root/'LEGGIMI.txt').write_text("Archivio integrale della fotografia corrente R2. Tutti i file elencati nel manifest sono verificati SHA256. I file multipart sono conservati senza perdita; la cartella documenti_leggibili contiene anche JSON ricomposti per audit e partite. Comprende dati non ancora certificati e partite future: controllare data, captured_at, kickoff e stato esito. Non attribuire una categoria mancante. Versioni orfane di oggetti R2 e altri prefissi del bucket non fanno parte di questo checkpoint. Nessuna modifica al modello o all'archivio originale.\n")
+db=sqlite3.connect(out/'ArabSniper_Archivio_R2.sqlite')
+db.execute('pragma journal_mode=off');db.execute('pragma synchronous=off')
+db.executescript('create table nodes(hash text primary key,kind text,payload blob); create table documents(path text primary key,root_hash text,source_sha256 text); create table metadata(key text primary key,value text);')
+def save(kind,payload):
+ encoded=payload.encode() if isinstance(payload,str) else payload
+ h=hashlib.sha256(kind.encode()+b'\0'+encoded).hexdigest()
+ db.execute('insert or ignore into nodes values(?,?,?)',(h,kind,zlib.compress(encoded,6)))
+ return h
+def build(ev,first,depth=0):
+ event,value=first
+ if event in ('start_map','start_array') and depth<4:
+  rows=[]
+  if event=='start_map':
+   while True:
+    e,v=next(ev)
+    if e=='end_map':break
+    if e!='map_key':raise ValueError('Expected key')
+    rows.append([v,build(ev,next(ev),depth+1)])
+   kind='object'
+  else:
+   while True:
+    e,v=next(ev)
+    if e=='end_array':break
+    rows.append(build(ev,(e,v),depth+1))
+   kind='array'
+  return save(kind,simplejson.dumps(rows,ensure_ascii=False,separators=(',',':')))
+ b=ObjectBuilder();b.event(event,value);n=int(event in ('start_map','start_array'))
+ while n:
+  e,v=next(ev);b.event(e,v);n+=int(e in ('start_map','start_array'))-int(e in ('end_map','end_array'))
+ return save('json',simplejson.dumps(b.value,use_decimal=True,ensure_ascii=False,separators=(',',':')))
+meta={'scope':'All logical JSON and Markdown documents referenced by the current private checkpoint; multipart JSON decoded and all JSON values retained with lossless structural deduplication. Old unreferenced R2 object versions and unrelated bucket prefixes excluded. Not an audit certification.','created_at':datetime.now(timezone.utc).isoformat(),'manifest_sha256':hashlib.sha256(raw).hexdigest(),'files':len(files)}
+db.execute('insert into metadata values(?,?)',('export',json.dumps(meta)))
+db.execute('insert into metadata values(?,?)',('checkpoint_manifest',raw.decode()))
+n=0
+for path,item in sorted(files.items()):
+ if '/_audit_parts/' in path:continue
+ p=root/path
+ if path.endswith('.json'):
+  with open_verified_json(p) as src:
+   ev=iter(ijson.basic_parse(src));h=build(ev,next(ev))
+   if next(ev,None) is not None:raise ValueError('Trailing data')
+ else:h=save('text',p.read_bytes())
+ db.execute('insert into documents values(?,?,?)',(path,h,item['sha256']))
+ db.commit();n+=1
+ print('Logical documents preserved:',n,'Database bytes:',(out/'ArabSniper_Archivio_R2.sqlite').stat().st_size,flush=True)
+db.execute('insert into metadata values(?,?)',('document_count',str(n)))
+db.commit()
+assert db.execute('pragma integrity_check').fetchone()[0]=='ok'
+print('Export complete. Documents:',n,'Unique nodes:',db.execute('select count(*) from nodes').fetchone()[0],flush=True)
+db.close()
 with zipfile.ZipFile(out/'ArabSniper_Archivio_R2.zip','w',zipfile.ZIP_DEFLATED,compresslevel=3,allowZip64=True) as z:
- for p in root.rglob('*'):
-  if p.is_file():z.write(p,'originali/'+p.relative_to(root).as_posix())
- for path in files:
-  if path.endswith('.json') and '/_audit_parts/' not in path:
-   p=root/path
-   if p.stat().st_size<1024*1024:
-    v=json.loads(p.read_bytes())
-    if isinstance(v,dict) and v.get('_storage')=='arabsniper-audit-parts-v1':
-     with open_verified_json(p) as src,z.open('documenti_leggibili/'+path,'w',force_zip64=True) as dest:shutil.copyfileobj(src,dest,1024*1024)
-print('Export verified. Files:',len(files),'Archive bytes:',(out/'ArabSniper_Archivio_R2.zip').stat().st_size,flush=True)
+ z.write(out/'ArabSniper_Archivio_R2.sqlite','ArabSniper_Archivio_R2.sqlite')
+ z.write('tools/read_export_20261107.py','LEGGI_ARCHIVIO.py')
+ z.writestr('LEGGIMI.txt','Archivio completo dei documenti logici del checkpoint privato R2. Tutti i dati JSON sono preservati; ripetizioni identiche sono archiviate una sola volta e richiamate tramite hash. Per ricostruire tutti i JSON: python LEGGI_ARCHIVIO.py ArabSniper_Archivio_R2.sqlite cartella_output. Non servono API o credenziali. Include dati e risultati non certificati: verificare i rispettivi campi. La presenza nello storico non implica selezione Gold/Platinum. Dati mancanti non sono inventati. Vecchie versioni orfane R2 non incluse.')
+print('Final archive bytes:',(out/'ArabSniper_Archivio_R2.zip').stat().st_size,flush=True)
