@@ -1,0 +1,186 @@
+name: Transfer encrypted private export in bounded blocks
+on:
+  push:
+    branches: ['export/private-r2-transfer-20261107']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: private-r2-encrypted-20261107
+          run-id: 42350681144
+          github-token: ${{ github.token }}
+          path: incoming
+      - name: Split ciphertext only
+        run: |
+          mkdir parts
+          split -b 400M -d -a 2 incoming/ArabSniper_Archivio_R2.zip.enc parts/part-
+          python - <<'PY'
+          import hashlib,json,pathlib
+          rows=[]
+          for p in sorted(pathlib.Path('parts').glob('part-*')):
+              h=hashlib.sha256()
+              with p.open('rb') as f:
+                  for b in iter(lambda:f.read(1048576),b''):h.update(b)
+              rows.append({'name':p.name,'bytes':p.stat().st_size,'sha256':h.hexdigest()})
+          assert len(rows)==21
+          pathlib.Path('transfer-index.json').write_text(json.dumps(rows,indent=2))
+          print('Verified encrypted transfer parts:',len(rows))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-00
+          path: parts/part-00
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-01
+          path: parts/part-01
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-02
+          path: parts/part-02
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-03
+          path: parts/part-03
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-04
+          path: parts/part-04
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-05
+          path: parts/part-05
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-06
+          path: parts/part-06
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-07
+          path: parts/part-07
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-08
+          path: parts/part-08
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-09
+          path: parts/part-09
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-10
+          path: parts/part-10
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-11
+          path: parts/part-11
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-12
+          path: parts/part-12
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-13
+          path: parts/part-13
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-14
+          path: parts/part-14
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-15
+          path: parts/part-15
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-16
+          path: parts/part-16
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-17
+          path: parts/part-17
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-18
+          path: parts/part-18
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-19
+          path: parts/part-19
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-part-20
+          path: parts/part-20
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-export-transfer-index
+          path: transfer-index.json
+          retention-days: 1
