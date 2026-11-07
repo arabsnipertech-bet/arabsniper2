@@ -1,0 +1,39 @@
+name: Private R2 encrypted export 20261107
+on:
+  push:
+    branches: ['export/private-r2-20261107']
+permissions:
+  contents: read
+concurrency:
+  group: private-r2-export-20261107
+  cancel-in-progress: false
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3 ijson==3.6.0
+      - name: Read and verify fixed private checkpoint
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          PYTHONUNBUFFERED: '1'
+        run: python tools/export_private_r2_20261107.py
+      - name: Encrypt export for its owner
+        run: |
+          openssl cms -encrypt -aes-256-cbc -binary -outform DER -in export-out/ArabSniper_Archivio_R2.zip -out export-out/ArabSniper_Archivio_R2.zip.enc tools/export_20261107_public.pem
+          rm export-out/ArabSniper_Archivio_R2.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-r2-encrypted-20261107
+          path: export-out/*.enc
+          retention-days: 1
+          compression-level: 0
