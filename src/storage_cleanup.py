@@ -7,7 +7,7 @@ import argparse
 import json
 import re
 from pathlib import Path
-from audit_storage import FORMAT, read_store
+from audit_storage import validate_store, FORMAT, read_store
 
 ROOTS = ('data', 'auditordata', 'auditarchive')
 PART = re.compile(r'[a-f0-9]{64}\.json\.gz\Z')
@@ -23,11 +23,14 @@ def clean(root, apply=False):
         for path in sorted(base.rglob('*.json')):
             if '_audit_parts' in path.parts:
                 continue
+            if path.stat().st_size > 1024*1024:
+                validate_store(path)
+                continue
             value = json.loads(path.read_bytes())
             if isinstance(value, dict) and '_storage' in value:
                 if value['_storage'] != FORMAT:
                     raise ValueError(f'Unknown storage format: {path}')
-                read_store(path)  # Full byte counts and SHA-256 validation.
+                validate_store(path)  # Full byte counts and SHA-256 validation.
                 manifests.append(path)
                 for part in value['parts']:
                     referenced.add(path.parent / '_audit_parts' / (part['sha256'] + '.json.gz'))
@@ -45,7 +48,7 @@ def clean(root, apply=False):
         for path in candidates:
             path.unlink()
         for path in manifests:
-            read_store(path)
+            validate_store(path)
     return report
 
 

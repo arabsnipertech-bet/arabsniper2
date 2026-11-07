@@ -151,6 +151,8 @@ def build_board(day, as_of):
                 if row.get('published_selection') and row.get('market') in board:
                     board[row['market']]['started_selections'] += 1
         if a.get('model_id') != MODEL_ID: continue
+        from copy import deepcopy
+        prior_stability = deepcopy((a.get('matrix') or {}).get('proposal_stability') or {})
         if kickoff and kickoff > stamp(as_of): expire(a, meta, as_of)
         rows = [safe_price_row(r) for r in a.get('matrix', {}).get('rows', [])]
         indexed = {r['id']: r for r in rows}
@@ -167,6 +169,8 @@ def build_board(day, as_of):
         matrix = a.get('matrix', {})
         matrix['quote_monitoring']['suppressed_study_candidates'] = []
         matrix['quote_monitoring']['studio_ideas'] = generate_ideas(a, as_of, meta.get('kickoff'), matrix['quote_monitoring']['suppressed_study_candidates']) if meta.get('status_short') in ('NS', 'TBD') else []
+        from decision_shadow import capture as capture_shadow
+        matrix['decision_shadow'] = capture_shadow(a, meta, as_of, prior_stability)
         platinum += bool(a.get('matrix', {}).get('platinum_policy', {}).get('best_market_id'))
         a.get('matrix', {})['summary'] = {'categories': dict(category_counts), 'observed_markets': len(rows),
                                         'priced_markets': sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)}

@@ -147,3 +147,53 @@
  .mx-opportunity{padding:15px 12px}
 }
 @media(prefers-reduced-motion:reduce){.btn,.day-btn{transition:none}}
+
+/* Gold Matchroom: presentation only. No ranking, market or social policy. */
+body[data-gold-ui="2026-11"]{--bg:#090d13;--panel:#101720;--panel-2:#151e29;--gold:#e8c783;--cyan:#8bc6de;background:radial-gradient(ellipse at 80% 0,#20201866,transparent 36%),#090d13;color:#edf1f5}
+body[data-gold-ui="2026-11"] .page{width:min(1460px,calc(100% - 64px));padding-top:28px}
+body[data-gold-ui="2026-11"] .topbar{position:relative;top:auto;background:transparent;border:0;border-bottom:1px solid #343a42;border-radius:0;box-shadow:none;padding:0 0 26px;align-items:center;backdrop-filter:none}
+.gold-brand-label{display:block;font-size:11px;letter-spacing:.22em;font-weight:800;color:#e8c783;margin-bottom:9px}
+body[data-gold-ui="2026-11"] .brand h1{font-size:clamp(27px,3vw,40px);font-weight:650;color:#f3f1eb;letter-spacing:-.055em}.gold-brand-mark{color:#927c50;font-weight:300;padding:0 5px}
+body[data-gold-ui="2026-11"] .brand p{font-size:13px;color:#a9b2bd;margin-top:9px}
+body[data-gold-ui="2026-11"] .live-line{font-size:11px;font-weight:500;color:#a6c6bc;margin-top:12px}
+body[data-gold-ui="2026-11"] .live-dot{width:6px;height:6px;box-shadow:none;background:#8ac8ad;animation:none}
+body[data-gold-ui="2026-11"] .btn{border-radius:7px;background:#121a24;border-color:#34404c;font-size:12px;font-weight:600;min-height:42px}
+body[data-gold-ui="2026-11"] .btn-gold{background:#e8c783;border-color:#e8c783;color:#171b20}
+body[data-gold-ui="2026-11"] .btn-danger{color:#b5bdc7;background:transparent}
+body[data-gold-ui="2026-11"] .toolbar{margin-top:22px;border:1px solid #2a3440;border-radius:10px;background:#101720;padding:12px 16px;gap:20px}
+body[data-gold-ui="2026-11"] .day-btn{border-radius:6px;background:transparent;border-color:transparent;min-height:42px;color:#aab4bf;font-size:12px;padding:9px 15px}
+body[data-gold-ui="2026-11"] .day-btn.active{background:#e8c783;color:#171b20;border-color:#e8c783;box-shadow:none}
+body[data-gold-ui="2026-11"] .sync-box{font-size:11px;line-height:1.65;color:#a9b4c0}
+body[data-gold-ui="2026-11"] .ranking-section{background:transparent;border:0;padding:0;margin-top:30px}
+body[data-gold-ui="2026-11"] .mx-heading{margin:28px 0 20px;align-items:center}
+body[data-gold-ui="2026-11"] .mx-heading h2{font-size:clamp(23px,2vw,30px);font-weight:600;letter-spacing:-.035em;margin:8px 0}
+body[data-gold-ui="2026-11"] .mx-heading p{font-size:12px;color:#aab6c2}
+body[data-gold-ui="2026-11"] .mx-heading>b{font-size:10px;font-weight:600;letter-spacing:.1em;color:#d8c497;background:transparent;border:1px solid #6b5d40;border-radius:5px}
+body[data-gold-ui="2026-11"] .mx-counters{border:1px solid #293543;background:#101821;border-radius:9px;gap:12px 26px;padding:17px 20px;font-size:12px;color:#aab7c4}
+body[data-gold-ui="2026-11"] .mx-counters b{font-size:17px;margin-right:3px;color:#f0efe8}
+body[data-gold-ui="2026-11"] .mx-categories{gap:7px;margin-top:22px}
+body[data-gold-ui="2026-11"] .mx-categories button{background:#111923;border:1px solid #303e4b;border-radius:6px;min-height:42px;color:#b9c5d1;font-size:11px}
+body[data-gold-ui="2026-11"] .mx-categories button[aria-pressed=true]{background:#28251e;border-color:#b99a60;color:#f2dba9;box-shadow:none}
+body[data-gold-ui="2026-11"] .mx-controls{border-radius:9px;background:#111a24;border-color:#2e3c49;padding:16px}
+body[data-gold-ui="2026-11"] .mx-controls input,body[data-gold-ui="2026-11"] .mx-controls select{border-color:#3c4a57;background:#0c131c;border-radius:6px;font-size:12px}
+body[data-gold-ui="2026-11"] .mx-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
+body[data-gold-ui="2026-11"] .mx-results-count,body[data-gold-ui="2026-11"] .mx-results>.mx-empty{grid-column:1/-1;margin:6px 0 0;font-size:12px}
+body[data-gold-ui="2026-11"] .mx-card{margin:0;border-radius:12px;border-color:#33414f;background:#111a24;box-shadow:0 7px 24px #0002;min-width:0}
+body[data-gold-ui="2026-11"] .mx-card>header{padding:20px;background:linear-gradient(110deg,var(--mx-tint),#141e29 80%);border-bottom:1px solid #2e3b48;gap:12px}
+body[data-gold-ui="2026-11"] .mx-card h3{font-size:21px;letter-spacing:-.03em;line-height:1.35}
+body[data-gold-ui="2026-11"] .mx-card>header .mx-category{font-size:10px!important;letter-spacing:.12em!important;border-radius:4px;padding:5px 8px;margin-bottom:8px}
+body[data-gold-ui="2026-11"] .mx-card .mx-best{border-radius:8px;box-shadow:none;padding:18px;background:#182331}
+body[data-gold-ui="2026-11"] .mx-card .mx-best h4{font-size:19px;margin:10px 0}
+body[data-gold-ui="2026-11"] .mx-card .mx-best-price{font-size:34px;line-height:1.2;letter-spacing:-.04em}
+body[data-gold-ui="2026-11"] .mx-card .mx-quote-cell{background:#0e1822;border-color:#344453;border-radius:7px;box-shadow:none}
+body[data-gold-ui="2026-11"] .mx-card>.mx-cockpit{border-radius:8px;background:#0e1822;padding:16px;margin:14px 20px 20px;box-shadow:none}
+body[data-gold-ui="2026-11"] .mx-card .mx-instrument>strong{font-size:24px}
+body[data-gold-ui="2026-11"] .mx-card .mx-instrument:nth-child(2)>strong{font-size:30px}
+body[data-gold-ui="2026-11"] .mx-card .mx-cockpit-pick h3{font-size:19px}
+body[data-gold-ui="2026-11"] .mx-open{background:#182431;font-size:12px;color:#d4c49e;border-top-color:#34414e}
+body[data-gold-ui="2026-11"] .mx-card>footer{background:#0d151f;color:#9eafbe;font-size:10px}
+body[data-gold-ui="2026-11"] .mx-modal{border-radius:12px;background:#101923;box-shadow:0 25px 100px #0009}
+body[data-gold-ui="2026-11"] .mx-modal-header{background:#172331}
+body[data-gold-ui="2026-11"] :focus-visible{outline:2px solid #e8c783;outline-offset:3px}
+@media(max-width:1100px){body[data-gold-ui="2026-11"] .mx-results{grid-template-columns:1fr}body[data-gold-ui="2026-11"] .page{width:calc(100% - 40px)}}
+@media(max-width:600px){body[data-gold-ui="2026-11"] .page{width:calc(100% - 24px);padding-top:18px}body[data-gold-ui="2026-11"] .topbar{display:block;padding-bottom:18px}body[data-gold-ui="2026-11"] .top-actions{justify-content:flex-start;margin-top:18px}body[data-gold-ui="2026-11"] .toolbar{padding:10px;gap:12px}body[data-gold-ui="2026-11"] .day-btn{padding:8px 10px;font-size:11px}body[data-gold-ui="2026-11"] .mx-counters{padding:14px;gap:12px 18px}body[data-gold-ui="2026-11"] .mx-card>header{padding:16px 14px}body[data-gold-ui="2026-11"] .mx-card h3{font-size:20px}body[data-gold-ui="2026-11"] .mx-card>.mx-cockpit{margin:12px;padding:12px 8px}body[data-gold-ui="2026-11"] .mx-results{gap:16px}body[data-gold-ui="2026-11"] .mx-heading>b{display:none}}

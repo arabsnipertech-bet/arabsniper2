@@ -228,7 +228,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
  const nearCombo=payload.matches[3].multimarket.matrix.rows.find(r=>r.spec.kind==='halves_total');
  Object.assign(nearCombo,{statistical_pct:55,fair_odd:100/55});
  Object.assign(nearCombo.combo,{active:false,reasons:['combo_probability','combo_rates'],lambda_ht:1.12,lambda_sh:1.8,over25_ft_oci:0});
- const browser=await chromium.launch({headless:true});
+ const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
  try{
   await verifyCachedRelease(browser,payload);
   await verifyCalendarRollover(browser,payload);

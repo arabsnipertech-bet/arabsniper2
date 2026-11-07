@@ -58,7 +58,7 @@ def build_studies(report):
                      r['outcome'], r['odd'] if valid(r['odd'],1,float('inf')) and r['odd']>1 else None) for r in paired]
         stat, book = metrics(observations()), metrics(observations(True))
         summaries.append(dict(zip(('snapshot','model_id','phase','market','scope','country','league_id','rule','membership'),key),
-                              fixtures=len(rows), settled=sum(r['outcome'] is not None for r in rows),
+                              contracts=len(rows), fixtures=len({r['fixture_id'] for r in rows}), settled=sum(r['outcome'] is not None for r in rows),
                               pending=sum(r['outcome'] is None for r in rows),
                               statistics=stat, book=book,
                               fixture_ids=[r['fixture_id'] for r in rows]))
@@ -69,14 +69,14 @@ def build_studies(report):
 
 def study_markdown(study):
     lines = ['## Studi sulla selezione', '', study['note'], '',
-             '| Snapshot | Modello | Fase | Mercato | Regola | Gruppo | Partite | Pendenti | Vinte/valutate | ROI teorico % |',
-             '|---|---|---|---|---|---|---:|---:|---|---:|']
+             '| Snapshot | Modello | Fase | Mercato | Regola | Gruppo | Contratti | Partite distinte | Pendenti | Vinte/valutate | ROI teorico % |',
+             '|---|---|---|---|---|---|---:|---:|---:|---|---:|']
     for g in study['groups']:
         if g['country'] != '*' or g['scope'] != 'primary_only' or g['model_id'] != 'context-goals-v3.4':
             continue
         m=g['statistics']
         values=[g[k] for k in ('snapshot','model_id','phase','market','rule','membership')]
-        values += [g['fixtures'],g['pending'],f"{m.get('wins',0)}/{m['n']}",m.get('paper_roi_pct','—')]
+        values += [g.get('contracts',g['fixtures']),g['fixtures'],g['pending'],f"{m.get('wins',0)}/{m['n']}",m.get('paper_roi_pct','—')]
         lines.append('| '+' | '.join(str(v) for v in values)+' |')
     lines += ['', 'Il JSON include anche alternative non principali, scartati, dati mancanti e suddivisioni per campionato. Nessuna promozione automatica delle regole.', '']
     return '\n'.join(lines)
@@ -106,7 +106,17 @@ def rank_study_ideas(ideas):
         odd, probability = item.get('odd'), item.get('poisson_pct')
         priced = valid(odd, 1, float('inf')) and odd > 1
         ev = odd * probability - 100 if priced and valid(probability) else None
-        eligible = priced and valid(probability, STAR_MIN_POISSON)
+        low_ev = item.get('ev_low_pct')
+        supported = item.get('quality') == 'supported'
+        executable = item.get('quote_executable') is True and item.get('quote_status') in ('recent', 'cached_stable')
+        reasons = []
+        if not priced or not executable: reasons.append('unusable_quote')
+        if not supported: reasons.append('unsupported_data')
+        if not valid(probability, STAR_MIN_POISSON): reasons.append('probability_floor')
+        if not valid(low_ev, 0, float('inf')) or low_ev < 0: reasons.append('negative_or_missing_prudent_ev')
+        if ev is None or ev <= 0: reasons.append('nonpositive_ev')
+        item['star_gate'] = dict(version='radar-prudent-value-v1', eligible=not reasons, reasons=reasons)
+        eligible = not reasons
         credible = valid(probability, FLOW_MIN_POISSON)
         low = item.get('poisson_low_pct')
         agreeing, paired = item.get('agreeing_books'), item.get('paired_books')
@@ -135,7 +145,7 @@ def rank_study_ideas(ideas):
         return (not eligible, item.get('study_note') != 'goal_context', -score, -len(signals), item['market'], item['type'])
 
     ranked = sorted(ideas, key=priority)
-    if ranked and ranked[0]['poisson_ev_pct'] is not None and valid(ranked[0].get('poisson_pct'), STAR_MIN_POISSON):
+    if ranked and ranked[0]['star_gate']['eligible']:
         ranked[0]['best_study'] = True
     return ranked
 
@@ -231,6 +241,8 @@ def generate_ideas(assessment, as_of, kickoff, suppressed=None):
         flow = oci if oci is not None else 0
         value = odd is not None and odd*pct > 100
         item = dict(market=market, spec=row['spec'], label=row['label'], odd=odd,
+                    quality=row.get('quality'), quote_status=row.get('quote_status'),
+                    quote_executable=row.get('quote_executable') is True, ev_low_pct=row.get('ev_low_pct'),
                     poisson_pct=pct, fair_odd=100/pct, oci=oci, historical_oci=historical and oci is not None,
                     flow_at=(source if historical else row).get('quote_observed_at'),
                     delta_pct=delta, fair_delta_pp=fair_delta, agreeing_books=row.get('agreeing_books') if live else None,

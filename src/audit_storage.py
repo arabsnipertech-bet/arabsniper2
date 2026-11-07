@@ -4,6 +4,7 @@ Small/legacy JSON remains readable. Large JSON is an atomic manifest referencing
 immutable, compressed 4 MiB byte chunks. No forecast or old chunk is deleted.
 """
 import gzip
+import io
 import hashlib
 import json
 import os
@@ -35,7 +36,7 @@ def atomic_bytes(path, data):
 
 @contextmanager
 def open_verified_json(path):
-    """Open legacy JSON or a fully checked, disk-spooled multipart document."""
+    """Stream verified chunks; full-document verification completes on exit."""
     path = Path(path)
     # Manifests are small. Large legacy documents must never be read in full.
     value = None
@@ -45,9 +46,9 @@ def open_verified_json(path):
         with path.open('rb') as stream:
             yield stream
         return
-    checksum = hashlib.sha256()
-    size = 0
-    with tempfile.TemporaryFile(mode='w+b') as spool:
+    def chunks():
+        checksum = hashlib.sha256()
+        size = 0
         for part in value['parts']:
             name = part['sha256']
             if len(name) != 64 or any(c not in '0123456789abcdef' for c in name):
@@ -55,11 +56,30 @@ def open_verified_json(path):
             raw = gzip.decompress((path.parent/'_audit_parts'/(name+'.json.gz')).read_bytes())
             if len(raw) != part['bytes'] or digest(raw) != name:
                 raise ValueError('Audit part checksum mismatch')
-            spool.write(raw); checksum.update(raw); size += len(raw)
+            checksum.update(raw); size += len(raw)
+            yield raw
         if size != value['bytes'] or checksum.hexdigest() != value['sha256']:
             raise ValueError('Audit manifest checksum mismatch')
-        spool.seek(0)
-        yield spool
+    with io.BufferedReader(_ChunkReader(chunks()), buffer_size=256*1024) as stream:
+        try:
+            yield stream
+        finally:
+            # Even a caller reading only metadata must validate the entire tail.
+            while stream.read(256*1024):
+                pass
+
+
+class _ChunkReader(io.RawIOBase):
+    def __init__(self, chunks):
+        self.chunks=iter(chunks);self.buffer=b'';self.offset=0
+    def readable(self):return True
+    def readinto(self, out):
+        while self.offset == len(self.buffer):
+            try:self.buffer=next(self.chunks);self.offset=0
+            except StopIteration:return 0
+        n=min(len(out),len(self.buffer)-self.offset)
+        out[:n]=self.buffer[self.offset:self.offset+n];self.offset+=n
+        return n
 
 
 def validate_store(path):
@@ -97,7 +117,11 @@ def publish_spool(path, spool, chunk_bytes=CHUNK_BYTES):
 def read_store(path, default=None):
     path=Path(path)
     if not path.exists():return deepcopy(default)
+    if path.stat().st_size > 64*1024*1024:
+        raise ValueError('Use AuditLedger/open_verified_json for large audit files')
     value=json.loads(path.read_bytes())
+    if isinstance(value,dict) and value.get('_storage')==FORMAT and value['bytes']>64*1024*1024:
+        raise ValueError('Use AuditLedger/open_verified_json for large audit files')
     if not isinstance(value,dict) or value.get('_storage')!=FORMAT:return value
     checksum=hashlib.sha256()
     size=0

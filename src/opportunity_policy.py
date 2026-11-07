@@ -290,7 +290,7 @@ def ranking_key(row):
             -row['ev_pct'], -row['statistical_pct'], str(row['id']))
 
 
-def annotate(matrix, as_of=None, assessment=None):
+def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True):
     rows = matrix.get('rows', [])
     if assessment is not None and (assessment.get('inputs') or assessment.get('profiles')):
         matrix['goal_context'] = goal_context(assessment, rows)
@@ -315,7 +315,7 @@ def annotate(matrix, as_of=None, assessment=None):
         if row.get('spec', {}).get('kind') == 'halves_total': row['combo'] = combo_status(row, rows)
     ft_prices = [r['odd'] for r in goals['over25_ft'] if r.get('quote_status') in ('recent', 'cached_stable') and numeric(r.get('odd'))]
     upgrade = bool(ft_prices and max(ft_prices) < ODDS_MIN_BY_MARKET['over25_ft'])
-    if upgrade:
+    if upgrade and automatic_upgrade:
         for row in rows:
             if row['opportunity']['eligible'] and goal_market(row) in ('over35_ft', 'over15_ht'):
                 row['opportunity'].update(priority=-2 if goal_market(row) == 'over35_ft' else -1, automatic_upgrade=True)

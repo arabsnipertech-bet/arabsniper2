@@ -163,7 +163,7 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
         day.write(results_path)
         progress(f'costruzione rapporto giornaliero {date}')
         from adaptive_calibration import Evidence, WINDOW
-        evidence = Evidence() if (now.astimezone(TZ).date()-date).days <= WINDOW else None
+        evidence = Evidence()  # Empty evidence is explicit even outside the training window.
         daily = build_daily(day, str(date), now.isoformat(), os.environ.get('GITHUB_SHA'),
                             observe=evidence.observe if evidence is not None else None)
         if evidence is not None:
