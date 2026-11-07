@@ -51,12 +51,13 @@
   async function poll() {
     if(polling||root.document?.hidden)return;
     polling=true;
+    const controller=new AbortController(), timeout=setTimeout(()=>controller.abort(),10000);
     try {
-      const response=await root.fetch('/api/live-scores',{cache:'no-store',signal:AbortSignal.timeout(10000)});
+      const response=await root.fetch('/api/live-scores',{cache:'no-store',signal:controller.signal});
       if(!response.ok)throw new Error('Live unavailable');
       accept(await response.json());
     } catch(_) { /* Retain last observation; view() marks it stale after 5 min. */ }
-    finally {polling=false;root.dispatchEvent(new Event('arabsniper-live-update'));}
+    finally {clearTimeout(timeout);polling=false;root.dispatchEvent(new Event('arabsniper-live-update'));}
   }
   root.ArabLive={fixture,view,firstHalf,accept,poll};
   if(root.document){

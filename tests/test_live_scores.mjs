@@ -94,3 +94,10 @@ test('half-time distinguishes provisional scores, confirmed zeroes and absent da
  assert.equal(scope.ArabLive.firstHalf({fixture:{status_short:'FT',result:{home_ht:0,away_ht:1}}},now).score,'0–1');
 });
 
+
+test('poll works without AbortSignal.timeout and releases its timer',async()=>{
+ let called=0,cleared=0;
+ const scope={console,Date,Number,Set,Object,AbortController,Event,setTimeout:()=>42,clearTimeout:id=>{assert.equal(id,42);cleared++;},dispatchEvent(){},fetch:async(_url,options)=>{called++;assert(options.signal instanceof AbortSignal);return {ok:true,json:async()=>({schema_version:1,enabled:false,fixtures:{}})};}};
+ vm.createContext(scope);vm.runInContext(fs.readFileSync('web/live-scores.js','utf8'),scope);
+ await scope.ArabLive.poll();assert.equal(called,1);assert.equal(cleared,1);
+});

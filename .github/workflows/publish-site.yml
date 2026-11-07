@@ -9,6 +9,7 @@ on:
       - web/gold-dashboard-live.html
       - web/index.html
       - web/_redirects
+      - web/vendor/**
       - web/homepage.js
       - web/competition-scope.js
       - 'web/lateral-matrix.js'
