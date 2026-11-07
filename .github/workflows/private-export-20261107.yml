@@ -1,16 +1,16 @@
-name: Private R2 encrypted export 20261107
+name: Private archive size metadata
 on:
   push:
-    branches: ['export/private-r2-compact-20261107']
+    branches: ['export/private-r2-metadata-20261107']
 permissions:
   contents: read
 concurrency:
-  group: private-r2-export-20261107
+  group: private-r2-metadata-20261107
   cancel-in-progress: false
 jobs:
   export:
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install boto3 ijson==3.6.0 simplejson
-      - name: Read and verify fixed private checkpoint
+      - name: Read aggregate archive sizes
         env:
           R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
           R2_BUCKET: arabsniper-gold
@@ -27,13 +27,3 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           PYTHONUNBUFFERED: '1'
         run: python tools/export_private_r2_20261107.py
-      - name: Encrypt export for its owner
-        run: |
-          openssl cms -encrypt -stream -aes-256-cbc -binary -outform DER -in export-out/ArabSniper_Archivio_R2.zip -out export-out/ArabSniper_Archivio_R2.zip.enc tools/export_20261107_public.pem
-          rm export-out/ArabSniper_Archivio_R2.zip
-      - uses: actions/upload-artifact@v4
-        with:
-          name: private-r2-encrypted-20261107
-          path: export-out/*.enc
-          retention-days: 1
-          compression-level: 0
