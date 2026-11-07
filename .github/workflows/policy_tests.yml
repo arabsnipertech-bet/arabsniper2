@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      - '.github/workflows/gold-history.yml'
       - 'src/**'
       - 'tests/**'
       - 'auditor/current_audit.py'
@@ -31,7 +32,7 @@ on:
       - 'workers/live-scores/**'
   push:
     branches: [main]
-    paths: ['src/**', 'tests/**', 'auditor/current_audit.py', 'auditor/recover_daily.py', 'auditor/repair_calibration.py', '.github/workflows/repair-learning-chain.yml', '.github/workflows/recover-daily-results.yml', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'web/index.html', 'web/homepage.js', 'web/competition-scope.js', 'web/statistics-first.js', 'web/statistics-first.css', 'web/lateral-matrix.js', 'web/lateral-matrix.css', 'web/results.js', '.github/workflows/policy_tests.yml', '.github/workflows/night_scan_backup.yml', '.github/workflows/auditor_backup.yml', '.github/workflows/run-auditor.yml', 'workers/live-scores/**']
+    paths: ['.github/workflows/gold-history.yml', 'src/**', 'tests/**', 'auditor/current_audit.py', 'auditor/recover_daily.py', 'auditor/repair_calibration.py', '.github/workflows/repair-learning-chain.yml', '.github/workflows/recover-daily-results.yml', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'web/index.html', 'web/homepage.js', 'web/competition-scope.js', 'web/statistics-first.js', 'web/statistics-first.css', 'web/lateral-matrix.js', 'web/lateral-matrix.css', 'web/results.js', '.github/workflows/policy_tests.yml', '.github/workflows/night_scan_backup.yml', '.github/workflows/auditor_backup.yml', '.github/workflows/run-auditor.yml', 'workers/live-scores/**']
 permissions:
   contents: read
 jobs:
@@ -54,6 +55,7 @@ jobs:
       - run: node tests/test_statistics_first.js
       - run: node tests/test_lateral_matrix.js
       - run: node tests/test_storage_loader.cjs
+      - run: node tests/test_gold_login_ui.cjs
       - run: node --test tests/test_live_scores.mjs
 
 

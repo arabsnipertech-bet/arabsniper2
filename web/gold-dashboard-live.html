@@ -550,6 +550,17 @@
       padding: 24px;
       box-shadow: var(--shadow);
     }
+    .login-card [hidden] { display:none !important; }
+    .login-card label { display:block;margin:16px 0 7px;font-size:.88rem;font-weight:700; }
+    .login-card a { color:var(--gold); }
+    .login-home { font-size:.82rem;text-decoration:none; }
+    .login-card .login-step { color:var(--gold);font-size:.7rem;letter-spacing:.1em;margin:24px 0 10px; }
+    .login-card .login-status { color:#a8e5c0;min-height:1.2em; }
+    .login-card .login-support { font-size:.76rem;border-top:1px solid var(--border);padding-top:16px; }
+    .login-actions { display:flex;gap:8px;flex-wrap:wrap;margin-top:12px; }
+    .login-actions .btn { flex:1;font-size:.78rem; }
+    #loginCode { font-size:1.6rem;letter-spacing:.35em;text-align:center;margin-top:8px; }
+    .login-input { font-size:16px; }
     .login-card h2 { color: var(--gold); margin: 0; }
     .login-card p { color: var(--muted); line-height: 1.5; font-size: .86rem; }
     .login-input {
@@ -564,7 +575,7 @@
     }
     .login-input:focus { border-color: var(--gold); }
     .login-error { min-height: 20px; color: #ff9ba5; font-size: .76rem; margin-top: 8px; }
-    .login-button { width: 100%; margin-top: 10px; background: var(--gold); color: #05070b; border-color: var(--gold); }
+    body[data-gold-ui] .login-card .login-button { width: 100%; margin-top: 10px; background: var(--gold); color: #05070b; border-color: var(--gold); }
 
     @media (max-width: 1180px) {
       .matches-grid { grid-template-columns: 1fr; }
@@ -828,13 +839,21 @@
 
   <div id="loginOverlay" class="login-overlay show">
     <form class="login-card" onsubmit="submitLogin(event)">
-      <h2>Accesso Area Premium</h2>
-      <p>Inserisci la tua email: riceverai un codice a 6 cifre per accedere. Usa la stessa email del pagamento.</p>
-      <input id="loginEmail" class="login-input" type="email" autocomplete="email" placeholder="nome@email.it" required />
-      <input id="loginCode" class="login-input" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="Codice a 6 cifre" aria-label="Codice ricevuto via email" hidden disabled />
-      <div id="loginError" class="login-error" role="status" aria-live="polite"></div>
-      <button id="changeEmail" class="btn" type="button" onclick="resetCodeLogin()" hidden>Cambia email / richiedi un nuovo codice</button>
-      <button id="loginButton" class="btn login-button" type="submit">Invia codice</button>
+      <a class="login-home" href="/">← Torna alla home</a>
+      <p class="login-step" id="loginStep">PASSAGGIO 1 DI 2 · LA TUA EMAIL</p>
+      <h2 id="loginTitle">Entra nella tua Gold</h2>
+      <p id="loginHelp">Usa l’email del tuo pass o della tua prova gratuita. Non serve una password: ti inviamo un codice monouso.</p>
+      <label for="loginEmail">La tua email</label>
+      <input id="loginEmail" class="login-input" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="nome@email.it" required />
+      <label id="codeLabel" for="loginCode" hidden>Codice ricevuto via email</label>
+      <input id="loginCode" class="login-input" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" aria-describedby="loginHelp" hidden disabled />
+      <p id="loginStatus" class="login-status" role="status" aria-live="polite"></p>
+      <div id="loginError" class="login-error" role="alert"></div>
+      <button id="loginButton" class="btn login-button" type="submit">Ricevi il codice via email</button>
+      <div class="login-actions"><button id="resendCode" class="btn" type="button" onclick="resendLoginCode()" hidden>Reinvia codice</button>
+      <button id="changeEmail" class="btn" type="button" onclick="resetCodeLogin()" hidden>Cambia email</button></div>
+      <p id="loginPlans" hidden>Email verificata, ma accesso non attivo. <a href="/#piani">Vedi i pass Gold</a> oppure <a href="mailto:arabsnipertech@gmail.com">contatta l’assistenza</a> se hai già pagato.</p>
+      <p class="login-support">Il codice dura 10 minuti. Controlla anche Spam e Promozioni. Dopo aver letto l’email, torna in questa stessa pagina.<br><a href="mailto:arabsnipertech@gmail.com">Hai bisogno di aiuto? Scrivici</a></p>
     </form>
   </div>
 
@@ -880,6 +899,7 @@
     let relationFilter = 'all';
     let calendarBase = calendarDate();
     let dayLoadSequence = 0;
+    let dayLoadController = null;
     let hourMenuReady = false;
     let initialHourScrollDone = false;
 
@@ -960,62 +980,103 @@
     }
 
     let loginChallenge = null;
+    let loginSentAt = 0;
+    let resendTimer = null;
+    function loginMessage(message, error = false) {
+      document.getElementById('loginError').textContent = error ? message : '';
+      document.getElementById('loginStatus').textContent = error ? '' : message;
+    }
+    function saveLoginDraft() {
+      try {
+        if(loginChallenge) sessionStorage.setItem('gold_login_draft', JSON.stringify({challenge:loginChallenge,email:document.getElementById('loginEmail').value,at:loginSentAt}));
+        else sessionStorage.removeItem('gold_login_draft');
+      } catch (_) { /* Browsers may disable storage; OTP still works in this page. */ }
+    }
+    function showCodeStep() {
+      document.getElementById('loginEmail').readOnly = true;
+      const code = document.getElementById('loginCode');
+      code.hidden = false; code.disabled = false; code.required = true;
+      document.getElementById('codeLabel').hidden = false;
+      document.getElementById('changeEmail').hidden = false;
+      document.getElementById('resendCode').hidden = false;
+      document.getElementById('loginStep').textContent = 'PASSAGGIO 2 DI 2 · IL CODICE EMAIL';
+      document.getElementById('loginTitle').textContent = 'Controlla la tua posta';
+      document.getElementById('loginHelp').textContent = 'Inserisci le 6 cifre ricevute. Se richiedi un nuovo codice, usa soltanto l’ultimo.';
+      document.getElementById('loginButton').textContent = 'Verifica codice ed entra';
+      clearInterval(resendTimer);
+      const tick=()=>{const seconds=Math.max(0,Math.ceil((loginSentAt+60000-Date.now())/1000));const button=document.getElementById('resendCode');button.disabled=seconds>0;button.textContent=seconds?'Reinvia tra '+seconds+' s':'Reinvia codice';if(!seconds)clearInterval(resendTimer);};
+      tick();resendTimer=setInterval(tick,1000);
+    }
     async function authRequest(path, body) {
-      const response = await fetch('/api/auth/' + path, {
-        method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
-        headers: body ? {'Content-Type': 'application/json'} : {},
-        ...(body ? {body: JSON.stringify(body)} : {})
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Accedi con il codice ricevuto via email.');
-      return data;
+      const controller = new AbortController(), timer=setTimeout(()=>controller.abort(),20000);
+      try {
+        const response = await fetch('/api/auth/' + path, {
+          method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store', signal:controller.signal,
+          headers: body ? {'Content-Type': 'application/json'} : {},
+          ...(body ? {body: JSON.stringify(body)} : {})
+        });
+        let data;try { data=await response.json(); } catch (_) { throw new Error('Il servizio non risponde correttamente. Attendi qualche secondo e riprova.'); }
+        if (!response.ok) {const error=new Error(data.error || 'Accesso non riuscito. Riprova.');error.status=response.status;throw error;}
+        return data;
+      } catch(error) {
+        if(error.name==='AbortError')throw new Error('La connessione impiega troppo tempo. Riprova: se hai già ricevuto un codice, usa l’ultimo.');
+        if(error instanceof TypeError)throw new Error('Connessione non disponibile. Controlla internet e riprova.');
+        throw error;
+      } finally {clearTimeout(timer);}
     }
     function resetCodeLogin() {
-      loginChallenge = null;
+      loginChallenge = null; loginSentAt=0;clearInterval(resendTimer);saveLoginDraft();
       document.getElementById('loginEmail').readOnly = false;
       const code = document.getElementById('loginCode');
       code.hidden = true; code.disabled = true; code.required = false; code.value = '';
-      document.getElementById('changeEmail').hidden = true;
-      document.getElementById('loginButton').textContent = 'Invia codice';
-      document.getElementById('loginError').textContent = '';
+      for(const id of ['changeEmail','resendCode','codeLabel','loginPlans'])document.getElementById(id).hidden=true;
+      document.getElementById('loginButton').textContent = 'Ricevi il codice via email';
+      document.getElementById('loginStep').textContent='PASSAGGIO 1 DI 2 · LA TUA EMAIL';
+      document.getElementById('loginTitle').textContent='Entra nella tua Gold';
+      document.getElementById('loginHelp').textContent='Usa l’email del tuo pass o della tua prova gratuita. Non serve una password.';
+      loginMessage('');
     }
-    async function submitLogin(event) {
+    async function resendLoginCode() {
+      if(Date.now()-loginSentAt<60000)return;
+      await submitLogin({preventDefault(){}},true);
+    }
+    async function submitLogin(event, resend=false) {
       event.preventDefault();
-      const input = document.getElementById('loginEmail');
-      const code = document.getElementById('loginCode');
-      const error = document.getElementById('loginError');
-      const button = document.getElementById('loginButton');
-      const email = input.value.trim().toLowerCase();
-      button.disabled = true;
-      document.getElementById('changeEmail').disabled = true;
-      error.textContent = '';
+      const input=document.getElementById('loginEmail'),code=document.getElementById('loginCode');
+      const button=document.getElementById('loginButton'),email=input.value.trim().toLowerCase();
+      if(button.disabled)return;
+      if(loginChallenge&&!resend&&!/^[0-9]{6}$/.test(code.value.trim())){loginMessage('Inserisci tutte le 6 cifre del codice ricevuto.',true);code.focus();return;}
+      button.disabled=true;document.getElementById('changeEmail').disabled=true;document.getElementById('resendCode').disabled=true;
+      clearInterval(resendTimer);loginMessage('');document.getElementById('loginPlans').hidden=true;
+      button.textContent=loginChallenge&&!resend?'Verifica in corso…':'Invio del codice…';
       try {
-        if (!loginChallenge) {
-          const data = await authRequest('request-code', {email});
-          loginChallenge = data.challenge;
-          input.readOnly = true;
-          code.hidden = false; code.disabled = false; code.required = true;
-          document.getElementById('changeEmail').hidden = false;
-          error.textContent = 'Codice inviato. Controlla anche la posta indesiderata. Scade tra 10 minuti.';
-          code.focus();
+        if(!loginChallenge||resend) {
+          const data=await authRequest('request-code',{email});
+          if(!/^[a-f0-9]{64}$/.test(data.challenge||''))throw new Error('Invio non confermato. Riprova tra un minuto.');
+          loginChallenge=data.challenge;loginSentAt=Date.now();code.value='';saveLoginDraft();showCodeStep();
+          loginMessage('Codice inviato a '+email+'. Controlla anche Spam e Promozioni.');code.focus();
         } else {
-          const data = await authRequest('verify-code', {email, code: code.value, challenge: loginChallenge});
-          if (data.active) { resetCodeLogin(); showApplication(); }
+          const data=await authRequest('verify-code',{email,code:code.value.trim(),challenge:loginChallenge});
+          if(!data.active)throw new Error('Accesso Gold non attivo. Contatta l’assistenza se il tuo pass è valido.');
+          resetCodeLogin();showApplication();
         }
-      } catch (err) { error.textContent = err.message; }
-      finally {
-        button.disabled = false;
-        document.getElementById('changeEmail').disabled = false;
-        button.textContent = loginChallenge ? 'Verifica codice e accedi' : 'Invia codice';
+      } catch(err) {
+        loginMessage(err.message,true);
+        if(err.status===403&&loginChallenge&&!resend)document.getElementById('loginPlans').hidden=false;
+      } finally {
+        button.disabled=false;document.getElementById('changeEmail').disabled=false;
+        if(loginChallenge)showCodeStep();else button.textContent='Ricevi il codice via email';
       }
     }
     async function initializeAccess() {
-      localStorage.removeItem(STORAGE_KEY);
-      if (new URLSearchParams(location.search).get('logout') === 'true') {
-        await logoutGold(); return;
-      }
-      try { if ((await authRequest('session')).active) showApplication(); }
-      catch (_) { /* Login stays visible when there is no valid session. */ }
+      try {localStorage.removeItem(STORAGE_KEY);} catch (_) {}
+      const code=document.getElementById('loginCode');
+      code.addEventListener('input',()=>{code.value=code.value.replace(/[^0-9]/g,'').slice(0,6);});
+      code.addEventListener('paste',event=>{const text=event.clipboardData?.getData('text')||'';const digits=text.replace(/[^0-9]/g,'');if(digits.length===6){event.preventDefault();code.value=digits;}});
+      try {const draft=JSON.parse(sessionStorage.getItem('gold_login_draft'));if(draft&&/^[a-f0-9]{64}$/.test(draft.challenge)&&typeof draft.email==='string'&&Date.now()-draft.at>=0&&Date.now()-draft.at<600000){loginChallenge=draft.challenge;loginSentAt=draft.at;document.getElementById('loginEmail').value=draft.email;showCodeStep();}} catch (_) {}
+      if (new URLSearchParams(location.search).get('logout') === 'true') {await logoutGold();return;}
+      try {const data=await authRequest('session');if(data.active){resetCodeLogin();showApplication();}else loginMessage('Il tuo accesso non risulta attivo. Usa l’email del pass o contatta l’assistenza.',true);}
+      catch (err) {if(err.status!==401)loginMessage(err.message,true);}
     }
 
     function showApplication() {
@@ -1030,7 +1091,7 @@
     async function logoutGold() {
       try {
         await authRequest('logout', {});
-        localStorage.removeItem(STORAGE_KEY);
+        try {localStorage.removeItem(STORAGE_KEY);} catch (_) {}
         window.location.href = 'index.html';
       } catch (_) { alert('Uscita non riuscita. Riprova per chiudere la sessione.'); }
     }
@@ -1112,7 +1173,8 @@
     async function loadAuditSummary() {
       const strip = document.getElementById('auditStrip');
       try {
-        const payload = await loadJson(AUDIT_FILE);
+        const catalog = await loadJson('arab_quote_model_research.json');
+        const payload = catalog?._gold_audit_summary || await loadJson(AUDIT_FILE);
         const summary = payload?.summary || {};
         const over = summary?.by_market?.over25_ft || {};
         strip.innerHTML = `
@@ -1168,47 +1230,71 @@
       await loadCurrentDay({ preservePosition: true });
     }
 
-    async function loadJson(file) {
-      const response = await fetch(rawUrl(file), { cache: 'no-store', credentials: 'same-origin' });
-      if (response.status === 401 || response.status === 403) {
-        document.getElementById('app').hidden = true;
-        document.getElementById('loginOverlay').classList.add('show');
-        throw new Error('Sessione scaduta o accesso Gold non attivo. Accedi nuovamente.');
+    async function loadJson(file, embedded = null, signal = null, indexOnly = false) {
+      // Retry only idempotent reads; OTP sends are never retried automatically.
+      async function read(path, binary=false) {
+        for(let attempt=0;attempt<3;attempt++) {
+          const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),45000);
+          const cancel=()=>controller.abort();signal?.addEventListener('abort',cancel,{once:true});if(signal?.aborted)cancel();
+          try {
+            const response=await fetch(rawUrl(path),{cache:'no-store',credentials:'same-origin',signal:controller.signal});
+            if(response.status===401||response.status===403) {
+              resetCodeLogin();
+              document.getElementById('app').hidden=true;
+              document.getElementById('loginOverlay').classList.add('show');
+              const message=response.status===401?'La sessione è scaduta. Richiedi un nuovo codice per rientrare.':'Il tuo accesso Gold non risulta attivo. Verifica l’email del pass o contatta l’assistenza.';
+              loginMessage(message,true);
+              const error=new Error(message);error.code='GOLD_AUTH_REQUIRED';throw error;
+            }
+            if(!response.ok) {const error=new Error(response.status===404?'Dati non disponibili: la giornata potrebbe essere in aggiornamento. Riprova tra poco.':'Servizio dati temporaneamente non disponibile. Riprova.');error.retryable=[408,500,502,503,504].includes(response.status);throw error;}
+            return binary?await response.arrayBuffer():await response.json();
+          } catch(error) {
+            if(error.code==='GOLD_AUTH_REQUIRED'||signal?.aborted)throw error;
+            const retry=error.retryable||error.name==='AbortError'||error.name==='TypeError';
+            if(!retry||attempt===2){if(error.name==='SyntaxError')throw new Error('Risposta dati non valida. Premi Riprova tra qualche secondo.');if(error.name==='AbortError')throw new Error('Download troppo lento. Controlla la connessione e premi Riprova.');if(error.name==='TypeError')throw new Error('Connessione interrotta. Controlla internet e premi Riprova.');throw error;}
+          } finally {clearTimeout(timer);signal?.removeEventListener('abort',cancel);}
+          await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));
+        }
       }
-      if (!response.ok) throw new Error(`File non disponibile: ${file}`);
-      const value = await response.json();
-      if (value?._storage !== 'arabsniper-audit-parts-v1') return value;
-      const digest = async bytes => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), b => b.toString(16).padStart(2, '0')).join('');
-      const chunks = new Array(value.parts.length);
-      let next = 0;
-      async function worker() {
-      while (next < value.parts.length) {
-        const index = next++;
-        const part = value.parts[index];
-        if (!/^[a-f0-9]{64}$/.test(part.sha256)) throw new Error('Identificatore dati non valido');
-        const res = await fetch(rawUrl(`_audit_parts/${part.sha256}.json.gz`), {cache: 'no-store', credentials: 'same-origin'});
-        if (!res.ok) throw new Error('Parte dei dati non disponibile: riprovare la sincronizzazione');
-        const raw = new Uint8Array(await new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
-        if (raw.length !== part.bytes || await digest(raw) !== part.sha256) throw new Error('Integrità dati non verificata');
-        chunks[index] = raw;
+      const value=embedded||await read(file);
+      if(value?._gold_storage==='arabsniper-gold-pages-v1'&&indexOnly)return value;
+      if(value?._gold_storage==='arabsniper-gold-pages-v1') {
+        if(typeof DecompressionStream==='undefined'||!globalThis.crypto?.subtle)throw new Error('Aggiorna il browser o apri Gold in Chrome, Safari o Firefox per caricare i dati protetti.');
+        if(!Array.isArray(value.pages)||!Number.isSafeInteger(value.match_count)||value.match_count<0)throw new Error('Indice giornata non valido.');
+        const matches=new Array(value.match_count);let next=0,offset=0,completed=0,stopped=false;
+        const pages=value.pages.map(page=>{if(!/^[a-f0-9]{64}$/.test(page.sha256)||!Number.isSafeInteger(page.bytes)||page.bytes<2||!Number.isSafeInteger(page.count)||page.count<1)throw new Error('Indice pagina non valido.');const item={...page,offset};offset+=page.count;return item;});
+        if(offset!==value.match_count)throw new Error('Conteggio partite non valido.');
+        async function pageWorker(){while(!stopped&&next<pages.length){const page=pages[next++];const compressed=await read('_audit_parts/'+page.sha256+'.json.gz',true);const raw=await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');if(raw.byteLength!==page.bytes||hash!==page.sha256)throw new Error('Integrità pagina non verificata. Premi Riprova.');const rows=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(raw));if(!Array.isArray(rows)||rows.length!==page.count)throw new Error('Pagina partite incompleta.');for(let i=0;i<rows.length;i++)matches[page.offset+i]=rows[i];completed++;if(!signal?.aborted&&typeof document!=='undefined'){const status=document.getElementById('liveStatus');if(status)status.textContent='Caricamento partite · '+Math.round(completed/pages.length*100)+'%';}}}
+        const results=await Promise.allSettled(Array.from({length:Math.min(2,pages.length)},()=>pageWorker().catch(error=>{stopped=true;throw error;})));
+        const failure=results.find(result=>result.status==='rejected');if(failure)throw failure.reason;
+        return {...value,matches};
       }
-      }
-      await Promise.all(Array.from({length: Math.min(3, value.parts.length)}, worker));
-      const total = chunks.reduce((sum, raw) => sum + raw.length, 0);
-      if (total !== value.bytes) throw new Error('Dati incompleti');
-      const joined = new Uint8Array(total);
-      let offset = 0;
-      for (const chunk of chunks) { joined.set(chunk, offset); offset += chunk.length; }
-      if (await digest(joined) !== value.sha256) throw new Error('Integrità documento non verificata');
-      return JSON.parse(new TextDecoder('utf-8', {fatal:true}).decode(joined));
+      if(value?._storage!=='arabsniper-audit-parts-v1')return value;
+      if(typeof DecompressionStream==='undefined'||!globalThis.crypto?.subtle)throw new Error('Questo browser non supporta il caricamento protetto. Apri Gold in una versione aggiornata di Chrome, Safari o Firefox.');
+      if(!Array.isArray(value.parts)||!Number.isSafeInteger(value.bytes)||value.bytes<0)throw new Error('Indice dei dati non valido. Riprova la sincronizzazione.');
+      const digest=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+      let total=0;
+      const parts=value.parts.map(part=>{if(!/^[a-f0-9]{64}$/.test(part.sha256)||!Number.isSafeInteger(part.bytes)||part.bytes<=0)throw new Error('Identificatore dati non valido');const result={...part,offset:total};total+=part.bytes;return result;});
+      if(total!==value.bytes)throw new Error('Dati incompleti');
+      // One destination buffer: avoid retaining every chunk AND a second full copy.
+      const joined=new Uint8Array(total);let next=0,stopped=false;
+      async function worker(){while(!stopped&&next<parts.length){const part=parts[next++];const compressed=await read('_audit_parts/'+part.sha256+'.json.gz',true);const raw=new Uint8Array(await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());if(raw.length!==part.bytes||await digest(raw)!==part.sha256)throw new Error('Integrità dati non verificata. Premi Riprova per scaricare una copia aggiornata.');joined.set(raw,part.offset);}}
+      const results=await Promise.allSettled(Array.from({length:Math.min(3,parts.length)},()=>worker().catch(error=>{stopped=true;throw error;})));
+      const failure=results.find(result=>result.status==='rejected');if(failure)throw failure.reason;
+      if(await digest(joined)!==value.sha256)throw new Error('Integrità documento non verificata');
+      return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(joined));
     }
 
-    async function loadCalendarDay(day, targetDate) {
+    async function loadCalendarDay(day, targetDate, signal = null) {
+      let catalog=null;
+      try {catalog=await loadJson('arab_quote_model_research.json',null,signal);} catch(error) {if(error.code==='GOLD_AUTH_REQUIRED'||signal?.aborted)throw error;}
+      const readDay=(file,indexOnly=false)=>loadJson(file,catalog?._gold_browser_days?.[file]||null,signal,indexOnly);
       // File positions belong to the last scan, not necessarily to today's date.
       // Follow the date offset without changing forecasts or their timestamps.
       if (day === 0) {
-        const latest = await loadJson('arab_quote_day1.json');
-        const archived = [latest?.previous_day, latest?.current_day_archive].find(item => item?.date === targetDate);
+        const latest = await readDay('arab_quote_day1.json',true);
+        let archived = [latest?.previous_day, latest?.current_day_archive].find(item => item?.date === targetDate);
+        if(archived?._gold_storage==='arabsniper-gold-pages-v1')archived=await loadJson(null,archived,signal);
         if (archived?.history_version === 'gold-history-v1' && archived.date === targetDate && Array.isArray(archived.matches)) {
           return {payload:archived,file:'Archivio privato · '+targetDate,shifted:false};
         }
@@ -1221,7 +1307,7 @@
       while (slot >= 1 && slot <= 5 && !visited.has(slot)) {
         visited.add(slot);
         const file = `arab_quote_day${slot}.json`;
-        const payload = await loadJson(file);
+        const payload = await readDay(file);
         const date = payload?.date;
         if (!Array.isArray(payload?.matches) || typeof date !== 'string' ||
             !/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date)) ||
@@ -1238,6 +1324,8 @@
 
     async function loadCurrentDay(options = {}) {
       const request = ++dayLoadSequence;
+      dayLoadController?.abort();dayLoadController=new AbortController();
+      const signal=dayLoadController.signal;
       buildDayButtons();
       const day = currentDay;
       const baseDate = calendarBase;
@@ -1260,7 +1348,7 @@
         document.getElementById('updatedAt').textContent = 'Ultima scansione: —';
       }
       try {
-        const loaded = await loadCalendarDay(day, targetDate);
+        const loaded = await loadCalendarDay(day, targetDate, signal);
         if (request !== dayLoadSequence) return;
         if (baseDate !== calendarDate()) { await checkCalendarRollover(); return; }
         const {file, shifted} = loaded;
@@ -1270,7 +1358,7 @@
         window.ArabLive?.poll();
         renderMarketRankings(payload);
         renderMatchResearch(payload);
-        loadModelResearch();
+        if(!payload.multimarket_method?.model_id?.startsWith('lateral-matrix')) loadModelResearch();
         currentMatches = [...payload.matches];
         document.getElementById('selectedDay').textContent = `${day === 0 ? 'Ieri' : day === 1 ? 'Oggi' : 'Giorno '+day} · ${formatDateIt(payload.date)}`;
         document.getElementById('fileSource').textContent = `Fonte: ${file}`;
@@ -1285,13 +1373,17 @@
         if (request !== dayLoadSequence) return;
         if (baseDate !== calendarDate()) { await checkCalendarRollover(); return; }
         console.error(err);
+        if(preservePosition&&currentPayload?.date===targetDate&&err.code!=='GOLD_AUTH_REQUIRED') {
+          document.getElementById('liveStatus').textContent='Aggiornamento non riuscito · restano visibili i dati del '+formatTimestamp(currentPayload.updated_at)+'. Premi Aggiorna per riprovare.';
+          restoreViewportAnchor(anchor);return;
+        }
         currentPayload = null;
         currentMatches = [];
         filteredMatches = [];
         const pending = err.code === 'GOLD_DAY_PENDING';
         document.getElementById('marketRankings')?.remove();
-        document.getElementById('matchResearch').innerHTML = `<div class="empty">${pending ? escapeHtml(err.message) : 'Analisi non disponibile. Ricarica i dati.'}</div>`;
-        grid.innerHTML = `<div class="${pending ? 'empty' : 'error'}">${escapeHtml(err.message)}</div>`;
+        document.getElementById('matchResearch').innerHTML = `<div class="empty">${pending ? escapeHtml(err.message) : 'Caricamento non riuscito. Puoi riprovare senza uscire dal tuo account.'}</div>`;
+        grid.innerHTML = `<div class="${pending ? 'empty' : 'error'}">${escapeHtml(err.message)}<br><button class="btn" type="button" onclick="manualRefresh()">Riprova caricamento</button></div>`;
         document.getElementById('fileSource').textContent = 'Fonte: in attesa di dati validi';
         document.getElementById('updatedAt').textContent = 'Ultima scansione: —';
         document.getElementById('matchCount').textContent = '0 partite';
@@ -1899,6 +1991,7 @@
     }
     function renderMarketRankings(payload) {
       document.getElementById('marketRankings')?.remove();
+      if(payload.gold_scope||payload.multimarket_method?.model_id?.startsWith('lateral-matrix'))return;
       const section = document.createElement('section');
       section.id = 'marketRankings';
       section.className = 'ranking-section';
@@ -1986,6 +2079,12 @@
     }
 
     function applyFilters() {
+      if(document.getElementById('legacyDashboard')?.hidden){
+        filteredMatches=currentMatches;
+        document.getElementById('matchesGrid').innerHTML='';
+        document.getElementById('matchCount').textContent=currentMatches.length+' partite';
+        return;
+      }
       const search = normalizeText(document.getElementById('searchInput').value.trim());
       const sortMode = document.getElementById('sortSelect').value;
       filteredMatches = currentMatches.filter(match => {

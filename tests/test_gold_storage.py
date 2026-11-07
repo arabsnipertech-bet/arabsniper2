@@ -19,6 +19,9 @@ class Storage(unittest.TestCase):
    s=Fake();publish(s,'test',a);restore(s,'test',b)
    self.assertEqual(s.calls[-1],'state/current.json');self.assertFalse((Path(b)/'data/arab_quote_homepage.json').exists())
    self.assertTrue((Path(b)/'data/arab_quote_day1.json').exists())
+   self.assertEqual(json.loads(s.objects['arab_quote_day2.json']), {'matches':[]}, 'Social readers keep the original full feed')
+   catalog=json.loads(s.objects['arab_quote_model_research.json']);self.assertIn('_gold_browser_days',catalog)
+   self.assertEqual(catalog['_gold_browser_days']['arab_quote_day2.json']['match_count'],0)
  def test_tamper_fails_before_writing(self):
   with tempfile.TemporaryDirectory() as a:
    s=Fake();s.objects['state/current.json']=b'{"version":1,"files":{"../../evil":{"sha256":"a","bytes":1}}}'
