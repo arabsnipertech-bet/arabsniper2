@@ -236,9 +236,10 @@ def educational_message(day, slot=None):
 def load_audit(day):
     repo=os.environ["GITHUB_REPOSITORY"]
     res=json.loads(subprocess.check_output(
-        ["gh","api",f"repos/{repo}/actions/artifacts?per_page=100"],text=True))
+        ["gh","api","--paginate","--slurp",f"repos/{repo}/actions/artifacts?per_page=100"],text=True))
     prefix=f"telegram-audit-{day}-"
-    candidates=[a for a in res.get("artifacts",[]) if a["name"].startswith(prefix) and not a["expired"]]
+    candidates=[a for page in res for a in page.get("artifacts",[])
+                if a["name"].startswith(prefix) and not a["expired"]]
     if not candidates:
         print("No audited report: do not publish unverifiable results")
         return None

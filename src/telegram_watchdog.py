@@ -67,6 +67,8 @@ class GitHub:
         names = [f"tg-{day}-{slot.replace(':','')}-sent"]
         if slot in ("12:45","17:15"):
             names.append(f"telegram-gold-promo-{day}-{slot.replace(':','')}-sent")
+        elif slot == "10:45":
+            names.append(f"telegram-evidence-{day}-audit-sent")
         elif slot == "16:45":
             names.append(f"telegram-evidence-{day}-market-sent")
         for name in names:

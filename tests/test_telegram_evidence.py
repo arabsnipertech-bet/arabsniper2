@@ -74,3 +74,21 @@ class EvidenceTests(unittest.TestCase):
 
 if __name__=="__main__":
     unittest.main()
+
+class AuditLookupTests(unittest.TestCase):
+    def test_report_found_beyond_first_artifact_page(self):
+        import json, os, tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        pages = [{'artifacts': []}, {'artifacts': [dict(name='telegram-audit-2026-11-06-77',
+                  expired=False, created_at='2026-11-07T08:30:00Z', workflow_run={'id':77})]}]
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder)
+            (target/'report.json').write_text(json.dumps({'date':'2026-11-06'}))
+            with patch.dict(os.environ, {'GITHUB_REPOSITORY':'arabsnipertech-bet/arabsniper2'}), \
+                 patch.object(module.subprocess, 'check_output', return_value=json.dumps(pages)) as query, \
+                 patch.object(module.subprocess, 'check_call') as download, \
+                 patch.object(module, 'Path', return_value=target):
+                self.assertEqual(module.load_audit('2026-11-06')['date'], '2026-11-06')
+                self.assertIn('--paginate', query.call_args.args[0])
+                self.assertIn('77', download.call_args.args[0])

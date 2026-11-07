@@ -36,4 +36,4 @@ class TelegramWatchdogTests(unittest.TestCase):
         now = datetime.fromisoformat("2026-11-04T17:35:00+01:00")
         api = FakeApi([{"head_branch":"main","status":"in_progress"}])
         self.assertEqual(wake(api,now)[0]["action"],"already_attempted")
-        self.assertNotIn("13:00", [slot for _,slot,_ in due_slots(now.replace(hour=13,minute=5))])
+        self.assertIn("13:00", [slot for _,slot,_ in due_slots(now.replace(hour=13,minute=5))])

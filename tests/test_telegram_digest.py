@@ -54,7 +54,7 @@ class TelegramTest(unittest.TestCase):
             self.assertEqual(social_board(board, now, kickoff_until=end, exclude={"3"}, limit=1),
                              [{"fixture_id":"4"}])
 
-    def test_all_seven_slots_have_primary_cron_in_both_seasons(self):
+    def test_all_slots_have_primary_cron_in_both_seasons(self):
         from datetime import timedelta, timezone
         for day in ("2026-11-04", "2026-07-04"):
             from telegram_slots import CHANNEL_SLOTS
@@ -65,7 +65,7 @@ class TelegramTest(unittest.TestCase):
                             and str(utc.hour) in c.split()[1].split(","))
                 self.assertEqual(slot_for_schedule(now, "schedule", cron), slot)
                 self.assertEqual(slot_for_schedule(now+timedelta(minutes=15), "workflow_dispatch", "", slot), slot)
-        self.assertEqual(len(WINDOWS),7)
+        self.assertEqual(len(WINDOWS),8)
 
     def test_editorial_rotation_and_no_pick_messages(self):
         from datetime import date, timedelta
@@ -76,6 +76,17 @@ class TelegramTest(unittest.TestCase):
                               for i in range(len(EDUCATIONAL_THEMES))}),len(EDUCATIONAL_THEMES))
         self.assertIn("/prova",slot_message(dict(slot="22:00",picks=[])))
         self.assertIn("Nessuna nuova",slot_message(dict(slot="18:30",first="19:00",last="20:00",picks=[])))
+
+    def test_morning_results_reject_wrong_date_or_invalid_totals(self):
+        from telegram_digest import slot_message
+        post = dict(slot='10:45', day='2026-11-07', picks=[])
+        self.assertIn('in verifica', slot_message(post))
+        report = dict(date='2026-11-06', selections_total=dict(total=3, won=1, lost=1, pending=1))
+        self.assertIn('Vinte: 1', slot_message(dict(post, audit=report)))
+        self.assertIn('Perse: 1', slot_message(dict(post, audit=report)))
+        self.assertIn('in verifica', slot_message(dict(post, audit=dict(report, date='2026-11-05'))))
+        report['selections_total']['total'] = 99
+        self.assertIn('in verifica', slot_message(dict(post, audit=report)))
 
     def test_external_backup_dispatch_is_strictly_gated(self):
         now=datetime.fromisoformat("2026-11-03T17:44:00+01:00")
