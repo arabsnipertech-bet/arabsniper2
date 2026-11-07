@@ -20,7 +20,7 @@ def receipt_path(root, day):
     return Path(root)/f'auditarchive/prematch_{day}_checkpoint.json'
 
 
-def seal_day(root, day, now, pending, queried=False):
+def seal_day(root, day, now, pending, queried=False, *, pending_summary=None):
     root = Path(root)
     outputs = [f'auditarchive/prematch_{day}_{suffix}' for suffix in
                ('results.json', 'daily.json', 'daily.md')]
@@ -31,6 +31,10 @@ def seal_day(root, day, now, pending, queried=False):
     receipt = {'version': 1, 'day': str(day), 'checked_at': now.isoformat(),
                'pending': pending, 'results_queried': queried, 'input_sha256': digest(root/f'auditordata/prematch_{day}.json'),
                'outputs': {path: digest(root/path) for path in outputs}}
+    if pending_summary is not None:
+        if pending_summary.get('pending') is not pending:
+            raise ValueError('Pending counts disagree with daily receipt')
+        receipt['pending_summary'] = pending_summary
     write_store(receipt_path(root, day), receipt)
 
 

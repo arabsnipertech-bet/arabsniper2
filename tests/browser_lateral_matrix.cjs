@@ -302,10 +302,13 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await page.screenshot({path:`test-artifacts/matrix-combo-inactive-${name}.png`});
    await page.locator('[data-mx-open]').first().click();
    assert(await page.locator('dialog.mx-modal').isVisible(),'Matrix must be a native modal');
+   assert.equal(await page.locator('dialog .mx-goal-panel').count(),2,'Goal expectations and observed PT/ST means are visible');
+   assert.equal(await page.locator('dialog [data-mx-instrument] option').count(),59,'Every available matrix row stays selectable');
+   assert(!(await page.locator('dialog').innerText()).includes('EV'),'EV stays internal');
    assert.equal(await page.locator('.mx-market-row').count(),6,'Five goal targets and the half-time combo open by default');
    const comboRow=page.locator('.mx-market-row').filter({hasText:'Over 0,5 PT + Over 0,5 ST'});
    assert((await comboRow.textContent()).includes('Combo Attiva'));
-   assert((await comboRow.textContent()).includes('EV non calcolabile senza quota reale'));
+   assert((await comboRow.textContent()).includes('Probabilità senza aggio dello stesso operatore'));
    assert.equal(await page.locator('.mx-card .mx-detail').count(),0,'No inline expansion');
    await page.keyboard.press('Shift+Tab');
    assert(await page.evaluate(()=>!!document.activeElement.closest('dialog.mx-modal')),'Native modal focus trap');

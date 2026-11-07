@@ -13,7 +13,8 @@ from multimarket_model import stamp
 from opportunity_policy import POLICY_ID, annotate, goal_market
 from platinum_policy import POLICY_ID as PLATINUM_ID, evaluate as platinum_evaluate
 
-VERSION='decision-shadow-v2.1'
+VERSION='decision-shadow-v2.2'
+FAIR_PROTOCOL='fair_quote_probability_flow_v1'
 PATHS=('market_fair','poisson_base','favorite_anchor_only','calibrated_v51')
 FIELDS=('id','spec','family','period','quality','statistical_pct','low_pct','high_pct','win_weight','loss_weight',
         'fair_odd','sensitivity_weights','odd','ev_pct','ev_low_pct','edge_pp','oci','selected_margin_pct',
@@ -53,7 +54,9 @@ def stage(row, name):
 def decisions(matrix):
     rows=matrix['rows']
     return dict(first=next((r['id'] for r in rows if r['opportunity'].get('rank')==1),None),
-        rows=[dict(id=r['id'],spec=r['spec'],odd=r.get('odd'),probability_pct=r.get('statistical_pct'),
+        rows=[dict(id=r['id'],spec=r['spec'],odd=r.get('_quoted_odd', r.get('odd')),probability_pct=r.get('statistical_pct'),
+                   **({'eligibility_odd':r['odd'], 'quote_basis':FAIR_PROTOCOL,
+                       'gross_quote_ev_pct':r['statistical_pct']*r['_quoted_odd']-100} if '_quoted_odd' in r else {}),
                    ev_pct=r.get('ev_pct'),ev_low_pct=r.get('ev_low_pct'),**r['opportunity']) for r in rows])
 
 def capture(assessment, meta, as_of, prior_stability=None):
@@ -78,11 +81,14 @@ def capture(assessment, meta, as_of, prior_stability=None):
         sensitivities=assessment.get('pure_poisson_sensitivity_rates'),
         quote={k:deepcopy(anchor_quote.get(k)) for k in ('selected_market_odds','bookmaker_id','provider_updated_at')} if anchor_quote else None,
         factor=(source.get('lambda_shrinkage') or {}).get('factor', .15))
-    evidence=dict(lambda_inputs=lambda_inputs, rows=rows,goal_context=context,prior_stability=prior,as_of=as_of,fixture_id=str(meta.get('fixture_id')))
+    peak=deepcopy(assessment.get('anti_peak_most_prolific'))
+    evidence=dict(lambda_inputs=lambda_inputs, rows=rows,goal_context=context,prior_stability=prior,as_of=as_of,fixture_id=str(meta.get('fixture_id')),
+                  anti_peak_most_prolific=peak, market_fair_protocol=FAIR_PROTOCOL)
     digest=sha256(json.dumps(evidence,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
     out=dict(version=VERSION,policy_id=POLICY_ID,platinum_policy_id=PLATINUM_ID,captured_at=as_of,
              evidence_sha256=digest,available=True,paths={},shadow_only=True,
-             uncertainty_protocol='frozen_base_offsets_for_market_fair', prior_state_available=prior_stability is not None)
+             uncertainty_protocol='frozen_base_offsets_for_market_fair', prior_state_available=prior_stability is not None,
+             market_fair_protocol=FAIR_PROTOCOL, anti_peak_most_prolific=peak)
     # A missing fair quote on an unpriced row is harmless: it cannot be chosen.
     missing=[r['id'] for r in rows if r.get('quote_status') in ('recent','cached_stable')
              and number(r.get('odd')) and r['odd']>1 and any(stage(r,n) is None for n in PATHS)]
@@ -96,8 +102,11 @@ def capture(assessment, meta, as_of, prior_stability=None):
             if values is not None:
                 r.update({k:deepcopy(values[k]) for k in BASE_FIELDS if k in values})
                 if name!='calibrated_v51': r.pop('calibration',None)
+                if name=='market_fair':
+                    r['_quoted_odd']=r.get('odd')
+                    r['odd']=values['fair_odd']
                 reprice(r)
-        annotate(matrix,as_of)
+        annotate(matrix,as_of,comparison_basis=FAIR_PROTOCOL if name=='market_fair' else None)
         out['paths'][name]=decisions(matrix)
         if name=='calibrated_v51': baseline=matrix
     ordinary=dict(rows=deepcopy(baseline['rows']),goal_context=deepcopy(context),proposal_stability=deepcopy(prior))
@@ -210,13 +219,19 @@ class DecisionAudit:
         aliases = dict(market_fair='market_fair', poisson_base='pure_poisson',
                        favorite_anchor_only='anchored_poisson', calibrated_v51='calibrated_v51')
         summaries, experiments, snapshots, cohorts = {}, {}, [], {}
+        protocols, availability = {}, {}
         for label, items in [('first', self.first), ('latest', self.latest)]:
             paths={}; counts={}; differences={}; pending={}; platinum={}
+            protocols[label] = {}; availability[label] = {'anti_peak_most_prolific': {'available_snapshots': 0, 'unavailable_snapshots': 0}}
             references={}; reference_counts={}; reference_pending={}; variant_changes={}; compared={}
             for _,item in items.values():
                 snapshots.append(dict(snapshot=label, **item))
                 frozen=item['decisions']; base=frozen['paths']['poisson_base']['first']
                 variants = dict(frozen.get('experiments') or {})
+                protocol = frozen.get('market_fair_protocol', 'legacy_gross_quote_value_gates')
+                protocols[label][protocol] = protocols[label].get(protocol, 0)+1
+                field = 'available_snapshots' if 'anti_peak_most_prolific' in variants else 'unavailable_snapshots'
+                availability[label]['anti_peak_most_prolific'][field] += 1
                 if 'gold_no_automatic_upgrade' in frozen:
                     variants.setdefault('gold_no_automatic_upgrade', frozen['gold_no_automatic_upgrade'])
                 for name, choice in variants.items():
@@ -264,6 +279,7 @@ class DecisionAudit:
                 ('platinum_positive_ev','platinum_flow_only_negative_ev')}
         comparison={label:{aliases[n]:v for n,v in groups.items()} for label,groups in summaries.items()}
         return dict(version=VERSION,policy_id=POLICY_ID,snapshot_count=len(self.seen),unavailable_snapshots=self.unavailable,
+                    market_fair_protocols=protocols, experiment_availability=availability,
                     gold_no_upgrade_changed_first=self.changed,summaries=summaries,decision_path_comparison=comparison,
                     experiments=experiments,platinum_value_cohorts=cohorts,snapshots=snapshots,
                     social_publication='not_inferred_from_eligibility; requires delivery receipts',

@@ -28,7 +28,7 @@ def evidence(assessment):
                 'sample': observed('sample', len(values)),
                 'mean': observed('mean', mean(values) if values else None),
                 'without_last': observed('without_last', mean(values[1:]) if len(values) > 1 else None),
-                'without_peak': (sum(values)-max(values))/(len(values)-1) if len(values)>1 else None,
+                'without_peak': observed('without_peak', (sum(values)-max(values))/(len(values)-1) if len(values)>1 else None),
                 'conceded_mean': defense.get('mean') if numeric(defense.get('mean')) else mean(conceded) if conceded else None,
                 'frequency': observed('frequency', mean(v > 0 for v in values) if values else None),
                 # Count the whole observed window, not only the current drought.

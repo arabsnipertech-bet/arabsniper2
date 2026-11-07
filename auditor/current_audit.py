@@ -186,10 +186,8 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
         atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md',
                      (markdown(daily)+study_markdown(daily['selection_studies'])).encode())
         from auditor_history_chunks import seal_day
-        unresolved = any(not (r.get('settlement') or {}).get('outcomes') or
-                         any(v is None for v in r['settlement']['outcomes'].values())
-                         for _, _, r in day.records())
-        seal_day(root, date, now, unresolved, queried)
+        pending_summary = daily['pending_summary']
+        seal_day(root, date, now, pending_summary['pending'], queried, pending_summary=pending_summary)
         del daily
         if combined is not None:
             for collection, key, record in day.records():

@@ -166,6 +166,7 @@ def markdown(benchmark):
     lines += ['', f"Trappole: {traps['saved_losses']} perdite evitate, tasso {traps['saved_loss_rate']}; saldo teorico evitato {traps['avoided_net_units']} unità (incluse vincite escluse).", 'Campioni operativi sovrapposti non sommabili.', '']
     decision = benchmark.get('decision_benchmark') or {}
     lines += ['', '## Decisioni effettive sui medesimi snapshot', '',
+              'market_fair v2.2: ammissione a quota equa con gate di probabilità/flusso; saldo sulla quota lorda congelata. I protocolli storici restano distinti.', '',
               '| Snapshot | Percorso | Attivate | Cambiate vs Poisson | Chiuse | Pendenti | Unità | ROI % | IC 95% ROI per fixture |',
               '|---|---|---:|---:|---:|---:|---:|---:|---|']
     for snapshot, paths in (decision.get('decision_path_comparison') or {}).items():

@@ -98,7 +98,7 @@ const combo={id:'combo',family:'combo',period:'ft',spec:{kind:'halves_total',per
 assert(api.opportunityPanel([priced,combo]).includes('★ Combo Consigliata'));
 assert(api.comboText([combo]).includes('Quota book n.d.'));
 assert(api.comboText([combo]).includes('<b>Equa 1,67</b>'));
-assert(api.marketRow(combo).includes('EV non calcolabile senza quota reale'));
+assert(api.marketRow(combo).includes('Probabilità senza aggio dello stesso operatore'));
 assert(api.marketRow(combo).includes('Riferimento Over 2,5 FT'));
 assert.equal(api.bestOpportunity([combo]),null,'An active price-less combo is not a priced main proposal');
 const complete={...matches[0],multimarket:{matrix:{rows:[priced,combo]}}};
@@ -512,7 +512,7 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  const m={fixture:{fixture_id:910,kickoff:iso(now+7200000),status_short:'NS'},multimarket:{matrix:{rows:[a,b],quote_monitoring:{studio_ideas:[]}}}};
  const before=JSON.stringify(m);
  assert.equal(api.studyDefaultRow(m,now),b,'Prudent probability selects the study display, even without a star');
- const html=api.cockpit(m,{},true);assert(html.includes('STUDIO STATISTICO · VALORE NON CONFERMATO'));assert(html.includes('può essere negativo'));assert(!html.includes('⭐'));
+ const html=api.cockpit(m,{},true);assert(html.includes('STUDIO STATISTICO · VALORE NON CONFERMATO'));assert(html.includes('Stima disponibile per lo studio'));assert(!html.includes('⭐'));
  assert.equal(JSON.stringify(m),before,'Display fallback cannot mutate ranking, certificates or forecasts');
  for(const change of [{quality:'limited'},{quote_executable:false},{quote_status:'stale'},{odd:null},{statistical_pct:null},{provider_updated_at:iso(now-7200000)},{provider_updated_at:iso(now+60000)}]){
   const copy=structuredClone(m);copy.multimarket.matrix.rows=copy.multimarket.matrix.rows.map(r=>({...r,...change}));assert.equal(api.studyDefaultRow(copy,now),null);
