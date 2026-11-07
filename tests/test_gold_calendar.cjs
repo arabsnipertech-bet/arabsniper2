@@ -12,7 +12,7 @@ const element = id => {
   return elements.get(id);
 };
 const context = {
-  Date, Intl, Set, console:{error(){}}, currentDay:1, dayLoadSequence:0,
+  Date, Intl, Set, AbortController, dayLoadController:null, console:{error(){}}, currentDay:1, dayLoadSequence:0,
   currentPayload:null, currentMatches:[], filteredMatches:[], window:{},
   document:{hidden:false, getElementById:element},
   formatDateIt:date=>date.slice(5).split('-').reverse().join('/'),
@@ -38,7 +38,7 @@ const files = dates => Object.fromEntries(dates.map((date,i)=>[`arab_quote_day${
   assert.equal(result.file,'arab_quote_day2.json');
   assert.equal(result.payload.date,'2026-10-29');
   assert.equal(result.shifted,true);
-  assert.equal(calls.length,2,'Only the expected slot and its date offset are downloaded');
+  assert.equal(calls.filter(file=>file!=='arab_quote_model_research.json').length,2,'Only the expected slot and its date offset are downloaded');
   assert.equal(JSON.stringify(feeds),before,'Saved predictions and timestamps remain immutable');
   assert.equal((await context.loadCalendarDay(1,'2026-10-30')).file,'arab_quote_day3.json');
   assert.equal((await context.loadCalendarDay(4,'2026-11-01')).file,'arab_quote_day5.json');

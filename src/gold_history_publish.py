@@ -65,6 +65,14 @@ def main():
         s3.put_object(Bucket=bucket, Key='arab_quote_day1.json',
                       Body=json.dumps(projection, ensure_ascii=False, separators=(',', ':')).encode(),
                       ContentType='application/json', CacheControl='private, no-store')
+        # Keep the browser's lazy yesterday index in sync with the same snapshot.
+        catalog = json.loads(s3.get_object(Bucket=bucket, Key='arab_quote_model_research.json')['Body'].read())
+        if '_gold_browser_days' in catalog:
+            from gold_browser_feed import project as browser_project, encoded
+            def upload_page(key, data):
+                s3.put_object(Bucket=bucket, Key=key, Body=data, ContentType='application/octet-stream', CacheControl='private, no-store')
+            catalog['_gold_browser_days']['arab_quote_day1.json'] = browser_project(projection, upload_page)
+            s3.put_object(Bucket=bucket, Key='arab_quote_model_research.json', Body=encoded(catalog), ContentType='application/json', CacheControl='private, no-store')
         write_manifest(s3, bucket, new_index)
         previous = projection.get('previous_day') or {}
         summary = {'today':board.get('date'), 'yesterday':previous.get('date'),

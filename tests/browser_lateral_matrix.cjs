@@ -26,6 +26,12 @@ async function verifyCachedRelease(browser,payload){
   if(url.pathname==='/api/auth/session'){
    res.setHeader('Content-Type','application/json');return res.end('{"active":false}');
   }
+  if(url.pathname==='/api/auth/request-code'){
+   res.setHeader('Content-Type','application/json');return res.end(JSON.stringify({challenge:'a'.repeat(64)}));
+  }
+  if(url.pathname==='/api/auth/verify-code'){
+   let body='';req.on('data',part=>body+=part);req.on('end',()=>{const valid=JSON.parse(body).code==='123456';res.statusCode=valid?200:400;res.setHeader('Content-Type','application/json');res.end(JSON.stringify(valid?{active:true}:{error:'Codice errato, scaduto o già utilizzato.'}));});return;
+  }
   const file=url.pathname.slice(1);
   if(assets.has(file)){
    res.setHeader('Content-Type',file.endsWith('.css')?'text/css':'text/javascript');
@@ -46,6 +52,23 @@ async function verifyCachedRelease(browser,payload){
   assert.equal(await page.evaluate(()=>ArabMatrix.POLICY),'gold-goals-v6.1','Production HTML must replace the cached client');
   assert.equal(await page.evaluate(()=>ArabMatrix.SCOPE),payload.gold_scope.policy_id);
   assert.equal(requests.filter(url=>url===script).length,1,'Current content-versioned bundle requested');
+  // Synthetic email flow on this local server: no real email or entitlement changes.
+  await page.evaluate(()=>{window.showApplication=()=>{window.loginVerified=true;};});
+  await page.fill('#loginEmail','reader@example.com');
+  await page.click('#loginButton');
+  await page.waitForFunction(()=>!document.getElementById('loginCode').hidden);
+  assert((await page.locator('#loginStatus').textContent()).includes('reader@example.com'));
+  assert.equal(await page.locator('#loginError').textContent(),'');
+  assert(await page.locator('#resendCode').isDisabled());
+  fs.mkdirSync('test-artifacts',{recursive:true});
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:'test-artifacts/gold-login-code-mobile.png',fullPage:true});
+  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Login fits mobile width');
+  await page.fill('#loginCode','000000');await page.click('#loginButton');
+  await page.waitForFunction(()=>document.getElementById('loginError').textContent.includes('Codice errato'));
+  await page.fill('#loginCode','123456');await page.click('#loginButton');
+  await page.waitForFunction(()=>window.loginVerified===true);
+  await page.setViewportSize({width:1280,height:900});
   await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;renderMatchResearch(p)},payload);
   assert.equal(await page.locator('.mx-card').count(),payload.matches.length,'Current whitelist fixtures remain visible');
   assert((await page.locator('.mx-counters').textContent()).includes('Proposte su 5 mercati gol · Combo PT+ST'));

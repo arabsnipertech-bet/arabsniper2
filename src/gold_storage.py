@@ -81,6 +81,22 @@ def publish(s3,bucket,root):
             task.result()
             if count%25==0 or count==len(tasks):print(f'Uploaded {count}/{len(tasks)} objects',flush=True)
     # Gold uses its existing names and requires authenticated Worker access.
+    from gold_browser_feed import project as browser_project, encoded
+    def upload_browser_page(key, data):
+        s3.put_object(Bucket=bucket, Key=key, Body=data,
+                      ContentType='application/octet-stream', CacheControl='private, no-store')
+    # Add the browser index to the already-authenticated metadata endpoint.
+    # Keep every original daily feed unchanged for Telegram/Facebook readers.
+    catalog = json.loads(gold['arab_quote_model_research.json'])
+    catalog['_gold_browser_days'] = {
+        name: browser_project(json.loads(gold[name]), upload_browser_page)
+        for name in GOLD if re.fullmatch(r'arab_quote_day[1-5]\.json', name)
+    }
+    audit = json.loads(gold['arab_quote_prediction_audit.json'])
+    catalog['_gold_audit_summary'] = {key: audit[key] for key in ('summary', 'updated_at') if key in audit}
+    gold['arab_quote_model_research.json'] = encoded(catalog)
+    for name, board in catalog['_gold_browser_days'].items():
+        print(f"Browser feed {name}: {board.get('match_count', 0)} matches, {len(board.get('pages', []))} verified pages", flush=True)
     for name,data in gold.items():
         s3.put_object(Bucket=bucket,Key=name,Body=data,ContentType='application/json',CacheControl='private, no-store')
     write_manifest(s3,bucket,index)
