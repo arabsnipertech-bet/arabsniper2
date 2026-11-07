@@ -9,6 +9,7 @@ on:
       - 'auditor/current_audit.py'
       - 'auditor/recover_daily.py'
       - 'auditor/repair_calibration.py'
+      - 'auditor/repair_certificate.py'
       - '.github/workflows/repair-learning-chain.yml'
       - '.github/workflows/recover-daily-results.yml'
       - '.github/workflows/policy_tests.yml'
@@ -33,7 +34,7 @@ on:
       - 'workers/live-scores/**'
   push:
     branches: [main]
-    paths: ['web/vendor/**', '.github/workflows/gold-history.yml', 'src/**', 'tests/**', 'auditor/current_audit.py', 'auditor/recover_daily.py', 'auditor/repair_calibration.py', '.github/workflows/repair-learning-chain.yml', '.github/workflows/recover-daily-results.yml', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'web/index.html', 'web/homepage.js', 'web/competition-scope.js', 'web/statistics-first.js', 'web/statistics-first.css', 'web/lateral-matrix.js', 'web/lateral-matrix.css', 'web/results.js', '.github/workflows/policy_tests.yml', '.github/workflows/night_scan_backup.yml', '.github/workflows/auditor_backup.yml', '.github/workflows/run-auditor.yml', 'workers/live-scores/**']
+    paths: ['web/vendor/**', '.github/workflows/gold-history.yml', 'src/**', 'tests/**', 'auditor/current_audit.py', 'auditor/recover_daily.py', 'auditor/repair_calibration.py', 'auditor/repair_certificate.py', '.github/workflows/repair-learning-chain.yml', '.github/workflows/recover-daily-results.yml', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'web/index.html', 'web/homepage.js', 'web/competition-scope.js', 'web/statistics-first.js', 'web/statistics-first.css', 'web/lateral-matrix.js', 'web/lateral-matrix.css', 'web/results.js', '.github/workflows/policy_tests.yml', '.github/workflows/night_scan_backup.yml', '.github/workflows/auditor_backup.yml', '.github/workflows/run-auditor.yml', 'workers/live-scores/**']
 permissions:
   contents: read
 jobs:
@@ -44,7 +45,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests ijson==3.6.0
+      - run: pip install requests ijson==3.6.0 cryptography
       - run: python -m unittest discover -s tests -v
       - run: python -m py_compile src/3appdays.py src/policy_integration.py src/statistics_first.py src/statistics_integration.py src/lateral_matrix.py src/matrix_quotes.py src/matrix_pipeline.py src/matrix_audit.py src/selection_policy.py src/prematch_audit.py src/first_half_quality.py src/filter_audit.py src/multimarket_model.py src/context_analysis.py src/analysis_history.py src/multimarket_audit.py src/model_research.py src/signal_research.py auditor/current_audit.py
       - name: Run every Node test file
