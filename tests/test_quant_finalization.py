@@ -4,6 +4,8 @@ from datetime import date
 from hashlib import sha256
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'src'))
 from adaptive_calibration import fit, nightly_state
 from daily_audit import fingerprint, same_frozen_forecast
 from decision_metrics import uncertainty
@@ -95,3 +97,19 @@ class QuantFinalization(unittest.TestCase):
         self.assertEqual(r['gold_certificate']['contracts_count'],1)
         self.assertEqual(r['latest_prematch_gold']['contracts_count'],0)
         self.assertEqual(r['all_eligible_markets']['distinct_fixtures_count'],1)
+
+    def test_lambda_capture_hash_covers_original_rates_and_preserves_source(self):
+        from lateral_matrix import build_matrix
+        from adaptive_pricing import apply_matrix
+        at='2026-11-07T08:00:00Z';meta=dict(fixture_id=1,kickoff='2026-11-07T20:00:00Z',status_short='NS')
+        a=build_matrix(dict(rates=dict(home_ft=.8,away_ft=1.5,home_ht=.35,away_ht=.6)),at)
+        for r in a['matrix']['rows']:
+            if r['spec']['kind']=='result' and r['period']=='ft':
+                r.update(selected_market_odds={'1':1.3,'x':5.,'2':9.},provider_updated_at=at,quote_status='recent')
+        apply_matrix(a,meta,at);annotate(a['matrix'],at)
+        saved=deepcopy(a);x=capture(a,meta,at,{})
+        self.assertTrue(x['lambda_expansion_study']['available'])
+        self.assertTrue(x['lambda_expansion_study']['applied'])
+        self.assertIn('lambda_total_expansion',x['experiments']);self.assertEqual(a,saved)
+        a['pure_poisson_rates']['home_ft'] += .01
+        self.assertNotEqual(x['evidence_sha256'],capture(a,meta,at,{})['evidence_sha256'])

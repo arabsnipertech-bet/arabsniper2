@@ -69,7 +69,16 @@ def capture(assessment, meta, as_of, prior_stability=None):
     context=deepcopy(source.get('goal_context') or {})
     # Never seed a counterfactual with the winner selected at the same instant.
     prior=deepcopy(prior_stability or {})
-    evidence=dict(rows=rows,goal_context=context,prior_stability=prior,as_of=as_of,fixture_id=str(meta.get('fixture_id')))
+    from quote_sources import fresh
+    anchor_quote = next((r for r in source.get('rows', [])
+        if r.get('quote_status') == 'recent' and fresh(r.get('provider_updated_at'), as_of, meta.get('kickoff'))
+        and (r.get('spec') or {}).get('kind') == 'result' and (r.get('spec') or {}).get('period') == 'ft'
+        and r.get('selected_market_odds')), None)
+    lambda_inputs = dict(rates=assessment.get('pure_poisson_rates'),
+        sensitivities=assessment.get('pure_poisson_sensitivity_rates'),
+        quote={k:deepcopy(anchor_quote.get(k)) for k in ('selected_market_odds','bookmaker_id','provider_updated_at')} if anchor_quote else None,
+        factor=(source.get('lambda_shrinkage') or {}).get('factor', .15))
+    evidence=dict(lambda_inputs=lambda_inputs, rows=rows,goal_context=context,prior_stability=prior,as_of=as_of,fixture_id=str(meta.get('fixture_id')))
     digest=sha256(json.dumps(evidence,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
     out=dict(version=VERSION,policy_id=POLICY_ID,platinum_policy_id=PLATINUM_ID,captured_at=as_of,
              evidence_sha256=digest,available=True,paths={},shadow_only=True,
@@ -131,12 +140,8 @@ def capture(assessment, meta, as_of, prior_stability=None):
 
     out['gold_first_changed']=out['paths']['calibrated_v51']['first']!=out['gold_no_automatic_upgrade']['first']
     # Total-goal research compares with anchored Poisson, not with calibrated V5.1.
-    from quote_sources import fresh
-    rates = assessment.get('pure_poisson_rates')
-    prices = next((r.get('selected_market_odds') for r in source.get('rows', [])
-                   if r.get('quote_status') == 'recent' and fresh(r.get('provider_updated_at'), as_of, meta.get('kickoff'))
-                   and (r.get('spec') or {}).get('kind') == 'result'
-                   and (r.get('spec') or {}).get('period') == 'ft' and r.get('selected_market_odds')), None)
+    rates = lambda_inputs['rates']
+    prices = anchor_quote.get('selected_market_odds') if anchor_quote else None
     out['lambda_expansion_study'] = dict(available=False, reason='missing_frozen_rates_or_fresh_1x2')
     if rates and prices:
         from lambda_shadow import expanded_rates
@@ -150,6 +155,10 @@ def capture(assessment, meta, as_of, prior_stability=None):
         for row in experiment['rows']:
             row.update({k:deepcopy(estimates[row['id']][k]) for k in BASE_FIELDS if k in estimates[row['id']]})
             row.pop('calibration', None)
+            for side, team in (row.get('goal_evidence') or {}).get('teams', {}).items():
+                for period in ('ft', 'ht'):
+                    if period in team and side+'_'+period in expanded:
+                        team[period]['expected_goals'] = expanded[side+'_'+period]
             reprice(row)
         annotate(experiment, as_of)
         out['experiments']['lambda_total_expansion'] = decisions(experiment)
