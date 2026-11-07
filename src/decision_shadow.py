@@ -209,12 +209,27 @@ class DecisionAudit:
         summaries, experiments, snapshots, cohorts = {}, {}, [], {}
         for label, items in [('first', self.first), ('latest', self.latest)]:
             paths={}; counts={}; differences={}; pending={}; platinum={}
+            references={}; reference_counts={}; reference_pending={}; variant_changes={}; compared={}
             for _,item in items.values():
                 snapshots.append(dict(snapshot=label, **item))
                 frozen=item['decisions']; base=frozen['paths']['poisson_base']['first']
                 variants = dict(frozen.get('experiments') or {})
                 if 'gold_no_automatic_upgrade' in frozen:
                     variants.setdefault('gold_no_automatic_upgrade', frozen['gold_no_automatic_upgrade'])
+                for name, choice in variants.items():
+                    reference_name = 'favorite_anchor_only' if name == 'lambda_total_expansion' else 'calibrated_v51'
+                    reference = frozen['paths'][reference_name]
+                    references.setdefault(name, []); reference_counts.setdefault(name, 0); reference_pending.setdefault(name, 0)
+                    variant_changes[name] = variant_changes.get(name, 0) + (choice['first'] != reference['first'])
+                    compared.setdefault(name, set()).add(item['fixture_id'])
+                    row = next((r for r in reference['rows'] if r['id'] == reference['first']), None)
+                    if row:
+                        reference_counts[name] += 1
+                        payout = settle_spec(row['spec'], item['result'])
+                        if payout in ((1.,0.),(0.,1.)):
+                            references[name].append(dict(fid=item['fixture_id'], odd=row['odd'], y=int(payout[0]), p=row['probability_pct']/100))
+                        else:
+                            reference_pending[name] += 1
                 for name,choice in {**frozen['paths'], **variants}.items():
                     paths.setdefault(name,[]);counts.setdefault(name,0);differences.setdefault(name,0);pending.setdefault(name,0)
                     differences[name] += choice['first'] != base
@@ -236,8 +251,10 @@ class DecisionAudit:
             experiments[label]={n:v for n,v in result.items() if n not in PATHS}
             for n,v in experiments[label].items():
                 ref='favorite_anchor_only' if n=='lambda_total_expansion' else 'calibrated_v51'
-                reference=result.get(ref, {})
-                v['baseline']=ref
+                reference=selected_summary(references[n], reference_counts[n], reference_pending[n], 0)
+                reference.pop('changed_vs_pure_poisson', None)
+                v.update(baseline=ref, baseline_on_same_snapshots=reference,
+                         changed_vs_baseline=variant_changes[n], compared_fixtures_count=len(compared[n]))
                 v['roi_difference_pp']=(v['roi_pct']-reference['roi_pct']
                     if v['roi_pct'] is not None and reference.get('roi_pct') is not None else None)
             cohorts[label]={n:metrics(platinum.get(n, [])) for n in

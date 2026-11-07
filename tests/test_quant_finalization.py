@@ -113,3 +113,20 @@ class QuantFinalization(unittest.TestCase):
         self.assertIn('lambda_total_expansion',x['experiments']);self.assertEqual(a,saved)
         a['pure_poisson_rates']['home_ft'] += .01
         self.assertNotEqual(x['evidence_sha256'],capture(a,meta,at,{})['evidence_sha256'])
+
+    def test_experiment_baseline_uses_only_identical_available_snapshots(self):
+        from decision_shadow import DecisionAudit, PATHS
+        from lateral_matrix import specification
+        choice=dict(first='a', rows=[dict(id='a',spec=specification('total','ft','over',2.5),odd=2.,probability_pct=60)])
+        audit=DecisionAudit()
+        for fid in ('a','b'):
+            frozen=dict(paths={name:deepcopy(choice) for name in PATHS})
+            if fid=='a': frozen['experiments']={'market_prior_blend':dict(first=None,rows=[])}
+            item=dict(fixture_id=fid,captured_at='2026-11-07T10:00:00Z',mode='frozen_prematch',forecast_sha256=fid,
+                decisions=frozen,result={'status':'FT','home_ft':3,'away_ft':0,'home_ht':1,'away_ht':0})
+            audit.first[fid]=(fid,item)
+        result=audit.report()['experiments']['first']['market_prior_blend']
+        self.assertEqual(result['compared_fixtures_count'],1)
+        self.assertEqual(result['baseline_on_same_snapshots']['first_choices_activated'],1)
+        self.assertEqual(result['changed_vs_baseline'],1)
+        self.assertEqual(result['first_choices_activated'],0)
