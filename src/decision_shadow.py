@@ -13,7 +13,7 @@ from multimarket_model import stamp
 from opportunity_policy import POLICY_ID, annotate, goal_market
 from platinum_policy import POLICY_ID as PLATINUM_ID, evaluate as platinum_evaluate
 
-VERSION='decision-shadow-v2'
+VERSION='decision-shadow-v2.1'
 PATHS=('market_fair','poisson_base','favorite_anchor_only','calibrated_v51')
 FIELDS=('id','spec','family','period','quality','statistical_pct','low_pct','high_pct','win_weight','loss_weight',
         'fair_odd','sensitivity_weights','odd','ev_pct','ev_low_pct','edge_pp','oci','selected_margin_pct',
@@ -73,7 +73,7 @@ def capture(assessment, meta, as_of, prior_stability=None):
     anchor_quote = next((r for r in source.get('rows', [])
         if r.get('quote_status') == 'recent' and fresh(r.get('provider_updated_at'), as_of, meta.get('kickoff'))
         and (r.get('spec') or {}).get('kind') == 'result' and (r.get('spec') or {}).get('period') == 'ft'
-        and r.get('selected_market_odds')), None)
+        and set(r.get('selected_market_odds') or {}) == {'1','x','2'}), None)
     lambda_inputs = dict(rates=assessment.get('pure_poisson_rates'),
         sensitivities=assessment.get('pure_poisson_sensitivity_rates'),
         quote={k:deepcopy(anchor_quote.get(k)) for k in ('selected_market_odds','bookmaker_id','provider_updated_at')} if anchor_quote else None,
@@ -148,20 +148,23 @@ def capture(assessment, meta, as_of, prior_stability=None):
         from lateral_matrix import matrix_rows
         factor = (source.get('lambda_shrinkage') or {}).get('factor', .15)
         expanded, details = expanded_rates(rates, prices, factor)
-        probe = dict(assessment, rates=expanded, sensitivity_rates=[expanded_rates(r, prices, factor)[0]
-                     for r in assessment.get('pure_poisson_sensitivity_rates', [])])
-        estimates = {r['id']: r for r in matrix_rows(probe, {r['id']:r['spec'] for r in rows})}
-        experiment=dict(rows=deepcopy(rows), goal_context=deepcopy(context), proposal_stability=deepcopy(prior))
-        for row in experiment['rows']:
-            row.update({k:deepcopy(estimates[row['id']][k]) for k in BASE_FIELDS if k in estimates[row['id']]})
-            row.pop('calibration', None)
-            for side, team in (row.get('goal_evidence') or {}).get('teams', {}).items():
-                for period in ('ft', 'ht'):
-                    if period in team and side+'_'+period in expanded:
-                        team[period]['expected_goals'] = expanded[side+'_'+period]
-            reprice(row)
-        annotate(experiment, as_of)
-        out['experiments']['lambda_total_expansion'] = decisions(experiment)
+        if not details.get('applied'):
+            out['experiments']['lambda_total_expansion'] = deepcopy(out['paths']['favorite_anchor_only'])
+        else:
+            probe = dict(assessment, rates=expanded, sensitivity_rates=[expanded_rates(r, prices, factor)[0]
+                         for r in assessment.get('pure_poisson_sensitivity_rates', [])])
+            estimates = {r['id']: r for r in matrix_rows(probe, {r['id']:r['spec'] for r in rows})}
+            experiment=dict(rows=deepcopy(rows), goal_context=deepcopy(context), proposal_stability=deepcopy(prior))
+            for row in experiment['rows']:
+                row.update({k:deepcopy(estimates[row['id']][k]) for k in BASE_FIELDS if k in estimates[row['id']]})
+                row.pop('calibration', None)
+                for side, team in (row.get('goal_evidence') or {}).get('teams', {}).items():
+                    for period in ('ft', 'ht'):
+                        if period in team and side+'_'+period in expanded:
+                            team[period]['expected_goals'] = expanded[side+'_'+period]
+                reprice(row)
+            annotate(experiment, as_of)
+            out['experiments']['lambda_total_expansion'] = decisions(experiment)
         out['lambda_expansion_study'] = dict(available=True, baseline='favorite_anchor_only',
             production_applied=False, **details)
     platinum=[]

@@ -25,7 +25,7 @@ jobs:
       matrix:
         date: ${{ fromJSON(inputs.dates || '["2026-11-05","2026-11-06"]') }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 55
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
         with:
