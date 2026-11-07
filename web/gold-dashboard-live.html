@@ -575,7 +575,7 @@
     }
     .login-input:focus { border-color: var(--gold); }
     .login-error { min-height: 20px; color: #ff9ba5; font-size: .76rem; margin-top: 8px; }
-    .login-button { width: 100%; margin-top: 10px; background: var(--gold); color: #05070b; border-color: var(--gold); }
+    body[data-gold-ui] .login-card .login-button { width: 100%; margin-top: 10px; background: var(--gold); color: #05070b; border-color: var(--gold); }
 
     @media (max-width: 1180px) {
       .matches-grid { grid-template-columns: 1fr; }
@@ -850,7 +850,7 @@
       <p id="loginStatus" class="login-status" role="status" aria-live="polite"></p>
       <div id="loginError" class="login-error" role="alert"></div>
       <button id="loginButton" class="btn login-button" type="submit">Ricevi il codice via email</button>
-      <div class="login-actions"><button id="resendCode" class="btn" type="button" onclick="resendLoginCode()" hidden>Invia un nuovo codice</button>
+      <div class="login-actions"><button id="resendCode" class="btn" type="button" onclick="resendLoginCode()" hidden>Reinvia codice</button>
       <button id="changeEmail" class="btn" type="button" onclick="resetCodeLogin()" hidden>Cambia email</button></div>
       <p id="loginPlans" hidden>Email verificata, ma accesso non attivo. <a href="/#piani">Vedi i pass Gold</a> oppure <a href="mailto:arabsnipertech@gmail.com">contatta l’assistenza</a> se hai già pagato.</p>
       <p class="login-support">Il codice dura 10 minuti. Controlla anche Spam e Promozioni. Dopo aver letto l’email, torna in questa stessa pagina.<br><a href="mailto:arabsnipertech@gmail.com">Hai bisogno di aiuto? Scrivici</a></p>
@@ -1004,7 +1004,7 @@
       document.getElementById('loginHelp').textContent = 'Inserisci le 6 cifre ricevute. Se richiedi un nuovo codice, usa soltanto l’ultimo.';
       document.getElementById('loginButton').textContent = 'Verifica codice ed entra';
       clearInterval(resendTimer);
-      const tick=()=>{const seconds=Math.max(0,Math.ceil((loginSentAt+60000-Date.now())/1000));const button=document.getElementById('resendCode');button.disabled=seconds>0;button.textContent=seconds?'Nuovo codice tra '+seconds+' s':'Invia un nuovo codice';if(!seconds)clearInterval(resendTimer);};
+      const tick=()=>{const seconds=Math.max(0,Math.ceil((loginSentAt+60000-Date.now())/1000));const button=document.getElementById('resendCode');button.disabled=seconds>0;button.textContent=seconds?'Reinvia tra '+seconds+' s':'Reinvia codice';if(!seconds)clearInterval(resendTimer);};
       tick();resendTimer=setInterval(tick,1000);
     }
     async function authRequest(path, body) {

@@ -60,6 +60,7 @@ async function verifyCachedRelease(browser,payload){
   assert((await page.locator('#loginStatus').textContent()).includes('reader@example.com'));
   assert.equal(await page.locator('#loginError').textContent(),'');
   assert(await page.locator('#resendCode').isDisabled());
+  assert.equal(await page.locator('#loginButton').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(232, 199, 131)','Login action keeps its gold contrast despite shared dashboard styles');
   fs.mkdirSync('test-artifacts',{recursive:true});
   await page.setViewportSize({width:390,height:844});
   await page.screenshot({path:'test-artifacts/gold-login-code-mobile.png',fullPage:true});
