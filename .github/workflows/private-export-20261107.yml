@@ -1,11 +1,11 @@
 name: Private R2 encrypted export 20261107
 on:
   push:
-    branches: ['export/private-r2-compact-20261107']
+    branches: ['export/private-r2-exact-20261107']
 permissions:
   contents: read
 concurrency:
-  group: private-r2-export-20261107
+  group: private-r2-exact-20261107
   cancel-in-progress: false
 jobs:
   export:
