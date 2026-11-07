@@ -16,7 +16,7 @@ Base tecnica: 60bbc051bddfc6ac521f2e5b283d5e5233ce1561. Le revisioni successive 
 
 Il tracking prematch confronta Platinum con EV centrale/prudente non negativi e Gold senza promozione artificiale quando Over 2.5 FT ha quota bassa. Il fattore alpha simmetrico è registrato in shadow; il valore pubblicato resta invariato. Nessuna riscrittura delle previsioni storiche.
 
-Non vengono promossi i blend 70/30 o 55/45, l'espansione lambda +10%, le nuove soglie OCI o MIN_N/PRIOR 35. Le evidenze fornite non validano questi numeri. Le 3.008 righe del file OCI contengono 877 vinte, 2.004 perse e 127 pendenti: tutte le 20 fasce con vincite al 100% sono riproducibili convertendo erroneamente in booleano le stringhe `won`, `lost`, `pending`. Dopo deduplicazione rimangono 2.407 contratti su 383 gare; 1.620 contratti chiusi quotati hanno ROI teorico −14,30%. Il miglioramento della probabilità fair non implica automaticamente un miglioramento del rendimento delle proposte.
+Non vengono promossi i blend 70/30 o 55/45, l'espansione lambda +10%, le nuove soglie OCI o MIN_N/PRIOR 35. Le evidenze fornite non validano questi numeri. Le 3.008 righe del file OCI contengono 877 vinte, 2.004 perse e 127 pendenti: tutte le 20 fasce con vincite al 100% sono riproducibili convertendo erroneamente in booleano le stringhe `won`, `lost`, `pending`. Dopo deduplicazione, inclusa l’equivalenza delle linee Asian .5, rimangono 2.406 contratti su 383 gare; 1.619 contratti chiusi quotati hanno ROI teorico −14,25%. Il miglioramento della probabilità fair non implica automaticamente un miglioramento del rendimento delle proposte.
 
 ## Workflow
 
