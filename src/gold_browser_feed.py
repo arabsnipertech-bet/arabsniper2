@@ -8,7 +8,7 @@ import hashlib
 import json
 
 FORMAT = 'arabsniper-gold-pages-v1'
-PAGE_BYTES = 2 * 1024 * 1024
+PAGE_BYTES = 8 * 1024 * 1024
 
 
 def encoded(value):
