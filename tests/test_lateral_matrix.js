@@ -504,3 +504,21 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  const absent=structuredClone(m);absent.multimarket.status='no_prematch_snapshot';assert.equal(api.studyDefaultRow(absent),null);
  console.log('PASS Study cockpit: existing best study selected, exact market, zero/missing data, no invented fallback or payload changes');
 }
+
+{
+ const now=Date.now(),iso=n=>new Date(n).toISOString();
+ const row=(id,p,low)=>({id,label:id,spec:{kind:'total',period:'ft',side:'over',line:id==='a'?2.5:3.5},quality:'supported',quote_executable:true,quote_status:'recent',odd:2,statistical_pct:p,low_pct:low,provider_updated_at:iso(now-60000),quote_observed_at:iso(now-60000),ev_pct:-10,ev_low_pct:-20});
+ const a=row('a',60,40),b=row('b',55,45);
+ const m={fixture:{fixture_id:910,kickoff:iso(now+7200000),status_short:'NS'},multimarket:{matrix:{rows:[a,b],quote_monitoring:{studio_ideas:[]}}}};
+ const before=JSON.stringify(m);
+ assert.equal(api.studyDefaultRow(m,now),b,'Prudent probability selects the study display, even without a star');
+ const html=api.cockpit(m,{},true);assert(html.includes('STUDIO STATISTICO · VALORE NON CONFERMATO'));assert(html.includes('può essere negativo'));assert(!html.includes('⭐'));
+ assert.equal(JSON.stringify(m),before,'Display fallback cannot mutate ranking, certificates or forecasts');
+ for(const change of [{quality:'limited'},{quote_executable:false},{quote_status:'stale'},{odd:null},{statistical_pct:null},{provider_updated_at:iso(now-7200000)},{provider_updated_at:iso(now+60000)}]){
+  const copy=structuredClone(m);copy.multimarket.matrix.rows=copy.multimarket.matrix.rows.map(r=>({...r,...change}));assert.equal(api.studyDefaultRow(copy,now),null);
+ }
+ const history=structuredClone(m);history._gold_history={verified_prematch:true};assert.equal(api.studyDefaultRow(history,now),null);
+ const live=structuredClone(m);live.fixture.kickoff=iso(now-1);assert.equal(api.studyDefaultRow(live,now),null);
+ const absent=structuredClone(m);absent.multimarket.status='no_prematch_snapshot';assert.equal(api.studyDefaultRow(absent,now),null);
+ console.log('PASS Supported study default: prudent ranking, fresh quotes, no certification, immutable history');
+}
