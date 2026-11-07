@@ -141,7 +141,8 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
         with AuditLedger(results_path, progress=progress) as previous:
             for collection, key, record in day.records():
                 old = previous.get(collection, {}).get(key)
-                if old is not None and fingerprint(old) != fingerprint(record):
+                from daily_audit import same_frozen_forecast
+                if old is not None and not same_frozen_forecast(old, record):
                     raise ValueError(f'Frozen forecast mismatch: {date}/{collection}/{key}')
                 if (old or {}).get('settlement'):
                     record['settlement'] = old['settlement']
@@ -175,6 +176,11 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
             progress('Promotional projection unavailable: '+type(error).__name__)
             promo = dict(schema_version=1, date=str(date), ready=False, examples=[])
         write(root / f'auditarchive/prematch_{date}_promo.json', promo)
+        from auditor_history_chunks import digest
+        daily['evidence_provenance']['input_files'] = {
+            path.relative_to(root).as_posix(): digest(path),
+            results_path.relative_to(root).as_posix(): digest(results_path),
+            f'auditarchive/prematch_{date}_calibration.json': digest(root/f'auditarchive/prematch_{date}_calibration.json')}
         daily['selection_studies'] = build_studies(daily)
         write(root / f'auditarchive/prematch_{date}_daily.json', daily)
         atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md',

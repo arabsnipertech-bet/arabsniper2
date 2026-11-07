@@ -73,6 +73,10 @@ class DailyRecoveryTests(unittest.TestCase):
             with TemporaryDirectory() as retry:
                 self.assertEqual(install(storage,'test',Path(retry),DAY,'existing',NOW), public)
             self.assertEqual(fetch.call_count,1)
+            refreshed = prepare(storage, 'test', Path(work), DAY, NOW, fetch, refresh=True)
+            self.assertNotEqual(refreshed, 'existing')
+            self.assertEqual(fetch.call_count, 1)  # Final official scores are reused, not invented or fetched again.
+            install(storage, 'test', Path(dest), DAY, refreshed, NOW)
 
     def test_existing_report_missing_learning_chain_recovers_journal_without_rewriting_predictions(self):
         from audit_ledger import AuditLedger
@@ -117,7 +121,16 @@ class DailyRecoveryTests(unittest.TestCase):
             ingest(normal)
             archive(normal, NOW)
             settle_day(normal, DAY, NOW, fetch)
-            self.assertEqual(read_store(Path(dest)/report_path(DAY)), read_store(normal/report_path(DAY)))
+            recovered = read_store(Path(dest)/report_path(DAY))
+            ordinary = read_store(normal/report_path(DAY))
+            # Recovery and normal ingestion retain different original labels and byte hashes.
+            from auditor_history_chunks import digest as file_digest
+            for folder, report in ((Path(dest), recovered), (normal, ordinary)):
+                hashes = report['evidence_provenance'].pop('input_files')
+                self.assertTrue(hashes)
+                for path, checksum in hashes.items():
+                    self.assertEqual(checksum, file_digest(folder/path))
+            self.assertEqual(recovered, ordinary)
 
     def test_changed_source_or_corrupt_preparation_leaves_official_pointer_alone(self):
         storage = Fake()

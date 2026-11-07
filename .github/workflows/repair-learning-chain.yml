@@ -16,6 +16,7 @@ env:
   R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
   R2_BUCKET: arabsniper-gold
   PYTHONUNBUFFERED: '1'
+  RECOVERY_REFRESH: 'true'
 jobs:
   prepare:
     if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main' && vars.GOLD_PRIVATE == 'true'

@@ -47,18 +47,11 @@ jobs:
       - run: pip install requests ijson==3.6.0
       - run: python -m unittest discover -s tests -v
       - run: python -m py_compile src/3appdays.py src/policy_integration.py src/statistics_first.py src/statistics_integration.py src/lateral_matrix.py src/matrix_quotes.py src/matrix_pipeline.py src/matrix_audit.py src/selection_policy.py src/prematch_audit.py src/first_half_quality.py src/filter_audit.py src/multimarket_model.py src/context_analysis.py src/analysis_history.py src/multimarket_audit.py src/model_research.py src/signal_research.py auditor/current_audit.py
-      - name: Check public homepage and verified results
+      - name: Run every Node test file
         run: |
-          node tests/test_homepage.js
-          node tests/test_results.js
-      - run: node tests/test_dashboard.js
-      - run: node tests/test_gold_calendar.cjs
-      - run: node tests/test_statistics_first.js
-      - run: node tests/test_lateral_matrix.js
-      - run: node tests/test_storage_loader.cjs
-      - run: node tests/test_gold_login_ui.cjs
-      - run: node --test tests/test_live_scores.mjs
-
+          for test in tests/test_*.js tests/test_*.cjs tests/test_*.mjs; do
+            node "$test" || exit 1
+          done
 
       - name: Install browser for dashboard checks
         timeout-minutes: 10

@@ -13,7 +13,7 @@ from multimarket_model import stamp
 from opportunity_policy import POLICY_ID, annotate, goal_market
 from platinum_policy import POLICY_ID as PLATINUM_ID, evaluate as platinum_evaluate
 
-VERSION='decision-shadow-v1'
+VERSION='decision-shadow-v2'
 PATHS=('market_fair','poisson_base','favorite_anchor_only','calibrated_v51')
 FIELDS=('id','spec','family','period','quality','statistical_pct','low_pct','high_pct','win_weight','loss_weight',
         'fair_odd','sensitivity_weights','odd','ev_pct','ev_low_pct','edge_pp','oci','selected_margin_pct',
@@ -21,17 +21,26 @@ FIELDS=('id','spec','family','period','quality','statistical_pct','low_pct','hig
         'selected_movement','delta_pct','first_odd','bookmaker','paired_books','agreeing_books',
         'movement_confirmed','fair_direction_coherent','margin_band','cache_source_at','cache_expires_at',
         'pure_poisson','calibration_base','calibration','goal_evidence','ht_evidence','market_fair_pct',
-        'selected_market_fair_pct','value_profile','category','label')
+        'selected_market_fair_pct','value_profile','category','label','provider_updated_at','quote_observed_at')
 
 def compact(row):
     return {k:deepcopy(row[k]) for k in FIELDS if k in row}
 
+def same_book_fair(row):
+    margin, odd = row.get('selected_margin_pct'), row.get('odd')
+    if not number(margin) or not 0 <= margin <= 9 or not number(odd) or odd <= 1:
+        return None
+    value = row.get('selected_market_fair_pct')
+    return value if number(value) and 0 < value < 100 else 100 / odd / (1 + margin/100)
+
+
 def stage(row, name):
     original=row.get('pure_poisson') or row.get('calibration_base') or row
-    if name=='poisson_base': return original
+    if name=='poisson_base':
+        return None if row.get('_anchor_applied') and not row.get('pure_poisson') else original
     if name=='favorite_anchor_only': return row.get('calibration_base') or row
     if name=='calibrated_v51': return row
-    p=row.get('market_fair_pct')
+    p=same_book_fair(row)
     if not number(p) or not 0 < p < 100: return None
     p/=100
     base=original.get('win_weight')
@@ -55,6 +64,8 @@ def capture(assessment, meta, as_of, prior_stability=None):
     if (source.get('opportunity_policy') or {}).get('id')!=POLICY_ID:
         return dict(version=VERSION,available=False,reason='unsupported_policy_version')
     rows=[compact(r) for r in source.get('rows',[]) if goal_market(r)]
+    if source.get('lambda_shrinkage'):
+        for row in rows: row['_anchor_applied'] = True
     context=deepcopy(source.get('goal_context') or {})
     # Never seed a counterfactual with the winner selected at the same instant.
     prior=deepcopy(prior_stability or {})
@@ -83,13 +94,73 @@ def capture(assessment, meta, as_of, prior_stability=None):
     ordinary=dict(rows=deepcopy(baseline['rows']),goal_context=deepcopy(context),proposal_stability=deepcopy(prior))
     annotate(ordinary,as_of,automatic_upgrade=False)
     out['gold_no_automatic_upgrade']=decisions(ordinary)
+    out['experiments'] = {'gold_no_automatic_upgrade': decisions(ordinary)}
+    for variant in ('divergence_10ft_8ht', 'market_prior_blend', 'over25_floor_185', 'anti_peak_most_prolific'):
+        experiment=dict(rows=deepcopy(baseline['rows']), goal_context=deepcopy(context), proposal_stability=deepcopy(prior))
+        if variant == 'anti_peak_most_prolific':
+            # Older frozen evidence without this statistic cannot test the hypothesis.
+            if any(not number(((r.get('goal_evidence') or {}).get('teams', {}).get(side, {}).get(
+                    (r.get('spec') or {}).get('period'), {}) or {}).get('without_peak'))
+                    for r in experiment['rows'] for side in ('home', 'away')):
+                continue
+            for row in experiment['rows']:
+                for team in (row.get('goal_evidence') or {}).get('teams', {}).values():
+                    for period in ('ft', 'ht'):
+                        values = team.get(period) or {}
+                        if number(values.get('without_peak')):
+                            values['without_last'] = values['without_peak']
+        if variant == 'market_prior_blend':
+            for row in experiment['rows']:
+                fair, p = same_book_fair(row), row.get('statistical_pct')
+                if fair is None or not number(p): continue
+                period = (row.get('spec') or {}).get('period')
+                weight = (.45 if period == 'ht' and p > fair else .30
+                          if period == 'ft' and abs(p-fair) > 8 and number(row.get('oci')) and row['oci'] < 25 else 0.)
+                if not weight: continue
+                delta = weight*(fair-p)/100
+                center = min(1., max(0., p/100+delta))
+                scenarios = [min(1., max(0., w+delta)) for w,l in row.get('sensitivity_weights', [[p/100,1-p/100]])]
+                row.update(win_weight=center, loss_weight=1-center, statistical_pct=100*center,
+                           fair_odd=1/center if center else None, low_pct=100*min([center,*scenarios]),
+                           high_pct=100*max([center,*scenarios]), sensitivity_weights=[[v,1-v] for v in scenarios])
+                reprice(row)
+        annotate(experiment, as_of, divergence_caps={'ft':10.,'ht':8.} if variant=='divergence_10ft_8ht' else None,
+                 over25_floor=1.85 if variant=='over25_floor_185' else None)
+        out['experiments'][variant] = decisions(experiment)
+    out['experiment_protocol'] = 'one hypothesis per variant; identical published ranking; no production promotion'
+
     out['gold_first_changed']=out['paths']['calibrated_v51']['first']!=out['gold_no_automatic_upgrade']['first']
+    # Total-goal research compares with anchored Poisson, not with calibrated V5.1.
+    from quote_sources import fresh
+    rates = assessment.get('pure_poisson_rates')
+    prices = next((r.get('selected_market_odds') for r in source.get('rows', [])
+                   if r.get('quote_status') == 'recent' and fresh(r.get('provider_updated_at'), as_of, meta.get('kickoff'))
+                   and (r.get('spec') or {}).get('kind') == 'result'
+                   and (r.get('spec') or {}).get('period') == 'ft' and r.get('selected_market_odds')), None)
+    out['lambda_expansion_study'] = dict(available=False, reason='missing_frozen_rates_or_fresh_1x2')
+    if rates and prices:
+        from lambda_shadow import expanded_rates
+        from lateral_matrix import matrix_rows
+        factor = (source.get('lambda_shrinkage') or {}).get('factor', .15)
+        expanded, details = expanded_rates(rates, prices, factor)
+        probe = dict(assessment, rates=expanded, sensitivity_rates=[expanded_rates(r, prices, factor)[0]
+                     for r in assessment.get('pure_poisson_sensitivity_rates', [])])
+        estimates = {r['id']: r for r in matrix_rows(probe, {r['id']:r['spec'] for r in rows})}
+        experiment=dict(rows=deepcopy(rows), goal_context=deepcopy(context), proposal_stability=deepcopy(prior))
+        for row in experiment['rows']:
+            row.update({k:deepcopy(estimates[row['id']][k]) for k in BASE_FIELDS if k in estimates[row['id']]})
+            row.pop('calibration', None)
+            reprice(row)
+        annotate(experiment, as_of)
+        out['experiments']['lambda_total_expansion'] = decisions(experiment)
+        out['lambda_expansion_study'] = dict(available=True, baseline='favorite_anchor_only',
+            production_applied=False, **details)
     platinum=[]
     for r in rows:
         published=platinum_evaluate(r,as_of)
         positive=all(number(r.get(k)) and r[k]>=0 for k in ('ev_pct','ev_low_pct'))
         platinum.append(dict(id=r['id'],spec=r['spec'],odd=r.get('odd'),ev_pct=r.get('ev_pct'),ev_low_pct=r.get('ev_low_pct'),
-            flow_value_group='nonnegative' if number(r.get('ev_pct')) and r['ev_pct']>=0 else 'negative_or_unknown',
+            flow_value_group='platinum_positive_ev' if positive else 'platinum_flow_only_negative_ev',
             baseline_eligible=published['eligible'],shadow_eligible=published['eligible'] and positive,
             shadow_reasons=published['reasons']+([] if positive else ['nonnegative_ev_and_prudent_ev_required'])))
     out['platinum_nonnegative_ev']=platinum
@@ -122,20 +193,49 @@ class DecisionAudit:
         if fid not in self.latest or rank>self.latest[fid][0]:self.latest[fid]=(rank,item)
     def report(self):
         from lateral_matrix import settle_spec
+        from decision_metrics import selected_summary
         from calibration_benchmark import metrics
-        summaries={};snapshots=[]
-        for label,items in [('first',self.first),('latest',self.latest)]:
-            paths={n:[] for n in PATHS}
+        aliases = dict(market_fair='market_fair', poisson_base='pure_poisson',
+                       favorite_anchor_only='anchored_poisson', calibrated_v51='calibrated_v51')
+        summaries, experiments, snapshots, cohorts = {}, {}, [], {}
+        for label, items in [('first', self.first), ('latest', self.latest)]:
+            paths={}; counts={}; differences={}; pending={}; platinum={}
             for _,item in items.values():
-                snapshots.append(dict(snapshot=label,**item))
-                for name,choice in item['decisions']['paths'].items():
+                snapshots.append(dict(snapshot=label, **item))
+                frozen=item['decisions']; base=frozen['paths']['poisson_base']['first']
+                variants = dict(frozen.get('experiments') or {})
+                if 'gold_no_automatic_upgrade' in frozen:
+                    variants.setdefault('gold_no_automatic_upgrade', frozen['gold_no_automatic_upgrade'])
+                for name,choice in {**frozen['paths'], **variants}.items():
+                    paths.setdefault(name,[]);counts.setdefault(name,0);differences.setdefault(name,0);pending.setdefault(name,0)
+                    differences[name] += choice['first'] != base
                     row=next((r for r in choice['rows'] if r['id']==choice['first']),None)
-                    if not row:continue
+                    if not row: continue
+                    counts[name] += 1
                     payout=settle_spec(row['spec'],item['result'])
-                    if payout not in ((1.,0.),(0.,1.)):continue
+                    if payout not in ((1.,0.),(0.,1.)):
+                        pending[name] += 1;continue
                     paths[name].append(dict(fid=item['fixture_id'],odd=row['odd'],y=int(payout[0]),p=row['probability_pct']/100))
-            summaries[label]={n:metrics(rows,'p') for n,rows in paths.items()}
+                for row in frozen.get('platinum_nonnegative_ev', []):
+                    if not row.get('baseline_eligible'): continue
+                    group = ('platinum_positive_ev' if row.get('shadow_eligible') else 'platinum_flow_only_negative_ev')
+                    payout=settle_spec(row['spec'],item['result'])
+                    if payout in ((1.,0.),(0.,1.)):
+                        platinum.setdefault(group, []).append(dict(fid=item['fixture_id'], odd=row['odd'], y=int(payout[0])))
+            result={n:selected_summary(v,counts[n],pending[n],differences[n]) for n,v in paths.items()}
+            summaries[label]={n:result[n] for n in PATHS if n in result}
+            experiments[label]={n:v for n,v in result.items() if n not in PATHS}
+            for n,v in experiments[label].items():
+                ref='favorite_anchor_only' if n=='lambda_total_expansion' else 'calibrated_v51'
+                reference=result.get(ref, {})
+                v['baseline']=ref
+                v['roi_difference_pp']=(v['roi_pct']-reference['roi_pct']
+                    if v['roi_pct'] is not None and reference.get('roi_pct') is not None else None)
+            cohorts[label]={n:metrics(platinum.get(n, [])) for n in
+                ('platinum_positive_ev','platinum_flow_only_negative_ev')}
+        comparison={label:{aliases[n]:v for n,v in groups.items()} for label,groups in summaries.items()}
         return dict(version=VERSION,policy_id=POLICY_ID,snapshot_count=len(self.seen),unavailable_snapshots=self.unavailable,
-                    gold_no_upgrade_changed_first=self.changed,summaries=summaries,snapshots=snapshots,
+                    gold_no_upgrade_changed_first=self.changed,summaries=summaries,decision_path_comparison=comparison,
+                    experiments=experiments,platinum_value_cohorts=cohorts,snapshots=snapshots,
                     social_publication='not_inferred_from_eligibility; requires delivery receipts',
-                    note='Retrospective replay is distinct from frozen official Gold certificates. Overlapping snapshots are not independent.')
+                    note='Retrospective replay is distinct from frozen official Gold certificates. First/latest are not additive; CIs cluster by fixture.')

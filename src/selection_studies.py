@@ -58,7 +58,8 @@ def build_studies(report):
                      r['outcome'], r['odd'] if valid(r['odd'],1,float('inf')) and r['odd']>1 else None) for r in paired]
         stat, book = metrics(observations()), metrics(observations(True))
         summaries.append(dict(zip(('snapshot','model_id','phase','market','scope','country','league_id','rule','membership'),key),
-                              contracts=len(rows), fixtures=len({r['fixture_id'] for r in rows}), settled=sum(r['outcome'] is not None for r in rows),
+                              contracts=len(rows), fixtures=len({r['fixture_id'] for r in rows}),
+                              contracts_count=len(rows), distinct_fixtures_count=len({r['fixture_id'] for r in rows}), settled=sum(r['outcome'] is not None for r in rows),
                               pending=sum(r['outcome'] is None for r in rows),
                               statistics=stat, book=book,
                               fixture_ids=[r['fixture_id'] for r in rows]))
@@ -432,7 +433,8 @@ def study_summary(rows, min_n=50):
         returns = profits(matched)
         n = len(matched)
         se = stdev(returns)/n**.5 if n > 1 else None
-        return dict(selections=len(items), settled=len(settled), pending=len(items)-len(settled),
+        return dict(contracts_count=len(items), distinct_fixtures_count=len({r['fid'] for r in items}),
+                    selections=len(items), settled=len(settled), pending=len(items)-len(settled),
                     wins=sum(r['y'] for r in settled), losses=sum(1-r['y'] for r in settled),
                     hit_rate=average([r['y'] for r in settled]), brier_score=average([(r['p']-r['y'])**2 for r in settled]),
                     priced_n=len(priced), roi=average(profits(priced)), clv_n=len(paired), clv=average([r['clv'] for r in paired]),
@@ -453,5 +455,6 @@ def study_audit(store):
     for record in store.get('study_observations', {}).values():
         evidence.observe(record)
     rows = list(evidence.samples())
-    return {**study_summary(rows), 'selections': [r for r in rows if not r.get('suppressed')],
+    return {'contracts_count': len(rows), 'distinct_fixtures_count': len({r['fid'] for r in rows}),
+            **study_summary(rows), 'selections': [r for r in rows if not r.get('suppressed')],
             'suppressed_study_candidates': [r for r in rows if r.get('suppressed')]}

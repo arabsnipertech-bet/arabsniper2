@@ -43,8 +43,7 @@ def source_set(index, day):
     end = datetime.combine(day + timedelta(days=1), time.min, TZ)
     dated = f'auditordata/prematch_{day}.json'
     names = {dated, f'auditarchive/prematch_{day}_results.json'}
-    if dated not in index:
-        names.add(FORECASTS)
+    names.add(FORECASTS)
     for path in index:
         if path.startswith('data/'+PREFIX) and path.endswith('_forecasts.json'):
             value = path.removeprefix('data/'+PREFIX).removesuffix('_forecasts.json')
@@ -99,11 +98,11 @@ def recovery_files(root, paths):
                 pending.extend(str(Path(path).parent/'_audit_parts'/(part['sha256']+'.json.gz')) for part in value['parts'])
 
 
-def prepare(storage, bucket, root, day, now, fetcher=fetch_results):
+def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=False):
     if not 1 <= (now.astimezone(TZ).date() - day).days <= 14:
         raise ValueError('Recovery requires a closed Rome date within 14 days')
     index = previous_manifest(storage, bucket)
-    if complete_day(index, day):
+    if complete_day(index, day) and not refresh:
         restore_subset(storage, bucket, root, index, [f'auditarchive/prematch_{day}_checkpoint.json'])
         receipt = read_store(root/f'auditarchive/prematch_{day}_checkpoint.json')
         if receipt.get('pending') is False:
@@ -239,7 +238,7 @@ def main():
     with TemporaryDirectory() as folder:
         root = Path(folder)
         if args.mode == 'prepare':
-            digest = prepare(storage, bucket, root, args.date, now)
+            digest = prepare(storage, bucket, root, args.date, now, refresh=os.getenv("RECOVERY_REFRESH") == "true")
             with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
                 out.write('digest='+digest+'\n')
             print(f'Verified recovery input ready for {args.date}', flush=True)

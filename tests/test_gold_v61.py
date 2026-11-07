@@ -30,7 +30,8 @@ class GoldV61(unittest.TestCase):
             annotate({'rows':[r]},NOW);self.assertFalse(r['opportunity']['eligible'])
         self.assertTrue(evaluate(row(oci=-20,delta_pct=2))['eligible'])
         self.assertTrue(evaluate(row(statistical_pct=70,selected_market_fair_pct=55,delta_pct=0))['eligible'])
-        self.assertTrue(evaluate(row(statistical_pct=70,selected_market_fair_pct=54,delta_pct=-.01,oci=.01))['eligible'])
+        self.assertFalse(evaluate(row(statistical_pct=70,selected_market_fair_pct=54,delta_pct=-.01,oci=.01))['eligible'])
+        self.assertTrue(evaluate(row(statistical_pct=70,selected_market_fair_pct=54,delta_pct=-8,oci=60))['eligible'])
 
     def test_gol_peak_ratio_and_symmetry_boundaries(self):
         r=row()

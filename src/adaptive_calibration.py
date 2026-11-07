@@ -353,8 +353,9 @@ def fit(samples, as_of, previous=None, _minimum=MIN_N, _macro=False):
                 and (roi is not None and roi < 0 or gain is not None and gain > 0)):
             factor = min(.35, factor+.02*len(traps)/(len(traps)+PRIOR))
         # Independent shadow experiment: production factor above is unchanged.
-        fresh_rows = [v for fid, v in traps.items() if fid not in seen]
         prior_shadow = old.get('mismatch_symmetric_shadow') or {}
+        shadow_seen = set(prior_shadow.get('consumed_fixtures', old.get('mismatch_seen_fixtures', [])))
+        fresh_rows = [v for fid, v in traps.items() if fid not in shadow_seen]
         shadow_factor = prior_shadow.get('factor', old.get('mismatch_shrinkage_factor', .15))
         shadow_factor = bound(shadow_factor, .15, .35) if number(shadow_factor) else .15
         fresh_paired = [v for v in fresh_rows if number(v.get('odd')) and v['odd']>1
@@ -362,16 +363,18 @@ def fit(samples, as_of, previous=None, _minimum=MIN_N, _macro=False):
         fresh_roi = sum(v['odd']*v['y']-1 for v in fresh_paired)/len(fresh_paired) if fresh_paired else None
         fresh_gain = sum((v['p']-v['y'])**2-(v['market_fair_pct']/100-v['y'])**2 for v in fresh_paired)/len(fresh_paired) if fresh_paired else None
         action = 'hold'
-        if len(fresh_paired)>=MIN_N_MACRO and signature!=old.get('mismatch_evidence_sha256'):
+        if len(fresh_paired)>=MIN_N_MACRO:
             step=.02*len(fresh_paired)/(len(fresh_paired)+PRIOR)
-            if fresh_roi>0 and fresh_gain<0:
+            if fresh_gain <= 0:
                 shadow_factor=max(.15,shadow_factor-step);action='return_toward_base'
             elif fresh_roi<0 or fresh_gain>0:
                 shadow_factor=min(.35,shadow_factor+step);action='increase'
-        result['mismatch_symmetric_shadow'] = dict(version='symmetric-alpha-shadow-v1',factor=shadow_factor,
+        if action != 'hold':
+            shadow_seen.update(v['fid'] for v in fresh_paired)
+        result['mismatch_symmetric_shadow'] = dict(version='symmetric-alpha-shadow-v2',factor=shadow_factor,
             action=action,new_paired_fixtures=len(fresh_paired),new_roi=fresh_roi,new_brier_gain_fair=fresh_gain,
-            production_applied=False)
-        if signature == old.get('mismatch_evidence_sha256') and prior_shadow:
+            production_applied=False, consumed_fixtures=sorted(shadow_seen))
+        if signature == old.get('mismatch_evidence_sha256') and prior_shadow and action == 'hold':
             result['mismatch_symmetric_shadow'] = prior_shadow
         result.update(mismatch_shrinkage_factor=factor, mismatch_evidence_sha256=signature,
                       mismatch_seen_fixtures=sorted(seen | set(traps)),
@@ -429,6 +432,14 @@ def nightly_state(root, as_of):
     state['training_evidence'] = dict(files=sorted(inputs, key=lambda r: r['date']),
         missing_dates=sorted(missing), missing_results_dates=sorted(missing_results),
         empty_dates=sorted(empty), complete=not missing and not missing_results)
+    state['evidence_provenance'] = dict(
+        files=state['training_evidence']['files'],
+        dates=[item['date'] for item in state['training_evidence']['files']],
+        samples_count=sum(item['samples'] for item in inputs),
+        window_days=WINDOW, half_life_days=HALF_LIFE,
+        complete=state['training_evidence']['complete'],
+        blockers=([dict(code='missing_calibration_evidence_for_settled_day', date=d) for d in sorted(missing)]
+                  + [dict(code='missing_results_evidence_for_settled_day', date=d) for d in sorted(missing_results)]))
     # The report is aggregate provenance. Its group counts are never training rows.
     report = root/'data/arab_quote_prematch_report.json'
     if not report.exists():
