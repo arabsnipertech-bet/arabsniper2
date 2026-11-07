@@ -160,13 +160,13 @@ def build_daily(store, date, generated_at, source_revision=None, observe=None):
 def markdown(report):
     lines = [f"# Audit {report['audit_date']}", '', report['note'], '',
              f"Generated: {report['generated_at']} | Revision: {report['source_revision']}", '',
-             f"Invalid records excluded: {len(report['excluded_records'])}", '',
-             '| Snapshot | Model | Period | Fixtures | With primary | Primary settled | Primary pending |',
-             '|---|---|---|---:|---:|---:|---:|']
+             f"Invalid records excluded: {len(report['excluded_records'])}", '']
     lines += [f"Policy: {report.get('policy_id', 'unavailable')}",
               'gold_certificate: prima Gold di rango 1 osservata; latest_prematch_gold: ultima proposta prematch.',
               'all_eligible_markets: tutti i ranghi ammissibili; published_social_picks: solo ricevute di invio.',
-              'SHA-256 input: '+json.dumps(report.get('evidence_provenance', {}).get('input_files', {}), sort_keys=True), '']
+              'SHA-256 input: '+json.dumps(report.get('evidence_provenance', {}).get('input_files', {}), sort_keys=True), '',
+              '| Snapshot | Model | Period | Fixtures | With primary | Primary settled | Primary pending |',
+              '|---|---|---|---:|---:|---:|---:|']
     cohorts = defaultdict(list)
     for f in report['fixtures']:
         cohorts[(f['snapshot'], f['model_id'], f['period'])].append(f)

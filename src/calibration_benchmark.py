@@ -173,11 +173,11 @@ def markdown(benchmark):
             values=[snapshot,name,*(value.get(k) for k in ('first_choices_activated','changed_vs_pure_poisson','n','pending_choices','net_units','roi_pct')),
                     (value.get('uncertainty') or {}).get('roi_pct_interval')]
             lines.append('| '+' | '.join('—' if x is None else str(x) for x in values)+' |')
-    lines += ['', '## Varianti isolate (solo shadow)', '', '| Snapshot | Variante | Attivate | ROI % | Differenza ROI pp |', '|---|---|---:|---:|---:|']
+    lines += ['', '## Varianti isolate (solo shadow)', '', '| Snapshot | Variante | Gare confrontate | Scelte cambiate | Attivate | ROI % | Differenza ROI pp |', '|---|---|---:|---:|---:|---:|---:|']
     for snapshot, variants in (decision.get('experiments') or {}).items():
         for name,value in variants.items():
             lines.append('| '+' | '.join(str(v) if v is not None else '—' for v in
-                (snapshot,name,value['first_choices_activated'],value['roi_pct'],value['roi_difference_pp']))+' |')
+                (snapshot,name,value['compared_fixtures_count'],value['changed_vs_baseline'],value['first_choices_activated'],value['roi_pct'],value['roi_difference_pp']))+' |')
     lines += ['', '## Coorti Platinum (contratti, non pubblicazioni)', '', '| Snapshot | Coorte | Contratti | Gare distinte | ROI % |', '|---|---|---:|---:|---:|']
     for snapshot, groups in (decision.get('platinum_value_cohorts') or {}).items():
         for name,value in groups.items():
