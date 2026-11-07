@@ -131,6 +131,11 @@ def build_daily(store, date, generated_at, source_revision=None, observe=None):
             observe(record)
     return {'four_level_benchmark': build_benchmark(store), 'studio_ideas_audit': study_audit(store), 'schema_version': 1, 'audit_date': date, 'generated_at': generated_at,
             'source_revision': source_revision,
+            'evidence_provenance': {'forecast_sha256': sorted({r['forecast_sha256'] for r in fixtures}),
+                'official_gold': 'gold_certificate = first eligible rank 1 observed',
+                'latest_gold': 'latest prematch snapshot, distinct from first certificate',
+                'eligible_markets': 'all eligible ranks, distinct from first choice',
+                'social_publications': 'require delivery receipts; never inferred from ranks'},
             'note': 'Experimental. First/latest are separate cohorts, never additive. Paper ROI is not executed profit. No forecast is recalculated.',
             'excluded_records': rejected, 'fixtures': fixtures, 'markets': rows,
             'selection_groups': [dict(zip(('snapshot', 'model_id', 'period', 'market', 'group'), k), **metrics(v))

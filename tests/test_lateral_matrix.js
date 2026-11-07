@@ -438,20 +438,21 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  const frozen=JSON.stringify(monitor);
  const html=api.opportunityPanel(m.multimarket.matrix.rows,null,{now:Date.parse(monitor.as_of),kickoff:m.fixture.kickoff,monitoring:monitor});
  assert.equal(JSON.stringify(monitor),frozen);
- for(const label of ['RADAR BLU · MONITORAGGIO','SOLO STUDIO','⭐ Miglior Spunto: Over 2,5 FT a 1,69',
+ for(const label of ['RADAR BLU · MONITORAGGIO','SOLO STUDIO',
   '<li>1 FT · Quota 2,40 (valore e flusso)</li>','<li>Over 1,5 PT · Quota 2,50 (pressione book, statistica debole)</li>',
   '<li>1X + Over 2,5 FT · Quota 3,20 (combo correlata)</li>'])assert(html.includes(label),label);
- assert.equal((html.match(/<li>/g)||[]).length,4);
- assert(!html.includes('<li>Over 2,5 FT'));
+ assert.equal((html.match(/<li>/g)||[]).length,5);
+ assert(html.includes('<li>Over 2,5 FT'));
  assert(!/data-opportunity-id|data-platinum-id|Fuori Gold|mercato escluso|Poisson|OCI|EV [%P]|%|<br>/i.test(html));
- assert.equal((html.match(/data-best-study/g)||[]).length,1);
+ assert.equal((html.match(/data-best-study/g)||[]).length,0);
  // Even an old feed with a stale backend badge cannot star a remote outsider.
  const outsider={...monitor.studio_ideas[0],label:'Venezia 2',market:'1x2_2',odd:9.50,poisson_pct:31.999,best_study:true};
  const panel=i=>api.opportunityPanel(m.multimarket.matrix.rows,null,{now:Date.parse(monitor.as_of),kickoff:m.fixture.kickoff,monitoring:{...monitor,studio_ideas:[i]}});
  assert(!panel(outsider).includes('Venezia 2'));
  assert(!panel(outsider).includes('data-best-study'));
  assert(!panel({...outsider,poisson_pct:32}).includes('data-best-study'));
- assert(panel({...outsider,market:'1x2_1',odd:2,poisson_pct:40}).includes('data-best-study'));
+ assert(!panel({...outsider,market:'1x2_1',odd:2,poisson_pct:40}).includes('data-best-study'));
+ assert(panel({...outsider,market:'1x2_1',odd:2,poisson_pct:60,quality:'supported',quote_executable:true,quote_status:'recent',ev_low_pct:0,star_gate:{eligible:true}}).includes('data-best-study'));
 
 }
 
@@ -484,7 +485,7 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
 {
  const a={id:'pt',label:'Over 2,5 PT',spec:{kind:'total',period:'ht',side:'over',line:2.5},odd:2,quote_status:'recent',statistical_pct:40,oci:0,selected_margin_pct:5};
  const b={...a,id:'ft',label:'Over 2,5 FT',spec:{...a.spec,period:'ft'},statistical_pct:55};
- const idea={spec:b.spec,label:b.label,market:'over25_ft',odd:2,poisson_pct:55,best_study:true};
+ const idea={spec:b.spec,label:b.label,market:'over25_ft',odd:2,poisson_pct:55,best_study:true,quality:'supported',quote_executable:true,quote_status:'recent',ev_low_pct:1};
  const m={fixture:{fixture_id:909,kickoff:'2099-01-01T20:00:00Z'},multimarket:{matrix:{rows:[a,b],quote_monitoring:{studio_ideas:[idea]}}}};
  const frozen=JSON.stringify(m);
  assert.equal(api.studyDefaultRow(m),b,'Select the existing starred market, including its period');

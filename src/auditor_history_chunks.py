@@ -22,8 +22,9 @@ def seal_day(root, day, now, pending, queried=False):
     outputs = [f'auditarchive/prematch_{day}_{suffix}' for suffix in
                ('results.json', 'daily.json', 'daily.md')]
     calibration = f'auditarchive/prematch_{day}_calibration.json'
-    if (root/calibration).exists():
-        outputs.append(calibration)
+    if not (root/calibration).is_file():
+        raise ValueError('Missing learning evidence for closed date: '+str(day))
+    outputs.append(calibration)
     receipt = {'version': 1, 'day': str(day), 'checked_at': now.isoformat(),
                'pending': pending, 'results_queried': queried, 'input_sha256': digest(root/f'auditordata/prematch_{day}.json'),
                'outputs': {path: digest(root/path) for path in outputs}}
@@ -41,6 +42,10 @@ def reusable(root, day, as_of):
         return False  # Newly ingested evidence requires a new report.
     expected = {f'auditarchive/prematch_{day}_{suffix}' for suffix in
                 ('results.json', 'daily.json', 'daily.md')}
+    calibration = f'auditarchive/prematch_{day}_calibration.json'
+    if calibration not in receipt['outputs'] or not (root/calibration).is_file():
+        return False  # A report without learning evidence is not a complete day.
+    expected.add(calibration)
     if not expected <= receipt['outputs'].keys():
         raise ValueError('Incomplete historical day receipt')
     for path, checksum in receipt['outputs'].items():

@@ -65,12 +65,45 @@ class DailyRecoveryTests(unittest.TestCase):
             self.assertEqual(public['all_results'][0]['captured_at'],'2026-10-30T14:00:00+01:00')
             after = previous_manifest(storage,'test')
             self.assertEqual({p:after[p] for p in new_scan}, new_scan)
-            self.assertEqual(source_set(after,DAY), source_set(before,DAY))
+            self.assertEqual({p:after[p] for p in before}, before)
+            for suffix in ('results.json','calibration.json','checkpoint.json'):
+                self.assertIn(f'auditarchive/prematch_{DAY}_{suffix}',after)
             self.assertIn(report_path(DAY), after)
             self.assertEqual(prepare(storage,'test',Path(work),DAY,NOW,fetch),'existing')
             with TemporaryDirectory() as retry:
                 self.assertEqual(install(storage,'test',Path(retry),DAY,'existing',NOW), public)
             self.assertEqual(fetch.call_count,1)
+
+    def test_existing_report_missing_learning_chain_recovers_journal_without_rewriting_predictions(self):
+        from audit_ledger import AuditLedger
+        from daily_audit import fingerprint
+        storage = Fake()
+        with TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest, patch.dict(os.environ, {'API_SPORTS_KEY':'test'}):
+            root = Path(seed)
+            official = sources(storage, root)
+            # Archive before journal ingestion, reproducing the November 5 gap.
+            archive(root, NOW)
+            settle_day(root, DAY, NOW, lambda *args: official)
+            dated = f'auditordata/prematch_{DAY}.json'
+            with AuditLedger(root/dated) as ledger:
+                original = {(c,k): fingerprint(r) for c,k,r in ledger.records()}
+            index = previous_manifest(storage, 'test')
+            for path, raw in collect(root).items():
+                if path.endswith(('_calibration.json', '_checkpoint.json')): continue
+                digest = sha(raw)
+                storage.put_object(Bucket='test', Key='state/objects/'+digest, Body=raw)
+                index[path] = {'sha256': digest, 'bytes': len(raw)}
+            write_manifest(storage, 'test', index)
+            fetch = Mock(return_value=official)
+            digest = prepare(storage, 'test', Path(work), DAY, NOW, fetch)
+            self.assertNotEqual(digest, 'existing')
+            install(storage, 'test', Path(dest), DAY, digest, NOW)
+            with AuditLedger(Path(dest)/dated) as ledger:
+                for (c,k), checksum in original.items():
+                    self.assertEqual(fingerprint(ledger[c][k]), checksum)
+                self.assertGreater(sum(1 for _ in ledger.records()), len(original))
+            self.assertIn(f'auditarchive/prematch_{DAY}_calibration.json', previous_manifest(storage, 'test'))
+            fetch.assert_called_once()
 
     def test_recovery_reproduces_the_normal_frozen_daily_report(self):
         storage = Fake()

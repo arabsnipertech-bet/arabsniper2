@@ -27,6 +27,8 @@ def metrics(rows, probability=None):
 
 def build_benchmark(store):
     first, operations, closes = {}, {}, {}
+    from decision_shadow import DecisionAudit
+    decisions = DecisionAudit()
     studies = StudyEvidence()
     excluded = 0
     for collection in ('multimarket_evaluations', 'analysis_updates'):
@@ -37,6 +39,7 @@ def build_benchmark(store):
                     or a.get('model_id') != MODEL_ID or meta.get('fixture_id') is None
                     or start.date().isoformat() < a.get('validation_from', '2026-10-26')):
                 continue
+            decisions.observe(record)
             fid = str(meta['fixture_id'])
             result = (record.get('settlement') or {}).get('result') or {}
             matrix = a.get('matrix') or {}
@@ -65,7 +68,7 @@ def build_benchmark(store):
                 raw = (row.get('pure_poisson') or row.get('calibration_base') or row).get('win_weight')
                 fair = row.get('market_fair_pct')
                 p = row.get('statistical_pct')
-                entry = dict(fid=fid, market=contract, odd=odd, y=int(payout[0]), base=raw,
+                entry = dict(fid=fid, market=contract, odd=odd, y=int(payout[0]), base=raw, anchored=(row.get('calibration_base') or row).get('win_weight'),
                              fair=fair/100 if number(fair) else None, calibrated=p/100 if number(p) else None,
                              at=at, updated=stamp(row.get('provider_updated_at')), book=book, clv=None)
                 rank = (at, spec['kind'] == 'asian_total', -odd, book)
@@ -84,7 +87,7 @@ def build_benchmark(store):
         return row
     matched = []
     for _, row in first.values():
-        if all(number(row.get(k)) and 0 <= row[k] <= 1 for k in ('base','fair','calibrated')):
+        if all(number(row.get(k)) and 0 <= row[k] <= 1 for k in ('base','fair','anchored','calibrated')):
             matched.append(with_clv(row))
         else: excluded += 1
     def levels(rows):
@@ -92,7 +95,7 @@ def build_benchmark(store):
         calibrated['delta_brier_vs_base'] = (calibrated['brier_score']-base['brier_score']) if rows else None
         market = metrics(rows, 'fair')
         market.pop('roi_pct', None)
-        return dict(market_fair=market, poisson_base=base, calibrated_v51=calibrated)
+        return dict(market_fair=market, poisson_base=base, favorite_anchor_only=metrics(rows,'anchored'), calibrated_v51=calibrated)
     # Operations are separate prospective choices on closed fixtures. Their
     # counts must never be added together or used as extra training fixtures.
     ops = defaultdict(list)
@@ -125,12 +128,12 @@ def build_benchmark(store):
         pending=len(suppressed_pending), saved_losses=sum(1-r['y'] for r in traps),
         saved_loss_rate=sum(1-r['y'] for r in traps)/len(traps) if traps else None,
         avoided_net_units=-sum(r['odd']*r['y']-1 for r in priced))
-    return dict(version=VERSION, validation_cycle=VALIDATION_CYCLE, snapshot='first_executable_prematch',
+    return dict(decision_benchmark=decisions.report(), version=VERSION, validation_cycle=VALIDATION_CYCLE, snapshot='first_executable_prematch',
                 matched_contracts=len(matched), matched_fixtures=len({r['fid'] for r in matched}),
                 excluded_incomplete_probabilities=excluded, levels=levels(matched),
                 by_odds_band={label: levels([r for r in matched if lo <= r['odd'] < hi]) for lo,hi,label in BANDS},
                 operational_selections=summaries,
-                notes=['Three probability levels use identical contracts, quotes, snapshots and outcomes.',
+                notes=['Four probability levels use identical contracts, quotes, snapshots and outcomes.',
                        'Operations are separate first published selections; overlapping cohorts are not additive.',
                        'Unit-stake returns are hypothetical. Missing CLV remains null; saved losses excludes forgone wins, avoided_net_units includes them.'])
 
@@ -141,19 +144,19 @@ def markdown(benchmark):
     for name, group in benchmark['levels'].items():
         values = [name, *(group.get(k) for k in ('n','fixtures','brier_score','log_loss','roi_pct','clv_pct'))]
         lines.append('| '+' | '.join('—' if v is None else str(round(v,6)) if isinstance(v,float) else str(v) for v in values)+' |')
-    lines += ['', '| Selezioni operative | Gare | Hit rate | Quota media | ROI % | CLV % |', '|---|---:|---:|---:|---:|---:|']
+    lines += ['', '| Selezioni operative | Contratti | Gare distinte | Hit rate | Quota media | ROI % | CLV % |', '|---|---:|---:|---:|---:|---:|---:|']
     for name,g in benchmark['operational_selections'].items():
-        lines.append('| '+' | '.join(str(v) if v is not None else '—' for v in [name, *(g.get(k) for k in ('fixtures','hit_rate','mean_odd','roi_pct','clv_pct'))])+' |')
+        lines.append('| '+' | '.join(str(v) if v is not None else '—' for v in [name, *(g.get(k) for k in ('n','fixtures','hit_rate','mean_odd','roi_pct','clv_pct'))])+' |')
     lines += ['', '| Fascia | Livello | Contratti | Brier | Log-loss | ROI % | CLV % |', '|---|---|---:|---:|---:|---:|---:|']
     for band, groups in benchmark['by_odds_band'].items():
         for name,g in groups.items():
             lines.append('| '+' | '.join(str(v) if v is not None else '—' for v in [band,name,*(g.get(k) for k in ('n','brier_score','log_loss','roi_pct','clv_pct'))])+' |')
-    lines += ['', '| Categoria | Mercato / fascia | Contratti | Hit rate | ROI % | CLV % |', '|---|---|---:|---:|---:|---:|']
+    lines += ['', '| Categoria | Mercato / fascia | Contratti | Gare distinte | Hit rate | ROI % | CLV % |', '|---|---|---:|---:|---:|---:|---:|']
     for category, summary in benchmark['operational_selections'].items():
         details = {**summary['by_market'], **summary['by_odds_band']}
         if 'band_1.70_1.85' in summary: details['1.70-1.85'] = summary['band_1.70_1.85']
         for name,g in details.items():
-            lines.append('| '+' | '.join(str(v) if v is not None else '—' for v in [category,name,*(g.get(k) for k in ('n','hit_rate','roi_pct','clv_pct'))])+' |')
+            lines.append('| '+' | '.join(str(v) if v is not None else '—' for v in [category,name,*(g.get(k) for k in ('n','fixtures','hit_rate','roi_pct','clv_pct'))])+' |')
     traps=benchmark['operational_selections']['suppressed_traps']
     lines += ['', f"Trappole: {traps['saved_losses']} perdite evitate, tasso {traps['saved_loss_rate']}; saldo teorico evitato {traps['avoided_net_units']} unità (incluse vincite escluse).", 'Campioni operativi sovrapposti non sommabili.', '']
     return '\n'.join(lines)

@@ -2,7 +2,7 @@
 const {chromium}=require('playwright');
 const fs=require('node:fs');const path=require('node:path');const assert=require('node:assert/strict');
 (async()=>{
-  const browser=await chromium.launch({headless:true});
+  const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
   try {
     const page=await browser.newPage();
     await page.route('**/*',r=>r.abort());

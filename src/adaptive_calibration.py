@@ -18,7 +18,7 @@ MIN_N, WINDOW, HALF_LIFE, PRIOR = 50, 28, 14, 50
 MIN_N_MACRO = 25
 VALIDATION_CYCLE = 'validation_freeze_v5.1_2026-11-01'
 LINES = {('ft', 2.5): 'over25_ft', ('ft', 3.5): 'over35_ft',
-         ('ht', 1.5): 'over15_ht', ('ht', .5): 'over05_ht'}
+         ('ht', 1.5): 'over15_ht', ('ht', .5): 'over05_ht', ('ht', 2.5): 'over25_ht'}
 TRAPS = ('strong_favorite_trap', 'possible_favorite_trap', 'multi_signal_goal_pressure',
          'odds_cross_reversal', 'favorite_steam_vulnerable', 'underdog_book_square')
 
@@ -107,6 +107,7 @@ load_weights.cache_clear = _read_weights.cache_clear
 def calibration_status(state=None, as_of=None):
     state = load_weights() if state is None else state
     valid = current_state(state, as_of) if as_of else bool(state.get('as_of'))
+    valid = valid and state.get('training_evidence', {}).get('complete') is not False
     active = sum(bool(usable_entry(state, k)) for k in state.get('cohorts', {})) if valid else 0
     factor = state.get('mismatch_shrinkage_factor', .15)
     factor = bound(factor, 0., .35) if valid and number(factor) else .15
@@ -351,6 +352,27 @@ def fit(samples, as_of, previous=None, _minimum=MIN_N, _macro=False):
         if (len(traps) >= MIN_N_MACRO and set(traps)-seen and signature != old.get('mismatch_evidence_sha256')
                 and (roi is not None and roi < 0 or gain is not None and gain > 0)):
             factor = min(.35, factor+.02*len(traps)/(len(traps)+PRIOR))
+        # Independent shadow experiment: production factor above is unchanged.
+        fresh_rows = [v for fid, v in traps.items() if fid not in seen]
+        prior_shadow = old.get('mismatch_symmetric_shadow') or {}
+        shadow_factor = prior_shadow.get('factor', old.get('mismatch_shrinkage_factor', .15))
+        shadow_factor = bound(shadow_factor, .15, .35) if number(shadow_factor) else .15
+        fresh_paired = [v for v in fresh_rows if number(v.get('odd')) and v['odd']>1
+                        and number(v.get('market_fair_pct'))]
+        fresh_roi = sum(v['odd']*v['y']-1 for v in fresh_paired)/len(fresh_paired) if fresh_paired else None
+        fresh_gain = sum((v['p']-v['y'])**2-(v['market_fair_pct']/100-v['y'])**2 for v in fresh_paired)/len(fresh_paired) if fresh_paired else None
+        action = 'hold'
+        if len(fresh_paired)>=MIN_N_MACRO and signature!=old.get('mismatch_evidence_sha256'):
+            step=.02*len(fresh_paired)/(len(fresh_paired)+PRIOR)
+            if fresh_roi>0 and fresh_gain<0:
+                shadow_factor=max(.15,shadow_factor-step);action='return_toward_base'
+            elif fresh_roi<0 or fresh_gain>0:
+                shadow_factor=min(.35,shadow_factor+step);action='increase'
+        result['mismatch_symmetric_shadow'] = dict(version='symmetric-alpha-shadow-v1',factor=shadow_factor,
+            action=action,new_paired_fixtures=len(fresh_paired),new_roi=fresh_roi,new_brier_gain_fair=fresh_gain,
+            production_applied=False)
+        if signature == old.get('mismatch_evidence_sha256') and prior_shadow:
+            result['mismatch_symmetric_shadow'] = prior_shadow
         result.update(mismatch_shrinkage_factor=factor, mismatch_evidence_sha256=signature,
                       mismatch_seen_fixtures=sorted(seen | set(traps)),
                       mismatch_evidence=dict(n=len(traps), roi=roi, brier_gain_fair=gain))
@@ -361,11 +383,28 @@ def nightly_state(root, as_of):
     """Compact evidence is extracted during the Auditor's existing ledger traversal."""
     from audit_storage import read_store, open_verified_json
     import ijson
-    rows = []
+    rows, inputs, missing, empty, missing_results = [], [], [], [], []
     for days in range(1, WINDOW+1):
         day = as_of-timedelta(days=days)
         path = root / f'auditarchive/prematch_{day}_calibration.json'
-        rows.extend(read_store(path, []))
+        expected = any((root / f'auditarchive/prematch_{day}_{suffix}').exists()
+                       for suffix in ('daily.json', 'results.json', 'checkpoint.json'))
+        expected = expected or (root / f'auditordata/prematch_{day}.json').exists()
+        if expected and not (root / f'auditarchive/prematch_{day}_results.json').exists():
+            missing_results.append(str(day))
+        if not path.exists():
+            if expected:
+                missing.append(str(day))
+            continue
+        raw = path.read_bytes()
+        samples = read_store(path)
+        if not isinstance(samples, list):
+            raise ValueError(f'Invalid calibration evidence: {path.name}')
+        rows.extend(samples)
+        if not samples:
+            empty.append(str(day))
+        inputs.append(dict(date=str(day), path=path.relative_to(root).as_posix(),
+                           sha256=sha256(raw).hexdigest(), samples=len(samples)))
     # The prediction audit contains certified per-fixture by_market_pattern outcomes.
     # Never fan out an aggregate hit-rate into fictitious independent observations.
     predictions = root/'data/arab_quote_prediction_audit.json'
@@ -387,6 +426,9 @@ def nightly_state(root, as_of):
                             and isinstance(outcomes.get(event), bool) and outcomes[event] == bool(row['y'])):
                         row['pattern'] = pattern.get('classification')
     state = fit(rows, as_of, read_store(root/WEIGHTS, {}))
+    state['training_evidence'] = dict(files=sorted(inputs, key=lambda r: r['date']),
+        missing_dates=sorted(missing), missing_results_dates=sorted(missing_results),
+        empty_dates=sorted(empty), complete=not missing and not missing_results)
     # The report is aggregate provenance. Its group counts are never training rows.
     report = root/'data/arab_quote_prematch_report.json'
     if not report.exists():
@@ -418,6 +460,8 @@ def main():
             or args.as_of != now.date()):
         parser.error('calibration requires the active nightly Auditor window')
     state = nightly_state(ROOT, args.as_of)
+    if not state['training_evidence']['complete']:
+        raise RuntimeError('Incomplete learning evidence: '+', '.join(sorted(set(state['training_evidence']['missing_dates'] + state['training_evidence']['missing_results_dates']))))
     old = read_store(ROOT/WEIGHTS, {})
     trained_at = old.pop('trained_at', None)
     state['trained_at'] = trained_at if trained_at and old == state else now.isoformat()

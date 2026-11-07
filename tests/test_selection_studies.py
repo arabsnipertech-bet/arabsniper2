@@ -163,7 +163,7 @@ class PerthStudyTests(unittest.TestCase):
 
     def test_highest_convergence_wins_independently_of_row_order(self):
         from selection_studies import rank_study_ideas
-        base = dict(type='goal', market='over25_ft', odd=2., poisson_pct=58, oci=40,
+        base = dict(quality='supported', quote_executable=True, quote_status='recent', ev_low_pct=4., type='goal', market='over25_ft', odd=2., poisson_pct=58, oci=40,
                     paired_books=5, agreeing_books=4, poisson_low_pct=52)
         higher_price = dict(base, market='over35_ft', odd=2.5, historical_oci=True,
                             agreeing_books=1, poisson_low_pct=35)
@@ -177,10 +177,10 @@ class PerthStudyTests(unittest.TestCase):
 
     def test_como_venezia_outsider_cannot_take_star_even_with_unanimous_flow(self):
         from selection_studies import rank_study_ideas
-        outsider = dict(type='studio_1x2_value_flow', market='1x2_2', odd=9.50, poisson_pct=16,
+        outsider = dict(quality='supported', quote_executable=True, quote_status='recent', ev_low_pct=1., type='studio_1x2_value_flow', market='1x2_2', odd=9.50, poisson_pct=16,
                         oci=95, delta_pct=-8, fair_delta_pp=4, paired_books=8, agreeing_books=8, best_study=True)
-        favorite = dict(type='studio_1x2_value_flow', market='1x2_1', odd=1.35, poisson_pct=75)
-        over = dict(type='studio_goal_flow_near_miss', market='over25_ft', odd=1.9, poisson_pct=58)
+        favorite = dict(quality='supported', quote_executable=True, quote_status='recent', ev_low_pct=1., type='studio_1x2_value_flow', market='1x2_1', odd=1.35, poisson_pct=75)
+        over = dict(quality='supported', quote_executable=True, quote_status='recent', ev_low_pct=1., type='studio_goal_flow_near_miss', market='over25_ft', odd=1.9, poisson_pct=58)
         for solid in (favorite, over):
             ranked = rank_study_ideas([outsider, solid])
             self.assertEqual([i['market'] for i in ranked if i.get('best_study')], [solid['market']])
@@ -226,6 +226,7 @@ def distortion_fixture(name):
     def row(spec, p, odd, delta=0):
         return dict(spec=spec,id=market_id(spec),label=label(spec),statistical_pct=p,
                     odd=odd,oci=60,delta_pct=delta,quote_status='recent',quote_executable=True,
+                    quality='supported',ev_low_pct=(p-1)*odd-100,low_pct=p-1,
                     provider_updated_at=at,quote_observed_at=at,bookmaker_id='9',
                     opportunity=dict(eligible=False,reasons=['market']))
     matrix['rows'] = [row(specification('result','ft',side),p,odd,d)

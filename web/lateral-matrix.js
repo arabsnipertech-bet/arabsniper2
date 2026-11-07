@@ -281,7 +281,10 @@
   return ideas;
  }
  function bestStudyIdea(ideas){
-  return visibleStudyIdeas(ideas).find(i=>i.best_study===true&&Number.isFinite(i.poisson_pct)&&i.poisson_pct>=32&&i.poisson_pct<=100&&Number.isFinite(i.odd)&&i.odd>1);
+  return visibleStudyIdeas(ideas).find(i=>i.best_study===true&&Number.isFinite(i.poisson_pct)&&i.poisson_pct>=32&&i.poisson_pct<=100&&Number.isFinite(i.odd)&&i.odd>1
+   &&i.quality==='supported'&&i.quote_executable===true&&['recent','cached_stable'].includes(i.quote_status)
+   &&Number.isFinite(i.ev_low_pct)&&i.ev_low_pct>=0&&i.odd*i.poisson_pct>100
+   &&(!i.star_gate||i.star_gate.eligible===true));
  }
  function studyDefaultRow(m){
   if(m.multimarket?.status==='no_prematch_snapshot'||m._gold_history&&!m._gold_history.verified_prematch)return null;

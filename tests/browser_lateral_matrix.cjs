@@ -228,7 +228,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
  const nearCombo=payload.matches[3].multimarket.matrix.rows.find(r=>r.spec.kind==='halves_total');
  Object.assign(nearCombo,{statistical_pct:55,fair_odd:100/55});
  Object.assign(nearCombo.combo,{active:false,reasons:['combo_probability','combo_rates'],lambda_ht:1.12,lambda_sh:1.8,over25_ft_oci:0});
- const browser=await chromium.launch({headless:true});
+ const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH});
  try{
   await verifyCachedRelease(browser,payload);
   await verifyCalendarRollover(browser,payload);
@@ -516,8 +516,25 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   await page.locator('[data-mx-filter="phase"]').selectOption('upcoming');
   assert.equal(await page.locator('.mx-card').count(),2);
   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozenTiers);
-  // The cockpit opens on the existing star; selecting a different market survives rendering.
-  const studyExample=JSON.parse(cp.execFileSync('python',['-c',"import sys,json;sys.path[:0]=['src','tests'];from test_selection_studies import perth_fixture;print(json.dumps(perth_fixture()))"],{encoding:'utf8'}));
+  // Negative/missing prudent EV stays observable but cannot receive a star.
+  const rejectedStudy=JSON.parse(cp.execFileSync('python',['-c',"import sys,json;sys.path[:0]=['src','tests'];from test_selection_studies import perth_fixture;print(json.dumps(perth_fixture()))"],{encoding:'utf8'}));
+  const rejectedPreview={...payload,matches:[{...payload.matches[0],fixture:{...payload.matches[0].fixture,fixture_id:908,kickoff:'2099-01-01T20:00:00Z'},multimarket:rejectedStudy.multimarket}]};
+  await page.evaluate(p=>{Object.assign(ArabMatrix.state,{category:'all',phase:'all',family:'all',period:'all',search:''});currentPayload=p;renderMatchResearch(p)},rejectedPreview);
+  assert(!(await page.locator('.mx-card>.mx-cockpit').textContent()).includes('MIGLIOR SPUNTO · SOLO STUDIO'));
+  // A separate controlled positive-EV case tests star navigation and persistence.
+  const studyExample=JSON.parse(cp.execFileSync('python',['-c',`
+import sys,json
+sys.path[:0]=['src','tests']
+from test_selection_studies import perth_fixture
+from selection_studies import generate_ideas
+m=perth_fixture();matrix=m['multimarket']['matrix'];monitor=matrix['quote_monitoring']
+for row in matrix['rows']:
+ if row['spec'].get('period')=='ft' and row['spec'].get('line')==2.5:
+  row.update(odd=2.1,quality='supported',ev_low_pct=1.0)
+monitor['studio_ideas']=generate_ideas(m['multimarket'],monitor['as_of'],m['fixture']['kickoff'])
+assert any(i.get('best_study') for i in monitor['studio_ideas'])
+print(json.dumps(m))
+`],{encoding:'utf8'}));
   const studyPreview={...payload,matches:[{...payload.matches[0],fixture:{...payload.matches[0].fixture,fixture_id:909,kickoff:'2099-01-01T20:00:00Z'},multimarket:studyExample.multimarket}]};
   await page.evaluate(p=>{Object.assign(ArabMatrix.state,{category:'all',phase:'all',family:'all',period:'all',search:''});currentPayload=p;renderMatchResearch(p)},studyPreview);
   const studyOriginal=await page.evaluate(()=>JSON.stringify(currentPayload));

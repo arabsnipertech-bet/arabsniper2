@@ -127,7 +127,7 @@ def apply_matrix(assessment, meta, as_of, state=None):
             values[name] = blend(src, entry, bonus)
             active.add(name)
     # Neutral neighbours anchor the nested binary events, including any-goal HT.
-    for chain in [('gg_ht', 'over15_ht', 'over05_ht'), ('over35_ft', 'over25_ft')]:
+    for chain in [('over25_ht', 'over15_ht', 'over05_ht'), ('gg_ht', 'over15_ht', 'over05_ht'), ('over35_ft', 'over25_ft')]:
         chain = [k for k in chain if k in values]
         for i, k in enumerate(chain):
             if k in active:
