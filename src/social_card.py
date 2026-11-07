@@ -84,7 +84,7 @@ def render(post, path):
             tag='LIVE DALLA GOLD' if post['live']['origin']=='gold' else 'SEGUIREMO QUESTA SINGOLA LIVE'
             draw.text((55,923),tag,font=font(17,'bold'),fill='#FFB14A',anchor='lt')
     elif picks:
-        draw.text((55,617),'La singola' if len(picks)==1 else 'Le singole',font=font(77,'serif'),fill=WHITE,anchor='lt')
+        draw.text((55,617),'La tripla' if slot == '13:00' and len(picks) == 3 else 'Le singole',font=font(77,'serif'),fill=WHITE,anchor='lt')
         step = min(272,510//len(picks))
         for n,p in enumerate(picks):
             y=734+n*step
@@ -97,6 +97,9 @@ def render(post, path):
             paragraph(draw,55,y+step-46,p['label'],32,760,42,color=MUTED)
             draw.text((1025,y+60),f"{p['odd']:.2f}".replace('.',','),font=font(54,'serif'),fill=shade,anchor='rt')
             draw.text((1025,y+121),'QUOTA',font=font(17,'mono'),fill=MUTED,anchor='rt')
+    elif slot == '10:45':
+        paragraph(draw,55,625,'Riscontri trasparenti',76,955,215,'serif')
+        paragraph(draw,58,865,post['text'],30,940,350)
     elif edu:
         parts=post['text'].split('\n\n')
         title=parts[1].lstrip('🔎 ').capitalize().replace('oci','OCI')

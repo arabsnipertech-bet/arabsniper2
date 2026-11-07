@@ -63,7 +63,7 @@ def audit(day, posts, scores):
                              halftime=(scores.get(fid, {}).get("halftime") or {}),
                              fulltime=(scores.get(fid, {}).get("fulltime") or {})))
             groups.setdefault(slot, []).append(rows[-1])
-    singles = [r for r in rows if r["slot"] != "13:00"]
+    singles = [r for r in rows if r["slot"] != "13:00" or len(groups.get("13:00", [])) != 3]
     settled = [r for r in rows if r["status"] != "pending"]
     def aggregate(items):
         valid = [r for r in items if r["status"] != "pending"]

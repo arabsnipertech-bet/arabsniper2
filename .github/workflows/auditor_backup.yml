@@ -2,7 +2,7 @@ name: ArabSniper Auditor Backup
 
 on:
   schedule:
-    - cron: '10 1-5 * * *'
+    - cron: '0,20,40 0-5 * * *'
       timezone: 'Europe/Rome'
   workflow_dispatch:
     inputs:

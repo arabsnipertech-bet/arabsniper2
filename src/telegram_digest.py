@@ -15,8 +15,8 @@ ROME = ZoneInfo("Europe/Rome")
 CHANNEL = "@arabsniper_signals"
 from telegram_slots import WINDOWS, EDITORIAL, CHANNEL_SLOTS
 
-UTC_CRONS = {"30 22,23,2,3,8,9,10,11,15,16,17 * * *", "0 18,19,20,21 * * *",
-             "45 10,11,14,15 * * *", "15 15,16 * * *"}
+UTC_CRONS = {"30 22,23,2,3,10,11,15,16,17 * * *", "0 11,12,18,19,20,21 * * *",
+             "45 8,9,10,11,14,15 * * *", "15 15,16 * * *"}
 MARKETS = {"over15_ht": ("ht", 2), "over25_ht": ("ht", 3), "gg_ht": ("ht", "gg"),
            "over25_ft": ("ft", 3), "over35_ft": ("ft", 4)}
 FINAL = {"FT", "AET", "PEN"}
@@ -240,12 +240,18 @@ def prepare():
             print('name=' + name, file=out)
         return
     if slot in EDITORIAL:
-        legacy = (f"telegram-evidence-{day}-market-sent" if slot == "16:45"
+        legacy = (f"telegram-evidence-{day}-{'audit' if slot == '10:45' else 'market'}-sent" if slot in ("10:45", "16:45")
                   else f"telegram-gold-promo-{day}-{slot.replace(':','')}-sent")
         if artifact(legacy):
             print("Editorial already delivered by previous schedule")
             return
         post = {"slot":slot, "picks":[], "day":day}
+        if EDITORIAL[slot] == 'audit':
+            from telegram_evidence import load_audit, audit_message
+            expected = (now.date() - timedelta(days=1)).isoformat()
+            report = load_audit(expected)
+            if report and report.get('date') == expected and audit_message(report):
+                post['audit'] = report
         if slot in ('12:45','17:15'):
             try:
                 from promo_successes import load_yesterday
@@ -339,6 +345,12 @@ def slot_message(post):
     slot = post["slot"]
     picks = post["picks"]
     if slot in EDITORIAL:
+        if EDITORIAL[slot] == 'audit':
+            from telegram_evidence import audit_message
+            expected = (datetime.fromisoformat(post['day']).date() - timedelta(days=1)).isoformat()
+            report = post.get('audit') or {}
+            message = audit_message(report) if report.get('date') == expected else None
+            return message or f"ArabSniper · Riscontri del {expected} in verifica. Nessun risultato non verificato viene pubblicato."
         if post.get('successes') and EDITORIAL[slot]=='promo':
             from promo_successes import message
             return message(post['successes'])
@@ -359,7 +371,8 @@ def slot_message(post):
             return MESSAGES[-1]
         return (f"ArabSniper · Controllo delle {slot} completato. "
                 f"Nessuna nuova selezione valida da pubblicare per le gare {post['first']}–{post['last']}.")
-    lines = [f"ArabSniper · {'Singola' if len(picks)==1 else 'Selezioni singole'} delle {slot}"]
+    title = "Tripla" if slot == "13:00" and len(picks) == 3 else "Singola" if len(picks) == 1 else "Selezioni singole"
+    lines = [f"ArabSniper · {title} delle {slot}"]
     for pick in picks:
         start = instant(pick["kickoff"]).astimezone(ROME)
         at = instant(pick["provider_updated_at"]).astimezone(ROME)

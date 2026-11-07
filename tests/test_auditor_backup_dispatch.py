@@ -54,7 +54,8 @@ class AuditorBackupTests(unittest.TestCase):
 
     def test_before_backup_and_after_window_never_touch_network(self):
         for at in ('2026-10-31T00:30:00+01:00', '2026-10-31T00:39:59+01:00',
-                   '2026-10-31T05:30:00+01:00', '2026-10-31T06:00:00+01:00',
+                   '2026-10-31T01:30:00+01:00', '2026-10-31T03:59:59+01:00',
+                   '2026-10-31T05:10:00+01:00', '2026-10-31T05:30:00+01:00', '2026-10-31T06:00:00+01:00',
                    '2026-10-31T18:00:00+01:00'):
             api = Mock()
             self.assertEqual(backup.wake_auditor(api, backup.instant(at))['action'],
