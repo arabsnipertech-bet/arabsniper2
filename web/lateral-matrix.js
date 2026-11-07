@@ -286,13 +286,30 @@
    &&Number.isFinite(i.ev_low_pct)&&i.ev_low_pct>=0&&i.odd*i.poisson_pct>100
    &&(!i.star_gate||i.star_gate.eligible===true));
  }
- function studyDefaultRow(m){
-  if(m.multimarket?.status==='no_prematch_snapshot'||m._gold_history&&!m._gold_history.verified_prematch)return null;
+ function starredStudyRow(m){
   const ideas=m.multimarket?.matrix?.quote_monitoring?.studio_ideas;
   const best=Array.isArray(ideas)?bestStudyIdea(ideas):null;
   if(!best?.spec?.kind||!best.spec.period||!best.spec.side)return null;
-  // Resolve the existing starred study to its exact matrix market; never rank anew.
   return rowsOf(m).find(row=>row.spec&&Object.keys({...row.spec,...best.spec}).every(key=>row.spec[key]===best.spec[key]))||null;
+ }
+ function studyDefaultRow(m,now=Date.now()){
+  if(m.multimarket?.status==='no_prematch_snapshot'||m._gold_history&&!m._gold_history.verified_prematch)return null;
+  const starred=starredStudyRow(m);
+  if(starred)return starred;
+  // Display-only default for upcoming matches. Never backfill historical decisions.
+  if(m._gold_history||phase(m,now)!=='upcoming')return null;
+  const kickoff=Date.parse(m.fixture?.kickoff);
+  const candidates=rowsOf(m).filter(r=>{
+   if(!goalMarket(r)||r.quality!=='supported'||r.quote_executable!==true||!priced(r)||
+      !Number.isFinite(r.odd)||r.odd<=1||!Number.isFinite(r.statistical_pct)||r.statistical_pct<=0||r.statistical_pct>100)return false;
+   const at=Date.parse(r.provider_updated_at),seen=Date.parse(r.quote_observed_at);
+   const cache=Date.parse(r.cache_source_at),expiry=Date.parse(r.cache_expires_at);
+   const fresh=r.quote_status==='cached_stable'?expiry-cache===12*3600000&&cache<=now&&now<=expiry:
+    Number.isFinite(at)&&at<=now&&now-at<=(kickoff-now<=3*3600000?1:6)*3600000;
+   return fresh&&(!Number.isFinite(seen)||seen<=now);
+  });
+  const cautious=r=>Number.isFinite(r.low_pct)&&r.low_pct>=0&&r.low_pct<=r.statistical_pct?r.low_pct:0;
+  return candidates.sort((a,b)=>cautious(b)-cautious(a)||b.statistical_pct-a.statistical_pct||String(a.id).localeCompare(String(b.id)))[0]||null;
  }
  function studyIdeaPanel(ideas){
   ideas=visibleStudyIdeas(ideas);
@@ -562,13 +579,15 @@
   const fid=String(m.fixture?.fixture_id),selectedId=inline?inlineInstruments.get(fid):instrumentId;
   const studyDefault=!tier.row&&tier.tone==='studio'?studyDefaultRow(m):null;
   const row=rows.find(r=>r.id===selectedId)||tier.row||studyDefault;
+  const statisticalDefault=studyDefault&&studyDefault!==starredStudyRow(m);
   const study=tier.tone==='studio'?{kickoff:m.fixture?.kickoff}:null;
   const saved=row&&studyObservation(row,study),flow=saved||row||{};
   const probability=row?(study?poissonEstimate(row).probability:row.statistical_pct):null;
   const oci=(priced(row)||saved)?flow.oci:null,margin=(priced(row)||saved)?flow.selected_margin_pct??flow.margin_pct:null;
   return '<section class="mx-cockpit mx-tone-'+tier.tone+'"><div class="mx-cockpit-heading"><span class="mx-category">'+tier.name+'</span><span>ANALISI PREPARTITA</span></div>'+
-   '<label class="mx-instrument-select">Mercato visualizzato<select '+(inline?'data-mx-inline-instrument="'+esc(fid)+'"':'data-mx-instrument')+'><option value="">'+(tier.row?'Proposta '+tier.name+' · '+esc(tier.row.label):studyDefault?'Miglior spunto · '+esc(studyDefault.label):'Scegli un mercato da osservare')+'</option>'+rows.map(r=>'<option value="'+esc(r.id)+'" '+(r.id===selectedId?'selected':'')+'>'+esc(r.label)+'</option>').join('')+'</select></label>'+
-   (row?'<div class="mx-cockpit-pick"><div><small>'+(row===tier.row?'PROPOSTA '+tier.name:row===studyDefault?'MIGLIOR SPUNTO · SOLO STUDIO':'MERCATO IN OSSERVAZIONE')+'</small><h3>'+esc(row.label)+'</h3></div><div class="mx-cockpit-price"><small>'+(saved?'Apertura → ultima osservata':'Apertura → quota attuale')+'</small>'+(saved?'<span class="mx-price">'+num(flow.first_odd,2)+' → <b>'+num(flow.odd,2)+'</b></span><small>Storico · da confermare</small>':price(row))+'</div></div>':'<p class="mx-cockpit-empty">Le analisi di studio restano consultabili: scegli il mercato per leggere i suoi indicatori.</p>')+
+   '<label class="mx-instrument-select">Mercato visualizzato<select '+(inline?'data-mx-inline-instrument="'+esc(fid)+'"':'data-mx-instrument')+'><option value="">'+(tier.row?'Proposta '+tier.name+' · '+esc(tier.row.label):studyDefault?(statisticalDefault?'Studio statistico · ':'Miglior spunto · ')+esc(studyDefault.label):'Scegli un mercato da osservare')+'</option>'+rows.map(r=>'<option value="'+esc(r.id)+'" '+(r.id===selectedId?'selected':'')+'>'+esc(r.label)+'</option>').join('')+'</select></label>'+
+   (row?'<div class="mx-cockpit-pick"><div><small>'+(row===tier.row?'PROPOSTA '+tier.name:row===studyDefault?(statisticalDefault?'STUDIO STATISTICO · VALORE NON CONFERMATO':'MIGLIOR SPUNTO · SOLO STUDIO'):'MERCATO IN OSSERVAZIONE')+'</small><h3>'+esc(row.label)+'</h3></div><div class="mx-cockpit-price"><small>'+(saved?'Apertura → ultima osservata':'Apertura → quota attuale')+'</small>'+(saved?'<span class="mx-price">'+num(flow.first_odd,2)+' → <b>'+num(flow.odd,2)+'</b></span><small>Storico · da confermare</small>':price(row))+'</div></div>':'<p class="mx-cockpit-empty">Le analisi di studio restano consultabili: scegli il mercato per leggere i suoi indicatori.</p>')+
+   (statisticalDefault&&row===studyDefault?'<p class="mx-cockpit-note" data-study-default>Mercato gol con la maggiore probabilità prudente disponibile; a parità, probabilità centrale. Il valore atteso può essere negativo o non disponibile. Nessuna stella Radar o proposta Gold.</p>':'')+
    '<div class="mx-instruments">'+instrument('OCI',oci,-100,100,'','Movimento delle quote')+instrument('Probabilità modello',probability,0,100,'%','Stima statistica prematch')+instrument('Aggio',margin,0,20,'%','Più basso = minor margine')+'</div>'+
    (row?'<div class="mx-cockpit-evidence">'+movementSignal(flow,!!saved)+'<div><small>OPERATORI CONCORDI</small><b>'+esc(flow.agreeing_books??'—')+' / '+esc(flow.paired_books??'—')+'</b></div><div><small>FONTE</small><b>'+esc(flow.bookmaker||'Non disponibile')+'</b><small>'+esc(services.timestamp?.(flow.quote_observed_at)||flow.quote_observed_at||'')+'</small></div></div>':'')+
    '<p class="mx-cockpit-note">OCI e aggio descrivono le quote, non la certezza dell’esito. I quadranti non modificano la probabilità. Aggio oltre 20% e OCI fuori scala conservano il valore numerico.</p></section>';
