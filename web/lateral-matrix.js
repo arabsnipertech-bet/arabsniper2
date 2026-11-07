@@ -582,7 +582,7 @@
   const statisticalDefault=studyDefault&&studyDefault!==starredStudyRow(m);
   const study=tier.tone==='studio'?{kickoff:m.fixture?.kickoff}:null;
   const saved=row&&studyObservation(row,study),flow=saved||row||{};
-  const probability=row?(study?poissonEstimate(row).probability:row.statistical_pct):null;
+  const probability=row?(study&&!(statisticalDefault&&row===studyDefault)?poissonEstimate(row).probability:row.statistical_pct):null;
   const oci=(priced(row)||saved)?flow.oci:null,margin=(priced(row)||saved)?flow.selected_margin_pct??flow.margin_pct:null;
   return '<section class="mx-cockpit mx-tone-'+tier.tone+'"><div class="mx-cockpit-heading"><span class="mx-category">'+tier.name+'</span><span>ANALISI PREPARTITA</span></div>'+
    '<label class="mx-instrument-select">Mercato visualizzato<select '+(inline?'data-mx-inline-instrument="'+esc(fid)+'"':'data-mx-instrument')+'><option value="">'+(tier.row?'Proposta '+tier.name+' · '+esc(tier.row.label):studyDefault?(statisticalDefault?'Studio statistico · ':'Miglior spunto · ')+esc(studyDefault.label):'Scegli un mercato da osservare')+'</option>'+rows.map(r=>'<option value="'+esc(r.id)+'" '+(r.id===selectedId?'selected':'')+'>'+esc(r.label)+'</option>').join('')+'</select></label>'+
