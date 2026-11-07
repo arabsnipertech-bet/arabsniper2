@@ -9,7 +9,7 @@ Base tecnica: 60bbc051bddfc6ac521f2e5b283d5e5233ce1561. Le revisioni successive 
 - Over 2.5 PT incluso nella mappa e nella monotonicità 0.5/1.5/2.5 PT.
 - Stella Radar solo con qualità supportata, quota utilizzabile, EV centrale positivo ed EV prudente non negativo. Scarti conservati. Contratti e gare distinte separati nei report.
 - Benchmark decisionale su quattro percorsi degli stessi snapshot; prime scelte, eleggibilità e rango. Replay retrospettivo dichiarato e distinto dalle decisioni congelate; pubblicazioni social non dedotte dall'eleggibilità.
-- Lettura incrementale verificata; `read_store` rifiuta documenti oltre 64 MiB per impedire la materializzazione del master da 27,8 GB.
+- Lettura incrementale verificata; `read_store` rifiuta il master storico oltre 64 MiB, mantenendo compatibili i feed operativi più grandi, per impedire la materializzazione del master da 27,8 GB.
 - Gold Matchroom: nuova gerarchia visiva, schede adattive, controlli leggibili su mobile, focus tastiera. Percorsi di autenticazione e dati invariati.
 
 ## Esperimenti separati, non promossi automaticamente
@@ -26,4 +26,4 @@ Nessuna modifica ai contenuti, moduli o workflow Telegram/Facebook. Nessun invio
 
 ## Verifica locale
 
-615 test Python e 13 file di test Node superati prima del rilascio. L'esecuzione browser locale è impedita dal runtime (`socket() Operation not permitted`); i test browser obbligatori vengono verificati nel runner GitHub prima del merge. I risultati remoti, il completamento del recupero R2 e l'effettiva pubblicazione vanno riportati separatamente: un deploy hook accettato non prova che il sito sia già aggiornato.
+616 test Python e 13 file di test Node superati prima del rilascio. L'esecuzione browser locale è impedita dal runtime (`socket() Operation not permitted`); i test browser obbligatori vengono verificati nel runner GitHub prima del merge. I risultati remoti, il completamento del recupero R2 e l'effettiva pubblicazione vanno riportati separatamente: un deploy hook accettato non prova che il sito sia già aggiornato.
