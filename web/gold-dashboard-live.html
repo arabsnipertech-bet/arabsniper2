@@ -861,7 +861,8 @@
   <script src="/statistics-first.js?v=4.0"></script>
   <link rel="stylesheet" href="/lateral-matrix.css?v=8e2ae417f35f">
   <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=356644d1fba7"></script>
-  <script src="/live-scores.js?v=8415d2038a5f"></script>
+  <script src="/vendor/fflate-0.8.2.js"></script>
+  <script src="/live-scores.js?v=a17ad119a2d0"></script>
   <script>
     'use strict';
 
@@ -1231,6 +1232,11 @@
     }
 
     async function loadJson(file, embedded = null, signal = null, indexOnly = false) {
+      async function decodeGzip(compressed) {
+        if(typeof DecompressionStream!=='undefined')return new Uint8Array(await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
+        if(globalThis.fflate?.gunzipSync)return globalThis.fflate.gunzipSync(new Uint8Array(compressed));
+        throw new Error('Decoder dati non disponibile. Ricarica la pagina e riprova.');
+      }
       // Retry only idempotent reads; OTP sends are never retried automatically.
       async function read(path, binary=false) {
         for(let attempt=0;attempt<3;attempt++) {
@@ -1259,18 +1265,18 @@
       const value=embedded||await read(file);
       if(value?._gold_storage==='arabsniper-gold-pages-v1'&&indexOnly)return value;
       if(value?._gold_storage==='arabsniper-gold-pages-v1') {
-        if(typeof DecompressionStream==='undefined'||!globalThis.crypto?.subtle)throw new Error('Aggiorna il browser o apri Gold in Chrome, Safari o Firefox per caricare i dati protetti.');
+        if(!globalThis.crypto?.subtle)throw new Error('Aggiorna il browser o apri Gold in Chrome, Safari o Firefox per caricare i dati protetti.');
         if(!Array.isArray(value.pages)||!Number.isSafeInteger(value.match_count)||value.match_count<0)throw new Error('Indice giornata non valido.');
         const matches=new Array(value.match_count);let next=0,offset=0,completed=0,stopped=false;
         const pages=value.pages.map(page=>{if(!/^[a-f0-9]{64}$/.test(page.sha256)||!Number.isSafeInteger(page.bytes)||page.bytes<2||!Number.isSafeInteger(page.count)||page.count<1)throw new Error('Indice pagina non valido.');const item={...page,offset};offset+=page.count;return item;});
         if(offset!==value.match_count)throw new Error('Conteggio partite non valido.');
-        async function pageWorker(){while(!stopped&&next<pages.length){const page=pages[next++];const compressed=await read('_audit_parts/'+page.sha256+'.json.gz',true);const raw=await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');if(raw.byteLength!==page.bytes||hash!==page.sha256)throw new Error('Integrità pagina non verificata. Premi Riprova.');const rows=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(raw));if(!Array.isArray(rows)||rows.length!==page.count)throw new Error('Pagina partite incompleta.');for(let i=0;i<rows.length;i++)matches[page.offset+i]=rows[i];completed++;if(!signal?.aborted&&typeof document!=='undefined'){const status=document.getElementById('liveStatus');if(status)status.textContent='Caricamento partite · '+Math.round(completed/pages.length*100)+'%';}}}
+        async function pageWorker(){while(!stopped&&next<pages.length){const page=pages[next++];const compressed=await read('_audit_parts/'+page.sha256+'.json.gz',true);const raw=await decodeGzip(compressed);const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');if(raw.byteLength!==page.bytes||hash!==page.sha256)throw new Error('Integrità pagina non verificata. Premi Riprova.');const rows=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(raw));if(!Array.isArray(rows)||rows.length!==page.count)throw new Error('Pagina partite incompleta.');for(let i=0;i<rows.length;i++)matches[page.offset+i]=rows[i];completed++;if(!signal?.aborted&&typeof document!=='undefined'){const status=document.getElementById('liveStatus');if(status)status.textContent='Caricamento partite · '+Math.round(completed/pages.length*100)+'%';}}}
         const results=await Promise.allSettled(Array.from({length:Math.min(2,pages.length)},()=>pageWorker().catch(error=>{stopped=true;throw error;})));
         const failure=results.find(result=>result.status==='rejected');if(failure)throw failure.reason;
         return {...value,matches};
       }
       if(value?._storage!=='arabsniper-audit-parts-v1')return value;
-      if(typeof DecompressionStream==='undefined'||!globalThis.crypto?.subtle)throw new Error('Questo browser non supporta il caricamento protetto. Apri Gold in una versione aggiornata di Chrome, Safari o Firefox.');
+      if(!globalThis.crypto?.subtle)throw new Error('Questo browser non supporta il caricamento protetto. Apri Gold in una versione aggiornata di Chrome, Safari o Firefox.');
       if(!Array.isArray(value.parts)||!Number.isSafeInteger(value.bytes)||value.bytes<0)throw new Error('Indice dei dati non valido. Riprova la sincronizzazione.');
       const digest=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
       let total=0;
@@ -1278,7 +1284,7 @@
       if(total!==value.bytes)throw new Error('Dati incompleti');
       // One destination buffer: avoid retaining every chunk AND a second full copy.
       const joined=new Uint8Array(total);let next=0,stopped=false;
-      async function worker(){while(!stopped&&next<parts.length){const part=parts[next++];const compressed=await read('_audit_parts/'+part.sha256+'.json.gz',true);const raw=new Uint8Array(await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());if(raw.length!==part.bytes||await digest(raw)!==part.sha256)throw new Error('Integrità dati non verificata. Premi Riprova per scaricare una copia aggiornata.');joined.set(raw,part.offset);}}
+      async function worker(){while(!stopped&&next<parts.length){const part=parts[next++];const compressed=await read('_audit_parts/'+part.sha256+'.json.gz',true);const raw=await decodeGzip(compressed);if(raw.length!==part.bytes||await digest(raw)!==part.sha256)throw new Error('Integrità dati non verificata. Premi Riprova per scaricare una copia aggiornata.');joined.set(raw,part.offset);}}
       const results=await Promise.allSettled(Array.from({length:Math.min(3,parts.length)},()=>worker().catch(error=>{stopped=true;throw error;})));
       const failure=results.find(result=>result.status==='rejected');if(failure)throw failure.reason;
       if(await digest(joined)!==value.sha256)throw new Error('Integrità documento non verificata');

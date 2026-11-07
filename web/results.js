@@ -7,8 +7,9 @@
  const cards=rows=>rows.map(r=>`<article class="result-card ${r.outcome==='won'?'won':'lost'}"><span class="result-outcome">${r.outcome==='won'?'✓ CENTRATA':'✕ NON CENTRATA'}</span><span class="league">${esc(r.league)}</span><h3>${esc(r.match)}</h3><strong>${esc(r.label)}</strong>${typeof r.odd==='number'&&Number.isFinite(r.odd)&&r.odd>1?`<span class="result-odd">${r.odd.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})} <small>QUOTA PREMATCH</small></span>`:''}</article>`).join('');
  async function refresh(){
   const panel=document.getElementById('results-content');
+    const controller=new AbortController(), timeout=setTimeout(()=>controller.abort(),15000);
   try{
-   const response=await fetch(endpoint+'?v='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(15000)});
+   const response=await fetch(endpoint+'?v='+Date.now(),{cache:'no-store',signal:controller.signal});
    if(!response.ok)throw Error('feed');
    const p=await response.json();
    if(!p.available||!Array.isArray(p.all_results)||!p.daily?.settled){panel.innerHTML=p.model_id==='lateral-matrix-v5.0'?'<div class="empty">Il nuovo modello V5 è in verifica prospettica. Per ieri non sono ancora disponibili selezioni concluse: i risultati del modello precedente restano separati.</div>':'<div class="empty">I risultati di ieri sono in verifica. Pubblicheremo gli esiti quando disponibili.</div>';return;}
@@ -18,7 +19,7 @@
    const d=p.daily;
    const examples=(p.examples||[]).filter(r=>r.outcome==='won'&&String(r.market).startsWith('over')&&typeof r.odd==='number'&&Number.isFinite(r.odd)&&r.odd>1).sort((a,b)=>b.odd-a.odd).slice(0,10);
    panel.innerHTML=`<p class="note">${p.model_id==='lateral-matrix-v5.0'?'Risultati del nuovo modello V5':'Risultati del modello precedente · non validano V5'}</p><p class="note">${esc(date(p.date))} · Quote registrate prima del calcio d’inizio</p><p>Selezione dei soli pronostici vincenti: questo estratto non rappresenta il rendimento complessivo. Tutti gli esiti, comprese le perdite, sono consultabili qui sotto.</p>${examples.length?`<div class="results-grid">${cards(examples)}</div>`:'<div class="empty">Nessun Over vinto con quota prematch verificata disponibile per questa giornata.</div>'}<p class="note">Fino a 10 Over vinti, ordinati per quota prematch decrescente. I risultati passati non garantiscono quelli futuri.</p><details><summary>Tutti gli esiti del giorno: ${d.wins} vinti, ${d.losses} persi, ${d.pending} in attesa</summary><p class="note">${esc(p.cohort)}</p><div class="results-grid">${cards(p.all_results.filter(r=>r.outcome!=='pending'))}</div></details>`;
-  }catch(_){panel.innerHTML='<div class="empty">Risultati temporaneamente non disponibili.</div>';}
+  }catch(_){panel.innerHTML='<div class="empty">Risultati temporaneamente non disponibili.</div>';}finally{clearTimeout(timeout);}
  }
  refresh();setInterval(refresh,300000);
 })();

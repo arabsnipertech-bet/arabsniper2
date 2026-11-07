@@ -5,7 +5,7 @@ async function verifyCachedRelease(browser,payload){
  const http=require('node:http'),requests=[];
  const html=fs.readFileSync('web/gold-dashboard-live.html','utf8');
  const script=html.match(/<script src="(\/lateral-matrix\.js[^\"]*)"><\/script>/)[1];
- const assets=new Set(['competition-scope.js','statistics-first.js','statistics-first.css','lateral-matrix.js','lateral-matrix.css','live-scores.js']);
+ const assets=new Set(['vendor/fflate-0.8.2.js','competition-scope.js','statistics-first.js','statistics-first.css','lateral-matrix.js','lateral-matrix.css','live-scores.js']);
  const oldScript='/lateral-matrix.js?v=5.10';
  const server=http.createServer((req,res)=>{
   requests.push(req.url);
@@ -89,7 +89,7 @@ async function verifyCachedRelease(browser,payload){
 async function verifyCalendarRollover(browser,payload){
  const http=require('node:http');
  let dates=['2026-10-28','2026-10-29','2026-10-30','2026-10-31','2026-11-01'];
- const assets=new Set(['competition-scope.js','statistics-first.js','statistics-first.css','lateral-matrix.js','lateral-matrix.css','live-scores.js']);
+ const assets=new Set(['vendor/fflate-0.8.2.js','competition-scope.js','statistics-first.js','statistics-first.css','lateral-matrix.js','lateral-matrix.css','live-scores.js']);
  const server=http.createServer((req,res)=>{
   const url=new URL(req.url,'http://127.0.0.1');
   res.setHeader('Cache-Control','no-store');

@@ -65,8 +65,9 @@
     const target = document.getElementById('daily-picks');
     const now = new Date();
     document.getElementById('preview-date').textContent = new Intl.DateTimeFormat('it-IT', {timeZone:zone, day:'numeric', month:'long', year:'numeric'}).format(now);
+    const controller=new AbortController(), timeout=setTimeout(()=>controller.abort(),15000);
     try {
-      const response = await fetch(URL + '?v=' + Date.now(), {cache:'no-store', signal:AbortSignal.timeout(15000)});
+      const response = await fetch(URL + '?v=' + Date.now(), {cache:'no-store', signal:controller.signal});
       if (!response.ok) throw new Error('feed');
       const payload = await response.json();
       const seen = new Set();
@@ -93,7 +94,7 @@
       const panel = document.getElementById('cruscotto');
       if (panel) panel.innerHTML = '<h2 id="match-title">Anteprima temporaneamente non disponibile</h2><p>Nuovo tentativo automatico tra un minuto.</p>';
       target.innerHTML = '<div class="empty">Selezioni temporaneamente non disponibili. Riproviamo automaticamente tra un minuto.</div>';
-    } finally { busy = false; }
+    } finally { clearTimeout(timeout); busy = false; }
   }
   handleUrlMessages();
   refresh();

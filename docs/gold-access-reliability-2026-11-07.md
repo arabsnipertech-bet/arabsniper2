@@ -13,3 +13,6 @@ The verified historical day contained 295 matches: 135,048,668 bytes, 17 pages (
 Validation covers blocked browser storage, OTP errors/success, resend cooldown, transient 503, mid-page expired session, checksum/count failure, lazy archive lookup, source changes during publication, and preservation of social feeds. The browser suite exercises the code-entry UI using a local synthetic server, with a mobile screenshot. Real email delivery and individual reported device errors require production evidence and are not inferred from synthetic tests.
 
 Each page still requires the existing Worker authentication and entitlement check. Page sizing bounds parsing memory while avoiding excessive per-page authorization requests; no authorization cache or bypass is introduced.
+
+## Browser compatibility follow-up
+Home, public results and the live overlay now use AbortController with a cleared timer instead of AbortSignal.timeout. Gold retains native gzip decompression where available and falls back to locally vendored, pinned fflate 0.8.2 (MIT); SHA-256, byte and record-count validation remain mandatory on both paths. Regression tests explicitly omit the newer timeout API and native gzip stream. No authentication, forecast, ranking or social publication rules change.

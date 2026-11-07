@@ -4,7 +4,7 @@ async function run(payload,fail=false){
  const nodes=Object.fromEntries(['daily-picks','preview-date','cruscotto'].map(id=>[id,{textContent:'',innerHTML:''}]));
  const calls=[];let pending;
  class Clock extends Date{constructor(...a){super(...(a.length?a:['2026-10-22T12:00:00Z']));}static now(){return +new Clock();}}
- const ctx={ArabCompetitionScope:require('../web/competition-scope.js'),Date:Clock,Intl,Set,Number,String,AbortSignal,handleUrlMessages(){},setInterval(){},document:{getElementById:id=>nodes[id],addEventListener(){}},fetch:async(url)=>{calls.push(url);return {ok:!fail,json:async()=>payload}}};
+ const ctx={ArabCompetitionScope:require('../web/competition-scope.js'),Date:Clock,Intl,Set,Number,String,AbortController,setTimeout,clearTimeout,handleUrlMessages(){},setInterval(){},document:{getElementById:id=>nodes[id],addEventListener(){}},fetch:async(url)=>{calls.push(url);return {ok:!fail,json:async()=>payload}}};
  vm.runInNewContext(code,ctx);await new Promise(r=>setImmediate(r));return {nodes,calls};
 }
 (async()=>{
