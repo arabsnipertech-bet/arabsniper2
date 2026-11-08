@@ -32,6 +32,17 @@ class AnalysisTest(unittest.TestCase):
         self.assertEqual(p,{'1':52.3,'over25':61.2})
         self.assertIn('GG n.d.',probability_lines({'probabilities':p})[1])
 
+    def test_same_study_option_as_gold_without_recomputing_probability(self):
+        m=match(1)
+        m['multimarket']['matrix']={'rows':[dict(id='o25',label='Over 2,5 FT',spec=dict(kind='total',period='ft',side='over',line=2.5),quality='supported',quote_executable=True,quote_status='recent',odd=1.92,statistical_pct=61.2,low_pct=55,provider_updated_at=NOW.isoformat(),quote_observed_at=NOW.isoformat())]}
+        p=self.choose([m])[0]['proposal']
+        self.assertEqual(p['label'],'Over 2,5 FT')
+        self.assertEqual(p['odd'],1.92)
+        self.assertEqual(p['probability'],61.2)
+        self.assertIn('Studio',p['title'])
+        m['multimarket']['matrix']['rows'][0]['provider_updated_at']=(NOW-timedelta(hours=2)).isoformat()
+        self.assertIsNone(self.choose([m])[0]['proposal'])
+
     def test_sports_events_require_confirmation_and_correct_reversal(self):
         s={};o=dict(status='1H',home=0,away=0,minute=1)
         self.assertIsNone(advance(s,o,0));self.assertIsNotNone(advance(s,o,46))

@@ -680,17 +680,23 @@
   });
   updateModal();if(dialog){dialog.showModal();dialog.querySelector('[data-mx-close]').focus();}
  }
- function compactProposal(m,helpers={}){
+ function proposalData(m,helpers={}){
   const tier=cockpitTier(m,helpers),star=!m._gold_history?starredStudyRow(m):null;
   const radar=!m._gold_history?marketSignals(rowsOf(m),{archived:(helpers.phase||phase)(m)!=='upcoming',kickoff:m.fixture?.kickoff})[0]:null;
   const row=tier.row||star||radar||(!m._gold_history?studyDefaultRow(m):null);
-  if(!row)return '<div class="mx-compact-proposal"><small>Proposta non disponibile · apri le analisi</small></div>';
+  if(!row)return null;
   const starred=tier.tone==='studio'&&(row===star||row===radar);
   const title=tier.row?'Proposta '+tier.name:starred?'Miglior spunto Blu · solo studio':'Miglior proposta Studio · statistica';
   const saved=tier.tone==='studio'?studyObservation(row,{kickoff:m.fixture?.kickoff}):null;
   const odd=saved?.odd??(priced(row)?row.odd:null);
   const note=saved?'Ultima osservata · da confermare':row.quote_source==='synthetic_combo'?'Quota sintetica PT × ST':row.quote_status==='cached_stable'?'Quota da cache':priced(row)?'Quota osservata':'Quota non disponibile';
-  return '<section class="mx-compact-proposal" aria-label="Migliore proposta"><div><small>'+esc(title)+'</small><strong>'+esc(row.label)+'</strong></div><div class="mx-compact-proposal-price"><b>'+num(odd,2)+'</b><small>'+esc(note)+'</small></div></section>';
+  return {title,label:row.label,odd,note,probability:row.statistical_pct};
+ }
+ function compactProposal(m,helpers={}){
+  const proposal=proposalData(m,helpers);
+  if(!proposal)return '<div class="mx-compact-proposal"><small>Proposta non disponibile · apri le analisi</small></div>';
+  const {title,label,odd,note}=proposal;
+  return '<section class="mx-compact-proposal" aria-label="Migliore proposta"><div><small>'+esc(title)+'</small><strong>'+esc(label)+'</strong></div><div class="mx-compact-proposal-price"><b>'+num(odd,2)+'</b><small>'+esc(note)+'</small></div></section>';
  }
  function compactQuotes(rows,helpers,study){
   return '<div class="mx-compact-quotes" aria-label="Quote 1X2 apertura e attuale">'+[['1','1 · Casa'],['x','X · Pareggio'],['2','2 · Ospite']].map(([side,label])=>{
@@ -743,7 +749,7 @@
   h.onchange=e=>{const fid=e.target.dataset?.mxInlineInstrument;if(fid!==undefined){inlineInstruments.set(fid,e.target.value||null);const m=(payload.matches||[]).find(x=>String(x.fixture?.fixture_id)===fid);if(m){e.target.closest('.mx-cockpit').outerHTML=cockpit(m,helpers,true);[...h.querySelectorAll('[data-mx-inline-instrument]')].find(x=>x.dataset.mxInlineInstrument===fid)?.focus();}return;}const key=e.target.dataset?.mxFilter;if(key&&key in state){state[key]=e.target.value;render(payload,host,helpers);}};
   updateModal();
  }
- const api={compactProposal,compactQuotes,card,operatorFair,observedMeans,goalPanels,studyDefaultRow,historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
+ const api={proposalData,compactProposal,compactQuotes,card,operatorFair,observedMeans,goalPanels,studyDefaultRow,historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.ArabMatrix=api;
 })(typeof window!=='undefined'?window:globalThis);
