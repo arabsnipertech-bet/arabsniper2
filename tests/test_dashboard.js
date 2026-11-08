@@ -134,6 +134,54 @@ assert(host.innerHTML.includes('value="over15_ht::over" selected'));
 assert(host.innerHTML.includes('Pesi e calcolo, dato per dato'));
 console.log('V3 dossier: backend primary, independent sources, evidence, missing data and market selection passed.');
 
+// Display-only OCI uses actual single-operator history, never changes eligibility.
+const movementFixtures=JSON.parse(require('child_process').execFileSync('python', ['-c', `
+import sys,json
+sys.path[:0]=['tests','src']
+from test_context_analysis import book
+from context_analysis import movement
+out={}
+for name,points in [('down',[2.5,2.2,2]),('up',[2,2.2,2.5]),('flat',[2,2,2]),('reverse',[2.5,2,2.4]),('missing',[2])]:
+    out[name]=movement([book('A <script>',points)],'over')
+    out[name+'_multi']=movement([book('A',points),book('B',points)],'over')
+out['conflict']=movement([book('A',[2.5,2]),book('B',[2,2.5])],'over')
+print(json.dumps(out))
+`], {cwd:path.join(__dirname,'..'),encoding:'utf8'}));
+const displayOci=m=>{researchContext.ociInput=m;return vm.runInContext('contextDisplayOci(ociInput)',researchContext);};
+for(const key of ['down','up','reverse']) {
+  const m=movementFixtures[key],before=JSON.stringify(m),display=displayOci(m);
+  assert.equal(display.single,true);
+  // Identical trajectories: only the existing coverage term differs (1 vs 2 books).
+  assert(Math.abs(display.value-(movementFixtures[key+'_multi'].oci-Math.sign(display.value)*1.25))<1e-10);
+  assert.equal(JSON.stringify(m),before);
+  assert.equal(m.confirmed,false);assert.equal(m.oci,null);
+}
+assert(displayOci(movementFixtures.down).value>0);
+assert(displayOci(movementFixtures.up).value<0);
+assert(displayOci(movementFixtures.reverse).value<0);
+assert.equal(displayOci(movementFixtures.flat).value,0);
+assert.equal(displayOci(movementFixtures.missing).value,null);
+assert.equal(displayOci(movementFixtures.conflict).value,null);
+assert.equal(displayOci(movementFixtures.down_multi).value,movementFixtures.down_multi.oci);
+assert.equal(displayOci({oci:0,paired_books:2}).value,0);
+for(const patch of [{hours:0},{leg_fair_delta_pp:null},{persistence:null},{sequence:[2]}, {observed_to:'invalid'}]) {
+  const m=JSON.parse(JSON.stringify(movementFixtures.down));Object.assign(m.operators[0],patch);
+  assert.equal(displayOci(m).value,null);
+}
+researchContext.ociRow={movement:movementFixtures.down};
+let ociMarkup=vm.runInContext('contextOciSummary(ociRow)',researchContext);
+assert(ociMarkup.includes('Singolo bookmaker'));assert(ociMarkup.includes('&lt;script&gt;'));
+assert(!ociMarkup.includes('<details'));assert(!ociMarkup.includes('<script>'));
+assert(vm.runInContext('contextMovement(ociRow)',researchContext).includes('(singolo bookmaker)'));
+researchContext.v3.matches[0].multimarket.markets[1].movement=movementFixtures.down;
+vm.runInContext("researchSelectFixture('100','over15_ht::over')",researchContext);
+const scenario=host.innerHTML.slice(host.innerHTML.indexOf('<section class="cx-scenario">'));
+assert(scenario.indexOf('cx-oci-summary')<scenario.indexOf('<details'));
+assert(scenario.includes('Singolo bookmaker'));
+assert(vm.runInContext('contextOdds(v3.matches[0])',researchContext).includes('cx-oci-summary'));
+assert(!vm.runInContext('contextOdds(v3.matches[0],true)',researchContext).includes('cx-oci-summary'));
+console.log('Visible OCI: backend fixtures, single-book signs/zero/reversal, multi-book parity, missing history, immutable signals and expanded dossier passed.');
+
 // Opening must belong to the displayed book; single-book movements get no signal.
 researchContext.oddsFixture={fixture:{home:'Home',away:'Away'},multimarket:{markets:[{
  market:'1x2_ft',selection:'2',odd:1.6,book_probability_pct:60,quote:{bookmaker:'A',provider_updated_at:future(-1)},

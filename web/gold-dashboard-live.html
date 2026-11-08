@@ -753,7 +753,9 @@
     .cx-status-top .cx-crossing{margin:0;color:#99ebff}.cx-home-band{grid-column:1/-1;padding:8px 10px;border:1px solid #627f92;border-radius:6px;color:#c3dce8;font-size:.74rem}.cx-current b{color:#82f3ff}
     @media(max-width:600px){.cx-list-row.cx-gold-blue{margin-left:2px;margin-right:2px}.cx-status-top{font-size:.77rem}}
     .cx-home-band{border-left:3px solid #b1d4ec;background:#1b303d;padding:12px;display:grid;gap:6px}.cx-home-band>strong{color:#d4ebfa;font-size:.8rem}.cx-home-focus{display:flex;flex-wrap:wrap;gap:8px;margin-top:3px}.cx-home-focus>span{flex:1 1 130px;border:1px solid #597182;padding:8px;border-radius:5px}.cx-home-focus b,.cx-home-focus small{display:block}.cx-home-focus small{margin-top:5px;color:#c1ccd4;line-height:1.5}
-  </style>
+      .cx-oci-summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin:10px 0;padding:10px 12px;border:1px solid #485a70;border-radius:10px;background:#101e30;color:#e8edf5}
+    .cx-oci-summary strong{font-size:.95rem}.cx-oci-summary strong b{font-variant-numeric:tabular-nums}.cx-oci-summary small{display:block;flex-basis:100%;font-size:.75rem;color:#b9c6d8;overflow-wrap:anywhere}
+    </style>
 </head>
 <body data-gold-ui="2026-11" data-gold-design="matchroom-v6">
   <div class="page" id="app" hidden>
@@ -1743,6 +1745,28 @@
     function contextSigned(v, suffix='') {
       return Number.isFinite(v)?`${v>0?'+':''}${v.toFixed(2)}${suffix}`:'—';
     }
+    function contextDisplayOci(m={}) {
+      // Display-only fallback: do not mutate movement.oci or multi-book signals.
+      if(Number.isFinite(m.oci))return {value:m.oci,single:false,reason:'OCI del feed'};
+      const operators=m.operators||[];
+      if(m.paired_books!==1||operators.length!==1)return {value:null,single:false,reason:m.paired_books>1?'Consenso multi-book insufficiente':'Servono due rilevazioni confrontabili'};
+      const o=operators[0],start=Date.parse(o.observed_from),end=Date.parse(o.observed_to);
+      if(!Array.isArray(o.sequence)||o.sequence.length<2||!o.sequence.every(v=>Number.isFinite(v)&&v>1)||
+         !Number.isFinite(start)||!Number.isFinite(end)||end<=start||
+         ![o.leg_fair_delta_pp,o.hours,o.persistence].every(Number.isFinite)||o.hours<=0||o.persistence<0||o.persistence>1)
+        return {value:null,single:true,reason:'Storico completo del bookmaker non disponibile'};
+      // Same OCI-AS formula as context_analysis.movement, evaluated on one operator.
+      const delta=o.leg_fair_delta_pp;
+      const absolute=Math.min(Math.abs(delta)/4,1)*40+25+
+        Math.min(Math.abs(delta)/o.hours/1.5,1)*10+o.persistence*15+10/8;
+      return {value:Math.abs(delta)<.10?0:absolute*Math.sign(delta),single:true,bookmaker:o.bookmaker,reason:'Singolo bookmaker · consenso multi-book non confermato'};
+    }
+    function contextOciSummary(row) {
+      const m=row?.movement||{},oci=contextDisplayOci(m);
+      const label=oci.single?`Singolo bookmaker${oci.bookmaker?' · '+oci.bookmaker:''}`:
+        Number.isFinite(oci.value)?`${m.paired_books??'—'} bookmaker confrontabili`:oci.reason;
+      return `<div class="cx-oci-summary" aria-label="OCI del mercato"><strong>OCI <b>${contextSigned(oci.value)}</b></strong><small>${escapeHtml(label)}</small>${oci.single?'<small>Consenso multi-book non confermato</small>':''}${oci.single&&!Number.isFinite(oci.value)?`<small>${escapeHtml(oci.reason)}</small>`:''}</div>`;
+    }
     function contextMovementLabel(m) {
       if(!m.confirmed)return 'Consenso multi-book non confermato';
       const up=m.direction==='up',down=m.direction==='down';
@@ -1764,7 +1788,7 @@
       return `<details class="cx-odds-note cx-favorite"><summary>${escapeHtml(title)}</summary><p>Confronto tra casa e ospite sulle quote dello stesso operatore. Il pareggio X resta un esito distinto. Parità di quota non significa cambio di favorita.</p>${details}</details>`;
     }
     function contextMovement(row) {
-      const m=row?.movement||{},operators=m.operators||[];
+      const m=row?.movement||{},operators=m.operators||[],oci=contextDisplayOci(m);
       const details=operators.map(o=>{
         const complete=[o.fair_initial_pct,o.fair_current_pct,o.margin_initial_pct,o.margin_current_pct].every(Number.isFinite);
         let comparison='';
@@ -1776,7 +1800,7 @@
         return `<section><b>${escapeHtml(o.bookmaker)}</b><p>Quote osservate: ${(o.sequence||[]).map(v=>escapeHtml(formatOdd(v))).join(' → ')}</p><p>Totale inizio confronto → ultima: ${contextSigned(Number.isFinite(o.net_delta_pct)?o.net_delta_pct:(o.current/o.initial-1)*100,'%')}. Ultimo tratto: ${contextSigned(o.delta_pct,'%')}${o.reversal?' · inversione di movimento':''}.</p>${complete?`<p>Book senza margine: ${contextPct(o.fair_initial_pct)} → ${contextPct(o.fair_current_pct)} (${contextSigned(o.fair_current_pct-o.fair_initial_pct,' punti')}).<br>Aggio del mercato completo: ${contextPct(o.margin_initial_pct)} → ${contextPct(o.margin_current_pct)} (${contextSigned(o.margin_current_pct-o.margin_initial_pct,' punti')}).</p>${comparison}`:'<p>Book prima/dopo e aggio: dettagli disponibili dalla prossima scansione.</p>'}<small>${escapeHtml(formatTimestamp(o.observed_from))} → ${escapeHtml(formatTimestamp(o.observed_to))}${o.leg_from?' · ultimo tratto da '+escapeHtml(formatTimestamp(o.leg_from)):''}</small></section>`;
       }).join('');
       const coverage=Number.isFinite(m.available_books)?`<p>Bookmaker disponibili: ${m.available_books} · confrontabili: ${m.paired_books||0} · concordi: ${m.agreeing_books||0}${m.recovered_books?' · recuperati sul periodo comune: '+m.recovered_books:''}.</p>`:'';
-      return `<div class="cx-movement">${coverage}<strong>${escapeHtml(contextMovementLabel(m))}</strong><p>OCI ArabSniper attuale: ${contextSigned(m.oci)} · precedente confrontabile: ${contextSigned(m.oci_previous)}${m.oci_previous_at?' ('+escapeHtml(formatTimestamp(m.oci_previous_at))+')':''}. ${Number.isFinite(m.oci)?m.oci>0?'Segno positivo: probabilità book in aumento nell’ultimo tratto.':m.oci<0?'Segno negativo: probabilità book in diminuzione nell’ultimo tratto.':'Nessuna variazione rilevante della probabilità book.':'Storico o consenso insufficienti.'}</p><details><summary>Percorso, aggio e confronto con la statistica per operatore</summary>${details||'<p>Storico confrontabile non disponibile.</p>'}</details><small>OCI è un indice di movimento, non una percentuale di successo. Aggio e movimenti provengono dalle stesse quote: non sono conferme indipendenti né flussi di denaro.</small></div>`;
+      return `<div class="cx-movement">${coverage}<strong>${escapeHtml(contextMovementLabel(m))}</strong><p>OCI ArabSniper attuale: ${contextSigned(oci.value)}${oci.single?' (singolo bookmaker)':''} · precedente confrontabile: ${contextSigned(m.oci_previous)}${m.oci_previous_at?' ('+escapeHtml(formatTimestamp(m.oci_previous_at))+')':''}. ${Number.isFinite(oci.value)?oci.value>0?'Segno positivo: probabilità book in aumento nell’ultimo tratto.':oci.value<0?'Segno negativo: probabilità book in diminuzione nell’ultimo tratto.':'Nessuna variazione rilevante della probabilità book.':'Storico o consenso insufficienti.'}</p><details><summary>Percorso, aggio e confronto con la statistica per operatore</summary>${details||'<p>Storico confrontabile non disponibile.</p>'}</details><small>OCI è un indice di movimento, non una percentuale di successo. Aggio e movimenti provengono dalle stesse quote: non sono conferme indipendenti né flussi di denaro.</small></div>`;
     }
     function contextDirection(direction) {
       const path=direction==='up'?'M12 21V3M4 11l8-8 8 8':direction==='down'?'M12 3v18M4 13l8 8 8-8':'M3 12h18M13 4l8 8-8 8';
@@ -1810,7 +1834,7 @@
         const age=(Date.now()-Date.parse(q?.provider_updated_at))/3600000;
         const source=`<small class="cx-quote-source">${q?`${escapeHtml(q.bookmaker)} · ${escapeHtml(formatTimestamp(q.provider_updated_at))}`:'Fonte o orario non disponibili'}${stale?' · rilevazione precedente, esclusa dai segnali recenti':Number.isFinite(age)&&age>1?' · quota da ricontrollare':''}</small>`;
         if(compact)return `<div class="cx-odd-cell cx-overview-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line cx-current"><span>${stale?'Ultima disponibile':'Attuale'}</span><b>${contextNumber(current)}</b></div>${source}${consensus}<div class="cx-overview-estimates"><span>Stat. <b>${contextPct(r?.statistical_pct)}</b></span><span>Book <b>${contextPct(r?.book_probability_pct)}</b></span></div></div>`;
-        return `<div class="cx-odd-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line"><span>${stale?'Ultima disponibile':'Attuale'}</span><b>${contextNumber(current)}</b></div>${net}${source}${consensus}</div>`;
+        return `<div class="cx-odd-cell"><b>${label}</b><div class="cx-odd-line"><span>Apertura*</span><b>${contextNumber(initial)}</b></div><div class="cx-odd-line"><span>${stale?'Ultima disponibile':'Attuale'}</span><b>${contextNumber(current)}</b></div>${net}${source}${consensus}${contextOciSummary(r)}</div>`;
       };
       const result=rows.filter(r=>r.market==='1x2_ft'&&Number.isFinite(r.book_probability_pct));
       const sorted=[...result].sort((a,b)=>b.book_probability_pct-a.book_probability_pct);
@@ -1977,7 +2001,7 @@
         }
         html+='</div>';
         const selectOptions=a.markets.filter(r=>!r.market.includes('_ht_over')||r.selection==='yes').map(r=>[`${r.market}::${r.selection}`,r.label]);
-        html+=`<section class="cx-scenario"><label>Valuta una giocata per questa partita<select onchange="researchSelectFixture(${escapeHtml(JSON.stringify(String(f.fixture_id)))},this.value)">${options(selectOptions,`${chosen.market}::${chosen.selection}`)}</select></label><div class="cx-scenario-title"><h4>${escapeHtml(chosen.label)}</h4><span>${contextPct(chosen.statistical_pct)} statistica · ${contextPct(chosen.book_probability_pct)} book</span></div>${chosen.market===main?.market&&chosen.selection===main?.selection?'<p class="cx-odds-note">Coincide con l’analisi Over 2,5 FT. Apri i dettagli per pro e contro.</p>':contextEvidence(chosen)}<details class="cx-detail"><summary>Movimenti della quota selezionata</summary>${contextMovement(chosen)}</details>${contextPrice(chosen)}</section>`;
+        html+=`<section class="cx-scenario"><label>Valuta una giocata per questa partita<select onchange="researchSelectFixture(${escapeHtml(JSON.stringify(String(f.fixture_id)))},this.value)">${options(selectOptions,`${chosen.market}::${chosen.selection}`)}</select></label><div class="cx-scenario-title"><h4>${escapeHtml(chosen.label)}</h4><span>${contextPct(chosen.statistical_pct)} statistica · ${contextPct(chosen.book_probability_pct)} book</span></div>${contextOciSummary(chosen)}${chosen.market===main?.market&&chosen.selection===main?.selection?'<p class="cx-odds-note">Coincide con l’analisi Over 2,5 FT. Apri i dettagli per pro e contro.</p>':contextEvidence(chosen)}<details class="cx-detail"><summary>Movimenti della quota selezionata</summary>${contextMovement(chosen)}</details>${contextPrice(chosen)}</section>`;
         if(a.favorite_context?.status==='signal')html+=`<aside class="cx-context"><strong>Attenzione al gol PT dello sfavorito</strong><p>${escapeHtml(a.favorite_context.reason)}</p><p>${a.favorite_context.drop_confirmed?'Drop della favorita confermato su più operatori.':'Drop della favorita non confermato.'} ${escapeHtml(a.favorite_context.note)}</p></aside>`;
         html+=`<details class="cx-detail"><summary>Quadro statistico · casa e trasferta</summary>${contextTeamTable(match)}${contextHistory(match)}</details>${contextJointMovements(match)}${contextBook(match)}${contextWeights(match)}<details class="cx-detail"><summary>Altre ipotesi, in ordine di riscontro</summary>${(a.ranked_hypotheses||[]).slice(1).map(id=>{const r=a.markets.find(x=>`${x.market}::${x.selection}`===id);return r?`<button type="button" class="cx-alternative" onclick="researchSelectFixture(${chooseArgs(r)})"><span>${escapeHtml(r.label)}</span><span>${contextPct(r.statistical_pct)} · ${escapeHtml(r.source)}</span></button>`:'';}).join('')}</details><footer class="cx-footer">Analisi ${escapeHtml(formatTimestamp(a.captured_at))} · ${escapeHtml(a.model_id)} · tutti i mercati conservati prima dell’inizio</footer></article>`;
       }
