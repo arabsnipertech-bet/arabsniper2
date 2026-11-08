@@ -1,6 +1,6 @@
 """Immutable per-scan evidence; historical merges run only in the nightly Auditor."""
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timezone
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -96,22 +96,76 @@ def merge_policy(target, incoming, kind):
         destination['snapshots'].sort(key=lambda s: stamp(s['observed_at']))
 
 
-def merge_forecast(ledger, collection, key, record):
+class ForecastHistory:
+    """Disposable compact lookup for recovery's descriptive update labels.
+
+    The durable forecast is still inserted unchanged by merge_forecast. Keeping
+    the preceding candidate on disk avoids parsing every earlier full payload
+    for every new observation. Unusual legacy metadata uses the original path.
+    """
+    def __init__(self, ledger):
+        self.ledger = ledger
+        self.unsupported = set()
+        ledger.db.execute('CREATE TABLE recovery_forecast_history ('
+            'position INTEGER PRIMARY KEY, record_key TEXT UNIQUE, fixture_id TEXT, '
+            'model_version TEXT, captured_at TEXT, candidate TEXT)')
+        ledger.db.execute('CREATE INDEX recovery_forecast_lookup ON '
+            'recovery_forecast_history(fixture_id,model_version,captured_at DESC,position ASC)')
+        for key, record in ledger.get('analysis_updates', {}).items():
+            self.add(key, record)
+
+    def add(self, key, record):
+        fid = (record.get('fixture') or {}).get('fixture_id')
+        model = record.get('model_version')
+        if fid is None or not isinstance(model, str):
+            return
+        observed = stamp(record.get('captured_at'))
+        if observed is None:
+            self.unsupported.add((str(fid), model))
+            return
+        candidate = (record.get('multimarket') or {}).get('best_candidate') or {}
+        self.ledger.db.execute('INSERT OR IGNORE INTO recovery_forecast_history '
+            '(record_key,fixture_id,model_version,captured_at,candidate) VALUES(?,?,?,?,?)',
+            (str(key), str(fid), model,
+             observed.astimezone(timezone.utc).isoformat(timespec='microseconds'),
+             json.dumps(candidate, ensure_ascii=False, separators=(',', ':'), allow_nan=False)))
+
+    def previous(self, record):
+        fid = (record.get('fixture') or {}).get('fixture_id')
+        model = record.get('model_version')
+        observed = stamp(record.get('captured_at'))
+        if (fid is None or not isinstance(model, str) or observed is None
+                or (str(fid), model) in self.unsupported):
+            return NotImplemented
+        row = self.ledger.db.execute('SELECT candidate FROM recovery_forecast_history '
+            'WHERE fixture_id=? AND model_version=? AND captured_at<? '
+            'ORDER BY captured_at DESC,position ASC LIMIT 1',
+            (str(fid), model, observed.astimezone(timezone.utc).isoformat(timespec='microseconds'))).fetchone()
+        return {'multimarket': {'best_candidate': json.loads(row[0])}} if row else None
+
+
+def merge_forecast(ledger, collection, key, record, *, history=None):
     if collection == 'analysis_updates' and key not in ledger.get(collection, {}):
         # This descriptive label depends on earlier scans; derive
         # it at ingestion without changing any frozen prediction.
-        previous = [r for c, _, r in ledger.records(
-            fixture_id=record.get('fixture', {}).get('fixture_id'))
-            if c == collection and r.get('model_version') == record.get('model_version')
-            and stamp(r.get('captured_at')) < stamp(record.get('captured_at'))]
-        old = max(previous, key=lambda r: stamp(r['captured_at']), default={})
+        old = history.previous(record) if history is not None else NotImplemented
+        if old is NotImplemented:
+            previous = [r for c, _, r in ledger.records(
+                fixture_id=record.get('fixture', {}).get('fixture_id'))
+                if c == collection and r.get('model_version') == record.get('model_version')
+                and stamp(r.get('captured_at')) < stamp(record.get('captured_at'))]
+            old = max(previous, key=lambda r: stamp(r['captured_at']), default=None)
+        has_previous = old is not None
+        old = old or {}
         first = (old.get('multimarket') or {}).get('best_candidate') or {}
         last = (record.get('multimarket') or {}).get('best_candidate') or {}
-        record['update_reason'] = ('prima_analisi' if not previous else
+        record['update_reason'] = ('prima_analisi' if not has_previous else
             'proposta_cambiata' if (first.get('market'), first.get('selection')) !=
             (last.get('market'), last.get('selection')) else 'aggiornamento_dati_e_quote')
     # First forecast is immutable; later observations have unique keys.
-    ledger.put(collection, key, record, overwrite=False)
+    inserted = ledger.put(collection, key, record, overwrite=False)
+    if inserted and history is not None and collection == 'analysis_updates':
+        history.add(key, record)
 
 
 def pending_journals(root, before=None):
