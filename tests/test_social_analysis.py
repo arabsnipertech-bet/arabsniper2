@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import datetime,timedelta
 from zoneinfo import ZoneInfo
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
-from social_analysis import select,caption
+from social_analysis import select,caption,model_probabilities,probability_lines
 from sports_daily_live import advance
 NOW=datetime(2026,11,8,12,30,tzinfo=ZoneInfo('Europe/Rome'))
 def match(i,country='Italy',league='Serie A',sample=8):
@@ -26,6 +26,12 @@ class AnalysisTest(unittest.TestCase):
     def test_unavailable_not_backfilled(self):
         p=dict(slot='12:30',picks=self.choose([match(1)]),analysis_only=True)
         self.assertIn('1 schede su 4',caption(p));self.assertLess(len(caption(p).encode('utf-16-le'))//2,1024)
+    def test_probabilities_are_existing_model_values(self):
+        a={'matrix':{'rows':[{'spec':{'kind':'result','period':'ft','side':'1'},'statistical_pct':52.3},{'spec':{'kind':'total','period':'ft','side':'over','line':2.5},'statistical_pct':61.2},{'spec':{'kind':'btts','period':'ft','side':'yes'},'statistical_pct':None}]}}
+        p=model_probabilities(a)
+        self.assertEqual(p,{'1':52.3,'over25':61.2})
+        self.assertIn('GG n.d.',probability_lines({'probabilities':p})[1])
+
     def test_sports_events_require_confirmation_and_correct_reversal(self):
         s={};o=dict(status='1H',home=0,away=0,minute=1)
         self.assertIsNone(advance(s,o,0));self.assertIsNotNone(advance(s,o,46))

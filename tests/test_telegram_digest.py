@@ -65,7 +65,7 @@ class TelegramTest(unittest.TestCase):
                             and str(utc.hour) in c.split()[1].split(","))
                 self.assertEqual(slot_for_schedule(now, "schedule", cron), slot)
                 self.assertEqual(slot_for_schedule(now+timedelta(minutes=15), "workflow_dispatch", "", slot), slot)
-        self.assertEqual(len(WINDOWS),8)
+        self.assertEqual(len(WINDOWS),9)
 
     def test_editorial_rotation_and_no_pick_messages(self):
         from datetime import date, timedelta
@@ -77,16 +77,14 @@ class TelegramTest(unittest.TestCase):
         self.assertIn("/prova",slot_message(dict(slot="22:00",picks=[])))
         self.assertIn("Nessuna nuova",slot_message(dict(slot="18:30",first="19:00",last="20:00",picks=[])))
 
-    def test_morning_results_reject_wrong_date_or_invalid_totals(self):
+    def test_morning_reads_gold_window(self):
+        from telegram_slots import EDITORIAL
         from telegram_digest import slot_message
-        post = dict(slot='10:45', day='2026-11-07', picks=[])
-        self.assertIn('in verifica', slot_message(post))
-        report = dict(date='2026-11-06', selections_total=dict(total=3, won=1, lost=1, pending=1))
-        self.assertIn('Vinte: 1', slot_message(dict(post, audit=report)))
-        self.assertIn('Perse: 1', slot_message(dict(post, audit=report)))
-        self.assertIn('in verifica', slot_message(dict(post, audit=dict(report, date='2026-11-05'))))
-        report['selections_total']['total'] = 99
-        self.assertIn('in verifica', slot_message(dict(post, audit=report)))
+        self.assertEqual(WINDOWS['10:45'],('10:45','12:30',4))
+        self.assertNotIn('10:45',EDITORIAL)
+        post=dict(slot='10:45',day='2026-11-08',picks=[],analysis_only=True)
+        self.assertIn('Taccuino',slot_message(post))
+        self.assertNotIn('Riscontri',slot_message(post))
 
     def test_external_backup_dispatch_is_strictly_gated(self):
         now=datetime.fromisoformat("2026-11-03T17:44:00+01:00")

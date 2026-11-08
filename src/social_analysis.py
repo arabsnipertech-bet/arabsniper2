@@ -14,6 +14,21 @@ def priority(f):
     pair=(f.get('country'),f.get('league'))
     return 0 if pair in MAJOR else 1 if pair in NEXT else 2
 
+def model_probabilities(assessment):
+    result={}
+    for row in (assessment.get('matrix') or {}).get('rows',[]):
+        spec=row.get('spec') or {};value=row.get('statistical_pct')
+        if not number(value) or value>100 or spec.get('period',row.get('period'))!='ft':continue
+        kind,side,line=spec.get('kind'),spec.get('side'),spec.get('line')
+        key=side if kind=='result' and side in ('1','x','2') else 'over25' if kind in ('total','asian_total') and side=='over' and line==2.5 else 'gg' if kind=='btts' and side=='yes' else None
+        if key and key not in result:result[key]=value
+    return result
+def probability_lines(p):
+    v=p.get('probabilities') or {}
+    def pct(key):return f"{v[key]:.1f}%".replace('.',',') if number(v.get(key)) and v[key]<=100 else 'n.d.'
+    return [f"Prob. modello FT: 1 {pct('1')} · X {pct('x')} · 2 {pct('2')}",
+            f"Prob. modello FT: Over 2,5 {pct('over25')} · GG {pct('gg')}"]
+
 def select(board,now,start,end,excluded=()):
     updated=moment(board.get('updated_at'))
     if board.get('date')!=now.astimezone(ROME).date().isoformat() or not updated or not timedelta(0)<=now-updated<=timedelta(minutes=90):return []
@@ -32,14 +47,14 @@ def select(board,now,start,end,excluded=()):
             ht=r.get(side+'_ht')
             detail[side]=dict(ft=r[side+'_ft'],pt=ht if number(ht) and ht<=r[side+'_ft'] and (p.get('for_ht',{}).get('sample') or 0)>=4 else None,
                 scored=p.get('for_ft',{}).get('mean'),conceded=p.get('against_ft',{}).get('mean'),sample=sample[side])
-        row=dict(id=fid,fixture_id=fid,match=f['match'],country=f['country'],league=f['league'],kickoff=f['kickoff'],captured_at=a['captured_at'],analysis=detail,league_priority=priority(f))
+        row=dict(id=fid,fixture_id=fid,match=f['match'],country=f['country'],league=f['league'],kickoff=f['kickoff'],captured_at=a['captured_at'],analysis=detail,probabilities=model_probabilities(a),league_priority=priority(f))
         if fid not in rows or at>moment(rows[fid]['captured_at']):rows[fid]=row
     return sorted(rows.values(),key=lambda p:(p['league_priority'],-min(x['sample'] for x in p['analysis'].values()),-moment(p['captured_at']).timestamp(),p['kickoff'],p['id']))[:4]
 def fmt(v):return f'{v:.2f}'.replace('.',',') if number(v) else 'n.d.'
 def caption(post):
     picks=post['picks'];lines=[f"📊 ArabSniper · Taccuino delle {post['slot']}"]
     if not picks:return lines[0]+'\nNessuna nuova scheda con dati sufficienti e aggiornati nella fascia prevista.'
-    lines+=['Partite e analisi nella grafica. Gol attesi: medie del modello, non risultati esatti. Medie segnati/subiti: dati storici del campione.']
+    lines+=['Dalla pagina Gold: partite, statistiche e probabilità del modello nella grafica. Gol attesi: medie del modello, non risultati esatti. Medie segnati/subiti: dati storici del campione.']
     if len(picks)<4:lines.append(f'Disponibili {len(picks)} schede su 4: nessuna integrazione con dati insufficienti.')
     live=post.get('sports_live')
     if live:lines.append('📡 LIVE SPORTIVO DEL GIORNO: '+live['match']+' · '+moment(live['kickoff']).astimezone(ROME).strftime('%H:%M')+'. Seguiremo gol, intervallo e finale.')
@@ -59,8 +74,8 @@ def render(post,path):
         paragraph(d,50,y+65,p['match'],36,970,58,'bold')
         pt=f"{fmt(h['pt'])} / {fmt(v['pt'])}";st=f"{fmt(h['ft']-h['pt'] if h['pt'] is not None else None)} / {fmt(v['ft']-v['pt'] if v['pt'] is not None else None)}"
         text=f"Gol attesi casa / ospite: {fmt(h['ft'])} / {fmt(v['ft'])}\nPT: {pt} · ST: {st}\nMedie segnati/subiti: casa {fmt(h['scored'])}/{fmt(h['conceded'])} · ospite {fmt(v['scored'])}/{fmt(v['conceded'])}\nCampioni FT: {h['sample']} / {v['sample']} gare · dati {moment(p['captured_at']).astimezone(ROME):%H:%M}"
-        for line_no,line in enumerate(text.split('\n')):
-            paragraph(d,50,y+132+line_no*32,line,24,970,31)
+        for line_no,line in enumerate(text.split('\n')+probability_lines(p)):
+            paragraph(d,50,y+125+line_no*29,line,22,970,28)
     if not post['picks']:paragraph(d,50,300,caption(post),42,960,700)
     paragraph(d,50,1460,'Gol attesi: stime, non certezze. PT/ST: primo/secondo tempo. Medie storiche FT su campioni disponibili; n.d. = dato insufficiente.',23,970,100)
     im.save(path,format='JPEG',quality=92)

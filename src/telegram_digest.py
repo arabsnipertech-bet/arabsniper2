@@ -387,7 +387,7 @@ def slot_message(post):
     return "\n".join(lines) + footer
 
 def send():
-    """Send the image and its caption as one verified Telegram message."""
+    """Send the current Gold analysis image and caption as one verified message."""
     token = os.environ["BOT_TOKEN"]
     if not token:
         raise SystemExit("Missing bot token")
