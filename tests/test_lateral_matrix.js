@@ -522,3 +522,11 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  const absent=structuredClone(m);absent.multimarket.status='no_prematch_snapshot';assert.equal(api.studyDefaultRow(absent,now),null);
  console.log('PASS Supported study default: prudent ranking, fresh quotes, no certification, immutable history');
 }
+// Overview exposes only 1X2 prices; other markets and research stay in the dialog.
+const compactRows=['1','x','2'].map((side,i)=>({period:'ft',spec:{kind:'result',period:'ft',side},odd:2+i,first_odd:2.2+i,delta_pct:-5,quote_status:'recent'}));
+const compact=api.compactQuotes(compactRows,{},null);
+assert.equal((compact.match(/<section>/g)||[]).length,3);assert(compact.includes('↓ -5,0%'));assert(!compact.includes('Poisson'));
+const compactCard=api.card({fixture:{fixture_id:'compact',match:'A - B'},multimarket:{matrix:{rows:compactRows}}},{});
+assert(compactCard.includes('Apri analisi'));assert(!compactCard.includes('mx-cockpit'));assert(!compactCard.includes('mx-study-base'));
+assert(!api.compactQuotes([{...compactRows[0],quote_status:'missing',last_odd:2}],{},null).includes('↓ -5,0%'));
+console.log('PASS compact overview: three 1X2 cells, detail entry and no stale movement');

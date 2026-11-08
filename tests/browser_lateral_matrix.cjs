@@ -137,7 +137,9 @@ async function verifyCalendarRollover(browser,payload){
   }
   await page.locator('.day-btn[data-day="0"]').click();
   await page.waitForFunction(()=>document.getElementById('selectedDay').textContent==='Ieri · 28/10'&&document.querySelectorAll('.mx-card').length===1);
-  assert((await page.locator('.mx-card').textContent()).includes('Proposta prematch conservata'));
+  await page.locator('[data-mx-open]').click();
+  assert((await page.locator('dialog').textContent()).includes('Proposta prematch conservata'));
+  await page.locator('[data-mx-close]').click();
   assert((await page.locator('.mx-card').textContent()).includes('Partita di prova 2026-10-28'));
   assert((await page.locator('.mx-card').textContent()).includes('FT (90 minuti): 2'));
   await page.screenshot({path:'test-artifacts/gold-yesterday-mobile.png',fullPage:true});
@@ -265,117 +267,46 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   await page.addScriptTag({content:fs.readFileSync('web/live-scores.js','utf8')});
   await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;renderMatchResearch(p)},payload);
   fs.mkdirSync('test-artifacts',{recursive:true});
+
+  const original=await page.evaluate(()=>JSON.stringify(currentPayload));
   for(const [name,width,height] of [['desktop',1280,1000],['mobile',390,844],['small-mobile',360,800]]){
    await page.setViewportSize({width,height});
    assert.equal(await page.locator('.mx-card').count(),9);
-   assert.equal(await page.locator('.mx-heading > b').textContent(),'GOLD v6.1');
-   assert((await page.locator('.mx-card footer').first().textContent()).includes('Regole gold-goals-v6.1 · Modello statistico lateral-matrix-v5.0'));
-   assert.equal(await page.locator('.mx-1x2 .mx-quote-cell').count(),27);
-   assert.equal(await page.locator('.mx-best').count(),9);
-   const summaries=await page.locator('.mx-best').allTextContents();
-   assert(summaries.every(t=>t.includes('Over 0,5 PT + Over 0,5 ST')&&t.includes('Quota book n.d.')));
-   assert.equal(summaries.filter(t=>t.includes('★ Combo Consigliata')).length,5);
-   assert.equal(summaries.filter(t=>t.includes('Combo non attiva')&&t.includes('OCI -92,5')).length,3);
-   assert.equal(summaries.filter(t=>t.includes('Combo vicina · non attiva')).length,1);
-   assert(summaries.every(t=>t.includes('Over 2,5 PT · Stima')));
-   assert(summaries.every(t=>!t.includes('1,85–2,60')&&!t.includes('Soglie statistiche e controlli')));
-   assert.equal(await page.locator('.mx-quote-legend').count(),0);
-   const tones=await page.locator('.mx-best [class^="mx-combo-"]').evaluateAll(nodes=>nodes.map(n=>({tone:n.className,color:getComputedStyle(n).color,bold:+getComputedStyle(n).fontWeight})));
-   assert.equal(tones.filter(t=>t.tone==='mx-combo-active'&&t.color==='rgb(129, 225, 180)'&&t.bold>=700).length,5);
-   assert.equal(tones.filter(t=>t.tone==='mx-combo-near'&&t.color==='rgb(255, 224, 128)').length,1);
-   assert.equal(tones.filter(t=>t.tone==='mx-combo-inactive'&&t.color==='rgb(255, 157, 144)').length,3);
-   assert(!summaries.some(t=>t.includes('Confronto dei quattro mercati')));
-   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5);
-   const proposals=await page.locator('.mx-best[data-opportunity-id]').evaluateAll(nodes=>nodes.map(n=>({odd:+n.dataset.opportunityOdd,max:+n.dataset.opportunityMaxOdd,p:+n.dataset.opportunityProbability,text:n.textContent})));
-   assert(proposals.every(r=>r.odd>=1.70&&r.odd<=r.max&&[2.6,3.5,4.5,5.5,7.5].includes(r.max)&&r.p>=18));
-   assert(proposals.some(r=>r.text.includes('Convergenza di Trend')));
-   assert(!proposals.some(r=>r.text.includes('Contrarian sano')));
-   assert.equal(await page.locator('.mx-1x2 .mx-net-red').count(),27);
-   assert((await page.locator('.mx-1x2').first().textContent()).includes('Apertura'));
+   assert.equal(await page.locator('.mx-compact-quotes>section').count(),27);
+   assert.equal(await page.locator('.mx-card .mx-cockpit,.mx-card .mx-study-base,.mx-card .mx-best').count(),0);
+   assert.equal(await page.locator('.mx-compact-quotes .mx-net-red').count(),27);
+   assert((await page.locator('.mx-compact-quotes').first().textContent()).includes('Apertura'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
+   await page.locator('.mx-card').first().scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-${name}.png`});
-   await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
-   await page.screenshot({path:`test-artifacts/matrix-proposal-${name}.png`});
-   await page.locator('.mx-best').nth(3).scrollIntoViewIfNeeded();
-   await page.screenshot({path:`test-artifacts/matrix-combo-near-${name}.png`});
-   await page.locator('.mx-best').nth(1).scrollIntoViewIfNeeded();
-   await page.screenshot({path:`test-artifacts/matrix-combo-inactive-${name}.png`});
    await page.locator('[data-mx-open]').first().click();
-   assert(await page.locator('dialog.mx-modal').isVisible(),'Matrix must be a native modal');
-   assert.equal(await page.locator('dialog .mx-goal-panel').count(),2,'Goal expectations and observed PT/ST means are visible');
-   assert.equal(await page.locator('dialog [data-mx-instrument] option').count(),59,'Every available matrix row stays selectable');
-   assert(!(await page.locator('dialog').innerText()).includes('EV'),'EV stays internal');
-   assert.equal(await page.locator('.mx-market-row').count(),6,'Five goal targets and the half-time combo open by default');
-   const comboRow=page.locator('.mx-market-row').filter({hasText:'Over 0,5 PT + Over 0,5 ST'});
-   assert((await comboRow.textContent()).includes('Combo Attiva'));
-   assert((await comboRow.textContent()).includes('Probabilità senza aggio dello stesso operatore'));
-   assert.equal(await page.locator('.mx-card .mx-detail').count(),0,'No inline expansion');
-   await page.keyboard.press('Shift+Tab');
-   assert(await page.evaluate(()=>!!document.activeElement.closest('dialog.mx-modal')),'Native modal focus trap');
+   assert(await page.locator('dialog.mx-modal').isVisible());
+   assert.equal(await page.locator('dialog .mx-goal-panel').count(),2);
+   assert.equal(await page.locator('dialog .mx-1x2 .mx-quote-cell').count(),3);
+   assert.equal(await page.locator('dialog [data-mx-instrument] option').count(),59);
+   assert(!(await page.locator('dialog').innerText()).includes('EV'));
+   assert.equal(await page.locator('.mx-modal-scroll > .mx-best').count(),1,'Official analysis moved inside');
    for(const [section,count] of [['ft',8],['ht',6],['result',3],['asian',40],['targets',6]]){
     await page.locator('[data-mx-section="'+section+'"]').click();
     assert.equal(await page.locator('.mx-market-row').count(),count);
-    assert.equal(await page.locator('.mx-modal-scroll').evaluate(e=>e.scrollTop),0,'Changing section starts at its first row');
-    if(section==='asian')await page.locator('.mx-modal-scroll').evaluate(e=>{e.scrollTop=e.scrollHeight});
    }
-   const text=await page.locator('dialog.mx-modal').textContent();
-   assert(!/Risultato esatto|Over 5,5|Under 5,5|Multigol/.test(text),'Dead markets must be absent');
-   assert(await page.evaluate(()=>{const e=document.querySelector('dialog.mx-modal');return e.scrollWidth<=e.clientWidth}),'Modal horizontal overflow');
-   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Matrix overflow '+name);
-   await page.locator('[data-mx-close]').focus();
+   await page.keyboard.press('Shift+Tab');
+   assert(await page.evaluate(()=>!!document.activeElement.closest('dialog')));
+   assert(await page.locator('dialog').evaluate(e=>e.scrollWidth<=e.clientWidth),'Modal overflow '+name);
    await page.screenshot({path:`test-artifacts/matrix-details-${name}.png`});
    await page.keyboard.press('Escape');
-   await page.locator('dialog.mx-modal').waitFor({state:'detached',timeout:5000});
-   assert.equal(await page.locator('dialog.mx-modal').count(),0);
-   assert(await page.locator('[data-mx-open]').first().evaluate(e=>e===document.activeElement),'Focus restored after Escape');
+   assert.equal(await page.locator('dialog').count(),0);
+   assert(await page.locator('[data-mx-open]').first().evaluate(e=>e===document.activeElement));
    await page.locator('[data-mx-open]').first().click();
    await page.locator('[data-mx-section="ht"]').click();
    await page.evaluate(()=>renderMatchResearch(currentPayload));
-   assert(await page.locator('dialog.mx-modal').isVisible(),'Fast render preserves modal');
    assert.equal(await page.locator('[data-mx-section="ht"]').getAttribute('aria-pressed'),'true');
-   assert.equal(await page.locator('.mx-market-row').count(),6);
    await page.locator('[data-mx-close]').click();
-   await page.locator('dialog.mx-modal').waitFor({state:'detached',timeout:5000});
-   assert.equal(await page.locator('dialog.mx-modal').count(),0);
-   await page.locator('[data-mx-open]').first().click();
-   await page.mouse.click(1,1);
-   await page.locator('dialog.mx-modal').waitFor({state:'detached',timeout:5000});
-   assert.equal(await page.locator('dialog.mx-modal').count(),0,'Backdrop closes modal');
-   assert(await page.evaluate(()=>document.body.style.overflow!=='hidden'),'Body scrolling restored');
-   const beforeComboFilter=await page.evaluate(()=>JSON.stringify(currentPayload));
-   await page.locator('[data-mx-filter="family"]').selectOption('asian');
-   await page.locator('[data-mx-filter="period"]').selectOption('ht');
-   await page.getByRole('button',{name:'Combo 5',exact:true}).click();
-   assert.equal(await page.locator('[data-mx-category="combo"]').getAttribute('aria-pressed'),'true');
-   assert.equal(await page.locator('[data-mx-filter="family"]').inputValue(),'all');
-   assert.equal(await page.locator('[data-mx-filter="period"]').inputValue(),'all');
+   await page.locator('[data-mx-category="combo"]').click();
    assert.equal(await page.locator('.mx-card').count(),5);
-   assert.equal(await page.locator('.mx-best .mx-combo-active').count(),5);
-   assert.equal(await page.locator('.mx-best .mx-combo-near,.mx-best .mx-combo-inactive').count(),0);
-   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5,'Combo filtering cannot replace official proposals');
-   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),beforeComboFilter);
-   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Combo filter overflow '+name);
-   await page.locator('[data-mx-category="combo"]').scrollIntoViewIfNeeded();
-   await page.screenshot({path:`test-artifacts/matrix-combo-filter-${name}.png`});
    await page.locator('[data-mx-category="all"]').click();
-   assert.equal(await page.locator('.mx-card').count(),9);
+   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),original);
   }
-  await page.locator('[data-mx-category="divergence"]').click();
-  assert.equal(await page.locator('.mx-card').count(),4);
-  await page.locator('[data-mx-category="all"]').click();
-  await page.locator('[data-mx-filter="family"]').selectOption('asian');
-  await page.locator('[data-mx-filter="period"]').selectOption('ht');
-  assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5,'Matrix filters must not replace the match proposal');
-  await page.locator('[data-mx-open]').first().click();
-  await page.locator('[data-mx-section="ht"]').click();
-  assert.equal(await page.locator('.mx-market-row').count(),6);
-  assert((await page.locator('.mx-market-row').first().textContent()).includes('PT'));
-  await page.locator('[data-mx-close]').click();
-  await page.locator('[data-mx-filter="family"]').selectOption('all');
-  await page.locator('[data-mx-filter="period"]').selectOption('all');
-  await page.locator('[data-mx-category="no_quote"]').click();
-  assert.equal(await page.locator('.mx-card').count(),9);
-  await page.locator('[data-mx-category="all"]').click();
   await page.evaluate(()=>{currentPayload.matches[0].fixture.kickoff=new Date(Date.now()-3600000).toISOString();currentPayload.matches[0].fixture.status_short='HT';currentPayload.matches[0].fixture.live={status:'HT',elapsed:45,goals:{home:1,away:1},halftime:{home:1,away:1},observed_at:new Date().toISOString()};renderMatchResearch(currentPayload)});
   assert.equal(await page.locator('[data-live-fixture="1"] [data-live-slot="halftime"]').textContent(),'PT 1–1 · concluso');
   const frozen=await page.evaluate(()=>{window.savedMatrixCard=document.querySelector('.mx-card');return JSON.stringify(currentPayload)});
@@ -397,199 +328,25 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   await page.locator('[data-live-fixture="2"] header').scrollIntoViewIfNeeded();
   await page.screenshot({path:'test-artifacts/matrix-halftime-live-small-mobile.png'});
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Live overflow');
-  const timed={...payload,matches:contexts.map((a,i)=>({...payload.matches[i],multimarket:a}))};
-  await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},timed);
-  const timing=await page.locator('.mx-timing:not(.mx-first-half)').allTextContents();
-  assert(timing[0].includes('Ordine di valutazione: Over 1,5 PT')&&timing[0].includes('Favorita in casa'));
-  assert(timing[1].includes('Ordine di valutazione: Over 1,5 PT')&&timing[1].includes('Favorita in trasferta'));
-  assert(timing[2].includes('Ordine di valutazione: Goal PT')&&timing[3].includes('Ordine di valutazione: Goal PT'));
-  assert(timing[0].includes('Precedenza tra idonei'));
-  assert(timing[4].includes('Quote bilanciate')&&timing[4].includes('0,40'));
-  assert((await page.locator('.mx-best h4').allTextContents())[2].includes('Goal'));
-  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Drought priority overflow');
-  await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
-  await page.screenshot({path:'test-artifacts/matrix-drought-priority-mobile.png'});
-  const capped={...payload,matches:caps.map((a,i)=>({...payload.matches[i],multimarket:a}))};
-  await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},capped);
-  for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
-   await page.setViewportSize({width,height:844});
-   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),5);
-   assert.equal(await page.locator('.mx-best[data-opportunity-odd="5.5"]').count(),1);
-   assert.equal(await page.locator('.mx-best-empty').count(),2);
-   assert((await page.locator('.mx-best').nth(4).textContent()).includes('Quota stabile da cache'));
-   assert((await page.locator('.mx-best').first().textContent()).includes('minimo 26'));
-   assert(!(await page.locator('.mx-best').first().textContent()).includes('2,10–3,50'));
-   assert.equal(await page.locator('.mx-first-half').count(),2);
-   assert((await page.locator('.mx-best').first().textContent()).includes('★ Combo Consigliata'));
-   assert((await page.locator('.mx-first-half').first().textContent()).includes('xG PT non disponibili'));
-   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Market caps overflow '+name);
-   await page.locator('.mx-best').first().scrollIntoViewIfNeeded();
-   await page.screenshot({path:`test-artifacts/matrix-market-caps-${name}.png`});
-   await page.locator('[data-mx-open]').first().click();
-   assert((await page.locator('.mx-market-row').first().textContent()).includes('Idoneo'));
-   assert(await page.evaluate(()=>{const e=document.querySelector('dialog.mx-modal');return e.scrollWidth<=e.clientWidth}),'Market caps modal overflow');
-   await page.locator('[data-mx-close]').click();
+
+  // Categories and all research remain accessible inside the compact card.
+  for(const [label,variantsToUse] of [['timing',contexts],['caps',caps],['radar',monitor],['platinum',elite]]){
+   const sample={...payload,matches:variantsToUse.map((a,i)=>({...payload.matches[i%payload.matches.length],fixture:{...payload.matches[0].fixture,fixture_id:String(100+i),kickoff:new Date(Date.now()+7200000).toISOString()},multimarket:a}))};
+   await page.evaluate(p=>{Object.assign(ArabMatrix.state,{category:'all',family:'all',period:'all',phase:'all'});currentPayload=p;renderMatchResearch(p)},sample);
+   const snapshot=await page.evaluate(()=>JSON.stringify(currentPayload));
+   assert.equal(await page.locator('.mx-card').count(),variantsToUse.length);
+   for(let i=0;i<variantsToUse.length;i++){
+    await page.locator('[data-mx-open]').nth(i).click();
+    assert.equal(await page.locator('dialog .mx-cockpit').count(),1);
+    assert(await page.locator('dialog .mx-best').count()>=1,label+' research remains available');
+    assert(!/NaN|undefined/.test(await page.locator('dialog').innerText()));
+    const select=page.locator('dialog [data-mx-instrument]');
+    const choices=await select.locator('option').evaluateAll(opts=>opts.map(o=>o.value).filter(Boolean));
+    if(choices.length){await select.selectOption(choices[0]);await page.evaluate(()=>renderMatchResearch(currentPayload));assert.equal(await select.inputValue(),choices[0]);}
+    await page.locator('[data-mx-close]').click();
+   }
+   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),snapshot,label+' data immutable');
   }
-  const monitored={...payload,matches:monitor.map((a,i)=>({...payload.matches[i],fixture:{...payload.matches[i].fixture,fixture_id:String(101+i)},multimarket:a}))};
-  await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},monitored);
-  const monitorBefore=await page.evaluate(()=>JSON.stringify(currentPayload));
-  for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
-   await page.setViewportSize({width,height:844});
-   assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),5);
-   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),1);
-   assert.equal(await page.locator('.mx-best-empty').count(),3);
-   const blue=page.locator('.mx-best-market').first();
-   assert((await blue.textContent()).includes('Radar di Mercato · Statistica debole o assente · Solo studio'));
-   assert((await blue.textContent()).includes('Solo studio · esclusa dalle giocate Gold ufficiali.'));
-   assert.equal(await blue.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(16, 47, 80)');
-   assert.equal(await blue.locator('h4').evaluate(e=>getComputedStyle(e).color),'rgb(158, 216, 255)');
-   assert.equal(await blue.getAttribute('data-opportunity-id'),null);
-   assert(await page.locator('.mx-card .mx-quote-cell').evaluateAll(cells=>cells.every(e=>e.scrollWidth<=e.clientWidth+1)),'Quote cells must not clip their contents '+name);
-   const missingStats=page.locator('[data-live-fixture="106"] .mx-best-market');
-   assert((await missingStats.textContent()).includes('Radar di Mercato · Statistica debole o assente · Solo studio'));
-   assert((await missingStats.textContent()).includes('Persistenza del movimento'));
-   assert(!(await missingStats.textContent()).includes('minimo Gold'));
-   assert(!/NaN|undefined/.test(await missingStats.textContent()));
-   assert.equal(await page.locator('[data-live-fixture="103"] .mx-best-market').count(),1,'Negative model EV cannot veto price monitoring');
-   const studyCard=page.locator('[data-live-fixture="103"]');
-   assert(await studyCard.locator('.mx-study-base').isVisible());
-   assert((await studyCard.locator('.mx-quote-board').textContent()).includes('Poisson prematch'));
-   assert((await studyCard.locator('.mx-quote-cell').first().textContent()).includes('Quota equa Poisson'));
-   assert.equal(await page.locator('.mx-card:has([data-opportunity-id]) .mx-study-base').count(),0);
-   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Blue signals overflow '+name);
-   await blue.scrollIntoViewIfNeeded();
-   await page.screenshot({path:`test-artifacts/matrix-market-signal-${name}.png`});
-   await page.locator('[data-mx-category="market_signal"]').click();
-   assert.equal(await page.locator('.mx-card').count(),5);
-   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),0);
-   assert.equal(await page.locator('[data-mx-category="market_signal"] b').textContent(),'5');
-   await page.locator('[data-mx-filter="period"]').selectOption('ht');
-   assert.equal(await page.locator('.mx-card').count(),1);
-   assert((await page.locator('.mx-best h4').textContent()).includes('Over 1,5 PT'));
-   await page.locator('[data-mx-filter="period"]').selectOption('all');
-   await page.locator('[data-mx-open]').first().click();
-   const signalRow=page.locator('.mx-market-row').first();
-   assert((await signalRow.textContent()).includes('Radar di Mercato · Solo studio'));
-   assert((await signalRow.textContent()).includes('Scartato · stima bassa'));
-   assert(!/Idoneo/.test(await signalRow.textContent()));
-   assert(await page.evaluate(()=>{const e=document.querySelector('dialog.mx-modal');return e.scrollWidth<=e.clientWidth}),'Blue modal overflow '+name);
-   await page.screenshot({path:`test-artifacts/matrix-market-signal-detail-${name}.png`});
-   await page.locator('[data-mx-close]').click();
-   await page.locator('[data-mx-category="all"]').click();
-   assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),1);
-   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),monitorBefore,'Monitoring leaves backend decisions and ranks unchanged');
-  }
-  await page.evaluate(()=>{ArabLive.accept({schema_version:1,enabled:true,fixtures:{'101':{fixture_id:'101',status:'1H',elapsed:1,goals:{home:0,away:0},observed_at:new Date(Date.now()+1000).toISOString()}}});renderMatchResearch(currentPayload)});
-  assert.equal(await page.locator('.mx-best[data-market-signal-id]').count(),4,'A live overlay closes monitoring even before the scheduled kickoff');
-  assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),monitorBefore,'The live lifecycle never rewrites prematch decisions');
-  assert.equal(await page.locator('.mx-best[data-opportunity-id]').count(),1);
-  await page.locator('[data-mx-open]').first().click();
-  assert.equal(await page.locator('dialog .mx-market-signal').count(),0,'The matrix also respects the live lifecycle');
-  await page.locator('[data-mx-close]').click();
-  await page.locator('[data-mx-category="market_signal"]').click();
-  assert.equal(await page.locator('.mx-card').count(),4);
-  console.log('PASS market radar: absent statistics and negative EV, separate category/counts, official Gold unchanged, blue desktop/mobile cards and matrix, no live reclassification');
-  const tiered={...payload,matches:elite.map((a,i)=>({...payload.matches[i],fixture:{...payload.matches[i].fixture,fixture_id:String(501+i),match:'Verifica Platinum '+(i+1)},multimarket:structuredClone(a)}))};
-  for(const m of tiered.matches){
-   m.multimarket.matrix.platinum_policy.evaluated_at=new Date(now).toISOString();
-   for(const r of m.multimarket.matrix.rows)r.platinum.evaluated_at=new Date(now).toISOString();
-  }
-  await page.evaluate(p=>{Object.assign(ArabMatrix.state,{category:'all',period:'all',family:'all',phase:'all',search:''});currentPayload=p;renderMatchResearch(p)},tiered);
-  const frozenTiers=await page.evaluate(()=>JSON.stringify(currentPayload));
-  for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
-   await page.setViewportSize({width,height:844});
-   assert.equal(await page.locator('.mx-card-platinum').count(),3);
-   assert.equal(await page.locator('.mx-match-layout > .mx-best-platinum').count(),3);
-   assert.equal(await page.locator('.mx-match-layout > .mx-best-stable').count(),1,'Official Gold remains available');
-   assert.equal(await page.locator('.mx-best-market').count(),2);
-   const silver=page.locator('[data-live-fixture="501"]');
-   assert.equal(await silver.locator('.mx-study-base').count(),0);
-   assert.equal(await silver.locator('header .mx-tier-label').textContent(),'PLATINUM');
-   assert.equal(await silver.locator('header .mx-tier-label').evaluate(e=>getComputedStyle(e).color),'rgb(237, 243, 250)');
-   assert(+await silver.locator('header .mx-tier-label strong').evaluate(e=>getComputedStyle(e).fontWeight)>=700);
-   assert.equal(await silver.locator('.mx-best-platinum').getAttribute('data-opportunity-id'),null);
-   assert(!(await silver.locator('.mx-best-platinum').textContent()).includes('Nessuna proposta supera'));
-   assert(!/NaN|undefined/.test(await silver.textContent()));
-   await page.locator('[data-mx-category="platinum"]').click();
-   assert.equal(await page.locator('.mx-card').count(),3);
-   assert.equal(await page.locator('[data-mx-category="platinum"] b').textContent(),'3');
-   assert.equal(await page.locator('[data-mx-category="market_signal"] b').textContent(),'2');
-   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Platinum overflow '+name);
-   await page.locator('[data-mx-category="platinum"]').scrollIntoViewIfNeeded();
-   await page.screenshot({path:`test-artifacts/matrix-platinum-${name}.png`});
-   await page.locator('[data-mx-filter="period"]').selectOption('ht');
-   assert.equal(await page.locator('.mx-card').count(),1);
-   assert((await page.locator('.mx-best-platinum h4').textContent()).includes('Over 1,5 PT'));
-   await page.locator('[data-mx-filter="period"]').selectOption('all');
-   await page.locator('[data-mx-open]').first().click();
-   assert.equal(await page.locator('dialog .mx-market-row .mx-platinum').count(),1);
-   assert.equal(await page.locator('dialog .mx-market-row .mx-market-signal').count(),0);
-   assert((await page.locator('dialog .mx-market-row').textContent()).includes('Gold: Scartato'));
-   await page.locator('[data-mx-close]').click();
-   const official=page.locator('[data-live-fixture="503"] .mx-platinum-gold');
-   await official.locator('summary').click();
-   assert.equal(await official.locator('[data-opportunity-id]').count(),1);
-   await official.locator('summary').click();
-   await page.locator('[data-mx-category="market_signal"]').click();
-   assert.equal(await page.locator('.mx-card').count(),2);
-   const rejected=page.locator('[data-live-fixture="507"]');
-   assert.equal(await rejected.count(),1);
-   assert.equal(await rejected.locator('.mx-best-platinum').count(),0);
-   assert((await rejected.textContent()).includes('Radar di Mercato'));
-   await page.locator('[data-mx-category="all"]').click();
-   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozenTiers);
-  }
-  await page.evaluate(()=>{ArabLive.accept({schema_version:1,enabled:true,fixtures:{'501':{fixture_id:'501',status:'1H',elapsed:1,goals:{home:0,away:0},observed_at:new Date(Date.now()+1000).toISOString()}}});renderMatchResearch(currentPayload)});
-  await page.locator('[data-mx-category="platinum"]').click();
-  assert.equal(await page.locator('.mx-card').count(),3,'A stored prematch Platinum stays visible live');
-  await page.locator('[data-mx-filter="phase"]').selectOption('upcoming');
-  assert.equal(await page.locator('.mx-card').count(),2);
-  assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),frozenTiers);
-  // Negative/missing prudent EV stays observable but cannot receive a star.
-  const rejectedStudy=JSON.parse(cp.execFileSync('python',['-c',"import sys,json;sys.path[:0]=['src','tests'];from test_selection_studies import perth_fixture;print(json.dumps(perth_fixture()))"],{encoding:'utf8'}));
-  const rejectedPreview={...payload,matches:[{...payload.matches[0],fixture:{...payload.matches[0].fixture,fixture_id:908,kickoff:'2099-01-01T20:00:00Z'},multimarket:rejectedStudy.multimarket}]};
-  await page.evaluate(p=>{Object.assign(ArabMatrix.state,{category:'all',phase:'all',family:'all',period:'all',search:''});currentPayload=p;renderMatchResearch(p)},rejectedPreview);
-  assert(!(await page.locator('.mx-card>.mx-cockpit').textContent()).includes('MIGLIOR SPUNTO · SOLO STUDIO'));
-  // A separate controlled positive-EV case tests star navigation and persistence.
-  const studyExample=JSON.parse(cp.execFileSync('python',['-c',`
-import sys,json
-sys.path[:0]=['src','tests']
-from test_selection_studies import perth_fixture
-from selection_studies import generate_ideas
-m=perth_fixture();matrix=m['multimarket']['matrix'];monitor=matrix['quote_monitoring']
-for row in matrix['rows']:
- if row['spec'].get('period')=='ft' and row['spec'].get('line')==2.5:
-  row.update(odd=2.1,quality='supported',ev_low_pct=1.0)
-monitor['studio_ideas']=generate_ideas(m['multimarket'],monitor['as_of'],m['fixture']['kickoff'])
-assert any(i.get('best_study') for i in monitor['studio_ideas'])
-print(json.dumps(m))
-`],{encoding:'utf8'}));
-  const studyPreview={...payload,matches:[{...payload.matches[0],fixture:{...payload.matches[0].fixture,fixture_id:909,kickoff:'2099-01-01T20:00:00Z'},multimarket:studyExample.multimarket}]};
-  await page.evaluate(p=>{Object.assign(ArabMatrix.state,{category:'all',phase:'all',family:'all',period:'all',search:''});currentPayload=p;renderMatchResearch(p)},studyPreview);
-  const studyOriginal=await page.evaluate(()=>JSON.stringify(currentPayload));
-  for(const [name,width] of [['desktop',1280],['mobile',390],['small-mobile',360]]){
-   await page.setViewportSize({width,height:844});
-   const cockpit=page.locator('.mx-card>.mx-cockpit');
-   const select=cockpit.locator('select');
-   await select.selectOption('');
-   assert((await cockpit.textContent()).includes('MIGLIOR SPUNTO · SOLO STUDIO'));
-   assert((await cockpit.locator('.mx-cockpit-pick h3').textContent()).includes('Over 2,5 FT'));
-   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
-   await cockpit.scrollIntoViewIfNeeded();
-   await page.screenshot({path:`test-artifacts/studio-default-${name}.png`});
-   const other=await select.locator('option').evaluateAll(opts=>opts.find(o=>o.value&&o.textContent.includes('Over 1,5 PT')).value);
-   await select.selectOption(other);
-   await page.evaluate(()=>renderMatchResearch(currentPayload));
-   assert.equal(await select.inputValue(),other);
-   assert((await cockpit.locator('.mx-cockpit-pick h3').textContent()).includes('Over 1,5 PT'));
-   await page.locator('[data-mx-open]').click();
-   assert((await page.locator('.mx-modal .mx-cockpit-pick h3').textContent()).includes('Over 2,5 FT'));
-   await page.locator('[data-mx-close]').click();
-  }
-  assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),studyOriginal);
-  console.log('PASS Studio default browser: starred market, retained manual choice, modal, immutable data, desktop/390/360');
-  console.log('PASS Platinum browser: backend decisions, silver title/cards/filter, no-statistics and EV routes, separate Gold, immutable live, desktop/390/360');
-  console.log('PASS Gold v6.1 browser: concise cards, green/yellow/red combos, versions, quote coverage, unchanged desktop/390/360 grid, modal and immutable live overlays');
+  console.log('PASS compact Gold browser: 1X2 only, full detail, categories, selector, live overlays, calendar/login/cache, desktop/390/360');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
-

@@ -31,6 +31,12 @@ class Results(unittest.TestCase):
   self.assertEqual(after['date'],'2026-10-23')
   self.assertFalse(after['available'])
   self.assertEqual(after['examples'],[])
+ def test_latest_verified_has_its_own_date(self):
+  p=build({'2026-10-22':{'markets':[row(1,True),row(2,False)]}},datetime(2026,10,24,8,tzinfo=timezone.utc))
+  self.assertFalse(p['available'])
+  self.assertEqual(p['all_results'],[])
+  self.assertEqual(p['latest_verified']['date'],'2026-10-22')
+  self.assertEqual(p['latest_verified']['daily']['settled'],2)
  def test_rome_date(self):
   r=row(1,True);r['fixture']['kickoff']='2026-10-21T23:00:00Z';r['captured_at']='2026-10-21T20:00:00Z'
   self.assertEqual(build({'2026-10-22':{'markets':[r]}},NOW)['daily']['wins'],1)

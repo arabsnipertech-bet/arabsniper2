@@ -12,13 +12,19 @@
    const response=await fetch(endpoint+'?v='+Date.now(),{cache:'no-store',signal:controller.signal});
    if(!response.ok)throw Error('feed');
    const p=await response.json();
-   if(!p.available||!Array.isArray(p.all_results)||!p.daily?.settled){panel.innerHTML=p.model_id==='lateral-matrix-v5.0'?'<div class="empty">Il nuovo modello V5 è in verifica prospettica. Per ieri non sono ancora disponibili selezioni concluse: i risultati del modello precedente restano separati.</div>':'<div class="empty">I risultati di ieri sono in verifica. Pubblicheremo gli esiti quando disponibili.</div>';return;}
    const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
    const expected=new Date(today+'T12:00:00Z');expected.setUTCDate(expected.getUTCDate()-1);
-   if(p.date!==expected.toISOString().slice(0,10)){panel.innerHTML='<div class="empty">I risultati di ieri sono in aggiornamento.</div>';return;}
-   const d=p.daily;
-   const examples=(p.examples||[]).filter(r=>r.outcome==='won'&&String(r.market).startsWith('over')&&typeof r.odd==='number'&&Number.isFinite(r.odd)&&r.odd>1).sort((a,b)=>b.odd-a.odd).slice(0,10);
-   panel.innerHTML=`<p class="note">${p.model_id==='lateral-matrix-v5.0'?'Risultati del nuovo modello V5':'Risultati del modello precedente · non validano V5'}</p><p class="note">${esc(date(p.date))} · Quote registrate prima del calcio d’inizio</p><p>Selezione dei soli pronostici vincenti: questo estratto non rappresenta il rendimento complessivo. Tutti gli esiti, comprese le perdite, sono consultabili qui sotto.</p>${examples.length?`<div class="results-grid">${cards(examples)}</div>`:'<div class="empty">Nessun Over vinto con quota prematch verificata disponibile per questa giornata.</div>'}<p class="note">Fino a 10 Over vinti, ordinati per quota prematch decrescente. I risultati passati non garantiscono quelli futuri.</p><details><summary>Tutti gli esiti del giorno: ${d.wins} vinti, ${d.losses} persi, ${d.pending} in attesa</summary><p class="note">${esc(p.cohort)}</p><div class="results-grid">${cards(p.all_results.filter(r=>r.outcome!=='pending'))}</div></details>`;
+   const yesterday=expected.toISOString().slice(0,10);
+   const eligible=v=>v&&/^\d{4}-\d{2}-\d{2}$/.test(v.date)&&v.date<=yesterday&&Array.isArray(v.all_results)&&v.all_results.some(r=>['won','lost'].includes(r.outcome));
+   const current=eligible(p)&&p.available&&p.date===yesterday;
+   const report=current?p:eligible(p.latest_verified)?p.latest_verified:eligible(p)?p:null;
+   const h=p.history;
+   const history=h&&h.settled>0?`<details><summary>Riepilogo storico verificato · ${esc(h.settled)} esiti conclusi</summary><p>${esc(date(h.from_date))} – ${esc(date(h.to_date))}: ${esc(h.wins)} analisi centrate, ${esc(h.losses)} non centrate, ${esc(h.pending)} in attesa.</p><p class="note">${esc(p.cohort)} Modello: ${esc(p.model_id)}. I risultati di versioni diverse restano separati.</p></details>`:'';
+   const notice=current?'':`<p class="note">Gli esiti del ${esc(date(yesterday))} sono in aggiornamento. ${report?'Di seguito l’ultima giornata verificata disponibile.':history?'È disponibile il riepilogo storico verificato qui sotto.':''}</p>`;
+   if(!report){panel.innerHTML=notice+history+(!history?'<p>Non sono ancora disponibili esiti verificati da mostrare.</p>':'');return;}
+   const settled=report.all_results.filter(r=>['won','lost'].includes(r.outcome));
+   const wins=settled.filter(r=>r.outcome==='won').length,losses=settled.length-wins;
+   panel.innerHTML=notice+`<p class="note">${esc(date(report.date))} · Verifica delle analisi prematch</p><p>${wins} esiti centrati · ${losses} non centrati. Le quote sono quelle registrate prima della partita.</p><div class="results-grid">${cards(settled.slice(0,10))}</div>${settled.length>10?`<details><summary>Altri ${settled.length-10} esiti della giornata</summary><div class="results-grid">${cards(settled.slice(10))}</div></details>`:''}<p class="note">Esiti ordinati per partita, senza ricostruire le analisi dopo il risultato. I risultati passati non garantiscono quelli futuri.</p>`+history;
   }catch(_){panel.innerHTML='<div class="empty">Risultati temporaneamente non disponibili.</div>';}finally{clearTimeout(timeout);}
  }
  refresh();setInterval(refresh,300000);

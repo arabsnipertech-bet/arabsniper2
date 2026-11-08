@@ -246,3 +246,17 @@ body.gold-light[data-gold-design] .sync-box,body.gold-light[data-gold-design] .m
 body.gold-light[data-gold-design] .live-line{color:#276b57}
 body.gold-light[data-gold-design] .mx-categories button[aria-pressed=true]{background:#f6ecd9;color:#71501b;border-color:#c5ae80}
 body[data-gold-design] .mx-card .mx-best-market{background:#102f50}
+
+/* Compact match overview; research remains inside the match dialog. */
+.mx-compact-quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px 20px}
+.mx-compact-quotes>section{min-width:0;padding:10px;border:1px solid #34414d;border-radius:9px;background:#0e1922}
+.mx-compact-quotes h4{margin:0 0 9px;color:#dfc48c;font-size:12px}
+.mx-compact-opening{display:block;color:#a5afbd;font-size:11px}.mx-compact-opening b{font-weight:400}
+.mx-compact-price{display:block;font-size:25px;line-height:1.4;color:#edf1f7}
+.mx-compact-quotes small{display:block;font-size:10px;color:#a5afbd}
+.mx-compact-quotes .mx-net{margin:8px 0 0;padding:5px;border:0;background:transparent;min-height:0}
+.mx-compact-quotes .mx-net b{font-size:13px}.mx-compact-quotes .mx-net small{display:none}
+body[data-gold-design] .mx-card.mx-compact .mx-open{margin:0;width:100%;border-radius:0;border:0;border-top:1px solid #27313c;padding:13px 20px;text-align:right;min-height:46px}
+body[data-gold-design] .mx-card.mx-compact header{padding:16px 20px;border-bottom:0}
+body[data-gold-design] .mx-card.mx-compact h3{font-size:21px;margin-bottom:0}
+@media(max-width:480px){.mx-compact-quotes{padding:12px;gap:7px}.mx-compact-quotes>section{padding:8px 6px}.mx-compact-price{font-size:23px}body[data-gold-design] .mx-card.mx-compact header{padding:14px 12px}.mx-compact-quotes .mx-net b{font-size:12px}}
