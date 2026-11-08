@@ -1,3 +1,19 @@
 const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
-async function run(payload,ok=true){const panel={innerHTML:''};class Clock extends Date{constructor(...a){super(...(a.length?a:['2026-10-23T10:00:00Z']))}};vm.runInNewContext(fs.readFileSync('web/results.js','utf8'),{Date:Clock,Intl,Number,String,AbortController,setTimeout,clearTimeout,setInterval(){},document:{getElementById:()=>panel},fetch:async()=>({ok,json:async()=>payload})});await new Promise(r=>setImmediate(r));return panel.innerHTML;}
-(async()=>{const p={available:true,date:'2026-10-22',cohort:'Test',daily:{wins:3,losses:2,pending:1,settled:5,hit_rate:60},history:{settled:10,hit_rate:50,from_date:'2026-10-01',to_date:'2026-10-22',days_with_data:2},examples:[{match:'Example',outcome:'won',market:'over25_ft',odd:2.75}],all_results:[...Array.from({length:3},()=>({match:'Win',outcome:'won'})),...Array.from({length:2},()=>({match:'Loss',outcome:'lost'})),{match:'Pending',outcome:'pending'}]};let html=await run(p);assert.equal((html.match(/class="result-card /g)||[]).length,6);assert(!html.includes('%'));assert(html.includes('2,75'));assert(html.includes('non rappresenta il rendimento complessivo'));assert(html.includes('2 persi'));assert(html.includes('modello precedente'));assert((await run({...p,model_id:'statistics-first-v4.0'})).includes('modello precedente'));assert((await run({...p,model_id:'lateral-matrix-v5.0'})).includes('nuovo modello V5'));p.examples[0].match='<img onerror="bad">';html=await run(p);assert(!html.includes('<img'));assert(html.includes('&lt;img'));assert((await run({...p,date:'2026-10-21'})).includes('aggiornamento'));assert((await run(p,false)).includes('temporaneamente'));console.log('PASS results: full denominator, all rows, HTML escaping, stale and unavailable feeds')})().catch(e=>{console.error(e);process.exit(1)});
+async function render(data){
+ const panel={innerHTML:''};
+ class Clock extends Date{constructor(...a){super(...(a.length?a:['2026-11-08T12:00:00Z']));}static now(){return +new Clock();}}
+ vm.runInNewContext(fs.readFileSync('web/results.js','utf8'),{Date:Clock,Intl,AbortController,setTimeout,clearTimeout,setInterval(){},document:{getElementById:()=>panel},fetch:async()=>({ok:true,json:async()=>data})});
+ await new Promise(r=>setImmediate(r));return panel.innerHTML;
+}
+(async()=>{
+ const row={outcome:'won',match:'Casa - Ospite',label:'Over 2,5',odd:1.9};
+ const history={settled:3,wins:2,losses:1,pending:0,from_date:'2026-11-01',to_date:'2026-11-07'};
+ let html=await render({available:false,date:'2026-11-07',all_results:[],history});
+ assert(html.includes('3 esiti conclusi'));assert(!html.includes('V5 è in verifica'));
+ html=await render({available:false,date:'2026-11-07',history,latest_verified:{date:'2026-11-05',all_results:[row]}});
+ assert(html.includes('5 novembre 2026'));assert(html.includes('ultima giornata verificata'));assert(html.includes('Casa - Ospite'));
+ html=await render({available:true,date:'2026-11-07',all_results:[row,{...row,outcome:'lost',match:'<script>evil</script>'}]});
+ assert(html.includes('1 esiti centrati · 1 non centrati'));assert(!html.includes('<script>'));assert(!html.includes('in aggiornamento'));
+ html=await render({latest_verified:{date:'2026-11-09',all_results:[row]}});assert(!html.includes('Casa - Ospite'));
+ console.log('PASS verified results: missing yesterday, dated historical fallback, all outcomes, escaping, future rejection');
+})();
