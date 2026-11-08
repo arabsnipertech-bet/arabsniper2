@@ -387,7 +387,7 @@ def slot_message(post):
     return "\n".join(lines) + footer
 
 def send():
-    """Send the current Gold analysis image and caption as one verified message."""
+    """Send current Gold analysis and its existing best option as one verified message."""
     token = os.environ["BOT_TOKEN"]
     if not token:
         raise SystemExit("Missing bot token")

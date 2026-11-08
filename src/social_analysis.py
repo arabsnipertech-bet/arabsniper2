@@ -1,5 +1,6 @@
 """Sports editorial selection independent of betting markets, prices and tiers."""
-import math
+import math,json,subprocess
+from pathlib import Path
 from datetime import datetime,timedelta
 from zoneinfo import ZoneInfo
 ROME=ZoneInfo('Europe/Rome')
@@ -29,6 +30,21 @@ def probability_lines(p):
     return [f"Prob. modello FT: 1 {pct('1')} · X {pct('x')} · 2 {pct('2')}",
             f"Prob. modello FT: Over 2,5 {pct('over25')} · GG {pct('gg')}"]
 
+def attach_proposals(picks,board,now):
+    if not picks:return picks
+    ids={p['id'] for p in picks}
+    matches=[m for m in board.get('matches',[]) if str((m.get('fixture') or {}).get('fixture_id')) in ids]
+    script=Path(__file__).with_name('social_proposals.cjs')
+    output=subprocess.check_output(['node',str(script)],input=json.dumps(dict(matches=matches,now=now.timestamp()*1000)),text=True,timeout=20)
+    proposals=json.loads(output)
+    for pick in picks:pick['proposal']=proposals.get(pick['id'])
+    return picks
+
+def proposal_lines(p):
+    v=p.get('proposal') or {}
+    if not v.get('label'):return ['Proposta non disponibile nella Gold']
+    return [v['title']+': '+v['label'], 'Quota '+fmt(v.get('odd'))+' · '+v['note']]
+
 def select(board,now,start,end,excluded=()):
     updated=moment(board.get('updated_at'))
     if board.get('date')!=now.astimezone(ROME).date().isoformat() or not updated or not timedelta(0)<=now-updated<=timedelta(minutes=90):return []
@@ -49,26 +65,27 @@ def select(board,now,start,end,excluded=()):
                 scored=p.get('for_ft',{}).get('mean'),conceded=p.get('against_ft',{}).get('mean'),sample=sample[side])
         row=dict(id=fid,fixture_id=fid,match=f['match'],country=f['country'],league=f['league'],kickoff=f['kickoff'],captured_at=a['captured_at'],analysis=detail,probabilities=model_probabilities(a),league_priority=priority(f))
         if fid not in rows or at>moment(rows[fid]['captured_at']):rows[fid]=row
-    return sorted(rows.values(),key=lambda p:(p['league_priority'],-min(x['sample'] for x in p['analysis'].values()),-moment(p['captured_at']).timestamp(),p['kickoff'],p['id']))[:4]
+    chosen=sorted(rows.values(),key=lambda p:(p['league_priority'],-min(x['sample'] for x in p['analysis'].values()),-moment(p['captured_at']).timestamp(),p['kickoff'],p['id']))[:4]
+    return attach_proposals(chosen,board,now)
 def fmt(v):return f'{v:.2f}'.replace('.',',') if number(v) else 'n.d.'
 def caption(post):
     picks=post['picks'];lines=[f"📊 ArabSniper · Taccuino delle {post['slot']}"]
     if not picks:return lines[0]+'\nNessuna nuova scheda con dati sufficienti e aggiornati nella fascia prevista.'
-    lines+=['Dalla pagina Gold: partite, statistiche e probabilità del modello nella grafica. Gol attesi: medie del modello, non risultati esatti. Medie segnati/subiti: dati storici del campione.']
+    lines+=['Dalla pagina Gold: partite, statistiche, probabilità e migliore opzione del software nella grafica. Gol attesi: medie del modello, non risultati esatti. Medie segnati/subiti: dati storici del campione.']
     if len(picks)<4:lines.append(f'Disponibili {len(picks)} schede su 4: nessuna integrazione con dati insufficienti.')
     live=post.get('sports_live')
     if live:lines.append('📡 LIVE SPORTIVO DEL GIORNO: '+live['match']+' · '+moment(live['kickoff']).astimezone(ROME).strftime('%H:%M')+'. Seguiremo gol, intervallo e finale.')
-    lines+=['Confrontate i dati e i loro limiti: campioni diversi e ipotesi del modello possono cambiare la lettura.','Nessuna indicazione di giocata. Orari italiani.']
+    lines+=['Confrontate i dati e i loro limiti: campioni diversi e ipotesi del modello possono cambiare la lettura.','Blu e Studio: spunti statistici, non proposte Gold. Orari italiani.']
     return '\n\n'.join(lines)
 def render(post,path):
     from PIL import Image,ImageDraw
     from social_card import font,paragraph
-    im=Image.new('RGB',(1080,1600),'#091925');d=ImageDraw.Draw(im)
+    im=Image.new('RGB',(1080,1920),'#091925');d=ImageDraw.Draw(im)
     d.text((50,35),'ArabSniperBet',font=font(39,'bold'),fill='#F5F3EB')
     d.text((50,105),'IL TACCUINO DELLE PARTITE',font=font(39,'serif'),fill='#EAC070')
     d.text((50,165),post['day']+' · '+post['slot']+' · ORARI ITALIANI',font=font(23,'mono'),fill='#77DCD2')
     for i,p in enumerate(post['picks']):
-        y=235+i*300;a=p['analysis'];h=a['home'];v=a['away']
+        y=235+i*380;a=p['analysis'];h=a['home'];v=a['away']
         d.line((50,y,1030,y),fill='#425868',width=2)
         paragraph(d,50,y+18,p['country']+' · '+p['league']+' · '+moment(p['kickoff']).astimezone(ROME).strftime('%H:%M'),23,970,34)
         paragraph(d,50,y+65,p['match'],36,970,58,'bold')
@@ -76,6 +93,8 @@ def render(post,path):
         text=f"Gol attesi casa / ospite: {fmt(h['ft'])} / {fmt(v['ft'])}\nPT: {pt} · ST: {st}\nMedie segnati/subiti: casa {fmt(h['scored'])}/{fmt(h['conceded'])} · ospite {fmt(v['scored'])}/{fmt(v['conceded'])}\nCampioni FT: {h['sample']} / {v['sample']} gare · dati {moment(p['captured_at']).astimezone(ROME):%H:%M}"
         for line_no,line in enumerate(text.split('\n')+probability_lines(p)):
             paragraph(d,50,y+125+line_no*29,line,22,970,28)
+        for line_no,line in enumerate(proposal_lines(p)):
+            paragraph(d,50,y+305+line_no*30,line,23,970,29,'bold' if line_no==0 else 'regular')
     if not post['picks']:paragraph(d,50,300,caption(post),42,960,700)
-    paragraph(d,50,1460,'Gol attesi: stime, non certezze. PT/ST: primo/secondo tempo. Medie storiche FT su campioni disponibili; n.d. = dato insufficiente.',23,970,100)
+    paragraph(d,50,1780,'Gol attesi: stime, non certezze. PT/ST: primo/secondo tempo. Medie storiche FT su campioni disponibili; n.d. = dato insufficiente.',23,970,100)
     im.save(path,format='JPEG',quality=92)
