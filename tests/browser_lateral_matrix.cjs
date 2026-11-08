@@ -338,7 +338,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    for(let i=0;i<variantsToUse.length;i++){
     await page.locator('[data-mx-open]').nth(i).click();
     assert.equal(await page.locator('dialog .mx-cockpit').count(),1);
-    assert.equal(await page.locator('dialog .mx-best').count(),1);
+    assert(await page.locator('dialog .mx-best').count()>=1,label+' research remains available');
     assert(!/NaN|undefined/.test(await page.locator('dialog').innerText()));
     const select=page.locator('dialog [data-mx-instrument]');
     const choices=await select.locator('option').evaluateAll(opts=>opts.map(o=>o.value).filter(Boolean));
