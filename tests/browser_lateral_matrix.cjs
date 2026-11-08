@@ -285,7 +285,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.locator('dialog .mx-1x2 .mx-quote-cell').count(),3);
    assert.equal(await page.locator('dialog [data-mx-instrument] option').count(),59);
    assert(!(await page.locator('dialog').innerText()).includes('EV'));
-   assert.equal(await page.locator('dialog .mx-best').count(),1,'Official analysis moved inside');
+   assert.equal(await page.locator('.mx-modal-scroll > .mx-best').count(),1,'Official analysis moved inside');
    for(const [section,count] of [['ft',8],['ht',6],['result',3],['asian',40],['targets',6]]){
     await page.locator('[data-mx-section="'+section+'"]').click();
     assert.equal(await page.locator('.mx-market-row').count(),count);
