@@ -44,7 +44,9 @@ jobs:
     needs: eligibility
     if: needs.eligibility.outputs.recover == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 55
+    # Preparation reads immutable archives outside the writer mutex.
+    # Weekend evidence exceeds 55 minutes; keep publication bounded separately.
+    timeout-minutes: 120
     outputs:
       date: ${{ steps.day.outputs.date }}
       digest: ${{ steps.recover.outputs.digest }}
