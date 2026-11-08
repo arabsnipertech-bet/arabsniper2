@@ -863,7 +863,7 @@
   <link rel="stylesheet" href="/statistics-first.css?v=4.0">
   <script src="/statistics-first.js?v=4.0"></script>
   <link rel="stylesheet" href="/lateral-matrix.css?v=2cf021ab0d41">
-  <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=1e45986a4e9e"></script>
+  <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=7c9b60672720"></script>
   <script src="/vendor/fflate-0.8.2.js"></script>
   <script src="/live-scores.js?v=a17ad119a2d0"></script>
   <script>
@@ -1095,6 +1095,7 @@
     async function logoutGold() {
       try {
         await authRequest('logout', {});
+        loadJson.pageCache?.clear();
         try {localStorage.removeItem(STORAGE_KEY);} catch (_) {}
         window.location.href = 'index.html';
       } catch (_) { alert('Uscita non riuscita. Riprova per chiudere la sessione.'); }
@@ -1234,7 +1235,8 @@
       await loadCurrentDay({ preservePosition: true });
     }
 
-    async function loadJson(file, embedded = null, signal = null, indexOnly = false) {
+    async function loadJson(file, embedded = null, signal = null, indexOnly = false, onProgress = null) {
+      const cache=loadJson.pageCache||(loadJson.pageCache=new Map());
       async function decodeGzip(compressed) {
         if(typeof DecompressionStream!=='undefined')return new Uint8Array(await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
         if(globalThis.fflate?.gunzipSync)return globalThis.fflate.gunzipSync(new Uint8Array(compressed));
@@ -1248,6 +1250,7 @@
           try {
             const response=await fetch(rawUrl(path),{cache:'no-store',credentials:'same-origin',signal:controller.signal});
             if(response.status===401||response.status===403) {
+              cache.clear();
               resetCodeLogin();
               document.getElementById('app').hidden=true;
               document.getElementById('loginOverlay').classList.add('show');
@@ -1270,10 +1273,40 @@
       if(value?._gold_storage==='arabsniper-gold-pages-v1') {
         if(!globalThis.crypto?.subtle)throw new Error('Aggiorna il browser o apri Gold in Chrome, Safari o Firefox per caricare i dati protetti.');
         if(!Array.isArray(value.pages)||!Number.isSafeInteger(value.match_count)||value.match_count<0)throw new Error('Indice giornata non valido.');
-        const matches=new Array(value.match_count);let next=0,offset=0,completed=0,stopped=false;
+        const matches=new Array(value.match_count);let next=0,offset=0,completed=0,stopped=false,lastPreview=0;
         const pages=value.pages.map(page=>{if(!/^[a-f0-9]{64}$/.test(page.sha256)||!Number.isSafeInteger(page.bytes)||page.bytes<2||!Number.isSafeInteger(page.count)||page.count<1)throw new Error('Indice pagina non valido.');const item={...page,offset};offset+=page.count;return item;});
         if(offset!==value.match_count)throw new Error('Conteggio partite non valido.');
-        async function pageWorker(){while(!stopped&&next<pages.length){const page=pages[next++];const compressed=await read('_audit_parts/'+page.sha256+'.json.gz',true);const raw=await decodeGzip(compressed);const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');if(raw.byteLength!==page.bytes||hash!==page.sha256)throw new Error('Integrità pagina non verificata. Premi Riprova.');const rows=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(raw));if(!Array.isArray(rows)||rows.length!==page.count)throw new Error('Pagina partite incompleta.');for(let i=0;i<rows.length;i++)matches[page.offset+i]=rows[i];completed++;if(!signal?.aborted&&typeof document!=='undefined'){const status=document.getElementById('liveStatus');if(status)status.textContent='Caricamento partite · '+Math.round(completed/pages.length*100)+'%';}}}
+        async function pageWorker(){
+          while(!stopped&&next<pages.length){
+            const page=pages[next++],key=page.sha256;
+            if(signal?.aborted)throw new DOMException('Aborted','AbortError');
+            // The catalog is freshly authenticated on each day load. Keep only
+            // verified compressed pages in tab memory, bounded to 16 MiB.
+            const compressed=cache.get(key)||await read('_audit_parts/'+key+'.json.gz',true);
+            const raw=await decodeGzip(compressed);
+            const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
+            if(raw.byteLength!==page.bytes||hash!==key){cache.delete(key);throw new Error('Integrità pagina non verificata. Premi Riprova.');}
+            const rows=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(raw));
+            if(!Array.isArray(rows)||rows.length!==page.count)throw new Error('Pagina partite incompleta.');
+            if(signal?.aborted||stopped)return;
+            if(compressed.byteLength<=16*1024*1024){
+              cache.delete(key);cache.set(key,compressed);
+              let size=Array.from(cache.values()).reduce((n,b)=>n+b.byteLength,0);
+              while(size>16*1024*1024){const oldest=cache.keys().next().value;size-=cache.get(oldest).byteLength;cache.delete(oldest);}
+            }
+            for(let i=0;i<rows.length;i++)matches[page.offset+i]=rows[i];
+            completed++;
+            if(typeof document!=='undefined'){
+              const status=document.getElementById('liveStatus');
+              if(status)status.textContent='Caricamento partite · '+Math.round(completed/pages.length*100)+'%';
+            }
+            if(onProgress&&completed<pages.length&&(lastPreview===0||Date.now()-lastPreview>=1000)){
+              lastPreview=Date.now();
+              onProgress({...value,matches:matches.filter(Boolean),_gold_loading:true},completed,pages.length);
+              await new Promise(resolve=>setTimeout(resolve,0));
+            }
+          }
+        }
         const results=await Promise.allSettled(Array.from({length:Math.min(2,pages.length)},()=>pageWorker().catch(error=>{stopped=true;throw error;})));
         const failure=results.find(result=>result.status==='rejected');if(failure)throw failure.reason;
         return {...value,matches};
@@ -1294,16 +1327,17 @@
       return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(joined));
     }
 
-    async function loadCalendarDay(day, targetDate, signal = null) {
+    async function loadCalendarDay(day, targetDate, signal = null, onProgress = null) {
       let catalog=null;
       try {catalog=await loadJson('arab_quote_model_research.json',null,signal);} catch(error) {if(error.code==='GOLD_AUTH_REQUIRED'||signal?.aborted)throw error;}
-      const readDay=(file,indexOnly=false)=>loadJson(file,catalog?._gold_browser_days?.[file]||null,signal,indexOnly);
+      const progress=partial=>{if(partial.date===targetDate)onProgress?.(partial);};
+      const readDay=(file,indexOnly=false)=>loadJson(file,catalog?._gold_browser_days?.[file]||null,signal,indexOnly,progress);
       // File positions belong to the last scan, not necessarily to today's date.
       // Follow the date offset without changing forecasts or their timestamps.
       if (day === 0) {
         const latest = await readDay('arab_quote_day1.json',true);
         let archived = [latest?.previous_day, latest?.current_day_archive].find(item => item?.date === targetDate);
-        if(archived?._gold_storage==='arabsniper-gold-pages-v1')archived=await loadJson(null,archived,signal);
+        if(archived?._gold_storage==='arabsniper-gold-pages-v1')archived=await loadJson(null,archived,signal,false,progress);
         if (archived?.history_version === 'gold-history-v1' && archived.date === targetDate && Array.isArray(archived.matches)) {
           return {payload:archived,file:'Archivio privato · '+targetDate,shifted:false};
         }
@@ -1357,7 +1391,15 @@
         document.getElementById('updatedAt').textContent = 'Ultima scansione: —';
       }
       try {
-        const loaded = await loadCalendarDay(day, targetDate, signal);
+        const loaded = await loadCalendarDay(day, targetDate, signal, partial=>{
+          if(request!==dayLoadSequence||signal.aborted||baseDate!==calendarDate()||
+             (preservePosition&&currentPayload&&!currentPayload._gold_loading))return;
+          if(window.ArabMatrix)partial=window.ArabMatrix.scopePayload(partial);
+          currentPayload=partial;
+          renderMatchResearch(partial);
+          document.getElementById('fileSource').textContent='Elenco parziale · caricamento in corso';
+          document.getElementById('updatedAt').textContent='Ultima scansione: '+formatTimestamp(partial.updated_at);
+        });
         if (request !== dayLoadSequence) return;
         if (baseDate !== calendarDate()) { await checkCalendarRollover(); return; }
         const {file, shifted} = loaded;
@@ -1382,6 +1424,10 @@
         if (request !== dayLoadSequence) return;
         if (baseDate !== calendarDate()) { await checkCalendarRollover(); return; }
         console.error(err);
+        if(currentPayload?._gold_loading&&currentPayload.date===targetDate&&err.code!=='GOLD_AUTH_REQUIRED'){
+          document.getElementById('liveStatus').textContent='Caricamento interrotto · elenco incompleto. Premi Ricarica dati per riprovare.';
+          return;
+        }
         if(preservePosition&&currentPayload?.date===targetDate&&err.code!=='GOLD_AUTH_REQUIRED') {
           document.getElementById('liveStatus').textContent='Aggiornamento non riuscito · restano visibili i dati del '+formatTimestamp(currentPayload.updated_at)+'. Premi Aggiorna per riprovare.';
           restoreViewportAnchor(anchor);return;

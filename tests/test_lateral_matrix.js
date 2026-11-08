@@ -531,3 +531,29 @@ const compactCard=api.card({fixture:{fixture_id:'compact',match:'A - B'},multima
 assert(compactCard.includes('Apri analisi'));assert(!compactCard.includes('mx-cockpit'));assert(!compactCard.includes('mx-study-base'));
 assert(!api.compactQuotes([{...compactRows[0],quote_status:'missing',last_odd:2}],{},null).includes('↓ -5,0%'));
 console.log('PASS compact overview: three 1X2 cells, detail entry and no stale movement');
+
+{
+// Real matrix-shaped readings, including cached_quote which omits movement_hours.
+const oneBook={oci:null,paired_books:1,agreeing_books:1,bookmaker:'Book A',quote_status:'cached_stable',odd:2,
+ selected_movement:{fair_delta_pp:2,persistence:1,reversal:false,observed_from:'2026-11-08T08:00:00Z',observed_to:'2026-11-08T10:00:00Z'},
+ movement_hours:2,speed_pp_per_hour:1};
+const frozen=JSON.stringify(oneBook);
+assert(Math.abs(api.displayOci(oneBook).value-(20+25+10/1.5+15+1.25))<1e-9);
+const cached=structuredClone(oneBook);delete cached.movement_hours;
+assert.equal(api.displayOci(cached).value,api.displayOci(oneBook).value);
+const negative=structuredClone(cached);negative.selected_movement.fair_delta_pp=-2;
+assert.equal(api.displayOci(negative).value,-api.displayOci(cached).value);
+const flat=structuredClone(cached);flat.selected_movement.fair_delta_pp=0;flat.speed_pp_per_hour=0;
+assert.equal(api.displayOci(flat).value,0);
+assert.equal(api.displayOci({...oneBook,oci:72,paired_books:3}).value,72);
+assert.equal(api.displayOci({...oneBook,paired_books:2}).value,null);
+assert.equal(api.displayOci({...oneBook,selected_movement:null}).value,null);
+assert.equal(api.displayOci({...oneBook,quote_source:'synthetic_combo'}).value,null);
+const invalid=structuredClone(oneBook);invalid.selected_movement.observed_to=invalid.selected_movement.observed_from;
+assert.equal(api.displayOci(invalid).value,null);
+assert(api.quoteCell(oneBook,'Test').includes('Singolo bookmaker'));
+assert(api.marketRow({...oneBook,spec:{kind:'total'},label:'Test'}).includes('Singolo bookmaker'));
+assert.equal(JSON.stringify(oneBook),frozen);
+console.log('PASS matrix single-book OCI: cached history, zero, sign, invalid history, multi-book parity, table, quote panel and immutability');
+
+}

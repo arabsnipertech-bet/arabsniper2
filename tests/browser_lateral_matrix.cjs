@@ -347,6 +347,26 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    }
    assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),snapshot,label+' data immutable');
   }
+  // Reproduce the current Gold modal (not the legacy context renderer).
+  const singlePayload=structuredClone(payload);singlePayload.matches=singlePayload.matches.slice(0,1);
+  const singleRow=singlePayload.matches[0].multimarket.matrix.rows.find(r=>r.spec.kind==='total'&&r.spec.side==='over');
+  Object.assign(singleRow,{oci:null,paired_books:1,agreeing_books:1,movement_confirmed:false,
+   quote_status:'cached_stable',odd:2,first_odd:2.4,movement_hours:2,
+   selected_movement:{fair_delta_pp:2,persistence:1,reversal:false,observed_from:'2026-11-08T08:00:00Z',observed_to:'2026-11-08T10:00:00Z'}});
+  for(const width of [1280,390,360]){
+   await page.setViewportSize({width,height:900});
+   await page.evaluate(p=>{Object.assign(ArabMatrix.state,{category:'all',family:'all',period:'all',phase:'all',search:''});currentPayload=p;renderMatchResearch(p)},singlePayload);
+   const before=await page.evaluate(()=>JSON.stringify(currentPayload));
+   await page.locator('[data-mx-open]').first().click();
+   await page.locator('dialog [data-mx-instrument]').selectOption(singleRow.id);
+   const gauge=page.locator('dialog .mx-instrument').first();
+   assert((await gauge.innerText()).includes('Singolo bookmaker'));
+   assert(!(await gauge.locator('strong').innerText()).includes('—'));
+   assert(await page.evaluate(()=>{const d=document.querySelector('dialog');return d.scrollWidth<=d.clientWidth+1}));
+   await page.screenshot({path:`test-artifacts/oci-single-${width}.png`});
+   assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),before);
+   await page.locator('[data-mx-close]').click();
+  }
   console.log('PASS compact Gold browser: 1X2 only, full detail, categories, selector, live overlays, calendar/login/cache, desktop/390/360');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
