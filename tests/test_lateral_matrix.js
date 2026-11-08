@@ -512,6 +512,7 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  const m={fixture:{fixture_id:910,kickoff:iso(now+7200000),status_short:'NS'},multimarket:{matrix:{rows:[a,b],quote_monitoring:{studio_ideas:[]}}}};
  const before=JSON.stringify(m);
  assert.equal(api.studyDefaultRow(m,now),b,'Prudent probability selects the study display, even without a star');
+ assert(api.compactProposal(m).includes('Miglior proposta Studio'));assert(api.compactProposal(m).includes('<strong>b</strong>'));
  const html=api.cockpit(m,{},true);assert(html.includes('STUDIO STATISTICO · VALORE NON CONFERMATO'));assert(html.includes('Stima disponibile per lo studio'));assert(!html.includes('⭐'));
  assert.equal(JSON.stringify(m),before,'Display fallback cannot mutate ranking, certificates or forecasts');
  for(const change of [{quality:'limited'},{quote_executable:false},{quote_status:'stale'},{odd:null},{statistical_pct:null},{provider_updated_at:iso(now-7200000)},{provider_updated_at:iso(now+60000)}]){

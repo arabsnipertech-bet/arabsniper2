@@ -680,6 +680,18 @@
   });
   updateModal();if(dialog){dialog.showModal();dialog.querySelector('[data-mx-close]').focus();}
  }
+ function compactProposal(m,helpers={}){
+  const tier=cockpitTier(m,helpers),star=!m._gold_history?starredStudyRow(m):null;
+  const radar=!m._gold_history?marketSignals(rowsOf(m),{archived:(helpers.phase||phase)(m)!=='upcoming',kickoff:m.fixture?.kickoff})[0]:null;
+  const row=tier.row||star||radar||(!m._gold_history?studyDefaultRow(m):null);
+  if(!row)return '<div class="mx-compact-proposal"><small>Proposta non disponibile · apri le analisi</small></div>';
+  const starred=tier.tone==='studio'&&(row===star||row===radar);
+  const title=tier.row?'Proposta '+tier.name:starred?'Miglior spunto Blu · solo studio':'Miglior proposta Studio · statistica';
+  const saved=tier.tone==='studio'?studyObservation(row,{kickoff:m.fixture?.kickoff}):null;
+  const odd=saved?.odd??(priced(row)?row.odd:null);
+  const note=saved?'Ultima osservata · da confermare':row.quote_source==='synthetic_combo'?'Quota sintetica PT × ST':row.quote_status==='cached_stable'?'Quota da cache':priced(row)?'Quota osservata':'Quota non disponibile';
+  return '<section class="mx-compact-proposal" aria-label="Migliore proposta"><div><small>'+esc(title)+'</small><strong>'+esc(row.label)+'</strong></div><div class="mx-compact-proposal-price"><b>'+num(odd,2)+'</b><small>'+esc(note)+'</small></div></section>';
+ }
  function compactQuotes(rows,helpers,study){
   return '<div class="mx-compact-quotes" aria-label="Quote 1X2 apertura e attuale">'+[['1','1 · Casa'],['x','X · Pareggio'],['2','2 · Ospite']].map(([side,label])=>{
    const row=rows.find(r=>r.period==='ft'&&r.spec?.kind==='result'&&r.spec.side===side&&r.spec.extra==null)||{};
@@ -697,7 +709,7 @@
   const tier=cockpitTier(m,helpers);
   return '<article class="mx-card mx-compact mx-tone-'+tier.tone+(elite?' mx-card-platinum':'')+'" data-live-fixture="'+esc(fid)+'"><header><div><span class="mx-category'+(elite?' mx-tier-label':'')+'"><strong>'+tier.name+'</strong></span><time>'+esc(f.time||'')+'</time><small>'+esc(f.country)+' · '+esc(f.league)+'</small>'+'<h3>'+esc(f.match)+'</h3></div><div class="mx-live"><button type="button" class="mx-save" data-mx-save="'+esc(fid)+'" aria-label="Osserva '+esc(f.match)+'" aria-pressed="'+observedFixtures.has(fid)+'">'+(observedFixtures.has(fid)?'★':'☆')+'</button><span data-live-slot="badge">'+(helpers.liveBadge?.(m)||'')+'</span><span data-live-slot="state">'+esc(helpers.stateLabel?.(m)||'')+'</span><span data-live-slot="halftime">'+halfTimeText(helpers.firstHalf?.(m))+'</span></div></header>'+
    (m._gold_history?'<div data-live-slot="panel">'+(helpers.livePanel?.(m)||'')+'</div>':'')+
-   (noSnapshot?'<p class="mx-explanation">Nessuna analisi prematch salvata per questa partita.</p>':compactQuotes(all,helpers,study))+
+   (noSnapshot?'<p class="mx-explanation">Nessuna analisi prematch salvata per questa partita.</p>':compactProposal(m,helpers)+compactQuotes(all,helpers,study))+
    (all.length?'<button class="mx-open" type="button" data-mx-open="'+esc(fid)+'" aria-haspopup="dialog">Apri analisi <span>↗</span></button>':'')+'</article>';
  }
  let payload,host,helpers;
@@ -731,7 +743,7 @@
   h.onchange=e=>{const fid=e.target.dataset?.mxInlineInstrument;if(fid!==undefined){inlineInstruments.set(fid,e.target.value||null);const m=(payload.matches||[]).find(x=>String(x.fixture?.fixture_id)===fid);if(m){e.target.closest('.mx-cockpit').outerHTML=cockpit(m,helpers,true);[...h.querySelectorAll('[data-mx-inline-instrument]')].find(x=>x.dataset.mxInlineInstrument===fid)?.focus();}return;}const key=e.target.dataset?.mxFilter;if(key&&key in state){state[key]=e.target.value;render(payload,host,helpers);}};
   updateModal();
  }
- const api={compactQuotes,card,operatorFair,observedMeans,goalPanels,studyDefaultRow,historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
+ const api={compactProposal,compactQuotes,card,operatorFair,observedMeans,goalPanels,studyDefaultRow,historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.ArabMatrix=api;
 })(typeof window!=='undefined'?window:globalThis);

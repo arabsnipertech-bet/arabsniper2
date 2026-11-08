@@ -260,3 +260,9 @@ body[data-gold-design] .mx-card.mx-compact .mx-open{margin:0;width:100%;border-r
 body[data-gold-design] .mx-card.mx-compact header{padding:16px 20px;border-bottom:0}
 body[data-gold-design] .mx-card.mx-compact h3{font-size:21px;margin-bottom:0}
 @media(max-width:480px){.mx-compact-quotes{padding:12px;gap:7px}.mx-compact-quotes>section{padding:8px 6px}.mx-compact-price{font-size:23px}body[data-gold-design] .mx-card.mx-compact header{padding:14px 12px}.mx-compact-quotes .mx-net b{font-size:12px}}
+
+.mx-compact-proposal{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:0 20px 3px;padding:12px 0;border-top:1px solid #293140}
+.mx-compact-proposal>div{min-width:0}.mx-compact-proposal small{display:block;font-size:10px;line-height:1.5;color:#a7b4c6}
+.mx-compact-proposal strong{display:block;font-size:17px;line-height:1.4;color:var(--mx-accent,#e8c27d);overflow-wrap:anywhere}
+.mx-compact-proposal-price{flex:0 0 94px;text-align:right}.mx-compact-proposal-price b{font-size:23px;color:var(--mx-accent,#e8c27d)}
+@media(max-width:480px){.mx-compact-proposal{margin:0 12px 3px;gap:10px}.mx-compact-proposal strong{font-size:16px}.mx-compact-proposal-price{flex-basis:82px}}
