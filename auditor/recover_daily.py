@@ -16,7 +16,7 @@ from tempfile import TemporaryDirectory
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
-from audit_journal import PREFIX, merge_forecast
+from audit_journal import PREFIX, ForecastHistory, merge_forecast
 from audit_ledger import AuditLedger, entries
 from audit_storage import FORMAT, atomic_bytes, read_store, write_store
 from current_audit import TZ, fetch_results, forecast_day, settle_day
@@ -125,6 +125,7 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
         pending.sort(key=lambda p:(p.endswith('_policies.json'),p))
         from daily_audit import fingerprint
         original = {(c,k): fingerprint(r) for c,k,r in ledger.records()}
+        history = ForecastHistory(ledger)
         paths = ([FORECASTS] if FORECASTS in sources else []) + pending
         for path in paths:
             print('Verifying original source for '+str(day)+': '+path, flush=True)
@@ -146,9 +147,11 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
                     raise ValueError('Unexpected policy forecast collection')
                 record.pop('settlement', None)
                 if journal:
-                    merge_forecast(ledger, collection, key, record)
+                    merge_forecast(ledger, collection, key, record, history=history)
                 else:
-                    ledger.put(collection, key, record, overwrite=False)
+                    inserted = ledger.put(collection, key, record, overwrite=False)
+                    if inserted and collection == 'analysis_updates':
+                        history.add(key, record)
             if not verified_type or (policy and schema_version != 1):
                 raise ValueError('Missing forecast journal type')
         if not any(len(ledger.get(c, {})) for c in ('multimarket_evaluations', 'analysis_updates')):
