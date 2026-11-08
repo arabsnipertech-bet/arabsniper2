@@ -93,7 +93,7 @@ class SafeRedirect(HTTPRedirectHandler):
 
 def receipts(now):
     days = {now.date().isoformat(),(now.date()-timedelta(days=1)).isoformat()}
-    names = {f'tg-{day}-{slot}-sent' for day in days for slot in ('0030','0430','1230','1730','1830','2000','2200')}
+    names = {f'tg-{day}-{slot}-sent' for day in days for slot in ('0030','0430','1230','1300','1730','1830','2000','2200')}
     output=[]
     for name in sorted(names):
         data=gh('artifacts?'+urlencode({'name':name,'per_page':100}))

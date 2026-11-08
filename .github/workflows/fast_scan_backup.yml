@@ -49,7 +49,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
-        run: python3 src/telegram_live.py dispatch
+        run: python3 src/sports_daily_live.py dispatch
       - name: Recover Facebook independently from Telegram completion
         if: always()
         env:

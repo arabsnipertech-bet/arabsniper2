@@ -62,6 +62,9 @@ def render_reserved(draw, pick, reserved):
 
 
 def render(post, path):
+    if post.get("analysis_only"):
+        from social_analysis import render as analysis_render
+        return analysis_render(post, path)
     picks = post.get('picks', [])
     slot = post.get('slot','')
     promo = not picks and (slot in ('12:45','17:15','22:00') or bool(post.get('successes')))

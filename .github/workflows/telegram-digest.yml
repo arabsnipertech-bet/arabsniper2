@@ -35,6 +35,7 @@ jobs:
           python3 -m unittest discover -s tests -p test_telegram_digest.py -v
           python3 -m unittest discover -s tests -p test_social_reserved.py -v
           python3 -m unittest discover -s tests -p test_promo_successes.py -v
+          python3 -m unittest discover -s tests -p test_social_analysis.py -v
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -61,7 +62,11 @@ jobs:
           obj = client().get_object(Bucket=os.environ['R2_BUCKET'], Key='arab_quote_day1.json')
           board = json.load(obj['Body'])
           assert board.get('date') == now.date().isoformat() and board.get('matches')
-          social_board(board, now, blue_only=True)
+          from social_analysis import select, render
+          end=now.replace(hour=23,minute=59,second=59)
+          preview=select(board,now,now,end)
+          render(dict(day=board['date'],slot='ANTEPRIMA',picks=preview,analysis_only=True),'analysis-preview.jpg')
+          print('Editorial preview:', len(preview), 'fixtures:', [p['match'] for p in preview])
           token = os.environ['BOT_TOKEN']
           bot = telegram('getMe', token)
           chat = telegram('getChat', token, chat_id=CHANNEL)
@@ -73,6 +78,12 @@ jobs:
               assert slot_message(dict(slot=slot,picks=[],first=first,last=last,day=board['date']))
           print('Channel posting rights and private Gold source verified for all configured slots')
           PYTHON
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push'
+        with:
+          name: editorial-analysis-preview
+          path: analysis-preview.jpg
+          retention-days: 3
       - id: prepare
         env:
           API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}

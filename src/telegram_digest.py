@@ -283,22 +283,15 @@ def prepare():
             raise RuntimeError("Missing current private board; retry this slot")
         reserve(name, dict(slot=slot, picks=[], first=first, last=last, stale=True))
         return
-    candidates = social_board(board, now, kickoff_from=start, kickoff_until=end, exclude=excluded,
-                              limit=3, blue_only=True, tier_order=("Gold", "Blu", "Platinum"))
-    chosen = [dict(row, id=row["fixture_id"], model_probability=row.get("statistical_pct"),
-                   market_confirmed=row.get("market_confirmation") in ("confirmed", "convergence"))
-              for row in candidates[:1]]
-    # Store no teams, markets or odds for the reserved cards in public receipts.
-    reserved = [dict(id=row["fixture_id"], kickoff=row["kickoff"])
-                for row in candidates[1:3]]
-    post = dict(slot=slot, picks=chosen, reserved=reserved, first=first, last=last)
+    from social_analysis import select
+    chosen = select(board, now, start, end, excluded)
+    post = dict(slot=slot, picks=chosen, reserved=[], first=first, last=last, analysis_only=True)
     try:
-        from telegram_live import reserve_publication
-        reserve_publication(post, candidates[1:3], now)
+        from sports_daily_live import reserve_publication
+        reserve_publication(post, now)
     except Exception as error:
-        # A provider/conditional-write failure must never invent a live promise.
-        post.pop('live', None)
-        print('Live reservation unavailable:', type(error).__name__)
+        post.pop('sports_live', None)
+        print('Sports live reservation unavailable:', type(error).__name__)
     reserve(name, post)
 
 
@@ -313,6 +306,8 @@ def refresh_reserved(post, now):
     """Remove expired previews before each channel sends its image."""
     if post.get('live') and (not post.get('picks') or instant(post['live']['kickoff']) <= now):
         post.pop('live')
+    if post.get('sports_live') and (not post.get('picks') or instant(post['sports_live']['kickoff']) <= now):
+        post.pop('sports_live')
     public_ids = {str(p.get("id", p.get("fixture_id"))) for p in post.get("picks", [])}
     seen = set(public_ids)
     valid = []
@@ -342,6 +337,9 @@ def social_cta(post):
 
 
 def slot_message(post):
+    if post.get("analysis_only"):
+        from social_analysis import caption
+        return caption(post)
     slot = post["slot"]
     picks = post["picks"]
     if slot in EDITORIAL:
