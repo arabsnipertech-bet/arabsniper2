@@ -57,7 +57,7 @@ class NightlySchedule(unittest.TestCase):
             with self.assertRaises(TimeoutError):
                 run(root, lambda: now, runner)
             self.assertLess(calls.index(['src/adaptive_calibration.py', '--as-of', '2026-11-05']),
-                            calls.index(['src/gold_storage.py', 'publish']))
+                            calls.index(['src/gold_storage.py', 'checkpoint']))
             self.assertFalse((root/MARKER).exists())
             self.assertEqual(read_store(root/PROGRESS)['stage'], 'daily')
 
@@ -138,14 +138,14 @@ class NightlySchedule(unittest.TestCase):
             self.assertEqual(run(folder, lambda: now, runner), 'complete')
             self.assertTrue(already_completed(folder, now))
         self.assertEqual(calls, [
-            ['src/gold_storage.py', 'restore'], ['auditor/current_audit.py', 'prepare', '--journal-limit', '8', '--delta-archive', '--journal-before', '2026-10-31T00:00:00+01:00'], ['src/gold_storage.py', 'publish'],
+            ['src/gold_storage.py', 'restore'], ['auditor/current_audit.py', 'prepare', '--journal-limit', '8', '--delta-archive', '--journal-before', '2026-10-31T00:00:00+01:00'], ['src/gold_storage.py', 'checkpoint'],
             ['auditor/current_audit.py', 'daily', '--date', '2026-10-30'],
             ['src/adaptive_calibration.py', '--as-of', '2026-10-31'],
-            ['src/gold_storage.py', 'publish'], ['src/homepage_results.py'],
+            ['src/gold_storage.py', 'checkpoint'], ['src/homepage_results.py'],
             ['src/private_publication.py', '--results-only'],
             ['auditor/current_audit.py', 'history', '--date', '2026-10-30', '--assemble-only', '--as-of', now.isoformat()],
-            ['src/gold_storage.py', 'publish'], ['src/gold_policy_audit.py'],
-            ['src/adaptive_calibration.py', '--as-of', '2026-10-31'], ['src/gold_storage.py', 'publish']])
+            ['src/gold_storage.py', 'checkpoint'], ['src/gold_policy_audit.py'],
+            ['src/adaptive_calibration.py', '--as-of', '2026-10-31'], ['src/gold_storage.py', 'checkpoint']])
 
     def test_interrupted_history_resumes_the_committed_day_before_new_journals(self):
         now = datetime.fromisoformat('2026-10-31T00:40:00+01:00')
@@ -158,7 +158,7 @@ class NightlySchedule(unittest.TestCase):
                 for path, raw in remote.items(): write_store(root/path, raw)
             elif args[:2] == ['auditor/current_audit.py', 'daily']:
                 daily_report(root, args[-1])
-            elif args == ['src/gold_storage.py', 'publish']:
+            elif args == ['src/gold_storage.py', 'checkpoint']:
                 remote.clear()
                 for path in (PROGRESS, MARKER, *(p.relative_to(root) for p in root.glob('auditarchive/*_daily.json'))):
                     if (root/path).exists(): remote[path] = read_store(root/path)

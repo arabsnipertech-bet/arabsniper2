@@ -34,7 +34,7 @@ class HistoryChunks(unittest.TestCase):
             tick = [NOW]
             def phase(*args):
                 calls.append(args)
-                if args == ('src/gold_storage.py', 'publish'):
+                if args == ('src/gold_storage.py', 'checkpoint'):
                     checkpoints.append({p.relative_to(root): p.read_bytes() for p in root.rglob('*') if p.is_file()})
                     tick[0] += timedelta(minutes=13)
                 elif args[1] == 'daily':
@@ -123,4 +123,4 @@ class JournalChunks(unittest.TestCase):
             self.assertEqual(run(root,lambda:NOW,phase),'paused')
             self.assertEqual(read_store(root/PROGRESS)['stage'],'preparing')
             self.assertNotIn('daily',[c[1] for c in calls if c[0]=='auditor/current_audit.py'])
-            self.assertEqual(calls[-1],['src/gold_storage.py','publish'])
+            self.assertEqual(calls[-1],['src/gold_storage.py','checkpoint'])

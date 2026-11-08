@@ -57,7 +57,7 @@ class Priority(unittest.TestCase):
             def history(*args):
                 self.assertTrue((root/STATUS).exists())
                 self.assertEqual((root/PROGRESS).read_bytes(),old)
-                self.assertIn(['src/gold_storage.py','publish'],calls)
+                self.assertIn(['src/gold_storage.py','checkpoint-day','--date','2026-11-05'],calls)
                 self.assertEqual(read_store(root/WEIGHTS)['as_of'],'2026-11-06')
                 return False
             with patch('auditor_history_chunks.advance', side_effect=history):
@@ -65,7 +65,7 @@ class Priority(unittest.TestCase):
             self.assertFalse((root/MARKER).exists())
             calls.clear()
             ensure_priority(root,NOW.date(),lambda *a:calls.append(a),lambda:calls.append('calibrate'))
-            self.assertEqual(calls,[])
+            self.assertEqual(calls,[('src/homepage_results.py',),('src/private_publication.py','--results-only')])
 
     def test_stale_calibration_cannot_publish_priority_success(self):
         with tempfile.TemporaryDirectory() as folder:

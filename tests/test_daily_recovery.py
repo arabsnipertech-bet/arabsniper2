@@ -47,6 +47,32 @@ def sources(storage, root):
 
 
 class DailyRecoveryTests(unittest.TestCase):
+    def test_policy_journals_recover_the_last_published_analysis_and_keep_original_sources(self):
+        storage=Fake()
+        policy='data/arab_quote_scan_journal_20261030T150000000000_policies.json'
+        with TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest, patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):
+            root=Path(seed);official=sources(storage,root)
+            latest=copy.deepcopy(read_store(root/JOURNAL)['analysis_updates'])
+            previous=next(iter(latest.values()))
+            previous['captured_at']='2026-10-30T16:00:00+01:00'
+            previous['multimarket']['markets'][0]['odd']=3.15
+            write_store(root/policy,{'schema_version':1,'journal_type':'policies',
+                'gold':{'fixtures':{}},'platinum':{'fixtures':{}},
+                'analysis_updates':{'lateral-matrix-v5.0::1::'+previous['captured_at']:previous}})
+            index=previous_manifest(storage,'test')
+            for path,raw in collect(root).items():
+                digest=sha(raw);storage.put_object(Bucket='test',Key='state/objects/'+digest,Body=raw)
+                index[path]={'sha256':digest,'bytes':len(raw)}
+            write_manifest(storage,'test',index)
+            original=source_set(index,DAY)
+            self.assertIn(policy,original)
+            digest=prepare(storage,'test',Path(work),DAY,NOW,lambda *a:official)
+            result=install(storage,'test',Path(dest),DAY,digest,NOW)
+            self.assertEqual(result['all_results'][0]['odd'],3.15)
+            self.assertEqual(result['all_results'][0]['captured_at'],previous['captured_at'])
+            after=previous_manifest(storage,'test')
+            self.assertEqual({p:after[p] for p in index},index)
+
     def test_missing_day_is_recovered_from_immutable_prematch_journal_with_one_call(self):
         storage = Fake()
         with TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest, patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):

@@ -68,7 +68,7 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
     def checkpoint(work_date, stage):
         value = {'version': 1, 'work_date': work_date.isoformat(), 'stage': stage}
         atomic_bytes(root / PROGRESS, json.dumps(value).encode())
-        phase('src/gold_storage.py', 'publish')
+        phase('src/gold_storage.py', 'checkpoint')
         print(f'Auditor checkpoint saved: {work_date} {stage}', flush=True)
 
     phase('src/gold_storage.py', 'restore')
@@ -129,7 +129,7 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
                       'calibration_status': __import__('adaptive_calibration').calibration_status(
                           read_store(root/'data/arab_calibration_weights.json', {}), clock().isoformat())}
             atomic_bytes(root / MARKER, json.dumps(marker, separators=(',', ':')).encode()+b'\n')
-        phase('src/gold_storage.py', 'publish')
+        phase('src/gold_storage.py', 'checkpoint')
         print(f'Nightly Auditor batch completed and published: {work_date}', flush=True)
     return 'complete'
 
