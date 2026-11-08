@@ -45,8 +45,8 @@ def source_set(index, day):
     names = {dated, f'auditarchive/prematch_{day}_results.json'}
     names.add(FORECASTS)
     for path in index:
-        if path.startswith('data/'+PREFIX) and path.endswith('_forecasts.json'):
-            value = path.removeprefix('data/'+PREFIX).removesuffix('_forecasts.json')
+        if path.startswith('data/'+PREFIX) and path.endswith(('_forecasts.json','_policies.json')):
+            value = path.removeprefix('data/'+PREFIX).rsplit('_',1)[0]
             at = datetime.strptime(value, '%Y%m%dT%H%M%S%f').replace(tzinfo=timezone.utc)
             if at < end:
                 names.add(path)
@@ -120,28 +120,36 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
         # Existing per-date archive wins, then the original master, then each
         # journal in observation order, as in normal archival/ingestion.
         pending = [p for p in sorted(sources) if p.startswith('data/'+PREFIX)]
+        # Match ordinary ingestion: forecast journals first, policy journals
+        # second. Preserve policy publication markers and Study observations.
+        pending.sort(key=lambda p:(p.endswith('_policies.json'),p))
         from daily_audit import fingerprint
         original = {(c,k): fingerprint(r) for c,k,r in ledger.records()}
         paths = ([FORECASTS] if FORECASTS in sources else []) + pending
         for path in paths:
             print('Verifying original source for '+str(day)+': '+path, flush=True)
             journal = path != FORECASTS
+            policy = path.endswith('_policies.json')
             verified_type = not journal
+            schema_version = None
             for collection, key, record in entries(root / path, fixture_date=day.isoformat()):
                 if collection is None:
                     if journal and key == 'journal_type':
-                        if record != 'forecasts':
+                        if record != ('policies' if policy else 'forecasts'):
                             raise ValueError('Incorrect journal type')
                         verified_type = True
+                    if journal and key == 'schema_version': schema_version = record
                     continue
                 if key is None or forecast_day(collection, key, record, now) != day.isoformat():
                     continue
+                if policy and collection not in ('analysis_updates','study_observations'):
+                    raise ValueError('Unexpected policy forecast collection')
                 record.pop('settlement', None)
                 if journal:
                     merge_forecast(ledger, collection, key, record)
                 else:
                     ledger.put(collection, key, record, overwrite=False)
-            if not verified_type:
+            if not verified_type or (policy and schema_version != 1):
                 raise ValueError('Missing forecast journal type')
         if not any(len(ledger.get(c, {})) for c in ('multimarket_evaluations', 'analysis_updates')):
             raise ValueError('No eligible frozen observations for this date')

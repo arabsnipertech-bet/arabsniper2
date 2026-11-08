@@ -11,13 +11,15 @@ def allowed(path):
     if path == 'data/arab_calibration_weights.json': return True
     return path not in PUBLIC and bool(re.fullmatch(r'(data/arab_quote_[a-zA-Z0-9_]+\.json|(auditordata|auditarchive)/prematch_[a-zA-Z0-9_.-]+\.(json|md)|(data|auditordata|auditarchive)/_audit_parts/[a-f0-9]{64}\.json\.gz)',path))
 
-def collect(root, verified=None):
+def collect(root, verified=None, *, patterns=None):
     root=Path(root); files={}
     verified=verified or {}
     def unchanged(key, raw):
         item=verified.get(key, {})
         return item.get('bytes')==len(raw) and item.get('sha256')==sha(raw)
-    for pattern in ('data/arab_calibration_weights.json','data/arab_quote_*.json','auditordata/prematch_*.json','auditarchive/prematch_*'):
+    if patterns is None:
+        patterns=('data/arab_calibration_weights.json','data/arab_quote_*.json','auditordata/prematch_*.json','auditarchive/prematch_*')
+    for pattern in patterns:
         for p in root.glob(pattern):
             key=p.relative_to(root).as_posix()
             if not allowed(key) or not p.is_file() or p.is_symlink(): continue
@@ -52,19 +54,20 @@ def previous_manifest(s3,bucket):
 def previous_objects(s3,bucket):
     return {item['sha256'] for item in previous_manifest(s3,bucket).values()}
 
-def publish(s3,bucket,root):
+def publish(s3,bucket,root, *, checkpoint_only=False):
     root=Path(root)
     # Validate every Gold file before writing anything, avoiding partial corrupt releases.
-    gold={name:json.dumps(read_store(root/'data'/name),ensure_ascii=False,separators=(',',':')).encode() for name in GOLD if (root/'data'/name).exists()}
-    if len(gold)!=len(GOLD): raise ValueError('Missing Gold files; publication aborted')
+    gold={} if checkpoint_only else {name:json.dumps(read_store(root/'data'/name),ensure_ascii=False,separators=(',',':')).encode() for name in GOLD if (root/'data'/name).exists()}
+    if not checkpoint_only and len(gold)!=len(GOLD): raise ValueError('Missing Gold files; publication aborted')
     verified=previous_manifest(s3,bucket)
     # Optional display archive: the scan files and decision engine stay untouched.
-    try:
-        from gold_history import project
-        projection=project(root,json.loads(gold['arab_quote_day1.json']))
-        gold['arab_quote_day1.json']=json.dumps(projection,ensure_ascii=False,separators=(',',':')).encode()
-    except Exception as error:
-        print('Gold yesterday archive deferred: '+type(error).__name__,flush=True)
+    if not checkpoint_only:
+        try:
+            from gold_history import project
+            projection=project(root,json.loads(gold['arab_quote_day1.json']))
+            gold['arab_quote_day1.json']=json.dumps(projection,ensure_ascii=False,separators=(',',':')).encode()
+        except Exception as error:
+            print('Gold yesterday archive deferred: '+type(error).__name__,flush=True)
     files=collect(root,verified); index={}; known={item['sha256'] for item in verified.values()}
     uploads={}
     for path,data in files.items():
@@ -80,6 +83,12 @@ def publish(s3,bucket,root):
         for count,task in enumerate(as_completed(tasks),1):
             task.result()
             if count%25==0 or count==len(tasks):print(f'Uploaded {count}/{len(tasks)} objects',flush=True)
+    if checkpoint_only:
+        if not index:
+            raise ValueError('Empty private checkpoint')
+        write_manifest(s3,bucket,index)
+        print(f'Private audit checkpoint saved: {len(index)} files; Gold feeds unchanged',flush=True)
+        return
     # Gold uses its existing names and requires authenticated Worker access.
     from gold_browser_feed import project as browser_project, encoded
     def upload_browser_page(key, data):
@@ -101,6 +110,54 @@ def publish(s3,bucket,root):
         s3.put_object(Bucket=bucket,Key=name,Body=data,ContentType='application/json',CacheControl='private, no-store')
     write_manifest(s3,bucket,index)
     print(f'Private checkpoint saved: {len(index)} files; {len(gold)} Gold feeds')
+
+
+def checkpoint_day(s3, bucket, root, day):
+    """Commit one verified priority day without rebuilding Gold or old archives.
+
+    The caller holds the normal data-writer mutex. Merge with the current
+    manifest so old progress, unconsumed journals and current scans survive.
+    """
+    from datetime import date, datetime, timedelta
+    from adaptive_calibration import VERSION, VALIDATION_CYCLE
+    from auditor_daily_priority import STATUS, WEIGHTS, signature
+    from auditor_history_chunks import reusable
+    from auditor_schedule import ROME
+    day = date.fromisoformat(str(day))
+    root = Path(root)
+    required = {f'auditordata/prematch_{day}.json', STATUS, WEIGHTS}
+    required.update(f'auditarchive/prematch_{day}_{suffix}' for suffix in
+                    ('daily.json','daily.md','results.json','calibration.json','checkpoint.json'))
+    if any(not (root/path).is_file() or (root/path).is_symlink() for path in required):
+        raise ValueError('Missing priority checkpoint evidence')
+    status = read_store(root/STATUS, {})
+    weights = read_store(root/WEIGHTS, {})
+    report = root/f'auditarchive/prematch_{day}_daily.json'
+    if (status.get('version') != 1 or status.get('date') != str(day+timedelta(days=1))
+            or status.get('report_date') != str(day)
+            or status.get('report_sha256') != signature(report)
+            or status.get('weights_sha256') != signature(root/WEIGHTS)
+            or weights.get('as_of') != status['date']
+            or weights.get('version') != VERSION
+            or weights.get('validation_cycle') != VALIDATION_CYCLE
+            or read_store(report, {}).get('audit_date') != str(day)
+            or not reusable(root, day, datetime.now(ROME))):
+        raise ValueError('Unverified priority checkpoint evidence')
+    verified = previous_manifest(s3,bucket)
+    files = collect(root,verified,patterns=sorted(required))
+    additions = {path:{'sha256':sha(raw),'bytes':len(raw)} for path,raw in files.items()}
+    known = {item['sha256'] for item in verified.values()}
+    uploads = {sha(raw):raw for raw in files.values() if sha(raw) not in known}
+    def upload(item):
+        digest, raw = item
+        s3.put_object(Bucket=bucket,Key='state/objects/'+digest,Body=raw,Metadata={'sha256':digest})
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for _ in pool.map(upload,uploads.items()):
+            pass
+    if previous_manifest(s3,bucket) != verified:
+        raise RuntimeError('Private checkpoint advanced during priority publication')
+    write_manifest(s3,bucket,{**verified,**additions})
+    print(f'Priority daily checkpoint saved: {day}; {len(additions)} files; Gold feeds unchanged',flush=True)
 
 def write_manifest(s3, bucket, index):
     manifest = json.dumps({'version': 1, 'files': index}, sort_keys=True, separators=(',', ':')).encode()
@@ -163,9 +220,19 @@ def client():
     return boto3.client('s3',endpoint_url=f'https://{account}.r2.cloudflarestorage.com',region_name='auto',aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],config=Config(retries={'max_attempts':3},connect_timeout=15,read_timeout=60))
 
 if __name__=='__main__':
-    command=sys.argv[1]
-    if command not in ('publish','restore'):raise SystemExit('Expected publish or restore')
-    try:globals()[command](client(),os.environ['R2_BUCKET'],Path(__file__).resolve().parents[1])
+    import argparse
+    from datetime import date
+    parser=argparse.ArgumentParser()
+    parser.add_argument('command',choices=('publish','restore','checkpoint','checkpoint-day'))
+    parser.add_argument('--date',type=date.fromisoformat)
+    args=parser.parse_args()
+    if (args.command=='checkpoint-day') != (args.date is not None):
+        parser.error('--date is required only for checkpoint-day')
+    try:
+        storage,bucket,root=client(),os.environ['R2_BUCKET'],Path(__file__).resolve().parents[1]
+        if args.command=='checkpoint':publish(storage,bucket,root,checkpoint_only=True)
+        elif args.command=='checkpoint-day':checkpoint_day(storage,bucket,root,args.date)
+        else:globals()[args.command](storage,bucket,root)
     except Exception as error:
         # Never print SDK request headers/credentials.
         raise SystemExit('Private storage failed: '+type(error).__name__)

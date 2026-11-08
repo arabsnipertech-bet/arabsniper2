@@ -20,23 +20,26 @@ def ensure_priority(root, today, phase, calibrate):
     day = today-timedelta(days=1)
     report = root/f'auditarchive/prematch_{day}_daily.json'
     saved = read_store(root/STATUS, {})
-    if (saved.get('date') == str(today) and has_daily_report(root, today)
+    ready = (saved.get('version') == 1 and saved.get('date') == str(today)
+            and saved.get('report_date') == str(day) and has_daily_report(root, today)
             and saved.get('report_sha256') == signature(report)
             and (root/WEIGHTS).is_file()
             and saved.get('weights_sha256') == signature(root/WEIGHTS)
-            and read_store(root/WEIGHTS, {}).get('as_of') == str(today)):
-        return
-    phase('src/auditor_daily_priority.py', '--date', str(day))
-    if not has_daily_report(root, today):
-        raise ValueError('Missing priority daily Auditor report')
-    calibrate()
-    if read_store(root/WEIGHTS, {}).get('as_of') != str(today):
-        raise ValueError('Priority calibration was not updated')
-    write_store(root/STATUS, {'version': 1, 'date': str(today), 'report_date': str(day),
-                             'report_sha256': signature(report),
-                             'weights_sha256': signature(root/WEIGHTS)})
-    # This checkpoint preserves any older PROGRESS/cursor and unconsumed journals.
-    phase('src/gold_storage.py', 'publish')
+            and read_store(root/WEIGHTS, {}).get('as_of') == str(today))
+    if not ready:
+        phase('src/auditor_daily_priority.py', '--date', str(day))
+        if not has_daily_report(root, today):
+            raise ValueError('Missing priority daily Auditor report')
+        calibrate()
+        if read_store(root/WEIGHTS, {}).get('as_of') != str(today):
+            raise ValueError('Priority calibration was not updated')
+        write_store(root/STATUS, {'version': 1, 'date': str(today), 'report_date': str(day),
+                                 'report_sha256': signature(report),
+                                 'weights_sha256': signature(root/WEIGHTS)})
+        # This checkpoint preserves older progress and unconsumed journals.
+        phase('src/gold_storage.py', 'checkpoint-day', '--date', str(day))
+    # Rebuild public results on retries too: private save may have succeeded
+    # immediately before an interrupted git publication.
     phase('src/homepage_results.py')
     phase('src/private_publication.py', '--results-only')
     print(f'Priority daily report and calibration saved: {day}', flush=True)
@@ -65,7 +68,7 @@ def build_yesterday(root, day, now, fetcher=None):
         ledger.add_collection('fixtures')
         for source in forecasts:
             kind = None
-            for col, key, record in entries(source):
+            for col, key, record in entries(source, fixture_date=str(day)):
                 if col is None:
                     if key == 'journal_type': kind = record
                 elif key is not None and forecast_day(col, key, record, now) == str(day):
@@ -74,14 +77,16 @@ def build_yesterday(root, day, now, fetcher=None):
             if kind != 'forecasts':
                 raise ValueError('Invalid forecast journal')
         for source in policies:
-            payload = read_store(source)
-            if payload.get('schema_version') != 1 or payload.get('journal_type') != 'policies':
-                raise ValueError('Invalid policy journal')
-            for col in ('analysis_updates', 'study_observations'):
-                for key, record in payload.get(col, {}).items():
+            metadata = {}
+            for col, key, record in entries(source, fixture_date=str(day)):
+                if col is None:
+                    if key in ('schema_version','journal_type'): metadata[key] = record
+                elif col in ('analysis_updates','study_observations') and key is not None:
                     if forecast_day(col, key, record, now) == str(day):
                         record.pop('settlement', None)
                         merge_forecast(ledger, col, key, record)
+            if metadata != {'schema_version':1,'journal_type':'policies'}:
+                raise ValueError('Invalid policy journal')
         ledger.write(path)
     # The normal settlement, daily report and calibration evidence remain unchanged.
     return settle_day(root, day, now, fetcher=fetcher or fetch_results)

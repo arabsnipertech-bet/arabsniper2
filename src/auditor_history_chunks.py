@@ -92,7 +92,7 @@ def advance(root, work_date, phase, deadline, clock):
         elapsed = max(0, (clock()-block_started).total_seconds())
         cursor['largest_block_seconds'] = max(cursor.get('largest_block_seconds', 0), elapsed)
         write_store(root/CURSOR, cursor)
-        phase('src/gold_storage.py', 'publish')
+        phase('src/gold_storage.py', 'checkpoint')
         elapsed = max(0, (clock()-block_started).total_seconds())
         needed = max(needed, elapsed*1.25+300)
         print(f'Historical day saved independently: {day}', flush=True)
