@@ -1,6 +1,6 @@
 """Independent price/flow tier. Never edits a Gold decision or probability."""
 from math import isfinite
-from opportunity_policy import goal_market
+from opportunity_policy import goal_market, probability_order
 from multimarket_model import stamp
 
 LEGACY_POLICY_ID = 'platinum-flow-v1'
@@ -70,7 +70,7 @@ def evaluate(row, as_of):
             'gold_eligible': (row.get('opportunity') or {}).get('eligible') is True}
 
 
-def annotate(matrix, meta, as_of):
+def annotate(matrix, meta, as_of, *, probability_model=None, quote_filter=None):
     now, kickoff = stamp(as_of), stamp(meta.get('kickoff'))
     if (not now or not kickoff or now >= kickoff or meta.get('result')
             or meta.get('status_short') not in ('NS', 'TBD')): return
@@ -79,10 +79,20 @@ def annotate(matrix, meta, as_of):
         if goal_market(row) is None:
             continue
         row['platinum'] = evaluate(row, as_of)
+        reason = quote_filter(row) if quote_filter else None
+        if reason:
+            d = row['platinum']
+            d.update(eligible=False, reasons=[*d['reasons'], reason], qualification=None,
+                     value_cohort=None, positive_ev_shadow_eligible=False)
         if row['platinum']['eligible']: candidates.append(row)
-    candidates.sort(key=lambda r: (-r['oci'], r['delta_pct'], -r['odd'], str(r['id'])))
+    if probability_model:
+        candidates.sort(key=lambda r: (r['ev_pct'] is None or r['ev_pct'] <= 0, probability_order(r)))
+    else:
+        candidates.sort(key=lambda r: (-r['oci'], r['delta_pct'], -r['odd'], str(r['id'])))
     for rank, row in enumerate(candidates, 1): row['platinum']['rank'] = rank
     matrix['platinum_policy'] = {'id': POLICY_ID, 'evaluated_at': as_of, 'limits': dict(LIMITS),
         'eligible_markets': len({goal_market(r) for r in candidates}),
         'best_market_id': candidates[0]['id'] if candidates else None,
         'gold_policy_changed': False}
+    if probability_model:
+        matrix['platinum_policy']['probability_model'] = probability_model

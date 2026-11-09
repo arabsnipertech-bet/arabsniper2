@@ -282,3 +282,17 @@ body[data-gold-design] .mx-card.mx-compact h3{font-size:21px;margin-bottom:0}
 .mx-v7-odds span{display:grid;gap:4px;font-size:.7rem}
 .mx-v7-compact{display:block;padding:0 12px 7px;font-size:.69rem;color:#b9e4eb}
 @media(max-width:560px){.mx-v7-panel{margin:9px 12px;padding:9px}.mx-v7-panel ul{grid-template-columns:1fr}.mx-v7-odds{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.mx-v7-published{background:#16232d;border-color:#354b57;padding:14px}
+.mx-v7-published header{margin-bottom:10px}
+.mx-v7-published ul{gap:8px}
+.mx-v7-published li{padding:9px 11px;background:#1c303d}
+.mx-v7-published li[data-v7-role=primary]{grid-column:1/-1;border-left:3px solid var(--mx-accent);background:#202b34}
+.mx-v7-published li[data-v7-role=primary] span,.mx-v7-published li strong{color:var(--mx-accent)}
+.mx-v7-published li b,.mx-v7-published li strong{font-size:1rem}
+.mx-v7-published li strong small{font-size:.64rem;font-weight:500}
+.mx-v7-published .mx-v7-empty{font-size:.85rem;line-height:1.45}
+.mx-v7-advanced{margin:12px 24px;border:1px solid #354b57;border-radius:10px}
+.mx-v7-advanced>summary{cursor:pointer;min-height:44px;padding:12px;font-size:.85rem}
+.mx-v7-advanced .mx-cockpit,.mx-v7-advanced .mx-opportunity{margin:12px}
+@media(max-width:560px){.mx-v7-published{padding:12px}.mx-v7-advanced{margin:10px 12px}}

@@ -143,6 +143,7 @@ def main(directory='data'):
             and not m['fixture'].get('result') and stamp(m['fixture'].get('kickoff'))
             and stamp(m['fixture']['kickoff']) > stamp(as_of)]
         policies = Counter(a.get('matrix', {}).get('opportunity_policy', {}).get('id') for a in upcoming)
+        v7_tiers, v7_picks = Counter(), Counter()
         required = {market_id(s) for s in base_specs()}
         for a in upcoming:
             if a.get('matrix', {}).get('platinum_policy', {}).get('id') != PLATINUM_POLICY_ID:
@@ -151,10 +152,23 @@ def main(directory='data'):
                 raise RuntimeError('Incomplete Gold policy migration; refusing publication')
             if a.get('rates') and not required.issubset({r['id'] for r in a['matrix']['rows']}):
                 raise RuntimeError('Incomplete Gold market migration; refusing publication')
+            matrix = a['matrix']
+            model = matrix.get('publication_model')
+            if model:
+                if any(matrix[k].get('probability_model') != model
+                       for k in ('opportunity_policy', 'platinum_policy')):
+                    raise RuntimeError('Gold and Platinum have different probability sources')
+                v7 = matrix.get('v7') or {}
+                v7_tiers[v7.get('tier', 'unavailable')] += 1
+                for role in ('primary', 'consigliata', 'colpaccio'):
+                    signal = (v7.get('signals') or {}).get(role)
+                    if signal:
+                        v7_picks[role] += 1
         counters[path.name] = {'fixtures': count, 'eligible_markets': summary.get('eligible_markets', 0),
             'fixtures_with_proposal': summary.get('upcoming_fixtures_with_proposal', 0),
             'fixtures_with_platinum': summary.get('upcoming_fixtures_with_platinum', 0),
             'saved_policy_versions': dict(policies),
+            'v7_publication_tiers': dict(v7_tiers), 'v7_selections': dict(v7_picks),
             'fixtures_with_combo': sum(any(r.get('spec', {}).get('kind') == 'halves_total'
                 for r in a.get('matrix', {}).get('rows', [])) for a in upcoming),
             'allowed_fixtures': len(day.get('matches', [])),

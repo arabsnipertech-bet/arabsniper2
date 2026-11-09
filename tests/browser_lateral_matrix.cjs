@@ -383,6 +383,49 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.evaluate(()=>JSON.stringify(currentPayload)),before);
    await page.locator('[data-mx-close]').click();
   }
+  const activePayload=structuredClone(singlePayload),activeMatch=activePayload.matches[0];
+  activeMatch.fixture.fixture_id='751';
+  const matrix=activeMatch.multimarket.matrix,v7=matrix.v7,model=v7.version;
+  matrix.publication_model=model;
+  Object.assign(v7,{status:'published',fixture_id:'751',tier:'radar',signals:{},markets:{}});
+  const picks=[
+   ['primary',r=>r.spec.kind==='btts'&&r.period==='ft'&&r.spec.side==='yes','GG FT',1.90,.58],
+   ['consigliata',r=>r.spec.kind==='halves_total','Over 0,5 PT + Over 0,5 ST',2.40,.49],
+   ['colpaccio',r=>r.spec.kind==='total'&&r.period==='ht'&&r.spec.line===3.5&&r.spec.side==='over','Over 3,5 PT',10.,.12]
+  ];
+  for(const [role,match,label,odd,prob] of picks){
+   const source=matrix.rows.find(match);
+   Object.assign(source,{probability_model:model,odd,first_odd:odd,statistical_pct:prob*100,
+    quote_executable:true,quote_status:'recent',provider_updated_at:v7.captured_at,quote_observed_at:v7.captured_at});
+   v7.signals[role]={market_id:source.id,source_market_id:source.id,odd};
+   v7.markets[source.id]={label,odd,source_market_id:source.id,raw:prob,calibrated:prob,fair:prob,
+    quote:{first_odd:odd,bookmaker:'Test'},features:{oci:12,margin_pct:5}};
+  }
+  for(const width of [1280,390,360]){
+   await page.setViewportSize({width,height:900});
+   await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},activePayload);
+   const card=page.locator('.mx-card');
+   assert.equal(await card.locator('.mx-category').innerText(),'RADAR BLU');
+   assert.equal(await card.locator('.mx-compact-proposal strong').innerText(),'GG FT');
+   assert((await card.innerText()).includes('58,0%'));
+   assert(!/Consigliata|Colpaccio|Studio V7/.test(await card.innerText()));
+   await card.locator('[data-mx-open]').click();
+   const modal=page.locator('dialog');
+   const headline=modal.locator('[data-v7-role="primary"]');
+   assert((await headline.innerText()).includes('GG FT'));
+   assert((await headline.innerText()).includes('58,0%'));
+   assert.deepEqual(await modal.locator('[data-v7-role]').count(),3);
+   assert(!(await modal.locator('.mx-cockpit').isVisible()));
+   assert(await modal.evaluate(el=>el.scrollWidth<=el.clientWidth),'V7 sheet fits '+width);
+   await modal.locator('[data-v7-details] summary').click();
+   assert(await modal.getByText('Poisson originale').isVisible());
+   await modal.locator('[data-v7-advanced] > summary').click();
+   await modal.locator('[data-mx-section="ht"]').click();
+   assert(await modal.locator('.mx-cockpit').isVisible());
+   assert.equal(await modal.locator('[data-mx-section="ht"]').getAttribute('aria-pressed'),'true');
+   await page.screenshot({path:`test-artifacts/matrix-v7-selection-${width}.png`});
+   await page.locator('[data-mx-close]').click();
+  }
   console.log('PASS compact Gold browser: 1X2 only, full detail, categories, selector, live overlays, calendar/login/cache, desktop/390/360');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

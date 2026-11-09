@@ -54,3 +54,30 @@ Fast, NightScan, Auditor e manutenzione V7 condividono il mutex di scrittura. La
 La pubblicazione richiede suite Python e Node, anteprima browser desktop/mobile, prova del feed privato con una sessione autorizzata e riscontro dello stato Cloudflare. La promozione del motore ufficiale richiede giornate acquisite dopo il freeze.
 
 Per ripristinare la produzione, fare revert del merge V7 su main e pubblicare il nuovo main mediante il workflow Cloudflare. Usare git revert -m 1 per il merge ordinario e git revert per lo squash. Il revert conserva i successivi commit dei feed pubblici. Conservare il manifest R2 corrente e gli archivi V7. Se serve correggere un feed, recuperare soltanto i relativi oggetti dal manifest verificato precedente sotto il mutex. Verificare sessione Gold, archivio e un ciclo Fast dopo la pubblicazione.
+
+## Attivazione V7 per Gold, Platinum e Studio
+
+Il motore usa la stessa distribuzione di punteggi V7 per tutti i mercati della matrice. Le stime V5.1, le probabilità Poisson originali e il fair restano disponibili nell'audit. Le policy Gold v6.1 e Platinum v1.1 conservano i rispettivi criteri di ammissione. I mercati ammessi sono ordinati per probabilità V7, con lo scenario prudente e il prezzo come criteri successivi. Le Platinum ammesse per flusso con valore atteso centrale nullo o negativo sono indicate esplicitamente e hanno precedenza inferiore alle proposte ufficiali con valore positivo.
+
+La lista pubblica una sola proposta per partita nell'area Gold. In scheda, Consigliata richiede un altro mercato compatibile con quota più alta. Colpaccio richiede quota da 4,50, probabilità sotto il 32% e sostegno del proprio prezzo anche nello scenario prudente. Studio e Radar Blu confrontano esiti 1X2, GG/NG, Over/Under e combo binarie con quota diretta utilizzabile. Le linee asiatiche a mezzo gol equivalenti condividono l'identità del mercato. Per le combo senza prezzo eseguibile resta consultabile la stima. Ogni ruolo congelato conserva il prezzo effettivamente selezionato per l'audit.
+
+### Controllo delle fasce OCI del 9 novembre
+
+Replay del workbook storico su **1.407 partite e 8.560 coppie partita/mercato** del 26 ottobre–6 novembre. Si usa l'ultima riga prematch con quota registrata come recente o stabile da cache, escludendo quote esplicitamente sintetiche e timestamp successivi alla rilevazione. Le linee equivalenti sono deduplicate. Nei record più vecchi la disponibilità è quella dichiarata dal workbook, con timestamp di fonte e flag eseguibile spesso assenti. Il blocco finale del 4–6 novembre è cronologicamente separato, ma appartiene allo stesso storico del dossier.
+
+| Coorte | N intero periodo | ROI teorico | N 4–6 novembre | ROI teorico |
+|---|---:|---:|---:|---:|
+| Over 1,5 PT, OCI da 0 a meno di 50 | 93 | +14,3% | 18 | +9,2% |
+| Over 1,5 PT, OCI da 50 | 225 | −7,6% | 39 | −4,9% |
+| Over 2,5 FT, OCI da 0 a meno di 50 | 104 | +13,5% | 15 | +17,5% |
+| Over 2,5 FT, OCI da 50 | 290 | −11,6% | 51 | −22,9% |
+| GG PT, OCI sotto −50 e quota salita almeno del 5% | 159 | +29,1% | 32 | +35,5% |
+| Over 2,5 FT, persistenza tra 0 e 1 | 193 | +11,9% | 36 | +14,7% |
+| Over 2,5 FT, quota scesa almeno del 5% | 54 | −29,6% | 13 | −35,2% |
+| Over 2,5 FT in calo con GG PT in salita nello stesso snapshot | 71 | +5,4% | 17 | +6,2% |
+
+Per separare l'OCI dal prezzo si è stimata, fino al 3 novembre, la differenza media tra frequenza e fair per quattro fasce OCI, con 50 osservazioni equivalenti a correzione zero. Sul blocco finale la correzione migliora leggermente Brier e log-loss di GG PT e Over 2,5 FT e peggiora entrambi su Over 1,5 PT, Over 2,5 PT, Over 3,5 FT e GG FT. Per Over 3,5 PT e combo dirette il campione OCI è insufficiente. Le fasce rimangono coorti di osservazione. L'autoapprendimento V7 continua a verificare il peso del fair su finestre temporali separate.
+
+### Ripristino operativo della promozione
+
+Prima del passaggio, `main` punta a `25b571ad73ca820a1805674fea9cb74399b82633`. Per tornare alla selezione V5.1 delle partite future, impostare la variabile GitHub Actions `V7_SHADOW_ONLY=true` e avviare **ArabSniper Fast Scan** con `force_fast`. Il refresh ripristina le probabilità V5.1 conservate e ricostruisce i feed compatibili. Le fotografie già congelate e gli esiti restano nell'archivio. Riattivare V7 rimuovendo la variabile ed eseguendo un nuovo Fast.

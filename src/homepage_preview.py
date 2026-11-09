@@ -151,10 +151,18 @@ def build_preview(payload, previous=None, now=None, rng=None):
             if (not kickoff or kickoff <= now or kickoff.astimezone(ROME).date().isoformat() != today
                     or f.get('status_short') not in ('NS', 'TBD') or not output_allowed(match)): continue
             # Preserve the saved snapshot while checking freshness at publication.
-            view = {**a, 'matrix': deepcopy(a.get('matrix') or {})}
-            expire(view, f, now.isoformat())
-            selected = view['matrix']['opportunity_policy']['best_market_id']
-            row = next((r for r in view['matrix']['rows'] if r['id'] == selected), None)
+            matrix = a.get('matrix') or {}
+            if matrix.get('publication_model'):
+                from v7_probability import price_usable
+                selected = (matrix.get('opportunity_policy') or {}).get('best_market_id')
+                row = next((r for r in matrix.get('rows', []) if r['id'] == selected
+                            and r.get('probability_model') == matrix['publication_model']
+                            and price_usable(r, now.isoformat(), f['kickoff'])), None)
+            else:
+                view = {**a, 'matrix': deepcopy(matrix)}
+                expire(view, f, now.isoformat())
+                selected = view['matrix']['opportunity_policy']['best_market_id']
+                row = next((r for r in view['matrix']['rows'] if r['id'] == selected), None)
             if row:
                 candidates.append((row.get('ev_low_pct', -100), {'fixture_id': str(f['fixture_id']),
                     'match': f.get('match', ''), 'league': f.get('league', ''), 'country': f.get('country'), 'kickoff': f['kickoff'],

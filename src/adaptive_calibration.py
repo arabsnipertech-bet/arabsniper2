@@ -187,7 +187,8 @@ class Evidence:
             odd, book = row.get('odd'), row.get('bookmaker_id')
             key = cohort(market, odd, meta.get('competition_tier'))
             seen, updated = stamp(row.get('quote_observed_at')), stamp(row.get('provider_updated_at'))
-            margin, p = row.get('selected_margin_pct'), row.get('statistical_pct')
+            margin = row.get('selected_margin_pct')
+            p = (row.get('v51_pricing') or row).get('statistical_pct')
             if (not key or book is None or row.get('quote_status') != 'recent'
                     or row.get('quote_source') not in ('bookmaker', 'asian_halfline') or row.get('quote_executable') is not True
                     or not number(margin) or not 0 <= margin <= 9 or not seen or not updated

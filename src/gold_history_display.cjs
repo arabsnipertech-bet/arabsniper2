@@ -20,7 +20,7 @@ const result = input.map(record => {
   const platinum = matrix.platinumSignals(rows, options);
   const radar = tier.tone === 'studio' ? matrix.marketSignals(rows, options) : [];
   return {name:radar.length ? 'RADAR BLU' : tier.name, tone:tier.tone,
-    category:radar.length ? 'radar' : tier.tone, proposal_id:tier.row?.id || null,
+    category:tier.category || (radar.length ? 'radar' : tier.tone), proposal_id:tier.row?.id || null,
     platinum_ids:platinum.map(r=>r.id), radar_ids:radar.map(r=>r.id)};
 });
 global.Date = Clock;

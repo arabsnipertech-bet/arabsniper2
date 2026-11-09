@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT/'src'), str(ROOT/'auditor')]
@@ -12,10 +13,11 @@ sys.path[:0] = [str(ROOT/'src'), str(ROOT/'auditor')]
 from audit_storage import read_store, write_store
 from current_audit import forecast_day
 from gold_storage import sha, write_manifest
-from lateral_matrix import market_id, settle_spec, specification
+from lateral_matrix import build_matrix, market_id, settle_spec, specification
+from matrix_pipeline import build_board
 from matrix_quotes import collect
 from v7_archive import ROME, WEIGHTS, quote_evidence, results_for_day, valid_snapshot
-from v7_decision import COMBOS, GG, GOAL, capture, quote_rows, route
+from v7_decision import COMBOS, GG, GOAL, capture, publication, quote_rows, route
 from v7_learning import STATE, active_weight, deduplicated, fit, run
 from v7_maintenance import MARKER, complete_price_pages, consolidate, price_window
 from v7_probability import BASE_WEIGHT, blend_rates, market_rates, price_usable, raw_rates, result_probabilities, score_model
@@ -109,6 +111,65 @@ class MathAndRouting(unittest.TestCase):
         self.assertFalse(valid_snapshot(snapshot, META, AT))
         self.assertIsNone(capture(assessment(), META, START))
         self.assertIsNone(capture(assessment(), dict(META,result={'status':'FT'}), AT))
+
+    def test_active_tiers_share_repriced_v7_and_rollback_restores_v51(self):
+        profiles = {side: {f'for_{p}': dict(sample=8, mean=1.5, without_last=1.5)
+                           for p in ('ft', 'ht')} for side in ('home', 'away')}
+        a = build_matrix(dict(rates=dict(RATES, home_ft=2.3, away_ft=1.4),
+                              profiles=profiles, markets=[]), AT)
+        matrix = a['matrix']
+        over = next(r for r in matrix['rows'] if r['id'] == FT)
+        legacy = over['statistical_pct']
+        quote = row(json.loads(FT), 2.25, fair=.43)
+        quote.pop('statistical_pct')
+        over.update(quote, first_odd=2.25/.96, bookmaker='Test', oci=38,
+                    market_fair_pct=43, delta_pct=-4, paired_books=4, agreeing_books=3,
+                    movement_confirmed=True, fair_direction_coherent=True,
+                    selected_movement=dict(delta_pct=-4, fair_delta_pp=2, persistence=.67, reversal=False))
+        meta = dict(META, country='Italy', league='Serie A')
+        day = {'matches': [dict(fixture=meta, multimarket=a)]}
+        with patch.dict('os.environ', {'GOLD_PRIVATE': 'true', 'V7_SHADOW_ONLY': 'false'}):
+            build_board(day, AT)
+            snapshot = matrix['v7']
+            for policy in ('opportunity_policy', 'platinum_policy'):
+                self.assertEqual(matrix[policy]['probability_model'], snapshot['version'])
+                self.assertEqual(matrix[policy]['best_market_id'], FT)
+            primary = snapshot['signals']['primary']
+            self.assertEqual(primary['market_id'], FT)
+            self.assertEqual(primary['odd'], over['odd'])
+            self.assertAlmostEqual(over['statistical_pct']/100, snapshot['markets'][FT]['calibrated'], places=6)
+            self.assertAlmostEqual(snapshot['markets'][FT]['v51'], legacy/100)
+            self.assertAlmostEqual(over['ev_pct'], over['statistical_pct']*over['odd']-100, places=3)
+            self.assertTrue(valid_snapshot(snapshot, meta, AT))
+            build_board(day, AT)
+            self.assertEqual(matrix['v7'], snapshot)
+            build_board(day, START)
+            self.assertEqual(matrix['v7'], snapshot)
+        with patch.dict('os.environ', {'GOLD_PRIVATE': 'true', 'V7_SHADOW_ONLY': 'true'}):
+            build_board(day, AT)
+            self.assertEqual(matrix['v7']['status'], 'shadow')
+            self.assertNotIn('publication_model', matrix)
+            self.assertEqual(over['statistical_pct'], legacy)
+
+    def test_publication_compares_gg_ft_and_executable_combos_and_keeps_roles_distinct(self):
+        gg_ft = market_id(specification('btts', 'ft', 'yes'))
+        no_goal = market_id(specification('btts', 'ft', 'no'))
+        combo = market_id(specification('halves_total', 'ft', 'over', .5, .5))
+        def priced(key, p, odd, excluded=()):
+            spec = json.loads(key)
+            return dict(source_market_id=key, spec_kind=spec['kind'], calibrated=p, odd=odd,
+                        ev=p*odd-1, ev_low=p*odd-1.01, edge_exclusions=excluded)
+        records = {gg_ft:priced(gg_ft,.62,1.85), FT:priced(FT,.52,2.1),
+                   combo:priced(combo,.54,2.25), HIGH:priced(HIGH,.12,10.),
+                   no_goal:priced(no_goal,.38,4.)}
+        signals = dict(radar_conversione=None, radar_sorprese=None)
+        tier = publication(records, signals, (None, None, None, None), FT)
+        self.assertEqual(tier, 'radar')
+        self.assertEqual([signals[key]['market_id'] for key in ('primary','consigliata','colpaccio')],
+                         [gg_ft, combo, HIGH])
+        records[combo]['edge_exclusions'] = ['quota_non_eseguibile']
+        publication(records, signals, (None, None, None, None), FT)
+        self.assertEqual(signals['consigliata']['market_id'], FT)
 
 
 class ArchiveAndWorkflow(unittest.TestCase):

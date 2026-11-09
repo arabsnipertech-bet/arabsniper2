@@ -152,31 +152,45 @@ def build_board(day, as_of):
                 if row.get('published_selection') and row.get('market') in board:
                     board[row['market']]['started_selections'] += 1
         if a.get('model_id') != MODEL_ID: continue
-        from copy import deepcopy
-        prior_stability = deepcopy((a.get('matrix') or {}).get('proposal_stability') or {})
-        if kickoff and kickoff > stamp(as_of): expire(a, meta, as_of)
-        rows = [safe_price_row(r) for r in a.get('matrix', {}).get('rows', [])]
-        indexed = {r['id']: r for r in rows}
+        matrix = a.setdefault('matrix', {})
+        before_kickoff = kickoff and kickoff > stamp(as_of) and not meta.get('result')
+        if before_kickoff:
+            prior_stability = deepcopy(matrix.get('v51_stability', matrix.get('proposal_stability')) or {})
+            if matrix.get('publication_model') or matrix.get('v51_stability'):
+                matrix['proposal_stability'] = deepcopy(prior_stability)
+            expire(a, meta, as_of)
+            annotate_platinum(matrix, meta, as_of)
+            quote_monitoring(matrix, as_of, meta.get('kickoff'))
+            from decision_shadow import capture as capture_shadow
+            matrix['decision_shadow'] = capture_shadow(a, meta, as_of, prior_stability)
+            if os.getenv('GOLD_PRIVATE') == 'true' and meta.get('status_short') in ('NS', 'TBD'):
+                from v7_decision import VERSION, capture as capture_v7, recheck_policies
+                from v7_learning import active_weight
+                weight, learning = active_weight(as_of)
+                publish = os.getenv('V7_SHADOW_ONLY') != 'true'
+                if publish:
+                    matrix['v51_stability'] = deepcopy(matrix.get('proposal_stability'))
+                    matrix['publication_model'] = VERSION
+                else:
+                    matrix.pop('publication_model', None)
+                    matrix.pop('v51_stability', None)
+                matrix['v7'] = capture_v7(a, meta, as_of, weight, learning, publish=publish)
+                if publish and matrix['v7'] is None:
+                    recheck_policies(a, meta, as_of, None)
+            from selection_studies import generate_ideas
+            matrix['quote_monitoring']['suppressed_study_candidates'] = []
+            matrix['quote_monitoring']['studio_ideas'] = generate_ideas(
+                a, as_of, meta.get('kickoff'), matrix['quote_monitoring']['suppressed_study_candidates']
+            ) if meta.get('status_short') in ('NS', 'TBD') else []
+        rows = [safe_price_row(r) for r in matrix.get('rows', [])]
         modeled += len(rows)
         priced += sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)
         complete += bool(rows)
         category_counts = Counter(r.get('category', 'no_quote') for r in rows)
         categories.update(category_counts)
-        if kickoff and kickoff <= stamp(as_of) or meta.get('result'):
+        if not before_kickoff:
             continue  # Immutable forecast, even when it is no longer upcoming.
-        annotate_platinum(a.get('matrix', {}), meta, as_of)
-        quote_monitoring(a.get('matrix',{}),as_of,meta.get('kickoff'))
-        from selection_studies import generate_ideas
-        matrix = a.get('matrix', {})
-        matrix['quote_monitoring']['suppressed_study_candidates'] = []
-        matrix['quote_monitoring']['studio_ideas'] = generate_ideas(a, as_of, meta.get('kickoff'), matrix['quote_monitoring']['suppressed_study_candidates']) if meta.get('status_short') in ('NS', 'TBD') else []
-        from decision_shadow import capture as capture_shadow
-        matrix['decision_shadow'] = capture_shadow(a, meta, as_of, prior_stability)
-        if os.getenv('GOLD_PRIVATE') == 'true':
-            from v7_decision import capture as capture_v7
-            from v7_learning import active_weight
-            weight, learning = active_weight(as_of)
-            matrix['v7'] = capture_v7(a, meta, as_of, weight, learning)
+        indexed = {r['id']: r for r in rows}
         platinum += bool(a.get('matrix', {}).get('platinum_policy', {}).get('best_market_id'))
         a.get('matrix', {})['summary'] = {'categories': dict(category_counts), 'observed_markets': len(rows),
                                         'priced_markets': sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)}
@@ -211,9 +225,13 @@ def build_board(day, as_of):
             old['quote'] = {'bookmaker': new.get('bookmaker'), 'bookmaker_id': new.get('bookmaker_id'),
                 'provider_updated_at': new.get('provider_updated_at'),
                 'movement': {'first_odds': {old['selection']: new.get('first_odd')}}} if new.get('odd') else None
-            old['price_assessment'] = {'reference_source': 'statistics_only',
+            old['price_assessment'] = {'reference_source': 'v7_calibrated' if new.get('probability_model') else 'statistics_only',
                 'reference_fair_odd': new.get('fair_odd'), 'estimated_return_pct': new.get('ev_pct'),
                 'validated_advantage': False}
+            if new.get('probability_model'):
+                old['probability_model'] = new['probability_model']
+            else:
+                old.pop('probability_model', None)
             old['opportunity'] = deepcopy(new.get('opportunity') or {})
             old['matrix_market_id'] = new['id']
             old['selection_reasons'] = list(old['opportunity'].get('reasons') or [])
