@@ -59,7 +59,8 @@ def forecast_day(collection, key, record, now):
     elif collection == 'study_observations':
         expected_key = f"{expected_key}::{record.get('captured_at')}"
     elif collection == 'analysis_updates':
-        expected_key = f"{record.get('model_version')}::{expected_key}::{record.get('captured_at')}"
+        stage = '::publication' if record.get('publication_snapshot') is True else ''
+        expected_key = f"{record.get('model_version')}::{expected_key}{stage}::{record.get('captured_at')}"
     elif collection == 'signal_observations':
         from signal_research import record_key
         expected_key = record_key(record)
@@ -119,7 +120,8 @@ def fetch_results(date, key):
         matches.append({'fixture': {'fixture_id': str(fixture.get('id')), 'result': {
             'status': (fixture.get('status') or {}).get('short'),
             'home_ht': ht.get('home'), 'away_ht': ht.get('away'),
-            'home_ft': ft.get('home'), 'away_ft': ft.get('away')}}})
+            'home_ft': ft.get('home'), 'away_ft': ft.get('away'),
+            'extra_time': score.get('extratime'), 'penalties': score.get('penalty')}}})
     return {'days': [{'matches': matches}]}
 
 
@@ -133,6 +135,7 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
     if not path.is_file():
         raise FileNotFoundError(f'No frozen archive for {date}')
     queried = False
+    fetched = None
     progress(f'caricamento e verifica previsioni {date}')
     results_path = root / f'auditarchive/prematch_{date}_results.json'
     with AuditLedger(path, progress=progress) as day:
@@ -155,13 +158,16 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
             if not key:
                 raise RuntimeError('API_SPORTS_KEY mancante per verificare i risultati')
             progress(f'richiesta risultati API-Football {date}')
-            settle_ledger(day, fetcher(str(date), key))
+            fetched = fetcher(str(date), key)
+            settle_ledger(day, fetched)
             queried = True
         day.metadata = {'schema_version': 1}
         for collection in COLLECTIONS:
             day.add_collection(collection)
         progress(f'salvataggio esiti {date}')
         day.write(results_path)
+        from v7_archive import archive_day
+        archive_day(root, day, date, now, fetched)
         progress(f'costruzione rapporto giornaliero {date}')
         from adaptive_calibration import Evidence, WINDOW
         evidence = Evidence()  # Empty evidence is explicit even outside the training window.

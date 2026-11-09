@@ -248,6 +248,16 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
  Object.assign(caps[4].matrix.rows[0],{quote_status:'cached_stable',cache_source_at:new Date(now-2*3600000).toISOString(),cache_expires_at:new Date(now+10*3600000).toISOString()});
  const payload={gold_scope:{policy_id:scope},updated_at:new Date(now).toISOString(),multimarket_method:{model_id:'lateral-matrix-v5.0'},matches:Array.from({length:9},(_,i)=>({gold_scope:{policy_id:scope,allowed:true},fixture:{fixture_id:String(i+1),home:'Squadra casa',away:'Squadra ospite',
   kickoff:new Date(now+7200000+i*60000).toISOString(),status_short:'NS',time:'20:45',country:'Italia',league:'DATI SINTETICI DI VERIFICA',match:i===8?'Nome squadra molto lungo per verificare la visualizzazione da telefono – Avversaria':'Squadra '+(i+1)+' – Avversaria'},multimarket:structuredClone(variants[i%2])}))};
+ const researchMatch=payload.matches[0];
+ const researchMarket=researchMatch.multimarket.matrix.rows.find(row=>row.spec.kind==='total'&&row.spec.period==='ft'&&row.spec.line===2.5&&row.spec.side==='over');
+ researchMatch.multimarket.matrix.v7={
+  version:'arabsniper-v7.0',status:'shadow',fixture_id:researchMatch.fixture.fixture_id,
+  kickoff:researchMatch.fixture.kickoff,captured_at:new Date(now).toISOString(),calibration:'baseline',
+  rates:{home_ht:.65,away_ht:.44,home_ft:1.72,away_ft:1.29},means:{},market_projection:{},
+  signals:{lineare:{market_id:researchMarket.id,reasons:['probabilita_e_prezzo']}},
+  markets:{[researchMarket.id]:{label:'Over 2,5 FT',odd:2.05,raw:.48,calibrated:.52,fair:.49,
+   quote:{first_odd:2.23,quote_status:'recent'},features:{delta_pct:-8,oci:24,margin_pct:4}}}
+ };
  // UI-only price fixtures exercise all three result cells and movement colors.
  for(const m of payload.matches)for(const row of m.multimarket.matrix.rows){
   if(row.spec.kind==='result'&&row.period==='ft')Object.assign(row,{quote_status:'recent',first_odd:2.5,odd:2.2,delta_pct:-12,bookmaker:'OPERATORE SINTETICO',oci:55,paired_books:3,agreeing_books:3,margin_pct:4,margin_delta_pp:-1,margin_band:'low',ev_pct:-1,ev_low_pct:-2});
@@ -281,12 +291,18 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await page.screenshot({path:`test-artifacts/matrix-${name}.png`});
    await page.locator('[data-mx-open]').first().click();
    assert(await page.locator('dialog.mx-modal').isVisible());
-   assert.equal(await page.locator('dialog .mx-goal-panel').count(),2);
+   assert.equal(await page.locator('dialog .mx-cockpit .mx-goal-panel').count(),2);
+   const v7=page.locator('dialog .mx-v7-panel');
+   assert(await v7.isVisible(),'V7 section shown with compatible feed');
+   assert((await v7.innerText()).includes('52,0%'));
+   await v7.locator('summary').click();
+   assert(await v7.getByText('Poisson originale').isVisible());
+   assert(await v7.evaluate(e=>e.scrollWidth<=e.clientWidth),'V7 detail overflow '+name);
    assert.equal(await page.locator('dialog .mx-1x2 .mx-quote-cell').count(),3);
-   assert.equal(await page.locator('dialog [data-mx-instrument] option').count(),59);
+   assert.equal(await page.locator('dialog [data-mx-instrument] option').count(),61);
    assert(!(await page.locator('dialog').innerText()).includes('EV'));
    assert.equal(await page.locator('.mx-modal-scroll > .mx-best').count(),1,'Official analysis moved inside');
-   for(const [section,count] of [['ft',8],['ht',6],['result',3],['asian',40],['targets',6]]){
+   for(const [section,count] of [['ft',8],['ht',8],['result',3],['asian',40],['targets',6]]){
     await page.locator('[data-mx-section="'+section+'"]').click();
     assert.equal(await page.locator('.mx-market-row').count(),count);
    }

@@ -478,6 +478,10 @@ def main():
     state['trained_at'] = trained_at if trained_at and old == state else now.isoformat()
     atomic_bytes(ROOT/WEIGHTS, (json.dumps(state, sort_keys=True, indent=2, allow_nan=False)+'\n').encode())
     publish(ROOT, {WEIGHTS})
+    from v7_learning import run as learn_v7
+    report = learn_v7(ROOT, now)
+    print(f"V7 shadow calibration: {report['update']['reason']}; "
+          f"{report['verified_fixtures']} fixtures", flush=True)
     print(f"Calibrazione pubblicata: {len(state['cohorts'])} coorti", flush=True)
 
 

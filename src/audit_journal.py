@@ -66,6 +66,16 @@ def capture_policies(root, observed_at=None):
                     model_version=assessment['model_id'], multimarket=assessment, publication_snapshot=True))
             gold_capture(gold, match, now)
             platinum_capture(platinum, match, now)
+    # The browser and social feeds do not need per-operator price evidence.
+    from v7_archive import quote_evidence, read_quote_state, valid_snapshot
+    forecasts = [(record, (record['multimarket'].get('matrix') or {}).get('v7'))
+                 for record in publications.values()]
+    forecasts = [(record, v7) for record, v7 in forecasts if v7]
+    quotes = read_quote_state(root/'data/arab_quote_state.json', {v7['fixture_id'] for _, v7 in forecasts})
+    for record, v7 in forecasts:
+        if not valid_snapshot(v7, record['fixture'], record['captured_at']):
+            raise ValueError('Invalid V7 prematch publication evidence')
+        record['v7_quote_evidence'] = quote_evidence(quotes.get(v7['fixture_id'], {}), v7)
     write_store(path, {'schema_version': 1, 'journal_type': 'policies',
                       'observed_at': now, 'gold': gold, 'platinum': platinum, 'study_observations': studies, 'analysis_updates': publications})
     print(f'Frozen current policy evidence: Gold {len(gold["fixtures"])}; '
