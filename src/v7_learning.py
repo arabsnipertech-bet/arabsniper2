@@ -1,4 +1,4 @@
-"""Nightly calibration for the V7 shadow distribution, with an untouched holdout."""
+"""Nightly calibration for V7, with a chronological holdout."""
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta
 from functools import lru_cache
@@ -104,7 +104,7 @@ def diagnostics(rows, today):
     for row in rows:
         markets[row['market']].append(row)
         for role in row['roles']:
-            roles[role].append(row)
+            roles[role].append({**row, 'roi': row.get('role_roi', {}).get(role, row['roi'])})
         band = min(9, int(10 * row['calibrated']))
         bands[str(10 * band)].append(row)
         reasons = set(row['policy_exclusions'])
@@ -135,7 +135,7 @@ def diagnostics(rows, today):
 
 def fit(rows, cutoff, previous):
     today = cutoff.astimezone(ROME).date()
-    eligible = [r for r in deduplicated(rows, cutoff) if r.get('supported', True)
+    eligible = [r for r in deduplicated(rows, cutoff) if r.get('supported', True) and r.get('benchmark', True)
                 and set(r['variants']) == {str(w) for w in WEIGHTS}
                 and all(finite(r.get(k)) for k in BASELINES)]
     dates = sorted({r['date'] for r in eligible})
@@ -198,7 +198,7 @@ def run(root, cutoff):
                  status=learned['status'])
     report = dict(version=VERSION, date=str(today), window_days=WINDOW, half_life_days=HALF_LIFE,
                   state=state, checked_days=days, verified_fixtures=len({r['fixture_id'] for r in settled}),
-                  comparison=evaluate(settled, today), update=learned,
+                  comparison=evaluate([r for r in settled if r.get('benchmark', True)], today), update=learned,
                   diagnostics=diagnostics(settled, today),
                   manual_review=['structural_parameters', 'market_feature_weights', 'gold_promotion'])
     write_store(path, report)

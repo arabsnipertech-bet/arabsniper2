@@ -19,6 +19,8 @@ def seed_stability(previous, current):
     """Transfer only a saved published choice, never a fresh unpublished winner."""
     old = previous.get('matrix') or {}
     matrix = current.get('matrix') or {}
+    if old.get('v51_stability'):
+        matrix['v51_stability'] = deepcopy(old['v51_stability'])
     # Display history is separate from eligibility and never refreshes quote age.
     if old.get('last_proposal'):
         matrix['last_proposal'] = deepcopy(old['last_proposal'])
@@ -88,12 +90,12 @@ def retain(row, state, as_of):
     return True
 
 
-def stabilize(matrix, as_of, strict):
+def stabilize(matrix, as_of, strict, *, prefer_incumbent=True):
     state = matrix.get('proposal_stability') or {}
     previous = next((r for r in matrix.get('rows', []) if r['id'] == state.get('market_id')), None)
     best = strict[0] if strict else None
     held = False
-    if state.get('version') == STABILITY_ID and previous:
+    if prefer_incumbent and state.get('version') == STABILITY_ID and previous:
         held = not previous['opportunity']['eligible'] and retain(previous, state, as_of)
         if previous['opportunity']['eligible']:
             # Keep a valid incumbent when the alternative only improves its

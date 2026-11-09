@@ -1,11 +1,15 @@
-"""Shadow proposals and routing. Observed movement never changes a probability."""
+"""V7 selection and prematch evidence. Movement never changes a probability."""
 from collections import defaultdict
 from hashlib import sha256
+from itertools import product
 import json
 
-from lateral_matrix import label, market_id, specification
+from adaptive_pricing import BASE_FIELDS, reprice
+from lateral_matrix import label, market_id, payout_weights, specification
 from matrix_quotes import safe_price_row
 from multimarket_model import stamp
+from opportunity_policy import annotate as annotate_gold, probability_order
+from platinum_policy import annotate as annotate_platinum
 from v7_probability import (BASE_WEIGHT, VERSION, blend_rates, fair_inputs, finite,
                             market_rates, outcome_fair, price_usable, raw_rates,
                             score_model, statistical_rates, utc)
@@ -23,6 +27,7 @@ COMBOS = (specification('pt_ft_total', 'ft', 'over', 1.5, 2.5),
           specification('pt_btts_ft_total', 'ft', 'yes', 2.5))
 LONG_PRICE = 4.50  # Observation boundary, versioned as part of the shadow routing.
 MIN_LINEAR_P = .32  # Eligibility for an exploratory card, independent of Gold/Platinum.
+PAYOUT_FIELDS = ('push_probability', 'half_win_probability', 'half_loss_probability')
 
 
 def fingerprint(value):
@@ -62,7 +67,7 @@ def features(row, usable, as_of):
     move = row.get('selected_movement') or {}
     from_at, to_at, now = (stamp(t) for t in (move.get('observed_from'), move.get('observed_to'), as_of))
     repeated = bool(from_at and to_at and from_at < to_at <= now)
-    oci = row.get('oci')
+    oci = None if row.get('historical_oci') else row.get('oci')
     return dict(delta_pct=move.get('delta_pct') if repeated else None,
                 oci=oci if finite(oci) else None,
                 oci_band=('below_-50' if oci < -50 else '-50_to_0' if oci < 0 else
@@ -148,7 +153,105 @@ def route(rows, fair_result):
         })
 
 
-def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
+def recheck_policies(assessment, meta, as_of, rates):
+    def quote_filter(row):
+        if rates is None:
+            return 'v7_unavailable'
+        if not price_usable(row, as_of, meta['kickoff']):
+            return 'v7_quote_unusable'
+
+    matrix = assessment['matrix']
+    view = {**assessment, 'rates': rates} if rates is not None else None
+    annotate_gold(matrix, as_of, view, probability_model=VERSION, quote_filter=quote_filter)
+    annotate_platinum(matrix, meta, as_of, probability_model=VERSION, quote_filter=quote_filter)
+
+
+def publish_prices(assessment, meta, as_of, model, projection, weight, means):
+    """Replace pricing from one distribution while retaining the V5.1 inputs for refresh."""
+    scenarios = assessment.get('pure_poisson_sensitivity_rates', assessment.get('sensitivity_rates', []))
+    models = [model, *(score_model(blend_rates(statistical_rates(rates, means), projection, weight))
+                       for scenario in scenarios or [] if (rates := raw_rates({'rates': scenario})) is not None)]
+    for row in assessment['matrix']['rows']:
+        if not row.get('spec'):
+            continue
+        row['v51_pricing'] = {key: row[key] for key in (*BASE_FIELDS, *PAYOUT_FIELDS) if key in row}
+        estimates = [m.estimate(row['spec']) for m in models]
+        estimate = estimates[0]
+        row.update(probability_model=VERSION, statistical_pct=round(100*estimate['p'], 4),
+                   low_pct=round(100*min(v['p'] for v in estimates), 4),
+                   high_pct=round(100*max(v['p'] for v in estimates), 4),
+                   sensitivity_weights=[list(pair) for pair in sorted({
+                       (v['win_weight'], v['loss_weight']) for v in estimates})],
+                   **{key: estimate[key] for key in ('win_weight', 'loss_weight', 'fair_odd', *PAYOUT_FIELDS)})
+        reprice(row)
+    recheck_policies(assessment, meta, as_of, model.rates)
+
+
+def official_choices(matrix):
+    rows = {r['id']: r for r in matrix['rows']}
+    gold = rows.get(matrix['opportunity_policy']['best_market_id'])
+    platinum = rows.get(matrix['platinum_policy']['best_market_id'])
+    tier, best = min(((tier, row) for tier, row in (('platinum', platinum), ('gold', gold)) if row),
+                     key=lambda item: (item[1]['ev_pct'] <= 0, probability_order(item[1]), item[0] != 'platinum'),
+                     default=(None, None))
+    return tier, best, gold, platinum
+
+
+def compatible(first, second):
+    """A higher-priced pick may share the scenario, including nested goal events."""
+    def wins(spec, ht, ft):
+        return payout_weights(spec, *(ht if spec['period'] == 'ht' else ft), *ht)[0] == 1.
+    # All promoted and exploratory lines here are binary and bounded at 3.5.
+    for h, a, hs, away_s in product(range(5), repeat=4):
+        ht, ft = (h, a), (h+hs, a+away_s)
+        if wins(first, ht, ft) and wins(second, ht, ft):
+            return True
+    return False
+
+
+def publication(records, signals, official, radar_id):
+    official_tier, best, gold, platinum = official
+    tier = official_tier or ('radar' if radar_id or signals['radar_conversione'] or
+                             signals['radar_sorprese'] else 'studio')
+    candidates = sorted((key for key, row in records.items()
+                         if row['spec_kind'] in ('result', 'total', 'btts', 'halves_total')
+                         and not row['edge_exclusions'] and finite(row.get('ev_low')) and row['ev_low'] >= 0),
+                        key=lambda key: (-records[key]['calibrated'], -records[key]['ev_low'],
+                                         -records[key]['ev'], -records[key]['odd'], key))
+
+    def proposed(key, reason, source=None):
+        if key:
+            row = records[key]
+            return dict(market_id=key, source_market_id=source['id'] if source else row['source_market_id'],
+                        odd=source['odd'] if source else row['odd'], reasons=[reason])
+
+    def long_price(key):
+        row = records[key]
+        return row['odd'] >= LONG_PRICE and row['calibrated'] < MIN_LINEAR_P
+
+    main = (market_id(canonical(best['spec'])) if best else
+            next((key for key in candidates if records[key]['calibrated'] >= MIN_LINEAR_P
+                  and records[key]['odd'] < LONG_PRICE), None))
+    alternatives = [key for key in candidates if key != main and (
+                    not main or compatible(json.loads(main), json.loads(key)))]
+    recommended = next((key for key in alternatives if main and records[key]['odd'] > records[main]['odd']
+                        and not long_price(key)), None)
+    longshot = max((key for key in alternatives if key != recommended and long_price(key)
+                    and (not recommended or compatible(json.loads(recommended), json.loads(key)))),
+                   key=lambda key: (records[key]['ev_low'], records[key]['calibrated'], key), default=None)
+    primary_reason = ('platinum_flusso' if best and best['ev_pct'] <= 0 else 'probabilita_e_prezzo')
+    # Classifications remain auditable. Only the selected main is the headline.
+    for role in ('lineare', 'alternativa', 'studio'):
+        signals.pop(role, None)
+    signals.update(primary=proposed(main, primary_reason, best),
+                   consigliata=proposed(recommended, 'quota_superiore_verificata'),
+                   colpaccio=proposed(longshot, 'quota_alta_e_riscontro_statistico'),
+                   gold=proposed(market_id(canonical(gold['spec'])), 'criteri_gold', gold) if gold else None,
+                   platinum=proposed(market_id(canonical(platinum['spec'])), 'criteri_platinum', platinum) if platinum else None)
+    return tier
+
+
+def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, publish=False):
     at, kickoff = stamp(as_of), stamp(meta.get('kickoff'))
     if (not at or not kickoff or at >= kickoff or meta.get('result') or
             meta.get('status_short') not in ('NS', 'TBD')):
@@ -171,17 +274,24 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
     calibrated = blend_rates(stats, projected, weight)
     raw_model, stat_model, fixed_model = (score_model(r) for r in (raw, stats, corrected))
     learned_model = fixed_model if calibrated == corrected else score_model(calibrated)
-    baseline = {r['id']: r for r in original_rows}
+    baseline = {r['id']: (r.get('v51_pricing') or r).get('statistical_pct') for r in original_rows}
+    if publish:
+        publish_prices(assessment, meta, as_of, learned_model, projected, weight, means)
+        official = official_choices(matrix)
+        # An equivalent price from another book can fail the same-market gates.
+        # The exact published offer takes precedence over the best generic price.
+        for row in reversed(official[1:]):
+            if row:
+                chosen[market_id(canonical(row['spec']))] = row, True
     records = {}
     candidates = [(canonical(r['spec']), r, usable) for r, usable in chosen.values()]
-    candidates += [(spec, {}, False) for spec in COMBOS]
+    candidates += [(spec, {}, False) for spec in COMBOS if market_id(spec) not in chosen]
     for spec, row, usable in candidates:
         key = market_id(spec)
         fair_p = outcome_fair(row) if usable else None
-        if fair_result and spec['kind'] == 'result' and spec['period'] == 'ft':
+        if not publish and fair_result and spec['kind'] == 'result' and spec['period'] == 'ft':
             fair_p = fair_result[('1', 'x', '2').index(spec['side'])]
-        original = baseline.get(key, row)
-        original_p = original.get('statistical_pct')
+        original_p = baseline.get(row.get('id'), baseline.get(key))
         odd = row.get('odd') if usable else None
         estimate = learned_model.estimate(spec)
         probability = min(1., max(0., estimate['p']))
@@ -211,16 +321,24 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
                             calibrated=round(probability, 8), fair=fair_p,
                             v51=original_p / 100 if finite(original_p) else None,
                             odd=odd, ev=ev, supported=supported,
+                            ev_low=row.get('ev_low_pct')/100 if publish and usable and finite(row.get('ev_low_pct')) else None,
                             quote=quote,
                             features=features(row, usable, as_of),
                             edge_exclusions=exclusions,
                             policy_exclusions=(row.get('opportunity') or {}).get('reasons') or [],
                             platinum_exclusions=(row.get('platinum') or {}).get('reasons') or [])
     signals = route(records, fair_result)
-    signals['gold'] = {'market_id': (matrix.get('opportunity_policy') or {}).get('best_market_id')}
-    signals['platinum'] = {'market_id': (matrix.get('platinum_policy') or {}).get('best_market_id')}
-    signals['radar_blu'] = {'market_id': (matrix.get('quote_monitoring') or {}).get('watch_id')}
-    payload = dict(version=VERSION, status='shadow', fixture_id=str(meta['fixture_id']),
+    if publish:
+        from matrix_pipeline import quote_monitoring
+        quote_monitoring(matrix, as_of, meta['kickoff'])
+        radar_id = matrix['quote_monitoring']['watch_id']
+        tier = publication(records, signals, official, radar_id)
+    else:
+        radar_id = (matrix.get('quote_monitoring') or {}).get('watch_id')
+        signals['gold'] = {'market_id': (matrix.get('opportunity_policy') or {}).get('best_market_id')}
+        signals['platinum'] = {'market_id': (matrix.get('platinum_policy') or {}).get('best_market_id')}
+    signals['radar_blu'] = {'market_id': radar_id}
+    payload = dict(version=VERSION, status='published' if publish else 'shadow', fixture_id=str(meta['fixture_id']),
                    captured_at=utc(at), kickoff=utc(kickoff),
                    statistics_at=utc(statistics_at), statistics=stats, raw_rates=raw,
                    market_projection=projected, rates=calibrated, weight=weight if projected else 0.,
@@ -229,4 +347,6 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
                                     result=fair_result),
                    data_status='team_history' if any(r['supported'] for r in records.values()) else 'limited',
                    baseline_model=assessment.get('model_id'), means=means, markets=records, signals=signals)
+    if publish:
+        payload['tier'] = tier
     return {**payload, 'sha256': fingerprint(payload)}

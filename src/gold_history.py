@@ -30,6 +30,12 @@ def day_of(value):
     return d.astimezone(ROME).date().isoformat() if d else None
 
 
+def forecast_time(match):
+    assessment = match.get('multimarket') or {}
+    v7 = (assessment.get('matrix') or {}).get('v7') or {}
+    return stamp(v7.get('captured_at') if v7.get('status') == 'published' else assessment.get('captured_at'))
+
+
 def frozen_display(matches, root):
     """Use the existing display rules at the saved prematch time, in isolation."""
     result = subprocess.run(['node', str(Path(__file__).with_name('gold_history_display.cjs'))],
@@ -49,12 +55,12 @@ def merge_day(previous, feed, now, display):
         if not fid.isdigit() or not kickoff or day_of(f['kickoff']) != date:
             continue
         before = saved.get(fid)
-        analysis_at = stamp((match.get('multimarket') or {}).get('captured_at'))
+        analysis_at = forecast_time(match)
         # Never invent a timestamp or an analysis after kickoff. During first
         # migration, started matches may contain a verifiably frozen estimate.
         valid = bool(analysis_at and analysis_at < kickoff and analysis_at <= now
                      and (match.get('multimarket') or {}).get('status') != 'no_prematch_snapshot')
-        old_at = stamp((before or {}).get('multimarket', {}).get('captured_at'))
+        old_at = forecast_time(before or {})
         if before is None or (now < kickoff and valid and (not old_at or analysis_at >= old_at)):
             candidate = deepcopy(match)
             candidate.pop('_gold_history', None)

@@ -59,7 +59,8 @@ def reprice(row):
     if row.get('quote_status') not in ('recent', 'cached_stable') or not recalculate(row):
         return
     fair = row.get('market_fair_pct')
-    row['edge_pp'] = 100*row['win_weight']-fair if number(fair) else None
+    settled = row['win_weight']+row['loss_weight']
+    row['edge_pp'] = 100*row['win_weight']/settled-fair if number(fair) and settled else None
     oci = row.get('oci')
     strong = number(oci) and abs(oci) >= 40 and row.get('movement_confirmed') and row.get('fair_direction_coherent')
     behavior, stable, category, reason = value_profile(row, row['ev_pct']/100, row['ev_low_pct']/100,
@@ -75,6 +76,14 @@ def apply_matrix(assessment, meta, as_of, state=None):
     when, start = stamp(as_of), stamp(meta.get('kickoff'))
     if not when or not start or when >= start or meta.get('result'):
         return
+    for row in matrix.get('rows', []):
+        previous = row.pop('v51_pricing', None)
+        if previous is not None:
+            for key in (*BASE_FIELDS, 'push_probability', 'half_win_probability', 'half_loss_probability'):
+                row.pop(key, None)
+            row.pop('probability_model', None)
+            row.update(previous)
+            reprice(row)
     anchor_matrix(assessment, meta, as_of, state)
     from adaptive_calibration import calibration_status
     matrix['calibration_status'] = calibration_status(state, as_of)

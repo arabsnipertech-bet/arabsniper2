@@ -27,6 +27,8 @@ LABELS = {'convergence': 'Convergenza di Trend',
           'excluded': 'Fuori proposta'}
 REASONS = {
     'market': 'Mercato escluso dal box: resta nella matrice',
+    'v7_quote_unusable': 'Quota senza evidenza eseguibile prematch',
+    'v7_unavailable': 'Stima V7 non disponibile',
     'probability': 'Probabilità inferiore alla soglia del mercato',
     'price': 'Quota fuori dall’intervallo consentito per il mercato',
     'stale': 'Quota recente non disponibile',
@@ -296,7 +298,16 @@ def ranking_key(row):
             -row['ev_pct'], -row['statistical_pct'], str(row['id']))
 
 
-def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, divergence_caps=None, over25_floor=None, comparison_basis=None):
+def probability_order(row):
+    def descending(field):
+        value = row.get(field)
+        return -value if numeric(value) else float('inf')
+    return (descending('statistical_pct'), descending('ev_low_pct'), descending('ev_pct'),
+            descending('odd'), row['spec']['kind'] == 'asian_total', str(row['id']))
+
+
+def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, divergence_caps=None,
+             over25_floor=None, comparison_basis=None, probability_model=None, quote_filter=None):
     rows = matrix.get('rows', [])
     if assessment is not None and (assessment.get('inputs') or assessment.get('profiles')):
         matrix['goal_context'] = goal_context(assessment, rows)
@@ -308,6 +319,13 @@ def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, div
             if goal_market(row) in ('over15_ht', 'over25_ht', 'gg_ht'): row['ht_evidence'] = evidence
     context = matrix.get('goal_context') or {}
     for row in rows: row['opportunity'] = evaluate(row, context.get('pt_priority_active', False), context.get('preferred_pt_market'), divergence_caps=divergence_caps, over25_floor=over25_floor, comparison_basis=comparison_basis)
+    if quote_filter:
+        for row in rows:
+            reason = quote_filter(row)
+            if reason:
+                d = row['opportunity']
+                d.update(eligible=False, strict_eligible=False, signal='excluded', label=LABELS['excluded'],
+                         playability_score=None, reasons=[*d['reasons'], reason])
     goals = {key: [r for r in rows if goal_market(r) == key] for key in ODDS_MAX_BY_MARKET}
     for subset, superset in [('over35_ft', 'over25_ft'), ('gg_ht', 'over15_ht'), ('over25_ht', 'over15_ht')]:
         for a in goals[subset]:
@@ -325,10 +343,11 @@ def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, div
         for row in rows:
             if row['opportunity']['eligible'] and goal_market(row) in ('over35_ft', 'over15_ht'):
                 row['opportunity'].update(priority=-2 if goal_market(row) == 'over35_ft' else -1, automatic_upgrade=True)
-    eligible = sorted((r for r in rows if r['opportunity']['eligible']), key=ranking_key)
+    order = probability_order if probability_model else ranking_key
+    eligible = sorted((r for r in rows if r['opportunity']['eligible']), key=order)
     from proposal_stability import stabilize
-    best = stabilize(matrix, as_of, eligible)
-    eligible = sorted((r for r in rows if r['opportunity']['eligible']), key=ranking_key)
+    best = stabilize(matrix, as_of, eligible, prefer_incumbent=not probability_model)
+    eligible = sorted((r for r in rows if r['opportunity']['eligible']), key=order)
     if best: eligible = [best, *[r for r in eligible if r is not best]]
     for rank, row in enumerate(eligible, 1): row['opportunity']['rank'] = rank
     matrix['opportunity_policy'] = {'id': POLICY_ID, 'evaluated_at': as_of,
@@ -341,6 +360,9 @@ def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, div
         'eligible_markets': len(eligible),
         'excluded_reasons': dict(Counter(reason for r in rows for reason in r['opportunity']['reasons'])),
         'best_market_id': eligible[0]['id'] if eligible else None}
+    if probability_model:
+        matrix['opportunity_policy'].update(probability_model=probability_model,
+            eligible_markets=len({goal_market(r) for r in eligible}))
     return eligible[0] if eligible else None
 
 

@@ -17,6 +17,10 @@ VOID = {'CANC', 'ABD', 'AWD', 'WO'}
 WEIGHTS = (.50, .55, .60, .65, .70, .75, .80)
 BENCHMARKS = frozenset((*GOAL.values(), GG, *(market_id(specification('result', 'ft', side))
                                           for side in ('1', 'x', '2'))))
+MONITORED = BENCHMARKS | {
+    market_id(specification('btts', 'ft', 'yes')),
+    market_id(specification('halves_total', 'ft', 'over', .5, .5)),
+}
 ABLATIONS = frozenset({'sensitivity', 'odds_rising', 'price', 'suspicious_divergence',
                        'yield_floor', 'oci_negative'})
 
@@ -120,12 +124,16 @@ def results_for_day(store, day, at, fetched=None, previous=None):
         outcomes = {}
         rows = snapshot['markets']
         role_for_market = defaultdict(list)
+        role_prices = defaultdict(dict)
         for role, signal in snapshot['signals'].items():
             if role == 'observations' or not signal:
                 continue
             market = signal.get('market_id')
             if market:
-                role_for_market[market_id(canonical(json.loads(market)))].append(role)
+                key = market_id(canonical(json.loads(market)))
+                role_for_market[key].append(role)
+                if finite(signal.get('odd')):
+                    role_prices[key][role] = signal['odd']
         models = {}
         for key, row in rows.items():
             spec = json.loads(key)
@@ -138,15 +146,18 @@ def results_for_day(store, day, at, fetched=None, previous=None):
             profit = win * (odd - 1) - loss if finite(odd) and odd > 1 else None
             outcomes[key] = dict(win=win, loss=loss, roi=profit)
             binary = win + loss == 1 and win in (0, 1)
-            if not binary or key not in BENCHMARKS:
+            if not binary or key not in MONITORED and not role_for_market.get(key):
                 continue
-            if row.get('fair') is not None and row.get('v51') is not None and not models:
+            comparable = key in BENCHMARKS and row.get('fair') is not None and row.get('v51') is not None
+            if comparable and not models:
                 models = {str(weight): score_model(blend_rates(snapshot['statistics'],
                           snapshot['market_projection'], weight)) for weight in WEIGHTS}
             variants = ({weight: round(model.estimate(spec)['p'], 8) for weight, model in models.items()}
-                        if row.get('fair') is not None and row.get('v51') is not None else {})
+                        if comparable else {})
             samples.append(dict(fixture_id=fid, market=key, date=str(day), kickoff=snapshot['kickoff'],
                 observed_at=observed_at, outcome=int(win), roi=profit, roles=role_for_market.get(key, []),
+                benchmark=key in BENCHMARKS,
+                role_roi={role: win*(price-1)-loss for role, price in role_prices.get(key, {}).items()},
                 supported=row['supported'],
                 features=row['features'], edge_exclusions=row['edge_exclusions'],
                 policy_exclusions=row['policy_exclusions'], raw=row['raw'], corrected=row['corrected'],
