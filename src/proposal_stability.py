@@ -61,7 +61,7 @@ def strict_state(row, as_of):
 
 
 def retain(row, state, as_of):
-    # v6.1 thresholds are mandatory, including GG PT's explicit negative floor.
+    # v6.1 thresholds are mandatory, including the market-specific EV floors.
     # Hysteresis may choose between eligible rows, never relax admission.
     if row.get('opportunity', {}).get('policy_id') == 'gold-goals-v6.1': return False
     now, start = stamp(as_of), stamp(state.get('last_strict_at'))

@@ -17,16 +17,17 @@ def row(**changes):
     result = {'id': 'primary', 'label': 'Over 2,5 FT', 'spec': S('total', 'ft', 'over', 2.5),
         'family': 'totals', 'period': 'ft', 'quality': 'supported', 'quote_status': 'recent',
         'odd': 2., 'statistical_pct': 60., 'ev_pct': 20., 'ev_low_pct': 8.,
-        'selected_margin_pct': 3., 'selected_margin_delta_pp': 0., 'oci': 60.,
+        'selected_margin_pct': 3., 'selected_margin_delta_pp': 0., 'oci': 45.,
         'paired_books': 3, 'agreeing_books': 3, 'movement_confirmed': True,
         'fair_direction_coherent': True, 'category': 'mature',
-        'provider_updated_at': NOW, 'selected_movement': {'delta_pct': -8.,
-            'fair_delta_pp': 3., 'persistence': 1., 'reversal': False}}
+        'provider_updated_at': NOW, 'selected_movement': {'delta_pct': -4.,
+            'fair_delta_pp': 3., 'persistence': .75, 'reversal': False}}
     result['ht_evidence'] = first_half_evidence({'inputs': {'histories': {side: team_history(side) for side in ('home','away')}}})
     from goal_evidence import evidence
     result['goal_evidence'] = evidence(statistical_analysis(match(), NOW))
     result['market_fair_pct'] = 50.
-    result['delta_pct'] = -8.
+    result['selected_market_fair_pct'] = 50.
+    result['delta_pct'] = -4.
     result.update(changes)
     if 'odd' not in changes:
         from opportunity_policy import goal_market, ODDS_MIN_BY_MARKET
@@ -36,7 +37,8 @@ def row(**changes):
 
 class PlayableValue(unittest.TestCase):
     def test_inclusive_probability_and_price_boundaries(self):
-        for p,q in [(48,2.6),(80,1.70),(80,1.84),(80,1.85)]: self.assertTrue(evaluate(row(statistical_pct=p,odd=q))['eligible'])
+        for p,q in [(48,2.6),(80,1.70),(80,1.84),(80,1.85)]:
+            self.assertTrue(evaluate(row(statistical_pct=p,odd=q,selected_market_fair_pct=p-10))['eligible'])
         for p,q,reason in [(47.999,2.6,'probability'),(80,1.69,'yield_floor'),(60,2.6001,'price')]:
             self.assertIn(reason,evaluate(row(statistical_pct=p,odd=q))['reasons'])
         for p,ok in [(39.999,False),(40,True)]:

@@ -85,6 +85,9 @@ class HistoryChunks(unittest.TestCase):
             root=Path(folder); seed(root)
             day=date(2026,10,20)
             current_audit.settle_day(root, day, NOW)
+            signals = read_store(root/f'auditarchive/prematch_{day}_daily.json')['v7_signals']
+            self.assertEqual(signals['radar_sorprese']['persistence_intermediate']['n'], 0)
+            self.assertIsNone(signals['colpaccio']['roi_without_three_largest_wins'])
             source=root/'auditordata/prematch_2026-10-20.json'
             value=read_store(source); value['extra_evidence']=True; write_store(source,value)
             self.assertFalse(reusable(root,day,NOW))

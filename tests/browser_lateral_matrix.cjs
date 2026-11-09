@@ -228,12 +228,12 @@ assert monitor[0]['matrix']['rows'][0]['opportunity']['reasons']==['probability'
 assert monitor[1]['matrix']['rows'][0]['opportunity']['reasons']==['probability']
 assert sum(r['opportunity']['eligible'] for b in monitor for r in b['matrix']['rows'])==1
 elite=[]
-strong=dict(watch,odd=2.5,first_odd=2.5/.96,delta_pct=-4,statistical_pct=None,ev_pct=None,
-            ev_low_pct=None,quality='prior_only',ht_evidence=None,goal_evidence=None,
+strong=dict(watch,odd=2.5,first_odd=2.5/.96,delta_pct=-4,statistical_pct=43,ev_pct=7.5,
+            ev_low_pct=2,ht_evidence=None,goal_evidence=None,
             selected_movement={'delta_pct':-4,'fair_delta_pp':1,'persistence':.75,'reversal':False})
 excellent=dict(strong,id='elite-ht',spec=S('total','ht','over',1.5),period='ht',label='Over 1,5 PT',
                odd=1.9,first_odd=1.9/.96,ev_pct=10)
-both=row(id='both',odd=2.5,first_odd=2.5/.92,bookmaker='BOOK SINTETICO')
+both=row(id='both',odd=2.5,first_odd=2.5/.96,bookmaker='BOOK SINTETICO')
 for r in [strong,excellent,both,row(id='gold-only',oci=0),dict(strong,delta_pct=-2,first_odd=2.5/.98,
           selected_movement={'delta_pct':-2,'fair_delta_pp':1,'persistence':.75,'reversal':False}),dict(strong,oci=0),
           dict(strong,ev_pct=-15.0001,statistical_pct=33.99996)]:

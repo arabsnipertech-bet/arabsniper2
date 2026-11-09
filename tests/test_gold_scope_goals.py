@@ -30,7 +30,7 @@ def flow(favorite='1', balanced_gap=None):
 
 
 def goal_rows():
-    return [row(id='ft25', odd=2.0, statistical_pct=70., ev_pct=26., ev_low_pct=12.),
+    return [row(id='ft25', odd=2.0, statistical_pct=70., selected_market_fair_pct=55., ev_pct=26., ev_low_pct=12.),
         row(id='ft35', spec=S('total', 'ft', 'over', 3.5), odd=2.7, statistical_pct=45., ev_pct=21.5, ev_low_pct=8.),
         row(id='ht15', spec=S('total', 'ht', 'over', 1.5), period='ht', odd=2.1, statistical_pct=55., ev_pct=10., ev_low_pct=5.),
         row(id='gght', spec=S('btts', 'ht', 'yes'), period='ht', odd=3.5, statistical_pct=40., ev_pct=20., ev_low_pct=6.)]

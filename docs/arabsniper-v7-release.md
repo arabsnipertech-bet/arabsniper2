@@ -57,7 +57,7 @@ Per ripristinare la produzione, fare revert del merge V7 su main e pubblicare il
 
 ## Attivazione V7 per Gold, Platinum e Studio
 
-Il motore usa la stessa distribuzione di punteggi V7 per tutti i mercati della matrice. Le stime V5.1, le probabilità Poisson originali e il fair restano disponibili nell'audit. Le policy Gold v6.1 e Platinum v1.1 conservano i rispettivi criteri di ammissione. I mercati ammessi sono ordinati per probabilità V7, con lo scenario prudente e il prezzo come criteri successivi. Le Platinum ammesse per flusso con valore atteso centrale nullo o negativo sono indicate esplicitamente e hanno precedenza inferiore alle proposte ufficiali con valore positivo.
+Il motore usa la stessa distribuzione di punteggi V7 per tutti i mercati della matrice. Le stime V5.1, le probabilità Poisson originali e il fair restano disponibili nell'audit. La revisione `v7-prudence-v1` richiede flusso verificato, EV positivo ed EV prudente almeno al 2% per ogni Platinum. Con OCI da 50 in su, una Platinum idonea viene dopo una Gold idonea. Tra le proposte con la stessa precedenza contano probabilità V7, scenario prudente e prezzo.
 
 La lista pubblica una sola proposta per partita nell'area Gold. In scheda, Consigliata richiede un altro mercato compatibile con quota più alta. Colpaccio richiede quota da 4,50, probabilità sotto il 32% e sostegno del proprio prezzo anche nello scenario prudente. Studio e Radar Blu confrontano esiti 1X2, GG/NG, Over/Under e combo binarie con quota diretta utilizzabile. Le linee asiatiche a mezzo gol equivalenti condividono l'identità del mercato. Per le combo senza prezzo eseguibile resta consultabile la stima. Ogni ruolo congelato conserva il prezzo effettivamente selezionato per l'audit.
 
@@ -77,6 +77,10 @@ Replay del workbook storico su **1.407 partite e 8.560 coppie partita/mercato** 
 | Over 2,5 FT in calo con GG PT in salita nello stesso snapshot | 71 | +5,4% | 17 | +6,2% |
 
 Per separare l'OCI dal prezzo si è stimata, fino al 3 novembre, la differenza media tra frequenza e fair per quattro fasce OCI, con 50 osservazioni equivalenti a correzione zero. Sul blocco finale la correzione migliora leggermente Brier e log-loss di GG PT e Over 2,5 FT e peggiora entrambi su Over 1,5 PT, Over 2,5 PT, Over 3,5 FT e GG FT. Per Over 3,5 PT e combo dirette il campione OCI è insufficiente. Le fasce rimangono coorti di osservazione. L'autoapprendimento V7 continua a verificare il peso del fair su finestre temporali separate.
+
+Per Over 2,5 e Over 3,5 FT, lo scarto positivo tra stima e fair può arrivare a 15 punti. L'EV prudente minimo aumenta di due punti se OCI raggiunge 50, la quota scende almeno del 5% o la persistenza del movimento è pari a 1. I tre criteri applicano un unico rialzo, cumulabile con il supplemento per l'aggio. Il minimo di base per GG PT e Over 2,5 PT è 2%. L'Over 2,5 PT usa il controllo OCI comune agli altri mercati Gold.
+
+L'OCI-AS attribuisce 15 punti alla persistenza mediana quando è strettamente compresa tra 0 e 1. Il contributo è zero ai due estremi. I report V7 di Radar Sorprese e Colpaccio riportano il rendimento unitario con e senza le tre vincite maggiori, la numerosità residua e gli stessi dati per la persistenza intermedia. Si usano le quote dei segnali congelate prima del calcio d'inizio.
 
 ### Ripristino operativo della promozione
 

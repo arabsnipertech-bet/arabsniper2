@@ -28,7 +28,7 @@ def saved(**changes):
 
 
 def wobble(r):
-    r.update(odd=1.99, ev_pct=1.4, ev_low_pct=1.9, oci=50., selected_margin_pct=3.1)
+    r.update(odd=1.99, ev_pct=1.4, ev_low_pct=1.9, oci=48., selected_margin_pct=3.1)
 
 
 class ProposalStability(unittest.TestCase):

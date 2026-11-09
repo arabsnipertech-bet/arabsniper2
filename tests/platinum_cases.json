@@ -29,10 +29,10 @@
       "persistence": 0.5,
       "reversal": false
     },
-    "quality": "prior_only",
-    "statistical_pct": null,
-    "ev_pct": null,
-    "ev_low_pct": null,
+    "quality": "supported",
+    "statistical_pct": 43,
+    "ev_pct": 7.5,
+    "ev_low_pct": 2,
     "opportunity": {
       "policy_id": "gold-goals-v6.1",
       "eligible": false,
@@ -46,8 +46,12 @@
   "cases": [
     {
       "name": "high_odds_without_statistics",
-      "patch": {},
-      "eligible": true
+      "patch": {
+        "statistical_pct": null,
+        "ev_pct": null,
+        "ev_low_pct": null
+      },
+      "eligible": false
     },
     {
       "name": "oci_below",
@@ -158,12 +162,12 @@
       "eligible": false
     },
     {
-      "name": "low_odds_no_value",
+      "name": "lower_price_with_verified_value",
       "patch": {
         "odd": 2.49,
         "first_odd": 2.5670103092783507
       },
-      "eligible": false
+      "eligible": true
     },
     {
       "name": "outside_market",
@@ -238,22 +242,23 @@
       "eligible": false
     },
     {
-      "name": "ev_route",
+      "name": "ev_at_ten_with_weak_lower_bound",
       "patch": {
         "odd": 1.9,
         "first_odd": 1.958762886597938,
-        "ev_pct": 10
+        "ev_pct": 10,
+        "ev_low_pct": 1.999
       },
-      "eligible": true
+      "eligible": false
     },
     {
-      "name": "ev_below",
+      "name": "ev_below_ten_with_sufficient_lower_bound",
       "patch": {
         "odd": 1.9,
         "first_odd": 1.958762886597938,
         "ev_pct": 9.999
       },
-      "eligible": false
+      "eligible": true
     },
     {
       "name": "negative_ev_high_odds",
@@ -264,13 +269,13 @@
       "eligible": false
     },
     {
-      "name": "weak_statistics",
+      "name": "negative_ev_at_high_price",
       "patch": {
         "statistical_pct": 5,
         "ev_pct": -12,
         "quality": "limited"
       },
-      "eligible": true
+      "eligible": false
     },
     {
       "name": "no_gold_decision",
@@ -291,11 +296,11 @@
       "eligible": true
     },
     {
-      "name": "ev_floor_exact",
+      "name": "former_negative_floor",
       "patch": {
         "ev_pct": -15
       },
-      "eligible": true
+      "eligible": false
     },
     {
       "name": "ev_floor_just_below",
@@ -305,9 +310,9 @@
       "eligible": false
     },
     {
-      "name": "ev_floor_just_above",
+      "name": "ev_positive",
       "patch": {
-        "ev_pct": -14.9999
+        "ev_pct": 2.01
       },
       "eligible": true
     },
@@ -316,15 +321,14 @@
       "patch": {
         "ev_pct": 0
       },
-      "eligible": true
+      "eligible": false
     },
     {
-      "name": "ev_floor_ignores_lower_bound",
+      "name": "missing_prudent_ev",
       "patch": {
-        "ev_pct": -15,
-        "ev_low_pct": -80
+        "ev_low_pct": null
       },
-      "eligible": true
+      "eligible": false
     },
     {
       "name": "ev_absent_with_statistics",
@@ -358,11 +362,11 @@
       "eligible": false
     },
     {
-      "name": "high_odds_and_value",
+      "name": "invalid_prudent_ev",
       "patch": {
-        "ev_pct": 10
+        "ev_low_pct": "2"
       },
-      "eligible": true
+      "eligible": false
     }
   ]
 }

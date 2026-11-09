@@ -88,7 +88,8 @@ def from_private_day(day, now):
                     continue
                 if tier=="gold" and decision.get("policy_id") not in ("gold-goals-v6.1",):
                     continue
-                choices_for_fixture.append(dict(
+                priority=2 if decision.get("secondary_to_gold") is True else 0 if tier=="platinum" else 1
+                choices_for_fixture.append((priority, dict(
                     fixture_id=str(fid),match=f.get("match",""),league=f.get("league",""),
                     kickoff=start.isoformat(),captured_at=captured.isoformat(),
                     provider_updated_at=at.isoformat(),quote_status=status,odd=odd,label=row.get("label") or market,
@@ -104,10 +105,9 @@ def from_private_day(day, now):
                     stable=(decision.get("stability") or {}).get("status")=="strict",
                     market_confirmed=(tier=="platinum" or decision.get("signal")=="convergence"),
                     score=float(row.get("oci") or 0) if tier=="platinum" else float(decision.get("playability_score") or 0),
-                    signal=tier if tier=="platinum" else decision.get("signal","unconfirmed")))
-        # Platinum wins for this fixture, Gold remains a fallback.
+                    signal=tier if tier=="platinum" else decision.get("signal","unconfirmed"))))
         if choices_for_fixture:
-            choices.append(next((x for x in choices_for_fixture if x["source_tier"]=="platinum"),choices_for_fixture[0]))
+            choices.append(min(choices_for_fixture, key=lambda choice: choice[0])[1])
     return choices
 
 

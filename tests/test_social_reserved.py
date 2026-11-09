@@ -5,7 +5,7 @@ from datetime import datetime
 from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'src'))
 from telegram_digest import refresh_reserved, slot_message
-from homepage_preview import social_board
+from homepage_preview import SECONDARY_PLATINUM_PRIORITY, social_board
 from facebook_page import selection
 
 class ReservedTest(unittest.TestCase):
@@ -28,6 +28,10 @@ class ReservedTest(unittest.TestCase):
             self.assertEqual([p['tier'] for p in new],['Gold','Blu','Platinum'])
             old=social_board(board,self.now,limit=1)
             self.assertEqual(old[0]['tier'],'Platinum')
+            candidates[0]=((SECONDARY_PLATINUM_PRIORITY,-99),candidates[0][1])
+            revised=social_board(board,self.now,tier_order=('Platinum','Gold','Blu'))
+            self.assertEqual([p['tier'] for p in revised],['Platinum','Gold','Blu'])
+            self.assertEqual(revised[1]['fixture_id'],'1')
     def test_private_fields_removed_and_expiry(self):
         post=refresh_reserved(self.post(),self.now)
         self.assertEqual(post['reserved'],[dict(id='3',kickoff='2026-11-05T18:30:00+01:00')])

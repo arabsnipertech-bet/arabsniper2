@@ -26,7 +26,7 @@ def fixture():
 
 
 class PlatinumPolicy(unittest.TestCase):
-    def test_shared_price_boundaries_and_no_statistical_veto(self):
+    def test_shared_flow_and_value_boundaries(self):
         for case in CASES['cases']:
             with self.subTest(case=case['name']):
                 row = {**deepcopy(CASES['base']), **case['patch']}; before = deepcopy(row)
@@ -36,26 +36,26 @@ class PlatinumPolicy(unittest.TestCase):
     def test_over25_at_new_gold_floor_still_needs_platinum_flow_and_ev(self):
         row = deepcopy(CASES['base'])
         row['spec']['line'] = 2.5
-        row.update(odd=1.70, first_odd=1.70/.97, ev_pct=10)
+        row.update(odd=1.70, first_odd=1.70/.97, ev_pct=3.)
         self.assertTrue(evaluate(row, NOW)['eligible'])
-        self.assertFalse(evaluate(dict(row, ev_pct=9.99), NOW)['eligible'])
+        self.assertFalse(evaluate(dict(row, ev_pct=12., ev_low_pct=1.999), NOW)['eligible'])
         self.assertFalse(evaluate(dict(row, oci=29), NOW)['eligible'])
 
     def test_ev_floor_reasons_and_invalid_values(self):
         row = deepcopy(CASES['base'])
-        self.assertEqual(evaluate({**row, 'ev_pct': -15}, NOW)['qualification'], 'high_odds')
-        self.assertEqual(evaluate({**row, 'ev_pct': -15.0001}, NOW)['reasons'], ['ev_floor'])
+        self.assertEqual(evaluate(row, NOW)['qualification'], 'flow_and_value')
+        self.assertEqual(evaluate({**row, 'ev_pct': -15}, NOW)['reasons'], ['ev_floor'])
         for invalid in (float('nan'), float('inf'), float('-inf'), True, '-15'):
             with self.subTest(ev=invalid):
                 self.assertEqual(evaluate({**row, 'ev_pct': invalid}, NOW)['reasons'], ['ev_unavailable'])
         row.pop('ev_pct'); row.pop('statistical_pct')
-        self.assertTrue(evaluate(row, NOW)['eligible'])
+        self.assertFalse(evaluate(row, NOW)['eligible'])
 
     def test_excluded_primary_falls_back_without_changing_gold_or_combo(self):
         m = fixture(); matrix = m['multimarket']['matrix']
         rejected = matrix['rows'][0]
         rejected.update(oci=80, ev_pct=-15.0001, combo={'active': False, 'reasons': ['example']})
-        alternate = {**deepcopy(CASES['base']), 'id': 'over25', 'ev_pct': -15,
+        alternate = {**deepcopy(CASES['base']), 'id': 'over25',
                      'spec': {**CASES['base']['spec'], 'line': 2.5}}
         matrix['rows'].append(alternate)
         before = deepcopy(matrix)
@@ -78,6 +78,21 @@ class PlatinumPolicy(unittest.TestCase):
         self.assertFalse(evaluate(row, '2026-10-29T12:00:01Z')['eligible'])
         self.assertFalse(evaluate(row, '2026-10-28T23:59:59Z')['eligible'])
         self.assertFalse(evaluate({**row, 'cache_expires_at': '2026-10-29T13:00:00Z'}, NOW)['eligible'])
+
+    def test_high_oci_has_secondary_priority_in_v7(self):
+        from v7_decision import official_choices
+        m = fixture(); matrix = m['multimarket']['matrix']
+        moderate = matrix['rows'][0]
+        strong = {**deepcopy(moderate), 'id': 'strong', 'oci': 50, 'statistical_pct': 60}
+        matrix['rows'].append(strong)
+        annotate(matrix, m['fixture'], NOW, probability_model='v7')
+        self.assertEqual(matrix['platinum_policy']['best_market_id'], moderate['id'])
+        self.assertTrue(strong['platinum']['secondary_to_gold'])
+        moderate['oci'] = 29
+        annotate(matrix, m['fixture'], NOW, probability_model='v7')
+        self.assertEqual(official_choices(matrix)[:2], ('platinum', strong))
+        matrix['opportunity_policy']['best_market_id'] = moderate['id']
+        self.assertEqual(official_choices(matrix)[:2], ('gold', moderate))
 
     def test_annotation_preserves_gold_and_deduplicates_equivalent_markets(self):
         m = fixture(); matrix = m['multimarket']['matrix']
@@ -126,15 +141,16 @@ class PlatinumPolicy(unittest.TestCase):
         capture(store, m, '2026-10-29T11:00:00Z')
         self.assertEqual([g['snapshot'] for g in report(store, NOW)['groups']], ['first'])
 
-    def test_board_accepts_missing_statistics_without_promoting_gold(self):
+    def test_board_keeps_missing_statistics_in_study(self):
         from matrix_pipeline import build_board
         from lateral_matrix import market_id
         m = fixture(); a = m['multimarket']; row = a['matrix']['rows'][0]
-        row.update(id=market_id(row['spec']), provider_updated_at=NOW, low_pct=None, fair_odd=None)
+        row.update(id=market_id(row['spec']), provider_updated_at=NOW, low_pct=None, fair_odd=None,
+                   statistical_pct=None, ev_pct=None, ev_low_pct=None, quality='prior_only')
         a['markets'] = [{'market': 'over35_ft', 'selection': 'over', 'probabilities': {}}]
         day = {'date': '2026-10-29', 'matches': [m]}
         build_board(day, NOW)
-        self.assertEqual(day['matrix_summary']['upcoming_fixtures_with_platinum'], 1)
+        self.assertEqual(day['matrix_summary']['upcoming_fixtures_with_platinum'], 0)
         self.assertEqual(day['matrix_summary']['upcoming_fixtures_with_proposal'], 0)
         self.assertIsNone(a['markets'][0]['probabilities']['statistics'])
         self.assertFalse(a['markets'][0]['published_selection'])

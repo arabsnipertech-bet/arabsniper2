@@ -863,7 +863,7 @@
   <link rel="stylesheet" href="/statistics-first.css?v=4.0">
   <script src="/statistics-first.js?v=4.0"></script>
   <link rel="stylesheet" href="/lateral-matrix.css?v=0fb0e285ba8b">
-  <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=579d01c9f862"></script>
+  <script src="/competition-scope.js?v=ea22d96ef1f5"></script><script src="/lateral-matrix.js?v=f4a95596cabe"></script>
   <script src="/vendor/fflate-0.8.2.js"></script>
   <script src="/live-scores.js?v=a17ad119a2d0"></script>
   <script>
@@ -1803,8 +1803,10 @@
         return {value:null,single:true,reason:'Storico completo del bookmaker non disponibile'};
       // Same OCI-AS formula as context_analysis.movement, evaluated on one operator.
       const delta=o.leg_fair_delta_pp;
+      const persistenceWeight=m.oci_method==='oci-as-intermediate-persistence-v1'?
+        (o.persistence>0&&o.persistence<1?15:0):o.persistence*15;
       const absolute=Math.min(Math.abs(delta)/4,1)*40+25+
-        Math.min(Math.abs(delta)/o.hours/1.5,1)*10+o.persistence*15+10/8;
+        Math.min(Math.abs(delta)/o.hours/1.5,1)*10+persistenceWeight+10/8;
       return {value:Math.abs(delta)<.10?0:absolute*Math.sign(delta),single:true,bookmaker:o.bookmaker,reason:'Singolo bookmaker · consenso multi-book non confermato'};
     }
     function contextOciSummary(row) {

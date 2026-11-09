@@ -1,17 +1,12 @@
 """Independent price/flow tier. Never edits a Gold decision or probability."""
-from math import isfinite
-from opportunity_policy import goal_market, probability_order
+from opportunity_policy import RULES_REVISION, goal_market, numeric, probability_order
 from multimarket_model import stamp
 
 LEGACY_POLICY_ID = 'platinum-flow-v1'
 POLICY_ID = 'platinum-flow-v1.1'
 LIMITS = {'min_oci': 30, 'max_delta_pct': -3, 'max_margin_pct': 9,
           'min_persistence': .5, 'min_agreeing_books': 2,
-          'min_odd': 2.5, 'min_ev_pct': 10, 'min_high_odds_ev_pct': -15}
-
-
-def numeric(value):
-    return isinstance(value, (int, float)) and not isinstance(value, bool) and isfinite(value)
+          'min_ev_low_pct': 2., 'secondary_oci': 50}
 
 
 def flow_rejections(row, as_of, max_drop):
@@ -46,27 +41,25 @@ def flow_rejections(row, as_of, max_drop):
 
 
 def evaluate(row, as_of):
+    from adaptive_pricing import gate_passes
+
     reasons = flow_rejections(row, as_of, LIMITS['max_delta_pct'])
-    odd = row.get('odd')
-    ev = row.get('ev_pct')
-    from adaptive_pricing import threshold, gate_passes
-    delta = threshold(row)
-    high_price = numeric(odd) and odd >= LIMITS['min_odd']
-    missing_history_ev = ev is None and row.get('statistical_pct') is None
-    high_odds = high_price and (missing_history_ev or
-        numeric(ev) and ev >= LIMITS['min_high_odds_ev_pct']+max(0., delta))
-    if delta > 0 and not missing_history_ev and (not numeric(row.get('edge_pp')) or row['edge_pp'] < delta):
-        high_odds = False
-    excellent_ev = numeric(ev) and ev >= LIMITS['min_ev_pct']+delta and gate_passes(row, LIMITS['min_ev_pct'])
-    if not high_odds and not excellent_ev:
-        reasons.append('ev_floor' if high_price and numeric(ev) else
-                       'ev_unavailable' if high_price else 'odds_or_value')
-    return {'policy_id': POLICY_ID, 'eligible': not reasons, 'rank': None,
+    ev, ev_low = row.get('ev_pct'), row.get('ev_low_pct')
+    if not numeric(ev):
+        reasons.append('ev_unavailable')
+    elif ev <= 0:
+        reasons.append('ev_floor')
+    elif not gate_passes(row, 0.):
+        reasons.append('edge')
+    if not numeric(ev_low) or ev_low < LIMITS['min_ev_low_pct']:
+        reasons.append('sensitivity')
+    eligible = not reasons
+    return {'policy_id': POLICY_ID, 'rules_revision': RULES_REVISION, 'eligible': eligible, 'rank': None,
             'evaluated_at': as_of, 'reasons': reasons,
-            'value_cohort': ('platinum_positive_ev' if all(numeric(row.get(k)) and row[k] >= 0 for k in ('ev_pct','ev_low_pct'))
-                             else 'platinum_flow_only_negative_ev') if not reasons else None,
-            'positive_ev_shadow_eligible': not reasons and all(numeric(row.get(k)) and row[k] >= 0 for k in ('ev_pct','ev_low_pct')),
-            'qualification': 'odds_and_value' if high_odds and excellent_ev else 'high_odds' if high_odds else 'expected_value' if excellent_ev else None,
+            'value_cohort': 'platinum_positive_ev' if eligible else None,
+            'positive_ev_shadow_eligible': eligible,
+            'qualification': 'flow_and_value' if eligible else None,
+            'secondary_to_gold': eligible and row['oci'] >= LIMITS['secondary_oci'],
             'gold_eligible': (row.get('opportunity') or {}).get('eligible') is True}
 
 
@@ -83,14 +76,15 @@ def annotate(matrix, meta, as_of, *, probability_model=None, quote_filter=None):
         if reason:
             d = row['platinum']
             d.update(eligible=False, reasons=[*d['reasons'], reason], qualification=None,
-                     value_cohort=None, positive_ev_shadow_eligible=False)
+                     value_cohort=None, positive_ev_shadow_eligible=False, secondary_to_gold=False)
         if row['platinum']['eligible']: candidates.append(row)
     if probability_model:
-        candidates.sort(key=lambda r: (r['ev_pct'] is None or r['ev_pct'] <= 0, probability_order(r)))
+        candidates.sort(key=lambda r: (r['platinum']['secondary_to_gold'], probability_order(r)))
     else:
-        candidates.sort(key=lambda r: (-r['oci'], r['delta_pct'], -r['odd'], str(r['id'])))
+        candidates.sort(key=lambda r: (r['platinum']['secondary_to_gold'], -r['oci'], r['delta_pct'], -r['odd'], str(r['id'])))
     for rank, row in enumerate(candidates, 1): row['platinum']['rank'] = rank
-    matrix['platinum_policy'] = {'id': POLICY_ID, 'evaluated_at': as_of, 'limits': dict(LIMITS),
+    matrix['platinum_policy'] = {'id': POLICY_ID, 'rules_revision': RULES_REVISION,
+        'evaluated_at': as_of, 'limits': dict(LIMITS),
         'eligible_markets': len({goal_market(r) for r in candidates}),
         'best_market_id': candidates[0]['id'] if candidates else None,
         'gold_policy_changed': False}
