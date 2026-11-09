@@ -4,7 +4,7 @@ from copy import deepcopy
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
-from context_analysis import select_history,profile,correction,evaluate,movement,favorite_path
+from context_analysis import select_history,profile,correction,evaluate,movement,favorite_path,persistence_component
 from analysis_history import freeze_update,latest_store
 from multimarket_model import fair
 from multimarket_audit import settle,build_report
@@ -26,6 +26,17 @@ def book(name,points,side='over'):
     return {'bookmaker':name,'bookmaker_id':name,'observed_at':NOW,'provider_updated_at':NOW,'odds':traces[-1]['odds'],'fair':p,'overround_pct':m,'trace':traces}
 
 class ContextTests(unittest.TestCase):
+    def test_oci_persistence_full_weight_only_between_extremes(self):
+        for value, expected in ((0., 0.), (.25, 15.), (.5, 15.), (.75, 15.), (1., 0.)):
+            self.assertEqual(persistence_component(value), expected)
+        for points, expected in (([2.5, 2.4, 2.3, 2.1], 0.), ([2.5, 2.4, 2.45, 2.1], 15.)):
+            result = movement([book('A', points), book('B', points)], 'over')
+            self.assertTrue(result['confirmed'])
+            operator = result['operators'][0]
+            delta, hours = operator['leg_fair_delta_pp'], operator['hours']
+            base = min(delta/4, 1)*40 + 25 + min(delta/hours/1.5, 1)*10 + 2.5
+            self.assertAlmostEqual(result['oci']-base, expected)
+
     def test_window_season_friendlies_future_missing(self):
         h=history();h[0]['friendly']=True;h[1]['season']=2025;h[2]['kickoff']='2026-10-21T12:00:00+00:00'
         chosen=select_history(h,NOW,2026)

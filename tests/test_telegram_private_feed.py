@@ -37,6 +37,15 @@ class PrivateTelegramReader(unittest.TestCase):
         self.assertEqual(out[0]["market"],"over15_ht")
         self.assertEqual(out[0]["odd"],2.2)
         self.assertEqual(picks({"date":day["date"],"selections":out},now,("20:30","22:00"),1)[0]["tier"],"platinum")
+    def test_gold_precedes_secondary_platinum_for_the_same_fixture(self):
+        day,now=self.fixture()
+        matrix=day["matches"][0]["multimarket"]["matrix"]
+        row=matrix["rows"][0]
+        row["platinum"]["secondary_to_gold"]=True
+        self.assertEqual(from_private_day(day,now)[0]["source_tier"],"platinum")
+        row["opportunity"]={"eligible":True,"policy_id":"gold-goals-v6.1"}
+        matrix["opportunity_policy"]["best_market_id"]="p1"
+        self.assertEqual(from_private_day(day,now)[0]["source_tier"],"gold")
     def test_stale_expired_started_and_withdrawn_never_publish(self):
         day,now=self.fixture()
         self.assertEqual(from_private_day(day,now+timedelta(minutes=95)),[])

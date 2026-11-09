@@ -8,6 +8,7 @@ from copy import deepcopy
 from multimarket_model import SPECS, COMBOS, number, stamp, fair, goal_probabilities, quote_benchmarks
 
 MODEL_ID = 'context-goals-v3.4'
+OCI_METHOD = 'oci-as-intermediate-persistence-v1'
 PRIMARY_MARKETS = {('over15_ht','over'), ('over25_ht','over'), ('over25_ft','over'), ('over35_ft','over'), ('gg_ht','yes')}
 CONFIG = {'history': 8, 'form': 4, 'halftime': 4, 'correction_per_goal': .02,
           'correction_cap': .05, 'minimum_context_reference': 3,
@@ -183,6 +184,10 @@ def favorite_consensus(rows):
             'books_with_historical_switch':sum(bool(r['changes']) for r in eligible)}
 
 
+def persistence_component(value):
+    return 15. if 0 < value < 1 else 0.
+
+
 def movement(books, side, include_previous=True):
     """Same operators over the same observation window; no aggregate mix shift."""
     paired=[]
@@ -250,10 +255,12 @@ def movement(books, side, include_previous=True):
     if confirmed:
         delta=median(r['leg_fair_delta_pp'] for r in agreeing)
         hours=median(r['hours'] for r in agreeing)
+        persistence=median(r['persistence'] for r in agreeing)
+        persistence_weight=persistence_component(persistence)
         absolute=(min(abs(delta)/4,1)*40+len(agreeing)/len(rows)*25+
-                  min(abs(delta)/hours/1.5,1)*10+median(r['persistence'] for r in agreeing)*15+min(len(rows)/8,1)*10)
+                  min(abs(delta)/hours/1.5,1)*10+persistence_weight+min(len(rows)/8,1)*10)
         oci=0 if abs(delta)<.10 else absolute*(1 if delta>0 else -1)
-    result = {'schema_version':3,'available_books':len(books),'history_books':len(candidates),'recovered_books':recovered_count,'window_method':'common_observations' if recovered_count else 'original_aligned_starts','oci':oci,'oci_method':'OCI-AS on paired operators, last leg; descriptive, not independent evidence',
+    result = {'schema_version':3,'available_books':len(books),'history_books':len(candidates),'recovered_books':recovered_count,'window_method':'common_observations' if recovered_count else 'original_aligned_starts','oci':oci,'oci_method':OCI_METHOD,
         'fair_direction_coherent':bool(confirmed and all(r['leg_fair_delta_pp']*sign<0 for r in agreeing)),
         'confirmed':confirmed,'paired_books':len(rows),'agreeing_books':len(agreeing),
         'direction':('up' if sign>0 else 'down') if confirmed else None,

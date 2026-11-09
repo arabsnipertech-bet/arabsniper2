@@ -167,7 +167,8 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
         progress(f'salvataggio esiti {date}')
         day.write(results_path)
         from v7_archive import archive_day
-        archive_day(root, day, date, now, fetched)
+        from v7_learning import signal_diagnostics
+        v7_signals = signal_diagnostics(archive_day(root, day, date, now, fetched)['samples'])
         progress(f'costruzione rapporto giornaliero {date}')
         from adaptive_calibration import Evidence, WINDOW
         evidence = Evidence()  # Empty evidence is explicit even outside the training window.
@@ -188,6 +189,7 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
             results_path.relative_to(root).as_posix(): digest(results_path),
             f'auditarchive/prematch_{date}_calibration.json': digest(root/f'auditarchive/prematch_{date}_calibration.json')}
         daily['selection_studies'] = build_studies(daily)
+        daily['v7_signals'] = v7_signals
         write(root / f'auditarchive/prematch_{date}_daily.json', daily)
         atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md',
                      (markdown(daily)+study_markdown(daily['selection_studies'])).encode())

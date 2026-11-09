@@ -16,7 +16,7 @@ from gold_storage import sha, write_manifest
 from lateral_matrix import build_matrix, market_id, settle_spec, specification
 from matrix_pipeline import build_board
 from matrix_quotes import collect
-from v7_archive import ROME, WEIGHTS, quote_evidence, results_for_day, valid_snapshot
+from v7_archive import ROME, WEIGHTS, day_path, quote_evidence, results_for_day, valid_snapshot
 from v7_decision import COMBOS, GG, GOAL, capture, publication, quote_rows, route
 from v7_learning import STATE, active_weight, deduplicated, fit, run
 from v7_maintenance import MARKER, complete_price_pages, consolidate, price_window
@@ -173,6 +173,11 @@ class MathAndRouting(unittest.TestCase):
 
 
 class ArchiveAndWorkflow(unittest.TestCase):
+    def test_scheduled_price_writer_uses_the_same_rollback_flag(self):
+        for filename in ('v7-maintenance.yml', 'fast_scan.yml', 'night_scan.yml'):
+            workflow = (ROOT/'.github/workflows'/filename).read_text()
+            self.assertIn('V7_SHADOW_ONLY: ${{ vars.V7_SHADOW_ONLY }}', workflow)
+
     def test_italian_midnight_partition_and_separate_results(self):
         snap = capture(assessment(), META, AT)
         record = dict(fixture=META, captured_at=AT, publication_snapshot=True, model_version='v5',
@@ -239,6 +244,38 @@ class ArchiveAndWorkflow(unittest.TestCase):
 
 
 class Learning(unittest.TestCase):
+    def test_nightly_reports_roi_stress_by_signal_and_intermediate_persistence(self):
+        cutoff = datetime(2026, 11, 10, 0, 42, tzinfo=ROME)
+        day = date(2026, 11, 9)
+        at = '2026-11-09T20:00:00+01:00'
+        profits = [8., 5., 4., 2., -1., -1.]
+        persistence = [.5, 1., .75, 0., .3, None]
+        samples = [dict(fixture_id=str(i), market=HIGH, date=str(day), kickoff=at,
+                        observed_at='2026-11-09T22:00:00+01:00', outcome=int(profit > 0),
+                        calibrated=.25, roi=-1., roles=['colpaccio', 'radar_sorprese'] if i == 0 else ['colpaccio'],
+                        role_roi={'colpaccio': profit, 'radar_sorprese': 3.},
+                        policy_exclusions=[], features={'persistence': value}, benchmark=False)
+                   for i, (profit, value) in enumerate(zip(profits, persistence))]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_store(day_path(root, day), dict(version='arabsniper-v7.0', date=str(day),
+                        counts={'settled': 6}, samples=[*samples, samples[0]]))
+            report = run(root, cutoff)
+            self.assertEqual(report, read_store(root/f'auditarchive/prematch_{day}_v7_learning.json'))
+        signals = report['diagnostics']['signals']
+        colpaccio = signals['colpaccio']
+        self.assertEqual(colpaccio['roi'], sum(profits)/6)
+        self.assertEqual(colpaccio['roi_without_three_largest_wins'], 0.)
+        self.assertEqual(colpaccio['top_wins_removed'], 3)
+        self.assertEqual(colpaccio['n_without_three_largest_wins'], 3)
+        intermediate = colpaccio['persistence_intermediate']
+        self.assertEqual((intermediate['n'], intermediate['top_wins_removed']), (3, 2))
+        self.assertEqual(intermediate['roi_without_three_largest_wins'], -1.)
+        radar = signals['radar_sorprese']
+        self.assertEqual(radar['roi'], 3.)
+        self.assertEqual(radar['persistence_intermediate']['n'], 1)
+        self.assertIsNone(radar['roi_without_three_largest_wins'])
+
     def test_future_outcomes_cannot_enter_training_and_update_is_bounded(self):
         cutoff = datetime(2026,11,29,1,tzinfo=ROME)
         rows = []

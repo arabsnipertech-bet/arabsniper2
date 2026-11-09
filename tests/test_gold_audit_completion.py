@@ -63,7 +63,9 @@ class GoldAuditCompletion(unittest.TestCase):
         self.assertNotEqual(st['scored'],a['profiles']['home']['for_ft']['mean']-a['profiles']['home']['for_ht']['mean'])
 
     def test_market_fair_admission_is_not_vetoed_by_book_margin(self):
-        a=self.assessment();saved=deepcopy(a)
+        a=self.assessment()
+        a['matrix']['rows'][0]['selected_market_fair_pct'] = None
+        saved=deepcopy(a)
         result=capture(a,match()['fixture'],NOW,{})
         fair=result['paths']['market_fair']
         self.assertEqual(result['market_fair_protocol'],FAIR_PROTOCOL)

@@ -70,6 +70,7 @@ def features(row, usable, as_of):
     oci = None if row.get('historical_oci') else row.get('oci')
     return dict(delta_pct=move.get('delta_pct') if repeated else None,
                 oci=oci if finite(oci) else None,
+                oci_method=row.get('oci_method'),
                 oci_band=('below_-50' if oci < -50 else '-50_to_0' if oci < 0 else
                           '0_to_50' if oci < 50 else '50_plus') if finite(oci) else None,
                 persistence=move.get('persistence') if repeated else None,
@@ -191,6 +192,8 @@ def official_choices(matrix):
     rows = {r['id']: r for r in matrix['rows']}
     gold = rows.get(matrix['opportunity_policy']['best_market_id'])
     platinum = rows.get(matrix['platinum_policy']['best_market_id'])
+    if gold and platinum and platinum['platinum']['secondary_to_gold']:
+        return 'gold', gold, gold, platinum
     tier, best = min(((tier, row) for tier, row in (('platinum', platinum), ('gold', gold)) if row),
                      key=lambda item: (item[1]['ev_pct'] <= 0, probability_order(item[1]), item[0] != 'platinum'),
                      default=(None, None))
@@ -239,11 +242,10 @@ def publication(records, signals, official, radar_id):
     longshot = max((key for key in alternatives if key != recommended and long_price(key)
                     and (not recommended or compatible(json.loads(recommended), json.loads(key)))),
                    key=lambda key: (records[key]['ev_low'], records[key]['calibrated'], key), default=None)
-    primary_reason = ('platinum_flusso' if best and best['ev_pct'] <= 0 else 'probabilita_e_prezzo')
     # Classifications remain auditable. Only the selected main is the headline.
     for role in ('lineare', 'alternativa', 'studio'):
         signals.pop(role, None)
-    signals.update(primary=proposed(main, primary_reason, best),
+    signals.update(primary=proposed(main, 'probabilita_e_prezzo', best),
                    consigliata=proposed(recommended, 'quota_superiore_verificata'),
                    colpaccio=proposed(longshot, 'quota_alta_e_riscontro_statistico'),
                    gold=proposed(market_id(canonical(gold['spec'])), 'criteri_gold', gold) if gold else None,

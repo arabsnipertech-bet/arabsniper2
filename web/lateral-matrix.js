@@ -4,6 +4,7 @@
  const MODEL='lateral-matrix-v5.0',V7='arabsniper-v7.0';
  const competition=typeof module==='object'&&module.exports?require('./competition-scope.js'):globalThis.ArabCompetitionScope;
  const POLICY='gold-goals-v6.1',SCOPE=competition.id;
+ const RULES_REVISION='v7-prudence-v1';
  const acceptedScope=competition.accepts;
  const acceptedPolicy=d=>[POLICY,'gold-goals-v6','gold-goals-v5','gold-goals-v4','gold-goals-v3','gold-goals-v2'].includes(d?.policy_id);
  const MIN_P={over15_ht:40,over25_ht:18,gg_ht:26,over25_ft:48,over35_ft:35};
@@ -15,7 +16,8 @@
  // Display-only monitoring. These limits never enter the Gold scoring policy.
  const MARKET_SIGNAL=Object.freeze({min_oci:30,max_delta_pct:-2,max_margin_pct:9,min_persistence:.5,min_agreeing_books:2});
  const LEGACY_PLATINUM_POLICY='platinum-flow-v1',PLATINUM_POLICY='platinum-flow-v1.1';
- const PLATINUM=Object.freeze({...MARKET_SIGNAL,max_delta_pct:-3,min_odd:2.5,min_ev_pct:10,min_high_odds_ev_pct:-15});
+ const PLATINUM=Object.freeze({...MARKET_SIGNAL,max_delta_pct:-3,min_ev_low_pct:2});
+ const LEGACY_PLATINUM_VALUE={min_odd:2.5,min_ev_pct:10,min_high_odds_ev_pct:-15};
  const MARKET_SIGNAL_TEXT='Radar di Mercato · Statistica debole o assente · Solo studio';
  const LEGACY_MAX={over15_ht:3.5,over25_ft:3.5,gg_ht:5.5,over35_ft:5.5};
  const priced=r=>['recent','cached_stable'].includes(r?.quote_status);
@@ -142,13 +144,17 @@
  function v61Valid(r,now,archived){
   const d=r.opportunity;if(d?.policy_id!==POLICY)return true;
   const m=goalMarket(r),margin=r.selected_margin_pct,delta=Number.isFinite(r.delta_pct)?r.delta_pct:r.selected_movement?.delta_pct;
-  const book=Number.isFinite(r.selected_market_fair_pct)?r.selected_market_fair_pct:Number.isFinite(margin)&&margin> -100&&r.odd>1?100/r.odd/(1+margin/100):r.market_fair_pct;
-  const floors={over15_ht:2,over25_ht:0,over25_ft:2,over35_ft:1,gg_ht:-1};
-  const minimum=floors[m]+(margin>=6.5?1.5:0);
   if(!d.structural_supported||!d.market_checks_passed||!Number.isFinite(margin)||margin<0||margin>8||r.oci< -20||delta>2+1e-9)return false;
-  if(m==='over25_ht'&&(!Number.isFinite(r.oci)||r.oci<15))return false;
-  if(Number.isFinite(book)&&r.statistical_pct-book>15+1e-9&&!(delta<0&&r.oci>0))return false;
-  if(r.ev_low_pct<minimum||!adaptiveValue(r,m==='gg_ht'?6:0)||d.stability?.status==='retained')return false;
+  if(d.rules_revision===RULES_REVISION){
+   if(!Number.isFinite(r.ev_low_pct)||!Number.isFinite(d.min_ev_low_pct)||r.ev_low_pct+1e-9<d.min_ev_low_pct)return false;
+  }else{
+   const book=Number.isFinite(r.selected_market_fair_pct)?r.selected_market_fair_pct:Number.isFinite(margin)&&margin> -100&&r.odd>1?100/r.odd/(1+margin/100):r.market_fair_pct;
+   const floors={over15_ht:2,over25_ht:0,over25_ft:2,over35_ft:1,gg_ht:-1};
+   if(m==='over25_ht'&&(!Number.isFinite(r.oci)||r.oci<15))return false;
+   if(Number.isFinite(book)&&r.statistical_pct-book>15+1e-9&&!(delta<0&&r.oci>0))return false;
+   if(r.ev_low_pct<floors[m]+(margin>=6.5?1.5:0))return false;
+  }
+  if(!adaptiveValue(r,m==='gg_ht'?6:0)||d.stability?.status==='retained')return false;
   if(r.quote_status==='cached_stable'){
    const at=Date.parse(r.cache_source_at),end=Date.parse(r.cache_expires_at);
    if(!Number.isFinite(at)||!Number.isFinite(end)||end-at!==12*3600000||(!archived&&(now<at||now>end)))return false;
@@ -262,11 +268,15 @@
    const legacy=(archived||monitoringClosed)&&d?.policy_id===LEGACY_PLATINUM_POLICY;
    if((d?.policy_id!==PLATINUM_POLICY&&!legacy)||d.eligible!==true||!Number.isInteger(d.rank)||d.rank<1||
       !Number.isFinite(at)||at>now||(Number.isFinite(start)&&at>=start))return false;
-   return flowSignalValid(r,PLATINUM,archived||monitoringClosed?at:now)&&
-    (adaptiveValue(r,PLATINUM.min_ev_pct)||
-     (r.odd>=PLATINUM.min_odd&&(legacy||
-      (Number.isFinite(r.ev_pct)&&r.ev_pct>=PLATINUM.min_high_odds_ev_pct+Math.max(0,calibrationDelta(r))&&(calibrationDelta(r)<=0||r.edge_pp>=calibrationDelta(r)))||
-      (r.ev_pct==null&&r.statistical_pct==null))));
+   if(!flowSignalValid(r,PLATINUM,archived||monitoringClosed?at:now))return false;
+   if(d.rules_revision===RULES_REVISION){
+    return r.ev_pct>0&&adaptiveValue(r,0)&&Number.isFinite(r.ev_low_pct)&&r.ev_low_pct>=PLATINUM.min_ev_low_pct;
+   }
+   const prior=LEGACY_PLATINUM_VALUE;
+   return adaptiveValue(r,prior.min_ev_pct)||
+    (r.odd>=prior.min_odd&&(legacy||
+     (Number.isFinite(r.ev_pct)&&r.ev_pct>=prior.min_high_odds_ev_pct+Math.max(0,calibrationDelta(r))&&(calibrationDelta(r)<=0||r.edge_pp>=calibrationDelta(r)))||
+     (r.ev_pct==null&&r.statistical_pct==null)));
   }).sort((a,b)=>a.platinum.rank-b.platinum.rank||String(a.id).localeCompare(String(b.id)));
   const seen=new Set();return candidates.filter(r=>{const key=goalMarket(r);if(seen.has(key))return false;seen.add(key);return true;});
  }
@@ -427,7 +437,9 @@
      ![m.fair_delta_pp,m.persistence,hours].every(Number.isFinite)||hours<=0||m.persistence<0||m.persistence>1)
    return {value:null,label:'Storico completo del singolo bookmaker non disponibile'};
   const delta=m.fair_delta_pp;
-  const amplitude=Math.min(Math.abs(delta)/4,1)*40+25+Math.min(Math.abs(delta)/hours/1.5,1)*10+m.persistence*15+10/8;
+  const persistenceWeight=row.oci_method==='oci-as-intermediate-persistence-v1'?
+   (m.persistence>0&&m.persistence<1?15:0):m.persistence*15;
+  const amplitude=Math.min(Math.abs(delta)/4,1)*40+25+Math.min(Math.abs(delta)/hours/1.5,1)*10+persistenceWeight+10/8;
   return {value:Math.abs(delta)<.10?0:amplitude*Math.sign(delta),label:'Singolo bookmaker · consenso multi-book non confermato'};
  }
  function movementSignal(row,saved=false){
@@ -483,7 +495,8 @@
  }
  function platinumPanel(rows,context,options,elite,best){
   const gold=best?'<details class="mx-method mx-platinum-gold"><summary>Giocata ufficiale Gold v6.1 · '+esc(best.label)+' · '+num(best.odd,2)+'</summary>'+opportunityPanel(rows,context,{...options,suppressPlatinum:true})+'</details>':'<p>Categoria Platinum · distinta dalle giocate Gold ufficiali.</p>';
-  return '<aside class="mx-best mx-best-platinum" data-platinum-id="'+esc(elite.id)+'"><span class="mx-section-title">Top Pick · <strong>PLATINUM</strong> · Quota &amp; Flusso Dominante</span><h4>'+esc(elite.label)+'</h4><span class="mx-badge mx-platinum"><strong>PLATINUM</strong></span><div class="mx-best-price">'+num(elite.odd,2)+'<small>'+(elite.quote_status==='cached_stable'?'Quota stabile da cache':'QUOTA OSSERVATA')+' · '+esc(elite.bookmaker)+'</small></div><dl>'+[
+  const caption=elite.platinum.rules_revision===RULES_REVISION?'Valore e flusso':'Quota &amp; Flusso Dominante';
+  return '<aside class="mx-best mx-best-platinum" data-platinum-id="'+esc(elite.id)+'"><span class="mx-section-title">Top Pick · <strong>PLATINUM</strong> · '+caption+'</span><h4>'+esc(elite.label)+'</h4><span class="mx-badge mx-platinum"><strong>PLATINUM</strong></span><div class="mx-best-price">'+num(elite.odd,2)+'<small>'+(elite.quote_status==='cached_stable'?'Quota stabile da cache':'QUOTA OSSERVATA')+' · '+esc(elite.bookmaker)+'</small></div><dl>'+[
    ['OCI / variazione quota',signed(elite.oci)+' / '+signed(elite.delta_pct)+'%'],
    ['Aggio / operatori concordi',pct(elite.selected_margin_pct)+' / '+elite.agreeing_books+'/'+elite.paired_books],
    ['Persistenza del movimento',pct(100*elite.selected_movement.persistence)],
@@ -494,7 +507,7 @@
  function opportunityPanel(rows,context,options={}){
   const best=bestOpportunity(rows,options),pricedCount=rows.filter(r=>priced(r)).length;
   const elite=!options.suppressPlatinum&&platinumSignals(rows,options)[0];
-  if(elite)return platinumPanel(rows,context,options,elite,best);
+  if(elite&&(!best||!elite.platinum.secondary_to_gold))return platinumPanel(rows,context,options,elite,best);
   const checked=rows.filter(r=>goalMarket(r)!==null&&acceptedPolicy(r.opportunity)),counts={};
   for(const r of checked)for(const code of (!priced(r)?['stale']:r.opportunity.reasons||[]))counts[code]=(counts[code]||0)+1;
   const blockers=['oci_negative','odds_rising','suspicious_divergence','margin','margin_missing','stale'];
@@ -616,7 +629,8 @@
   const options={archived:phase(m)!=='upcoming',monitoringClosed:(services.phase||phase)(m)!=='upcoming',kickoff:m.fixture?.kickoff,monitoring:a.matrix?.quote_monitoring};
   if(a.status==='no_prematch_snapshot')return {name:'STUDIO',tone:'studio',row:null};
   const elite=platinumSignals(rows,options)[0],gold=bestOpportunity(rows,options);
-  return elite?{name:'PLATINUM',tone:'platinum',row:elite}:gold?{name:'GOLD',tone:'gold',row:gold}:{name:'STUDIO',tone:'studio',row:null};
+  if(elite&&(!gold||!elite.platinum.secondary_to_gold))return {name:'PLATINUM',tone:'platinum',row:elite};
+  return gold?{name:'GOLD',tone:'gold',row:gold}:{name:'STUDIO',tone:'studio',row:null};
  }
  function historyProposal(m,services,options){
   const h=m._gold_history;

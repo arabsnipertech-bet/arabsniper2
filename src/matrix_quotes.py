@@ -428,7 +428,7 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         fair_basis='independent_disjoint_halves' if synthetic else 'settlement_weight' if row['spec']['kind'] in ('dnb', 'handicap', 'asian_total') else 'outcome',
         edge_pp=100*(row['win_weight']/(row['win_weight']+row['loss_weight'])-book_p) if book_p is not None and row['win_weight']+row['loss_weight'] else None,
         ev_pct=round(ev*100, 4), ev_low_pct=round(min(evs)*100, 4), ev_high_pct=round(max(evs)*100, 4),
-        oci=oci, oci_previous=move.get('oci_previous'), oci_direction=move.get('direction'),
+        oci=oci, oci_method=move.get('oci_method'), oci_previous=move.get('oci_previous'), oci_direction=move.get('direction'),
         paired_books=move.get('paired_books', 0), agreeing_books=move.get('agreeing_books', 0),
         delta_pct=100*(odd/best['first_odd']-1), amplitude_pct=move.get('amplitude_pct'),
         margin_pct=margin, margin_band=margin_band, margin_delta_pp=margin_delta, margin_trend=margin_trend,

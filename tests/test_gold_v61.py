@@ -31,7 +31,27 @@ class GoldV61(unittest.TestCase):
         self.assertTrue(evaluate(row(oci=-20,delta_pct=2))['eligible'])
         self.assertTrue(evaluate(row(statistical_pct=70,selected_market_fair_pct=55,delta_pct=0))['eligible'])
         self.assertFalse(evaluate(row(statistical_pct=70,selected_market_fair_pct=54,delta_pct=-.01,oci=.01))['eligible'])
-        self.assertTrue(evaluate(row(statistical_pct=70,selected_market_fair_pct=54,delta_pct=-8,oci=60))['eligible'])
+        for line in (2.5, 3.5):
+            r = row(spec=S('total','ft','over',line), statistical_pct=70.,
+                    selected_market_fair_pct=55., delta_pct=-8., oci=60.)
+            self.assertTrue(evaluate(r)['eligible'])
+            r['selected_market_fair_pct'] -= .0001
+            self.assertIn('suspicious_divergence',evaluate(r)['reasons'])
+
+    def test_ft_saturation_raises_the_prudent_floor_only_once(self):
+        for line, base in ((2.5, 2.), (3.5, 1.)):
+            neutral = row(spec=S('total','ft','over',line), oci=49.999, delta_pct=-4.999,
+                          ev_low_pct=base)
+            self.assertTrue(evaluate(neutral)['eligible'])
+            compressed = {**neutral['selected_movement'], 'persistence': 1.}
+            for trigger in ({'oci': 50.}, {'delta_pct': -5.}, {'selected_movement': compressed},
+                            {'oci': 50., 'delta_pct': -5., 'selected_movement': compressed}):
+                r = {**neutral, **trigger}
+                decision = evaluate(r)
+                self.assertEqual(decision['min_ev_low_pct'], base+2.)
+                self.assertEqual(decision['reasons'], ['sensitivity'])
+                self.assertTrue(evaluate({**r, 'ev_low_pct': base+2.})['eligible'])
+                self.assertEqual(evaluate({**r, 'selected_margin_pct': 6.5})['min_ev_low_pct'], base+3.5)
 
     def test_gol_peak_ratio_and_symmetry_boundaries(self):
         r=row()
@@ -39,27 +59,28 @@ class GoldV61(unittest.TestCase):
         self.assertTrue(evaluate(r)['eligible'])
         r['goal_evidence']['teams']['home']['ft']['without_last']-=.0001
         self.assertIn('isolated_peak',evaluate(r)['reasons'])
-        r=row(spec=S('btts','ht','yes'),odd=4.,statistical_pct=26.,ev_pct=6.,ev_low_pct=-1.)
+        r=row(spec=S('btts','ht','yes'),odd=4.,statistical_pct=26.,ev_pct=6.,ev_low_pct=2.)
         for t in r['goal_evidence']['teams'].values():t['ht'].update(expected_goals=.55,mean=.5,without_last=.5,conceded_mean=.5,sample=4)
         self.assertTrue(evaluate(r)['eligible'])
         for field in ('expected_goals','mean','conceded_mean','sample'):
             trial=deepcopy(r);trial['goal_evidence']['teams']['away']['ht'][field]-=.0001
             self.assertFalse(evaluate(trial)['eligible'],field)
         self.assertIn('sensitivity',evaluate({**r,'selected_margin_pct':6.5})['reasons'])
-        self.assertTrue(evaluate({**r,'selected_margin_pct':6.5,'ev_low_pct':.5})['eligible'])
+        self.assertTrue(evaluate({**r,'selected_margin_pct':6.5,'ev_low_pct':3.5})['eligible'])
+        self.assertIn('sensitivity', evaluate({**r, 'ev_low_pct': 1.999})['reasons'])
 
-    def test_ht_over_requires_rate_frequency_samples_and_oci_for_25(self):
-        for line,total,odd,p,low in [(1.5,1.35,2.5,40,2),(2.5,1.70,5.5,18,0)]:
-            r=row(spec=S('total','ht','over',line),odd=odd,statistical_pct=p,ev_low_pct=low,oci=15)
+    def test_ht_over_requires_rate_frequency_samples_and_prudent_value(self):
+        for line,total,odd,p in [(1.5,1.35,2.5,40),(2.5,1.70,5.5,18)]:
+            r=row(spec=S('total','ht','over',line),odd=odd,statistical_pct=p,ev_low_pct=2.,oci=None)
             for t in r['goal_evidence']['teams'].values():t['ht'].update(expected_goals=total/2,frequency=.75)
             self.assertTrue(evaluate(r)['eligible'])
+            self.assertEqual(evaluate({**r, 'oci': 0, 'ev_low_pct': 1.999})['reasons'], ['sensitivity'])
+            self.assertEqual(evaluate({**r, 'oci': -21})['reasons'], ['oci_negative'])
             for t in r['goal_evidence']['teams'].values():t['ht']['frequency']=.7499
             self.assertIn('ht_frequency',evaluate(r)['reasons'])
             r['goal_evidence']['teams']['home']['ht']['frequency']=.75
             r['goal_evidence']['teams']['away']['ht']['expected_goals']-=.0001
             self.assertIn('ht_expected',evaluate(r)['reasons'])
-        r=row(spec=S('total','ht','over',2.5),odd=5.5,statistical_pct=25,oci=14.999)
-        self.assertIn('ht_oci',evaluate(r)['reasons'])
 
     def test_low_price_upgrade_prefers_35_then_15_without_forcing_bad_pick(self):
         ft=row(id='low',odd=1.69)

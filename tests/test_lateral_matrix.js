@@ -274,7 +274,7 @@ assert(api.halfTimeText({status:'in_progress',score:'1–0',stale:true}).include
 // Shared boundary cases verify Python/client parity without changing Gold.
 const platinumCases=JSON.parse(fs.readFileSync('tests/platinum_cases.json','utf8'));
 const platinumNow=Date.parse(platinumCases.now),platinumOptions={now:platinumNow,kickoff:platinumCases.kickoff};
-const platinumDecision={policy_id:api.PLATINUM_POLICY,eligible:true,rank:1,evaluated_at:platinumCases.now};
+const platinumDecision={policy_id:api.PLATINUM_POLICY,rules_revision:'v7-prudence-v1',eligible:true,rank:1,evaluated_at:platinumCases.now};
 for(const test of platinumCases.cases){
  const r={...structuredClone(platinumCases.base),...test.patch,platinum:platinumDecision};
  assert.equal(api.platinumSignals([r],platinumOptions).length>0,test.eligible,test.name);
@@ -291,21 +291,22 @@ const tierMatch={...matches[0],fixture:{...matches[0].fixture,kickoff:platinumCa
 assert.equal(api.matchingRows(tierMatch,{...opts,category:'platinum'},platinumNow).length,1);
 assert.equal(api.matchingRows(tierMatch,{...opts,category:'market_signal'},platinumNow).length,0,'Silver is distinct from blue in category navigation');
 assert.equal(api.marketSignals([platinum],platinumOptions).length,1,'The underlying Radar thresholds remain unchanged');
-const belowFloor={...platinum,ev_pct:-15.0001};
+const belowFloor={...platinum,ev_pct:-15};
 const excludedMatch={...tierMatch,multimarket:{matrix:{rows:[belowFloor]}}};
 assert.equal(api.matchingRows(excludedMatch,{...opts,category:'platinum'},platinumNow).length,0);
 assert.equal(api.matchingRows(excludedMatch,{...opts,category:'market_signal'},platinumNow).length,1,'Excluded high odds fall back to unchanged Radar');
 assert(!api.opportunityPanel([belowFloor],null,platinumOptions).includes('data-platinum-id'));
 assert(api.opportunityPanel([belowFloor],null,platinumOptions).includes('data-market-signal-id'));
-const fallbackPlatinum={...platinum,id:'over25',spec:{...platinum.spec,line:2.5},ev_pct:-15,platinum:{...platinumDecision,rank:2}};
+const fallbackPlatinum={...platinum,id:'over25',spec:{...platinum.spec,line:2.5},platinum:{...platinumDecision,rank:2}};
 assert.equal(api.platinumSignals([belowFloor,fallbackPlatinum],platinumOptions)[0].id,'over25');
-const legacyPlatinum={...belowFloor,platinum:{...platinumDecision,policy_id:'platinum-flow-v1'}};
+const legacyPlatinum={...belowFloor,platinum:{...platinumDecision,rules_revision:undefined,policy_id:'platinum-flow-v1'}};
 assert.equal(api.platinumSignals([legacyPlatinum],platinumOptions).length,0,'Future fixtures require the new policy');
 assert.equal(api.platinumSignals([legacyPlatinum],{...platinumOptions,archived:true}).length,1,'Frozen v1 selections keep their original classification');
 assert.equal(api.platinumSignals([legacyPlatinum],{...platinumOptions,monitoringClosed:true}).length,1);
+assert.equal(api.platinumSignals([{...legacyPlatinum,platinum:{...legacyPlatinum.platinum,policy_id:api.PLATINUM_POLICY}}],{...platinumOptions,archived:true}).length,1);
 assert.equal(api.platinumSignals([belowFloor],{...platinumOptions,archived:true}).length,0,'New policy never bypasses the floor');
 const absentEv={...platinum};delete absentEv.ev_pct;delete absentEv.statistical_pct;
-assert.equal(api.platinumSignals([absentEv],platinumOptions).length,1);
+assert.equal(api.platinumSignals([absentEv],platinumOptions).length,0);
 for(const ev of [NaN,Infinity,-Infinity])assert.equal(api.platinumSignals([{...platinum,ev_pct:ev}],platinumOptions).length,0);
 const both=[platinum,priced],bothBefore=JSON.stringify(both),goldBefore=api.bestOpportunity(both,platinumOptions);
 const silverPanel=api.opportunityPanel(both,null,platinumOptions);
@@ -319,7 +320,11 @@ assert.equal(JSON.stringify(both),bothBefore);
 assert(api.marketRow(platinum,{}, {platinum:true,marketSignal:true}).includes('<strong>PLATINUM</strong>'));
 assert(!api.marketRow(platinum,{}, {platinum:true,marketSignal:true}).includes('Radar di Mercato · Solo studio'));
 assert(!/undefined|NaN/.test(silverPanel));
-console.log('PASS Platinum: shared flow/value boundaries, missing statistics, separate silver filter, frozen archive and unchanged Gold decisions/ranking');
+const secondary={...platinum,oci:50,platinum:{...platinumDecision,secondary_to_gold:true}};
+assert(api.opportunityPanel([secondary,priced],null,platinumOptions).includes('data-opportunity-id'));
+assert(!api.opportunityPanel([secondary,priced],null,platinumOptions).includes('data-platinum-id'));
+assert(api.opportunityPanel([secondary],null,platinumOptions).includes('data-platinum-id'));
+console.log('PASS Platinum: shared flow/value boundaries, Gold precedence over high OCI, separate silver filter and frozen archive');
 // Waiting for quotes is visible in Radar without acquiring a confirmed signal.
 const waitingRow={...signal,id:'pending-quote',odd:null,first_odd:null,oci:null,quote_status:'missing',opportunity:null};
 const waitingOptions={...signalOptions,monitoring:{version:'quote-monitoring-v1',study_only:true,state:'waiting_quotes',row_ids:['pending-quote'],waiting_markets:[{market:'over35_ft'}]}};
@@ -539,6 +544,10 @@ const oneBook={oci:null,paired_books:1,agreeing_books:1,bookmaker:'Book A',quote
  movement_hours:2,speed_pp_per_hour:1};
 const frozen=JSON.stringify(oneBook);
 assert(Math.abs(api.displayOci(oneBook).value-(20+25+10/1.5+15+1.25))<1e-9);
+const revisedOci={...oneBook,oci_method:'oci-as-intermediate-persistence-v1'};
+assert(Math.abs(api.displayOci(revisedOci).value-api.displayOci(oneBook).value+15)<1e-9);
+assert.equal(api.displayOci({...revisedOci,selected_movement:{...oneBook.selected_movement,persistence:.5}}).value,
+ api.displayOci(oneBook).value);
 const cached=structuredClone(oneBook);delete cached.movement_hours;
 assert.equal(api.displayOci(cached).value,api.displayOci(oneBook).value);
 const negative=structuredClone(cached);negative.selected_movement.fair_delta_pp=-2;

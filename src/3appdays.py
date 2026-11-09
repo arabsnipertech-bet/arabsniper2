@@ -828,6 +828,8 @@ def calculate_oci_as(
     first_seen_at: str,
     current_at: str,
 ) -> Dict[str, Any]:
+    from context_analysis import persistence_component
+
     if abs(delta_fair_pp) < 0.10:
         return {
             "value": 0.0,
@@ -848,12 +850,12 @@ def calculate_oci_as(
     magnitude_component = min(abs(delta_fair_pp) / 4.0, 1.0) * 40.0
     consensus_component = clamp(consensus_ratio, 0.0, 1.0) * 25.0
     velocity_component = min(velocity_pp_h / 1.50, 1.0) * 10.0
-    persistence_component = persistence * 15.0
+    persistence_weight = persistence_component(persistence)
     coverage_component = min(bookmakers_count / 8.0, 1.0) * 10.0
 
     absolute = clamp(
         magnitude_component + consensus_component + velocity_component +
-        persistence_component + coverage_component,
+        persistence_weight + coverage_component,
         0.0,
         100.0,
     )
@@ -867,7 +869,7 @@ def calculate_oci_as(
             "magnitude": round3(magnitude_component),
             "consensus": round3(consensus_component),
             "velocity": round3(velocity_component),
-            "persistence": round3(persistence_component),
+            "persistence": round3(persistence_weight),
             "coverage": round3(coverage_component),
         },
     }

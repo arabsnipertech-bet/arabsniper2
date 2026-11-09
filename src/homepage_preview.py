@@ -14,6 +14,7 @@ from copy import deepcopy
 
 ROME = ZoneInfo('Europe/Rome')
 MARKETS = {'over15_ht', 'over25_ht', 'gg_ht', 'over25_ft', 'over35_ft'}
+SECONDARY_PLATINUM_PRIORITY = 1.5
 
 def stamp(value):
     try:
@@ -87,7 +88,9 @@ def board_spunti(fixture, assessment, now, *, blue_only=False):
                     or row.get('quote_status') not in ('recent', 'cached_stable')):
                 continue
             observed = row.get('provider_updated_at')
-            score = row.get('oci') if priority == 0 else decision.get('playability_score')
+            score = row.get('oci') if field == 'platinum' else decision.get('playability_score')
+            if decision.get('secondary_to_gold') is True:
+                priority = SECONDARY_PLATINUM_PRIORITY
             probability = row.get('statistical_pct')
         quote_time = stamp(observed)
         if (not quote_time or not 0 <= (now-quote_time).total_seconds() <= 28800
@@ -103,7 +106,7 @@ def board_spunti(fixture, assessment, now, *, blue_only=False):
                     kickoff=fixture['kickoff'], country=fixture.get('country',''), league=fixture.get('league',''), captured_at=assessment['captured_at'],
                     provider_updated_at=observed, statistical_pct=probability,
                     margin_pct=row.get('selected_margin_pct'),
-                    market_confirmation='confirmed' if priority == 0 else
+                    market_confirmation='confirmed' if field == 'platinum' else
                     (row.get('opportunity') or {}).get('signal'))
         yield (priority, -score if number(score) else float('inf'),
                fixture['kickoff'], pick['fixture_id']), pick
@@ -127,8 +130,11 @@ def social_board(payload, now, *, kickoff_from=None, kickoff_until=None, exclude
     # Social-only ordering; model qualification and other callers are unchanged.
     if tier_order:
         priorities = {tier: i for i, tier in enumerate(tier_order)}
-        ranked = [((priorities.get(pick['tier'], len(priorities)), *key[1:]), pick)
-                  for key, pick in ranked]
+        for index, (key, pick) in enumerate(ranked):
+            priority = priorities.get(pick['tier'], len(priorities))
+            if key[0] == SECONDARY_PLATINUM_PRIORITY:
+                priority = max(priority, priorities.get('Gold', len(priorities)) + .5)
+            ranked[index] = (priority, *key[1:]), pick
     distinct = {}
     for _, pick in sorted(ranked, key=lambda item: item[0]):
         distinct.setdefault(pick['fixture_id'], pick)

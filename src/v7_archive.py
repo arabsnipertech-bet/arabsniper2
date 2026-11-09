@@ -177,3 +177,4 @@ def archive_day(root, store, day, at, fetched=None):
     output = results_for_day(store, day, at, by_id, previous)
     if output['fixtures'] or output['rejected_forecasts']:
         write_store(path, output)
+    return output

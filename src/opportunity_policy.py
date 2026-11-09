@@ -8,6 +8,7 @@ from math import isfinite, sqrt
 from statistics import mean, median
 
 POLICY_ID = 'gold-goals-v6.1'
+RULES_REVISION = 'v7-prudence-v1'
 SUPPORTED_POLICY_IDS = ('gold-goals-v2', 'gold-goals-v3', 'gold-goals-v4', 'gold-goals-v5', 'gold-goals-v6', POLICY_ID)
 ODDS_MIN, ODDS_MAX = 1.70, 7.50
 GOALS = {('total', 'ht', 'over', 1.5): 'over15_ht', ('btts', 'ht', 'yes', None): 'gg_ht',
@@ -15,7 +16,8 @@ GOALS = {('total', 'ht', 'over', 1.5): 'over15_ht', ('btts', 'ht', 'yes', None):
          ('total', 'ft', 'over', 2.5): 'over25_ft', ('total', 'ft', 'over', 3.5): 'over35_ft'}
 ODDS_MIN_BY_MARKET = {'over15_ht': 2.10, 'over25_ht': 4.50, 'over25_ft': ODDS_MIN, 'gg_ht': 3.50, 'over35_ft': 2.10}
 ODDS_MAX_BY_MARKET = {'over15_ht': 3.50, 'over25_ht': 7.50, 'over25_ft': 2.60, 'gg_ht': 5.50, 'over35_ft': 4.50}
-MIN_EV_LOW_BY_MARKET = {'over15_ht': 2., 'over25_ht': 0., 'over25_ft': 2., 'gg_ht': -1., 'over35_ft': 1.}
+MIN_EV_LOW_BY_MARKET = {'over15_ht': 2., 'over25_ht': 2., 'over25_ft': 2., 'gg_ht': 2., 'over35_ft': 1.}
+FT_OVER_MARKETS = {'over25_ft', 'over35_ft'}
 # Prudential admission rules, not fitted/calibrated probabilities. The model's
 # independent 45-minute estimates remain untouched, including absent HT xG.
 MIN_PROBABILITY_BY_MARKET = {'over15_ht': 40., 'over25_ht': 18., 'gg_ht': 26., 'over25_ft': 48., 'over35_ft': 35.}
@@ -44,7 +46,6 @@ REASONS = {
     'odds_rising': 'Salita quota superiore al 2% sullo stesso operatore',
     'suspicious_divergence': 'Divergenza sospetta / Mercato non concorde',
     'margin_missing': 'Aggio dello stesso operatore non disponibile',
-    'ht_oci': 'Over 2,5 PT richiede OCI almeno +15',
     'structural_missing': 'Statistiche strutturali non disponibili',
     'isolated_peak': 'Media senza ultima inferiore all’80% della media combinata',
     'ht_symmetry': 'Simmetria delle due squadre nel PT insufficiente',
@@ -238,12 +239,23 @@ def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None,
     minimum_p, minimum_odd, maximum_odd = min_probability(row), ODDS_MIN_BY_MARKET.get(market, ODDS_MIN), odds_max(row)
     if market == 'over25_ft' and over25_floor is not None: minimum_odd = over25_floor
     margin, oci = row.get('selected_margin_pct'), row.get('oci')
+    movement = row.get('selected_movement') or {}
+    delta = row.get('delta_pct')
+    if not numeric(delta): delta = movement.get('delta_pct')
+    persistence = movement.get('persistence')
+    ft_over = market in FT_OVER_MARKETS
+    saturated = ft_over and (
+        (numeric(oci) and oci >= 50) or (numeric(delta) and delta <= -5 + 1e-9)
+        or (numeric(persistence) and persistence == 1.))
     margin_known = numeric(margin)
     band = 'unknown' if not margin_known else 'anomalous' if not 0 <= margin <= 8 else 'high' if margin >= 6.5 else 'low'
     from adaptive_pricing import gate_passes, threshold
     base_ev = 6. if market == 'gg_ht' else 0.
     min_ev = max(0., base_ev + threshold(row))
-    min_low = MIN_EV_LOW_BY_MARKET.get(market, 0.) + (1.5 if margin_known and 6.5 <= margin <= 8 else 0.)
+    saturation_surcharge = 2. if saturated else 0.
+    min_low = MIN_EV_LOW_BY_MARKET.get(market, 0.) + saturation_surcharge
+    if margin_known and 6.5 <= margin <= 8:
+        min_low += 1.5
     reasons = []
     if tier is None: reasons.append('market')
     if not numeric(p) or not minimum_p <= p <= 100: reasons.append('probability')
@@ -253,17 +265,17 @@ def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None,
     if row.get('quality') != 'supported': reasons.append('history')
     if not margin_known: reasons.append('margin_missing')
     elif not 0 <= margin <= 8: reasons.append('margin')
-    delta = row.get('delta_pct')
-    if not numeric(delta): delta = (row.get('selected_movement') or {}).get('delta_pct')
     if numeric(oci) and oci < -20: reasons.append('oci_negative')
     if numeric(delta) and delta > 2.+1e-9: reasons.append('odds_rising')
     book = row.get('selected_market_fair_pct')
     if not numeric(book) and numeric(odd) and odd > 1 and margin_known and margin > -100:
         book = 100/odd/(1+margin/100)
     if not numeric(book): book = row.get('market_fair_pct')
-    if numeric(p) and numeric(book) and p-book > (divergence_caps or {}).get(row.get('spec', {}).get('period'), 15.)+1e-9 and not (numeric(delta) and delta < 0 and numeric(oci) and oci > 0 and confirmed_flow(row)):
+    divergence_cap = (divergence_caps or {}).get(row.get('spec', {}).get('period'), 15.)
+    flow_exception = (not ft_over and numeric(delta) and delta < 0 and numeric(oci)
+                      and oci > 0 and confirmed_flow(row))
+    if numeric(p) and numeric(book) and p-book > divergence_cap+1e-9 and not flow_exception:
         reasons.append('suspicious_divergence')
-    if market == 'over25_ht' and (not numeric(oci) or oci < 15): reasons.append('ht_oci')
     if market in ('over15_ht', 'over25_ht', 'gg_ht') and not supported_first_half(row.get('ht_evidence')):
         reasons.append('ht_history')
     if market: reasons.extend(structural_reasons(row, market))
@@ -278,15 +290,16 @@ def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None,
     eligible = not reasons
     signal = signal_for(row, eligible)
     score = (p if fair_comparison else p * max(0., ev_low-min_low)/(odd-1)) if eligible else None
-    return {'policy_id': POLICY_ID, 'eligible': eligible, 'strict_eligible': eligible, 'rank': None, 'priority': tier,
+    return {'policy_id': POLICY_ID, 'rules_revision': RULES_REVISION,
+            'eligible': eligible, 'strict_eligible': eligible, 'rank': None, 'priority': tier,
             'goal_market': market, 'odds_min': minimum_odd, 'odds_max': maximum_odd,
             'min_probability_pct': minimum_p, 'min_ev_pct': min_ev,
             'ht_history_supported': market not in ('over15_ht', 'over25_ht', 'gg_ht') or 'ht_history' not in reasons and 'structural_missing' not in reasons,
             'structural_supported': not any(r in reasons for r in ('structural_missing', 'isolated_peak', 'ht_symmetry', 'ht_expected', 'ht_frequency', 'ht_history')),
-            'market_checks_passed': not any(r in reasons for r in ('margin', 'margin_missing', 'oci_negative', 'odds_rising', 'suspicious_divergence', 'ht_oci')),
+            'market_checks_passed': not any(r in reasons for r in ('margin', 'margin_missing', 'oci_negative', 'odds_rising', 'suspicious_divergence')),
             'threshold_status': 'user_defined_unvalidated',
             'entry_min_ev_pct': min_ev, 'entry_min_ev_low_pct': min_low,
-            'min_ev_low_pct': min_low, 'margin_band': band,
+            'min_ev_low_pct': min_low, 'ev_low_saturation_surcharge_pp': saturation_surcharge, 'margin_band': band,
             'signal': signal, 'label': LABELS[signal], 'reasons': reasons,
             'playability_score': score, 'pt_priority': pt_priority,
             **({'comparison_basis': comparison_basis, 'value_gates_applied': False} if fair_comparison else {})}
@@ -350,7 +363,7 @@ def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, div
     eligible = sorted((r for r in rows if r['opportunity']['eligible']), key=order)
     if best: eligible = [best, *[r for r in eligible if r is not best]]
     for rank, row in enumerate(eligible, 1): row['opportunity']['rank'] = rank
-    matrix['opportunity_policy'] = {'id': POLICY_ID, 'evaluated_at': as_of,
+    matrix['opportunity_policy'] = {'id': POLICY_ID, 'rules_revision': RULES_REVISION, 'evaluated_at': as_of,
         'odds_min': ODDS_MIN, 'odds_max': max(ODDS_MAX_BY_MARKET.values()),
         'standard_odds_max': ODDS_MAX, 'odds_min_by_market': dict(ODDS_MIN_BY_MARKET), 'automatic_upgrade': upgrade, 'odds_max_by_market': dict(ODDS_MAX_BY_MARKET),
         'asian_equivalence': 'identical_half_line_only', 'min_probability_pct': min(MIN_PROBABILITY_BY_MARKET.values()),

@@ -18,6 +18,7 @@ MIN_TRAIN_DAYS, MIN_TRAIN_FIXTURES = 8, 100
 MIN_TEST_DAYS, MIN_TEST_FIXTURES = 5, 80
 STEP, MIN_GAIN = .05, .001
 BASELINES = ('raw', 'corrected', 'calibrated', 'v51', 'fair')
+STRESS_ROLES = ('radar_sorprese', 'colpaccio')
 
 
 @lru_cache(maxsize=4)
@@ -94,17 +95,34 @@ def day_roi(rows):
         trials.sort()
         result['bootstrap_days_95'] = [trials[12], trials[487]]
     largest = sorted((v for v in profit if v > 0), reverse=True)[:3]
+    result['top_wins_removed'] = len(largest)
+    result['n_without_three_largest_wins'] = len(profit) - len(largest)
     result['roi_without_three_largest_wins'] = ((sum(profit) - sum(largest)) / (len(profit) - len(largest))
                                                 if len(profit) > len(largest) else None)
     return result
 
 
-def diagnostics(rows, today):
-    markets, roles, bands, ablation, observed = (defaultdict(list) for _ in range(5))
+def intermediate_persistence(row):
+    value = row['features'].get('persistence')
+    return finite(value) and 0 < value < 1
+
+
+def signal_diagnostics(rows):
+    roles = defaultdict(list, {role: [] for role in STRESS_ROLES})
     for row in rows:
-        markets[row['market']].append(row)
         for role in row['roles']:
             roles[role].append({**row, 'roi': row.get('role_roi', {}).get(role, row['roi'])})
+    signals = {role: day_roi(group) for role, group in roles.items()}
+    for role in STRESS_ROLES:
+        signals[role]['persistence_intermediate'] = day_roi(
+            row for row in roles[role] if intermediate_persistence(row))
+    return signals
+
+
+def diagnostics(rows, today):
+    markets, bands, ablation, observed = (defaultdict(list) for _ in range(4))
+    for row in rows:
+        markets[row['market']].append(row)
         band = min(9, int(10 * row['calibrated']))
         bands[str(10 * band)].append(row)
         reasons = set(row['policy_exclusions'])
@@ -114,7 +132,7 @@ def diagnostics(rows, today):
         dimensions = {'OCI': features.get('oci_band')}
         persistence, delta, margin = (features.get(k) for k in ('persistence', 'delta_pct', 'margin_pct'))
         if finite(persistence):
-            dimensions['persistenza'] = 'intermedia' if 0 < persistence < 1 else 'estrema'
+            dimensions['persistenza'] = 'intermedia' if intermediate_persistence(row) else 'estrema'
         if finite(delta):
             dimensions['movimento'] = 'calo_5_plus' if delta <= -5 else 'calo' if delta < 0 else 'salita' if delta > 0 else 'stabile'
         if finite(margin):
@@ -126,7 +144,7 @@ def diagnostics(rows, today):
             if band:
                 observed['|'.join((row['market'], dimension, band))].append(row)
     return dict(cohorts={key: evaluate(group, today) for key, group in markets.items()},
-                signals={key: day_roi(group) for key, group in roles.items()},
+                signals=signal_diagnostics(rows),
                 calibration_bins={key: dict(n=len(group), observed=sum(r['outcome'] for r in group)/len(group),
                     predicted=sum(r['calibrated'] for r in group)/len(group)) for key, group in bands.items()},
                 single_filter_observations={key: day_roi(group) for key, group in ablation.items()},

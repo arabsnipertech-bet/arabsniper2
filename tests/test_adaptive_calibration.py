@@ -196,13 +196,14 @@ class AdaptiveCalibration(unittest.TestCase):
                       market_fair_pct=49.,calibration=delta)
         reprice(mature)
         self.assertEqual(mature['category'],'value_watch')
-        high={**deepcopy(CASES['base']),'odd':2.7,'first_odd':2.9,'ev_pct':-15.,'edge_pp':2.}
+        high={**deepcopy(CASES['base']),'odd':2.7,'first_odd':2.9,'ev_pct':.8,'edge_pp':2.}
         high['delta_pct']=100*(high['odd']/high['first_odd']-1)
         self.assertTrue(platinum(high,AT)['eligible'])
         self.assertFalse(platinum({**high,'calibration':delta},AT)['eligible'])
         relaxed={**high,'calibration':{**delta,'threshold_delta_pp':-.5}}
         self.assertTrue(platinum(relaxed,AT)['eligible'])
-        self.assertFalse(platinum({**relaxed,'ev_pct':-15.1},AT)['eligible'])
+        self.assertFalse(platinum({**relaxed,'ev_pct':0},AT)['eligible'])
+        self.assertFalse(platinum({**relaxed,'ev_low_pct':1.999},AT)['eligible'])
 
     def test_pattern_class_requires_its_own_50_hits_and_absolute_cap(self):
         trials=observations(60,wins=60,market='gg_ht')
