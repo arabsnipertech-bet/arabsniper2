@@ -557,3 +557,18 @@ assert.equal(JSON.stringify(oneBook),frozen);
 console.log('PASS matrix single-book OCI: cached history, zero, sign, invalid history, multi-book parity, table, quote panel and immutability');
 
 }
+
+
+const v7Time='2026-11-09T18:00:00+01:00';
+const v7Match={fixture:{fixture_id:'7',kickoff:v7Time},multimarket:{matrix:{rows:[],v7:{
+ version:'arabsniper-v7.0',status:'shadow',fixture_id:'7',kickoff:v7Time,captured_at:'2026-11-09T16:00:00Z',
+ rates:{home_ht:.72,home_ft:1.7,away_ht:.51,away_ft:1.3},means:{},
+ signals:{lineare:{market_id:'over',reasons:['probabilita_e_prezzo']}},
+ markets:{over:{label:'Over 2,5 FT <test>',odd:2.15,calibrated:.54,raw:.5,fair:null}}
+}}}};
+assert.match(api.v7Panel(v7Match), /Over 2,5 FT &lt;test&gt;/);
+assert.match(api.v7Panel(v7Match), /54,0%/);
+assert.match(api.v7Panel(v7Match), /Fair mercato <b>—<\/b>/);
+assert.match(api.v7Panel(v7Match,{},true), /Studio V7/);
+v7Match.multimarket.matrix.v7.captured_at=v7Time;
+assert.equal(api.v7Panel(v7Match),'','An observation at kickoff cannot appear as prematch');

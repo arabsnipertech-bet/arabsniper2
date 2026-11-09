@@ -22,7 +22,8 @@ FAMILIES = {'result': '1x2', 'dc': '1x2', 'dnb': 'asian', 'total': 'totals',
             'team_total': 'totals', 'btts': 'btts', 'asian_total': 'asian',
             'handicap': 'asian', 'result_total': 'combo', 'dc_total': 'combo',
             'result_btts': 'combo', 'dc_btts': 'combo', 'btts_total': 'combo',
-            'htft': 'combo', 'halves_total': 'combo', 'range': 'ranges',
+            'htft': 'combo', 'halves_total': 'combo', 'pt_ft_total': 'combo',
+            'pt_btts_ft_total': 'combo', 'range': 'ranges',
             'score': 'scores', 'both_halves': 'combo'}
 
 
@@ -56,6 +57,8 @@ def label(spec):
     if k == 'btts_total': return f"{'GG' if s == 'yes' else 'No Goal'} + {'Over' if extra == 'over' else 'Under'} {line} {p}"
     if k == 'htft': return f'{s.upper()}/{str(extra).upper()} parziale/finale'
     if k == 'halves_total': return f"Over {line} PT + Over {str(float(extra)).replace('.', ',')} ST"
+    if k == 'pt_ft_total': return f"Over {line} PT + Over {str(float(extra)).replace('.', ',')} FT"
+    if k == 'pt_btts_ft_total': return f'GG PT + Over {line} FT'
     if k == 'range': return f'Multigol {line}–{extra} {p}'
     if k == 'score': return f'Risultato {s} {p}'
     if k == 'both_halves': return f"{'Casa' if s == 'home' else 'Ospite' if s == 'away' else 'Entrambe'} a segno in entrambi i tempi"
@@ -124,6 +127,8 @@ def payout_weights(spec, h, a, hh=None, ah=None):
     elif k == 'score': yes = f'{h}:{a}' == side
     elif k == 'htft': yes = result_side(hh, ah) == side and result == extra
     elif k == 'halves_total': yes = hh+ah > line and h+a-hh-ah > extra
+    elif k == 'pt_ft_total': yes = hh+ah > line and total > extra
+    elif k == 'pt_btts_ft_total': yes = hh > 0 and ah > 0 and total > line
     elif k == 'both_halves':
         home, away = hh > 0 and h-hh > 0, ah > 0 and a-ah > 0
         yes = home if side == 'home' else away if side == 'away' else home and away
@@ -132,8 +137,9 @@ def payout_weights(spec, h, a, hh=None, ah=None):
 
 
 class ScoreModel:
-    def __init__(self, rates):
+    def __init__(self, rates, *, second_half_floor=.30):
         self.rates = rates
+        self.second_half_floor = second_half_floor
         self.grids = {}
         self.tail = {}
         for period in ('ft', 'ht', 'sh'):
@@ -159,11 +165,23 @@ class ScoreModel:
                         self.htft[(result_side(first, 0), result_side(first+second, 0))] += p*q
             chance = self.htft[(spec['side'], spec['extra'])]
             return {(1., 0.): chance, (0., 1.): 1-chance}
+        if kind in ('pt_ft_total', 'pt_btts_ft_total'):
+            def qualifies(h, a):
+                return h+a > spec['line'] if kind == 'pt_ft_total' else h > 0 and a > 0
+            target = spec['extra'] if kind == 'pt_ft_total' else spec['line']
+            second = defaultdict(float)
+            for h, a, p in self.grids['sh']:
+                second[h+a] += p
+            tails = {n: sum(p for goals, p in second.items() if goals > n)
+                     for n in range(int(target)+1)}
+            chance = sum(p * (1. if h+a > target else tails[int(target-h-a)])
+                         for h, a, p in self.grids['ht'] if qualifies(h, a))
+            return {(1., 0.): chance, (0., 1.): 1-chance}
         if kind in ('halves_total', 'both_halves'):
             if kind == 'halves_total':
                 if spec['line'] == .5 and spec['extra'] == .5:
                     ht = self.rates['home_ht']+self.rates['away_ht']
-                    sh = max(.30, self.rates['home_ft']+self.rates['away_ft']-ht)
+                    sh = max(self.second_half_floor, self.rates['home_ft']+self.rates['away_ft']-ht)
                     a, b = 1-exp(-ht), 1-exp(-sh)
                 else:
                     a = sum(p for h, away, p in self.grids['ht'] if h+away > spec['line'])
@@ -231,7 +249,7 @@ def settle_spec(spec, result):
     ft = [result.get('home_ft'), result.get('away_ft')]
     ht = [result.get('home_ht'), result.get('away_ht')]
     valid = lambda x: isinstance(x, (int, float)) and not isinstance(x, bool) and x >= 0
-    need_ht = spec['period'] != 'ft' or spec['kind'] in ('htft', 'halves_total', 'both_halves')
+    need_ht = spec['period'] != 'ft' or spec['kind'] in ('htft', 'halves_total', 'both_halves', 'pt_ft_total', 'pt_btts_ft_total')
     if not all(valid(x) for x in ft) or need_ht and not all(valid(x) for x in ht): return None
     if need_ht and any(h > f for h, f in zip(ht, ft)): return None
     h, a = ht if spec['period'] == 'ht' else [f-t for f, t in zip(ft, ht)] if spec['period'] == 'sh' else ft
@@ -267,7 +285,7 @@ def matrix_rows(assessment, specs, model=None, scenarios=None):
         estimate = model.estimate(spec)
         alternatives = [estimate, *[s.estimate(spec) for s in scenarios]]
         row = {'id': key, 'spec': spec, 'family': FAMILIES[spec['kind']], 'label': label(spec),
-               'period': spec['period'], 'quality': quality(assessment, 'ht' if spec['kind'] in ('htft', 'halves_total', 'both_halves') else spec['period']),
+               'period': spec['period'], 'quality': quality(assessment, 'ht' if spec['kind'] in ('htft', 'halves_total', 'both_halves', 'pt_ft_total', 'pt_btts_ft_total') else spec['period']),
                'statistical_pct': round(estimate['p']*100, 4),
                'low_pct': round(min(v['p'] for v in alternatives)*100, 4),
                'high_pct': round(max(v['p'] for v in alternatives)*100, 4),

@@ -22,6 +22,7 @@ from audit_storage import FORMAT, atomic_bytes, read_store, write_store
 from current_audit import TZ, fetch_results, forecast_day, settle_day
 from daily_audit import markdown
 from gold_storage import allowed, client, previous_manifest, sha, write_manifest
+from gold_storage import restore_subset
 from homepage_results import publish as publish_results
 from selection_studies import study_markdown
 
@@ -51,36 +52,6 @@ def source_set(index, day):
             if at < end:
                 names.add(path)
     return {p: index[p]['sha256'] for p in sorted(names) if p in index}
-
-
-def restore_subset(storage, bucket, root, index, paths):
-    """Download only named pointers and their verified content-addressed chunks."""
-    def download(path):
-        info = index[path]
-        digest = info['sha256']
-        if not allowed(path) or not re.fullmatch('[0-9a-f]{64}', digest):
-            raise ValueError('Invalid private object reference')
-        raw = storage.get_object(Bucket=bucket, Key='state/objects/'+digest)['Body'].read()
-        if len(raw) != info['bytes'] or sha(raw) != digest:
-            raise ValueError('Private object checksum mismatch')
-        target = root / path
-        atomic_bytes(target, raw)
-        if target.suffix == '.json' and len(raw) <= 1024*1024:
-            value = json.loads(raw)
-            if isinstance(value, dict) and value.get('_storage') == FORMAT:
-                parts = []
-                for item in value['parts']:
-                    name = item['sha256']
-                    if not re.fullmatch('[0-9a-f]{64}', name):
-                        raise ValueError('Invalid private chunk')
-                    parts.append(str(Path(path).parent/'_audit_parts'/(name+'.json.gz')))
-                return parts
-        return []
-
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        chunks = {part for parts in pool.map(download, sorted(set(paths))) for part in parts}
-        for _ in pool.map(download, sorted(chunks)):
-            pass
 
 
 def recovery_files(root, paths):

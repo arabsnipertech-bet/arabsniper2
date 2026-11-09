@@ -2,7 +2,7 @@
 from math import isfinite
 
 MARKET_SCOPE_ID = 'gold-core-markets-v6.1'
-HT_TOTALS = (1.5, 2.5)
+HT_TOTALS = (1.5, 2.5, 3.5)
 FT_TOTALS = (1.5, 2.5, 3.5)
 ASIAN_FT = (1.75, 2., 2.25, 2.75, 3., 3.25)
 ASIAN_HT = (1., 1.25, 1.75, 2.)

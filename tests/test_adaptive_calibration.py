@@ -147,7 +147,7 @@ class AdaptiveCalibration(unittest.TestCase):
         a = build_matrix(statistical_analysis(match(),NOW),NOW)
         attach(a,feed([bet(6,.5)]),{},META,NOW)
         ref = a['matrix']['calibration_reference']
-        self.assertEqual((len(a['matrix']['rows']),ref['quote_status'],ref['odd']),(58,'recent',1.9))
+        self.assertEqual((len(a['matrix']['rows']),ref['quote_status'],ref['odd']),(60,'recent',1.9))
 
     def test_other_book_display_retains_a_same_contract_closing_offer(self):
         from adaptive_calibration import closing_prices

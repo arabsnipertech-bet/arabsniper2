@@ -1,5 +1,6 @@
 """Strict competition admission and uncapped observation within that scope."""
 from collections import Counter
+import os
 from copy import deepcopy
 from lateral_matrix import MODEL_ID, CONFIG_ID, build_matrix, market_id, specification
 from matrix_quotes import expire, safe_price_row, attach
@@ -171,6 +172,11 @@ def build_board(day, as_of):
         matrix['quote_monitoring']['studio_ideas'] = generate_ideas(a, as_of, meta.get('kickoff'), matrix['quote_monitoring']['suppressed_study_candidates']) if meta.get('status_short') in ('NS', 'TBD') else []
         from decision_shadow import capture as capture_shadow
         matrix['decision_shadow'] = capture_shadow(a, meta, as_of, prior_stability)
+        if os.getenv('GOLD_PRIVATE') == 'true':
+            from v7_decision import capture as capture_v7
+            from v7_learning import active_weight
+            weight, learning = active_weight(as_of)
+            matrix['v7'] = capture_v7(a, meta, as_of, weight, learning)
         platinum += bool(a.get('matrix', {}).get('platinum_policy', {}).get('best_market_id'))
         a.get('matrix', {})['summary'] = {'categories': dict(category_counts), 'observed_markets': len(rows),
                                         'priced_markets': sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)}

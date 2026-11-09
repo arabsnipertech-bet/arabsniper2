@@ -16,7 +16,7 @@ ACTIVE = ('in_progress', 'queued', 'waiting', 'pending', 'requested')
 WRITERS = {'.github/workflows/' + name for name in (
     'fast_scan.yml', 'night_scan.yml', 'freeze-audit-source.yml', 'gold-storage-check.yml',
     'manual-auditor.yml', 'odds-probe.yml', 'repair-matrix-quotes.yml',
-    'run-auditor.yml', 'recover-auditor.yml', 'storage-cleanup.yml')}
+    'run-auditor.yml', 'recover-auditor.yml', 'storage-cleanup.yml', 'v7-maintenance.yml')}
 INTERVAL = timedelta(minutes=60)
 RETRY_DELAY = timedelta(minutes=10)
 MAX_FAILED_ATTEMPTS = 2
@@ -193,8 +193,11 @@ def wake_fast(api, now=None, dry_run=False):
 def main():
     if os.getenv('GITHUB_REPOSITORY') != REPOSITORY or os.getenv('GITHUB_REF') != 'refs/heads/main':
         raise RuntimeError('Backup may run only on production main')
-    result = wake_fast(GitHub(os.getenv('GITHUB_TOKEN')),
-                       dry_run=os.getenv('FAST_BACKUP_DRY_RUN') == 'true')
+    try:
+        result = wake_fast(GitHub(os.getenv('GITHUB_TOKEN')),
+                           dry_run=os.getenv('FAST_BACKUP_DRY_RUN') == 'true')
+    except IncompleteListing:
+        result = {'action': 'listing_incomplete_retry_next_check', 'dispatched': False}
     print(json.dumps(result, sort_keys=True))
     if os.getenv('GITHUB_STEP_SUMMARY'):
         with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:

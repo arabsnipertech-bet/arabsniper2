@@ -54,7 +54,7 @@ def previous_manifest(s3,bucket):
 def previous_objects(s3,bucket):
     return {item['sha256'] for item in previous_manifest(s3,bucket).values()}
 
-def publish(s3,bucket,root, *, checkpoint_only=False):
+def publish(s3,bucket,root, *, checkpoint_only=False, selected_paths=None):
     root=Path(root)
     # Validate every Gold file before writing anything, avoiding partial corrupt releases.
     gold={} if checkpoint_only else {name:json.dumps(read_store(root/'data'/name),ensure_ascii=False,separators=(',',':')).encode() for name in GOLD if (root/'data'/name).exists()}
@@ -68,7 +68,9 @@ def publish(s3,bucket,root, *, checkpoint_only=False):
             gold['arab_quote_day1.json']=json.dumps(projection,ensure_ascii=False,separators=(',',':')).encode()
         except Exception as error:
             print('Gold yesterday archive deferred: '+type(error).__name__,flush=True)
-    files=collect(root,verified); index={}; known={item['sha256'] for item in verified.values()}
+    files = collect(root, verified, patterns=selected_paths)
+    index = dict(verified) if selected_paths is not None else {}
+    known = {item['sha256'] for item in verified.values()}
     uploads={}
     for path,data in files.items():
         digest=sha(data)
@@ -83,6 +85,8 @@ def publish(s3,bucket,root, *, checkpoint_only=False):
         for count,task in enumerate(as_completed(tasks),1):
             task.result()
             if count%25==0 or count==len(tasks):print(f'Uploaded {count}/{len(tasks)} objects',flush=True)
+    if selected_paths is not None and previous_manifest(s3, bucket) != verified:
+        raise RuntimeError('Private checkpoint advanced during incremental publication')
     if checkpoint_only:
         if not index:
             raise ValueError('Empty private checkpoint')
@@ -143,6 +147,11 @@ def checkpoint_day(s3, bucket, root, day):
             or read_store(report, {}).get('audit_date') != str(day)
             or not reusable(root, day, datetime.now(ROME))):
         raise ValueError('Unverified priority checkpoint evidence')
+    for optional in (f'auditarchive/prematch_{day}_v7.json',
+                     f'auditarchive/prematch_{day}_v7_learning.json',
+                     'data/arab_quote_v7_weights.json'):
+        if (root/optional).is_file():
+            required.add(optional)
     verified = previous_manifest(s3,bucket)
     files = collect(root,verified,patterns=sorted(required))
     additions = {path:{'sha256':sha(raw),'bytes':len(raw)} for path,raw in files.items()}
@@ -164,6 +173,36 @@ def write_manifest(s3, bucket, index):
     s3.put_object(Bucket=bucket, Key='state/manifests/'+sha(manifest)+'.json', Body=manifest)
     # Pointer last: a failed upload leaves the previous checkpoint recoverable.
     s3.put_object(Bucket=bucket, Key='state/current.json', Body=manifest, ContentType='application/json')
+
+def restore_subset(storage, bucket, root, index, paths):
+    """Download only named pointers and their verified content-addressed chunks."""
+    def download(path):
+        info = index[path]
+        digest = info['sha256']
+        if not allowed(path) or not re.fullmatch('[0-9a-f]{64}', digest):
+            raise ValueError('Invalid private object reference')
+        raw = storage.get_object(Bucket=bucket, Key='state/objects/'+digest)['Body'].read()
+        if len(raw) != info['bytes'] or sha(raw) != digest:
+            raise ValueError('Private object checksum mismatch')
+        target = root / path
+        atomic_bytes(target, raw)
+        if target.suffix == '.json' and len(raw) <= 1024*1024:
+            value = json.loads(raw)
+            if isinstance(value, dict) and value.get('_storage') == FORMAT:
+                parts = []
+                for item in value['parts']:
+                    name = item['sha256']
+                    if not re.fullmatch('[0-9a-f]{64}', name):
+                        raise ValueError('Invalid private chunk')
+                    parts.append(str(Path(path).parent/'_audit_parts'/(name+'.json.gz')))
+                return parts
+        return []
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        chunks = {part for parts in pool.map(download, sorted(set(paths))) for part in parts}
+        for _ in pool.map(download, sorted(chunks)):
+            pass
+
 
 def restore(s3,bucket,root):
     root=Path(root)
