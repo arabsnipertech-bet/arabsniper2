@@ -16,6 +16,13 @@ const rows=[{id:'a',family:'totals',period:'ft',spec:{kind:'total',period:'ft',s
  {id:'b',family:'asian',period:'ht',spec:{kind:'asian_total',period:'ht',side:'over',line:1.25},category:'contrarian',market_behavior:'divergence',ev_pct:30,ev_low_pct:20,quote_status:'recent',quality:'supported'},
  {id:'c',family:'btts',period:'ht',spec:{kind:'btts',period:'ht',side:'yes'},category:'no_quote',quote_status:'missing'}];
 const matches=Array.from({length:160},(_,i)=>({gold_scope:{policy_id:api.SCOPE,allowed:true},fixture:{fixture_id:String(i+1),kickoff:'2026-10-26T20:00:00Z',match:'Casa '+i+' – Ospite',league:'Serie prova'},multimarket:{model_id:api.MODEL,matrix:{rows:structuredClone(rows)}}}));
+const historicOci=api.marketRow({...rows[2],quote_status:'recent',oci:null,
+ oci_unavailable_reason:'nessuna_maggioranza_multi_operatore',
+ last_confirmed_oci:{value:-58.42,observed_at:'2026-11-10T11:32:00+01:00'}},
+ {timestamp:()=> '11:32'},{v7:{status:'published',niches:{}}});
+assert.match(historicOci,/OCI corrente non confermato · Consenso tra bookmaker insufficiente/);
+assert.match(historicOci,/Ultimo OCI confermato <b>[^<]+<\/b> · 11:32/);
+assert.match(historicOci,/Effetto molla · assente nello snapshot/);
 const p={matches,gold_scope:{policy_id:api.SCOPE}},opts={...api.state};
 assert.equal(api.selectMatches(p,opts,0).length,160);
 assert.equal(api.selectMatches({matches:[{...matches[0],gold_scope:null}]},opts,0).length,0);
