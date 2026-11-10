@@ -279,7 +279,8 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.locator('.mx-compact-quotes>section').count(),27);
    assert.equal(await page.locator('.mx-card .mx-cockpit,.mx-card .mx-study-base,.mx-card .mx-best').count(),0);
    for(const direction of ['down','flat','up'])assert.equal(await page.locator('.mx-compact-quotes [data-movement='+direction+']').count(),9);
-   assert((await page.locator('.mx-compact-quotes').first().textContent()).includes('Apertura'));
+   assert((await page.locator('.mx-compact-quotes').first().textContent()).includes('Prima osservata'));
+   assert((await page.locator('.mx-compact-quotes-label span').first().getAttribute('title')).includes('non apertura ufficiale'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
    await page.locator('.mx-card').first().scrollIntoViewIfNeeded();
    await page.screenshot({path:`test-artifacts/matrix-${name}.png`});
