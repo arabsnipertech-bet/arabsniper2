@@ -41,7 +41,14 @@ def prices(rows):
 
 def inventory(payload, fid, at):
     groups, rejected = collect(payload or {}, fid, at)
-    return {'usable_market_books': len(coverage(payload, fid, at, False)),
+    raw = [r for r in (payload or {}).get('response', []) if str((r.get('fixture') or {}).get('id')) == str(fid)]
+    return {'raw_fixture_records': len(raw), 'api_results': (payload or {}).get('results'),
+            'api_error_fields': list((payload or {}).get('errors') or []),
+            'pagination': (payload or {}).get('collection'),
+            'raw_bookmakers': len({b.get('id') for r in raw for b in r.get('bookmakers', [])}),
+            'raw_bet_types': sorted({str(bet.get('id'))+':'+str(bet.get('name')) for r in raw
+                for b in r.get('bookmakers', []) for bet in b.get('bets', [])}),
+            'usable_market_books': len(coverage(payload, fid, at, False)),
             'complete_groups': sum(g['complete'] for g in groups.values()),
             'books': sorted({g['bookmaker_id'] for g in groups.values()}),
             'market_books': sorted([list(item) for item in coverage(payload, fid, at, False)]),
@@ -110,7 +117,10 @@ def run():
             ('fixture_id', 'match', 'kickoff', 'league', 'league_id', 'season', 'date', 'status_short')} for m in requested]
         archived = [m for day in days for m in day.get('matches', [])]
         gold_matches = [m for day in gold.values() for m in day.get('matches', [])]
-        for match in archived:
+        def has_prices(match):
+            return any(type(r.get('odd')) in (float, int) and r['odd'] > 1
+                       for r in ((match.get('multimarket') or {}).get('matrix') or {}).get('rows', []))
+        for match in sorted(archived, key=lambda m: (not has_prices(m), str((m.get('fixture') or {}).get('kickoff')))):
             meta = match.get('fixture') or {}
             if named(meta) and not any(str(m['fixture_id']) == str(meta['fixture_id']) for m in requested):
                 requested.append(meta)
@@ -145,6 +155,9 @@ def run():
                 for bid in (1, 5, 6, 8, 34):
                     result, _ = api.get_bounded('odds', {'fixture': fid, 'bet': bid}, 8)
                     row['queries'].append({'bet': bid, **inventory(result, fid, current_time())})
+                result, _ = api.get_bounded('odds', {'league': meta['league_id'], 'season': meta['season'],
+                    'date': meta['date'], 'timezone': 'Europe/Rome'}, 10)
+                row['queries'].append({'route': 'league_date', **inventory(result, fid, current_time())})
                 for key, matches in [('archive', archived), ('gold', gold_matches)]:
                     item = next((m for m in matches if str((m.get('fixture') or {}).get('fixture_id')) == str(fid)), {})
                     row[key] = {'present': bool(item), '1x2': prices(((item.get('multimarket') or {}).get('matrix') or {}).get('rows', [])),
