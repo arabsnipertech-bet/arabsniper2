@@ -29,8 +29,8 @@ async function main() {
         const file = url.pathname === '/' ? '/index.html' : url.pathname
         return route.fulfill({ path: 'web' + file })
       })
-      await page.route(feedPath, route => route.fulfill({ json: feed }))
-      await page.goto('http://arabsniper.test/?checkout=cancelled')
+      await page.route(feedPath, route => route.fulfill({ json: feed, headers: { 'access-control-allow-origin': '*' } }))
+      await page.goto('http://arabsniper.test/?canceled=true')
       await page.getByText('Club Aperto – Ospiti', { exact: true }).first().waitFor()
       const bacheca = page.locator('#daily-picks')
       assert.equal(await bacheca.locator('article').count(), 2)
@@ -43,6 +43,7 @@ async function main() {
       assert.match(await page.locator('#publisher-trial-copy').innerText(), /7 giorni/)
       assert.equal(await page.getByText('Accedi a Gold ↗').getAttribute('href'), 'gold-dashboard-live.html')
       assert.equal(await page.locator('#piani button').count(), 3)
+      assert.match(await page.locator('#checkout-status').innerText(), /Pagamento annullato/)
       assert.equal(await page.locator('[href^="mailto:"]').count(), 1)
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width)
       assert.deepEqual(errors, [])
