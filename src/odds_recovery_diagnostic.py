@@ -6,12 +6,15 @@ No production checkpoint, forecast, quote or credential is modified.
 from copy import deepcopy
 from datetime import datetime, timezone
 import hashlib
+import gzip
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
+import requests
 
 from audit_storage import read_store
 from gold_storage import client as storage_client, previous_manifest, restore_subset
@@ -105,6 +108,48 @@ print(json.dumps({'complete_groups':sum(g['complete'] for g in groups.values()),
     return json.loads(result.stdout)
 
 
+def rendered_gold(match):
+    program = """const a=require('./web/lateral-matrix.js');let s='';
+process.stdin.on('data',b=>s+=b);process.stdin.on('end',()=>{
+const html=a.card(JSON.parse(s),{});console.log(JSON.stringify({
+has_1x2_board:html.includes('mx-compact-quotes'),
+first_observed_label:html.includes('Prima osservata'),
+movement_cells:(html.match(/data-movement=/g)||[]).length}));});"""
+    result = subprocess.run(['node', '-e', program], cwd=Path(__file__).resolve().parents[1],
+        input=json.dumps(match), text=True, capture_output=True, check=True, timeout=20)
+    return json.loads(result.stdout)
+
+
+def browser_match(s3, bucket, catalog, day, fid, cache):
+    board = (catalog.get('_gold_browser_days') or {}).get(f'arab_quote_day{day}.json') or {}
+    for item in board.get('pages', []):
+        digest = item['sha256']
+        if digest not in cache:
+            raw = gzip.decompress(s3.get_object(Bucket=bucket, Key='_audit_parts/'+digest+'.json.gz')['Body'].read())
+            if hashlib.sha256(raw).hexdigest() != digest or len(raw) != item['bytes']:
+                raise ValueError('Published browser page checksum mismatch')
+            cache[digest] = json.loads(raw)
+        result = next((m for m in cache[digest] if str((m.get('fixture') or {}).get('fixture_id')) == str(fid)), None)
+        if result:
+            return result
+    return None
+
+
+def deployed_assets():
+    result = {}
+    try:
+        response = requests.get('https://arabsniperbet.com/gold-dashboard-live', timeout=20)
+        result['gold_http_status'] = response.status_code
+        match = re.search(r'<script src="(/lateral-matrix\.js[^\"]*)"', response.text)
+        if match:
+            script = requests.get('https://arabsniperbet.com'+match[1], timeout=20)
+            result.update(script_url=match[1], script_http_status=script.status_code,
+                matches_verified_source=script.content == (Path(__file__).resolve().parents[1]/'web/lateral-matrix.js').read_bytes())
+    except Exception as error:
+        result['verification_error'] = type(error).__name__
+    return result
+
+
 def run():
     e = engine()
     api = e.APIClient(os.environ['API_SPORTS_KEY'])
@@ -141,6 +186,8 @@ def run():
                 gold[str(i)] = json.loads(s3.get_object(Bucket=bucket, Key=f'arab_quote_day{i}.json')['Body'].read())
             except Exception as error:
                 report.setdefault('gold_errors', []).append(type(error).__name__)
+        browser_catalog = json.loads(s3.get_object(Bucket=bucket, Key='arab_quote_model_research.json')['Body'].read())
+        browser_pages = {}
         report['archive_coverage'] = feed_coverage(days)
         report['gold_coverage'] = feed_coverage(gold.values())
         report['checkpoint_identity'] = hashlib.sha256(json.dumps(index, sort_keys=True).encode()).hexdigest()
@@ -219,6 +266,14 @@ def run():
                 item = next((m for m in matches if str((m.get('fixture') or {}).get('fixture_id')) == str(fid)), {})
                 row[key] = {'present': bool(item), '1x2': prices(((item.get('multimarket') or {}).get('matrix') or {}).get('rows', [])),
                             'decision_model': ((item.get('multimarket') or {}).get('matrix') or {}).get('publication_model')}
+                if key == 'gold' and item:
+                    row['rendered_gold'] = rendered_gold(item)
+                    day_number = next(i for i, day in gold.items() if any(
+                        str((m.get('fixture') or {}).get('fixture_id')) == str(fid) for m in day.get('matches', [])))
+                    browser = browser_match(s3, bucket, browser_catalog, day_number, fid, browser_pages)
+                    row['browser_projection_present'] = browser is not None
+                    row['browser_1x2_matches_gold'] = bool(browser is not None and
+                        prices(((browser.get('multimarket') or {}).get('matrix') or {}).get('rows', [])) == row['gold']['1x2'])
             partition = journal.index['fixtures'].get(str(fid))
             recorded = journal.days.get(partition, {}).get('fixtures', {}).get(str(fid), {})
             row['actual_temporal_series'] = {key: {'observations': len(g['observations']), 'first': g['first'],
@@ -235,6 +290,7 @@ def run():
             str(p.get('source', {}).get('acquisition_id') or '').startswith(api.odds_acquisition_session+':')
             for day in journal.days.values() for fixture in day['fixtures'].values()
             for group in fixture['groups'].values() for p in group['observations'])
+        report['cloudflare'] = deployed_assets()
     destination = Path('odds-recovery-evidence')
     destination.mkdir(exist_ok=True)
     (destination/'diagnostic.json').write_text(json.dumps(report, ensure_ascii=False, indent=2))
