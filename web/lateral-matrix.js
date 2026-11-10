@@ -938,25 +938,43 @@
    (v7?'<small>'+pct(probability)+' · probabilità V7</small>':'')+'</div><div class="mx-compact-proposal-price"><b>'+num(odd,2)+'</b><small>'+esc(note)+'</small>'+
    (v7&&Number.isFinite(first)?'<small>Apertura '+num(first,2)+'</small>':'')+'</div></section>';
  }
- function compactQuotes(rows,helpers,study){
-  return '<div class="mx-compact-quotes" aria-label="Quote 1X2 apertura e attuale">'+[['1','1 · Casa'],['x','X · Pareggio'],['2','2 · Ospite']].map(([side,label])=>{
-   const row=rows.find(r=>r.period==='ft'&&r.spec?.kind==='result'&&r.spec.side===side&&r.spec.extra==null)||{};
-   const saved=studyObservation(row,study),flow=saved||row,recent=priced(row);
-   const status=saved?'Ultima osservata':row.quote_status==='cached_stable'?'Da cache':recent?'Attuale':Number.isFinite(row.last_odd)?'Da confermare':'Non disponibile';
-   return '<section><h4>'+label+'</h4><span class="mx-compact-opening">Apertura <b>'+num(flow.first_odd,2)+'</b></span><strong class="mx-compact-price">'+num(saved||recent?flow.odd:row.last_odd,2)+'</strong><small>'+status+'</small>'+movementSignal(flow,!!saved)+'</section>';
-  }).join('')+'</div>';
+ function compactQuotes(rows,{kickoff,closed=false}={}){
+  const validQuote=value=>Number.isFinite(value)&&value>1?value:null;
+  const quotes=[['1','Casa'],['x','Pareggio'],['2','Ospite']].map(([side,label])=>{
+   const row=rows.find(r=>r.spec?.kind==='result'&&r.spec.period==='ft'&&r.spec.side===side&&r.spec.line==null&&r.spec.extra==null)||{};
+   const saved=studyObservation(row,{kickoff}),source=saved||row,recent=priced(row);
+   const first=validQuote(source.first_odd),last=validQuote(saved||recent?source.odd:row.last_odd);
+   const firstSeen=Date.parse(source.first_observed_at);
+   const single=first===last&&Number.isFinite(firstSeen)&&firstSeen===Date.parse(source.quote_observed_at);
+   const delta=(saved||recent)&&first!=null&&last!=null&&!single?Math.round((last/first-1)*1000)/10:null;
+   const status=last==null?'':saved?'Ultima':row.quote_status==='cached_stable'?'Cache':recent?'':'Da confermare';
+   return {side:side.toUpperCase(),label,first,last,single,delta,status};
+  });
+  if(quotes.every(({first,last})=>first==null&&last==null))return '';
+  return '<div class="mx-compact-quotes" role="group" aria-label="Quote 1X2">'+
+   '<div class="mx-compact-quotes-label"><b>1X2</b><span>Apertura → '+(closed?'Ultima prematch':'Attuale')+'</span></div>'+
+   quotes.map(({side,label,first,last,single,delta,status})=>{
+    const movement=delta==null?'unknown':delta<0?'down':delta>0?'up':'flat';
+    const [arrow,description]={
+     unknown:['—',single?'Prima rilevazione':'Variazione non disponibile'],
+     down:['↓','Calo'],up:['↑','Rialzo'],flat:['→','Invariata']
+    }[movement];
+    const change=delta==null?arrow:arrow+' '+signed(delta||0)+'%';
+    return '<section aria-label="'+side+' · '+label+'"><div class="mx-compact-quote-line"><b class="mx-compact-side">'+side+'</b><span>'+
+     num(first,2)+' → <strong class="mx-compact-price">'+num(last,2)+'</strong></span></div>'+
+     '<div class="mx-compact-quote-move"><b data-movement="'+movement+'" title="'+description+'">'+change+'</b>'+
+     (status?'<small>'+status+'</small>':'')+'</div></section>';
+   }).join('')+'</div>';
  }
  function card(m,helpers){
   const f=m.fixture||{},a=m.multimarket||{},all=rowsOf(m),fid=String(f.fixture_id);
   const noSnapshot=a.status==='no_prematch_snapshot';
-  const tierOptions={archived:phase(m)!=='upcoming',monitoringClosed:(helpers.phase||phase)(m)!=='upcoming',kickoff:f.kickoff,lastProposal:a.matrix?.last_proposal,monitoring:a.matrix?.quote_monitoring};
-  const active=publishedView(m);
   const tier=cockpitTier(m,helpers);
   const elite=tier.tone==='platinum';
-  const study=!active&&!noSnapshot&&!elite&&!bestOpportunity(all,tierOptions)?{profiles:a.profiles,home:f.home,away:f.away,kickoff:f.kickoff}:null;
   return '<article class="mx-card mx-compact mx-tone-'+tier.tone+(elite?' mx-card-platinum':'')+'" data-live-fixture="'+esc(fid)+'"><header><div>'+matchBadge(tier)+'<time>'+esc(f.time||'')+'</time><small>'+esc(f.country)+' · '+esc(f.league)+'</small>'+'<h3>'+esc(f.match)+'</h3></div><div class="mx-live"><button type="button" class="mx-save" data-mx-save="'+esc(fid)+'" aria-label="Osserva '+esc(f.match)+'" aria-pressed="'+observedFixtures.has(fid)+'">'+(observedFixtures.has(fid)?'★':'☆')+'</button><span data-live-slot="badge">'+(helpers.liveBadge?.(m)||'')+'</span><span data-live-slot="state">'+esc(helpers.stateLabel?.(m)||'')+'</span><span data-live-slot="halftime">'+halfTimeText(helpers.firstHalf?.(m))+'</span></div></header>'+
+   (noSnapshot?'':compactQuotes(all,{kickoff:f.kickoff,closed:m._gold_history||(helpers.phase||phase)(m)!=='upcoming'}))+
    (m._gold_history?'<div data-live-slot="panel">'+(helpers.livePanel?.(m)||'')+'</div>':'')+
-   (noSnapshot?'<p class="mx-explanation">Nessuna analisi prematch salvata per questa partita.</p>':compactProposal(m,helpers)+(active?'':compactQuotes(all,helpers,study)))+
+   (noSnapshot?'<p class="mx-explanation">Nessuna analisi prematch salvata per questa partita.</p>':compactProposal(m,helpers))+
    (all.length?'<button class="mx-open" type="button" data-mx-open="'+esc(fid)+'" aria-haspopup="dialog">Apri analisi <span>↗</span></button>':'')+'</article>';
  }
  let payload,host,helpers;

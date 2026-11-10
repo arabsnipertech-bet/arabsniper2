@@ -250,7 +250,11 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   kickoff:new Date(now+7200000+i*60000).toISOString(),status_short:'NS',time:'20:45',country:'Italia',league:'DATI SINTETICI DI VERIFICA',match:i===8?'Nome squadra molto lungo per verificare la visualizzazione da telefono – Avversaria':'Squadra '+(i+1)+' – Avversaria'},multimarket:structuredClone(variants[i%2])}))};
  // UI-only price fixtures exercise all three result cells and movement colors.
  for(const m of payload.matches)for(const row of m.multimarket.matrix.rows){
-  if(row.spec.kind==='result'&&row.period==='ft')Object.assign(row,{quote_status:'recent',first_odd:2.5,odd:2.2,delta_pct:-12,bookmaker:'OPERATORE SINTETICO',oci:55,paired_books:3,agreeing_books:3,margin_pct:4,margin_delta_pp:-1,margin_band:'low',ev_pct:-1,ev_low_pct:-2});
+  if(row.spec.kind!=='result'||row.period!=='ft')continue;
+  const [odd,delta_pct]={'1':[2.2,-12],x:[2.5,0],'2':[2.75,10]}[row.spec.side];
+  Object.assign(row,{quote_status:'recent',first_odd:2.5,odd,delta_pct,bookmaker:'OPERATORE SINTETICO',
+   first_observed_at:new Date(now-3600000).toISOString(),quote_observed_at:new Date(now).toISOString(),
+   oci:55,paired_books:3,agreeing_books:3,margin_pct:4,margin_delta_pp:-1,margin_band:'low',ev_pct:-1,ev_low_pct:-2});
  }
  const nearCombo=payload.matches[3].multimarket.matrix.rows.find(r=>r.spec.kind==='halves_total');
  Object.assign(nearCombo,{statistical_pct:55,fair_odd:100/55});
@@ -274,7 +278,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.locator('.mx-card').count(),9);
    assert.equal(await page.locator('.mx-compact-quotes>section').count(),27);
    assert.equal(await page.locator('.mx-card .mx-cockpit,.mx-card .mx-study-base,.mx-card .mx-best').count(),0);
-   assert.equal(await page.locator('.mx-compact-quotes .mx-net-red').count(),27);
+   for(const direction of ['down','flat','up'])assert.equal(await page.locator('.mx-compact-quotes [data-movement='+direction+']').count(),9);
    assert((await page.locator('.mx-compact-quotes').first().textContent()).includes('Apertura'));
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'List overflow '+name);
    await page.locator('.mx-card').first().scrollIntoViewIfNeeded();
@@ -393,6 +397,14 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},activePayload);
    const card=page.locator('.mx-card');
    assert.equal(await card.locator('header .mx-level').innerText(),'★ PLATINUM');
+   const quotes=card.locator('header + .mx-compact-quotes:has(+ .mx-triad-compact)');
+   assert.deepEqual(await quotes.locator('[data-movement]').allTextContents(),['↓ -12,0%','→ 0,0%','↑ +10,0%']);
+   assert(await quotes.evaluate(el=>{
+    const cells=[...el.querySelectorAll(':scope > section')];
+    return cells.length===3&&cells.every(cell=>cell.offsetTop===cells[0].offsetTop&&cell.scrollWidth<=cell.clientWidth);
+   }),'1X2 fits on one row at '+width);
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'V7 card fits '+width);
+   await card.screenshot({path:`test-artifacts/matrix-v7-card-${width}.png`});
    assert.equal(await card.locator('[data-v7-slot=most_probable] b').innerText(),'GG FT');
    assert((await card.innerText()).includes('58,0%'));
    assert.equal(await card.locator('[data-v7-slot]').count(),3);

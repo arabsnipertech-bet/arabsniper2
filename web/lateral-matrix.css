@@ -248,18 +248,28 @@ body.gold-light[data-gold-design] .mx-categories button[aria-pressed=true]{backg
 body[data-gold-design] .mx-card .mx-best-market{background:#102f50}
 
 /* Compact match overview; research remains inside the match dialog. */
-.mx-compact-quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px 20px}
-.mx-compact-quotes>section{min-width:0;padding:10px;border:1px solid #34414d;border-radius:9px;background:#0e1922}
-.mx-compact-quotes h4{margin:0 0 9px;color:#dfc48c;font-size:12px}
-.mx-compact-opening{display:block;color:#a5afbd;font-size:11px}.mx-compact-opening b{font-weight:400}
-.mx-compact-price{display:block;font-size:25px;line-height:1.4;color:#edf1f7}
-.mx-compact-quotes small{display:block;font-size:10px;color:#a5afbd}
-.mx-compact-quotes .mx-net{margin:8px 0 0;padding:5px;border:0;background:transparent;min-height:0}
-.mx-compact-quotes .mx-net b{font-size:13px}.mx-compact-quotes .mx-net small{display:none}
+.mx-compact-quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 6px;margin:0 14px 9px;color:#aebcd1;font-variant-numeric:tabular-nums}
+.mx-compact-quotes-label{grid-column:1/-1;display:flex;gap:7px;font-size:11px;line-height:1.2}
+.mx-compact-quotes-label b,.mx-compact-side{color:#d8b66d}
+.mx-compact-quotes>section{display:grid;align-content:start;gap:2px;min-width:0;padding:5px 6px;border:1px solid #34414d;border-radius:6px;background:#0e1922}
+.mx-compact-quote-line,.mx-compact-quote-move{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 6px;min-width:0;line-height:1.2}
+.mx-compact-quote-line{font-size:12px;overflow-wrap:anywhere}
+.mx-compact-price{color:#f3f0e8}
+.mx-compact-quote-move,.mx-compact-quote-move small{font-size:10px}
+.mx-compact-quote-move [data-movement=down]{color:#6ee7b7}
+.mx-compact-quote-move [data-movement=flat]{color:#f5cf72}
+.mx-compact-quote-move [data-movement=up]{color:#ff989f}
+body.gold-light[data-gold-design] .mx-compact-quotes{color:#526170}
+body.gold-light[data-gold-design] .mx-compact-quotes>section{background:#f7f4ed;border-color:#d9cfba}
+body.gold-light[data-gold-design] :is(.mx-compact-quotes-label b,.mx-compact-side){color:#795820}
+body.gold-light[data-gold-design] .mx-compact-price{color:#172435}
+body.gold-light[data-gold-design] .mx-compact-quote-move [data-movement=down]{color:#146448}
+body.gold-light[data-gold-design] .mx-compact-quote-move [data-movement=flat]{color:#805600}
+body.gold-light[data-gold-design] .mx-compact-quote-move [data-movement=up]{color:#a72737}
 body[data-gold-design] .mx-card.mx-compact .mx-open{margin:0;width:100%;border-radius:0;border:0;border-top:1px solid #27313c;padding:13px 20px;text-align:right;min-height:46px}
 body[data-gold-design] .mx-card.mx-compact header{padding:16px 20px;border-bottom:0}
 body[data-gold-design] .mx-card.mx-compact h3{font-size:21px;margin-bottom:0}
-@media(max-width:480px){.mx-compact-quotes{padding:12px;gap:7px}.mx-compact-quotes>section{padding:8px 6px}.mx-compact-price{font-size:23px}body[data-gold-design] .mx-card.mx-compact header{padding:14px 12px}.mx-compact-quotes .mx-net b{font-size:12px}}
+@media(max-width:480px){.mx-compact-quotes{margin-inline:12px;column-gap:4px}.mx-compact-quotes>section{padding-inline:4px}.mx-compact-quote-line{font-size:11px;column-gap:4px}body[data-gold-design] .mx-card.mx-compact header{padding:14px 12px}}
 
 .mx-compact-proposal{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:0 20px 3px;padding:12px 0;border-top:1px solid #293140}
 .mx-compact-proposal>div{min-width:0}.mx-compact-proposal small{display:block;font-size:10px;line-height:1.5;color:#a7b4c6}
