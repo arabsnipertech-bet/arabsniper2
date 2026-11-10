@@ -22,7 +22,8 @@ class EmptyRecovery(unittest.TestCase):
         self.assertEqual(coverage(result,100,NOW),{('over25_ft','2')})
         self.assertEqual(base['response'],[])
         self.assertTrue(c.report[0]['recovered_from_empty'])
-        self.assertEqual(client.get.call_args_list[1].args[1]['league'],1)
+        self.assertEqual(client.get.call_args_list[1].args[1], {'fixture':100,'bet':1})
+        self.assertEqual(client.get.call_args_list[2].args[1]['league'],1)
     def test_started_or_unknown_never_recovered(self):
         for kickoff in ('2026-10-23T08:00:00+00:00',None):
             c,client=self.collector(kickoff);c.enrich({'collection':{'complete':True},'response':[]},100)
