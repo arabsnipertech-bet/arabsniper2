@@ -64,6 +64,12 @@ jobs:
       - name: Record verified daily Auditor completion
         if: steps.nightly.outputs.completed == 'true'
         run: echo "Daily Auditor completion verified in the published checkpoint."
+      - name: Record the independent V7 checkpoint
+        if: always() && steps.nightly.outputs.v7_completed == 'true'
+        run: echo "V7 results, daily report and learning state verified in the published checkpoint." >> "$GITHUB_STEP_SUMMARY"
+      - name: Record the legacy skip
+        if: always() && steps.nightly.outputs.v51_status == 'partial_v51_skip'
+        run: echo "V5.1 skipped within its bounded window. The V7 checkpoint was saved independently." >> "$GITHUB_STEP_SUMMARY"
       - name: Record saved partial progress
         if: steps.nightly.outputs.paused == 'true'
         run: echo "Historical chunk saved. More dates remain; this is NOT full Auditor certification."

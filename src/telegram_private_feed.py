@@ -6,10 +6,12 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from opportunity_policy import goal_market
+from v7_decision import TIER_RANK, stored_offers
 
 ROME=ZoneInfo("Europe/Rome")
 ALLOWED={"over15_ht","over25_ht","gg_ht","over25_ft","over35_ft"}
 POLICY="platinum-flow-v1.1"
+V7_GOALS=ALLOWED | {"over15_sh","over25_sh","gg_sh"}
 
 
 def stamp(raw):
@@ -48,6 +50,29 @@ def from_private_day(day, now):
             continue
         scope=match.get("gold_scope") or {}
         if scope.get("allowed") is not True:
+            continue
+        if "triad" in (matrix.get("v7") or {}):
+            offers=[(pick, row) for _,pick,row in stored_offers(a,f,now.isoformat())
+                    if pick["tier"] in ("GOLD","PLATINUM") and goal_market(row) in V7_GOALS]
+            if not offers:
+                continue
+            pick,row=max(offers,key=lambda pair:TIER_RANK[pair[0]["tier"]])
+            tier=pick["tier"].lower()
+            decision=row.get("opportunity") or {}
+            choices.append(dict(fixture_id=str(fid),match=f.get("match",""),league=f.get("league",""),
+                kickoff=start.isoformat(),captured_at=matrix["v7"]["captured_at"],
+                provider_updated_at=row["provider_updated_at"],quote_status=row.get("quote_status"),
+                odd=pick["odd"],label=pick["label"],market=goal_market(row),source_tier=tier,
+                badge=pick["badge"],horizon=pick["horizon"],niche_id=pick["niche_id"],
+                model_probability=100*pick["probability"],oci=row.get("oci"),delta_pct=row.get("delta_pct"),
+                ev_pct=row.get("ev_pct"),bookmaker=row.get("bookmaker"),first_odd=row.get("first_odd"),
+                margin_pct=row.get("selected_margin_pct"),movement_confirmed=row.get("movement_confirmed"),
+                bookmakers_count=row.get("bookmakers_count"),quote_observed_at=row.get("quote_observed_at"),
+                strict=bool(decision.get("strict_eligible",True)),
+                stable=(decision.get("stability") or {}).get("status")=="strict",
+                market_confirmed=tier=="platinum" or decision.get("signal")=="convergence",
+                score=float(row.get("oci") or 0) if tier=="platinum" else float(decision.get("playability_score") or 0),
+                signal=tier if tier=="platinum" else decision.get("signal","unconfirmed")))
             continue
         rows=matrix.get("rows") or []
         platinum=matrix.get("platinum_policy") or {}

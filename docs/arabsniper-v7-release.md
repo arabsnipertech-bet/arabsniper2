@@ -57,9 +57,19 @@ Per ripristinare la produzione, fare revert del merge V7 su main e pubblicare il
 
 ## Attivazione V7 per Gold, Platinum e Studio
 
-Il motore usa la stessa distribuzione di punteggi V7 per tutti i mercati della matrice. Le stime V5.1, le probabilità Poisson originali e il fair restano disponibili nell'audit. La revisione `v7-prudence-v1` richiede flusso verificato, EV positivo ed EV prudente almeno al 2% per ogni Platinum. Con OCI da 50 in su, una Platinum idonea viene dopo una Gold idonea. Tra le proposte con la stessa precedenza contano probabilità V7, scenario prudente e prezzo.
+La revisione `v7-unified-v1` usa una distribuzione V7 per tutti i mercati prematch. L’audit conserva Poisson originale, stima calibrata, fair e V5.1 dove disponibile.
 
-La lista pubblica una sola proposta per partita nell'area Gold. In scheda, Consigliata richiede un altro mercato compatibile con quota più alta. Colpaccio richiede quota da 4,50, probabilità sotto il 32% e sostegno del proprio prezzo anche nello scenario prudente. Studio e Radar Blu confrontano esiti 1X2, GG/NG, Over/Under e combo binarie con quota diretta utilizzabile. Le linee asiatiche a mezzo gol equivalenti condividono l'identità del mercato. Per le combo senza prezzo eseguibile resta consultabile la stima. Ogni ruolo congelato conserva il prezzo effettivamente selezionato per l'audit.
+| Slot | Probabilità minima | Quota | EV | EV prudente |
+|---|---:|---:|---:|---:|
+| Più probabile | 45% | 1,55–2,15 | > 0 | ≥ 0% |
+| Consigliata | 32% | 2,15–3,50 | > 0 | ≥ 0% |
+| Colpaccio | 16% | ≥ 3,50 | > 0 | Verificato nei requisiti del livello assegnato |
+
+Il risultato 2 nel Colpaccio richiede quota da 4,50 e movimento in salita. Ogni slot conserva mercato, fonte, quota, probabilità, EV, livello, orizzonte e nicchia. Uno slot resta vuoto quando mancano offerte valide o requisiti. L’anteprima pubblica espone un solo mercato confermato per partita.
+
+Il modello tratta PT e ST con quattro intensità Poisson. Le intensità FT sono le somme per squadra. Le combo valutano gli eventi congiunti sul punteggio PT e i gol ST. La quota equa è `1 + L/W`. Per le combo senza prezzo diretto il riferimento è mostrato se entrambe le componenti hanno quote osservate valide.
+
+Gold applica i controlli strutturali e almeno il 2% di EV prudente. Platinum eredita l’intero filtro Gold e richiede OCI da 30 a meno di 50, calo di almeno il 3%, persistenza da 0,50 a meno di 1 e assenza di inversioni. I trigger Favorita PT, Inversione 1X2, Rimbalzo PT e Simmetria 1°+2°T indirizzano la ricerca di alternative. I trigger non cambiano probabilità o EV.
 
 ### Controllo delle fasce OCI del 9 novembre
 
@@ -82,6 +92,8 @@ Per Over 2,5 e Over 3,5 FT, lo scarto positivo tra stima e fair può arrivare a 
 
 L'OCI-AS attribuisce 15 punti alla persistenza mediana quando è strettamente compresa tra 0 e 1. Il contributo è zero ai due estremi. I report V7 di Radar Sorprese e Colpaccio riportano il rendimento unitario con e senza le tre vincite maggiori, la numerosità residua e gli stessi dati per la persistenza intermedia. Si usano le quote dei segnali congelate prima del calcio d'inizio.
 
-### Ripristino operativo della promozione
+### Auditor e ripristino operativo
 
-Prima del passaggio, `main` punta a `25b571ad73ca820a1805674fea9cb74399b82633`. Per tornare alla selezione V5.1 delle partite future, impostare la variabile GitHub Actions `V7_SHADOW_ONLY=true` e avviare **ArabSniper Fast Scan** con `force_fast`. Il refresh ripristina le probabilità V5.1 conservate e ricostruisce i feed compatibili. Le fotografie già congelate e gli esiti restano nell'archivio. Riattivare V7 rimuovendo la variabile ed eseguendo un nuovo Fast.
+Auditor ripristina per primi gli oggetti del giorno chiuso, i journal prematch pertinenti e gli esiti V7 della finestra mobile. Liquida i risultati, genera il report di apprendimento e aggiorna `data/arab_quote_v7_weights.json`. Il checkpoint R2 verifica i quattro file con SHA-256 prima di avviare lo storico V5.1. Il ripristino dello storico e la calibrazione V5.1 hanno budget separati di 15 e 6 minuti entro la finestra protetta. Un’interruzione V5.1 registra `partial_v51_skip` e conserva il checkpoint V7. La pubblicazione dei risultati pubblici usa lo storico disponibile dopo il ripristino.
+
+Per ripristinare la revisione precedente, fare revert del merge di questa release su `main`, distribuire il nuovo `main` su Cloudflare e avviare Fast Scan con `force_fast`. Il riferimento precedente è `26814f3c34136fc7a91463f27a36e193f909b4ac`. La variabile `V7_SHADOW_ONLY` appartiene alla versione precedente. Conservare gli oggetti R2 correnti e verificare feed e accesso Gold dopo il refresh.

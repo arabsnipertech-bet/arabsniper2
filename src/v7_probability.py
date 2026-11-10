@@ -1,4 +1,4 @@
-"""V7 probability research. All prices enter once, at the score-distribution level."""
+"""V7 prematch probabilities. All prices enter once, at the score-distribution level."""
 from datetime import timezone
 from math import exp, isfinite, sqrt
 
@@ -8,7 +8,7 @@ from quote_cache import within_window
 from quote_sources import fresh
 
 VERSION = 'arabsniper-v7.0'
-# Selected on 26 Oct–3 Nov from the predeclared grid for shadow use.
+# Selected on 26 Oct–3 Nov from the predeclared grid.
 # Preserve a statistical contribution even when fair is the stronger benchmark.
 BASE_WEIGHT = .80
 MIN_WEIGHT, MAX_WEIGHT = .50, .80
@@ -168,7 +168,7 @@ def statistical_rates(raw, means):
 
 
 def market_rates(statistics, totals, result=None):
-    """One fair score projection with full 1X2, exact half-line totals and a statistical ST split."""
+    """Fit regulation volume/share and distribute it using verified period lines."""
     if not result and not any(totals.values()):
         return None
     home_ht, away_ht = statistics['home_ht'], statistics['away_ht']
@@ -178,7 +178,18 @@ def market_rates(statistics, totals, result=None):
     if not ft_prior:
         return None
     fair_ft, share = _fit_fulltime(ft_prior, statistics['home_ft'] / ft_prior, totals.get('ft', {}), result)
-    if totals.get('ht'):
+    if totals.get('sh'):
+        fair_st = _fit_total(st_prior, totals['sh'])
+        if totals.get('ht'):
+            fair_ht = _fit_total(ht_prior, totals['ht'])
+            if not totals.get('ft') and not result:
+                fair_ft = fair_ht + fair_st
+            fair_ht = fair_ft * fair_ht / (fair_ht + fair_st)
+        elif not totals.get('ft') and not result:
+            fair_ht, fair_ft = ht_prior, ht_prior+fair_st
+        else:
+            fair_ht = max(.005, fair_ft-fair_st)
+    elif totals.get('ht'):
         fair_ht = _fit_total(ht_prior, totals['ht'])
         if not totals.get('ft') and not result:
             fair_ft = fair_ht + st_prior
@@ -194,7 +205,7 @@ def market_rates(statistics, totals, result=None):
 
 def fair_inputs(rows):
     """Accept one fair price per line and one complete same-book 1X2 vector."""
-    totals = {'ft': {}, 'ht': {}}
+    totals = {'ft': {}, 'ht': {}, 'sh': {}}
     result = None
     for row in sorted(rows, key=lambda r: (r.get('quote_status') != 'recent',
                                             r['selected_margin_pct'], str(r.get('bookmaker_id')))):

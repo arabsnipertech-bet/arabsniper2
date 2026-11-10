@@ -59,7 +59,7 @@ def captured_prices(fixture, rows):
         point = points[-1]
         if key.startswith(('direct_combo_v1|','direct_combo_discovery_v1|')):
             from quote_sources import number
-            if (point.get('bet_id') == 184 and point.get('complete') and point.get('specs') and
+            if (point.get('quote_executable') is True and point.get('complete') and point.get('specs') and
                     set(point.get('odds', {})) == {'over', 'not_over'} and
                     all(number(v) is not None and number(v) > 1 for v in point['odds'].values()) and
                     all(core_market(s) for s in point['specs'].values())):
@@ -189,17 +189,18 @@ def main(directory='data'):
     dashboard['days'] = sorted(refreshed.values(), key=lambda d: d['date'])
     dashboard['updated_at'] = as_of
     from adaptive_calibration import calibration_status
+    from v7_probability import VERSION
     dashboard['calibration_status'] = calibration_status(as_of=as_of)
     dashboard['opportunity_refresh'] = {'policy_id': POLICY_ID, 'at': as_of, 'api_calls': 0, 'days': counters}
     dashboard.setdefault('method', {}).setdefault('user_policy', {}).update(
         competition_policy=SCOPE_ID, universal_observation=False, romania_allowed=True,
         goals_only_proposals=True, drought_probability_bonus=0)
     dashboard['method'].setdefault('active_analysis', {}).update(
-        competition_policy=SCOPE_ID, opportunity_policy=POLICY_ID,
+        competition_policy=SCOPE_ID, opportunity_policy=POLICY_ID, decision_model=VERSION,
         universal_observation=False, all_whitelisted_fixtures=True)
     dashboard['method'].update(
         competition_filter=SCOPE_DESCRIPTION,
-        markers='Gold v6.1: cinque mercati gol e Combo PT+ST; ordine di valutazione fra mercati idonei.')
+        markers='Triade V7 con mercati PT, ST e FT; livelli Blu, Gold e Platinum.')
     write_store(dashboard_path, dashboard)
     write_store(directory/'arab_quote_state.json', state)
     print('Policy refresh complete: statistics, source timestamps and started forecasts preserved', flush=True)

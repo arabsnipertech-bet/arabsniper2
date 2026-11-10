@@ -228,17 +228,17 @@ assert monitor[0]['matrix']['rows'][0]['opportunity']['reasons']==['probability'
 assert monitor[1]['matrix']['rows'][0]['opportunity']['reasons']==['probability']
 assert sum(r['opportunity']['eligible'] for b in monitor for r in b['matrix']['rows'])==1
 elite=[]
-strong=dict(watch,odd=2.5,first_odd=2.5/.96,delta_pct=-4,statistical_pct=43,ev_pct=7.5,
-            ev_low_pct=2,ht_evidence=None,goal_evidence=None,
-            selected_movement={'delta_pct':-4,'fair_delta_pp':1,'persistence':.75,'reversal':False})
+strong=row(id='elite-ft',odd=2.5,first_odd=2.5/.96,statistical_pct=57,ev_pct=42.5,
+           ev_low_pct=8,oci=35,bookmaker='OPERATORE SINTETICO',
+           selected_movement={'delta_pct':-4,'fair_delta_pp':1,'persistence':.75,'reversal':False})
 excellent=dict(strong,id='elite-ht',spec=S('total','ht','over',1.5),period='ht',label='Over 1,5 PT',
-               odd=1.9,first_odd=1.9/.96,ev_pct=10)
+               statistical_pct=55,odd=2.4,first_odd=2.4/.96,ev_pct=32)
 both=row(id='both',odd=2.5,first_odd=2.5/.96,bookmaker='BOOK SINTETICO')
 for r in [strong,excellent,both,row(id='gold-only',oci=0),dict(strong,delta_pct=-2,first_odd=2.5/.98,
           selected_movement={'delta_pct':-2,'fair_delta_pp':1,'persistence':.75,'reversal':False}),dict(strong,oci=0),
           dict(strong,ev_pct=-15.0001,statistical_pct=33.99996)]:
  b=deepcopy(a);b['matrix']['rows']=[deepcopy(r)]
- annotate(b['matrix'],NOW,b)
+ annotate(b['matrix'],NOW)
  annotate_platinum(b['matrix'],match()['fixture'],NOW)
  elite.append(b)
 assert sum(bool(b['matrix']['platinum_policy']['best_market_id']) for b in elite)==3
@@ -248,16 +248,6 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
  Object.assign(caps[4].matrix.rows[0],{quote_status:'cached_stable',cache_source_at:new Date(now-2*3600000).toISOString(),cache_expires_at:new Date(now+10*3600000).toISOString()});
  const payload={gold_scope:{policy_id:scope},updated_at:new Date(now).toISOString(),multimarket_method:{model_id:'lateral-matrix-v5.0'},matches:Array.from({length:9},(_,i)=>({gold_scope:{policy_id:scope,allowed:true},fixture:{fixture_id:String(i+1),home:'Squadra casa',away:'Squadra ospite',
   kickoff:new Date(now+7200000+i*60000).toISOString(),status_short:'NS',time:'20:45',country:'Italia',league:'DATI SINTETICI DI VERIFICA',match:i===8?'Nome squadra molto lungo per verificare la visualizzazione da telefono – Avversaria':'Squadra '+(i+1)+' – Avversaria'},multimarket:structuredClone(variants[i%2])}))};
- const researchMatch=payload.matches[0];
- const researchMarket=researchMatch.multimarket.matrix.rows.find(row=>row.spec.kind==='total'&&row.spec.period==='ft'&&row.spec.line===2.5&&row.spec.side==='over');
- researchMatch.multimarket.matrix.v7={
-  version:'arabsniper-v7.0',status:'shadow',fixture_id:researchMatch.fixture.fixture_id,
-  kickoff:researchMatch.fixture.kickoff,captured_at:new Date(now).toISOString(),calibration:'baseline',
-  rates:{home_ht:.65,away_ht:.44,home_ft:1.72,away_ft:1.29},means:{},market_projection:{},
-  signals:{lineare:{market_id:researchMarket.id,reasons:['probabilita_e_prezzo']}},
-  markets:{[researchMarket.id]:{label:'Over 2,5 FT',odd:2.05,raw:.48,calibrated:.52,fair:.49,
-   quote:{first_odd:2.23,quote_status:'recent'},features:{delta_pct:-8,oci:24,margin_pct:4}}}
- };
  // UI-only price fixtures exercise all three result cells and movement colors.
  for(const m of payload.matches)for(const row of m.multimarket.matrix.rows){
   if(row.spec.kind==='result'&&row.period==='ft')Object.assign(row,{quote_status:'recent',first_odd:2.5,odd:2.2,delta_pct:-12,bookmaker:'OPERATORE SINTETICO',oci:55,paired_books:3,agreeing_books:3,margin_pct:4,margin_delta_pp:-1,margin_band:'low',ev_pct:-1,ev_low_pct:-2});
@@ -292,17 +282,11 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await page.locator('[data-mx-open]').first().click();
    assert(await page.locator('dialog.mx-modal').isVisible());
    assert.equal(await page.locator('dialog .mx-cockpit .mx-goal-panel').count(),2);
-   const v7=page.locator('dialog .mx-v7-panel');
-   assert(await v7.isVisible(),'V7 section shown with compatible feed');
-   assert((await v7.innerText()).includes('52,0%'));
-   await v7.locator('summary').click();
-   assert(await v7.getByText('Poisson originale').isVisible());
-   assert(await v7.evaluate(e=>e.scrollWidth<=e.clientWidth),'V7 detail overflow '+name);
    assert.equal(await page.locator('dialog .mx-1x2 .mx-quote-cell').count(),3);
-   assert.equal(await page.locator('dialog [data-mx-instrument] option').count(),61);
+   assert.equal(await page.locator('dialog [data-mx-instrument] option').count(),74);
    assert(!(await page.locator('dialog').innerText()).includes('EV'));
    assert.equal(await page.locator('.mx-modal-scroll > .mx-best').count(),1,'Official analysis moved inside');
-   for(const [section,count] of [['ft',8],['ht',8],['result',3],['asian',40],['targets',6]]){
+   for(const [section,count] of [['ft',8],['ht',10],['sh',8],['result',3],['asian',40],['targets',12]]){
     await page.locator('[data-mx-section="'+section+'"]').click();
     assert.equal(await page.locator('.mx-market-row').count(),count);
    }
@@ -385,19 +369,22 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   }
   const activePayload=structuredClone(singlePayload),activeMatch=activePayload.matches[0];
   activeMatch.fixture.fixture_id='751';
-  const matrix=activeMatch.multimarket.matrix,v7=matrix.v7,model=v7.version;
+  const matrix=activeMatch.multimarket.matrix,model='arabsniper-v7.0';
   matrix.publication_model=model;
-  Object.assign(v7,{status:'published',fixture_id:'751',tier:'radar',signals:{},markets:{}});
+  const v7=matrix.v7={version:model,status:'published',fixture_id:'751',tier:'PLATINUM',
+   kickoff:activeMatch.fixture.kickoff,captured_at:new Date(now).toISOString(),
+   rates:{home_ht:.65,away_ht:.44,home_ft:1.72,away_ft:1.29},means:{},triad:{},markets:{}};
   const picks=[
-   ['primary',r=>r.spec.kind==='btts'&&r.period==='ft'&&r.spec.side==='yes','GG FT',1.90,.58],
-   ['consigliata',r=>r.spec.kind==='halves_total','Over 0,5 PT + Over 0,5 ST',2.40,.49],
-   ['colpaccio',r=>r.spec.kind==='total'&&r.period==='ht'&&r.spec.line===3.5&&r.spec.side==='over','Over 3,5 PT',10.,.12]
+   ['most_probable',r=>r.spec.kind==='btts'&&r.period==='ft'&&r.spec.side==='yes','GG FT',1.90,.58,'BLU','◆ BLU','FT',"[FINALE 90']"],
+   ['recommended_alternative',r=>r.spec.kind==='btts'&&r.period==='sh'&&r.spec.side==='yes','GG ST',2.95,.41,'PLATINUM','★ PLATINUM','ST','[2° TEMPO]'],
+   ['high_odds_shot',r=>r.spec.kind==='btts'&&r.period==='ht'&&r.spec.side==='yes','GG PT',5.50,.21,'GOLD','● GOLD','PT','[1° TEMPO]']
   ];
-  for(const [role,match,label,odd,prob] of picks){
+  for(const [role,match,label,odd,prob,tier,badge,horizon,horizon_label] of picks){
    const source=matrix.rows.find(match);
    Object.assign(source,{probability_model:model,odd,first_odd:odd,statistical_pct:prob*100,
     quote_executable:true,quote_status:'recent',provider_updated_at:v7.captured_at,quote_observed_at:v7.captured_at});
-   v7.signals[role]={market_id:source.id,source_market_id:source.id,odd};
+   v7.triad[role]={market_id:source.id,source_market_id:source.id,odd,probability:prob,
+    ev:prob*odd-1,tier,badge,horizon,horizon_label,niche_label:'Simmetria 1°+2°T'};
    v7.markets[source.id]={label,odd,source_market_id:source.id,raw:prob,calibrated:prob,fair:prob,
     quote:{first_odd:odd,bookmaker:'Test'},features:{oci:12,margin_pct:5}};
   }
@@ -405,16 +392,17 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await page.setViewportSize({width,height:900});
    await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},activePayload);
    const card=page.locator('.mx-card');
-   assert.equal(await card.locator('.mx-category').innerText(),'RADAR BLU');
-   assert.equal(await card.locator('.mx-compact-proposal strong').innerText(),'GG FT');
+   assert.equal(await card.locator('header .mx-level').innerText(),'★ PLATINUM');
+   assert.equal(await card.locator('[data-v7-slot=most_probable] b').innerText(),'GG FT');
    assert((await card.innerText()).includes('58,0%'));
-   assert(!/Consigliata|Colpaccio|Studio V7/.test(await card.innerText()));
+   assert.equal(await card.locator('[data-v7-slot]').count(),3);
+   assert((await card.innerText()).includes('[2° TEMPO]'));
    await card.locator('[data-mx-open]').click();
    const modal=page.locator('dialog');
-   const headline=modal.locator('[data-v7-role="primary"]');
+   const headline=modal.locator('[data-v7-slot="most_probable"]');
    assert((await headline.innerText()).includes('GG FT'));
    assert((await headline.innerText()).includes('58,0%'));
-   assert.deepEqual(await modal.locator('[data-v7-role]').count(),3);
+   assert.deepEqual(await modal.locator('[data-v7-slot]').count(),3);
    assert(!(await modal.locator('.mx-cockpit').isVisible()));
    assert(await modal.evaluate(el=>el.scrollWidth<=el.clientWidth),'V7 sheet fits '+width);
    await modal.locator('[data-v7-details] summary').click();

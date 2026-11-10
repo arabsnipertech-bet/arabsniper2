@@ -18,6 +18,7 @@ MIN_TRAIN_DAYS, MIN_TRAIN_FIXTURES = 8, 100
 MIN_TEST_DAYS, MIN_TEST_FIXTURES = 5, 80
 STEP, MIN_GAIN = .05, .001
 BASELINES = ('raw', 'corrected', 'calibrated', 'v51', 'fair')
+V7_BASELINES = tuple(key for key in BASELINES if key != 'v51')
 STRESS_ROLES = ('radar_sorprese', 'colpaccio')
 
 
@@ -57,9 +58,9 @@ def metrics(rows, p, today):
 
 
 def evaluate(rows, today):
-    # Metrics for each estimate and fair use the identical matched population.
-    matched = [r for r in rows if all(finite(r.get(k)) for k in BASELINES)]
-    return {k: metrics(matched, lambda r: r[k], today) for k in BASELINES}
+    # V7 and fair use the same population. V5.1 is a comparison when available.
+    matched = [r for r in rows if all(finite(r.get(k)) for k in V7_BASELINES)]
+    return {k: metrics(matched, lambda r: r.get(k), today) for k in BASELINES}
 
 
 def deduplicated(rows, cutoff):
@@ -155,7 +156,7 @@ def fit(rows, cutoff, previous):
     today = cutoff.astimezone(ROME).date()
     eligible = [r for r in deduplicated(rows, cutoff) if r.get('supported', True) and r.get('benchmark', True)
                 and set(r['variants']) == {str(w) for w in WEIGHTS}
-                and all(finite(r.get(k)) for k in BASELINES)]
+                and all(finite(r.get(k)) for k in V7_BASELINES)]
     dates = sorted({r['date'] for r in eligible})
     tests = dates[-MIN_TEST_DAYS:]
     split = datetime.combine(date.fromisoformat(tests[0]), time(), ROME) if tests else cutoff
@@ -179,7 +180,9 @@ def fit(rows, cutoff, previous):
     before = compare(holdout, previous)
     report.update(candidate=candidate, train_scores={str(w): value for w, value in fitted.items()},
                   holdout_candidate=scores, holdout_previous=before, reason='holdout_gate_not_met')
-    baselines = [before, report['holdout']['fair'], report['holdout']['v51']]
+    baselines = [before, report['holdout']['fair']]
+    if report['holdout']['v51']['n'] == len(holdout):
+        baselines.append(report['holdout']['v51'])
     consistently_better = sum(
         compare(group, candidate)['log_loss'] <= compare(group, previous)['log_loss']
         for day in tests if (group := [r for r in holdout if r['date'] == day])) >= MIN_TEST_DAYS - 1
@@ -196,17 +199,27 @@ def run(root, cutoff):
     today = cutoff.astimezone(ROME).date()
     path = root / f'auditarchive/prematch_{today-timedelta(days=1)}_v7_learning.json'
     existing = read_store(path, {})
-    if existing.get('date') == str(today) and existing.get('version') == VERSION:
+    if isinstance(existing, dict) and existing.get('date') == str(today) and existing.get('version') == VERSION:
         # Recovery can repeat the priority and full nightly phases. Restore the
         # same candidate after a partial write instead of applying a second step.
         if isinstance(existing.get('state'), dict):
             write_store(root/STATE, existing['state'])
         return existing
-    rows, days, previous = [], {}, active_weight(cutoff, root)[0]
+    rows, days, anomalies, previous = [], {}, {}, active_weight(cutoff, root)[0]
     for offset in range(1, WINDOW + 1):
         day = today - timedelta(days=offset)
-        data = read_store(day_path(root, day), {})
+        try:
+            data = read_store(day_path(root, day), {})
+        except (ValueError, OSError) as error:
+            anomalies[str(day)] = type(error).__name__
+            continue
+        if not isinstance(data, dict):
+            anomalies[str(day)] = 'invalid_v7_archive'
+            continue
         if data.get('version') != VERSION or data.get('date') != str(day):
+            continue
+        if not isinstance(data.get('counts'), dict) or not isinstance(data.get('samples'), list):
+            anomalies[str(day)] = 'invalid_v7_archive'
             continue
         days[str(day)] = {**data['counts'], 'rejected_forecasts': data.get('rejected_forecasts', 0)}
         rows.extend(data['samples'])
@@ -215,7 +228,7 @@ def run(root, cutoff):
     state = dict(version=VERSION, trained_at=utc(cutoff), weight=learned['weight'],
                  status=learned['status'])
     report = dict(version=VERSION, date=str(today), window_days=WINDOW, half_life_days=HALF_LIFE,
-                  state=state, checked_days=days, verified_fixtures=len({r['fixture_id'] for r in settled}),
+                  state=state, checked_days=days, anomalies=anomalies, verified_fixtures=len({r['fixture_id'] for r in settled}),
                   comparison=evaluate([r for r in settled if r.get('benchmark', True)], today), update=learned,
                   diagnostics=diagnostics(settled, today),
                   manual_review=['structural_parameters', 'market_feature_weights', 'gold_promotion'])

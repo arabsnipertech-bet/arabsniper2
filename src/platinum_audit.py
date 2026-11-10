@@ -28,12 +28,12 @@ def capture(store, match, observed_at):
             or not output_allowed(match) or not now or not kickoff or not decision
             or not decision <= now < kickoff or meta.get('result')
             or meta.get('status_short') not in ('NS', 'TBD')): return False
-    primary = policy.get('best_market_id')
+    primary = policy.get('published_market_id', policy.get('best_market_id'))
     chosen = next((r for r in matrix.get('rows', []) if r['id'] == primary), None)
     if primary and (not chosen or not evaluate(chosen, policy['evaluated_at'])['eligible']
                     or chosen.get('platinum', {}).get('policy_id') != POLICY_ID
                     or chosen['platinum'].get('eligible') is not True
-                    or chosen['platinum'].get('rank') != 1):
+                    or ('published_market_id' not in policy and chosen['platinum'].get('rank') != 1)):
         raise ValueError('Platinum audit choice mismatch; refusing publication')
     snapshot = {'policy_id': POLICY_ID, 'decision_at': policy['evaluated_at'],
                 'kickoff': meta['kickoff'], 'statistics_captured_at': assessment.get('captured_at'),

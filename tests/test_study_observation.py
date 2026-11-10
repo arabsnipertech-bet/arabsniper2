@@ -54,7 +54,7 @@ class StudyObservationTests(unittest.TestCase):
                 item['multimarket'] = result = attach(deepcopy(base), quotes, {}, item['fixture'], NOW)
                 build_board({'date':'2026-10-26', 'matches':[item]}, NOW)
                 row = next(r for r in result['matrix']['rows'] if r['spec'] == target)
-                pure = row.get('calibration_base') or row
+                pure = row.get('calibration_base') or row['v51_pricing']
                 self.assertAlmostEqual(pure['statistical_pct'], model['p']*100, places=3)
                 self.assertAlmostEqual(pure['fair_odd'], model['fair_odd'], places=6)
                 profile = result['profiles']['home']['for_ft']

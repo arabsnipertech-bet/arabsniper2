@@ -174,6 +174,18 @@ class DailyRecoveryTests(unittest.TestCase):
                 install(storage,'test',Path(dest),DAY,digest,NOW)
             self.assertEqual(storage.objects['state/current.json'],pointer)
 
+    def test_recovers_v7_and_results_when_legacy_is_partial(self):
+        from recover_daily import recovery_status
+        storage = Fake()
+        with TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest, patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):
+            official = sources(storage, Path(seed))
+            with patch('recover_daily.recover_legacy', return_value=('partial_v51_skip','deadline')):
+                digest = prepare(storage,'test',Path(work),DAY,NOW,lambda *args:official)
+            report = install(storage,'test',Path(dest),DAY,digest,NOW)
+            self.assertTrue(report['available'])
+            self.assertIn(f'auditarchive/prematch_{DAY}_v7.json',previous_manifest(storage,'test'))
+            self.assertEqual(read_store(Path(dest)/recovery_status(DAY))['status'],'partial_v51_skip')
+
     def test_empty_official_results_are_never_published_as_a_completed_report(self):
         storage = Fake()
         with TemporaryDirectory() as seed, TemporaryDirectory() as work, patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):

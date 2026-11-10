@@ -25,7 +25,7 @@ def daily_report(root, day='2026-10-30'):
 class NightlySchedule(unittest.TestCase):
     def setUp(self):
         # Priority is integration-tested separately; isolate legacy history sequencing.
-        priority = patch('auditor_daily_priority.ensure_priority')
+        priority = patch('nightly_auditor.ensure_priority')
         priority.start()
         self.addCleanup(priority.stop)
 
@@ -57,7 +57,7 @@ class NightlySchedule(unittest.TestCase):
             with self.assertRaises(TimeoutError):
                 run(root, lambda: now, runner)
             self.assertLess(calls.index(['src/adaptive_calibration.py', '--as-of', '2026-11-05']),
-                            calls.index(['src/gold_storage.py', 'checkpoint']))
+                            calls.index(['src/gold_storage.py', 'checkpoint-day', '--date', '2026-11-04', '--legacy']))
             self.assertFalse((root/MARKER).exists())
             self.assertEqual(read_store(root/PROGRESS)['stage'], 'daily')
 
@@ -122,15 +122,21 @@ class NightlySchedule(unittest.TestCase):
             write_store(Path(folder)/MARKER, {'schema_version': 1, 'status': 'complete',
                 'date': '2026-10-31', 'started_at': '2026-10-31T00:30:00+01:00', 'completed_at': now.isoformat()})
             daily_report(folder)
-            self.assertEqual(run(folder, lambda: now, runner), 'already_completed')
+            with patch('nightly_auditor.v7_ready', return_value=True):
+                self.assertEqual(run(folder, lambda: now, runner), 'already_completed')
         self.assertEqual(len(runner.call_args_list), 1)
-        self.assertEqual(runner.call_args.args[1][-1], 'restore')
+        self.assertEqual(runner.call_args.args[1][1:], ['src/gold_storage.py','restore-v7-priority','--date','2026-10-30'])
 
     def test_runner_orders_evidence_before_settlement_and_publication(self):
         now = datetime.fromisoformat('2026-10-31T00:35:00+01:00')
         calls = []
         def runner(root, command, deadline, clock):
-            self.assertEqual(deadline.isoformat(), '2026-10-31T01:50:00+01:00')
+            bounded = {'restore': '2026-10-31T00:50:00+01:00',
+                       'legacy-evidence':'2026-10-31T00:41:00+01:00'}
+            expected = bounded.get(command[2] if len(command)>2 else '', '2026-10-31T01:50:00+01:00')
+            if command[1]=='src/adaptive_calibration.py':
+                expected = bounded['legacy-evidence']
+            self.assertEqual(deadline.isoformat(), expected)
             calls.append(command[1:])
             if command[1:3] == ['auditor/current_audit.py', 'daily']:
                 daily_report(root, command[-1])
@@ -138,14 +144,19 @@ class NightlySchedule(unittest.TestCase):
             self.assertEqual(run(folder, lambda: now, runner), 'complete')
             self.assertTrue(already_completed(folder, now))
         self.assertEqual(calls, [
-            ['src/gold_storage.py', 'restore'], ['auditor/current_audit.py', 'prepare', '--journal-limit', '8', '--delta-archive', '--journal-before', '2026-10-31T00:00:00+01:00'], ['src/gold_storage.py', 'checkpoint'],
-            ['auditor/current_audit.py', 'daily', '--date', '2026-10-30'],
+            ['src/gold_storage.py', 'restore-v7-priority', '--date', '2026-10-30'],
+            ['src/gold_storage.py', 'restore'],
+            ['src/homepage_results.py'], ['src/private_publication.py', '--results-only'],
+            ['auditor/current_audit.py', 'legacy-evidence', '--date', '2026-10-30'],
             ['src/adaptive_calibration.py', '--as-of', '2026-10-31'],
+            ['src/gold_storage.py', 'checkpoint-day', '--date', '2026-10-30', '--legacy'],
+            ['auditor/current_audit.py', 'prepare', '--journal-limit', '8', '--delta-archive', '--journal-before', '2026-10-31T00:00:00+01:00'], ['src/gold_storage.py', 'checkpoint'],
+            ['auditor/current_audit.py', 'daily', '--date', '2026-10-30'],
             ['src/gold_storage.py', 'checkpoint'], ['src/homepage_results.py'],
             ['src/private_publication.py', '--results-only'],
             ['auditor/current_audit.py', 'history', '--date', '2026-10-30', '--assemble-only', '--as-of', now.isoformat()],
             ['src/gold_storage.py', 'checkpoint'], ['src/gold_policy_audit.py'],
-            ['src/adaptive_calibration.py', '--as-of', '2026-10-31'], ['src/gold_storage.py', 'checkpoint']])
+            ['src/gold_storage.py', 'checkpoint']])
 
     def test_interrupted_history_resumes_the_committed_day_before_new_journals(self):
         now = datetime.fromisoformat('2026-10-31T00:40:00+01:00')

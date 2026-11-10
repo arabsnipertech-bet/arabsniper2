@@ -39,7 +39,7 @@ class GoldV61(unittest.TestCase):
             self.assertIn('suspicious_divergence',evaluate(r)['reasons'])
 
     def test_ft_saturation_raises_the_prudent_floor_only_once(self):
-        for line, base in ((2.5, 2.), (3.5, 1.)):
+        for line, base in ((2.5, 2.), (3.5, 2.)):
             neutral = row(spec=S('total','ft','over',line), oci=49.999, delta_pct=-4.999,
                           ev_low_pct=base)
             self.assertTrue(evaluate(neutral)['eligible'])
@@ -202,7 +202,7 @@ class GoldV61(unittest.TestCase):
                 self.assertEqual(updated['matrix']['opportunity_policy']['id'],POLICY_ID)
                 self.assertEqual(updated['captured_at'],a['captured_at'])
                 self.assertEqual(updated['inputs'],a['inputs'])
-                current={r['id']:r['statistical_pct'] for r in updated['matrix']['rows']}
+                current={r['id']:r['v51_pricing']['statistical_pct'] for r in updated['matrix']['rows']}
                 self.assertEqual(probabilities,{k:current[k] for k in probabilities})
                 combo=next(r for r in updated['matrix']['rows'] if r['spec']['kind']=='halves_total')
                 self.assertEqual(combo['combo']['policy_id'],POLICY_ID)

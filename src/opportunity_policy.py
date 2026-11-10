@@ -8,19 +8,24 @@ from math import isfinite, sqrt
 from statistics import mean, median
 
 POLICY_ID = 'gold-goals-v6.1'
-RULES_REVISION = 'v7-prudence-v1'
+RULES_REVISION = 'v7-unified-v1'
 SUPPORTED_POLICY_IDS = ('gold-goals-v2', 'gold-goals-v3', 'gold-goals-v4', 'gold-goals-v5', 'gold-goals-v6', POLICY_ID)
 ODDS_MIN, ODDS_MAX = 1.70, 7.50
 GOALS = {('total', 'ht', 'over', 1.5): 'over15_ht', ('btts', 'ht', 'yes', None): 'gg_ht',
          ('total', 'ht', 'over', 2.5): 'over25_ht',
-         ('total', 'ft', 'over', 2.5): 'over25_ft', ('total', 'ft', 'over', 3.5): 'over35_ft'}
-ODDS_MIN_BY_MARKET = {'over15_ht': 2.10, 'over25_ht': 4.50, 'over25_ft': ODDS_MIN, 'gg_ht': 3.50, 'over35_ft': 2.10}
-ODDS_MAX_BY_MARKET = {'over15_ht': 3.50, 'over25_ht': 7.50, 'over25_ft': 2.60, 'gg_ht': 5.50, 'over35_ft': 4.50}
-MIN_EV_LOW_BY_MARKET = {'over15_ht': 2., 'over25_ht': 2., 'over25_ft': 2., 'gg_ht': 2., 'over35_ft': 1.}
+         ('total', 'ft', 'over', 2.5): 'over25_ft', ('total', 'ft', 'over', 3.5): 'over35_ft',
+         ('total', 'sh', 'over', 1.5): 'over15_sh', ('total', 'sh', 'over', 2.5): 'over25_sh',
+         ('btts', 'sh', 'yes', None): 'gg_sh'}
+ODDS_MIN_BY_MARKET = {'over15_ht': 2.10, 'over25_ht': 4.50, 'over25_ft': ODDS_MIN, 'gg_ht': 3.50, 'over35_ft': 2.10,
+                     'over15_sh': 1.55, 'over25_sh': 3.50, 'gg_sh': 2.15}
+ODDS_MAX_BY_MARKET = {'over15_ht': 3.50, 'over25_ht': 7.50, 'over25_ft': 2.60, 'gg_ht': 5.50, 'over35_ft': 4.50,
+                     'over15_sh': 2.15, 'over25_sh': 7.50, 'gg_sh': 3.50}
+MIN_EV_LOW_BY_MARKET = dict.fromkeys(GOALS.values(), 2.)
 FT_OVER_MARKETS = {'over25_ft', 'over35_ft'}
 # Prudential admission rules, not fitted/calibrated probabilities. The model's
 # independent 45-minute estimates remain untouched, including absent HT xG.
-MIN_PROBABILITY_BY_MARKET = {'over15_ht': 40., 'over25_ht': 18., 'gg_ht': 26., 'over25_ft': 48., 'over35_ft': 35.}
+MIN_PROBABILITY_BY_MARKET = {'over15_ht': 40., 'over25_ht': 18., 'gg_ht': 26., 'over25_ft': 48., 'over35_ft': 35.,
+                             'over15_sh': 45., 'over25_sh': 16., 'gg_sh': 32.}
 HT_EVIDENCE_ID = 'observed-first-half-v1'
 HT_MIN_MATCHES = 4
 LABELS = {'convergence': 'Convergenza di Trend',
@@ -36,6 +41,7 @@ REASONS = {
     'stale': 'Quota recente non disponibile',
     'history': 'Storico statistico insufficiente',
     'ht_history': 'Servono almeno quattro primi tempi osservati per ciascuna squadra',
+    'st_history': 'Servono almeno quattro secondi tempi osservati per ciascuna squadra',
     'adapter': 'Associazione della quota da aggiornare',
     'margin': 'Aggio anomalo: prezzo da verificare',
     'edge': 'Vantaggio insufficiente rispetto all’aggio',
@@ -217,7 +223,7 @@ def goal_context(assessment, rows):
         'preferred_pt_market': preferred, 'drought_role': role,
         'reason': 'drought_and_comparable_1x2_flow' if flow and affected else
                   'no_comparable_imbalance' if not flow else 'no_supported_scoring_gap',
-        'note': 'Priorità sperimentale, non recupero dei gol dovuto. Il flusso 1X2 non conferma da solo il mercato gol.'}
+        'note': 'Priorità di contesto. La conferma del mercato gol richiede evidenza sulla sua quota.'}
 
 
 def signal_for(row, eligible):
@@ -284,7 +290,7 @@ def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None,
     # Explicitly isolated benchmark: a fair quote has zero central EV by identity.
     # Published calls never pass comparison_basis and retain every value gate.
     if not fair_comparison:
-        if not numeric(ev) or ev + 1e-9 < min_ev or not gate_passes(row, base_ev): reasons.append('edge')
+        if not numeric(ev) or ev <= 0 or ev + 1e-9 < min_ev or not gate_passes(row, base_ev): reasons.append('edge')
         if not numeric(ev_low) or ev_low + 1e-9 < min_low: reasons.append('sensitivity')
     reasons = list(dict.fromkeys(reasons))
     eligible = not reasons
@@ -295,7 +301,7 @@ def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None,
             'goal_market': market, 'odds_min': minimum_odd, 'odds_max': maximum_odd,
             'min_probability_pct': minimum_p, 'min_ev_pct': min_ev,
             'ht_history_supported': market not in ('over15_ht', 'over25_ht', 'gg_ht') or 'ht_history' not in reasons and 'structural_missing' not in reasons,
-            'structural_supported': not any(r in reasons for r in ('structural_missing', 'isolated_peak', 'ht_symmetry', 'ht_expected', 'ht_frequency', 'ht_history')),
+            'structural_supported': not any(r in reasons for r in ('structural_missing', 'isolated_peak', 'ht_symmetry', 'ht_expected', 'ht_frequency', 'ht_history', 'st_history')),
             'market_checks_passed': not any(r in reasons for r in ('margin', 'margin_missing', 'oci_negative', 'odds_rising', 'suspicious_divergence')),
             'threshold_status': 'user_defined_unvalidated',
             'entry_min_ev_pct': min_ev, 'entry_min_ev_low_pct': min_low,
@@ -340,7 +346,8 @@ def annotate(matrix, as_of=None, assessment=None, *, automatic_upgrade=True, div
                 d.update(eligible=False, strict_eligible=False, signal='excluded', label=LABELS['excluded'],
                          playability_score=None, reasons=[*d['reasons'], reason])
     goals = {key: [r for r in rows if goal_market(r) == key] for key in ODDS_MAX_BY_MARKET}
-    for subset, superset in [('over35_ft', 'over25_ft'), ('gg_ht', 'over15_ht'), ('over25_ht', 'over15_ht')]:
+    for subset, superset in [('over35_ft', 'over25_ft'), ('gg_ht', 'over15_ht'), ('over25_ht', 'over15_ht'),
+                             ('gg_sh', 'over15_sh'), ('over25_sh', 'over15_sh')]:
         for a in goals[subset]:
             for b in goals[superset]:
                 if numeric(a.get('statistical_pct')) and numeric(b.get('statistical_pct')) and a['statistical_pct'] > b['statistical_pct']+.01:

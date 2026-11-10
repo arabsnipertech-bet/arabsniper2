@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+from copy import deepcopy
 import io
 import json
 from pathlib import Path
@@ -13,11 +14,12 @@ sys.path[:0] = [str(ROOT/'src'), str(ROOT/'auditor')]
 from audit_storage import read_store, write_store
 from current_audit import forecast_day
 from gold_storage import sha, write_manifest
-from lateral_matrix import build_matrix, market_id, settle_spec, specification
+from lateral_matrix import FAMILIES, build_matrix, market_id, settle_spec, specification
 from matrix_pipeline import build_board
 from matrix_quotes import collect
 from v7_archive import ROME, WEIGHTS, day_path, quote_evidence, results_for_day, valid_snapshot
-from v7_decision import COMBOS, GG, GOAL, capture, publication, quote_rows, route
+from v7_decision import (AWAY, BOTH_GOALS, COMBOS, GG, GG_BOTH, GG_CARRY, GG_FT, GOAL,
+                         OVER_CARRY, capture, quote_rows, route, stored_offers)
 from v7_learning import STATE, active_weight, deduplicated, fit, run
 from v7_maintenance import MARKER, complete_price_pages, consolidate, price_window
 from v7_probability import BASE_WEIGHT, blend_rates, market_rates, price_usable, raw_rates, result_probabilities, score_model
@@ -26,20 +28,24 @@ AT = '2026-11-09T22:30:00+01:00'
 START = '2026-11-09T23:45:00+01:00'
 META = dict(fixture_id=321, kickoff=START, status_short='NS')
 RATES = dict(home_ft=1.25, away_ft=1.20, home_ht=.55, away_ht=.50)
+PROFILES = {side: {f'for_{period}': dict(sample=8, mean=1.5, without_last=1.5, without_peak=1.)
+                   for period in ('ft', 'ht')} for side in ('home', 'away')}
+PATTERNS = dict(conversion=False, rebound_gg=False)
+
 FT = GOAL['over25_ft']
 HT = GOAL['over15_ht']
 HIGH = GOAL['over35_ht']
 
 
 def row(spec, odd=2.50, p=.45, fair=.40):
-    return dict(id=market_id(spec), spec=spec, quality='supported',
+    return dict(id=market_id(spec), spec=spec, quality='supported', family=FAMILIES[spec['kind']], period=spec['period'],
                 statistical_pct=p*100, odd=odd, first_odd=odd, quote_status='recent',
                 quote_observed_at=AT, provider_updated_at=AT, quote_executable=True,
                 bookmaker_id='1', selected_margin_pct=5, selected_market_fair_pct=fair*100)
 
 
 def assessment():
-    return dict(rates=RATES, statistics_as_of=AT, matrix=dict(rows=[
+    return dict(rates=RATES, statistics_as_of=AT, profiles=PROFILES, matrix=dict(rows=[
         row(json.loads(FT)), row(json.loads(HT)), row(json.loads(GG), 6., .20, .17)]))
 
 
@@ -62,9 +68,10 @@ class MathAndRouting(unittest.TestCase):
         rates = dict(home_ft=1.3, away_ft=.85, home_ht=1.3, away_ht=.85)
         model = score_model(rates)
         p = lambda spec: model.estimate(spec)['p']
-        self.assertAlmostEqual(p(COMBOS[0]), p(specification('total','ht','over',2.5)), places=10)
+        self.assertAlmostEqual(p(json.loads(OVER_CARRY)), p(specification('total','ht','over',2.5)), places=10)
         self.assertAlmostEqual(p(specification('halves_total','ft','over',.5,.5)), 0.)
-        self.assertLess(p(COMBOS[1]), p(json.loads(GG)))
+        self.assertLess(p(json.loads(GG_CARRY)), p(json.loads(GG)))
+        self.assertEqual(p(json.loads(GG_BOTH)), 0.)
         self.assertLessEqual(p(json.loads(GG)), p(json.loads(HT)))
         self.assertAlmostEqual(p(json.loads(HIGH)) + p(specification('total','ht','under',3.5)), 1., places=10)
         score = dict(status='PEN', home_ht=2, away_ht=2, home_ft=2, away_ft=2,
@@ -88,20 +95,14 @@ class MathAndRouting(unittest.TestCase):
         groups, _ = collect(odds, 321, AT)
         self.assertEqual(next(iter(groups.values()))['specs']['over'], spec)
 
-    def test_conversion_and_colpaccio_have_independent_eligibility(self):
-        def r(p, odd, delta, edge=True):
-            return dict(calibrated=p, statistics=p, odd=odd, ev=p*odd-1,
-                        features=dict(delta_pct=delta, oci=-63),
-                        edge_exclusions=[] if edge else ['missing_price'],
-                        supported=True, spec_kind='total', side='over')
-        rows = {FT:r(.60,2.1,-4), GG:r(.25,6,8), HT:r(.62,2.2,0), HIGH:r(.21,7,0,False)}
-        result = route(rows, None)
-        self.assertEqual(result['lineare']['market_id'], FT)
-        self.assertEqual(result['alternativa']['market_id'], GG)
-        self.assertEqual(result['radar_conversione']['market_id'], FT)
-        self.assertIsNone(result['colpaccio'])
-        rows[HIGH] = r(.21,7,0)
-        self.assertEqual(route(rows, None)['colpaccio']['market_id'], HIGH)
+    def test_conversion_observes_a_market_even_when_triade_has_no_eligible_price(self):
+        p, odd = .42, 2.
+        records = {FT: dict(source_market_id=FT, label='Over 2,5 FT', calibrated=p,
+                            odd=odd, ev=p*odd-1, ev_low=-.2, horizon='FT',
+                            tier='BLU', niche_id='bookmaker_shift_rebound', features={})}
+        triad, signals = route(records, dict(PATTERNS, conversion=True))
+        self.assertEqual(signals['radar_conversione']['market_id'], FT)
+        self.assertTrue(all(pick is None for pick in triad.values()))
 
     def test_snapshot_hash_survives_serialization_and_rejects_postkickoff(self):
         snapshot = json.loads(json.dumps(capture(assessment(), META, AT)))
@@ -112,71 +113,111 @@ class MathAndRouting(unittest.TestCase):
         self.assertIsNone(capture(assessment(), META, START))
         self.assertIsNone(capture(assessment(), dict(META,result={'status':'FT'}), AT))
 
-    def test_active_tiers_share_repriced_v7_and_rollback_restores_v51(self):
-        profiles = {side: {f'for_{p}': dict(sample=8, mean=1.5, without_last=1.5)
-                           for p in ('ft', 'ht')} for side in ('home', 'away')}
-        a = build_matrix(dict(rates=dict(RATES, home_ft=2.3, away_ft=1.4),
-                              profiles=profiles, markets=[]), AT)
+    def test_active_tiers_share_v7_and_started_snapshot_is_immutable(self):
+        a = build_matrix(dict(rates=dict(RATES, home_ft=2.0, away_ft=1.3),
+                              profiles=PROFILES, markets=[]), AT)
         matrix = a['matrix']
         over = next(r for r in matrix['rows'] if r['id'] == FT)
-        legacy = over['statistical_pct']
-        quote = row(json.loads(FT), 2.25, fair=.43)
+        baseline = over['statistical_pct']
+        quote = row(json.loads(FT), 2.10, fair=.60)
         quote.pop('statistical_pct')
-        over.update(quote, first_odd=2.25/.96, bookmaker='Test', oci=38,
-                    market_fair_pct=43, delta_pct=-4, paired_books=4, agreeing_books=3,
+        over.update(quote, first_odd=2.10/.96, bookmaker='Test', oci=38,
+                    market_fair_pct=60, delta_pct=-4, paired_books=4, agreeing_books=3,
                     movement_confirmed=True, fair_direction_coherent=True,
                     selected_movement=dict(delta_pct=-4, fair_delta_pp=2, persistence=.67, reversal=False))
         meta = dict(META, country='Italy', league='Serie A')
-        day = {'matches': [dict(fixture=meta, multimarket=a)]}
-        with patch.dict('os.environ', {'GOLD_PRIVATE': 'true', 'V7_SHADOW_ONLY': 'false'}):
+        fixture = dict(fixture=meta, multimarket=a)
+        day = {'matches': [fixture]}
+        with patch.dict('os.environ', {'GOLD_PRIVATE': 'true', 'V7_SHADOW_ONLY': 'true'}):
             build_board(day, AT)
             snapshot = matrix['v7']
             for policy in ('opportunity_policy', 'platinum_policy'):
                 self.assertEqual(matrix[policy]['probability_model'], snapshot['version'])
                 self.assertEqual(matrix[policy]['best_market_id'], FT)
-            primary = snapshot['signals']['primary']
+            primary = snapshot['triad']['most_probable']
             self.assertEqual(primary['market_id'], FT)
+            self.assertEqual(primary['tier'], 'PLATINUM')
+            self.assertEqual(primary['badge'], '★ PLATINUM')
             self.assertEqual(primary['odd'], over['odd'])
+            self.assertEqual(primary['horizon'], 'FT')
+            self.assertEqual(fixture['display']['primary_choice'], primary)
+            self.assertEqual(fixture['triad'], snapshot['triad'])
+            self.assertEqual(list(stored_offers(a, meta, AT))[0][1], primary)
             self.assertAlmostEqual(over['statistical_pct']/100, snapshot['markets'][FT]['calibrated'], places=6)
-            self.assertAlmostEqual(snapshot['markets'][FT]['v51'], legacy/100)
+            self.assertAlmostEqual(snapshot['markets'][FT]['v51'], baseline/100)
             self.assertAlmostEqual(over['ev_pct'], over['statistical_pct']*over['odd']-100, places=3)
             self.assertTrue(valid_snapshot(snapshot, meta, AT))
             build_board(day, AT)
             self.assertEqual(matrix['v7'], snapshot)
             build_board(day, START)
             self.assertEqual(matrix['v7'], snapshot)
-        with patch.dict('os.environ', {'GOLD_PRIVATE': 'true', 'V7_SHADOW_ONLY': 'true'}):
-            build_board(day, AT)
-            self.assertEqual(matrix['v7']['status'], 'shadow')
-            self.assertNotIn('publication_model', matrix)
-            self.assertEqual(over['statistical_pct'], legacy)
+            self.assertEqual(list(stored_offers(a, meta, START)), [])
 
-    def test_publication_compares_gg_ft_and_executable_combos_and_keeps_roles_distinct(self):
-        gg_ft = market_id(specification('btts', 'ft', 'yes'))
-        no_goal = market_id(specification('btts', 'ft', 'no'))
-        combo = market_id(specification('halves_total', 'ft', 'over', .5, .5))
-        def priced(key, p, odd, excluded=()):
+    def test_triad_orders_by_probability_and_enforces_exact_role_limits(self):
+        def priced(key, p, odd, tier='BLU', niche_id=None, delta=None):
             spec = json.loads(key)
-            return dict(source_market_id=key, spec_kind=spec['kind'], calibrated=p, odd=odd,
-                        ev=p*odd-1, ev_low=p*odd-1.01, edge_exclusions=excluded)
-        records = {gg_ft:priced(gg_ft,.62,1.85), FT:priced(FT,.52,2.1),
-                   combo:priced(combo,.54,2.25), HIGH:priced(HIGH,.12,10.),
-                   no_goal:priced(no_goal,.38,4.)}
-        signals = dict(radar_conversione=None, radar_sorprese=None)
-        tier = publication(records, signals, (None, None, None, None), FT)
-        self.assertEqual(tier, 'radar')
-        self.assertEqual([signals[key]['market_id'] for key in ('primary','consigliata','colpaccio')],
-                         [gg_ft, combo, HIGH])
-        records[combo]['edge_exclusions'] = ['quota_non_eseguibile']
-        publication(records, signals, (None, None, None, None), FT)
-        self.assertEqual(signals['consigliata']['market_id'], FT)
+            return dict(source_market_id=key, label=key, calibrated=p, odd=odd,
+                        ev=p*odd-1, ev_low=p*odd-1.01, tier=tier, niche_id=niche_id,
+                        horizon='PT+ST' if spec in COMBOS else {'ht':'PT','sh':'ST','ft':'FT'}[spec['period']],
+                        features=dict(net_delta_pct=delta))
+        records = {GG_FT:priced(GG_FT,.62,1.85), FT:priced(FT,.52,2.1),
+                   BOTH_GOALS:priced(BOTH_GOALS,.54,2.25),
+                   HT:priced(HT,.48,2.25),
+                   GG:priced(GG,.26,5.), HIGH:priced(HIGH,.21,10.),
+                   AWAY:priced(AWAY,.25,8.,delta=-3.)}
+        triad, _ = route(records, PATTERNS)
+        self.assertEqual([pick['market_id'] for pick in triad.values()], [GG_FT, HT, GG])
+        records[GG]['calibrated'] = .15999
+        self.assertIsNone(route(records, PATTERNS)[0]['high_odds_shot'])
+        records[AWAY]['features']['net_delta_pct'] = 5.
+        self.assertEqual(route(records, PATTERNS)[0]['high_odds_shot']['market_id'], AWAY)
+        records[HT]['ev_low'] = -0.0001
+        self.assertIsNone(route(records, PATTERNS)[0]['recommended_alternative'])
+
+    def test_all_four_niches_require_observed_inputs(self):
+        from context_analysis import congruence_triggers
+        profiles = deepcopy(PROFILES)
+        profiles['home']['against_ft'] = {'xg_mean': 1.}
+        means = {side: {'st': {'sample': 4}} for side in ('home', 'away')}
+        prices = dict(home={'odd': 1.70}, gg_ht={'odd': 5.50, 'features': {'net_delta_pct': 5., 'oci': -51}},
+                      over25_ft={'odd': 1.75, 'features': {'net_delta_pct': -1}},
+                      over15_ht={'odd': 3.50})
+        rates = dict(home_ht=.75, away_ht=.60, home_st=.80, away_st=.80, home_ft=1.55, away_ft=1.40)
+        observed = congruence_triggers(profiles, means, rates, prices, {}, {}, None)
+        self.assertTrue(all(value for key, value in observed.items() if key != 'balanced_1x2_inversion'))
+        self.assertFalse(observed['balanced_1x2_inversion'])
+        balanced = dict(rates, home_ht=.73, away_ht=.62)
+        opening, current = {'1':2.2,'2':2.8}, {'1':2.3,'2':2.7}
+        self.assertTrue(congruence_triggers(profiles, means, balanced, prices, opening, current, .44)
+                        ['balanced_1x2_inversion'])
+        self.assertFalse(congruence_triggers(profiles, means, balanced, prices, opening, opening, .44)
+                         ['balanced_1x2_inversion'])
+        prices['gg_ht']['features']['oci'] = -50
+        prices['home']['odd'] = 1.701
+        self.assertFalse(congruence_triggers(profiles, means, rates, prices, {}, {}, None)['rebound_gg'])
+        self.assertFalse(congruence_triggers(profiles, means, rates, prices, {}, {}, None)['fav_home_pt_vulnerable'])
+        self.assertFalse(congruence_triggers(profiles, {}, rates, prices, {}, {}, None)['pt_st_symmetry_11_22'])
+
+    def test_combo_without_direct_odd_has_a_model_reference_only(self):
+        assessment = build_matrix(dict(rates=RATES, profiles=PROFILES), AT)
+        rows = {r['id']: r for r in assessment['matrix']['rows']}
+        for key in (GG, FT):
+            rows[key].update(row(json.loads(key)))
+        snapshot = capture(assessment, META, AT)
+        reference = snapshot['markets'][GG_CARRY]
+        self.assertIsNone(reference['odd'])
+        self.assertIsNone(reference['ev'])
+        self.assertEqual([leg['market_id'] for leg in reference['reference_legs']], [GG, FT])
+        self.assertAlmostEqual(reference['model_fair_odd'], 1/reference['calibrated'], places=5)
+        rows[FT]['quote_observed_at'] = START
+        self.assertNotIn('reference_legs', capture(assessment, META, AT)['markets'][GG_CARRY])
 
 
 class ArchiveAndWorkflow(unittest.TestCase):
-    def test_scheduled_price_writer_uses_the_same_rollback_flag(self):
+    def test_price_writers_cannot_select_a_different_engine(self):
         for filename in ('v7-maintenance.yml', 'fast_scan.yml', 'night_scan.yml'):
             workflow = (ROOT/'.github/workflows'/filename).read_text()
-            self.assertIn('V7_SHADOW_ONLY: ${{ vars.V7_SHADOW_ONLY }}', workflow)
+            self.assertNotIn('V7_SHADOW_ONLY', workflow)
 
     def test_italian_midnight_partition_and_separate_results(self):
         snap = capture(assessment(), META, AT)

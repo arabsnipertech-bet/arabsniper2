@@ -188,6 +188,51 @@ def persistence_component(value):
     return 15. if 0 < value < 1 else 0.
 
 
+def congruence_triggers(profiles, means, rates, prices, opening, current, opening_share):
+    """Prematch predicates only. A trigger never changes a probability or a price."""
+    from opportunity_policy import numeric
+
+    def minimum(value, floor):
+        return numeric(value) and value >= floor
+
+    def between(value, low, high):
+        return numeric(value) and low <= value <= high
+
+    away, home = profiles.get('away', {}), profiles.get('home', {})
+    ft = rates['home_ft'] + rates['away_ft']
+    ht = rates['home_ht'] + rates['away_ht']
+    pt_share = rates['home_ht']/ht if ht else None
+    favorite = (between(prices['home'].get('odd'), 1.35, 1.70)
+                and minimum(rates['home_ht'], .75)
+                and (minimum(away.get('for_ft', {}).get('without_peak'), .85)
+                     or minimum(away.get('for_ht', {}).get('without_peak'), .35))
+                and (minimum(home.get('against_ft', {}).get('xg_mean'), 1.)
+                     or minimum(means.get('home', {}).get('ht', {}).get('conceded'), .45)))
+    balanced = (bool(opening and current) and between(current.get('1'), 2.10, 2.90)
+                and between(current.get('2'), 2.10, 2.90)
+                and (current['1']-opening['1'])*(current['2']-opening['2']) < 0
+                and between(pt_share, .45, .55) and numeric(opening_share)
+                and abs(pt_share-opening_share) > 1e-9)
+    gg, over, ht_over = (prices[k] for k in ('gg_ht', 'over25_ft', 'over15_ht'))
+    gg_delta, over_delta = (r.get('features', {}).get('net_delta_pct') for r in (gg, over))
+    gg_oci = gg.get('features', {}).get('oci')
+    conversion = (numeric(gg_delta) and gg_delta > 0 and numeric(over_delta) and over_delta < 0
+                  and between(over.get('odd'), 1.75, 2.25))
+    observed_ht = [team.get('for_ht', {}) for team in (home, away)]
+    robust = (all(numeric(team.get(key)) for team in observed_ht for key in ('mean', 'without_last'))
+              and sum(t['without_last'] for t in observed_ht) >= .8*sum(t['mean'] for t in observed_ht))
+    rebound = ht >= 1.35 and robust and between(ht_over.get('odd'), 3., 3.5)
+    rebound_gg = (ht >= 1.35 and robust and minimum(gg.get('odd'), 5.5)
+                  and minimum(gg_delta, 5.) and numeric(gg_oci) and gg_oci < -50)
+    symmetry = (ft >= 2.85 and all(rates[key] >= floor for key, floor in
+                (('home_ht', .55), ('away_ht', .50), ('home_st', .65), ('away_st', .60)))
+                and all(minimum(means.get(side, {}).get('st', {}).get('sample'), 3)
+                        for side in ('home', 'away')))
+    return dict(fav_home_pt_vulnerable=favorite, balanced_1x2_inversion=balanced,
+                pt_st_symmetry_11_22=symmetry, conversion=conversion,
+                rebound=rebound, rebound_gg=rebound_gg)
+
+
 def movement(books, side, include_previous=True):
     """Same operators over the same observation window; no aggregate mix shift."""
     paired=[]

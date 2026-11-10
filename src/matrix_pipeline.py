@@ -1,12 +1,13 @@
 """Strict competition admission and uncapped observation within that scope."""
 from collections import Counter
-import os
 from copy import deepcopy
-from lateral_matrix import MODEL_ID, CONFIG_ID, build_matrix, market_id, specification
+from json import loads
+from lateral_matrix import MODEL_ID, CONFIG_ID, base_specs, build_matrix, market_id, matrix_rows, specification
 from matrix_quotes import expire, safe_price_row, attach
+from market_scope import trim_matrix
 from multimarket_model import stamp
 from opportunity_policy import POLICY_ID, goal_market, numeric
-from platinum_policy import annotate as annotate_platinum, POLICY_ID as PLATINUM_POLICY_ID
+from platinum_policy import POLICY_ID as PLATINUM_POLICY_ID
 from gold_competitions import (SCOPE_ID, profile as whitelist_profile, fixture_allowed,
                                enforce_day, output_allowed)
 
@@ -138,11 +139,16 @@ def complete_day(ns, client, day, as_of):
 
 
 def build_board(day, as_of):
-    from adaptive_calibration import calibration_status
+    from adaptive_calibration import calibration_status, market_of
+    from v7_decision import TRIAD_MARKETS, VERSION, capture, recheck_policies
+    from v7_learning import active_weight
+
     day['calibration_status'] = calibration_status(as_of=as_of)
+    day['decision_model'] = VERSION
     enforce_day(day)
     board = {key: {'label': key, 'selected': [], 'eligible': 0, 'remaining_slots': None, 'started_selections': 0} for key in LEGACY}
     categories = Counter()
+    standard = {market_id(spec): spec for spec in base_specs()}
     modeled, priced, complete, eligible, proposals, platinum = 0, 0, 0, 0, 0, 0
     for match in day.get('matches', []):
         a, meta = match.get('multimarket') or {}, match.get('fixture') or {}
@@ -153,35 +159,50 @@ def build_board(day, as_of):
                     board[row['market']]['started_selections'] += 1
         if a.get('model_id') != MODEL_ID: continue
         matrix = a.setdefault('matrix', {})
-        before_kickoff = kickoff and kickoff > stamp(as_of) and not meta.get('result')
+        before_kickoff = (kickoff and kickoff > stamp(as_of) and not meta.get('result')
+                          and meta.get('status_short') in ('NS', 'TBD'))
         if before_kickoff:
-            prior_stability = deepcopy(matrix.get('v51_stability', matrix.get('proposal_stability')) or {})
-            if matrix.get('publication_model') or matrix.get('v51_stability'):
-                matrix['proposal_stability'] = deepcopy(prior_stability)
+            existing = {row['id'] for row in matrix.get('rows', [])}
+            if a.get('rates') and not standard.keys() <= existing:
+                missing = {key: spec for key, spec in standard.items() if key not in existing}
+                matrix.setdefault('rows', []).extend(matrix_rows(a, missing))
+                trim_matrix(matrix)
             expire(a, meta, as_of)
-            annotate_platinum(matrix, meta, as_of)
+            matrix.pop('decision_shadow', None)
+            matrix.pop('v51_stability', None)
+            matrix['publication_model'] = VERSION
+            weight, learning = active_weight(as_of)
+            snapshot = matrix['v7'] = capture(a, meta, as_of, weight, learning)
+            if snapshot is None:
+                for row in matrix.get('rows', []):
+                    row.update(v7_supported=False, statistical_pct=None, low_pct=None, high_pct=None,
+                               fair_odd=None, ev_pct=None, ev_low_pct=None, ev_high_pct=None)
+                recheck_policies(a, meta, as_of, None)
+            decision = snapshot or {}
+            for key, field in (('gold','opportunity_policy'), ('platinum','platinum_policy')):
+                pick = (decision.get('signals') or {}).get(key) or {}
+                matrix[field]['published_market_id'] = pick.get('source_market_id')
+            match.update({key: decision.get(key) for key in ('tier', 'badge', 'horizon', 'niche_id')},
+                         triad=decision.get('triad', dict.fromkeys(TRIAD_MARKETS)))
+            match.setdefault('display', {}).update(analysis_engine=VERSION,
+                primary_choice=match['triad']['most_probable'],
+                ranked_choices=[pick for pick in match['triad'].values() if pick])
+            if snapshot and 'model' in match:
+                rates = snapshot['rates']
+                raw, calibrated = {}, {}
+                for key, record in snapshot['markets'].items():
+                    spec = loads(key)
+                    name = market_of(spec)
+                    if name:
+                        raw.setdefault(name, {})[spec['side']] = record['raw']
+                        calibrated.setdefault(name, {})[spec['side']] = record['calibrated']
+                match['model'].update(active_engine=VERSION, probabilities_raw=raw,
+                    probabilities_calibrated=calibrated, probabilities=deepcopy(calibrated),
+                    calibration_applied=any(calibrated[k] != raw[k] for k in raw),
+                    calibration={'version': VERSION, 'status': snapshot['calibration'], 'weight': snapshot['weight']},
+                    lambdas={**rates, 'total_ft': rates['home_ft']+rates['away_ft'],
+                             'total_ht': rates['home_ht']+rates['away_ht']})
             quote_monitoring(matrix, as_of, meta.get('kickoff'))
-            from decision_shadow import capture as capture_shadow
-            matrix['decision_shadow'] = capture_shadow(a, meta, as_of, prior_stability)
-            if os.getenv('GOLD_PRIVATE') == 'true' and meta.get('status_short') in ('NS', 'TBD'):
-                from v7_decision import VERSION, capture as capture_v7, recheck_policies
-                from v7_learning import active_weight
-                weight, learning = active_weight(as_of)
-                publish = os.getenv('V7_SHADOW_ONLY') != 'true'
-                if publish:
-                    matrix['v51_stability'] = deepcopy(matrix.get('proposal_stability'))
-                    matrix['publication_model'] = VERSION
-                else:
-                    matrix.pop('publication_model', None)
-                    matrix.pop('v51_stability', None)
-                matrix['v7'] = capture_v7(a, meta, as_of, weight, learning, publish=publish)
-                if publish and matrix['v7'] is None:
-                    recheck_policies(a, meta, as_of, None)
-            from selection_studies import generate_ideas
-            matrix['quote_monitoring']['suppressed_study_candidates'] = []
-            matrix['quote_monitoring']['studio_ideas'] = generate_ideas(
-                a, as_of, meta.get('kickoff'), matrix['quote_monitoring']['suppressed_study_candidates']
-            ) if meta.get('status_short') in ('NS', 'TBD') else []
         rows = [safe_price_row(r) for r in matrix.get('rows', [])]
         modeled += len(rows)
         priced += sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)
@@ -191,12 +212,15 @@ def build_board(day, as_of):
         if not before_kickoff:
             continue  # Immutable forecast, even when it is no longer upcoming.
         indexed = {r['id']: r for r in rows}
-        platinum += bool(a.get('matrix', {}).get('platinum_policy', {}).get('best_market_id'))
+        platinum += bool(matrix.get('platinum_policy', {}).get('published_market_id'))
         a.get('matrix', {})['summary'] = {'categories': dict(category_counts), 'observed_markets': len(rows),
                                         'priced_markets': sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows)}
         policy = a.get('matrix', {}).get('opportunity_policy') or {}
         eligible += policy.get('eligible_markets', 0)
-        proposals += bool(policy.get('best_market_id'))
+        published = next((pick for pick in match['triad'].values()
+                          if pick and pick['tier'] in ('GOLD','PLATINUM')), None)
+        published_id = published['source_market_id'] if published else None
+        proposals += bool(published_id)
         a['selected_markets'], a['best_candidate'] = [], None
         a['markets'] = [r for r in a.get('markets', []) if r.get('market') in LEGACY]
         if market_id(LEGACY['over25_ht']) in indexed and not any(r.get('market') == 'over25_ht' for r in a['markets']):
@@ -206,11 +230,10 @@ def build_board(day, as_of):
         # matrix; these flags no longer restrict fixtures or the other markets.
         for old in a.get('markets', []):
             if old['market'] not in LEGACY: continue
-            equivalents = [r for r in rows if goal_market(r) == old['market'] and
-                           (r.get('opportunity') or {}).get('eligible') is True]
-            new = min(equivalents, key=lambda r: r['opportunity']['rank']) if equivalents else indexed.get(market_id(LEGACY[old['market']]))
+            offered = indexed.get(published_id)
+            new = offered if offered and goal_market(offered) == old['market'] else indexed.get(market_id(LEGACY[old['market']]))
             if not new: continue
-            chosen = (new.get('opportunity') or {}).get('eligible') is True
+            chosen = new['id'] == published_id
             probability = new.get('statistical_pct')
             known_probability = numeric(probability) and 0 <= probability <= 100
             old.update(statistical_pct=probability if known_probability else None,
@@ -235,7 +258,7 @@ def build_board(day, as_of):
             old['opportunity'] = deepcopy(new.get('opportunity') or {})
             old['matrix_market_id'] = new['id']
             old['selection_reasons'] = list(old['opportunity'].get('reasons') or [])
-            old['published_rank'] = old['opportunity'].get('rank')
+            old['published_rank'] = 1 if chosen else None
             old['market_confirmation'] = {'status': {'convergence': 'confirmed', 'contrarian': 'contrary'}.get(old['opportunity'].get('signal'), 'neutral'),
                                          'scope': 'same_market', 'patterns': [], 'probability_bonus': 0}
             if chosen:
@@ -244,9 +267,8 @@ def build_board(day, as_of):
                     board[old['market']]['selected'].append({'fixture_id': str(meta['fixture_id']),
                         'market': old['market'], 'kickoff': meta['kickoff'], 'statistical_pct': new['statistical_pct'],
                         'statistical_score': new['low_pct'], 'confirmation': old['market_confirmation']['status']})
-                if new['id'] == policy.get('best_market_id'):
-                    old['matrix_ev_low_pct'] = new.get('ev_low_pct')
-                    a['best_candidate'] = old
+                old['matrix_ev_low_pct'] = new.get('ev_low_pct')
+                a['best_candidate'] = old
     for key, group in board.items():
         group['selected'].sort(key=lambda r: (r['kickoff'], r['fixture_id']))
         group['eligible'] = len(group['selected'])
@@ -284,9 +306,12 @@ def refresh_exports(day, as_of):
                 'published_rank': row.get('published_rank'), 'opportunity': deepcopy(row.get('opportunity'))}
             candidates.append(candidate)
             if candidate['gate']['eligible']: rankings[row['market']].append(candidate)
-        match['display'] = {'analysis_engine': MODEL_ID, 'primary_choice': a.get('best_candidate'),
-            'ranked_choices': sorted((r for r in candidates if r['gate']['eligible']), key=lambda r: r['published_rank'] or 999),
-            'market_candidates': candidates, 'markets': {}}
+        display = match.setdefault('display', {})
+        if 'triad' not in match:
+            display.update(analysis_engine=MODEL_ID, primary_choice=a.get('best_candidate'),
+                ranked_choices=sorted((r for r in candidates if r['gate']['eligible']),
+                                      key=lambda r: r['published_rank'] or 999))
+        display.update(market_candidates=candidates, markets={})
     for rows in rankings.values(): rows.sort(key=lambda r: (r['published_rank'] or 999, str(r['fixture_id'])))
     day['market_rankings'] = rankings
     day['probability_rankings'] = deepcopy(rankings)

@@ -1,7 +1,7 @@
 """Recover a missing closed-day report from immutable prematch evidence.
 
 Preparation uses an isolated runner. Publication alone takes the shared writer
-lock, imports the complete verified learning chain and preserves the latest scan manifest.
+lock and preserves the latest scan manifest even when V5.1 evidence is incomplete.
 """
 import argparse
 from concurrent.futures import ThreadPoolExecutor
@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 from tempfile import TemporaryDirectory
 
@@ -37,6 +38,29 @@ def report_path(day):
 def complete_day(index, day):
     return all(f'auditarchive/prematch_{day}_{suffix}' in index for suffix in
                ('daily.json', 'daily.md', 'results.json', 'calibration.json', 'checkpoint.json'))
+
+
+def recovery_status(day):
+    return f'auditarchive/prematch_{day}_v51_status.json'
+
+
+def recovery_core(files, day):
+    return all(f'auditarchive/prematch_{day}_{suffix}' in files
+               for suffix in ('daily.json', 'daily.md', 'results.json', 'v7.json'))
+
+
+def recover_legacy(root, day, now, queried):
+    from nightly_auditor import run_command
+    args = [sys.executable, str(ROOT/'auditor/current_audit.py'), 'legacy-evidence',
+            '--root', str(root.resolve()), '--date', str(day), '--as-of', now.isoformat()]
+    if queried:
+        args.append('--results-queried')
+    clock = lambda: datetime.now(TZ)
+    try:
+        run_command(root, args, clock()+timedelta(minutes=6), clock)
+    except (TimeoutError, subprocess.CalledProcessError) as error:
+        return 'partial_v51_skip', 'deadline' if isinstance(error, TimeoutError) else f'exit_{error.returncode}'
+    return 'complete', None
 
 
 def source_set(index, day):
@@ -74,9 +98,14 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
         raise ValueError('Recovery requires a closed Rome date within 14 days')
     index = previous_manifest(storage, bucket)
     if complete_day(index, day) and not refresh:
-        restore_subset(storage, bucket, root, index, [f'auditarchive/prematch_{day}_checkpoint.json'])
+        status = recovery_status(day)
+        needed = [f'auditarchive/prematch_{day}_checkpoint.json']
+        if status in index:
+            needed.append(status)
+        restore_subset(storage, bucket, root, index, needed)
+        legacy = read_store(root/status, {}) if status in index else {}
         receipt = read_store(root/f'auditarchive/prematch_{day}_checkpoint.json')
-        if receipt.get('pending') is False:
+        if receipt.get('pending') is False and legacy.get('status') != 'partial_v51_skip':
             return 'existing'
     sources = source_set(index, day)
     restore_subset(storage, bucket, root, index, sources)
@@ -133,20 +162,29 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
         if not dated.exists() or sum(len(ledger.get(c,{})) for c in ledger.collections) != len(original):
             ledger.write(dated)
 
-    settle_day(root, day, now, fetcher=fetcher)
+    queried = settle_day(root, day, now, fetcher=fetcher, legacy_evidence=False,
+                         progress=lambda message: print(f'Recovery {day}: {message}', flush=True))
     report = read_store(root / report_path(day))
-    if not any(r.get('outcome') is not None for r in report['markets']):
+    v7 = read_store(root/f'auditarchive/prematch_{day}_v7.json')
+    if not any(r.get('outcome') is not None for r in report['markets']) and not v7['counts'].get('settled'):
         raise ValueError('No verified outcomes in the recovered report')
+    status, reason = recover_legacy(root, day, now, queried)
+    write_store(root/recovery_status(day), {'date':str(day), 'status':status, 'reason':reason})
+    print(f'Recovery {day}: V7 ready, V5.1 {status}', flush=True)
     # Stage the complete chain, including immutable parts. Publication runs
     # under the existing writer mutex and checks the original source set again.
     bundle = {}
     pointers = [f'auditordata/prematch_{day}.json', *[p.relative_to(root).as_posix()
                 for p in (root/'auditarchive').glob(f'prematch_{day}_*') if p.is_file()]]
+    if status == 'partial_v51_skip':
+        optional = {f'auditarchive/prematch_{day}_{suffix}' for suffix in ('calibration.json', 'checkpoint.json')}
+        pointers = [path for path in pointers if path not in optional]
     for path, raw_file in recovery_files(root, pointers):
         checksum = sha(raw_file)
         storage.put_object(Bucket=bucket, Key='state/objects/'+checksum, Body=raw_file)
         bundle[path] = {'sha256': checksum, 'bytes': len(raw_file)}
-    staged = {'version': 2, 'date': day.isoformat(), 'sources': sources, 'files': bundle}
+    staged = {'version': 3, 'date': day.isoformat(), 'sources': sources, 'files': bundle,
+              'legacy_status': status}
     raw = gzip.compress(json.dumps(staged, ensure_ascii=False, allow_nan=False,
                                    separators=(',', ':')).encode(), mtime=0)
     digest = sha(raw)
@@ -165,11 +203,13 @@ def install(storage, bucket, root, day, digest, now):
         if sha(raw) != digest:
             raise ValueError('Staged chain checksum mismatch')
         staged = json.loads(gzip.decompress(raw))
-        if (staged.get('version') != 2 or staged.get('date') != day.isoformat()
+        if (staged.get('version') not in (2, 3) or staged.get('date') != day.isoformat()
                 or source_set(index, day) != staged.get('sources')):
             raise ValueError('Frozen sources changed; prepare the day again')
         additions = staged['files']
-        if not complete_day(additions, day):
+        partial = staged['version'] == 3 and staged.get('legacy_status') == 'partial_v51_skip'
+        if (staged['version'] == 3 and not recovery_core(additions, day)
+                or not partial and not complete_day(additions, day)):
             raise ValueError('Incomplete recovered chain')
         dated = f'auditordata/prematch_{day}.json'
         if dated not in additions:
@@ -192,7 +232,16 @@ def install(storage, bucket, root, day, digest, now):
                         if updated is None or fingerprint(updated) != fingerprint(record):
                             raise ValueError('Frozen archive changed')
         from auditor_history_chunks import reusable
-        if not reusable(root, day, now):
+        if partial:
+            from v7_probability import VERSION
+            v7 = read_store(root/f'auditarchive/prematch_{day}_v7.json', {})
+            status = read_store(root/recovery_status(day), {})
+            daily = read_store(root/target, {})
+            if (v7.get('version') != VERSION or v7.get('date') != str(day)
+                    or status.get('status') != 'partial_v51_skip' or status.get('date') != str(day)
+                    or daily.get('audit_date') != str(day)):
+                raise ValueError('Unverified V7 recovery')
+        elif not reusable(root, day, now):
             raise ValueError('Recovered chain does not have a verified receipt')
         if previous_manifest(storage, bucket) != index:
             raise RuntimeError('Private checkpoint advanced during publication')

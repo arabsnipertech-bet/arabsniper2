@@ -147,7 +147,7 @@ class AdaptiveCalibration(unittest.TestCase):
         a = build_matrix(statistical_analysis(match(),NOW),NOW)
         attach(a,feed([bet(6,.5)]),{},META,NOW)
         ref = a['matrix']['calibration_reference']
-        self.assertEqual((len(a['matrix']['rows']),ref['quote_status'],ref['odd']),(60,'recent',1.9))
+        self.assertEqual((len(a['matrix']['rows']),ref['quote_status'],ref['odd']),(73,'recent',1.9))
 
     def test_other_book_display_retains_a_same_contract_closing_offer(self):
         from adaptive_calibration import closing_prices
@@ -186,7 +186,7 @@ class AdaptiveCalibration(unittest.TestCase):
         from opportunity_policy import evaluate as gold
         from platinum_policy import evaluate as platinum
         from test_opportunity_policy import row
-        from test_platinum_policy import CASES
+        from test_platinum_policy import BASE
         delta={'version':VERSION,'n':60,'threshold_delta_pp':1.}
         gold_row=row(ev_pct=.8,ev_low_pct=3.,edge_pp=.9)
         self.assertTrue(gold(gold_row)['eligible'])
@@ -196,7 +196,7 @@ class AdaptiveCalibration(unittest.TestCase):
                       market_fair_pct=49.,calibration=delta)
         reprice(mature)
         self.assertEqual(mature['category'],'value_watch')
-        high={**deepcopy(CASES['base']),'odd':2.7,'first_odd':2.9,'ev_pct':.8,'edge_pp':2.}
+        high={**deepcopy(BASE),'odd':2.7,'first_odd':2.7/.96,'ev_pct':.8,'edge_pp':2.}
         high['delta_pct']=100*(high['odd']/high['first_odd']-1)
         self.assertTrue(platinum(high,AT)['eligible'])
         self.assertFalse(platinum({**high,'calibration':delta},AT)['eligible'])

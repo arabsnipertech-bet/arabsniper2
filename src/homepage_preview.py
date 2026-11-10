@@ -9,6 +9,7 @@ from statistics_first import MODEL_ID, TARGETS
 from matrix_quotes import expire
 from opportunity_policy import POLICY_ID, best_opportunity, goal_market
 from gold_competitions import output_allowed, SCOPE_ID
+from v7_decision import TIER_RANK, stored_offers
 import json
 from copy import deepcopy
 
@@ -57,6 +58,27 @@ def board_spunti(fixture, assessment, now, *, blue_only=False):
     matrix = assessment.get('matrix') or {}
     captured = stamp(assessment.get('captured_at'))
     if not captured or not 0 <= (now-captured).total_seconds() <= 5400 or fixture.get('result'):
+        return
+    if 'triad' in (matrix.get('v7') or {}):
+        for role, selection, row in stored_offers(assessment, fixture, now.isoformat()):
+            tier = selection['tier']
+            if blue_only and tier != 'BLU':
+                continue
+            pick = {k: row.get(k) for k in ('odd', 'first_odd', 'delta_pct', 'bookmaker',
+                                           'movement_confirmed', 'bookmakers_count', 'oci')}
+            if row.get('historical_oci'):
+                pick['oci'] = None
+            pick.update(label=selection['label'], market=goal_market(row),
+                        quote_status=row.get('quote_status'), tier={'BLU': 'Blu', 'GOLD': 'Gold', 'PLATINUM': 'Platinum'}[tier],
+                        role=role, badge=selection['badge'], horizon=selection['horizon'], niche_id=selection['niche_id'],
+                        fixture_id=str(fixture['fixture_id']), match=fixture['match'], kickoff=fixture['kickoff'],
+                        country=fixture.get('country', ''), league=fixture.get('league', ''),
+                        captured_at=(matrix['v7'] or {})['captured_at'],
+                        provider_updated_at=row['provider_updated_at'], statistical_pct=100*selection['probability'],
+                        margin_pct=row.get('selected_margin_pct'),
+                        market_confirmation='confirmed' if tier == 'PLATINUM' else
+                        (row.get('opportunity') or {}).get('signal'))
+            yield (2-TIER_RANK[tier], -selection['probability'], fixture['kickoff'], pick['fixture_id']), pick
         return
     rows = {row.get('id'): row for row in matrix.get('rows', [])}
     for priority, tier, field in ((0, 'Platinum', 'platinum'), (1, 'Gold', 'opportunity'),
@@ -158,7 +180,12 @@ def build_preview(payload, previous=None, now=None, rng=None):
                     or f.get('status_short') not in ('NS', 'TBD') or not output_allowed(match)): continue
             # Preserve the saved snapshot while checking freshness at publication.
             matrix = a.get('matrix') or {}
-            if matrix.get('publication_model'):
+            selection = None
+            if 'triad' in (matrix.get('v7') or {}):
+                selection, row = next(((pick, source)
+                    for _, pick, source in stored_offers(a, f, now.isoformat())
+                    if pick['tier'] in ('GOLD', 'PLATINUM')), (None, None))
+            elif matrix.get('publication_model'):
                 from v7_probability import price_usable
                 selected = (matrix.get('opportunity_policy') or {}).get('best_market_id')
                 row = next((r for r in matrix.get('rows', []) if r['id'] == selected
@@ -170,7 +197,9 @@ def build_preview(payload, previous=None, now=None, rng=None):
                 selected = view['matrix']['opportunity_policy']['best_market_id']
                 row = next((r for r in view['matrix']['rows'] if r['id'] == selected), None)
             if row:
-                candidates.append((row.get('ev_low_pct', -100), {'fixture_id': str(f['fixture_id']),
+                tier_meta = ({key: selection[key] for key in ('tier', 'badge', 'horizon', 'niche_id')}
+                             if selection else {})
+                candidates.append((row.get('ev_low_pct', -100), {**tier_meta, 'fixture_id': str(f['fixture_id']),
                     'match': f.get('match', ''), 'league': f.get('league', ''), 'country': f.get('country'), 'kickoff': f['kickoff'],
                     'label': row['label'], 'market': row['spec']['kind']+'_'+row['period'], 'spec': deepcopy(row['spec']),
                     'odd': row['odd'], 'statistical_pct': row['statistical_pct'],
@@ -181,7 +210,8 @@ def build_preview(payload, previous=None, now=None, rng=None):
                     'movement_confirmed': row.get('movement_confirmed'),
                     'competition_policy': SCOPE_ID,
                     'margin_pct': row.get('selected_margin_pct'),
-                    'model_id': 'lateral-matrix-v5.0', 'captured_at': a.get('captured_at'),
+                    'model_id': matrix.get('publication_model') or 'lateral-matrix-v5.0',
+                    'captured_at': (matrix.get('v7') or {}).get('captured_at') if selection else a.get('captured_at'),
                     'provider_updated_at': row.get('provider_updated_at'),
                     'quote_executable': row.get('quote_executable', True)}))
         candidates.sort(key=lambda x: (-x[0], x[1]['kickoff'], x[1]['fixture_id'], x[1]['label']))

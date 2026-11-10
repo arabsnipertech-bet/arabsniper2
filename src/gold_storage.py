@@ -116,7 +116,7 @@ def publish(s3,bucket,root, *, checkpoint_only=False, selected_paths=None):
     print(f'Private checkpoint saved: {len(index)} files; {len(gold)} Gold feeds')
 
 
-def checkpoint_day(s3, bucket, root, day):
+def checkpoint_day(s3, bucket, root, day, *, legacy=False):
     """Commit one verified priority day without rebuilding Gold or old archives.
 
     The caller holds the normal data-writer mutex. Merge with the current
@@ -124,34 +124,50 @@ def checkpoint_day(s3, bucket, root, day):
     """
     from datetime import date, datetime, timedelta
     from adaptive_calibration import VERSION, VALIDATION_CYCLE
-    from auditor_daily_priority import STATUS, WEIGHTS, signature
+    from auditor_daily_priority import LEGACY_STATUS, STATUS, WEIGHTS, signature, v7_paths, v7_ready
     from auditor_history_chunks import reusable
     from auditor_schedule import ROME
     day = date.fromisoformat(str(day))
     root = Path(root)
-    required = {f'auditordata/prematch_{day}.json', STATUS, WEIGHTS}
+    required = {f'auditordata/prematch_{day}.json', STATUS}
     required.update(f'auditarchive/prematch_{day}_{suffix}' for suffix in
-                    ('daily.json','daily.md','results.json','calibration.json','checkpoint.json'))
+                    ('daily.json', 'daily.md', 'results.json'))
+    status = read_store(root/STATUS, {})
+    today = day+timedelta(days=1)
+    if status.get('version') == 2:
+        if not v7_ready(root, today):
+            raise ValueError('Unverified V7 priority checkpoint evidence')
+        required.update(v7_paths(day).values())
+        legacy_status = read_store(root/LEGACY_STATUS, {})
+        promo = f'auditarchive/prematch_{day}_promo.json'
+        if (root/promo).is_file():
+            required.add(promo)
+        if legacy and legacy_status.get('date') == str(today):
+            required.add(LEGACY_STATUS)
+            # Legacy evidence is optional for the V7 checkpoint.
+            if legacy_status.get('evidence_saved') is True:
+                required.update(f'auditarchive/prematch_{day}_{suffix}' for suffix in ('calibration.json','checkpoint.json'))
+            if legacy_status.get('status') == 'complete':
+                required.add(WEIGHTS)
+    else:
+        required.add(WEIGHTS)
+        required.update(f'auditarchive/prematch_{day}_{suffix}' for suffix in ('calibration.json','checkpoint.json'))
     if any(not (root/path).is_file() or (root/path).is_symlink() for path in required):
         raise ValueError('Missing priority checkpoint evidence')
-    status = read_store(root/STATUS, {})
-    weights = read_store(root/WEIGHTS, {})
     report = root/f'auditarchive/prematch_{day}_daily.json'
-    if (status.get('version') != 1 or status.get('date') != str(day+timedelta(days=1))
-            or status.get('report_date') != str(day)
-            or status.get('report_sha256') != signature(report)
-            or status.get('weights_sha256') != signature(root/WEIGHTS)
-            or weights.get('as_of') != status['date']
-            or weights.get('version') != VERSION
-            or weights.get('validation_cycle') != VALIDATION_CYCLE
-            or read_store(report, {}).get('audit_date') != str(day)
-            or not reusable(root, day, datetime.now(ROME))):
-        raise ValueError('Unverified priority checkpoint evidence')
-    for optional in (f'auditarchive/prematch_{day}_v7.json',
-                     f'auditarchive/prematch_{day}_v7_learning.json',
-                     'data/arab_quote_v7_weights.json'):
-        if (root/optional).is_file():
-            required.add(optional)
+    if status.get('version') != 2:
+        weights = read_store(root/WEIGHTS, {})
+        if (status.get('version') != 1 or status.get('date') != str(today)
+                or status.get('report_date') != str(day)
+                or status.get('report_sha256') != signature(report)
+                or status.get('weights_sha256') != signature(root/WEIGHTS)
+                or weights.get('as_of') != status['date']
+                or weights.get('version') != VERSION
+                or weights.get('validation_cycle') != VALIDATION_CYCLE
+                or read_store(report, {}).get('audit_date') != str(day)
+                or not reusable(root, day, datetime.now(ROME))):
+            raise ValueError('Unverified priority checkpoint evidence')
+        required.update(path for path in v7_paths(day).values() if (root/path).is_file())
     verified = previous_manifest(s3,bucket)
     files = collect(root,verified,patterns=sorted(required))
     additions = {path:{'sha256':sha(raw),'bytes':len(raw)} for path,raw in files.items()}
@@ -202,6 +218,31 @@ def restore_subset(storage, bucket, root, index, paths):
         chunks = {part for parts in pool.map(download, sorted(set(paths))) for part in parts}
         for _ in pool.map(download, sorted(chunks)):
             pass
+
+
+def restore_v7_priority(storage, bucket, root, day):
+    """Restore only the closed day, eligible journals and V7 learning inputs."""
+    from datetime import datetime, time, timedelta
+    from zoneinfo import ZoneInfo
+    from audit_journal import PREFIX
+    from auditor_daily_priority import STATUS, v7_paths
+    from auditor_schedule import MARKER, ROME
+    from v7_archive import day_path
+    from v7_learning import STATE, WINDOW
+
+    index = previous_manifest(storage, bucket)
+    if not index:
+        raise ValueError('Private checkpoint required for V7 priority')
+    cutoff = datetime.combine(day+timedelta(days=1), time(), ROME).astimezone(ZoneInfo('UTC'))
+    journal_cutoff = 'data/'+PREFIX+cutoff.strftime('%Y%m%dT%H%M%S%f')
+    paths = {STATUS, MARKER, STATE, *v7_paths(day).values(),
+             f'auditordata/prematch_{day}.json'}
+    paths.update(f'auditarchive/prematch_{day}_{suffix}' for suffix in ('results.json', 'daily.md', 'promo.json'))
+    paths.update(day_path(Path('.'), day-timedelta(days=i)).as_posix() for i in range(1, WINDOW))
+    paths.update(path for path in index if path.startswith('data/'+PREFIX) and path < journal_cutoff)
+    selected = paths & index.keys()
+    restore_subset(storage, bucket, Path(root), index, selected)
+    print(f'Priority V7 inputs restored: {len(selected)} verified files', flush=True)
 
 
 def restore(s3,bucket,root):
@@ -262,15 +303,17 @@ if __name__=='__main__':
     import argparse
     from datetime import date
     parser=argparse.ArgumentParser()
-    parser.add_argument('command',choices=('publish','restore','checkpoint','checkpoint-day'))
+    parser.add_argument('command',choices=('publish','restore','restore-v7-priority','checkpoint','checkpoint-day'))
     parser.add_argument('--date',type=date.fromisoformat)
+    parser.add_argument('--legacy',action='store_true')
     args=parser.parse_args()
-    if (args.command=='checkpoint-day') != (args.date is not None):
-        parser.error('--date is required only for checkpoint-day')
+    if (args.command in ('checkpoint-day','restore-v7-priority')) != (args.date is not None):
+        parser.error('--date is required for dated priority operations')
     try:
         storage,bucket,root=client(),os.environ['R2_BUCKET'],Path(__file__).resolve().parents[1]
         if args.command=='checkpoint':publish(storage,bucket,root,checkpoint_only=True)
-        elif args.command=='checkpoint-day':checkpoint_day(storage,bucket,root,args.date)
+        elif args.command=='checkpoint-day':checkpoint_day(storage,bucket,root,args.date,legacy=args.legacy)
+        elif args.command=='restore-v7-priority':restore_v7_priority(storage,bucket,root,args.date)
         else:globals()[args.command](storage,bucket,root)
     except Exception as error:
         # Never print SDK request headers/credentials.
