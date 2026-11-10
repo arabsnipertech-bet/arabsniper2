@@ -19,7 +19,7 @@ WORKFLOWS = {
     'telegram-gold-promo.yml', 'telegram-morning-correction.yml',
     'facebook-page.yml', 'facebook-recovery.yml',
 }
-ARTIFACT = re.compile(r'tg-(?:spunti-)?\d{4}-\d{2}-\d{2}-\d{4}-(?:claim|sent|prepared)')
+ARTIFACT = re.compile(r'tg-(?:spunti-)?\d{4}-\d{2}-\d{2}-\d{4}-(?:claim|sent)')
 
 
 def get(url, headers=None, **kwargs):
@@ -60,9 +60,15 @@ def drain_and_import(token, now):
             return fixture_ids(get(f'https://raw.githubusercontent.com/{REPO}/{sha}/{PUBLIC_PATH}').json())
         exposed = set().union(*workers.map(old_feed, source))
 
-        artifacts = api('actions/artifacts', {'per_page': 100, 'created': '>=' + cutoff})
-        if artifacts['total_count'] > 100:
+        def artifact_page(page):
+            return api('actions/artifacts', {'per_page': 100, 'created': '>=' + cutoff, 'page': page})
+        first_page = artifact_page(1)
+        pages = (first_page['total_count'] + 99) // 100
+        if pages > 15:
             raise RuntimeError('Legacy receipt scan exceeds bound')
+        recent = list(first_page['artifacts'])
+        for page in workers.map(artifact_page, range(2, pages + 1)):
+            recent.extend(page['artifacts'])
 
         def download(item):
             path = 'actions/artifacts/' + str(int(item['id'])) + '/zip'
@@ -82,6 +88,8 @@ def drain_and_import(token, now):
                     ids |= fixture_ids(payload)
                     ids.update(str(fid) for fid in payload.get('fixtures', []) if str(fid).isdigit())
             return ids
-        items = [item for item in artifacts['artifacts'] if not item['expired'] and ARTIFACT.fullmatch(item['name'])]
-        exposed.update(set().union(*workers.map(download, items)))
+        items = {item['id']: item for item in recent
+                 if item['created_at'].replace('Z', '+00:00') >= cutoff
+                 and not item['expired'] and ARTIFACT.fullmatch(item['name'])}
+        exposed.update(set().union(*workers.map(download, items.values())))
     return sorted(value for value in exposed if value.isascii() and value.isdecimal())

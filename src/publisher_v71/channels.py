@@ -82,6 +82,18 @@ class Telegram:
         kind = 'rejected' if body.get('ok') is False and code in (400, 401, 403, 404) else 'uncertain'
         raise DeliveryError(kind, f'telegram_http_{response.status_code}')
 
+    def trial_healthy(self, now):
+        from urllib.parse import urlsplit
+        hook = self.call('getWebhookInfo')
+        url = urlsplit(hook.get('url', ''))
+        allowed = hook.get('allowed_updates') or ['message']
+        last_error = hook.get('last_error_date')
+        return (url.scheme == 'https' and url.hostname in
+                ('arabsniperbet.com', 'stripe-checker.arabsnipertech.workers.dev')
+                and url.path == '/api/telegram-webhook' and 'message' in allowed
+                and (not last_error or now.timestamp() - last_error > 3600)
+                and hook.get('pending_update_count', 0) < 20)
+
     def send(self, post, image):
         data = {'chat_id': '@' + CHANNEL, 'caption': post['text'], 'disable_notification':
                 'true' if post['kind'] == 'live' else 'false'}

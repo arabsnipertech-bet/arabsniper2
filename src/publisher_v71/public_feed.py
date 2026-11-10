@@ -15,7 +15,21 @@ BRANCH = 'publisher-public-v71'
 REF = 'refs/heads/' + BRANCH
 
 
-def projection(state, now):
+def historical(source):
+    latest = source.get('latest_verified') or {}
+    settled = latest.get('daily') or {}
+    try:
+        date = latest['date']
+        stamp(date + 'T00:00:00Z').date()
+        won, lost = settled['wins'], settled['losses']
+    except (AttributeError, KeyError, TypeError):
+        return None
+    if not all(type(n) is int and n >= 0 for n in (won, lost)) or won + lost == 0:
+        return None
+    return {'date': date, 'won': won, 'lost': lost}
+
+
+def projection(state, now, past=None):
     report = max(state['reports'].values(), key=lambda item: item['view']['date'], default=None)
     academy = max((p['view'] for p in state['posts'].values() if p['kind'] == 'academy'),
                   key=lambda item: item['date'], default=None)
@@ -30,6 +44,7 @@ def projection(state, now):
         'groups': sorted(groups, key=lambda item: item['free']['kickoff']),
         'live': live['view'] if live and now - stamp(live['view']['observed_at']) < timedelta(hours=24) else None,
         'report': report['view'] if report else None,
+        'historical': historical(past or {}) if not report else None,
         'academy': academy,
         'trial_verified': state['runtime'].get('trial_verified', False),
     }

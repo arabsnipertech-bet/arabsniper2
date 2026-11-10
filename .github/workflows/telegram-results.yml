@@ -5,7 +5,6 @@ on:
       date:
         description: 'Closed match date in Rome (YYYY-MM-DD); blank means yesterday'
         required: false
-      timezone: Europe/Rome
 permissions:
   contents: read
   actions: read

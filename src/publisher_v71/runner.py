@@ -204,7 +204,8 @@ def publish_home(store, candidates, now):
             current = candidates[group['picks'][0]['fixture_id']]
             free = group['picks'][0]
             group['eligible_home'] = all(current[key] == free[key] for key in ('kickoff', 'market', 'odd', 'probability'))
-    view = public_feed.projection(store.state, now)
+    past = safe_read('historical_results', lambda: read_local('data/arab_quote_results_public.json'), {})
+    view = public_feed.projection(store.state, now, past)
     revision = safe_read('homepage', lambda: public_feed.publish(view), None)
     if revision:
         at = clock()
@@ -294,7 +295,10 @@ def main():
     services = {'telegram': Telegram(os.getenv('BOT_TOKEN'))}
     if os.environ.get('FACEBOOK_ENABLED') == 'true':
         services['facebook'] = Facebook(os.getenv('META_TOKEN'))
-    tick(store, services, os.environ['GH_TOKEN'], trial_ok=os.environ.get('TRIAL_VERIFIED') == 'true')
+    trial_ok = cutover.TRIAL_PROVEN and os.environ.get('TRIAL_DISABLED') != 'true'
+    if trial_ok:
+        trial_ok = safe_read('trial_webhook', lambda: services['telegram'].trial_healthy(clock()), False)
+    tick(store, services, os.environ['GH_TOKEN'], trial_ok=trial_ok)
 
 
 if __name__ == '__main__':

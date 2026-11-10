@@ -134,6 +134,7 @@ class CompetitionQualityScope(unittest.TestCase):
         data=json.loads(re.search(rb'^  const rules = (.*);$',script,re.M)[1])
         self.assertEqual(data,browser_data())
         url='/competition-scope.js?v='+sha256(script).hexdigest()[:12]
-        for page,next_script in [('index.html','homepage.js'),('gold-dashboard-live.html','/lateral-matrix.js')]:
-            html=(ROOT/'web'/page).read_text()
-            self.assertIn(f'<script src="{url}"></script><script src="{next_script}?v=',html)
+        html=(ROOT/'web'/'gold-dashboard-live.html').read_text()
+        self.assertIn(f'<script src="{url}"></script><script src="/lateral-matrix.js?v=',html)
+        homepage=(ROOT/'web'/'index.html').read_text()
+        self.assertNotIn('competition-scope.js',homepage)

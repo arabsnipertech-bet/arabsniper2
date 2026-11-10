@@ -69,7 +69,7 @@ def read_board(board, now):
                 or board.get('date') != rome_day(kickoff) or f.get('status_short') != 'NS'
                 or f.get('result') or not output_allowed(item)):
             continue
-        match, league = clean(f.get('match'), 95), clean(f.get('league'), 70)
+        match, league = clean(f.get('match'), 75), clean(f.get('league'), 45)
         if not (match and league):
             continue
         assessment = item.get('multimarket') or {}
@@ -78,7 +78,7 @@ def read_board(board, now):
             continue
         for role, pick, source in stored_offers(assessment, f, utc(now)):
             quote_at = stamp(source.get('provider_updated_at'))
-            label = clean(pick.get('label'), 100)
+            label = clean(pick.get('label'), 70)
             if (not label or not quote_at or not fresh(source.get('provider_updated_at'), now, QUOTE_AGE)
                     or not 0 < pick['probability'] <= 1):
                 continue

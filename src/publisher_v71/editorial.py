@@ -28,7 +28,7 @@ ACADEMY = (
     ('Bilancio e limiti del modello', 'Una settimana con poche selezioni può avere risultati molto variabili. Confronta periodi con criteri omogenei e separa le selezioni pubblicate dalle analisi interne.'),
 )
 OUTCOMES = {'won': 'Corretta', 'lost': 'Errata', 'pending': 'In attesa', 'void': 'Rimborsata'}
-COHORTS = {'public': 'Gratuite pubblicate', 'gold': 'Disponibili in Gold', 'internal': 'Ricerca interna'}
+COHORTS = {'public': 'Gratuite pubblicate', 'gold': 'Gold documentate', 'internal': 'Ricerca interna'}
 
 
 def amount(value, digits=1):
@@ -114,7 +114,7 @@ def message(kind, view, marker, channel):
     caption = '\n\n'.join([heading, *filter(None, lines), footer])
     if channel == 'telegram' and len(caption.encode('utf-16-le')) // 2 > 1024:
         if kind == 'best':
-            lines = [line[:145] for line in lines]
+            lines[2] = lines[2][:100]
         elif kind == 'report':
             lines = [*report_copy(view), *(line[:70] for line in lines[3:])]
         caption = '\n\n'.join([heading, *filter(None, lines), footer])

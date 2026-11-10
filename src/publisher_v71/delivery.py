@@ -76,7 +76,13 @@ def attempt(store, post, service, candidates, clock, emit):
         emit(post, blocked)
         return
 
-    image = None if post.get('edit_id') else card(post['kind'], post['view'])
+    try:
+        image = None if post.get('edit_id') else card(post['kind'], post['view'])
+    except (OSError, ValueError) as exc:
+        post.update(status='failed', reason='render_' + type(exc).__name__)
+        store.save()
+        emit(post, post['reason'])
+        return
     now = clock()
     blocked = can_send(post, now, candidates)
     if blocked:
@@ -96,6 +102,11 @@ def attempt(store, post, service, candidates, clock, emit):
             post.update(status='uncertain' if exc.kind == 'uncertain' else 'failed', reason=exc.reason)
         store.save()
         emit(post, post['status'] + '_' + exc.reason)
+        return
+    except Exception as exc:
+        post.update(status='uncertain', reason='transport_' + type(exc).__name__)
+        store.save()
+        emit(post, post['reason'])
         return
     post.update(status='sent', receipt=receipt)
     store.save()

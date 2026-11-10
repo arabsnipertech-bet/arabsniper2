@@ -157,7 +157,7 @@ jobs:
       META_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
       API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
       FACEBOOK_ENABLED: ${{ vars.PUBLISHER_V71_FACEBOOK_DISABLED != 'true' }}
-      TRIAL_VERIFIED: ${{ vars.PUBLISHER_V71_TRIAL_VERIFIED == 'true' }}
+      TRIAL_DISABLED: ${{ vars.PUBLISHER_V71_TRIAL_DISABLED }}
       PUBLISHER_DISABLED: ${{ vars.PUBLISHER_V71_DISABLED }}
       R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
       R2_BUCKET: arabsniper-gold
@@ -171,6 +171,7 @@ jobs:
             /src/
             /data/arab_quote_homepage.json
             /data/live_watchlist.json
+            /data/arab_quote_results_public.json
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:

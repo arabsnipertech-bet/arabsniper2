@@ -110,9 +110,18 @@
       el('publisher-academy').replaceChildren(...content)
     }
     reportCards(payload?.report)
-    if (payload?.trial_verified === true) {
-      el('publisher-trial-copy').textContent = 'Apri @ArabSniperBot, invia /prova e verifica l’email. La prova Gold dura 7 giorni, senza carta e senza rinnovo automatico.'
+    if (!payload?.report && payload?.historical) {
+      const previous = payload.historical
+      const when = new Date(previous.date + 'T12:00:00Z')
+      el('results-content').replaceChildren(
+        node('p', 'Archivio verificato · edizione precedente', 'eyebrow'),
+        node('h3', `Giornata del ${shortDate.format(when)}`),
+        node('p', `${previous.won} corrette · ${previous.lost} errate`, 'model-number'),
+        node('p', 'Il report V7.1 comparirà dopo il primo ciclo certificato.', 'muted'))
     }
+    el('publisher-trial-copy').textContent = payload?.trial_verified === true
+      ? 'Apri @ArabSniperBot, invia /prova e verifica l’email. La prova Gold dura 7 giorni, senza carta e senza rinnovo automatico.'
+      : 'Apri il bot ufficiale per consultare le opzioni di prova Gold.'
   }
 
   async function refresh() {
