@@ -305,7 +305,7 @@ console.log('HT observation and joint movements: missing markets, absent history
 // Both Over movements are visible in the main feed without opening a dossier.
 vm.runInContext("contextFeed='over25_ft'",researchContext);
 const overview=vm.runInContext('contextOdds(feedFixture,true)',researchContext);
-for(const label of ['1 · Casa','X · Pareggio','2 · Ospite','Over 1,5 PT','Over 2,5 FT','Stat.','Book','Apertura*','Attuale'])assert(overview.includes(label));
+for(const label of ['1 · Casa','X · Pareggio','2 · Ospite','Over 1,5 PT','Over 2,5 FT','Stat.','Book','Prima osservata','Attuale'])assert(overview.includes(label));
 assert(!overview.includes('<details class="cx-detail">'));
 assert(overview.includes('cx-overview-cell'));
 assert(!overview.includes('Over 3,5 FT'));

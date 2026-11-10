@@ -496,7 +496,7 @@
    '<span>Statistica <b>'+pct(row.statistical_pct)+'</b></span>';
   const priceLabel=saved?'Ultima osservata':row.quote_status==='cached_stable'?'Quota stabile da cache':recent?'Attuale':Number.isFinite(row.last_odd)?'Ultima quota · da confermare':'Quota non ricevuta';
   const observed=saved?flow.quote_observed_at:flow.provider_updated_at;
-  return '<section class="mx-quote-cell"><h4>'+esc(title)+'</h4><div class="mx-quote-pair"><span title="Quota iniziale rilevata presso lo stesso operatore">Apertura<b>'+num(flow.first_odd,2)+'</b></span><span>'+priceLabel+'<b>'+num(saved||recent?flow.odd:row.last_odd,2)+'</b></span></div>'+movementSignal(flow,!!saved)+
+  return '<section class="mx-quote-cell"><h4>'+esc(title)+'</h4><div class="mx-quote-pair"><span title="Prima quota reale osservata presso lo stesso operatore; non apertura ufficiale">Prima osservata<b>'+num(flow.first_odd,2)+'</b></span><span>'+priceLabel+'<b>'+num(saved||recent?flow.odd:row.last_odd,2)+'</b></span></div>'+movementSignal(flow,!!saved)+
    '<div class="mx-quote-metrics">'+statistics+'<span>'+(saved||older?'Ultimo OCI osservato':'OCI')+' <b>'+signed(displayOci(pressure).value)+'</b></span><span>Aggio mediano <b>'+pct(flow.margin_pct)+'</b> '+esc(band)+'</span><span>Δ aggio <b>'+signed(flow.margin_delta_pp)+' pt</b></span>'+
    (study&&row.quality&&QUALITY[row.quality]?'<span>'+esc(QUALITY[row.quality])+'</span>':'')+
    (study&&Number.isFinite(flow.speed_pp_per_hour)?'<span>Velocità <b>'+num(flow.speed_pp_per_hour,1)+' pp/ora</b></span>':'')+
@@ -514,7 +514,7 @@
   const goals=[['total','ht','over',1.5,'Over 1,5 PT'],['total','ft','over',2.5,'Over 2,5 FT'],['total','ft','over',3.5,'Over 3,5 FT'],['btts','ht','yes',null,'GG PT']];
   if(study)goals.splice(1,0,['total','ht','over',2.5,'Over 2,5 PT']);
   const combo=study&&rows.find(isCombo);
-  return '<section class="mx-quote-board" aria-label="Quote 1X2 apertura e attuale">'+(study?studyHeader(study):'')+'<h4 class="mx-section-title">QUOTE 1 · X · 2 — APERTURA E ATTUALE</h4><div class="mx-1x2">'+[['1','1 · Casa'],['x','X · Pareggio'],['2','2 · Ospite']].map(([s,l])=>quoteCell(find('result','ft',s),l,helpers,study)).join('')+'</div>'+
+  return '<section class="mx-quote-board" aria-label="Quote 1X2 prima osservata e attuale">'+(study?studyHeader(study):'')+'<h4 class="mx-section-title">QUOTE 1 · X · 2 — PRIMA OSSERVATA E ATTUALE</h4><div class="mx-1x2">'+[['1','1 · Casa'],['x','X · Pareggio'],['2','2 · Ospite']].map(([s,l])=>quoteCell(find('result','ft',s),l,helpers,study)).join('')+'</div>'+
    '<details class="mx-more-quotes"><summary>Quote gol e altri indicatori</summary><div class="mx-goal-quotes">'+goals.map(([k,p,s,l,t])=>quoteCell(find(k,p,s,l),t,helpers,study)).join('')+(combo?quoteCell(combo,'Combo Over 0,5 PT + Over 0,5 ST',helpers,study):'')+'</div></details></section>';
  }
  function timingContext(context){
@@ -586,7 +586,7 @@
   const observed=studyObservation(row,options.study);
   const stats=base?'<strong>'+pct(base.probability)+'</strong><small>Poisson prematch · Quota equa '+num(base.fair,2)+' · '+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>':
    '<strong>'+pct(row.statistical_pct)+'</strong><small>Equa '+num(row.fair_odd,2)+' · '+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>';
-  const prices=observed?'<strong>'+num(observed.odd,2)+'</strong><small>Ultima osservata · apertura '+num(observed.first_odd,2)+' · '+signed(observed.delta_pct)+'%</small>':price(row);
+  const prices=observed?'<strong>'+num(observed.odd,2)+'</strong><small>Ultima osservata · prima osservata '+num(observed.first_odd,2)+' · '+signed(observed.delta_pct)+'%</small>':price(row);
   const priceTime=observed?.quote_observed_at||row.provider_updated_at;
   const reading=options.study&&!Number.isFinite((observed||row).oci)?studyObservation(row,options.study,true):null;
   const flow=reading||observed||row;
@@ -698,7 +698,7 @@
   const oci=reading.value,margin=(priced(row)||saved)?flow.selected_margin_pct??flow.margin_pct:null;
   return '<section class="mx-cockpit mx-tone-'+tier.tone+'"><div class="mx-cockpit-heading"><span class="mx-category">'+tier.name+'</span><span>ANALISI PREPARTITA</span></div>'+
    (!inline&&tier.row?'<div class="mx-official-reference" data-official-proposal><strong>'+esc(caption)+'</strong><span>'+esc(tier.row.label)+' · '+num(tier.row.odd,2)+'</span><small>Resta la proposta iniziale mentre esplori altri mercati.</small></div>':'')+'<label class="mx-instrument-select">Mercato visualizzato<select '+(inline?'data-mx-inline-instrument="'+esc(fid)+'"':'data-mx-instrument')+'><option value="">'+(tier.row?esc(caption)+' · '+esc(tier.row.label):studyDefault?(statisticalDefault?'Studio statistico · ':'Miglior spunto · ')+esc(studyDefault.label):'Scegli un mercato da osservare')+'</option>'+rows.map(r=>'<option value="'+esc(r.id)+'" '+(r.id===selectedId?'selected':'')+'>'+esc(r.label)+'</option>').join('')+'</select></label>'+
-   (row?'<div class="mx-cockpit-pick"><div><small>'+(row===tier.row?esc(caption.toUpperCase()):row===studyDefault?(statisticalDefault?'STUDIO STATISTICO · VALORE NON CONFERMATO':'MIGLIOR SPUNTO · SOLO STUDIO'):'MERCATO IN OSSERVAZIONE')+'</small><h3>'+esc(row.label)+'</h3></div><div class="mx-cockpit-price"><small>'+(saved?'Apertura → ultima osservata':'Apertura → quota attuale')+'</small>'+(saved?'<span class="mx-price">'+num(flow.first_odd,2)+' → <b>'+num(flow.odd,2)+'</b></span><small>Storico · da confermare</small>':price(row))+'</div></div>':'<p class="mx-cockpit-empty">Le analisi di studio restano consultabili: scegli il mercato per leggere i suoi indicatori.</p>')+
+   (row?'<div class="mx-cockpit-pick"><div><small>'+(row===tier.row?esc(caption.toUpperCase()):row===studyDefault?(statisticalDefault?'STUDIO STATISTICO · VALORE NON CONFERMATO':'MIGLIOR SPUNTO · SOLO STUDIO'):'MERCATO IN OSSERVAZIONE')+'</small><h3>'+esc(row.label)+'</h3></div><div class="mx-cockpit-price"><small>'+(saved?'Prima osservata → ultima osservata':'Prima osservata → quota attuale')+'</small>'+(saved?'<span class="mx-price">'+num(flow.first_odd,2)+' → <b>'+num(flow.odd,2)+'</b></span><small>Storico · da confermare</small>':price(row))+'</div></div>':'<p class="mx-cockpit-empty">Le analisi di studio restano consultabili: scegli il mercato per leggere i suoi indicatori.</p>')+
    (statisticalDefault&&row===studyDefault?'<p class="mx-cockpit-note" data-study-default>Mercato gol con la maggiore probabilità prudente disponibile; a parità, probabilità centrale. Stima disponibile per lo studio. Nessuna stella Radar o proposta Gold.</p>':'')+
    (!inline&&!active?goalPanels(m):'')+
    '<div class="mx-instruments">'+instrument('OCI',oci,-100,100,'',reading.label)+instrument('Probabilità modello',probability,0,100,'%','Stima statistica prematch')+instrument('Aggio',margin,0,20,'%','Più basso = minor margine')+'</div>'+
@@ -949,7 +949,7 @@
   const {title,label,odd,first,note,probability,v7}=proposal;
   return '<section class="mx-compact-proposal" aria-label="Migliore proposta"><div><small>'+esc(title)+'</small><strong>'+esc(label)+'</strong>'+
    (v7?'<small>'+pct(probability)+' · probabilità V7</small>':'')+'</div><div class="mx-compact-proposal-price"><b>'+num(odd,2)+'</b><small>'+esc(note)+'</small>'+
-   (v7&&Number.isFinite(first)?'<small>Apertura '+num(first,2)+'</small>':'')+'</div></section>';
+   (v7&&Number.isFinite(first)?'<small>Prima osservata '+num(first,2)+'</small>':'')+'</div></section>';
  }
  function compactQuotes(rows,{kickoff,closed=false}={}){
   const validQuote=value=>Number.isFinite(value)&&value>1?value:null;

@@ -74,7 +74,7 @@ assert(api.movementSignal({...priced,delta_pct:5}).includes('↑ +5,0%'));
 assert(api.movementSignal({...priced,delta_pct:1}).includes('mx-net-green'));
 assert(api.movementSignal({...priced,delta_pct:10,quote_status:'stale'}).includes('Storico assente'));
 const cell=api.quoteCell({...priced,first_odd:2.2,delta_pct:-9.09,margin_pct:4,oci:55},'1 · Casa');
-assert(cell.includes('Apertura'));assert(cell.includes('Attuale'));assert(cell.includes('2,20'));assert(cell.includes('OCI'));assert(cell.includes('Aggio'));
+assert(cell.includes('Prima osservata'));assert(cell.includes('Attuale'));assert(cell.includes('2,20'));assert(cell.includes('OCI'));assert(cell.includes('Aggio'));
 assert(api.opportunityPanel([priced,asian]).includes('MIGLIOR VALORE STIMATO'));
 const oldHandicap={...asian,spec:{kind:'handicap',period:'ft',side:'home',line:.25},quote_adapter_version:1,odd:12,oci:99,margin_pct:4};
 const legacyMatch={multimarket:{matrix:{rows:[oldHandicap,priced]}}};
@@ -428,7 +428,7 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  for(const t of ['Attuale<b>2,10','Ultimo OCI osservato','Nuovo','Archivio','4/6',at])assert(newer.includes(t),t);
  assert(!newer.includes('Ultima osservata<b>2,04'));
  assert(api.marketRow(partial,{}, {study}).includes('Ultimo OCI osservato · Archivio'));
- assert(api.marketRow(stale,{}, {study}).includes('apertura 2,40'));
+ assert(api.marketRow(stale,{}, {study}).includes('prima osservata 2,40'));
  assert.equal(api.studyObservation(stale,{...blank,now:Date.parse(at)-1}),null);
  assert.equal(api.studyObservation(stale,{...blank,kickoff:at}),null);
  const invalid={...stale,quote_status:'invalid_adapter'};
