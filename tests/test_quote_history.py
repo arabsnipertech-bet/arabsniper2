@@ -101,9 +101,12 @@ class PersistentPrices(unittest.TestCase):
 
     def test_cache_refresh_retains_actual_acquisition_time_and_does_not_write_journal(self):
         raw = payload()
+        raw['response'][0]['bookmakers'][0]['bets'].append({'id':184,'name':'To Score in Both Halves',
+            'values':[{'value':'Yes','odd':'2.0'},{'value':'No','odd':'1.9'}]})
         raw['response'][0]['_observed_at'] = AT
         groups, _ = collect(raw, 100, '2026-10-26T10:00:00Z')
-        self.assertEqual(next(iter(groups.values()))['observed_at'], AT)
+        self.assertTrue(all(g['observed_at']==AT for g in groups.values()))
+        self.assertTrue(any(g.get('bet_id')==184 for g in groups.values()),'Direct combo uses its real acquisition time too')
         raw['response'][0]['_observed_at'] = '2026-10-26T11:00:00Z'
         self.assertFalse(collect(raw, 100, '2026-10-26T10:00:00Z')[0])
 

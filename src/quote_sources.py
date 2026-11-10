@@ -192,6 +192,8 @@ def direct_combo_groups(payload, fid, observed_at):
         fixture = record.get('fixture') or {}
         at, start = stamp(record.get('update')), stamp(fixture.get('date'))
         if str(fixture.get('id')) != str(fid) or not all((at, start, now)) or at > now or now >= start: continue
+        actual_observation = stamp(record.get('_observed_at'))
+        if actual_observation and (actual_observation > now or at > actual_observation): continue
         for book in record.get('bookmakers', []):
             if book.get('id') is None: continue
             for bet in book.get('bets', []):
@@ -215,7 +217,9 @@ def direct_combo_groups(payload, fid, observed_at):
                     key=f'direct_combo_discovery_v1|{discovery["source_token"]}|{group}|{book["id"]}'
                 candidate = {'odds':odds, 'specs':{'over':dict(spec)},
                     'complete':True, 'bookmaker_id':str(book['id']), 'bookmaker':str(book.get('name') or book['id']),
-                    'bet_id':int(bid), 'group':group, 'observed_at':observed_at, 'provider_updated_at':record['update'],
+                    'bet_id':int(bid), 'group':group,
+                    'observed_at':actual_observation.isoformat() if actual_observation else observed_at,
+                    'provider_updated_at':record['update'],
                     'quote_source':'bookmaker', 'quote_executable':True,
                     'quote_provenance':{'version':SOURCE_VERSION, 'kind':'direct_combo',
                         'source_bet_id':discovery.get('source_bet_id',int(bid)), 'discovery':discovery,
