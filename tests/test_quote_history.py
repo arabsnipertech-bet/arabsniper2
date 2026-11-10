@@ -229,8 +229,8 @@ class IncrementalAcquisition(unittest.TestCase):
         from statistics_first import statistical_analysis
         from test_statistics_first import match
         from v7_maintenance import incremental, MARKER
-        now = datetime(2026,10,26,10,32,tzinfo=timezone.utc)
-        kickoff = '2026-10-26T12:00:00+00:00'
+        now = datetime(2026,10,26,11,32,tzinfo=timezone.utc)
+        kickoff = '2026-10-26T13:00:00+00:00'
         old = payload()
         old['response'][0]['fixture']['date'] = kickoff
         current = payload(now.isoformat(), 1.8)
