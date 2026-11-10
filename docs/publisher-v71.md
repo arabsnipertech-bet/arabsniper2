@@ -12,6 +12,8 @@ Il Publisher legge i board Gold già pubblicati in R2 e usa il primo ruolo V7 co
 | Dentro i Numeri | Dalle 16:45, con rinvio in presenza di una BEST da inviare. | Telegram, Meta, homepage. |
 | Gold | Martedì e sabato dalle 12:15, se il webhook della prova risulta disponibile. | Telegram, Meta, homepage. |
 
+Il recupero editoriale già avviato dal timer esterno riattiva lo stesso Publisher quando manca un ciclo recente. La verifica avviene dopo il marcatore pubblico e usa il medesimo registro degli invii.
+
 Una singola richiede una proposta Probabile di livello Gold o Platinum e una finestra fra 20 e 45 minuti. Nei giorni con più gare, il Publisher può creare ulteriori gruppi se superano gli stessi controlli. L’ora UTC identifica gli eventi nel registro, l’ora di Roma determina giorno e orari editoriali.
 
 ## Ricevute e riscontri

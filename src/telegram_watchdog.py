@@ -6,6 +6,7 @@ each target workflow retains its own validation, dedup and freshness checks.
 import json
 import os
 from datetime import datetime, timedelta, timezone, time
+from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -105,13 +106,40 @@ def wake(api,now,dry_run=False):
     return planned
 
 
+PUBLISHER_WORKFLOW = 'publisher-v71.yml'
+PUBLISHER_INTERVAL = timedelta(minutes=17)
+
+
+def wake_publisher(api, now, *, dry_run=False):
+    """Wake the existing Publisher if neither its cron nor Fast woke it recently."""
+    path = 'workflows/' + PUBLISHER_WORKFLOW
+    if api.request(path).get('state') != 'active':
+        return 'workflow_disabled'
+    for run in api.runs(PUBLISHER_WORKFLOW, now - timedelta(minutes=45)):
+        if run['status'] != 'completed':
+            return 'already_running'
+        created = datetime.fromisoformat(run['created_at'].replace('Z', '+00:00'))
+        if now - created < PUBLISHER_INTERVAL:
+            return 'recent_cycle'
+    if dry_run:
+        return 'would_dispatch'
+    api.request(path + '/dispatches', {'ref': 'main', 'inputs': {'dry_run': 'false'}})
+    return 'dispatched'
+
+
 def main():
-    from publisher_v71.cutover import ENABLED
-    if ENABLED:
-        print('Editorial recovery is owned by Publisher V7.1')
-        return
     if os.environ.get("GITHUB_REPOSITORY")!=REPO or os.environ.get("GITHUB_REF")!="refs/heads/main":
         raise RuntimeError("Production main only")
+    from publisher_v71.cutover import ENABLED
+    if ENABLED:
+        public_path = Path(__file__).resolve().parents[1] / 'data/arab_quote_homepage.json'
+        with public_path.open(encoding='utf-8') as source:
+            safe = json.load(source).get('publisher') == 'v7.1'
+        result = (wake_publisher(GitHub(os.environ.get('GITHUB_TOKEN')), datetime.now(ROME),
+                                 dry_run=os.environ.get('FAST_BACKUP_DRY_RUN') == 'true')
+                  if safe else 'awaiting_safe_public_projection')
+        print(json.dumps({'publisher_watchdog': result}))
+        return
     result=wake(GitHub(os.environ.get("GITHUB_TOKEN")),datetime.now(ROME),
                 dry_run=os.environ.get("FAST_BACKUP_DRY_RUN")=="true")
     print(json.dumps({"telegram_watchdog":result},ensure_ascii=False))
