@@ -18,7 +18,8 @@ from telegram_slots import WINDOWS, EDITORIAL, CHANNEL_SLOTS
 UTC_CRONS = {"30 22,23,2,3,10,11,15,16,17 * * *", "0 11,12,18,19,20,21 * * *",
              "45 8,9,10,11,14,15 * * *", "15 15,16 * * *"}
 MARKETS = {"over15_ht": ("ht", 2), "over25_ht": ("ht", 3), "gg_ht": ("ht", "gg"),
-           "over25_ft": ("ft", 3), "over35_ft": ("ft", 4)}
+           "over25_ft": ("ft", 3), "over35_ft": ("ft", 4),
+           "over15_sh": ("sh", 2), "over25_sh": ("sh", 3), "gg_sh": ("sh", "gg")}
 FINAL = {"FT", "AET", "PEN"}
 LIVE = {"1H", "HT", "2H", "ET", "BT", "P", "LIVE"}
 
@@ -59,6 +60,7 @@ def picks(feed, now, window=None, limit=3, exclude=None):
                          score=float(row.get("score") if private else policy.get("playability_score") or 0),
                          signal=row.get("signal") if private else policy.get("signal") or "unconfirmed",
                          tier=row.get("source_tier") or "gold",
+                         horizon=row.get("horizon"), niche_id=row.get("niche_id"), badge=row.get("badge"),
                          strict=bool(row.get("strict") if private else policy.get("strict_eligible", False)),
                          stable=bool(row.get("stable")) if private else (policy.get("stability") or {}).get("status") == "strict",
                          market_confirmed=bool(row.get("market_confirmed")) if private else row.get("market_confirmation") == "confirmed",
@@ -147,16 +149,24 @@ def verdict(pick, score, now):
     if status == "LIVE" and period == "ht":
         return "Periodo live da verificare"
     field = ("halftime" if period == "ht" else "fulltime") if ended else "goals"
-    if period == "ft" and status in {"ET", "BT", "P"}:
+    if period != "ht" and status in {"ET", "BT", "P"}:
         field, ended = "fulltime", True
     value = score.get(field) or {}
     h, a = value.get("home"), value.get("away")
     if not all(type(x) is int and x >= 0 for x in (h,a)):
         return "Punteggio da verificare"
+    if period == "sh":
+        if status not in FINAL | {"2H", "ET", "BT", "P"}:
+            return "Secondo tempo in attesa"
+        ht = score.get("halftime") or {}
+        ph, pa = ht.get("home"), ht.get("away")
+        if not all(type(x) is int and x >= 0 for x in (ph, pa)) or ph > h or pa > a:
+            return "Punteggio da verificare"
+        h, a = h-ph, a-pa
     hit = min(h,a) > 0 if target == "gg" else h+a >= target
     state = ("✅ Centrato" if hit else "❌ Non centrato") if ended else ("🟢 Soglia raggiunta live" if hit else "In corso")
     minute = score.get("elapsed")
-    phase = ("PT" if period == "ht" else "FT") if ended else (f"{minute}′" if isinstance(minute,int) else status)
+    phase = {"ht":"PT","sh":"ST","ft":"FT"}[period] if ended else (f"{minute}′" if isinstance(minute,int) else status)
     return f"{state} · {phase} {h}–{a}"
 
 def gh(*args):

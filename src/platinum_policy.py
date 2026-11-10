@@ -1,10 +1,10 @@
-"""Independent price/flow tier. Never edits a Gold decision or probability."""
-from opportunity_policy import RULES_REVISION, goal_market, numeric, probability_order
+"""Gold admission with additional confirmed multi-operator flow."""
+from opportunity_policy import RULES_REVISION, evaluate as evaluate_gold, goal_market, numeric, probability_order
 from multimarket_model import stamp
 
 LEGACY_POLICY_ID = 'platinum-flow-v1'
 POLICY_ID = 'platinum-flow-v1.1'
-LIMITS = {'min_oci': 30, 'max_delta_pct': -3, 'max_margin_pct': 9,
+LIMITS = {'min_oci': 30, 'max_delta_pct': -3, 'max_margin_pct': 8,
           'min_persistence': .5, 'min_agreeing_books': 2,
           'min_ev_low_pct': 2., 'secondary_oci': 50}
 
@@ -40,27 +40,29 @@ def flow_rejections(row, as_of, max_drop):
     return reasons
 
 
-def evaluate(row, as_of):
-    from adaptive_pricing import gate_passes
-
+def evaluate(row, as_of, gold=None):
+    if gold is None:
+        gold = evaluate_gold(row)
     reasons = flow_rejections(row, as_of, LIMITS['max_delta_pct'])
-    ev, ev_low = row.get('ev_pct'), row.get('ev_low_pct')
-    if not numeric(ev):
-        reasons.append('ev_unavailable')
-    elif ev <= 0:
-        reasons.append('ev_floor')
-    elif not gate_passes(row, 0.):
-        reasons.append('edge')
-    if not numeric(ev_low) or ev_low < LIMITS['min_ev_low_pct']:
-        reasons.append('sensitivity')
+    if gold.get('eligible') is not True:
+        reasons.extend(gold.get('reasons') or ['gold_requirements'])
+    move = row.get('selected_movement') or {}
+    if move.get('persistence') == 1.:
+        reasons.append('persistence')
+    oci = row.get('oci')
+    secondary = not reasons and numeric(oci) and oci >= LIMITS['secondary_oci']
+    if numeric(oci) and oci >= LIMITS['secondary_oci']:
+        reasons.append('oci_secondary_to_gold')
+    reasons = list(dict.fromkeys(reasons))
     eligible = not reasons
     return {'policy_id': POLICY_ID, 'rules_revision': RULES_REVISION, 'eligible': eligible, 'rank': None,
             'evaluated_at': as_of, 'reasons': reasons,
             'value_cohort': 'platinum_positive_ev' if eligible else None,
             'positive_ev_shadow_eligible': eligible,
             'qualification': 'flow_and_value' if eligible else None,
-            'secondary_to_gold': eligible and row['oci'] >= LIMITS['secondary_oci'],
-            'gold_eligible': (row.get('opportunity') or {}).get('eligible') is True}
+            'secondary_to_gold': secondary,
+            'min_ev_low_pct': gold.get('min_ev_low_pct'),
+            'gold_eligible': gold.get('eligible') is True}
 
 
 def annotate(matrix, meta, as_of, *, probability_model=None, quote_filter=None):
@@ -71,7 +73,8 @@ def annotate(matrix, meta, as_of, *, probability_model=None, quote_filter=None):
     for row in matrix.get('rows', []):
         if goal_market(row) is None:
             continue
-        row['platinum'] = evaluate(row, as_of)
+        gold = row.get('opportunity') or {}
+        row['platinum'] = evaluate(row, as_of, gold if gold.get('rules_revision') == RULES_REVISION else None)
         reason = quote_filter(row) if quote_filter else None
         if reason:
             d = row['platinum']
@@ -79,9 +82,9 @@ def annotate(matrix, meta, as_of, *, probability_model=None, quote_filter=None):
                      value_cohort=None, positive_ev_shadow_eligible=False, secondary_to_gold=False)
         if row['platinum']['eligible']: candidates.append(row)
     if probability_model:
-        candidates.sort(key=lambda r: (r['platinum']['secondary_to_gold'], probability_order(r)))
+        candidates.sort(key=probability_order)
     else:
-        candidates.sort(key=lambda r: (r['platinum']['secondary_to_gold'], -r['oci'], r['delta_pct'], -r['odd'], str(r['id'])))
+        candidates.sort(key=lambda r: (-r['oci'], r['delta_pct'], -r['odd'], str(r['id'])))
     for rank, row in enumerate(candidates, 1): row['platinum']['rank'] = rank
     matrix['platinum_policy'] = {'id': POLICY_ID, 'rules_revision': RULES_REVISION,
         'evaluated_at': as_of, 'limits': dict(LIMITS),

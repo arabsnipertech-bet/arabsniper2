@@ -9,14 +9,17 @@ from platinum_policy import evaluate, annotate, POLICY_ID, LEGACY_POLICY_ID
 from platinum_audit import capture, report
 from gold_policy_audit import attach_result
 from lateral_matrix import MODEL_ID
+from test_opportunity_policy import row as goal_row
 from gold_competitions import SCOPE_ID
 
 CASES = json.loads((Path(__file__).parent/'platinum_cases.json').read_text())
 NOW, KICKOFF = CASES['now'], CASES['kickoff']
+BASE = goal_row(**{**CASES['base'], 'selected_margin_pct': 6.,
+                    'selected_market_fair_pct': 38., 'market_fair_pct': 38.})
 
 
 def fixture():
-    matrix = {'rows': [deepcopy(CASES['base'])],
+    matrix = {'rows': [deepcopy(BASE)],
               'opportunity_policy': {'id': 'gold-goals-v6.1', 'best_market_id': None}}
     meta = {'fixture_id': '100', 'home': 'Casa', 'away': 'Ospite', 'match': 'Casa – Ospite',
             'kickoff': KICKOFF, 'status_short': 'NS', 'country': 'Italy', 'league': 'Serie A'}
@@ -29,25 +32,25 @@ class PlatinumPolicy(unittest.TestCase):
     def test_shared_flow_and_value_boundaries(self):
         for case in CASES['cases']:
             with self.subTest(case=case['name']):
-                row = {**deepcopy(CASES['base']), **case['patch']}; before = deepcopy(row)
-                self.assertEqual(evaluate(row, NOW)['eligible'], case['eligible'])
+                row = {**deepcopy(BASE), **case['patch']}; before = deepcopy(row)
+                self.assertEqual(evaluate(row, NOW)['eligible'], case['eligible'] and row['odd'] >= 2.10)
                 self.assertEqual(row, before)
 
     def test_over25_at_new_gold_floor_still_needs_platinum_flow_and_ev(self):
-        row = deepcopy(CASES['base'])
+        row = deepcopy(BASE)
         row['spec']['line'] = 2.5
-        row.update(odd=1.70, first_odd=1.70/.97, ev_pct=3.)
+        row.update(odd=1.70, first_odd=1.70/.97, ev_pct=3., statistical_pct=62., selected_market_fair_pct=60.)
         self.assertTrue(evaluate(row, NOW)['eligible'])
         self.assertFalse(evaluate(dict(row, ev_pct=12., ev_low_pct=1.999), NOW)['eligible'])
         self.assertFalse(evaluate(dict(row, oci=29), NOW)['eligible'])
 
     def test_ev_floor_reasons_and_invalid_values(self):
-        row = deepcopy(CASES['base'])
+        row = deepcopy(BASE)
         self.assertEqual(evaluate(row, NOW)['qualification'], 'flow_and_value')
-        self.assertEqual(evaluate({**row, 'ev_pct': -15}, NOW)['reasons'], ['ev_floor'])
+        self.assertEqual(evaluate({**row, 'ev_pct': -15}, NOW)['reasons'], ['edge'])
         for invalid in (float('nan'), float('inf'), float('-inf'), True, '-15'):
             with self.subTest(ev=invalid):
-                self.assertEqual(evaluate({**row, 'ev_pct': invalid}, NOW)['reasons'], ['ev_unavailable'])
+                self.assertEqual(evaluate({**row, 'ev_pct': invalid}, NOW)['reasons'], ['edge'])
         row.pop('ev_pct'); row.pop('statistical_pct')
         self.assertFalse(evaluate(row, NOW)['eligible'])
 
@@ -55,14 +58,16 @@ class PlatinumPolicy(unittest.TestCase):
         m = fixture(); matrix = m['multimarket']['matrix']
         rejected = matrix['rows'][0]
         rejected.update(oci=80, ev_pct=-15.0001, combo={'active': False, 'reasons': ['example']})
-        alternate = {**deepcopy(CASES['base']), 'id': 'over25',
-                     'spec': {**CASES['base']['spec'], 'line': 2.5}}
+        alternate = {**deepcopy(BASE), 'id': 'over25',
+                     'statistical_pct': 53., 'selected_market_fair_pct': 48.,
+                     'spec': {**BASE['spec'], 'line': 2.5}}
         matrix['rows'].append(alternate)
         before = deepcopy(matrix)
         annotate(matrix, m['fixture'], NOW)
         self.assertEqual(matrix['platinum_policy']['best_market_id'], 'over25')
         self.assertEqual(matrix['platinum_policy']['eligible_markets'], 1)
-        self.assertEqual(rejected['platinum']['reasons'], ['ev_floor'])
+        self.assertIn('edge', rejected['platinum']['reasons'])
+        self.assertIn('oci_secondary_to_gold', rejected['platinum']['reasons'])
         self.assertIsNone(rejected['platinum']['rank'])
         self.assertEqual(alternate['platinum']['rank'], 1)
         for old, new in zip(before['rows'], matrix['rows']):
@@ -71,7 +76,7 @@ class PlatinumPolicy(unittest.TestCase):
         self.assertEqual(matrix['opportunity_policy'], before['opportunity_policy'])
 
     def test_cache_window_never_renews(self):
-        row = {**CASES['base'], 'quote_status': 'cached_stable',
+        row = {**BASE, 'quote_status': 'cached_stable',
                'cache_source_at': '2026-10-29T00:00:00Z', 'cache_expires_at': '2026-10-29T12:00:00Z'}
         self.assertTrue(evaluate(row, NOW)['eligible'])
         self.assertTrue(evaluate(row, row['cache_expires_at'])['eligible'])
@@ -79,24 +84,44 @@ class PlatinumPolicy(unittest.TestCase):
         self.assertFalse(evaluate(row, '2026-10-28T23:59:59Z')['eligible'])
         self.assertFalse(evaluate({**row, 'cache_expires_at': '2026-10-29T13:00:00Z'}, NOW)['eligible'])
 
-    def test_high_oci_has_secondary_priority_in_v7(self):
-        from v7_decision import official_choices
+    def test_platinum_requires_gold_and_moderate_oci(self):
         m = fixture(); matrix = m['multimarket']['matrix']
         moderate = matrix['rows'][0]
-        strong = {**deepcopy(moderate), 'id': 'strong', 'oci': 50, 'statistical_pct': 60}
+        strong = {**deepcopy(moderate), 'id': 'strong', 'oci': 50, 'ev_low_pct': 5.}
         matrix['rows'].append(strong)
-        annotate(matrix, m['fixture'], NOW, probability_model='v7')
+        annotate(matrix, m['fixture'], NOW, probability_model='arabsniper-v7.0')
         self.assertEqual(matrix['platinum_policy']['best_market_id'], moderate['id'])
         self.assertTrue(strong['platinum']['secondary_to_gold'])
+        self.assertTrue(strong['platinum']['gold_eligible'])
+        self.assertFalse(strong['platinum']['eligible'])
         moderate['oci'] = 29
-        annotate(matrix, m['fixture'], NOW, probability_model='v7')
-        self.assertEqual(official_choices(matrix)[:2], ('platinum', strong))
-        matrix['opportunity_policy']['best_market_id'] = moderate['id']
-        self.assertEqual(official_choices(matrix)[:2], ('gold', moderate))
+        annotate(matrix, m['fixture'], NOW)
+        self.assertIsNone(matrix['platinum_policy']['best_market_id'])
+
+    def test_saturation_and_aggio_are_shared_with_gold_at_exact_boundaries(self):
+        from opportunity_policy import evaluate as gold
+        for line in (2.5, 3.5):
+            with self.subTest(line=line):
+                base = {**deepcopy(BASE), 'spec': {**BASE['spec'], 'line': line}, 'odd': 2.5,
+                        'first_odd': 2.5/.95, 'delta_pct': -5., 'statistical_pct': 55.,
+                        'selected_market_fair_pct': 40., 'oci': 49.999,
+                        'selected_margin_pct': 6.5, 'ev_low_pct': 5.5}
+                base['selected_movement']['delta_pct'] = -5.
+                self.assertTrue(gold(base)['eligible'])
+                self.assertTrue(evaluate(base, NOW)['eligible'])
+                short = {**base, 'ev_low_pct': 5.4999}
+                self.assertEqual(gold(short)['min_ev_low_pct'], 5.5)
+                self.assertEqual(evaluate(short, NOW)['min_ev_low_pct'], 5.5)
+                self.assertFalse(evaluate(short, NOW)['eligible'])
+                divergent = {**base, 'selected_market_fair_pct': 39.9999}
+                self.assertIn('suspicious_divergence', evaluate(divergent, NOW)['reasons'])
+                fully_persistent = {**base, 'selected_movement': {**base['selected_movement'], 'persistence': 1.}}
+                self.assertTrue(gold(fully_persistent)['eligible'])
+                self.assertIn('persistence', evaluate(fully_persistent, NOW)['reasons'])
 
     def test_annotation_preserves_gold_and_deduplicates_equivalent_markets(self):
         m = fixture(); matrix = m['multimarket']['matrix']
-        alternate = {**deepcopy(CASES['base']), 'id': 'asian', 'oci': 40,
+        alternate = {**deepcopy(BASE), 'id': 'asian', 'oci': 40,
                      'spec': {**CASES['base']['spec'], 'kind': 'asian_total'}}
         matrix['rows'].append(alternate)
         before = deepcopy(matrix)

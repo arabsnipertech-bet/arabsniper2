@@ -118,7 +118,7 @@ class JournalChunks(unittest.TestCase):
         from audit_journal import PREFIX
         from unittest.mock import patch
         import os
-        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ,{'GOLD_PRIVATE':'true'}), patch('auditor_daily_priority.ensure_priority'):
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ,{'GOLD_PRIVATE':'true'}), patch('nightly_auditor.ensure_priority'):
             root=Path(folder)
             write_store(root/'data'/f'{PREFIX}20261109T100000_forecasts.json',{'pending':True})
             calls=[]

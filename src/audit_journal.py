@@ -76,6 +76,8 @@ def capture_policies(root, observed_at=None):
         if not valid_snapshot(v7, record['fixture'], record['captured_at']):
             raise ValueError('Invalid V7 prematch publication evidence')
         record['v7_quote_evidence'] = quote_evidence(quotes.get(v7['fixture_id'], {}), v7)
+        if 'triad' in v7:
+            record.update({key:v7[key] for key in ('triad','tier','horizon','niche_id','badge')})
     write_store(path, {'schema_version': 1, 'journal_type': 'policies',
                       'observed_at': now, 'gold': gold, 'platinum': platinum, 'study_observations': studies, 'analysis_updates': publications})
     print(f'Frozen current policy evidence: Gold {len(gold["fixtures"])}; '

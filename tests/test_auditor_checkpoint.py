@@ -9,9 +9,9 @@ from unittest.mock import patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
 from audit_storage import write_store, read_store
-from auditor_daily_priority import STATUS, WEIGHTS, signature, ensure_priority
+from auditor_daily_priority import STATUS, WEIGHTS, signature, ensure_priority, v7_paths
 from auditor_history_chunks import seal_day
-from gold_storage import checkpoint_day, publish, previous_manifest, GOLD, write_manifest
+from gold_storage import checkpoint_day, publish, previous_manifest, GOLD, write_manifest, restore_v7_priority
 from test_gold_storage import Fake
 
 DAY=date(2026,11,7)
@@ -32,6 +32,19 @@ def evidence(root):
     write_store(root/STATUS,{'version':1,'date':str(NOW.date()),'report_date':str(DAY),
                             'report_sha256':signature(root/f'auditarchive/prematch_{DAY}_daily.json'),
                             'weights_sha256':signature(root/WEIGHTS)})
+
+
+def v7_evidence(root):
+    from v7_probability import VERSION
+    evidence(root)
+    paths=v7_paths(DAY)
+    weights={'version':VERSION,'trained_at':NOW.isoformat(),'weight':.8,'status':'baseline_retained'}
+    write_store(root/paths['weights_sha256'],weights)
+    write_store(root/paths['outcomes_sha256'],{'version':VERSION,'date':str(DAY),'fixtures':{}})
+    write_store(root/paths['learning_sha256'],{'version':VERSION,'date':str(NOW.date()),'state':weights})
+    write_store(root/STATUS,{'version':2,'date':str(NOW.date()),'report_date':str(DAY),
+                             **{key:signature(root/path) for key,path in paths.items()}})
+    return paths
 
 
 class AuditCheckpoint(unittest.TestCase):
@@ -118,18 +131,33 @@ class AuditCheckpoint(unittest.TestCase):
             self.assertFalse(set(GOLD)&storage.objects.keys())
             self.assertFalse(any(p.startswith('gold-browser/') for p in storage.calls))
 
-    def test_private_save_survives_failed_publication_without_rebuilding_or_recalibration(self):
+    def test_v7_checkpoint_survives_missing_legacy_and_rejects_corruption(self):
         with TemporaryDirectory() as folder:
-            root=Path(folder);evidence(root)
+            root=Path(folder); paths=v7_evidence(root); storage=Fake()
+            (root/WEIGHTS).unlink()
+            (root/f'auditarchive/prematch_{DAY}_calibration.json').unlink()
+            checkpoint_day(storage,'test',root,DAY)
+            manifest=previous_manifest(storage,'test')
+            self.assertTrue(set(paths.values()) <= manifest.keys())
+            self.assertNotIn(WEIGHTS,manifest)
+            write_store(root/paths['learning_sha256'],{'version':'corrupt'})
+            with self.assertRaisesRegex(ValueError,'Unverified V7'):
+                checkpoint_day(storage,'test',root,DAY)
+            self.assertEqual(previous_manifest(storage,'test'),manifest)
+
+    def test_v7_priority_restores_and_reuses_only_the_closed_day(self):
+        with TemporaryDirectory() as folder, TemporaryDirectory() as restored:
+            root=Path(folder); paths=v7_evidence(root); storage=Fake()
+            checkpoint_day(storage,'test',root,DAY)
+            before=previous_manifest(storage,'test')
+            write_manifest(storage,'test',{**before, 'auditarchive/prematch_2026-11-05_calibration.json':
+                {'sha256':'a'*64, 'bytes':400}})
+            destination=Path(restored)
+            restore_v7_priority(storage,'test',destination,DAY)
+            self.assertTrue(all((destination/path).exists() for path in paths.values()))
             calls=[]
-            def failed(*args):
-                calls.append(args)
-                if args[0]=='src/private_publication.py':raise RuntimeError('git temporarily failed')
-            with self.assertRaisesRegex(RuntimeError,'git temporarily failed'):
-                ensure_priority(root,NOW.date(),failed,lambda:self.fail('unexpected recalibration'))
-            calls.clear()
-            ensure_priority(root,NOW.date(),lambda *a:calls.append(a),lambda:self.fail('unexpected recalibration'))
-            self.assertEqual(calls,[('src/homepage_results.py',),('src/private_publication.py','--results-only')])
+            ensure_priority(destination,NOW.date(),lambda *a:calls.append(a))
+            self.assertEqual(calls,[])
 
 
 if __name__=='__main__':unittest.main()

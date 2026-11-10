@@ -296,3 +296,24 @@ body[data-gold-design] .mx-card.mx-compact h3{font-size:21px;margin-bottom:0}
 .mx-v7-advanced>summary{cursor:pointer;min-height:44px;padding:12px;font-size:.85rem}
 .mx-v7-advanced .mx-cockpit,.mx-v7-advanced .mx-opportunity{margin:12px}
 @media(max-width:560px){.mx-v7-published{padding:12px}.mx-v7-advanced{margin:10px 12px}}
+
+.mx-level{display:inline-block;width:max-content;max-width:100%;padding:.25em .6em;border:1px solid;border-radius:6px;font-size:.7rem;font-weight:800;line-height:1.25;white-space:nowrap}
+.mx-level[data-tier=platinum]{background:linear-gradient(135deg,#E2E8F0,#F59E0B);color:#0F172A;border-color:#FBBF24}
+.mx-level[data-tier=gold]{background:#F59E0B;color:#0F172A;border-color:#FBBF24}
+.mx-level[data-tier=blu]{background:#2563EB;color:#FFFFFF;border-color:#60A5FA}
+.mx-triad,.mx-v7-panel .mx-triad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0;padding:0;list-style:none}
+.mx-triad-compact{margin:0 14px 12px}
+.mx-triad li[data-v7-slot]{display:grid;gap:5px;align-content:start;min-width:0;padding:8px 10px;border-radius:7px;overflow-wrap:anywhere}
+.mx-triad li[data-v7-slot=most_probable]{border-left:3px solid #10B981;background:rgba(16,185,129,.10)}
+.mx-triad li[data-v7-slot=recommended_alternative]{border-left:3px solid #F59E0B;background:rgba(245,158,11,.10)}
+.mx-triad li[data-v7-slot=high_odds_shot]{border-left:3px solid #EF4444;background:rgba(239,68,68,.10)}
+.mx-triad-heading,.mx-triad-market,.mx-triad-meta{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px}
+.mx-triad-heading,.mx-triad-market{justify-content:space-between}
+.mx-triad-heading>span:first-child{font-size:.69rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.mx-triad-market strong{color:inherit}
+.mx-triad-meta,.mx-v7-panel .mx-triad li .mx-triad-meta span,.mx-triad li small{font-size:.72rem;color:#bdcbd7}
+.mx-v7-panel .mx-triad li .mx-level{font-size:.68rem}
+.mx-triad .mx-niche{border:1px solid #8B5CF6;border-radius:4px;padding:0 .3em}
+.mx-model-references{margin-top:10px;font-size:.8rem}
+.mx-model-references small{display:block;color:#bdcbd7}
+@media(max-width:680px){.mx-triad,.mx-v7-panel .mx-triad{grid-template-columns:1fr}}

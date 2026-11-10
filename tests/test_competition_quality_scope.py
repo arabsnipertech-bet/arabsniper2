@@ -16,8 +16,6 @@ from matrix_pipeline import build_board, complete_day
 from odds_collection import OddsEnricher
 from test_policy_engine import engine
 from test_statistics_first import NOW, KICKOFF
-from test_opportunity_policy import row as goal_row
-from test_platinum_policy import CASES
 from lateral_matrix import MODEL_ID
 from near_kickoff_quotes import NearKickoffRefresher
 
@@ -114,14 +112,22 @@ class CompetitionQualityScope(unittest.TestCase):
         self.assertIn(('odds',{'fixture':42}),client.calls)
         self.assertNotIn(('odds',{'fixture':43}),client.calls)
         self.assertFalse(day['matches'][0]['multimarket'].get('best_candidate'))
-        # Run priced snapshots through the same board that emits both tiers.
-        gold_candidate=goal_row()
-        platinum_candidate={**deepcopy(CASES['base']), 'provider_updated_at':NOW, 'quote_observed_at':NOW}
-        assessment={'model_id':MODEL_ID,'matrix':{'rows':[gold_candidate,platinum_candidate]}}
-        day['matches'][0]['multimarket']=assessment
+        # The same V7 gates apply after recovering the admitted fixture.
+        from test_v7 import FT, PROFILES, RATES, row
+        from lateral_matrix import build_matrix
+        m = day['matches'][0]
+        m['multimarket'] = assessment = build_matrix(
+            dict(rates=dict(RATES, home_ft=2.0, away_ft=1.3), profiles=PROFILES), NOW)
+        over = next(r for r in assessment['matrix']['rows'] if r['id'] == FT)
+        over.update(row(over['spec'], 2.10, fair=.60), first_odd=2.10/.96,
+                    quote_observed_at=NOW, provider_updated_at=NOW, bookmaker='Test',
+                    oci=38, delta_pct=-4, paired_books=4, agreeing_books=3,
+                    movement_confirmed=True, fair_direction_coherent=True,
+                    selected_movement=dict(delta_pct=-4, fair_delta_pp=2, persistence=.67, reversal=False))
         build_board(day,NOW)
-        self.assertEqual(assessment['matrix']['opportunity_policy']['best_market_id'],gold_candidate['id'])
-        self.assertEqual(assessment['matrix']['platinum_policy']['best_market_id'],platinum_candidate['id'])
+        self.assertEqual(assessment['matrix']['opportunity_policy']['best_market_id'], FT)
+        self.assertEqual(assessment['matrix']['platinum_policy']['best_market_id'], FT)
+        self.assertEqual(m['triad']['most_probable']['tier'], 'PLATINUM')
 
     def test_compiled_browser_rules_and_versioned_assets_match_policy(self):
         script=(ROOT/'web/competition-scope.js').read_bytes()

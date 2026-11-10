@@ -7,6 +7,7 @@
   const numeric = value => typeof value === 'number' && Number.isFinite(value);
   const pct = value => numeric(value) ? value.toLocaleString('it-IT', {maximumFractionDigits:1}) + '%' : 'n/d';
   const time = value => new Intl.DateTimeFormat('it-IT', {timeZone: zone, hour:'2-digit', minute:'2-digit'}).format(new Date(value));
+  const matrixModel = row => ['lateral-matrix-v5.0','arabsniper-v7.0'].includes(row.model_id);
   // The public feed carries the Gold decision. Revalidate its public fields
   // against the exact V6.1 market and price band before rendering a card.
   const gold61Markets = {
@@ -14,7 +15,10 @@
     'total/ht/over/2.5': ['over25_ht', 4.50, 7.50, 18],
     'total/ft/over/2.5': ['over25_ft', 1.70, 2.60, 48],
     'total/ft/over/3.5': ['over35_ft', 2.10, 4.50, 35],
-    'btts/ht/yes/': ['gg_ht', 3.50, 5.50, 26]
+    'btts/ht/yes/': ['gg_ht', 3.50, 5.50, 26],
+    'total/sh/over/1.5': ['over15_sh', 1.55, 2.15, 45],
+    'total/sh/over/2.5': ['over25_sh', 3.50, 7.50, 16],
+    'btts/sh/yes/': ['gg_sh', 2.15, 3.50, 32]
   };
   function gold61Visible(row) {
     const s = row.spec || {}, d = row.opportunity;
@@ -74,10 +78,12 @@
       const rows = payload.date === dateKey(now) && Array.isArray(payload.selections) ? payload.selections.filter(row => {
         const kickoff = new Date(row.kickoff);
         if (!row.fixture_id || seen.has(row.fixture_id) || !Number.isFinite(+kickoff) || +kickoff <= +now || dateKey(kickoff) !== dateKey(now) || !numeric(row.odd) || row.odd <= 1 || !Number.isFinite(Date.parse(row.captured_at))) return false;
-        if (row.model_id === 'lateral-matrix-v5.0' && !globalThis.ArabCompetitionScope.allows(row.competition_policy,row.country,row.league)) return false;
-        if (row.model_id === 'lateral-matrix-v5.0' && row.opportunity?.policy_id === 'gold-goals-v6.1') {
+        if (matrixModel(row) && !globalThis.ArabCompetitionScope.allows(row.competition_policy,row.country,row.league)) return false;
+        if (row.model_id === 'arabsniper-v7.0' &&
+            (!['GOLD','PLATINUM'].includes(row.tier) || row.opportunity?.rules_revision !== 'v7-unified-v1')) return false;
+        if (matrixModel(row) && row.opportunity?.policy_id === 'gold-goals-v6.1') {
           if (!gold61Visible(row)) return false;
-        } else if (row.model_id === 'lateral-matrix-v5.0') {
+        } else if (matrixModel(row)) {
           const d = row.opportunity;
           const s = row.spec || {}, caps = {over15_ht:3.5,over25_ft:3.5,gg_ht:5.5,over35_ft:5.5};
           const key = s.extra!=null?null:s.kind==='btts'&&s.period==='ht'&&s.side==='yes'&&s.line==null?'gg_ht':['total','asian_total'].includes(s.kind)&&s.side==='over'?(s.period==='ht'&&s.line===1.5?'over15_ht':s.period==='ft'&&s.line===2.5?'over25_ft':s.period==='ft'&&s.line===3.5?'over35_ft':null):null;
@@ -89,7 +95,7 @@
         seen.add(row.fixture_id); return true;
       }).slice(0,3) : [];
       renderCockpit(rows);
-      target.innerHTML = rows.length ? rows.map((row, i) => `<article class="pick"><div class="pick-top"><span>ANALISI ${String(i+1).padStart(2,'0')}</span><time datetime="${escape(row.kickoff)}">${time(row.kickoff)} · ${Date.parse(row.kickoff)>+now?'In programma':'Orario di inizio trascorso'}</time></div><div class="league">${escape(row.league)}</div><h3>${escape(row.match)}</h3><div class="target"><strong>${escape(row.label)}</strong><div class="odd">${row.odd.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})}<small>QUOTA PREMATCH</small></div></div><div class="probabilities"><span>Stima statistica<b>${pct(row.statistical_pct)}</b></span><span>Lettura mercato<b>${row.model_id==='lateral-matrix-v5.0'?({convergence:'Convergenza',contrarian:'Contrarian sano',divergence:'Contrarian',unconfirmed:'Flusso non confermato'}[row.market_confirmation]||'In osservazione'):row.model_id==='statistics-first-v4.0'?({confirmed:'Oro + azzurro',context:'Scenario indiretto',contrary:'In contrasto'}[row.market_confirmation]||'Da confermare'):'Versione precedente'}</b></span></div><span class="snapshot">Analisi delle ${time(row.captured_at)} · orari italiani</span></article>`).join('') : '<div class="empty">Nessuna selezione pubblicata per oggi con questi criteri. La dashboard Gold contiene tutte le analisi, anche quelle senza quote o con dati limitati.</div>';
+      target.innerHTML = rows.length ? rows.map((row, i) => `<article class="pick"><div class="pick-top"><span>ANALISI ${String(i+1).padStart(2,'0')}</span><time datetime="${escape(row.kickoff)}">${time(row.kickoff)} · ${Date.parse(row.kickoff)>+now?'In programma':'Orario di inizio trascorso'}</time></div><div class="league">${escape(row.league)}</div><h3>${escape(row.match)}</h3><div class="target"><strong>${escape(row.label)}</strong><div class="odd">${row.odd.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})}<small>QUOTA PREMATCH</small></div></div><div class="probabilities"><span>Stima statistica<b>${pct(row.statistical_pct)}</b></span><span>Lettura mercato<b>${matrixModel(row)?({convergence:'Convergenza',contrarian:'Contrarian sano',divergence:'Contrarian',unconfirmed:'Flusso non confermato'}[row.market_confirmation]||'In osservazione'):row.model_id==='statistics-first-v4.0'?({confirmed:'Oro + azzurro',context:'Scenario indiretto',contrary:'In contrasto'}[row.market_confirmation]||'Da confermare'):'Versione precedente'}</b></span></div><span class="snapshot">Analisi delle ${time(row.captured_at)} · orari italiani</span></article>`).join('') : '<div class="empty">Nessuna selezione pubblicata per oggi con questi criteri. La dashboard Gold contiene tutte le analisi, anche quelle senza quote o con dati limitati.</div>';
     } catch (_) {
       const panel = document.getElementById('cruscotto');
       if (panel) panel.innerHTML = '<h2 id="match-title">Anteprima temporaneamente non disponibile</h2><p>Nuovo tentativo automatico tra un minuto.</p>';

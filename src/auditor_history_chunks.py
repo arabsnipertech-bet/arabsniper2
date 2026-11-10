@@ -55,6 +55,11 @@ def reusable(root, day, as_of):
     expected.add(calibration)
     if not expected <= receipt['outputs'].keys():
         raise ValueError('Incomplete historical day receipt')
+    status = read_store(root/f'auditarchive/prematch_{day}_v51_status.json', {})
+    if (status.get('status') == 'partial_v51_skip'
+            and any(not (root/path).is_file() or digest(root/path) != checksum
+                    for path, checksum in receipt['outputs'].items() if path in expected)):
+        return False
     for path, checksum in receipt['outputs'].items():
         if path not in expected | {f'auditarchive/prematch_{day}_calibration.json'}:
             raise ValueError('Invalid historical receipt output')

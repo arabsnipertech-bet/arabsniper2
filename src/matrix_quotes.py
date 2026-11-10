@@ -212,14 +212,15 @@ def collect(payload, fid, observed_at, ht_half=None):
     direct = direct_combo_groups(payload, fid, observed_at)
     groups.update(direct)
     starts = {str(r.get('fixture', {}).get('id')):r.get('fixture', {}).get('date') for r in payload.get('response', [])}
-    has_direct = any(fresh(g['provider_updated_at'], observed_at, starts.get(str(fid))) for g in direct.values())
+    has_direct = any(g['specs']['over']['kind'] == 'halves_total'
+                     and fresh(g['provider_updated_at'], observed_at, starts.get(str(fid))) for g in direct.values())
     synthetic = {} if has_direct else synthetic_combo_groups(payload, fid, observed_at)
     groups.update(synthetic)
     if ht_half is not None:
         for key, item in list(groups.items()):
             sample = next(iter(item.get('specs', {}).values()), {})
             if sample.get('kind') in ('total', 'asian_total') and sample.get('period') == 'ht' and sample.get('line') == .5:
-                ht_half.append(groups.pop(key))
+                ht_half.append(item)
     diagnostics['asian_halfline_fallbacks'] = sum(g.get('quote_source') == 'asian_halfline' for g in groups.values())
     diagnostics['synthetic_combos'] = len(synthetic)
     diagnostics['direct_combos'] = len(direct)

@@ -9,13 +9,13 @@ from copy import deepcopy
 from hashlib import sha256
 from math import exp, floor
 import json
-from market_scope import MARKET_SCOPE_ID, FT_TOTALS, HT_TOTALS, ASIAN_FT, ASIAN_HT, HANDICAPS, core_market
+from market_scope import MARKET_SCOPE_ID, TOTAL_LINES, ASIAN_FT, ASIAN_HT, HANDICAPS, COMBO_SPECS, JOINT_KINDS, core_market
 
 MODEL_ID = 'lateral-matrix-v5.0'
 CONFIG = {'tail_tolerance': 1e-11, 'score_ceiling': 48,
           'minimum_team_ft_for_value': 4, 'minimum_team_ht_for_value': 3,
           'maximum_selections': None, 'book_weight_in_statistics': 0,
-          'probability_bonus_from_oci': 0, 'experimental': True, 'market_scope': MARKET_SCOPE_ID}
+          'probability_bonus_from_oci': 0, 'market_scope': MARKET_SCOPE_ID}
 CONFIG_ID = sha256(json.dumps(CONFIG, sort_keys=True).encode()).hexdigest()[:16]
 PERIODS = {'ft': 'FT', 'ht': 'PT', 'sh': 'ST'}
 FAMILIES = {'result': '1x2', 'dc': '1x2', 'dnb': 'asian', 'total': 'totals',
@@ -61,22 +61,22 @@ def label(spec):
     if k == 'pt_btts_ft_total': return f'GG PT + Over {line} FT'
     if k == 'range': return f'Multigol {line}–{extra} {p}'
     if k == 'score': return f'Risultato {s} {p}'
-    if k == 'both_halves': return f"{'Casa' if s == 'home' else 'Ospite' if s == 'away' else 'Entrambe'} a segno in entrambi i tempi"
+    if k == 'both_halves': return 'GG PT + GG ST' if s == 'both' else f"{'Casa' if s == 'home' else 'Ospite'} a segno in entrambi i tempi"
     return k
 
 
 def base_specs():
     rows = [specification('result', 'ft', side) for side in ('1', 'x', '2')]
     rows += [specification('dnb', 'ft', side) for side in ('1', '2')]
-    for period in ('ft', 'ht'):
+    for period, lines in TOTAL_LINES.items():
         rows += [specification('btts', period, side) for side in ('yes', 'no')]
         rows += [specification('total', period, side, line)
-                 for line in (FT_TOTALS if period == 'ft' else HT_TOTALS) for side in ('over', 'under')]
+                 for line in lines for side in ('over', 'under')]
         rows += [specification('asian_total', period, side, line)
-                 for line in (ASIAN_FT if period == 'ft' else ASIAN_HT) for side in ('over', 'under')]
+                 for line in (ASIAN_FT if period == 'ft' else ASIAN_HT if period == 'ht' else ()) for side in ('over', 'under')]
     rows += [specification('handicap', 'ft', side, line)
              for line in HANDICAPS for side in ('home', 'away')]
-    rows.append(specification('halves_total', 'ft', 'over', .5, .5))
+    rows.extend(dict(spec) for spec in COMBO_SPECS)
     return rows
 
 
@@ -179,19 +179,15 @@ class ScoreModel:
             return {(1., 0.): chance, (0., 1.): 1-chance}
         if kind in ('halves_total', 'both_halves'):
             if kind == 'halves_total':
-                if spec['line'] == .5 and spec['extra'] == .5:
-                    ht = self.rates['home_ht']+self.rates['away_ht']
-                    sh = max(self.second_half_floor, self.rates['home_ft']+self.rates['away_ft']-ht)
-                    a, b = 1-exp(-ht), 1-exp(-sh)
-                else:
-                    a = sum(p for h, away, p in self.grids['ht'] if h+away > spec['line'])
-                    b = sum(p for h, away, p in self.grids['sh'] if h+away > spec['extra'])
-                chance = a*b  # Disjoint increments only.
+                qualifies = lambda h, a: h+a > spec['line']
+                second = sum(p for h, a, p in self.grids['sh'] if h+a > spec['extra'])
+                if spec['extra'] == .5 and self.second_half_floor:
+                    second = max(second, 1-exp(-self.second_half_floor))
             else:
-                r = self.rates
-                h = (1-exp(-r['home_ht']))*(1-exp(-(r['home_ft']-r['home_ht'])))
-                a = (1-exp(-r['away_ht']))*(1-exp(-(r['away_ft']-r['away_ht'])))
-                chance = h if spec['side'] == 'home' else a if spec['side'] == 'away' else h*a
+                qualifies = lambda h, a: (h > 0 if spec['side'] == 'home' else a > 0
+                                          if spec['side'] == 'away' else h > 0 and a > 0)
+                second = sum(p for h, a, p in self.grids['sh'] if qualifies(h, a))
+            chance = sum(p*second for h, a, p in self.grids['ht'] if qualifies(h, a))
             return {(1., 0.): chance, (0., 1.): 1-chance}
         for h, a, p in self.grids[period]:
             bins[payout_weights(spec, h, a)] += p
@@ -217,13 +213,16 @@ def study_result_totals(model, side):
 
 
 def quality(assessment, period):
-    period = 'ht' if period == 'sh' else period
-    profiles = assessment.get('profiles') or {}
-    counts = [profiles.get(side, {}).get('for_'+period, {}).get('sample', 0) for side in ('home', 'away')]
+    if period == 'sh':
+        teams = (assessment.get('observed_goal_means') or {}).get('teams') or {}
+        counts = [teams.get(side, {}).get('st', {}).get('sample', 0) for side in ('home', 'away')]
+    else:
+        profiles = assessment.get('profiles') or {}
+        counts = [profiles.get(side, {}).get('for_'+period, {}).get('sample', 0) for side in ('home', 'away')]
     minimum = min(counts)
     if not max(counts): return 'prior_only'
     if not minimum: return 'prior_dominant'
-    return 'supported' if minimum >= CONFIG['minimum_team_'+period+'_for_value'] else 'limited'
+    return 'supported' if minimum >= (4 if period == 'ft' else 3) else 'limited'
 
 
 def empirical(assessment, spec):
@@ -249,7 +248,7 @@ def settle_spec(spec, result):
     ft = [result.get('home_ft'), result.get('away_ft')]
     ht = [result.get('home_ht'), result.get('away_ht')]
     valid = lambda x: isinstance(x, (int, float)) and not isinstance(x, bool) and x >= 0
-    need_ht = spec['period'] != 'ft' or spec['kind'] in ('htft', 'halves_total', 'both_halves', 'pt_ft_total', 'pt_btts_ft_total')
+    need_ht = spec['period'] != 'ft' or spec['kind'] in JOINT_KINDS or spec['kind'] == 'htft'
     if not all(valid(x) for x in ft) or need_ht and not all(valid(x) for x in ht): return None
     if need_ht and any(h > f for h, f in zip(ht, ft)): return None
     h, a = ht if spec['period'] == 'ht' else [f-t for f, t in zip(ft, ht)] if spec['period'] == 'sh' else ft
@@ -269,7 +268,7 @@ def build_matrix(assessment, as_of, additional_specs=()):
         'score_tail_probability': model.tail,
         'market_scope': {'id': MARKET_SCOPE_ID, 'modeled_markets': len(matrix)},
         'assumptions': ['Poisson per squadra con incrementi PT/ST indipendenti.',
-            'Mercati core, Over 2,5 PT e combo gol nei due tempi; ST combo con minimo 0,30 gol attesi.',
+            'Mercati PT, ST e FT, con quattro combinazioni di punteggio congiunto.',
             'Frequenze storiche descrittive; stime e rendimenti teorici ancora da validare.']}
     output['notes'] = [*output.get('notes', []), 'Tutte le partite disponibili vengono mostrate, anche con dati o quote insufficienti.']
     return output
@@ -284,8 +283,9 @@ def matrix_rows(assessment, specs, model=None, scenarios=None):
         if not core_market(spec): continue
         estimate = model.estimate(spec)
         alternatives = [estimate, *[s.estimate(spec) for s in scenarios]]
+        period = 'sh' if spec['kind'] in ('halves_total', 'both_halves') else 'ht' if spec['kind'] in JOINT_KINDS else spec['period']
         row = {'id': key, 'spec': spec, 'family': FAMILIES[spec['kind']], 'label': label(spec),
-               'period': spec['period'], 'quality': quality(assessment, 'ht' if spec['kind'] in ('htft', 'halves_total', 'both_halves', 'pt_ft_total', 'pt_btts_ft_total') else spec['period']),
+               'period': spec['period'], 'quality': quality(assessment, period),
                'statistical_pct': round(estimate['p']*100, 4),
                'low_pct': round(min(v['p'] for v in alternatives)*100, 4),
                'high_pct': round(max(v['p'] for v in alternatives)*100, 4),

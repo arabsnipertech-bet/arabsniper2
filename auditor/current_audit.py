@@ -125,7 +125,8 @@ def fetch_results(date, key):
     return {'days': [{'matches': matches}]}
 
 
-def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: None, combined=None):
+def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: None, combined=None,
+               *, legacy_evidence=True):
     from audit_ledger import AuditLedger, settle_ledger
     from selection_studies import build_studies, study_markdown
     from audit_storage import atomic_bytes
@@ -170,12 +171,7 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
         from v7_learning import signal_diagnostics
         v7_signals = signal_diagnostics(archive_day(root, day, date, now, fetched)['samples'])
         progress(f'costruzione rapporto giornaliero {date}')
-        from adaptive_calibration import Evidence, WINDOW
-        evidence = Evidence()  # Empty evidence is explicit even outside the training window.
-        daily = build_daily(day, str(date), now.isoformat(), os.environ.get('GITHUB_SHA'),
-                            observe=evidence.observe if evidence is not None else None)
-        if evidence is not None:
-            write(root / f'auditarchive/prematch_{date}_calibration.json', evidence.samples())
+        daily = build_daily(day, str(date), now.isoformat(), os.environ.get('GITHUB_SHA'))
         try:
             from promo_successes import build as build_promo
             promo = build_promo(day, str(date))
@@ -186,22 +182,37 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
         from auditor_history_chunks import digest
         daily['evidence_provenance']['input_files'] = {
             path.relative_to(root).as_posix(): digest(path),
-            results_path.relative_to(root).as_posix(): digest(results_path),
-            f'auditarchive/prematch_{date}_calibration.json': digest(root/f'auditarchive/prematch_{date}_calibration.json')}
+            results_path.relative_to(root).as_posix(): digest(results_path)}
         daily['selection_studies'] = build_studies(daily)
         daily['v7_signals'] = v7_signals
         write(root / f'auditarchive/prematch_{date}_daily.json', daily)
         atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md',
                      (markdown(daily)+study_markdown(daily['selection_studies'])).encode())
-        from auditor_history_chunks import seal_day
-        pending_summary = daily['pending_summary']
-        seal_day(root, date, now, pending_summary['pending'], queried, pending_summary=pending_summary)
+        if legacy_evidence:
+            seal_legacy_day(root, date, now, queried, ledger=day)
         del daily
         if combined is not None:
             for collection, key, record in day.records():
                 combined.put(collection, key, record)
 
     return queried
+
+
+def seal_legacy_day(root, date, now, queried=False, *, ledger=None):
+    """Build V5.1 evidence from saved results without rewriting the V7 report."""
+    from adaptive_calibration import Evidence
+    from audit_ledger import AuditLedger
+    from auditor_history_chunks import seal_day
+    if ledger is None:
+        with AuditLedger(root/f'auditarchive/prematch_{date}_results.json') as saved:
+            return seal_legacy_day(root, date, now, queried, ledger=saved)
+    evidence = Evidence()
+    for collection in ('multimarket_evaluations', 'analysis_updates', 'study_observations'):
+        for record in ledger.get(collection, {}).values():
+            evidence.observe(record)
+    write(root/f'auditarchive/prematch_{date}_calibration.json', evidence.samples())
+    pending = read(root/f'auditarchive/prematch_{date}_daily.json', {})['pending_summary']
+    seal_day(root, date, now, pending['pending'], queried, pending_summary=pending)
 
 
 def settle_history_day(arguments):
@@ -272,17 +283,29 @@ def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, p
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('mode', choices=['freeze', 'settle', 'prepare', 'daily', 'history'])
+    parser.add_argument('mode', choices=['freeze', 'settle', 'prepare', 'daily', 'history', 'learn-v7', 'legacy-evidence'])
     parser.add_argument('--date', type=lambda value: datetime.strptime(value, '%Y-%m-%d').date())
     parser.add_argument('--journal-before', type=datetime.fromisoformat)
     parser.add_argument('--journal-limit', type=int)
     parser.add_argument('--delta-archive', action='store_true')
     parser.add_argument('--assemble-only', action='store_true')
     parser.add_argument('--as-of', type=datetime.fromisoformat)
+    parser.add_argument('--root', type=Path, default=ROOT, help=argparse.SUPPRESS)
+    parser.add_argument('--results-queried', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
     now = args.as_of or datetime.now(TZ)
     if now.tzinfo is None:
         parser.error('as-of requires a timezone')
+    if args.mode == 'legacy-evidence':
+        if args.date is None or args.date >= now.astimezone(TZ).date():
+            parser.error('legacy-evidence requires a closed --date')
+        seal_legacy_day(args.root, args.date, now, args.results_queried)
+        return
+    if args.mode == 'learn-v7':
+        from v7_learning import run as learn_v7
+        report = learn_v7(ROOT, now)
+        print(f"V7 learning: {report['update']['reason']}; {report['verified_fixtures']} fixtures", flush=True)
+        return
     from task_progress import TaskProgress
     with TaskProgress('Auditor') as progress:
         if args.mode == 'prepare':

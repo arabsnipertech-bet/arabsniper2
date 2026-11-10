@@ -578,6 +578,30 @@ const v7Match={fixture:{fixture_id:'7',kickoff:v7Time},multimarket:{matrix:{rows
 assert.match(api.v7Panel(v7Match), /Over 2,5 FT &lt;test&gt;/);
 assert.match(api.v7Panel(v7Match), /54,0%/);
 assert.match(api.v7Panel(v7Match), /Fair mercato <b>—<\/b>/);
-assert.match(api.v7Panel(v7Match,{},true), /Studio V7/);
+assert.match(api.v7Panel(v7Match,{},true), /Archivio V7/);
 v7Match.multimarket.matrix.v7.captured_at=v7Time;
 assert.equal(api.v7Panel(v7Match),'','An observation at kickoff cannot appear as prematch');
+
+// Every active V7 card reserves three slots, with trusted saved evidence only.
+const triadNow=Date.now(), triadAt=new Date(triadNow-60000).toISOString();
+const triadStart=new Date(triadNow+3600000).toISOString(), triadModel='arabsniper-v7.0';
+const triadRow={id:'st-goals',family:'totals',period:'sh',
+ spec:{kind:'total',period:'sh',side:'over',line:1.5},probability_model:triadModel,odd:2.10,
+ quote_executable:true,quote_status:'recent',quote_observed_at:triadAt,provider_updated_at:triadAt};
+const triadSignal={market_id:'st-goals',source_market_id:triadRow.id,odd:2.10,probability:.54,ev:.134,
+ tier:'GOLD',badge:'● GOLD',horizon:'ST',horizon_label:'[2° TEMPO]',
+ niche_id:'pt_st_symmetry_11_22',niche_label:'Simmetria 1°+2°T'};
+const triadMatch={fixture:{fixture_id:'701',kickoff:triadStart},multimarket:{matrix:{
+ publication_model:triadModel,rows:[triadRow],v7:{version:triadModel,status:'published',
+  fixture_id:'701',kickoff:triadStart,captured_at:triadAt,tier:'GOLD',
+  triad:{most_probable:triadSignal,recommended_alternative:null,high_odds_shot:null},
+  markets:{'st-goals':{source_market_id:triadRow.id,label:'Over 1,5 ST',odd:2.10,calibrated:.54}}}
+}}};
+const triadHtml=api.card(triadMatch,{});
+assert.equal((triadHtml.match(/data-v7-slot=/g)||[]).length,3);
+for(const label of ['● GOLD','Over 1,5 ST','[2° TEMPO]','54,0%','EV +13,4%','Simmetria 1°+2°T'])
+ assert(triadHtml.includes(label),label);
+assert.equal((triadHtml.match(/Nessun mercato idoneo/g)||[]).length,2);
+triadRow.quote_observed_at=triadStart;
+assert.match(api.card(triadMatch,{}),/Quota da aggiornare/);
+assert(!api.card(triadMatch,{}).includes('Over 1,5 ST'));

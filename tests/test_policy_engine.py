@@ -116,8 +116,10 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(value['multimarket']['model_id'],MODEL_ID)
         self.assertEqual(value['multimarket']['data_quality']['home']['sample'],8)
         self.assertEqual(value['multimarket']['data_quality']['away']['ht_sample'],4)
-        self.assertEqual(value['model']['probabilities_raw'],value['model']['probabilities_calibrated'])
-        self.assertFalse(value['model']['calibration_applied'])
+        self.assertEqual(value['model']['active_engine'], 'arabsniper-v7.0')
+        self.assertNotEqual(value['model']['probabilities_raw'],value['model']['probabilities_calibrated'])
+        self.assertTrue(value['model']['calibration_applied'])
+        self.assertEqual(value['model']['probabilities'], value['model']['probabilities_calibrated'])
         self.assertIsNone(value['multimarket']['markets'][0]['odd'])
         self.assertLess(calls.index('statistical_analysis'),calls.index('odds'))
         self.assertAlmostEqual(value['model']['lambdas']['total_ft'],value['model']['lambdas']['home_ft']+value['model']['lambdas']['away_ft'])
@@ -135,7 +137,7 @@ class EngineTests(unittest.TestCase):
         def audit(ns, output, client):
             observed.append(len(output['days'][0]['matches']))
             assert output['days'][0]['selection_board']['max_per_market'] is None
-            assert all(len(m['multimarket']['matrix']['rows'])==60 for m in output['days'][0]['matches'])
+            assert all(len(m['multimarket']['matrix']['rows'])==73 for m in output['days'][0]['matches'])
             return {'cohorts':[], 'status':'experimental'}
         with tempfile.TemporaryDirectory() as folder:
             ns=dict(engine.__dict__)

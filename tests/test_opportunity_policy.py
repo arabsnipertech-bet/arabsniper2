@@ -132,8 +132,8 @@ class PlayableValue(unittest.TestCase):
             before = [(r['id'], r['statistical_pct'], r.get('provider_updated_at')) for r in a['matrix']['rows']]
             ledger = deepcopy(state)
             self.assertEqual(refresh_day(day, state, NOW), 1)
-            self.assertEqual(r['opportunity']['signal'], signal)
-            self.assertEqual(before, [(r['id'], r['statistical_pct'], r.get('provider_updated_at')) for r in a['matrix']['rows']])
+            self.assertEqual(r['opportunity']['signal'], signal if r['opportunity']['eligible'] else 'excluded')
+            self.assertEqual(before, [(r['id'], r['v51_pricing']['statistical_pct'], r.get('provider_updated_at')) for r in a['matrix']['rows']])
             self.assertEqual(state, ledger)
             frozen = deepcopy(day)
             self.assertEqual(refresh_day(day, state, '2026-10-27T08:00:00Z'), 0)

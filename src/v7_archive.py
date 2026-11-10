@@ -8,18 +8,18 @@ from zoneinfo import ZoneInfo
 from audit_storage import open_verified_json, read_store, write_store
 from lateral_matrix import market_id, settle_spec, specification
 from multimarket_model import stamp
-from v7_decision import canonical, fingerprint, GOAL, GG
+from v7_decision import canonical, fingerprint, COMBOS, GOAL, GG, GG_SH
 from v7_probability import VERSION, blend_rates, finite, score_model, utc
 
 ROME = ZoneInfo('Europe/Rome')
 FINISHED = {'FT', 'AET', 'PEN'}
 VOID = {'CANC', 'ABD', 'AWD', 'WO'}
 WEIGHTS = (.50, .55, .60, .65, .70, .75, .80)
-BENCHMARKS = frozenset((*GOAL.values(), GG, *(market_id(specification('result', 'ft', side))
+BENCHMARKS = frozenset((*GOAL.values(), GG, GG_SH, *(market_id(specification('result', 'ft', side))
                                           for side in ('1', 'x', '2'))))
 MONITORED = BENCHMARKS | {
     market_id(specification('btts', 'ft', 'yes')),
-    market_id(specification('halves_total', 'ft', 'over', .5, .5)),
+    *(market_id(spec) for spec in COMBOS),
 }
 ABLATIONS = frozenset({'sensitivity', 'odds_rising', 'price', 'suspicious_divergence',
                        'yield_floor', 'oci_negative'})
@@ -148,7 +148,7 @@ def results_for_day(store, day, at, fetched=None, previous=None):
             binary = win + loss == 1 and win in (0, 1)
             if not binary or key not in MONITORED and not role_for_market.get(key):
                 continue
-            comparable = key in BENCHMARKS and row.get('fair') is not None and row.get('v51') is not None
+            comparable = key in BENCHMARKS and row.get('fair') is not None
             if comparable and not models:
                 models = {str(weight): score_model(blend_rates(snapshot['statistics'],
                           snapshot['market_projection'], weight)) for weight in WEIGHTS}
@@ -159,12 +159,15 @@ def results_for_day(store, day, at, fetched=None, previous=None):
                 benchmark=key in BENCHMARKS,
                 role_roi={role: win*(price-1)-loss for role, price in role_prices.get(key, {}).items()},
                 supported=row['supported'],
+                tier=row.get('tier'), horizon=row.get('horizon'), niche_id=row.get('niche_id'),
                 features=row['features'], edge_exclusions=row['edge_exclusions'],
                 policy_exclusions=row['policy_exclusions'], raw=row['raw'], corrected=row['corrected'],
                 calibrated=row['calibrated'], v51=row['v51'], fair=row['fair'], variants=variants))
         fixtures[fid] = dict(forecast_sha256=snapshot['sha256'], kickoff=snapshot['kickoff'],
                              captured_at=snapshot['captured_at'], observed_at=observed_at,
                              status=state, result=result, outcomes=outcomes)
+        if 'triad' in snapshot:
+            fixtures[fid].update({key: snapshot.get(key) for key in ('triad', 'tier', 'badge', 'horizon', 'niche_id')})
     return dict(version=VERSION, date=str(day), generated_at=utc(at),
                 counts=dict(progress), rejected_forecasts=invalid, fixtures=fixtures, samples=samples)
 
@@ -175,6 +178,8 @@ def archive_day(root, store, day, at, fetched=None):
     by_id = {str(m.get('fixture', {}).get('fixture_id')): m.get('fixture', {}).get('result')
              for d in (fetched or {}).get('days', []) for m in d.get('matches', [])}
     output = results_for_day(store, day, at, by_id, previous)
-    if output['fixtures'] or output['rejected_forecasts']:
+    if output['fixtures'] or output['rejected_forecasts'] or not path.is_file():
         write_store(path, output)
+    elif previous:
+        return previous
     return output

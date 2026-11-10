@@ -82,7 +82,7 @@ class FirstHalfAdmission(unittest.TestCase):
         self.assertEqual(e['teams']['home']['sample'], 1)
         self.assertEqual(e['teams']['away']['sample'], 4)
 
-    def test_cached_migration_changes_admission_not_probabilities_or_started_matches(self):
+    def test_cached_migration_keeps_baseline_probabilities_and_started_matches(self):
         m = match(); a = build_matrix(statistical_analysis(m, NOW), NOW); m['multimarket'] = a
         before = {r['id']: (r['statistical_pct'], r['low_pct'], r['high_pct']) for r in a['matrix']['rows']}
         rates = deepcopy(a['rates'])
@@ -91,10 +91,10 @@ class FirstHalfAdmission(unittest.TestCase):
         day = {'date': '2026-10-26', 'matches': [m]}
         self.assertEqual(refresh_day(day, {}, NOW), 1)
         self.assertEqual(a['rates'], rates)
-        self.assertEqual(before, {r['id']: (r['statistical_pct'], r['low_pct'], r['high_pct']) for r in a['matrix']['rows']})
+        self.assertEqual(before, {r['id']: tuple(r['v51_pricing'][k] for k in ('statistical_pct','low_pct','high_pct')) for r in a['matrix']['rows']})
         policy = a['matrix']['opportunity_policy']
         self.assertEqual(policy['id'], POLICY_ID)
-        self.assertEqual(policy['min_probability_pct'], 18.)
+        self.assertEqual(policy['min_probability_pct'], 16.)
         self.assertEqual(policy['min_probability_pct_by_market'], MIN_PROBABILITY_BY_MARKET)
         json.dumps(day, allow_nan=False)
         frozen = deepcopy(day)

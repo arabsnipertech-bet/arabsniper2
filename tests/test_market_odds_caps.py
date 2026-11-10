@@ -83,18 +83,16 @@ class MarketOddsCaps(unittest.TestCase):
         a['matrix']['opportunity_policy']['id'] = 'gold-goals-v3'
         day = {'date': '2026-10-26', 'updated_at': NOW, 'matches': [m]}
         self.assertEqual(refresh_day(day, state, NOW), 1)
-        self.assertEqual(old_probabilities, {r['id']: r['statistical_pct'] for r in a['matrix']['rows']})
+        self.assertEqual(old_probabilities, {r['id']: r['v51_pricing']['statistical_pct'] for r in a['matrix']['rows']})
         self.assertEqual(state, old_ledger)
         self.assertEqual(a['matrix']['opportunity_policy']['id'], POLICY_ID)
         self.assertEqual(r['opportunity']['odds_max'], 4.5)
-        # A supported synthetic admission verifies legacy/public consumers too.
-        r.update(statistical_pct=35., low_pct=30., quality='supported', ev_pct=47., ev_low_pct=26.)
-        annotate(a['matrix'], NOW, a); build_board(day, NOW)
-        self.assertEqual(a['best_candidate']['matrix_market_id'], r['id'])
-        self.assertEqual(a['best_candidate']['odd'], 4.2)
+        # The retained quote is visible, but 4.20 cannot fill an Over 3.5
+        # triad slot even with a qualifying Gold score.
+        self.assertEqual(r['odd'], 4.2)
+        self.assertIsNone(m['triad']['recommended_alternative'])
         preview = build_preview(day, now=datetime.fromisoformat(NOW))
-        self.assertEqual(preview['selections'][0]['spec'], r['spec'])
-        self.assertEqual(preview['selections'][0]['opportunity']['odds_max'], 4.5)
+        self.assertEqual(preview['selections'], [])
         frozen = deepcopy(day)
         self.assertEqual(refresh_day(day, state, '2026-10-27T08:00:00Z'), 0)
         self.assertEqual(day, frozen)

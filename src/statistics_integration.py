@@ -159,20 +159,6 @@ def install(ns, matrix_mode=False):
             # Project the matrix into the four legacy exports; no second quote
             # parser, ledger, OCI or overround calculation is required.
             build_board({'matches': [output]}, observed)
-            if assessment['matrix'].get('calibration'):
-                output['model']['calibration_applied'] = True
-                output['model']['calibration'] = assessment['matrix']['calibration']
-                from adaptive_calibration import market_of
-                reference = assessment['matrix'].get('calibration_reference')
-                calibrated = output['model']['probabilities_calibrated']
-                raw = output['model']['probabilities_raw']
-                for leg in [*assessment['matrix']['rows'], *([reference] if reference else [])]:
-                    market = market_of(leg.get('spec') or {})
-                    if market and leg.get('calibration'):
-                        side = leg['spec']['side']
-                        raw.setdefault(market, {})[side] = (leg.get('calibration_base') or leg)['win_weight']
-                        calibrated.setdefault(market, {})[side] = leg['win_weight']
-                output['model']['probabilities'] = deepcopy(calibrated)
             if assessment.get('favorite_trap_pattern'):
                 output['model']['favorite_trap_pattern'] = assessment['favorite_trap_pattern']
         return output
@@ -217,7 +203,7 @@ def install(ns, matrix_mode=False):
                 coverage = day.get('universal_coverage', {})
                 league_two = sum((m.get('gold_scope') or {}).get('tier') == 'senior_division_4'
                                  for m in day.get('matches', []))
-                ns['log'](f"V5 {day['date']}: {summary['displayed_fixtures']} partite visibili / "
+                ns['log'](f"V7 {day['date']}: {summary['displayed_fixtures']} partite visibili / "
                           f"{coverage.get('available_fixture_ids')} disponibili; "
                           f"{summary['analyzed_fixtures']} matrici, {summary['modeled_markets']} esiti, "
                           f"{summary['priced_markets']} quote recenti; categorie {summary['categories']}; "
@@ -253,7 +239,8 @@ def install(ns, matrix_mode=False):
                 day['market_rankings'] = rankings
                 day['probability_rankings'] = deepcopy(rankings)
             day.setdefault('multimarket_method', {}).update(model_id=engine_id, validation_from=VALIDATION_FROM,
-                                         experimental=True, statistics_first=True)
+                                         statistics_first=True)
+            day['multimarket_method'].pop('experimental', None)
             ns['atomic_write_json'](ns['DATA_DIR']/f"arab_quote_selections_day{day.get('day', 1)}.json",
                                    selection_export(day, as_of) if matrix_mode else
                                    {'date': day.get('date'), 'generated_at': as_of, 'selection_board': board,
@@ -283,14 +270,16 @@ def install(ns, matrix_mode=False):
             markers='Oro: selezione statistica. Azzurro: conferma diretta nelle quote.',
             book='Movimenti osservati sugli stessi operatori, depurati dall’aggio; nessun bonus alle probabilità.')
         if matrix_mode:
+            from v7_probability import VERSION as V7_VERSION
             output['method']['active_analysis'].update(universal_observation=False, all_whitelisted_fixtures=True,
-                competition_policy=SCOPE_ID, all_supported_score_markets=True)
+                competition_policy=SCOPE_ID, all_supported_score_markets=True, decision_model=V7_VERSION)
             output['method']['user_policy'].update(universal_observation=False, competition_policy=SCOPE_ID,
                 romania_allowed=True, goals_only_proposals=True, drought_probability_bonus=0,
                 market_confirmation_after_selection=False)
-            output['method'].update(markets='Matrice 1X2, doppia chance, Over/Under, GG/NG, PT/ST, asiatici, multigol e combo.',
+            output['method'].update(markets='Matrice V7 1X2, Over/Under, GG/NG, asiatici e quattro combo PT+ST.',
+                calibration='Quote fair incorporate una volta nelle intensità V7. Pesi V7 verificati in ordine cronologico.',
                 competition_filter=SCOPE_DESCRIPTION,
-                markers='Proposte su cinque mercati gol, controlli OCI/aggio e Combo PT+ST; soglie gold-goals-v6.1.',
+                markers='Triade V7 e livelli Blu, Gold e Platinum; controlli OCI e aggio.',
                 book='OCI e aggio per esito, linea e periodo; volumi e smart money non osservati.')
         ns['atomic_write_json'](ns['OUTPUT_FILE'], output)
         for day in output.get('days', []):

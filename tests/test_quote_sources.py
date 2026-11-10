@@ -105,9 +105,12 @@ class ComboSources(unittest.TestCase):
 
     def test_team_specific_both_halves_never_prices_match_combo(self):
         for bid,name in ((48,'To Score in Both Halves - Home'),(111,'Home team to score in both halves'),
-                         (112,'Away team to score in both halves'),(113,'Both teams to score in both halves')):
+                         (112,'Away team to score in both halves')):
             item=self.direct();item.update(id=bid,name=name)
             self.assertEqual(direct_combo_groups(feed([item]),100,NOW),{})
+        item=self.direct();item.update(id=113,name='Both teams to score in both halves')
+        actual=next(iter(direct_combo_groups(feed([item]),100,NOW).values()))
+        self.assertEqual(actual['specs']['over'], {'kind':'both_halves','period':'ft','side':'both'})
         item=self.direct();item['name']='Home team will score in both halves'
         self.assertEqual(direct_combo_groups(feed([item]),100,NOW),{})
         item=self.direct();item['values'][0]['odd']=2.1

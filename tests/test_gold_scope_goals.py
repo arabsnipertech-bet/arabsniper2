@@ -102,7 +102,7 @@ class GoldScope(unittest.TestCase):
 
 
 class GoalPriority(unittest.TestCase):
-    def test_legacy_exports_and_gold_share_pt_choice(self):
+    def test_legacy_priority_cannot_publish_unverified_prices_through_v7(self):
         m = match(); a = build_matrix(statistical_analysis(m, NOW), NOW)
         context = example('away', '1')
         a['inputs'] = context['inputs']
@@ -113,12 +113,13 @@ class GoalPriority(unittest.TestCase):
         m['multimarket'] = a
         day = {'date': '2026-10-26', 'matches': [m]}
         build_board(day, NOW)
-        self.assertEqual(a['best_candidate']['market'], 'gg_ht')
-        self.assertEqual(m['display']['primary_choice']['market'], 'gg_ht')
-        self.assertEqual(m['display']['ranked_choices'][0]['market'], 'gg_ht')
+        self.assertIsNone(a['best_candidate'])
+        self.assertIsNone(m['display']['primary_choice'])
+        self.assertEqual(m['display']['ranked_choices'], [])
+        self.assertEqual(m['display']['analysis_engine'], 'arabsniper-v7.0')
         export = selection_export(day, NOW)
         self.assertEqual(export['opportunity_policy'], POLICY_ID)
-        self.assertEqual(export['rankings']['gg_ht'][0]['published_rank'], 1)
+        self.assertEqual(export['rankings']['gg_ht'], [])
 
     def test_favorite_gap_home_and_away_prefers_over_pt(self):
         for side, favorite in [('home', '1'), ('away', '2')]:

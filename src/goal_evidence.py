@@ -13,6 +13,7 @@ def evidence(assessment):
     from statistics_first import period_rows
     profiles, rates = assessment.get('profiles') or {}, assessment.get('rates') or {}
     histories = (assessment.get('inputs') or {}).get('histories') or {}
+    means = (assessment.get('observed_goal_means') or {}).get('teams') or {}
     teams = {}
     for side in ('home', 'away'):
         team = {}
@@ -35,6 +36,8 @@ def evidence(assessment):
                 'goalless_matches': sum(v == 0 for v in values) if values else attack.get('goalless_matches'),
                 'expected_goals': rates.get(side+'_'+period),
             }
+        team['sh'] = {'sample': ((means.get(side) or {}).get('st') or {}).get('sample'),
+                      'expected_goals': rates.get(side+'_st')}
         teams[side] = team
     return {'id': EVIDENCE_ID, 'teams': teams, 'combined_basis': 'home_and_away_goals_scored_in_period',
             'peak_shadow': {'production_applied': False, 'periods': {period: (
@@ -47,6 +50,10 @@ def evidence(assessment):
 def structural_reasons(row, market):
     data = row.get('goal_evidence') or {}
     if data.get('id') != EVIDENCE_ID: return ['structural_missing']
+    if market.endswith('_sh'):
+        samples = [((data.get('teams', {}).get(s) or {}).get('sh') or {}).get('sample')
+                   for s in ('home', 'away')]
+        return [] if all(numeric(n) and n >= 4 for n in samples) else ['st_history']
     teams = data.get('teams') or {}
     period = 'ht' if market in ('over15_ht', 'over25_ht', 'gg_ht') else 'ft'
     pair = [(teams.get(s) or {}).get(period) or {} for s in ('home', 'away')]

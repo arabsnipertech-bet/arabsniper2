@@ -7,7 +7,8 @@ import signal
 import subprocess
 import sys
 
-from audit_storage import atomic_bytes, read_store
+from audit_storage import atomic_bytes, read_store, write_store
+from auditor_daily_priority import LEGACY_STATUS, ensure_priority, v7_ready
 from auditor_schedule import ROME, MARKER, admission, recovery_admission, already_completed, has_daily_report
 
 
@@ -59,11 +60,39 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
     def phase(*args):
         command_runner(root, [sys.executable, *args], deadline, clock)
 
-    def calibrate():
+    def output(name, value):
+        if os.getenv('GITHUB_OUTPUT'):
+            with Path(os.environ['GITHUB_OUTPUT']).open('a') as out:
+                out.write(f'{name}={str(value).lower()}\n')
+
+    day = str(today-timedelta(days=1))
+
+    def legacy_status(status, reason=None, evidence_saved=False):
+        write_store(root/LEGACY_STATUS, dict(date=str(today), status=status, reason=reason,
+                                           evidence_saved=evidence_saved))
+        phase('src/gold_storage.py', 'checkpoint-day', '--date', day, '--legacy')
+        output('v51_status', status)
+        print(f'V5.1 audit status: {status}', flush=True)
+
+    def calibrate_legacy():
+        # V7 is already checkpointed. Leave time to persist the status after a
+        # bounded V5.1 subprocess, including if a historical file is incomplete.
+        end = min(clock()+timedelta(minutes=6), deadline-timedelta(minutes=3))
         args = ['src/adaptive_calibration.py', '--as-of', today.isoformat()]
         if recovery_date:
             args.extend(['--recovery-date', recovery_date])
-        phase(*args)
+        status = 'complete'
+        reason = None
+        evidence_saved = False
+        try:
+            command_runner(root, [sys.executable, 'auditor/current_audit.py',
+                                  'legacy-evidence', '--date', day], end, clock)
+            evidence_saved = True
+            command_runner(root, [sys.executable, *args], end, clock)
+        except (TimeoutError, subprocess.CalledProcessError) as error:
+            status = 'partial_v51_skip'
+            reason = 'deadline' if isinstance(error, TimeoutError) else f'exit_{error.returncode}'
+        legacy_status(status, reason, evidence_saved)
 
     def checkpoint(work_date, stage):
         value = {'version': 1, 'work_date': work_date.isoformat(), 'stage': stage}
@@ -71,16 +100,35 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
         phase('src/gold_storage.py', 'checkpoint')
         print(f'Auditor checkpoint saved: {work_date} {stage}', flush=True)
 
-    phase('src/gold_storage.py', 'restore')
-    pending = saved_batch(root, today)
-    if pending is not None and pending[1] != 'preparing' and not has_daily_report(root, pending[0]):
-        pending = (pending[0], None)  # Rebuild an incomplete legacy checkpoint.
-    if pending is None and already_completed(root, clock()):
+    phase('src/gold_storage.py', 'restore-v7-priority', '--date', day)
+    if already_completed(root, clock()) and v7_ready(root, today):
         print('Nightly Auditor already published for this Rome date', flush=True)
+        output('v7_completed', True)
         return 'already_completed'
 
-    from auditor_daily_priority import ensure_priority
-    ensure_priority(root, today, phase, calibrate)
+    ensure_priority(root, today, phase)
+    output('v7_completed', True)
+    if deadline-clock() < timedelta(minutes=20):
+        if deadline-clock() >= timedelta(minutes=3):
+            legacy_status('partial_v51_skip', 'insufficient_window')
+        return 'paused'
+
+    # Historic state can be huge or incomplete. V7 already has its own
+    # verified checkpoint, and this restore cannot hold the writer past cutoff.
+    end = min(clock()+timedelta(minutes=15), deadline-timedelta(minutes=3))
+    try:
+        command_runner(root, [sys.executable, 'src/gold_storage.py', 'restore'], end, clock)
+    except (TimeoutError, subprocess.CalledProcessError) as error:
+        legacy_status('partial_v51_skip', 'restore_deadline' if isinstance(error, TimeoutError) else 'restore_failed')
+        return 'paused'
+
+    pending = saved_batch(root, today)
+    if pending is not None and pending[1] != 'preparing' and not has_daily_report(root, pending[0]):
+        pending = (pending[0], None)
+    phase('src/homepage_results.py')
+    phase('src/private_publication.py', '--results-only')
+    if deadline-clock() >= timedelta(minutes=4):
+        calibrate_legacy()
     if deadline-clock() < timedelta(minutes=20):
         return 'paused'
 
@@ -99,15 +147,12 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
             checkpoint(work_date, 'preparing')
             if pending_journals(root, cutoff):
                 return 'paused'
-            phase('auditor/current_audit.py', 'daily', '--date', report_date)
+            if work_date != today or not v7_ready(root, today):
+                phase('auditor/current_audit.py', 'daily', '--date', report_date)
             stage = None
         if not has_daily_report(root, work_date):
             raise ValueError(f'Missing or mismatched daily Auditor report for batch {work_date}')
-        # Save today's certified learning before the expensive historical pass.
-        # Retain the daily progress marker so a timeout never claims full completion.
-        if work_date == today and stage != 'history':
-            calibrate()
-        if stage is None or (work_date == today and stage != 'history'):
+        if stage is None:
             checkpoint(work_date, 'daily')
         # Public projections are not in R2. Rebuild on resume if git failed.
         phase('src/homepage_results.py')
@@ -118,8 +163,6 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
                 return 'paused'
             checkpoint(work_date, 'history')
         phase('src/gold_policy_audit.py')
-        if work_date == today:
-            calibrate()
         (root / PROGRESS).unlink(missing_ok=True)
         if work_date == today:
             marker = {'schema_version': 1, 'status': 'complete', 'date': gate['date'],

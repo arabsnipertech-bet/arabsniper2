@@ -6,7 +6,8 @@ from copy import deepcopy
 from datetime import datetime
 from math import isfinite
 import re
-from market_discovery import discover_payload
+from market_discovery import clean, discover_payload
+from market_scope import COMBO_SPECS
 
 SOURCE_VERSION = 'quote-sources-v1'
 TOTALS = {
@@ -169,12 +170,21 @@ def synthetic_combo_groups(payload, fid, observed_at):
     return result
 
 
-def direct_combo_groups(payload, fid, observed_at):
-    """Semantic match-total both-halves market, with an explicit Yes/No pair.
+def direct_combo_spec(bet):
+    name = clean(bet.get('name'))
+    if str(bet.get('id')) == '184' and name == 'to score in both halves':
+        return COMBO_SPECS[0]
+    if re.fullmatch(r'over 1\.5 (?:pt|first half|1st half) (?:and )?over 2\.5 (?:ft|full time)', name):
+        return COMBO_SPECS[1]
+    if re.fullmatch(r'(?:gg pt|btts first half|both teams to score first half) (?:and )?over 2\.5 (?:ft|full time)', name):
+        return COMBO_SPECS[2]
+    if name in ('gg pt gg st', 'btts first half and btts second half',
+                'both teams to score in both halves', 'both teams score in both halves'):
+        return COMBO_SPECS[3]
 
-    Team-specific and BTTS-in-both-halves settlements are rejected by discovery.
-    The canonical 184 adapter preserves the actual complement and source ID.
-    """
+
+def direct_combo_groups(payload, fid, observed_at):
+    """Exact whole-match settlements with a complete Yes/No pair from one book."""
     result = {}
     ambiguous = set()
     now = stamp(observed_at)
@@ -185,8 +195,9 @@ def direct_combo_groups(payload, fid, observed_at):
         for book in record.get('bookmakers', []):
             if book.get('id') is None: continue
             for bet in book.get('bets', []):
-                if bet.get('_discovery_rejected'): continue
-                if str(bet.get('id')) != '184' or norm(bet.get('name')) != 'to score in both halves': continue
+                spec = direct_combo_spec(bet)
+                bid = str(bet.get('id'))
+                if spec is None or not bid.isdigit(): continue
                 odds, invalid = {}, False
                 for value in bet.get('values', []):
                     token = {'yes':'over', 'no':'not_over'}.get(norm(value.get('value')))
@@ -195,17 +206,19 @@ def direct_combo_groups(payload, fid, observed_at):
                         invalid = True; continue
                     odds[token] = odd
                 if invalid or set(odds) != {'over', 'not_over'}: continue
-                group = '184|halves_total|ft|0.5|0.5'
+                group = f"{bid}|{spec['kind']}|ft"
+                if spec['kind'] == 'halves_total':
+                    group += '|0.5|0.5'  # Preserve the existing quote trace.
                 key = f'direct_combo_v1|{group}|{book["id"]}'
                 discovery=bet.get('_market_discovery') or {}
-                if discovery and str(discovery.get('source_bet_id'))!='184':
+                if discovery and str(discovery.get('source_bet_id')) != bid:
                     key=f'direct_combo_discovery_v1|{discovery["source_token"]}|{group}|{book["id"]}'
-                candidate = {'odds':odds, 'specs':{'over':{'kind':'halves_total','period':'ft','side':'over','line':.5,'extra':.5}},
+                candidate = {'odds':odds, 'specs':{'over':dict(spec)},
                     'complete':True, 'bookmaker_id':str(book['id']), 'bookmaker':str(book.get('name') or book['id']),
-                    'bet_id':184, 'group':group, 'observed_at':observed_at, 'provider_updated_at':record['update'],
+                    'bet_id':int(bid), 'group':group, 'observed_at':observed_at, 'provider_updated_at':record['update'],
                     'quote_source':'bookmaker', 'quote_executable':True,
                     'quote_provenance':{'version':SOURCE_VERSION, 'kind':'direct_combo',
-                        'source_bet_id':discovery.get('source_bet_id',184), 'discovery':discovery,
+                        'source_bet_id':discovery.get('source_bet_id',int(bid)), 'discovery':discovery,
                         'source_bet_name':discovery.get('source_bet_name',bet['name']), 'source_outcome':'Yes', 'opposite_outcome':'No'}}
                 old = result.get(key)
                 snapshot = (key, at)
