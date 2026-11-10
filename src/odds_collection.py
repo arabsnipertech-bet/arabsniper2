@@ -215,7 +215,12 @@ class OddsEnricher:
         hours = hours_to_kickoff(meta, self.now)
         if hours <= 0:
             return base
-        if hours > 30 and not present_books:
+        # The first usable 1X2 snapshot must be collected early, otherwise
+        # later movements cannot be compared with the opening observation.
+        # For uncovered fixtures up to 72h away, try one bounded Match Winner
+        # query instead of silently abandoning the market.
+        distant_without_book = hours > 30 and not present_books
+        if distant_without_book and hours > 72:
             self.stats['odds_targeted_unproductive_skips'] += 1
             return base
         distant = hours > 18 and secondary_competition(meta)
@@ -237,6 +242,16 @@ class OddsEnricher:
             queries.append(('fixture',fid))  # Unfiltered discovery when even the catalogue is unavailable.
         if uncovered and not distant and all(meta.get(k) is not None for k in ('league_id','season','date')):
             queries.insert(0, ('league_date', meta['date']))
+        if not counts['1x2_ft']:
+            # Do not spend all eight targeted attempts on secondary markets
+            # while Match Winner is still absent. Never synthesize 1/X/2 odds.
+            identities[1] = ('result', 'ft')
+            queries = [('bet', 1)] + [q for q in queries if q != ('bet', 1)]
+        if distant_without_book:
+            # One cheap early observation attempt; normal polling resumes
+            # closer to kickoff and all calls remain subject to quota/cooldown.
+            identities[1] = ('result', 'ft')
+            queries = [('bet', 1)]
         result = base
         attempts = 0
         # Retain bounded calls for known priority fixtures on subsequent calendar days.
