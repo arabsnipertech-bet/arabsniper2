@@ -51,7 +51,7 @@ class AdaptivePolling(TestCase):
             worker.register_fixture(metadata); worker.enrich(payload,100)
             return requests
         first=collect(NOW)
-        self.assertEqual(first,[{'fixture':100,'bet':5}])
+        self.assertEqual(first,[{'fixture':100,'bet':1},{'fixture':100,'bet':5}])
         self.assertNotIn(6,[r.get('bet') for r in collect(NOW+timedelta(hours=7,minutes=59))])
         self.assertIn(6,[r.get('bet') for r in collect(NOW+timedelta(hours=8))])
         self.assertIn(6,[r.get('bet') for r in collect(NOW+timedelta(hours=24))])
@@ -64,7 +64,9 @@ class AdaptivePolling(TestCase):
         worker.register_fixture(meta(31))
         empty = {'response':[],'collection':{'complete':True}}
         self.assertIs(worker.enrich(empty,100),empty)
-        client.get.assert_not_called()
+        # An early 1X2 discovery is now permitted, but unknown quota must
+        # prevent actual odds requests; only the status check can occur.
+        self.assertFalse(any(call.args and call.args[0]=='odds' for call in client.get.call_args_list))
         prior={'multimarket':{'matrix':{'rows':[{'spec':S('result','ft','1'),'odd':2.,'quote_status':'recent'}]}}}
         self.assertLess(fixture_priority(meta(11)['kickoff'],{},NOW), fixture_priority(meta(31)['kickoff'],{},NOW))
         self.assertLess(fixture_priority(meta(24)['kickoff'],prior,NOW), fixture_priority(meta(17)['kickoff'],{},NOW))
