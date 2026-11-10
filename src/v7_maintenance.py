@@ -12,6 +12,7 @@ from gold_storage import GOLD, client, previous_manifest, publish, restore_subse
 from matrix_quotes import attach
 from multimarket_model import stamp
 from proposal_stability import seed_stability
+from quote_history import QuoteHistory, PREFIX as PRICE_HISTORY_PREFIX, restore_for_fixtures
 from v7_archive import ROME
 from v7_probability import utc
 
@@ -93,7 +94,8 @@ def complete_price_pages(api, fid, can_request):
         if paging.get('current') != page or paging.get('total') != pages or not next_page.get('response'):
             return None
         rows.extend(next_page['response'])
-    return {**payload, 'response': rows}
+    return {**payload, 'response': rows,
+            'collection': {'complete': True, 'pages_fetched': pages, 'pages_total': pages}}
 
 
 def incremental(root, api=None, clock=local_now, budget=65):
@@ -127,19 +129,32 @@ def incremental(root, api=None, clock=local_now, budget=65):
     state = read_store(state_path)
     if not isinstance(state, dict):
         raise ValueError('Missing private odds state')
+    prices = QuoteHistory(root/'data')
+    target_ids = {str(match['fixture']['fixture_id']) for match in targets}
+    prices.seed_matrix({'matrix_quotes': {fid: value for fid, value in state.get('matrix_quotes', {}).items()
+                                         if fid in target_ids}})
     refreshed = 0
-    for match in targets:
-        if not can_request():
-            break
-        meta, assessment = match['fixture'], match['multimarket']
-        fid = int(meta['fixture_id'])
-        payload = complete_price_pages(api, fid, can_request)
-        at = clock()
-        if not payload or at >= stamp(meta['kickoff']):
-            continue
-        seed_stability(assessment, assessment)
-        attach(assessment, payload, state, meta, utc(at))
-        refreshed += 1
+    try:
+        for match in targets:
+            if not can_request():
+                break
+            meta, assessment = match['fixture'], match['multimarket']
+            fid = int(meta['fixture_id'])
+            payload = complete_price_pages(api, fid, can_request)
+            at = clock()
+            if not payload or at >= stamp(meta['kickoff']):
+                continue
+            from uuid import uuid4
+            observed = utc(at)
+            payload['collection']['acquisition_id'] = uuid4().hex
+            for row in payload['response']:
+                row['_observed_at'] = observed
+            prices.observe(payload, observed, {'fixture': fid})
+            seed_stability(assessment, assessment)
+            attach(assessment, payload, state, meta, observed)
+            refreshed += 1
+    finally:
+        prices.flush()
     if refreshed:
         write_store(state_path, state)
         write_store(path, day)
@@ -163,6 +178,9 @@ def price_pass(storage, bucket, root, budget, clock=local_now):
     if not required.issubset(index):
         raise ValueError('Incomplete incremental Gold checkpoint')
     restore_subset(storage, bucket, root, index, required | (optional & index.keys()))
+    current = read_store(root/'data/arab_quote_day1.json', {})
+    restore_for_fixtures(storage, bucket, root, index,
+                         [m['fixture']['fixture_id'] for m in upcoming_targets(current, clock())])
     count = incremental(root, clock=clock, budget=budget)
     if not count:
         return 0
@@ -174,6 +192,7 @@ def price_pass(storage, bucket, root, budget, clock=local_now):
         raise RuntimeError('Private checkpoint advanced during the price refresh')
     paths = required | {'data/arab_quote_history.json', journal.relative_to(root).as_posix()}
     paths.update(p.relative_to(root).as_posix() for p in (root/'data').glob('arab_quote_selections_day[1-5].json'))
+    paths.update(p.relative_to(root).as_posix() for p in (root/'data').glob(PRICE_HISTORY_PREFIX+'*.json'))
     publish(storage, bucket, root, selected_paths=sorted(paths))
     return count
 

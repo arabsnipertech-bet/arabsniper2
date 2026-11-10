@@ -44,6 +44,9 @@ Difetti aggiuntivi rilevati e corretti:
 6. La cache di calcolo limita le serie a 48 punti ed elimina i match dopo due
    giorni. Ora un archivio separato conserva tutte le nuove acquisizioni reali,
    incluse le quote invariate, prima di qualsiasi fusione o selezione.
+7. Anche l'aggiornamento V7 di metà ora viene incluso nello storico persistente,
+   ripristinando soltanto le partizioni delle gare interessate. L'aggiornamento
+   incrementale non può così perdere la prima osservazione o saltare l'archivio.
 
 ## Contratto dello storico
 

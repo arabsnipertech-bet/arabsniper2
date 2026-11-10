@@ -144,6 +144,21 @@ class QuoteHistory:
         self.index_dirty = False
 
 
+def restore_for_fixtures(storage, bucket, root, manifest, fixture_ids):
+    """Restore only the archive partitions needed by an incremental price pass."""
+    from gold_storage import restore_subset
+    root = Path(root)
+    index_path = 'data/'+INDEX
+    if index_path not in manifest:
+        return
+    restore_subset(storage, bucket, root, manifest, [index_path])
+    mapping = read_store(root/index_path)['fixtures']
+    paths = {'data/'+PREFIX+mapping[str(fid)]+'.json' for fid in fixture_ids if str(fid) in mapping}
+    if not paths.issubset(manifest):
+        raise ValueError('Missing private quote history partition')
+    restore_subset(storage, bucket, root, manifest, paths)
+
+
 def checkpoint():
     """Preserve acquisitions after a failed scan without publishing any Gold."""
     import os

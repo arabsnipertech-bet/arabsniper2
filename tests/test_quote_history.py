@@ -17,6 +17,7 @@ from matrix_quotes import collect, ledger_offers
 from quote_history import QuoteHistory, INDEX, PREFIX
 from test_gold_storage import Fake
 from test_quote_sources import feed, bet
+from audit_storage import write_store
 
 AT = '2026-10-26T08:00:00+00:00'
 START = '2026-10-29T18:00:00+00:00'
@@ -220,3 +221,66 @@ class RawAcquisition(unittest.TestCase):
             self.assertEqual({r['spec']['side']:r['odd'] for r in result},{'1':2.,'x':3.3,'2':4.})
             self.assertTrue(all(not r['opportunity']['eligible'] for r in result))
             self.assertTrue(client.odds_observer.index['fixtures'])
+
+
+class IncrementalAcquisition(unittest.TestCase):
+    def test_half_hour_refresh_archives_real_update_and_retains_original_first(self):
+        from lateral_matrix import build_matrix
+        from statistics_first import statistical_analysis
+        from test_statistics_first import match
+        from v7_maintenance import incremental, MARKER
+        now = datetime(2026,10,26,10,32,tzinfo=timezone.utc)
+        kickoff = '2026-10-26T12:00:00+00:00'
+        old = payload()
+        old['response'][0]['fixture']['date'] = kickoff
+        current = payload(now.isoformat(), 1.8)
+        current['response'][0]['fixture']['date'] = kickoff
+        current['paging'] = {'current':1,'total':1}
+        state = {}
+        groups, _ = collect(old,100,AT)
+        ledger_offers(state,100,groups,AT,kickoff)
+        m = match()
+        m['fixture']['kickoff'] = kickoff
+        m['multimarket'] = build_matrix(statistical_analysis(m,now.isoformat()),now.isoformat())
+        class API:
+            request_count=0
+            def get(self, endpoint, params, **kw):
+                self.request_count+=1
+                if endpoint=='status':return {'response':{'subscription':{'active':True},
+                    'requests':{'current':1000,'limit_day':75000}}}
+                return deepcopy(current)
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            write_store(root/MARKER,{'status':'complete','started_at':(now-timedelta(minutes=28)).isoformat(),
+                'completed_at':(now-timedelta(minutes=11)).isoformat()})
+            write_store(root/'data/arab_quote_day1.json',{'date':'2026-10-26','matches':[m]})
+            write_store(root/'data/arab_quote_state.json',state)
+            self.assertEqual(incremental(root,api=API(),clock=lambda:now),1)
+            journal=QuoteHistory(root/'data')
+            journal.seed_matrix(read_store(root/'data/arab_quote_state.json'))
+            points=history(journal)
+            self.assertEqual(points['first']['over']['odd'],2.)
+            self.assertEqual(len(points['observations']),2)
+            self.assertAlmostEqual(points['observations'][-1]['delta_from_first_pct']['over'],-10)
+            self.assertEqual(points['observations'][-1]['source']['endpoint'],'odds')
+
+    def test_incremental_restore_downloads_only_required_partition_without_resetting_index(self):
+        from quote_history import restore_for_fixtures
+        with tempfile.TemporaryDirectory() as a,tempfile.TemporaryDirectory() as b:
+            data=Path(a)/'data'
+            journal=QuoteHistory(data)
+            journal.observe(payload(),AT,{'fixture':100})
+            another=payload('2026-10-27T08:00:00Z')
+            another['response'][0]['fixture']['id']=200
+            journal.observe(another,'2026-10-27T08:00:00Z',{'fixture':200})
+            journal.flush()
+            remote=Fake()
+            publish(remote,'test',a,checkpoint_only=True)
+            manifest=json.loads(remote.objects['state/current.json'])['files']
+            restore_for_fixtures(remote,'test',b,manifest,[100])
+            self.assertTrue((Path(b)/'data'/(PREFIX+'20261026.json')).exists())
+            self.assertFalse((Path(b)/'data'/(PREFIX+'20261027.json')).exists())
+            restored=QuoteHistory(Path(b)/'data')
+            self.assertEqual(set(restored.index['fixtures']),{'100','200'})
+            restored.observe(payload('2026-10-26T10:00:00Z',1.8),'2026-10-26T10:00:00Z',{'fixture':100})
+            self.assertEqual(history(restored)['first']['over']['odd'],2.)
