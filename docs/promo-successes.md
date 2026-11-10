@@ -1,5 +1,0 @@
-# Promozioni con successi verificati
-Le promozioni delle 12:45 e 17:15 leggono il piccolo rapporto privato prematch_DATE_promo.json prodotto dall’auditor giornaliero e incluso nel checkpoint R2. Niente nuove chiamate sportive o ricalcolo del modello nel processo promozionale.
-Si usano soltanto proposte Gold/Platinum eleggibili o Studio non soppresse, con quota presente e timestamp precedente al calcio d’inizio. Prima osservazione per partita/mercato; nessuna ricostruzione retroattiva. Solo esiti interamente vincenti, non rimborsi o mezze vincite. Fino a dieci partite distinte, ordinate per quota decrescente.
-Minimo cinque partite: sotto soglia, rapporto assente, data sbagliata o errore di lettura, rimane il promozionale standard. La grafica distingue le categorie; il testo dichiara che è una selezione di successi e non il bilancio completo. Nessuna percentuale né elenco perdenti nel messaggio. Il registro auditor integrale resta invariato.
-Il primo rapporto viene creato alla prossima esecuzione giornaliera dell’auditor; non si forza una lunga riesecuzione per generare marketing.
