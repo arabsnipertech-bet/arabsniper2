@@ -59,7 +59,7 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(requested[0],{'fixture':100,'bet':1})
         self.assertIn(('1x2_ft','1'),coverage(result,100,NOW))
 
-    def test_early_uncovered_fixture_probes_only_match_winner(self):
+    def test_early_uncovered_fixture_bounds_result_and_goal_probes(self):
         candidate=payload(updated='2026-10-23T08:00:00+00:00')
         candidate['response'][0]['fixture']['date']='2026-10-25T09:00:00+00:00'
         candidate['response'][0]['bookmakers'][0]['bets']=[{
@@ -73,7 +73,7 @@ class RecoveryTests(unittest.TestCase):
         result=c.enrich(empty,100)
         requested=[call.args[1] for call in client.get.call_args_list
                    if call.args and call.args[0]=='odds']
-        self.assertEqual(requested,[{'fixture':100,'bet':1}])
+        self.assertEqual(requested,[{'fixture':100,'bet':1},{'fixture':100,'bet':905}])
         self.assertIn(('1x2_ft','1'),coverage(result,100,NOW))
 
     def test_unknown_or_low_quota_does_not_probe(self):
@@ -82,6 +82,28 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(c.calls,0)
         c,client=self.collector(payload(2));client.get.side_effect=lambda *a,**k:None
         c.enrich(payload(),100);self.assertEqual(c.calls,0)
+
+    def test_five_day_fixture_can_recover_goals_even_when_1x2_is_unavailable(self):
+        from datetime import datetime, timedelta
+        start=(datetime.fromisoformat(NOW)+timedelta(hours=100)).isoformat()
+        answer=payload()
+        answer['response'][0]['fixture']['date']=start
+        answer['response'][0]['bookmakers'][0]['bets']=[{'id':8,'name':'Both Teams Score','values':[
+            {'value':'Yes','odd':'1.9'},{'value':'No','odd':'1.9'}]}]
+        requests=[]
+        client=Mock();client.request_count=0
+        def get(path,params,**kw):
+            client.request_count+=1
+            if path=='status':return {'response':{'requests':{'current':1000,'limit_day':75000}}}
+            requests.append(params)
+            return answer if params.get('bet')==8 else {'response':[]}
+        client.get.side_effect=get
+        c=OddsEnricher(client,{},NOW,max_calls=2,market_catalog=[{'id':8,'name':'Both Teams Score'}])
+        c.register_fixture({'fixture_id':100,'kickoff':start})
+        recovered=c.enrich({'collection':{'complete':True},'response':[]},100)
+        self.assertEqual(requests,[{'fixture':100,'bet':1},{'fixture':100,'bet':8}])
+        self.assertEqual(coverage(recovered,100,NOW),{('gg_ft','1')})
+        self.assertNotIn(('1x2_ft','1'),coverage(recovered,100,NOW))
     def test_cooldown_persists_and_failed_requests_not_cached(self):
         c,client=self.collector({'response':[]});c.enrich(payload(),100)
         state=c.finish();self.assertEqual(len(state['queries']),2)
@@ -116,12 +138,19 @@ class CatalogTests(unittest.TestCase):
 if __name__=='__main__':unittest.main()
 
 class AdaptiveTests(unittest.TestCase):
-    def test_unproductive_route_pauses_then_recovers(self):
+    def test_unproductive_route_pauses_secondary_but_never_missing_result(self):
         client=Mock();client.request_count=0
+        requests=[]
+        def get(path,params,**kw):
+            client.request_count += 1
+            if path == 'status':return {'response':{'requests':{'current':1000,'limit_day':75000}}}
+            requests.append(params)
+            return {'response':[]}
+        client.get.side_effect=get
         state={'route_health':{'bet':{'paused_at':NOW,'no_gain_streak':24},'bookmaker':{'paused_at':NOW,'no_gain_streak':24}}}
-        c=OddsEnricher(client,state,now=NOW)
+        c=OddsEnricher(client,state,now=NOW,market_catalog=[{'id':5,'name':'Goals Over/Under'}])
         c.enrich(payload(),100)
-        client.get.assert_not_called()
+        self.assertEqual(requests,[{'fixture':100,'bet':1}])
         self.assertGreater(c.stats['odds_targeted_unproductive_skips'],0)
     def test_statistics_quota_check_ignores_collector_time_limit(self):
         client=Mock();client.request_count=0

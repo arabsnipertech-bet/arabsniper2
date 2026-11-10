@@ -16,6 +16,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          ref: 09131e57e347c79246f6493d93e52f7215ff204f
+          path: baseline
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -27,11 +33,13 @@ jobs:
           R2_BUCKET: arabsniper-gold
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          BASELINE_ROOT: ${{ github.workspace }}/baseline
+        working-directory: candidate
         run: python src/odds_recovery_diagnostic.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: odds-recovery-evidence-${{ github.run_id }}
-          path: odds-recovery-evidence/
+          path: candidate/odds-recovery-evidence/
           if-no-files-found: error
           retention-days: 30

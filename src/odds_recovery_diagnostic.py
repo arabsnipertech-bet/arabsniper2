@@ -9,6 +9,8 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 
 from audit_storage import read_store
@@ -17,6 +19,7 @@ from matrix_quotes import collect
 from multimarket_model import stamp
 from odds_collection import OddsEnricher, coverage
 from odds_probe import engine
+from quote_history import QuoteHistory, PREFIX, INDEX
 
 TARGET_DATE = '2026-11-11'
 TARGETS = (('kawasaki', 'kashiwa'), ('vissel', 'machida'))
@@ -59,10 +62,11 @@ def inventory(payload, fid, at):
 def feed_coverage(days):
     rows = [m for day in days for m in day.get('matches', [])]
     result = {'fixtures': len(rows), '1x2_complete': 0, '1x2_any': 0,
-              'goal_prices': 0, 'with_temporal_history': 0, 'models': {}}
+              'goal_prices': 0, 'with_temporal_history': 0, 'models': {},
+              'upcoming_fixtures': 0, 'upcoming_1x2_complete': 0, 'upcoming_with_goal_prices': 0}
     for m in rows:
         a = m.get('multimarket') or {}
-        model = str((m.get('v7') or {}).get('model_version') or a.get('model_id'))
+        model = str((a.get('matrix') or {}).get('publication_model') or a.get('model_id'))
         result['models'][model] = result['models'].get(model, 0)+1
         matrix = (a.get('matrix') or {}).get('rows', [])
         available = [r for r in matrix if type(r.get('odd')) in (float, int)
@@ -74,7 +78,31 @@ def feed_coverage(days):
         result['1x2_any'] += bool(outcomes)
         result['goal_prices'] += sum((r.get('spec') or {}).get('kind') in ('total', 'btts') for r in available)
         result['with_temporal_history'] += any(r.get('oci') is not None for r in matrix)
+        start = stamp((m.get('fixture') or {}).get('kickoff'))
+        if start and start > datetime.now(timezone.utc):
+            result['upcoming_fixtures'] += 1
+            result['upcoming_1x2_complete'] += {'1', 'x', '2'} <= outcomes
+            result['upcoming_with_goal_prices'] += any((r.get('spec') or {}).get('kind') in ('total', 'btts') for r in available)
     return result
+
+
+def v6_inventory(payload, fid, at):
+    root = os.environ.get('BASELINE_ROOT')
+    if not root:
+        return {'available': False}
+    program = """import json,sys
+from matrix_quotes import collect
+value=json.load(sys.stdin)
+groups,rejected=collect(value['payload'],value['fid'],value['at'])
+print(json.dumps({'complete_groups':sum(g['complete'] for g in groups.values()),
+                 'groups':len(groups),'books':sorted({g['bookmaker_id'] for g in groups.values()}),
+                 'rejections':rejected}))
+"""
+    env = {**os.environ, 'PYTHONPATH': str(Path(root)/'src')}
+    result = subprocess.run([sys.executable, '-c', program], cwd=root, env=env,
+        input=json.dumps({'payload': payload or {}, 'fid': fid, 'at': at}), text=True,
+        capture_output=True, check=True, timeout=30)
+    return json.loads(result.stdout)
 
 
 def run():
@@ -85,6 +113,8 @@ def run():
     selected = {'data/arab_quote_state.json', 'data/arab_quote_odds_collection.json',
                 'data/arab_bet_catalog.json'}
     selected.update(f'data/arab_quote_day{i}.json' for i in range(1, 6))
+    history_paths = {path for path in index if path.startswith('data/'+PREFIX)}
+    selected.update(history_paths)
     report = {'at': current_time(), 'revision': os.getenv('GITHUB_SHA'),
               'requested_date': TARGET_DATE, 'production_writes': 0,
               'checkpoint_files': len(index), 'cases': []}
@@ -95,6 +125,16 @@ def run():
         saved = read_store(root/'data/arab_quote_odds_collection.json', {})
         catalog = read_store(root/'data/arab_bet_catalog.json', {})
         days = [read_store(root/f'data/arab_quote_day{i}.json', {}) for i in range(1, 6)]
+        report['persistent_price_files'] = len(history_paths)
+        report['persistent_price_groups'] = report['persistent_price_observations'] = 0
+        for path in history_paths-{'data/'+INDEX}:
+            recorded = read_store(root/path, {})
+            for fixture in recorded.get('fixtures', {}).values():
+                report['persistent_price_groups'] += len(fixture.get('groups', {}))
+                report['persistent_price_observations'] += sum(len(g['observations']) for g in fixture.get('groups', {}).values())
+        journal = QuoteHistory(root/'data')
+        journal.seed_matrix(state)
+        api.odds_observer = journal
         gold = {}
         for i in range(1, 6):
             try:
@@ -104,6 +144,11 @@ def run():
         report['archive_coverage'] = feed_coverage(days)
         report['gold_coverage'] = feed_coverage(gold.values())
         report['checkpoint_identity'] = hashlib.sha256(json.dumps(index, sort_keys=True).encode()).hexdigest()
+        manifest_bytes = json.dumps({'version': 1, 'files': index}, sort_keys=True, separators=(',', ':')).encode()
+        manifest_id = hashlib.sha256(manifest_bytes).hexdigest()
+        checkpoint = s3.get_object(Bucket=bucket, Key='state/manifests/'+manifest_id+'.json')['Body'].read()
+        report['immutable_manifest_sha256'] = manifest_id
+        report['immutable_manifest_verified'] = checkpoint == manifest_bytes
         quota, _ = api.get_bounded('status', {}, 1)
         limits = ((quota or {}).get('response') or {}).get('requests') or {}
         used, limit = limits.get('current'), limits.get('limit_day')
@@ -129,7 +174,7 @@ def run():
                 report.setdefault('missing_requested_fixtures', []).append(list(pair))
         sample = []
         seen = {str(m['fixture_id']) for m in requested}
-        for match in archived:
+        for match in sorted(archived, key=lambda m: (not has_prices(m), str((m.get('fixture') or {}).get('kickoff')))):
             meta = match.get('fixture') or {}
             start = stamp(meta.get('kickoff'))
             if start and start > datetime.now(timezone.utc) and str(meta['fixture_id']) not in seen:
@@ -147,9 +192,18 @@ def run():
             row = {k: meta.get(k) for k in ('fixture_id', 'match', 'kickoff', 'date', 'league')}
             row['requested_case'] = named(meta)
             row['general'] = inventory(base, fid, at)
+            row['v6_same_response'] = v6_inventory(base, fid, at)
             enricher.register_fixture(meta)
             recovered = enricher.enrich(base, fid)
             row['collector'] = inventory(recovered, fid, current_time())
+            row['collector_v6_same_response'] = v6_inventory(recovered, fid, current_time())
+            anchors = {str(day)+':'+fid_+':'+key: deepcopy(g['first'])
+                for day, stored in journal.days.items() for fid_, fixture in stored['fixtures'].items()
+                for key, g in fixture['groups'].items()}
+            second, _ = api.get_bounded('odds', {'fixture': fid}, 12)
+            row['second_general'] = inventory(second, fid, current_time())
+            row['first_observation_unchanged'] = all(journal.days[day]['fixtures'][fid_]['groups'][key]['first'] == first
+                for identity, first in anchors.items() for day, fid_, key in [identity.split(':', 2)])
             if row['requested_case']:
                 row['queries'] = []
                 for bid in (1, 5, 6, 8, 34):
@@ -158,17 +212,29 @@ def run():
                 result, _ = api.get_bounded('odds', {'league': meta['league_id'], 'season': meta['season'],
                     'date': meta['date'], 'timezone': 'Europe/Rome'}, 10)
                 row['queries'].append({'route': 'league_date', **inventory(result, fid, current_time())})
-                for key, matches in [('archive', archived), ('gold', gold_matches)]:
-                    item = next((m for m in matches if str((m.get('fixture') or {}).get('fixture_id')) == str(fid)), {})
-                    row[key] = {'present': bool(item), '1x2': prices(((item.get('multimarket') or {}).get('matrix') or {}).get('rows', [])),
-                                'v7': (item.get('multimarket') or {}).get('v7', {}).get('version')}
                 row['archive_groups'] = {k: {'count': len(points), 'first': points[0], 'last': points[-1]}
                     for k, points in state.get('matrix_quotes', {}).get(str(fid), {}).get('groups', {}).items()
                     if points and ('|result|ft|' in k or '|btts|ht|' in k)}
+            for key, matches in [('archive', archived), ('gold', gold_matches)]:
+                item = next((m for m in matches if str((m.get('fixture') or {}).get('fixture_id')) == str(fid)), {})
+                row[key] = {'present': bool(item), '1x2': prices(((item.get('multimarket') or {}).get('matrix') or {}).get('rows', [])),
+                            'decision_model': ((item.get('multimarket') or {}).get('matrix') or {}).get('publication_model')}
+            partition = journal.index['fixtures'].get(str(fid))
+            recorded = journal.days.get(partition, {}).get('fixtures', {}).get(str(fid), {})
+            row['actual_temporal_series'] = {key: {'observations': len(g['observations']), 'first': g['first'],
+                'last_observed_at': g['observations'][-1]['observed_at'],
+                'last_delta_from_first_pct': g['observations'][-1]['delta_from_first_pct']}
+                for key, g in recorded.get('groups', {}).items() if '|result|ft|' in key}
             row['http_calls'] = api.request_count-before_calls
             report['cases'].append(row)
         report['targeted_stats'] = enricher.stats
         report['http_calls'] = api.request_count
+        journal.flush()
+        report['local_journal_observations'] = journal.observations
+        report['new_http_observations'] = sum(
+            str(p.get('source', {}).get('acquisition_id') or '').startswith(api.odds_acquisition_session+':')
+            for day in journal.days.values() for fixture in day['fixtures'].values()
+            for group in fixture['groups'].values() for p in group['observations'])
     destination = Path('odds-recovery-evidence')
     destination.mkdir(exist_ok=True)
     (destination/'diagnostic.json').write_text(json.dumps(report, ensure_ascii=False, indent=2))

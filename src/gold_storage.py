@@ -245,9 +245,14 @@ def restore_v7_priority(storage, bucket, root, day):
     print(f'Priority V7 inputs restored: {len(selected)} verified files', flush=True)
 
 
-def restore(s3,bucket,root):
+def restore(s3,bucket,root,manifest_sha=None):
     root=Path(root)
-    manifest=json.loads(s3.get_object(Bucket=bucket,Key='state/current.json')['Body'].read())
+    if manifest_sha is not None and not re.fullmatch('[a-f0-9]{64}',manifest_sha):
+        raise ValueError('Invalid immutable checkpoint identifier')
+    key='state/manifests/'+manifest_sha+'.json' if manifest_sha else 'state/current.json'
+    raw=s3.get_object(Bucket=bucket,Key=key)['Body'].read()
+    if manifest_sha and sha(raw)!=manifest_sha:raise ValueError('Immutable checkpoint checksum mismatch')
+    manifest=json.loads(raw)
     if manifest.get('version')!=1 or not isinstance(manifest.get('files'),dict):raise ValueError('Invalid checkpoint')
     pending={}; objects={}
     for path,item in manifest['files'].items():
@@ -306,14 +311,17 @@ if __name__=='__main__':
     parser.add_argument('command',choices=('publish','restore','restore-v7-priority','checkpoint','checkpoint-day'))
     parser.add_argument('--date',type=date.fromisoformat)
     parser.add_argument('--legacy',action='store_true')
+    parser.add_argument('--manifest-sha',help='Restore an existing immutable checkpoint to this checkout')
     args=parser.parse_args()
     if (args.command in ('checkpoint-day','restore-v7-priority')) != (args.date is not None):
         parser.error('--date is required for dated priority operations')
+    if args.manifest_sha and args.command!='restore':parser.error('--manifest-sha applies only to restore')
     try:
         storage,bucket,root=client(),os.environ['R2_BUCKET'],Path(__file__).resolve().parents[1]
         if args.command=='checkpoint':publish(storage,bucket,root,checkpoint_only=True)
         elif args.command=='checkpoint-day':checkpoint_day(storage,bucket,root,args.date,legacy=args.legacy)
         elif args.command=='restore-v7-priority':restore_v7_priority(storage,bucket,root,args.date)
+        elif args.command=='restore':restore(storage,bucket,root,args.manifest_sha)
         else:globals()[args.command](storage,bucket,root)
     except Exception as error:
         # Never print SDK request headers/credentials.

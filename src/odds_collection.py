@@ -11,9 +11,9 @@ from quote_sources import direct_combo_groups, normalize_payload
 from gold_competitions import excluded_known_meta
 from market_discovery import identify, clean, VERSION as DISCOVERY_VERSION
 
-TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht', 'over05_ht', 'over05_sh', 'combo_ht_sh')
+TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht', 'gg_ft', 'over05_ht', 'over05_sh', 'combo_ht_sh')
 BET_IDS = {'1x2_ft':(1,), 'over25_ft':(5,50,336), 'over35_ft':(5,50,336),
-           'over15_ht':(6,72), 'over25_ht':(6,72), 'gg_ht':(34,),
+           'over15_ht':(6,72), 'over25_ht':(6,72), 'gg_ht':(34,), 'gg_ft':(8,),
            'over05_ht':(6,72), 'over05_sh':(26,), 'combo_ht_sh':(184,)}
 # Compatibility export only. Runtime routes are discovered from the catalogue
 # and the entire fixture payload; these historical IDs are not admission rules.
@@ -21,7 +21,7 @@ SEMANTIC_TARGETS = {('result','ft'):('1x2_ft',),
     ('total','ft'):('over25_ft','over35_ft'), ('asian_total','ft'):('over25_ft','over35_ft'),
     ('total','ht'):('over15_ht','over25_ht','over05_ht'),
     ('asian_total','ht'):('over15_ht','over25_ht','over05_ht'),
-    ('btts','ht'):('gg_ht',), ('total','sh'):('over05_sh',),
+    ('btts','ht'):('gg_ht',), ('btts','ft'):('gg_ft',), ('total','sh'):('over05_sh',),
     ('halves_total','ft'):('combo_ht_sh',)}
 
 
@@ -217,10 +217,9 @@ class OddsEnricher:
             return base
         # The first usable 1X2 snapshot must be collected early, otherwise
         # later movements cannot be compared with the opening observation.
-        # For uncovered fixtures up to 72h away, try one bounded Match Winner
-        # query instead of silently abandoning the market.
+        # Cover the entire five-day Night schedule with bounded early probes.
         distant_without_book = hours > 30 and not present_books
-        if distant_without_book and hours > 72:
+        if distant_without_book and hours > 120:
             self.stats['odds_targeted_unproductive_skips'] += 1
             return base
         distant = hours > 18 and secondary_competition(meta)
@@ -248,10 +247,13 @@ class OddsEnricher:
             identities[1] = ('result', 'ft')
             queries = [('bet', 1)] + [q for q in queries if q != ('bet', 1)]
         if distant_without_book:
-            # One cheap early observation attempt; normal polling resumes
-            # closer to kickoff and all calls remain subject to quota/cooldown.
+            # A provider may offer goals before 1X2. Spend at most two queries,
+            # prioritising 1X2 and then catalogue-verified FT goal markets.
+            # Per-route cooldowns rotate later probes instead of repeating gaps.
             identities[1] = ('result', 'ft')
-            queries = [('bet', 1)]
+            early_routes = sorted((r for r in routes if r[0] != 1),
+                                  key=lambda r: (r[2] != 'ft', r[1] != 'total', str(r[0])))
+            queries = [('bet', 1)]+[('bet', r[0]) for r in early_routes]
         result = base
         attempts = 0
         # Retain bounded calls for known priority fixtures on subsequent calendar days.
@@ -273,12 +275,13 @@ class OddsEnricher:
             health = self.state.setdefault('route_health', {}).setdefault(kind, {})
             paused = stamp(health.get('paused_at'))
             if paused and 0 <= (stamp(self.now)-paused).total_seconds() < 21600:
-                if not uncovered and hours > 6:
+                essential_result = kind == 'bet' and identities.get(value) == ('result', 'ft') and not counts['1x2_ft']
+                if not uncovered and hours > 6 and not essential_result:
                     self.stats['odds_targeted_unproductive_skips'] += 1
                     continue
             elif paused:
                 health.clear()
-            if attempts >= 8:
+            if attempts >= (2 if distant_without_book else 8):
                 break
             if self.calls >= call_limit or not self.allowed():
                 self.stats['odds_targeted_budget_stops'] += 1
@@ -294,6 +297,8 @@ class OddsEnricher:
                     extra = self.client.get('odds', params, use_cache=False)
             finally:
                 self.elapsed += time.monotonic()-started
+            if not self.fixed_now:
+                self.now = datetime.now(timezone.utc).isoformat()
             used = self.client.request_count-start_calls
             self.calls += max(1,used)
             self.stats['odds_targeted_requests'] += max(1,used)

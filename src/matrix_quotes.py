@@ -149,6 +149,8 @@ def collect(payload, fid, observed_at, ht_half=None):
         if str((record.get('fixture') or {}).get('id')) != str(fid): continue
         updated, kickoff = stamp(record.get('update')), stamp((record.get('fixture') or {}).get('date'))
         if not now or updated and updated > now or kickoff and now >= kickoff: continue
+        actual_observation = stamp(record.get('_observed_at'))
+        if actual_observation and (actual_observation > now or updated and updated > actual_observation): continue
         for book in record.get('bookmakers', []):
             if book.get('id') is None: continue
             for bet in book.get('bets', []):
@@ -194,7 +196,8 @@ def collect(payload, fid, observed_at, ht_half=None):
                     complete = item['expected'] is not None and set(item['odds']) == item['expected']
                     candidate = {k: item[k] for k in ('odds', 'specs')}
                     candidate.update(bookmaker_id=str(book['id']), bookmaker=str(book.get('name') or book['id']),
-                        bet_id=bid, observed_at=observed_at, provider_updated_at=updated.isoformat() if updated else None,
+                        bet_id=bid, observed_at=actual_observation.isoformat() if actual_observation else observed_at,
+                        provider_updated_at=updated.isoformat() if updated else None,
                         complete=complete, group=f'{bid}|{group}')
                     candidate.update(quote_source='asian_halfline' if source else 'bookmaker',
                                      quote_executable=True, quote_provenance=deepcopy(source or discovered))
