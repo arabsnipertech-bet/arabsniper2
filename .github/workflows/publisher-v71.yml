@@ -1,0 +1,89 @@
+name: Publisher ArabSniperBet V7.1
+
+on:
+  push:
+    branches: [work/v7-1-intelligent-publisher]
+    paths: ['.github/workflows/publisher-v71.yml']
+  workflow_dispatch:
+  
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    env:
+      BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      META_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - run: pip install 'boto3>=1.42,<2'
+      - name: Verify credentials and current endpoints without sending
+        run: |
+          python - <<'PY'
+          from urllib.request import urlopen, Request
+          from urllib.error import HTTPError
+          from urllib.parse import urlencode
+          from botocore.config import Config
+          import boto3, json, os
+          bad = []
+          def check(name, fn):
+              try:
+                  fn()
+                  print(name + ': OK', flush=True)
+              except Exception as exc:
+                  print(name + ': ' + type(exc).__name__ +
+                        (' HTTP ' + str(exc.code) if isinstance(exc, HTTPError) else ''), flush=True)
+                  bad.append(name)
+          def read(url, **kw):
+              with urlopen(Request(url, **kw), timeout=15) as response:
+                  return json.load(response)
+          def tg(method, **query):
+              result = read('https://api.telegram.org/bot' + os.environ['BOT_TOKEN'] +
+                            '/' + method + '?' + urlencode(query))
+              assert result['ok']
+              return result['result']
+          def channel():
+              bot = tg('getMe')
+              assert bot['username'].lower() == 'arabsniperbot'
+              chat = tg('getChat', chat_id='@arabsniper_signals')
+              assert chat['username'].lower() == 'arabsniper_signals'
+              assert tg('getChatMember', chat_id=chat['id'], user_id=bot['id'])['can_post_messages']
+          def trial():
+              hook = tg('getWebhookInfo')
+              assert hook['url'] == 'https://arabsniperbet.com/api/telegram-webhook'
+              assert not hook.get('allowed_updates') or 'message' in hook['allowed_updates']
+              try:
+                  read(hook['url'], data=b'{}', headers={'Content-Type': 'application/json'})
+              except HTTPError as exc:
+                  assert exc.code == 403
+              else:
+                  raise ValueError('Expected authenticated webhook guard')
+          def meta():
+              page = '604216843376166'
+              root = 'https://graph.facebook.com/v25.0/'
+              h = {'Authorization': 'Bearer ' + os.environ['META_TOKEN']}
+              assert read(root + 'me?fields=id', headers=h)['id'] == page
+              assert 'data' in read(root + page + '/published_posts?fields=id&limit=1', headers=h)
+          def r2():
+              s3 = boto3.client('s3', endpoint_url='https://' + os.environ['R2_ACCOUNT_ID'] + '.r2.cloudflarestorage.com',
+                  region_name='auto', aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],
+                  aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
+                  config=Config(connect_timeout=10, read_timeout=25, retries={'total_max_attempts': 2}))
+              bucket = os.environ['R2_BUCKET']
+              for key in ('arab_quote_day1.json', 'arab_quote_day2.json', 'state/current.json'):
+                  assert s3.head_object(Bucket=bucket, Key=key)['ContentLength'] > 0
+          def live():
+              data = read('https://arabsniperbet.com/api/live-scores')
+              assert data['enabled'] and data['schema_version'] == 1
+          for name, fn in [('Telegram channel', channel), ('Telegram trial webhook guard', trial),
+                           ('Meta Page read access', meta), ('Gold R2 source', r2), ('Live score cache', live)]:
+              check(name, fn)
+          if bad:
+              raise SystemExit('Unavailable: ' + ', '.join(bad))
+          PY
