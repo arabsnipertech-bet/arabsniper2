@@ -529,13 +529,31 @@ assert(asianBoard.includes('Book della linea 3,5')&&asianBoard.includes('2,88')&
  console.log('PASS Supported study default: prudent ranking, fresh quotes, no certification, immutable history');
 }
 // Overview exposes only 1X2 prices; other markets and research stay in the dialog.
-const compactRows=['1','x','2'].map((side,i)=>({period:'ft',spec:{kind:'result',period:'ft',side},odd:2+i,first_odd:2.2+i,delta_pct:-5,quote_status:'recent'}));
-const compact=api.compactQuotes(compactRows,{},null);
-assert.equal((compact.match(/<section>/g)||[]).length,3);assert(compact.includes('↓ -5,0%'));assert(!compact.includes('Poisson'));
+const compactRows=[['1',2.50,2.20],['x',3.10,3.10],['2',4,4.40]].map(([side,first_odd,odd])=>({
+ period:'ft',spec:{kind:'result',period:'ft',side},odd,first_odd,delta_pct:-5,quote_status:'recent'
+}));
+const compact=api.compactQuotes(compactRows);
+assert.equal((compact.match(/<section aria-label/g)||[]).length,3);
+assert.match(compact,/2,50 → <strong class="mx-compact-price">2,20/);
+assert.match(compact,/data-movement="down"[^>]*>↓ -12,0%/);
+assert.match(compact,/data-movement="flat"[^>]*>→ 0,0%/);
+assert.match(compact,/data-movement="up"[^>]*>↑ \+10,0%/);
+assert(!compact.includes('Poisson'));
 const compactCard=api.card({fixture:{fixture_id:'compact',match:'A - B'},multimarket:{matrix:{rows:compactRows}}},{});
+assert.match(compactCard,/<\/header><div class="mx-compact-quotes"/);
+assert(compactCard.indexOf('mx-compact-quotes')<compactCard.indexOf('mx-compact-proposal'));
 assert(compactCard.includes('Apri analisi'));assert(!compactCard.includes('mx-cockpit'));assert(!compactCard.includes('mx-study-base'));
-assert(!api.compactQuotes([{...compactRows[0],quote_status:'missing',last_odd:2}],{},null).includes('↓ -5,0%'));
-console.log('PASS compact overview: three 1X2 cells, detail entry and no stale movement');
+const unconfirmed=api.compactQuotes([{...compactRows[0],quote_status:'missing',last_odd:2.2}]);
+assert(unconfirmed.includes('Da confermare'));assert(!unconfirmed.includes('↓'));
+assert.equal(api.compactQuotes([{...compactRows[0],odd:null,first_odd:null}]),'');
+const quoteNow=Date.now(),observed=new Date(quoteNow-3600000).toISOString();
+const oneObservation={...compactRows[1],first_observed_at:observed,quote_observed_at:observed,quote_status:'cached_stable'};
+assert.match(api.compactQuotes([oneObservation]),/title="Prima rilevazione">—<\/b><small>Cache/);
+const past={...compactRows[0],quote_status:'stale',last_odd:2.2,bookmaker:'Book A',quote_observed_at:observed,provider_updated_at:observed};
+const history=api.compactQuotes([past],{kickoff:new Date(quoteNow-1800000).toISOString(),closed:true});
+assert(history.includes('Apertura → Ultima prematch'));
+assert.match(history,/↓ -12,0%<\/b><small>Ultima/);
+console.log('PASS compact 1X2: placement, paired prices, three directions, cache and unconfirmed history');
 
 {
 // Real matrix-shaped readings, including cached_quote which omits movement_hours.
