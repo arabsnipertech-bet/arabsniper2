@@ -104,6 +104,13 @@ class PublisherTests(TestCase):
             self.assertLessEqual(len(post['text'].encode('utf-16-le')) // 2, 1024)
         self.assertEqual(public_feed.projection(store.state, NOW + timedelta(minutes=41))['groups'], [])
 
+    def test_fixture_claims_survive_active_ledger_retention(self):
+        store = LocalStore()
+        self.assertTrue(add_group(store, [pick(1), pick(2, 65)], NOW, ('telegram',)))
+        store.prune(NOW + timedelta(days=10))
+        self.assertFalse(store.state['groups'])
+        self.assertEqual(store.state['runtime']['reserved_fixtures'], ['1', '2'])
+
     def test_unknown_delivery_reconciles_and_never_reposts(self):
         store = LocalStore()
         delivery.queue(store, 'academy', 'day', editorial.academy(NOW.date()), ('telegram',),

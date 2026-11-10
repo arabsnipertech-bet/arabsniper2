@@ -103,6 +103,8 @@ def add_group(store, picks, now, channels):
         return False
     store.freeze(f'{rome_day(first)}/groups/{key}.json', group)
     store.state['groups'][key] = group
+    reserved_ids = store.state['runtime'].get('reserved_fixtures', [])
+    store.state['runtime']['reserved_fixtures'] = sorted(set(reserved_ids).union(p['fixture_id'] for p in picks))
     view = project_group(group, now)
     today = rome_day(first)
     representative = (picks[0]['tier'] in ('GOLD', 'PLATINUM') and picks[0]['role'] == 'most_probable'
@@ -241,6 +243,7 @@ def tick(store, services, gh_token, *, trial_ok):
         safe_read('gold_availability', lambda: archive_availability(store, picks, now), None)
     seen = {p['fixture_id'] for group in store.state['groups'].values() for p in group['picks']}
     seen.update(store.state['legacy']['handoff']['ids'])
+    seen.update(store.state['runtime'].get('reserved_fixtures', []))
     group = group_for([p for p in picks if p['fixture_id'] not in seen], now)
     best = bool(group and add_group(store, group, now, services))
     if not best:
