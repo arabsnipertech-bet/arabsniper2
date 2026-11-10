@@ -279,7 +279,16 @@ def build_preview(payload, previous=None, now=None, rng=None):
 def publish(directory='data'):
     directory = Path(directory)
     destination = directory / 'arab_quote_homepage.json'
-    value = build_preview(read_store(directory/'arab_quote_day1.json', {}), read_store(destination, {}))
+    from publisher_v71.cutover import ENABLED
+    if ENABLED:
+        # The scheduled scans still write this public path. V7.1 owns the
+        # editorial release and keeps reserved BESTs out of public Git history.
+        now = datetime.now(timezone.utc)
+        value = {'publisher': 'v7.1', 'date': now.astimezone(ROME).date().isoformat(),
+                 'updated_at': now.isoformat(), 'selections': [], 'social_spunti': [],
+                 'social_selections': []}
+    else:
+        value = build_preview(read_store(directory/'arab_quote_day1.json', {}), read_store(destination, {}))
     atomic_bytes(destination, (json.dumps(value, ensure_ascii=False, separators=(',', ':'))+'\n').encode())
     return value
 

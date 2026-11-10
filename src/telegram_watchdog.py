@@ -106,6 +106,10 @@ def wake(api,now,dry_run=False):
 
 
 def main():
+    from publisher_v71.cutover import ENABLED
+    if ENABLED:
+        print('Editorial recovery is owned by Publisher V7.1')
+        return
     if os.environ.get("GITHUB_REPOSITORY")!=REPO or os.environ.get("GITHUB_REF")!="refs/heads/main":
         raise RuntimeError("Production main only")
     result=wake(GitHub(os.environ.get("GITHUB_TOKEN")),datetime.now(ROME),
@@ -135,6 +139,10 @@ def wake_facebook(api, now, dry_run=False):
 
 
 def facebook_main():
+    from publisher_v71.cutover import ENABLED
+    if ENABLED:
+        print('Editorial recovery is owned by Publisher V7.1')
+        return
     if os.environ.get('GITHUB_REPOSITORY') != REPO or os.environ.get('GITHUB_REF') != 'refs/heads/main':
         raise RuntimeError('Production main only')
     result = wake_facebook(GitHub(os.environ.get('GITHUB_TOKEN')), datetime.now(ROME),

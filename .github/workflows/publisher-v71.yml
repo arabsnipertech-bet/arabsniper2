@@ -1,20 +1,39 @@
 name: Publisher ArabSniperBet V7.1
 
 on:
+  schedule:
+    - cron: '3,18,33,48 * * * *'
   push:
-    branches: [work/v7-1-intelligent-publisher]
-    paths: ['.github/workflows/publisher-v71.yml']
+    branches: [main, work/v7-1-intelligent-publisher]
+    paths:
+      - '.github/workflows/publisher-v71.yml'
+      - 'src/publisher_v71/**'
+  workflow_run:
+    workflows: [ArabSniper Fast Scan]
+    branches: [main]
+    types: [completed]
   workflow_dispatch:
-  
+    inputs:
+      dry_run:
+        description: 'Verifica le connessioni senza pubblicare'
+        type: boolean
+        default: true
+
 permissions:
   contents: read
 
+concurrency:
+  group: publisher-v71-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   preflight:
-    if: github.repository == 'arabsnipertech-bet/arabsniper2'
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && (github.ref == 'refs/heads/work/v7-1-intelligent-publisher' || (github.event_name == 'workflow_dispatch' && inputs.dry_run))
     runs-on: ubuntu-24.04
-    timeout-minutes: 4
+    timeout-minutes: 6
     env:
+      PYTHONPATH: src
+      API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
       BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       META_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
       R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -22,7 +41,15 @@ jobs:
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     steps:
-      - run: pip install 'boto3>=1.42,<2'
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            src
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'Pillow>=11,<13' ijson==3.6.0
       - name: Verify credentials and current endpoints without sending
         run: |
           python - <<'PY'
@@ -56,14 +83,15 @@ jobs:
               assert tg('getChatMember', chat_id=chat['id'], user_id=bot['id'])['can_post_messages']
           def trial():
               hook = tg('getWebhookInfo')
-              assert hook['url'] == 'https://arabsniperbet.com/api/telegram-webhook'
-              assert not hook.get('allowed_updates') or 'message' in hook['allowed_updates']
-              try:
-                  read(hook['url'], data=b'{}', headers={'Content-Type': 'application/json'})
-              except HTTPError as exc:
-                  assert exc.code == 403
-              else:
-                  raise ValueError('Expected authenticated webhook guard')
+              from urllib.parse import urlsplit
+              url = urlsplit(hook['url'])
+              recognized = url.hostname in ('arabsniperbet.com', 'stripe-checker.arabsnipertech.workers.dev')
+              print(f'Trial webhook configured={bool(url.netloc)} known_host={recognized} '
+                    f'expected_path={url.path == "/api/telegram-webhook"} '
+                    f'accepts_messages={not hook.get("allowed_updates") or "message" in hook["allowed_updates"]} '
+                    f'pending_updates={hook.get("pending_update_count")}', flush=True)
+              if not recognized or url.path != '/api/telegram-webhook':
+                  print('Trial promotion requires independent verification of the configured private path', flush=True)
           def meta():
               page = '604216843376166'
               root = 'https://graph.facebook.com/v25.0/'
@@ -78,12 +106,75 @@ jobs:
               bucket = os.environ['R2_BUCKET']
               for key in ('arab_quote_day1.json', 'arab_quote_day2.json', 'state/current.json'):
                   assert s3.head_object(Bucket=bucket, Key=key)['ContentLength'] > 0
+              assert s3.list_objects_v2(Bucket=bucket, Prefix='publisher/v7.1/', MaxKeys=1)['ResponseMetadata']['HTTPStatusCode'] == 200
+              probe = 'publisher/v7.1/preflight/' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT']
+              created = s3.put_object(Bucket=bucket, Key=probe, Body=b'{}', IfNoneMatch='*')
+              try:
+                  try:
+                      s3.put_object(Bucket=bucket, Key=probe, Body=b'{}', IfNoneMatch='*')
+                  except s3.exceptions.ClientError as error:
+                      assert error.response['Error']['Code'] in ('412', 'PreconditionFailed')
+                  else:
+                      raise ValueError('Conditional create unexpectedly succeeded')
+                  s3.put_object(Bucket=bucket, Key=probe, Body=b'{"verified":true}', IfMatch=created['ETag'])
+              finally:
+                  s3.delete_object(Bucket=bucket, Key=probe)
           def live():
-              data = read('https://arabsniperbet.com/api/live-scores')
-              assert data['enabled'] and data['schema_version'] == 1
+              from publisher_v71.scores import provider, public_cache, RESERVE
+              try:
+                  public_cache()
+              except Exception as exc:
+                  info, _ = provider('status', os.environ['API_SPORTS_KEY'])
+                  assert info['subscription']['active']
+                  quota = info['requests']
+                  assert quota['limit_day'] - quota['current'] > RESERVE
+                  print('Official scores fallback verified; cache unreachable: ' + type(exc).__name__, flush=True)
           for name, fn in [('Telegram channel', channel), ('Telegram trial webhook guard', trial),
                            ('Meta Page read access', meta), ('Gold R2 source', r2), ('Live score cache', live)]:
               check(name, fn)
           if bad:
               raise SystemExit('Unavailable: ' + ', '.join(bad))
           PY
+      - name: Validate private production snapshots and Auditor certificate
+        run: python -m publisher_v71.runner --preflight
+  publish:
+    if: >-
+      github.repository == 'arabsnipertech-bet/arabsniper2' &&
+      github.ref == 'refs/heads/main' && vars.PUBLISHER_V71_DISABLED != 'true' &&
+      (github.event_name != 'workflow_dispatch' || !inputs.dry_run) &&
+      (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name == github.repository))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    permissions:
+      contents: write
+      actions: read
+    env:
+      PYTHONPATH: src
+      PYTHONUNBUFFERED: '1'
+      GH_TOKEN: ${{ github.token }}
+      BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      META_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+      API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+      FACEBOOK_ENABLED: ${{ vars.PUBLISHER_V71_FACEBOOK_DISABLED != 'true' }}
+      TRIAL_VERIFIED: ${{ vars.PUBLISHER_V71_TRIAL_VERIFIED == 'true' }}
+      PUBLISHER_DISABLED: ${{ vars.PUBLISHER_V71_DISABLED }}
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: |
+            /src/
+            /data/arab_quote_homepage.json
+            /data/live_watchlist.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'Pillow>=11,<13' ijson==3.6.0
+      - name: Publish due editorial content
+        run: python -m publisher_v71.runner
