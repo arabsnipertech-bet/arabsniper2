@@ -26,6 +26,9 @@ from quote_history import QuoteHistory, PREFIX, INDEX
 
 TARGET_DATE = '2026-11-11'
 TARGETS = (('kawasaki', 'kashiwa'), ('vissel', 'machida'))
+# Keep the pre-release comparison reproducible even if new quoted fixtures
+# change the four dynamically selected API examples.
+PERSISTENCE_PROOF_IDS = {'1647175', '1645407', '1649140', '1649141', '1648030', '1648031'}
 
 
 def current_time():
@@ -172,11 +175,29 @@ def run():
         days = [read_store(root/f'data/arab_quote_day{i}.json', {}) for i in range(1, 6)]
         report['persistent_price_files'] = len(history_paths)
         report['persistent_price_groups'] = report['persistent_price_observations'] = 0
+        report['persistent_price_sources'] = {'http': 0, 'original_ledger': 0, 'other': 0}
+        report['persisted_1x2_series'] = {}
         for path in history_paths-{'data/'+INDEX}:
             recorded = read_store(root/path, {})
-            for fixture in recorded.get('fixtures', {}).values():
+            for fid, fixture in recorded.get('fixtures', {}).items():
                 report['persistent_price_groups'] += len(fixture.get('groups', {}))
                 report['persistent_price_observations'] += sum(len(g['observations']) for g in fixture.get('groups', {}).values())
+                for key, group in fixture.get('groups', {}).items():
+                    observations = group['observations']
+                    for point in observations:
+                        source = point.get('source') or {}
+                        kind = ('http' if source.get('provider') == 'API-Football' and source.get('acquisition_id')
+                                else 'original_ledger' if source.get('endpoint') == 'legacy_matrix_ledger' else 'other')
+                        report['persistent_price_sources'][kind] += 1
+                    if str(fid) in PERSISTENCE_PROOF_IDS and '|result|ft|' in key and observations:
+                        report['persisted_1x2_series'].setdefault(str(fid), {})[key] = {
+                            'first': deepcopy(group['first']), 'observations': len(observations),
+                            'http_observations': sum(bool((p.get('source') or {}).get('acquisition_id')) for p in observations),
+                            'bookmaker': group.get('bookmaker'),
+                            'last': {k: deepcopy(observations[-1].get(k)) for k in (
+                                'observed_at', 'provider_updated_at', 'odds', 'delta_from_first_pct', 'source')}}
+        # The above is captured before any local seeding or new API requests.
+        # It proves what production writers actually committed to R2.
         journal = QuoteHistory(root/'data')
         journal.seed_matrix(state)
         api.odds_observer = journal
