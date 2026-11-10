@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT/'src'))
 from audit_storage import read_store
 from gold_storage import GOLD, publish, restore
 from matrix_quotes import collect, ledger_offers
-from quote_history import QuoteHistory, INDEX, PREFIX
+from quote_history import QuoteHistory, INDEX, PREFIX, partition_id
 from test_gold_storage import Fake
 from test_quote_sources import feed, bet
 from audit_storage import write_store
@@ -62,7 +62,7 @@ class PersistentPrices(unittest.TestCase):
             self.assertEqual(history(restored)['first'], first)
             self.assertEqual(len(history(restored)['observations']), 61)
             restored.flush()
-            self.assertEqual(len(read_store(Path(b)/'data'/(PREFIX+'20261026.json'))['fixtures']['100']['groups'].popitem()[1]['observations']), 61)
+            self.assertEqual(len(read_store(Path(b)/'data'/(PREFIX+partition_id(100,AT)+'.json'))['fixtures']['100']['groups'].popitem()[1]['observations']), 61)
 
     def test_identical_price_from_new_http_is_saved_but_does_not_manufacture_oci_history(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -93,7 +93,7 @@ class PersistentPrices(unittest.TestCase):
             self.assertEqual(first['first']['over'], {'odd': 2., 'observed_at': AT, 'provider_updated_at': AT})
             self.assertEqual(first['observations'][0]['source']['endpoint'], 'legacy_matrix_ledger')
             self.assertAlmostEqual(first['observations'][-1]['delta_from_first_pct']['over'], -10)
-            self.assertEqual(len(journal.days['20261026']['fixtures']['100']['groups']), 2)
+            self.assertEqual(len(journal.days[partition_id(100,AT)]['fixtures']['100']['groups']), 2)
             journal.flush()
             restored = QuoteHistory(tmp)
             restored.seed_matrix(state)
@@ -127,7 +127,7 @@ class PersistentPrices(unittest.TestCase):
             raw = payload('2026-10-27T08:00:00Z', 1.8)
             raw['response'][0]['fixture']['date'] = '2026-10-30T18:00:00Z'
             journal.observe(raw, '2026-10-27T08:00:00Z', {'fixture': 100})
-            self.assertEqual(journal.index['fixtures']['100'], '20261026')
+            self.assertEqual(journal.index['fixtures']['100'], partition_id(100,AT))
             self.assertEqual(history(journal)['first']['over']['odd'], 2.)
             self.assertAlmostEqual(history(journal)['observations'][-1]['delta_from_first_pct']['over'], -10)
 
@@ -136,7 +136,7 @@ class PersistentPrices(unittest.TestCase):
             journal = QuoteHistory(tmp)
             journal.observe(payload(), AT, {'fixture':100})
             journal.flush()
-            (Path(tmp)/(PREFIX+'20261026.json')).unlink()
+            (Path(tmp)/(PREFIX+partition_id(100,AT)+'.json')).unlink()
             restored = QuoteHistory(tmp)
             with self.assertRaisesRegex(ValueError, 'Missing referenced'):
                 restored.observe(payload('2026-10-26T10:00:00Z', 1.8),'2026-10-26T10:00:00Z',{'fixture':100})
@@ -281,8 +281,8 @@ class IncrementalAcquisition(unittest.TestCase):
             publish(remote,'test',a,checkpoint_only=True)
             manifest=json.loads(remote.objects['state/current.json'])['files']
             restore_for_fixtures(remote,'test',b,manifest,[100])
-            self.assertTrue((Path(b)/'data'/(PREFIX+'20261026.json')).exists())
-            self.assertFalse((Path(b)/'data'/(PREFIX+'20261027.json')).exists())
+            self.assertTrue((Path(b)/'data'/(PREFIX+partition_id(100,AT)+'.json')).exists())
+            self.assertFalse((Path(b)/'data'/(PREFIX+partition_id(200,'2026-10-27T08:00:00Z')+'.json')).exists())
             restored=QuoteHistory(Path(b)/'data')
             self.assertEqual(set(restored.index['fixtures']),{'100','200'})
             restored.observe(payload('2026-10-26T10:00:00Z',1.8),'2026-10-26T10:00:00Z',{'fixture':100})

@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
+import re
 from zoneinfo import ZoneInfo
 
 from audit_storage import read_store, write_store
@@ -22,6 +23,11 @@ ROME = ZoneInfo('Europe/Rome')
 
 def fingerprint(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+
+
+def partition_id(fid, observed):
+    # Sixteen small date partitions bound rewrite cost during large weekends.
+    return stamp(observed).astimezone(ROME).strftime('%Y%m%d')+'_'+hashlib.sha256(str(fid).encode()).hexdigest()[0]
 
 
 class QuoteHistory:
@@ -38,10 +44,10 @@ class QuoteHistory:
         fid = str(fid)
         existing = fid in self.index['fixtures']
         if not existing:
-            self.index['fixtures'][fid] = stamp(observed).astimezone(ROME).strftime('%Y%m%d')
+            self.index['fixtures'][fid] = partition_id(fid, observed)
             self.index_dirty = True
         day = self.index['fixtures'][fid]
-        if not isinstance(day, str) or len(day) != 8 or not day.isdigit():
+        if not isinstance(day, str) or not re.fullmatch(r'\d{8}(?:_[0-9a-f])?', day):
             raise ValueError('Invalid quote history partition')
         if day not in self.days:
             if existing and not (self.directory/(PREFIX+day+'.json')).is_file():

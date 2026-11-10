@@ -51,8 +51,9 @@ Difetti aggiuntivi rilevati e corretti:
 ## Contratto dello storico
 
 `quote_history.py` scrive `arab_quote_price_history_index.json` e partizioni
-`arab_quote_price_history_YYYYMMDD.json`. La partizione è scelta alla prima
-osservazione e resta la stessa anche se la partita viene rinviata.
+`arab_quote_price_history_YYYYMMDD_H.json`. Il suffisso distribuisce le gare su
+16 file per limitare il lavoro di scrittura nei weekend. La partizione è scelta
+alla prima osservazione e resta la stessa anche se la partita viene rinviata.
 
 Ogni serie identifica fixture, bookmaker, mercato/periodo/linea e provenienza.
 Ogni rilevazione conserva quota, orario osservato, orario del fornitore, fonte,
