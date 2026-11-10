@@ -461,6 +461,19 @@
   const amplitude=Math.min(Math.abs(delta)/4,1)*40+25+Math.min(Math.abs(delta)/hours/1.5,1)*10+persistenceWeight+10/8;
   return {value:Math.abs(delta)<.10?0:amplitude*Math.sign(delta),label:'Singolo bookmaker · consenso multi-book non confermato'};
  }
+ function ociHistory(row,helpers={},v7){
+  const last=row.last_confirmed_oci;
+  if(!Number.isFinite(last?.value)||!Number.isFinite(Date.parse(last.observed_at)))return '';
+  const reasons={storico_comparabile_assente:'Rilevazioni confrontabili insufficienti',
+   nessuna_maggioranza_multi_operatore:'Consenso tra bookmaker insufficiente'};
+  const reason=row.quote_status==='stale'?'Quota scaduta':row.quote_status==='missing'?'Quota non disponibile':reasons[row.oci_unavailable_reason];
+  const rebound=v7?.niches?.bookmaker_shift_rebound||[];
+  const signal=goalMarket(row)==='gg_ht'&&v7?.status==='published'?
+   '<small>Effetto molla · '+(rebound.some(id=>v7.markets?.[id]?.source_market_id===row.id)?'confermato nello snapshot':'assente nello snapshot')+'</small>':'';
+  return (!Number.isFinite(row.oci)?'<small>OCI corrente non confermato'+(reason?' · '+esc(reason):'')+'</small>':'')+
+   '<small>Ultimo OCI confermato <b>'+signed(last.value)+'</b> · '+
+   esc(helpers.timestamp?.(last.observed_at)||last.observed_at)+'</small>'+signal;
+ }
  function movementSignal(row,saved=false){
   const delta=(priced(row)||saved)&&Number.isFinite(row.delta_pct)?row.delta_pct:null;
   const first=Date.parse(row.first_observed_at),last=Date.parse(row.quote_observed_at);
@@ -582,7 +595,7 @@
   return '<div class="mx-market-row" role="row"><div class="mx-market-name" role="cell"><b>'+esc(row.label)+'</b>'+(isCombo(row)?'<span class="mx-badge mx-combo-'+tone+'">'+(tone==='active'?'Combo Attiva':tone==='near'?'Sotto soglia · Vicina':row.combo?.policy_id===POLICY?'Sotto soglia':'Dati assenti')+'</span>'+(!comboActive(row)?'<small>'+esc(comboReasons(row))+'</small>':''):options.platinum?'<span class="mx-badge mx-platinum"><strong>PLATINUM</strong></span>':options.marketSignal?'<span class="mx-badge mx-market-signal" title="'+MARKET_SIGNAL_TEXT+'">Radar di Mercato · Solo studio</span>':badge(row))+range+'</div>'+
    '<div role="cell" data-title="Statistica">'+stats+(asian?'<small>Rimborsi inclusi nel valore</small>':'')+'</div>'+
    '<div role="cell" data-title="Prima → attuale">'+prices+(priceTime?'<small>'+esc(helpers.timestamp?.(priceTime)||priceTime)+'</small>':'')+'</div>'+
-   '<div role="cell" data-title="OCI"><b>'+signed(comboReference&&!options.study?row.combo?.over25_ft_oci:displayOci(flow).value)+'</b><small>'+esc(displayOci(flow).label)+' · '+(options.study?studyFlowLabel+' · '+esc(flow.agreeing_books??0)+'/'+esc(flow.paired_books??0)+' operatori concordi'+(comboReference?' · Rif. Over 2,5 FT '+signed(row.combo?.over25_ft_oci):''):comboReference?'Riferimento Over 2,5 FT':esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi')+'</small></div>'+
+   '<div role="cell" data-title="OCI"><b>'+signed(comboReference&&!options.study?row.combo?.over25_ft_oci:displayOci(flow).value)+'</b><small>'+esc(displayOci(flow).label)+' · '+(options.study?studyFlowLabel+' · '+esc(flow.agreeing_books??0)+'/'+esc(flow.paired_books??0)+' operatori concordi'+(comboReference?' · Rif. Over 2,5 FT '+signed(row.combo?.over25_ft_oci):''):comboReference?'Riferimento Over 2,5 FT':esc(row.agreeing_books??0)+'/'+esc(row.paired_books??0)+' operatori concordi')+'</small>'+ociHistory(row,helpers,options.v7)+'</div>'+
    '<div role="cell" data-title="Aggio"><b>'+pct(row.selected_margin_pct)+'</b><small>'+(row.quote_source==='synthetic_combo'?'Massimo sui singoli PT/ST · '+(row.quote_provenance?.component_margins_pct||[]).map(pct).join(' / '):isCombo(row)&&!priced(row)?'Richiede una quota bookmaker':'Book selezionato · Δ '+signed(row.selected_margin_delta_pp)+' pt')+'</small>'+(!isCombo(row)?'<small>Mediana '+pct(row.margin_pct)+'</small>':'')+'</div>'+
    '<div role="cell" data-title="Fair mercato"><b>'+pct(operatorFair(row))+'</b><small>Probabilità senza aggio dello stesso operatore</small></div></div>';
  }
@@ -846,7 +859,7 @@
   const active=publishedView(m),study=!active&&!platinum.size&&!bestOpportunity(rowsOf(m),tierOptions)?{kickoff:m.fixture?.kickoff}:null;
   const teams=active?.v7?{...m,multimarket:{...m.multimarket,rates:active.v7.rates}}:m;
   return '<div class="mx-detail"><p class="mx-explanation">'+rows.length+' esiti in questa vista. Quote, OCI e aggio della stessa linea e periodo.</p>'+
-   '<div class="mx-table" role="table" aria-label="Matrice delle opportunità"><div class="mx-table-head" role="row">'+['Mercato','Statistica','Prima → attuale','OCI','Aggio','Fair mercato'].map(t=>'<div role="columnheader">'+t+'</div>').join('')+'</div>'+rows.map(r=>marketRow(r,services,{study,marketSignal:signals.has(r.id),platinum:platinum.has(r.id)})).join('')+'</div>'+
+   '<div class="mx-table" role="table" aria-label="Matrice delle opportunità"><div class="mx-table-head" role="row">'+['Mercato','Statistica','Prima → attuale','OCI','Aggio','Fair mercato'].map(t=>'<div role="columnheader">'+t+'</div>').join('')+'</div>'+rows.map(r=>marketRow(r,services,{study,v7:active?.v7,marketSignal:signals.has(r.id),platinum:platinum.has(r.id)})).join('')+'</div>'+
    '<details class="mx-method"><summary>Statistiche delle squadre</summary>'+teamProfiles(teams)+'</details>'+
    '<details class="mx-method"><summary>Come leggere i valori</summary><p>Aggio: competitività dei prezzi, non misura di liquidità. OCI: movimento delle quote, non volume di denaro. La sensibilità prudente non è un intervallo di confidenza. Il valore asiatico include rimborsi e mezzi esiti.</p></details></div>';
  }

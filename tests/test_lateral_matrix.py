@@ -4,7 +4,8 @@ from datetime import datetime, timezone
 
 from lateral_matrix import (ScoreModel, specification as S, market_id, build_matrix,
                             payout_weights, settle_spec, MODEL_ID)
-from matrix_quotes import collect, attach, expire, parse_value, migrate_handicap_history
+from matrix_quotes import (collect, attach, expire, parse_value, migrate_handicap_history,
+                           preserve_confirmed_oci)
 from repair_matrix_quotes import repair_day
 from matrix_pipeline import build_board, complete_day, fixture_allowed
 from matrix_audit import MatrixAccumulator
@@ -20,6 +21,32 @@ def payload(when=NOW, over=2.2, under=1.9, books=2, values=None, bid=5, name='Go
 
 
 class MatrixMath(unittest.TestCase):
+    def test_last_confirmed_oci_survives_refresh_without_becoming_current(self):
+        history = {}
+        first = '2026-11-10T11:32:00+01:00'
+        later = '2026-11-10T13:41:00+01:00'
+        row = {'id': 'gg_ht', 'oci': -58.42, 'movement_confirmed': True,
+               'quote_status': 'recent', 'quote_observed_at': first}
+        preserve_confirmed_oci(row, history, first)
+
+        refreshed = dict(row, oci=None, movement_confirmed=False, quote_observed_at=later)
+        preserve_confirmed_oci(refreshed, history, later)
+        self.assertIsNone(refreshed['oci'])
+        self.assertFalse(refreshed['movement_confirmed'])
+        self.assertEqual(refreshed['last_confirmed_oci'], {'value': -58.42, 'observed_at': first})
+
+        cached = dict(refreshed, oci=0, movement_confirmed=True, quote_status='cached_stable')
+        preserve_confirmed_oci(cached, history, later)
+        self.assertEqual(cached['last_confirmed_oci'], refreshed['last_confirmed_oci'])
+
+        confirmed = dict(cached, quote_status='recent')
+        preserve_confirmed_oci(confirmed, history, later)
+        self.assertEqual(history['gg_ht'], {'value': 0, 'observed_at': later})
+        replay = {'id': 'gg_ht', 'oci': None, 'last_confirmed_oci': history['gg_ht']}
+        preserve_confirmed_oci(replay, history, first)
+        self.assertNotIn('last_confirmed_oci', replay)
+        self.assertEqual(history['gg_ht']['observed_at'], later)
+
     @classmethod
     def setUpClass(cls):
         cls.a = build_matrix(statistical_analysis(match(), NOW), NOW)

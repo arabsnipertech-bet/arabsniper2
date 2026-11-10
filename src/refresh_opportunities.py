@@ -5,7 +5,7 @@ from pathlib import Path
 from audit_storage import read_store, write_store
 from lateral_matrix import MODEL_ID, CONFIG_ID, base_specs, market_id, matrix_rows
 from matrix_quotes import (CATALOG, partition, migrate_handicap_history, ledger_offers,
-                           analyse_prices, expire)
+                           analyse_prices, expire, preserve_confirmed_oci)
 from matrix_pipeline import build_board, selection_export
 from multimarket_model import stamp
 from opportunity_policy import POLICY_ID
@@ -106,8 +106,11 @@ def refresh_day(day, state, as_of):
         if fixture:
             captured = captured_prices(fixture, rows)
             offers = ledger_offers(state, meta['fixture_id'], captured, as_of, meta['kickoff'])
+            history = fixture.setdefault('confirmed_oci', {})
             for row in rows:
+                preserve_confirmed_oci(row, history, as_of)
                 analyse_prices(row, offers.get(row['id'], []), as_of, meta['kickoff'], allow_cached=True)
+                preserve_confirmed_oci(row, history, as_of)
         expire(a, meta, as_of)
         matrix['opportunity_refreshed_at'] = as_of
         matrix.setdefault('coverage', {}).update(modeled_markets=len(rows),

@@ -430,6 +430,9 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         edge_pp=100*(row['win_weight']/(row['win_weight']+row['loss_weight'])-book_p) if book_p is not None and row['win_weight']+row['loss_weight'] else None,
         ev_pct=round(ev*100, 4), ev_low_pct=round(min(evs)*100, 4), ev_high_pct=round(max(evs)*100, 4),
         oci=oci, oci_method=move.get('oci_method'), oci_previous=move.get('oci_previous'), oci_direction=move.get('direction'),
+        oci_unavailable_reason=move.get('reason') if oci is None else None,
+        oci_observed_at=max((operator['observed_to'] for operator in move.get('operators', [])),
+                            key=stamp, default=None) if oci is not None else None,
         paired_books=move.get('paired_books', 0), agreeing_books=move.get('agreeing_books', 0),
         delta_pct=100*(odd/best['first_odd']-1), amplitude_pct=move.get('amplitude_pct'),
         margin_pct=margin, margin_band=margin_band, margin_delta_pp=margin_delta, margin_trend=margin_trend,
@@ -504,6 +507,27 @@ def study_combo_quotes(payload, meta, as_of):
     return result
 
 
+def preserve_confirmed_oci(row, history, as_of):
+    """Retain confirmed evidence separately from the live quote and decision fields."""
+    cutoff = stamp(as_of)
+    if not cutoff or not handicap_price_valid(row):
+        return
+    market = row['id']
+    saved = history.get(market)
+    candidates = (saved, row.pop('last_confirmed_oci', None))
+    observed = row.get('oci_observed_at') or row.get('quote_observed_at')
+    if (row.get('quote_status') == 'recent' and row.get('movement_confirmed') is True
+            and not row.get('historical_oci') and number(row.get('oci')) is not None):
+        candidates += ({'value': row['oci'], 'observed_at': observed},)
+    valid = [item for item in candidates if item and number(item.get('value')) is not None
+             and stamp(item.get('observed_at')) and stamp(item['observed_at']) <= cutoff]
+    if valid:
+        latest = max(valid, key=lambda item: stamp(item['observed_at']))
+        row['last_confirmed_oci'] = latest
+        if not saved or stamp(latest['observed_at']) >= stamp(saved['observed_at']):
+            history[market] = latest
+
+
 def attach(assessment, payload, state, meta, as_of):
     from gold_competitions import output_allowed
     from refresh_opportunities import captured_prices
@@ -526,9 +550,13 @@ def attach(assessment, payload, state, meta, as_of):
     extra = {key: values[0]['spec'] for key, values in offers.items() if key not in existing}
     if extra: matrix['rows'].extend(matrix_rows(assessment, extra))
     from adaptive_calibration import closing_prices, market_of
+    fixture = state.get('matrix_quotes', {}).get(str(meta['fixture_id']), {})
+    history = fixture.setdefault('confirmed_oci', {}) if allowed else {}
     for row in matrix['rows']:
         prices = offers.get(row['id'], [])
+        preserve_confirmed_oci(row, history, as_of)
         analyse_prices(row, prices, as_of, meta['kickoff'], allow_cached=allowed)
+        preserve_confirmed_oci(row, history, as_of)
         if prices and market_of(row['spec']):
             closes = closing_prices(prices, prices[0]['token'], as_of, meta['kickoff'])
             if closes:
