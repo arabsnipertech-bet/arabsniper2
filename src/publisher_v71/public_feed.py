@@ -73,23 +73,28 @@ def publish(view):
     tree = git('mktree', data=f'100644 blob {blob}\thomepage.json\n'.encode())
     for attempt in range(3):
         parent = branch_head()
+        previous = None
         if parent:
             git('fetch', '--no-tags', '--depth=1', 'origin', REF)
             parent = git('rev-parse', 'FETCH_HEAD')
             if not re.fullmatch(r'[0-9a-f]{40}', parent):
                 raise ValueError('Unexpected public branch reference')
             existing = json.loads(git('show', parent + ':homepage.json'))
+            if existing.get('publisher') != 'v7.1':
+                raise ValueError('Unexpected existing public branch content')
+            published = stamp(git('show', '-s', '--format=%cI', parent))
+            previous = (existing, parent, published)
             if all(existing.get(key) == value for key, value in view.items() if key != 'updated_at'):
-                return parent
+                return parent, previous
         args = ['-p', parent] if parent else []
         commit = git('commit-tree', tree, *args, '-m', 'Update ArabSniperBet public editorial feed')
         try:
             git('push', 'origin', f'{commit}:{REF}')
-            return commit
+            return commit, previous
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
             # A timed-out push may have succeeded. Read the authoritative ref.
             if branch_head() == commit:
-                return commit
+                return commit, previous
             if attempt == 2:
                 raise
             time.sleep(2 ** attempt)
