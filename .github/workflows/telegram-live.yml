@@ -12,6 +12,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   live:
+    # Retired by Publisher V7.1. Restore via the documented rollback.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 200
     env:

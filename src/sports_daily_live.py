@@ -31,6 +31,10 @@ def reserve_publication(post,now):
         store.write(state);post['sports_live']=announcement;return
 
 def dispatch():
+    from publisher_v71.cutover import ENABLED
+    if ENABLED:
+        print('Editorial recovery is owned by Publisher V7.1')
+        return
     if os.getenv('FAST_BACKUP_DRY_RUN')=='true':return
     runs=gh('workflows/'+WORKFLOW+'/runs?per_page=20').get('workflow_runs',[])
     if any(r['status'] in ('queued','in_progress','pending','waiting') for r in runs):return

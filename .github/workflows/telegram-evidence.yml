@@ -13,6 +13,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   evidence:
+    # Retired by Publisher V7.1. Restore via the documented rollback.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:

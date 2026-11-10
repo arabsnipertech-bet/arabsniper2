@@ -46,8 +46,10 @@ async function run(payload,fail=false){
    r=await run({...v5,selections:[{...selection,...extra}]});assert.equal((r.nodes['daily-picks'].innerHTML.match(/class="pick"/g)||[]).length,ok?1:0,JSON.stringify({spec,extra}));
   }
  }
- const releaseHash=require('node:crypto').createHash('sha256').update(code).digest('hex').slice(0,12);
- assert(html.includes('src="homepage.js?v='+releaseHash+'"'));
+ const publisher=fs.readFileSync('web/publisher-v71.js','utf8');
+ const releaseHash=require('node:crypto').createHash('sha256').update(publisher).digest('hex').slice(0,12);
+ assert(html.includes('src="publisher-v71.js?v='+releaseHash+'"'));
+ assert(!html.includes('src="homepage.js'));
  const currentMarkets=[
   ['total','ht','over',1.5,'over15_ht',2.1,3.5,40],
   ['total','ht','over',2.5,'over25_ht',4.5,7.5,18],
