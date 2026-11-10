@@ -43,3 +43,6 @@ jobs:
       - name: Refresh and checkpoint complete prices for imminent fixtures
         if: github.event.schedule == '30 12-22 * * *'
         run: python src/v7_maintenance.py prices
+      - name: Preserve observed prices if the incremental refresh fails
+        if: failure() && github.event.schedule == '30 12-22 * * *'
+        run: python src/quote_history.py

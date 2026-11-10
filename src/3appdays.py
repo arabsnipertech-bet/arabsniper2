@@ -284,6 +284,11 @@ class APIClient:
         self.cache: Dict[str, Any] = {}
         self.request_count = 0
         self.odds_enricher = None
+        self.odds_observer = None
+        self.prefetched_odds = {}
+        from uuid import uuid4
+        self.odds_acquisition_session = uuid4().hex
+        self.odds_observation_sequence = 0
         self.history_cache = None
         self._http_remaining = None
         self.odds_extra_pages = 0
@@ -348,6 +353,14 @@ class APIClient:
         self.odds_books_recovered += len(all_books-initial_books)
         result = {**first, "response": rows, "results": len(rows),
                   "collection": {"pages_fetched": total, "pages_total": total, "complete": True}}
+        observed_at = iso_now()
+        result['collection']['observed_at'] = observed_at
+        self.odds_observation_sequence += 1
+        result['collection']['acquisition_id'] = self.odds_acquisition_session+':'+str(self.odds_observation_sequence)
+        for row in rows:
+            row['_observed_at'] = observed_at
+        if self.odds_observer is not None:
+            self.odds_observer.observe(result, observed_at, params)
         if self.odds_enricher is not None and set(params) == {"fixture"}:
             result = self.odds_enricher.enrich(result, params["fixture"])
         return result
@@ -1984,6 +1997,9 @@ def scan_dates(
         state["version"] = VERSION
 
     state.setdefault("fixtures", {})
+    from quote_history import QuoteHistory
+    if isinstance(getattr(client, 'odds_observer', None), QuoteHistory):
+        client.odds_observer.seed_matrix(state)
     league_cache: Dict[str, Any] = {}
     output_days: List[Dict[str, Any]] = []
     excluded = set(excluded_countries)
@@ -2061,6 +2077,18 @@ def scan_dates(
             return fixture_priority(fixture.get("date"), previous, order_time)
         fixtures.sort(key=recovery_order)
         log(f"⚽ Fixture pre-match valide: {len(fixtures)}")
+        # Price acquisition follows the known schedule before expensive team
+        # statistics. A statistics failure cannot consume the observation window.
+        if isinstance(client, APIClient) and client.odds_observer is not None:
+            for scheduled in fixtures:
+                scheduled_meta = fixture_meta(scheduled)
+                scheduled_id = scheduled_meta['fixture_id']
+                if client.odds_enricher is not None:
+                    client.odds_enricher.register_fixture(scheduled_meta)
+                    if not client.odds_enricher.allowed(check_limits=False):
+                        break
+                client.prefetched_odds[str(scheduled_id)] = client.get('odds', {'fixture': int(scheduled_id)})
+                client.odds_observer.flush()
         refreshed_matches: List[Dict[str, Any]] = []
         refreshed_ids: set[str] = set()
         failed_ids: set[str] = set()
@@ -3264,6 +3292,8 @@ def main() -> None:
             raise SystemExit(2)
     days = 2 if args.fast else 1 if args.today else 5 if args.night else max(1, min(args.days, 7))
     # Refresh reference IDs daily and preserve the last good catalog on errors.
+    from quote_history import QuoteHistory
+    client.odds_observer = QuoteHistory(DATA_DIR)
     catalog = read_json(BET_CATALOG_FILE, {})
     from multimarket_model import stamp
     catalog_at = stamp(catalog.get("updated_at"))
@@ -3280,6 +3310,7 @@ def main() -> None:
     try:
         output = scan_dates(client, get_target_dates(start, days), excluded)
     finally:
+        client.odds_observer.flush()
         client.history_cache.save()
         log('History cache: ' + json.dumps(client.history_cache.report, sort_keys=True))
     log(f"✅ Output scritto: {OUTPUT_FILE}")

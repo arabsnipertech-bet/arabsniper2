@@ -550,6 +550,9 @@ const compactCard=api.card({fixture:{fixture_id:'compact',match:'A - B'},multima
 assert.match(compactCard,/<\/header><div class="mx-compact-quotes"/);
 assert(compactCard.indexOf('mx-compact-quotes')<compactCard.indexOf('mx-compact-proposal'));
 assert(compactCard.includes('Apri analisi'));assert(!compactCard.includes('mx-cockpit'));assert(!compactCard.includes('mx-study-base'));
+const quoteOnlyCard=api.card({fixture:{fixture_id:'no-forecast',match:'A - B'},multimarket:{status:'no_prematch_snapshot',matrix:{rows:compactRows}}},{});
+assert(quoteOnlyCard.includes('mx-compact-quotes'),'Real 1X2 prices remain visible without an eligible forecast');
+assert(quoteOnlyCard.includes('non apertura ufficiale'));
 const unconfirmed=api.compactQuotes([{...compactRows[0],quote_status:'missing',last_odd:2.2}]);
 assert(unconfirmed.includes('Da confermare'));assert(!unconfirmed.includes('↓'));
 assert.equal(api.compactQuotes([{...compactRows[0],odd:null,first_odd:null}]),'');
@@ -558,7 +561,7 @@ const oneObservation={...compactRows[1],first_observed_at:observed,quote_observe
 assert.match(api.compactQuotes([oneObservation]),/title="Prima rilevazione">—<\/b><small>Cache/);
 const past={...compactRows[0],quote_status:'stale',last_odd:2.2,bookmaker:'Book A',quote_observed_at:observed,provider_updated_at:observed};
 const history=api.compactQuotes([past],{kickoff:new Date(quoteNow-1800000).toISOString(),closed:true});
-assert(history.includes('Apertura → Ultima prematch'));
+assert(history.includes('Prima osservata → Ultima prematch'));
 assert.match(history,/↓ -12,0%<\/b><small>Ultima/);
 console.log('PASS compact 1X2: placement, paired prices, three directions, cache and unconfirmed history');
 

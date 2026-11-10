@@ -114,7 +114,11 @@ def install(ns, matrix_mode=False):
         # 2. Reuse the existing API-Football recovery/catalogue and quote ledger.
         if getattr(client, 'odds_enricher', None) is not None:
             client.odds_enricher.register_fixture(meta)
-        payload = client.get('odds', {'fixture': ns['safe_int'](meta['fixture_id'])})
+        prefetched = getattr(client, 'prefetched_odds', None)
+        if isinstance(prefetched, dict) and str(meta['fixture_id']) in prefetched:
+            payload = prefetched.pop(str(meta['fixture_id']))
+        else:
+            payload = client.get('odds', {'fixture': ns['safe_int'](meta['fixture_id'])})
         observed = ns['iso_now']()
         if matrix_mode:
             from near_kickoff_quotes import recover_near_kickoff

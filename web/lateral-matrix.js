@@ -965,7 +965,7 @@
   });
   if(quotes.every(({first,last})=>first==null&&last==null))return '';
   return '<div class="mx-compact-quotes" role="group" aria-label="Quote 1X2">'+
-   '<div class="mx-compact-quotes-label"><b>1X2</b><span>Apertura → '+(closed?'Ultima prematch':'Attuale')+'</span></div>'+
+   '<div class="mx-compact-quotes-label"><b>1X2</b><span title="Prima quota reale osservata dello stesso bookmaker; non apertura ufficiale">Prima osservata → '+(closed?'Ultima prematch':'Attuale')+'</span></div>'+
    quotes.map(({side,label,first,last,single,delta,status})=>{
     const movement=delta==null?'unknown':delta<0?'down':delta>0?'up':'flat';
     const [arrow,description]={
@@ -985,7 +985,7 @@
   const tier=cockpitTier(m,helpers);
   const elite=tier.tone==='platinum';
   return '<article class="mx-card mx-compact mx-tone-'+tier.tone+(elite?' mx-card-platinum':'')+'" data-live-fixture="'+esc(fid)+'"><header><div>'+matchBadge(tier)+'<time>'+esc(f.time||'')+'</time><small>'+esc(f.country)+' · '+esc(f.league)+'</small>'+'<h3>'+esc(f.match)+'</h3></div><div class="mx-live"><button type="button" class="mx-save" data-mx-save="'+esc(fid)+'" aria-label="Osserva '+esc(f.match)+'" aria-pressed="'+observedFixtures.has(fid)+'">'+(observedFixtures.has(fid)?'★':'☆')+'</button><span data-live-slot="badge">'+(helpers.liveBadge?.(m)||'')+'</span><span data-live-slot="state">'+esc(helpers.stateLabel?.(m)||'')+'</span><span data-live-slot="halftime">'+halfTimeText(helpers.firstHalf?.(m))+'</span></div></header>'+
-   (noSnapshot?'':compactQuotes(all,{kickoff:f.kickoff,closed:m._gold_history||(helpers.phase||phase)(m)!=='upcoming'}))+
+   compactQuotes(all,{kickoff:f.kickoff,closed:m._gold_history||(helpers.phase||phase)(m)!=='upcoming'})+
    (m._gold_history?'<div data-live-slot="panel">'+(helpers.livePanel?.(m)||'')+'</div>':'')+
    (noSnapshot?'<p class="mx-explanation">Nessuna analisi prematch salvata per questa partita.</p>':compactProposal(m,helpers))+
    (all.length?'<button class="mx-open" type="button" data-mx-open="'+esc(fid)+'" aria-haspopup="dialog">Apri analisi <span>↗</span></button>':'')+'</article>';

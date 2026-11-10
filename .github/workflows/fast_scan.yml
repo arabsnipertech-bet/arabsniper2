@@ -16,6 +16,10 @@ on:
       - 'src/scan_audit.py'
       - 'src/3appdays.py'
       - 'src/history_cache.py'
+      - 'src/odds_collection.py'
+      - 'src/quote_history.py'
+      - 'src/quote_cache.py'
+      - 'src/quote_sources.py'
       - 'src/policy_integration.py'
       - 'src/lateral_matrix.py'
       - 'src/matrix_quotes.py'
@@ -181,6 +185,10 @@ jobs:
       - name: Save verified state in private storage
         if: steps.fast_guard.outputs.run == 'true' && (vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true')
         run: python src/gold_storage.py publish
+
+      - name: Preserve observed prices if the scan fails
+        if: failure() && (vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true')
+        run: python src/quote_history.py
 
       - name: Publish only public projections
         if: steps.fast_guard.outputs.run == 'true' && vars.GOLD_PRIVATE == 'true'

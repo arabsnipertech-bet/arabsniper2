@@ -121,6 +121,10 @@ jobs:
         if: steps.night_guard.outputs.run == 'true' && (vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true')
         run: python src/gold_storage.py publish
 
+      - name: Preserve observed prices if the scan fails
+        if: failure() && (vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true')
+        run: python src/quote_history.py
+
       - name: Publish only public projections
         if: steps.night_guard.outputs.run == 'true' && (vars.GOLD_PRIVATE == 'true')
         run: python src/private_publication.py
