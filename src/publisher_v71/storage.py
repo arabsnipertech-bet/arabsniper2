@@ -62,6 +62,14 @@ class Storage:
             return False
         return True
 
+    def remember(self, key, data):
+        if self.freeze(key, data):
+            return data
+        saved, _ = self.read('evidence/' + key)
+        if not isinstance(saved, dict):
+            raise ValueError('Frozen publisher document missing')
+        return saved
+
     def snapshots(self, key):
         prefix = 'evidence/' + key
         pages = self.client.get_paginator('list_objects_v2').paginate(

@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
 from publisher_v71 import delivery, editorial, live, public_feed, report, selection
 from publisher_v71.channels import DeliveryError, TelegramHistory
-from publisher_v71.runner import add_group
+from publisher_v71.runner import add_group, record_home_receipt
 from publisher_v71.storage import Storage
 from v7_decision import GOAL, fingerprint
 
@@ -58,7 +58,13 @@ class LocalStore(Storage):
         self.saved += 1
 
     def freeze(self, key, value):
-        self.immutable.setdefault(key, json.loads(json.dumps(value)))
+        if key in self.immutable:
+            return False
+        self.immutable[key] = json.loads(json.dumps(value))
+        return True
+
+    def read(self, key, default=None, **kwargs):
+        return self.immutable.get(key.removeprefix('evidence/'), default), None
 
 
 class PublisherTests(TestCase):
@@ -103,6 +109,30 @@ class PublisherTests(TestCase):
             self.assertIn('quota 1,91', post['text'])
             self.assertLessEqual(len(post['text'].encode('utf-16-le')) // 2, 1024)
         self.assertEqual(public_feed.projection(store.state, NOW + timedelta(minutes=41))['groups'], [])
+
+    def test_homepage_receipt_recovers_from_an_already_visible_revision(self):
+        store = LocalStore()
+        picks = [pick(1), pick(2, 65)]
+        self.assertTrue(add_group(store, picks, NOW, ('telegram',)))
+        key = selection.group_id(picks)
+        group = store.state['groups'][key]
+        original = {'groups': [selection.project_group(group, NOW)]}
+        record_home_receipt(store, original, 'published-ref', NOW + timedelta(minutes=1))
+        record_home_receipt(store, {'groups': []}, 'new-ref', NOW + timedelta(hours=1))
+        self.assertEqual(group['homepage_revision'], 'published-ref')
+        self.assertEqual(group['homepage_at'], selection.utc(NOW + timedelta(minutes=1)))
+
+    def test_group_retry_uses_the_already_frozen_snapshot(self):
+        store = LocalStore()
+        original = [pick(1), pick(2, 65)]
+        group_id = selection.group_id(original)
+        store.freeze(f'2026-11-11/groups/{group_id}.json',
+                     {'id': group_id, 'picks': original, 'created_at': selection.utc(NOW), 'eligible_home': False})
+        changed = [dict(original[0], odd=2.02), original[1]]
+        self.assertTrue(add_group(store, changed, NOW, ('telegram',)))
+        post = next(iter(store.state['posts'].values()))
+        self.assertEqual(post['view']['free']['odd'], 1.91)
+        self.assertEqual(delivery.can_send(post, NOW, {'1': changed[0], '2': changed[1]}), 'quote_or_decision_changed')
 
     def test_fixture_claims_survive_active_ledger_retention(self):
         store = LocalStore()

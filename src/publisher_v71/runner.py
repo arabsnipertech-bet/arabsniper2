@@ -101,7 +101,12 @@ def add_group(store, picks, now, channels):
     until = min(first - LEAD, *(stamp(p['expires_at']) for p in picks))
     if key in store.state['groups'] or until <= now:
         return False
-    store.freeze(f'{rome_day(first)}/groups/{key}.json', group)
+    group = store.remember(f'{rome_day(first)}/groups/{key}.json', group)
+    picks = group['picks']
+    first = stamp(picks[0]['kickoff'])
+    until = min(first - LEAD, *(stamp(p['expires_at']) for p in picks))
+    if until <= now:
+        return False
     store.state['groups'][key] = group
     reserved_ids = store.state['runtime'].get('reserved_fixtures', [])
     store.state['runtime']['reserved_fixtures'] = sorted(set(reserved_ids).union(p['fixture_id'] for p in picks))
@@ -140,9 +145,12 @@ def plan_live(store, now, candidates, channels):
         reserve = next((p for p in pool if p['fixture_id'] in watched
                         and kickoff + timedelta(minutes=45) <= stamp(p['kickoff'])
                         and rome_day(stamp(p['kickoff'])) == day), None)
-        states[day] = live.start_state(primary, reserve, now)
-        store.freeze(f'{day}/live/original.json', states[day])
-        queue(store, 'live', day + '/start', states[day]['view'], ['telegram'], now, kickoff - LEAD)
+        state = store.remember(f'{day}/live/original.json', live.start_state(primary, reserve, now))
+        kickoff = stamp(state['pick']['kickoff'])
+        if kickoff < now + LEAD:
+            continue
+        states[day] = state
+        queue(store, 'live', day + '/start', state['view'], ['telegram'], now, kickoff - LEAD)
     if not any(not state['done'] for state in states.values()):
         return
     feed = safe_read('live_scores', lambda: scores.read(store, states.values(), now, clock, event_log), {})
@@ -177,7 +185,7 @@ def plan_editorial(store, now, channels, best_queued, trial_ok):
             view = safe_read('report', lambda: report.build(audit, list(store.snapshots(previous + '/gold/')),
                                                               free_receipts(store, previous)), None)
             if view:
-                store.freeze(previous + '/report.json', view)
+                view = store.remember(previous + '/report.json', view)
                 reports[previous] = {'created_at': utc(now), 'view': view}
                 queue(store, 'report', previous, view, channels, now, now + timedelta(hours=12))
             else:
@@ -195,6 +203,16 @@ def plan_editorial(store, now, channels, best_queued, trial_ok):
         queue(store, 'gold', str(today), {}, channels, now, now + timedelta(hours=3))
 
 
+def record_home_receipt(store, view, revision, at):
+    if not at:
+        return
+    for row in view['groups']:
+        group = store.state['groups'].get(row['id'])
+        if (group and not group.get('homepage_at')
+                and stamp(group['created_at']) <= at < stamp(group['picks'][0]['kickoff'])):
+            group.update(homepage_at=utc(at), homepage_revision=revision)
+
+
 def publish_home(store, candidates, now):
     for group in store.state['groups'].values():
         if not group.get('homepage_at'):
@@ -208,13 +226,12 @@ def publish_home(store, candidates, now):
             group['eligible_home'] = all(current[key] == free[key] for key in ('kickoff', 'market', 'odd', 'probability'))
     past = safe_read('historical_results', lambda: read_local('data/arab_quote_results_public.json'), {})
     view = public_feed.projection(store.state, now, past)
-    revision = safe_read('homepage', lambda: public_feed.publish(view), None)
-    if revision:
-        at = clock()
-        for row in view['groups']:
-            group = store.state['groups'][row['id']]
-            if not group.get('homepage_at') and at < stamp(group['picks'][0]['kickoff']):
-                group.update(homepage_at=utc(at), homepage_revision=revision)
+    result = safe_read('homepage', lambda: public_feed.publish(view), None)
+    if result:
+        revision, previous = result
+        if previous:
+            record_home_receipt(store, *previous)
+        record_home_receipt(store, view, revision, clock())
         store.save()
         event_log('homepage', 'published', revision=revision, groups=len(view['groups']))
 
