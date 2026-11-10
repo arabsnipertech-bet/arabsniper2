@@ -44,6 +44,38 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(c.stats['odds_targeted_markets_recovered'],1)
         self.assertEqual(c.stats['odds_targeted_requests'],2)
         self.assertEqual(len(coverage(result,100,NOW)),2)
+    def test_match_winner_queried_first_when_missing(self):
+        candidate=payload()
+        candidate['response'][0]['bookmakers'][0]['bets']=[{
+            'id':1,'name':'Match Winner','values':[
+                {'value':'Home','odd':'2.10'},
+                {'value':'Draw','odd':'3.30'},
+                {'value':'Away','odd':'3.80'}]}]
+        c,client=self.collector(candidate)
+        result=c.enrich(payload(),100)
+        requested=[call.args[1] for call in client.get.call_args_list
+                   if call.args and call.args[0]=='odds']
+        self.assertTrue(requested)
+        self.assertEqual(requested[0],{'fixture':100,'bet':1})
+        self.assertIn(('1x2_ft','1'),coverage(result,100,NOW))
+
+    def test_early_uncovered_fixture_probes_only_match_winner(self):
+        candidate=payload(updated='2026-10-23T08:00:00+00:00')
+        candidate['response'][0]['fixture']['date']='2026-10-25T09:00:00+00:00'
+        candidate['response'][0]['bookmakers'][0]['bets']=[{
+            'id':1,'name':'Match Winner','values':[
+                {'value':'Home','odd':'2.10'},
+                {'value':'Draw','odd':'3.30'},
+                {'value':'Away','odd':'3.80'}]}]
+        c,client=self.collector(candidate)
+        c.register_fixture({'fixture_id':100,'kickoff':'2026-10-25T09:00:00+00:00'})
+        empty={'collection':{'complete':True},'response':[]}
+        result=c.enrich(empty,100)
+        requested=[call.args[1] for call in client.get.call_args_list
+                   if call.args and call.args[0]=='odds']
+        self.assertEqual(requested,[{'fixture':100,'bet':1}])
+        self.assertIn(('1x2_ft','1'),coverage(result,100,NOW))
+
     def test_unknown_or_low_quota_does_not_probe(self):
         c,client=self.collector(payload(2),quota=74900)
         c.enrich(payload(),100)
