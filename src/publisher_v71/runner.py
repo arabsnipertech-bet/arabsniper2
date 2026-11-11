@@ -213,9 +213,8 @@ def plan_editorial(store, now, channels, best_queued, trial_ok):
         queue(store, 'academy', str(today), view, channels, now, now + timedelta(hours=5))
     if (trial_ok and today.weekday() in (1, 5) and 12 * 60 + 15 <= minute <= 14 * 60
             and not best_queued):
-        # The bounded Gold-engine campaign owns Telegram's trial advertising
-        # during these dates; keep Facebook's existing editorial schedule.
-        gold_channels = [c for c in channels if c != 'telegram' or
+        # The bounded campaign owns trial advertising on both social channels.
+        gold_channels = [c for c in channels if
                          not date(2026, 11, 12) <= today <= date(2026, 11, 18)]
         if gold_channels:
             queue(store, 'gold', str(today), {}, gold_channels, now, now + timedelta(hours=3))
@@ -352,4 +351,5 @@ if __name__ == '__main__':
         # Never echo upstream request URLs, headers or private forecasts.
         event_log('publisher', 'cycle_aborted', error=type(error).__name__)
         raise SystemExit(1) from None
+
 

@@ -31,9 +31,11 @@ jobs:
         with:
           node-version: '24'
       - name: Campaign schedule and renewal regression tests
+        id: tests
         run: |
           node --test tests/test_gold_renewal.mjs tests/test_telegram_trial.mjs
           python -m unittest discover -s tests -p test_gold_campaign_schedule.py
+          python -m unittest discover -s tests -p test_gold_campaign_facebook.py
       - name: Install private rollback backup client
         if: github.event_name == 'push'
         run: pip install 'boto3>=1.42,<2'
@@ -60,3 +62,20 @@ jobs:
           D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python scripts/gold-campaign-repeat.py
+
+      - name: Verify Facebook campaign destination without posting
+        if: github.event_name == 'push'
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          META_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+        run: python scripts/gold-campaign-facebook.py --verify
+      - name: Publish due Facebook campaign reminder once
+        if: always() && github.event_name != 'push' && steps.tests.outcome == 'success'
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          META_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+        run: python scripts/gold-campaign-facebook.py
