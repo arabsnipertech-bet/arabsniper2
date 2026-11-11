@@ -126,7 +126,7 @@ model_estimates:(html.match(/Stima V7 · in attesa di quote bookmaker/g)||[]).le
     return json.loads(result.stdout)
 
 
-def browser_match(s3, bucket, catalog, day, fid, cache):
+def browser_matches(s3, bucket, catalog, day, cache):
     board = (catalog.get('_gold_browser_days') or {}).get(f'arab_quote_day{day}.json') or {}
     for item in board.get('pages', []):
         digest = item['sha256']
@@ -134,11 +134,58 @@ def browser_match(s3, bucket, catalog, day, fid, cache):
             raw = gzip.decompress(s3.get_object(Bucket=bucket, Key='_audit_parts/'+digest+'.json.gz')['Body'].read())
             if hashlib.sha256(raw).hexdigest() != digest or len(raw) != item['bytes']:
                 raise ValueError('Published browser page checksum mismatch')
-            cache[digest] = json.loads(raw)
-        result = next((m for m in cache[digest] if str((m.get('fixture') or {}).get('fixture_id')) == str(fid)), None)
-        if result:
-            return result
-    return None
+            matches = json.loads(raw)
+            if not isinstance(matches, list) or len(matches) != item['count']:
+                raise ValueError('Published browser page count mismatch')
+            cache[digest] = matches
+        yield from cache[digest]
+
+
+def browser_match(s3, bucket, catalog, day, fid, cache):
+    return next((m for m in browser_matches(s3, bucket, catalog, day, cache)
+                 if str((m.get('fixture') or {}).get('fixture_id')) == str(fid)), None)
+
+
+def rendered_browser_coverage(matches, as_of):
+    """Run the shipped Gold renderer on every active browser fixture."""
+    active = []
+    for match in matches:
+        fixture = match.get('fixture') or {}
+        start = stamp(fixture.get('kickoff'))
+        if not start or start <= as_of or fixture.get('status_short') not in ('NS', 'TBD') or fixture.get('result'):
+            continue
+        matrix = ((match.get('multimarket') or {}).get('matrix') or {})
+        v7 = matrix.get('v7') or {}
+        picks = [p for p in (v7.get('triad') or {}).values() if p]
+        source_ids = {p.get('source_market_id') for p in picks}
+        fields = ('id', 'spec', 'probability_model', 'quote_status', 'quote_executable', 'odd', 'prematch_stable',
+                  'cache_expires_at', 'first_odd', 'quote_observed_at', 'provider_updated_at')
+        active.append({'fixture': fixture, 'triad': match.get('triad'),
+            'multimarket': {'matrix': {'publication_model': matrix.get('publication_model'),
+                'rows': [{k: r[k] for k in fields if k in r} for r in matrix.get('rows', []) if r['id'] in source_ids],
+                'v7': {**{k: v7.get(k) for k in ('version', 'status', 'fixture_id', 'kickoff', 'captured_at', 'tier', 'triad')},
+                       'markets': {p['market_id']: (v7.get('markets') or {}).get(p['market_id'])
+                                   for p in picks if p.get('market_id')}}}}})
+    program = """const {matches,asOf}=JSON.parse(require('node:fs').readFileSync(0,'utf8'));
+const a=require('./web/lateral-matrix.js');
+const result={active_cards:matches.length,full_triads:0,cards_with_estimates:0,
+ model_estimates:0,three_empty_slots:0,without_visible_proposal:0};
+for(const m of matches){
+ const view=a.publishedView(m,Date.parse(asOf));
+ const html=view?.triad?a.triadPanel(view,true):'';
+ const picks=Object.values(view?.triad||{}).filter(Boolean);
+ const estimates=picks.filter(p=>p.signal.quote_state==='model_estimate').length;
+ result.full_triads+=picks.length===3;
+ result.cards_with_estimates+=estimates>0;
+ result.model_estimates+=estimates;
+ result.three_empty_slots+=(html.match(/Nessun mercato idoneo/g)||[]).length===3;
+ result.without_visible_proposal+=!(picks.length||view?.primary);
+}
+console.log(JSON.stringify(result));"""
+    result = subprocess.run(['node', '-e', program], cwd=Path(__file__).resolve().parents[1],
+        input=json.dumps({'matches': active, 'asOf': as_of.isoformat()}), text=True,
+        capture_output=True, check=True, timeout=30)
+    return json.loads(result.stdout)
 
 
 def deployed_assets():
@@ -217,6 +264,11 @@ def run():
         as_of = datetime.now(timezone.utc)
         report['archive_prematch_by_day'] = [prematch_coverage(day, as_of) for day in days]
         report['gold_prematch_by_day'] = [prematch_coverage(day, as_of) for day in gold.values()]
+        report['browser_prematch_by_day'] = []
+        for day_number, day in gold.items():
+            browser = list(browser_matches(s3, bucket, browser_catalog, day_number, {}))
+            report['browser_prematch_by_day'].append({
+                'date': day.get('date'), **rendered_browser_coverage(browser, as_of)})
         report['checkpoint_identity'] = hashlib.sha256(json.dumps(index, sort_keys=True).encode()).hexdigest()
         manifest_bytes = json.dumps({'version': 1, 'files': index}, sort_keys=True, separators=(',', ':')).encode()
         manifest_id = hashlib.sha256(manifest_bytes).hexdigest()

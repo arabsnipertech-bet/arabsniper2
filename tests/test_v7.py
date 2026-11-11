@@ -65,6 +65,11 @@ class MathAndRouting(unittest.TestCase):
                 self.assertEqual(round(pick['model_fair_odd'], 2), round(1/pick['probability'], 2))
             self.assertFalse(any(snapshot['signals'][role] for role in ('primary', 'consigliata', 'colpaccio', 'gold', 'platinum')))
             self.assertFalse(list(stored_offers(a, meta, AT)))
+            from odds_recovery_diagnostic import rendered_browser_coverage
+            a['matrix']['v7'] = snapshot
+            rendered = rendered_browser_coverage([{'fixture': meta, 'multimarket': a}], datetime.fromisoformat(AT))
+            self.assertEqual(rendered, {'active_cards': 1, 'full_triads': 1, 'cards_with_estimates': 1,
+                'model_estimates': 3, 'three_empty_slots': 0, 'without_visible_proposal': 0})
             a['profiles'] = {}
             self.assertFalse(any(capture(a, meta, AT)['triad'].values()))
 
