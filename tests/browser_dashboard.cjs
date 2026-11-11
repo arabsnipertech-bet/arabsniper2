@@ -108,5 +108,6 @@ const fs=require('node:fs');const path=require('node:path');const assert=require
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Favorite focus mobile overflow');
     await page.screenshot({path:'test-artifacts/favorite-focus-mobile.png',fullPage:true});
     console.log('Browser: desktop/mobile layout, no horizontal overflow, exact markets and stable primary passed.');
+    await require('./browser_gold_access.cjs')(browser);
   } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

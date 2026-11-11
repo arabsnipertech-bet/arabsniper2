@@ -766,12 +766,33 @@
         <p>Il quadro delle partite. Quote, statistiche e segnali a confronto.</p>
         <div class="live-line"><span class="live-dot"></span><span id="liveStatus">Connessione ai dati...</span></div>
       </div>
+      <div class="gold-account-area">
+        <section id="goldAccess" class="gold-access" aria-label="Il tuo accesso Gold" hidden>
+          <div class="gold-access-head"><strong>GOLD | Il tuo accesso</strong><span id="goldAccessState" class="gold-access-state" role="status">—</span></div>
+          <p id="goldAccessEmail" class="gold-access-email"></p>
+          <dl><dt>Scadenza</dt><dd><time id="goldAccessExpiry">—</time> <small id="goldAccessZone">Europe/Rome</small></dd>
+            <dt>Tempo residuo</dt><dd id="goldAccessRemaining" class="gold-access-count">—</dd></dl>
+          <p id="goldAccessPromo" class="gold-access-promo" hidden>Il tuo accesso Gold sta per scadere. Rinnova ora e risparmia il 10%.</p>
+          <details id="goldRenewalDetails"><summary id="goldRenewalSummary">Rinnova il tuo accesso</summary>
+            <div id="goldRenewalOptions" hidden><label for="goldRenewalPlan">Scegli il pacchetto</label><select id="goldRenewalPlan"></select>
+              <label id="goldRenewalDiscountLabel" class="gold-discount-toggle" hidden><input type="checkbox" id="goldRenewalDiscount"> Applica lo sconto del 10%</label>
+              <button type="button" id="goldRenewalPay">Continua su Stripe</button>
+              <a id="goldCheckoutResume" class="gold-access-resume" hidden>Riprendi il pagamento già aperto</a>
+              <p class="gold-access-note">Pagamento singolo, senza rinnovo automatico. Se rinnovi in anticipo conservi il tempo residuo. Il mensile aggiunge un mese di calendario.</p>
+              <p class="gold-access-note">L’eventuale offerta viene verificata dal server e resta valida nel Checkout per un’ora dalla creazione.</p>
+            </div><p id="goldRenewalUnavailable" class="gold-access-note">Rinnovi in preparazione. Contatta l’assistenza.</p>
+          </details>
+          <p id="goldAccessMessage" class="gold-access-message" role="status" aria-live="polite"></p>
+          <button id="goldAccessRefresh" type="button" class="gold-access-refresh">Aggiorna stato</button>
+        </section>
       <div class="top-actions"><button class="btn" type="button" onclick="document.body.classList.toggle('gold-light');this.textContent=document.body.classList.contains('gold-light')?'☾ Tema scuro':'☼ Tema chiaro'">☼ Tema chiaro</button><button class="btn" type="button" onclick="document.body.classList.toggle('gold-compact');this.textContent=document.body.classList.contains('gold-compact')?'Vista espansa':'Vista compatta'">Vista compatta</button>
         <button class="btn btn-gold" type="button" onclick="manualRefresh()">Ricarica dati</button>
         <a class="btn" href="index.html" style="text-decoration:none">Home</a>
         <button class="btn btn-danger" type="button" onclick="logoutGold()">Logout</button>
       </div>
+      </div>
     </header>
+    <p id="goldAccessLockNote" class="gold-access-lock-note" hidden>Il tuo accesso Gold è terminato. Scegli un nuovo pacchetto nel riquadro del tuo account per tornare a consultare le partite.</p>
 
     <section class="toolbar">
       <div class="day-buttons" id="dayButtons"></div>
@@ -866,6 +887,8 @@
   <script src="/competition-scope.js?v=cdb648e824eb"></script><script src="/lateral-matrix.js?v=bacabe5b57a8"></script>
   <script src="/vendor/fflate-0.8.2.js"></script>
   <script src="/live-scores.js?v=a17ad119a2d0"></script>
+  <link rel="stylesheet" href="/gold-access.css?v=1">
+  <script src="/gold-access.js?v=1"></script>
   <script>
     'use strict';
 
@@ -975,7 +998,7 @@
     }
 
     function checkCalendarRollover() {
-      if (document.hidden || document.getElementById('app').hidden || calendarBase === calendarDate()) return;
+      if (document.hidden || document.getElementById('app').hidden || document.getElementById('app').classList.contains('gold-access-locked') || calendarBase === calendarDate()) return;
       currentDay = 1;
       contextDetailId = null;
       initialHourScrollDone = false;
@@ -1061,8 +1084,8 @@
           loginMessage('Codice inviato a '+email+'. Controlla anche Spam e Promozioni.');code.focus();
         } else {
           const data=await authRequest('verify-code',{email,code:code.value.trim(),challenge:loginChallenge});
-          if(!data.active)throw new Error('Accesso Gold non attivo. Contatta l’assistenza se il tuo pass è valido.');
-          resetCodeLogin();showApplication();
+          if(!data.active&&!data.authenticated)throw new Error('Accesso Gold non attivo. Contatta l’assistenza se il tuo pass è valido.');
+          resetCodeLogin();showApplication(data);
         }
       } catch(err) {
         loginMessage(err.message,true);
@@ -1079,13 +1102,14 @@
       code.addEventListener('paste',event=>{const text=event.clipboardData?.getData('text')||'';const digits=text.replace(/[^0-9]/g,'');if(digits.length===6){event.preventDefault();code.value=digits;}});
       try {const draft=JSON.parse(sessionStorage.getItem('gold_login_draft'));if(draft&&/^[a-f0-9]{64}$/.test(draft.challenge)&&typeof draft.email==='string'&&Date.now()-draft.at>=0&&Date.now()-draft.at<600000){loginChallenge=draft.challenge;loginSentAt=draft.at;document.getElementById('loginEmail').value=draft.email;showCodeStep();}} catch (_) {}
       if (new URLSearchParams(location.search).get('logout') === 'true') {await logoutGold();return;}
-      try {const data=await authRequest('session');if(data.active){resetCodeLogin();showApplication();}else loginMessage('Il tuo accesso non risulta attivo. Usa l’email del pass o contatta l’assistenza.',true);}
+      try {const data=await authRequest('session'+(new URLSearchParams(location.search).get('renewal')==='success'?'?refresh=1':''));if(data.active||data.authenticated){resetCodeLogin();showApplication(data);}else loginMessage('Il tuo accesso non risulta attivo. Usa l’email del pass o contatta l’assistenza.',true);}
       catch (err) {if(err.status!==401)loginMessage(err.message,true);}
     }
 
-    function showApplication() {
+    function showApplication(data = null) {
       document.getElementById('loginOverlay').classList.remove('show');
       document.getElementById('app').hidden = false;
+      if(data && globalThis.GoldAccess && !GoldAccess.accept(data))return;
       buildDayButtons();
       buildHourOptions();
       loadAuditSummary();
@@ -1095,6 +1119,7 @@
     async function logoutGold() {
       try {
         await authRequest('logout', {});
+        globalThis.GoldAccess?.stop();
         loadJson.pageCache?.clear();
         try {localStorage.removeItem(STORAGE_KEY);} catch (_) {}
         window.location.href = 'index.html';
@@ -1251,7 +1276,12 @@
             const response=await fetch(rawUrl(path),{cache:'no-store',credentials:'same-origin',signal:controller.signal});
             if(response.status===401||response.status===403) {
               cache.clear();
+              if(response.status===403&&globalThis.GoldAccess?.deny()) {
+                void GoldAccess.refresh(true);
+                const error=new Error('Accesso Gold non attivo. Puoi rinnovare dal riquadro del tuo account.');error.code='GOLD_AUTH_REQUIRED';throw error;
+              }
               resetCodeLogin();
+              globalThis.GoldAccess?.stop();
               document.getElementById('app').hidden=true;
               document.getElementById('loginOverlay').classList.add('show');
               const message=response.status===401?'La sessione è scaduta. Richiedi un nuovo codice per rientrare.':'Il tuo accesso Gold non risulta attivo. Verifica l’email del pass o contatta l’assistenza.';
@@ -2668,6 +2698,17 @@
     document.addEventListener('visibilitychange', checkCalendarRollover);
     window.addEventListener('focus', checkCalendarRollover);
     window.setInterval(checkCalendarRollover, 60000);
+    window.addEventListener('gold-access-expired',()=>{
+      loadJson.pageCache?.clear();currentPayload=null;currentMatches=[];filteredMatches=[];
+      document.getElementById('detailOverlay').classList.remove('show');
+      for(const dialog of document.querySelectorAll('dialog.mx-modal[open]'))dialog.close();
+    });
+    window.addEventListener('gold-access-restored',()=>{buildDayButtons();buildHourOptions();loadAuditSummary();loadCurrentDay();});
+    window.addEventListener('gold-session-expired',()=>{
+      document.getElementById('app').hidden=true;resetCodeLogin();document.getElementById('loginOverlay').classList.add('show');
+      window.dispatchEvent(new Event('gold-access-expired'));
+      loginMessage('La sessione è scaduta. Richiedi un nuovo codice per rientrare.',true);
+    });
     initializeAccess();
   </script>
 </body>
