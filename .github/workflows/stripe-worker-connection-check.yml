@@ -14,6 +14,7 @@ jobs:
         shell: python
         env:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
         run: |
           import os, json, urllib.request, urllib.error
           token = os.environ.get("CF_TOKEN", "")
@@ -48,9 +49,26 @@ jobs:
           for b in settings.get("bindings", []):
               safe = {k: b[k] for k in ("name", "type", "id", "bucket_name") if k in b}
               print("Binding:", json.dumps(safe))
+          token = os.environ.get("D1_TOKEN", "")
+          if not token:
+              raise SystemExit("Secret CLOUDFLARE_D1_API_TOKEN assente o vuoto.")
           db = read("/d1/database/2f9dbeae-4b26-494d-9b88-a3a89a1c4f25")
           print("Lettura metadati D1:", "OK" if db is not None else "NON DISPONIBILE con questo token")
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
               out.write("Worker stripe-checker: lettura impostazioni riuscita.\n\n")
               out.write("D1: " + ("lettura metadati riuscita" if db is not None else "permesso non verificato") + ".\n\n")
               out.write("Nessun deploy, nessuna modifica ai dati, nessun messaggio inviato.\n")
+          if db is None:
+              raise SystemExit("Token D1 non verificato.")
+          sql = "SELECT status, COUNT(*) AS total FROM telegram_trial_claims GROUP BY status"
+          req = urllib.request.Request(base + "/d1/database/2f9dbeae-4b26-494d-9b88-a3a89a1c4f25/query",
+              data=json.dumps({"sql": sql}).encode(),
+              headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"}, method="POST")
+          try:
+              with client.open(req, timeout=30) as response:
+                  result = json.load(response)
+              if not result.get("success"):
+                  raise ValueError()
+          except Exception:
+              raise SystemExit("Query D1 di sola lettura non riuscita.")
+          print("Registro prove (conteggi aggregati):", json.dumps(result["result"][0]["results"]))
