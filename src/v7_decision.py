@@ -4,9 +4,11 @@ from functools import lru_cache
 from hashlib import sha256
 from itertools import product
 import json
+from zoneinfo import ZoneInfo
 
 from adaptive_pricing import BASE_FIELDS, reprice
 from context_analysis import congruence_triggers
+from gold_competitions import national_competition
 from lateral_matrix import label, market_id, payout_weights, quality, specification
 from market_scope import COMBO_SPECS, JOINT_KINDS
 from matrix_quotes import safe_price_row
@@ -43,6 +45,7 @@ TRIAD_MARKETS = {
 TRIAD_LIMITS = {'most_probable': (.45, 1.55, 2.15),
                 'recommended_alternative': (.32, 2.15, 3.50),
                 'high_odds_shot': (.16, 3.50, float('inf'))}
+STUDY_LIMITS = {**TRIAD_LIMITS, 'most_probable': (.45, 1.50, 2.15)}
 SIGNAL_ROLES = dict(zip(TRIAD_MARKETS, ('primary', 'consigliata', 'colpaccio')))
 BADGES = {'BLU': '◆ BLU', 'GOLD': '● GOLD', 'PLATINUM': '★ PLATINUM'}
 TIER_RANK = {tier: rank for rank, tier in enumerate(BADGES)}
@@ -82,8 +85,7 @@ def quote_rows(rows, as_of, kickoff):
         pick = max(usable, key=lambda r: (r['odd'], stamp(r['quote_observed_at']), r['id'] == key, r['id']),
                    default=next((r for r in group if r['id'] == key), group[0]))
         chosen[key] = pick, bool(usable)
-        inputs.extend(dict(r, spec=canonical(r['spec'])) for r in usable
-                      if r['quote_status'] == 'recent' and outcome_fair(r) is not None)
+        inputs.extend(dict(r, spec=canonical(r['spec'])) for r in usable if outcome_fair(r) is not None)
     return chosen, inputs
 
 
@@ -95,9 +97,11 @@ def features(row, usable, as_of):
     repeated = bool(from_at and to_at and from_at < to_at <= now)
     first, odd = row.get('first_odd'), row['odd']
     first_at, last_at = (stamp(row.get(k)) for k in ('first_observed_at', 'quote_observed_at'))
-    net = 100*(odd/first-1) if first_at and last_at and first_at < last_at <= now and finite(first) and first > 1 else None
+    opening_delta = 100*(odd/first-1) if first_at and last_at and first_at < last_at <= now and finite(first) and first > 1 else None
+    net = 0. if row.get('prematch_stable') else opening_delta
     oci = None if row.get('historical_oci') else row.get('oci')
     return dict(delta_pct=move.get('delta_pct') if repeated else None, net_delta_pct=net,
+                opening_delta_pct=opening_delta,
                 oci=oci if finite(oci) else None, oci_method=row.get('oci_method'),
                 oci_band=('below_-50' if oci < -50 else '-50_to_0' if oci < 0 else
                           '0_to_50' if oci < 50 else '50_plus') if finite(oci) else None,
@@ -157,7 +161,7 @@ def recheck_policies(assessment, meta, as_of, rates):
             return 'v7_unavailable'
         if not row.get('v7_supported'):
             return 'history'
-        if not price_usable(row, as_of, meta['kickoff']):
+        if row.get('prematch_stable') or not price_usable(row, as_of, meta['kickoff']):
             return 'v7_quote_unusable'
 
     matrix = assessment['matrix']
@@ -192,27 +196,78 @@ def publish_prices(assessment, meta, as_of, model, projection, weight, means):
     recheck_policies(assessment, meta, as_of, model.rates)
 
 
-@lru_cache(maxsize=1024)
-def compatible(first, second):
-    """Reject pairs with no joint winning PT and ST score."""
-    specs = json.loads(first), json.loads(second)
-    for home, away, home_st, away_st in product(range(5), repeat=4):
+@lru_cache(maxsize=128)
+def winning_scores(key):
+    spec = json.loads(key)
+    mask = 0
+    for i, (home, away, home_st, away_st) in enumerate(product(range(5), repeat=4)):
         ht = home, away
         scores = {'ht': ht, 'sh': (home_st, away_st), 'ft': (home+home_st, away+away_st)}
-        if all(payout_weights(spec, *scores[spec['period']], *ht)[0] == 1. for spec in specs):
-            return True
-    return False
+        if payout_weights(spec, *scores[spec['period']], *ht)[0] == 1.:
+            mask |= 1 << i
+    return mask
+
+
+def compatible(first, *others):
+    """The selected markets must share a joint winning PT and ST score."""
+    mask = winning_scores(first)
+    for key in others:
+        mask &= winning_scores(key)
+    return bool(mask)
 
 
 def signal(key, row, reason):
     return dict(market_id=key, source_market_id=row['source_market_id'], label=row['label'],
                 odd=row['odd'], probability=row['calibrated'], ev=row['ev'], ev_low=row['ev_low'],
+                model_fair_odd=row.get('model_fair_odd'), quote_state=row.get('quote_state'),
                 tier=row['tier'], badge=BADGES.get(row['tier']), horizon=row['horizon'],
                 horizon_label=TAGS[row['horizon']], niche_id=row['niche_id'],
                 niche_label=NICHE_LABELS.get(row['niche_id']), reasons=[reason])
 
 
-def route(records, observed):
+def fill_study_slots(triad, records, allow_model_estimates):
+    if not any(finite(row['odd']) for row in records.values()):
+        return
+    fixed = [pick['market_id'] for pick in triad.values() if pick]
+    options = {}
+    for role, pick in triad.items():
+        if pick:
+            continue
+        floor, minimum, maximum = STUDY_LIMITS[role]
+        candidates = []
+        for key, row in records.items():
+            if (key in fixed or not row.get('study_supported') or row['calibrated'] < floor
+                    or row['spec_kind'] not in ('result', 'total', 'btts', *JOINT_KINDS)):
+                continue
+            is_estimate = not finite(row['odd'])
+            if is_estimate and (not allow_model_estimates or row['horizon'] not in ('PT', 'ST', 'PT+ST')):
+                continue
+            value = row['model_fair_odd'] if is_estimate else row['odd']
+            if finite(value) and minimum <= value <= maximum and compatible(key, *fixed):
+                candidates.append(key)
+        options[role] = [None, *candidates]
+    if not options:
+        return
+
+    def score(picks):
+        ranks = [(finite(records[k]['odd']), records[k]['calibrated'], records[k]['ev'] or 0., k)
+                 if k is not None else (False, 0., 0., '') for k in picks]
+        return sum(k is not None for k in picks), sum(rank[0] for rank in ranks), ranks
+
+    def valid(picks):
+        extra = [key for key in picks if key is not None]
+        return not extra or len(set(extra)) == len(extra) and compatible(extra[0], *extra[1:], *fixed)
+
+    best = max(filter(valid, product(*options.values())), key=score)
+    for role, key in zip(options, best):
+        if key is not None:
+            row = records[key]
+            estimate = row['odd'] is None
+            triad[role] = {**signal(key, {**row, 'tier': 'BLU'}, 'stima_modello' if estimate else 'solo_studio'),
+                           'study_only': True, 'quote_state': 'model_estimate' if estimate else row['quote_state']}
+
+
+def route(records, observed, *, study=False, allow_model_estimates=False):
     triad = dict.fromkeys(TRIAD_MARKETS)
     chosen = []
     for role, markets in TRIAD_MARKETS.items():
@@ -224,7 +279,7 @@ def route(records, observed):
             if not (row['tier'] and finite(odd) and minimum <= odd <= maximum
                     and row['calibrated'] >= floor and finite(ev) and ev > 0):
                 continue
-            if role != 'high_odds_shot' and (not finite(low) or low < 0):
+            if (role != 'high_odds_shot' or row['tier'] == 'BLU') and (not finite(low) or low < 0):
                 continue
             if role == 'recommended_alternative' and chosen and odd <= records[chosen[0]]['odd']:
                 continue
@@ -253,6 +308,8 @@ def route(records, observed):
     best = max(surprises, key=lambda k: (records[k]['calibrated'], k), default=None)
     signals['radar_sorprese'] = signal(best, records[best], 'quota_alta_in_salita') if best else None
     signals['observations'] = observed
+    if study:
+        fill_study_slots(triad, records, allow_model_estimates)
     return triad, signals
 
 
@@ -283,6 +340,10 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
     publish_prices(assessment, meta, as_of, learned_model, projected, weight, means)
     records = {}
     sources = {r['id']: r for r in original_rows}
+    profiles = assessment.get('profiles') or {}
+    limited_national_history = national_competition(meta.get('league')) and all(
+        profiles.get(side, {}).get('for_'+period, {}).get('sample', 0) >= minimum
+        for side in ('home', 'away') for period, minimum in (('ft', 3), ('ht', 2)))
     for key, (row, usable) in chosen.items():
         source = sources[row['id']]
         spec = canonical(row['spec'])
@@ -302,9 +363,12 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
             exclusions.append('statistica_insufficiente')
         if ev is not None and ev <= 0:
             exclusions.append('ev_non_positivo')
-        quote = ({**{k: row.get(k) for k in ('first_odd', 'bookmaker', 'bookmaker_id', 'quote_status')},
+        quote = ({**{k: row.get(k) for k in ('first_odd', 'opening_odd', 'bookmaker', 'bookmaker_id', 'quote_status')},
                   **{k: utc(row.get(k)) for k in ('first_observed_at', 'quote_observed_at',
                                                   'provider_updated_at')}} if usable else None)
+        evidence = features(row, usable, as_of)
+        quote_state = ('stable' if usable and (row['quote_status'] == 'cached_stable' or row.get('first_odd') == odd)
+                       else 'moving' if evidence.get('net_delta_pct') else 'observed' if usable else 'missing')
         records[key] = dict(source_market_id=row['id'], label=label(spec), spec_kind=spec['kind'], side=spec['side'],
                             horizon='PT+ST' if spec['kind'] in JOINT_KINDS else HORIZONS[spec['period']],
                             raw=round(bounded_probability(raw_model, spec), 8),
@@ -312,11 +376,13 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
                             corrected=round(bounded_probability(fixed_model, spec), 8),
                             calibrated=round(min(1., max(0., estimate['p'])), 8), fair=fair_p,
                             v51=original_p/100 if finite(original_p) else None, odd=odd, ev=ev, supported=supported,
+                            study_supported=bool(supported or limited_national_history), quote_state=quote_state,
                             ev_low=ev_low/100 if usable and finite(ev_low) else None,
-                            model_fair_odd=estimate['fair_odd'], quote=quote, features=features(row, usable, as_of),
+                            model_fair_odd=estimate['fair_odd'], quote=quote, features=evidence,
                             edge_exclusions=exclusions, policy_exclusions=(source.get('opportunity') or {}).get('reasons') or [],
                             platinum_exclusions=(source.get('platinum') or {}).get('reasons') or [])
-    niches, observed_patterns = niche_evidence(records, assessment, calibrated, stats, totals, weight, fair_rows, means)
+    niches, observed_patterns = niche_evidence(records, assessment, calibrated, stats, totals, weight,
+                                               [r for r in fair_rows if r['quote_status'] == 'recent'], means)
     for key, row in records.items():
         row['niche_id'] = next((name for name, keys in niches.items() if key in keys), None)
         source = sources[row['source_market_id']]
@@ -334,7 +400,9 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
             row['reference_legs'] = [dict(market_id=leg, label=records[leg]['label'], odd=records[leg]['odd'],
                                           quote=records[leg]['quote']) for leg in legs]
 
-    triad, signals = route(records, observed_patterns)
+    rome = ZoneInfo('Europe/Rome')
+    days_ahead = (kickoff.astimezone(rome).date()-at.astimezone(rome).date()).days
+    triad, signals = route(records, observed_patterns, study=True, allow_model_estimates=1 <= days_ahead <= 4)
     first = next((pick for pick in triad.values() if pick), None)
     tier = max((pick['tier'] for pick in triad.values() if pick), key=TIER_RANK.__getitem__,
                default='BLU' if niches or any(row['tier'] for row in records.values()) else None)
@@ -370,7 +438,7 @@ def stored_offers(assessment, fixture, as_of):
         pick = triad.get(role) or {}
         source = rows.get(pick.get('source_market_id')) or {}
         market = (snapshot.get('markets') or {}).get(pick.get('market_id')) or {}
-        if (pick.get('tier') in TIER_RANK and source.get('probability_model') == VERSION
+        if (not pick.get('study_only') and pick.get('tier') in TIER_RANK and source.get('probability_model') == VERSION
                 and source['id'] == market.get('source_market_id')
                 and pick.get('odd') == source.get('odd') == market.get('odd')
                 and finite(pick.get('probability')) and pick['probability'] == market.get('calibrated')

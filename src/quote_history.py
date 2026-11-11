@@ -18,6 +18,7 @@ from multimarket_model import stamp
 VERSION = 'observed-price-history-v1'
 INDEX = 'arab_quote_price_history_index.json'
 PREFIX = 'arab_quote_price_history_'
+OPENING_SNAPSHOT = 'private/arab_snapshot_database.json'
 ROME = ZoneInfo('Europe/Rome')
 
 
@@ -40,13 +41,7 @@ class QuoteHistory:
         self.index_dirty = False
         self.observations = 0
 
-    def fixture(self, fid, kickoff, observed):
-        fid = str(fid)
-        existing = fid in self.index['fixtures']
-        if not existing:
-            self.index['fixtures'][fid] = partition_id(fid, observed)
-            self.index_dirty = True
-        day = self.index['fixtures'][fid]
+    def partition(self, day, existing):
         if not isinstance(day, str) or not re.fullmatch(r'\d{8}(?:_[0-9a-f])?', day):
             raise ValueError('Invalid quote history partition')
         if day not in self.days:
@@ -56,12 +51,29 @@ class QuoteHistory:
                                        {'version': VERSION, 'fixtures': {}})
             if self.days[day].get('version') != VERSION:
                 raise ValueError('Unknown quote history partition')
-        if existing and fid not in self.days[day]['fixtures']:
+        return self.days[day]['fixtures']
+
+    def stored_fixture(self, fid):
+        day = self.index['fixtures'].get(str(fid))
+        if day is None:
+            return {}
+        fixtures = self.partition(day, existing=True)
+        if str(fid) not in fixtures:
             raise ValueError('Missing referenced quote history fixture')
-        fixture = self.days[day]['fixtures'].setdefault(fid, {'kickoff': kickoff, 'groups': {}})
+        return fixtures[str(fid)]
+
+    def fixture(self, fid, kickoff, observed):
+        fid = str(fid)
+        existing = fid in self.index['fixtures']
+        if existing:
+            fixture = self.stored_fixture(fid)
+        else:
+            day = self.index['fixtures'][fid] = partition_id(fid, observed)
+            self.index_dirty = True
+            fixture = self.partition(day, existing=False).setdefault(fid, {'kickoff': kickoff, 'groups': {}})
         # A rescheduled fixture keeps the original baseline and partition.
         fixture['kickoff'] = kickoff
-        self.dirty.add(day)
+        self.dirty.add(self.index['fixtures'][fid])
         return fixture
 
     def append(self, fid, kickoff, key, group, source, *, seed=False):
@@ -85,6 +97,8 @@ class QuoteHistory:
             'quote_provenance': deepcopy(group.get('quote_provenance') or {}),
             'first_observation_type': 'first_observed_not_bookmaker_opening',
             'first': {}, 'observations': []})
+        if group.get('specs'):
+            history.update({field: deepcopy(group[field]) for field in ('specs', 'group') if field in group})
         entry = {'observed_at': group['observed_at'], 'provider_updated_at': group['provider_updated_at'],
                  'odds': deepcopy(odds), 'complete': bool(group.get('complete')),
                  'source': deepcopy(source)}
@@ -131,14 +145,66 @@ class QuoteHistory:
         from matrix_quotes import collect
         if not payload.get('collection', {}).get('complete'):
             return
-        starts = {str(r.get('fixture', {}).get('id')): r.get('fixture', {}).get('date')
-                  for r in payload.get('response', [])}
-        for fid, kickoff in starts.items():
-            captured, _ = collect(payload, fid, observed_at)
+        rows = {}
+        for row in payload.get('response', []):
+            fixture = row.get('fixture') or {}
+            if fixture.get('id') is not None:
+                rows.setdefault(str(fixture['id']), []).append(row)
+        for fid, records in rows.items():
+            kickoff = records[0]['fixture'].get('date')
+            captured, _ = collect({'response': records}, fid, observed_at)
             for key, group in captured.items():
                 self.append(fid, kickoff, key, group,
                             {'provider': 'API-Football', 'endpoint': 'odds', 'query': dict(query),
                              'acquisition_id': payload['collection'].get('acquisition_id')})
+
+    def restore_openings(self, state, meta, as_of):
+        """Recover a first observation even when a scan failed before saving its matrix."""
+        from quote_sources import prematch_observation
+
+        fid, kickoff = str(meta['fixture_id']), meta['kickoff']
+        saved = self.stored_fixture(fid).get('groups', {})
+        if not saved:
+            return
+        fixture = state.setdefault('matrix_quotes', {}).setdefault(fid, {'kickoff': kickoff, 'groups': {}})
+        openings, ledger = fixture.setdefault('openings', {}), fixture['groups']
+        for key, history in saved.items():
+            locked = openings.setdefault(key, {})
+            for token, first in history['first'].items():
+                if prematch_observation(first.get('provider_updated_at'), first.get('observed_at'), as_of, kickoff):
+                    locked.setdefault(token, {'odd': first['odd'], 'observed_at': first['observed_at']})
+            if ledger.get(key):
+                continue
+            points = [point for point in history['observations']
+                      if prematch_observation(point.get('provider_updated_at'), point.get('observed_at'), as_of, kickoff)]
+            last = max(points, key=lambda point: (point['complete'], stamp(point['provider_updated_at'])), default=None)
+            if last is not None:
+                ledger[key] = [{**{k: last[k] for k in ('odds', 'observed_at', 'provider_updated_at', 'complete')},
+                                **{k: history[k] for k in ('bookmaker', 'quote_source', 'quote_provenance', 'bet_id', 'group', 'specs') if k in history},
+                                'quote_executable': True}]
+
+    def save_openings(self, matches, as_of):
+        """Publish a private rolling snapshot; the journal retains historical firsts."""
+        path = self.directory/OPENING_SNAPSHOT
+        now = stamp(as_of)
+        if now is None:
+            return
+        previous = read_store(path, {'odds': {}})['odds']
+        fixtures = {fid: row for fid, row in previous.items() if stamp(row.get('kickoff')) and stamp(row['kickoff']) > now}
+        for match in matches:
+            meta = match.get('fixture') or {}
+            kickoff = stamp(meta.get('kickoff'))
+            if not kickoff or kickoff <= now or meta.get('fixture_id') is None:
+                continue
+            fid = str(meta['fixture_id'])
+            markets = {key: {'bookmaker_id': group['bookmaker_id'], 'bookmaker': group.get('bookmaker'),
+                             'outcomes': {side: {'opening_odd': first['odd'], 'observed_at': first['observed_at']}
+                                          for side, first in group['first'].items() if stamp(first.get('observed_at')) < kickoff}}
+                       for key, group in self.stored_fixture(fid).get('groups', {}).items() if group['first']}
+            if markets:
+                fixtures[fid] = {'fixture_id': fid, 'kickoff': meta['kickoff'], 'markets': markets}
+        if fixtures or path.is_file():
+            write_store(path, {'version': VERSION, 'odds': fixtures})
 
     def flush(self):
         for day in sorted(self.dirty):

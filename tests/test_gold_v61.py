@@ -125,10 +125,10 @@ class GoldV61(unittest.TestCase):
         self.assertTrue(quoted);self.assertTrue(all(r['quote_status']=='cached_stable' for r in quoted))
         self.assertEqual(before,{r['id']:r['statistical_pct'] for r in a['matrix']['rows']})
         expire(a,m['fixture'],'2026-10-26T20:00:01Z')
-        self.assertTrue(all(r.get('odd') is None for r in a['matrix']['rows']))
-        remembered=[r.get('last_odd') for r in a['matrix']['rows']]
+        self.assertTrue(all(r['prematch_stable'] and r['oci'] == 0 for r in quoted))
+        remembered=[r.get('odd') for r in a['matrix']['rows']]
         expire(a,m['fixture'],'2026-10-26T20:01:00Z')
-        self.assertEqual(remembered,[r.get('last_odd') for r in a['matrix']['rows']])
+        self.assertEqual(remembered,[r.get('odd') for r in a['matrix']['rows']])
 
     def test_repeated_feed_without_provider_timestamp_cannot_renew_cache(self):
         m=match();m['fixture']['kickoff']='2026-10-28T20:00:00Z'

@@ -61,7 +61,10 @@ concurrency:
 
 jobs:
   fast-scan:
-    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main'
+    # A release that needs a fresh five-day checkpoint is followed by a forced Fast.
+    if: >-
+      github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main' &&
+      (github.event_name != 'push' || !contains(github.event.head_commit.message, '[night-before-fast]'))
     runs-on: ubuntu-24.04
     timeout-minutes: 75
 

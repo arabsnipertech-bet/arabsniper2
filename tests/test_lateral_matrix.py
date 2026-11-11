@@ -195,7 +195,8 @@ class MatrixMath(unittest.TestCase):
         self.assertEqual(row['quote_status'], 'cached_stable')
         self.assertIsNotNone(row['ev_pct'])
         self.assertIsNotNone(row['selected_margin_pct'])
-        self.assertIsNone(row['oci'])
+        self.assertEqual(row['oci'], 0.)
+        self.assertFalse(row['movement_confirmed'])
         self.assertFalse(row['opportunity']['eligible'])
 
     def test_compatible_old_quote_history_is_preserved(self):

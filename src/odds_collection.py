@@ -3,11 +3,12 @@
 Supplemental queries never synthesize an outcome or merge partial market sides.
 Persistent cooldowns avoid repeatedly asking the same empty question.
 """
+from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime, timezone
 import time
 from multimarket_model import collect_quotes, stamp
-from quote_sources import direct_combo_groups, normalize_payload
+from quote_sources import direct_combo_groups, normalize_payload, prematch_observation
 from gold_competitions import excluded_known_meta
 from market_discovery import identify, clean, VERSION as DISCOVERY_VERSION
 
@@ -84,31 +85,71 @@ def coverage(payload, fid, now, target_only=True):
     return result
 
 
-def merge_payload(base, extra, fid, now):
+def scheduled_odds(client, fixtures, target_date, clock):
+    """Read the calendar once, then query each uncovered fixture directly."""
+    if not fixtures:
+        return
+    enricher = client.odds_enricher
+    if enricher is not None and not enricher.allowed(check_limits=False):
+        return
+    ids = {str(meta['fixture_id']) for meta in fixtures}
+    daily = client.get('odds', {'date': target_date, 'timezone': 'Europe/Rome'}, odds_fixture_ids=ids)
+    by_fixture = defaultdict(list)
+    for row in (daily or {}).get('response', []):
+        by_fixture[str((row.get('fixture') or {}).get('id'))].append(row)
+    for meta in fixtures:
+        fid = str(meta['fixture_id'])
+        now = clock()
+        hours = hours_to_kickoff(meta, now)
+        if hours is None or hours <= 0:
+            continue
+        if enricher is not None:
+            enricher.register_fixture(meta)
+            if not enricher.allowed(check_limits=False):
+                break
+        base = {**(daily or {}), 'response': by_fixture[fid], 'results': len(by_fixture[fid])}
+        known = {market for market, _ in coverage(base, fid, now)}
+        if not known or hours <= 12 and not {'1x2_ft', 'over25_ft'} <= known:
+            direct = client.get('odds', {'fixture': int(fid)})
+            if direct and direct.get('response'):
+                base = merge_payload(base, direct, fid, clock(), allow_stable=True) if base['response'] else direct
+        elif enricher is not None:
+            base = enricher.enrich(base, int(fid))
+        client.prefetched_odds[fid] = base
+
+
+def merge_payload(base, extra, fid, now, *, allow_stable=False):
     """Keep each bet whole, newest provider snapshot wins; never join odds sides."""
     result = {key: deepcopy(value) for key, value in base.items() if key != 'response'}
-    current = stamp(now)
     records = {}
     for supplemental, payload in ((False, base), (True, extra or {})):
         for row in payload.get('response', []):
             if str(row.get('fixture', {}).get('id')) != str(fid):
                 continue
             updated = stamp(row.get('update'))
-            kickoff = stamp(row.get('fixture', {}).get('date'))
-            if supplemental and (not updated or not kickoff or kickoff <= current or
-                                 not 0 <= (current-updated).total_seconds() <= 21600):
-                continue
+            observed = row.get('_observed_at') or now
+            if supplemental:
+                if not prematch_observation(row.get('update'), observed, now, row.get('fixture', {}).get('date')):
+                    continue
+                if not allow_stable and (stamp(now)-updated).total_seconds() > 21600:
+                    continue
             for book in row.get('bookmakers', []):
                 for bet in book.get('bets', []):
                     key = (str(book.get('id')), str(bet.get('id')) if bet.get('id') is not None else 'name:'+clean(bet.get('name')))
                     previous = records.get(key)
-                    if previous and (not updated or previous[0] and updated <= previous[0]):
-                        continue
+                    if previous:
+                        if not updated or previous[0] and updated < previous[0]:
+                            continue
+                        if updated == previous[0]:
+                            old_values = {v.get('value'): v.get('odd') for v in previous[3].get('values', [])}
+                            new_values = {v.get('value'): v.get('odd') for v in bet.get('values', [])}
+                            if not old_values.items() < new_values.items():
+                                continue
                     records[key] = (updated, row, book, bet)
     groups = {}
     for updated, row, book, bet in records.values():
         # Group only identical snapshot timestamps, retaining whole markets.
-        key = (row.get('update'), str(book.get('id')))
+        key = (row.get('update'), row.get('_observed_at'), str(book.get('id')))
         if key not in groups:
             # Copy each selected subtree once, excluding the arrays rebuilt here.
             # No full-feed or full-book copies inside the per-market loop.

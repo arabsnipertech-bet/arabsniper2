@@ -6,6 +6,8 @@ of a huge document. The authenticated Gold projection alone uses this index.
 import gzip
 import hashlib
 import json
+from collections import Counter
+from datetime import datetime, timezone
 
 FORMAT = 'arabsniper-gold-pages-v1'
 PAGE_BYTES = 8 * 1024 * 1024
@@ -13,6 +15,35 @@ PAGE_BYTES = 8 * 1024 * 1024
 
 def encoded(value):
     return json.dumps(value, ensure_ascii=False, separators=(',', ':')).encode()
+
+
+def prematch_coverage(day):
+    from multimarket_model import stamp
+    from quote_cache import valid_number
+
+    now = datetime.now(timezone.utc)
+    summary = {'all': Counter(), 'national_teams': Counter(), 'japan_cups': Counter()}
+    for match in day.get('matches', []):
+        meta = match.get('fixture') or {}
+        kickoff = stamp(meta.get('kickoff'))
+        if not kickoff or kickoff <= now or meta.get('status_short') not in ('NS', 'TBD') or meta.get('result'):
+            continue
+        matrix = (match.get('multimarket') or {}).get('matrix') or {}
+        prices = [r for r in matrix.get('rows', []) if r.get('quote_executable') is True
+                  and r.get('quote_status') in ('recent', 'cached_stable') and valid_number(r.get('odd')) and r['odd'] > 1]
+        signs = {spec.get('side') for r in prices if (spec := r.get('spec') or {}).get('kind') == 'result'
+                 and spec.get('period') == 'ft'}
+        picks = [p for p in ((matrix.get('v7') or {}).get('triad') or {}).values() if p]
+        coverage = dict(fixtures=1, quoted=bool(prices), one_x_two={'1', 'x', '2'} <= signs,
+                        stable=any(r.get('prematch_stable') for r in prices),
+                        full_triad=len(picks) == 3, model_estimates=sum(p.get('quote_state') == 'model_estimate' for p in picks))
+        summary['all'].update(coverage)
+        scope = (match.get('gold_scope') or {}).get('tier')
+        if scope == 'national_team':
+            summary['national_teams'].update(coverage)
+        if scope == 'national_cup' and meta.get('country') == 'Japan':
+            summary['japan_cups'].update(coverage)
+    return {'date': day.get('date'), **summary}
 
 
 def project(value, upload, page_bytes=PAGE_BYTES):

@@ -12,7 +12,7 @@ from gold_storage import GOLD, client, previous_manifest, publish, restore_subse
 from matrix_quotes import attach
 from multimarket_model import stamp
 from proposal_stability import seed_stability
-from quote_history import QuoteHistory, PREFIX as PRICE_HISTORY_PREFIX, restore_for_fixtures
+from quote_history import OPENING_SNAPSHOT, QuoteHistory, PREFIX as PRICE_HISTORY_PREFIX, restore_for_fixtures
 from v7_archive import ROME
 from v7_probability import utc
 
@@ -150,12 +150,14 @@ def incremental(root, api=None, clock=local_now, budget=65):
             for row in payload['response']:
                 row['_observed_at'] = observed
             prices.observe(payload, observed, {'fixture': fid})
+            prices.restore_openings(state, meta, observed)
             seed_stability(assessment, assessment)
             attach(assessment, payload, state, meta, observed)
             refreshed += 1
     finally:
         prices.flush()
     if refreshed:
+        prices.save_openings(targets, utc(clock()))
         write_store(state_path, state)
         write_store(path, day)
     return refreshed
@@ -174,7 +176,7 @@ def price_pass(storage, bucket, root, budget, clock=local_now):
     required = {'data/'+name for name in GOLD} | {
         'data/arab_quote_dashboard.json', 'data/arab_quote_state.json'}
     optional = {'data/arab_calibration_weights.json', 'data/arab_quote_v7_weights.json',
-                'data/arab_quote_history.json'}
+                'data/arab_quote_history.json', 'data/'+OPENING_SNAPSHOT}
     if not required.issubset(index):
         raise ValueError('Incomplete incremental Gold checkpoint')
     restore_subset(storage, bucket, root, index, required | (optional & index.keys()))
@@ -193,6 +195,7 @@ def price_pass(storage, bucket, root, budget, clock=local_now):
     paths = required | {'data/arab_quote_history.json', journal.relative_to(root).as_posix()}
     paths.update(p.relative_to(root).as_posix() for p in (root/'data').glob('arab_quote_selections_day[1-5].json'))
     paths.update(p.relative_to(root).as_posix() for p in (root/'data').glob(PRICE_HISTORY_PREFIX+'*.json'))
+    paths.add('data/'+OPENING_SNAPSHOT)
     publish(storage, bucket, root, selected_paths=sorted(paths))
     return count
 

@@ -107,12 +107,17 @@ def complete_day(ns, client, day, as_of):
             state=ns['read_json'](ns['STATE_FILE'],{}) if all(k in ns for k in ('read_json','STATE_FILE')) else {}
             if getattr(client,'odds_enricher',None) is not None: client.odds_enricher.register_fixture(meta)
             try:
-                payload=client.get('odds',{'fixture':int(meta['fixture_id'])}) if client is not None else None
+                prefetched = getattr(client, 'prefetched_odds', {})
+                payload = (prefetched.pop(fid) if fid in prefetched else
+                           client.get('odds', {'fixture': int(meta['fixture_id'])}) if client is not None else None)
             except Exception as exc:
                 payload=None
                 a['notes'].append('Quote temporaneamente non disponibili: '+type(exc).__name__)
             observed=ns['iso_now']() if 'iso_now' in ns else as_of
             if stamp(observed) < kickoff:
+                journal = getattr(client, 'odds_observer', None)
+                if journal is not None:
+                    journal.restore_openings(state, meta, observed)
                 attach(a,payload or {},state,meta,observed)
                 if all(k in ns for k in ('atomic_write_json','STATE_FILE')):
                     ns['atomic_write_json'](ns['STATE_FILE'],state)

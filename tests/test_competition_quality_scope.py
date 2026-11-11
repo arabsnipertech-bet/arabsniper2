@@ -18,6 +18,8 @@ from test_policy_engine import engine
 from test_statistics_first import NOW, KICKOFF
 from lateral_matrix import MODEL_ID
 from near_kickoff_quotes import NearKickoffRefresher
+from statistics_first import league_prior, team_history
+from test_statistics_first import team_history as sample_team_history
 
 EXCLUDED = [
     ('Ukraine','Persha Liga'), ('Ukraine','Persha Liha - Championship Round'), ('Ukraine','Druha Liga - Group A'),
@@ -54,6 +56,39 @@ def meta(raw):
 
 
 class CompetitionQualityScope(unittest.TestCase):
+    def test_official_national_competitions_and_japanese_cups(self):
+        names = ['UEFA Nations League', 'UEFA Nations League - League D', 'UEFA Nations League - Playoffs',
+                 'Euro Championship - Qualification', 'Africa Cup of Nations - Qualification', 'Asian Cup - Qualification']
+        names += ['World Cup - Qualification '+region for region in ('Europe', 'CONMEBOL', 'CAF', 'AFC', 'CONCACAF')]
+        for name in names:
+            self.assertEqual(profile({'country': 'World', 'name': name})['tier'], 'national_team', name)
+        for name in ('Friendlies', 'International Friendlies', 'UEFA Nations League Women', 'UEFA Nations League U21'):
+            self.assertFalse(fixture_allowed(fixture(1, 'World', name)), name)
+        self.assertTrue(fixture_allowed(fixture(2, 'Japan', "Emperor's Cup")))
+
+    def test_cup_uses_eight_official_season_matches_when_halves_are_sparse(self):
+        meta = dict(league='J-League Cup', league_id=101, country='Japan', season=2026)
+        rows = [dict(row, league_id=101 if i < 4 else 98, halftime_available=i not in (1, 2))
+                for i, row in enumerate(sample_team_history())]
+        old = dict(rows[0], fixture_id='old', season=2025)
+        friendly = dict(rows[0], fixture_id='friendly', friendly=True)
+        self.assertEqual(len(team_history([old, friendly, *rows], meta, NOW)), 8)
+        rows[1]['halftime_available'] = True
+        self.assertEqual(len(team_history(rows, meta, NOW)), 4)
+
+    def test_national_history_uses_24_months_across_seasons_and_valid_prior(self):
+        meta = dict(league='UEFA Nations League', league_id=5, country='World', season=2026)
+        raw = sample_team_history()[0]
+        rows = [dict(raw, fixture_id=str(i), kickoff=day, national_group='uefa', season=2025)
+                for i, day in enumerate(('2025-11-15T12:00:00Z', '2024-10-26T12:00:00Z',
+                                         '2024-10-25T22:00:00Z', '2026-10-26T22:00:00Z'))]
+        rows += [dict(raw, fixture_id='club'), dict(rows[0], fixture_id='friendly', friendly=True)]
+        self.assertEqual([r['fixture_id'] for r in team_history(rows, meta, NOW)], ['0', '1'])
+        baseline = dict(reference_scope='national_team', sample=3, ht_sample=2, avg_home_goals=1.2, avg_home_ht=.5)
+        self.assertEqual(league_prior(baseline, 'home', 'ft'), (1.2, 3))
+        self.assertEqual(league_prior(baseline, 'home', 'ht'), (.5, 2))
+        self.assertEqual(league_prior(dict(baseline, sample=2), 'home', 'ft')[1], 0)
+
     def test_exclusions_and_quality_exceptions_are_country_scoped(self):
         for country,name in EXCLUDED+ALLOWED:
             with self.subTest(country=country,name=name):

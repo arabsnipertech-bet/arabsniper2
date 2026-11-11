@@ -50,6 +50,40 @@ def assessment():
 
 
 class MathAndRouting(unittest.TestCase):
+    def test_study_uses_compatible_real_prices_without_publishing_weak_ev(self):
+        def candidate(key, probability, odd, fair, horizon):
+            return dict(source_market_id=key, label=key, calibrated=probability, odd=odd,
+                        ev=-.03 if odd else None, ev_low=-.12 if odd else None, tier=None,
+                        niche_id=None, horizon=horizon, spec_kind=json.loads(key)['kind'],
+                        model_fair_odd=fair, quote_state='stable' if odd else 'missing',
+                        study_supported=True, features={})
+
+        records = {GG_FT: candidate(GG_FT, .54, 1.8, 1.85, 'FT'),
+                   HT: candidate(HT, .40, None, 2.5, 'PT'),
+                   GG: candidate(GG, .22, 4.0, 4.55, 'PT')}
+        triad, signals = route(records, PATTERNS, study=True, allow_model_estimates=True)
+        self.assertEqual([r['market_id'] for r in triad.values()], [GG_FT, HT, GG])
+        self.assertTrue(all(r['tier'] == 'BLU' and r['study_only'] for r in triad.values()))
+        estimate = triad['recommended_alternative']
+        self.assertEqual((estimate['odd'], estimate['model_fair_odd'], estimate['quote_state']), (None, 2.5, 'model_estimate'))
+        self.assertFalse(any(signals[k] for k in ('primary', 'consigliata', 'colpaccio', 'gold', 'platinum')))
+        today, _ = route(records, PATTERNS, study=True)
+        self.assertIsNone(today['recommended_alternative'])
+        records[HT].update(odd=2.4, ev=-.04, ev_low=-.10, quote_state='moving')
+        self.assertEqual(route(records, PATTERNS, study=True)[0]['recommended_alternative']['odd'], 2.4)
+
+    def test_retained_price_can_feed_fair_projection_and_stays_in_studio(self):
+        a = assessment()
+        ft = a['matrix']['rows'][0]
+        ft.update(odd=2.05, first_odd=2.05, provider_updated_at='2026-11-08T18:00:00+01:00',
+                  quote_observed_at='2026-11-08T19:00:00+01:00', quote_status='cached_stable',
+                  prematch_stable=True, cache_expires_at=START, oci=0., delta_pct=0.)
+        snapshot = capture(a, META, AT)
+        self.assertEqual(snapshot['fair_inputs']['totals']['ft']['2.5'], .4)
+        self.assertEqual(snapshot['markets'][FT]['quote_state'], 'stable')
+        self.assertFalse(ft['opportunity']['eligible'])
+        self.assertFalse(ft['platinum']['eligible'])
+
     def test_draw_changes_fit_and_strong_favorite_gains_probability(self):
         baseline = raw_rates({'rates': RATES})
         balanced = market_rates(baseline, {}, (.65, .20, .15))

@@ -310,7 +310,7 @@ class APIClient:
     def _cache_key(path: str, params: Mapping[str, Any]) -> str:
         return f"{path}?" + "&".join(f"{key}={params[key]}" for key in sorted(params))
 
-    def get(self, path: str, params: Mapping[str, Any], use_cache: bool = True) -> Optional[Dict[str, Any]]:
+    def get(self, path: str, params: Mapping[str, Any], use_cache: bool = True, *, odds_fixture_ids=None) -> Optional[Dict[str, Any]]:
         if path != "odds" or "page" in params:
             if self.history_cache is not None and use_cache:
                 from history_cache import descriptor
@@ -351,6 +351,8 @@ class APIClient:
             rows.extend(payload["response"])
         all_books = {(r.get("fixture", {}).get("id"), b.get("id")) for r in rows for b in r.get("bookmakers", [])}
         self.odds_books_recovered += len(all_books-initial_books)
+        if odds_fixture_ids is not None:
+            rows = [r for r in rows if str((r.get('fixture') or {}).get('id')) in odds_fixture_ids]
         result = {**first, "response": rows, "results": len(rows),
                   "collection": {"pages_fetched": total, "pages_total": total, "complete": True}}
         observed_at = iso_now()
@@ -2069,7 +2071,7 @@ def scan_dates(
                 continue
             fixtures.append(fixture_row)
 
-        from odds_collection import fixture_priority
+        from odds_collection import fixture_priority, scheduled_odds
         order_time = iso_now()
         def recovery_order(row):
             fixture = row.get("fixture") or {}
@@ -2080,14 +2082,9 @@ def scan_dates(
         # Price acquisition follows the known schedule before expensive team
         # statistics. A statistics failure cannot consume the observation window.
         if isinstance(client, APIClient) and client.odds_observer is not None:
-            for scheduled in fixtures:
-                scheduled_meta = fixture_meta(scheduled)
-                scheduled_id = scheduled_meta['fixture_id']
-                if client.odds_enricher is not None:
-                    client.odds_enricher.register_fixture(scheduled_meta)
-                    if not client.odds_enricher.allowed(check_limits=False):
-                        break
-                client.prefetched_odds[str(scheduled_id)] = client.get('odds', {'fixture': int(scheduled_id)})
+            try:
+                scheduled_odds(client, [fixture_meta(row) for row in fixtures], target_date, iso_now)
+            finally:
                 client.odds_observer.flush()
         refreshed_matches: List[Dict[str, Any]] = []
         refreshed_ids: set[str] = set()
@@ -3309,6 +3306,7 @@ def main() -> None:
                                        clock=now_rome, reuse=bool(args.fast or args.today))
     try:
         output = scan_dates(client, get_target_dates(start, days), excluded)
+        client.odds_observer.save_openings((match for day in output['days'] for match in day['matches']), iso_now())
     finally:
         client.odds_observer.flush()
         client.history_cache.save()
