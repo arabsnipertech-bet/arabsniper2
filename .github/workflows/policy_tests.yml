@@ -39,7 +39,7 @@ permissions:
   contents: read
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -54,17 +54,17 @@ jobs:
             node "$test" || exit 1
           done
 
-      - name: Install browser for dashboard checks
+      - name: Prepare browser for dashboard checks
         timeout-minutes: 10
         run: |
-          # The hosted Azure mirror can stall large font downloads. Keep the
-          # Ubuntu archive/signature checks and bound network retries.
-          if [ -f /etc/apt/apt-mirrors.txt ]; then
-            printf '%s\n' 'https://archive.ubuntu.com/ubuntu/' | sudo tee /etc/apt/apt-mirrors.txt >/dev/null
-          fi
-          printf '%s\n' 'Acquire::Retries "2";' 'Acquire::http::Timeout "30";' 'Acquire::https::Timeout "30";' | sudo tee /etc/apt/apt.conf.d/80-arabsniper-timeouts >/dev/null
           npm install --prefix /tmp/arabsniper-browser playwright@1.62.1
-          /tmp/arabsniper-browser/node_modules/.bin/playwright install --with-deps chromium
+          browser=$(command -v google-chrome || command -v chromium || true)
+          if [ -n "$browser" ]; then
+            "$browser" --version
+            printf '%s\n' "PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=$browser" "CHROMIUM_PATH=$browser" >> "$GITHUB_ENV"
+          else
+            /tmp/arabsniper-browser/node_modules/.bin/playwright install --with-deps chromium
+          fi
       - name: Check dashboard in desktop and mobile browser
         run: NODE_PATH=/tmp/arabsniper-browser/node_modules node tests/browser_dashboard.cjs
       - name: Check statistics-first dashboard
