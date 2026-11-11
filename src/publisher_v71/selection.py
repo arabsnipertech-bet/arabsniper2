@@ -14,6 +14,11 @@ CATEGORIES = {
     'recommended_alternative': 'Plausibile',
     'high_odds_shot': 'Colpaccio',
 }
+TRIAD_LABELS = {
+    'most_probable': 'Più probabile',
+    'recommended_alternative': 'Consigliata',
+    'high_odds_shot': 'Colpaccio',
+}
 LEAD = timedelta(minutes=20)
 WINDOW = timedelta(minutes=60)
 SPAN = timedelta(minutes=90)

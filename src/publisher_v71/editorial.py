@@ -66,7 +66,27 @@ def best_copy(view):
     ]
 
 
-def report_copy(view):
+def report_copy(view, *, compact=False):
+    if 'triad_examples' in view:
+        examples = view['triad_examples']
+        lines = ['Esempi selezionati dalle schede Gold · verifica Auditor' if examples
+                 else 'Bilancio verificato dall’Auditor']
+        for row in examples:
+            match, market = row['match'], row['market']
+            if compact:
+                match = match[:46].rstrip() + '…' if len(match) > 46 else match
+                market = market[:46].rstrip() + '…' if len(market) > 46 else market
+            halftime = f" (PT {row['halftime']})" if row.get('halftime') else ''
+            study = ' · Studio' if row.get('study_only') else ''
+            lines.append(f"{match} · {row['score']}{halftime}\n✓ {row['category']} · {market}{study}")
+        summary = []
+        for key, name in (('public', 'BEST gratuite'), ('gold', 'BEST Gold documentate'), ('internal', 'Ricerca')):
+            value = view['cohorts'][key]
+            decided = value['won'] + value['lost']
+            summary.append(f"{name} {value['won']}/{decided}" if decided else f'{name} —')
+        lines.append('Corrette su esiti definitivi\n' + ' · '.join(summary))
+        return lines
+
     lines = []
     for cohort, value in view['cohorts'].items():
         lines.append(
@@ -103,19 +123,23 @@ def message(kind, view, marker, channel):
         lines = best_copy(view)
         title = 'La selezione aperta'
     elif kind == 'report':
-        lines.extend(f"{OUTCOMES[r['outcome']]} · {r['match'][:45]} · {r['market'][:38]}"
-                     for r in view['examples'])
+        if 'triad_examples' in view:
+            lines = report_copy(view, compact=channel == 'telegram')
+        else:
+            lines.extend(f"{OUTCOMES[r['outcome']]} · {r['match'][:45]} · {r['market'][:38]}"
+                         for r in view['examples'])
     elif kind == 'live':
         lines = live_copy(view)[1:]
     heading = f'ArabSniperBet · {label}\n{title}'
-    footer = f'{SITE} · 18+ · Stime sperimentali\n{marker}'
+    site = f'Dati completi {SITE}/#risultati' if kind == 'report' and 'triad_examples' in view else SITE
+    footer = f'{site} · 18+ · Stime sperimentali\n{marker}'
     if kind == 'gold':
         footer = f'{BOT}\n{CHANNEL}\n{footer}'
     caption = '\n\n'.join([heading, *filter(None, lines), footer])
     if channel == 'telegram' and len(caption.encode('utf-16-le')) // 2 > 1024:
         if kind == 'best':
             lines[2] = lines[2][:100]
-        elif kind == 'report':
+        elif kind == 'report' and 'triad_examples' not in view:
             lines = [*report_copy(view), *(line[:70] for line in lines[3:])]
         caption = '\n\n'.join([heading, *filter(None, lines), footer])
         if len(caption.encode('utf-16-le')) // 2 > 1024:

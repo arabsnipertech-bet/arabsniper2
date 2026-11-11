@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
 from publisher_v71 import delivery, editorial, live, public_feed, report, selection
 from publisher_v71.channels import DeliveryError, TelegramHistory
-from publisher_v71.runner import add_group, record_home_receipt
+from publisher_v71.runner import add_group, plan_report, record_home_receipt
 from publisher_v71.storage import Storage
 from v7_decision import GOAL, fingerprint
 
@@ -46,6 +46,43 @@ def board(item):
     v7['sha256'] = fingerprint(v7)
     return {'date': selection.rome_day(datetime.fromisoformat(kickoff)), 'updated_at': captured,
             'matches': [{'fixture': f, 'multimarket': {'matrix': {'v7': v7, 'rows': [source]}}}]}
+
+
+def full_board(item):
+    payload = board(item)
+    matrix = payload['matches'][0]['multimarket']['matrix']
+    snapshot = matrix['v7']
+    snapshot['markets'][item['market_id']]['label'] = item['market']
+    for role, name, label in [('recommended_alternative', 'over15_ht', 'Over 1,5 primo tempo'),
+                              ('high_odds_shot', 'over25_ht', 'Over 2,5 primo tempo')]:
+        key = GOAL[name]
+        estimate = {'source_market_id': name, 'odd': None, 'model_fair_odd': 3.125}
+        snapshot['markets'][key] = {**estimate, 'label': label, 'calibrated': .32, 'private': 'private source'}
+        snapshot['triad'][role] = {**estimate, 'market_id': key, 'probability': .32, 'tier': 'BLU',
+                                  'study_only': True, 'quote_state': 'model_estimate'}
+        matrix['rows'].append({'id': name, 'probability_model': snapshot['version']})
+    snapshot['sha256'] = fingerprint({k: v for k, v in snapshot.items() if k != 'sha256'})
+    return payload
+
+
+def certified_day():
+    audit = {'date': '2026-11-11', 'generated_at': '2026-11-12T03:30:00Z', 'fixtures': {}, 'fixture_labels': {}}
+    for number in reversed(range(1, 8)):
+        pick_row = pick(number, number + 25)
+        fid = pick_row['fixture_id']
+        market = GOAL['over15_ht']
+        audit['fixtures'][fid] = {
+            'kickoff': pick_row['kickoff'], 'captured_at': pick_row['captured_at'],
+            'status': 'settled', 'result': {'status': 'FT', 'home_ft': 1, 'away_ft': 1, 'home_ht': 1, 'away_ht': 1},
+            'triad': {'most_probable': {'market_id': GOAL['over25_ft'], 'label': 'Over 2,5 finale'},
+                      'recommended_alternative': {'market_id': market, 'label': 'Over 1,5 primo tempo',
+                                                  'horizon': 'PT', 'study_only': True}},
+            'outcomes': {market: {'win': 1, 'loss': 0}, GOAL['over25_ft']: {'win': 0, 'loss': 1}},
+        }
+        audit['fixture_labels'][fid] = pick_row['match']
+    audit['fixtures']['1']['captured_at'] = audit['fixtures']['1']['kickoff']
+    audit['fixtures']['2']['status'] = 'pending'
+    return audit
 
 
 class LocalStore(Storage):
@@ -109,6 +146,26 @@ class PublisherTests(TestCase):
             self.assertIn('quota 1,91', post['text'])
             self.assertLessEqual(len(post['text'].encode('utf-16-le')) // 2, 1024)
         self.assertEqual(public_feed.projection(store.state, NOW + timedelta(minutes=41))['groups'], [])
+
+    def test_home_uses_complete_gold_triads_and_locked_schedule_without_best(self):
+        incomplete = board(pick(1, 160, 'BLU'))
+        complete = [full_board(pick(i, 160 + i, 'BLU')) for i in (2, 3, 4, 5)]
+        # One interrupted fixture and one corrupt forecast must not be showcased.
+        complete[-1]['matches'][0]['fixture']['status_short'] = 'PST'
+        complete[0]['matches'][0]['multimarket']['matrix']['v7']['sha256'] = 'tampered'
+        with mock.patch('publisher_v71.showcase.output_allowed', return_value=True):
+            view = public_feed.projection(LocalStore().state, NOW, boards=[incomplete, *complete])
+        self.assertEqual(view['groups'], [])
+        self.assertEqual([row['fixture_id'] for row in view['gold_previews']], ['3', '4'])
+        self.assertEqual([row['fixture_id'] for row in view['gold_schedule']], ['1', '2', '3', '4'])
+        for fixture in view['gold_schedule']:
+            self.assertEqual(set(fixture), {'fixture_id', 'match', 'league', 'kickoff'})
+        proposals = view['gold_previews'][0]['proposals']
+        self.assertEqual([row['category'] for row in proposals], list(selection.TRIAD_LABELS.values()))
+        self.assertEqual(proposals[0]['odd'], 1.91)
+        self.assertNotIn('odd', proposals[1])
+        self.assertNotIn('private source', json.dumps(view))
+        self.assertNotIn('model_fair_odd', json.dumps(view))
 
     def test_homepage_receipt_recovers_from_an_already_visible_revision(self):
         store = LocalStore()
@@ -185,6 +242,38 @@ class PublisherTests(TestCase):
         self.assertEqual(verified['cohorts']['gold']['pending'], 1)
         self.assertEqual([e['outcome'] for e in verified['examples']], ['lost', 'won'])
         self.assertIsNone(report.build(audit, [pick(8)], []))
+
+    def test_recap_uses_up_to_four_certified_fixtures_and_a_winning_triad_slot(self):
+        audit = certified_day()
+        view = report.build(audit, [], [])
+        rows = view['triad_examples']
+        self.assertEqual([row['match'] for row in rows], [pick(i)['match'] for i in (3, 4, 5, 6)])
+        self.assertTrue(all(row['category'] == 'Consigliata' and row['halftime'] == '1–1' for row in rows))
+        self.assertEqual(view['cohorts']['gold']['total'], 0)
+        self.assertEqual(view['examples'], [])
+        for channel in ('telegram', 'facebook'):
+            text = editorial.message('report', view, 'AS71-EXAMPLE', channel)
+            for row in rows:
+                self.assertIn(row['match'], text)
+            self.assertIn('Esempi selezionati dalle schede Gold', text)
+            self.assertIn('https://arabsniperbet.com/#risultati', text)
+            self.assertLessEqual(len(text.encode('utf-16-le')) // 2, 1024)
+        audit['fixture_labels'] = {'3': pick(3)['match']}
+        self.assertEqual(len(report.build(audit, [], [])['triad_examples']), 1)
+
+    def test_existing_recap_is_enriched_in_home_without_a_second_delivery(self):
+        store = LocalStore()
+        previous = '2026-11-11'
+        old_view = {'date': previous, 'cohorts': {k: report.metrics([]) for k in editorial.COHORTS}, 'examples': []}
+        now = datetime.fromisoformat('2026-11-12T10:00:00+00:00')
+        store.state['reports'][previous] = {'created_at': selection.utc(now), 'view': old_view}
+        with mock.patch('publisher_v71.report.certified', return_value=certified_day()) as certified:
+            plan_report(store, now, ('telegram', 'facebook'), datetime.fromisoformat(previous).date())
+            plan_report(store, now, ('telegram', 'facebook'), datetime.fromisoformat(previous).date())
+        self.assertEqual(certified.call_count, 1)
+        self.assertEqual(store.state['posts'], {})
+        self.assertNotIn('triad_examples', old_view)
+        self.assertEqual(len(store.state['reports'][previous]['view']['triad_examples']), 4)
 
     def test_live_uses_official_result_and_reserve(self):
         state = live.start_state(pick(1), pick(2, 105), NOW)

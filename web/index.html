@@ -45,40 +45,69 @@ body{color:#F3F0E8}.button.gold{color:#0B1424}.hero{padding-block:clamp(42px,7vw
 .editorial-hero-card dt,.model-number{font-weight:700;color:var(--gold)}.editorial-hero-card dd{margin:3px 0 0;color:var(--muted)}
 .editorial-pick{padding:20px}.editorial-pick .league{margin-top:15px}.editorial-pick h3{min-height:0;margin-bottom:15px;overflow-wrap:anywhere}
 .editorial-pick.preview{border-style:dashed}.editorial-pick .snapshot{margin-top:14px}.editorial-link{color:var(--gold);text-underline-offset:4px;text-decoration:underline}
+#daily-picks{grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr))}
+#daily-picks .editorial-pick:only-child{max-width:540px}
+.gold-preview-triad{list-style:none;margin:14px 0;padding:0;border-block:1px solid var(--line)}
+.gold-preview-triad li{display:grid;gap:2px;padding:9px 0;overflow-wrap:anywhere}
+.gold-preview-triad li+li{border-top:1px solid var(--line)}
+.gold-preview-role{color:var(--gold);font-size:12px;font-weight:700}
+.gold-preview-triad small{color:var(--muted);font-size:12px}
 .editorial-pair,.editorial-report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .editorial-pair section{padding-block:16px}.editorial-content{border-radius:12px;padding:20px;min-height:120px}.editorial-content h3{margin:0 0 7px}
 .editorial-content p{margin:0 0 6px}.editorial-report-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .editorial-metric{border-top:1px solid var(--line);padding:10px 0}.editorial-metric p{font-size:13px;margin:4px 0}
 .editorial-examples{padding-left:20px;color:var(--muted);font-size:14px}
+.editorial-live-nav{display:flex;align-items:center;gap:8px;margin:14px 0 10px;color:var(--muted);font-size:12px}
+.editorial-live-nav[hidden]{display:none}
+.editorial-live-nav button{border:1px solid var(--line);border-radius:6px;padding:4px 11px;min-height:32px;background:var(--bg);color:var(--gold)}
+#publisher-live-match{overflow-wrap:anywhere}
+.editorial-hits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;list-style:none;margin:16px 0;padding:0}
+.editorial-hits li{border:1px solid var(--line);border-radius:8px;padding:10px 13px;background:var(--bg);overflow-wrap:anywhere}
+.editorial-hit-match{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.editorial-score{color:var(--gold);white-space:nowrap;font-variant-numeric:tabular-nums}
+.editorial-report-details summary{width:fit-content;color:var(--gold);font-weight:700;cursor:pointer}
+.editorial-report-details[open] summary{margin-bottom:12px}
 .channels{grid-template-columns:repeat(4,minmax(0,1fr))}.channels a{overflow-wrap:anywhere}
 @media(max-width:820px){.channels{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.editorial-pair,.editorial-report-grid,.channels{grid-template-columns:minmax(0,1fr)}.results-panel{padding:20px}.pick-top{flex-wrap:wrap}}
+@media(max-width:600px){.editorial-pair,.editorial-report-grid,.editorial-hits,.channels{grid-template-columns:minmax(0,1fr)}.results-panel{padding:20px}.pick-top{flex-wrap:wrap}}
 </style>
 </head>
 <body>
-<header><nav class="wrap" aria-label="Navigazione principale"><a class="brand" href="/"><img src="logo1.jpg" alt=""><span>ARAB SNIPER<small>STATISTICHE · QUOTE · ANALISI</small></span></a><div class="nav-links"><a href="#selezioni">Selezioni di oggi</a><a href="#live">Live</a><a href="#risultati">Riscontri</a><a href="#contatti">Contatti</a><a href="#piani">Abbonamenti</a><a class="button gold" href="gold-dashboard-live.html">Accedi a Gold ↗</a></div></nav></header>
+<header><nav class="wrap" aria-label="Navigazione principale"><a class="brand" href="/"><img src="logo1.jpg" alt=""><span>ARAB SNIPER<small>STATISTICHE · QUOTE · ANALISI</small></span></a><div class="nav-links"><a href="#selezioni">Bacheca Gold</a><a href="#live">Live</a><a href="#risultati">Riscontri</a><a href="#contatti">Contatti</a><a href="#piani">Abbonamenti</a><a class="button gold" href="gold-dashboard-live.html">Accedi a Gold ↗</a></div></nav></header>
 <main class="wrap">
 <div class="hero desk"><div>
 <span class="eyebrow">ArabSniperBet · V7.1</span>
 <h1>Il calcio, letto<br><em>attraverso i numeri.</em></h1>
 <p>Il software incrocia i dati delle squadre con i movimenti delle quote. La bacheca pubblica mostra le BEST selezionate dal modello e i riscontri certificati dopo le partite.</p>
-<div class="actions"><a href="#selezioni" class="button gold">Esplora le BEST ↓</a><a href="#academy" class="button">Dentro i Numeri</a></div>
+<div class="actions"><a href="#selezioni" class="button gold">Vedi le anteprime Gold ↓</a><a href="#academy" class="button">Dentro i Numeri</a></div>
 </div><aside class="editorial-hero-card" aria-label="Le categorie editoriali">
 <p class="eyebrow">La triade V7</p>
 <dl><div><dt>01 · Probabile</dt><dd>La prima proposta qualificata della triade.</dd></div><div><dt>02 · Plausibile</dt><dd>Lo scenario alternativo selezionato dal modello.</dd></div><div><dt>03 · Colpaccio</dt><dd>Una lettura qualificata a quota più alta.</dd></div></dl>
 </aside></div>
 <div class="method-strip"><span><b>01</b> Statistiche delle squadre</span><span><b>02</b> Quote e movimenti</span><span><b>03</b> Verifica dopo il match</span></div>
 <section id="selezioni" aria-labelledby="picks-title">
-<div class="section-head"><div><span class="eyebrow">Prima del calcio d’inizio</span><h2 id="picks-title">BEST e anteprime Gold</h2><p>Una BEST aperta per gruppo. Le altre partite sono presentate in anteprima.</p></div><time class="date" id="preview-date"></time></div>
+<div class="section-head"><div><span class="eyebrow">Prima del calcio d’inizio</span><h2 id="picks-title">BEST e anteprime Gold</h2><p>Le tre proposte di una scheda Gold e le BEST aperte quando disponibili.</p></div><time class="date" id="preview-date"></time></div>
 <div class="picks" id="daily-picks" aria-live="polite"><p class="empty">Caricamento della bacheca…</p></div>
 <p class="note">Quote rilevate al momento indicato. Orari italiani. Le probabilità sono stime del modello.</p>
 </section>
 <div class="editorial-pair">
-<section id="live" aria-labelledby="live-title"><span class="eyebrow">Dal calcio d’inizio</span><h2 id="live-title">ArabSniper Live</h2><div class="editorial-content" id="publisher-live"><p class="muted">In attesa del prossimo Live.</p></div></section>
+<section id="live" aria-labelledby="live-title">
+<span class="eyebrow">Dal calendario Gold</span><h2 id="live-title">ArabSniper Live</h2>
+<div class="editorial-content" id="publisher-live">
+<div id="publisher-live-match"><p class="muted">In attesa delle prossime partite in Gold.</p></div>
+<div class="editorial-live-nav" id="publisher-live-nav" role="group" aria-label="Scorri le partite Gold" hidden>
+<button type="button" id="publisher-live-back" aria-label="Partita precedente">←</button>
+<button type="button" id="publisher-live-next" aria-label="Partita successiva">→</button>
+<span id="publisher-live-count"></span>
+<button type="button" id="publisher-live-pause">Pausa</button>
+</div>
+<a class="editorial-link" id="publisher-live-gold" href="gold-dashboard-live.html" hidden>Apri Gold ↗</a>
+</div>
+</section>
 <section id="academy" aria-labelledby="academy-title"><span class="eyebrow">Academy</span><h2 id="academy-title">Dentro i Numeri</h2><div class="editorial-content" id="publisher-academy"><p class="muted">Una lettura quotidiana di quote, stime ed esiti.</p></div></section>
 </div>
 <section id="risultati" aria-labelledby="results-title">
-<div class="section-head"><div><span class="eyebrow">Dalle analisi agli esiti</span><h2 id="results-title">Risultati verificati</h2><p>Tre gruppi distinti per confrontare ciò che è stato pubblicato e ciò che appartiene alla ricerca.</p></div></div>
+<div class="section-head"><div><span class="eyebrow">Dalle analisi agli esiti</span><h2 id="results-title">Risultati verificati</h2></div></div>
 <div class="results-panel" id="results-content"><p class="muted">Il report appare dopo la certificazione dell’Auditor.</p></div></section>
 <div class="gold-panel"><div><span class="eyebrow">Il quadro completo</span><h2>La tua analisi continua in Gold.</h2><p class="muted">Tutte le partite autorizzate e la matrice di probabilità, prezzi, OCI e aggio: 1X2, Over/Under, Goal/No Goal, parziali, asiatici e combo.</p><div class="actions"><a class="button gold" href="gold-dashboard-live.html">Accedi alla dashboard ↗</a><a class="button" href="#piani">Scegli il tuo accesso</a></div></div><div class="features"><div><span>↗</span> Quote osservate e movimenti di mercato</div><div><span>◎</span> Convergenza, contrarian e mercati laterali</div><div><span>＋</span> Dettagli squadra, primo tempo e finale</div><div><span>⌑</span> Area riservata con verifica dell’accesso</div></div></div>
 <aside id="prova-gold" class="trial" aria-labelledby="trial-title">
@@ -197,4 +226,4 @@ body{color:#F3F0E8}.button.gold{color:#0B1424}.hero{padding-block:clamp(42px,7vw
     }
 
 
-</script><script defer src="publisher-v71.js?v=bfce8dd6c19c"></script></body></html>
+</script><script defer src="publisher-v71.js?v=269653ca443a"></script></body></html>

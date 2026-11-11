@@ -5,17 +5,18 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import json
 
-from audit_storage import read_store
+from audit_storage import open_verified_json, read_store
 from auditor_daily_priority import STATUS, v7_paths
 from gold_storage import previous_manifest, restore_subset
 from lateral_matrix import settle_spec
 from multimarket_model import stamp
+from v7_archive import FINISHED
 from v7_probability import VERSION, finite
 
-from .selection import rome_day
+from .selection import TRIAD_LABELS, clean, rome_day
 
 
-def certified(storage, day):
+def certified(storage, day, *, with_fixture_labels=False):
     manifest = previous_manifest(storage.client, storage.bucket)
     paths = v7_paths(day)
     if STATUS not in manifest or any(p not in manifest for p in paths.values()):
@@ -29,11 +30,62 @@ def certified(storage, day):
                 or any(certificate.get(key) != manifest[path]['sha256'] for key, path in paths.items())):
             return None
         path = paths['outcomes_sha256']
-        restore_subset(storage.client, storage.bucket, root, manifest, [path])
+        daily_path = paths['daily_sha256']
+        restore_subset(storage.client, storage.bucket, root, manifest,
+                       [path, daily_path] if with_fixture_labels else [path])
         audit = read_store(root / path)
         if audit.get('version') != VERSION or audit.get('date') != str(day) or not stamp(audit.get('generated_at')):
             raise ValueError('Invalid certified V7 archive')
+        if with_fixture_labels:
+            audit['fixture_labels'] = fixture_labels(root / daily_path, audit['fixtures'])
         return audit
+
+
+def fixture_labels(path, fixtures):
+    """Join display names from the daily file covered by the same certificate."""
+    import ijson
+
+    labels = {}
+    with open_verified_json(path) as stream:
+        for row in ijson.items(stream, 'fixtures.item'):
+            meta = row.get('fixture') or {}
+            fid = str(meta.get('fixture_id', ''))
+            kickoff = stamp(meta.get('kickoff'))
+            evidence = fixtures.get(fid) or {}
+            match = clean(meta.get('match'), 75)
+            if not match and clean(meta.get('home'), 36) and clean(meta.get('away'), 36):
+                match = clean(meta['home'], 36) + ' – ' + clean(meta['away'], 36)
+            if match and kickoff and kickoff == stamp(evidence.get('kickoff')):
+                labels.setdefault(fid, match)
+    return labels
+
+
+def score(result, period):
+    home, away = (result.get(side + '_' + period) for side in ('home', 'away'))
+    return f'{home}–{away}' if all(type(goals) is int and goals >= 0 for goals in (home, away)) else None
+
+
+def triad_examples(audit):
+    examples = []
+    for fid, match in (audit.get('fixture_labels') or {}).items():
+        evidence = audit['fixtures'][fid]
+        captured, kickoff = (stamp(evidence.get(key)) for key in ('captured_at', 'kickoff'))
+        result = evidence.get('result') or {}
+        final = score(result, 'ft')
+        if (not captured or not kickoff or captured >= kickoff or rome_day(kickoff) != audit['date']
+                or evidence.get('status') != 'settled' or result.get('status') not in FINISHED or not final):
+            continue
+        for role, category in TRIAD_LABELS.items():
+            pick = (evidence.get('triad') or {}).get(role) or {}
+            settled = (evidence.get('outcomes') or {}).get(pick.get('market_id')) or {}
+            market = clean(pick.get('label'), 70)
+            if market and settled.get('win') == 1 and settled.get('loss') == 0:
+                halftime = score(result, 'ht') if pick.get('horizon') in ('PT', 'ST', 'PT+ST') else None
+                examples.append((kickoff, fid, {'match': match, 'score': final, 'halftime': halftime,
+                                                'category': category, 'market': market,
+                                                'study_only': pick.get('study_only') is True}))
+                break
+    return [row for _, _, row in sorted(examples)[:4]]
 
 
 def settle(pick, evidence):
@@ -66,7 +118,7 @@ def metrics(rows):
 
 
 def build(audit, availability, public):
-    """Report only evidenced Gold and free picks. Examples always came from a free feed."""
+    """Summarize evidenced cohorts and attach wins from certified prematch triads."""
     fixtures = audit['fixtures']
     cohorts = {'public': [], 'gold': [], 'internal': []}
     public_ids = {p['fixture_id'] for p in public}
@@ -89,7 +141,8 @@ def build(audit, availability, public):
                 and row.get('outcome') in (0, 1) and finite(row.get('roi'))):
             cohorts['internal'].append({'outcome': 'won' if row['outcome'] else 'lost', 'profit': row['roi']})
 
-    if not any(cohorts.values()):
+    highlights = triad_examples(audit)
+    if not any(cohorts.values()) and not highlights:
         return None
     free = [r for r in cohorts['public'] if r['outcome'] in ('won', 'lost', 'void')]
     examples = []
@@ -101,4 +154,5 @@ def build(audit, availability, public):
     return {'date': audit['date'], 'certified_at': audit['generated_at'],
             'cohorts': {key: metrics(rows) for key, rows in cohorts.items()},
             'examples': [{k: r[k] for k in ('match', 'league', 'market', 'odd', 'outcome')}
-                         for r in examples[:3]]}
+                         for r in examples[:3]],
+            'triad_examples': highlights}
