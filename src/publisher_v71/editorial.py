@@ -122,12 +122,9 @@ def message(kind, view, marker, channel):
     if kind == 'best':
         lines = best_copy(view)
         title = 'La selezione aperta'
-    elif kind == 'report':
-        if 'triad_examples' in view:
-            lines = report_copy(view, compact=channel == 'telegram')
-        else:
-            lines.extend(f"{OUTCOMES[r['outcome']]} · {r['match'][:45]} · {r['market'][:38]}"
-                         for r in view['examples'])
+    elif kind == 'report' and 'triad_examples' not in view:
+        lines.extend(f"{OUTCOMES[r['outcome']]} · {r['match'][:45]} · {r['market'][:38]}"
+                     for r in view['examples'])
     elif kind == 'live':
         lines = live_copy(view)[1:]
     heading = f'ArabSniperBet · {label}\n{title}'
@@ -139,8 +136,11 @@ def message(kind, view, marker, channel):
     if channel == 'telegram' and len(caption.encode('utf-16-le')) // 2 > 1024:
         if kind == 'best':
             lines[2] = lines[2][:100]
-        elif kind == 'report' and 'triad_examples' not in view:
-            lines = [*report_copy(view), *(line[:70] for line in lines[3:])]
+        elif kind == 'report':
+            if 'triad_examples' in view:
+                lines = report_copy(view, compact=True)
+            else:
+                lines = [*report_copy(view), *(line[:70] for line in lines[3:])]
         caption = '\n\n'.join([heading, *filter(None, lines), footer])
         if len(caption.encode('utf-16-le')) // 2 > 1024:
             budget = 1024 - len((heading + footer).encode('utf-16-le')) // 2 - 8

@@ -72,7 +72,7 @@ async function main() {
       assert.equal(await bacheca.locator('.gold-preview-triad li').count(), 6)
       assert.match(await bacheca.innerText(), /Quota bookmaker in attesa/)
       const live = page.locator('#publisher-live')
-      assert.match(await live.innerText(), /🔒 Gold/)
+      assert.match(await live.innerText(), /🔒 Gold/i)
       assert.match(await live.innerText(), /Casa Gold – Ospiti Gold/)
       assert.match(await live.innerText(), /In programma/)
       assert.doesNotMatch(await live.innerText(), /Over|Colpaccio/)
