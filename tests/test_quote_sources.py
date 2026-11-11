@@ -7,6 +7,10 @@ from unittest.mock import Mock, patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'src'))
 from quote_sources import normalize_payload, synthetic_combo_groups, synthetic_margin, direct_combo_groups
 from matrix_quotes import collect, ledger_offers, analyse_prices, attach
+from odds_collection import scheduled_odds
+from quote_history import OPENING_SNAPSHOT, QuoteHistory
+from audit_storage import read_store
+from v7_probability import price_usable
 from refresh_opportunities import captured_prices, refresh_day
 from near_kickoff_quotes import NearKickoffRefresher, needs_refresh
 from lateral_matrix import build_matrix, base_specs
@@ -38,6 +42,86 @@ def saved():
 
 
 class ExactSources(unittest.TestCase):
+    def test_opening_survives_old_provider_timestamp_and_real_movement(self):
+        meta = dict(META, kickoff='2026-10-29T20:00:00Z')
+        state = {}
+        analysis = build_matrix(statistical_analysis(match(), NOW), NOW)
+        def snapshot(at, odd, observed):
+            data = feed([bet(5, 2.5, odd, 1.75)], at=at)
+            data['response'][0]['fixture']['date'] = meta['kickoff']
+            attach(analysis, data, state, meta, observed)
+            return next(r for r in analysis['matrix']['rows'] if r['spec'] == {
+                'kind': 'total', 'period': 'ft', 'side': 'over', 'line': 2.5})
+
+        initial = snapshot(NOW, 2.0, NOW)
+        self.assertEqual(initial['opening_odd'], 2.0)
+        next_day = '2026-10-27T18:00:00Z'
+        stable = snapshot(NOW, 2.0, next_day)
+        self.assertEqual((stable['opening_odd'], stable['odd'], stable['quote_status'], stable['delta_pct'], stable['oci']),
+                         (2.0, 2.0, 'cached_stable', 0., 0.))
+        self.assertTrue(price_usable(stable, next_day, meta['kickoff']))
+        update = '2026-10-28T18:00:00Z'
+        changed = snapshot(update, 2.2, update)
+        self.assertEqual((changed['opening_odd'], changed['odd'], changed['quote_status']), (2.0, 2.2, 'recent'))
+        self.assertAlmostEqual(changed['delta_pct'], 10.)
+        replay = snapshot(update, 1.9, '2026-10-29T17:00:00Z')
+        self.assertEqual((replay['opening_odd'], replay['odd'], replay['delta_pct'], replay['oci']), (2.0, 2.2, 0., 0.))
+        self.assertAlmostEqual(replay['opening_delta_pct'], 10.)
+        self.assertFalse(replay['movement_confirmed'])
+        self.assertFalse(price_usable(replay, meta['kickoff'], meta['kickoff']))
+
+    def test_fair_and_overround_use_complete_book_by_period_and_line(self):
+        f = feed([bet(5, 2.5, 2., 1.85)], book=1)
+        f['response'] += feed([bet(6, 1.5, 2.1, 1.78), bet(26, 1.5, 2.3, 1.65)], book=2)['response']
+        partial = feed([bet(5, 2.5, 3., 1.6)], book=3)
+        partial['response'][0]['bookmakers'][0]['bets'][0]['values'].pop()
+        f['response'] += partial['response']
+        a = build_matrix(statistical_analysis(match(), NOW), NOW)
+        attach(a, f, {}, META, NOW)
+        for period, line, book, over, under in [('ft', 2.5, '1', 2., 1.85),
+                                                ('ht', 1.5, '2', 2.1, 1.78),
+                                                ('sh', 1.5, '2', 2.3, 1.65)]:
+            row = next(r for r in a['matrix']['rows'] if r['spec'] == {
+                'kind': 'total', 'period': period, 'side': 'over', 'line': line})
+            self.assertEqual((row['bookmaker_id'], row['odd']), (book, over))
+            self.assertAlmostEqual(row['selected_margin_pct'], 100*(1/over+1/under-1))
+            self.assertAlmostEqual(row['selected_market_fair_pct'], 100/over/(1/over+1/under))
+
+    def test_snapshot_and_cache_restore_after_failed_analysis(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as folder:
+            journal = QuoteHistory(folder)
+            journal.observe(feed(), NOW, {'fixture': 100})
+            journal.flush()
+            reopened = QuoteHistory(folder)
+            state = {}
+            later = '2026-10-26T19:00:00+00:00'
+            reopened.restore_openings(state, META, later)
+            a = build_matrix(statistical_analysis(match(), NOW), NOW)
+            attach(a, {}, state, META, later)
+            row = next(r for r in a['matrix']['rows'] if r['spec'] == {
+                'kind': 'total', 'period': 'ft', 'side': 'over', 'line': 2.5})
+            self.assertEqual((row['opening_odd'], row['odd'], row['quote_status']), (1.9, 1.9, 'cached_stable'))
+            reopened.save_openings([{'fixture': META}], later)
+            snapshot = read_store(Path(folder)/OPENING_SNAPSHOT)
+            market, = snapshot['odds']['100']['markets'].values()
+            self.assertEqual(market['bookmaker_id'], '999')
+            first = market['outcomes']['over']
+            self.assertEqual(first, {'opening_odd': 1.9, 'observed_at': NOW})
+
+    def test_calendar_falls_back_to_exact_fixture_without_prices(self):
+        client = Mock(odds_enricher=None, prefetched_odds={})
+        fallback = feed()
+        fallback['response'][0]['fixture']['id'] = 101
+        client.get.side_effect = [feed(), fallback]
+        meta = dict(META, kickoff='2026-10-27T20:00:00+00:00')
+        scheduled_odds(client, [meta, dict(meta, fixture_id=101)], '2026-10-26', lambda: NOW)
+        self.assertEqual([c.args[1] for c in client.get.call_args_list], [
+            {'date': '2026-10-26', 'timezone': 'Europe/Rome'}, {'fixture': 101}])
+        self.assertEqual(set(client.prefetched_odds), {'100', '101'})
+        self.assertEqual(client.prefetched_odds['101']['response'][0]['fixture']['id'], 101)
+
     def test_all_requested_exact_lines_and_all_books(self):
         for bid, line in ((72,1.5),(72,2.5),(50,2.5),(336,3.5)):
             with self.subTest(bid=bid, line=line):

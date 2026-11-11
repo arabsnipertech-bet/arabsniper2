@@ -300,6 +300,9 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
     offers = defaultdict(list)
     for key, group in captured.items():
         if not group.get('specs') or not all(core_market(s) for s in group['specs'].values()): continue
+        at, seen = stamp(group.get('provider_updated_at')), stamp(group.get('observed_at'))
+        if not seen or not seen <= now or at and at > seen:
+            continue
         points = fixture['groups'].setdefault(key, [])
         provenance = group.get('quote_provenance') or {}
         same_source = provenance.get('kind') != 'market_discovery' or str(provenance.get('source_bet_id')) == str(group['bet_id'])
@@ -317,22 +320,46 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
                     points.append({k: deepcopy(point.get(k)) for k in ('odds', 'observed_at', 'provider_updated_at')})
                     points[-1]['complete'] = True
                 break
-        at = stamp(group['provider_updated_at'])
-        if points and stamp(points[-1].get('provider_updated_at')) and (not at or at < stamp(points[-1]['provider_updated_at'])):
-            continue  # A delayed provider response must not reverse time.
+        previous = points[-1] if points else None
+        before = stamp(previous.get('provider_updated_at')) if previous else None
+        upgrade = (previous and not previous['complete'] and group['complete']
+                   and previous['odds'].items() <= group['odds'].items())
+        older_or_partial = bool(previous and (at is None or before and (at < before or at == before and not upgrade)
+                                or previous['complete'] and not group['complete']))
+        if older_or_partial:
+            # A replay or incomplete response cannot replace a confirmed snapshot.
+            previous_seen = stamp(previous.get('observed_at'))
+            reread = group.get('_reused_price') or previous_seen and stamp(group['observed_at']) > previous_seen
+            if reread:
+                previous['stable_tokens'] = list(previous['odds'])
+            group = {**group, **previous}
         snap = {k: deepcopy(group[k]) for k in ('odds', 'observed_at', 'provider_updated_at', 'complete')}
         for field in ('quote_source', 'quote_executable', 'quote_provenance', 'specs', 'group', 'bet_id', 'bookmaker'):
             if field in group: snap[field] = deepcopy(group[field])
-        if not points or (points[-1]['odds'], points[-1]['provider_updated_at'], points[-1]['complete']) != (snap['odds'], snap['provider_updated_at'], snap['complete']):
+        if not older_or_partial:
+            snap['stable_tokens'] = [token for token, odd in snap['odds'].items()
+                                     if previous and previous['odds'].get(token) == odd]
             points.append(snap)
+        # Each outcome has an immutable first observation, including outcomes
+        # added to a partial group after its initial observation.
+        openings = fixture.setdefault('openings', {}).setdefault(key, {})
+        if not openings:
+            for point in points:
+                for token, odd in point['odds'].items():
+                    openings.setdefault(token, {'odd': odd, 'observed_at': point['observed_at']})
+        for token, odd in points[-1]['odds'].items():
+            openings.setdefault(token, {'odd': odd, 'observed_at': points[-1]['observed_at']})
         if len(points) > 48: points[:] = [points[0], *points[-47:]]
         for token, spec in group['specs'].items():
+            if token not in group['odds']:
+                continue
             usable = [p for p in points if token in p['odds']]
             complete = [p for p in usable if p['complete'] and set(p['odds']) == set(group['odds'])]
-            first = usable[0]
+            first = openings[token]
             offers[market_id(spec)].append({**group, 'spec': spec, 'token': token,
                 'observed_at': points[-1]['observed_at'],
-                'odd': group['odds'][token], 'first_odd': first['odds'][token],
+                'odd': group['odds'][token], 'first_odd': first['odd'],
+                'stable_price': token in points[-1].get('stable_tokens', ()),
                 'first_at': first['observed_at'], 'trace': complete if group['complete'] else [],
                 'raw_trace': usable})
     return offers
@@ -356,12 +383,12 @@ def value_profile(row, ev, low, strong, oci, synthetic):
 def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     if not core_market(row.get('spec')):
         raise ValueError('Price analysis outside the active market scope')
-    from quote_cache import remember, restore, within_window
+    from quote_cache import mark_stable, real_prematch_price, remember, restore, within_window
     remember(row)
     row['quote_adapter_version'] = HANDICAP_ADAPTER_VERSION
     row.update(speed_pp_per_hour=None, selected_margin_pct=None, selected_margin_delta_pp=None, selected_market_fair_pct=None,
                selected_movement=None, selected_market_odds=None, opening_market_odds=None,
-               movement_confirmed=False, fair_direction_coherent=False)
+               movement_confirmed=False, fair_direction_coherent=False, prematch_stable=False)
     now, start = stamp(as_of), stamp(kickoff)
     max_hours = 1 if now and start and 0 < (start-now).total_seconds() <= 10800 else 6
     offers = [o for o in offers if number(o.get('odd')) is not None and o['odd'] > 1 and
@@ -371,7 +398,11 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
               0 <= (now-stamp(o['provider_updated_at'])).total_seconds() <= max_hours*3600]
     cached = False
     if not recent and allow_cached:
-        recent = [o for o in offers if within_window({**o, 'quote_observed_at': o.get('observed_at')}, as_of, kickoff)]
+        for offer in offers:
+            candidate = {**offer, 'quote_executable': offer.get('quote_executable', True),
+                         'quote_observed_at': offer.get('observed_at')}
+            if real_prematch_price(candidate, as_of, kickoff) or within_window(candidate, as_of, kickoff):
+                recent.append(offer)
         cached = bool(recent)
     # Select the source after choosing the fresh or cached time window.
     # Direct and derived offers have different fair-price and margin inputs.
@@ -400,7 +431,9 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
                        quote_observed_at=old.get('observed_at'))
         restore(row, as_of, kickoff, allow_cached)
         return
-    best = max(recent, key=lambda o: (o['odd'], o.get('provider_updated_at') or o.get('observed_at') or '', o['bookmaker_id']))
+    complete_books = [o for o in recent if o['complete'] and o.get('quote_source') != 'synthetic_combo'
+                      and 0 <= fair(o['odds'])[1] <= 30]
+    best = max(complete_books or recent, key=lambda o: (o['odd'], o.get('provider_updated_at') or o.get('observed_at') or '', o['bookmaker_id']))
     synthetic = best.get('quote_source') == 'synthetic_combo'
     row.update(quote_source=best.get('quote_source', 'bookmaker'),
                quote_executable=not synthetic, quote_provenance=deepcopy(best.get('quote_provenance') or {}))
@@ -424,7 +457,7 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     margin_band = 'unavailable' if margin is None else 'low' if margin < low_margin else 'high' if margin > 9 else 'medium'
     margin_delta = move.get('median_overround_delta_pp')
     margin_trend = 'unavailable' if margin_delta is None else 'compressing' if margin_delta <= -1 else 'expanding' if margin_delta >= 1 else 'stable'
-    row.update(quote_status='cached_stable' if cached else 'recent', quote_status_label='Quota stabile da cache' if cached else 'Quota recente', odd=odd, first_odd=best['first_odd'],
+    row.update(quote_status='recent', quote_status_label='Quota recente', odd=odd, first_odd=best['first_odd'], opening_odd=best['first_odd'],
         bookmaker=best['bookmaker'], bookmaker_id=best['bookmaker_id'], bet_id=best['bet_id'],
         first_observed_at=best['first_at'], provider_updated_at=best['provider_updated_at'],
         quote_observed_at=best['observed_at'], bookmakers_count=len(recent),
@@ -437,7 +470,7 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         oci_observed_at=max((operator['observed_to'] for operator in move.get('operators', [])),
                             key=stamp, default=None) if oci is not None else None,
         paired_books=move.get('paired_books', 0), agreeing_books=move.get('agreeing_books', 0),
-        delta_pct=100*(odd/best['first_odd']-1), amplitude_pct=move.get('amplitude_pct'),
+        delta_pct=100*(odd/best['first_odd']-1), opening_delta_pct=100*(odd/best['first_odd']-1), amplitude_pct=move.get('amplitude_pct'),
         margin_pct=margin, margin_band=margin_band, margin_delta_pp=margin_delta, margin_trend=margin_trend,
         margin_anomaly=bool(margin is not None and (margin < 0 or margin > 30)),
         fair_delta_pp=move.get('median_fair_delta_pp'), market_behavior=behavior,
@@ -467,9 +500,8 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
                    persistence=median(o['persistence'] for o in operators),
                    speed_pp_per_hour=median(abs(o['leg_fair_delta_pp'])/o['hours'] for o in operators))
 
-    if cached:
-        remember(row)
-        restore(row, as_of, kickoff, True)
+    if cached or allow_cached and best.get('stable_price') and not synthetic:
+        mark_stable(row, kickoff)
     else:
         row.pop('cache_source_at', None); row.pop('cache_expires_at', None)
     remember(row)
@@ -542,9 +574,8 @@ def attach(assessment, payload, state, meta, as_of):
         saved = captured_prices(previous, assessment.get('matrix', {}).get('rows', []))
         for key, prior in saved.items():
             fresh = captured.get(key)
-            at = stamp(fresh.get('provider_updated_at')) if fresh else None
-            before = stamp(prior.get('provider_updated_at'))
-            if not fresh or before and (not at or at < before): captured[key] = prior
+            if not fresh:
+                captured[key] = {**prior, '_reused_price': True}
     offers = ledger_offers(state, meta['fixture_id'], captured, as_of, meta['kickoff'])
     matrix = assessment['matrix']
     matrix['study_combo_quotes'] = study_combo_quotes(payload, meta, as_of)
@@ -572,7 +603,7 @@ def attach(assessment, payload, state, meta, as_of):
     matrix['as_of'] = as_of
     matrix['coverage'] = {'modeled_markets': len(matrix['rows']),
         'priced_markets': sum(r['quote_status'] in ('recent', 'cached_stable') for r in matrix['rows']),
-        'movement_markets': sum(r.get('oci') is not None for r in matrix['rows']),
+        'movement_markets': sum(r.get('oci') is not None and not r.get('prematch_stable') for r in matrix['rows']),
         'categories': dict(Counter(r['category'] for r in matrix['rows'])),
         'adapters': diagnostics}
     matrix['market_notes'] = [

@@ -31,8 +31,8 @@ def descriptor(path, params):
     """Exact request shape, including sample length; unrelated endpoints bypass."""
     if type(params.get('last')) is not int or params['last'] <= 0:
         return None
-    if path == 'fixtures' and params.get('status') == 'FT':
-        if set(params) == {'team', 'last', 'status'}:
+    if path == 'fixtures' and params.get('status') in ('FT', 'FT-AET-PEN'):
+        if set(params) in ({'team', 'last', 'status'}, {'team', 'league', 'season', 'last', 'status'}):
             return {'teams': {str(params['team'])}, 'league': None}
         if set(params) == {'league', 'season', 'last', 'status'}:
             return {'teams': set(), 'league': f"{params['league']}::{params['season']}"}

@@ -446,6 +446,7 @@
  }
  // Descriptive display only. Never overwrite the OCI used by policy/selection.
  function displayOci(row={}){
+  if(row.prematch_stable===true)return {value:0,label:'Quota stabile · nessun movimento confermato'};
   if(Number.isFinite(row.oci))return {value:row.oci,label:'Movimento delle quote · '+(row.paired_books??'—')+' bookmaker'};
   const m=row.selected_movement||{},start=Date.parse(m.observed_from),end=Date.parse(m.observed_to);
   if(row.paired_books!==1)return {value:null,label:row.paired_books>1?'Consenso multi-book insufficiente':'Servono due rilevazioni confrontabili'};
@@ -718,6 +719,10 @@
  const V7_TIERS={gold:'GOLD',platinum:'PLATINUM',blu:'BLU',studio:'STUDIO',radar:'RADAR BLU'};
  const BADGES={blu:'◆ BLU',gold:'● GOLD',platinum:'★ PLATINUM'};
  const TRIAD={most_probable:'Più probabile',recommended_alternative:'Consigliata',high_odds_shot:'Colpaccio'};
+ const MODEL_ESTIMATE='[STIMA MODELLO - ATTESA QUOTA BOOK]';
+ const quoteStateLabel=(signal,source)=>signal?.quote_state==='model_estimate'?MODEL_ESTIMATE:
+  signal?.quote_state==='stable'?(source.first_odd===source.odd?'Stabile da apertura':'Ultima quota osservata · stabile'):
+  signal?.quote_state==='moving'?'In movimento':'Quota osservata';
  const V7_HEADLINE='Miglior proposta rispetto alla quota';
  const v7Estimate=v=>pct(Number.isFinite(v)?100*v:null);
  function v7Snapshot(m,now){
@@ -739,14 +744,24 @@
    const record=v7.markets?.[signal?.market_id];
    const source=sources.get(signal?.source_market_id);
    if(!record||!source||source.probability_model!==V7||record.source_market_id!==source.id||
-      !priced(source)||source.quote_executable!==true||record.odd!==source.odd||signal.odd!==source.odd||
-      !Number.isFinite(source.odd)||source.odd<=1||!Number.isFinite(record.calibrated)||
-      !(record.calibrated>=0&&record.calibrated<=1))return null;
+      !Number.isFinite(record.calibrated)||!(record.calibrated>=0&&record.calibrated<=1))return null;
+   if(signal.quote_state==='model_estimate'){
+    if(signal.tier!=='BLU'||signal.study_only!==true||signal.odd!==null||record.odd!==null||
+       !Number.isFinite(record.model_fair_odd)||record.model_fair_odd<=1||
+       record.model_fair_odd!==signal.model_fair_odd||signal.probability!==record.calibrated)return null;
+    return {record,source,signal,reasons:signal.reasons||[]};
+   }
+   if(!priced(source)||source.quote_executable!==true||record.odd!==source.odd||signal.odd!==source.odd||
+      !Number.isFinite(source.odd)||source.odd<=1||source.prematch_stable&&signal.tier!=='BLU')return null;
    const at=Date.parse(source.provider_updated_at),seen=Date.parse(source.quote_observed_at);
    if(!(at<=seen&&seen<=Date.parse(v7.captured_at)))return null;
    if(!archived){
     const cached=source.quote_status==='cached_stable',expiry=Date.parse(source.cache_expires_at);
-    if(!(cached?now<=expiry:now-at<=(kickoff-now<=10800000?3600000:21600000)))return null;
+    const current=cached?now<=expiry:now-at<=(kickoff-now<=10800000?3600000:21600000);
+    if(!current){
+     if(signal.tier!=='BLU')return null;
+     return {record,source,signal:{...signal,quote_state:'stable'},reasons:signal.reasons||[]};
+    }
    }
    return {record,source,signal,reasons:signal.reasons||[]};
   };
@@ -772,10 +787,13 @@
   return '<ul class="mx-triad'+(compact?' mx-triad-compact':'')+'" aria-label="Triade prematch V7">'+
    Object.entries(TRIAD).map(([role,title])=>{
     const p=view.triad[role],s=p?.signal;
+    const estimate=s?.quote_state==='model_estimate';
     const badge=s&&levelBadge(String(s.tier).toLowerCase(),s.badge);
     return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+title+'</span>'+(badge||'')+'</div>'+
-     (p?'<div class="mx-triad-market"><b>'+esc(p.record.label)+'</b><strong>'+num(p.record.odd,2)+'</strong></div>'+
+     (p?'<div class="mx-triad-market"><b>'+esc(p.record.label)+'</b>'+(estimate?'':'<strong>'+num(p.record.odd,2)+'</strong>')+'</div>'+
       '<div class="mx-triad-meta"><span>'+esc(s.horizon_label)+'</span><span>'+v7Estimate(p.record.calibrated)+' V7</span>'+
+      (Number.isFinite(p.record.model_fair_odd)?'<span>Quota equa '+num(p.record.model_fair_odd,2)+'</span>':'')+
+      (s.quote_state?'<span>'+esc(quoteStateLabel(s,p.source))+'</span>':'')+
       (Number.isFinite(s.ev)?'<span>EV '+signed(100*s.ev)+'%</span>':'')+
       (s.niche_label?'<span class="mx-niche">'+esc(s.niche_label)+'</span>':'')+'</div>':
       '<small>'+(saved?.[role]?'Quota da aggiornare':'Nessun mercato idoneo')+'</small>')+'</li>';
@@ -798,7 +816,7 @@
    item(recommended,'Consigliata','Alternativa in studio a quota superiore','consigliata')+
    item(longshot,'Colpaccio','Quota alta · esito meno probabile','colpaccio');
   const record=primary?.record,source=primary?.source;
-  const metrics=record?'<div class="mx-v7-odds"><span>Prima → ultima quota <b>'+num(record.quote?.first_odd,2)+' → '+num(record.odd,2)+'</b></span>'+
+  const metrics=record&&Number.isFinite(record.odd)?'<div class="mx-v7-odds"><span>Prima → ultima quota <b>'+num(record.quote?.first_odd,2)+' → '+num(record.odd,2)+'</b></span>'+
    '<span>Movimento quota <b>'+pct(source.delta_pct)+'</b></span><span>OCI <b>'+signed(record.features?.oci)+'</b></span><span>Aggio <b>'+pct(record.features?.margin_pct)+'</b></span>'+
    '<span>Poisson originale <b>'+v7Estimate(record.raw)+'</b></span><span>Calibrata V7 <b>'+v7Estimate(record.calibrated)+'</b></span>'+
    '<span>Fair mercato <b>'+v7Estimate(record.fair)+'</b></span><span>Quota '+(source.quote_status==='cached_stable'?'da cache':'rilevata')+
@@ -927,7 +945,7 @@
    const pick=active.primary;
    if(!pick)return null;
    return {title:active.triad?TRIAD.most_probable:V7_HEADLINE,label:pick.record.label,odd:pick.record.odd,first:pick.record.quote?.first_odd,
-    note:pick.source.quote_status==='cached_stable'?'Quota da cache':'Quota osservata',
+    note:quoteStateLabel(pick.signal,pick.source),
     probability:100*pick.record.calibrated,v7:true};
   }
   const tier=cockpitTier(m,helpers),star=!m._gold_history?starredStudyRow(m):null;

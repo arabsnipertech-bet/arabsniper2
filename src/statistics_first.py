@@ -13,6 +13,7 @@ import json
 
 from multimarket_model import SPECS, stamp, goal_probabilities, quote_benchmarks
 from context_analysis import movement
+from gold_competitions import national_competition, output_profile
 
 MODEL_ID = 'statistics-first-v4.0'
 VALIDATION_FROM = '2026-10-26'
@@ -33,7 +34,7 @@ CONFIG = {
 }
 CONFIG_ID = sha256(json.dumps(CONFIG, sort_keys=True).encode()).hexdigest()[:16]
 HISTORY_FIELDS = ('fixture_id', 'kickoff', 'date', 'season', 'side', 'league_id',
-                  'home_id', 'away_id', 'friendly', 'halftime_available',
+                  'home_id', 'away_id', 'friendly', 'national_group', 'halftime_available',
                   'research_ft', 'team_goals_ft', 'team_conceded_ft',
                   'team_goals_ht', 'team_conceded_ht', 'team_xg_for',
                   'team_xg_against', 'team_shots_on_target_for',
@@ -49,7 +50,7 @@ def clamp(value, lo, hi):
     return max(lo, min(hi, value))
 
 
-def history(rows, as_of, season=None):
+def history(rows, as_of, season=None, *, not_before=None):
     """Only real pre-cutoff official records, with regulation-time scores."""
     now = stamp(as_of)
     selected = []
@@ -57,7 +58,7 @@ def history(rows, as_of, season=None):
         return []
     for item in rows:
         when = stamp(item.get('kickoff'))
-        if not when or when >= now or item.get('fixture_id') is None:
+        if not when or when >= now or not_before and when < not_before or item.get('fixture_id') is None:
             continue
         if item.get('friendly') or 'friendl' in str(item.get('league', '')).lower():
             continue
@@ -77,6 +78,27 @@ def history(rows, as_of, season=None):
     return list(unique.values())[:CONFIG['history_ft']]
 
 
+def team_history(rows, meta, as_of):
+    """Select inputs before computing rates, using the fixture's competition context."""
+    if national_competition(meta.get('league')):
+        cutoff = stamp(as_of)
+        if not cutoff:
+            return []
+        try:
+            start = cutoff.replace(year=cutoff.year-2)
+        except ValueError:  # February 29 in a leap year.
+            start = cutoff.replace(year=cutoff.year-2, day=28)
+        return history([row for row in rows if row.get('national_group') or national_competition(row.get('league'))],
+                       as_of, not_before=start)
+    clubs = [row for row in rows if not (row.get('national_group') or national_competition(row.get('league')))]
+    if output_profile({'fixture': meta})['tier'] in ('national_cup', 'international_cup') and meta.get('league_id') is not None:
+        cup = history([row for row in clubs if str(row.get('league_id')) == str(meta['league_id'])],
+                      as_of, meta.get('season'))
+        if len(cup) >= 4 and len(period_rows(cup, 'ht')) >= 3:
+            return cup
+    return history(clubs, as_of, meta.get('season'))
+
+
 def period_rows(rows, period):
     if period == 'ft':
         return rows[:CONFIG['history_ft']]
@@ -90,7 +112,8 @@ def league_prior(league, side, period):
     fallback = {'home_ft': 1.45, 'away_ft': 1.15, 'home_ht': .68, 'away_ht': .52}
     value = league.get(key)
     count = league.get('sample' if period == 'ft' else 'ht_sample', 0)
-    valid = numeric(value) and value >= 0 and numeric(count) and count > 0
+    minimum = (3 if period == 'ft' else 2) if league.get('reference_scope') == 'national_team' else 1
+    valid = numeric(value) and value >= 0 and numeric(count) and count >= minimum
     return (max(.05, value) if valid else fallback[f'{side}_{period}'],
             int(count) if valid else 0)
 
@@ -285,7 +308,7 @@ def frozen_goal_observations(histories, profiles, as_of):
 
 def statistical_analysis(match, as_of):
     stats, meta = match.get('statistics') or {}, match.get('fixture') or {}
-    histories = {s: history((stats.get(s) or {}).get('last_matches', []), as_of, meta.get('season'))
+    histories = {s: team_history((stats.get(s) or {}).get('last_matches', []), meta, as_of)
                  for s in ('home', 'away')}
     league = deepcopy(stats.get('league') or {})
     h2h, overlaps = valid_h2h(stats, meta, as_of, histories)

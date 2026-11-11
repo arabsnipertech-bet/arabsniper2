@@ -3,13 +3,14 @@ from pathlib import Path
 import hashlib, json, os, re, sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from audit_storage import read_store, atomic_bytes, FORMAT, validate_store
+from quote_history import OPENING_SNAPSHOT
 PUBLIC = {'data/arab_quote_homepage.json','data/arab_quote_results_public.json'}
 GOLD = [f'arab_quote_day{i}.json' for i in range(1,6)]+['arab_quote_prediction_audit.json','arab_quote_model_research.json']
 
 def sha(data): return hashlib.sha256(data).hexdigest()
 def allowed(path):
-    if path == 'data/arab_calibration_weights.json': return True
-    return path not in PUBLIC and bool(re.fullmatch(r'(data/arab_quote_[a-zA-Z0-9_]+\.json|(auditordata|auditarchive)/prematch_[a-zA-Z0-9_.-]+\.(json|md)|(data|auditordata|auditarchive)/_audit_parts/[a-f0-9]{64}\.json\.gz)',path))
+    if path in ('data/arab_calibration_weights.json', 'data/'+OPENING_SNAPSHOT): return True
+    return path not in PUBLIC and bool(re.fullmatch(r'(data/arab_quote_[a-zA-Z0-9_]+\.json|(auditordata|auditarchive)/prematch_[a-zA-Z0-9_.-]+\.(json|md)|(data|data/private|auditordata|auditarchive)/_audit_parts/[a-f0-9]{64}\.json\.gz)',path))
 
 def collect(root, verified=None, *, patterns=None):
     root=Path(root); files={}
@@ -18,7 +19,7 @@ def collect(root, verified=None, *, patterns=None):
         item=verified.get(key, {})
         return item.get('bytes')==len(raw) and item.get('sha256')==sha(raw)
     if patterns is None:
-        patterns=('data/arab_calibration_weights.json','data/arab_quote_*.json','auditordata/prematch_*.json','auditarchive/prematch_*')
+        patterns=('data/arab_calibration_weights.json','data/'+OPENING_SNAPSHOT,'data/arab_quote_*.json','auditordata/prematch_*.json','auditarchive/prematch_*')
     for pattern in patterns:
         for p in root.glob(pattern):
             key=p.relative_to(root).as_posix()
@@ -94,17 +95,18 @@ def publish(s3,bucket,root, *, checkpoint_only=False, selected_paths=None):
         print(f'Private audit checkpoint saved: {len(index)} files; Gold feeds unchanged',flush=True)
         return
     # Gold uses its existing names and requires authenticated Worker access.
-    from gold_browser_feed import project as browser_project, encoded
+    from gold_browser_feed import project as browser_project, encoded, prematch_coverage
     def upload_browser_page(key, data):
         s3.put_object(Bucket=bucket, Key=key, Body=data,
                       ContentType='application/octet-stream', CacheControl='private, no-store')
     # Add the browser index to the already-authenticated metadata endpoint.
     # Keep every original daily feed unchanged for Telegram/Facebook readers.
     catalog = json.loads(gold['arab_quote_model_research.json'])
-    catalog['_gold_browser_days'] = {
-        name: browser_project(json.loads(gold[name]), upload_browser_page)
-        for name in GOLD if re.fullmatch(r'arab_quote_day[1-5]\.json', name)
-    }
+    boards = catalog['_gold_browser_days'] = {}
+    for name in GOLD[:5]:
+        day = json.loads(gold[name])
+        boards[name] = browser_project(day, upload_browser_page)
+        print('Gold prematch coverage '+json.dumps(prematch_coverage(day), sort_keys=True), flush=True)
     audit = json.loads(gold['arab_quote_prediction_audit.json'])
     catalog['_gold_audit_summary'] = {key: audit[key] for key in ('summary', 'updated_at') if key in audit}
     gold['arab_quote_model_research.json'] = encoded(catalog)

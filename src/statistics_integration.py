@@ -1,9 +1,10 @@
 """Statistics-first pipeline with the active scoped V5 matrix and V4 replay."""
 from copy import deepcopy
 
+from gold_competitions import national_competition, output_profile
 from selection_policy import competition
 from multimarket_model import collect_quotes, update_ledger, stamp
-from statistics_first import (statistical_analysis, confirm_markets, history, numeric,
+from statistics_first import (statistical_analysis, confirm_markets, team_history, numeric, period_rows,
                               build_selection_board, MODEL_ID, CONFIG, VALIDATION_FROM)
 
 
@@ -56,10 +57,13 @@ def install(ns, matrix_mode=False):
                         'team_goals_ht', 'team_conceded_ht', 'team_goals_2h', 'team_conceded_2h'):
                 if key in row:
                     row[key] = None
-        row.update(kickoff=f['date'], season=(fixture.get('league') or {}).get('season'),
-                   friendly='friendl' in str((fixture.get('league') or {}).get('name', '')).lower(),
+        league = fixture.get('league') or {}
+        row.update(kickoff=f['date'], season=league.get('season'), league_id=league.get('id'),
+                   friendly='friendl' in str(league.get('name', '')).lower(),
                    home_goals=h, away_goals=a, total_ft=h+a,
                    over25_ft=h+a >= 3, over15_ft=h+a >= 2, gg_ft=h > 0 and a > 0)
+        if national := national_competition(league.get('name')):
+            row['national_group'] = national
         if row.get('side') in ('home', 'away'):
             gf, ga = (h, a) if row['side'] == 'home' else (a, h)
             row.update(research_ft={'scored': gf, 'conceded': ga},
@@ -71,10 +75,23 @@ def install(ns, matrix_mode=False):
     ns['_match_row'] = match_row
 
     def recent(client, team_id, last=8):
-        payload = client.get('fixtures', {'team': team_id, 'last': 32, 'status': 'FT'})
-        rows = [match_row(r, team_id) for r in (payload or {}).get('response', [])]
-        validated = history([r for r in rows if r], history_context.get('as_of', ns['iso_now']()),
-                            history_context.get('season'))
+        meta = history_context.get('fixture') or {}
+        cutoff = history_context.get('as_of', ns['iso_now']())
+        national = national_competition(meta.get('league'))
+        cup = output_profile({'fixture': meta})['tier'] in ('national_cup', 'international_cup')
+        status = 'FT-AET-PEN' if national or cup else 'FT'
+
+        def read_matches(**params):
+            payload = client.get('fixtures', {'team': team_id, 'status': status, **params})
+            return [row for fixture in (payload or {}).get('response', []) if (row := match_row(fixture, team_id))]
+
+        rows = []
+        if cup and all(meta.get(key) is not None for key in ('league_id', 'season')):
+            rows = read_matches(league=meta['league_id'], season=meta['season'], last=8)
+        cup_rows = team_history(rows, meta, cutoff)
+        if len(cup_rows) < 4 or len(period_rows(cup_rows, 'ht')) < 3:
+            rows = read_matches(last=50 if national else 32) + rows
+        validated = team_history(rows, meta, cutoff)
         by_id = {str(r['fixture_id']): r for r in rows if r}
         # Preserve full rows for existing API summaries; compact only inside the model.
         return [by_id[str(r['fixture_id'])] for r in validated]
@@ -89,7 +106,7 @@ def install(ns, matrix_mode=False):
         kickoff = stamp(meta.get('kickoff'))
         if not kickoff or kickoff <= stamp(cutoff):
             return None
-        history_context.update(as_of=cutoff, season=meta.get('season'))
+        history_context.update(as_of=cutoff, fixture=meta)
         # 1. Independent statistical inputs; the quotes have not been requested.
         home = ns['enrich_team_matches_with_xg'](client, recent(client, ns['safe_int'](meta['home_id'])),
                                                   ns['safe_int'](meta['home_id']))
@@ -97,8 +114,21 @@ def install(ns, matrix_mode=False):
                                                   ns['safe_int'](meta['away_id']))
         league_key = f"{meta['league_id']}::{meta['season']}"
         if league_key not in cache:
-            cache[league_key] = ns['get_league_baseline'](client, ns['safe_int'](meta['league_id']),
-                                                        ns['safe_int'](meta['season']))
+            league_id, season = (ns['safe_int'](meta[key]) for key in ('league_id', 'season'))
+            league = ns['get_league_baseline'](client, league_id, season)
+            if national_competition(meta.get('league')):
+                for previous in range(season-1, season-3, -1):
+                    if previous <= 0 or league['sample'] >= 3 and league['ht_sample'] >= 2:
+                        break
+                    prior = ns['get_league_baseline'](client, league_id, previous)
+                    if league['sample'] < 3 <= prior['sample']:
+                        for key in ('sample', 'avg_home_goals', 'avg_away_goals', 'avg_total_ft'):
+                            league[key] = prior[key]
+                    if league['ht_sample'] < 2 <= prior['ht_sample']:
+                        for key in ('ht_sample', 'avg_home_ht', 'avg_away_ht', 'avg_total_ht', 'ht_source'):
+                            league[key] = prior[key]
+                league['reference_scope'] = 'national_team'
+            cache[league_key] = league
             cache[league_key]['as_of'] = cutoff
         h2h = ns['summarize_h2h'](ns['get_h2h_matches'](client, ns['safe_int'](meta['home_id']),
                                                      ns['safe_int'](meta['away_id'])))
@@ -131,6 +161,9 @@ def install(ns, matrix_mode=False):
         book = {}
         assessment['captured_at'] = observed
         if matrix_mode:
+            journal = getattr(client, 'odds_observer', None)
+            if journal is not None:
+                journal.restore_openings(state, meta, observed)
             attach_matrix(assessment, payload or {}, state, meta, observed)
             from adaptive_pricing import freeze_pattern
             freeze_pattern(ns, output, assessment, observed)

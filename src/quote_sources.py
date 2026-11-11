@@ -51,6 +51,11 @@ def fresh(updated, now, kickoff):
     return 0 <= (now-updated).total_seconds() <= hours*3600
 
 
+def prematch_observation(updated, observed, as_of, kickoff):
+    provider, seen, now, start = map(stamp, (updated, observed, as_of, kickoff))
+    return bool(provider and seen and now and start and provider <= seen <= now < start)
+
+
 def total_pairs(payload):
     """Yield only whole, unambiguous Over/Under pairs from one raw bet."""
     for record in discover_payload(payload).get('response', []):

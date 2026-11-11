@@ -9,8 +9,8 @@ import json
 import re
 import unicodedata
 
-SCOPE_ID = 'gold-senior-whitelist-v2.2'
-SCOPE_DESCRIPTION = 'Divisioni senior e coppe autorizzate, con eccezioni selezionate per le serie inferiori europee.'
+SCOPE_ID = 'gold-senior-whitelist-v2.3'
+SCOPE_DESCRIPTION = 'Divisioni senior, coppe autorizzate e competizioni ufficiali delle nazionali.'
 
 
 def norm(value):
@@ -153,7 +153,7 @@ CUPS = {
     'slovakia': ('Cup',), 'spain': ('Copa del Rey', 'Super Cup'),
     'sweden': ('Svenska Cupen',), 'switzerland': ('Schweizer Cup',),
     'turkey': ('Cup', 'Super Cup'), 'ukraine': ('Cup', 'Super Cup'),
-    'china': ('FA Cup', 'Super Cup'), 'japan': ('Emperor Cup', 'Emperors Cup', 'J-League Cup', 'Super Cup'),
+    'china': ('FA Cup', 'Super Cup'), 'japan': ('Emperor Cup', "Emperor's Cup", 'Emperors Cup', 'J-League Cup', 'Super Cup'),
 }
 INTERNATIONAL = {'UEFA Champions League', 'UEFA Europa League', 'UEFA Conference League',
     'UEFA Europa Conference League', 'AFC Champions League', 'AFC Champions League Elite',
@@ -172,6 +172,35 @@ LOWER_NAMES = {level: {k: {norm(n) for n in names} for k, names in mapping.items
                for level, mapping in ((2, SECOND), (3, THIRD), (4, FOURTH))}
 CUP_NAMES = {k: {norm(n) for n in names} for k, names in CUPS.items()}
 INTERNATIONAL_NAMES = {norm(n) for n in INTERNATIONAL}
+NATIONAL_NAMES = {
+    'uefa nations league': 'uefa', 'euro championship': 'uefa',
+    'euro championship qualification': 'uefa', 'european championship qualification': 'uefa',
+    'uefa euro qualification': 'uefa', 'euro qualification': 'uefa', 'euro qualifiers': 'uefa',
+    'africa cup of nations': 'caf', 'africa cup of nations qualification': 'caf',
+    'african cup of nations qualification': 'caf', 'afcon qualification': 'caf',
+    'asian cup': 'afc', 'asian cup qualification': 'afc', 'afc asian cup qualification': 'afc',
+    'afc asian cup': 'afc', 'copa america': 'conmebol', 'concacaf gold cup': 'concacaf',
+    'concacaf nations league': 'concacaf', 'ofc nations cup': 'ofc',
+    'world cup': 'fifa', 'fifa world cup': 'fifa',
+}
+for region, confederation in {
+    'europe': 'uefa', 'uefa': 'uefa', 'south america': 'conmebol', 'conmebol': 'conmebol',
+    'africa': 'caf', 'caf': 'caf', 'asia': 'afc', 'afc': 'afc',
+    'north america': 'concacaf', 'concacaf': 'concacaf', 'oceania': 'ofc', 'ofc': 'ofc',
+    'play offs': 'fifa', 'playoffs': 'fifa', 'intercontinental': 'fifa',
+}.items():
+    for prefix in ('world cup qualification', 'wc qualification', 'fifa world cup qualification'):
+        NATIONAL_NAMES[f'{prefix} {region}'] = confederation
+
+
+def national_competition(value):
+    name = norm(value)
+    if FORBIDDEN.search(name) or 'friendl' in name:
+        return None
+    if name.startswith('uefa nations league '):
+        # League labels and knockout stages use the same senior competition.
+        return 'uefa'
+    return NATIONAL_NAMES.get(name)
 
 
 BLOCKED_NAMES = {country: tuple(norm(name) for name in families)
@@ -194,8 +223,11 @@ def profile(league):
     country, name = norm(league.get('country')), norm(league.get('name'))
     country = COUNTRY_ALIASES.get(country, country)
     allowed, tier, reason = False, 'blocked', 'competition_not_whitelisted'
-    if FORBIDDEN.search(name): reason = 'youth_reserve_or_nonlisted_senior_category'
+    if 'friendl' in name: reason = 'friendly'
+    elif FORBIDDEN.search(name): reason = 'youth_reserve_or_nonlisted_senior_category'
     elif excluded_family(country, name): reason = 'excluded_lower_division'
+    elif national_competition(name):
+        allowed, tier, reason = True, 'national_team', 'whitelisted_official_national_team'
     elif name in INTERNATIONAL_NAMES and country in ('world', 'europe', 'asia', 'international', 'north america', 'south america'):
         allowed, tier, reason = True, 'international_cup', 'whitelisted_international_cup'
     elif name in TOP_NAMES.get(country, set()):
@@ -259,7 +291,7 @@ def enforce_day(day):
         removed.update(previous.get('exclusion_reasons') or {})
     day['gold_scope'] = {'policy_id': SCOPE_ID, 'allowed_fixtures': len(kept),
         'excluded_fixtures': sum(removed.values()), 'exclusion_reasons': dict(removed),
-        'romania_allowed': True, 'scope': 'selected_senior_divisions_and_explicit_cups'}
+        'romania_allowed': True, 'scope': 'selected_senior_divisions_cups_and_official_national_teams'}
     coverage = day.setdefault('universal_coverage', {})
     if coverage.get('competition_policy') != SCOPE_ID:
         # A saved schedule cannot establish the size of a fresh provider list.
@@ -272,7 +304,8 @@ def enforce_day(day):
 
 
 def browser_data():
-    return {'id': SCOPE_ID, 'aliases': COUNTRY_ALIASES, 'retired': browser_exclusions()}
+    return {'id': SCOPE_ID, 'aliases': COUNTRY_ALIASES, 'retired': browser_exclusions(),
+            'national': sorted(NATIONAL_NAMES)}
 
 
 if __name__ == '__main__':

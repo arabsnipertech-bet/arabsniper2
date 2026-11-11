@@ -74,7 +74,7 @@ def captured_prices(fixture, rows):
         if group not in specs: continue
         current_specs = {s: spec for s, spec in specs[group].items() if s in point['odds']}
         if not current_specs: continue
-        captured[key] = {**point, 'bookmaker_id': book, 'bookmaker': names.get(book) or f'Operatore {book}',
+        captured[key] = {**point, 'bookmaker_id': book, 'bookmaker': point.get('bookmaker') or names.get(book) or f'Operatore {book}',
             'bet_id': int(group.split('|')[0]), 'group': group, 'specs': current_specs}
     return captured
 
@@ -115,7 +115,7 @@ def refresh_day(day, state, as_of):
         matrix['opportunity_refreshed_at'] = as_of
         matrix.setdefault('coverage', {}).update(modeled_markets=len(rows),
             priced_markets=sum(r.get('quote_status') in ('recent', 'cached_stable') for r in rows),
-            movement_markets=sum(r.get('oci') is not None for r in rows),
+            movement_markets=sum(r.get('oci') is not None and not r.get('prematch_stable') for r in rows),
             categories=dict(Counter(r.get('category', 'no_quote') for r in rows)))
         count += 1
     if count or scope_changed:

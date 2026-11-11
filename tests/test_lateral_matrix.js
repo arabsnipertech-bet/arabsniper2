@@ -633,3 +633,33 @@ assert.equal((triadHtml.match(/Nessun mercato idoneo/g)||[]).length,2);
 triadRow.quote_observed_at=triadStart;
 assert.match(api.card(triadMatch,{}),/Quota da aggiornare/);
 assert(!api.card(triadMatch,{}).includes('Over 1,5 ST'));
+
+const scope=require('../web/competition-scope.js');
+assert(scope.allows(scope.id,'World','UEFA Nations League - League C'));
+assert(scope.allows(scope.id,'World','World Cup - Qualification CONMEBOL'));
+assert(!scope.allows(scope.id,'World','Friendlies'));
+assert(!scope.allows(scope.id,'World','UEFA Nations League Women'));
+
+const study=structuredClone(triadMatch),studyMatrix=study.multimarket.matrix;
+const oldPrice=new Date(triadNow-36*3600000).toISOString();
+Object.assign(studyMatrix.rows[0],{quote_observed_at:oldPrice,provider_updated_at:oldPrice,
+ quote_status:'cached_stable',prematch_stable:true,cache_expires_at:triadStart,first_odd:2.10});
+Object.assign(studyMatrix.v7.triad.most_probable,{tier:'BLU',badge:'◆ BLU',study_only:true,quote_state:'stable'});
+studyMatrix.v7.markets['st-goals'].model_fair_odd=1.85;
+const estimate={id:'pt-goals',family:'totals',period:'ht',spec:{kind:'total',period:'ht',side:'over',line:1.5},
+ probability_model:triadModel,odd:null,quote_status:'missing'};
+studyMatrix.rows.push(estimate);
+studyMatrix.v7.markets[estimate.id]={source_market_id:estimate.id,label:'Over 1,5 PT',odd:null,calibrated:.40,model_fair_odd:2.50};
+studyMatrix.v7.triad.recommended_alternative={market_id:estimate.id,source_market_id:estimate.id,
+ tier:'BLU',badge:'◆ BLU',study_only:true,odd:null,quote_state:'model_estimate',probability:.40,
+ model_fair_odd:2.50,horizon_label:'[1° TEMPO]'};
+const studyHtml=api.card(study,{});
+for(const label of ['Stabile da apertura','Quota equa 1,85','Quota equa 2,50','[STIMA MODELLO - ATTESA QUOTA BOOK]'])
+ assert(studyHtml.includes(label),label);
+assert.equal(api.publishedView(study,triadNow).tier,'blu');
+studyMatrix.rows[0].quote_status='recent';
+studyMatrix.rows[0].prematch_stable=false;
+studyMatrix.v7.triad.most_probable.quote_state='moving';
+assert.equal(api.publishedView(study,triadNow).triad.most_probable.signal.quote_state,'stable');
+studyMatrix.v7.triad.recommended_alternative.tier='GOLD';
+assert.equal(api.publishedView(study,triadNow).triad.recommended_alternative,null);
