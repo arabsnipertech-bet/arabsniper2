@@ -3,13 +3,15 @@
 No outcome is assembled across operators, lines, periods or provider snapshots.
 """
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import isfinite
 import re
 from market_discovery import clean, discover_payload
 from market_scope import COMBO_SPECS
 
 SOURCE_VERSION = 'quote-sources-v1'
+PREMATCH_HOURS = 120
+PREMATCH_WINDOW = timedelta(hours=PREMATCH_HOURS)
 TOTALS = {
     5: ('ft', False, ('Goals Over/Under',)),
     6: ('ht', False, ('Goals Over/Under First Half',)),
@@ -45,6 +47,7 @@ def norm(value):
 
 
 def fresh(updated, now, kickoff):
+    """Short freshness window for current flow and premium admission."""
     updated, now, kickoff = stamp(updated), stamp(now), stamp(kickoff)
     if not all((updated, now, kickoff)) or now >= kickoff: return False
     hours = 1 if (kickoff-now).total_seconds() <= 10800 else 6
@@ -54,6 +57,11 @@ def fresh(updated, now, kickoff):
 def prematch_observation(updated, observed, as_of, kickoff):
     provider, seen, now, start = map(stamp, (updated, observed, as_of, kickoff))
     return bool(provider and seen and now and start and provider <= seen <= now < start)
+
+
+def valid_prematch_quote(updated, observed, as_of, kickoff):
+    return (prematch_observation(updated, observed, as_of, kickoff)
+            and stamp(as_of)-stamp(updated) <= PREMATCH_WINDOW)
 
 
 def total_pairs(payload):
@@ -95,7 +103,7 @@ def total_pairs(payload):
 
 
 def normalize_payload(payload, observed_at):
-    """Prefer a fresh complete native pair; otherwise alias the exact Asian .5.
+    """Keep complete pre-match pairs across all books and alias the exact Asian .5.
 
     Generated pairs keep their actual source ID/time and never patch one side of
     a native market. Repeated normalization is idempotent.
@@ -103,14 +111,17 @@ def normalize_payload(payload, observed_at):
     result = deepcopy(payload or {})
     result['response'] = [r for r in result.get('response', []) if not r.get('_halfline_fallback')]
     result = discover_payload(result)
-    pairs = list(total_pairs(result))
-    native = {(p['fixture_id'], p['bookmaker_id'], p['period'], p['line'])
-              for p in pairs if not p['asian'] and fresh(p['provider_updated_at'], observed_at, p['kickoff'])}
+    pairs = [p for p in total_pairs(result) if valid_prematch_quote(
+        p['provider_updated_at'], p['_record'].get('_observed_at') or observed_at, observed_at, p['kickoff'])]
+    native = {(p['fixture_id'], p['bookmaker_id'], p['period'], p['line']):
+              fresh(p['provider_updated_at'], observed_at, p['kickoff'])
+              for p in sorted(pairs, key=lambda p: stamp(p['provider_updated_at'])) if not p['asian']}
     candidates = {}
     for pair in pairs:
         key = (pair['fixture_id'], pair['bookmaker_id'], pair['period'], pair['line'])
-        if (not pair['asian'] or (pair['period'], pair['line']) not in TARGETS | {('ht', .5)}
-                or key in native or not fresh(pair['provider_updated_at'], observed_at, pair['kickoff'])):
+        if not pair['asian'] or (pair['period'], pair['line']) not in TARGETS | {('ht', .5)}:
+            continue
+        if key in native and (native[key] or not fresh(pair['provider_updated_at'], observed_at, pair['kickoff'])):
             continue
         old = candidates.get(key)
         if old is None or (stamp(pair['provider_updated_at']), -pair['bet_id']) > (stamp(old['provider_updated_at']), -old['bet_id']):
@@ -192,13 +203,12 @@ def direct_combo_groups(payload, fid, observed_at):
     """Exact whole-match settlements with a complete Yes/No pair from one book."""
     result = {}
     ambiguous = set()
-    now = stamp(observed_at)
     for record in discover_payload(payload).get('response', []):
         fixture = record.get('fixture') or {}
-        at, start = stamp(record.get('update')), stamp(fixture.get('date'))
-        if str(fixture.get('id')) != str(fid) or not all((at, start, now)) or at > now or now >= start: continue
-        actual_observation = stamp(record.get('_observed_at'))
-        if actual_observation and (actual_observation > now or at > actual_observation): continue
+        at = stamp(record.get('update'))
+        observed = record.get('_observed_at') or observed_at
+        if str(fixture.get('id')) != str(fid) or not valid_prematch_quote(record.get('update'), observed, observed_at, fixture.get('date')):
+            continue
         for book in record.get('bookmakers', []):
             if book.get('id') is None: continue
             for bet in book.get('bets', []):
@@ -223,7 +233,7 @@ def direct_combo_groups(payload, fid, observed_at):
                 candidate = {'odds':odds, 'specs':{'over':dict(spec)},
                     'complete':True, 'bookmaker_id':str(book['id']), 'bookmaker':str(book.get('name') or book['id']),
                     'bet_id':int(bid), 'group':group,
-                    'observed_at':actual_observation.isoformat() if actual_observation else observed_at,
+                    'observed_at':stamp(observed).isoformat(),
                     'provider_updated_at':record['update'],
                     'quote_source':'bookmaker', 'quote_executable':True,
                     'quote_provenance':{'version':SOURCE_VERSION, 'kind':'direct_combo',

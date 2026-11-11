@@ -201,10 +201,11 @@ def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "", fo
     command = build_command(mode, github=github, days=days, audit_date=audit_date)
     log(f"🚀 Avvio: {' '.join(command)}")
     started_at = now_iso()
+    from fast_scan_guard import fast_day_count
     report = {
         "mode": mode,
         "github": github,
-        "days": 2 if mode == "fast" else 5 if mode == "night" else days,
+        "days": fast_day_count() if mode == "fast" else 5 if mode == "night" else days,
         "audit_date": audit_date,
         "command": command,
         "returncode": None,

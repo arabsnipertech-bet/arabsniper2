@@ -50,6 +50,24 @@ def assessment():
 
 
 class MathAndRouting(unittest.TestCase):
+    def test_no_books_use_three_fixture_estimates_without_offers_today_or_in_four_days(self):
+        for kickoff in (START, '2026-11-13T19:00:00+01:00'):
+            a = assessment()
+            for row in a['matrix']['rows']:
+                row.update(odd=None, first_odd=None, quote_status='missing', quote_executable=False)
+            meta = dict(META, kickoff=kickoff)
+            snapshot = capture(a, meta, AT)
+            self.assertEqual([pick['market_id'] for pick in snapshot['triad'].values()], [FT, HT, GG])
+            for pick in snapshot['triad'].values():
+                self.assertEqual((pick['tier'], pick['quote_state'], pick['study_only']), ('BLU', 'model_estimate', True))
+                self.assertIsNone(pick['odd'])
+                self.assertIsNone(pick['ev'])
+                self.assertEqual(round(pick['model_fair_odd'], 2), round(1/pick['probability'], 2))
+            self.assertFalse(any(snapshot['signals'][role] for role in ('primary', 'consigliata', 'colpaccio', 'gold', 'platinum')))
+            self.assertFalse(list(stored_offers(a, meta, AT)))
+            a['profiles'] = {}
+            self.assertFalse(any(capture(a, meta, AT)['triad'].values()))
+
     def test_study_uses_compatible_real_prices_without_publishing_weak_ev(self):
         def candidate(key, probability, odd, fair, horizon):
             return dict(source_market_id=key, label=key, calibrated=probability, odd=odd,

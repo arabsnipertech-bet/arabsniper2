@@ -11,17 +11,32 @@ from datetime import datetime, timezone
 
 FORMAT = 'arabsniper-gold-pages-v1'
 PAGE_BYTES = 8 * 1024 * 1024
+INACTIVE = {'PST', 'CANC', 'ABD'}
 
 
 def encoded(value):
     return json.dumps(value, ensure_ascii=False, separators=(',', ':')).encode()
 
 
-def prematch_coverage(day):
+def inactive_without_analysis(match):
+    meta = match.get('fixture') or {}
+    status = meta.get('status_short') or (meta.get('result') or {}).get('status')
+    if status not in INACTIVE:
+        return False
+    analysis = match.get('multimarket') or {}
+    matrix = analysis.get('matrix') or {}
+    saved = any((analysis.get('markets'), matrix.get('rows'),
+                 (matrix.get('v7') or {}).get('status') == 'published'))
+    promoted = any(pick and pick.get('tier') in ('GOLD', 'PLATINUM')
+                   for pick in (match.get('triad') or {}).values())
+    return not (promoted or saved or (match.get('_gold_history') or {}).get('verified_prematch'))
+
+
+def prematch_coverage(day, now=None):
     from multimarket_model import stamp
     from quote_cache import valid_number
 
-    now = datetime.now(timezone.utc)
+    now = now or datetime.now(timezone.utc)
     summary = {'all': Counter(), 'national_teams': Counter(), 'japan_cups': Counter()}
     for match in day.get('matches', []):
         meta = match.get('fixture') or {}
@@ -33,10 +48,18 @@ def prematch_coverage(day):
                   and r.get('quote_status') in ('recent', 'cached_stable') and valid_number(r.get('odd')) and r['odd'] > 1]
         signs = {spec.get('side') for r in prices if (spec := r.get('spec') or {}).get('kind') == 'result'
                  and spec.get('period') == 'ft'}
+        result_pair = any(set(r.get('selected_market_odds') or {}) == {'1', 'x', '2'} and
+                          (r.get('spec') or {}).get('kind') == 'result' and r['spec'].get('period') == 'ft' for r in prices)
+        goal_pair = any(valid_number(r.get('selected_market_fair_pct')) and
+                        valid_number(r.get('selected_margin_pct')) and 0 <= r['selected_margin_pct'] <= 30 and
+                        (spec := r.get('spec') or {}).get('kind') in ('total', 'asian_total') and
+                        spec.get('period') == 'ft' and spec.get('line') == 2.5 for r in prices)
         picks = [p for p in ((matrix.get('v7') or {}).get('triad') or {}).values() if p]
         coverage = dict(fixtures=1, quoted=bool(prices), one_x_two={'1', 'x', '2'} <= signs,
+                        complete_1x2=result_pair, complete_over25=goal_pair, complete_primary=result_pair and goal_pair,
                         stable=any(r.get('prematch_stable') for r in prices),
-                        full_triad=len(picks) == 3, model_estimates=sum(p.get('quote_state') == 'model_estimate' for p in picks))
+                        full_triad=len(picks) == 3, empty_triad=not picks,
+                        model_estimates=sum(p.get('quote_state') == 'model_estimate' for p in picks))
         summary['all'].update(coverage)
         scope = (match.get('gold_scope') or {}).get('tier')
         if scope == 'national_team':
@@ -65,7 +88,7 @@ def project(value, upload, page_bytes=PAGE_BYTES):
         pages.append({'sha256': digest, 'bytes': len(raw), 'count': len(pending)})
         pending, size = [], 2
 
-    for match in value['matches']:
+    for match in sorted(value['matches'], key=inactive_without_analysis):
         raw = encoded(match)
         if pending and size + len(raw) + 1 > page_bytes:
             flush()

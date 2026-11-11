@@ -654,7 +654,7 @@ studyMatrix.v7.triad.recommended_alternative={market_id:estimate.id,source_marke
  tier:'BLU',badge:'◆ BLU',study_only:true,odd:null,quote_state:'model_estimate',probability:.40,
  model_fair_odd:2.50,horizon_label:'[1° TEMPO]'};
 const studyHtml=api.card(study,{});
-for(const label of ['Stabile da apertura','Quota equa 1,85','Quota equa 2,50','[STIMA MODELLO - ATTESA QUOTA BOOK]'])
+for(const label of ['Stabile da apertura','Quota equa 1,85','Quota equa 2,50','Stima V7 · in attesa di quote bookmaker'])
  assert(studyHtml.includes(label),label);
 assert.equal(api.publishedView(study,triadNow).tier,'blu');
 studyMatrix.rows[0].quote_status='recent';
@@ -663,3 +663,18 @@ studyMatrix.v7.triad.most_probable.quote_state='moving';
 assert.equal(api.publishedView(study,triadNow).triad.most_probable.signal.quote_state,'stable');
 studyMatrix.v7.triad.recommended_alternative.tier='GOLD';
 assert.equal(api.publishedView(study,triadNow).triad.recommended_alternative,null);
+
+const unquoted=structuredClone(triadMatch), unquotedMatrix=unquoted.multimarket.matrix;
+unquotedMatrix.v7.triad={most_probable:null,recommended_alternative:null,high_odds_shot:null};
+const emptyCard=api.card(unquoted,{});
+assert.match(emptyCard,/Nessuna proposta prematch disponibile/);
+assert.doesNotMatch(emptyCard,/Nessun mercato idoneo/);
+
+const boardHost={};
+const activeFixture={...matches[0],fixture:{...matches[0].fixture,fixture_id:'801',status_short:'NS',match:'In calendario'}};
+const postponedFixture={...activeFixture,fixture:{...activeFixture.fixture,fixture_id:'802',status_short:'PST',
+ kickoff:new Date(triadNow-86400000).toISOString(),match:'Orfana rinviata'},
+ multimarket:{status:'no_prematch_snapshot',matrix:{rows:[]}}};
+api.render({matches:[postponedFixture,activeFixture],gold_scope:{policy_id:scope.id}},boardHost);
+assert(boardHost.innerHTML.indexOf('In calendario')<boardHost.innerHTML.indexOf('Rinviate, annullate o sospese'));
+assert.match(boardHost.innerHTML,/<details class="mx-reading-help mx-inactive"><summary>[^<]+<\/summary>[\s\S]*Orfana rinviata/);

@@ -3,9 +3,10 @@ from copy import deepcopy
 from datetime import timedelta
 from math import isfinite
 from multimarket_model import stamp
-from quote_sources import prematch_observation
+from quote_sources import PREMATCH_HOURS, PREMATCH_WINDOW, valid_prematch_quote
 
-MAX_HOURS = 12
+MAX_HOURS = PREMATCH_HOURS
+UNDATED_WINDOW = timedelta(hours=12)
 PRICE_FIELDS = ('odd', 'first_odd', 'opening_odd', 'opening_delta_pct', 'first_observed_at', 'bookmaker', 'bookmaker_id',
     'bet_id', 'provider_updated_at', 'quote_observed_at', 'selected_margin_pct',
     'selected_margin_delta_pp', 'selected_market_fair_pct', 'selected_market_odds',
@@ -22,23 +23,26 @@ def valid_number(value):
 
 
 def source_time(source):
-    # A newly downloaded copy of an old provider snapshot cannot renew 12h TTL.
+    # Re-reading a snapshot cannot reset its expiry.
     dates = [stamp(source.get(k)) for k in ('provider_updated_at', 'quote_observed_at')]
     return min((d for d in dates if d), default=None)
 
 
 def real_prematch_price(source, as_of, kickoff):
     return (source.get('quote_executable') is True and source.get('bookmaker_id') is not None
-            and prematch_observation(source.get('provider_updated_at'), source.get('quote_observed_at'), as_of, kickoff))
+            and valid_prematch_quote(source.get('provider_updated_at'), source.get('quote_observed_at'), as_of, kickoff))
 
 
 def within_window(source, as_of, kickoff):
-    if source.get('prematch_stable') is True:
+    if source.get('prematch_stable') is True or (source.get('quote_executable') is True
+            and source.get('bookmaker_id') is not None and stamp(source.get('provider_updated_at'))
+            and stamp(source.get('quote_observed_at'))):
         return real_prematch_price(source, as_of, kickoff)
     now, start, at = stamp(as_of), stamp(kickoff), source_time(source)
     dates = [stamp(source.get(k)) for k in ('provider_updated_at', 'quote_observed_at')]
+    window = PREMATCH_WINDOW if all(dates) else UNDATED_WINDOW
     return bool(now and start and at and now < start and all(d <= now for d in dates if d)
-                and 0 <= (now-at).total_seconds() <= MAX_HOURS*3600)
+                and now-at <= window)
 
 
 def remember(row):
@@ -89,12 +93,16 @@ def recalculate(row):
 def mark_stable(row, kickoff):
     at = source_time(row)
     row.update(quote_status='cached_stable', cache_source_at=at.isoformat())
+    start = stamp(kickoff)
+    dated = stamp(row.get('provider_updated_at')) and stamp(row.get('quote_observed_at'))
+    expires = at + (PREMATCH_WINDOW if dated else UNDATED_WINDOW)
     if (row.get('quote_executable') is not True or row.get('bookmaker_id') is None
-            or not stamp(row.get('provider_updated_at'))):
+            or not dated):
         row.update(quote_status_label='Quota stabile da cache',
-                   cache_expires_at=(at+timedelta(hours=MAX_HOURS)).isoformat())
+                   cache_expires_at=expires.isoformat())
         return
-    row.update(prematch_stable=True, cache_expires_at=kickoff,
+    expires_at = kickoff if start and start <= expires else expires.isoformat()
+    row.update(prematch_stable=True, cache_expires_at=expires_at,
                quote_status_label='Stabile da apertura' if row.get('first_odd') == row.get('odd') else 'Ultima quota osservata · stabile',
                delta_pct=0., oci=0., oci_method=None, oci_previous=None, oci_direction=None,
                oci_observed_at=None, oci_unavailable_reason=None, selected_movement=None,

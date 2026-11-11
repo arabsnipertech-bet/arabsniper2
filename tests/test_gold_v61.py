@@ -104,13 +104,13 @@ class GoldV61(unittest.TestCase):
     def test_cache_window_is_inclusive_and_never_renewed_or_future_dated(self):
         r=row(odd=2.2,first_odd=2.4,bookmaker_id='A',quote_observed_at=NOW,
               win_weight=.6,loss_weight=.4,sensitivity_weights=[[.55,.45]])
-        remember(r);kickoff='2026-10-27T20:00:00Z'
+        remember(r);kickoff='2026-11-01T20:00:00Z'
         r.update(odd=None,quote_status='stale',selected_margin_pct=29,bookmaker_id='B')
-        self.assertTrue(restore(r,'2026-10-26T20:00:00Z',kickoff,True))
+        self.assertTrue(restore(r,'2026-10-31T08:00:00Z',kickoff,True))
         self.assertEqual(r['bookmaker_id'],'A');self.assertEqual(r['selected_margin_pct'],3)
         self.assertEqual(r['quote_status'],'cached_stable');self.assertAlmostEqual(r['ev_low_pct'],21.)
         self.assertEqual(r['provider_updated_at'],NOW)
-        self.assertFalse(restore(r,'2026-10-26T20:00:01Z',kickoff,True))
+        self.assertFalse(restore(r,'2026-10-31T08:00:01Z',kickoff,True))
         self.assertFalse(restore(r,'2026-10-26T07:59:59Z',kickoff,True))
         self.assertFalse(restore(r,'2026-10-26T09:00:00Z',kickoff,False))
         self.assertFalse(restore(r,kickoff,kickoff,True))

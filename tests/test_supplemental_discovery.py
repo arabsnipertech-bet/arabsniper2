@@ -12,7 +12,7 @@ from test_policy_engine import engine
 
 
 class SupplementalDiscoveryTests(unittest.TestCase):
-    def test_asian_or_alternative_id_recovers_and_clears_no_gain_streak(self):
+    def test_asian_or_alternative_id_recovers_with_legacy_route_state(self):
         for bid, line, name, market in [(50, 2.5, 'Goal Line', 'over25_ft'),
                 (72, 1.5, 'Goal Line (1st Half)', 'over15_ht'),
                 (336, 3.5, 'Goal Line', 'over35_ft'),
@@ -33,7 +33,7 @@ class SupplementalDiscoveryTests(unittest.TestCase):
                 self.assertIn((market, '998'), coverage(result, 100, NOW))
                 self.assertEqual(enricher.stats['odds_targeted_markets_recovered'], 1)
                 self.assertEqual(enricher.stats['odds_targeted_no_gain'], 0)
-                self.assertFalse(state['route_health']['bet'])
+                self.assertNotIn('route_health', state)
 
     def test_neutral_qualifiers_preserve_identity_and_numeric_line(self):
         for qualifier in ('Main', 'Alternative', 'Alt', 'Regular', 'Regulation Time',

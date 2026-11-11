@@ -3,16 +3,17 @@
 Supplemental queries never synthesize an outcome or merge partial market sides.
 Persistent cooldowns avoid repeatedly asking the same empty question.
 """
-from collections import defaultdict
+from collections import Counter, defaultdict
 from copy import deepcopy
 from datetime import datetime, timezone
 import time
 from multimarket_model import collect_quotes, stamp
-from quote_sources import direct_combo_groups, normalize_payload, prematch_observation
+from quote_sources import direct_combo_groups, fresh, valid_prematch_quote
 from gold_competitions import excluded_known_meta
 from market_discovery import identify, clean, VERSION as DISCOVERY_VERSION
 
 TARGETS = ('1x2_ft', 'over25_ft', 'over35_ft', 'over15_ht', 'over25_ht', 'gg_ht', 'gg_ft', 'over05_ht', 'over05_sh', 'combo_ht_sh')
+PRIMARY_MARKETS = {'1x2_ft', 'over25_ft'}
 BET_IDS = {'1x2_ft':(1,), 'over25_ft':(5,50,336), 'over35_ft':(5,50,336),
            'over15_ht':(6,72), 'over25_ht':(6,72), 'gg_ht':(34,), 'gg_ft':(8,),
            'over05_ht':(6,72), 'over05_sh':(26,), 'combo_ht_sh':(184,)}
@@ -76,78 +77,110 @@ def discovery_routes(catalog, rows, counts, *, with_identity=False):
 
 
 def coverage(payload, fid, now, target_only=True):
-    normalized = normalize_payload(payload or {}, now)
-    quotes = collect_quotes(normalized, now)
+    quotes = collect_quotes(payload or {}, now)
     result = {(market, book) for market, books in quotes.get(str(fid), {}).items()
-              if not target_only or market in TARGETS for book in books}
+              if not target_only or market in TARGETS for book, row in books.items() if row['provider_updated_at']}
     result.update(('combo_ht_sh', group['bookmaker_id'])
-                  for group in direct_combo_groups(normalized, fid, now).values())
+                  for group in direct_combo_groups(payload or {}, fid, now).values())
     return result
 
 
 def scheduled_odds(client, fixtures, target_date, clock):
-    """Read the calendar once, then query each uncovered fixture directly."""
-    if not fixtures:
-        return
+    """Collect primary odds by admitted league and UTC date before enrichment."""
     enricher = client.odds_enricher
-    if enricher is not None and not enricher.allowed(check_limits=False):
-        return
-    ids = {str(meta['fixture_id']) for meta in fixtures}
-    daily = client.get('odds', {'date': target_date, 'timezone': 'Europe/Rome'}, odds_fixture_ids=ids)
-    by_fixture = defaultdict(list)
-    for row in (daily or {}).get('response', []):
-        by_fixture[str((row.get('fixture') or {}).get('id'))].append(row)
+    grouped = defaultdict(set)
+    upcoming = {}
+    now = stamp(clock())
     for meta in fixtures:
-        fid = str(meta['fixture_id'])
-        now = clock()
-        hours = hours_to_kickoff(meta, now)
-        if hours is None or hours <= 0:
+        start = stamp(meta.get('kickoff'))
+        if not start or start <= now or meta.get('status_short') not in (None, 'NS', 'TBD'):
             continue
-        if enricher is not None:
-            enricher.register_fixture(meta)
-            if not enricher.allowed(check_limits=False):
-                break
-        base = {**(daily or {}), 'response': by_fixture[fid], 'results': len(by_fixture[fid])}
+        fid = str(meta['fixture_id'])
+        day = start.astimezone(timezone.utc).date().isoformat()
+        league, season = meta.get('league_id'), meta.get('season')
+        key = (day, league, season) if league and season else (day, None, None)
+        grouped[key].add(fid)
+        upcoming[fid] = meta
+
+    bases = {}
+    report = Counter(fixtures=len(upcoming), calendar_queries=len(grouped))
+    for (day, league, season), ids in grouped.items():
+        params = {'date': day}
+        if league is not None:
+            params.update(league=league, season=season)
+        scheduled = client.get('odds', params, odds_fixture_ids=ids)
+        if scheduled is None:
+            report['calendar_errors'] += 1
+            continue
+        by_fixture = defaultdict(list)
+        for row in scheduled.get('response', []):
+            by_fixture[str((row.get('fixture') or {}).get('id'))].append(row)
+        for fid in ids:
+            rows = by_fixture[fid]
+            bases[fid] = {**scheduled, 'response': rows, 'results': len(rows)}
+
+    for fid, meta in upcoming.items():
+        now = clock()
+        if stamp(meta['kickoff']) <= stamp(now):
+            continue
+        base = bases.get(fid)
         known = {market for market, _ in coverage(base, fid, now)}
-        if not known or hours <= 12 and not {'1x2_ft', 'over25_ft'} <= known:
-            direct = client.get('odds', {'fixture': int(fid)})
-            if direct and direct.get('response'):
-                base = merge_payload(base, direct, fid, clock(), allow_stable=True) if base['response'] else direct
-        elif enricher is not None:
-            base = enricher.enrich(base, int(fid))
+        direct_failed = False
+        if not PRIMARY_MARKETS <= known:
+            report['fixture_queries'] += 1
+            direct = client.get('odds', {'fixture': int(fid)}, enrich_odds=False)
+            if direct is not None:
+                base = merge_payload(direct, base, fid, clock()) if base and base['response'] else direct
+                known = {market for market, _ in coverage(base, fid, clock())}
+            else:
+                report['fixture_errors'] += 1
+                direct_failed = True
+        report['complete_1x2'] += '1x2_ft' in known
+        report['complete_over25'] += 'over25_ft' in known
+        report['complete_primary'] += PRIMARY_MARKETS <= known
+        if base is not None and not direct_failed and not any(row.get('bookmakers') for row in base.get('response', [])):
+            report['api_empty'] += 1
         client.prefetched_odds[fid] = base
 
+    if enricher is not None:
+        for fid, meta in upcoming.items():
+            if not enricher.allowed():
+                break
+            if fid in client.prefetched_odds:
+                enricher.register_fixture(meta)
+                client.prefetched_odds[fid] = enricher.enrich(client.prefetched_odds[fid], int(fid), primary_scanned=True)
+    return {'date': target_date, **report}
 
-def merge_payload(base, extra, fid, now, *, allow_stable=False):
-    """Keep each bet whole, newest provider snapshot wins; never join odds sides."""
+
+def merge_payload(base, extra, fid, now, *, allow_stable=True):
+    """Keep whole provider snapshots so a later partial bet cannot erase a pair."""
     result = {key: deepcopy(value) for key, value in base.items() if key != 'response'}
     records = {}
     for supplemental, payload in ((False, base), (True, extra or {})):
         for row in payload.get('response', []):
             if str(row.get('fixture', {}).get('id')) != str(fid):
                 continue
-            updated = stamp(row.get('update'))
+            updated = row.get('update')
             observed = row.get('_observed_at') or now
+            kickoff = row.get('fixture', {}).get('date')
             if supplemental:
-                if not prematch_observation(row.get('update'), observed, now, row.get('fixture', {}).get('date')):
+                if not valid_prematch_quote(updated, observed, now, kickoff):
                     continue
-                if not allow_stable and (stamp(now)-updated).total_seconds() > 21600:
+                if not allow_stable and not fresh(updated, now, kickoff):
                     continue
             for book in row.get('bookmakers', []):
                 for bet in book.get('bets', []):
-                    key = (str(book.get('id')), str(bet.get('id')) if bet.get('id') is not None else 'name:'+clean(bet.get('name')))
+                    bet_id = str(bet['id']) if bet.get('id') is not None else 'name:'+clean(bet.get('name'))
+                    key = (str(book.get('id')), bet_id, stamp(updated))
                     previous = records.get(key)
                     if previous:
-                        if not updated or previous[0] and updated < previous[0]:
+                        old_values = {v.get('value'): v.get('odd') for v in previous[2].get('values', [])}
+                        new_values = {v.get('value'): v.get('odd') for v in bet.get('values', [])}
+                        if not old_values.items() < new_values.items():
                             continue
-                        if updated == previous[0]:
-                            old_values = {v.get('value'): v.get('odd') for v in previous[3].get('values', [])}
-                            new_values = {v.get('value'): v.get('odd') for v in bet.get('values', [])}
-                            if not old_values.items() < new_values.items():
-                                continue
-                    records[key] = (updated, row, book, bet)
+                    records[key] = (row, book, bet)
     groups = {}
-    for updated, row, book, bet in records.values():
+    for row, book, bet in records.values():
         # Group only identical snapshot timestamps, retaining whole markets.
         key = (row.get('update'), row.get('_observed_at'), str(book.get('id')))
         if key not in groups:
@@ -161,8 +194,12 @@ def merge_payload(base, extra, fid, now, *, allow_stable=False):
     return result
 
 
+def quota_reserve(limit):
+    return min(500, int(limit * .05))
+
+
 class OddsEnricher:
-    def __init__(self, client, state, now=None, max_calls=1200, max_seconds=300, market_catalog=None):
+    def __init__(self, client, state, now=None, max_calls=1200, max_seconds=900, market_catalog=None):
         self.client, self.state = client, state
         self.fixed_now = now
         self.now = now or datetime.now(timezone.utc).isoformat()
@@ -174,7 +211,7 @@ class OddsEnricher:
         self.quota_remaining = None
         self.quota_checked_at = None
         self.quota_calls = 0
-        self.reserve = 7500
+        self.reserve = 0
         self.stats = dict(odds_targeted_requests=0, odds_targeted_books_recovered=0,
                           odds_targeted_markets_recovered=0, odds_targeted_empty=0,
                           odds_targeted_errors=0, odds_targeted_no_gain=0,
@@ -184,10 +221,10 @@ class OddsEnricher:
         self.catalog = state.get('bookmakers', [])
         self.market_catalog = market_catalog if market_catalog is not None else state.get('market_catalog', [])
         if market_catalog is not None: state['market_catalog']=deepcopy(market_catalog)
+        state.pop('route_health', None)
         if state.get('discovery_version') and state['discovery_version'] != DISCOVERY_VERSION:
             # Old no-gain decisions used stricter market labels. Let the
             # bounded collector reassess them without touching prices or history.
-            state.pop('route_health', None)
             state.pop('queries', None)
         state['discovery_version']=DISCOVERY_VERSION
 
@@ -197,10 +234,11 @@ class OddsEnricher:
         # Recheck provider quota to account for other consumers and UTC resets.
         if self.quota_checked_at is None or time.monotonic()-self.quota_checked_at > 60:
             status = self.client.get('status', {}, use_cache=False)
-            info = (status or {}).get('response', {}).get('requests', {})
+            info = ((status or {}).get('response') or {}).get('requests') or {}
             used, limit = info.get('current'), info.get('limit_day')
-            self.quota_remaining = limit-used if type(used) is int and type(limit) is int else None
-            self.reserve = max(7500, int(limit*.1)) if type(limit) is int else 7500
+            known = type(used) is int and type(limit) is int and limit > 0
+            self.quota_remaining = limit-used if known else None
+            self.reserve = quota_reserve(limit) if known else 0
             self.quota_calls = self.client.request_count
             self.quota_checked_at = time.monotonic()
         remaining = None if self.quota_remaining is None else self.quota_remaining-(self.client.request_count-self.quota_calls)
@@ -229,7 +267,7 @@ class OddsEnricher:
         """Trusted fixture metadata from the fixtures endpoint, never inferred odds."""
         self.fixtures[str(meta["fixture_id"])] = dict(meta)
 
-    def enrich(self, base, fid):
+    def enrich(self, base, fid, *, primary_scanned=False):
         self.now = self.fixed_now or datetime.now(timezone.utc).isoformat()
         prioritized = str(fid) in self.priority_fixtures
         self.priority_fixtures.discard(str(fid))
@@ -248,7 +286,7 @@ class OddsEnricher:
         before_all = coverage(base, fid, self.now, target_only=False)
         before = {item for item in before_all if item[0] in TARGETS}
         current_all, current = before_all, before
-        present_books = {str(b['id']) for r in rows for b in r.get('bookmakers', [])}
+        present_books = {str(b['id']) for r in rows for b in r.get('bookmakers', []) if b.get('id') is not None}
         counts = {k:sum(m==k for m,b in before) for k in TARGETS}
         # Query sparsest goal markets first, but do not alter eligibility thresholds.
         start = stamp(meta.get('kickoff')) or min(starts)
@@ -278,10 +316,10 @@ class OddsEnricher:
             if index < len(markets): queries.append(('bet', markets[index]))
             if index < len(missing): queries.append(('bookmaker', missing[index]))
         uncovered = not before
-        if uncovered and not distant and not queries:
+        if uncovered and not distant and not primary_scanned and not queries:
             queries.append(('fixture',fid))  # Unfiltered discovery when even the catalogue is unavailable.
-        if uncovered and not distant and all(meta.get(k) is not None for k in ('league_id','season','date')):
-            queries.insert(0, ('league_date', meta['date']))
+        if uncovered and not distant and not primary_scanned and all(meta.get(k) is not None for k in ('league_id','season')):
+            queries.insert(0, ('league_date', start.astimezone(timezone.utc).date().isoformat()))
         if not counts['1x2_ft']:
             # Do not spend all eight targeted attempts on secondary markets
             # while Match Winner is still absent. Never synthesize 1/X/2 odds.
@@ -313,22 +351,13 @@ class OddsEnricher:
             if checked and (stamp(self.now)-checked).total_seconds() < cooldown:
                 self.stats['odds_targeted_cooldown_skips'] += 1
                 continue
-            health = self.state.setdefault('route_health', {}).setdefault(kind, {})
-            paused = stamp(health.get('paused_at'))
-            if paused and 0 <= (stamp(self.now)-paused).total_seconds() < 21600:
-                essential_result = kind == 'bet' and identities.get(value) == ('result', 'ft') and not counts['1x2_ft']
-                if not uncovered and hours > 6 and not essential_result:
-                    self.stats['odds_targeted_unproductive_skips'] += 1
-                    continue
-            elif paused:
-                health.clear()
             if attempts >= (2 if distant_without_book else 8):
                 break
             if self.calls >= call_limit or not self.allowed():
                 self.stats['odds_targeted_budget_stops'] += 1
                 break
             start_calls = self.client.request_count
-            params = ({'league':meta['league_id'],'season':meta['season'],'date':meta['date'],'timezone':'Europe/Rome'}
+            params = ({'league':meta['league_id'],'season':meta['season'],'date':value}
                       if kind == 'league_date' else {'fixture':fid,kind:value})
             started = time.monotonic()
             try:
@@ -348,9 +377,6 @@ class OddsEnricher:
                 self.stats['odds_targeted_errors'] += 1
                 continue  # Failed request is not cached as an empty result.
             history[key] = self.now
-            health['no_gain_streak'] = health.get('no_gain_streak', 0)+1
-            if health['no_gain_streak'] >= 24:
-                health['paused_at'] = self.now
             if kind == 'bookmaker':
                 self.state['cursors'][str(fid)] = cursor = cursor+1
             if not extra.get('response'):
@@ -366,8 +392,6 @@ class OddsEnricher:
             result = candidate
             if not after-current:
                 self.stats['odds_targeted_no_gain'] += 1
-            else:
-                health.clear()
             current_all, current = candidate_all, after
         after = current
         new_books = {b for m,b in after}-{b for m,b in before}

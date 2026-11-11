@@ -18,6 +18,10 @@ from fast_backup_dispatch import fresh_for_hour
 MARKER = 'data/arab_quote_fast_status.json'
 
 
+def fast_day_count():
+    return 5 if os.getenv('ARAB_FORCE_FAST') == 'true' else 2
+
+
 def completed_recently(root, now=None):
     now = now or datetime.now(TZ)
     marker = read_store(Path(root) / MARKER, {})
@@ -46,6 +50,8 @@ def record_completion(root, requested_at, now=None):
     dates = window(started)[:2]
     if not valid_window(root, dates, started, now):
         raise ValueError('Fast did not refresh both expected dates')
+    if run.get('days') == 5 and not valid_window(root, window(started), started, now):
+        raise ValueError('Forced Fast did not refresh all five expected dates')
     marker = {'schema_version': 1, 'status': 'complete', 'dates': dates,
               'started_at': started.isoformat(), 'completed_at': now.isoformat(),
               'run_id': os.getenv('GITHUB_RUN_ID'), 'run_attempt': os.getenv('GITHUB_RUN_ATTEMPT')}

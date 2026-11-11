@@ -24,6 +24,21 @@ class GoldBrowserFeed(unittest.TestCase):
         self.assertEqual(project({'summary':{}},lambda *_:self.fail('upload')),{'summary':{}})
         self.assertEqual(project({'matches':[]},lambda *_:self.fail('upload'))['match_count'],0)
 
+    def test_orphaned_inactive_fixtures_follow_active_and_archived_analyses(self):
+        postponed = {'fixture': {'fixture_id': 1, 'status_short': 'PST'},
+                     'multimarket': {'status': 'no_prematch_snapshot', 'matrix': {'rows': []}}}
+        active = {'fixture': {'fixture_id': 2, 'status_short': 'NS'}}
+        saved = {'fixture': {'fixture_id': 3, 'status_short': 'ABD'},
+                 'multimarket': {'matrix': {'v7': {'status': 'published'}}}}
+        cancelled = {'fixture': {'fixture_id': 4, 'status_short': 'CANC'}}
+        matches = [postponed, active, saved, cancelled]
+        pages = {}
+        index = project({'matches': matches}, pages.__setitem__)
+        page, = index['pages']
+        published = json.loads(gzip.decompress(pages['_audit_parts/'+page['sha256']+'.json.gz']))
+        self.assertEqual(published, [active, saved, postponed, cancelled])
+        self.assertEqual(matches[0], postponed)
+
     def test_catalog_publication_preserves_social_feeds_and_rejects_changed_sources(self):
         import io
         from gold_browser_feed import publish_catalog, encoded

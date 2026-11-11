@@ -20,8 +20,11 @@ class MergeTests(unittest.TestCase):
         a=payload(values=[{'value':'Over 2.5','odd':'1.8'}])
         b=payload(values=[{'value':'Under 2.5','odd':'2.1'}],updated='2026-10-23T08:30:00+00:00')
         self.assertEqual(coverage(merge_payload(a,b,100,NOW),100,NOW),set())
-    def test_stale_future_wrong_fixture_ignored(self):
-        for b in (payload(2,updated='2026-10-22T08:00:00+00:00'),payload(2,updated='2026-10-23T10:00:00+00:00'),payload(2,fid=200)):
+    def test_stable_quote_is_kept_and_expired_future_wrong_fixture_ignored(self):
+        stable = payload(2, updated='2026-10-21T09:00:00+00:00')
+        self.assertEqual(coverage(merge_payload(payload(),stable,100,NOW),100,NOW),
+                         {('over25_ft','1'), ('over25_ft','2')})
+        for b in (payload(2,updated='2026-10-18T08:59:00+00:00'),payload(2,updated='2026-10-23T10:00:00+00:00'),payload(2,fid=200)):
             self.assertEqual(coverage(merge_payload(payload(),b,100,NOW),100,NOW),{('over25_ft','1')})
     def test_older_quote_does_not_replace_newer(self):
         a=payload(updated='2026-10-23T08:30:00+00:00'); b=payload(values=[])
@@ -138,7 +141,7 @@ class CatalogTests(unittest.TestCase):
 if __name__=='__main__':unittest.main()
 
 class AdaptiveTests(unittest.TestCase):
-    def test_unproductive_route_pauses_secondary_but_never_missing_result(self):
+    def test_only_same_fixture_query_is_cooled_down(self):
         client=Mock();client.request_count=0
         requests=[]
         def get(path,params,**kw):
@@ -147,11 +150,20 @@ class AdaptiveTests(unittest.TestCase):
             requests.append(params)
             return {'response':[]}
         client.get.side_effect=get
-        state={'route_health':{'bet':{'paused_at':NOW,'no_gain_streak':24},'bookmaker':{'paused_at':NOW,'no_gain_streak':24}}}
+        state={'route_health':{'bet':{'paused_at':NOW,'no_gain_streak':24},'bookmaker':{'paused_at':NOW,'no_gain_streak':24}},
+               'queries':{'99:bet:5':NOW, '100:bet:1':NOW}, 'bookmakers':[{'id':2}]}
         c=OddsEnricher(client,state,now=NOW,market_catalog=[{'id':5,'name':'Goals Over/Under'}])
         c.enrich(payload(),100)
-        self.assertEqual(requests,[{'fixture':100,'bet':1}])
-        self.assertGreater(c.stats['odds_targeted_unproductive_skips'],0)
+        self.assertEqual(requests,[{'fixture':100,'bet':5}, {'fixture':100,'bookmaker':2}])
+        self.assertEqual(c.stats['odds_targeted_cooldown_skips'],1)
+        self.assertNotIn('route_health',c.state)
+
+    def test_7500_plan_has_usable_supplemental_quota(self):
+        client = Mock(request_count=0)
+        client.get.return_value = {'response': {'requests': {'current': 0, 'limit_day': 7500}}}
+        enricher = OddsEnricher(client, {}, now=NOW)
+        self.assertTrue(enricher.allowed())
+        self.assertEqual((enricher.reserve, enricher.max_seconds), (375, 900))
     def test_statistics_quota_check_ignores_collector_time_limit(self):
         client=Mock();client.request_count=0
         client.get.return_value={'response':{'requests':{'current':5000,'limit_day':75000}}}

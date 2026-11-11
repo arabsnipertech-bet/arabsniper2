@@ -27,6 +27,8 @@
  const missingQuote=r=>!priced(r)&&(!isJoint(r.spec)||r.combo?.price_available===true);
  const ST_GOLD={over15_sh:[45,1.55,2.15],gg_sh:[32,2.15,3.5],over25_sh:[16,3.5,7.5]};
  const state={category:'all',family:'all',period:'all',phase:'all',sort:'time',search:''};
+ const INACTIVE=['PST','CANC','ABD'];
+ const PREMATCH_WINDOW_MS=120*3600000;
  const observedFixtures=new Set();
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const num=(v,n=1)=>typeof v==='number'&&Number.isFinite(v)?v.toLocaleString('it-IT',{minimumFractionDigits:n,maximumFractionDigits:n}):'—';
@@ -78,6 +80,12 @@
   if(['CANC','PST','ABD','SUSP','WO','AWD'].includes(s))return 'other';
   return Date.parse(f.kickoff)>now?'upcoming':'live';
  };
+ function inactiveWithoutAnalysis(m){
+  const f=m.fixture||{},a=m.multimarket||{},matrix=a.matrix||{};
+  if(!INACTIVE.includes(f.status_short||f.result?.status||f.live?.status))return false;
+  return !a.markets?.length&&!matrix.rows?.length&&matrix.v7?.status!=='published'&&
+   !m._gold_history?.verified_prematch&&!Object.values(m.triad||{}).some(p=>['GOLD','PLATINUM'].includes(p?.tier));
+ }
  function rowsOf(m){
   if(m.multimarket?.matrix)return (m.multimarket.matrix.rows||[]).filter(r=>coreMarket(r.spec)).map(r=>{
    if(r.spec?.kind!=='handicap'||r.quote_adapter_version===2)return r;
@@ -719,7 +727,7 @@
  const V7_TIERS={gold:'GOLD',platinum:'PLATINUM',blu:'BLU',studio:'STUDIO',radar:'RADAR BLU'};
  const BADGES={blu:'◆ BLU',gold:'● GOLD',platinum:'★ PLATINUM'};
  const TRIAD={most_probable:'Più probabile',recommended_alternative:'Consigliata',high_odds_shot:'Colpaccio'};
- const MODEL_ESTIMATE='[STIMA MODELLO - ATTESA QUOTA BOOK]';
+ const MODEL_ESTIMATE='Stima V7 · in attesa di quote bookmaker';
  const quoteStateLabel=(signal,source)=>signal?.quote_state==='model_estimate'?MODEL_ESTIMATE:
   signal?.quote_state==='stable'?(source.first_odd===source.odd?'Stabile da apertura':'Ultima quota osservata · stabile'):
   signal?.quote_state==='moving'?'In movimento':'Quota osservata';
@@ -756,6 +764,7 @@
    const at=Date.parse(source.provider_updated_at),seen=Date.parse(source.quote_observed_at);
    if(!(at<=seen&&seen<=Date.parse(v7.captured_at)))return null;
    if(!archived){
+    if(now-at>PREMATCH_WINDOW_MS)return null;
     const cached=source.quote_status==='cached_stable',expiry=Date.parse(source.cache_expires_at);
     const current=cached?now<=expiry:now-at<=(kickoff-now<=10800000?3600000:21600000);
     if(!current){
@@ -784,6 +793,10 @@
  }
  function triadPanel(view,compact=false){
   const saved=view.v7?.triad;
+  if(!Object.values(view.triad).some(Boolean)){
+   const message=Object.values(saved||{}).some(Boolean)?'Quota da aggiornare':'Nessuna proposta prematch disponibile.';
+   return '<p class="mx-v7-empty">'+message+'</p>';
+  }
   return '<ul class="mx-triad'+(compact?' mx-triad-compact':'')+'" aria-label="Triade prematch V7">'+
    Object.entries(TRIAD).map(([role,title])=>{
     const p=view.triad[role],s=p?.signal;
@@ -1017,6 +1030,8 @@
  function render(p,h,services={}){
   p=scopePayload(p);payload=p;host=h;helpers=services;
   const all=p.matches||[],rows=all.flatMap(rowsOf),matches=selectMatches(p,state,Date.now(),services.phase||phase);
+  const activeMatches=[],inactiveMatches=[];
+  for(const m of matches)(inactiveWithoutAnalysis(m)?inactiveMatches:activeMatches).push(m);
   const active=all.some(m=>m.multimarket?.matrix?.publication_model===V7);
   const count=key=>key==='all'?all.length:all.filter(m=>matchingRows(m,{...state,category:key,family:'all',period:'all'},Date.now(),services.phase||phase).length).length;
   const options=(items,chosen)=>Object.entries(items).map(([v,l])=>'<option value="'+v+'" '+(v===chosen?'selected':'')+'>'+esc(l)+'</option>').join('');
@@ -1028,7 +1043,8 @@
    '<label class="mx-search">Cerca<input type="search" data-mx-filter="search" value="'+esc(state.search)+'" placeholder="Squadra o campionato"></label></div>'+
    '<details class="mx-reading-help"><summary>Come leggere categorie e indicatori</summary><p class="mx-caption">Gold e Platinum applicano i criteri dei rispettivi livelli alle stime prematch. Il Radar Blu raccoglie osservazioni sui movimenti delle quote. Consigliata e Colpaccio sono ipotesi a quota superiore valutate a parte. La quota equa deriva dalla probabilità stimata. OCI e aggio descrivono il mercato delle quote.</p></details>'+
    '<div class="mx-results" aria-live="polite"><p class="mx-results-count">'+matches.length+' di '+all.length+' partite · '+esc(CATEGORIES[state.category])+'</p>'+
-   (matches.length?matches.map(m=>card(m,services)).join(''):'<div class="mx-empty">Nessuna partita con questi filtri. <button type="button" data-mx-reset>Mostra tutto il palinsesto</button></div>')+'</div>'+
+   (matches.length?activeMatches.map(m=>card(m,services)).join(''):'<div class="mx-empty">Nessuna partita con questi filtri. <button type="button" data-mx-reset>Mostra tutto il palinsesto</button></div>')+
+   (inactiveMatches.length?'<details class="mx-reading-help mx-inactive"><summary>Rinviate, annullate o sospese · '+inactiveMatches.length+'</summary>'+inactiveMatches.map(m=>card(m,services)).join('')+'</details>':'')+'</div>'+
    '<p class="mx-caption">'+(p.history_view?'Archivio di ieri: analisi, quote e categorie prematch conservate. Si aggiornano solo i risultati disponibili; le partite senza risultato restano in attesa.':'Ogni Fast ricalcola le analisi prepartita. Gli aggiornamenti del fornitore possono essere meno frequenti; la data delle quote è sempre indicata. Le partite iniziate conservano la previsione prepartita, con punteggio live separato.')+'</p></section>';
   h.onclick=e=>{
    const expand=e.target.closest?.('[data-mx-open]'),category=e.target.closest?.('[data-mx-category]'),save=e.target.closest?.('[data-mx-save]');

@@ -310,7 +310,8 @@ class APIClient:
     def _cache_key(path: str, params: Mapping[str, Any]) -> str:
         return f"{path}?" + "&".join(f"{key}={params[key]}" for key in sorted(params))
 
-    def get(self, path: str, params: Mapping[str, Any], use_cache: bool = True, *, odds_fixture_ids=None) -> Optional[Dict[str, Any]]:
+    def get(self, path: str, params: Mapping[str, Any], use_cache: bool = True, *,
+            odds_fixture_ids=None, enrich_odds=True) -> Optional[Dict[str, Any]]:
         if path != "odds" or "page" in params:
             if self.history_cache is not None and use_cache:
                 from history_cache import descriptor
@@ -363,7 +364,7 @@ class APIClient:
             row['_observed_at'] = observed_at
         if self.odds_observer is not None:
             self.odds_observer.observe(result, observed_at, params)
-        if self.odds_enricher is not None and set(params) == {"fixture"}:
+        if enrich_odds and self.odds_enricher is not None and set(params) == {"fixture"}:
             result = self.odds_enricher.enrich(result, params["fixture"])
         return result
 
@@ -2083,7 +2084,8 @@ def scan_dates(
         # statistics. A statistics failure cannot consume the observation window.
         if isinstance(client, APIClient) and client.odds_observer is not None:
             try:
-                scheduled_odds(client, [fixture_meta(row) for row in fixtures], target_date, iso_now)
+                primary = scheduled_odds(client, [fixture_meta(row) for row in fixtures], target_date, iso_now)
+                log("Primary odds coverage " + json.dumps(primary, sort_keys=True))
             finally:
                 client.odds_observer.flush()
         refreshed_matches: List[Dict[str, Any]] = []
@@ -3287,7 +3289,8 @@ def main() -> None:
         except Exception:
             log("❌ Formato --date non valido. Usa YYYY-MM-DD")
             raise SystemExit(2)
-    days = 2 if args.fast else 1 if args.today else 5 if args.night else max(1, min(args.days, 7))
+    from fast_scan_guard import fast_day_count
+    days = fast_day_count() if args.fast else 1 if args.today else 5 if args.night else max(1, min(args.days, 7))
     # Refresh reference IDs daily and preserve the last good catalog on errors.
     from quote_history import QuoteHistory
     client.odds_observer = QuoteHistory(DATA_DIR)

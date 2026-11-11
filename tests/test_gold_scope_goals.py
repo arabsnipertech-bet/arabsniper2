@@ -114,8 +114,9 @@ class GoalPriority(unittest.TestCase):
         day = {'date': '2026-10-26', 'matches': [m]}
         build_board(day, NOW)
         self.assertIsNone(a['best_candidate'])
-        self.assertIsNone(m['display']['primary_choice'])
-        self.assertEqual(m['display']['ranked_choices'], [])
+        self.assertEqual(m['display']['primary_choice']['quote_state'], 'model_estimate')
+        self.assertEqual(len(m['display']['ranked_choices']), 3)
+        self.assertTrue(all(pick['study_only'] and pick['odd'] is None for pick in m['display']['ranked_choices']))
         self.assertEqual(m['display']['analysis_engine'], 'arabsniper-v7.0')
         export = selection_export(day, NOW)
         self.assertEqual(export['opportunity_policy'], POLICY_ID)

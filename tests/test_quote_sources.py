@@ -110,17 +110,46 @@ class ExactSources(unittest.TestCase):
             first = market['outcomes']['over']
             self.assertEqual(first, {'opening_odd': 1.9, 'observed_at': NOW})
 
-    def test_calendar_falls_back_to_exact_fixture_without_prices(self):
-        client = Mock(odds_enricher=None, prefetched_odds={})
-        fallback = feed()
-        fallback['response'][0]['fixture']['id'] = 101
-        client.get.side_effect = [feed(), fallback]
-        meta = dict(META, kickoff='2026-10-27T20:00:00+00:00')
-        scheduled_odds(client, [meta, dict(meta, fixture_id=101)], '2026-10-26', lambda: NOW)
+    def test_calendar_uses_league_and_utc_then_fetches_incomplete_fixture_at_any_distance(self):
+        client = Mock(prefetched_odds={})
+        client.odds_enricher.allowed.return_value = False
+        kickoff = '2026-10-28T00:30:00+01:00'
+        winner = {'id': 1, 'name': 'Match Winner', 'values': [
+            {'value': side, 'odd': odd} for side, odd in [('Home', 2.1), ('Draw', 3.2), ('Away', 3.5)]]}
+        calendar = feed([winner, bet(5, 2.5)])
+        calendar['response'][0]['fixture']['date'] = kickoff
+        partial = feed([bet(5, 2.5)], book=2)
+        partial['response'][0]['fixture'] = {'id': 101, 'date': kickoff}
+        calendar['response'] += partial['response']
+        direct = feed([winner], book=777, at='2026-10-24T18:00:00+00:00')
+        direct['response'][0]['fixture'] = {'id': 101, 'date': kickoff}
+        client.get.side_effect = [calendar, direct]
+        meta = dict(META, kickoff=kickoff, league_id=101, season=2026, status_short='NS')
+        report = scheduled_odds(client, [meta, dict(meta, fixture_id=101),
+                                        dict(meta, fixture_id=102, status_short='PST')], '2026-10-28', lambda: NOW)
         self.assertEqual([c.args[1] for c in client.get.call_args_list], [
-            {'date': '2026-10-26', 'timezone': 'Europe/Rome'}, {'fixture': 101}])
+            {'date': '2026-10-27', 'league': 101, 'season': 2026}, {'fixture': 101}])
+        self.assertEqual(client.get.call_args_list[0].kwargs['odds_fixture_ids'], {'100', '101'})
+        self.assertFalse(client.get.call_args_list[1].kwargs['enrich_odds'])
+        client.odds_enricher.enrich.assert_not_called()
         self.assertEqual(set(client.prefetched_odds), {'100', '101'})
-        self.assertEqual(client.prefetched_odds['101']['response'][0]['fixture']['id'], 101)
+        self.assertEqual(report['complete_primary'], 2)
+        self.assertEqual({r['bookmakers'][0]['id'] for r in client.prefetched_odds['101']['response']}, {2, 777})
+
+    def test_old_complete_pair_from_any_operator_precedes_new_partial_quote(self):
+        stable = feed([bet(50, 2.5)], book=777, at='2026-10-24T18:00:00+00:00')
+        partial = feed([bet(5, 2.5)], book=1)
+        partial['response'][0]['bookmakers'][0]['bets'][0]['values'].pop()
+        data = {'response': partial['response'] + stable['response']}
+        a = build_matrix(statistical_analysis(match(), NOW), NOW)
+        attach(a, data, {}, META, NOW)
+        over = next(r for r in a['matrix']['rows'] if r['spec'] == {
+            'kind': 'total', 'period': 'ft', 'side': 'over', 'line': 2.5})
+        self.assertEqual((over['odd'], over['bookmaker_id'], over['quote_status']), (1.9, '777', 'cached_stable'))
+        self.assertAlmostEqual(over['selected_market_fair_pct'], 50.)
+        self.assertAlmostEqual(over['selected_margin_pct'], 100*(2/1.9-1))
+        self.assertFalse(over['movement_confirmed'])
+        self.assertFalse(over['opportunity']['eligible'])
 
     def test_all_requested_exact_lines_and_all_books(self):
         for bid, line in ((72,1.5),(72,2.5),(50,2.5),(336,3.5)):
@@ -151,7 +180,7 @@ class ExactSources(unittest.TestCase):
 
     def test_no_quarter_integer_partial_ambiguous_wrong_identity_or_stale_alias(self):
         inputs=[feed([bet(50,2.25)]),feed([bet(50,2)]),feed([bet(50,2.5,name='Total Corners')]),
-                feed([bet(50,2.5)],at='2026-10-26T16:00:00+00:00'),
+                feed([bet(50,2.5)],at='2026-10-21T17:59:00+00:00'),
                 feed([bet(50,2.5)],at='2026-10-26T19:00:00+00:00')]
         partial=feed([bet(50,2.5)]);partial['response'][0]['bookmakers'][0]['bets'][0]['values'].pop();inputs.append(partial)
         conflict=feed([bet(50,2.5)]);conflict['response'][0]['bookmakers'][0]['bets'][0]['values'].append({'value':'Over 2.5','odd':3});inputs.append(conflict)
@@ -210,7 +239,7 @@ class ComboSources(unittest.TestCase):
         merged=merge_payload(raw,later,100,'2026-10-26T18:02:00+00:00')
         self.assertIn(184,BET_IDS['combo_ht_sh'])
         self.assertIn(('combo_ht_sh','999'),coverage(raw,100,NOW,False))
-        self.assertFalse(coverage(raw,100,NOW,False) <= coverage(merged,100,'2026-10-26T18:02:00+00:00',False))
+        self.assertTrue(coverage(raw,100,NOW,False) <= coverage(merged,100,'2026-10-26T18:02:00+00:00',False))
 
     def combo(self, raw=None):
         groups=synthetic_combo_groups(normalize_payload(raw or feed([bet(6),bet(26)]),NOW),100,NOW)

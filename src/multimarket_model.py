@@ -65,7 +65,7 @@ def fair(odds):
 
 def collect_quotes(payload, observed_at):
     """Use the existing odds response; never request additional odds endpoints."""
-    from quote_sources import normalize_payload
+    from quote_sources import PREMATCH_WINDOW, normalize_payload
     payload = normalize_payload(payload, observed_at)
     now = stamp(observed_at)
     collected = {}
@@ -75,7 +75,9 @@ def collect_quotes(payload, observed_at):
         fid = str((response.get('fixture') or {}).get('id', ''))
         kickoff = stamp((response.get('fixture') or {}).get('date'))
         updated = stamp(response.get('update'))
-        if not fid or updated and updated > now or kickoff and now >= kickoff:
+        seen = stamp(response.get('_observed_at') or observed_at)
+        if (not fid or not seen or seen > now or kickoff and now >= kickoff
+                or updated and (updated > seen or now-updated > PREMATCH_WINDOW)):
             continue
         markets = collected.setdefault(fid, {})
         for book in response.get('bookmakers', []):
@@ -105,8 +107,13 @@ def collect_quotes(payload, observed_at):
                     row = {'bookmaker_id': str(book['id']), 'bookmaker': str(book.get('name') or book['id']),
                            'bet_id': bid, 'bet_name': name, 'line': line, 'odds': odds,
                            'fair': probabilities, 'overround_pct': overround,
-                           'observed_at': observed_at, 'provider_updated_at': updated.isoformat() if updated else None}
-                    markets.setdefault(key, {})[str(book['id'])] = row
+                           'observed_at': seen.isoformat(), 'provider_updated_at': updated.isoformat() if updated else None}
+                    operators = markets.setdefault(key, {})
+                    operator = str(book['id'])
+                    previous = operators.get(operator)
+                    previous_update = stamp((previous or {}).get('provider_updated_at'))
+                    if previous is None or updated and (previous_update is None or updated >= previous_update):
+                        operators[operator] = row
     return collected
 
 

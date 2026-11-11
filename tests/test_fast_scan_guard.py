@@ -38,6 +38,19 @@ class FakeStorage:
 
 
 class FastGuardTests(unittest.TestCase):
+    def test_force_requests_five_days_and_requires_verified_refresh(self):
+        with patch.dict('os.environ', {'ARAB_FORCE_FAST': 'true'}):
+            self.assertEqual(guard.fast_day_count(), 5)
+        with patch.dict('os.environ', {'ARAB_FORCE_FAST': 'false'}):
+            self.assertEqual(guard.fast_day_count(), 2)
+        with tempfile.TemporaryDirectory() as root:
+            feeds(root)
+            state = Path(root) / 'data/arab_quote_run_state.json'
+            state.write_text(json.dumps({**json.loads(state.read_text()), 'days': 5}))
+            (Path(root) / 'data/arab_quote_day5.json').unlink()
+            with self.assertRaisesRegex(ValueError, 'five expected dates'):
+                guard.record_completion(root, START, NOW)
+
     def test_no_marker_and_night_state_are_not_fast_completion(self):
         with tempfile.TemporaryDirectory() as root:
             feeds(root)

@@ -17,10 +17,11 @@ import tempfile
 import requests
 
 from audit_storage import read_store
+from gold_browser_feed import prematch_coverage
 from gold_storage import client as storage_client, previous_manifest, restore_subset
 from matrix_quotes import collect
 from multimarket_model import stamp
-from odds_collection import OddsEnricher, coverage
+from odds_collection import OddsEnricher, coverage, quota_reserve
 from odds_probe import engine
 from quote_history import QuoteHistory, PREFIX, INDEX
 
@@ -117,7 +118,9 @@ process.stdin.on('data',b=>s+=b);process.stdin.on('end',()=>{
 const html=a.card(JSON.parse(s),{});console.log(JSON.stringify({
 has_1x2_board:html.includes('mx-compact-quotes'),
 first_observed_label:html.includes('Prima osservata'),
-movement_cells:(html.match(/data-movement=/g)||[]).length}));});"""
+movement_cells:(html.match(/data-movement=/g)||[]).length,
+empty_slots:(html.match(/Nessun mercato idoneo/g)||[]).length,
+model_estimates:(html.match(/Stima V7 · in attesa di quote bookmaker/g)||[]).length}));});"""
     result = subprocess.run(['node', '-e', program], cwd=Path(__file__).resolve().parents[1],
         input=json.dumps(match), text=True, capture_output=True, check=True, timeout=20)
     return json.loads(result.stdout)
@@ -211,6 +214,9 @@ def run():
         browser_pages = {}
         report['archive_coverage'] = feed_coverage(days)
         report['gold_coverage'] = feed_coverage(gold.values())
+        as_of = datetime.now(timezone.utc)
+        report['archive_prematch_by_day'] = [prematch_coverage(day, as_of) for day in days]
+        report['gold_prematch_by_day'] = [prematch_coverage(day, as_of) for day in gold.values()]
         report['checkpoint_identity'] = hashlib.sha256(json.dumps(index, sort_keys=True).encode()).hexdigest()
         manifest_bytes = json.dumps({'version': 1, 'files': index}, sort_keys=True, separators=(',', ':')).encode()
         manifest_id = hashlib.sha256(manifest_bytes).hexdigest()
@@ -220,7 +226,7 @@ def run():
         quota, _ = api.get_bounded('status', {}, 1)
         limits = ((quota or {}).get('response') or {}).get('requests') or {}
         used, limit = limits.get('current'), limits.get('limit_day')
-        if type(used) is not int or type(limit) is not int or limit-used <= max(7500, int(limit*.1))+150:
+        if type(used) is not int or type(limit) is not int or limit-used <= quota_reserve(limit)+150:
             raise RuntimeError('Verified provider quota unavailable or insufficient')
         report['quota_remaining_before'] = limit-used
         schedule, _ = api.get_bounded('fixtures', {'date': TARGET_DATE, 'timezone': 'Europe/Rome'}, 3)

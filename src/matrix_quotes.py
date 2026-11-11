@@ -15,7 +15,8 @@ from lateral_matrix import specification, market_id, matrix_rows
 from opportunity_policy import annotate
 from market_scope import CORE_BET_IDS, STUDY_RESULT_TOTAL_IDS, core_market, trim_matrix
 from quote_sources import (normalize_payload, synthetic_combo_groups, synthetic_margin,
-                           synthetic_fair, direct_combo_groups, fresh)
+                           synthetic_fair, direct_combo_groups, fresh, PREMATCH_WINDOW,
+                           valid_prematch_quote)
 
 # Verified API-Football prematch catalogue identities. Never identify a market
 # by the presence of 'over' alone (corners/cards/team totals are different).
@@ -148,7 +149,7 @@ def collect(payload, fid, observed_at, ht_half=None):
     for record in (payload or {}).get('response', []):
         if str((record.get('fixture') or {}).get('id')) != str(fid): continue
         updated, kickoff = stamp(record.get('update')), stamp((record.get('fixture') or {}).get('date'))
-        if not now or updated and updated > now or kickoff and now >= kickoff: continue
+        if not now or updated and (updated > now or now-updated > PREMATCH_WINDOW) or kickoff and now >= kickoff: continue
         actual_observation = stamp(record.get('_observed_at'))
         if actual_observation and (actual_observation > now or updated and updated > actual_observation): continue
         for book in record.get('bookmakers', []):
@@ -206,6 +207,11 @@ def collect(payload, fid, observed_at, ht_half=None):
                     old = groups.get(key)
                     snapshot=(key,candidate['provider_updated_at'])
                     if snapshot in ambiguous_snapshots: continue
+                    if old and old['complete'] != complete:
+                        if old['complete']:
+                            continue
+                        groups[key] = candidate
+                        continue
                     if old and old['provider_updated_at']==candidate['provider_updated_at'] and old['odds']!=candidate['odds']:
                         ambiguous_snapshots.add(snapshot);groups.pop(key)
                         diagnostics['ambiguous_snapshots']+=1
@@ -383,27 +389,34 @@ def value_profile(row, ev, low, strong, oci, synthetic):
 def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     if not core_market(row.get('spec')):
         raise ValueError('Price analysis outside the active market scope')
-    from quote_cache import mark_stable, real_prematch_price, remember, restore, within_window
+    from quote_cache import mark_stable, remember, restore, within_window
     remember(row)
     row['quote_adapter_version'] = HANDICAP_ADAPTER_VERSION
     row.update(speed_pp_per_hour=None, selected_margin_pct=None, selected_margin_delta_pp=None, selected_market_fair_pct=None,
                selected_movement=None, selected_market_odds=None, opening_market_odds=None,
                movement_confirmed=False, fair_direction_coherent=False, prematch_stable=False)
-    now, start = stamp(as_of), stamp(kickoff)
-    max_hours = 1 if now and start and 0 < (start-now).total_seconds() <= 10800 else 6
+    now = stamp(as_of)
     offers = [o for o in offers if number(o.get('odd')) is not None and o['odd'] > 1 and
               (not stamp(o.get('observed_at')) or now and stamp(o['observed_at']) <= now) and
               (o.get('quote_source') != 'synthetic_combo' or synthetic_margin(o) is not None)]
-    recent = [o for o in offers if now and stamp(o.get('provider_updated_at')) and
-              0 <= (now-stamp(o['provider_updated_at'])).total_seconds() <= max_hours*3600]
+    recent = [o for o in offers if fresh(o.get('provider_updated_at'), as_of, kickoff)]
+
+    def complete_book(offer):
+        return (offer['complete'] and offer.get('quote_source') != 'synthetic_combo'
+                and 0 <= fair(offer['odds'])[1] <= 30)
+
     cached = False
-    if not recent and allow_cached:
+    if allow_cached and not any(complete_book(o) for o in recent):
+        retained = []
         for offer in offers:
             candidate = {**offer, 'quote_executable': offer.get('quote_executable', True),
                          'quote_observed_at': offer.get('observed_at')}
-            if real_prematch_price(candidate, as_of, kickoff) or within_window(candidate, as_of, kickoff):
-                recent.append(offer)
-        cached = bool(recent)
+            if within_window(candidate, as_of, kickoff):
+                retained.append(offer)
+        complete_retained = [o for o in retained if complete_book(o)]
+        if complete_retained or not recent:
+            recent = complete_retained or retained
+            cached = bool(recent)
     # Select the source after choosing the fresh or cached time window.
     # Direct and derived offers have different fair-price and margin inputs.
     direct = [o for o in recent if o.get('quote_source') != 'synthetic_combo']
@@ -431,8 +444,7 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
                        quote_observed_at=old.get('observed_at'))
         restore(row, as_of, kickoff, allow_cached)
         return
-    complete_books = [o for o in recent if o['complete'] and o.get('quote_source') != 'synthetic_combo'
-                      and 0 <= fair(o['odds'])[1] <= 30]
+    complete_books = [o for o in recent if complete_book(o)]
     best = max(complete_books or recent, key=lambda o: (o['odd'], o.get('provider_updated_at') or o.get('observed_at') or '', o['bookmaker_id']))
     synthetic = best.get('quote_source') == 'synthetic_combo'
     row.update(quote_source=best.get('quote_source', 'bookmaker'),
@@ -513,7 +525,8 @@ def study_combo_quotes(payload, meta, as_of):
     for record in (payload or {}).get('response', []):
         fixture = record.get('fixture') or {}
         updated = record.get('update')
-        if str(fixture.get('id')) != str(meta['fixture_id']) or not fresh(updated, as_of, meta['kickoff']):
+        if (str(fixture.get('id')) != str(meta['fixture_id']) or not valid_prematch_quote(
+                updated, record.get('_observed_at') or as_of, as_of, meta['kickoff'])):
             continue
         for book in record.get('bookmakers', []):
             if book.get('id') is None:
