@@ -117,6 +117,7 @@ async function cleanupAuth(env,now=Math.floor(Date.now()/1000)) {
 }
 
 
+
 return {authRoute,cleanupAuth};
 })();
 
@@ -125,6 +126,8 @@ const telegramTrialRoute = (() => {
    Disabled unless explicitly enabled on the production Cloudflare Worker.
    Never activate trials from channel messages, unverified emails, or arbitrary web requests. */
 const DAYS7=7*86400;
+const CAMPAIGN='gold-engine-2026-11';
+const campaignOn=env=>(env.TELEGRAM_TRIAL_CAMPAIGN??CAMPAIGN)===CAMPAIGN;
 const EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const lower=s=>String(s||'').trim().toLowerCase();
 const enc=new TextEncoder();
@@ -173,7 +176,85 @@ async function otpLimit(env,key,max,expiresAt) {
     'ON CONFLICT(key) DO UPDATE SET hits=hits+1 RETURNING hits',key,expiresAt);
   return row&&row.hits<=max;
 }
+async function pages(env,path,params={}) {
+  const rows=[];let after;
+  for(let i=0;i<20;i++) {
+    const page=await api(env,path,{...params,limit:'100',...(after?{starting_after:after}:{})});
+    if(!Array.isArray(page.data))throw Error('invalid_stripe_page');
+    rows.push(...page.data);
+    if(!page.has_more)return rows;
+    if(!page.data.length)throw Error('invalid_stripe_page');
+    after=page.data.at(-1).id;
+  }
+  throw Error('stripe_page_limit');
+}
+async function campaignGrant(env,access,email,tgid,now,monthlyPrice) {
+  let claim=await first(env,'SELECT * FROM telegram_campaign_claims WHERE campaign=? AND (email=? OR telegram_id=?) LIMIT 1',CAMPAIGN,email,tgid);
+  if(claim&&(claim.email!==email||claim.telegram_id!==tgid))return {type:'already_claimed'};
+  if(claim?.status==='granted')return {type:'granted',expires_at:claim.expires_at};
+  if(!claim) {
+    // Follow contiguous entitlements, including a pass followed by a longer trial.
+    let horizon=now,complete=false;
+    for(let i=0;i<100;i++) {
+      const current=await access(env,email,horizon);
+      if(!current.active){complete=true;break;}
+      if(current.source==='vip'&&!current.expires_at)return {type:'unlimited'};
+      if(!Number.isSafeInteger(current.expires_at)||current.expires_at<=horizon)throw Error('invalid_entitlement');
+      horizon=current.expires_at;
+    }
+    if(!complete)throw Error('entitlement_chain_limit');
+    await env.ACCESS_DB.prepare('INSERT OR IGNORE INTO telegram_campaign_claims (campaign,email,telegram_id,requested_at,base_expires_at,expires_at,status) VALUES (?,?,?,?,?,?,?)')
+      .bind(CAMPAIGN,email,tgid,now,horizon,horizon+DAYS7,'reserved').run();
+    claim=await first(env,'SELECT * FROM telegram_campaign_claims WHERE campaign=? AND email=? AND telegram_id=?',CAMPAIGN,email,tgid);
+    if(!claim)return {type:'already_claimed'};
+  }
+  if(claim.status==='granted')return {type:'granted',expires_at:claim.expires_at};
+  if(claim.status!=='reserved'||claim.expires_at<=now)throw Error('campaign_reservation_expired');
+  const key=(await mac(env.TELEGRAM_TRIAL_HMAC_SECRET,CAMPAIGN+':'+email+':'+tgid)).slice(0,32);
+  const customers=(await pages(env,'/customers',{email})).filter(c=>lower(c.email)===email);
+  const subscriptions=[];
+  for(const c of customers)for(const s of await pages(env,'/subscriptions',{customer:c.id,status:'all'}))subscriptions.push({...s,_customer:c.id});
+  // Recover successful remote writes even after Stripe's idempotency retention window.
+  let subscription=subscriptions.find(s=>s.metadata?.gold_trial_campaign===CAMPAIGN&&s.metadata?.gold_trial_claim===key);
+  if(!claim.action&&!subscription) {
+    const trial=subscriptions.filter(s=>s.status==='trialing'&&s.trial_end>now&&s.items?.data?.some(i=>(typeof i.price==='string'?i.price:i.price?.id)===monthlyPrice))
+      .sort((a,b)=>b.trial_end-a.trial_end)[0];
+    let customer=trial?trial._customer:customers[0]?.id;
+    if(!customer)customer=(await api(env,'/customers',{email,'metadata[trial_source]':'telegram_arabsniper'},'POST','as-campaign-customer-'+key)).id;
+    if(!customer)throw Error('customer_not_created');
+    await env.ACCESS_DB.prepare('UPDATE telegram_campaign_claims SET action=?,customer_id=?,subscription_id=? WHERE campaign=? AND email=? AND telegram_id=? AND action IS NULL AND status=\'reserved\'')
+      .bind(trial?'extend':'create',customer,trial?.id||null,CAMPAIGN,email,tgid).run();
+    claim=await first(env,'SELECT * FROM telegram_campaign_claims WHERE campaign=? AND email=? AND telegram_id=?',CAMPAIGN,email,tgid);
+  }
+  if(!subscription) {
+    const params={trial_end:String(claim.expires_at),cancel_at:String(claim.expires_at),
+      'trial_settings[end_behavior][missing_payment_method]':'cancel',
+      'metadata[gold_trial_campaign]':CAMPAIGN,'metadata[gold_trial_claim]':key};
+    if(claim.action==='extend') {
+      const target=await api(env,'/subscriptions/'+encodeURIComponent(claim.subscription_id));
+      if(target.status!=='trialing'||target.trial_end>claim.expires_at)throw Error('trial_changed_during_campaign');
+      params.proration_behavior='none';
+      subscription=await api(env,'/subscriptions/'+encodeURIComponent(claim.subscription_id),params,'POST','as-campaign-extend-'+key);
+    } else if(claim.action==='create') {
+      params.customer=claim.customer_id;params['items[0][price]']=monthlyPrice;
+      params['metadata[trial_source]']='telegram_arabsniper';
+      subscription=await api(env,'/subscriptions',params,'POST','as-campaign-create-'+key);
+    } else throw Error('invalid_campaign_action');
+  }
+  if(subscription.status!=='trialing'||Number(subscription.trial_end)!==claim.expires_at||Number(subscription.cancel_at)!==claim.expires_at) {
+    // Never leave an unexpectedly renewable subscription created by this promotion.
+    if(claim.action==='create'&&subscription.id)await api(env,'/subscriptions/'+encodeURIComponent(subscription.id),{},'DELETE','as-campaign-unsafe-cancel-'+key);
+    throw Error('campaign_safety_not_confirmed');
+  }
+  await env.ACCESS_DB.prepare('UPDATE telegram_campaign_claims SET status=\'granted\',subscription_id=?,granted_at=? WHERE campaign=? AND email=? AND telegram_id=? AND status=\'reserved\'')
+    .bind(subscription.id,now,CAMPAIGN,email,tgid).run();
+  // The status panel can have a short-lived cached entitlement after a grant.
+  const hasCache=await first(env,"SELECT name FROM sqlite_schema WHERE type='table' AND name='gold_access_cache'");
+  if(hasCache)await env.ACCESS_DB.prepare('DELETE FROM gold_access_cache WHERE email=?').bind(email).run();
+  return {type:'granted',expires_at:claim.expires_at};
+}
 async function tryGrant(env,access,email,tgid,now,monthlyPrice) {
+  if(campaignOn(env))return campaignGrant(env,access,email,tgid,now,monthlyPrice);
   // Never issue extra free weeks to accounts that already have an entitlement.
   if((await access(env,email,now)).active)return {type:'already_active'};
   const expiry=now+DAYS7;
@@ -228,15 +309,18 @@ async function processPrivateMessage(env,access,msg,monthlyPrice,now) {
   if(/^\/(start|prova)(?:@\w+)?(?:\s.*)?$/i.test(text)) {
     await sendTelegram(env,tgid,'🎁 ArabSniperBet Gold · 7 giorni gratis!\n\n' +
       'Inviami qui in privato la tua email. Riceverai un codice per confermarla.\n' +
-      'Una sola prova per persona/email. Nessuna carta, nessun addebito e nessun rinnovo automatico.\n' +
+      (campaignOn(env)?'Nuovo motore: altri 7 giorni anche se hai già provato Gold! Una sola attivazione per questa campagna. Se hai un accesso attivo, i giorni si aggiungono alla scadenza.\n':'Una sola prova per persona/email.\n') +
+      'Nessuna carta, nessun addebito e nessun rinnovo automatico della prova.\n' +
       'Accesso al sito: https://arabsniperbet.com/gold-dashboard-live.html');
     return;
   }
   if(EMAIL.test(text)&&text.length<=254) {
     const email=lower(text);
-    const existing=await first(env,'SELECT status FROM telegram_trial_claims WHERE email=? OR telegram_id=? LIMIT 1',email,tgid);
-    if(existing){
-      await sendTelegram(env,tgid,'Questa email o questo account Telegram ha già richiesto la prova gratuita. Per assistenza contatta il supporto ArabSniperBet.');
+    const existing=campaignOn(env)
+      ?await first(env,'SELECT * FROM telegram_campaign_claims WHERE campaign=? AND (email=? OR telegram_id=?) LIMIT 1',CAMPAIGN,email,tgid)
+      :await first(env,'SELECT status FROM telegram_trial_claims WHERE email=? OR telegram_id=? LIMIT 1',email,tgid);
+    if(existing&&(!campaignOn(env)||existing.status==='granted'||existing.email!==email||existing.telegram_id!==tgid)){
+      await sendTelegram(env,tgid,campaignOn(env)?'Questa email o questo account Telegram ha già richiesto i 7 giorni di questa campagna.':'Questa email o questo account Telegram ha già richiesto la prova gratuita. Per assistenza contatta il supporto ArabSniperBet.');
       return;
     }
     const previous=await first(env,'SELECT sent_at FROM telegram_trial_codes WHERE telegram_id=?',tgid);
@@ -253,7 +337,7 @@ async function processPrivateMessage(env,access,msg,monthlyPrice,now) {
       return;
     }
     const code=otp();
-    const digest=await mac(env.TELEGRAM_TRIAL_HMAC_SECRET,tgid+':'+email+':'+code);
+    const digest=await mac(env.TELEGRAM_TRIAL_HMAC_SECRET,(campaignOn(env)?CAMPAIGN+':':'')+tgid+':'+email+':'+code);
     await env.ACCESS_DB.prepare(
       'INSERT INTO telegram_trial_codes (telegram_id,email,digest,expires_at,sent_at,attempts) VALUES (?,?,?,?,?,0) '+
       'ON CONFLICT(telegram_id) DO UPDATE SET email=excluded.email,digest=excluded.digest,expires_at=excluded.expires_at,sent_at=excluded.sent_at,attempts=0'
@@ -272,7 +356,7 @@ async function processPrivateMessage(env,access,msg,monthlyPrice,now) {
       await sendTelegram(env,tgid,'Codice assente o scaduto. Inviami nuovamente la tua email per richiederne uno.');
       return;
     }
-    const digest=await mac(env.TELEGRAM_TRIAL_HMAC_SECRET,tgid+':'+record.email+':'+text);
+    const digest=await mac(env.TELEGRAM_TRIAL_HMAC_SECRET,(campaignOn(env)?CAMPAIGN+':':'')+tgid+':'+record.email+':'+text);
     // Atomic comparison and increment makes an incorrect code one of five attempts.
     const result=await first(env,
       'UPDATE telegram_trial_codes SET attempts=attempts+1 WHERE telegram_id=? AND digest=? AND expires_at>? AND attempts<5 RETURNING email',
@@ -289,8 +373,11 @@ async function processPrivateMessage(env,access,msg,monthlyPrice,now) {
         await sendTelegram(env,tgid,
           '✅ Prova Gold attivata per 7 giorni!\n\n' +
           'Accedi con questa email: '+record.email+'\n' +
+          'Scadenza: '+new Date(grant.expires_at*1000).toLocaleString('it-IT',{timeZone:'Europe/Rome'})+' (ora italiana)\n'+
           'https://arabsniperbet.com/gold-dashboard-live.html\n\n' +
           'Usa il codice email richiesto dal sito per accedere. Nessun addebito o rinnovo automatico.');
+      } else if(grant.type==='unlimited') {
+        await sendTelegram(env,tgid,'Il tuo accesso Gold è già senza scadenza: puoi provare subito il nuovo motore dal sito.');
       } else {
         await sendTelegram(env,tgid,grant.type==='already_active'?
           'La tua email ha già un accesso Gold attivo. Accedi dal sito con il codice email.':
@@ -400,6 +487,7 @@ el('confirm').onclick=async()=>{
     'Referrer-Policy':'no-referrer'
   }});
 }
+
 
 return goldTestLoginPage;
 })();
@@ -539,6 +627,7 @@ async function closeFailedRenewal(env,session) {
  if(order)await env.ACCESS_DB.prepare("UPDATE gold_renewals SET checkout_id=?,status='expired' WHERE id=? AND status IN ('creating','open')")
   .bind(session.id,order.id).run();
 }
+
 
 return {renewalEnabled,cachedAccess,invalidateAccessCache,renewalStatus,renewalCheckout,renewalOrder,markRenewalPaid,closeFailedRenewal};
 })();
@@ -836,3 +925,4 @@ export default {
     }catch{return reply({active:false,error:'Servizio pagamenti temporaneamente non disponibile.'},503);}
   }
 };
+
