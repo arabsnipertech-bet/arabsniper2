@@ -1,0 +1,405 @@
+{
+  "verification_workflow": 42926811128,
+  "verified_at_utc": "2026-11-11T00:02:42.914201+00:00",
+  "code_revision": "af4f27b3372576c9d6074ac055f9675ad6a29f8f",
+  "restore_code": "bb0c466e132c9baad8ed8f4f7a0f4501325f0a93",
+  "restore_branch": "restore/pre-odds-v6-v7-20261110-bb0c466e",
+  "merge_commit": "a3481a0a4911c5a96e3c840e98fb86e7598cfa3f",
+  "diagnostic_commit": "726c4f3e22018d89d2f945399eae9bd19a915ee9",
+  "workflow_runs": {
+    "python_node_browser_718": 42926698238,
+    "fast": 42919588960,
+    "night": 42919706014,
+    "cloudflare_publish": 42926698192,
+    "gold_archive": 42919589072,
+    "real_api_r2_gold": 42926811128
+  },
+  "immutable_manifests": {
+    "before": "3276389bb19702346321d54d45e489f1174be832d6083bb1cf67e00f9abea87d",
+    "after": "f276035705463234e405f6b3b3f549d074369f7f28ad56b3577748139eaf1875",
+    "after_verified": true
+  },
+  "production_persistence": {
+    "files": 74,
+    "groups": 25913,
+    "observations": 95614,
+    "sources": {
+      "http": 21958,
+      "original_ledger": 73656,
+      "other": 0
+    }
+  },
+  "first_observations": {
+    "groups": 33,
+    "outcomes": 99,
+    "unchanged": 99,
+    "mismatches": [],
+    "production_http_points": 66,
+    "cases": [
+      {
+        "id": "1647175",
+        "name": "Podbrezová - Zlaté Moravce",
+        "original_outcomes": 18,
+        "unchanged": 18,
+        "persisted_http_observations": 12,
+        "last_persisted_observation": "2026-11-11T00:40:21+01:00"
+      },
+      {
+        "id": "1645407",
+        "name": "Artis - FK Jablonec",
+        "original_outcomes": 27,
+        "unchanged": 27,
+        "persisted_http_observations": 18,
+        "last_persisted_observation": "2026-11-11T00:40:23+01:00"
+      },
+      {
+        "id": "1649140",
+        "name": "La Luz - Fenix",
+        "original_outcomes": 27,
+        "unchanged": 27,
+        "persisted_http_observations": 18,
+        "last_persisted_observation": "2026-11-11T00:40:23+01:00"
+      },
+      {
+        "id": "1649141",
+        "name": "Tacuarembo - Miramar",
+        "original_outcomes": 27,
+        "unchanged": 27,
+        "persisted_http_observations": 18,
+        "last_persisted_observation": "2026-11-11T00:40:24+01:00"
+      }
+    ]
+  },
+  "before_coverage": {
+    "fixtures": 247,
+    "1x2_complete": 16,
+    "1x2_any": 16,
+    "goal_prices": 382,
+    "with_temporal_history": 15,
+    "models": {
+      "arabsniper-v7.0": 244,
+      "lateral-matrix-v5.0": 3
+    },
+    "upcoming_fixtures": 235,
+    "upcoming_1x2_complete": 5,
+    "upcoming_with_goal_prices": 5
+  },
+  "after_coverage": {
+    "fixtures": 345,
+    "1x2_complete": 21,
+    "1x2_any": 21,
+    "goal_prices": 544,
+    "with_temporal_history": 15,
+    "models": {
+      "arabsniper-v7.0": 342,
+      "lateral-matrix-v5.0": 3
+    },
+    "upcoming_fixtures": 344,
+    "upcoming_1x2_complete": 21,
+    "upcoming_with_goal_prices": 21
+  },
+  "archive_matches_gold": true,
+  "real_cases": [
+    {
+      "fixture_id": "1648030",
+      "match": "Kawasaki Frontale - Kashiwa Reysol",
+      "date": "2026-11-11",
+      "requested_case": true,
+      "api_bookmakers": 0,
+      "current_complete_groups": 0,
+      "v6_same_response_complete_groups": 0,
+      "first_unchanged_during_new_http": true,
+      "browser_matches_gold": true,
+      "rendered": {
+        "has_1x2_board": false,
+        "first_observed_label": false,
+        "movement_cells": 0
+      },
+      "queries": [
+        {
+          "bet": 1,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 5,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 6,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 8,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 34,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "route": "league_date",
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        }
+      ]
+    },
+    {
+      "fixture_id": "1648031",
+      "match": "Vissel Kobe - Machida Zelvia",
+      "date": "2026-11-11",
+      "requested_case": true,
+      "api_bookmakers": 0,
+      "current_complete_groups": 0,
+      "v6_same_response_complete_groups": 0,
+      "first_unchanged_during_new_http": true,
+      "browser_matches_gold": true,
+      "rendered": {
+        "has_1x2_board": false,
+        "first_observed_label": false,
+        "movement_cells": 0
+      },
+      "queries": [
+        {
+          "bet": 1,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 5,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 6,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 8,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 34,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "route": "league_date",
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        }
+      ]
+    },
+    {
+      "fixture_id": "1648034",
+      "match": "Machida Zelvia - Vissel Kobe",
+      "date": "2026-11-15",
+      "requested_case": true,
+      "api_bookmakers": 0,
+      "current_complete_groups": 0,
+      "v6_same_response_complete_groups": 0,
+      "first_unchanged_during_new_http": true,
+      "browser_matches_gold": true,
+      "rendered": {
+        "has_1x2_board": false,
+        "first_observed_label": false,
+        "movement_cells": 0
+      },
+      "queries": [
+        {
+          "bet": 1,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 5,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 6,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 8,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 34,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "route": "league_date",
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        }
+      ]
+    },
+    {
+      "fixture_id": "1648037",
+      "match": "Kashiwa Reysol - Kawasaki Frontale",
+      "date": "2026-11-15",
+      "requested_case": true,
+      "api_bookmakers": 0,
+      "current_complete_groups": 0,
+      "v6_same_response_complete_groups": 0,
+      "first_unchanged_during_new_http": true,
+      "browser_matches_gold": true,
+      "rendered": {
+        "has_1x2_board": false,
+        "first_observed_label": false,
+        "movement_cells": 0
+      },
+      "queries": [
+        {
+          "bet": 1,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 5,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 6,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 8,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "bet": 34,
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        },
+        {
+          "route": "league_date",
+          "raw_fixture_records": 0,
+          "api_error_fields": [],
+          "complete": true
+        }
+      ]
+    },
+    {
+      "fixture_id": "1647175",
+      "match": "Podbrezová - Zlaté Moravce",
+      "date": "2026-11-11",
+      "requested_case": false,
+      "api_bookmakers": 7,
+      "current_complete_groups": 104,
+      "v6_same_response_complete_groups": 85,
+      "first_unchanged_during_new_http": true,
+      "browser_matches_gold": true,
+      "rendered": {
+        "has_1x2_board": true,
+        "first_observed_label": true,
+        "movement_cells": 3
+      },
+      "queries": []
+    },
+    {
+      "fixture_id": "1645407",
+      "match": "Artis - FK Jablonec",
+      "date": "2026-11-11",
+      "requested_case": false,
+      "api_bookmakers": 9,
+      "current_complete_groups": 182,
+      "v6_same_response_complete_groups": 146,
+      "first_unchanged_during_new_http": true,
+      "browser_matches_gold": true,
+      "rendered": {
+        "has_1x2_board": true,
+        "first_observed_label": true,
+        "movement_cells": 3
+      },
+      "queries": []
+    },
+    {
+      "fixture_id": "1649140",
+      "match": "La Luz - Fenix",
+      "date": "2026-11-11",
+      "requested_case": false,
+      "api_bookmakers": 9,
+      "current_complete_groups": 140,
+      "v6_same_response_complete_groups": 117,
+      "first_unchanged_during_new_http": true,
+      "browser_matches_gold": true,
+      "rendered": {
+        "has_1x2_board": true,
+        "first_observed_label": true,
+        "movement_cells": 3
+      },
+      "queries": []
+    },
+    {
+      "fixture_id": "1649141",
+      "match": "Tacuarembo - Miramar",
+      "date": "2026-11-11",
+      "requested_case": false,
+      "api_bookmakers": 9,
+      "current_complete_groups": 136,
+      "v6_same_response_complete_groups": 114,
+      "first_unchanged_during_new_http": true,
+      "browser_matches_gold": true,
+      "rendered": {
+        "has_1x2_board": true,
+        "first_observed_label": true,
+        "movement_cells": 3
+      },
+      "queries": []
+    }
+  ],
+  "cloudflare": {
+    "gold_http_status": 200,
+    "script_url": "/lateral-matrix.js?v=f659fbf7e51c",
+    "script_http_status": 200,
+    "matches_verified_source": true
+  },
+  "diagnostic_http_calls": 63,
+  "diagnostic_production_writes": 0,
+  "verification_failures": [],
+  "limitations": [
+    "Provider empty for requested Japanese fixtures",
+    "Full R2 restoration about 15 minutes",
+    "Authenticated manual OTP browser session not performed",
+    "Half-hour daytime path integration tested; production time window not forced",
+    "One transient fixtures/5xEr provider error during Night; no quote HTTP errors in that run",
+    "Additional operator appeared after Night; normal production polling has its own observation time"
+  ]
+}
