@@ -1,0 +1,62 @@
+name: Gold campaign publicity and conversion
+on:
+  schedule:
+    # Europe/Rome is CET for the bounded November campaign. Fallbacks deduplicate in D1.
+    - cron: '45 11,19 12-18 11 *'
+    - cron: '15 12,20 12-18 11 *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/gold-campaign-followup.yml'
+      - 'scripts/deploy-campaign-renewal.py'
+permissions:
+  contents: read
+concurrency:
+  group: stripe-checker-production-deploy
+  cancel-in-progress: false
+jobs:
+  campaign:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            workers/stripe-access
+            tests
+            scripts
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Campaign schedule and renewal regression tests
+        run: |
+          node --test tests/test_gold_renewal.mjs tests/test_telegram_trial.mjs
+          python -m unittest discover -s tests -p test_gold_campaign_schedule.py
+      - name: Install private rollback backup client
+        if: github.event_name == 'push'
+        run: pip install 'boto3>=1.42,<2'
+      - name: Deploy owner-authorized campaign conversion discount
+        if: github.event_name == 'push'
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python scripts/deploy-campaign-renewal.py
+      - name: Verify advertising prerequisites without sending
+        if: github.event_name == 'push'
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python scripts/gold-campaign-repeat.py --verify
+      - name: Publish due campaign reminder once
+        if: github.event_name != 'push'
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python scripts/gold-campaign-repeat.py

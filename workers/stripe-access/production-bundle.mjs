@@ -521,13 +521,20 @@ function checkoutReady(env,catalog) {
 function adminAllowed(env,email) {
  try{return JSON.parse(env.GOLD_PROMO_ALLOW_EMAILS||'[]').some(e=>String(e).trim().toLowerCase()===email);}catch{return false;}
 }
-function promoEligible(env,email,value,now) {
+async function promoEligible(env,email,value,now) {
  const left=Number(value.expires_at)-now;
- return promoConfigured(env)&&value.active&&left>0&&left<=48*3600&&(value.has_verified_payment===true||adminAllowed(env,email));
+ if(!promoConfigured(env)||!value.active||left<=0||left>48*3600)return false;
+ if(value.has_verified_payment===true||adminAllowed(env,email))return true;
+ // Owner-authorized conversion offer: only this campaign's granted, verified
+ // account, and only its actual current deadline. Other free grants stay excluded.
+ const table=await first(env,"SELECT name FROM sqlite_schema WHERE type='table' AND name='telegram_campaign_claims'");
+ if(!table)return false;
+ return !!await first(env,"SELECT email FROM telegram_campaign_claims WHERE campaign=? AND email=? AND status='granted' AND expires_at=? AND subscription_id IS NOT NULL",
+  'gold-engine-2026-11',email,value.expires_at);
 }
 async function renewalStatus(env,email,value,now,catalog) {
  const ready=checkoutReady(env,catalog);
- let eligible=ready&&promoEligible(env,email,value,now);
+ let eligible=ready&&await promoEligible(env,email,value,now);
  if(eligible) {
   const used=await first(env,"SELECT id FROM gold_renewals WHERE email=? AND cycle_expires_at=? AND promo=1 AND status!='expired'",email,value.expires_at);
   eligible=!used;
@@ -567,7 +574,7 @@ async function renewalCheckout(request,env,email,now,{access,catalog,stripe}) {
  if(!pending) {
   // Force fresh Stripe-backed entitlement before reserving any promotion.
   const value=await access(env,email,now);
-  if(body.use_promo&&!promoEligible(env,email,value,Math.floor(Date.now()/1000)))return answer('Promozione non disponibile per questo account.',403);
+  if(body.use_promo&&!await promoEligible(env,email,value,Math.floor(Date.now()/1000)))return answer('Promozione non disponibile per questo account.',403);
   const promo=body.use_promo?1:0;
   if(promo) {
    const used=await first(env,"SELECT id FROM gold_renewals WHERE email=? AND cycle_expires_at=? AND promo=1 AND status!='expired'",email,value.expires_at);
@@ -578,7 +585,7 @@ async function renewalCheckout(request,env,email,now,{access,catalog,stripe}) {
     return answer('Promozione temporaneamente non disponibile. Scegli il prezzo ordinario.',503);
   }
   const created=Math.floor(Date.now()/1000);
-  if(promo&&!promoEligible(env,email,value,created))return answer('La finestra promozionale è terminata. Aggiorna lo stato.',409);
+  if(promo&&!await promoEligible(env,email,value,created))return answer('La finestra promozionale è terminata. Aggiorna lo stato.',409);
   const orderId=crypto.randomUUID(),until=created+3600;
   const origin=env.AUTH_ORIGIN;
   const params={mode:'payment','line_items[0][price]':p.price,'line_items[0][quantity]':'1',customer_email:email,customer_creation:'always','adaptive_pricing[enabled]':'false',

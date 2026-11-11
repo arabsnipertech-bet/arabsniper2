@@ -222,3 +222,39 @@ test('No access for a wrong discount or an unsigned Stripe event',async()=>{
  const r=await worker.fetch(new Request(origin+'/api/stripe-webhook',{method:'POST',body:'{}'}),f.env);
  assert.equal(r.status,400);
 });
+
+
+function campaign(f,end,{campaign='gold-engine-2026-11',account=email,status='granted'}={}) {
+ f.db.exec(readFileSync(new URL('../workers/stripe-access/telegram-campaign-schema.sql',import.meta.url),'utf8'));
+ f.db.prepare('INSERT INTO telegram_campaign_claims(campaign,email,telegram_id,requested_at,base_expires_at,expires_at,status,subscription_id) VALUES (?,?,?,?,?,?,?,?)')
+  .run(campaign,account,'42',end-7*day,end-7*day,end,status,'sub_campaign');
+}
+test('Campaign free trial qualifies only in its final 48h, with the exact granted email and deadline',async()=>{
+ for(const [hours,options,expected] of [[49,{},false],[36,{},true],[6,{},true],[0,{},false],[-1,{},false],
+  [36,{campaign:'another-campaign'},false],[36,{account:'other@example.test'},false],[36,{status:'reserved'},false]]) {
+  const f=fixture(),end=clock+hours*3600;f.trial(end);campaign(f,end,options);
+  assert.equal((await f.status()).renewal.promo_eligible,expected,JSON.stringify([hours,options]));
+ }
+ const f=fixture(),end=clock+36*3600;f.trial(end);campaign(f,end+1);
+ assert.equal((await f.status()).renewal.promo_eligible,false,'Claim expiry must match real access');
+});
+test('Campaign conversion applies each exact 10% total and preserves remaining free days',async()=>{
+ for(const [plan,amount] of [['pass3d',450],['pass14d',1350],['pass1m',2610]]) {
+  const f=fixture(),end=clock+36*3600;f.trial(end);campaign(f,end);
+  const before=await f.status();assert.equal(before.renewal.promo_percent,10);
+  const [a,b]=await Promise.all([f.renew(plan,true),f.renew(plan,true)]);
+  assert.equal(a.status,200);assert.equal(b.status,200);assert.equal(f.sessions.size,1);
+  assert.equal(f.latest().amount_total,amount);
+  await f.confirm(f.latest());
+  const granted=f.db.prepare('SELECT * FROM passes').get();assert.equal(granted.starts_at,end);
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM gold_renewals WHERE promo=1 AND status=\'fulfilled\'').get().n,1);
+  assert.equal((await f.status()).renewal.promo_eligible,false);
+ }
+});
+test('Campaign promotion still requires enabled billing and a valid 10% coupon',async()=>{
+ const f=fixture(),end=clock+36*3600;f.trial(end);campaign(f,end);
+ f.env.GOLD_PROMO_ENABLED='false';assert.equal((await f.status()).renewal.promo_eligible,false);
+ assert.equal((await f.renew('pass3d',true)).status,403);
+ f.env.GOLD_PROMO_ENABLED='true';f.coupon.percent_off=20;
+ assert.equal((await f.renew('pass3d',true)).status,503);assert.equal(f.sessions.size,0);
+});
