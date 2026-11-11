@@ -1,0 +1,49 @@
+name: Rilascio rinnovi Gold
+
+on:
+  push:
+    branches: [ops/gold-renewal-169]
+    paths: [.github/ops/gold-release-phase]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stripe-checker-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/ops/gold-renewal-169'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Test isolati sul Worker e sul bundle
+        run: |
+          python3 workers/stripe-access/build_production.py
+          git diff --ignore-blank-lines --exit-code -- workers/stripe-access/production-bundle.mjs
+          git restore --source=HEAD --worktree -- workers/stripe-access/production-bundle.mjs
+          node --check workers/stripe-access/production-bundle.mjs
+          bundle_test=$(mktemp tests/.gold-release-XXXXXX.mjs)
+          trap 'rm -f "$bundle_test"' EXIT
+          python3 - "$bundle_test" <<'PY'
+          import sys
+          from pathlib import Path
+          source = Path("tests/test_gold_renewal.mjs").read_text()
+          old = "import worker,{PLANS} from '../workers/stripe-access/worker.mjs';"
+          new = "import {PLANS} from '../workers/stripe-access/worker.mjs';\nimport worker from '../workers/stripe-access/production-bundle.mjs';"
+          assert source.count(old) == 1
+          Path(sys.argv[1]).write_text(source.replace(old, new))
+          PY
+          node --test tests/test_*.mjs tests/test_*.cjs tests/test_*.js "$bundle_test"
+      - name: Applica la fase di rilascio a stripe-checker
+        env:
+          CF_WORKER_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          CF_D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+        run: python3 .github/ops/gold-worker-release.py
