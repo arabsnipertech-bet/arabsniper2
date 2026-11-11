@@ -85,12 +85,13 @@ def refresh_day(day, state, as_of):
     previous_count = len(day.get('matches', []))
     enforce_day(day)
     scope_changed = scope_changed or previous_count != len(day['matches'])
+    now = stamp(as_of)
     for match in day.get('matches', []):
         meta, a = match.get('fixture') or {}, match.get('multimarket') or {}
         kickoff = stamp(meta.get('kickoff'))
-        if (a.get('model_id') != MODEL_ID or not kickoff or kickoff <= stamp(as_of) or
+        if (a.get('model_id') != MODEL_ID or not kickoff or kickoff <= now or
                 meta.get('status_short') not in ('NS', 'TBD') or meta.get('result')): continue
-        matrix = a.get('matrix') or {}
+        matrix = a.setdefault('matrix', {})
         # Save the published choice before repricing can expire its quote.
         seed_stability(deepcopy(a), a)
         trim_matrix(matrix)
@@ -126,6 +127,8 @@ def refresh_day(day, state, as_of):
 
 
 def main(directory='data'):
+    from v7_decision import TRIAD_MARKETS
+
     directory = Path(directory)
     as_of = datetime.now(timezone.utc).isoformat()
     state = read_store(directory/'arab_quote_state.json')
@@ -140,13 +143,18 @@ def main(directory='data'):
                     selection_export(day, as_of))
         refreshed[day['date']] = day
         summary = day.get('matrix_summary') or {}
-        upcoming = [m['multimarket'] for m in day.get('matches', [])
-            if m.get('multimarket', {}).get('model_id') == MODEL_ID
-            and m.get('fixture', {}).get('status_short') in ('NS', 'TBD')
+        active = [m.get('multimarket') or {} for m in day.get('matches', [])
+            if m.get('fixture', {}).get('status_short') in ('NS', 'TBD')
             and not m['fixture'].get('result') and stamp(m['fixture'].get('kickoff'))
             and stamp(m['fixture']['kickoff']) > stamp(as_of)]
+        upcoming = [a for a in active if a.get('model_id') == MODEL_ID]
         policies = Counter(a.get('matrix', {}).get('opportunity_policy', {}).get('id') for a in upcoming)
         v7_tiers, v7_picks = Counter(), Counter()
+        complete_triads = 0
+        for a in active:
+            matrix = a.get('matrix') or {}
+            triad = ((matrix.get('v7') or {}).get('triad') or {})
+            complete_triads += all((triad.get(role) or {}).get('motivation') for role in TRIAD_MARKETS)
         required = {market_id(s) for s in base_specs()}
         for a in upcoming:
             if a.get('matrix', {}).get('platinum_policy', {}).get('id') != PLATINUM_POLICY_ID:
@@ -172,6 +180,7 @@ def main(directory='data'):
             'fixtures_with_platinum': summary.get('upcoming_fixtures_with_platinum', 0),
             'saved_policy_versions': dict(policies),
             'v7_publication_tiers': dict(v7_tiers), 'v7_selections': dict(v7_picks),
+            'v7_complete_triads_with_motivation': complete_triads, 'active_fixtures': len(active),
             'fixtures_with_combo': sum(any(r.get('spec', {}).get('kind') == 'halves_total'
                 for r in a.get('matrix', {}).get('rows', [])) for a in upcoming),
             'allowed_fixtures': len(day.get('matches', [])),

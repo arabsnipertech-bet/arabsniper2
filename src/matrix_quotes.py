@@ -439,14 +439,21 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         if offers:
             old = max(offers, key=lambda o: o.get('provider_updated_at') or '')
             row.update(last_odd=old['odd'], provider_updated_at=old.get('provider_updated_at'),
-                       first_odd=old.get('first_odd'), first_observed_at=old.get('first_at'),
+                       first_odd=old.get('first_odd'), opening_odd=old.get('first_odd'),
+                       first_observed_at=old.get('first_at'),
                        bookmaker=old.get('bookmaker'), bookmaker_id=old.get('bookmaker_id'),
                        quote_observed_at=old.get('observed_at'))
         restore(row, as_of, kickoff, allow_cached)
         return
     complete_books = [o for o in recent if complete_book(o)]
+    # A single bookmaker is enough for price and EV. A complete partition at
+    # that bookmaker also gives its own fair probability and overround.
     best = max(complete_books or recent, key=lambda o: (o['odd'], o.get('provider_updated_at') or o.get('observed_at') or '', o['bookmaker_id']))
     synthetic = best.get('quote_source') == 'synthetic_combo'
+    selected_fair, selected_margin = fair(best['odds']) if best['complete'] else ({}, None)
+    if synthetic:
+        selected_fair = {best['token']: synthetic_fair(best)}
+        selected_margin = synthetic_margin(best)
     row.update(quote_source=best.get('quote_source', 'bookmaker'),
                quote_executable=not synthetic, quote_provenance=deepcopy(best.get('quote_provenance') or {}))
     compatible = [o for o in recent if o['complete'] and o['group'] == best['group']]
@@ -496,8 +503,8 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         row['opening_market_odds'] = dict(own_trace[0]['odds'])
     own_margin_delta = (fair(own_trace[-1]['odds'])[1] - fair(own_trace[0]['odds'])[1]
                         if len(own_trace) >= 2 else None)
-    row.update(selected_margin_pct=synthetic_margin(best) if synthetic else fair(best['odds'])[1] if best['complete'] else None,
-               selected_market_fair_pct=100*synthetic_fair(best) if synthetic else 100*fair(best['odds'])[0][best['token']] if best['complete'] else None,
+    row.update(selected_margin_pct=selected_margin,
+               selected_market_fair_pct=100*selected_fair[best['token']] if selected_fair else None,
                selected_margin_delta_pp=own_margin_delta,
                selected_market_odds=deepcopy(best['odds']) if best['complete'] and row['spec']['kind'] == 'result' and row['period'] == 'ft' else None,
                movement_confirmed=bool(move.get('confirmed')),

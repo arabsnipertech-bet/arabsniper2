@@ -17,7 +17,7 @@ def flow_rejections(row, as_of, max_drop):
         reasons.append('price')
     if row.get('quote_status') == 'cached_stable':
         at, end, now = stamp(row.get('cache_source_at')), stamp(row.get('cache_expires_at')), stamp(as_of)
-        if not at or not end or not now or (end-at).total_seconds() != 43200 or not at <= now <= end:
+        if not at or not end or not now or not at <= now <= end:
             reasons.append('cache_expired')
     oci, margin, delta = row.get('oci'), row.get('selected_margin_pct'), row.get('delta_pct')
     if not numeric(oci) or not LIMITS['min_oci'] <= oci <= 100: reasons.append('oci')

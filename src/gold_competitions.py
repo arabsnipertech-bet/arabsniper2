@@ -197,10 +197,11 @@ def national_competition(value):
     name = norm(value)
     if FORBIDDEN.search(name) or 'friendl' in name:
         return None
-    if name.startswith('uefa nations league '):
-        # League labels and knockout stages use the same senior competition.
-        return 'uefa'
-    return NATIONAL_NAMES.get(name)
+    if name in NATIONAL_NAMES:
+        return NATIONAL_NAMES[name]
+    # Prefer regional qualifiers over the generic World Cup name.
+    prefix = max((key for key in NATIONAL_NAMES if name.startswith(key+' ')), key=len, default=None)
+    return NATIONAL_NAMES.get(prefix)
 
 
 BLOCKED_NAMES = {country: tuple(norm(name) for name in families)

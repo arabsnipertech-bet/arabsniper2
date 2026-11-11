@@ -6,11 +6,11 @@ import re
 import sys
 import tempfile
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
-from gold_competitions import SCOPE_ID, browser_data, enforce_day, fixture_allowed, profile
+from gold_competitions import SCOPE_ID, browser_data, enforce_day, fixture_allowed, national_competition, profile
 from live_watchlist import build as live_publication
 from matrix_pipeline import build_board, complete_day
 from odds_collection import OddsEnricher
@@ -62,6 +62,8 @@ class CompetitionQualityScope(unittest.TestCase):
         names += ['World Cup - Qualification '+region for region in ('Europe', 'CONMEBOL', 'CAF', 'AFC', 'CONCACAF')]
         for name in names:
             self.assertEqual(profile({'country': 'World', 'name': name})['tier'], 'national_team', name)
+            self.assertEqual(national_competition(name+' - Group A'), national_competition(name), name)
+        self.assertEqual(national_competition('FIFA World Cup Qualification CONMEBOL - Final Round'), 'conmebol')
         for name in ('Friendlies', 'International Friendlies', 'UEFA Nations League Women', 'UEFA Nations League U21'):
             self.assertFalse(fixture_allowed(fixture(1, 'World', name)), name)
         self.assertTrue(fixture_allowed(fixture(2, 'Japan', "Emperor's Cup")))
@@ -163,6 +165,36 @@ class CompetitionQualityScope(unittest.TestCase):
         self.assertEqual(assessment['matrix']['opportunity_policy']['best_market_id'], FT)
         self.assertEqual(assessment['matrix']['platinum_policy']['best_market_id'], FT)
         self.assertEqual(m['triad']['most_probable']['tier'], 'PLATINUM')
+
+    def test_empty_prefetch_retries_fixture_in_both_acquisition_paths(self):
+        from test_lateral_matrix import payload
+        game = fixture(100, 'Italy', 'Serie A')
+        returned = payload(books=1, over=2.1, under=1.9)
+        for prefetched in (None, {'response': []}, {'response': [{'bookmakers': []}]}, returned):
+            for complete in (False, True):
+                with self.subTest(prefetched=prefetched, complete=complete):
+                    client = Mock(spec=['get', 'odds_enricher', 'odds_observer', 'prefetched_odds'])
+                    client.odds_enricher = client.odds_observer = None
+                    client.prefetched_odds = {'100': deepcopy(prefetched)}
+                    client.get.side_effect = lambda path, params: {
+                        'response': [game] if 'date' in params else []} if path == 'fixtures' else returned
+                    if complete:
+                        day = {'date': '2026-10-26', 'matches': []}
+                        complete_day({'fixture_meta': meta}, client, day, NOW)
+                        match = day['matches'][0]
+                    else:
+                        with patch.object(engine, 'iso_now', return_value=NOW), patch.object(
+                                engine, 'enrich_team_matches_with_xg', side_effect=lambda client, rows, team: rows):
+                            match = engine.build_fixture_output(client, game, {}, {})
+                    odds_calls = [call.args[1] for call in client.get.call_args_list if call.args[0] == 'odds']
+                    self.assertEqual(odds_calls, [] if prefetched is returned else [{'fixture': 100}])
+                    over = next(row for row in match['multimarket']['matrix']['rows']
+                                if row['spec'] == {'kind': 'total', 'period': 'ft', 'side': 'over', 'line': 2.5})
+                    self.assertEqual((over['odd'], over['opening_odd'], over['bookmakers_count']), (2.1, 2.1, 1))
+                    self.assertGreater(over['selected_market_fair_pct'], 0)
+                    self.assertGreater(over['selected_margin_pct'], 0)
+                    self.assertIsNotNone(over['ev_pct'])
+                    self.assertFalse(over['movement_confirmed'])
 
     def test_compiled_browser_rules_and_versioned_assets_match_policy(self):
         script=(ROOT/'web/competition-scope.js').read_bytes()

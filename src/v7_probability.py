@@ -24,6 +24,7 @@ def utc(value):
 
 
 def price_usable(row, as_of, kickoff):
+    """An executable observation from one operator is sufficient."""
     now, start = stamp(as_of), stamp(kickoff)
     observed, updated = (stamp(row.get(k)) for k in ('quote_observed_at', 'provider_updated_at'))
     odd = row.get('odd')
@@ -207,8 +208,9 @@ def fair_inputs(rows):
     """Accept one fair price per line and one complete same-book 1X2 vector."""
     totals = {'ft': {}, 'ht': {}, 'sh': {}}
     result = None
-    for row in sorted(rows, key=lambda r: (r.get('quote_status') != 'recent',
-                                            r['selected_margin_pct'], str(r.get('bookmaker_id')))):
+    complete = (row for row in rows if outcome_fair(row) is not None)
+    for row in sorted(complete, key=lambda r: (r.get('quote_status') != 'recent',
+                                                r['selected_margin_pct'], str(r.get('bookmaker_id')))):
         spec = row['spec']
         if spec['kind'] == 'result' and spec['period'] == 'ft' and result is None:
             odds = row.get('selected_market_odds') or {}

@@ -170,6 +170,7 @@ class GoldV61(unittest.TestCase):
 
     def test_release_migrates_all_five_saved_days_without_rewriting_started_forecasts(self):
         from audit_storage import write_store, read_store
+        from matrix_quotes import collect, ledger_offers
         from refresh_opportunities import main
         from opportunity_policy import POLICY_ID
         a=build_matrix(statistical_analysis(match(),NOW),NOW)
@@ -183,14 +184,21 @@ class GoldV61(unittest.TestCase):
         start=datetime.fromisoformat(NOW.replace('Z','+00:00'))
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)
-            write_store(root/'arab_quote_state.json',{})
+            state = {}
             write_store(root/'arab_quote_dashboard.json',{'days':[]})
             for i in range(1,6):
                 m=match(str(i));m['multimarket']=deepcopy(a)
                 kickoff=start+timedelta(days=i-1,hours=12)
                 m['fixture']['kickoff']=kickoff.isoformat()
+                for hours, odd in ((2, 2.20), (1, 2.05)):
+                    at = (start-timedelta(hours=hours)).isoformat()
+                    observed = payload(at, odd, 1.9, books=1)
+                    observed['response'][0]['fixture'] = {'id': i, 'date': kickoff.isoformat()}
+                    prices, _ = collect(observed, i, at)
+                    ledger_offers(state, i, prices, at, kickoff.isoformat())
                 started=deepcopy(m);started['fixture'].update(fixture_id='started-'+str(i),kickoff=(start-timedelta(hours=1)).isoformat())
                 write_store(root/f'arab_quote_day{i}.json',{'date':kickoff.date().isoformat(),'matches':[m,started]})
+            write_store(root/'arab_quote_state.json',state)
             with patch('refresh_opportunities.datetime') as clock, patch('socket.socket',side_effect=AssertionError('No provider calls')):
                 clock.now.return_value=start
                 main(root)
@@ -207,11 +215,26 @@ class GoldV61(unittest.TestCase):
                 combo=next(r for r in updated['matrix']['rows'] if r['spec']['kind']=='halves_total')
                 self.assertEqual(combo['combo']['policy_id'],POLICY_ID)
                 self.assertTrue(any(r['spec']==S('total','ht','over',2.5) for r in updated['matrix']['rows']))
+                over = next(r for r in updated['matrix']['rows'] if r['spec'] == S('total','ft','over',2.5))
+                self.assertEqual((over['first_odd'], over['opening_odd'], over['odd']), (2.20, 2.20, 2.05))
+                self.assertAlmostEqual(over['delta_pct'], 100*(2.05/2.20-1))
+                self.assertAlmostEqual(over['selected_margin_pct'], 100*(1/2.05+1/1.9-1))
+                self.assertEqual(over['paired_books'], 1)
+                self.assertFalse(over['movement_confirmed'])
+                triad = updated['matrix']['v7']['triad']
+                self.assertEqual(len(triad), 3)
+                self.assertTrue(all(pick['motivation'] for pick in triad.values()))
                 export=read_store(root/f'arab_quote_selections_day{i}.json')
                 self.assertEqual(export['opportunity_policy'],POLICY_ID)
             dashboard=read_store(root/'arab_quote_dashboard.json')
             self.assertEqual(len(dashboard['days']),5)
             self.assertEqual(dashboard['opportunity_refresh']['api_calls'],0)
+            saved = read_store(root/'arab_quote_state.json')['matrix_quotes']
+            for fid, fixture in state['matrix_quotes'].items():
+                for field in ('openings', 'groups'):
+                    self.assertEqual(saved[fid][field], fixture[field])
+            self.assertTrue(all(d['v7_complete_triads_with_motivation']==d['active_fixtures']==1
+                                for d in dashboard['opportunity_refresh']['days'].values()))
 
     def test_fast_scan_refreshes_later_tabs_after_full_collection_too(self):
         workflow=Path('.github/workflows/fast_scan.yml').read_text()

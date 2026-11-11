@@ -87,10 +87,11 @@ class MarketOddsCaps(unittest.TestCase):
         self.assertEqual(state, old_ledger)
         self.assertEqual(a['matrix']['opportunity_policy']['id'], POLICY_ID)
         self.assertEqual(r['opportunity']['odds_max'], 4.5)
-        # The retained quote is visible, but 4.20 cannot fill an Over 3.5
-        # triad slot even with a qualifying Gold score.
+        # The observed price remains in the matrix. The alternative may now
+        # use a Studio pick, without exporting a premium signal.
         self.assertEqual(r['odd'], 4.2)
-        self.assertIsNone(m['triad']['recommended_alternative'])
+        self.assertTrue(m['triad']['recommended_alternative']['study_only'])
+        self.assertEqual(m['triad']['recommended_alternative']['tier'], 'BLU')
         preview = build_preview(day, now=datetime.fromisoformat(NOW))
         self.assertEqual(preview['selections'], [])
         frozen = deepcopy(day)

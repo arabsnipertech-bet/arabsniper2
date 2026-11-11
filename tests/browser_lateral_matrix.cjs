@@ -291,7 +291,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.locator('dialog [data-mx-instrument] option').count(),74);
    assert(!(await page.locator('dialog').innerText()).includes('EV'));
    assert.equal(await page.locator('.mx-modal-scroll > .mx-best').count(),1,'Official analysis moved inside');
-   for(const [section,count] of [['ft',8],['ht',10],['sh',8],['result',3],['asian',40],['targets',12]]){
+   for(const [section,count] of [['ft',8],['ht',10],['sh',8],['result',3],['btts',6],['asian',40],['combo',4],['targets',12]]){
     await page.locator('[data-mx-section="'+section+'"]').click();
     assert.equal(await page.locator('.mx-market-row').count(),count);
    }
@@ -389,7 +389,8 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    Object.assign(source,{probability_model:model,odd,first_odd:odd,statistical_pct:prob*100,
     quote_executable:true,quote_status:'recent',provider_updated_at:v7.captured_at,quote_observed_at:v7.captured_at});
    v7.triad[role]={market_id:source.id,source_market_id:source.id,odd,probability:prob,
-    ev:prob*odd-1,tier,badge,horizon,horizon_label,niche_label:'Simmetria 1°+2°T'};
+    ev:prob*odd-1,tier,badge,horizon,horizon_label,niche_label:'Simmetria 1°+2°T',
+    motivation:'Probabilità V7 · Fair bookmaker · Prima osservata · Quota osservata · Aggio · OCI'};
    v7.markets[source.id]={label,odd,source_market_id:source.id,raw:prob,calibrated:prob,fair:prob,
     quote:{first_odd:odd,bookmaker:'Test'},features:{oci:12,margin_pct:5}};
   }
@@ -415,6 +416,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    const headline=modal.locator('[data-v7-slot="most_probable"]');
    assert((await headline.innerText()).includes('GG FT'));
    assert((await headline.innerText()).includes('58,0%'));
+   assert((await headline.innerText()).includes('Fair bookmaker'));
    assert.deepEqual(await modal.locator('[data-v7-slot]').count(),3);
    assert(!(await modal.locator('.mx-cockpit').isVisible()));
    assert(await modal.evaluate(el=>el.scrollWidth<=el.clientWidth),'V7 sheet fits '+width);
@@ -424,6 +426,8 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await modal.locator('[data-mx-section="ht"]').click();
    assert(await modal.locator('.mx-cockpit').isVisible());
    assert.equal(await modal.locator('[data-mx-section="ht"]').getAttribute('aria-pressed'),'true');
+   await modal.locator('[data-mx-section="combo"]').click();
+   assert.equal(await modal.locator('.mx-market-row').count(),4);
    await page.screenshot({path:`test-artifacts/matrix-v7-selection-${width}.png`});
    await page.locator('[data-mx-close]').click();
   }

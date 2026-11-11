@@ -313,11 +313,11 @@ class ComboSources(unittest.TestCase):
 
 
 class TargetedRefresh(unittest.TestCase):
-    def client(self):
+    def client(self, used=1000, limit=75000):
         client=Mock();client.request_count=0
         def bounded(path,params,max_calls):
             client.request_count+=1
-            return ({'response':{'requests':{'current':1000,'limit_day':75000}}} if path=='status' else feed()),1
+            return ({'response':{'requests':{'current':used,'limit_day':limit}}} if path=='status' else feed()),1
         client.get_bounded.side_effect=bounded
         return client
 
@@ -348,6 +348,14 @@ class TargetedRefresh(unittest.TestCase):
         c=self.client();original=c.get_bounded.side_effect
         c.get_bounded.side_effect=lambda path,*args: original(path,*args) if path=='status' else ({'response':[]},0)
         self.assertEqual(NearKickoffRefresher(c,saved()).recover({},META,NOW),{})
+
+    def test_reserve_allows_recovery_on_small_and_large_plans(self):
+        for limit, remaining, reserve in ((1000, 51, 50), (75000, 501, 500)):
+            client = self.client(limit-remaining, limit)
+            refresh = NearKickoffRefresher(client, saved())
+            self.assertTrue(refresh.recover({}, META, NOW)['response'])
+            self.assertEqual(refresh.reserve, reserve)
+            self.assertEqual(client.get_bounded.call_args.args[2], 1)
 
 
 class HttpBudget(unittest.TestCase):

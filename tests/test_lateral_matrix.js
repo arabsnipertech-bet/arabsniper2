@@ -292,6 +292,8 @@ assert.equal(api.platinumSignals([platinum],{...platinumOptions,now:platinumNow-
 assert.equal(api.platinumSignals([platinum],{...platinumOptions,kickoff:platinumCases.now}).length,0);
 const cachedPlatinum={...platinum,quote_status:'cached_stable',cache_source_at:'2026-10-29T00:00:00Z',cache_expires_at:'2026-10-29T12:00:00Z'};
 assert.equal(api.platinumSignals([cachedPlatinum],platinumOptions).length,1);
+assert.equal(api.platinumSignals([{...cachedPlatinum,cache_expires_at:'2026-11-03T00:00:00Z'}],
+ {...platinumOptions,now:Date.parse('2026-11-02T23:59:59Z')}).length,1);
 assert.equal(api.platinumSignals([cachedPlatinum],{...platinumOptions,now:Date.parse('2026-10-29T13:00:00Z')}).length,0);
 assert.equal(api.platinumSignals([cachedPlatinum],{...platinumOptions,now:Date.parse('2026-10-30T13:00:00Z'),archived:true}).length,1,'Preserve the actual prematch tier after kickoff');
 const tierMatch={...matches[0],fixture:{...matches[0].fixture,kickoff:platinumCases.kickoff},multimarket:{matrix:{rows:[platinum]}}};
@@ -664,6 +666,16 @@ assert.equal(api.publishedView(study,triadNow).triad.most_probable.signal.quote_
 studyMatrix.v7.triad.recommended_alternative.tier='GOLD';
 assert.equal(api.publishedView(study,triadNow).triad.recommended_alternative,null);
 
+const expired=structuredClone(study),expiredMatrix=expired.multimarket.matrix;
+expiredMatrix.v7.triad.most_probable.tier='GOLD';
+const expiredView=api.publishedView(expired,triadNow);
+assert.equal(expiredView.triad.most_probable.signal.quote_state,'model_estimate');
+assert.equal(expiredView.triad.most_probable.signal.tier,'BLU');
+assert.equal(expiredView.triad.most_probable.record.odd,null);
+assert.match(api.triadPanel(expiredView),/Quota da aggiornare · ultima osservata 2,10/);
+assert.equal(expiredMatrix.v7.triad.most_probable.tier,'GOLD','Do not mutate the frozen forecast');
+assert.match(api.marketRow({...estimate,fair_odd:2.50}),/Quota equa V7 2,50/);
+
 const unquoted=structuredClone(triadMatch), unquotedMatrix=unquoted.multimarket.matrix;
 unquotedMatrix.v7.triad={most_probable:null,recommended_alternative:null,high_odds_shot:null};
 const emptyCard=api.card(unquoted,{});
@@ -676,5 +688,7 @@ const postponedFixture={...activeFixture,fixture:{...activeFixture.fixture,fixtu
  kickoff:new Date(triadNow-86400000).toISOString(),match:'Orfana rinviata'},
  multimarket:{status:'no_prematch_snapshot',matrix:{rows:[]}}};
 api.render({matches:[postponedFixture,activeFixture],gold_scope:{policy_id:scope.id}},boardHost);
+assert.deepEqual(api.selectMatches({matches:[postponedFixture,activeFixture]},opts),
+ [activeFixture,postponedFixture]);
 assert(boardHost.innerHTML.indexOf('In calendario')<boardHost.innerHTML.indexOf('Rinviate, annullate o sospese'));
 assert.match(boardHost.innerHTML,/<details class="mx-reading-help mx-inactive"><summary>[^<]+<\/summary>[\s\S]*Orfana rinviata/);

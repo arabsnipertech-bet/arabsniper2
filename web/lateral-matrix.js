@@ -82,7 +82,7 @@
  };
  function inactiveWithoutAnalysis(m){
   const f=m.fixture||{},a=m.multimarket||{},matrix=a.matrix||{};
-  if(!INACTIVE.includes(f.status_short||f.result?.status||f.live?.status))return false;
+  if(!INACTIVE.includes(f.result?.status||f.live?.status||f.status_short))return false;
   return !a.markets?.length&&!matrix.rows?.length&&matrix.v7?.status!=='published'&&
    !m._gold_history?.verified_prematch&&!Object.values(m.triad||{}).some(p=>['GOLD','PLATINUM'].includes(p?.tier));
  }
@@ -141,6 +141,8 @@
    if(options.search&&![f.match,f.league,f.country].join(' ').toLocaleLowerCase().includes(options.search.toLocaleLowerCase()))return false;
    return matchingRows(m,options,now,lifecycle).length>0||(options.category==='all'&&options.family==='all'&&options.period==='all');
   }).sort((a,b)=>{
+   const inactive=Number(inactiveWithoutAnalysis(a))-Number(inactiveWithoutAnalysis(b));
+   if(inactive)return inactive;
    if(['oci','odd'].includes(options.sort)){
     const key=options.sort==='oci'?'oci':'odd';
     const score=m=>Math.max(-Infinity,...rowsOf(m).map(r=>Number.isFinite(r[key])?r[key]:-Infinity));
@@ -273,7 +275,7 @@
    if(!goalMarket(r)||!priced(r)||!Number.isFinite(r.odd)||r.odd<=1)return false;
    if(r.quote_status==='cached_stable'){
     const at=Date.parse(r.cache_source_at),end=Date.parse(r.cache_expires_at);
-    if(!Number.isFinite(at)||!Number.isFinite(end)||end-at!==12*3600000||now<at||now>end)return false;
+    if(!Number.isFinite(at)||!Number.isFinite(end)||now<at||now>end)return false;
    }
    if(!Number.isFinite(r.oci)||r.oci<limits.min_oci||r.oci>100||
       !Number.isFinite(r.selected_margin_pct)||r.selected_margin_pct<0||r.selected_margin_pct>limits.max_margin_pct||
@@ -484,7 +486,8 @@
    esc(helpers.timestamp?.(last.observed_at)||last.observed_at)+'</small>'+signal;
  }
  function movementSignal(row,saved=false){
-  const delta=(priced(row)||saved)&&Number.isFinite(row.delta_pct)?row.delta_pct:null;
+  const fromOpening=row.opening_delta_pct??row.delta_pct;
+  const delta=(priced(row)||saved)&&Number.isFinite(fromOpening)?fromOpening:null;
   const first=Date.parse(row.first_observed_at),last=Date.parse(row.quote_observed_at);
   if(delta===0&&Number.isFinite(first)&&first===last&&row.first_odd===row.odd){
    return '<div class="mx-net mx-net-unknown"><b>Prima rilevazione</b><small>In attesa di una seconda osservazione dello stesso bookmaker.</small></div>';
@@ -582,10 +585,16 @@
   return '<p class="mx-timing mx-first-half"><b>Riscontri del primo tempo</b>'+['home','away'].map(side=>{const t=e.teams?.[side]||{};return '<small>'+(side==='home'?'Casa':'Ospite')+': '+num(t.sample,0)+' PT · gol fatti/subiti '+num(t.scored_mean,2)+' / '+num(t.conceded_mean,2)+' · xG PT '+(t.xg_for_sample?num(t.xg_for_mean,2)+' su '+num(t.xg_for_sample,0)+' gare':'non disponibili')+'</small>';}).join('')+'</p>';
  }
  function price(row){
-  if(!priced(row))return '<span class="mx-missing">'+(isCombo(row)?'Quota bookmaker non fornita':esc(quoteAvailability(row)))+'</span>'+(isCombo(row)?'<small>Equa calcolata dal modello</small>':'');
+  if(!priced(row)){
+   const historical=Number.isFinite(row.first_odd)&&row.first_odd>1&&Number.isFinite(row.last_odd)&&row.last_odd>1;
+   return '<span class="mx-missing">'+(isCombo(row)?'Quota bookmaker non fornita':esc(quoteAvailability(row)))+'</span>'+
+    (historical?'<small>Prima osservata '+num(row.first_odd,2)+' → ultima osservata '+num(row.last_odd,2)+
+     ' · '+signed(100*(row.last_odd/row.first_odd-1))+'%</small>':'');
+  }
   if(row.quote_source==='synthetic_combo')return '<span class="mx-price"><b>'+num(row.odd,2)+'</b></span><small>Quota sintetica PT × ST · '+esc(row.bookmaker)+'</small><small>Stima; quota Combo non offerta dal book</small>';
   const arrow=row.odd<row.first_odd?'↓':row.odd>row.first_odd?'↑':'→';
-  return (row.quote_status==='cached_stable'?'<small>Quota stabile da cache</small>':'')+'<span class="mx-price">'+num(row.first_odd,2)+' <i>'+arrow+'</i> <b>'+num(row.odd,2)+'</b></span><small>'+esc(row.bookmaker)+' · '+signed(row.delta_pct)+'%</small>';
+  const delta=row.opening_delta_pct??row.delta_pct;
+  return (row.quote_status==='cached_stable'?'<small>Quota stabile da cache</small>':'')+'<span class="mx-price">'+num(row.first_odd,2)+' <i>'+arrow+'</i> <b>'+num(row.odd,2)+'</b></span><small>'+esc(row.bookmaker)+' · '+signed(delta)+'%</small>';
  }
  function marketRow(row,helpers={},options={}){
   const asian=['asian_total','handicap','dnb'].includes(row.spec?.kind);
@@ -594,7 +603,8 @@
   const base=options.study?poissonEstimate(row):null;
   const observed=studyObservation(row,options.study);
   const stats=base?'<strong>'+pct(base.probability)+'</strong><small>Poisson prematch · Quota equa '+num(base.fair,2)+' · '+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>':
-   '<strong>'+pct(row.statistical_pct)+'</strong><small>Equa '+num(row.fair_odd,2)+' · '+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>';
+   '<strong>'+pct(row.statistical_pct)+'</strong><small>'+(row.probability_model===V7?'Quota equa V7':'Quota equa')+' '+num(row.fair_odd,2)+
+   ' · '+esc(QUALITY[row.quality]||'Stima archiviata')+'</small>';
   const prices=observed?'<strong>'+num(observed.odd,2)+'</strong><small>Ultima osservata · prima osservata '+num(observed.first_odd,2)+' · '+signed(observed.delta_pct)+'%</small>':price(row);
   const priceTime=observed?.quote_observed_at||row.provider_updated_at;
   const reading=options.study&&!Number.isFinite((observed||row).oci)?studyObservation(row,options.study,true):null;
@@ -644,7 +654,8 @@
   return '<div class="mx-goal-panels"><section class="mx-goal-panel"><h3>Gol attesi <small>λ · stima del modello</small></h3><table>'+head+'<tbody>'+['ht','st'].map(p=>{const home=rate('home',p),away=rate('away',p);return '<tr><th>'+(p==='ht'?'PT':'ST')+'</th><td>'+num(home,2)+'</td><td>'+num(away,2)+'</td><td>'+num(Number.isFinite(home)&&Number.isFinite(away)?home+away:null,2)+'</td></tr>';}).join('')+'</tbody></table><p>Stima media dei gol nel periodo. Può essere sbagliata; non è il risultato esatto previsto.</p></section>'+
    '<section class="mx-goal-panel"><h3>Medie gol <small>Fatti / subiti per gara</small></h3><table><thead><tr><th>Tempo</th><th>'+esc(m.fixture?.home||'Casa')+'</th><th>'+esc(m.fixture?.away||'Ospite')+'</th></tr></thead><tbody>'+['ht','st'].map(p=>'<tr><th>'+(p==='ht'?'PT':'ST')+'</th>'+['home','away'].map(s=>{const v=means?.[s]?.[p]||{};return '<td>'+num(v.scored,2)+' / '+num(v.conceded,2)+'<small>'+num(v.sample,0)+' gare osservate</small></td>';}).join('')+'</tr>').join('')+'</tbody></table><p>PT = primo tempo; ST = secondo tempo. Medie ST da punteggi PT e FT della stessa gara, a 90 minuti. Un dato mancante resta —.</p></section></div>';
  }
- const MATRIX_SECTIONS={targets:'Obiettivi gol',ft:'Gol FT',ht:'Primo tempo',sh:'Secondo tempo',result:'1 · X · 2',asian:'Asiatici'};
+ const MATRIX_SECTIONS={targets:'Obiettivi gol',result:'1 · X · 2',ft:'Over / Under FT',ht:'Primo tempo',sh:'Secondo tempo',
+  btts:'GG / NG',asian:'Asiatici',combo:'Combo'};
  let dialog=null,modalFixtureId=null,modalSection='targets',bodyOverflow='';
  function releaseModal(instance){
   if(dialog!==instance)return;
@@ -652,7 +663,16 @@
   [...(host?.querySelectorAll('[data-mx-open]')||[])].find(e=>e.dataset.mxOpen===oldId)?.focus();
  }
  function closeModal(){const instance=dialog;if(!instance)return;instance.close();releaseModal(instance);}
- function sectionRows(rows,section){return rows.filter(r=>section==='targets'?goalMarket(r)!==null||isJoint(r.spec):section==='asian'?r.family==='asian':section==='result'?r.spec?.kind==='result':r.period===section&&['total','btts'].includes(r.spec?.kind));}
+ function sectionRows(rows,section){
+  if(section==='targets')return rows.filter(r=>goalMarket(r)!==null||isJoint(r.spec)||
+   r.probability_model===V7&&(r.spec?.kind==='btts'&&r.spec.side==='yes'||
+    r.spec?.kind==='total'&&r.period==='ht'&&r.spec.line===3.5&&r.spec.side==='over'));
+  if(section==='asian')return rows.filter(r=>r.family==='asian');
+  if(section==='result')return rows.filter(r=>r.spec?.kind==='result');
+  if(section==='btts')return rows.filter(r=>r.spec?.kind==='btts');
+  if(section==='combo')return rows.filter(r=>isJoint(r.spec));
+  return rows.filter(r=>r.period===section&&['total','btts'].includes(r.spec?.kind));
+ }
  // Presentation-only instruments: no scoring, filtering or payload mutation.
  function cockpitTier(m,services={}){
   const history=m._gold_history;
@@ -764,12 +784,16 @@
    const at=Date.parse(source.provider_updated_at),seen=Date.parse(source.quote_observed_at);
    if(!(at<=seen&&seen<=Date.parse(v7.captured_at)))return null;
    if(!archived){
-    if(now-at>PREMATCH_WINDOW_MS)return null;
     const cached=source.quote_status==='cached_stable',expiry=Date.parse(source.cache_expires_at);
     const current=cached?now<=expiry:now-at<=(kickoff-now<=10800000?3600000:21600000);
-    if(!current){
-     if(signal.tier!=='BLU')return null;
+    if(!current&&signal.tier==='BLU'&&now-at<=PREMATCH_WINDOW_MS){
      return {record,source,signal:{...signal,quote_state:'stable'},reasons:signal.reasons||[]};
+    }
+    if(!current||now-at>PREMATCH_WINDOW_MS){
+     if(!Number.isFinite(record.model_fair_odd)||record.model_fair_odd<=1||
+        signal.probability!==record.calibrated)return null;
+     return {record:{...record,odd:null},source,expired:true,reasons:signal.reasons||[],
+      signal:{...signal,tier:'BLU',badge:BADGES.blu,odd:null,ev:null,study_only:true,quote_state:'model_estimate'}};
     }
    }
    return {record,source,signal,reasons:signal.reasons||[]};
@@ -791,6 +815,23 @@
  function matchBadge(tier){
   return levelBadge(tier.category,tier.badge)||'<span class="mx-category'+(tier.tone==='platinum'?' mx-tier-label':'')+'">'+esc(tier.name)+'</span>';
  }
+ function triadMotivation({record,source,signal,expired}){
+  const flow=displayOci(source);
+  const marketFair=Number.isFinite(record.fair)?100*record.fair:operatorFair(source);
+  const first=record.quote?.first_odd??source.first_odd;
+  const summary=signal.motivation&&!expired?signal.motivation:[
+   'Probabilità V7 '+v7Estimate(record.calibrated),
+   'Fair bookmaker '+pct(marketFair),
+   Number.isFinite(first)?'Prima osservata '+num(first,2):'Prima osservata non disponibile',
+   expired?'Quota da aggiornare · ultima osservata '+num(source.odd,2):
+    Number.isFinite(record.odd)?quoteStateLabel(signal,source)+' '+num(record.odd,2):'Quota bookmaker in attesa',
+   signal.niche_label,
+   'Aggio '+pct(record.features?.margin_pct??source.selected_margin_pct),
+   'OCI '+signed(record.features?.oci??flow.value),
+  ].filter(Boolean).join(' · ');
+  const single=source.paired_books===1&&Number.isFinite(flow.value)&&!Number.isFinite(source.oci)&&!expired;
+  return '<small>'+esc(summary+(single&&signal.motivation?' · OCI indicativo '+signed(flow.value):''))+'</small>';
+ }
  function triadPanel(view,compact=false){
   const saved=view.v7?.triad;
   if(!Object.values(view.triad).some(Boolean)){
@@ -808,7 +849,8 @@
       (Number.isFinite(p.record.model_fair_odd)?'<span>Quota equa '+num(p.record.model_fair_odd,2)+'</span>':'')+
       (s.quote_state?'<span>'+esc(quoteStateLabel(s,p.source))+'</span>':'')+
       (Number.isFinite(s.ev)?'<span>EV '+signed(100*s.ev)+'%</span>':'')+
-      (s.niche_label?'<span class="mx-niche">'+esc(s.niche_label)+'</span>':'')+'</div>':
+      (s.niche_label?'<span class="mx-niche">'+esc(s.niche_label)+'</span>':'')+'</div>'+
+      (compact?'':triadMotivation(p)):
       '<small>'+(saved?.[role]?'Quota da aggiornare':'Nessun mercato idoneo')+'</small>')+'</li>';
    }).join('')+'</ul>';
  }
@@ -909,8 +951,7 @@
   const tabs='<nav class="mx-modal-tabs" aria-label="Mercati della matrice">'+Object.entries(MATRIX_SECTIONS).map(([k,l])=>'<button type="button" data-mx-section="'+k+'" aria-pressed="'+(modalSection===k)+'">'+esc(l)+'</button>').join('')+'</nav>';
   const live=m._gold_history?'<div data-live-slot="panel">'+(helpers.livePanel?.(m)||'')+'</div>':'';
   const reference=!active||m._gold_history?historyProposal(m,helpers,{archived:phase(m)!=='upcoming',monitoringClosed:(helpers.phase||phase)(m)!=='upcoming',kickoff:m.fixture?.kickoff,monitoring:m.multimarket?.matrix?.quote_monitoring,lastProposal:m.multimarket?.matrix?.last_proposal}):'';
-  const all=rowsOf(m),detailRows=active&&modalSection==='targets'?all.filter(r=>
-   goalMarket(r)||isCombo(r)||r.spec?.kind==='btts'&&r.spec.side==='yes'||r.spec?.kind==='total'&&r.period==='ht'&&r.spec.line===3.5&&r.spec.side==='over'):sectionRows(all,modalSection);
+  const all=rowsOf(m),detailRows=sectionRows(all,modalSection);
   const detail=quoteBoard(all,helpers,!active&&tier.tone==='studio'?{profiles:m.multimarket?.profiles,home:m.fixture?.home,away:m.fixture?.away,kickoff:m.fixture?.kickoff}:null)+
    matrixDetail(m,detailRows,helpers);
   dialog.innerHTML='<header class="mx-modal-header"><div>'+matchBadge(tier)+'<h2 id="mx-modal-title">'+esc(m.fixture?.match)+'</h2><small>'+esc(m.fixture?.country)+' · '+esc(m.fixture?.league)+'</small></div><button type="button" data-mx-close aria-label="Chiudi matrice" autofocus>×</button></header>'+

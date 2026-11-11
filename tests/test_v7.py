@@ -50,8 +50,8 @@ def assessment():
 
 
 class MathAndRouting(unittest.TestCase):
-    def test_no_books_use_three_fixture_estimates_without_offers_today_or_in_four_days(self):
-        for kickoff in (START, '2026-11-13T19:00:00+01:00'):
+    def test_no_books_use_three_fixture_estimates_even_with_only_priors(self):
+        for kickoff in (START, '2026-11-13T19:00:00+01:00', '2026-11-14T19:00:00+01:00'):
             a = assessment()
             for row in a['matrix']['rows']:
                 row.update(odd=None, first_odd=None, quote_status='missing', quote_executable=False)
@@ -63,6 +63,8 @@ class MathAndRouting(unittest.TestCase):
                 self.assertIsNone(pick['odd'])
                 self.assertIsNone(pick['ev'])
                 self.assertEqual(round(pick['model_fair_odd'], 2), round(1/pick['probability'], 2))
+                for label in ('Probabilità V7', 'Fair bookmaker', 'Prima osservata', 'Quota equa V7', 'Aggio', 'OCI'):
+                    self.assertIn(label, pick['motivation'])
             self.assertFalse(any(snapshot['signals'][role] for role in ('primary', 'consigliata', 'colpaccio', 'gold', 'platinum')))
             self.assertFalse(list(stored_offers(a, meta, AT)))
             from odds_recovery_diagnostic import rendered_browser_coverage
@@ -71,7 +73,9 @@ class MathAndRouting(unittest.TestCase):
             self.assertEqual(rendered, {'active_cards': 1, 'full_triads': 1, 'cards_with_estimates': 1,
                 'model_estimates': 3, 'three_empty_slots': 0, 'without_visible_proposal': 0})
             a['profiles'] = {}
-            self.assertFalse(any(capture(a, meta, AT)['triad'].values()))
+            prior = capture(a, meta, AT)
+            self.assertTrue(all(pick['study_only'] for pick in prior['triad'].values()))
+            self.assertFalse(any(prior['signals'][tier] for tier in ('gold', 'platinum')))
 
     def test_study_uses_compatible_real_prices_without_publishing_weak_ev(self):
         def candidate(key, probability, odd, fair, horizon):
@@ -94,6 +98,17 @@ class MathAndRouting(unittest.TestCase):
         self.assertIsNone(today['recommended_alternative'])
         records[HT].update(odd=2.4, ev=-.04, ev_low=-.10, quote_state='moving')
         self.assertEqual(route(records, PATTERNS, study=True)[0]['recommended_alternative']['odd'], 2.4)
+
+        records[GG_FT].update(odd=None, model_fair_odd=1.85, quote_state='missing')
+        records[GG].update(odd=3.0, study_supported=False)
+        records[AWAY] = candidate(AWAY, .30, 3.2, 3.33, 'FT')
+        records[AWAY]['study_supported'] = False
+        triad, signals = route(records, PATTERNS, study=True, allow_model_estimates=True)
+        self.assertEqual([r['market_id'] for r in triad.values()], [GG_FT, HT, AWAY])
+        self.assertEqual(triad['most_probable']['quote_state'], 'model_estimate')
+        self.assertEqual(triad['high_odds_shot']['odd'], 3.2)
+        self.assertIn('scelta compatibile', triad['high_odds_shot']['motivation'])
+        self.assertFalse(any(signals[tier] for tier in ('gold', 'platinum')))
 
     def test_retained_price_can_feed_fair_projection_and_stays_in_studio(self):
         a = assessment()

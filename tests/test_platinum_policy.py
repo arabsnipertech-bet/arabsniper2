@@ -82,7 +82,9 @@ class PlatinumPolicy(unittest.TestCase):
         self.assertTrue(evaluate(row, row['cache_expires_at'])['eligible'])
         self.assertFalse(evaluate(row, '2026-10-29T12:00:01Z')['eligible'])
         self.assertFalse(evaluate(row, '2026-10-28T23:59:59Z')['eligible'])
-        self.assertFalse(evaluate({**row, 'cache_expires_at': '2026-10-29T13:00:00Z'}, NOW)['eligible'])
+        extended = {**row, 'cache_expires_at': '2026-11-03T00:00:00Z'}
+        self.assertTrue(evaluate(extended, '2026-11-02T23:59:59Z')['eligible'])
+        self.assertFalse(evaluate(extended, '2026-11-03T00:00:01Z')['eligible'])
 
     def test_platinum_requires_gold_and_moderate_oci(self):
         m = fixture(); matrix = m['multimarket']['matrix']

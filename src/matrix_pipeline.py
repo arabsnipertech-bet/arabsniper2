@@ -107,9 +107,10 @@ def complete_day(ns, client, day, as_of):
             state=ns['read_json'](ns['STATE_FILE'],{}) if all(k in ns for k in ('read_json','STATE_FILE')) else {}
             if getattr(client,'odds_enricher',None) is not None: client.odds_enricher.register_fixture(meta)
             try:
-                prefetched = getattr(client, 'prefetched_odds', {})
-                payload = (prefetched.pop(fid) if fid in prefetched else
-                           client.get('odds', {'fixture': int(meta['fixture_id'])}) if client is not None else None)
+                prefetched = getattr(client, 'prefetched_odds', None)
+                payload = prefetched.pop(fid, None) if isinstance(prefetched, dict) else None
+                if not (payload and any(r.get('bookmakers') for r in payload.get('response') or [])):
+                    payload = client.get('odds', {'fixture': int(meta['fixture_id'])})
             except Exception as exc:
                 payload=None
                 a['notes'].append('Quote temporaneamente non disponibili: '+type(exc).__name__)

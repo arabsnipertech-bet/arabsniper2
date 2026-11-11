@@ -145,10 +145,9 @@ def install(ns, matrix_mode=False):
         if getattr(client, 'odds_enricher', None) is not None:
             client.odds_enricher.register_fixture(meta)
         prefetched = getattr(client, 'prefetched_odds', None)
-        if isinstance(prefetched, dict) and str(meta['fixture_id']) in prefetched:
-            payload = prefetched.pop(str(meta['fixture_id']))
-        else:
-            payload = client.get('odds', {'fixture': ns['safe_int'](meta['fixture_id'])})
+        payload = prefetched.pop(str(meta['fixture_id']), None) if isinstance(prefetched, dict) else None
+        if not (payload and any(r.get('bookmakers') for r in payload.get('response') or [])):
+            payload = client.get('odds', {'fixture': int(meta['fixture_id'])})
         observed = ns['iso_now']()
         if matrix_mode:
             from near_kickoff_quotes import recover_near_kickoff

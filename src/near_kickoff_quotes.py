@@ -4,7 +4,7 @@ import time
 
 from lateral_matrix import base_specs, market_id
 from matrix_quotes import collect
-from odds_collection import merge_payload, coverage
+from odds_collection import merge_payload, coverage, quota_reserve
 from quote_sources import fresh, number, stamp, synthetic_margin
 from refresh_opportunities import captured_prices
 
@@ -35,7 +35,7 @@ class NearKickoffRefresher:
         self.max_calls = max(0, min(40, int(max_calls)))
         self.calls, self.attempted = 0, set()
         self.quota, self.quota_at, self.checked = None, 0, None
-        self.reserve = 7500
+        self.reserve = 0
         self.report = {'cap': self.max_calls, 'http_calls': 0, 'fixtures_attempted': 0,
                        'fixtures_recovered': 0, 'budget_skips': 0, 'quota_skips': 0,
                        'cooldown_skips': 0, 'errors': 0}
@@ -74,8 +74,9 @@ class NearKickoffRefresher:
         if self.checked is None or time.monotonic()-self.checked > 60:
             info = (self.request('status', {}) or {}).get('response', {}).get('requests', {})
             used, limit = info.get('current'), info.get('limit_day')
-            self.quota = limit-used if type(used) is int and type(limit) is int and limit > 0 else None
-            self.reserve = max(7500, int(limit*.1)) if type(limit) is int else 7500
+            known = type(used) is int and type(limit) is int and limit > 0
+            self.quota = limit-used if known else None
+            self.reserve = quota_reserve(limit) if known else 0
             self.quota_at, self.checked = self.client.request_count, time.monotonic()
         available = None if self.quota is None else self.quota-(self.client.request_count-self.quota_at)-self.reserve
         if available is None or available <= 0:

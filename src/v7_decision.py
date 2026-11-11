@@ -46,7 +46,6 @@ TRIAD_LIMITS = {'most_probable': (.45, 1.55, 2.15),
                 'recommended_alternative': (.32, 2.15, 3.50),
                 'high_odds_shot': (.16, 3.50, float('inf'))}
 STUDY_LIMITS = {**TRIAD_LIMITS, 'most_probable': (.45, 1.50, 2.15)}
-STUDY_PREFERRED = dict(zip(TRIAD_MARKETS, (GOAL['over25_ft'], GOAL['over15_ht'], GG)))
 SIGNAL_ROLES = dict(zip(TRIAD_MARKETS, ('primary', 'consigliata', 'colpaccio')))
 BADGES = {'BLU': '◆ BLU', 'GOLD': '● GOLD', 'PLATINUM': '★ PLATINUM'}
 TIER_RANK = {tier: rank for rank, tier in enumerate(BADGES)}
@@ -217,13 +216,50 @@ def compatible(first, *others):
     return bool(mask)
 
 
-def signal(key, row, reason):
+def selection_motivation(row, reason, relaxed):
+    quote, move = row.get('quote') or {}, row['features']
+    fair, first, odd = row.get('fair'), quote.get('first_odd'), row['odd']
+    margin, oci = move.get('margin_pct'), move.get('oci')
+    summary = {
+        'PLATINUM': 'Criteri Gold e flusso Platinum confermati',
+        'GOLD': 'Criteri Gold superati',
+        'BLU': 'Spunto Blu',
+    }.get(row['tier'], 'Osservazione di mercato')
+    if reason in ('solo_studio', 'stima_modello'):
+        summary = ('Studio · scelta compatibile per probabilità V7' if relaxed else
+                   'Studio · probabilità e fascia quota del ruolo')
+    parts = [summary, f"Probabilità V7 {100*row['calibrated']:.1f}%",
+             f'Fair bookmaker {100*fair:.1f}%' if finite(fair) else 'Fair bookmaker non disponibile']
+    if finite(odd):
+        parts.append(f'Prima osservata {first:.2f}' if finite(first) else 'Prima osservata non disponibile')
+        state = 'Ultima osservata stabile' if row.get('quote_state') == 'stable' else 'Quota osservata'
+        parts.append(f'{state} {odd:.2f}')
+        delta = move.get('opening_delta_pct')
+        if finite(delta):
+            parts.append(f'Variazione da apertura {delta:+.1f}%')
+    else:
+        parts.append('Prima osservata e quota attuale in attesa di quotazione')
+        if finite(row.get('model_fair_odd')):
+            parts.append(f"Quota equa V7 {row['model_fair_odd']:.2f}")
+    niche = NICHE_LABELS.get(row['niche_id'])
+    if niche:
+        parts.append('Contesto tattico '+niche)
+    parts.append(f'Aggio {margin:.1f}%' if finite(margin) else 'Aggio non disponibile')
+    if move.get('paired_books') == 1:
+        parts.append('OCI a singolo bookmaker, in attesa di conferma')
+    else:
+        parts.append(f'OCI {oci:+.1f}' if finite(oci) else 'OCI non disponibile')
+    return ' · '.join(parts).replace('.', ',')
+
+
+def signal(key, row, reason, *, relaxed=False):
     return dict(market_id=key, source_market_id=row['source_market_id'], label=row['label'],
                 odd=row['odd'], probability=row['calibrated'], ev=row['ev'], ev_low=row['ev_low'],
                 model_fair_odd=row.get('model_fair_odd'), quote_state=row.get('quote_state'),
                 tier=row['tier'], badge=BADGES.get(row['tier']), horizon=row['horizon'],
                 horizon_label=TAGS[row['horizon']], niche_id=row['niche_id'],
-                niche_label=NICHE_LABELS.get(row['niche_id']), reasons=[reason])
+                niche_label=NICHE_LABELS.get(row['niche_id']), reasons=[reason],
+                motivation=selection_motivation(row, reason, relaxed))
 
 
 def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced):
@@ -231,37 +267,46 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced):
     if model_only and not allow_unpriced:
         return
     fixed = [pick['market_id'] for pick in triad.values() if pick]
-    options = {}
+    options, standard = {}, {}
     for role, pick in triad.items():
         if pick:
             continue
         floor, minimum, maximum = STUDY_LIMITS[role]
-        candidates = []
+        candidates, preferred = [None], set()
         for key, row in records.items():
-            if model_only:
-                value = row['model_fair_odd']
-                if (key in TRIAD_MARKETS[role] and 0 < row['calibrated'] < 1
-                        and finite(value) and value > 1):
-                    candidates.append(key)
-                continue
-            if (key in fixed or not row.get('study_supported') or row['calibrated'] < floor
-                    or row['spec_kind'] not in ('result', 'total', 'btts', *JOINT_KINDS)):
+            if key in fixed or row['spec_kind'] not in ('result', 'total', 'btts', *JOINT_KINDS):
                 continue
             is_estimate = not finite(row['odd'])
-            if is_estimate and (not allow_model_estimates or row['horizon'] not in ('PT', 'ST', 'PT+ST')):
+            if is_estimate and not (model_only or allow_model_estimates):
                 continue
             value = row['model_fair_odd'] if is_estimate else row['odd']
-            if finite(value) and minimum <= value <= maximum and compatible(key, *fixed):
+            in_role = key in TRIAD_MARKETS[role]
+            if not (finite(value) and value > 1 and 0 < row['calibrated'] <= 1):
+                continue
+            within_limits = (row.get('study_supported') and row['calibrated'] >= floor
+                             and minimum <= value <= maximum and (in_role or not model_only))
+            if (within_limits or in_role) and compatible(key, *fixed):
                 candidates.append(key)
-        options[role] = [None, *candidates]
+                if within_limits:
+                    preferred.add(key)
+        options[role], standard[role] = candidates, preferred
     if not options:
         return
 
     def score(picks):
-        ranks = [(k == STUDY_PREFERRED[role] if model_only else finite(records[k]['odd']),
-                  records[k]['calibrated'], records[k]['ev'] or 0., k)
-                 if k is not None else (False, 0., 0., '') for role, k in zip(options, picks)]
-        return sum(k is not None for k in picks), sum(rank[0] for rank in ranks), ranks
+        # Keep the standard choices wherever a complete, compatible triad
+        # permits it. Rank relaxed candidates by their calibrated probability.
+        ranks = []
+        for role, key in zip(options, picks):
+            if key is None:
+                ranks.append((0, False, 0., 0., ''))
+                continue
+            row = records[key]
+            preferred = key in standard[role]
+            ranks.append((2 if preferred else 1, preferred and finite(row['odd']),
+                          row['calibrated'], row['ev'] or 0., key))
+        return (sum(rank[0] > 0 for rank in ranks), sum(rank[0] == 2 for rank in ranks),
+                sum(rank[1] for rank in ranks), ranks)
 
     def valid(picks):
         extra = [key for key in picks if key is not None]
@@ -272,8 +317,9 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced):
         if key is not None:
             row = records[key]
             estimate = row['odd'] is None
-            triad[role] = {**signal(key, {**row, 'tier': 'BLU'}, 'stima_modello' if estimate else 'solo_studio'),
-                           'study_only': True, 'quote_state': 'model_estimate' if estimate else row['quote_state']}
+            study_row = {**row, 'tier': 'BLU', 'quote_state': 'model_estimate' if estimate else row['quote_state']}
+            triad[role] = {**signal(key, study_row, 'stima_modello' if estimate else 'solo_studio',
+                                    relaxed=key not in standard[role]), 'study_only': True}
 
 
 def route(records, observed, *, study=False, allow_model_estimates=False, allow_unpriced=False):
@@ -411,10 +457,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
 
     rome = ZoneInfo('Europe/Rome')
     days_ahead = (kickoff.astimezone(rome).date()-at.astimezone(rome).date()).days
-    team_history = any(profiles.get(side, {}).get('for_'+period, {}).get('sample', 0) > 0
-                       for side in ('home', 'away') for period in ('ft', 'ht'))
     triad, signals = route(records, observed_patterns, study=True,
-                           allow_model_estimates=1 <= days_ahead <= 4, allow_unpriced=team_history)
+                           allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True)
     first = next((pick for pick in triad.values() if pick), None)
     tier = max((pick['tier'] for pick in triad.values() if pick), key=TIER_RANK.__getitem__,
                default='BLU' if niches or any(row['tier'] for row in records.values()) else None)
