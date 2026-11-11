@@ -72,3 +72,27 @@ jobs:
           except Exception:
               raise SystemExit("Query D1 di sola lettura non riuscita.")
           print("Registro prove (conteggi aggregati):", json.dumps(result["result"][0]["results"]))
+          import hashlib, email.parser, email.policy
+          token = os.environ["CF_TOKEN"]
+          req = urllib.request.Request(base + "/workers/scripts/stripe-checker/content/v2", headers={"Authorization": "Bearer " + token})
+          with client.open(req, timeout=30) as response:
+              raw = response.read()
+              ct = response.headers.get("Content-Type", "")
+          if "multipart/" in ct:
+              msg = email.parser.BytesParser(policy=email.policy.default).parsebytes(("Content-Type: " + ct + "\r\nMIME-Version: 1.0\r\n\r\n").encode() + raw)
+              parts = [(p.get_param("name", header="content-disposition"), p.get_payload(decode=True)) for p in msg.iter_parts()]
+          else:
+              parts = [("worker.js", raw)]
+          for name, data in parts:
+              if not data:
+                  continue
+              print("Live module:", name, "bytes:", len(data), "SHA256:", hashlib.sha256(data).hexdigest())
+              code = data.decode("utf-8")
+              root = "https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper2/cb8ee1887ce17665b83024e57a3e404e44f1ff58/workers/stripe-access/"
+              with urllib.request.urlopen(root + "production-bundle.mjs", timeout=30) as response:
+                  bundle = response.read().decode()
+              with urllib.request.urlopen(root + "telegram-trial.mjs", timeout=30) as response:
+                  trial = response.read().decode().replace("export ", "")
+              print("Matches repository bundle:", code.strip() == bundle.strip())
+              print("Exact Telegram module occurrences:", code.count(trial))
+              print("Renewal module present:", "function renewalStatus(" in code)
