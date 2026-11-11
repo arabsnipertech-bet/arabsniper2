@@ -27,10 +27,14 @@ def source_time(source):
     return min((d for d in dates if d), default=None)
 
 
+def real_prematch_price(source, as_of, kickoff):
+    return (source.get('quote_executable') is True and source.get('bookmaker_id') is not None
+            and prematch_observation(source.get('provider_updated_at'), source.get('quote_observed_at'), as_of, kickoff))
+
+
 def within_window(source, as_of, kickoff):
-    if (source.get('quote_executable') is True and source.get('bookmaker_id') is not None
-            and stamp(source.get('provider_updated_at'))):
-        return prematch_observation(source.get('provider_updated_at'), source.get('quote_observed_at'), as_of, kickoff)
+    if source.get('prematch_stable') is True:
+        return real_prematch_price(source, as_of, kickoff)
     now, start, at = stamp(as_of), stamp(kickoff), source_time(source)
     dates = [stamp(source.get(k)) for k in ('provider_updated_at', 'quote_observed_at')]
     return bool(now and start and at and now < start and all(d <= now for d in dates if d)
@@ -112,7 +116,9 @@ def restore(row, as_of, kickoff, allowed):
         candidates.append({**last, 'odd': row.get('first_odd'),
                            'quote_observed_at': row.get('first_observed_at')})
     for source in candidates:
-        if not valid_number(source.get('odd')) or source['odd'] <= 1 or not within_window(source, as_of, kickoff): continue
+        if (not valid_number(source.get('odd')) or source['odd'] <= 1 or
+                not (real_prematch_price(source, as_of, kickoff) or within_window(source, as_of, kickoff))):
+            continue
         trial = deepcopy(row)
         trial.update(deepcopy(source))
         trial['oci_method'] = source.get('oci_method')

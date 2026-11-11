@@ -439,6 +439,7 @@ def stored_offers(assessment, fixture, as_of):
         source = rows.get(pick.get('source_market_id')) or {}
         market = (snapshot.get('markets') or {}).get(pick.get('market_id')) or {}
         if (not pick.get('study_only') and pick.get('tier') in TIER_RANK and source.get('probability_model') == VERSION
+                and (not source.get('prematch_stable') or pick['tier'] == 'BLU')
                 and source['id'] == market.get('source_market_id')
                 and pick.get('odd') == source.get('odd') == market.get('odd')
                 and finite(pick.get('probability')) and pick['probability'] == market.get('calibrated')

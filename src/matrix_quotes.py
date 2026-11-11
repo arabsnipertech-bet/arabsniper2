@@ -383,7 +383,7 @@ def value_profile(row, ev, low, strong, oci, synthetic):
 def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     if not core_market(row.get('spec')):
         raise ValueError('Price analysis outside the active market scope')
-    from quote_cache import mark_stable, remember, restore, within_window
+    from quote_cache import mark_stable, real_prematch_price, remember, restore, within_window
     remember(row)
     row['quote_adapter_version'] = HANDICAP_ADAPTER_VERSION
     row.update(speed_pp_per_hour=None, selected_margin_pct=None, selected_margin_delta_pp=None, selected_market_fair_pct=None,
@@ -398,8 +398,11 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
               0 <= (now-stamp(o['provider_updated_at'])).total_seconds() <= max_hours*3600]
     cached = False
     if not recent and allow_cached:
-        recent = [o for o in offers if within_window({**o, 'quote_executable': o.get('quote_executable', True),
-                  'quote_observed_at': o.get('observed_at')}, as_of, kickoff)]
+        for offer in offers:
+            candidate = {**offer, 'quote_executable': offer.get('quote_executable', True),
+                         'quote_observed_at': offer.get('observed_at')}
+            if real_prematch_price(candidate, as_of, kickoff) or within_window(candidate, as_of, kickoff):
+                recent.append(offer)
         cached = bool(recent)
     # Select the source after choosing the fresh or cached time window.
     # Direct and derived offers have different fair-price and margin inputs.

@@ -657,5 +657,9 @@ const studyHtml=api.card(study,{});
 for(const label of ['Stabile da apertura','Quota equa 1,85','Quota equa 2,50','[STIMA MODELLO - ATTESA QUOTA BOOK]'])
  assert(studyHtml.includes(label),label);
 assert.equal(api.publishedView(study,triadNow).tier,'blu');
+studyMatrix.rows[0].quote_status='recent';
+studyMatrix.rows[0].prematch_stable=false;
+studyMatrix.v7.triad.most_probable.quote_state='moving';
+assert.equal(api.publishedView(study,triadNow).triad.most_probable.signal.quote_state,'stable');
 studyMatrix.v7.triad.recommended_alternative.tier='GOLD';
 assert.equal(api.publishedView(study,triadNow).triad.recommended_alternative,null);

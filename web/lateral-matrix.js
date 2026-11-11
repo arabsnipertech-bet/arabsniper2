@@ -757,8 +757,11 @@
    if(!(at<=seen&&seen<=Date.parse(v7.captured_at)))return null;
    if(!archived){
     const cached=source.quote_status==='cached_stable',expiry=Date.parse(source.cache_expires_at);
-    const retained=signal.tier==='BLU'&&source.prematch_stable===true&&expiry===kickoff;
-    if(!(retained||(cached?now<=expiry:now-at<=(kickoff-now<=10800000?3600000:21600000))))return null;
+    const current=cached?now<=expiry:now-at<=(kickoff-now<=10800000?3600000:21600000);
+    if(!current){
+     if(signal.tier!=='BLU')return null;
+     return {record,source,signal:{...signal,quote_state:'stable'},reasons:signal.reasons||[]};
+    }
    }
    return {record,source,signal,reasons:signal.reasons||[]};
   };
