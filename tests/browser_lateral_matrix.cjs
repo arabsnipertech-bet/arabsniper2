@@ -1,6 +1,15 @@
 // End-to-end UI on synthetic backend output. No account or provider calls.
 const {chromium}=require('playwright');
 const fs=require('node:fs'),assert=require('node:assert/strict'),cp=require('node:child_process');
+async function matrixPage(browser,payload,options={}){
+ const page=await browser.newPage(options);await page.route('**/*',r=>r.abort());
+ await page.setContent(fs.readFileSync('web/gold-dashboard-live.html','utf8'));
+ await page.addStyleTag({content:fs.readFileSync('web/lateral-matrix.css','utf8')});
+ for(const name of ['competition-scope.js','lateral-matrix.js','live-scores.js'])
+  await page.addScriptTag({content:fs.readFileSync('web/'+name,'utf8')});
+ await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;renderMatchResearch(p)},payload);
+ return page;
+}
 async function verifyCachedRelease(browser,payload){
  const http=require('node:http'),requests=[];
  const html=fs.readFileSync('web/gold-dashboard-live.html','utf8');
@@ -263,13 +272,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
  try{
   await verifyCachedRelease(browser,payload);
   await verifyCalendarRollover(browser,payload);
-  const page=await browser.newPage();await page.route('**/*',r=>r.abort());
-  await page.setContent(fs.readFileSync('web/gold-dashboard-live.html','utf8'));
-  await page.addStyleTag({content:fs.readFileSync('web/lateral-matrix.css','utf8')});
-  await page.addScriptTag({content:fs.readFileSync('web/competition-scope.js','utf8')});
-  await page.addScriptTag({content:fs.readFileSync('web/lateral-matrix.js','utf8')});
-  await page.addScriptTag({content:fs.readFileSync('web/live-scores.js','utf8')});
-  await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;renderMatchResearch(p)},payload);
+  const page=await matrixPage(browser,payload);
   fs.mkdirSync('test-artifacts',{recursive:true});
 
   const original=await page.evaluate(()=>JSON.stringify(currentPayload));
@@ -289,11 +292,12 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await page.locator('dialog .mx-cockpit .mx-goal-panel').count(),2);
    assert.equal(await page.locator('dialog .mx-1x2 .mx-quote-cell').count(),3);
    assert.equal(await page.locator('dialog [data-mx-instrument] option').count(),74);
-   assert(!(await page.locator('dialog').innerText()).includes('EV'));
+   assert.equal(await page.getByRole('tooltip').count(),0);
    assert.equal(await page.locator('.mx-modal-scroll > .mx-best').count(),1,'Official analysis moved inside');
    for(const [section,count] of [['ft',8],['ht',10],['sh',8],['result',3],['btts',6],['asian',40],['combo',4],['targets',12]]){
     await page.locator('[data-mx-section="'+section+'"]').click();
     assert.equal(await page.locator('.mx-market-row').count(),count);
+    assert.equal(await page.locator('.mx-market-row .mx-origin-badge').count(),count);
    }
    await page.keyboard.press('Shift+Tab');
    assert(await page.evaluate(()=>!!document.activeElement.closest('dialog')));
@@ -393,6 +397,11 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
     motivation:'Probabilità V7 · Fair bookmaker · Prima osservata · Quota osservata · Aggio · OCI'};
    v7.markets[source.id]={label,odd,source_market_id:source.id,raw:prob,calibrated:prob,fair:prob,
     quote:{first_odd:odd,bookmaker:'Test'},features:{oci:12,margin_pct:5}};
+   if(role==='most_probable'){
+    const origin={origin_badge:"Indice GG 90'",origin_tooltip:'λ Casa 1,72 · Ospite 1,29. Prob. V7 58,0% → Quota equa 1,72.'};
+    Object.assign(v7.triad[role],origin);
+    Object.assign(v7.markets[source.id],origin);
+   }
   }
   for(const width of [1280,390,360]){
    await page.setViewportSize({width,height:900});
@@ -410,7 +419,16 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await card.locator('[data-v7-slot=most_probable] b').innerText(),'GG FT');
    assert((await card.innerText()).includes('58,0%'));
    assert.equal(await card.locator('[data-v7-slot]').count(),3);
+   assert.equal(await card.locator('[data-v7-slot] .mx-origin-badge').count(),3);
    assert((await card.innerText()).includes('[2° TEMPO]'));
+   if(width===1280){
+    const trigger=card.locator('[data-v7-slot="most_probable"] .mx-origin-badge'),tooltip=page.getByRole('tooltip');
+    await trigger.hover();
+    assert.match(await tooltip.innerText(),/λ Casa 1,72 · Ospite 1,29/);
+    assert.equal(await trigger.getAttribute('aria-describedby'),'mx-origin-tooltip');
+    await card.locator('h3').hover();
+    await tooltip.waitFor({state:'hidden'});
+   }
    await card.locator('[data-mx-open]').click();
    const modal=page.locator('dialog');
    const headline=modal.locator('[data-v7-slot="most_probable"]');
@@ -418,6 +436,16 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert((await headline.innerText()).includes('58,0%'));
    assert((await headline.innerText()).includes('Fair bookmaker'));
    assert.deepEqual(await modal.locator('[data-v7-slot]').count(),3);
+   assert.equal(await modal.locator('[data-v7-slot] .mx-origin-badge').count(),3);
+   if(width===1280){
+    await page.keyboard.press('Tab');
+    const trigger=headline.locator('.mx-origin-badge');
+    assert(await trigger.evaluate(el=>el===document.activeElement));
+    assert.match(await page.getByRole('tooltip').innerText(),/Quota equa 1,72/);
+    await page.keyboard.press('Escape');
+    await page.getByRole('tooltip').waitFor({state:'hidden'});
+    assert(await modal.isVisible(),'Escape closes the origin tooltip first');
+   }
    assert(!(await modal.locator('.mx-cockpit').isVisible()));
    assert(await modal.evaluate(el=>el.scrollWidth<=el.clientWidth),'V7 sheet fits '+width);
    await modal.locator('[data-v7-details] summary').click();
@@ -431,6 +459,32 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await page.screenshot({path:`test-artifacts/matrix-v7-selection-${width}.png`});
    await page.locator('[data-mx-close]').click();
   }
-  console.log('PASS compact Gold browser: 1X2 only, full detail, categories, selector, live overlays, calendar/login/cache, desktop/390/360');
+  const mobile=await matrixPage(browser,activePayload,{viewport:{width:390,height:844},hasTouch:true,isMobile:true});
+  try{
+   const card=mobile.locator('.mx-card'),trigger=card.locator('[data-v7-slot="most_probable"] .mx-origin-badge');
+   const tooltip=mobile.getByRole('tooltip');
+   await trigger.tap();
+   assert.match(await tooltip.innerText(),/Prob\. V7 58,0%/);
+   assert.equal(await trigger.getAttribute('aria-expanded'),'true');
+   assert.equal(await mobile.locator('dialog').count(),0);
+   await trigger.tap();
+   await tooltip.waitFor({state:'hidden'});
+   await trigger.tap();
+   await card.locator('h3').tap();
+   await tooltip.waitFor({state:'hidden'});
+   await card.locator('[data-mx-open]').tap();
+   const modal=mobile.locator('dialog');
+   await modal.locator('[data-v7-advanced] > summary').tap();
+   const combo=matrix.rows.find(r=>r.spec.kind==='halves_total');
+   await modal.locator('[data-mx-instrument]').selectOption(combo.id);
+   const instrument=modal.locator('.mx-cockpit-pick .mx-origin-badge');
+   assert.equal(await instrument.innerText(),'Incrocio 1°T+2°T');
+   await instrument.tap();
+   assert.match(await tooltip.innerText(),/1°T \(λ 1,09\) e del 2°T \(λ 1,92\)/);
+   assert(await tooltip.evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight;}));
+   await modal.getByText('MERCATO IN OSSERVAZIONE',{exact:true}).tap();
+   await tooltip.waitFor({state:'hidden'});
+  }finally{await mobile.close();}
+  console.log('PASS compact Gold browser: matrix, live overlays, calendar, and origin badges with hover, keyboard and touch');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

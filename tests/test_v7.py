@@ -19,7 +19,7 @@ from matrix_pipeline import build_board
 from matrix_quotes import collect
 from v7_archive import ROME, WEIGHTS, day_path, quote_evidence, results_for_day, valid_snapshot
 from v7_decision import (AWAY, BOTH_GOALS, COMBOS, GG, GG_BOTH, GG_CARRY, GG_FT, GOAL,
-                         OVER_CARRY, capture, quote_rows, route, stored_offers)
+                         OVER_CARRY, capture, market_origin, quote_rows, route, stored_offers)
 from v7_learning import STATE, active_weight, deduplicated, fit, run
 from v7_maintenance import MARKER, complete_price_pages, consolidate, price_window
 from v7_probability import BASE_WEIGHT, blend_rates, market_rates, price_usable, raw_rates, result_probabilities, score_model
@@ -50,6 +50,63 @@ def assessment():
 
 
 class MathAndRouting(unittest.TestCase):
+    def test_origin_badges_cover_every_market_and_slot_in_a_v7_snapshot(self):
+        a = build_matrix(dict(rates=RATES, profiles={}), AT)
+        snapshot = capture(a, META, AT)
+        markets = snapshot['markets']
+        self.assertEqual(len(markets), len(a['matrix']['rows']))
+        self.assertTrue(all(m['origin_badge'] and 'Prob. V7 ' in m['origin_tooltip']
+                            and 'Quota equa ' in m['origin_tooltip'] for m in markets.values()))
+        self.assertEqual(markets[FT]['origin_badge'], "Volume 90' (λ 2,45)")
+        self.assertIn('λ Casa 0,55 · Ospite 0,50', markets[GG]['origin_tooltip'])
+        self.assertIn('λ 1,05', markets[GG_CARRY]['origin_tooltip'])
+        for slot in snapshot['triad'].values():
+            market = markets[slot['market_id']]
+            for key in ('origin_badge', 'origin_tooltip'):
+                self.assertEqual(slot[key], market[key])
+        self.assertTrue(valid_snapshot(snapshot, META, AT))
+
+    def test_origin_hierarchy_uses_the_same_market_and_actual_flow_numbers(self):
+        rates = raw_rates({'rates': RATES})
+        base = dict(calibrated=.54, model_fair_odd=1.85, odd=None, ev=None, ev_low=None,
+                    tier=None, niche_id=None, features={})
+        for kind, period, expected in (
+            ('btts', 'ht', 'Bilanciamento 1°T'), ('asian_total', 'ht', 'Ritmo 1°T (λ 1,05)'),
+            ('btts', 'sh', 'Spinta Ripresa 2°T'), ('total', 'sh', 'Dinamica 2°T (λ 1,40)'),
+            ('btts', 'ft', "Indice GG 90'"), ('total', 'ft', "Volume 90' (λ 2,45)"),
+            ('result', 'ft', "Forza 90' (1,25-1,20)"), ('dnb', 'ft', "Forza 90' (1,25-1,20)"),
+            ('handicap', 'ft', "Forza 90' (1,25-1,20)"), ('both_halves', 'ft', 'Incrocio 1°T+2°T'),
+        ):
+            origin = market_origin({'kind': kind, 'period': period}, rates, base)
+            self.assertEqual(origin['origin_badge'], expected)
+            self.assertIn('Prob. V7 54,0% → Quota equa 1,85', origin['origin_tooltip'])
+
+        spec = json.loads(FT)
+        priced = dict(base, odd=2.16, quote={'first_odd': 2.25}, ev=.166, ev_low=.04)
+        for patch, expected, detail in (
+            ({'niche_id': 'fav_home_pt_vulnerable', 'tier': 'PLATINUM'}, 'Favorita PT', 'λ 1°T casa 0,55'),
+            ({'niche_id': 'balanced_1x2_inversion'}, 'Inversione 1X2', 'casa 52,4%'),
+            ({'niche_id': 'bookmaker_shift_rebound'}, 'Rimbalzo PT', 'compressione sul finale'),
+            ({'niche_id': 'pt_st_symmetry_11_22'}, 'Simmetria 1°+2°T', 'λ 1,40'),
+            ({'features': {'oci': 38, 'agreeing_books': 2, 'paired_books': 3}}, 'Flusso OCI +38,0', '2/3 · EV +16,6%'),
+            ({'tier': 'PLATINUM', 'features': {'oci': 30, 'opening_delta_pct': -3}}, 'Flusso OCI +30,0', '-3,0%'),
+            ({'features': {'oci': -12}}, 'Valore Contrarian', 'EV prudente +4,0%'),
+            ({'features': {'margin_pct': 5.4}}, 'Valore +EV (16,6%)', 'Aggio 5,4%'),
+            ({'ev': -.02, 'ev_low': -.05, 'features': {'oci': 8}}, 'Trend Quota -4,0%', '2,25 a 2,16'),
+        ):
+            with self.subTest(expected=expected):
+                origin = market_origin(spec, rates, {**priced, **patch}, conversion=True)
+                self.assertEqual(origin['origin_badge'], expected)
+                self.assertIn(detail, origin['origin_tooltip'])
+
+    def test_badge_release_rebuilds_private_feeds_from_existing_observations(self):
+        from refresh_opportunities import cached_refresh_safe
+        paths = ['src/v7_decision.py', 'src/refresh_opportunities.py', 'web/lateral-matrix.js',
+                 'web/lateral-matrix.css', 'web/gold-dashboard-live.html', 'tests/test_v7.py']
+        self.assertTrue(cached_refresh_safe(paths))
+        self.assertFalse(cached_refresh_safe(paths + ['src/v7_probability.py']))
+        self.assertFalse(cached_refresh_safe(paths + ['src/odds_collection.py']))
+
     def test_no_books_use_three_fixture_estimates_even_with_only_priors(self):
         for kickoff in (START, '2026-11-13T19:00:00+01:00', '2026-11-14T19:00:00+01:00'):
             a = assessment()

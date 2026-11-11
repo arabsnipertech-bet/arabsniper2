@@ -252,6 +252,96 @@ def selection_motivation(row, reason, relaxed):
     return ' · '.join(parts).replace('.', ',')
 
 
+def origin_number(value, digits=2, signed=False):
+    if not finite(value):
+        return '—'
+    return (('+' if signed and value > 0 else '')+f'{value:.{digits}f}').replace('.', ',')
+
+
+def market_origin(spec, rates, record, *, conversion=False):
+    """Explain the saved probability and price without changing admission or ranking."""
+    kind, period = spec['kind'], spec['period']
+    home_ht, away_ht, home_st, away_st, home_ft, away_ft = (
+        rates[key] for key in ('home_ht', 'away_ht', 'home_st', 'away_st', 'home_ft', 'away_ft'))
+    ht, st, ft = (origin_number(total) for total in (home_ht+away_ht, home_st+away_st, home_ft+away_ft))
+    prob = origin_number(100*record['calibrated'], 1)
+    fair_odd = origin_number(record['model_fair_odd'])
+    comparison = f'Prob. V7 {prob}% → Quota equa {fair_odd}.'
+    niche = record['niche_id']
+    if niche == 'fav_home_pt_vulnerable':
+        badge = NICHE_LABELS[niche]
+        text = f"Favorita casa con spinta precoce (λ 1°T casa {origin_number(home_ht)}) e difesa vulnerabile nei primi 45′ contro un ospite incisivo."
+    elif niche == 'balanced_1x2_inversion':
+        badge = NICHE_LABELS[niche]
+        share = 100*home_ht/(home_ht+away_ht) if home_ht+away_ht else None
+        text = f"Quote 1 e 2 in equilibrio con movimento incrociato dall’apertura. Peso gol 1°T della casa {origin_number(share, 1)}%."
+    elif niche == 'bookmaker_shift_rebound':
+        badge = NICHE_LABELS[niche]
+        text = (f"Mercato 1°T in risalita su base offensiva solida (λ 1°T totale {ht}) e compressione sul finale."
+                if conversion else
+                f"Mercato 1°T osservato per il rimbalzo su base offensiva solida (λ 1°T totale {ht}) e il confronto con il finale.")
+    elif niche == 'pt_st_symmetry_11_22':
+        badge = NICHE_LABELS[niche]
+        text = f"Alto volume atteso (λ 90′ {ft}) distribuito tra 1° tempo (λ {ht}) e 2° tempo (λ {st})."
+    else:
+        badge, text = None, None
+    if badge:
+        return dict(origin_badge=badge, origin_tooltip=f'{text} {comparison}')
+
+    odd, ev, low = (record[key] for key in ('odd', 'ev', 'ev_low'))
+    move, quote = record['features'], record.get('quote') or {}
+    first = quote.get('first_odd') or quote.get('opening_odd')
+    delta, oci, margin = (move.get(key) for key in ('opening_delta_pct', 'oci', 'margin_pct'))
+    if finite(odd) and odd > 1:
+        if not finite(delta) and finite(first) and first > 1:
+            delta = 100*(odd/first-1)
+        shown_odd, opening = origin_number(odd), origin_number(first)
+        change, flow = origin_number(delta, 1, True), origin_number(oci, 1, True)
+        ev_pct = origin_number(100*ev, 1, True)+'%' if finite(ev) else '—'
+        low_pct = origin_number(100*low, 1, True)+'%' if finite(low) else '—'
+        if finite(oci) and (record['tier'] == 'PLATINUM' or oci >= 30 and finite(delta) and delta <= -3+1e-9):
+            badge = f'Flusso OCI {flow}'
+            books = '/'.join(origin_number(move.get(key), 0) for key in ('agreeing_books', 'paired_books'))
+            change_pct = change+'%' if finite(delta) else '—'
+            text = f"Calo quota {change_pct} dall’apertura ({opening} → {shown_odd}). Operatori concordi {books} · EV {ev_pct}."
+        elif finite(ev) and (record['tier'] == 'GOLD' or ev > 0 and finite(low) and low >= 0):
+            if finite(oci) and oci < 0:
+                badge = 'Valore Contrarian'
+                text = f'Quota bookmaker {shown_odd} · EV {ev_pct} · EV prudente {low_pct} · OCI {flow}.'
+            else:
+                badge = f'Valore +EV ({origin_number(100*ev, 1)}%)'
+                aggio = origin_number(margin, 1)+'%' if finite(margin) else 'non disponibile'
+                text = f'Quota bookmaker {shown_odd} sopra la quota equa V7 · Aggio {aggio}.'
+        elif finite(delta) and abs(delta) >= 2.5-1e-9:
+            badge = f'Trend Quota {change}%'
+            text = f"Variazione dall’apertura {opening} a {shown_odd} · OCI {flow}."
+        if badge:
+            return dict(origin_badge=badge, origin_tooltip=f'{text} {comparison}')
+
+    if kind in JOINT_KINDS:
+        badge = 'Incrocio 1°T+2°T'
+        text = f'Probabilità congiunta dalle distribuzioni del 1°T (λ {ht}) e del 2°T (λ {st}).'
+    elif period == 'ht':
+        badge = 'Bilanciamento 1°T' if kind == 'btts' else f'Ritmo 1°T (λ {ht})'
+        text = (f"Gol attesi nei primi 45′ · λ Casa {origin_number(home_ht)} · Ospite {origin_number(away_ht)}."
+                if kind == 'btts' else f"Volume gol atteso nei primi 45′ · λ totale {ht}.")
+    elif period == 'sh':
+        badge = 'Spinta Ripresa 2°T' if kind == 'btts' else f'Dinamica 2°T (λ {st})'
+        text = (f'Gol attesi nella ripresa · λ Casa {origin_number(home_st)} · Ospite {origin_number(away_st)}.'
+                if kind == 'btts' else f'Volume gol atteso nella ripresa · λ totale {st}.')
+    elif kind == 'btts':
+        badge = "Indice GG 90'"
+        text = f"Marcatura congiunta sui 90′ · λ Casa {origin_number(home_ft)} · Ospite {origin_number(away_ft)}."
+    elif kind in ('result', 'dnb', 'handicap'):
+        home, away = origin_number(home_ft), origin_number(away_ft)
+        badge = f"Forza 90' ({home}-{away})"
+        text = f"Gol attesi sui 90′ · λ Casa {home} · Ospite {away}."
+    else:
+        badge = f"Volume 90' (λ {ft})"
+        text = f"Proiezione Poisson sui 90′ · λ totale {ft}."
+    return dict(origin_badge=badge, origin_tooltip=f'{text} {comparison}')
+
+
 def signal(key, row, reason, *, relaxed=False):
     return dict(market_id=key, source_market_id=row['source_market_id'], label=row['label'],
                 odd=row['odd'], probability=row['calibrated'], ev=row['ev'], ev_low=row['ev_low'],
@@ -259,7 +349,8 @@ def signal(key, row, reason, *, relaxed=False):
                 tier=row['tier'], badge=BADGES.get(row['tier']), horizon=row['horizon'],
                 horizon_label=TAGS[row['horizon']], niche_id=row['niche_id'],
                 niche_label=NICHE_LABELS.get(row['niche_id']), reasons=[reason],
-                motivation=selection_motivation(row, reason, relaxed))
+                motivation=selection_motivation(row, reason, relaxed),
+                **{field: row[field] for field in ('origin_badge', 'origin_tooltip') if field in row})
 
 
 def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced):
@@ -450,6 +541,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
             row['tier'] = 'BLU'
         else:
             row['tier'] = None
+        row.update(market_origin(source['spec'], calibrated, row, conversion=observed_patterns['conversion']))
         legs = COMBO_LEGS.get(key)
         if legs and row['odd'] is None and all(finite(records.get(leg, {}).get('odd')) for leg in legs):
             row['reference_legs'] = [dict(market_id=leg, label=records[leg]['label'], odd=records[leg]['odd'],

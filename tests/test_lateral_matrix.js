@@ -629,6 +629,7 @@ const triadMatch={fixture:{fixture_id:'701',kickoff:triadStart},multimarket:{mat
 }}};
 const triadHtml=api.card(triadMatch,{});
 assert.equal((triadHtml.match(/data-v7-slot=/g)||[]).length,3);
+assert.equal((triadHtml.match(/data-mx-origin-tooltip=/g)||[]).length,1,'Each populated slot has an origin button');
 for(const label of ['● GOLD','Over 1,5 ST','[2° TEMPO]','54,0%','EV +13,4%','Simmetria 1°+2°T'])
  assert(triadHtml.includes(label),label);
 assert.equal((triadHtml.match(/Nessun mercato idoneo/g)||[]).length,2);
@@ -675,6 +676,41 @@ assert.equal(expiredView.triad.most_probable.record.odd,null);
 assert.match(api.triadPanel(expiredView),/Quota da aggiornare · ultima osservata 2,10/);
 assert.equal(expiredMatrix.v7.triad.most_probable.tier,'GOLD','Do not mutate the frozen forecast');
 assert.match(api.marketRow({...estimate,fair_odd:2.50}),/Quota equa V7 2,50/);
+
+const originRates={home_ht:.55,away_ht:.50,home_ft:1.25,away_ft:1.2};
+const originBase={statistical_pct:54,fair_odd:1.85,probability_model:triadModel,quote_status:'missing'};
+for(const [kind,period,label] of [
+ ['btts','ht','Bilanciamento 1°T'],['total','ht','Ritmo 1°T (λ 1,05)'],['asian_total','ht','Ritmo 1°T (λ 1,05)'],
+ ['btts','sh','Spinta Ripresa 2°T'],['total','sh','Dinamica 2°T (λ 1,40)'],
+ ['result','ft',"Forza 90' (1,25-1,20)"],['dnb','ft',"Forza 90' (1,25-1,20)"],
+ ['handicap','ft',"Forza 90' (1,25-1,20)"],['btts','ft',"Indice GG 90'"],['asian_total','ft',"Volume 90' (λ 2,45)"],
+ ...['halves_total','pt_ft_total','pt_btts_ft_total','both_halves'].map(kind=>[kind,'ft','Incrocio 1°T+2°T'])
+]){
+ const row={...originBase,spec:{kind,period}};
+ const origin=api.marketOrigin(row,{rates:originRates});
+ assert.equal(origin.origin_badge,label,kind+' '+period);
+ assert.match(origin.origin_tooltip,/Prob\. V7 54,0% → Quota equa 1,85/);
+ assert.match(api.marketRow({...row,...origin}),/data-mx-origin-tooltip="[^"]+" aria-expanded="false">/);
+}
+const originQuote={...originBase,spec:{kind:'total',period:'ft'},quote_status:'recent',quote_executable:true,
+ odd:2.16,first_odd:2.25,oci:38,paired_books:3,agreeing_books:2,ev_pct:16.6,ev_low_pct:4,selected_margin_pct:5.4};
+for(const [patch,label,detail] of [
+ [{},'Flusso OCI +38,0','2/3 · EV +16,6%'],
+ [{oci:-12},'Valore Contrarian','EV prudente +4,0%'],
+ [{oci:8},'Valore +EV (16,6%)','Aggio 5,4%'],
+ [{oci:8,ev_pct:-2,ev_low_pct:-5},'Trend Quota -4,0%','2,25 a 2,16']
+]){
+ const origin=api.marketOrigin({...originQuote,...patch},{rates:originRates});
+ assert.equal(origin.origin_badge,label);
+ assert(origin.origin_tooltip.includes(detail));
+}
+assert.equal(api.marketOrigin(originQuote,{rates:originRates,niche:'balanced_1x2_inversion'}).origin_badge,'Inversione 1X2');
+assert.match(api.marketOrigin(originQuote,{rates:originRates,niche:'balanced_1x2_inversion'}).origin_tooltip,/casa 52,4%/);
+assert.equal(api.marketOrigin(originQuote,{rates:originRates,expired:true}).origin_badge,"Volume 90' (λ 2,45)");
+const storedOrigin={origin_badge:'<b>Misurato</b>',origin_tooltip:'"Dati" · 54,0%'};
+assert.deepEqual(api.marketOrigin(originQuote,{record:storedOrigin}),storedOrigin);
+assert.match(api.marketRow({...originQuote,...storedOrigin}),/&quot;Dati&quot; · 54,0%/);
+assert.doesNotMatch(api.marketRow({...originQuote,...storedOrigin}),/<b>Misurato<\/b>/);
 
 const unquoted=structuredClone(triadMatch), unquotedMatrix=unquoted.multimarket.matrix;
 unquotedMatrix.v7.triad={most_probable:null,recommended_alternative:null,high_odds_shot:null};

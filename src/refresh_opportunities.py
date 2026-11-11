@@ -25,7 +25,7 @@ def cached_refresh_safe(paths):
                    'src/homepage_preview.py', 'src/context_analysis.py', 'src/refresh_opportunities.py',
                    'src/statistics_integration.py', 'src/gold_policy_audit.py',
                    'src/market_scope.py', 'src/proposal_stability.py',
-                   'src/platinum_policy.py', 'src/platinum_audit.py'}
+                   'src/platinum_policy.py', 'src/platinum_audit.py', 'src/v7_decision.py'}
     # This migration changes the computed market universe, not the Poisson
     # kernel or source statistics; the dedicated tests require identical core probabilities.
     if 'src/market_scope.py' in paths: price_files.add('src/lateral_matrix.py')
@@ -151,10 +151,18 @@ def main(directory='data'):
         policies = Counter(a.get('matrix', {}).get('opportunity_policy', {}).get('id') for a in upcoming)
         v7_tiers, v7_picks = Counter(), Counter()
         complete_triads = 0
+        origin_coverage = dict(triad_slots=0, badged_slots=0, markets=0, badged_markets=0)
         for a in active:
             matrix = a.get('matrix') or {}
-            triad = ((matrix.get('v7') or {}).get('triad') or {})
+            snapshot = matrix.get('v7') or {}
+            triad = snapshot.get('triad') or {}
             complete_triads += all((triad.get(role) or {}).get('motivation') for role in TRIAD_MARKETS)
+            slots = [triad.get(role) or {} for role in TRIAD_MARKETS]
+            markets = (snapshot.get('markets') or {}).values()
+            origin_coverage['triad_slots'] += len(slots)
+            origin_coverage['badged_slots'] += sum(bool(p.get('origin_badge') and p.get('origin_tooltip')) for p in slots)
+            origin_coverage['markets'] += len(markets)
+            origin_coverage['badged_markets'] += sum(bool(r.get('origin_badge') and r.get('origin_tooltip')) for r in markets)
         required = {market_id(s) for s in base_specs()}
         for a in upcoming:
             if a.get('matrix', {}).get('platinum_policy', {}).get('id') != PLATINUM_POLICY_ID:
@@ -181,6 +189,7 @@ def main(directory='data'):
             'saved_policy_versions': dict(policies),
             'v7_publication_tiers': dict(v7_tiers), 'v7_selections': dict(v7_picks),
             'v7_complete_triads_with_motivation': complete_triads, 'active_fixtures': len(active),
+            'v7_origin_coverage': origin_coverage,
             'fixtures_with_combo': sum(any(r.get('spec', {}).get('kind') == 'halves_total'
                 for r in a.get('matrix', {}).get('rows', [])) for a in upcoming),
             'allowed_fixtures': len(day.get('matches', [])),
