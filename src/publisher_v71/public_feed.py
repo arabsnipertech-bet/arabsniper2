@@ -8,6 +8,7 @@ import time
 
 from multimarket_model import stamp
 
+from . import showcase
 from .selection import project_group, utc
 from .storage import encoded
 
@@ -29,7 +30,7 @@ def historical(source):
     return {'date': date, 'won': won, 'lost': lost}
 
 
-def projection(state, now, past=None):
+def projection(state, now, past=None, *, boards=()):
     report = max(state['reports'].values(), key=lambda item: item['view']['date'], default=None)
     academy = max((p['view'] for p in state['posts'].values() if p['kind'] == 'academy'),
                   key=lambda item: item['date'], default=None)
@@ -39,9 +40,12 @@ def projection(state, now, past=None):
         view = project_group(group, now)
         if view and group.get('eligible_home'):
             groups.append(view)
+    previews, schedule = showcase.project(boards, now)
     return {
         'schema_version': 1, 'publisher': 'v7.1', 'updated_at': utc(now),
         'groups': sorted(groups, key=lambda item: item['free']['kickoff']),
+        'gold_previews': previews,
+        'gold_schedule': schedule,
         'live': live['view'] if live and now - stamp(live['view']['observed_at']) < timedelta(hours=24) else None,
         'report': report['view'] if report else None,
         'historical': historical(past or {}) if not report else None,

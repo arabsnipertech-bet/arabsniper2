@@ -1,5 +1,6 @@
 """Single production tick for Telegram, Facebook and the public homepage."""
 from datetime import datetime, date, timedelta, timezone
+from itertools import chain
 from pathlib import Path
 import json
 import os
@@ -52,12 +53,10 @@ def safe_read(name, fn, fallback):
         return fallback
 
 
-def read_boards(store, now):
-    days = []
-    for num in (1, 2):
-        day, _ = store.read(f'arab_quote_day{num}.json', {}, root=True)
-        days.append(day)
-    return published_candidates(days, now)
+def read_board(store, number):
+    board = safe_read(f'gold_board_day{number}', lambda: store.read(
+        f'arab_quote_day{number}.json', {}, root=True)[0], {})
+    return board if isinstance(board, dict) and isinstance(board.get('matches'), list) else {}
 
 
 def group_posts(store, group):
@@ -172,26 +171,40 @@ def plan_live(store, now, candidates, channels):
             queue(store, 'live', suffix, change, ['facebook'], now, until)
 
 
+def plan_report(store, now, channels, yesterday):
+    previous = str(yesterday)
+    reports = store.state['reports']
+    existing = reports.get(previous)
+    if existing and 'triad_examples' in existing['view']:
+        return
+    audit = safe_read('auditor', lambda: report.certified(store, yesterday, with_fixture_labels=True), None)
+    if not audit:
+        event_log('report', 'awaiting_certified_auditor', day=previous)
+        return
+    if existing:
+        # Refresh the homepage view while preserving the frozen outbox and receipts.
+        existing['view'] = {**existing['view'], 'triad_examples': report.triad_examples(audit)}
+        return
+    view = safe_read('report', lambda: report.build(audit, list(store.snapshots(previous + '/gold/')),
+                                                   free_receipts(store, previous)), None)
+    if not view:
+        event_log('report', 'cohort_incomplete_or_empty', day=previous)
+        return
+    saved = store.remember(previous + '/report.json', view)
+    view = {**saved, 'triad_examples': saved.get('triad_examples', view['triad_examples'])}
+    reports[previous] = {'created_at': utc(now), 'view': view}
+    queue(store, 'report', previous, view, channels, now, now + timedelta(hours=12))
+
+
 def plan_editorial(store, now, channels, best_queued, trial_ok):
     today = date.fromisoformat(rome_day(now))
     minute = local_minute(now)
     yesterday = today - timedelta(days=1)
     previous = str(yesterday)
     reports = store.state['reports']
-    if (minute >= 10 * 60 + 45 and previous not in reports
+    if (minute >= 10 * 60 + 45
             and str(today) > rome_day(stamp(store.state['legacy']['handoff']['created_at']))):
-        audit = safe_read('auditor', lambda: report.certified(store, yesterday), None)
-        if audit:
-            view = safe_read('report', lambda: report.build(audit, list(store.snapshots(previous + '/gold/')),
-                                                              free_receipts(store, previous)), None)
-            if view:
-                view = store.remember(previous + '/report.json', view)
-                reports[previous] = {'created_at': utc(now), 'view': view}
-                queue(store, 'report', previous, view, channels, now, now + timedelta(hours=12))
-            else:
-                event_log('report', 'cohort_incomplete_or_empty', day=previous)
-        else:
-            event_log('report', 'awaiting_certified_auditor', day=previous)
+        plan_report(store, now, channels, yesterday)
     if (16 * 60 + 45 <= minute <= 20 * 60
             and (not best_queued or minute >= 17 * 60 + 45)):
         week = [entry['view'] for key, entry in reports.items()
@@ -213,7 +226,7 @@ def record_home_receipt(store, view, revision, at):
             group.update(homepage_at=utc(at), homepage_revision=revision)
 
 
-def publish_home(store, candidates, now):
+def publish_home(store, candidates, now, boards):
     for group in store.state['groups'].values():
         if not group.get('homepage_at'):
             view = project_group(group, now)
@@ -225,7 +238,8 @@ def publish_home(store, candidates, now):
             free = group['picks'][0]
             group['eligible_home'] = all(current[key] == free[key] for key in ('kickoff', 'market', 'odd', 'probability'))
     past = safe_read('historical_results', lambda: read_local('data/arab_quote_results_public.json'), {})
-    view = public_feed.projection(store.state, now, past)
+    upcoming = chain(boards, (read_board(store, number) for number in (3, 4, 5)))
+    view = public_feed.projection(store.state, now, past, boards=upcoming)
     result = safe_read('homepage', lambda: public_feed.publish(view), None)
     if result:
         revision, previous = result
@@ -233,7 +247,9 @@ def publish_home(store, candidates, now):
             record_home_receipt(store, *previous)
         record_home_receipt(store, view, revision, clock())
         store.save()
-        event_log('homepage', 'published', revision=revision, groups=len(view['groups']))
+        event_log('homepage', 'published', revision=revision, groups=len(view['groups']),
+                  previews=len(view['gold_previews']), scheduled=len(view['gold_schedule']),
+                  recap_examples=len((view['report'] or {}).get('triad_examples', [])))
 
 
 def tick(store, services, gh_token, *, trial_ok):
@@ -254,7 +270,8 @@ def tick(store, services, gh_token, *, trial_ok):
         store.save()
         event_log('cutover', 'exclusive', legacy_fixtures=len(ids))
 
-    picks = safe_read('gold_board', lambda: read_boards(store, now), [])
+    boards = [read_board(store, number) for number in (1, 2)]
+    picks = safe_read('best_candidates', lambda: published_candidates(boards, now), [])
     candidates = {p['fixture_id']: p for p in picks}
     if picks:
         safe_read('gold_availability', lambda: archive_availability(store, picks, now), None)
@@ -285,19 +302,21 @@ def tick(store, services, gh_token, *, trial_ok):
                     store.save()
                     continue
             attempt(store, post, services[post['channel']], candidates, clock, delivery_log)
-    publish_home(store, candidates, clock())
+    publish_home(store, candidates, clock(), boards)
 
 
 def preflight(store):
     now = clock()
+    boards = []
     for number in (1, 2):
         board, _ = store.read(f'arab_quote_day{number}.json', root=True)
         if not isinstance(board.get('matches'), list) or not stamp(board.get('updated_at')):
             raise ValueError('Invalid private Gold board')
+        boards.append(board)
         published = sum(((((m.get('multimarket') or {}).get('matrix') or {}).get('v7')) or {}).get('version') == VERSION
                         for m in board['matches'])
         event_log('gold_board', 'validated_shape', day=board['date'], matches=len(board['matches']), v7=published)
-    event_log('best', 'available', candidates=len(read_boards(store, now)))
+    event_log('best', 'available', candidates=len(published_candidates(boards, now)))
     audit = report.certified(store, now.astimezone(ROME).date() - timedelta(days=1))
     event_log('auditor', 'certified' if audit else 'not_certified', day=audit['date'] if audit else None)
 

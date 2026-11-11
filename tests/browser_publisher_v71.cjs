@@ -16,6 +16,22 @@ const feed = { schema_version: 1, publisher: 'v7.1', updated_at: later(-1), tria
   ] },
   academy: { title: 'OCI e variazioni delle quote', body: 'Leggere l’orario della rilevazione.' },
 }
+const goldSchedule = [
+  { fixture_id: '8', match: 'Casa Gold – Ospiti Gold', league: 'Campionato', kickoff: later(160) },
+  { fixture_id: '9', match: 'Seconda Gara – Ospiti', league: 'Campionato', kickoff: later(180) },
+]
+const proposals = [
+  { category: 'Più probabile', market: 'Over 2,5 finale', probability: .58, odd: 1.93, quote_at: later(-10) },
+  { category: 'Consigliata', market: 'Over 1,5 primo tempo', probability: .38, study_only: true },
+  { category: 'Colpaccio', market: 'Gol primo tempo', probability: .29, odd: 3.80, quote_at: later(-10) },
+]
+const newFeed = { ...feed, groups: [], live: null, gold_schedule: goldSchedule,
+  gold_previews: goldSchedule.map(row => ({ ...row, proposals })),
+  report: { ...feed.report, triad_examples: [1, 2, 3, 4].map(id => ({
+    match: `Squadra ${id} – Ospiti`, score: '2–1', category: 'Consigliata',
+    market: 'Over 1,5 primo tempo', halftime: '1–1', study_only: true,
+  })) },
+}
 
 async function main() {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined })
@@ -23,13 +39,14 @@ async function main() {
     for (const width of [390, 1440]) {
       const page = await browser.newPage({ viewport: { width, height: 900 } })
       const errors = []
+      let payload = feed
       page.on('pageerror', error => errors.push(error))
       await page.route('http://arabsniper.test/**', route => {
         const url = new URL(route.request().url())
         const file = url.pathname === '/' ? '/index.html' : url.pathname
         return route.fulfill({ path: 'web' + file })
       })
-      await page.route(feedPath, route => route.fulfill({ json: feed, headers: { 'access-control-allow-origin': '*' } }))
+      await page.route(feedPath, route => route.fulfill({ json: payload, headers: { 'access-control-allow-origin': '*' } }))
       await page.goto('http://arabsniper.test/?canceled=true')
       await page.getByText('Club Aperto – Ospiti', { exact: true }).first().waitFor()
       const bacheca = page.locator('#daily-picks')
@@ -46,12 +63,42 @@ async function main() {
       assert.match(await page.locator('#checkout-status').innerText(), /Pagamento annullato/)
       assert.equal(await page.locator('[href^="mailto:"]').count(), 1)
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width)
+
+      payload = newFeed
+      await page.emulateMedia({ reducedMotion: 'reduce' })
+      await page.clock.install()
+      await page.reload()
+      await bacheca.getByText('Casa Gold – Ospiti Gold', { exact: true }).waitFor()
+      assert.equal(await bacheca.locator('.gold-preview-triad li').count(), 6)
+      assert.match(await bacheca.innerText(), /Quota bookmaker in attesa/)
+      const live = page.locator('#publisher-live')
+      assert.match(await live.innerText(), /🔒 Gold/i)
+      assert.match(await live.innerText(), /Casa Gold – Ospiti Gold/)
+      assert.match(await live.innerText(), /In programma/)
+      assert.doesNotMatch(await live.innerText(), /Over|Colpaccio/)
+      const resume = live.getByRole('button', { name: 'Riprendi' })
+      await page.clock.runFor(8100)
+      assert.match(await live.innerText(), /Casa Gold – Ospiti Gold/)
+      await resume.click()
+      await page.evaluate(() => document.activeElement.blur())
+      await page.mouse.move(0, 0)
+      await page.clock.runFor(8100)
+      assert.match(await live.innerText(), /Seconda Gara – Ospiti/)
+      await live.getByRole('button', { name: 'Partita precedente' }).click()
+      assert.match(await live.innerText(), /Casa Gold – Ospiti Gold/)
+      const recap = page.locator('#results-content')
+      assert.equal(await recap.locator('.editorial-hits li').count(), 4)
+      assert.match(await recap.innerText(), /PT 1–1/)
+      assert.equal(await recap.locator('details').evaluate(node => node.open), false)
+      await recap.getByText('Dati completi del report').click()
+      assert.match(await recap.innerText(), /Ricerca interna/)
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width)
       assert.deepEqual(errors, [])
       await page.close()
     }
   } finally {
     await browser.close()
   }
-  console.log('PASS: public V7.1 homepage on 390 px and 1440 px, PARTIAL, live, reports, Academy and Gold links')
+  console.log('PASS: public homepage on 390 px and 1440 px, full previews, locked rotation and certified recap')
 }
 main().catch(error => { console.error(error); process.exitCode = 1 })

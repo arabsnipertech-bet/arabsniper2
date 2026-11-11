@@ -1,6 +1,6 @@
 # ArabSniperBet V7.1 · Publisher
 
-Il Publisher legge i board Gold già pubblicati in R2 e usa il primo ruolo V7 con una quota eseguibile. Probabile, Plausibile e Colpaccio seguono l’ordine della triade. Gli invii e la homepage usano la stessa proiezione PARTIAL. Ogni gruppo ha al massimo una proposta completa e fino a due anteprime con partita, competizione, kickoff e categoria. Il ramo pubblico `publisher-public-v71` contiene un solo file JSON.
+Il Publisher legge i board Gold già pubblicati in R2 e usa il primo ruolo V7 con una quota eseguibile per le BEST. Probabile, Plausibile e Colpaccio seguono l’ordine della triade. Ogni gruppo BEST ha al massimo una proposta completa e fino a due anteprime con partita, competizione, kickoff e categoria. La homepage mostra anche fino a due triadi complete delle prossime partite in Gold, con le quote osservate e l’indicazione delle stime in attesa di quota. Il calendario Live alterna le prossime gare e mostra squadre, competizione e orario. Il ramo pubblico `publisher-public-v71` contiene un solo file JSON.
 
 ## Orari Europe/Rome
 
@@ -20,7 +20,7 @@ Una singola richiede una proposta Probabile di livello Gold o Platinum e una fin
 
 - Il registro è nel prefisso privato `publisher/v7.1/`. Le evidenze congelate usano creazione condizionale. Il registro usa scritture condizionali sul suo ETag.
 - I tentativi hanno un massimo di tre invii, con attese crescenti per i rifiuti transitori. Le risposte ambigue richiedono riscontro positivo dal canale. Un invio incerto resta sospeso in assenza di ricevuta.
-- Il report distingue BEST gratuite consegnate, BEST visibili in Gold osservate dal Publisher e campioni di ricerca senza ruolo o livello editoriale. Gli esempi pubblici provengono dalle gratuite. La quota media della ricerca viene indicata come non disponibile quando l’archivio non espone le singole quote. Successo su esiti corretti ed errati. ROI teorico su una unità per esito chiuso, rimborsate incluse a zero.
+- Il recap di Telegram, Facebook e homepage mette in evidenza fino a quattro partite con una proposta corretta tra i ruoli della triade prematch certificata dall’Auditor. Il bilancio distingue BEST gratuite, BEST Gold documentate e ricerca interna. La homepage conserva tutte le metriche del report. Successo su esiti corretti ed errati. ROI teorico su una unità per esito chiuso, rimborsate incluse a zero.
 - Il Live usa la cache dei punteggi esistente. Se la cache è indisponibile, usa al massimo 26 richieste al fornitore ufficiale per giornata e conserva una riserva di almeno 1.000 richieste. Un risultato finale usa il punteggio ufficiale dei 90 minuti. Il mercato prematch resta nel registro originale.
 
 ## Passaggio e rollback
