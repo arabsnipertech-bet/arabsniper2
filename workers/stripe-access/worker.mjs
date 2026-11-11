@@ -1,4 +1,5 @@
 import {authRoute, cleanupAuth} from './auth.mjs';
+import {renewalEnabled, cachedAccess, invalidateAccessCache, renewalStatus, renewalCheckout, renewalOrder, markRenewalPaid, closeFailedRenewal} from './renewal.mjs';
 import {telegramTrialRoute} from './telegram-trial.mjs';
 import {goldTestLoginPage} from './test-login.mjs';
 // OTP remains disabled until its staged deployment requirements are satisfied.
@@ -82,12 +83,42 @@ function monthEnd(start) {
   const candidates=[early,late].sort((a,b)=>a-b);
   return (candidates.find(t=>t+offsetAt(t)===target) ?? candidates[1])/1000;
 }
+async function paymentCharge(env,paymentIntent) {
+  const pi=await stripe(env,'/payment_intents/'+encodeURIComponent(paymentIntent),{'expand[]':'latest_charge'});
+  let charge=pi.latest_charge;
+  if(typeof charge==='string')charge=await stripe(env,'/charges/'+encodeURIComponent(charge));
+  return {pi,charge};
+}
+const revokedCharge = c => c.refunded||c.amount_refunded>0||c.disputed;
+async function verifiedPayment(env,paymentIntent) {
+  if(!paymentIntent)return false;
+  const {pi,charge}=await paymentCharge(env,paymentIntent);
+  return pi.status==='succeeded'&&!!charge&&!revokedCharge(charge);
+}
 export async function fulfill(env,event) {
   const ref=event.data.object;
   if(['charge.refunded','charge.dispute.created'].includes(event.type)) {
     let pi=id(ref.payment_intent);
     if(!pi&&ref.charge)pi=id((await stripe(env,'/charges/'+encodeURIComponent(id(ref.charge)))).payment_intent);
-    if(pi)await env.ACCESS_DB.prepare('UPDATE passes SET revoked=1 WHERE payment_intent=?').bind(pi).run();
+    if(pi) {
+      const affected=await env.ACCESS_DB.prepare('SELECT DISTINCT email FROM passes WHERE payment_intent=?').bind(pi).all();
+      await env.ACCESS_DB.prepare('UPDATE passes SET revoked=1 WHERE payment_intent=?').bind(pi).run();
+      for(const row of affected.results||[])await invalidateAccessCache(env,row.email);
+    }
+    return;
+  }
+  if(['checkout.session.expired','checkout.session.async_payment_failed'].includes(event.type)) {
+    if(!ref.metadata?.gold_renewal_id)return;
+    const session=await stripe(env,'/checkout/sessions/'+encodeURIComponent(ref.id));
+    if(session.payment_status!=='unpaid')return;
+    if(event.type==='checkout.session.expired'&&session.status!=='expired')return;
+    if(event.type==='checkout.session.async_payment_failed') {
+      const piId=id(session.payment_intent);
+      if(session.status!=='complete'||!piId)return;
+      const pi=await stripe(env,'/payment_intents/'+encodeURIComponent(piId));
+      if(!['canceled','requires_payment_method'].includes(pi.status))return;
+    }
+    await closeFailedRenewal(env,session);
     return;
   }
   if(!['checkout.session.completed','checkout.session.async_payment_succeeded'].includes(event.type))return;
@@ -102,16 +133,18 @@ export async function fulfill(env,event) {
   const entry=Object.entries({...plans(env),...plans(env,OLD_PLANS)}).find(([,p])=>p.price===priceId);
   if(!entry)return;
   const [plan,p]=entry;
-  if(s.currency!=='eur'||s.amount_total!==p.amount)return;
-  const email=normalize(s.customer_details?.email);
+  const order=await renewalOrder(env,s);
+  if(order&&(order.plan!==plan||order.status==='expired'))throw new Error('invalid_renewal_plan');
+  const expected=order?order.amount:p.amount;
+  if(order&&(s.currency!=='eur'||s.amount_total!==expected||expected!==(order.promo?Math.round(p.amount*.9):p.amount)||s.amount_subtotal!==p.amount||s.total_details?.amount_discount!==p.amount-expected))throw new Error('invalid_renewal_amount');
+  if(!order&&(s.currency!=='eur'||s.amount_total!==p.amount))return;
+  const email=order?order.email:normalize(s.customer_details?.email);
   if(!email||!id(s.payment_intent))throw new Error('missing_customer');
   // Fetch authoritative charge state too: late/retried success must not restore refunded access.
-  const pi=await stripe(env,'/payment_intents/'+encodeURIComponent(id(s.payment_intent)),{'expand[]':'latest_charge'});
+  const {pi,charge}=await paymentCharge(env,id(s.payment_intent));
   if(pi.status!=='succeeded')return;
-  let charge=pi.latest_charge;
-  if(typeof charge==='string')charge=await stripe(env,'/charges/'+encodeURIComponent(charge));
   if(!charge)throw new Error('charge_unavailable');
-  const revoked=charge.refunded||charge.amount_refunded>0||charge.disputed ? 1 : 0;
+  const revoked=revokedCharge(charge)?1:0;
   const paidAt=Number(event.created);
   if(!Number.isFinite(paidAt)||paidAt<Number(s.created))throw new Error('invalid_payment_time');
   if(plan==='monthly')return;
@@ -119,8 +152,14 @@ export async function fulfill(env,event) {
   const previous=isNew ? await subscriptionAccess(env,email,paidAt) : null;
   const earliest=Math.max(paidAt,previous?.expires_at||0);
   // Compare and insert in one statement: a concurrent purchase forces a fresh calculation.
-  const anchor='SELECT MAX(?1,COALESCE(MAX(expires_at),0)) AS t FROM passes WHERE email=?2 AND revoked=0 AND ?3';
-  const anchorArgs=[earliest,email,Number(isNew)];
+  // Ignore an isolated future pass when the account is already expired (for example after
+  // a refund). Preserve active and contiguous time, including a payment delivered out of order.
+  const anchor=order?`WITH RECURSIVE coverage(t) AS (
+      SELECT ?1 UNION SELECT p.expires_at FROM coverage JOIN passes p
+      ON p.email=?2 AND p.revoked=0 AND p.expires_at>t AND (p.starts_at<=t OR (p.starts_at<=?3 AND p.expires_at>?3))
+    ) SELECT MAX(t) AS t FROM coverage`:
+    'SELECT MAX(?1,COALESCE(MAX(expires_at),0)) AS t FROM passes WHERE email=?2 AND revoked=0 AND ?3';
+  const anchorArgs=[earliest,email,order?Math.max(paidAt,Math.floor(Date.now()/1000)):Number(isNew)];
   for(let attempt=0;attempt<8;attempt++) {
     const current=await env.ACCESS_DB.prepare(anchor).bind(...anchorArgs).all();
     const start=current.results[0].t;
@@ -129,43 +168,76 @@ export async function fulfill(env,event) {
       SELECT ?4,?2,?5,?6,?7,?8,?9 WHERE (?7=(${anchor})) ON CONFLICT(checkout_id) DO NOTHING`;
     await env.ACCESS_DB.prepare(sql).bind(...anchorArgs,s.id,plan,id(s.payment_intent),start,end,revoked).run();
     const saved=await env.ACCESS_DB.prepare('SELECT checkout_id FROM passes WHERE checkout_id=?').bind(s.id).all();
-    if(saved.results.length)return;
+    if(saved.results.length) {
+      await markRenewalPaid(env,order,s,paidAt);
+      await invalidateAccessCache(env,email);
+      return;
+    }
   }
   throw new Error('concurrent_pass_purchase');
 }
 export async function access(env,email,now=Math.floor(Date.now()/1000)) {
+  // Keep the existing low-cost authorization path for every private data read.
   if(VIPS.has(email))return {active:true,source:'vip',authentication:'legacy_email_only'};
   if(env.ACCESS_DB) {
     const result=await env.ACCESS_DB.prepare('SELECT expires_at,plan,payment_intent FROM passes WHERE email=? AND revoked=0 AND starts_at<=? AND expires_at>? ORDER BY expires_at DESC').bind(email,now,now).all();
     for(const row of result.results||[]) {
-      // Revocation remains correct even if a refund webhook has not arrived yet.
-      const pi=await stripe(env,'/payment_intents/'+encodeURIComponent(row.payment_intent),{'expand[]':'latest_charge'});
-      let c=pi.latest_charge;if(typeof c==='string')c=await stripe(env,'/charges/'+encodeURIComponent(c));
-      if(pi.status==='succeeded'&&c&&!c.refunded&&!c.amount_refunded&&!c.disputed)return {active:true,source:'stripe_pass',plan:row.plan,expires_at:row.expires_at,authentication:'legacy_email_only'};
+      if(await verifiedPayment(env,row.payment_intent))return {active:true,source:'stripe_pass',plan:row.plan,expires_at:row.expires_at,authentication:'legacy_email_only'};
     }
   }
   return subscriptionAccess(env,email,now);
 }
-async function subscriptionAccess(env,email,now) {
-  let latest=0;
+async function accountAccess(env,email,now) {
+  if(VIPS.has(email))return {active:true,source:'vip',expires_at:null,has_verified_payment:false,authentication:'legacy_email_only'};
+  const sub=await subscriptionAccess(env,email,now,true);
+  let result=sub, end=sub.active?sub.expires_at:now, history=sub.expires_at||0;
+  let verified=sub.has_verified_payment===true;
+  if(env.ACCESS_DB) {
+    const rows=(await env.ACCESS_DB.prepare('SELECT starts_at,expires_at,plan,payment_intent FROM passes WHERE email=? AND revoked=0 ORDER BY starts_at').bind(email).all()).results||[];
+    // Check relevant passes plus the most recent expired purchase for promotion history.
+    const expired=rows.filter(r=>r.expires_at<=now).at(-1);
+    for(const row of rows) {
+      if(row.expires_at<=now&&row!==expired)continue;
+      if(!await verifiedPayment(env,row.payment_intent))continue;
+      verified=true;
+      if(row.expires_at<=now)history=Math.max(history,row.expires_at);
+      if(row.starts_at<=end&&row.expires_at>now) {
+        if(row.starts_at<=now)result={active:true,source:'stripe_pass',plan:row.plan};
+        end=Math.max(end,row.expires_at);
+      }
+    }
+  }
+  return {...result,expires_at:result.active?end:(history||null),has_verified_payment:verified,authentication:'legacy_email_only'};
+}
+async function subscriptionAccess(env,email,now,summary=false) {
+  let latest=0,history=0,verified=false;
   const customers=await all(env,'/customers',{email});
   for(const customer of customers) {
     const subs=await all(env,'/subscriptions',{customer:customer.id,status:'all'});
     for(const sub of subs) {
-      if(!['active','trialing'].includes(sub.status))continue;
       const valid=(sub.items?.data||[]).filter(item=>id(item.price)===subscriptionPrice(env) || (env.STRIPE_MODE==='live'&&LEGACY_MONTHLY.has(id(item.price))));
       if(!valid.length)continue;
-      const expiry=sub.status==='trialing'?sub.trial_end:Math.max(...valid.map(i=>i.current_period_end||sub.current_period_end||0));
-      if(!(expiry>now))continue;
-      if(sub.status==='active') {
-        if(!sub.latest_invoice)continue;
-        const invoice=await stripe(env,'/invoices/'+encodeURIComponent(id(sub.latest_invoice)));
-        if(invoice.status!=='paid')continue;
+      const expiry=sub.status==='trialing'?sub.trial_end:Math.max(...valid.map(i=>i.current_period_end||sub.current_period_end||sub.ended_at||0));
+      const end=Math.min(expiry||0,sub.cancel_at||expiry||0,sub.ended_at||expiry||0);
+      if(end<=now)history=Math.max(history,end);
+      const active=['active','trialing'].includes(sub.status)&&end>now;
+      if(!summary&&!active)continue;
+      let invoice;
+      if(sub.latest_invoice&&(sub.status==='active'||(summary&&!verified))) {
+        invoice=await stripe(env,'/invoices/'+encodeURIComponent(id(sub.latest_invoice)),summary?{'expand[]':'payments'}:undefined);
+        if(summary&&!verified&&invoice.status==='paid'&&invoice.amount_paid>0) {
+          for(const p of invoice.payments?.data||[]) {
+            if(p.status==='paid'&&p.amount_paid>0&&p.payment?.type==='payment_intent'&&await verifiedPayment(env,id(p.payment.payment_intent))) {verified=true;break;}
+          }
+        }
       }
-      latest=Math.max(latest, Math.min(expiry,sub.cancel_at||expiry));
+      if(!active)continue;
+      if(sub.status==='active'&&invoice?.status!=='paid')continue;
+      latest=Math.max(latest,end);
     }
   }
-  return latest>now ? {active:true,source:'stripe_subscription',plan:'monthly',expires_at:latest,authentication:'legacy_email_only'} : {active:false};
+  const entitlement=latest>now ? {active:true,source:'stripe_subscription',plan:'monthly',expires_at:latest,authentication:'legacy_email_only'} : {active:false};
+  return summary?{...entitlement,expires_at:entitlement.expires_at??(history||null),has_verified_payment:verified}:entitlement;
 }
 export default {
   async scheduled(event,env) { if(env.AUTH_ENABLED==='true')await cleanupAuth(env); },
@@ -174,7 +246,10 @@ export default {
     if(testLogin)return testLogin;
     const trialResponse=await telegramTrialRoute(request,env,access,subscriptionPrice(env));
     if(trialResponse)return trialResponse;
-    const authResponse=await authRoute(request,env,access);
+    const authResponse=await authRoute(request,env,access,Math.floor(Date.now()/1000),{
+      status:async(email,now,fresh=false)=>renewalStatus(env,email,await cachedAccess(env,email,now,()=>renewalEnabled(env)?accountAccess(env,email,now):access(env,email,now),fresh),now,plans(env)),
+      checkout:(req,email,now)=>renewalCheckout(req,env,email,now,{access:accountAccess,catalog:plans(env),stripe})
+    });
     if(authResponse)return authResponse;
     const u=new URL(request.url),origin=request.headers.get('Origin');
     const headers={'Content-Type':'application/json','Cache-Control':'no-store','Vary':'Origin'};

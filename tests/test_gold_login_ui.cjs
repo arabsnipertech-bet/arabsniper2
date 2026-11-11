@@ -1,6 +1,6 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const html=fs.readFileSync('web/gold-dashboard-live.html','utf8');
-const source=html.slice(html.indexOf('    let loginChallenge = null;'),html.indexOf('    function showApplication()'));
+const source=html.slice(html.indexOf('    let loginChallenge = null;'),html.indexOf('    function showApplication('));
 const nodes=new Map(),node=id=>{if(!nodes.has(id))nodes.set(id,{value:'',hidden:false,disabled:false,textContent:'',focus(){},addEventListener(){}});return nodes.get(id);};
 let calls=[],opened=0,mode='session';
 const context={document:{getElementById:node},STORAGE_KEY:'old',localStorage:{removeItem(){throw Error('blocked');}},sessionStorage:{getItem(){throw Error('blocked');},setItem(){throw Error('blocked');},removeItem(){throw Error('blocked');}},location:{search:''},URLSearchParams,AbortController,setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},showApplication(){opened++;},

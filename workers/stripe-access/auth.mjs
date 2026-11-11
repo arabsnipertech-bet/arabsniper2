@@ -36,7 +36,7 @@ async function sessionRecord(request,env,now=Math.floor(Date.now()/1000)) {
 export async function sessionEmail(request,env,now=Math.floor(Date.now()/1000)) {
  return (await sessionRecord(request,env,now))?.email||null;
 }
-export async function authRoute(request,env,access,now=Math.floor(Date.now()/1000)) {
+export async function authRoute(request,env,access,now=Math.floor(Date.now()/1000),renewals=null) {
  const url=new URL(request.url),path=url.pathname;
  if(!path.startsWith('/api/auth/')&&!path.startsWith('/api/gold-data/'))return null;
  if(env.AUTH_ENABLED!=='true'||!env.ACCESS_DB||!env.OTP_SECRET||!env.RESEND_API_KEY||!env.EMAIL_FROM||!env.GOLD_DATA)
@@ -48,7 +48,17 @@ export async function authRoute(request,env,access,now=Math.floor(Date.now()/100
   if(path==='/api/auth/session'&&request.method==='GET') {
    const session=await sessionRecord(request,env,now);
    if(!session)return reply({active:false},401,{'Set-Cookie':cookie('',0)});
-   return reply({...await access(env,session.email,now),authentication:'email_otp',session_expires_at:session.expires_at});
+   const fresh=url.searchParams.get('refresh')==='1';
+   if(fresh&&!await limit(env,'status:'+session.email,5,60,now))return reply({error:'Attendi un minuto prima di aggiornare ancora.'},429);
+   const status=renewals?await renewals.status(session.email,now,fresh):{...await access(env,session.email,now),email:session.email,authenticated:true,server_time:now};
+   return reply({...status,authentication:'email_otp',session_expires_at:session.expires_at});
+  }
+  if(path==='/api/auth/renew'&&request.method==='POST') {
+   const email=await sessionEmail(request,env,now);
+   if(!email)return reply({error:'Accedi con il codice email per rinnovare.'},401);
+   if(!renewals)return reply({error:'Rinnovi in preparazione.'},503);
+   const result=await renewals.checkout(request,email,now);
+   const {status,...body}=result;return reply(body,status||200);
   }
   if(path==='/api/auth/logout'&&request.method==='POST') {
    const t=request.headers.get('Cookie')?.split(';').map(s=>s.trim()).find(s=>s.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);
@@ -93,10 +103,11 @@ export async function authRoute(request,env,access,now=Math.floor(Date.now()/100
   const row=await first(env,`UPDATE gold_codes SET attempts=attempts+1,consumed=CASE WHEN digest=? THEN 1 ELSE 0 END
    WHERE email=? AND challenge=? AND expires_at>? AND consumed=0 AND attempts<5 RETURNING consumed`,digest,email,body.challenge,now);
   if(!row?.consumed)return reply({error:'Codice errato, scaduto o già utilizzato.'},400);
-  const entitlement=await access(env,email,now);
-  if(!entitlement.active)return reply({error:'Email verificata. Acquista un piano per accedere a Gold.'},403);
+  const status=renewals?await renewals.status(email,now,true):{...await access(env,email,now),email,authenticated:true,server_time:now};
+  // A verified mailbox may renew expired access; private feeds still require an active entitlement.
+  if(!status.active&&env.GOLD_RENEWAL_ENABLED!=='true')return reply({error:'Email verificata. Acquista un piano per accedere a Gold.'},403);
   const t=token();await env.ACCESS_DB.prepare('INSERT INTO gold_sessions(digest,email,expires_at) VALUES (?,?,?)').bind(await hash(COOKIE+':'+t),email,now+SESSION_SECONDS).run();
-  return reply({...entitlement,authentication:'email_otp',session_expires_at:now+SESSION_SECONDS},200,{'Set-Cookie':cookie(t,SESSION_SECONDS)});
+  return reply({...status,authentication:'email_otp',session_expires_at:now+SESSION_SECONDS},200,{'Set-Cookie':cookie(t,SESSION_SECONDS)});
  }catch{return reply({error:'Servizio accessi temporaneamente non disponibile.'},503);}
 }
 export async function cleanupAuth(env,now=Math.floor(Date.now()/1000)) {

@@ -1,0 +1,25 @@
+.gold-account-area{flex:0 1 390px;min-width:0;display:grid;gap:12px}
+.gold-access{--access-color:#6bdda8;border:1px solid #3d514a;border-left:3px solid var(--access-color);border-radius:12px;background:var(--panel);padding:13px 15px;font-size:12px;min-width:0}
+.gold-access[hidden],.gold-access [hidden]{display:none!important}
+.gold-access[data-tone=yellow]{--access-color:#ffe04d;border-left-color:var(--access-color)}
+.gold-access[data-tone=red],.gold-access[data-tone=expired]{--access-color:#ff8c98;border-left-color:var(--access-color)}
+.gold-access-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;letter-spacing:.05em}
+.gold-access-head>strong{color:var(--gold)}.gold-access-state{color:var(--access-color);font-size:10px;font-weight:800;white-space:nowrap}
+.gold-access-email{overflow-wrap:anywhere;margin:9px 0;color:var(--text);font-weight:650}
+.gold-access dl{display:grid;grid-template-columns:auto 1fr;gap:5px 9px;margin:0;font-size:11px;line-height:1.5}
+.gold-access dt{color:var(--muted)}.gold-access dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}.gold-access dd small{font-size:9px;color:var(--muted)}
+.gold-access-count{color:var(--access-color);font-weight:700}
+.gold-access details{border-top:1px solid var(--border);margin-top:10px;padding-top:9px}.gold-access summary{cursor:pointer;color:var(--gold);font-weight:700;min-height:28px;line-height:28px}
+.gold-access-promo{font-size:12px;line-height:1.6;color:var(--gold);margin:8px 0}
+.gold-access label{display:block;color:var(--muted);font-size:11px;margin:9px 0 5px}
+.gold-access label.gold-discount-toggle{display:flex;align-items:center;gap:7px;cursor:pointer;min-height:30px}.gold-discount-toggle input{accent-color:var(--gold)}
+.gold-access select{display:block;width:100%;min-height:42px;border:1px solid var(--border);border-radius:8px;background:var(--panel-2);color:var(--text);padding:8px;font-size:12px}
+.gold-access button,.gold-access-resume{display:block;width:100%;min-height:42px;border:1px solid var(--gold);border-radius:8px;padding:10px;background:var(--gold);color:#14191e;font-weight:750;font-size:12px;margin:8px 0;text-align:center;text-decoration:none}
+.gold-access button:disabled{opacity:.55;cursor:wait}.gold-access button.gold-access-refresh{background:transparent;border-color:var(--border);color:var(--muted);font-size:11px;min-height:32px;margin-bottom:0;padding:6px}
+.gold-access-note,.gold-access-message{color:var(--muted);font-size:10px;line-height:1.6;margin:7px 0 0}.gold-access-message:empty{display:none}.gold-access-message[data-error=true]{color:#ff8c98}
+.gold-access-locked> :not(.topbar):not(.gold-sidebar):not(.gold-access-lock-note){display:none!important}
+.gold-access-locked .gold-sidebar nav{display:none}.gold-access-lock-note{margin:24px 0;padding:20px;border:1px solid var(--border);border-radius:12px;color:var(--muted);line-height:1.7}
+.gold-access-locked .top-actions .btn-gold{display:none}
+.gold-access-lock-note[hidden]{display:none}
+@media(max-width:1000px){body[data-gold-design] .topbar{flex-wrap:wrap}.gold-account-area{flex-basis:100%;grid-template-columns:minmax(260px,390px) 1fr;align-items:start}body[data-gold-design] .gold-account-area .top-actions{max-width:none;margin:0}}
+@media(max-width:650px){.gold-account-area{display:grid;grid-template-columns:1fr;width:100%;margin-top:16px}.gold-access{padding:12px}.gold-access-head{font-size:9px}body[data-gold-design] .gold-account-area .top-actions{justify-content:flex-start}.gold-access dl{font-size:11px}}
