@@ -20,7 +20,7 @@ function fixture() {
   ACCESS_DB:{prepare(sql){return {bind(...args){return {all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>db.prepare(sql).run(...args)}}}}}};
  const clients=[],subs=[],invoices={},payments={},sessions=new Map(),keys=new Map(),calls=[];
  const coupon={id:'coupon_smart',valid:true,percent_off:10,duration:'once',livemode:false};
- let mail, ordinal=0;
+ let mail, ordinal=0, stripeCreatedAt;
  globalThis.fetch=async(input,opts={})=>{
   const u=new URL(input),p=u.pathname;
   if(u.origin==='https://api.resend.com'){mail=JSON.parse(opts.body);return Response.json({id:'simulated-email'});}
@@ -44,7 +44,7 @@ function fixture() {
    const discount=form.has('discounts[0][coupon]')?p.amount/10:0;
    const id='cs_test_'+ ++ordinal;
    const s={id,livemode:false,mode:'payment',status:'open',payment_status:'unpaid',currency:'eur',amount_subtotal:p.amount,
-    amount_total:p.amount-discount,total_details:{amount_discount:discount},created:Math.floor(Date.now()/1000),expires_at:Number(form.get('expires_at')),
+    amount_total:p.amount-discount,total_details:{amount_discount:discount},created:stripeCreatedAt??Math.floor(Date.now()/1000),expires_at:Number(form.get('expires_at')),
     client_reference_id:form.get('client_reference_id'),metadata:{gold_renewal_id:form.get('metadata[gold_renewal_id]'),plan},
     url:'https://checkout.stripe.com/c/pay/'+id,line_items:{has_more:false,data:[{quantity:1,price:{id:'price_'+plan}}]}};
    sessions.set(id,s);keys.set(key,{...s});return Response.json(s);
@@ -81,7 +81,7 @@ function fixture() {
   payments[s.payment_intent]={status:'succeeded',latest_charge:{refunded:false,amount_refunded:0,disputed:false}};
   const result=await webhook(kind,s,created);assert.equal(result.status,expected,await result.clone().text());
  };
- return {db,env,calls,coupon,clients,subs,invoices,payments,sessions,pass,trial,renew,status,webhook,confirm,get,post,latest:()=>[...sessions.values()].at(-1),mail:()=>mail};
+ return {db,env,calls,coupon,clients,subs,invoices,payments,sessions,pass,trial,renew,status,webhook,confirm,get,post,latest:()=>[...sessions.values()].at(-1),mail:()=>mail,setStripeCreatedAt:t=>{stripeCreatedAt=t;}};
 }
 
 test('Session returns the authenticated email and a cached server expiry, never another account',async()=>{
@@ -170,13 +170,20 @@ test('A successful browser return and unpaid events do not grant anything',async
  assert.equal(f.db.prepare('SELECT status FROM gold_renewals').get().status,'expired');
  assert.equal((await f.renew()).status,200);
 });
+test('An isolated future pass does not postpone a paid renewal after expiry',async()=>{
+ const f=fixture();f.pass(clock+5*day,'future',clock+day);
+ assert.equal((await f.status()).active,false);
+ assert.equal((await f.renew()).status,200);
+ const s=f.latest();await f.confirm(s);
+ assert.equal(f.db.prepare('SELECT starts_at FROM passes WHERE checkout_id=?').get(s.id).starts_at,s.created);
+});
 test('All three discount totals, a one-hour Checkout and a single redemption even with concurrent requests',async()=>{
  for(const [plan,amount] of [['pass3d',450],['pass14d',1350],['pass1m',2610]]) {
   const f=fixture();f.pass(clock+600);
   const [a,b]=await Promise.all([f.renew(plan,true),f.renew(plan,true)]);
   assert.equal(a.status,200,await a.clone().text());assert.equal(b.status,200,await b.clone().text());
   assert.equal((await a.json()).url,(await b.json()).url);assert.equal(f.sessions.size,1);
-  const s=f.latest();assert.equal(s.amount_total,amount);assert.equal(s.expires_at,s.created+3600);
+  const s=f.latest();assert.equal(s.amount_total,amount);assert.equal(s.expires_at,f.db.prepare('SELECT created_at FROM gold_renewals').get().created_at+3600);
   const reserved=await f.status();assert.equal(reserved.renewal.promo_eligible,false);assert.equal(reserved.renewal.pending_checkout.url,s.url);
   await Promise.all([f.confirm(s),f.confirm(s,s.created+1,'checkout.session.async_payment_succeeded')]);
   const rows=f.db.prepare('SELECT * FROM gold_renewals').all();assert.equal(rows.length,1);assert.equal(rows[0].status,'fulfilled');assert.equal(rows[0].promo,1);
@@ -185,6 +192,12 @@ test('All three discount totals, a one-hour Checkout and a single redemption eve
   assert.equal((await f.status()).renewal.promo_eligible,false);
   assert.equal((await f.renew(plan,true)).status,409,'Refund does not reset a consumed promotion');
  }
+});
+test('Checkout cannot present a discount when Stripe creates it after the access deadline',async()=>{
+ const f=fixture();const expiry=clock+600;f.pass(expiry);f.setStripeCreatedAt(expiry);
+ assert.equal((await f.renew('pass3d',true)).status,409);
+ assert.equal(f.latest().status,'expired');
+ assert.equal(f.db.prepare('SELECT status FROM gold_renewals').get().status,'expired');
 });
 test('Coupon must be valid and exactly 10%; standard Checkout remains available',async()=>{
  const f=fixture();f.pass(clock+36*3600);f.coupon.percent_off=20;

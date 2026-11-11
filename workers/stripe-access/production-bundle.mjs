@@ -479,7 +479,7 @@ async function renewalCheckout(request,env,email,now,{access,catalog,stripe}) {
  if(!pending) {
   // Force fresh Stripe-backed entitlement before reserving any promotion.
   const value=await access(env,email,now);
-  if(body.use_promo&&!promoEligible(env,email,value,now))return answer('Promozione non disponibile per questo account.',403);
+  if(body.use_promo&&!promoEligible(env,email,value,Math.floor(Date.now()/1000)))return answer('Promozione non disponibile per questo account.',403);
   const promo=body.use_promo?1:0;
   if(promo) {
    const used=await first(env,"SELECT id FROM gold_renewals WHERE email=? AND cycle_expires_at=? AND promo=1 AND status!='expired'",email,value.expires_at);
@@ -489,14 +489,16 @@ async function renewalCheckout(request,env,email,now,{access,catalog,stripe}) {
    if(!coupon.valid||coupon.percent_off!==10||coupon.amount_off||coupon.duration!=='once'||coupon.applies_to?.products?.length||coupon.livemode!==(env.STRIPE_MODE==='live'))
     return answer('Promozione temporaneamente non disponibile. Scegli il prezzo ordinario.',503);
   }
-  const orderId=crypto.randomUUID(),until=now+3600;
+  const created=Math.floor(Date.now()/1000);
+  if(promo&&!promoEligible(env,email,value,created))return answer('La finestra promozionale è terminata. Aggiorna lo stato.',409);
+  const orderId=crypto.randomUUID(),until=created+3600;
   const origin=env.AUTH_ORIGIN;
   const params={mode:'payment','line_items[0][price]':p.price,'line_items[0][quantity]':'1',customer_email:email,customer_creation:'always','adaptive_pricing[enabled]':'false',
    success_url:origin+'/gold-dashboard-live.html?renewal=success',cancel_url:origin+'/gold-dashboard-live.html?renewal=canceled',
    client_reference_id:orderId,'metadata[gold_renewal_id]':orderId,'metadata[plan]':body.plan,expires_at:String(until),integration_identifier:'arabsniper_gold_qtvrnzkp'};
   if(promo)params['discounts[0][coupon]']=env.GOLD_RENEWAL_COUPON_ID;
   await env.ACCESS_DB.prepare(`INSERT OR IGNORE INTO gold_renewals(id,email,plan,cycle_expires_at,promo,amount,created_at,expires_at,stripe_params,status)
-   VALUES (?,?,?,?,?,?,?,?,?,'creating')`).bind(orderId,email,body.plan,value.expires_at||0,promo,promo?Math.round(p.amount*.9):p.amount,now,until,JSON.stringify(params)).run();
+   VALUES (?,?,?,?,?,?,?,?,?,'creating')`).bind(orderId,email,body.plan,value.expires_at||0,promo,promo?Math.round(p.amount*.9):p.amount,created,until,JSON.stringify(params)).run();
   pending=await first(env,"SELECT * FROM gold_renewals WHERE email=? AND status IN ('creating','open')",email);
   if(!pending)return answer('Promozione già prenotata. Aggiorna lo stato.',409);
   if(pending.plan!==body.plan||!!pending.promo!==body.use_promo)return answer('Un altro Checkout è in preparazione. Aggiorna lo stato.',409);
@@ -506,13 +508,14 @@ async function renewalCheckout(request,env,email,now,{access,catalog,stripe}) {
  if(now-pending.created_at>=23*3600)return answer('Pagamento da verificare con l’assistenza.',503);
  const s=await stripe(env,'/checkout/sessions',JSON.parse(pending.stripe_params),'POST','gold-renewal-'+pending.id);
  if(s.livemode!==(env.STRIPE_MODE==='live')||!s.id||s.client_reference_id!==pending.id||s.expires_at!==pending.expires_at)throw Error('invalid_checkout');
- if(s.mode!=='payment'||s.status!=='open'||s.currency!=='eur'||s.amount_total!==pending.amount||s.amount_subtotal!==p.amount||s.total_details?.amount_discount!==p.amount-pending.amount||!String(s.url).startsWith('https://checkout.stripe.com/')) {
+ const windowClosed=pending.promo&&!(Number.isInteger(s.created)&&s.created<pending.cycle_expires_at);
+ if(windowClosed||s.mode!=='payment'||s.status!=='open'||s.currency!=='eur'||s.amount_total!==pending.amount||s.amount_subtotal!==p.amount||s.total_details?.amount_discount!==p.amount-pending.amount||!String(s.url).startsWith('https://checkout.stripe.com/')) {
   // Do not redirect to a Checkout whose displayed amount differs from the offer.
   if(s.status==='open'&&s.payment_status==='unpaid') {
    await stripe(env,'/checkout/sessions/'+encodeURIComponent(s.id)+'/expire',{},'POST');
    await env.ACCESS_DB.prepare("UPDATE gold_renewals SET checkout_id=?,status='expired' WHERE id=? AND status='creating'").bind(s.id,pending.id).run();
   }
-  return answer('Importo del Checkout non confermato. Riprova o contatta l’assistenza.',503);
+  return windowClosed?answer('La finestra promozionale è terminata. Aggiorna lo stato.',409):answer('Importo del Checkout non confermato. Riprova o contatta l’assistenza.',503);
  }
  await env.ACCESS_DB.prepare("UPDATE gold_renewals SET checkout_id=?,checkout_url=?,status=CASE WHEN status='creating' THEN 'open' ELSE status END WHERE id=?")
   .bind(s.id,s.url,pending.id).run();
@@ -693,8 +696,14 @@ export async function fulfill(env,event) {
   const previous=isNew ? await subscriptionAccess(env,email,paidAt) : null;
   const earliest=Math.max(paidAt,previous?.expires_at||0);
   // Compare and insert in one statement: a concurrent purchase forces a fresh calculation.
-  const anchor='SELECT MAX(?1,COALESCE(MAX(expires_at),0)) AS t FROM passes WHERE email=?2 AND revoked=0 AND ?3';
-  const anchorArgs=[earliest,email,Number(isNew)];
+  // Ignore an isolated future pass when the account is already expired (for example after
+  // a refund). Preserve active and contiguous time, including a payment delivered out of order.
+  const anchor=order?`WITH RECURSIVE coverage(t) AS (
+      SELECT ?1 UNION SELECT p.expires_at FROM coverage JOIN passes p
+      ON p.email=?2 AND p.revoked=0 AND p.expires_at>t AND (p.starts_at<=t OR (p.starts_at<=?3 AND p.expires_at>?3))
+    ) SELECT MAX(t) AS t FROM coverage`:
+    'SELECT MAX(?1,COALESCE(MAX(expires_at),0)) AS t FROM passes WHERE email=?2 AND revoked=0 AND ?3';
+  const anchorArgs=[earliest,email,order?Math.max(paidAt,Math.floor(Date.now()/1000)):Number(isNew)];
   for(let attempt=0;attempt<8;attempt++) {
     const current=await env.ACCESS_DB.prepare(anchor).bind(...anchorArgs).all();
     const start=current.results[0].t;

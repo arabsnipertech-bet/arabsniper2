@@ -152,8 +152,14 @@ export async function fulfill(env,event) {
   const previous=isNew ? await subscriptionAccess(env,email,paidAt) : null;
   const earliest=Math.max(paidAt,previous?.expires_at||0);
   // Compare and insert in one statement: a concurrent purchase forces a fresh calculation.
-  const anchor='SELECT MAX(?1,COALESCE(MAX(expires_at),0)) AS t FROM passes WHERE email=?2 AND revoked=0 AND ?3';
-  const anchorArgs=[earliest,email,Number(isNew)];
+  // Ignore an isolated future pass when the account is already expired (for example after
+  // a refund). Preserve active and contiguous time, including a payment delivered out of order.
+  const anchor=order?`WITH RECURSIVE coverage(t) AS (
+      SELECT ?1 UNION SELECT p.expires_at FROM coverage JOIN passes p
+      ON p.email=?2 AND p.revoked=0 AND p.expires_at>t AND (p.starts_at<=t OR (p.starts_at<=?3 AND p.expires_at>?3))
+    ) SELECT MAX(t) AS t FROM coverage`:
+    'SELECT MAX(?1,COALESCE(MAX(expires_at),0)) AS t FROM passes WHERE email=?2 AND revoked=0 AND ?3';
+  const anchorArgs=[earliest,email,order?Math.max(paidAt,Math.floor(Date.now()/1000)):Number(isNew)];
   for(let attempt=0;attempt<8;attempt++) {
     const current=await env.ACCESS_DB.prepare(anchor).bind(...anchorArgs).all();
     const start=current.results[0].t;
