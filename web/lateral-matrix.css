@@ -342,3 +342,16 @@ body[data-gold-design] .mx-card.mx-compact h3{font-size:21px;margin-bottom:0}
 .mx-model-references{margin-top:10px;font-size:.8rem}
 .mx-model-references small{display:block;color:#bdcbd7}
 @media(max-width:680px){.mx-triad,.mx-v7-panel .mx-triad{grid-template-columns:1fr}}
+
+/* Final-result indicators: decorative animation only; frozen proposals are unchanged. */
+.mx-triad-outcome{display:inline-flex;align-items:center;justify-content:center;padding:3px 7px;border:1px solid currentColor;border-radius:6px;font-size:.66rem;font-weight:800;letter-spacing:.04em;white-space:nowrap}
+.mx-triad-won{color:#34d399;background:rgba(16,185,129,.13);animation:mx-outcome-pulse 2.2s ease-in-out infinite}
+.mx-triad-lost{color:#f87171;background:rgba(239,68,68,.13);animation:mx-outcome-pulse 2.2s ease-in-out infinite}
+@keyframes mx-outcome-pulse{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 0 3px currentColor}}
+@media(prefers-reduced-motion:reduce){.mx-triad-outcome{animation:none}}
+
+/* Illuminate the entire finished selection, without changing its tier color. */
+.mx-triad li[data-v7-slot]:has(.mx-triad-won){outline:2px solid #34d399;outline-offset:-2px;animation:mx-card-result-glow 2.2s ease-in-out infinite}
+.mx-triad li[data-v7-slot]:has(.mx-triad-lost){outline:2px solid #f87171;outline-offset:-2px;animation:mx-card-result-glow 2.2s ease-in-out infinite}
+@keyframes mx-card-result-glow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}
+@media(prefers-reduced-motion:reduce){.mx-triad li[data-v7-slot]:has(.mx-triad-outcome){animation:none}}

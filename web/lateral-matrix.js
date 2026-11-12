@@ -1001,7 +1001,40 @@
   const single=source.paired_books===1&&Number.isFinite(flow.value)&&!Number.isFinite(source.oci)&&!expired;
   return '<small>'+esc(summary+(single&&signal.motivation?' · OCI indicativo '+signed(flow.value):''))+'</small>';
  }
- function triadPanel(view,compact=false){
+ // Presentation-only settlement; unknown and complex markets remain neutral.
+ function triadOutcome(m,p){
+  if(!m||!p||p.signal?.quote_state==='model_estimate')return null;
+  const f=root.ArabLive?.fixture?.(m)||m.fixture||{},l=f.live||{},r=f.result||{};
+  const status=l.status||r.status||f.status_short;
+  if(status!=='FT')return null;
+  const score=[r.home_ft,r.away_ft].every(Number.isInteger)?[r.home_ft,r.away_ft]:
+   [l.goals?.home,l.goals?.away].every(Number.isInteger)?[l.goals.home,l.goals.away]:null;
+  if(!score||score.some(n=>n<0))return null;
+  const spec=p.source?.spec||{};
+  let goals=score;
+  if(['ht','sh'].includes(spec.period)){
+   const half=root.ArabLive?.firstHalf?.(m);
+   const nums=half?.status==='complete'&&typeof half.score==='string'?half.score.split(/[–-]/).map(Number):[];
+   if(nums.length!==2||nums.some(n=>!Number.isInteger(n)||n<0))return null;
+   goals=spec.period==='ht'?nums:score.map((n,i)=>n-nums[i]);
+   if(goals.some(n=>n<0))return null;
+  }else if(spec.period!=='ft')return null;
+  const [home,away]=goals;
+  if(spec.kind==='total'&&Number.isFinite(spec.line)&&['over','under'].includes(spec.side))
+   return spec.side==='over'?home+away>spec.line:home+away<spec.line;
+  if(spec.kind==='btts'&&['yes','no'].includes(spec.side))
+   return spec.side==='yes'?(home>0&&away>0):!(home>0&&away>0);
+  if(spec.kind==='result'&&spec.period==='ft'&&['1','x','2'].includes(spec.side))
+   return spec.side===(home>away?'1':home<away?'2':'x');
+  return null;
+ }
+ function triadOutcomeBadge(m,p){
+  const won=triadOutcome(m,p);
+  return won===null?'':'<span class="mx-triad-outcome '+(won?'mx-triad-won':'mx-triad-lost')+
+   '" role="status" aria-label="'+(won?'Proposta vinta':'Proposta persa')+'">'+
+   (won?'✓ VINTA':'✕ PERSA')+'</span>';
+ }
+ function triadPanel(view,compact=false,match=null){
   const saved=view.v7?.triad;
   if(!Object.values(view.triad).some(Boolean)){
    const message=Object.values(saved||{}).some(Boolean)?'Quota da aggiornare':'Nessuna proposta prematch disponibile.';
@@ -1012,7 +1045,7 @@
     const p=view.triad[role],s=p?.signal;
     const estimate=s?.quote_state==='model_estimate';
     const badge=s&&levelBadge(String(s.tier).toLowerCase(),s.badge);
-    return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+title+'</span>'+(badge||'')+'</div>'+
+    return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+title+'</span>'+(badge||'')+(p?triadOutcomeBadge(match,p):'')+'</div>'+
      (p?'<div class="mx-triad-market"><b>'+esc(p.record.label)+'</b>'+(estimate?'':'<strong>'+num(p.record.odd,2)+'</strong>')+'</div>'+
       '<div class="mx-triad-meta"><span>'+esc(s.horizon_label)+'</span><span>'+v7Estimate(p.record.calibrated)+' V7</span>'+
       (Number.isFinite(p.record.model_fair_odd)?'<span>Quota equa '+num(p.record.model_fair_odd,2)+'</span>':'')+
@@ -1053,7 +1086,7 @@
    modelReferences(v7)+'</details>':'';
   return '<section class="mx-v7-panel mx-v7-published" aria-label="Selezioni prematch V7"><header><small>MOTORE V7 · PREMATCH</small><small>'+
    esc(services.timestamp?.(v7?.captured_at)||'')+'</small></header>'+
-   (view.triad?triadPanel(view):
+   (view.triad?triadPanel(view,false,m):
     (!primary?'<p class="mx-v7-empty">Nessuna proposta principale con quota verificata e criteri soddisfatti.</p>':'')+
     (rows?'<ul>'+rows+'</ul>':''))+technical+'</section>';
  }
@@ -1187,7 +1220,7 @@
  }
  function compactProposal(m,helpers={}){
   const view=publishedView(m);
-  if(view?.triad)return triadPanel(view,true);
+  if(view?.triad)return triadPanel(view,true,m);
   const proposal=proposalData(m,helpers);
   if(!proposal)return '<div class="mx-compact-proposal"><small>Nessuna proposta principale disponibile</small></div>';
   const {title,label,odd,first,note,probability,v7}=proposal;
@@ -1271,7 +1304,7 @@
   h.onchange=e=>{const fid=e.target.dataset?.mxInlineInstrument;if(fid!==undefined){inlineInstruments.set(fid,e.target.value||null);const m=(payload.matches||[]).find(x=>String(x.fixture?.fixture_id)===fid);if(m){e.target.closest('.mx-cockpit').outerHTML=cockpit(m,helpers,true);[...h.querySelectorAll('[data-mx-inline-instrument]')].find(x=>x.dataset.mxInlineInstrument===fid)?.focus();}return;}const key=e.target.dataset?.mxFilter;if(key&&key in state){state[key]=e.target.value;render(payload,host,helpers);}};
   updateModal();
  }
- const api={publishedView,triadPanel,v7Panel,displayOci,proposalData,compactProposal,compactQuotes,card,operatorFair,observedMeans,goalPanels,studyDefaultRow,historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketOrigin,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
+ const api={triadOutcome,publishedView,triadPanel,v7Panel,displayOci,proposalData,compactProposal,compactQuotes,card,operatorFair,observedMeans,goalPanels,studyDefaultRow,historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketOrigin,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.ArabMatrix=api;
 })(typeof window!=='undefined'?window:globalThis);
