@@ -131,8 +131,12 @@ def report_copy(view, *, compact=False):
 
 def live_copy(view):
     score = f" · {view['home']}–{view['away']}" if 'home' in view else ''
-    return [f"{view['match']} · {view['league']}", f"{italian_time(view['kickoff'])} · {view['status']}{score}",
-            'Aggiornamenti dal risultato ufficiale.']
+    lines = [f"{view['match']} · {view['league']}", f"{italian_time(view['kickoff'])} · {view['status']}{score}"]
+    if 'halftime' in view and view['status'] != 'Intervallo':
+        home, away = view['halftime']
+        lines.append(f'Parziale all’intervallo · {home}–{away}')
+    lines.append('Aggiornamenti dal risultato ufficiale.')
+    return lines
 
 
 def presentation(kind, view):

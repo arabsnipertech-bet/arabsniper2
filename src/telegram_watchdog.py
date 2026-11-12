@@ -108,6 +108,24 @@ def wake(api,now,dry_run=False):
 
 PUBLISHER_WORKFLOW = 'publisher-v71.yml'
 PUBLISHER_INTERVAL = timedelta(minutes=17)
+LIVE_INTERVAL = timedelta(minutes=9)
+PUBLISHER_FEED = f'https://raw.githubusercontent.com/{REPO}/publisher-public-v71/homepage.json'
+
+
+def publisher_live_active(now):
+    """Read the public coverage state from the same Publisher."""
+    try:
+        with urlopen(PUBLISHER_FEED, timeout=5) as response:
+            feed = json.loads(response.read(100_001))
+        if feed.get('publisher') != 'v7.1':
+            return False
+        live = feed.get('live') or {}
+        if live.get('status') not in ('Prematch', 'In corso', 'Primo tempo', 'Intervallo', 'Secondo tempo'):
+            return False
+        start = datetime.fromisoformat(live['kickoff'].replace('Z', '+00:00'))
+        return start.tzinfo is not None and start <= now < start + timedelta(hours=5)
+    except (AttributeError, KeyError, TypeError, URLError, TimeoutError, ValueError):
+        return False
 
 
 def wake_publisher(api, now, *, dry_run=False):
@@ -115,11 +133,13 @@ def wake_publisher(api, now, *, dry_run=False):
     path = 'workflows/' + PUBLISHER_WORKFLOW
     if api.request(path).get('state') != 'active':
         return 'workflow_disabled'
-    for run in api.runs(PUBLISHER_WORKFLOW, now - timedelta(minutes=45)):
-        if run['status'] != 'completed':
-            return 'already_running'
-        created = datetime.fromisoformat(run['created_at'].replace('Z', '+00:00'))
-        if now - created < PUBLISHER_INTERVAL:
+    runs = api.runs(PUBLISHER_WORKFLOW, now - timedelta(minutes=45))
+    if any(run['status'] != 'completed' for run in runs):
+        return 'already_running'
+    if runs:
+        created = max(datetime.fromisoformat(run['created_at'].replace('Z', '+00:00')) for run in runs)
+        age = now - created
+        if age < LIVE_INTERVAL or (age < PUBLISHER_INTERVAL and not publisher_live_active(now)):
             return 'recent_cycle'
     if dry_run:
         return 'would_dispatch'

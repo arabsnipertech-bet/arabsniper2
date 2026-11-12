@@ -79,7 +79,9 @@ def read(store, states, now, clock, log):
         fid = str(meta.get('id', ''))
         if fid not in missing:
             continue
+        score = row.get('score') or {}
         fixtures[fid] = {'fixture_id': fid, 'source': 'API-Football', 'observed_at': seen,
                          'status': (meta.get('status') or {}).get('short'), 'refresh_failed': False,
-                         'goals': row.get('goals'), 'fulltime': (row.get('score') or {}).get('fulltime')}
+                         'goals': row.get('goals'), 'halftime': score.get('halftime'),
+                         'fulltime': score.get('fulltime')}
     return {'schema_version': 1, 'enabled': True, 'fixtures': fixtures}

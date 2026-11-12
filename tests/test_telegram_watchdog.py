@@ -1,10 +1,13 @@
 import unittest
+from unittest import mock
+import json
 import sys
+from io import BytesIO
 from pathlib import Path
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
-from telegram_watchdog import wake, wake_publisher, due_slots, ROME
+from telegram_watchdog import wake, wake_publisher, publisher_live_active, due_slots, ROME
 
 
 class FakeApi:
@@ -49,7 +52,8 @@ class TelegramWatchdogTests(unittest.TestCase):
         api = FakeApi([{"status": "in_progress"}])
         self.assertEqual(wake_publisher(api, now), "already_running")
         api.data = [{"status": "completed", "created_at": (now - timedelta(minutes=10)).isoformat()}]
-        self.assertEqual(wake_publisher(api, now), "recent_cycle")
+        with mock.patch('telegram_watchdog.publisher_live_active', return_value=False):
+            self.assertEqual(wake_publisher(api, now), "recent_cycle")
         api.state = "disabled_manually"
         self.assertEqual(wake_publisher(api, now), "workflow_disabled")
         self.assertEqual(api.dispatched, [])
@@ -63,3 +67,24 @@ class TelegramWatchdogTests(unittest.TestCase):
         self.assertEqual(api.dispatched, [
             ("workflows/publisher-v71.yml/dispatches", {"ref": "main", "inputs": {"dry_run": "false"}})
         ])
+
+    def test_active_live_can_wake_publisher_on_the_next_ten_minute_tick(self):
+        now = datetime.fromisoformat("2026-11-12T22:25:30+01:00")
+        recent = {"status": "completed", "created_at": (now - timedelta(minutes=9, seconds=55)).isoformat()}
+        api = FakeApi([recent])
+        with mock.patch('telegram_watchdog.publisher_live_active', return_value=True):
+            self.assertEqual(wake_publisher(api, now, dry_run=True), "would_dispatch")
+            api.data.append({"status": "in_progress"})
+            self.assertEqual(wake_publisher(api, now), "already_running")
+        self.assertFalse(api.dispatched)
+
+    def test_live_interval_applies_only_between_kickoff_and_the_end_of_coverage(self):
+        now = datetime.fromisoformat("2026-11-12T21:30:00+01:00")
+        kickoff = "2026-11-12T20:45:00+01:00"
+        for status, at, expected in (
+            ("Intervallo", now, True), ("Prematch", now - timedelta(hours=1), False),
+            ("Finale", now, False), ("In corso", now + timedelta(hours=5), False),
+        ):
+            payload = {"publisher": "v7.1", "live": {"status": status, "kickoff": kickoff}}
+            with mock.patch('telegram_watchdog.urlopen', return_value=BytesIO(json.dumps(payload).encode())):
+                self.assertEqual(publisher_live_active(at), expected)

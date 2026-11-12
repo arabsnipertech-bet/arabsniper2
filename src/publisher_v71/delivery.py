@@ -88,7 +88,7 @@ def attempt(store, post, service, candidates, clock, emit):
         return
 
     try:
-        image = None if post.get('edit_id') else card(post['kind'], post['view'])
+        image = card(post['kind'], post['view'])
     except (OSError, ValueError) as exc:
         post.update(status='failed', reason='render_' + type(exc).__name__)
         store.save()

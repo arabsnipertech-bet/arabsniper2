@@ -8,7 +8,7 @@ Il Publisher legge i board Gold già pubblicati in R2 e usa il primo ruolo V7 co
 | --- | --- | --- |
 | BEST | Verifica ogni 15 minuti e dopo Fast Scan. Gruppi di 2–3 gare entro 90 minuti. Primo kickoff entro 60 minuti e almeno 20 minuti di anticipo all’invio. | Telegram e homepage. Meta riceve al massimo una BEST Probabile Gold o Platinum per giornata. |
 | Spunto Studio | Una gara con analisi Studio già pubblicata in Gold per ciascuna fascia di kickoff 16–18, 18–20 e 20–24, da 60 a 20 minuti prima del via, quando la fascia non ha già una BEST sullo stesso canale. Fino a due anteprime con lucchetto. | Telegram e Facebook. |
-| Live | Una copertura per giornata di kickoff, se c’è una proposta pubblicata e monitorabile. | Telegram con modifiche allo stesso messaggio, homepage e riepilogo finale su Facebook. |
+| Live | Una copertura per giornata di kickoff, se c’è una proposta pubblicata e monitorabile. Durante la gara il timer può riattivare il Publisher al controllo successivo dei 10 minuti. | Telegram con aggiornamenti di scheda e testo sullo stesso messaggio, parziale all’intervallo e finale. Homepage e riepilogo finale su Facebook. |
 | Riscontri | Dal primo ciclo utile dopo le 10:45, con certificato Auditor della giornata precedente e coorti conciliabili. | Telegram, Meta, homepage. |
 | Dentro i Numeri | Dalle 16:45, con rinvio in presenza di una BEST da inviare. | Telegram, Meta, homepage. |
 | Gold | Martedì e sabato dalle 12:15, se il webhook della prova risulta disponibile. | Telegram, Meta, homepage. |
@@ -22,7 +22,7 @@ Una singola richiede una proposta Probabile di livello Gold o Platinum e una fin
 - Il registro è nel prefisso privato `publisher/v7.1/`. Le evidenze congelate usano creazione condizionale. Il registro usa scritture condizionali sul suo ETag.
 - I tentativi hanno un massimo di tre invii, con attese crescenti per i rifiuti transitori. Le risposte ambigue richiedono riscontro positivo dal canale. Un invio incerto resta sospeso in assenza di ricevuta.
 - Il recap di Telegram, Facebook e homepage mette in evidenza fino a quattro partite con una proposta corretta tra i ruoli della triade prematch certificata dall’Auditor. Il bilancio distingue BEST gratuite, BEST Gold documentate e ricerca interna. La homepage conserva tutte le metriche del report. Successo su esiti corretti ed errati. ROI teorico su una unità per esito chiuso, rimborsate incluse a zero.
-- Il Live usa la cache dei punteggi esistente. Se la cache è indisponibile, usa al massimo 26 richieste al fornitore ufficiale per giornata e conserva una riserva di almeno 1.000 richieste. Un risultato finale usa il punteggio ufficiale dei 90 minuti. Il mercato prematch resta nel registro originale.
+- Il Live usa la cache dei punteggi esistente. I punteggi in avanzamento e l’intervallo sono aggiornati alla prima osservazione fresca. Le rettifiche durante il gioco richiedono due osservazioni indipendenti. Se la cache è indisponibile, usa al massimo 26 richieste al fornitore ufficiale per giornata e conserva una riserva di almeno 1.000 richieste. Il risultato finale usa il punteggio ufficiale dei 90 minuti e riporta il parziale all’intervallo quando disponibile. Il mercato prematch resta nel registro originale.
 
 ## Passaggio e rollback
 
