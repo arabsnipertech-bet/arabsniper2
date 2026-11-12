@@ -1006,7 +1006,7 @@
   if(!m||!p||p.signal?.quote_state==='model_estimate')return null;
   const f=root.ArabLive?.fixture?.(m)||m.fixture||{},l=f.live||{},r=f.result||{};
   const status=l.status||r.status||f.status_short;
-  if(!['FT','AET'].includes(status))return null;
+  if(status!=='FT')return null;
   const score=[r.home_ft,r.away_ft].every(Number.isInteger)?[r.home_ft,r.away_ft]:
    [l.goals?.home,l.goals?.away].every(Number.isInteger)?[l.goals.home,l.goals.away]:null;
   if(!score||score.some(n=>n<0))return null;
