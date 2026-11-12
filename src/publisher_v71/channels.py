@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
+import json
 import re
 
 import requests
@@ -98,7 +99,16 @@ class Telegram:
         data = {'chat_id': '@' + CHANNEL, 'caption': post['text'], 'disable_notification':
                 'true' if post['kind'] == 'live' else 'false'}
         if post.get('edit_id'):
-            result = self.call('editMessageCaption', {**data, 'message_id': post['edit_id']}, edit=True)
+            target = {'chat_id': data['chat_id'], 'message_id': post['edit_id']}
+            media = json.dumps({'type': 'photo', 'media': 'attach://live_card', 'caption': post['text']},
+                               ensure_ascii=False)
+            try:
+                result = self.call('editMessageMedia', {**target, 'media': media},
+                                   files={'live_card': ('gold-classic.jpg', image, 'image/jpeg')}, edit=True)
+            except DeliveryError as exc:
+                if (exc.kind, exc.reason) != ('rejected', 'telegram_http_400'):
+                    raise
+                result = self.call('editMessageCaption', {**target, 'caption': post['text']}, edit=True)
         else:
             result = self.call('sendPhoto', data, files={'photo': ('gold-classic.jpg', image, 'image/jpeg')})
         if result is None and post.get('edit_id'):

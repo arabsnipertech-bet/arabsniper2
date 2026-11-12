@@ -150,7 +150,7 @@ def plan_live(store, now, candidates, channels):
             continue
         states[day] = state
         queue(store, 'live', day + '/start', state['view'], ['telegram'], now, kickoff - LEAD)
-    if not any(not state['done'] for state in states.values()):
+    if not any(not state['done'] or live.needs_halftime(state, now) for state in states.values()):
         return
     feed = safe_read('live_scores', lambda: scores.read(store, states.values(), now, clock, event_log), {})
     now = clock()
@@ -158,6 +158,7 @@ def plan_live(store, now, candidates, channels):
         start_post = store.state['posts'].get(f'telegram/live/{day}/start') or {}
         if start_post.get('status') != 'sent':
             continue
+        was_done = state['done']
         change = live.advance(state, feed, now, candidates)
         if not change:
             continue
@@ -167,7 +168,7 @@ def plan_live(store, now, candidates, channels):
         suffix = day + '/' + live.revision(change)
         queue(store, 'live', suffix, change, ['telegram'], now, until,
               edit=start_post['receipt']['id'])
-        if change['status'] == 'Finale' and 'facebook' in channels:
+        if change['status'] == 'Finale' and not was_done and 'facebook' in channels:
             queue(store, 'live', suffix, change, ['facebook'], now, until)
 
 

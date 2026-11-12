@@ -11,7 +11,7 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
 from publisher_v71 import delivery, editorial, live, public_feed, report, runner, selection, studio
-from publisher_v71.channels import DeliveryError, TelegramHistory
+from publisher_v71.channels import DeliveryError, Telegram, TelegramHistory
 from publisher_v71.runner import add_group, plan_report, record_home_receipt
 from publisher_v71.storage import Storage
 from v7_decision import GOAL, fingerprint
@@ -370,6 +370,84 @@ class PublisherTests(TestCase):
         result = live.advance(state, {'schema_version': 1, 'enabled': True, 'fixtures': {'2': fixture}}, end, {})
         self.assertEqual((result['status'], result['home'], result['away']), ('Finale', 2, 1))
         self.assertNotIn('market', result)
+
+    def test_live_updates_first_half_and_final_from_fresh_scores(self):
+        match = pick(1)
+        kickoff = datetime.fromisoformat(match['kickoff'])
+        state = live.start_state(match, None, NOW)
+        for offset, status, goals, halftime, fulltime, expected in (
+            (35, '1H', (0, 1), None, None, 'Primo tempo'),
+            (50, 'HT', (0, 1), (0, 1), None, 'Intervallo'),
+            (60, '2H', (0, 1), (0, 1), None, 'Secondo tempo'),
+            (110, 'FT', (1, 2), (0, 1), (0, 1), 'Finale'),
+        ):
+            now = kickoff + timedelta(minutes=offset)
+            fixture = {'fixture_id': '1', 'source': 'API-Football', 'observed_at': selection.utc(now),
+                       'refresh_failed': False, 'status': status, 'goals': dict(zip(('home', 'away'), goals))}
+            if halftime:
+                fixture['halftime'] = dict(zip(('home', 'away'), halftime))
+            if fulltime:
+                fixture['fulltime'] = dict(zip(('home', 'away'), fulltime))
+            feed = {'schema_version': 1, 'enabled': True, 'fixtures': {'1': fixture}}
+            view = live.advance(state, feed, now, {})
+            self.assertEqual((view['status'], view['home'], view['away']), (expected, 0, 1))
+            self.assertEqual(view.get('halftime'), list(halftime) if halftime else None)
+            state['view'] = view
+        self.assertTrue(state['done'])
+        self.assertIn('Parziale all’intervallo · 0–1', editorial.message('live', state['view'], 'AS71-TEST', 'telegram'))
+
+    def test_live_score_corrections_require_two_new_observations(self):
+        match = pick(1)
+        now = datetime.fromisoformat(match['kickoff']) + timedelta(minutes=30)
+        state = live.start_state(match, None, NOW)
+        fixture = {'fixture_id': '1', 'source': 'API-Football', 'observed_at': selection.utc(now),
+                   'refresh_failed': False, 'status': '1H', 'goals': {'home': 0, 'away': 1}}
+        feed = {'schema_version': 1, 'enabled': True, 'fixtures': {'1': fixture}}
+        state['view'] = live.advance(state, feed, now, {})
+        first = now + timedelta(minutes=1)
+        fixture.update(goals={'home': 0, 'away': 0}, observed_at=selection.utc(first))
+        self.assertIsNone(live.advance(state, feed, first, {}))
+        self.assertIsNone(live.advance(state, feed, first + timedelta(seconds=60), {}))
+        second = first + timedelta(seconds=60)
+        fixture['observed_at'] = selection.utc(second)
+        self.assertEqual(live.advance(state, feed, second, {})['away'], 0)
+
+    def test_old_final_gets_halftime_as_an_edit_of_the_original_message(self):
+        match = pick(1)
+        kickoff = datetime.fromisoformat(match['kickoff'])
+        now = kickoff + timedelta(minutes=115)
+        day = selection.rome_day(kickoff)
+        store = LocalStore()
+        state = live.start_state(match, None, NOW)
+        state.update(done=True, view=live.status_view(match, 'Finale', now, [0, 1]))
+        store.state['live'][day] = state
+        start_id = f'telegram/live/{day}/start'
+        store.state['posts'][start_id] = {'status': 'sent', 'receipt': {'id': '181'}}
+        fixture = {'fixture_id': '1', 'source': 'API-Football', 'observed_at': selection.utc(now),
+                   'refresh_failed': False, 'status': 'FT',
+                   'fulltime': {'home': 0, 'away': 1}, 'halftime': {'home': 0, 'away': 1}}
+        feed = {'schema_version': 1, 'enabled': True, 'fixtures': {'1': fixture}}
+        with (mock.patch.object(runner.scores, 'read', return_value=feed) as cache,
+              mock.patch.object(runner, 'read_local', return_value={}),
+              mock.patch.object(runner, 'clock', return_value=now)):
+            runner.plan_live(store, now, {}, ('telegram', 'facebook'))
+            runner.plan_live(store, now, {}, ('telegram', 'facebook'))
+        cache.assert_called_once()
+        edits = [post for key, post in store.state['posts'].items() if key != start_id]
+        self.assertEqual(len(edits), 1)
+        edit = edits[0]
+        self.assertEqual((edit['channel'], edit['edit_id']), ('telegram', '181'))
+        self.assertIn('Parziale all’intervallo · 0–1', edit['text'])
+        service = Telegram('mock-token')
+        receipt = {'chat': {'username': 'arabsniper_signals'}, 'message_id': 181,
+                   'date': int(now.timestamp()), 'edit_date': int(now.timestamp())}
+        with mock.patch.object(service, 'call', return_value=receipt) as api:
+            delivery.attempt(store, edit, service, {}, lambda: now, mock.Mock())
+        method, target = api.call_args.args
+        self.assertEqual((method, target['message_id']), ('editMessageMedia', '181'))
+        self.assertEqual(json.loads(target['media'])['caption'], edit['text'])
+        self.assertEqual(Image.open(BytesIO(api.call_args.kwargs['files']['live_card'][1])).size, (1080, 1350))
+        self.assertEqual(edit['receipt']['id'], '181')
 
     def test_public_receipt_parser_only_exact_channel_messages(self):
         parser = TelegramHistory('AS71-ABCD')

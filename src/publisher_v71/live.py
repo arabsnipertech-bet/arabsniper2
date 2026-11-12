@@ -9,16 +9,27 @@ from .selection import LEAD, project_pick, rome_day, utc
 ACTIVE = {'1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE'}
 FINAL = {'FT', 'AET', 'PEN'}
 STOPPED = {'PST', 'CANC', 'ABD', 'AWD', 'WO', 'SUSP', 'INT'}
+PHASES = {'1H': 'Primo tempo', 'HT': 'Intervallo', '2H': 'Secondo tempo'}
+AFTER_FIRST_HALF = (ACTIVE - {'1H', 'LIVE'}) | FINAL
 EXPIRED = timedelta(hours=5)
 
 
-def status_view(pick, status, at, score=None):
+def status_view(pick, status, at, score=None, *, halftime=None):
     row = project_pick(pick)
     row.pop('category')
     row.update(status=status, observed_at=utc(at))
     if score:
         row.update(home=score[0], away=score[1])
+    if halftime:
+        row['halftime'] = halftime
     return row
+
+
+def score_pair(source):
+    if not isinstance(source, dict):
+        return None
+    pair = [source.get('home'), source.get('away')]
+    return pair if all(type(n) is int and n >= 0 for n in pair) else None
 
 
 def observe(pick, feed, now):
@@ -33,39 +44,65 @@ def observe(pick, feed, now):
             or not kickoff <= seen <= now or now-seen > (EXPIRED if status in FINAL else timedelta(minutes=7))
             or status not in ACTIVE | FINAL | STOPPED):
         return None
-    source = (row.get('fulltime') if status in FINAL else row.get('goals')) or {}
-    score = [source.get('home'), source.get('away')]
-    if not all(type(n) is int and n >= 0 for n in score):
-        if status not in STOPPED:
-            return None
-        score = None
-    return {'at': utc(seen), 'status': status, 'score': score}
+    score = score_pair(row.get('fulltime') if status in FINAL else row.get('goals'))
+    halftime = score_pair(row.get('halftime')) if status in AFTER_FIRST_HALF else None
+    if status == 'HT':
+        score = halftime = halftime or score
+    if not score and status not in STOPPED:
+        return None
+    if halftime and score and any(half > total for half, total in zip(halftime, score)):
+        halftime = None
+    return {'at': utc(seen), 'status': status, 'score': score, 'halftime': halftime}
+
+
+def needs_halftime(state, now):
+    return (state.get('done') and state['view']['status'] == 'Finale'
+            and 'halftime' not in state['view']
+            and now < stamp(state['pick']['kickoff']) + EXPIRED)
 
 
 def advance(state, feed, now, reservable):
-    """Require two independent cache observations and use the reserve once."""
-    if state.get('done'):
+    """Apply fresh live scores and confirm corrections with independent readings."""
+    done = state.get('done')
+    if done and not needs_halftime(state, now):
         return None
     pick = state['pick']
     kickoff = stamp(pick['kickoff'])
     sample = observe(pick, feed, now)
+    if done:
+        if sample and sample['status'] in FINAL and sample['halftime']:
+            return status_view(pick, 'Finale', stamp(sample['at']), sample['score'], halftime=sample['halftime'])
+        return None
+
+    confirmed = state.get('confirmed') or {}
+    confirmed_at = stamp(confirmed.get('at'))
+    if sample and confirmed_at and stamp(sample['at']) <= confirmed_at:
+        sample = None
     if sample:
         last = state.get('candidate')
         status, score = sample['status'], sample['score']
         signature = (status, score)
         independent = last and (last['status'], last['score']) == signature and (
             stamp(sample['at']) - stamp(last['at']) >= timedelta(seconds=45))
-        if status in FINAL or independent:
-            confirmed = state.get('confirmed')
+        previous_score = confirmed.get('score')
+        correction = previous_score and score and any(new < old for old, new in zip(previous_score, score))
+        earlier_phase = (status == '1H' and confirmed.get('status') in AFTER_FIRST_HALF
+                         or status == 'HT' and confirmed.get('status') in AFTER_FIRST_HALF - {'HT'})
+        current_score = status in ACTIVE and not earlier_phase and (status == 'HT' or not correction)
+        if status in FINAL or current_score or independent:
             state['last_coverage'] = sample['at']
-            previous_score = confirmed.get('score') if confirmed else None
-            stage = 'Finale' if status in FINAL else 'Intervallo' if status == 'HT' else 'In corso'
+            stage = 'Finale' if status in FINAL else PHASES.get(status, 'In corso')
             if status in STOPPED:
                 stage = 'Gara sospesa o rinviata' if status in {'PST', 'SUSP', 'INT'} else 'Gara interrotta o annullata'
+            halftime = sample['halftime'] or state['view'].get('halftime')
+            if halftime and score and any(half > total for half, total in zip(halftime, score)):
+                halftime = None
             state['confirmed'] = sample
+            state['candidate'] = None
             state['done'] = status in FINAL | (STOPPED - {'SUSP', 'INT'})
-            if (confirmed is None or previous_score != score or state['view']['status'] != stage):
-                return status_view(pick, stage, stamp(sample['at']), score)
+            if (not confirmed or previous_score != score or state['view']['status'] != stage
+                    or state['view'].get('halftime') != halftime):
+                return status_view(pick, stage, stamp(sample['at']), score, halftime=halftime)
             return None
         if not last or (last['status'], last['score']) != signature:
             state['candidate'] = sample
