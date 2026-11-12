@@ -1001,15 +1001,20 @@
   const single=source.paired_books===1&&Number.isFinite(flow.value)&&!Number.isFinite(source.oci)&&!expired;
   return '<small>'+esc(summary+(single&&signal.motivation?' · OCI indicativo '+signed(flow.value):''))+'</small>';
  }
+ function regulationScore(f){
+  const l=f.live||{},r=f.result||{};
+  const status=l.status||r.status||f.status_short;
+  if(!['FT','AET','PEN'].includes(status))return null;
+  const scores=[[l.fulltime?.home,l.fulltime?.away],[r.home_ft,r.away_ft]];
+  // The running goals are the regulation result only for an ordinary finish.
+  if(status==='FT')scores.push([l.goals?.home,l.goals?.away]);
+  return scores.find(pair=>pair.every(n=>Number.isInteger(n)&&n>=0))||null;
+ }
  // Presentation-only settlement; unknown and complex markets remain neutral.
  function triadOutcome(m,p){
   if(!m||!p)return null;
-  const f=root.ArabLive?.fixture?.(m)||m.fixture||{},l=f.live||{},r=f.result||{};
-  const status=l.status||r.status||f.status_short;
-  if(status!=='FT')return null;
-  const score=[r.home_ft,r.away_ft].every(Number.isInteger)?[r.home_ft,r.away_ft]:
-   [l.goals?.home,l.goals?.away].every(Number.isInteger)?[l.goals.home,l.goals.away]:null;
-  if(!score||score.some(n=>n<0))return null;
+  const score=regulationScore(root.ArabLive?.fixture?.(m)||m.fixture||{});
+  if(!score)return null;
   const spec=p.source?.spec||{},kind=spec.kind;
   const half=root.ArabLive?.firstHalf?.(m);
   const nums=half?.status==='complete'&&typeof half.score==='string'?half.score.split(/[–-]/).map(Number):[];
@@ -1029,7 +1034,8 @@
   const goals=spec.period==='ft'?score:spec.period==='ht'&&validHalf?nums:
    spec.period==='sh'&&validHalf?second:null;
   if(!goals||spec.extra!=null)return null;
-  if(kind==='total'&&Number.isFinite(spec.line)&&['over','under'].includes(spec.side))
+  if(['total','asian_total'].includes(kind)&&Number.isFinite(spec.line)&&spec.line%1===.5&&
+     ['over','under'].includes(spec.side))
    return spec.side==='over'?over(goals,spec.line):total(goals)<spec.line;
   if(kind==='btts'&&['yes','no'].includes(spec.side))
    return spec.side==='yes'?both(goals):!both(goals);
@@ -1363,7 +1369,7 @@
   h.onchange=e=>{const fid=e.target.dataset?.mxInlineInstrument;if(fid!==undefined){inlineInstruments.set(fid,e.target.value||null);const m=(payload.matches||[]).find(x=>String(x.fixture?.fixture_id)===fid);if(m){e.target.closest('.mx-cockpit').outerHTML=cockpit(m,helpers,true);[...h.querySelectorAll('[data-mx-inline-instrument]')].find(x=>x.dataset.mxInlineInstrument===fid)?.focus();}return;}const key=e.target.dataset?.mxFilter;if(key&&key in state){state[key]=e.target.value;render(payload,host,helpers);}};
   updateModal();
  }
- const api={triadOutcome,publishedView,triadPanel,v7Panel,displayOci,proposalData,compactProposal,compactQuotes,card,operatorFair,observedMeans,goalPanels,studyDefaultRow,historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketOrigin,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
+ const api={regulationScore,triadOutcome,publishedView,triadPanel,v7Panel,displayOci,proposalData,compactProposal,compactQuotes,card,operatorFair,observedMeans,goalPanels,studyDefaultRow,historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketOrigin,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.ArabMatrix=api;
 })(typeof window!=='undefined'?window:globalThis);
