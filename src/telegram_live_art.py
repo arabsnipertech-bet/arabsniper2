@@ -1,4 +1,5 @@
 """Render original vector-style loop animations; no prediction data in assets."""
+from io import BytesIO
 from pathlib import Path
 from math import sin, cos, pi
 from PIL import Image, ImageDraw, ImageFont
@@ -18,7 +19,7 @@ def centered(draw,text,y,size,color,width=580):
     while draw.textlength(text,font=font(size))>width:size-=1
     draw.text((320,y),text,font=font(size),fill=color,anchor='mm')
 
-def frame(kind,n):
+def frame(kind,n,badge='SINGOLA GRATUITA · CANALE TELEGRAM'):
     title,color,subtitle=STATES[kind];t=n/32;im=Image.new('RGB',(640,640));d=ImageDraw.Draw(im)
     for y in range(640):
         d.line((0,y,640,y),fill=(7+int(5*y/640),20+int(14*y/640),33+int(14*y/640)))
@@ -60,13 +61,20 @@ def frame(kind,n):
     centered(d,title,408,46+int(2*sin(2*pi*t)),color)
     centered(d,subtitle,461,19,'#F3F2E9')
     d.rounded_rectangle((95,510,545,552),radius=12,fill='#173440')
-    centered(d,'SINGOLA GRATUITA · CANALE TELEGRAM',531,15,'#ADC3CC')
+    centered(d,badge,531,15,'#ADC3CC')
     centered(d,'arabsniperbet.com  ·  18+',586,17,'#94AFBD')
     return im
+
+def animation(kind, badge='SINGOLA GRATUITA · CANALE TELEGRAM'):
+    frames = [frame(kind, n, badge) for n in range(32)]
+    output = BytesIO()
+    frames[0].save(output, format='GIF', save_all=True, append_images=frames[1:],
+                   duration=100, loop=0, optimize=True)
+    return output.getvalue()
+
 
 def render_all(folder='assets/telegram-live'):
     out=Path(folder);out.mkdir(parents=True,exist_ok=True)
     for kind in STATES:
-        frames=[frame(kind,n) for n in range(32)]
-        frames[0].save(out/(kind+'.gif'),save_all=True,append_images=frames[1:],duration=100,loop=0,optimize=True)
+        (out / (kind + '.gif')).write_bytes(animation(kind))
 if __name__=='__main__':render_all()

@@ -34,7 +34,10 @@ def projection(state, now, past=None, *, boards=()):
     report = max(state['reports'].values(), key=lambda item: item['view']['date'], default=None)
     academy = max((p['view'] for p in state['posts'].values() if p['kind'] == 'academy'),
                   key=lambda item: item['date'], default=None)
-    live = max(state['live'].values(), key=lambda item: item['view']['observed_at'], default=None)
+    live = max((item['view'] for item in state['live'].values()),
+               key=lambda view: view['observed_at'], default=None)
+    if live:
+        live = {key: value for key, value in live.items() if key not in ('animation', 'events')}
     groups = []
     for group in state['groups'].values():
         view = project_group(group, now)
@@ -46,7 +49,7 @@ def projection(state, now, past=None, *, boards=()):
         'groups': sorted(groups, key=lambda item: item['free']['kickoff']),
         'gold_previews': previews,
         'gold_schedule': schedule,
-        'live': live['view'] if live and now - stamp(live['view']['observed_at']) < timedelta(hours=24) else None,
+        'live': live if live and now - stamp(live['observed_at']) < timedelta(hours=24) else None,
         'report': report['view'] if report else None,
         'historical': historical(past or {}) if not report else None,
         'academy': academy,

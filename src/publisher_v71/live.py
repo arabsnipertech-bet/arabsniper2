@@ -1,9 +1,10 @@
-"""Follow the original prematch match using only the existing score cache."""
+"""Follow the original prematch match using official scores and in-game events."""
 from datetime import timedelta
 
 from multimarket_model import stamp
 from v7_decision import fingerprint
 
+from . import live_events
 from .selection import LEAD, project_pick, rome_day, utc
 
 ACTIVE = {'1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE'}
@@ -12,9 +13,10 @@ STOPPED = {'PST', 'CANC', 'ABD', 'AWD', 'WO', 'SUSP', 'INT'}
 PHASES = {'1H': 'Primo tempo', 'HT': 'Intervallo', '2H': 'Secondo tempo'}
 AFTER_FIRST_HALF = (ACTIVE - {'1H', 'LIVE'}) | FINAL
 EXPIRED = timedelta(hours=5)
+EVENT_MONITOR_GRACE = timedelta(minutes=2)
 
 
-def status_view(pick, status, at, score=None, *, halftime=None):
+def status_view(pick, status, at, score=None, *, halftime=None, events=(), animation=None):
     row = project_pick(pick)
     row.pop('category')
     row.update(status=status, observed_at=utc(at))
@@ -22,6 +24,10 @@ def status_view(pick, status, at, score=None, *, halftime=None):
         row.update(home=score[0], away=score[1])
     if halftime:
         row['halftime'] = halftime
+    if events:
+        row['events'] = events
+    if animation:
+        row['animation'] = animation
     return row
 
 
@@ -52,13 +58,22 @@ def observe(pick, feed, now):
         return None
     if halftime and score and any(half > total for half, total in zip(halftime, score)):
         halftime = None
-    return {'at': utc(seen), 'status': status, 'score': score, 'halftime': halftime}
+    sample = {'at': utc(seen), 'status': status, 'score': score, 'halftime': halftime,
+              **{key: row[key] for key in ('elapsed', 'extra') if type(row.get(key)) is int}}
+    if 'events' in row:
+        sample['events'] = live_events.from_fixture(row)
+    return sample
 
 
 def needs_halftime(state, now):
     return (state.get('done') and state['view']['status'] == 'Finale'
             and 'halftime' not in state['view']
             and now < stamp(state['pick']['kickoff']) + EXPIRED)
+
+
+def monitor_current(state, now):
+    last = stamp(state.get('event_monitor_at'))
+    return bool(last and timedelta() <= now - last < EVENT_MONITOR_GRACE)
 
 
 def advance(state, feed, now, reservable):
@@ -71,7 +86,8 @@ def advance(state, feed, now, reservable):
     sample = observe(pick, feed, now)
     if done:
         if sample and sample['status'] in FINAL and sample['halftime']:
-            return status_view(pick, 'Finale', stamp(sample['at']), sample['score'], halftime=sample['halftime'])
+            return status_view(pick, 'Finale', stamp(sample['at']), sample['score'], halftime=sample['halftime'],
+                               events=state['view'].get('events', ()))
         return None
 
     confirmed = state.get('confirmed') or {}
@@ -97,15 +113,25 @@ def advance(state, feed, now, reservable):
             halftime = sample['halftime'] or state['view'].get('halftime')
             if halftime and score and any(half > total for half, total in zip(halftime, score)):
                 halftime = None
-            state['confirmed'] = sample
+            state['confirmed'] = {key: sample[key] for key in ('at', 'status', 'score', 'halftime')}
             state['candidate'] = None
             state['done'] = status in FINAL | (STOPPED - {'SUSP', 'INT'})
-            if (not confirmed or previous_score != score or state['view']['status'] != stage
-                    or state['view'].get('halftime') != halftime):
-                return status_view(pick, stage, stamp(sample['at']), score, halftime=halftime)
+            view = state['view']
+            events, animation = view.get('events', ()), None
+            if score and status in ACTIVE | FINAL:
+                events, animation = live_events.update(state, sample, previous_score, correction=correction)
+            changed = (not confirmed or previous_score != score or view['status'] != stage
+                       or view.get('halftime') != halftime)
+            if status in FINAL and (correction or confirmed.get('status') not in ACTIVE):
+                animation = None
+            if status in ACTIVE and not animation and not changed:
+                animation = view.get('animation')
+            if changed or list(view.get('events', ())) != list(events) or animation != view.get('animation'):
+                return status_view(pick, stage, stamp(sample['at']), score, halftime=halftime,
+                                   events=events, animation=animation)
             return None
         if not last or (last['status'], last['score']) != signature:
-            state['candidate'] = sample
+            state['candidate'] = {key: sample[key] for key in ('at', 'status', 'score')}
 
     reserve = state.get('reserve')
     missing = not sample and kickoff + timedelta(minutes=18) <= now and not state.get('last_coverage')
@@ -113,7 +139,7 @@ def advance(state, feed, now, reservable):
     if ((missing or stopped) and reserve and reserve['fixture_id'] in reservable
             and now + LEAD <= stamp(reserve['kickoff']) and not state.get('used_reserve')):
         state.update(pick=reserve, reserve=None, used_reserve=True, candidate=None, confirmed=None,
-                     last_coverage=None, done=False)
+                     last_coverage=None, done=False, event_history={}, event_monitor_at=None)
         return status_view(reserve, 'Prematch', now)
     if now >= kickoff + EXPIRED:
         state['done'] = True

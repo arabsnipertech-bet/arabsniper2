@@ -1,4 +1,5 @@
 """Editorial-only state. Conditional writes prevent overlapping sends."""
+from contextlib import contextmanager
 from datetime import timedelta
 import json
 
@@ -50,6 +51,34 @@ class Storage:
             Bucket=self.bucket, Key=PREFIX + 'state.json', Body=encoded(self.state),
             ContentType='application/json', CacheControl='private, no-store', **options)
         self.etag = result['ETag']
+
+    @contextmanager
+    def cycle(self, now):
+        """Serialize the short publishing cycles shared by both workflows."""
+        record, tag = self.read('cycle.json', limit=512)
+        if record and stamp(record['until']) > now:
+            yield False
+            return
+        key = PREFIX + 'cycle.json'
+        condition = {'IfMatch': tag} if tag else {'IfNoneMatch': '*'}
+        try:
+            result = self.client.put_object(
+                Bucket=self.bucket, Key=key, **condition,
+                Body=encoded({'until': (now + timedelta(minutes=8)).isoformat()}))
+        except Exception as exc:
+            if error_code(exc) not in ('409', '412', 'ConditionalRequestConflict', 'PreconditionFailed'):
+                raise
+            yield False
+            return
+        try:
+            yield True
+        finally:
+            try:
+                self.client.put_object(Bucket=self.bucket, Key=key, IfMatch=result['ETag'],
+                                       Body=encoded({'until': now.isoformat()}))
+            except Exception as exc:
+                if error_code(exc) not in ('409', '412', 'ConditionalRequestConflict', 'PreconditionFailed'):
+                    raise
 
     def freeze(self, key, data):
         try:

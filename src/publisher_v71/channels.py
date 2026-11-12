@@ -95,20 +95,39 @@ class Telegram:
                 and (not last_error or now.timestamp() - last_error > 3600)
                 and hook.get('pending_update_count', 0) < 20)
 
+    def edit_media(self, post, image, target):
+        from telegram_live_art import animation
+
+        def replace(kind, filename, content, mime):
+            media = json.dumps({'type': kind, 'media': 'attach://live_card', 'caption': post['text']},
+                               ensure_ascii=False)
+            return self.call('editMessageMedia', {**target, 'media': media},
+                             files={'live_card': (filename, content, mime)}, edit=True)
+
+        view = post['view']
+        motion = view.get('animation') if post['kind'] == 'live' else None
+        if motion:
+            try:
+                badge = f"{view['home']}–{view['away']} · {view['status'].upper()}"
+                return replace('animation', motion + '.gif', animation(motion, badge), 'image/gif')
+            except (OSError, ValueError):
+                pass
+            except DeliveryError as exc:
+                if (exc.kind, exc.reason) != ('rejected', 'telegram_http_400'):
+                    raise
+        try:
+            return replace('photo', 'gold-classic.jpg', image, 'image/jpeg')
+        except DeliveryError as exc:
+            if (exc.kind, exc.reason) != ('rejected', 'telegram_http_400'):
+                raise
+            return self.call('editMessageCaption', {**target, 'caption': post['text']}, edit=True)
+
     def send(self, post, image):
         data = {'chat_id': '@' + CHANNEL, 'caption': post['text'], 'disable_notification':
                 'true' if post['kind'] == 'live' else 'false'}
         if post.get('edit_id'):
             target = {'chat_id': data['chat_id'], 'message_id': post['edit_id']}
-            media = json.dumps({'type': 'photo', 'media': 'attach://live_card', 'caption': post['text']},
-                               ensure_ascii=False)
-            try:
-                result = self.call('editMessageMedia', {**target, 'media': media},
-                                   files={'live_card': ('gold-classic.jpg', image, 'image/jpeg')}, edit=True)
-            except DeliveryError as exc:
-                if (exc.kind, exc.reason) != ('rejected', 'telegram_http_400'):
-                    raise
-                result = self.call('editMessageCaption', {**target, 'caption': post['text']}, edit=True)
+            result = self.edit_media(post, image, target)
         else:
             result = self.call('sendPhoto', data, files={'photo': ('gold-classic.jpg', image, 'image/jpeg')})
         if result is None and post.get('edit_id'):

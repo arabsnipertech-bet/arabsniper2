@@ -10,6 +10,7 @@ from .selection import rome_day, utc
 CACHE = 'https://arabsniperbet.com/api/live-scores'
 API = 'https://v3.football.api-sports.io/'
 MAX_CALLS = 26
+MAX_EVENT_CALLS = 195
 RESERVE = 1000
 
 
@@ -31,6 +32,61 @@ def provider(path, key, params=None):
     return value['response'], response.headers
 
 
+def official_fixtures(store, now, params, log, *, budget='score_budget', limit=MAX_CALLS):
+    key = os.environ.get('API_SPORTS_KEY')
+    if not key:
+        return []
+    state = store.state['runtime'].get(budget)
+    if not state or state['date'] != rome_day(now):
+        info, _ = provider('status', key)
+        quota = info.get('requests') or {}
+        if not info.get('subscription', {}).get('active') or not all(
+                type(quota.get(name)) is int for name in ('current', 'limit_day')):
+            return []
+        state = {'date': rome_day(now), 'calls': 1, 'remaining': quota['limit_day'] - quota['current']}
+        store.state['runtime'][budget] = state
+        store.save()
+    if state['calls'] >= limit or state['remaining'] <= RESERVE:
+        log('live_scores', 'provider_budget_unavailable', budget=budget)
+        return []
+    state['calls'] += 1
+    state['remaining'] -= 1
+    store.save()
+    rows, headers = provider('fixtures', key, params)
+    remaining = headers.get('x-ratelimit-requests-remaining')
+    if remaining and remaining.isdecimal():
+        state['remaining'] = min(state['remaining'], int(remaining))
+    else:
+        # Future requests require an authoritative remaining-quota signal.
+        state['remaining'] = 0
+    store.save()
+    return rows
+
+
+def fixture_view(row, seen, *, with_events=False):
+    meta = row.get('fixture') or {}
+    phase = meta.get('status') or {}
+    score = row.get('score') or {}
+    view = {'fixture_id': str(meta.get('id', '')), 'source': 'API-Football', 'observed_at': seen,
+            'status': phase.get('short'), 'refresh_failed': False,
+            'elapsed': phase.get('elapsed'), 'extra': phase.get('extra'),
+            'goals': row.get('goals'), 'halftime': score.get('halftime'), 'fulltime': score.get('fulltime')}
+    if with_events:
+        view.update(events=row.get('events'), teams=row.get('teams'))
+    return view
+
+
+def feed(fixtures):
+    return {'schema_version': 1, 'enabled': True, 'fixtures': fixtures}
+
+
+def detailed(store, fixture, now, clock, log):
+    rows = official_fixtures(store, now, {'id': fixture}, log, budget='event_score_budget', limit=MAX_EVENT_CALLS)
+    if len(rows) != 1 or str((rows[0].get('fixture') or {}).get('id')) != fixture:
+        return {}
+    return feed({fixture: fixture_view(rows[0], utc(clock()), with_events=True)})
+
+
 def read(store, states, now, clock, log):
     try:
         cached = public_cache()
@@ -45,33 +101,9 @@ def read(store, states, now, clock, log):
                or (fixtures.get(fid) or {}).get('refresh_failed')
                or (fixtures[fid].get('status') not in ('FT', 'AET', 'PEN') and
                    now - stamp(fixtures[fid]['observed_at']) > timedelta(minutes=6))}
-    key = os.environ.get('API_SPORTS_KEY')
-    if not missing or not key:
+    rows = official_fixtures(store, now, {'ids': '-'.join(sorted(missing))}, log) if missing else []
+    if not rows:
         return cached
-    state = store.state['runtime'].get('score_budget')
-    if not state or state['date'] != rome_day(now):
-        info, _ = provider('status', key)
-        quota = info.get('requests') or {}
-        if not info.get('subscription', {}).get('active') or not all(
-                type(quota.get(name)) is int for name in ('current', 'limit_day')):
-            return cached
-        state = {'date': rome_day(now), 'calls': 1, 'remaining': quota['limit_day'] - quota['current']}
-        store.state['runtime']['score_budget'] = state
-        store.save()
-    if state['calls'] >= MAX_CALLS or state['remaining'] <= RESERVE:
-        log('live_scores', 'provider_budget_unavailable')
-        return cached
-    state['calls'] += 1
-    state['remaining'] -= 1
-    store.save()
-    rows, headers = provider('fixtures', key, {'ids': '-'.join(sorted(missing))})
-    remaining = headers.get('x-ratelimit-requests-remaining')
-    if remaining and remaining.isdecimal():
-        state['remaining'] = min(state['remaining'], int(remaining))
-    else:
-        # Future requests require an authoritative remaining-quota signal.
-        state['remaining'] = 0
-    store.save()
     seen = utc(clock())
     fixtures = dict(fixtures)
     for row in rows:
@@ -79,9 +111,5 @@ def read(store, states, now, clock, log):
         fid = str(meta.get('id', ''))
         if fid not in missing:
             continue
-        score = row.get('score') or {}
-        fixtures[fid] = {'fixture_id': fid, 'source': 'API-Football', 'observed_at': seen,
-                         'status': (meta.get('status') or {}).get('short'), 'refresh_failed': False,
-                         'goals': row.get('goals'), 'halftime': score.get('halftime'),
-                         'fulltime': score.get('fulltime')}
-    return {'schema_version': 1, 'enabled': True, 'fixtures': fixtures}
+        fixtures[fid] = fixture_view(row, seen)
+    return feed(fixtures)
