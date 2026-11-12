@@ -21,7 +21,7 @@ assert.equal(settle(match('FT',null),pick('total','ft','over',2.5)),null);
 assert.equal(settle(match(),pick('asian_total','ft','over',2.25)),null);
 assert.equal(settle(match(),pick('handicap','ft','home',-.5)),null);
 assert.equal(settle(match(),pick('halves_total','ft','over',.5)),null);
-assert.equal(settle(match(),{...pick('total','ft','over',2.5),signal:{quote_state:'model_estimate'}}),null);
+assert.equal(settle(match(),{...pick('total','ft','over',2.5),signal:{quote_state:'model_estimate'}}),true);
 const old=globalThis.ArabLive;
 try{
  globalThis.ArabLive={fixture:m=>m.fixture,firstHalf:()=>({status:'complete',score:'1–1'})};
@@ -30,5 +30,15 @@ try{
  assert.equal(settle(match(),pick('total','sh','over',.5)),true);
  assert.equal(settle(match(),pick('btts','sh','yes')),false);
  assert.equal(settle(match('FT',[0,0],[1,1]),pick('total','sh','over',.5)),null);
+ assert.equal(settle(match(),pick('total','ft','under',3.5)),true);
+ assert.equal(settle(match('FT',[4,1],[2,0]),pick('total','ft','under',3.5)),false);
+ assert.equal(settle(match(),pick('halves_total','ft','over',.5)),true);
+ assert.equal(settle(match('FT',[1,0],[1,0]),pick('halves_total','ft','over',.5)),false);
+ assert.equal(settle(match(),pick('pt_ft_total','ft','over',1.5)),true);
+ assert.equal(settle(match('FT',[2,0],[1,0]),pick('pt_ft_total','ft','over',1.5)),false);
+ assert.equal(settle(match(),pick('pt_btts_ft_total','ft','yes',2.5)),true);
+ assert.equal(settle(match('FT',[2,0],[1,0]),pick('pt_btts_ft_total','ft','yes',2.5)),false);
+ assert.equal(settle(match(),pick('both_halves','ft','both')),false);
+ assert.equal(settle(match('FT',[2,2],[1,1]),pick('both_halves','ft','both')),true);
 }finally{globalThis.ArabLive=old}
 console.log('Gold V7 triad settlement tests passed');
