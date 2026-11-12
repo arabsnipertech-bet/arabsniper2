@@ -55,15 +55,46 @@ def academy(day, report=None, week=()):
     return {'date': str(day), 'title': title, 'body': body, 'example': example}
 
 
-def best_copy(view):
+def best_copy(view, *, locked=False):
     free = view['free']
+    prefix = '🔒 Gold' if locked else 'Gold'
     return [
         f"{free['match']} · {free['league']} · {italian_time(free['kickoff'])}",
         f"{free['category']} · {free['market']} · quota {amount(free['odd'], 2)} · modello {amount(free['probability'] * 100)}%",
         f"{free['reason']} Quota rilevata {italian_time(free['quote_at'])}.",
-        *(f"Gold · {row['match']} · {row['league']} · {italian_time(row['kickoff'])} · {row['category']}"
+        *(f"{prefix} · {row['match']} · {row['league']} · {italian_time(row['kickoff'])} · {row['category']}"
           for row in view['previews']),
     ]
+
+
+def studio_copy(view, *, locked=False):
+    free = view['free']
+    prefix = '🔒 Gold' if locked else 'Gold'
+    details = f"{free['category']} · {free['market']} · stima V7 {amount(free['probability'] * 100)}%"
+    if 'odd' in free:
+        details += f"\nQuota osservata {amount(free['odd'], 2)} · {italian_time(free['quote_at'])}"
+    return [
+        f"{free['match']} · {free['league']} · {italian_time(free['kickoff'])}",
+        details,
+        *(f"{prefix} · {row['match']} · {italian_time(row['kickoff'])}" for row in view['previews']),
+    ]
+
+
+def campaign_active(day):
+    return date(2026, 11, 12) <= day <= date(2026, 11, 18)
+
+
+def gold_access(now, trial_ok):
+    lines = [f"🔓 Dashboard Gold {SITE}/gold-dashboard-live.html"]
+    if trial_ok and campaign_active(now.astimezone(ROME).date()):
+        lines.append(f"🎁 7 giorni gratis dal 12 al 18/11, anche per chi ha già provato. "
+                     f"Apri {BOT} e scrivi /prova in privato.")
+        lines.append("🏷️ Rinnovo con il 10% di sconto nelle ultime 48 ore della prova per gli utenti idonei.")
+    elif trial_ok:
+        lines.append(f"🎁 Prova Gold 7 giorni · {BOT} · /prova in privato")
+    else:
+        lines.append(f"🎁 Verifica la disponibilità della prova · {BOT} · /prova in privato")
+    return '\n'.join(lines)
 
 
 def report_copy(view, *, compact=False):
@@ -107,6 +138,8 @@ def live_copy(view):
 def presentation(kind, view):
     if kind == 'best':
         return 'BEST', view['free']['match'], best_copy(view)[1:]
+    if kind == 'studio':
+        return 'STUDIO', view['free']['match'], studio_copy(view)[1:]
     if kind == 'report':
         return 'REPORT', 'Riscontri del ' + date.fromisoformat(view['date']).strftime('%d/%m'), report_copy(view)
     if kind == 'academy':
@@ -117,11 +150,14 @@ def presentation(kind, view):
                                             'Accesso per 7 giorni, senza carta e senza rinnovo.']
 
 
-def message(kind, view, marker, channel):
+def message(kind, view, marker, channel, *, now=None, trial_ok=False):
     label, title, lines = presentation(kind, view)
     if kind == 'best':
-        lines = best_copy(view)
+        lines = best_copy(view, locked=channel == 'telegram')
         title = 'La selezione aperta'
+    elif kind == 'studio':
+        lines = studio_copy(view, locked=True)
+        title = 'Spunto dalle schede Gold'
     elif kind == 'report' and 'triad_examples' not in view:
         lines.extend(f"{OUTCOMES[r['outcome']]} · {r['match'][:45]} · {r['market'][:38]}"
                      for r in view['examples'])
@@ -132,6 +168,8 @@ def message(kind, view, marker, channel):
     footer = f'{site} · 18+ · Stime sperimentali\n{marker}'
     if kind == 'gold':
         footer = f'{BOT}\n{CHANNEL}\n{footer}'
+    elif channel == 'telegram' and kind in ('best', 'studio'):
+        footer = f'{gold_access(now, trial_ok and now is not None)}\n18+ · Stime sperimentali\n{marker}'
     caption = '\n\n'.join([heading, *filter(None, lines), footer])
     if channel == 'telegram' and len(caption.encode('utf-16-le')) // 2 > 1024:
         if kind == 'best':
@@ -206,7 +244,7 @@ def card(kind, view):
     top = max(bottom + 35, 510)
     draw.rounded_rectangle((86, top, 994, 1164), 23, fill=PANEL)
     y = top + 32
-    if kind == 'best':
+    if kind in ('best', 'studio'):
         free = view['free']
         y = block(draw, f"{free['league']}   /   {italian_time(free['kickoff'])}", 120, y, 839, 28, MUTED, max_lines=1) + 17
     for index, line in enumerate(filter(None, lines)):

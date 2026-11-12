@@ -11,13 +11,13 @@ PREVIEW_LIMIT = 2
 ROTATION_LIMIT = 8
 
 
-def triad(item, now):
+def proposals(item, now):
     fixture = item['fixture']
     matrix = (item.get('multimarket') or {}).get('matrix') or {}
     snapshot = matrix.get('v7') or {}
     slots = snapshot.get('triad') or {}
     at = utc(now)
-    if (snapshot.get('status') != 'published' or not all(slots.get(role) for role in TRIAD_LABELS)
+    if (snapshot.get('status') != 'published' or not slots
             or not valid_snapshot(snapshot, fixture, at)):
         return []
     captured = stamp(snapshot['captured_at'])
@@ -33,7 +33,7 @@ def triad(item, now):
         if (not market or not finite(probability) or not 0 <= probability <= 1
                 or pick.get('probability') != probability or source.get('probability_model') != VERSION
                 or record.get('source_market_id') != source['id']):
-            return []
+            continue
 
         row = {'category': category, 'market': market, 'probability': probability,
                'study_only': pick.get('study_only') is True}
@@ -43,7 +43,7 @@ def triad(item, now):
             if (odd is not None or pick.get('odd') is not None or pick.get('tier') != 'BLU'
                     or not row['study_only'] or not finite(fair_odd) or fair_odd <= 1
                     or pick.get('model_fair_odd') != fair_odd):
-                return []
+                continue
         else:
             quoted, observed = (stamp(source.get(key)) for key in ('provider_updated_at', 'quote_observed_at'))
             if (not finite(odd) or odd <= 1 or odd != pick.get('odd') or odd != source.get('odd')
@@ -53,7 +53,7 @@ def triad(item, now):
                     or now - quoted > PREMATCH_WINDOW
                     or (pick.get('tier') != 'BLU' and (source.get('prematch_stable')
                         or not price_usable(source, at, fixture['kickoff'])))):
-                return []
+                continue
             row.update(odd=odd, quote_at=utc(quoted))
         result.append(row)
     return result
@@ -85,9 +85,9 @@ def project(boards, now):
             if len(schedule) < ROTATION_LIMIT:
                 schedule.append(row)
             if len(previews) < PREVIEW_LIMIT:
-                proposals = triad(item, now)
-                if proposals:
-                    previews.append({**row, 'proposals': proposals})
+                triad = proposals(item, now)
+                if len(triad) == len(TRIAD_LABELS):
+                    previews.append({**row, 'proposals': triad})
             if len(previews) == PREVIEW_LIMIT and len(schedule) == ROTATION_LIMIT:
                 return previews, schedule
     return previews, schedule

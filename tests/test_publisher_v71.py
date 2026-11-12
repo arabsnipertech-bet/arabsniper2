@@ -10,7 +10,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
-from publisher_v71 import delivery, editorial, live, public_feed, report, selection
+from publisher_v71 import delivery, editorial, live, public_feed, report, runner, selection, studio
 from publisher_v71.channels import DeliveryError, TelegramHistory
 from publisher_v71.runner import add_group, plan_report, record_home_receipt
 from publisher_v71.storage import Storage
@@ -62,6 +62,18 @@ def full_board(item):
                                   'study_only': True, 'quote_state': 'model_estimate'}
         matrix['rows'].append({'id': name, 'probability_model': snapshot['version']})
     snapshot['sha256'] = fingerprint({k: v for k, v in snapshot.items() if k != 'sha256'})
+    return payload
+
+
+def studio_board(now, fid, kickoff_in, quote_age=5):
+    row = pick(fid, tier='BLU')
+    row.update(kickoff=selection.utc(now + timedelta(minutes=kickoff_in)),
+               captured_at=selection.utc(now - timedelta(minutes=3)),
+               quote_at=selection.utc(now - timedelta(minutes=quote_age)))
+    payload = full_board(row)
+    snapshot = payload['matches'][0]['multimarket']['matrix']['v7']
+    snapshot['triad']['most_probable']['study_only'] = True
+    snapshot['sha256'] = fingerprint({key: value for key, value in snapshot.items() if key != 'sha256'})
     return payload
 
 
@@ -166,6 +178,72 @@ class PublisherTests(TestCase):
         self.assertNotIn('odd', proposals[1])
         self.assertNotIn('private source', json.dumps(view))
         self.assertNotIn('model_fair_odd', json.dumps(view))
+
+    def test_publisher_sends_one_studio_pick_with_locks_and_campaign_when_best_empty(self):
+        now = datetime.fromisoformat('2026-11-12T14:25:00+00:00')
+        boards = [studio_board(now, 1, 35, 200), studio_board(now, 2, 95), studio_board(now, 3, 95)]
+        snapshot = boards[0]['matches'][0]['multimarket']['matrix']['v7']
+        snapshot['triad'] = {'most_probable': snapshot['triad']['most_probable']}
+        snapshot['sha256'] = fingerprint({key: value for key, value in snapshot.items() if key != 'sha256'})
+        board_today = dict(boards[0], matches=[b['matches'][0] for b in boards])
+        store = LocalStore()
+        store.state['legacy'] = {'handoff': {'created_at': selection.utc(NOW), 'ids': []}}
+        telegram, facebook = mock.Mock(), mock.Mock()
+        telegram.send.return_value = {'id': '123', 'at': selection.utc(now)}
+        services = {'telegram': telegram, 'facebook': facebook}
+        with (mock.patch.object(runner, 'clock', return_value=now),
+              mock.patch.object(runner, 'read_local', return_value={'publisher': 'v7.1'}),
+              mock.patch.object(runner, 'read_board', side_effect=lambda _, n: board_today if n == 1 else {}),
+              mock.patch.object(runner, 'publish_home'), mock.patch.object(runner, 'plan_live'),
+              mock.patch.object(runner, 'plan_editorial')):
+            runner.tick(store, services, '', trial_ok=True)
+            runner.tick(store, services, '', trial_ok=True)
+        telegram.send.assert_called_once()
+        facebook.send.assert_not_called()
+        post, image = telegram.send.call_args.args
+        self.assertEqual(post['kind'], 'studio')
+        self.assertEqual(post['status'], 'sent')
+        self.assertEqual(len(post['view']['previews']), 2)
+        self.assertEqual(set(post['view']['previews'][0]), set(studio.PREVIEW_FIELDS))
+        self.assertNotIn('odd', post['view']['free'])
+        self.assertIn('Over 2,5 finale', post['text'])
+        self.assertEqual(post['text'].count('🔒'), 2)
+        self.assertIn('7 giorni gratis dal 12 al 18/11', post['text'])
+        self.assertIn('/prova', post['text'])
+        self.assertIn('10%', post['text'])
+        self.assertIn('gold-dashboard-live.html', post['text'])
+        self.assertLessEqual(len(post['text'].encode('utf-16-le')) // 2, 1024)
+        self.assertEqual(Image.open(BytesIO(image)).size, (1080, 1350))
+
+    def test_studio_windows_and_delivery_recheck(self):
+        now = datetime.fromisoformat('2026-11-12T14:45:00+00:00')
+        boards = [studio_board(now, 1, 35), studio_board(now, 2, 45), studio_board(now, 3, 140)]
+        pool = studio.candidates(boards, now)
+        key, view = studio.group_for(pool, [], set(), now)
+        store = LocalStore()
+        until = datetime.fromisoformat(view['free']['kickoff']) - selection.LEAD
+        delivery.queue(store, 'studio', key, view, ['telegram'], now, until)
+        post = next(iter(store.state['posts'].values()))
+        self.assertIsNone(studio.group_for(pool, [post], set(), now))
+        self.assertIsNone(delivery.can_send(post, now, pool))
+        self.assertEqual(delivery.can_send(post, now, {**pool, '1': dict(pool['1'], market='Changed')}),
+                         'studio_source_changed')
+        self.assertEqual(delivery.can_send(post, until, pool), 'expired')
+        later = now + timedelta(minutes=85)
+        self.assertEqual(studio.group_for(studio.candidates(boards, later), [post], set(), later)[0],
+                         '2026-11-12/18/3')
+
+    def test_telegram_best_footer_tracks_trial_health_and_campaign_dates(self):
+        view = {'free': selection.project_pick(pick(1), True), 'previews': []}
+        active = datetime.fromisoformat('2026-11-12T16:00:00+00:00')
+        later = active + timedelta(days=7)
+        for when, trial_ok, discount in [(active, True, True), (active, False, False), (later, True, False)]:
+            text = editorial.message('best', view, 'AS71-TEST', 'telegram', now=when, trial_ok=trial_ok)
+            self.assertIn('/prova', text)
+            self.assertIn('gold-dashboard-live.html', text)
+            self.assertEqual('10%' in text, discount)
+        self.assertNotIn('/prova', editorial.message('best', view, 'AS71-TEST', 'facebook',
+                                                     now=active, trial_ok=True))
 
     def test_homepage_receipt_recovers_from_an_already_visible_revision(self):
         store = LocalStore()

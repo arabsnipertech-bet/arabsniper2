@@ -17,10 +17,12 @@ def queue(store, kind, key, view, channels, now, until, *, edit=None):
         if post_id in store.state['posts']:
             continue
         marker = 'AS71-' + fingerprint(post_id)[:16].upper()
+        text = message(kind, view, marker, channel, now=now,
+                       trial_ok=store.state['runtime'].get('trial_verified') is True)
         store.state['posts'][post_id] = {
             'id': post_id, 'channel': channel, 'kind': kind, 'key': key,
             'created_at': utc(now), 'expires_at': utc(until), 'view': view,
-            'marker': marker, 'text': message(kind, view, marker, channel),
+            'marker': marker, 'text': text,
             'status': 'ready', 'attempts': 0, 'edit_id': edit,
         }
 
@@ -40,6 +42,15 @@ def can_send(post, now, candidates):
         if (public['market'], public['odd'], public['probability']) != (
                 view['free']['market'], view['free']['odd'], view['free']['probability']):
             return 'quote_or_decision_changed'
+    if post['kind'] == 'studio':
+        view = post['view']
+        free = view['free']
+        if candidates.get(free['fixture_id']) != free:
+            return 'studio_source_changed'
+        for row in view['previews']:
+            current = candidates.get(row['fixture_id']) or {}
+            if any(current.get(field) != value for field, value in row.items()):
+                return 'studio_source_changed'
     if post['kind'] == 'live' and post['view']['status'] == 'Prematch':
         if stamp(post['view']['kickoff']) - now < LEAD:
             return 'late_prematch'

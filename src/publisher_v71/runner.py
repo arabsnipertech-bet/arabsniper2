@@ -10,10 +10,10 @@ from gold_storage import client
 from multimarket_model import stamp
 from v7_probability import VERSION
 
-from . import cutover, legacy, live, public_feed, report, scores
+from . import cutover, legacy, live, public_feed, report, scores, studio
 from .channels import Telegram, Facebook
 from .delivery import attempt, can_send, queue
-from .editorial import academy
+from .editorial import academy, campaign_active
 from .selection import (LEAD, ROME, group_for, group_id, project_group,
                         published_candidates, rome_day, utc)
 from .storage import Storage
@@ -214,10 +214,8 @@ def plan_editorial(store, now, channels, best_queued, trial_ok):
     if (trial_ok and today.weekday() in (1, 5) and 12 * 60 + 15 <= minute <= 14 * 60
             and not best_queued):
         # The bounded campaign owns trial advertising on both social channels.
-        gold_channels = [c for c in channels if
-                         not date(2026, 11, 12) <= today <= date(2026, 11, 18)]
-        if gold_channels:
-            queue(store, 'gold', str(today), {}, gold_channels, now, now + timedelta(hours=3))
+        if not campaign_active(today):
+            queue(store, 'gold', str(today), {}, channels, now, now + timedelta(hours=3))
 
 
 def record_home_receipt(store, view, revision, at):
@@ -286,13 +284,25 @@ def tick(store, services, gh_token, *, trial_ok):
     best = bool(group and add_group(store, group, now, services))
     if not best:
         event_log('best', 'no_new_eligible_group', candidates=len(picks))
+    study_pool = {}
+    if 'telegram' in services:
+        study_pool = safe_read('studio_board', lambda: studio.candidates(boards, now), {})
+        if not best:
+            suggestion = studio.group_for(study_pool, store.state['posts'].values(), seen, now)
+            if suggestion:
+                key, view = suggestion
+                queue(store, 'studio', key, view, ['telegram'], now, stamp(view['free']['kickoff']) - LEAD)
+                event_log('studio', 'group_queued', group=key, count=1 + len(view['previews']))
+            elif local_minute(now) >= 15 * 60:
+                event_log('studio', 'no_due_suggestion', candidates=len(study_pool))
     plan_editorial(store, now, services, best, trial_ok)
     store.save()
 
     for post in list(store.state['posts'].values()):
         if (post['channel'] in services and post['kind'] != 'live'
                 and stamp(post['expires_at']) + timedelta(hours=12) > now):
-            attempt(store, post, services[post['channel']], candidates, clock, delivery_log)
+            source = study_pool if post['kind'] == 'studio' else candidates
+            attempt(store, post, services[post['channel']], source, clock, delivery_log)
     plan_live(store, clock(), candidates, services)
     store.save()
     live_posts = [p for p in store.state['posts'].values() if p['kind'] == 'live']
