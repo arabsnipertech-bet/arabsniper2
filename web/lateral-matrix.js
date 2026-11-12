@@ -1003,29 +1003,38 @@
  }
  // Presentation-only settlement; unknown and complex markets remain neutral.
  function triadOutcome(m,p){
-  if(!m||!p||p.signal?.quote_state==='model_estimate')return null;
+  if(!m||!p)return null;
   const f=root.ArabLive?.fixture?.(m)||m.fixture||{},l=f.live||{},r=f.result||{};
   const status=l.status||r.status||f.status_short;
   if(status!=='FT')return null;
   const score=[r.home_ft,r.away_ft].every(Number.isInteger)?[r.home_ft,r.away_ft]:
    [l.goals?.home,l.goals?.away].every(Number.isInteger)?[l.goals.home,l.goals.away]:null;
   if(!score||score.some(n=>n<0))return null;
-  const spec=p.source?.spec||{};
-  let goals=score;
-  if(['ht','sh'].includes(spec.period)){
-   const half=root.ArabLive?.firstHalf?.(m);
-   const nums=half?.status==='complete'&&typeof half.score==='string'?half.score.split(/[–-]/).map(Number):[];
-   if(nums.length!==2||nums.some(n=>!Number.isInteger(n)||n<0))return null;
-   goals=spec.period==='ht'?nums:score.map((n,i)=>n-nums[i]);
-   if(goals.some(n=>n<0))return null;
-  }else if(spec.period!=='ft')return null;
-  const [home,away]=goals;
-  if(spec.kind==='total'&&Number.isFinite(spec.line)&&['over','under'].includes(spec.side))
-   return spec.side==='over'?home+away>spec.line:home+away<spec.line;
-  if(spec.kind==='btts'&&['yes','no'].includes(spec.side))
-   return spec.side==='yes'?(home>0&&away>0):!(home>0&&away>0);
-  if(spec.kind==='result'&&spec.period==='ft'&&['1','x','2'].includes(spec.side))
-   return spec.side===(home>away?'1':home<away?'2':'x');
+  const spec=p.source?.spec||{},kind=spec.kind;
+  const half=root.ArabLive?.firstHalf?.(m);
+  const nums=half?.status==='complete'&&typeof half.score==='string'?half.score.split(/[–-]/).map(Number):[];
+  const validHalf=nums.length===2&&nums.every(n=>Number.isInteger(n)&&n>=0)&&nums.every((n,i)=>n<=score[i]);
+  const second=validHalf?score.map((n,i)=>n-nums[i]):null;
+  const total=g=>g[0]+g[1];
+  const both=g=>g[0]>0&&g[1]>0;
+  const over=(g,line)=>total(g)>line;
+  if(kind==='halves_total'&&spec.period==='ft'&&spec.side==='over'&&spec.line===.5&&spec.extra===.5)
+   return validHalf?over(nums,.5)&&over(second,.5):null;
+  if(kind==='pt_ft_total'&&spec.period==='ft'&&spec.side==='over'&&spec.line===1.5&&spec.extra===2.5)
+   return validHalf?over(nums,1.5)&&over(score,2.5):null;
+  if(kind==='pt_btts_ft_total'&&spec.period==='ft'&&spec.side==='yes'&&spec.line===2.5&&spec.extra==null)
+   return validHalf?both(nums)&&over(score,2.5):null;
+  if(kind==='both_halves'&&spec.period==='ft'&&spec.side==='both'&&spec.line==null&&spec.extra==null)
+   return validHalf?both(nums)&&both(second):null;
+  const goals=spec.period==='ft'?score:spec.period==='ht'&&validHalf?nums:
+   spec.period==='sh'&&validHalf?second:null;
+  if(!goals||spec.extra!=null)return null;
+  if(kind==='total'&&Number.isFinite(spec.line)&&['over','under'].includes(spec.side))
+   return spec.side==='over'?over(goals,spec.line):total(goals)<spec.line;
+  if(kind==='btts'&&['yes','no'].includes(spec.side))
+   return spec.side==='yes'?both(goals):!both(goals);
+  if(kind==='result'&&spec.period==='ft'&&['1','x','2'].includes(spec.side))
+   return spec.side===(goals[0]>goals[1]?'1':goals[0]<goals[1]?'2':'x');
   return null;
  }
  function triadOutcomeBadge(m,p){
