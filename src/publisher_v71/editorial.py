@@ -153,7 +153,7 @@ def presentation(kind, view):
 def message(kind, view, marker, channel, *, now=None, trial_ok=False):
     label, title, lines = presentation(kind, view)
     if kind == 'best':
-        lines = best_copy(view, locked=channel == 'telegram')
+        lines = best_copy(view, locked=True)
         title = 'La selezione aperta'
     elif kind == 'studio':
         lines = studio_copy(view, locked=True)
@@ -168,7 +168,7 @@ def message(kind, view, marker, channel, *, now=None, trial_ok=False):
     footer = f'{site} · 18+ · Stime sperimentali\n{marker}'
     if kind == 'gold':
         footer = f'{BOT}\n{CHANNEL}\n{footer}'
-    elif channel == 'telegram' and kind in ('best', 'studio'):
+    elif kind in ('best', 'studio'):
         footer = f'{gold_access(now, trial_ok and now is not None)}\n18+ · Stime sperimentali\n{marker}'
     caption = '\n\n'.join([heading, *filter(None, lines), footer])
     if channel == 'telegram' and len(caption.encode('utf-16-le')) // 2 > 1024:

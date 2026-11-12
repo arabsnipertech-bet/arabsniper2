@@ -1,4 +1,5 @@
 import importlib.util,unittest
+from unittest import mock
 from pathlib import Path
 from datetime import datetime
 spec=importlib.util.spec_from_file_location('fb',Path(__file__).resolve().parents[1]/'scripts/gold-campaign-facebook.py')
@@ -6,6 +7,9 @@ fb=importlib.util.module_from_spec(spec);spec.loader.exec_module(fb)
 class FacebookCampaign(unittest.TestCase):
  def setUp(self):
   self.rows={};self.posts=[]
+  verified=mock.patch.object(fb,'verify_ready')
+  self.verify=verified.start()
+  self.addCleanup(verified.stop)
   def query(sql,params=None):
    p=params or []
    if sql.startswith('CREATE'):return []
@@ -32,6 +36,15 @@ class FacebookCampaign(unittest.TestCase):
   with self.assertRaises(AssertionError):fb.publish_once('2026-11-12',0,'pranzo')
   self.assertEqual(next(iter(self.rows.values()))['status'],'sending')
  def test_campaign_ends_without_remote_requests(self):
-  fb.campaign.run=lambda **k:self.fail('Remote check outside campaign')
   fb.run(datetime.fromisoformat('2026-11-19T12:00:00+00:00'))
+  self.verify.assert_not_called()
+ def test_recovery_uses_the_same_page_receipt_after_the_due_time(self):
+  fb.run(datetime.fromisoformat('2026-11-12T20:14:59+00:00'),recovery=True)
+  self.verify.assert_not_called()
+  due=datetime.fromisoformat('2026-11-12T20:15:00+00:00')
+  fb.run(due,recovery=True)
+  fb.run(due,recovery=True)
+  self.assertEqual(len(self.posts),1)
+  self.assertEqual(list(self.rows),['gold-engine-2026-11:2026-11-12:sera'])
+  self.verify.assert_called_once()
 if __name__=='__main__':unittest.main()

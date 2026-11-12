@@ -284,17 +284,19 @@ def tick(store, services, gh_token, *, trial_ok):
     best = bool(group and add_group(store, group, now, services))
     if not best:
         event_log('best', 'no_new_eligible_group', candidates=len(picks))
-    study_pool = {}
-    if 'telegram' in services:
-        study_pool = safe_read('studio_board', lambda: studio.candidates(boards, now), {})
-        if not best:
-            suggestion = studio.group_for(study_pool, store.state['posts'].values(), seen, now)
-            if suggestion:
-                key, view = suggestion
-                queue(store, 'studio', key, view, ['telegram'], now, stamp(view['free']['kickoff']) - LEAD)
-                event_log('studio', 'group_queued', group=key, count=1 + len(view['previews']))
-            elif local_minute(now) >= 15 * 60:
-                event_log('studio', 'no_due_suggestion', candidates=len(study_pool))
+    study_channels = [channel for channel in ('telegram', 'facebook') if channel in services]
+    study_pool = safe_read('studio_board', lambda: studio.candidates(boards, now), {}) if study_channels else {}
+    best_id = group_id(group) if best else None
+    for channel in study_channels:
+        if best_id and f'{channel}/best/{best_id}' in store.state['posts']:
+            continue
+        suggestion = studio.group_for(study_pool, store.state['posts'].values(), seen, now, channel=channel)
+        if suggestion:
+            key, view = suggestion
+            queue(store, 'studio', key, view, [channel], now, stamp(view['free']['kickoff']) - LEAD)
+            event_log('studio', 'group_queued', channel=channel, group=key, count=1 + len(view['previews']))
+        elif local_minute(now) >= 15 * 60:
+            event_log('studio', 'no_due_suggestion', channel=channel, candidates=len(study_pool))
     plan_editorial(store, now, services, best, trial_ok)
     store.save()
 

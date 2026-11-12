@@ -173,6 +173,7 @@ jobs:
             /data/live_watchlist.json
             /data/arab_quote_results_public.json
             /scripts/gold-campaign-repeat.py
+            /scripts/gold-campaign-facebook.py
             /scripts/deploy-telegram-campaign.py
             /workers/stripe-access/renewal.mjs
           sparse-checkout-cone-mode: false
@@ -189,3 +190,10 @@ jobs:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
           D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
         run: python scripts/gold-campaign-repeat.py --recover
+      - name: Recover due Facebook campaign reminders
+        if: env.FACEBOOK_ENABLED == 'true' && env.TRIAL_DISABLED != 'true'
+        continue-on-error: true
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+        run: python scripts/gold-campaign-facebook.py --recover
