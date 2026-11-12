@@ -525,6 +525,21 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await modalHistory.getByText('Vedi precedente').tap();
    assert(await modalHistory.locator('.mx-triad-won').isVisible());
    assert(await modal.evaluate(el=>el.scrollWidth<=el.clientWidth),'Expanded history fits on mobile');
+   await modal.locator('[data-mx-close]').tap();
+   await historyPage.setViewportSize({width:360,height:800});
+   await historyPage.evaluate(()=>{
+    ArabLive.accept({schema_version:1,enabled:true,fixtures:{'751':{fixture_id:'751',status:'AET',
+     elapsed:120,goals:{home:2,away:3},fulltime:{home:2,away:2},halftime:{home:0,away:1},
+     observed_at:new Date(Date.now()+1000).toISOString()}}});
+    window.dispatchEvent(new Event('arabsniper-live-update'));
+   });
+   const scoreboard=card.locator('.cx-score');
+   assert.equal(await scoreboard.locator('strong').innerText(),'2–3');
+   assert(await scoreboard.getByText('90′ · 2–2',{exact:true}).isVisible());
+   assert(await scoreboard.locator('strong').evaluate(el=>
+    getComputedStyle(el).whiteSpace==='nowrap'&&el.getClientRects().length===1));
+   assert.match(await slot.locator('.mx-triad-heading .mx-triad-won').innerText(),/VINTA/);
+   assert(await card.evaluate(el=>el.scrollWidth<=el.clientWidth),'The mobile scoreboard fits the card');
   }finally{await historyPage.close();}
   console.log('PASS compact Gold browser: matrix, live overlays, calendar, origin badges, and per-slot history');
  }finally{await browser.close()}

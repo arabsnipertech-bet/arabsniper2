@@ -732,7 +732,7 @@
 .cx-price-analysis{border:1px solid #45636e;border-left:3px solid #85d9e8;border-radius:9px;padding:12px;margin:14px 0;font-size:.78rem;line-height:1.6;background:#122c35}.cx-price-analysis strong{color:#9ce9ed}.cx-price-analysis em{display:block;color:#f0ce7f}
 
     .cx-list-row.cx-is-live,.cx-card.cx-is-live{border:2px solid #ddbb62;box-shadow:0 0 18px #d7b25233;background:linear-gradient(120deg,#253027,#141e25)}
-    .cx-live-stale{border-color:#827548}.cx-score{display:block;margin:8px 0;color:#f4df9b;font-variant-numeric:tabular-nums}.cx-score>b{display:inline-block;padding:3px 7px;border-radius:6px;background:#24352b;color:#a0f1ba;font-size:.7rem;letter-spacing:.04em}.cx-score>strong{font-size:1.35rem!important;display:inline!important;margin-left:6px}.cx-score>small{display:block;font-size:.65rem!important;color:#b0b9bf;margin-top:3px}.cx-live-stale .cx-score>b{color:#f0d490;background:#443b28}
+    .cx-live-stale{border-color:#827548}.cx-score{display:block;margin:8px 0;color:#f4df9b;font-variant-numeric:tabular-nums}.cx-score>b{display:inline-block;padding:3px 7px;border-radius:6px;background:#24352b;color:#a0f1ba;font-size:.7rem;letter-spacing:.04em}.cx-score>strong{font-size:1.35rem!important;display:inline-block!important;margin-left:6px;white-space:nowrap}.cx-score>small{display:block;font-size:.65rem!important;color:#b0b9bf;margin-top:3px}.cx-live-stale .cx-score>b{color:#f0d490;background:#443b28}
 
     .cx-quote-total{margin-top:9px;padding-top:7px;border-top:1px solid #ffffff25;color:#e3edf3}
     .cx-quote-total>span,.cx-signal-caption{display:block;font-size:.62rem;letter-spacing:.03em}
@@ -884,7 +884,7 @@
   <link rel="stylesheet" href="/statistics-first.css?v=4.0">
   <script src="/statistics-first.js?v=4.0"></script>
   <link rel="stylesheet" href="/lateral-matrix.css?v=0a727de9ab7a">
-  <script src="/competition-scope.js?v=cdb648e824eb"></script><script src="/lateral-matrix.js?v=f54e61424d0d"></script>
+  <script src="/competition-scope.js?v=cdb648e824eb"></script><script src="/lateral-matrix.js?v=11bf761e9e4b"></script>
   <script src="/vendor/fflate-0.8.2.js"></script>
   <script src="/live-scores.js?v=a17ad119a2d0"></script>
   <link rel="stylesheet" href="/gold-access.css?v=1">
@@ -1927,7 +1927,11 @@
     function contextLiveClass(match) { const v=contextLiveView(match);return v.active?' cx-is-live':v.stale?' cx-live-stale':''; }
     function contextLiveBadge(match) {
       const v=contextLiveView(match);if(!v.visible)return '';
-      return `<span class="cx-score"><b>${escapeHtml(v.label)}</b>${v.score?` <strong>${escapeHtml(v.score)}</strong>`:''}${v.minute?` <span>${escapeHtml(v.minute)}</span>`:''}<small>${v.observed_at?'Agg. '+escapeHtml(formatTimestamp(v.observed_at)):'Risultato da aggiornare'}</small></span>`;
+      const f=contextFixture(match),status=f.live?.status||f.result?.status||f.status_short;
+      const afterRegulation=['AET','PEN'].includes(status);
+      const regulation=afterRegulation&&window.ArabMatrix?.regulationScore?.(f);
+      const at90=afterRegulation?`<small>90′ · ${regulation?regulation.join('–'):'punteggio non disponibile'}</small>`:'';
+      return `<span class="cx-score"><b>${escapeHtml(v.label)}</b>${v.score?` <strong>${escapeHtml(v.score)}</strong>`:''}${v.minute?` <span>${escapeHtml(v.minute)}</span>`:''}${at90}<small>${v.observed_at?'Agg. '+escapeHtml(formatTimestamp(v.observed_at)):'Risultato da aggiornare'}</small></span>`;
     }
     let contextStateFilter='all';
     function contextState(match) {
