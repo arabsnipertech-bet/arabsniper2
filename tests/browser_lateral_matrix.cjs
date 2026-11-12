@@ -485,6 +485,47 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await modal.getByText('MERCATO IN OSSERVAZIONE',{exact:true}).tap();
    await tooltip.waitFor({state:'hidden'});
   }finally{await mobile.close();}
-  console.log('PASS compact Gold browser: matrix, live overlays, calendar, and origin badges with hover, keyboard and touch');
+  const historyPayload=structuredClone(activePayload),historyMatch=historyPayload.matches[0];
+  const kickoff=new Date(now-2*3600000).toISOString();
+  const captured=new Date(now-2.5*3600000).toISOString();
+  const previous=new Date(now-3*3600000).toISOString();
+  Object.assign(historyMatch.fixture,{kickoff,status_short:'2H'});
+  const historyMatrix=historyMatch.multimarket.matrix;
+  Object.assign(historyMatrix.v7,{kickoff,captured_at:captured});
+  for(const row of historyMatrix.rows){
+   if(row.probability_model===model)Object.assign(row,{provider_updated_at:captured,quote_observed_at:captured});
+  }
+  historyMatch._gold_triad_history={most_probable:[{
+   market_id:JSON.stringify({kind:'total',period:'ft',side:'over',line:2.5}),
+   label:'Over 2,5 FT',captured_at:previous,odd:1.53,
+  }]};
+  const historyPage=await matrixPage(browser,historyPayload,{viewport:{width:390,height:844},hasTouch:true,isMobile:true});
+  try{
+   const card=historyPage.locator('.mx-card'),slot=card.locator('[data-v7-slot="most_probable"]');
+   const history=slot.locator('.mx-triad-history'),entry=history.locator('.mx-triad-version');
+   assert.equal(await card.locator('.mx-triad-history').count(),1);
+   assert.equal(await slot.locator('time').first().getAttribute('datetime'),captured);
+   assert(!(await entry.isVisible()));
+   await history.getByText('Vedi precedente').tap();
+   assert(await entry.isVisible());
+   assert.equal(await entry.locator('time').getAttribute('datetime'),previous);
+   assert.match(await entry.innerText(),/Over 2,5 FT\s+Quota 1,53\s+Esito in attesa/);
+   assert.equal(await historyPage.locator('dialog').count(),0);
+   await historyPage.evaluate(()=>{
+    ArabLive.accept({schema_version:1,enabled:true,fixtures:{'751':{fixture_id:'751',status:'FT',
+     goals:{home:3,away:0},halftime:{home:2,away:0},observed_at:new Date().toISOString()}}});
+    window.dispatchEvent(new Event('arabsniper-live-update'));
+   });
+   assert(await entry.isVisible(),'The score refresh keeps the open slot history');
+   assert.match(await entry.locator('.mx-triad-won').innerText(),/VINTA/);
+   assert.match(await slot.locator('.mx-triad-heading .mx-triad-lost').innerText(),/PERSA/);
+   await card.locator('[data-mx-open]').tap();
+   const modal=historyPage.locator('dialog');
+   const modalHistory=modal.locator('[data-v7-slot="most_probable"] .mx-triad-history');
+   await modalHistory.getByText('Vedi precedente').tap();
+   assert(await modalHistory.locator('.mx-triad-won').isVisible());
+   assert(await modal.evaluate(el=>el.scrollWidth<=el.clientWidth),'Expanded history fits on mobile');
+  }finally{await historyPage.close();}
+  console.log('PASS compact Gold browser: matrix, live overlays, calendar, origin badges, and per-slot history');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

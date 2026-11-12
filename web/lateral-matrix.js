@@ -1037,11 +1037,41 @@
    return spec.side===(goals[0]>goals[1]?'1':goals[0]<goals[1]?'2':'x');
   return null;
  }
- function triadOutcomeBadge(m,p){
-  const won=triadOutcome(m,p);
-  return won===null?'':'<span class="mx-triad-outcome '+(won?'mx-triad-won':'mx-triad-lost')+
+ function triadOutcomeBadge(m,spec,pending=false){
+  const won=triadOutcome(m,{source:{spec}});
+  return won===null?(pending?'<small role="status">Esito in attesa</small>':''):
+   '<span class="mx-triad-outcome '+(won?'mx-triad-won':'mx-triad-lost')+
    '" role="status" aria-label="'+(won?'Proposta vinta':'Proposta persa')+'">'+
    (won?'✓ VINTA':'✕ PERSA')+'</span>';
+ }
+ function triadOutcomeSlot(match,spec,pending=false){
+  if(!spec)return '';
+  return '<span class="mx-triad-result" data-mx-triad-result="'+esc(JSON.stringify(spec))+'"'+
+   (pending?' data-mx-triad-pending':'')+'>'+triadOutcomeBadge(match,spec,pending)+'</span>';
+ }
+ const triadDateFormat=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',
+  day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+ function triadTime(value){
+  const at=Date.parse(value);
+  return Number.isFinite(at)?'<time datetime="'+esc(value)+'">'+triadDateFormat.format(at)+'</time>':'';
+ }
+ function triadHistoryPanel(match,role){
+  const versions=match?._gold_triad_history?.[role];
+  if(!Array.isArray(versions)||!versions.length)return '';
+  const items=versions.slice().reverse().map(version=>{
+   let spec;
+   try{spec=JSON.parse(version.market_id);}catch{return '';}
+   const time=triadTime(version.captured_at);
+   if(!spec||!time||!version.label)return '';
+   const price=Number.isFinite(version.odd)&&version.odd>1?'Quota '+num(version.odd,2):
+    Number.isFinite(version.model_fair_odd)&&version.model_fair_odd>1?
+     'Quota equa V7 '+num(version.model_fair_odd,2):'Quota non disponibile';
+   return '<li class="mx-triad-version">'+time+'<strong>'+esc(version.label)+'</strong>'+
+    '<small>'+price+'</small>'+triadOutcomeSlot(match,spec,true)+'</li>';
+  }).join('');
+  return items?'<details class="mx-triad-history" data-mx-triad-history="'+role+'"><summary>'+
+   (versions.length===1?'Vedi precedente':'Vedi precedenti')+'</summary>'+
+   '<ol class="mx-triad-versions">'+items+'</ol></details>':'';
  }
  function triadPanel(view,compact=false,match=null){
   const saved=view.v7?.triad;
@@ -1054,7 +1084,9 @@
     const p=view.triad[role],s=p?.signal;
     const estimate=s?.quote_state==='model_estimate';
     const badge=s&&levelBadge(String(s.tier).toLowerCase(),s.badge);
-    return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+title+'</span>'+(badge||'')+(p?triadOutcomeBadge(match,p):'')+'</div>'+
+    const previous=p?triadHistoryPanel(match,role):'';
+    return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+title+'</span>'+(badge||'')+
+     (p?triadOutcomeSlot(match,p.source.spec):'')+'</div>'+
      (p?'<div class="mx-triad-market"><b>'+esc(p.record.label)+'</b>'+(estimate?'':'<strong>'+num(p.record.odd,2)+'</strong>')+'</div>'+
       '<div class="mx-triad-meta"><span>'+esc(s.horizon_label)+'</span><span>'+v7Estimate(p.record.calibrated)+' V7</span>'+
       (Number.isFinite(p.record.model_fair_odd)?'<span>Quota equa '+num(p.record.model_fair_odd,2)+'</span>':'')+
@@ -1062,7 +1094,8 @@
       (Number.isFinite(s.ev)?'<span>EV '+signed(100*s.ev)+'%</span>':'')+
       originBadge(marketOrigin(p.source,{rates:view.v7?.rates,record:p.record,signal:s,expired:p.expired,
        conversion:view.v7?.signals?.observations?.conversion===true}))+'</div>'+
-      (compact?'':triadMotivation(p)):
+      (compact?'':triadMotivation(p))+
+      (previous?'<small>Analisi '+triadTime(view.v7?.captured_at)+'</small>'+previous:''):
       '<small>'+(saved?.[role]?'Quota da aggiornare':'Nessun mercato idoneo')+'</small>')+'</li>';
    }).join('')+'</ul>';
  }
@@ -1159,6 +1192,7 @@
   const active=publishedView(m);
   const advancedOpen=!!dialog.querySelector('[data-v7-advanced]')?.open;
   const detailsOpen=!!dialog.querySelector('[data-v7-details]')?.open;
+  const historyOpen=new Set([...dialog.querySelectorAll('[data-mx-triad-history][open]')].map(el=>el.dataset.mxTriadHistory));
   const scroll=resetScroll?0:dialog.querySelector('.mx-modal-scroll')?.scrollTop||0;
   const tier=cockpitTier(m,helpers);dialog.className='mx-modal mx-tone-'+tier.tone;
   const tabs='<nav class="mx-modal-tabs" aria-label="Mercati della matrice">'+Object.entries(MATRIX_SECTIONS).map(([k,l])=>'<button type="button" data-mx-section="'+k+'" aria-pressed="'+(modalSection===k)+'">'+esc(l)+'</button>').join('')+'</nav>';
@@ -1175,6 +1209,7 @@
     v7Panel(m,helpers)+cockpit(m,helpers,false,origin)+live+reference+detail)+
    '<p class="mx-caption">Analisi '+esc(helpers.timestamp?.(active?.v7?.captured_at||m.multimarket?.captured_at)||m.multimarket?.captured_at||'non disponibile')+' · Modello '+esc(active?V7:m.multimarket?.model_id||'non disponibile')+'</p></div>';
   dialog.querySelector('.mx-modal-scroll').scrollTop=scroll;
+  dialog.querySelectorAll('[data-mx-triad-history]').forEach(el=>{el.open=historyOpen.has(el.dataset.mxTriadHistory);});
   if(focused)dialog.querySelector('[data-mx-section="'+focused+'"]').focus();
   else if(closeFocused)dialog.querySelector('[data-mx-close]').focus();
   else if(instrumentFocused)dialog.querySelector('[data-mx-instrument]')?.focus();
@@ -1277,6 +1312,21 @@
    (all.length?'<button class="mx-open" type="button" data-mx-open="'+esc(fid)+'" aria-haspopup="dialog">Apri analisi <span>↗</span></button>':'')+'</article>';
  }
  let payload,host,helpers;
+ function refreshTriadOutcomes(){
+  if(!host)return;
+  const matches=new Map((payload?.matches||[]).map(match=>[String(match.fixture?.fixture_id),match]));
+  const update=(container,match)=>{
+   if(!match)return;
+   container.querySelectorAll('[data-mx-triad-result]').forEach(slot=>{
+    const spec=JSON.parse(slot.dataset.mxTriadResult);
+    const badge=triadOutcomeBadge(match,spec,slot.hasAttribute('data-mx-triad-pending'));
+    if(slot.innerHTML!==badge)slot.innerHTML=badge;
+   });
+  };
+  host.querySelectorAll('.mx-card[data-live-fixture]').forEach(card=>update(card,matches.get(card.dataset.liveFixture)));
+  if(dialog)update(dialog,matches.get(modalFixtureId));
+ }
+ root.addEventListener?.('arabsniper-live-update',refreshTriadOutcomes);
  function halfTimeText(half){
   if(!half||half.status==='pending')return '';
   if(!half.score)return 'PT · dato non disponibile';

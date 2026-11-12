@@ -29,7 +29,8 @@ def feeds(root):
 
 class FakeStorage:
     def __init__(self):
-        self.objects = {'state/current.json': b'{"version":1,"files":{}}'}
+        self.objects = {'state/current.json': b'{"version":1,"files":{}}',
+                        'arab_quote_model_research.json': b'{}'}
         self.fail = False
     def get_object(self, Bucket, Key): return {'Body': io.BytesIO(self.objects[Key])}
     def put_object(self, Bucket, Key, Body, **kwargs):

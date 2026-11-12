@@ -1,5 +1,6 @@
 """Private R2 checkpoint + Gold projection. Activate only after staging verification."""
 from pathlib import Path
+from datetime import datetime, timezone
 import hashlib, json, os, re, sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from audit_storage import read_store, atomic_bytes, FORMAT, validate_store
@@ -95,7 +96,9 @@ def publish(s3,bucket,root, *, checkpoint_only=False, selected_paths=None):
         print(f'Private audit checkpoint saved: {len(index)} files; Gold feeds unchanged',flush=True)
         return
     # Gold uses its existing names and requires authenticated Worker access.
-    from gold_browser_feed import project as browser_project, encoded, prematch_coverage
+    from gold_browser_feed import (project as browser_project, encoded, prematch_coverage,
+                                   read_triad_history, save_triad_history)
+    from gold_triad_history import keep_visible_days, observe_day
     def upload_browser_page(key, data):
         s3.put_object(Bucket=bucket, Key=key, Body=data,
                       ContentType='application/octet-stream', CacheControl='private, no-store')
@@ -103,10 +106,15 @@ def publish(s3,bucket,root, *, checkpoint_only=False, selected_paths=None):
     # Keep every original daily feed unchanged for Telegram/Facebook readers.
     catalog = json.loads(gold['arab_quote_model_research.json'])
     boards = catalog['_gold_browser_days'] = {}
+    triad_history = read_triad_history(s3, bucket)
+    now = datetime.now(timezone.utc)
+    keep_visible_days(triad_history, now)
     for name in GOLD[:5]:
         day = json.loads(gold[name])
-        boards[name] = browser_project(day, upload_browser_page)
+        observe_day(triad_history, day, now)
+        boards[name] = browser_project(day, upload_browser_page, triad_history=triad_history)
         print('Gold prematch coverage '+json.dumps(prematch_coverage(day), sort_keys=True), flush=True)
+    save_triad_history(catalog, triad_history, upload_browser_page)
     audit = json.loads(gold['arab_quote_prediction_audit.json'])
     catalog['_gold_audit_summary'] = {key: audit[key] for key in ('summary', 'updated_at') if key in audit}
     gold['arab_quote_model_research.json'] = encoded(catalog)

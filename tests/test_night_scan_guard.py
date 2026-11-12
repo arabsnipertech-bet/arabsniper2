@@ -102,6 +102,7 @@ class NightGuardTests(unittest.TestCase):
             feeds(source)
             store = FakeStorage()
             store.objects['state/current.json'] = b'{"version":1,"files":{}}'
+            store.objects['arab_quote_model_research.json'] = b'{}'
             with contextlib.redirect_stdout(io.StringIO()): publish(store, 'test', source)
             old_pointer = store.objects['state/current.json']
             guard.record_completion(source, START, END)
