@@ -129,7 +129,16 @@ async function campaignGrant(env,access,email,tgid,now,monthlyPrice) {
   if(hasCache)await env.ACCESS_DB.prepare('DELETE FROM gold_access_cache WHERE email=?').bind(email).run();
   return {type:'granted',expires_at:claim.expires_at};
 }
+// Campaign grant history is a permanent eligibility ledger; never purge on expiry.
+// The current campaign keeps its existing retry/idempotency handling.
+async function freePromotionUsed(env,email,tgid) {
+  return !!await first(env,
+    "SELECT campaign FROM telegram_campaign_claims WHERE status='granted' AND (email=? OR telegram_id=?) AND (?='' OR campaign<>?) LIMIT 1",
+    email,tgid,campaignOn(env)?CAMPAIGN:'',campaignOn(env)?CAMPAIGN:'');
+}
+const FREE_USED='Hai già usufruito della promozione gratuita Gold. Non sono disponibili ulteriori prove gratuite. Accedi alla tua area Gold per le offerte di rinnovo disponibili: https://arabsniperbet.com/gold-dashboard-live.html';
 async function tryGrant(env,access,email,tgid,now,monthlyPrice) {
+  if(await freePromotionUsed(env,email,tgid))return {type:'free_promotion_used'};
   if(campaignOn(env))return campaignGrant(env,access,email,tgid,now,monthlyPrice);
   // Never issue extra free weeks to accounts that already have an entitlement.
   if((await access(env,email,now)).active)return {type:'already_active'};
@@ -185,13 +194,14 @@ async function processPrivateMessage(env,access,msg,monthlyPrice,now) {
   if(/^\/(start|prova)(?:@\w+)?(?:\s.*)?$/i.test(text)) {
     await sendTelegram(env,tgid,'🎁 ArabSniperBet Gold · 7 giorni gratis!\n\n' +
       'Inviami qui in privato la tua email. Riceverai un codice per confermarla.\n' +
-      (campaignOn(env)?'Nuovo motore: altri 7 giorni anche se hai già provato Gold! Una sola attivazione per questa campagna. Se hai un accesso attivo, i giorni si aggiungono alla scadenza.\n':'Una sola prova per persona/email.\n') +
+      (campaignOn(env)?'Nuovo motore: altri 7 giorni anche se hai già provato Gold! Una sola attivazione; chi ne usufruisce non potrà aderire a future prove gratuite. Se hai un accesso attivo, i giorni si aggiungono alla scadenza.\n':'Una sola prova per persona/email.\n') +
       'Nessuna carta, nessun addebito e nessun rinnovo automatico della prova.\n' +
       'Accesso al sito: https://arabsniperbet.com/gold-dashboard-live.html');
     return;
   }
   if(EMAIL.test(text)&&text.length<=254) {
     const email=lower(text);
+    if(await freePromotionUsed(env,email,tgid)){await sendTelegram(env,tgid,FREE_USED);return;}
     const existing=campaignOn(env)
       ?await first(env,'SELECT * FROM telegram_campaign_claims WHERE campaign=? AND (email=? OR telegram_id=?) LIMIT 1',CAMPAIGN,email,tgid)
       :await first(env,'SELECT status FROM telegram_trial_claims WHERE email=? OR telegram_id=? LIMIT 1',email,tgid);
@@ -252,6 +262,8 @@ async function processPrivateMessage(env,access,msg,monthlyPrice,now) {
           'Scadenza: '+new Date(grant.expires_at*1000).toLocaleString('it-IT',{timeZone:'Europe/Rome'})+' (ora italiana)\n'+
           'https://arabsniperbet.com/gold-dashboard-live.html\n\n' +
           'Usa il codice email richiesto dal sito per accedere. Nessun addebito o rinnovo automatico.');
+      } else if(grant.type==='free_promotion_used') {
+        await sendTelegram(env,tgid,FREE_USED);
       } else if(grant.type==='unlimited') {
         await sendTelegram(env,tgid,'Il tuo accesso Gold è già senza scadenza: puoi provare subito il nuovo motore dal sito.');
       } else {

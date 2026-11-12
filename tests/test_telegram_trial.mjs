@@ -192,3 +192,31 @@ test('Campaign requires its own OTP and never modifies unlimited access',async()
   const vip=setup(true);await claimCampaign(vip,async()=>({active:true,source:'vip'}));
   assert.equal(vip.subs.length,0);assert.match(vip.outs.at(-1).message,/senza scadenza/);
 });
+
+function previousCampaign(s,campaign='gold-engine-2026-11',status='granted') {
+  s.db.prepare('INSERT INTO telegram_campaign_claims (campaign,email,telegram_id,requested_at,base_expires_at,expires_at,status) VALUES (?,?,?,?,?,?,?)')
+    .run(campaign,'person@example.com','42',START-800000,START-800000,START-195200,status);
+}
+test('Campaign beneficiaries cannot fall back to standard trials, with either identity',async()=>{
+  for(const [chat,email] of [[43,'PERSON@example.com'],[42,'other@example.com']]) {
+    const s=setup(false);previousCampaign(s);
+    await claimCampaign(s,async()=>({active:false}),chat,email);
+    assert.equal(s.outs.filter(x=>x.type==='email').length,0);
+    assert.equal(s.subs.length,0);assert.match(s.outs.at(-1).message,/ulteriori prove gratuite/);
+  }
+});
+test('A past campaign blocks future campaign grants even after expiry',async()=>{
+  const s=setup(true);previousCampaign(s,'earlier-campaign');
+  await claimCampaign(s);
+  assert.equal(s.subs.length,0);assert.equal(s.outs.filter(x=>x.type==='email').length,0);
+});
+test('Eligibility is checked again after OTP verification',async()=>{
+  const s=setup(false),check=msg=>telegramTrialRoute(s.request(42,msg),s.env,async()=>({active:false}),'price_monthly',START);
+  await check('person@example.com');const code=s.outs.find(x=>x.type==='email').code;
+  previousCampaign(s);await check(code);
+  assert.equal(s.subs.length,0);assert.match(s.outs.at(-1).message,/ulteriori prove gratuite/);
+});
+test('Unfulfilled past campaign reservation does not disqualify a new campaign',async()=>{
+  const s=setup(true);previousCampaign(s,'earlier-campaign','reserved');
+  await claimCampaign(s);assert.equal(s.subs.length,1);
+});
