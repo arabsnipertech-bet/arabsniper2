@@ -1,0 +1,110 @@
+name: Publish Gold recap and trial offer 12 November
+on:
+  push:
+    branches: ['work/telegram-gold-recap-20261112']
+    paths: ['.github/workflows/telegram-gold-recap-20261112.yml']
+permissions:
+  contents: read
+concurrency:
+  group: telegram-gold-recap-20261112
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/work/telegram-gold-recap-20261112'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/deploy-telegram-campaign.py
+          sparse-checkout-cone-mode: false
+      - name: Publish once to the verified Telegram channel
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          # Auditor-certified report 2026-11-11 from public feed blob 40f0e302ce678b76ff85b81bea453a3058a4453f.
+          GOLD_RECAP_TEXT: |-
+            ⚽ 4 RISCONTRI DALLE SCHEDE GOLD · 11 NOVEMBRE
+            
+            Quattro proposte Studio della triade Gold, registrate prima del calcio d’inizio e verificate dall’Auditor.
+            
+            ✅ Kawasaki Frontale – Kashiwa Reysol 1–2
+            Under 0,5 PT · intervallo 0–0
+            
+            ✅ Vissel Kobe – Machida Zelvia 0–1
+            Under 1,5 ST · intervallo 0–0
+            
+            ✅ Urawa – Cerezo Osaka 2–0
+            Under 3,5 FT
+            
+            ✅ Nové Zámky – Zemplín Michalovce 0–2
+            Under 0,5 PT · intervallo 0–0
+            
+            📊 Bilancio completo della giornata
+            https://arabsniperbet.com/#risultati
+            
+            🎁 GOLD V7 · 7 GIORNI GRATIS
+            Dal 12 al 18 novembre, anche per chi ha già fatto una prova. Apri @ArabSniperBot in privato, scrivi /prova e verifica l’email. Non serve la carta e la prova scade in automatico.
+            
+            🏷️ Nelle ultime 48 ore della prova, gli utenti idonei trovano in Gold il rinnovo con il 10% di sconto.
+            
+            Attiva la prova → https://t.me/ArabSniperBot
+            Dashboard Gold → https://arabsniperbet.com/gold-dashboard-live.html
+            18+ · Analisi statistiche
+        run: |
+          python3 - <<'PY'
+          from datetime import datetime
+          import importlib.util
+          import os
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+          
+          if datetime.now(ZoneInfo('Europe/Rome')).date().isoformat() != '2026-11-12':
+              raise SystemExit('Outside the approved publication day')
+          
+          spec = importlib.util.spec_from_file_location(
+              'campaign_ops', Path('scripts/deploy-telegram-campaign.py'))
+          ops = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(ops)
+          
+          key = ops.CAMPAIGN + ':verified:2026-11-11'
+          channel = '@arabsniper_signals'
+          link = 'https://t.me/arabsniper_signals/'
+          saved = ops.query(
+              'SELECT status,message_id FROM telegram_campaign_announcements WHERE campaign=?',
+              [key])
+          if saved:
+              if saved[0]['status'] != 'sent' or not saved[0]['message_id']:
+                  raise SystemExit('Previous send outcome uncertain. Check the channel before retrying.')
+              print('Already published: ' + link + str(saved[0]['message_id']))
+              raise SystemExit(0)
+          
+          bot = ops.telegram('getMe')
+          chat = ops.telegram('getChat', chat_id=channel)
+          if (not bot.get('is_bot') or bot['username'].lower() != 'arabsniperbot'
+                  or chat['type'] != 'channel' or chat['username'].lower() != channel[1:]):
+              raise SystemExit('Unexpected bot or channel identity')
+          member = ops.telegram('getChatMember', chat_id=chat['id'], user_id=bot['id'])
+          if member['status'] != 'administrator' or not member.get('can_post_messages'):
+              raise SystemExit('The verified bot cannot post to the channel')
+          
+          post = os.environ['GOLD_RECAP_TEXT']
+          reserved = ops.query(
+              "INSERT OR IGNORE INTO telegram_campaign_announcements(campaign,status,created_at) "
+              "VALUES (?,'sending',unixepoch()) RETURNING campaign", [key])
+          if not reserved:
+              raise SystemExit('Another run already reserved the publication')
+          
+          sent = ops.telegram('sendMessage', chat_id=chat['id'], text=post, disable_web_page_preview=True)
+          message_id = sent.get('message_id')
+          if sent['chat']['id'] != chat['id'] or type(message_id) is not int or message_id <= 0:
+              raise SystemExit('Invalid Telegram receipt')
+          print('Published: ' + link + str(message_id), flush=True)
+          saved = ops.query(
+              "UPDATE telegram_campaign_announcements SET status='sent',message_id=? "
+              "WHERE campaign=? AND status='sending' RETURNING message_id", [message_id, key])
+          if not saved or saved[0]['message_id'] != message_id:
+              raise SystemExit('Telegram confirmed publication but the receipt could not be stored')
+          PY
