@@ -1,4 +1,4 @@
-"""One Telegram study suggestion per afternoon or evening kickoff window."""
+"""One study suggestion per channel and afternoon or evening kickoff window."""
 from multimarket_model import stamp
 
 from . import showcase
@@ -32,10 +32,10 @@ def candidates(boards, now):
     return rows
 
 
-def group_for(pool, posts, excluded, now):
+def group_for(pool, posts, excluded, now, *, channel='telegram'):
     covered, attempted = set(), set(excluded)
     for post in posts:
-        if post['channel'] != 'telegram' or post['kind'] not in ('best', 'studio'):
+        if post['channel'] != channel or post['kind'] not in ('best', 'studio'):
             continue
         free = post['view']['free']
         status = post['status']

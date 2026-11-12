@@ -179,7 +179,7 @@ class PublisherTests(TestCase):
         self.assertNotIn('private source', json.dumps(view))
         self.assertNotIn('model_fair_odd', json.dumps(view))
 
-    def test_publisher_sends_one_studio_pick_with_locks_and_campaign_when_best_empty(self):
+    def test_publisher_sends_studio_to_each_channel_once_with_locks_and_campaign(self):
         now = datetime.fromisoformat('2026-11-12T14:25:00+00:00')
         boards = [studio_board(now, 1, 35, 200), studio_board(now, 2, 95), studio_board(now, 3, 95)]
         snapshot = boards[0]['matches'][0]['multimarket']['matrix']['v7']
@@ -190,16 +190,18 @@ class PublisherTests(TestCase):
         store.state['legacy'] = {'handoff': {'created_at': selection.utc(NOW), 'ids': []}}
         telegram, facebook = mock.Mock(), mock.Mock()
         telegram.send.return_value = {'id': '123', 'at': selection.utc(now)}
+        facebook.send.return_value = {'id': '604216843376166_456', 'at': selection.utc(now)}
         services = {'telegram': telegram, 'facebook': facebook}
         with (mock.patch.object(runner, 'clock', return_value=now),
               mock.patch.object(runner, 'read_local', return_value={'publisher': 'v7.1'}),
               mock.patch.object(runner, 'read_board', side_effect=lambda _, n: board_today if n == 1 else {}),
               mock.patch.object(runner, 'publish_home'), mock.patch.object(runner, 'plan_live'),
               mock.patch.object(runner, 'plan_editorial')):
+            runner.tick(store, {'telegram': telegram}, '', trial_ok=True)
             runner.tick(store, services, '', trial_ok=True)
             runner.tick(store, services, '', trial_ok=True)
         telegram.send.assert_called_once()
-        facebook.send.assert_not_called()
+        facebook.send.assert_called_once()
         post, image = telegram.send.call_args.args
         self.assertEqual(post['kind'], 'studio')
         self.assertEqual(post['status'], 'sent')
@@ -214,6 +216,10 @@ class PublisherTests(TestCase):
         self.assertIn('gold-dashboard-live.html', post['text'])
         self.assertLessEqual(len(post['text'].encode('utf-16-le')) // 2, 1024)
         self.assertEqual(Image.open(BytesIO(image)).size, (1080, 1350))
+        page_post, page_image = facebook.send.call_args.args
+        self.assertEqual(page_post['view'], post['view'])
+        self.assertEqual(page_post['text'].replace(page_post['marker'], post['marker']), post['text'])
+        self.assertEqual(page_image, image)
 
     def test_studio_windows_and_delivery_recheck(self):
         now = datetime.fromisoformat('2026-11-12T14:45:00+00:00')
@@ -233,17 +239,16 @@ class PublisherTests(TestCase):
         self.assertEqual(studio.group_for(studio.candidates(boards, later), [post], set(), later)[0],
                          '2026-11-12/18/3')
 
-    def test_telegram_best_footer_tracks_trial_health_and_campaign_dates(self):
+    def test_best_footer_tracks_trial_health_and_campaign_dates_on_both_channels(self):
         view = {'free': selection.project_pick(pick(1), True), 'previews': []}
         active = datetime.fromisoformat('2026-11-12T16:00:00+00:00')
         later = active + timedelta(days=7)
-        for when, trial_ok, discount in [(active, True, True), (active, False, False), (later, True, False)]:
-            text = editorial.message('best', view, 'AS71-TEST', 'telegram', now=when, trial_ok=trial_ok)
-            self.assertIn('/prova', text)
-            self.assertIn('gold-dashboard-live.html', text)
-            self.assertEqual('10%' in text, discount)
-        self.assertNotIn('/prova', editorial.message('best', view, 'AS71-TEST', 'facebook',
-                                                     now=active, trial_ok=True))
+        for channel in ('telegram', 'facebook'):
+            for when, trial_ok, discount in [(active, True, True), (active, False, False), (later, True, False)]:
+                text = editorial.message('best', view, 'AS71-TEST', channel, now=when, trial_ok=trial_ok)
+                self.assertIn('/prova', text)
+                self.assertIn('gold-dashboard-live.html', text)
+                self.assertEqual('10%' in text, discount)
 
     def test_homepage_receipt_recovers_from_an_already_visible_revision(self):
         store = LocalStore()
