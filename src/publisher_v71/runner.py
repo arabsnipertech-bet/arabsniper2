@@ -5,6 +5,7 @@ from pathlib import Path
 import json
 import os
 import sys
+import time
 
 from gold_storage import client
 from multimarket_model import stamp
@@ -150,26 +151,37 @@ def plan_live(store, now, candidates, channels):
             continue
         states[day] = state
         queue(store, 'live', day + '/start', state['view'], ['telegram'], now, kickoff - LEAD)
-    if not any(not state['done'] or live.needs_halftime(state, now) for state in states.values()):
+    due = {day: state for day, state in states.items() if live.needs_halftime(state, now) or (
+        not state['done'] and not live.monitor_current(state, now))}
+    if not due:
         return
-    feed = safe_read('live_scores', lambda: scores.read(store, states.values(), now, clock, event_log), {})
+    feed = safe_read('live_scores', lambda: scores.read(store, due.values(), now, clock, event_log), {})
     now = clock()
-    for day, state in states.items():
-        start_post = store.state['posts'].get(f'telegram/live/{day}/start') or {}
-        if start_post.get('status') != 'sent':
-            continue
-        was_done = state['done']
-        change = live.advance(state, feed, now, candidates)
-        if not change:
-            continue
-        state['view'] = change
-        until = (stamp(change['kickoff']) - LEAD if change['status'] == 'Prematch'
-                 else now + timedelta(hours=4))
-        suffix = day + '/' + live.revision(change)
-        queue(store, 'live', suffix, change, ['telegram'], now, until,
-              edit=start_post['receipt']['id'])
-        if change['status'] == 'Finale' and not was_done and 'facebook' in channels:
-            queue(store, 'live', suffix, change, ['facebook'], now, until)
+    for day, state in due.items():
+        update_live(store, day, state, feed, now, candidates, channels)
+
+
+def live_receipt(store, day):
+    post = store.state['posts'].get(f'telegram/live/{day}/start') or {}
+    if post.get('status') == 'sent':
+        return post['receipt']['id']
+
+
+def update_live(store, day, state, feed, now, candidates, channels):
+    receipt = live_receipt(store, day)
+    if not receipt:
+        return
+    was_done = state['done']
+    change = live.advance(state, feed, now, candidates)
+    if not change:
+        return
+    state['view'] = change
+    until = (stamp(change['kickoff']) - LEAD if change['status'] == 'Prematch'
+             else now + timedelta(hours=4))
+    suffix = day + '/' + live.revision(change)
+    queue(store, 'live', suffix, change, ['telegram'], now, until, edit=receipt)
+    if change['status'] == 'Finale' and not was_done and 'facebook' in channels:
+        queue(store, 'live', suffix, change, ['facebook'], now, until)
 
 
 def plan_report(store, now, channels, yesterday):
@@ -308,18 +320,23 @@ def tick(store, services, gh_token, *, trial_ok):
             attempt(store, post, services[post['channel']], source, clock, delivery_log)
     plan_live(store, clock(), candidates, services)
     store.save()
-    live_posts = [p for p in store.state['posts'].values() if p['kind'] == 'live']
+    send_live(store, services, candidates, now)
+    publish_home(store, candidates, clock(), boards)
+
+
+def send_live(store, services, candidates, now, *, day=None):
+    live_posts = [p for p in store.state['posts'].values() if p['kind'] == 'live'
+                  and (day is None or p['key'].startswith(day + '/'))]
     for post in sorted(live_posts, key=lambda p: p['created_at']):
         if (post['channel'] in services and
                 stamp(post['expires_at']) + timedelta(hours=12) > now):
-            if post.get('edit_id') and post['status'] in ('ready', 'retry'):
+            if post.get('edit_id') and post['status'] in ('ready', 'retry', 'sending', 'uncertain'):
                 if any(p['channel'] == post['channel'] and p.get('edit_id') == post['edit_id']
                        and p['created_at'] > post['created_at'] for p in live_posts):
                     post.update(status='skipped', reason='superseded_live_update')
                     store.save()
                     continue
             attempt(store, post, services[post['channel']], candidates, clock, delivery_log)
-    publish_home(store, candidates, clock(), boards)
 
 
 def preflight(store):
@@ -338,23 +355,38 @@ def preflight(store):
     event_log('auditor', 'certified' if audit else 'not_certified', day=audit['date'] if audit else None)
 
 
+def production_enabled():
+    return (cutover.ENABLED and os.environ.get('PUBLISHER_DISABLED') != 'true'
+            and os.environ.get('GITHUB_REPOSITORY') == legacy.REPO
+            and os.environ.get('GITHUB_REF') == 'refs/heads/main')
+
+
+def social_services():
+    services = {'telegram': Telegram(os.getenv('BOT_TOKEN'))}
+    if os.environ.get('FACEBOOK_ENABLED') == 'true':
+        services['facebook'] = Facebook(os.getenv('META_TOKEN'))
+    return services
+
+
 def main():
     if sys.argv[1:] == ['--preflight']:
         preflight(Storage(client(), os.environ['R2_BUCKET']))
         return
-    if (not cutover.ENABLED or os.environ.get('PUBLISHER_DISABLED') == 'true'
-            or os.environ.get('GITHUB_REPOSITORY') != legacy.REPO
-            or os.environ.get('GITHUB_REF') != 'refs/heads/main'):
+    if not production_enabled():
         event_log('publisher', 'disabled_or_non_production')
         return
     store = Storage(client(), os.environ['R2_BUCKET'])
-    services = {'telegram': Telegram(os.getenv('BOT_TOKEN'))}
-    if os.environ.get('FACEBOOK_ENABLED') == 'true':
-        services['facebook'] = Facebook(os.getenv('META_TOKEN'))
+    services = social_services()
     trial_ok = cutover.TRIAL_PROVEN and os.environ.get('TRIAL_DISABLED') != 'true'
     if trial_ok:
         trial_ok = safe_read('trial_webhook', lambda: services['telegram'].trial_healthy(clock()), False)
-    tick(store, services, os.environ['GH_TOKEN'], trial_ok=trial_ok)
+    for _ in range(10):
+        with store.cycle(clock()) as acquired:
+            if acquired:
+                tick(store, services, os.environ['GH_TOKEN'], trial_ok=trial_ok)
+                return
+        time.sleep(3)
+    event_log('publisher', 'deferred_to_next_cycle')
 
 
 if __name__ == '__main__':

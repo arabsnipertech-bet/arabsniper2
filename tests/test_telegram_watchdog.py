@@ -7,7 +7,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
-from telegram_watchdog import wake, wake_publisher, publisher_live_active, due_slots, ROME
+from telegram_watchdog import wake, wake_publisher, wake_live_monitor, publisher_live_active, due_slots, ROME
 
 
 class FakeApi:
@@ -88,3 +88,24 @@ class TelegramWatchdogTests(unittest.TestCase):
             payload = {"publisher": "v7.1", "live": {"status": status, "kickoff": kickoff}}
             with mock.patch('telegram_watchdog.urlopen', return_value=BytesIO(json.dumps(payload).encode())):
                 self.assertEqual(publisher_live_active(at), expected)
+
+    def test_event_monitor_starts_before_kickoff_and_does_not_overlap(self):
+        now = datetime.fromisoformat('2026-11-12T20:35:00+01:00')
+        api = FakeApi()
+        feed = {'publisher': 'v7.1', 'live': {'status': 'Prematch', 'fixture_id': '1528961',
+                                             'kickoff': '2026-11-12T20:45:00+01:00'}}
+
+        def read(*args, **kwargs):
+            return BytesIO(json.dumps(feed).encode())
+
+        with mock.patch('telegram_watchdog.urlopen', side_effect=read):
+            self.assertEqual(wake_live_monitor(api, now - timedelta(minutes=6)), 'no_announced_live')
+            self.assertEqual(wake_live_monitor(api, now, dry_run=True), 'would_dispatch')
+            self.assertEqual(api.dispatched, [])
+            self.assertEqual(wake_live_monitor(api, now), 'dispatched')
+            api.data = [{'status': 'in_progress'}]
+            self.assertEqual(wake_live_monitor(api, now + timedelta(minutes=10)), 'already_running')
+            feed['live']['status'] = 'Finale'
+            self.assertEqual(wake_live_monitor(api, now + timedelta(hours=2)), 'no_announced_live')
+        self.assertEqual(api.dispatched, [('workflows/telegram-live.yml/dispatches', {
+            'ref': 'main', 'inputs': {'fixture_id': '1528961'}})])

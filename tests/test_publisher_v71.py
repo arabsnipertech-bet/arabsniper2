@@ -1,16 +1,18 @@
 """Editorial tests exercise privacy, timing, immutable receipts and outcomes."""
+from contextlib import nullcontext
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
 from unittest import TestCase, mock
 import json
+import os
 import sys
 
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
-from publisher_v71 import delivery, editorial, live, public_feed, report, runner, selection, studio
+from publisher_v71 import delivery, editorial, live, monitor, public_feed, report, runner, scores, selection, studio
 from publisher_v71.channels import DeliveryError, Telegram, TelegramHistory
 from publisher_v71.runner import add_group, plan_report, record_home_receipt
 from publisher_v71.storage import Storage
@@ -114,6 +116,20 @@ class LocalStore(Storage):
 
     def read(self, key, default=None, **kwargs):
         return self.immutable.get(key.removeprefix('evidence/'), default), None
+
+
+def event(detail, minute, team, *, extra=None, comments=None):
+    return {'type': 'Goal', 'detail': detail, 'comments': comments, 'time': {'elapsed': minute, 'extra': extra},
+            'team': {'id': team, 'name': 'Casa' if team == 10 else 'Ospiti'}, 'player': {'id': minute}}
+
+
+def fixture(phase, goals, events, *, halftime=None, fulltime=None):
+    def pair(value):
+        return dict(zip(('home', 'away'), value)) if value is not None else None
+
+    return {'fixture': {'id': 1, 'status': {'short': phase, 'elapsed': 90 if phase == 'FT' else 40}},
+            'goals': pair(goals), 'score': {'halftime': pair(halftime), 'fulltime': pair(fulltime)},
+            'events': events, 'teams': {'home': {'id': 10}, 'away': {'id': 20}}}
 
 
 class PublisherTests(TestCase):
@@ -411,6 +427,134 @@ class PublisherTests(TestCase):
         second = first + timedelta(seconds=60)
         fixture['observed_at'] = selection.utc(second)
         self.assertEqual(live.advance(state, feed, second, {})['away'], 0)
+
+    def test_live_monitor_edits_original_message_for_goals_and_both_penalty_outcomes(self):
+        match = pick(1)
+        kickoff = datetime.fromisoformat(match['kickoff'])
+        day = selection.rome_day(kickoff)
+        store = LocalStore()
+        state = store.state['live'][day] = live.start_state(match, None, NOW)
+        start = f'telegram/live/{day}/start'
+        delivery.queue(store, 'live', day + '/start', state['view'], ['telegram'], NOW, kickoff)
+        store.state['posts'][start].update(status='sent', receipt={'id': '181', 'at': selection.utc(NOW)})
+        goal = event('Normal Goal', 7, 20)
+        missed = event('Missed Penalty', 13, 10)
+        penalty = event('Penalty', 45, 20, extra=2)
+        shootout = event('Missed Penalty', 120, 10, comments='Penalty Shootout')
+        telegram = Telegram('fake-token')
+        reads = []
+        for offset, phase, score, details, expected in (
+            (7, '1H', (0, 1), [goal], 'goal'),
+            (8, '1H', (0, 1), [goal], None),
+            (13, '1H', (0, 1), [goal, missed, missed], 'missed'),
+            (14, '1H', (0, 1), [goal, missed], None),
+            (47, '1H', (0, 2), [goal, missed, penalty], 'penalty'),
+            (49, 'HT', (0, 2), [goal, missed, penalty], 'photo'),
+            (100, 'FT', (0, 2), [goal, missed, penalty, shootout], 'photo'),
+        ):
+            with self.subTest(phase=phase, offset=offset):
+                now = kickoff + timedelta(minutes=offset)
+                data = fixture(phase, score, details,
+                               halftime=(0, 2) if phase in ('HT', 'FT') else None,
+                               fulltime=(0, 2) if phase == 'FT' else None)
+                receipt = {'chat': {'username': 'arabsniper_signals'}, 'message_id': 181,
+                           'date': int(NOW.timestamp()), 'edit_date': int(now.timestamp())}
+
+                def provider(path, key, params=None):
+                    reads.append((path, params))
+                    if path == 'status':
+                        return {'subscription': {'active': True},
+                                'requests': {'current': 0, 'limit_day': 10000}}, {}
+                    return [data], {'x-ratelimit-requests-remaining': '9000'}
+
+                with (mock.patch.object(store, 'cycle', return_value=nullcontext(True)),
+                      mock.patch.object(runner, 'clock', return_value=now),
+                      mock.patch.object(scores, 'provider', side_effect=provider),
+                      mock.patch.object(telegram, 'call', return_value=receipt) as api,
+                      mock.patch.dict(os.environ, {'API_SPORTS_KEY': 'fake'})):
+                    result = monitor.poll(store, {'telegram': telegram}, '1')
+                self.assertEqual(result, 'finished' if phase == 'FT' else 'polled')
+                if not expected:
+                    api.assert_not_called()
+                    continue
+                api.assert_called_once()
+                method, params = api.call_args.args
+                media = json.loads(params['media'])
+                self.assertEqual((method, params['message_id']), ('editMessageMedia', '181'))
+                self.assertIn(f'{score[0]}–{score[1]}', media['caption'])
+                name, content, mime = api.call_args.kwargs['files']['live_card']
+                if expected != 'photo':
+                    self.assertEqual((name, mime, media['type']), (expected + '.gif', 'image/gif', 'animation'))
+                    image = Image.open(BytesIO(content))
+                    self.assertEqual((image.format, image.size), ('GIF', (640, 640)))
+                    self.assertTrue(image.is_animated)
+                if expected == 'missed':
+                    self.assertIn('RIGORE SBAGLIATO · Casa · 13′', media['caption'])
+                if expected == 'penalty':
+                    self.assertIn('RIGORE SEGNATO! · Ospiti · 45+2′', media['caption'])
+        self.assertEqual(reads, [('status', None)] + [('fixtures', {'id': '1'})] * 7)
+        self.assertEqual(state['view']['status'], 'Finale')
+        self.assertEqual(state['view']['halftime'], [0, 2])
+        self.assertEqual([e['kind'] for e in state['view']['events']], ['goal', 'missed', 'penalty'])
+        self.assertNotIn('animation', state['view'])
+        self.assertNotIn('events', public_feed.projection(store.state, now)['live'])
+
+    def test_late_explicit_penalty_replaces_generic_goal_without_duplicates(self):
+        match = pick(1)
+        kickoff = datetime.fromisoformat(match['kickoff'])
+        state = live.start_state(match, None, NOW)
+        for offset, details, expected in (
+            (11, [], 'goal'),
+            (12, [event('Penalty', 10, 10)], 'penalty'),
+            (13, [event('Penalty', 10, 10)], None),
+        ):
+            now = kickoff + timedelta(minutes=offset)
+            row = fixture('1H', (1, 0), details)
+            feed = scores.feed({'1': scores.fixture_view(row, selection.utc(now), with_events=True)})
+            view = live.advance(state, feed, now, {})
+            if expected:
+                self.assertEqual((view['animation'], [e['kind'] for e in view['events']]), (expected, [expected]))
+                state['view'] = view
+            else:
+                self.assertIsNone(view)
+
+    def test_animation_rejection_falls_back_to_current_score_card(self):
+        telegram = Telegram('fake')
+        post = {'kind': 'live', 'edit_id': '181', 'text': 'RIGORE SBAGLIATO · 0–1',
+                'view': {'animation': 'missed', 'home': 0, 'away': 1, 'status': 'Primo tempo'}}
+        with (mock.patch('telegram_live_art.animation', return_value=b'GIF89a') as art,
+              mock.patch.object(telegram, 'call', side_effect=[
+                  DeliveryError('rejected', 'telegram_http_400'), None]) as api):
+            self.assertEqual(telegram.send(post, b'score-card')['id'], '181')
+        art.assert_called_once_with('missed', '0–1 · PRIMO TEMPO')
+        self.assertEqual([json.loads(call.args[1]['media'])['type'] for call in api.call_args_list],
+                         ['animation', 'photo'])
+        self.assertEqual(api.call_args.kwargs['files']['live_card'][1], b'score-card')
+
+    def test_event_quota_reserve_stops_match_requests(self):
+        store = LocalStore()
+        quota = {'subscription': {'active': True}, 'requests': {'current': 9000, 'limit_day': 10000}}
+        with (mock.patch.object(scores, 'provider', return_value=(quota, {})) as provider,
+              mock.patch.dict(os.environ, {'API_SPORTS_KEY': 'fake'})):
+            for _ in range(2):
+                self.assertEqual(scores.detailed(store, '1', NOW, lambda: NOW, mock.Mock()), {})
+        provider.assert_called_once_with('status', 'fake')
+
+    def test_publisher_cycle_respects_a_lease_and_releases_only_its_own(self):
+        client = mock.Mock()
+        store = Storage(client, 'bucket')
+        with mock.patch.object(store, 'read', return_value=({'until': selection.utc(NOW)}, '"old"')):
+            client.put_object.return_value = {'ETag': '"ours"'}
+            with store.cycle(NOW) as acquired:
+                self.assertTrue(acquired)
+                client.put_object.assert_called_once()
+        self.assertEqual([c.kwargs['IfMatch'] for c in client.put_object.call_args_list], ['"old"', '"ours"'])
+        client.reset_mock()
+        with mock.patch.object(store, 'read', return_value=(
+                {'until': selection.utc(NOW + timedelta(minutes=1))}, '"ours"')):
+            with store.cycle(NOW) as acquired:
+                self.assertFalse(acquired)
+        client.put_object.assert_not_called()
 
     def test_old_final_gets_halftime_as_an_edit_of_the_original_message(self):
         match = pick(1)

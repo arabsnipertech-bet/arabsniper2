@@ -130,11 +130,16 @@ def report_copy(view, *, compact=False):
 
 
 def live_copy(view):
+    from .live_events import LABELS, copy
+
     score = f" · {view['home']}–{view['away']}" if 'home' in view else ''
     lines = [f"{view['match']} · {view['league']}", f"{italian_time(view['kickoff'])} · {view['status']}{score}"]
     if 'halftime' in view and view['status'] != 'Intervallo':
         home, away = view['halftime']
         lines.append(f'Parziale all’intervallo · {home}–{away}')
+    if view.get('animation') == 'notice':
+        lines.append(LABELS['notice'])
+    lines.extend(copy(event) for event in view.get('events', ()))
     lines.append('Aggiornamenti dal risultato ufficiale.')
     return lines
 

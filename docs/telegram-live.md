@@ -1,5 +1,9 @@
 # One daily Telegram live
 
+The production V7.1 flow is described in [Publisher V7.1](publisher-v71.md).
+`telegram-live.yml` runs the Publisher monitor and reuses the original GIF renderer.
+The policy and delivery below describe the earlier `telegram_live.py` implementation.
+
 The external Fast Backup checks every ten minutes for eligible published picks.
 It starts one long-running GitHub job, which polls API-Football every 60 seconds.
 GitHub is not relaunched per minute. Existing schedule/digest and model criteria

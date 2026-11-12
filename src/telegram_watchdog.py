@@ -107,25 +107,50 @@ def wake(api,now,dry_run=False):
 
 
 PUBLISHER_WORKFLOW = 'publisher-v71.yml'
+LIVE_WORKFLOW = 'telegram-live.yml'
 PUBLISHER_INTERVAL = timedelta(minutes=17)
 LIVE_INTERVAL = timedelta(minutes=9)
 PUBLISHER_FEED = f'https://raw.githubusercontent.com/{REPO}/publisher-public-v71/homepage.json'
 
 
-def publisher_live_active(now):
+def publisher_live_view(now, lead=timedelta()):
     """Read the public coverage state from the same Publisher."""
     try:
         with urlopen(PUBLISHER_FEED, timeout=5) as response:
             feed = json.loads(response.read(100_001))
         if feed.get('publisher') != 'v7.1':
-            return False
+            return None
         live = feed.get('live') or {}
-        if live.get('status') not in ('Prematch', 'In corso', 'Primo tempo', 'Intervallo', 'Secondo tempo'):
-            return False
+        if live.get('status') not in ('Prematch', 'In corso', 'Primo tempo', 'Intervallo', 'Secondo tempo',
+                                      'Gara sospesa o rinviata'):
+            return None
         start = datetime.fromisoformat(live['kickoff'].replace('Z', '+00:00'))
-        return start.tzinfo is not None and start <= now < start + timedelta(hours=5)
+        if start.tzinfo is not None and start - lead <= now < start + timedelta(hours=5):
+            return live
     except (AttributeError, KeyError, TypeError, URLError, TimeoutError, ValueError):
-        return False
+        return None
+
+
+def publisher_live_active(now):
+    return publisher_live_view(now) is not None
+
+
+def wake_live_monitor(api, now, *, dry_run=False):
+    live = publisher_live_view(now, lead=timedelta(minutes=15)) or {}
+    fixture = str(live.get('fixture_id', ''))
+    if not fixture.isascii() or not fixture.isdecimal():
+        return 'no_announced_live'
+    if now >= datetime.fromisoformat(live['kickoff'].replace('Z', '+00:00')) + timedelta(minutes=190):
+        return 'outside_monitor_window'
+    path = 'workflows/' + LIVE_WORKFLOW
+    if api.request(path).get('state') != 'active':
+        return 'workflow_disabled'
+    if any(run['status'] != 'completed' for run in api.runs(LIVE_WORKFLOW, now - timedelta(hours=6))):
+        return 'already_running'
+    if dry_run:
+        return 'would_dispatch'
+    api.request(path + '/dispatches', {'ref': 'main', 'inputs': {'fixture_id': fixture}})
+    return 'dispatched'
 
 
 def wake_publisher(api, now, *, dry_run=False):
@@ -155,10 +180,15 @@ def main():
         public_path = Path(__file__).resolve().parents[1] / 'data/arab_quote_homepage.json'
         with public_path.open(encoding='utf-8') as source:
             safe = json.load(source).get('publisher') == 'v7.1'
-        result = (wake_publisher(GitHub(os.environ.get('GITHUB_TOKEN')), datetime.now(ROME),
-                                 dry_run=os.environ.get('FAST_BACKUP_DRY_RUN') == 'true')
-                  if safe else 'awaiting_safe_public_projection')
-        print(json.dumps({'publisher_watchdog': result}))
+        if not safe:
+            print(json.dumps({'publisher_watchdog': 'awaiting_safe_public_projection'}))
+            return
+        api = GitHub(os.environ.get('GITHUB_TOKEN'))
+        now = datetime.now(ROME)
+        dry_run = os.environ.get('FAST_BACKUP_DRY_RUN') == 'true'
+        result = wake_publisher(api, now, dry_run=dry_run)
+        monitor = wake_live_monitor(api, now, dry_run=dry_run)
+        print(json.dumps({'publisher_watchdog': result, 'telegram_live_watchdog': monitor}))
         return
     result=wake(GitHub(os.environ.get("GITHUB_TOKEN")),datetime.now(ROME),
                 dry_run=os.environ.get("FAST_BACKUP_DRY_RUN")=="true")

@@ -1,24 +1,30 @@
-name: Telegram one daily live
+name: Publisher Telegram Live Events
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['src/telegram_live.py', 'src/telegram_live_art.py', 'tests/test_telegram_live.py', '.github/workflows/telegram-live.yml']
+    inputs:
+      fixture_id:
+        description: 'Identificativo della partita già annunciata'
+        required: true
+        type: string
 permissions:
   contents: read
-  actions: read
 concurrency:
   group: arabsniper-telegram-live
   cancel-in-progress: false
 jobs:
   live:
-    # Retired by Publisher V7.1. Restore via the documented rollback.
-    if: ${{ false }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 200
+    if: >-
+      github.repository == 'arabsnipertech-bet/arabsniper2' &&
+      github.ref == 'refs/heads/main' && vars.PUBLISHER_V71_DISABLED != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 215
     env:
-      GH_TOKEN: ${{ github.token }}
+      PYTHONPATH: src
+      LIVE_FIXTURE_ID: ${{ inputs.fixture_id }}
+      PUBLISHER_DISABLED: ${{ vars.PUBLISHER_V71_DISABLED }}
       BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      FACEBOOK_ENABLED: ${{ vars.PUBLISHER_V71_FACEBOOK_DISABLED != 'true' }}
+      META_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
       API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
       R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
       R2_BUCKET: arabsniper-gold
@@ -26,22 +32,13 @@ jobs:
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout: src
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install boto3 requests Pillow==11.3.0
-      - name: Test live policy and event handling
-        run: python -m unittest discover -s tests -p test_telegram_live.py -v
-      - name: Render animation loops
-        run: python src/telegram_live_art.py
-      - uses: actions/upload-artifact@v4
-        if: github.event_name == 'push'
-        with:
-          name: telegram-live-animations
-          path: assets/telegram-live/*.gif
-          retention-days: 30
-      - name: Verify bot and private state access
-        run: python src/telegram_live.py check
-      - name: Monitor one published fixture with persistent recovery
-        if: github.event_name == 'workflow_dispatch'
-        run: python -u src/telegram_live.py monitor
+      - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'Pillow>=11,<13' ijson==3.6.0
+      - name: Monitor the announced fixture and update the original post
+        run: python -u -m publisher_v71.monitor
