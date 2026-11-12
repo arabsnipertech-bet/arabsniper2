@@ -11,12 +11,12 @@ START=date(2026,11,12);END=date(2026,11,18)
 ROME=ZoneInfo('Europe/Rome')
 SLOTS=((12*60+45,'pranzo'),(20*60+45,'sera'))
 
-def selected(now):
+def selected(now, *, recovery=False):
     local=now.astimezone(ROME)
     if not START<=local.date()<=END:return None
     minute=local.hour*60+local.minute
     for index,(start,label) in enumerate(SLOTS):
-        if start<=minute<start+150:
+        if start+(30 if recovery else 0)<=minute<start+150:
             return local.date().isoformat(),index,label
     return None
 
@@ -39,10 +39,16 @@ def message(day,index):
         '🌐 https://arabsniperbet.com/gold-dashboard-live.html\n'
         '18+ · Analisi statistiche, nessuna garanzia di vincita.')
 
-def run(now=None,verify_only=False):
-    choice=selected(now or datetime.now(timezone.utc))
+def run(now=None,verify_only=False,*,recovery=False):
+    choice=selected(now or datetime.now(timezone.utc),recovery=recovery)
     if not choice and not verify_only:
         print('Outside campaign dates or publication windows; nothing sent');return
+    if not verify_only:
+        day,index,label=choice;key=ops.CAMPAIGN+':'+day+':'+label
+        existing=ops.query('SELECT status,message_id FROM telegram_campaign_announcements WHERE campaign=?',[key])
+        if existing:
+            assert existing[0]['status']=='sent','Prior send outcome uncertain; inspect channel before retrying'
+            print('Already sent: https://t.me/arabsniper_signals/'+str(existing[0]['message_id']));return
     # Fail closed if a subsequent Worker deployment removed campaign eligibility.
     import os, email.parser, email.policy
     raw,h=ops.request(ops.BASE+ops.WORKER+'/content/v2',os.environ['CF_TOKEN'])
@@ -66,11 +72,6 @@ def run(now=None,verify_only=False):
     assert member['status']=='administrator' and member.get('can_post_messages')
     if verify_only:
         print('Campaign advertising preflight: OK (no publication)');return
-    day,index,label=choice;key=ops.CAMPAIGN+':'+day+':'+label
-    existing=ops.query('SELECT status,message_id FROM telegram_campaign_announcements WHERE campaign=?',[key])
-    if existing:
-        assert existing[0]['status']=='sent','Prior send outcome uncertain; inspect channel before retrying'
-        print('Already sent: https://t.me/arabsniper_signals/'+str(existing[0]['message_id']));return
     row=ops.query("INSERT OR IGNORE INTO telegram_campaign_announcements(campaign,status,created_at) VALUES (?,'sending',unixepoch()) RETURNING campaign",[key])
     assert row,'Another run owns this slot'
     sent=ops.telegram('sendMessage',chat_id=channel['id'],text=message(day,index),disable_web_page_preview=True)
@@ -79,7 +80,7 @@ def run(now=None,verify_only=False):
     print('Published '+key+': https://t.me/arabsniper_signals/'+str(sent['message_id']))
 
 if __name__=='__main__':
-    try:run(verify_only='--verify' in sys.argv)
+    try:run(verify_only='--verify' in sys.argv,recovery='--recover' in sys.argv)
     except Exception as e:
         print('STOP:',str(e) if isinstance(e,(AssertionError,RuntimeError)) else type(e).__name__)
         sys.exit(1)

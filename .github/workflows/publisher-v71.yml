@@ -172,6 +172,9 @@ jobs:
             /data/arab_quote_homepage.json
             /data/live_watchlist.json
             /data/arab_quote_results_public.json
+            /scripts/gold-campaign-repeat.py
+            /scripts/deploy-telegram-campaign.py
+            /workers/stripe-access/renewal.mjs
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
@@ -179,3 +182,10 @@ jobs:
       - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'Pillow>=11,<13' ijson==3.6.0
       - name: Publish due editorial content
         run: python -m publisher_v71.runner
+      - name: Recover due Telegram campaign reminders
+        if: env.TRIAL_DISABLED != 'true'
+        continue-on-error: true
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+        run: python scripts/gold-campaign-repeat.py --recover
