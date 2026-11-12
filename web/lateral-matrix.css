@@ -323,6 +323,18 @@ body[data-gold-design] .mx-card.mx-compact h3{font-size:21px;margin-bottom:0}
 .mx-triad-market strong{color:inherit}
 .mx-triad-meta,.mx-v7-panel .mx-triad li .mx-triad-meta span,.mx-triad li small{font-size:.72rem;color:#bdcbd7}
 .mx-v7-panel .mx-triad li .mx-level{font-size:.68rem}
+.mx-triad-result:empty{display:none}
+.mx-triad .mx-triad-history{margin-top:0;border-top:1px solid #526475}
+.mx-triad .mx-triad-history>summary{cursor:pointer;min-height:30px;padding:5px 0;color:#c6d8f2;font-size:.74rem;text-decoration:underline;text-underline-offset:3px}
+.mx-triad-history>summary:focus-visible{outline:2px solid #adbbff;outline-offset:2px}
+.mx-triad-versions{display:grid;gap:5px;margin:2px 0 0;padding:0;list-style:none}
+.mx-triad .mx-triad-version{display:grid;grid-template-columns:minmax(0,1fr);gap:3px;padding:6px 8px;border-left:2px solid #65778b;border-radius:4px;background:#172331}
+.mx-triad-version time{font-size:.7rem;color:#bdcbd7}
+.mx-triad .mx-triad-version strong{color:inherit;font-size:.82rem}
+.mx-triad-version .mx-triad-outcome{animation:none}
+.mx-triad .mx-triad-version:has(.mx-triad-won){border-color:#34d399}
+.mx-triad .mx-triad-version:has(.mx-triad-lost){border-color:#f87171}
+@media(pointer:coarse){.mx-triad .mx-triad-history>summary{min-height:44px}}
 .mx-origin-badge{
   display:inline-block;max-inline-size:100%;min-block-size:24px;
   margin:2px 0;padding:2px .45rem;border:1px solid #8b5cf6;border-radius:4px;
@@ -345,13 +357,13 @@ body[data-gold-design] .mx-card.mx-compact h3{font-size:21px;margin-bottom:0}
 
 /* Final-result indicators: decorative animation only; frozen proposals are unchanged. */
 .mx-triad-outcome{display:inline-flex;align-items:center;justify-content:center;padding:3px 7px;border:1px solid currentColor;border-radius:6px;font-size:.66rem;font-weight:800;letter-spacing:.04em;white-space:nowrap}
-.mx-triad-won{color:#34d399;background:rgba(16,185,129,.13);animation:mx-outcome-pulse 2.2s ease-in-out infinite}
-.mx-triad-lost{color:#f87171;background:rgba(239,68,68,.13);animation:mx-outcome-pulse 2.2s ease-in-out infinite}
+.mx-triad .mx-triad-won{color:#34d399;background:rgba(16,185,129,.13);animation:mx-outcome-pulse 2.2s ease-in-out infinite}
+.mx-triad .mx-triad-lost{color:#f87171;background:rgba(239,68,68,.13);animation:mx-outcome-pulse 2.2s ease-in-out infinite}
 @keyframes mx-outcome-pulse{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 0 3px currentColor}}
 @media(prefers-reduced-motion:reduce){.mx-triad-outcome{animation:none}}
 
 /* Illuminate the entire finished selection, without changing its tier color. */
-.mx-triad li[data-v7-slot]:has(.mx-triad-won){outline:2px solid #34d399;outline-offset:-2px;animation:mx-card-result-glow 2.2s ease-in-out infinite}
-.mx-triad li[data-v7-slot]:has(.mx-triad-lost){outline:2px solid #f87171;outline-offset:-2px;animation:mx-card-result-glow 2.2s ease-in-out infinite}
+.mx-triad li[data-v7-slot]:has(> .mx-triad-heading .mx-triad-won){outline:2px solid #34d399;outline-offset:-2px;animation:mx-card-result-glow 2.2s ease-in-out infinite}
+.mx-triad li[data-v7-slot]:has(> .mx-triad-heading .mx-triad-lost){outline:2px solid #f87171;outline-offset:-2px;animation:mx-card-result-glow 2.2s ease-in-out infinite}
 @keyframes mx-card-result-glow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}
 @media(prefers-reduced-motion:reduce){.mx-triad li[data-v7-slot]:has(.mx-triad-outcome){animation:none}}
