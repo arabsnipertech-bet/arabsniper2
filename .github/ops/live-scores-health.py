@@ -107,6 +107,8 @@ def inspect_live(now):
         reasons.append('No recent successful provider poll')
     if health.get('overdue_fixtures'):
         reasons.append('Tracked fixtures overdue without a confirmed result')
+    if health.get('stale_live_fixtures'):
+        reasons.append('Tracked live scores missing or older than five minutes')
     summary = {'status': live.get('status'), 'checked_at': now.isoformat(),
                'health': health, 'diagnostic': live.get('diagnostic')}
     return live, summary, reasons

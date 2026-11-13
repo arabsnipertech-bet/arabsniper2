@@ -4,7 +4,10 @@ const MINUTE = 60_000, HOUR = 60 * MINUTE, DAY = 24 * HOUR;
 const FAST_WINDOW = 3 * HOUR, RETRY_WINDOW = 72 * HOUR, CACHE_WINDOW = 4 * DAY;
 const OVERDUE = 135 * MINUTE;
 const PROVIDER_MIN_GAP_MS = 250;
+const MAX_FIXTURE_BATCH = 20;
+const LIVE_FRESHNESS = 5 * MINUTE;
 const FINISHED = new Set(['FT', 'AET', 'PEN']);
+const LIVE = new Set(['1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE']);
 const ADMIN = new Set(['CANC', 'ABD', 'AWD', 'WO']);
 const HALF_COMPLETE = new Set(['HT', '2H', 'ET', 'BT', 'P', ...FINISHED]);
 const STATUSES = new Set(['TBD', 'NS', '1H', 'HT', '2H', 'ET', 'BT', 'P', 'SUSP', 'INT', 'PST', 'LIVE',
@@ -38,9 +41,9 @@ export function relayRows(payload, now) {
   const at = Date.parse(payload?.captured_at);
   if (payload?.schema_version !== 1 || payload?.source !== 'API-Football' ||
       !Number.isFinite(at) || at > now + 30_000 || now - at > 7 * DAY ||
-      !Array.isArray(payload.fixtures) || payload.fixtures.length > 20) return [];
+      !Array.isArray(payload.fixtures) || payload.fixtures.length > MAX_FIXTURE_BATCH) return [];
   return payload.fixtures.map(raw => normalize(raw, at)).filter(row =>
-    row && (hasFinal(row) || now - at <= 5 * MINUTE)).map(row =>
+    row && (hasFinal(row) || now - at <= LIVE_FRESHNESS)).map(row =>
       ({...row, transport:'GitHub Actions/R2'}));
 }
 
@@ -153,6 +156,7 @@ export class ScoreStore {
       s.calls++;
       await store.put('state', s);
       const endpoint = path === 'status' ? 'status' : 'fixtures';
+      const query = endpoint === 'status' ? 'status' : path.startsWith('fixtures?ids=') ? 'by_id' : 'by_date';
       if (lastProviderRequestAt !== null) {
         const next = lastProviderRequestAt + PROVIDER_MIN_GAP_MS;
         let wait = next - Date.now();
@@ -170,7 +174,7 @@ export class ScoreStore {
         const value = response.headers.get(name);
         return value !== null && /^\d+$/.test(value) ? Number(value) : null;
       };
-      s.provider_usage = {observed_at:iso(now), endpoint, request_gap_ms:requestGap,
+      s.provider_usage = {observed_at:iso(now), endpoint, query, request_gap_ms:requestGap,
         daily_remaining:numericHeader('x-ratelimit-requests-remaining'),
         daily_limit:numericHeader('x-ratelimit-requests-limit'),
         minute_remaining:numericHeader('x-ratelimit-remaining'),
@@ -185,7 +189,7 @@ export class ScoreStore {
       const errors = Object.keys(body?.errors || {});
       if (!response.ok || !body || errors.length) {
         const categories = errors.filter(k => KNOWN_ERRORS.has(k));
-        s.diagnostic = {endpoint, http_status:response.status, categories:categories.length ? categories : ['other'],
+        s.diagnostic = {endpoint, query, http_status:response.status, categories:categories.length ? categories : ['other'],
           observed_at:iso(now), quota:s.provider_usage,
           limit_scope:response.headers.get('x-ratelimit-requests-remaining') === '0' ? 'daily' :
             minute === '0' ? 'minute' : 'unconfirmed'};
@@ -264,7 +268,7 @@ export class ScoreStore {
         const t = kickoff(f), row = s.scores[f.fixture_id];
         return t <= now + 10 * MINUTE && t > now - FAST_WINDOW && !FINISHED.has(row?.status) && !postponed(row);
       });
-      const dates = [...new Set(active.map(f => rome.format(kickoff(f))))];
+      const activeIds = new Set(active.map(f => String(f.fixture_id)));
       const followup = f => {
         const id = String(f.fixture_id), row = s.scores[id], t = kickoff(f), age = now - t, checked = s.followups[id];
         if (postponed(row)) {
@@ -276,7 +280,7 @@ export class ScoreStore {
         return age >= FAST_WINDOW || age >= 15 * MINUTE && (!row || row.status === 'NS' || row.status === 'TBD' ||
           row.refresh_failed || now - Date.parse(row.observed_at) > 6 * MINUTE);
       };
-      if (!dates.length && !s.watch.some(followup)) {
+      if (!active.length && !s.watch.some(followup)) {
         s.status = watchIssue || 'idle';
         s.published_at = now;
         s.consecutive_errors = 0;
@@ -310,37 +314,49 @@ export class ScoreStore {
         s.last_successful_poll_at = now;
         return received;
       };
-      for (const date of dates) {
-        if (s.retry_at > now) break;
-        const page = s.pages[date] || 1;
-        const query = 'fixtures?date=' + date + '&timezone=Europe%2FRome' + (page > 1 ? '&page=' + page : '');
-        const data = await api(query);
-        const eligible = new Set(s.watch.filter(f => rome.format(kickoff(f)) === date).map(f => String(f.fixture_id)));
-        const received = accept(data.response, eligible);
-        const pages = Number(data.paging?.total);
-        s.pages[date] = Number.isInteger(pages) && pages > page && page < 3 ? page + 1 : 1;
-        if (page === 1 && s.pages[date] === 1) {
-          for (const f of active) {
-            const id = String(f.fixture_id);
-            if (eligible.has(id) && !received.has(id) && s.scores[id]) s.scores[id].refresh_failed = true;
+      const needsRecoverySlot = active.length === MAX_FIXTURE_BATCH && s.watch.some(f =>
+        !activeIds.has(String(f.fixture_id)) && !complete(s.scores[f.fixture_id]) && followup(f));
+      const pollDates = active.length > MAX_FIXTURE_BATCH || needsRecoverySlot;
+      if (pollDates) {
+        const dates = [...new Set(active.map(f => rome.format(kickoff(f))))];
+        for (const date of dates) {
+          if (s.retry_at > now) break;
+          const page = s.pages[date] || 1;
+          const query = 'fixtures?date=' + date + '&timezone=Europe%2FRome' + (page > 1 ? '&page=' + page : '');
+          const data = await api(query);
+          const eligible = new Set(s.watch.filter(f => rome.format(kickoff(f)) === date).map(f => String(f.fixture_id)));
+          const received = accept(data.response, eligible);
+          const pages = Number(data.paging?.total);
+          s.pages[date] = Number.isInteger(pages) && pages > page && page < 3 ? page + 1 : 1;
+          if (page === 1 && s.pages[date] === 1) {
+            for (const id of activeIds) {
+              if (eligible.has(id) && !received.has(id) && s.scores[id]) s.scores[id].refresh_failed = true;
+            }
           }
         }
+        s.pages = Object.fromEntries(dates.map(date => [date, s.pages[date] || 1]));
+      } else {
+        s.pages = {};
       }
-      s.pages = Object.fromEntries(dates.map(date => [date, s.pages[date] || 1]));
-      // A single bounded batch covers omitted, delayed and corrected fixtures, including overnight ones.
-      const due = s.watch.filter(followup).sort((a,b) =>
+      // With a small live schedule, one ID query covers live and recovery together.
+      const due = new Set(s.watch.filter(followup).sort((a,b) =>
         Number(hasFinal(s.scores[a.fixture_id])) - Number(hasFinal(s.scores[b.fixture_id])) ||
         (s.followups[a.fixture_id]?.next_at || 0) - (s.followups[b.fixture_id]?.next_at || 0) ||
-        kickoff(a) - kickoff(b)).slice(0, 20);
-      if (due.length && !(s.retry_at > now) && s.calls < cap && remaining() > threshold()) {
-        const ids = due.map(f => String(f.fixture_id));
+        kickoff(a) - kickoff(b)));
+      const selected = new Set(pollDates ? [] : active);
+      for (const f of due) selected.add(f);
+      const batch = [...selected].slice(0, MAX_FIXTURE_BATCH);
+      if (batch.length && !(s.retry_at > now) && s.calls < cap && remaining() > threshold()) {
+        const ids = batch.map(f => String(f.fixture_id));
         const data = await api('fixtures?ids=' + ids.join('-') + '&timezone=Europe%2FRome');
         const received = accept(data.response, new Set(ids));
-        for (const f of due) {
+        for (const f of batch) {
           const id = String(f.fixture_id), row = s.scores[id];
           if (row && !received.has(id) && !hasFinal(row)) row.refresh_failed = true;
-          const count = (s.followups[id]?.count || 0) + 1;
-          s.followups[id] = {count, next_at:now + retryDelay(now, kickoff(f), row, count)};
+          if (due.has(f)) {
+            const count = (s.followups[id]?.count || 0) + 1;
+            s.followups[id] = {count, next_at:now + retryDelay(now, kickoff(f), row, count)};
+          }
         }
       }
       if (!polled && !(s.retry_at > now)) {
@@ -361,18 +377,25 @@ export class ScoreStore {
       s.retry_at = Math.max(s.provider_retry_after || 0,
         s.status === 'live_daily_cap' ? reset : now + (s.status === 'quota_reserve' ? HOUR : backoff));
     } finally {
-      let overdue = 0, missingHalftime = 0;
-      const overdueIds = [];
+      let overdue = 0, missingHalftime = 0, staleLive = 0;
+      const overdueIds = [], staleLiveIds = [];
       for (const f of s.watch) {
         const age = now - Date.parse(f.provider_kickoff || f.kickoff), row = s.scores[String(f.fixture_id)];
         if (age >= OVERDUE && !hasFinal(row) && !postponed(row)) {
           overdue++;
           if (overdueIds.length < 20) overdueIds.push(String(f.fixture_id));
         }
+        const scoreAge = now - Date.parse(row?.observed_at);
+        if (age >= 0 && age < FAST_WINDOW && LIVE.has(row?.status) &&
+            (!validScore(row.goals) || row.refresh_failed || !(scoreAge >= -30_000 && scoreAge <= LIVE_FRESHNESS))) {
+          staleLive++;
+          if (staleLiveIds.length < MAX_FIXTURE_BATCH) staleLiveIds.push(String(f.fixture_id));
+        }
         if (hasFinal(row) && !validScore(row.halftime)) missingHalftime++;
       }
       if (overdue && (s.status === 'ok' || s.status === 'idle')) s.status = 'results_pending';
       s.health = {overdue_fixtures:overdue, overdue_fixture_ids:overdueIds, missing_halftime:missingHalftime,
+        stale_live_fixtures:staleLive, stale_live_fixture_ids:staleLiveIds,
         watchlist_generated_at:timestamp(s.watch_generated_at), watchlist_status:watchIssue};
       for (const [id, row] of archive) await store.put('final:' + id, row);
       s.final_archive_initialized = true;

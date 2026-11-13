@@ -17,7 +17,7 @@ NOW = datetime(2026, 11, 13, 15, 56, 21, tzinfo=timezone.utc)
 
 
 def feed(status='provider_rate_limit', *, cron_age=2, overdue=0, missing_halftime=0,
-         watchlist_status=None, limit_scope='unconfirmed', retry_minutes=3):
+         watchlist_status=None, limit_scope='unconfirmed', retry_minutes=3, stale_live=0):
     limited = status == 'provider_rate_limit'
     return {
         'enabled': True,
@@ -31,6 +31,7 @@ def feed(status='provider_rate_limit', *, cron_age=2, overdue=0, missing_halftim
             'retry_after': (NOW + timedelta(minutes=retry_minutes)).isoformat() if limited else None,
             'overdue_fixtures': overdue,
             'missing_halftime': missing_halftime,
+            'stale_live_fixtures': stale_live,
             'watchlist_status': watchlist_status,
         },
     }
@@ -76,6 +77,7 @@ class LiveScoresHealthTests(TestCase):
     def test_existing_faults_are_reported_immediately(self):
         cases = (
             ('overdue fixture', feed(overdue=1)),
+            ('stale live fixture', feed(stale_live=1)),
             ('missing halftime', feed(missing_halftime=1)),
             ('stale cron', feed(cron_age=9)),
             ('stale watchlist', feed(watchlist_status='watchlist_stale')),
@@ -106,4 +108,10 @@ class LiveScoresHealthTests(TestCase):
         summary, reasons, waits, reads, log = self.inspect([feed('idle', cron_age=0)])
         self.assertEqual(reasons, [])
         self.assertNotIn('rate_limit_recheck', summary)
+        self.assertEqual((waits, reads), ([], 1))
+
+    def test_successful_poll_with_stale_live_fixture_is_reported(self):
+        summary, reasons, waits, reads, _ = self.inspect([feed('ok', stale_live=1)])
+        self.assertEqual(summary['status'], 'ok')
+        self.assertEqual(reasons, ['Tracked live scores missing or older than five minutes'])
         self.assertEqual((waits, reads), ([], 1))
