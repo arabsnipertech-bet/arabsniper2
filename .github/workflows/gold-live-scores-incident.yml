@@ -165,6 +165,9 @@ jobs:
               raise SystemExit('Fixture query deferred by provider quota or status.')
           ids.update(fid for _, fid in sorted(due, reverse=True)[:15])
           ids.add('1520978')
+          ids.update(('1549868', '1549870', '1631607'))
+          if len(ids) > 20:
+              ids = {'1644690','1649517','1520978','1549868','1549870','1631607'}
           diagnostic, rows, errors = provider('fixtures?' + urlencode({'ids': '-'.join(sorted(ids)), 'timezone': 'Europe/Rome'}))
           result = []
           for row in rows if isinstance(rows, list) else []:
@@ -214,6 +217,7 @@ jobs:
                   'captured_before_kickoff': bool(v7.get('captured_at') and
                     datetime.fromisoformat(v7['captured_at']) < datetime.fromisoformat(f['kickoff'])),
                   'result_status':(f.get('result') or {}).get('status'),
+                  'original_snapshot_sha256':v7.get('sha256'),
                   'live_status':(f.get('live') or {}).get('status'),
                   'status_short':f.get('status_short')})
           board = get_r2('arab_quote_day1.json')
@@ -245,7 +249,10 @@ jobs:
               audit = json.loads(raw)
               show('gold_auditor', {'date':day, 'counts':audit.get('counts'),
                    'fixture_count':len(audit.get('fixtures', {})),
-                   'verified':True, 'generated_at':audit.get('generated_at')})
+                   'verified':True, 'generated_at':audit.get('generated_at'),
+                   'recovered':{fid:{'status':audit.get('fixtures',{}).get(fid,{}).get('status'),
+                       'result':audit.get('fixtures',{}).get(fid,{}).get('result')}
+                       for fid in ('1549868','1549870','1631607')}})
           else:
               show('gold_auditor', {'date':day, 'available':False})
 
