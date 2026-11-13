@@ -1,0 +1,88 @@
+name: Verify remaining Gold evidence and account usage
+on:
+  push:
+    branches: [ops/resume-weekend-20261113]
+    paths: [.github/workflows/gold-evidence-once.yml]
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - run: pip install 'boto3>=1.42,<2'
+      - name: Read checksummed certificates and bounded official evidence
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_LIVE_SCORES_API_TOKEN }}
+        shell: python
+        run: |
+          import boto3, hashlib, json, os
+          from datetime import datetime, timezone
+          from urllib.request import urlopen, Request
+          from urllib.parse import urlencode
+          from botocore.config import Config
+          def emit(name,value):
+              print(name,json.dumps(value,sort_keys=True),flush=True)
+          s3=boto3.client('s3',region_name='auto',endpoint_url='https://dfdb02b4139b31c0ab4456a50eb371a2.r2.cloudflarestorage.com',aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],config=Config(connect_timeout=5,read_timeout=25,retries={'total_max_attempts':2}))
+          def raw(key):
+              with s3.get_object(Bucket='arabsniper-gold',Key=key)['Body'] as body: return body.read()
+          index=json.loads(raw('state/current.json'))['files']
+          def read_file(name):
+              ref=index.get(name)
+              if not ref: return None
+              data=raw('state/objects/'+ref['sha256'])
+              assert len(data)==ref['bytes'] and hashlib.sha256(data).hexdigest()==ref['sha256']
+              return json.loads(data)
+          pending=set()
+          for day in range(7,13):
+              date=f'2026-11-{day:02d}'
+              audit=read_file(f'auditarchive/prematch_{date}_v7.json')
+              if not audit:
+                  emit('Certificate',{'date':date,'missing':True})
+                  continue
+              fixtures=audit.get('fixtures',{})
+              missing=[]
+              for fid,fixture in fixtures.items():
+                  if fixture.get('status')!='settled': pending.add(fid)
+                  for role,pick in (fixture.get('triad') or {}).items():
+                      if not isinstance(pick,dict): continue
+                      mid=pick.get('market_id')
+                      outcome=(fixture.get('outcomes') or {}).get(mid)
+                      if not isinstance(outcome,dict):
+                          missing.append({'id':fid,'role':role,'market':mid,'status':fixture.get('status'),'score':fixture.get('result'),'key_present':mid in fixture.get('outcomes',{})})
+              emit('Certificate',{'date':date,'generated_at':audit.get('generated_at'),'counts':audit.get('counts'),'triad_picks':sum(len(f.get('triad') or {}) for f in fixtures.values()),'uncertified':missing})
+          history=read_file('data/arab_quote_usage_history.json') or {}
+          runs=[r for r in history.get('runs',[]) if '2026-11-13' in json.dumps({k:v for k,v in r.items() if k in ('generated_at','date','started_at')})]
+          emit('UsageHistory',{'note':history.get('note'),'available_runs':len(history.get('runs',[])),'today_runs':runs})
+          api='https://v3.football.api-sports.io/'
+          def provider(path):
+              with urlopen(Request(api+path,headers={'x-apisports-key':os.environ['API_SPORTS_KEY']}),timeout=20) as response:
+                  value=json.load(response)
+                  assert not value.get('errors'),'Provider rejected check'
+                  return value['response'],response.headers
+          status,headers=provider('status')
+          requests=status['requests']
+          remaining=requests['limit_day']-requests['current']
+          emit('AccountUsage',{'checked_at':datetime.now(timezone.utc).isoformat(),'requests':requests,'subscription':{k:status.get('subscription',{}).get(k) for k in ('plan','active')},'minute_remaining':headers.get('x-ratelimit-remaining')})
+          assert remaining>max(1000,(requests['limit_day']+9)//10)
+          assert headers.get('x-ratelimit-remaining') not in ('0','1','2')
+          if pending:
+              assert len(pending)<=20,len(pending)
+              rows,_=provider('fixtures?'+urlencode({'ids':'-'.join(sorted(pending)),'timezone':'Europe/Rome'}))
+              emit('PendingProvider',[{'id':r['fixture']['id'],'date':r['fixture']['date'],'status':r['fixture']['status']['short'],'teams':{k:v.get('name') for k,v in r['teams'].items()},'halftime':r['score'].get('halftime'),'fulltime':r['score'].get('fulltime')} for r in rows])
+          cf='https://api.cloudflare.com/client/v4/accounts/dfdb02b4139b31c0ab4456a50eb371a2/workers/scripts/arabsniper-live-scores'
+          def cfread(path):
+              with urlopen(Request(cf+path,headers={'Authorization':'Bearer '+os.environ['CF_TOKEN']}),timeout=15) as response:
+                  value=json.load(response)
+                  assert value.get('success') is True
+                  return value['result']
+          deploys=cfread('/deployments')['deployments']
+          emit('Deployments',deploys)
+          active=deploys[0]['versions'][0]['version_id']
+          candidates=[d for d in deploys if d['created_on'].startswith('2026-11-13T09:46')]
+          for vid in dict.fromkeys([active]+[d['versions'][0]['version_id'] for d in candidates]):
+              v=cfread('/versions/'+vid)
+              emit('ScriptIdentity',{'version':vid,'metadata':v.get('metadata'),'script':v.get('resources',{}).get('script')})
