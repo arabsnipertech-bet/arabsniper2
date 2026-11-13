@@ -1,0 +1,97 @@
+name: Publish verified Slovakia Faroe Islands GG PT
+on:
+  push:
+    branches: [ops/telegram-ggpt-20261113]
+    paths: ['.github/workflows/ops-telegram-ggpt-20261113.yml']
+permissions: {}
+concurrency:
+  group: arabsniper-telegram-ggpt-1528967
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Verify the completed first half and publish the result
+        env:
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          FIXTURE = 1528967
+          CHANNEL = "arabsniper_signals"
+          MESSAGE = "✅ COLPACCIO BLU CENTRATO\n\n⚽ Slovacchia–Fær Øer · UEFA Nations League\n🎯 GG primo tempo · quota osservata 6,00\n⏱ Intervallo 1–1\n\nEntrambe le squadre hanno segnato nel primo tempo. È il riscontro della selezione BLU del motore V7.\n\nFonte risultato: API-Football · 18+"
+          RECENT_PHASES = {"HT", "2H", "ET", "BT", "P", "FT", "AET", "PEN"}
+
+
+          def request(url, label, **options):
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(url, **options), timeout=12) as response:
+                      return json.load(response)
+              except Exception:
+                  raise SystemExit(f"{label}: response unavailable; publication unconfirmed") from None
+
+
+          def get_official():
+              data = request(
+                  f"https://v3.football.api-sports.io/fixtures?id={FIXTURE}",
+                  "Official fixture",
+                  headers={"x-apisports-key": os.environ["API_SPORTS_KEY"].strip()},
+              )
+              if data.get("errors"):
+                  raise SystemExit("Official provider rejected fixture lookup")
+              rows = data.get("response") or []
+              if len(rows) != 1:
+                  raise SystemExit("Official fixture missing or ambiguous")
+              row = rows[0]
+              match = row["fixture"]
+              teams = row["teams"]
+              if match["id"] != FIXTURE or match["date"][:10] != "2026-11-13":
+                  raise SystemExit("Unexpected fixture")
+              if teams["home"]["name"].casefold() != "slovakia" or teams["away"]["name"].casefold() != "faroe islands":
+                  raise SystemExit("Unexpected teams")
+              return match["status"]["short"], row["score"]["halftime"]
+
+
+          def confirmed():
+              feed = request(
+                  f"https://arabsniperbet.com/api/live-scores?id={FIXTURE}", "Public score feed",
+                  headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"},
+              )
+              row = (feed.get("fixtures") or {}).get(str(FIXTURE), {})
+              if row.get("status") in RECENT_PHASES and row.get("halftime") == {"home": 1, "away": 1}:
+                  return row["status"], row["halftime"], "Gold/API-Football"
+              status, half = get_official()
+              if status not in RECENT_PHASES or half != {"home": 1, "away": 1}:
+                  raise SystemExit("First-half score not confirmed as 1–1")
+              return status, half, "API-Football"
+
+
+          if datetime.now(ZoneInfo("Europe/Rome")).date().isoformat() != "2026-11-13":
+              raise SystemExit("Publication window closed")
+          status, half, source = confirmed()
+          print(f"Verified {FIXTURE}: {status}, first half {half['home']}–{half['away']} via {source}", flush=True)
+          token = os.environ["BOT_TOKEN"].strip()
+          if not token:
+              raise SystemExit("Telegram credential unavailable")
+          result = request(
+              f"https://api.telegram.org/bot{token}/sendMessage", "Telegram send",
+              headers={"Content-Type": "application/json"},
+              data=json.dumps({
+                  "chat_id": f"@{CHANNEL}",
+                  "text": MESSAGE,
+                  "link_preview_options": {"is_disabled": True},
+              }).encode(),
+          )
+          message = result.get("result", {})
+          if result.get("ok") is not True or message.get("chat", {}).get("username", "").lower() != CHANNEL or not message.get("message_id"):
+              raise SystemExit("Telegram send outcome unconfirmed")
+          print(f"POSTED https://t.me/{CHANNEL}/{message['message_id']}", flush=True)
+          PY
