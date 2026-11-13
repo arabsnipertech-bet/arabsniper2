@@ -3,10 +3,45 @@
   "main": "worker.mjs",
   "compatibility_date": "2026-10-01",
   "workers_dev": false,
-  "version_metadata": {"binding": "CF_VERSION_METADATA"},
-  "routes": [{"pattern": "arabsniperbet.com/api/live-scores*", "zone_name": "arabsniperbet.com"}],
-  "triggers": {"crons": ["*/2 * * * *"]},
-  "durable_objects": {"bindings": [{"name": "SCORES", "class_name": "ScoreStore"}]},
-  "migrations": [{"tag": "v1", "new_sqlite_classes": ["ScoreStore"]}],
-  "vars": {"LIVE_ENABLED": "true", "MAX_CALLS_PER_DAY": "1500", "RESERVE_REQUESTS": "1000"}
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  },
+  "routes": [
+    {
+      "pattern": "arabsniperbet.com/api/live-scores*",
+      "zone_name": "arabsniperbet.com"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "*/2 * * * *"
+    ]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "SCORES",
+        "class_name": "ScoreStore"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "ScoreStore"
+      ]
+    }
+  ],
+  "vars": {
+    "LIVE_ENABLED": "true",
+    "MAX_CALLS_PER_DAY": "1500",
+    "RESERVE_REQUESTS": "1000"
+  },
+  "r2_buckets": [
+    {
+      "binding": "OFFICIAL_RESULTS",
+      "bucket_name": "arabsniper-gold"
+    }
+  ]
 }
