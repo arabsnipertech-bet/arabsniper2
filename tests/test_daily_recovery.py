@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT/'src'), str(ROOT/'auditor')]
 from audit_storage import read_store, write_store
 from gold_storage import collect, previous_manifest, sha, write_manifest
-from recover_daily import FORECASTS, install, prepare, report_path, source_set
+from recover_daily import FORECASTS, checkpoint_sources, install, prepare, report_path, source_set
 from test_daily_audit import record
 from test_gold_storage import Fake
 from current_audit import archive, fetch_results, settle_day
@@ -50,6 +50,28 @@ def sources(storage, root):
 
 
 class DailyRecoveryTests(unittest.TestCase):
+    def test_refresh_uses_existing_closed_day_and_rechecks_the_certificate(self):
+        storage = Fake()
+        with TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest, patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):
+            root = Path(seed)
+            official = sources(storage, root)
+            original = prepare(storage, 'test', Path(work), DAY, NOW, lambda *args: official)
+            install(storage, 'test', Path(dest), DAY, original, NOW)
+            index = previous_manifest(storage, 'test')
+            self.assertEqual(len(checkpoint_sources(index, DAY)), 4)
+            correction = copy.deepcopy(official)
+            result = correction['days'][0]['matches'][0]['fixture']['result']
+            result.update(home_ht=0, away_ht=0, home_ft=0, away_ft=0)
+            fetch = Mock(return_value=correction)
+            with TemporaryDirectory() as refresh:
+                digest = prepare(storage, 'test', Path(refresh), DAY, NOW, fetch,
+                                 refresh=True, recheck_results=True, existing_forecasts=True)
+            fetch.assert_called_once_with(str(DAY), 'test')
+            dated = f'auditordata/prematch_{DAY}.json'
+            public = install(storage, 'test', Path(dest), DAY, digest, NOW)
+            self.assertEqual(public['daily']['losses'], 1)
+            self.assertEqual(previous_manifest(storage, 'test')[dated], index[dated])
+
     def test_delayed_fixtures_recovered_by_id_without_regressing_completed_rows(self):
         def row(fid, status, ft=None):
             return {'fixture': {'id': fid, 'status': {'short': status}},
