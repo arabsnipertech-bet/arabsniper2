@@ -5,7 +5,7 @@ each target workflow retains its own validation, dedup and freshness checks.
 """
 import json
 import os
-from datetime import datetime, timedelta, timezone, time
+from datetime import date, datetime, timedelta, timezone, time
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -110,6 +110,8 @@ PUBLISHER_WORKFLOW = 'publisher-v71.yml'
 LIVE_WORKFLOW = 'telegram-live.yml'
 PUBLISHER_INTERVAL = timedelta(minutes=17)
 LIVE_INTERVAL = timedelta(minutes=9)
+CAMPAIGN_FIRST = date(2026, 11, 12)
+CAMPAIGN_LAST = date(2026, 11, 18)
 PUBLISHER_FEED = f'https://raw.githubusercontent.com/{REPO}/publisher-public-v71/homepage.json'
 
 
@@ -164,7 +166,13 @@ def wake_publisher(api, now, *, dry_run=False):
     if runs:
         created = max(datetime.fromisoformat(run['created_at'].replace('Z', '+00:00')) for run in runs)
         age = now - created
-        if age < LIVE_INTERVAL or (age < PUBLISHER_INTERVAL and not publisher_live_active(now)):
+        local = now.astimezone(ROME)
+        slots = [time(10, 45), time(12), time(16, 45)]
+        if CAMPAIGN_FIRST <= local.date() <= CAMPAIGN_LAST:
+            slots.extend([time(12, 45), time(20, 45)])
+        crossed = any(created < datetime.combine(local.date(), slot, ROME) <= now for slot in slots)
+        if not crossed and (age < LIVE_INTERVAL or
+                            age < PUBLISHER_INTERVAL and not publisher_live_active(now)):
             return 'recent_cycle'
     if dry_run:
         return 'would_dispatch'
