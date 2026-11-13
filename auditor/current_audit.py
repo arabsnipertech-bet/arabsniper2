@@ -103,8 +103,8 @@ def archive_ledger(root, now, incoming, progress):
             'rejected_without_valid_prematch_evidence': rejected}
 
 
-def fetch_results(date, key):
-    from v7_archive import FINISHED, checked_score, merge_verified_result
+def fetch_results(date, key, fixture_ids=()):
+    from v7_archive import FINISHED, VOID, checked_score, merge_verified_result
 
     def fixtures(**params):
         query = urlencode({'timezone': 'Europe/Rome', **params})
@@ -112,27 +112,28 @@ def fetch_results(date, key):
         with urlopen(request, timeout=30) as response:
             payload = {'response': []} if getattr(response, 'status', 200) == 204 else json.load(response)
             daily = response.headers.get('x-ratelimit-requests-remaining')
+            limit = response.headers.get('x-ratelimit-requests-limit')
             minute = response.headers.get('x-ratelimit-remaining')
         if payload.get('errors'):
             raise RuntimeError(f'API risultati: richiesta rifiutata per {date}')
         if not isinstance(payload.get('response'), list):
             raise ValueError('Risposta API risultati non valida')
-        return payload, daily, minute
+        reserve = max(1000, (int(limit) + 9) // 10) if limit and limit.isdecimal() else 1000
+        return payload, bool(daily and daily.isdecimal() and int(daily) > reserve and minute not in ('0', '1'))
 
-    payload, daily, minute = fixtures(date=date)
+    payload, can_continue = fixtures(date=date)
     rows = list(payload['response'])
     pages = (payload.get('paging') or {}).get('total', 1)
     for page in range(2, min(pages, 3) + 1) if type(pages) is int else ():
-        if not daily or not daily.isdecimal() or int(daily) <= 1000 or minute == '0':
+        if not can_continue:
             break
-        extra, daily, minute = fixtures(date=date, page=page)
+        extra, can_continue = fixtures(date=date, page=page)
         rows.extend(extra['response'])
-    results = {}
-    for item in rows:
+    def accept(item):
         fixture = item.get('fixture') or {}
         fid = fixture.get('id')
         if type(fid) is not int or fid <= 0:
-            continue
+            return
         score = item.get('score') or {}
         ht, ft = score.get('halftime') or {}, score.get('fulltime') or {}
         status = (fixture.get('status') or {}).get('short')
@@ -145,12 +146,29 @@ def fetch_results(date, key):
             'home_ft': ft.get('home'), 'away_ft': ft.get('away'),
             'extra_time': score.get('extratime'), 'penalties': score.get('penalty')})
         results[fid] = merge_verified_result(results.get(fid), result)
+    results = {}
+    for row in rows:
+        accept(row)
+    delayed = [fid for fid in dict.fromkeys(fixture_ids)
+               if fid not in results or (results[fid].get('status') not in VOID | {'PST'}
+               and (results[fid].get('status') not in FINISHED or any(results[fid].get(field) is None
+                   for field in ('home_ft', 'away_ft', 'home_ht', 'away_ht'))))]
+    if delayed and can_continue:
+        selected = set(delayed[:20])
+        try:
+            details, _ = fixtures(ids='-'.join(str(fid) for fid in sorted(selected)))
+        except (OSError, RuntimeError, ValueError) as error:
+            print(f'API risultati {date}: recupero ID rinviato ({type(error).__name__})', flush=True)
+        else:
+            for row in details['response']:
+                if (row.get('fixture') or {}).get('id') in selected:
+                    accept(row)
     matches = [{'fixture': {'fixture_id': str(fid), 'result': result}} for fid, result in results.items()]
     return {'days': [{'matches': matches}]}
 
 
 def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: None, combined=None,
-               *, legacy_evidence=True, recheck_recent=False):
+               *, legacy_evidence=True, recheck_results=False):
     from audit_ledger import AuditLedger, settle_ledger
     from selection_studies import build_studies, study_markdown
     from audit_storage import atomic_bytes
@@ -175,16 +193,29 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
                 if (old or {}).get('settlement'):
                     record['settlement'] = old['settlement']
                     day.put(collection, key, record)
-        pending = any(not (r.get('settlement') or {}).get('outcomes') or
-                      any(v is None for v in r['settlement']['outcomes'].values())
-                      for _, _, r in day.records())
+        from audit_pending import unresolved
+        pending_fixtures = {}
+        pending = False
+        for _, _, record in day.records():
+            if not unresolved(record):
+                continue
+            pending = True
+            fixture = record.get('fixture') or {}
+            fid = str(fixture.get('fixture_id'))
+            if fid.isascii() and fid.isdecimal():
+                pending_fixtures[int(fid)] = max(pending_fixtures.get(int(fid), False),
+                                                bool(record.get('publication_snapshot')))
         age = (now.astimezone(TZ).date() - date).days
-        if age <= 14 and (pending or recheck_recent and age <= 3):
+        if age <= 14 and (pending or recheck_results):
             key = os.environ.get('API_SPORTS_KEY', '').strip()
             if not key:
                 raise RuntimeError('API_SPORTS_KEY mancante per verificare i risultati')
             progress(f'richiesta risultati API-Football {date}')
-            fetched = fetcher(str(date), key)
+            if fetcher is fetch_results:
+                ordered = sorted(pending_fixtures, key=lambda fid: (not pending_fixtures[fid], fid))
+                fetched = fetcher(str(date), key, ordered)
+            else:
+                fetched = fetcher(str(date), key)
             settle_ledger(day, fetched)
             queried = True
         day.metadata = {'schema_version': 1}
@@ -245,7 +276,8 @@ def settle_history_day(arguments):
     from task_progress import TaskProgress
     root, day, now = arguments
     with TaskProgress(f'Auditor {day}') as progress:
-        return settle_day(Path(root), day, now, progress=progress.update, recheck_recent=True)
+        return settle_day(Path(root), day, now, progress=progress.update,
+                          recheck_results=(now.astimezone(TZ).date() - day).days <= 3)
 
 
 def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, prepared_date=None, workers=1, assemble_only=False):

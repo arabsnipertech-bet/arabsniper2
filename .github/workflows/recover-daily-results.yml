@@ -9,6 +9,10 @@ on:
       date:
         description: 'Giornata chiusa da recuperare (vuoto = ieri, ora italiana)'
         required: false
+      refresh:
+        description: 'Verifica di nuovo i risultati ufficiali di una giornata chiusa'
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths: ['.github/workflows/recover-daily-results.yml']
@@ -75,6 +79,8 @@ jobs:
         id: recover
         env:
           DAY: ${{ steps.day.outputs.date }}
+          RECOVERY_REFRESH: ${{ inputs.refresh && 'true' || 'false' }}
+          RECOVERY_RECHECK_RESULTS: ${{ inputs.refresh && 'true' || 'false' }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
