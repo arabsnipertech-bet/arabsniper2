@@ -1,5 +1,9 @@
 name: Verify Gold live results
 on:
+  workflow_run:
+    workflows: [Recover official live scores]
+    branches: [main]
+    types: [completed]
   workflow_dispatch:
     inputs:
       fixture_ids:
@@ -22,7 +26,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   verify:
-    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main'
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 4
     env:
