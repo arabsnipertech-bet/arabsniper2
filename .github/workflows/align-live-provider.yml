@@ -1,0 +1,64 @@
+name: Align existing live scores provider credential
+on:
+  push:
+    branches: [ops/gold-results-audit-20261113]
+    paths: [.github/workflows/align-live-provider.yml]
+permissions:
+  contents: read
+concurrency:
+  group: arabsniper-live-scores-production
+  cancel-in-progress: false
+jobs:
+  align:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout: workers/live-scores
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate official quota and align only the existing score secret
+        env:
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_LIVE_SCORES_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          WRANGLER_SEND_METRICS: 'false'
+        shell: python
+        run: |
+          import json, os, subprocess
+          from urllib.request import Request, urlopen
+          key=os.environ['API_SPORTS_KEY'].strip()
+          if not key or '\n' in key: raise ValueError('Invalid key shape')
+          with urlopen(Request('https://v3.football.api-sports.io/status',headers={'x-apisports-key':key}),timeout=15) as response:
+              official=json.load(response)
+          q=official.get('response',{})
+          if official.get('errors') or q.get('subscription',{}).get('active') is not True or q.get('requests',{}).get('limit_day')!=75000:
+              raise ValueError('Expected active Ultra quota was not confirmed')
+          base='https://api.cloudflare.com/client/v4/accounts/'+os.environ['CLOUDFLARE_ACCOUNT_ID']+'/workers/scripts/arabsniper-live-scores'
+          def read(path):
+              with urlopen(Request(base+path,headers={'Authorization':'Bearer '+os.environ['CLOUDFLARE_API_TOKEN']}),timeout=20) as response:
+                  value=json.load(response)
+                  if value.get('success') is not True: raise ValueError('Cloudflare read failed')
+                  return value['result']
+          def active():
+              versions=read('/deployments')['deployments'][0]['versions']
+              if len(versions)!=1 or versions[0]['percentage']!=100: raise ValueError('Split deployment')
+              return versions[0]['version_id']
+          before=active()
+          bindings=read('/settings')['bindings']
+          if not any(b['name']=='API_SPORTS_KEY' and b['type']=='secret_text' for b in bindings):
+              raise ValueError('Expected existing secret is missing')
+          print('Rollback version: '+before,flush=True)
+          if active()!=before: raise ValueError('Concurrent deployment detected')
+          result=subprocess.run(['npx','--yes','wrangler@4.161.0','secret','put','API_SPORTS_KEY','--config','workers/live-scores/wrangler.jsonc'],
+              input=key+'\n',text=True,capture_output=True,timeout=100)
+          if result.returncode: raise SystemExit('Secret alignment failed; no automatic retry, inspect active deployment.')
+          after=active()
+          if after==before: raise ValueError('New credential deployment was not confirmed')
+          print('Existing provider credential aligned; active version: '+after,flush=True)
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
+              out.write('Provider credential aligned to verified GitHub Ultra key. Rollback version: '+before+'. Active: '+after+'. Score acquisition still requires runtime verification.\n')
