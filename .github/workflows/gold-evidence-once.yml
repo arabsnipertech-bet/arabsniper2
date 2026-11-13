@@ -53,10 +53,14 @@ jobs:
                       outcome=(fixture.get('outcomes') or {}).get(mid)
                       if not isinstance(outcome,dict):
                           missing.append({'id':fid,'role':role,'market':mid,'status':fixture.get('status'),'score':fixture.get('result'),'key_present':mid in fixture.get('outcomes',{})})
-              emit('Certificate',{'date':date,'generated_at':audit.get('generated_at'),'counts':audit.get('counts'),'triad_picks':sum(len(f.get('triad') or {}) for f in fixtures.values()),'uncertified':missing})
+              emit('Certificate',{'date':date,'generated_at':audit.get('generated_at'),'counts':audit.get('counts'),'triad_picks':sum(isinstance(p,dict) for f in fixtures.values() for p in (f.get('triad') or {}).values()),'uncertified':missing})
           history=read_file('data/arab_quote_usage_history.json') or {}
           runs=[r for r in history.get('runs',[]) if '2026-11-13' in json.dumps({k:v for k,v in r.items() if k in ('generated_at','date','started_at')})]
           emit('UsageHistory',{'note':history.get('note'),'available_runs':len(history.get('runs',[])),'today_runs':runs})
+          for day in range(7,14):
+              date=f'2026-11-{day:02d}'
+              daily=[r for r in history.get('runs',[]) if str(r.get('generated_at','')).startswith(date)]
+              emit('DailyScanCounters',{'date_local_completion':date,'runs':len(daily),'requests':sum(r.get('requests_this_run',0) for r in daily),'targeted_requests':sum(r.get('odds_targeted_requests',0) for r in daily),'empty':sum(r.get('odds_targeted_empty',0) for r in daily),'no_gain':sum(r.get('odds_targeted_no_gain',0) for r in daily)})
           api='https://v3.football.api-sports.io/'
           def provider(path):
               with urlopen(Request(api+path,headers={'x-apisports-key':os.environ['API_SPORTS_KEY']}),timeout=20) as response:
@@ -83,6 +87,6 @@ jobs:
           emit('Deployments',deploys)
           active=deploys[0]['versions'][0]['version_id']
           candidates=[d for d in deploys if d['created_on'].startswith('2026-11-13T09:46')]
-          for vid in dict.fromkeys([active]+[d['versions'][0]['version_id'] for d in candidates]):
+          for vid in dict.fromkeys([active,'2f7b6e49-2e58-4286-b4aa-36101903ba80']):
               v=cfread('/versions/'+vid)
               emit('ScriptIdentity',{'version':vid,'metadata':v.get('metadata'),'script':v.get('resources',{}).get('script')})
