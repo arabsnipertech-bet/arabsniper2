@@ -1,0 +1,165 @@
+name: Update the November Telegram campaign entry
+on:
+  push:
+    branches: [ops/meta-telegram-20261113]
+    paths: ['.github/workflows/ops-meta-telegram-20261113.yml']
+permissions: {}
+jobs:
+  update:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Create the dedicated invite and update the pinned welcome
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64
+          import json
+          import os
+          import subprocess
+          import tempfile
+          from datetime import datetime, timezone
+          from pathlib import Path
+          from urllib.error import HTTPError, URLError
+          from urllib.parse import urlsplit
+          from urllib.request import Request, urlopen
+
+          CHANNEL = "arabsniper_signals"
+          BOT = "arabsniperbot"
+          INVITE_NAME = "Meta – Test Telegram"
+          EXPIRES = int(datetime(2026, 11, 18, 23, tzinfo=timezone.utc).timestamp())
+          PREFIX = (
+              "⚽ Benvenuto su ArabSniperBet\n\n"
+              "Qui trovi analisi prima delle partite, aggiornamenti live sulle gare seguite "
+              "e riscontri dopo il fischio finale.\n\n"
+          )
+          PUBLIC_KEY = """-----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6jDOXs68dZQbVEe8MADj
+          gyRSVVtmLvsGqNc1Z6omM1lI/6m4VR4JJWWRQSR8EupPiT2LATSg67bQ75rCdsmv
+          CXXkNBorZP0opujkCRXeM9iwMB9UdQU5DUOTCmDV6bcEBxsZSC3gtsXiKQwOE/nr
+          XGTkKb/PtsSiGwVFpjCzCCzyAKaO2mHm21xqwv9zNoQKlh3SdSlyJY0+EEW6b3YK
+          MS7RNnY9Tb6VQIpIlLMnVTkKBbhKOPBgns5cLs6fk9rpvLaUUlpdcU+dZlX2surq
+          MRPuuez5fFjPYFPecxTQCFQuUSyKniVutdoBhByMWNYzZFaNxCYzBU4yqeZ/O4l6
+          WQIDAQAB
+          -----END PUBLIC KEY-----
+          """
+
+
+          class TelegramError(Exception):
+              pass
+
+
+          def telegram(method, **values):
+              token = os.environ.get("BOT_TOKEN", "").strip()
+              if not token:
+                  raise TelegramError("Bot credential unavailable")
+              req = Request(
+                  f"https://api.telegram.org/bot{token}/{method}",
+                  data=json.dumps(values).encode(),
+                  headers={"Content-Type": "application/json"},
+                  method="POST",
+              )
+              try:
+                  with urlopen(req, timeout=12) as response:
+                      result = json.load(response)
+              except HTTPError as exc:
+                  raise TelegramError(f"{method}: HTTP {exc.code}") from None
+              except (URLError, TimeoutError, ValueError, OSError):
+                  raise TelegramError(f"{method}: response unavailable") from None
+              if result.get("ok") is not True:
+                  raise TelegramError(f"{method}: unsuccessful")
+              return result["result"]
+
+
+          def invite(channel_id):
+              with tempfile.TemporaryDirectory() as temp:
+                  key = Path(temp) / "invite-public.pem"
+                  key.write_text(PUBLIC_KEY)
+                  command = [
+                      "openssl", "pkeyutl", "-encrypt", "-pubin", "-inkey", str(key),
+                      "-pkeyopt", "rsa_padding_mode:oaep", "-pkeyopt", "rsa_oaep_md:sha256",
+                  ]
+                  subprocess.run(command, input=b"test", capture_output=True, check=True)
+                  created = telegram(
+                      "createChatInviteLink", chat_id=channel_id, name=INVITE_NAME,
+                      expire_date=EXPIRES, creates_join_request=False,
+                  )
+                  url = created["invite_link"]
+                  parsed = urlsplit(url)
+                  if parsed.scheme != "https" or parsed.netloc != "t.me" or not (
+                      parsed.path.startswith("/+") or parsed.path.startswith("/joinchat/")
+                  ):
+                      raise TelegramError("Unexpected invitation format")
+                  encrypted = subprocess.run(command, input=url.encode(), capture_output=True, check=True)
+                  print("INVITE_CIPHERTEXT=" + base64.b64encode(encrypted.stdout).decode())
+
+
+          def update_pinned(chat):
+              pinned = chat.get("pinned_message") or {}
+              message = pinned.get("text")
+              if not isinstance(message, str) or "gold" not in message.casefold() or (
+                  "prova" not in message.casefold() and "gratis" not in message.casefold()
+              ):
+                  print("PINNED=needs_review")
+                  return
+              message_id = pinned["message_id"]
+              if message.startswith(PREFIX):
+                  print(f"PINNED=already_updated https://t.me/{CHANNEL}/{message_id}")
+                  return
+              updated = PREFIX + message
+              if len(updated.encode("utf-16-le")) // 2 > 4096:
+                  print("PINNED=needs_review")
+                  return
+              shift = len(PREFIX.encode("utf-16-le")) // 2
+              params = {
+                  "chat_id": chat["id"], "message_id": message_id, "text": updated,
+                  "entities": [dict(e, offset=e["offset"] + shift) for e in pinned.get("entities", [])],
+                  "link_preview_options": pinned.get("link_preview_options", {"is_disabled": True}),
+              }
+              if pinned.get("reply_markup"):
+                  params["reply_markup"] = pinned["reply_markup"]
+              changed = telegram("editMessageText", **params)
+              if changed.get("message_id") != message_id or changed.get("text") != updated:
+                  raise TelegramError("Pinned edit was not verified")
+              check = telegram("getChat", chat_id=chat["id"]).get("pinned_message") or {}
+              if check.get("message_id") != message_id or check.get("text") != updated:
+                  raise TelegramError("Updated post not confirmed as pinned")
+              print(f"PINNED=updated https://t.me/{CHANNEL}/{message_id}")
+
+
+          def run():
+              if datetime.now(timezone.utc).timestamp() >= EXPIRES:
+                  raise TelegramError("November campaign window ended")
+              bot = telegram("getMe")
+              chat = telegram("getChat", chat_id="@" + CHANNEL)
+              if not bot.get("is_bot") or bot.get("username", "").lower() != BOT:
+                  raise TelegramError("Unexpected bot")
+              if chat.get("type") != "channel" or chat.get("username", "").lower() != CHANNEL:
+                  raise TelegramError("Unexpected channel")
+              rights = telegram("getChatMember", chat_id=chat["id"], user_id=bot["id"])
+              if rights.get("status") != "administrator":
+                  raise TelegramError("Channel admin access unavailable")
+              print("MEMBER_COUNT=" + str(telegram("getChatMemberCount", chat_id=chat["id"])))
+              if rights.get("can_invite_users"):
+                  try:
+                      invite(chat["id"])
+                  except (TelegramError, subprocess.CalledProcessError) as exc:
+                      print("INVITE=unverified " + (str(exc) if isinstance(exc, TelegramError) else "encryption failed"))
+              else:
+                  print("INVITE=permission_missing")
+              if rights.get("can_edit_messages"):
+                  try:
+                      update_pinned(chat)
+                  except TelegramError as exc:
+                      print("PINNED=unverified " + str(exc))
+              else:
+                  print("PINNED=permission_missing")
+
+
+          try:
+              run()
+          except TelegramError as exc:
+              raise SystemExit(str(exc)) from None
+          PY
