@@ -5,6 +5,7 @@ from hashlib import sha256
 import json
 import os
 import subprocess
+from time import monotonic, sleep
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
@@ -17,6 +18,7 @@ LIVE = 'https://arabsniperbet.com/api/live-scores'
 FOOTBALL = 'https://v3.football.api-sports.io/'
 ROME = ZoneInfo('Europe/Rome')
 MAX_AGE = timedelta(minutes=8)
+RATE_LIMIT_GRACE = timedelta(minutes=5)
 
 
 def stamp(value):
@@ -110,6 +112,47 @@ def inspect_live(now):
     return live, summary, reasons
 
 
+def short_rate_limit_retry(summary, reasons, now):
+    if summary['status'] != 'provider_rate_limit' or len(reasons) != 1:
+        return None
+    health = summary['health']
+    diagnostic = summary['diagnostic'] or {}
+    retry_at = stamp(health.get('retry_after'))
+    if (
+        diagnostic.get('limit_scope') != 'daily'
+        and health.get('overdue_fixtures') == 0
+        and health.get('missing_halftime') == 0
+        and not health.get('watchlist_status')
+        and retry_at is not None
+        and retry_at <= now + RATE_LIMIT_GRACE
+    ):
+        return retry_at
+    return None
+
+
+def inspect_with_rate_limit_recheck(now):
+    live, summary, reasons = inspect_live(now)
+    retry_at = short_rate_limit_retry(summary, reasons, now)
+    if retry_at is None:
+        return live, summary, reasons
+
+    initial = {'checked_at': summary['checked_at'], 'retry_after': summary['health']['retry_after'],
+               'diagnostic': summary['diagnostic']}
+    print('Provider rate limit detected. Rechecking the stored feed for up to five minutes.', flush=True)
+    deadline = monotonic() + RATE_LIMIT_GRACE.total_seconds()
+    while retry_at is not None and (remaining := deadline - monotonic()) > 0:
+        after_retry = (retry_at - now).total_seconds() + 5
+        sleep(min(max(30, after_retry), remaining))
+        now = datetime.now(timezone.utc)
+        live, summary, reasons = inspect_live(now)
+        retry_at = short_rate_limit_retry(summary, reasons, now)
+
+    summary['rate_limit_recheck'] = {**initial, 'cleared': not reasons}
+    if not reasons:
+        print('::warning title=Gold live scores::The provider rate limit cleared during verification.', flush=True)
+    return live, summary, reasons
+
+
 def provider_results(ids):
     def fetch(path):
         with urlopen(Request(FOOTBALL + path, headers={'x-apisports-key': os.environ['API_SPORTS_KEY']}), timeout=15) as response:
@@ -132,7 +175,8 @@ def provider_results(ids):
 
 def run(ids, compare_auditor):
     now = datetime.now(timezone.utc)
-    live, summary, reasons = inspect_live(now)
+    inspect = inspect_live if ids else inspect_with_rate_limit_recheck
+    live, summary, reasons = inspect(now)
     fixtures = live['fixtures']
     if compare_auditor:
         summary['auditor_days'] = []

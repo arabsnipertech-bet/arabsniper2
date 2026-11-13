@@ -44,13 +44,18 @@ and is released separately by `publish-site.yml`.
 
 ## Production verification
 
-**Verify Gold live results** checks the public response and timestamps every
-15 minutes. It reports stalled collection, provider failures, and fixtures
-past their expected finish without a final result. It compares the previous
-Rome day's observed scores and proposal outcomes with the checksummed Auditor
-archive after the nightly window. GitHub Actions reports failures through the
-repository's existing workflow notifications. A manual run can compare up
-to 20 fixture IDs against API-Football using the existing GitHub Secret.
+**Verify Gold live results** checks the public response and timestamps after
+score recovery and on its 15-minute schedule. It reports stalled collection,
+provider failures, and fixtures past their expected finish without a final
+result. An automated check can give a short provider rate limit up to five
+minutes to clear when the cron and watchlist are healthy, all due scores are
+present, and the collector has a retry within the window. The recheck reads
+only the stored public feed. If the feed recovers, the workflow records a
+warning and preserves the initial diagnostic. A persistent limit, exhausted
+daily quota, overdue score or another fault still fails the check.
+The monitor compares the two most recent closed Rome dates with the
+checksummed Auditor archive after the nightly window. A manual run can compare
+up to 20 fixture IDs against API-Football using the existing GitHub Secret.
 
 For the November 13, 2026 incident, verify `1644690` and `1649517` and use
 `1520978` as an independently verified control. Check the Worker response and
