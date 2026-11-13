@@ -24,6 +24,9 @@ class RelayTests(unittest.TestCase):
     def test_batch_is_bounded_and_retained_overnight_ids_survive(self):
         self.assertEqual(len(relay.due(watch(100),{},NOW)),20)
         self.assertEqual(relay.due({'fixtures':[]},{'health':{'overdue_fixture_ids':['1644690']}},NOW),['1644690'])
+    def test_repeated_unresolved_results_do_not_starve_other_ids(self):
+        rows={str(i+1):{'status':'NS','observed_at':(NOW-timedelta(minutes=5)).isoformat()} for i in range(20)}
+        self.assertIn('21',relay.due(watch(21),{'fixtures':rows},NOW))
     def test_cap_and_cooldown_include_failed_requests(self):
         self.assertFalse(relay.allowed({'day':'2026-11-13','calls':599},NOW))
         self.assertFalse(relay.allowed({'day':'2026-11-13','calls':2,'attempted_at':NOW.isoformat()},NOW))

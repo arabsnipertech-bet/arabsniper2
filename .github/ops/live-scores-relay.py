@@ -35,11 +35,13 @@ def due(watch, live, now):
             for part in ('halftime','fulltime') for side in ('home','away'))
         observed = stamp(row.get('observed_at'))
         if not complete and (not observed or now-observed >= timedelta(minutes=4)):
-            candidates[fid] = kickoff
+            candidates[fid] = (0 if now-kickoff <= timedelta(hours=3) else 1,
+                observed or datetime.min.replace(tzinfo=timezone.utc), kickoff)
     # Overdue IDs come from the retained DO watchlist, which also spans midnight.
     for fid in live.get('health',{}).get('overdue_fixture_ids',[]):
         if str(fid).isascii() and str(fid).isdecimal():
-            candidates.setdefault(str(fid), now-timedelta(hours=72))
+            observed = stamp(fixtures.get(str(fid),{}).get('observed_at'))
+            candidates.setdefault(str(fid), (1, observed or datetime.min.replace(tzinfo=timezone.utc), now-timedelta(hours=72)))
     return sorted(candidates, key=lambda fid:(candidates[fid],fid))[:20]
 
 def allowed(state, now):
