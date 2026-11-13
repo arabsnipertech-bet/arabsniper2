@@ -1,0 +1,31 @@
+name: Resume authorized weekend recovery
+on:
+  push:
+    branches: [ops/resume-weekend-20261113]
+    paths: [.github/workflows/resume-weekend-once.yml]
+permissions:
+  contents: read
+  actions: write
+jobs:
+  dispatch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check merged timeout and launch only the two timed out dates
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: python
+        run: |
+          import base64, json, os, subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          def gh(path, *args):
+              return subprocess.check_output(['gh','api',f'repos/{repo}/'+path,*args],text=True)
+          source=json.loads(gh('contents/.github/workflows/recover-daily-results.yml?ref=main'))
+          assert 'timeout-minutes: 240' in base64.b64decode(source['content']).decode()
+          for rid in (43399324294,43399328193):
+              run=json.loads(gh(f'actions/runs/{rid}'))
+              assert run['status']=='completed' and run['conclusion']=='cancelled', run['id']
+          for day in ('2026-11-07','2026-11-08'):
+              gh('actions/workflows/recover-daily-results.yml/dispatches',
+                 '--method','POST','-f','ref=main','-f',f'inputs[date]={day}','-f','inputs[refresh]=false')
+              print('Dispatched existing main recovery for',day,flush=True)
