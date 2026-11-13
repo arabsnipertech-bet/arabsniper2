@@ -89,6 +89,20 @@ class TelegramWatchdogTests(unittest.TestCase):
             with mock.patch('telegram_watchdog.urlopen', return_value=BytesIO(json.dumps(payload).encode())):
                 self.assertEqual(publisher_live_active(at), expected)
 
+    def test_a_new_editorial_slot_wakes_publisher_even_after_a_recent_cycle(self):
+        for day, slot in ((13, '10:45'), (13, '12:00'), (13, '12:45'), (13, '16:45'), (18, '20:45')):
+            with self.subTest(day=day, slot=slot):
+                due = datetime.fromisoformat(f'2026-11-{day}T{slot}:00+01:00')
+                api = FakeApi([{'status': 'completed', 'created_at': (due - timedelta(minutes=3)).isoformat()}])
+                with mock.patch('telegram_watchdog.publisher_live_active', return_value=False):
+                    self.assertEqual(wake_publisher(api, due - timedelta(seconds=1)), 'recent_cycle')
+                    self.assertEqual(wake_publisher(api, due), 'dispatched')
+                    api.data[0]['created_at'] = due.isoformat()
+                    self.assertEqual(wake_publisher(api, due + timedelta(minutes=10)), 'recent_cycle')
+        due = datetime.fromisoformat('2026-11-19T12:45:00+01:00')
+        api = FakeApi([{'status': 'completed', 'created_at': (due - timedelta(minutes=3)).isoformat()}])
+        self.assertEqual(wake_publisher(api, due, dry_run=True), 'recent_cycle')
+
     def test_event_monitor_starts_before_kickoff_and_does_not_overlap(self):
         now = datetime.fromisoformat('2026-11-12T20:35:00+01:00')
         api = FakeApi()
