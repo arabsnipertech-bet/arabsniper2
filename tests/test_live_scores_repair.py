@@ -18,6 +18,6 @@ class RepairBoundsTests(unittest.TestCase):
         self.assertFalse(repair.permitted('2026-11-12', NOW, [{'status':'completed','conclusion':'failure','created_at':'2026-11-13T09:00:00Z'}]))
     def test_old_completed_recovery_allows_next_attempt(self):
         self.assertTrue(repair.permitted('2026-11-12', NOW, [{'status':'completed','created_at':'2026-11-12T23:59:00Z'}]))
-    def test_truncated_history_fails_closed(self):
-        self.assertFalse(repair.permitted('2026-11-12', NOW, [{}]*100))
+    def test_large_old_history_does_not_permanently_block_recovery(self):
+        self.assertTrue(repair.permitted('2026-11-12', NOW, [{'status':'completed','created_at':'2026-11-12T20:00:00Z'}]*100))
 if __name__ == '__main__': unittest.main()

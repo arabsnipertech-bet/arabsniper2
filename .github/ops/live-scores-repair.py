@@ -10,7 +10,7 @@ WORKFLOW = 'recover-daily-results.yml'
 
 def permitted(day, now, runs):
     age = (now.date() - date.fromisoformat(day)).days
-    if not 1 <= age <= 3 or len(runs) >= 100:
+    if not 1 <= age <= 3:
         return False
     for run in runs:
         if run.get('status') != 'completed':
