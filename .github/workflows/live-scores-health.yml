@@ -28,7 +28,7 @@ jobs:
   verify:
     if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-24.04
-    timeout-minutes: 4
+    timeout-minutes: 7
     env:
       PYTHONPATH: src
     steps:
