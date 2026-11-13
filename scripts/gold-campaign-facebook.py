@@ -28,15 +28,16 @@ def publish_once(day,index,label):
         print('Facebook already sent: https://www.facebook.com/'+existing[0]['post_id']);return
     verify_ready()
     owned=ops.query("INSERT OR IGNORE INTO facebook_campaign_announcements(campaign,status,created_at) VALUES (?,'sending',unixepoch()) RETURNING campaign",[key])
-    assert owned,'Another run owns this Facebook slot'
+    if not owned:
+        print('Another run owns the Facebook campaign slot');return
     sent=meta(PAGE+'/feed',{'message':campaign.message(day,index)})
     post=sent.get('id','')
     assert post.startswith(PAGE+'_') and post[len(PAGE)+1:].isdigit(),'Unverified Facebook publication receipt'
     ops.query("UPDATE facebook_campaign_announcements SET status='sent',post_id=? WHERE campaign=?",[post,key])
     print('Facebook published '+key+': https://www.facebook.com/'+post)
 
-def run(now=None,verify_only=False,*,recovery=False):
-    slot=campaign.selected(now or datetime.now(timezone.utc),recovery=recovery)
+def run(now=None,verify_only=False):
+    slot=campaign.selected(now or datetime.now(timezone.utc))
     if not slot and not verify_only:
         print('Outside Facebook campaign dates or windows; nothing sent');return
     if verify_only:
@@ -44,7 +45,7 @@ def run(now=None,verify_only=False,*,recovery=False):
         print('Facebook Page identity and published-post access verified; no post sent');return
     publish_once(*slot)
 if __name__=='__main__':
-    try:run(verify_only='--verify' in sys.argv,recovery='--recover' in sys.argv)
+    try:run(verify_only='--verify' in sys.argv)
     except Exception as e:
         print('STOP:',str(e) if isinstance(e,(AssertionError,RuntimeError)) else type(e).__name__)
         sys.exit(1)

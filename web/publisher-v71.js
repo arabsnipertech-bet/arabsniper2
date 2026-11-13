@@ -88,7 +88,13 @@
       grid.append(card)
     }
     const when = new Date(report.date + 'T12:00:00Z')
-    target.replaceChildren(node('p', `Giornata del ${shortDate.format(when)} · certificata dall’Auditor`, 'eyebrow'))
+    const partial = report.recovered?.pending
+    const status = partial ? 'esiti verificati finora dall’Auditor' : 'certificata dall’Auditor'
+    target.replaceChildren(node('p', `Giornata del ${shortDate.format(when)} · ${status}`, 'eyebrow'))
+    if (partial) {
+      const count = report.recovered.pending_fixtures
+      target.append(node('p', count ? `Partite ancora in verifica · ${count}` : 'Esiti ancora in verifica', 'muted'))
+    }
     let metrics = target
     if (Array.isArray(report.triad_examples)) {
       const highlights = report.triad_examples.slice(0, 4)

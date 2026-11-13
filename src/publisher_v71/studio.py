@@ -5,6 +5,8 @@ from . import showcase
 from .selection import LEAD, QUOTE_AGE, ROME, SPAN, WINDOW, fresh, rome_day
 
 PREVIEW_FIELDS = ('fixture_id', 'match', 'league', 'kickoff')
+AGENDA_START = 12 * 60
+AGENDA_END = 16 * 60
 
 
 def window(kickoff):
@@ -23,9 +25,10 @@ def candidates(boards, now):
             kickoff = stamp(fixture['kickoff'])
             if not window(fixture['kickoff']) or not LEAD < kickoff - now <= WINDOW + SPAN:
                 continue
-            pick = next((p for p in showcase.proposals(item, now) if p['study_only']), None)
-            if pick is None:
+            proposals = showcase.proposals(item, now)
+            if not proposals:
                 continue
+            pick = next((p for p in proposals if p['study_only']), proposals[0])
             if not fresh(pick.get('quote_at'), now, QUOTE_AGE):
                 pick = {key: pick[key] for key in ('category', 'market', 'probability', 'study_only')}
             rows.setdefault(fixture['fixture_id'], {**fixture, **pick})
@@ -55,3 +58,21 @@ def group_for(pool, posts, excluded, now, *, channel='telegram'):
                     and kickoff <= stamp(row['kickoff']) <= kickoff + SPAN][:2]
         return f"{slot}/{free['fixture_id']}", {'free': free, 'previews': previews}
     return None
+
+
+def agenda(boards, now):
+    """Today's Gold fixture schedule, with no market or price on the public card."""
+    local = now.astimezone(ROME)
+    minute = local.hour * 60 + local.minute
+    if not AGENDA_START <= minute < AGENDA_END:
+        return None
+    today = rome_day(now)
+    fixtures = {}
+    for board in boards:
+        if board.get('date') == today:
+            for _, row in showcase.upcoming(board, now):
+                if window(row['kickoff']):
+                    fixtures.setdefault(row['fixture_id'], row)
+    rows = sorted(fixtures.values(), key=lambda row: (row['kickoff'], row['fixture_id']))[:4]
+    if rows:
+        return {'date': today, 'fixtures': rows}

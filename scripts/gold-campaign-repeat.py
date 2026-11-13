@@ -11,12 +11,12 @@ START=date(2026,11,12);END=date(2026,11,18)
 ROME=ZoneInfo('Europe/Rome')
 SLOTS=((12*60+45,'pranzo'),(20*60+45,'sera'))
 
-def selected(now, *, recovery=False):
+def selected(now):
     local=now.astimezone(ROME)
     if not START<=local.date()<=END:return None
     minute=local.hour*60+local.minute
     for index,(start,label) in enumerate(SLOTS):
-        if start+(30 if recovery else 0)<=minute<start+150:
+        if start<=minute<start+150:
             return local.date().isoformat(),index,label
     return None
 
@@ -39,8 +39,8 @@ def message(day,index):
         '🌐 https://arabsniperbet.com/gold-dashboard-live.html\n'
         '18+ · Analisi statistiche, nessuna garanzia di vincita.')
 
-def run(now=None,verify_only=False,*,recovery=False):
-    choice=selected(now or datetime.now(timezone.utc),recovery=recovery)
+def run(now=None,verify_only=False):
+    choice=selected(now or datetime.now(timezone.utc))
     if not choice and not verify_only:
         print('Outside campaign dates or publication windows; nothing sent');return
     if not verify_only:
@@ -73,14 +73,15 @@ def run(now=None,verify_only=False,*,recovery=False):
     if verify_only:
         print('Campaign advertising preflight: OK (no publication)');return
     row=ops.query("INSERT OR IGNORE INTO telegram_campaign_announcements(campaign,status,created_at) VALUES (?,'sending',unixepoch()) RETURNING campaign",[key])
-    assert row,'Another run owns this slot'
+    if not row:
+        print('Another run owns the Telegram campaign slot');return
     sent=ops.telegram('sendMessage',chat_id=channel['id'],text=message(day,index),disable_web_page_preview=True)
     assert sent['chat']['id']==channel['id']
     ops.query("UPDATE telegram_campaign_announcements SET status='sent',message_id=? WHERE campaign=?",[sent['message_id'],key])
     print('Published '+key+': https://t.me/arabsniper_signals/'+str(sent['message_id']))
 
 if __name__=='__main__':
-    try:run(verify_only='--verify' in sys.argv,recovery='--recover' in sys.argv)
+    try:run(verify_only='--verify' in sys.argv)
     except Exception as e:
         print('STOP:',str(e) if isinstance(e,(AssertionError,RuntimeError)) else type(e).__name__)
         sys.exit(1)

@@ -55,9 +55,11 @@ def safe_read(name, fn, fallback):
 
 
 def read_board(store, number):
-    board = safe_read(f'gold_board_day{number}', lambda: store.read(
-        f'arab_quote_day{number}.json', {}, root=True)[0], {})
-    return board if isinstance(board, dict) and isinstance(board.get('matches'), list) else {}
+    board = safe_read(f'gold_board_day{number}', lambda: store.gold_board(number), {})
+    if board and number <= 2:
+        event_log(f'gold_board_day{number}', 'read', day=board['date'],
+                  fixtures=len(board['matches']), bytes=board['source_bytes'])
+    return board
 
 
 def group_posts(store, group):
@@ -188,25 +190,38 @@ def plan_report(store, now, channels, yesterday):
     previous = str(yesterday)
     reports = store.state['reports']
     existing = reports.get(previous)
-    if existing and 'triad_examples' in existing['view']:
+    if (existing and 'triad_examples' in existing['view']
+            and not existing['view'].get('recovered', {}).get('pending')):
         return
     audit = safe_read('auditor', lambda: report.certified(store, yesterday, with_fixture_labels=True), None)
     if not audit:
         event_log('report', 'awaiting_certified_auditor', day=previous)
         return
     if existing:
-        # Refresh the homepage view while preserving the frozen outbox and receipts.
-        existing['view'] = {**existing['view'], 'triad_examples': report.triad_examples(audit)}
+        view = existing['view']
+        if view.get('recovered', {}).get('pending'):
+            if stamp(audit['generated_at']) <= stamp(view['certified_at']):
+                return
+            updated = safe_read('report', lambda: report.build(audit, list(store.snapshots(previous + '/gold/')),
+                                                              free_receipts(store, previous)), None)
+            if updated:
+                existing['view'] = updated
+        else:
+            # An older report can gain examples without creating a second delivery.
+            existing['view'] = {**view, 'triad_examples': report.triad_examples(audit)}
         return
     view = safe_read('report', lambda: report.build(audit, list(store.snapshots(previous + '/gold/')),
                                                    free_receipts(store, previous)), None)
     if not view:
         event_log('report', 'cohort_incomplete_or_empty', day=previous)
         return
-    saved = store.remember(previous + '/report.json', view)
+    key = previous + ('/report-recovered.json' if 'recovered' in view else '/report.json')
+    saved = store.remember(key, view)
     view = {**saved, 'triad_examples': saved.get('triad_examples', view['triad_examples'])}
     reports[previous] = {'created_at': utc(now), 'view': view}
     queue(store, 'report', previous, view, channels, now, now + timedelta(hours=12))
+    event_log('report', 'queued', day=previous, examples=len(view['triad_examples']),
+              pending_fixtures=(view.get('recovered') or {}).get('pending_fixtures'))
 
 
 def plan_editorial(store, now, channels, best_queued, trial_ok):
@@ -297,6 +312,12 @@ def tick(store, services, gh_token, *, trial_ok):
     best = bool(group and add_group(store, group, now, services))
     if not best:
         event_log('best', 'no_new_eligible_group', candidates=len(picks))
+    agenda = studio.agenda(boards, now)
+    agenda_pool = {}
+    if agenda:
+        agenda_pool = {row['fixture_id']: row for row in agenda['fixtures']}
+        until = min(stamp(row['kickoff']) for row in agenda['fixtures'])
+        queue(store, 'agenda', agenda['date'], agenda, services, now, until)
     study_channels = [channel for channel in ('telegram', 'facebook') if channel in services]
     study_pool = safe_read('studio_board', lambda: studio.candidates(boards, now), {}) if study_channels else {}
     best_id = group_id(group) if best else None
@@ -316,7 +337,7 @@ def tick(store, services, gh_token, *, trial_ok):
     for post in list(store.state['posts'].values()):
         if (post['channel'] in services and post['kind'] != 'live'
                 and stamp(post['expires_at']) + timedelta(hours=12) > now):
-            source = study_pool if post['kind'] == 'studio' else candidates
+            source = {'studio': study_pool, 'agenda': agenda_pool}.get(post['kind'], candidates)
             attempt(store, post, services[post['channel']], source, clock, delivery_log)
     plan_live(store, clock(), candidates, services)
     store.save()
@@ -343,7 +364,7 @@ def preflight(store):
     now = clock()
     boards = []
     for number in (1, 2):
-        board, _ = store.read(f'arab_quote_day{number}.json', root=True)
+        board = store.gold_board(number)
         if not isinstance(board.get('matches'), list) or not stamp(board.get('updated_at')):
             raise ValueError('Invalid private Gold board')
         boards.append(board)

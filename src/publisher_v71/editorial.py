@@ -116,6 +116,11 @@ def report_copy(view, *, compact=False):
             decided = value['won'] + value['lost']
             summary.append(f"{name} {value['won']}/{decided}" if decided else f'{name} —')
         lines.append('Corrette su esiti definitivi\n' + ' · '.join(summary))
+        recovered = view.get('recovered') or {}
+        if recovered.get('pending'):
+            count = recovered.get('pending_fixtures')
+            lines.append(f'Bilancio in aggiornamento · partite in verifica {count}' if count
+                         else 'Bilancio in aggiornamento · esiti in verifica')
         return lines
 
     lines = []
@@ -149,6 +154,11 @@ def presentation(kind, view):
         return 'BEST', view['free']['match'], best_copy(view)[1:]
     if kind == 'studio':
         return 'STUDIO', view['free']['match'], studio_copy(view)[1:]
+    if kind == 'agenda':
+        return 'GOLD', 'Le partite di oggi in Gold', [
+            f"🔒 {row['match']} · {row['league']} · {italian_time(row['kickoff'])}"
+            for row in view['fixtures']
+        ]
     if kind == 'report':
         return 'REPORT', 'Riscontri del ' + date.fromisoformat(view['date']).strftime('%d/%m'), report_copy(view)
     if kind == 'academy':
@@ -177,8 +187,10 @@ def message(kind, view, marker, channel, *, now=None, trial_ok=False):
     footer = f'{site} · 18+ · Stime sperimentali\n{marker}'
     if kind == 'gold':
         footer = f'{BOT}\n{CHANNEL}\n{footer}'
-    elif kind in ('best', 'studio'):
+    elif kind in ('best', 'studio', 'agenda'):
         footer = f'{gold_access(now, trial_ok and now is not None)}\n18+ · Stime sperimentali\n{marker}'
+    elif kind == 'report' and now is not None:
+        footer = f'{site}\n{gold_access(now, trial_ok)}\n18+ · Stime sperimentali\n{marker}'
     caption = '\n\n'.join([heading, *filter(None, lines), footer])
     if channel == 'telegram' and len(caption.encode('utf-16-le')) // 2 > 1024:
         if kind == 'best':

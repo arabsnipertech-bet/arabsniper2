@@ -7,6 +7,7 @@ import json
 
 from audit_storage import open_verified_json, read_store
 from auditor_daily_priority import STATUS, v7_paths
+from auditor_history_chunks import receipt_path
 from gold_storage import previous_manifest, restore_subset
 from lateral_matrix import settle_spec
 from multimarket_model import stamp
@@ -19,26 +20,58 @@ from .selection import TRIAD_LABELS, clean, rome_day
 def certified(storage, day, *, with_fixture_labels=False):
     manifest = previous_manifest(storage.client, storage.bucket)
     paths = v7_paths(day)
-    if STATUS not in manifest or any(p not in manifest for p in paths.values()):
+    path = paths['outcomes_sha256']
+    daily_path = paths['daily_sha256']
+    pending_path = str(receipt_path(Path('.'), day))
+    priority = STATUS in manifest and all(p in manifest for p in paths.values())
+    if not priority and not {path, daily_path, pending_path} <= manifest.keys():
         return None
     with TemporaryDirectory(prefix='publisher-audit-') as directory:
         root = Path(directory)
-        restore_subset(storage.client, storage.bucket, root, manifest, [STATUS])
-        certificate = read_store(root / STATUS, {})
-        if (certificate.get('version') != 2 or certificate.get('report_date') != str(day)
-                or certificate.get('date') != str(day + timedelta(days=1))
-                or any(certificate.get(key) != manifest[path]['sha256'] for key, path in paths.items())):
-            return None
-        path = paths['outcomes_sha256']
-        daily_path = paths['daily_sha256']
+        if priority:
+            restore_subset(storage.client, storage.bucket, root, manifest, [STATUS])
+            certificate = read_store(root / STATUS, {})
+            priority = (certificate.get('version') == 2 and certificate.get('report_date') == str(day)
+                        and certificate.get('date') == str(day + timedelta(days=1))
+                        and all(certificate.get(key) == manifest[item]['sha256'] for key, item in paths.items()))
+        receipt = None
+        if not priority:
+            receipt = recovered_day(storage, root, manifest, day, pending_path, daily_path)
+            if receipt is None:
+                return None
         restore_subset(storage.client, storage.bucket, root, manifest,
                        [path, daily_path] if with_fixture_labels else [path])
         audit = read_store(root / path)
-        if audit.get('version') != VERSION or audit.get('date') != str(day) or not stamp(audit.get('generated_at')):
+        generated = stamp(audit.get('generated_at'))
+        if audit.get('version') != VERSION or audit.get('date') != str(day) or not generated:
             raise ValueError('Invalid certified V7 archive')
+        if receipt:
+            if generated != stamp(receipt['checked_at']):
+                return None
+            pending = receipt.get('pending_summary') or {}
+            audit['recovered'] = {'pending_fixtures': pending.get('pending_fixtures_count'),
+                                  'pending': receipt['pending']}
         if with_fixture_labels:
             audit['fixture_labels'] = fixture_labels(root / daily_path, audit['fixtures'])
         return audit
+
+
+def recovered_day(storage, root, manifest, day, receipt, daily):
+    """Accept the verified daily recovery without depending on the learning job."""
+    prefix = f'auditarchive/prematch_{day}_'
+    source = f'auditordata/prematch_{day}.json'
+    outputs = {daily, *(prefix + suffix for suffix in ('results.json', 'daily.md', 'calibration.json'))}
+    if not {receipt, source, *outputs} <= manifest.keys():
+        return None
+    restore_subset(storage.client, storage.bucket, root, manifest, [receipt])
+    value = read_store(root / receipt, {})
+    checked = stamp(value.get('checked_at'))
+    if (value.get('version') == 1 and value.get('day') == str(day) and checked
+            and rome_day(checked) > str(day) and type(value.get('pending')) is bool
+            and value.get('input_sha256') == manifest[source]['sha256']
+            and value.get('outputs') == {p: manifest[p]['sha256'] for p in outputs}):
+        return value
+    return None
 
 
 def fixture_labels(path, fixtures):
@@ -130,10 +163,12 @@ def build(audit, availability, public):
                 continue
             kickoff, observed, captured = (stamp(pick[key]) for key in ('kickoff', 'observed_at', 'captured_at'))
             if not (captured and observed and kickoff and captured <= observed < kickoff
-                    and rome_day(kickoff) == audit['date'] and fid in fixtures):
+                    and rome_day(kickoff) == audit['date']):
                 return None  # A missing receipt/outcome must never silently change the cohort.
             seen.add(fid)
-            outcome, profit = settle(pick, fixtures[fid])
+            if fid not in fixtures and 'recovered' not in audit:
+                return None
+            outcome, profit = settle(pick, fixtures[fid]) if fid in fixtures else ('pending', None)
             cohorts[audience].append(dict(pick, outcome=outcome, profit=profit))
     for row in audit.get('samples', []):
         # An audited research market without an assigned tier or official role.
@@ -155,4 +190,5 @@ def build(audit, availability, public):
             'cohorts': {key: metrics(rows) for key, rows in cohorts.items()},
             'examples': [{k: r[k] for k in ('match', 'league', 'market', 'odd', 'outcome')}
                          for r in examples[:3]],
-            'triad_examples': highlights}
+            'triad_examples': highlights,
+            **({'recovered': audit['recovered']} if 'recovered' in audit else {})}
