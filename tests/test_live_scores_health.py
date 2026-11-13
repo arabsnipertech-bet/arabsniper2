@@ -37,8 +37,13 @@ def feed(status='provider_rate_limit', *, cron_age=2, overdue=0, missing_halftim
     }
 
 
+def relayed_score(at=NOW, **values):
+    return {'status': '2H', 'observed_at': at.isoformat(), 'source': 'API-Football',
+            'transport': 'GitHub Actions/R2', **values}
+
+
 class LiveScoresHealthTests(TestCase):
-    def inspect(self, feeds):
+    def inspect(self, feeds, *, relay_finished_at=None):
         output = StringIO()
         waits = []
 
@@ -53,7 +58,7 @@ class LiveScoresHealthTests(TestCase):
               redirect_stdout(output)):
             clock.fromisoformat.side_effect = datetime.fromisoformat
             clock.now.side_effect = lambda _: now()
-            _, summary, reasons = health.inspect_with_rate_limit_recheck(NOW)
+            _, summary, reasons = health.inspect_with_rate_limit_recheck(NOW, relay_finished_at)
         provider.assert_not_called()
         return summary, reasons, waits, read.call_count, output.getvalue()
 
@@ -115,3 +120,62 @@ class LiveScoresHealthTests(TestCase):
         self.assertEqual(summary['status'], 'ok')
         self.assertEqual(reasons, ['Tracked live scores missing or older than five minutes'])
         self.assertEqual((waits, reads), ([], 1))
+
+    def test_recent_relay_delivery_keeps_the_limit_as_a_warning(self):
+        current = feed()
+        current['fixtures']['123'] = relayed_score()
+        summary, reasons, waits, reads, log = self.inspect([current])
+        self.assertEqual(reasons, [])
+        self.assertEqual(summary['status'], 'provider_rate_limit')
+        self.assertTrue(summary['relay_serves_live_scores'])
+        self.assertIn('::warning', log)
+        self.assertEqual((waits, reads), ([], 1))
+
+    def test_followup_waits_for_the_worker_to_consume_the_relay(self):
+        initial = feed(stale_live=21)
+        updated = feed(cron_age=-0.25)
+        updated['fixtures']['123'] = relayed_score()
+        summary, reasons, waits, reads, log = self.inspect(
+            [initial, updated], relay_finished_at=NOW - timedelta(seconds=10))
+        self.assertEqual(reasons, [])
+        self.assertTrue(summary['relay_serves_live_scores'])
+        self.assertFalse(summary['rate_limit_recheck']['cleared'])
+        self.assertIn('::warning', log)
+        self.assertEqual((waits, reads), ([15], 2))
+
+    def test_stale_scores_continue_to_fail_after_relay_followup(self):
+        still_stale = feed(stale_live=21, cron_age=-0.25)
+        summary, reasons, waits, reads, _ = self.inspect(
+            [feed(stale_live=21), still_stale], relay_finished_at=NOW - timedelta(seconds=10))
+        self.assertIn('Tracked live scores missing or older than five minutes', reasons)
+        self.assertNotIn('relay_serves_live_scores', summary)
+        self.assertEqual((waits, reads), ([15], 2))
+
+    def test_relay_without_a_new_worker_cycle_times_out(self):
+        stale = feed(stale_live=21)
+        summary, reasons, waits, reads, _ = self.inspect([stale] * 10, relay_finished_at=NOW)
+        self.assertIn('Tracked live scores missing or older than five minutes', reasons)
+        self.assertNotIn('relay_serves_live_scores', summary)
+        self.assertEqual((sum(waits), reads), (135, 10))
+
+    def test_daily_limits_and_delivery_gaps_remain_errors(self):
+        cases = (
+            ('daily', feed(limit_scope='daily'), relayed_score()),
+            ('overdue', feed(overdue=1, retry_minutes=8), relayed_score()),
+            ('missing halftime', feed(missing_halftime=1), relayed_score()),
+            ('watchlist', feed(watchlist_status='watchlist_stale'), relayed_score()),
+            ('stale relay', feed(retry_minutes=8), relayed_score(NOW - timedelta(minutes=6))),
+            ('stale worker', feed(retry_minutes=8),
+             relayed_score(NOW - timedelta(minutes=6), transport='Worker')),
+        )
+        for name, current, row in cases:
+            with self.subTest(name=name):
+                current['fixtures']['123'] = relayed_score()
+                current['fixtures']['124'] = row
+                if name == 'stale relay':
+                    del current['fixtures']['123']
+                summary, reasons, waits, reads, log = self.inspect([current])
+                self.assertTrue(reasons)
+                self.assertNotIn('relay_serves_live_scores', summary)
+                self.assertNotIn('::warning', log)
+                self.assertEqual((waits, reads), ([], 1))

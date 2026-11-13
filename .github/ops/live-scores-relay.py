@@ -13,6 +13,7 @@ from urllib.parse import urlencode
 KEY = 'live-scores/provider-relay.json'
 FINISHED = {'FT','AET','PEN'}
 ADMIN = {'PST','CANC','ABD','AWD','WO'}
+LIVE = {'1H','HT','2H','ET','BT','P','LIVE'}
 BATCH_SIZE = 20
 DAILY_CAP = 600
 
@@ -23,10 +24,30 @@ def stamp(value):
     except (AttributeError, ValueError):
         return None
 
+def temporarily_limited(live):
+    return (live.get('status') == 'provider_rate_limit' and
+            (live.get('diagnostic') or {}).get('limit_scope') != 'daily')
+
+
+def needs_midpoint(watch, live, now):
+    if not temporarily_limited(live):
+        return False
+    fixtures = live.get('fixtures') or {}
+    if (live.get('health') or {}).get('stale_live_fixtures'):
+        return True
+    for f in watch.get('fixtures', []):
+        kickoff = stamp(f.get('kickoff'))
+        if kickoff is None or not now - timedelta(hours=3) < kickoff <= now:
+            continue
+        status = (fixtures.get(str(f.get('fixture_id'))) or {}).get('status')
+        if status in LIVE or status in (None, 'NS', 'TBD') and now - kickoff < timedelta(minutes=15):
+            return True
+    return False
+
+
 def due(watch, live, now):
     fixtures = live.get('fixtures') or {}
-    limited = (live.get('status') == 'provider_rate_limit' and
-               (live.get('diagnostic') or {}).get('limit_scope') != 'daily')
+    limited = temporarily_limited(live)
     candidates = {}
     for f in watch.get('fixtures', []):
         fid, kickoff = str(f.get('fixture_id','')), stamp(f.get('kickoff'))
@@ -89,6 +110,10 @@ def run():
             'https://arabsniperbet.com/api/live-scores'),check=True,capture_output=True)
         return json.loads(public.stdout)
     live = public_feed()
+    if (os.environ.get('GITHUB_EVENT_NAME') == 'workflow_run' and os.environ.get('GITHUB_OUTPUT')
+            and needs_midpoint(watch, live, now)):
+        with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
+            out.write('live_followup=true\n')
     ids = due(watch, live, now)
     if not ids and live.get('status') == 'provider_rate_limit':
         retry = stamp((live.get('health') or {}).get('retry_after'))

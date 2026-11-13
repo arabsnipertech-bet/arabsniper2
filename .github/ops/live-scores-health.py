@@ -19,6 +19,11 @@ FOOTBALL = 'https://v3.football.api-sports.io/'
 ROME = ZoneInfo('Europe/Rome')
 MAX_AGE = timedelta(minutes=8)
 RATE_LIMIT_GRACE = timedelta(minutes=5)
+RELAY_CRON_GRACE_SECONDS = 135
+RELAY_POLL_SECONDS = 15
+LIVE_FRESHNESS = timedelta(minutes=5)
+LIVE_PHASES = {'1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE'}
+RATE_LIMIT_REASON = 'Collector state: provider_rate_limit'
 
 
 def stamp(value):
@@ -101,12 +106,15 @@ def inspect_live(now):
     reasons = []
     if not cron or now - cron > MAX_AGE:
         reasons.append('Cron Trigger missing or stale')
-    if live.get('status') not in ('ok', 'idle'):
-        reasons.append('Collector state: ' + str(live.get('status')))
-    if live.get('status') == 'ok' and (not last_poll or now - last_poll > timedelta(minutes=12)):
+    status = live.get('status')
+    if status not in ('ok', 'idle'):
+        reasons.append(f'Collector state: {status}')
+    if status == 'ok' and (not last_poll or now - last_poll > timedelta(minutes=12)):
         reasons.append('No recent successful provider poll')
     if health.get('overdue_fixtures'):
         reasons.append('Tracked fixtures overdue without a confirmed result')
+    if health.get('missing_halftime'):
+        reasons.append('Tracked final scores missing the confirmed halftime score')
     if health.get('stale_live_fixtures'):
         reasons.append('Tracked live scores missing or older than five minutes')
     summary = {'status': live.get('status'), 'checked_at': now.isoformat(),
@@ -132,26 +140,76 @@ def short_rate_limit_retry(summary, reasons, now):
     return None
 
 
-def inspect_with_rate_limit_recheck(now):
-    live, summary, reasons = inspect_live(now)
-    retry_at = short_rate_limit_retry(summary, reasons, now)
-    if retry_at is None:
-        return live, summary, reasons
+def relay_covers_scores(live, summary, reasons, now):
+    health = summary['health']
+    if (
+        reasons != [RATE_LIMIT_REASON]
+        or (summary['diagnostic'] or {}).get('limit_scope') == 'daily'
+        or health.get('watchlist_status')
+        or (health.get('relay') or {}).get('error')
+        or any(health.get(key) != 0 for key in ('overdue_fixtures', 'stale_live_fixtures', 'missing_halftime'))
+    ):
+        return False
+    earliest = now - LIVE_FRESHNESS
+    latest = now + timedelta(seconds=30)
+    relay_fresh = False
+    for row in live['fixtures'].values():
+        observed = stamp(row.get('observed_at'))
+        fresh = observed is not None and earliest <= observed <= latest
+        if row.get('status') in LIVE_PHASES and (not fresh or row.get('refresh_failed')):
+            return False
+        if fresh and row.get('transport') == 'GitHub Actions/R2' and row.get('source') == 'API-Football':
+            relay_fresh = True
+    return relay_fresh
 
-    initial = {'checked_at': summary['checked_at'], 'retry_after': summary['health']['retry_after'],
+
+def waiting_for_relay(summary, finished_at, now):
+    cron = stamp(summary['health'].get('last_cron_at'))
+    return (
+        finished_at is not None
+        and summary['status'] == 'provider_rate_limit'
+        and (summary['diagnostic'] or {}).get('limit_scope') != 'daily'
+        and cron is not None
+        and now - MAX_AGE <= cron < finished_at <= now
+    )
+
+
+def inspect_with_rate_limit_recheck(now, relay_finished_at=None):
+    live, summary, reasons = inspect_live(now)
+    initial = {'checked_at': summary['checked_at'], 'retry_after': summary['health'].get('retry_after'),
                'diagnostic': summary['diagnostic']}
-    print('Provider rate limit detected. Rechecking the stored feed for up to five minutes.', flush=True)
-    deadline = monotonic() + RATE_LIMIT_GRACE.total_seconds()
-    while retry_at is not None and (remaining := deadline - monotonic()) > 0:
-        after_retry = (retry_at - now).total_seconds() + 5
-        sleep(min(max(30, after_retry), remaining))
+    started = monotonic()
+    rechecked = False
+    while summary['status'] == 'provider_rate_limit':
+        if relay_covers_scores(live, summary, reasons, now):
+            summary['relay_serves_live_scores'] = True
+            reasons = []
+            print('::warning title=Gold live scores::API-Football limited the direct collector. '
+                  'The relay has delivered recent official scores.', flush=True)
+            break
+        elapsed = monotonic() - started
+        remaining = RATE_LIMIT_GRACE.total_seconds() - elapsed
+        if remaining <= 0:
+            break
+        retry_at = short_rate_limit_retry(summary, reasons, now)
+        if elapsed < RELAY_CRON_GRACE_SECONDS and waiting_for_relay(summary, relay_finished_at, now):
+            delay = min(RELAY_POLL_SECONDS, RELAY_CRON_GRACE_SECONDS - elapsed)
+        elif retry_at is not None:
+            delay = max(30, (retry_at - now).total_seconds() + 5)
+        else:
+            break
+        if not rechecked:
+            print('Provider rate limit detected. Rechecking the public feed for up to five minutes.', flush=True)
+        sleep(min(delay, remaining))
+        rechecked = True
         now = datetime.now(timezone.utc)
         live, summary, reasons = inspect_live(now)
-        retry_at = short_rate_limit_retry(summary, reasons, now)
 
-    summary['rate_limit_recheck'] = {**initial, 'cleared': not reasons}
-    if not reasons:
-        print('::warning title=Gold live scores::The provider rate limit cleared during verification.', flush=True)
+    if rechecked:
+        cleared = not reasons and summary['status'] != 'provider_rate_limit'
+        summary['rate_limit_recheck'] = {**initial, 'cleared': cleared}
+        if cleared:
+            print('::warning title=Gold live scores::The provider rate limit cleared during verification.', flush=True)
     return live, summary, reasons
 
 
@@ -177,8 +235,10 @@ def provider_results(ids):
 
 def run(ids, compare_auditor):
     now = datetime.now(timezone.utc)
-    inspect = inspect_live if ids else inspect_with_rate_limit_recheck
-    live, summary, reasons = inspect(now)
+    if ids:
+        live, summary, reasons = inspect_live(now)
+    else:
+        live, summary, reasons = inspect_with_rate_limit_recheck(now, stamp(os.environ.get('RELAY_FINISHED_AT')))
     fixtures = live['fixtures']
     if compare_auditor:
         summary['auditor_days'] = []

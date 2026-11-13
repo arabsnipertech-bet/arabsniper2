@@ -54,13 +54,21 @@ prioritizes the stale live fixture IDs reported by the Worker. When the direct
 collector is rate-limited, the relay can pick up active fixtures after two
 minutes and carry up to two groups of 20 in the existing private snapshot.
 It keeps the first successful group if the second fails and honors the relay's
-own Retry-After and daily allowance. An automated
+own Retry-After and daily allowance. If Fast Backup starts the relay while
+the direct collector is temporarily limited and fixtures are active, the
+same run checks again just over four minutes later. This bridges the gap
+between ten-minute Fast Backup checks when a GitHub scheduled run is delayed.
+The same cooldown and daily allowance apply to both attempts. An automated
 check can give a short provider rate limit up to five
 minutes to clear when the cron and watchlist are healthy, all due scores are
 present, and the collector has a retry within the window. The recheck reads
 only the stored public feed. If the feed recovers, the workflow records a
-warning and preserves the initial diagnostic. A persistent limit, exhausted
-daily quota, overdue score or another fault still fails the check.
+warning and preserves the initial diagnostic. After a successful relay run,
+the monitor can wait for the next Worker cron before evaluating freshness.
+A temporary provider limit is recorded as a warning when recent official
+relay results are visible and all tracked live and due scores are healthy.
+Missing, stale or overdue scores, an exhausted daily quota or a limit with
+no recent relay evidence still fail the check.
 The monitor compares the two most recent closed Rome dates with the
 checksummed Auditor archive after the nightly window. A manual run can compare
 up to 20 fixture IDs against API-Football using the existing GitHub Secret.
