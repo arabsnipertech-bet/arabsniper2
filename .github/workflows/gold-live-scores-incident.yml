@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 4
     steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install 'boto3>=1.42,<2'
       - name: Read live Worker and official fixtures
         env:
           CF_DEDICATED: ${{ secrets.CLOUDFLARE_LIVE_SCORES_API_TOKEN }}
@@ -18,6 +22,8 @@ jobs:
           CF_WORKERS: ${{ secrets.CLOUDFLARE_WORKERS_API_TOKEN }}
           CF_STRIPE: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
           CF_TOKEN: ${{ secrets.CLOUDFLARE_LIVE_SCORES_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN || secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           API_KEY: ${{ secrets.API_SPORTS_KEY }}
         shell: python
         run: |
@@ -173,3 +179,62 @@ jobs:
               show('provider/fixture/' + fid, dict(d, rows=rows))
           if diagnostic['http'] != 200 or errors or not {'1644690','1649517'}.issubset({row['fixture_id'] for row in result}):
               raise SystemExit('The provider did not confirm both incident fixtures.')
+
+          import boto3
+          from botocore.config import Config
+          s3 = boto3.client('s3', region_name='auto',
+              endpoint_url='https://dfdb02b4139b31c0ab4456a50eb371a2.r2.cloudflarestorage.com',
+              aws_access_key_id=os.environ.get('R2_ACCESS_KEY_ID'), aws_secret_access_key=os.environ.get('R2_SECRET_ACCESS_KEY'),
+              config=Config(connect_timeout=5, read_timeout=18, retries={'total_max_attempts': 1}))
+          def get_r2(name):
+              with s3.get_object(Bucket='arabsniper-gold', Key=name)['Body'] as stream:
+                  return json.load(stream)
+
+          selected = {'1644690', '1649517'}
+          found = {}
+          def record(match, origin):
+              f = match.get('fixture') or {}
+              fid = str(f.get('fixture_id'))
+              if fid not in selected:
+                  return
+              v7 = ((match.get('multimarket') or {}).get('matrix') or {}).get('v7') or {}
+              triad = v7.get('triad') or match.get('triad') or {}
+              found.setdefault(fid, []).append({'location':origin,
+                  'original_slot_count':sum(bool(x) for x in triad.values()),
+                  'captured_before_kickoff': bool(v7.get('captured_at') and
+                    datetime.fromisoformat(v7['captured_at']) < datetime.fromisoformat(f['kickoff'])),
+                  'result_status':(f.get('result') or {}).get('status'),
+                  'live_status':(f.get('live') or {}).get('status'),
+                  'status_short':f.get('status_short')})
+          board = get_r2('arab_quote_day1.json')
+          for location in ('today', 'current_day_archive', 'previous_day'):
+              part = board if location == 'today' else board.get(location) or {}
+              for match in part.get('matches', []):
+                  record(match, location)
+          catalog = get_r2('arab_quote_model_research.json')
+          import gzip
+          index = (catalog.get('_gold_browser_days') or {}).get('arab_quote_day1.json') or {}
+          for item in index.get('pages', []):
+              digest = item['sha256']
+              with s3.get_object(Bucket='arabsniper-gold', Key='_audit_parts/' + digest + '.json.gz')['Body'] as stream:
+                  raw = gzip.decompress(stream.read())
+              if len(raw) != item['bytes'] or hashlib.sha256(raw).hexdigest() != digest:
+                  raise SystemExit('Gold page checksum mismatch')
+              for match in json.loads(raw):
+                  record(match, 'browser_today')
+          show('gold_archive', {'date':board.get('date'), 'cases':found, 'verified_browser_pages':len(index.get('pages', []))})
+          manifest = get_r2('state/current.json')['files']
+          day = '2026-11-12'
+          path = f'auditarchive/prematch_{day}_v7.json'
+          item = manifest.get(path)
+          if item:
+              with s3.get_object(Bucket='arabsniper-gold', Key='state/objects/' + item['sha256'])['Body'] as stream:
+                  raw = stream.read()
+              if len(raw) != item['bytes'] or hashlib.sha256(raw).hexdigest() != item['sha256']:
+                  raise SystemExit('Auditor checksum mismatch')
+              audit = json.loads(raw)
+              show('gold_auditor', {'date':day, 'counts':audit.get('counts'),
+                   'fixture_count':len(audit.get('fixtures', {})),
+                   'verified':True, 'generated_at':audit.get('generated_at')})
+          else:
+              show('gold_auditor', {'date':day, 'available':False})
