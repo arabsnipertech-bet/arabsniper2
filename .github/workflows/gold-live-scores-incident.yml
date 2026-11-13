@@ -13,11 +13,15 @@ jobs:
     steps:
       - name: Read live Worker and official fixtures
         env:
+          CF_DEDICATED: ${{ secrets.CLOUDFLARE_LIVE_SCORES_API_TOKEN }}
+          CF_GENERAL: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_WORKERS: ${{ secrets.CLOUDFLARE_WORKERS_API_TOKEN }}
+          CF_STRIPE: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
           CF_TOKEN: ${{ secrets.CLOUDFLARE_LIVE_SCORES_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN || secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
           API_KEY: ${{ secrets.API_SPORTS_KEY }}
         shell: python
         run: |
-          import email.parser, email.policy, hashlib, json, os
+          import email.parser, email.policy, hashlib, json, os, subprocess
           from datetime import datetime, timezone
           from urllib.error import HTTPError, URLError
           from urllib.parse import urlencode
@@ -49,6 +53,16 @@ jobs:
           acct = cf + '/accounts/dfdb02b4139b31c0ab4456a50eb371a2'
           worker = '/workers/scripts/arabsniper-live-scores'
           token = os.environ.get('CF_TOKEN')
+          for name in ('CF_DEDICATED', 'CF_GENERAL', 'CF_WORKERS', 'CF_STRIPE'):
+              value = os.environ.get(name)
+              if not value:
+                  show('cloudflare_credential', {'name': name, 'present': False})
+                  continue
+              code, _, data = get(acct + worker + '/deployments', {'Authorization':'Bearer ' + value})
+              show('cloudflare_credential', {'name': name, 'http': code, 'authorized': decode(data).get('success') is True})
+              if code == 200 and decode(data).get('success') is True:
+                  token = value
+          
           if token:
               headers = {'Authorization': 'Bearer ' + token}
               for part in ('/settings', '/schedules', '/deployments', '/content/v2'):
@@ -95,7 +109,9 @@ jobs:
 
           ids = {'1644690', '1649517'}
           observed = datetime.now(timezone.utc)
-          status, _, body = get('https://arabsniperbet.com/api/live-scores')
+          attempt = subprocess.run(['curl', '-sS', '--max-time', '18', '-H', 'Accept: application/json', '-w', '\n%{http_code}', 'https://arabsniperbet.com/api/live-scores'], capture_output=True)
+          body, _, status = attempt.stdout.rpartition(b'\n')
+          status = int(status) if status.isdigit() else 0
           live = decode(body)
           scores = live.get('fixtures') or {}
           show('public_worker', {'http': status, 'checked_at': observed.isoformat(),
@@ -134,7 +150,8 @@ jobs:
           used, limit = quota.get('current'), quota.get('limit_day')
           if diagnostic['http'] != 200 or errors or info.get('subscription', {}).get('active') is not True or not isinstance(used, int) or not isinstance(limit, int) or limit - used <= max(1000, (limit + 9) // 10) or diagnostic['headers'].get('x-ratelimit-remaining') == '0':
               raise SystemExit('Fixture query deferred by provider quota or status.')
-          ids.update(fid for _, fid in sorted(due, reverse=True)[:16])
+          ids.update(fid for _, fid in sorted(due, reverse=True)[:15])
+          ids.add('1520978')
           diagnostic, rows, errors = provider('fixtures?' + urlencode({'ids': '-'.join(sorted(ids)), 'timezone': 'Europe/Rome'}))
           result = []
           for row in rows if isinstance(rows, list) else []:
@@ -146,5 +163,13 @@ jobs:
               result.append({'fixture_id': fid, 'date': f.get('date'), 'status': (f.get('status') or {}).get('short'),
                              'halftime': score.get('halftime'), 'fulltime': score.get('fulltime')})
           show('provider/fixtures', dict(diagnostic, rows=result, missing=sorted(ids - {row['fixture_id'] for row in result})))
+          for fid in ('1644690', '1649517'):
+              if diagnostic['headers'].get('x-ratelimit-remaining') in ('0','1','2'):
+                  break
+              d, data, rejected = provider('fixtures?' + urlencode({'id': fid, 'timezone':'Europe/Rome'}))
+              rows = [{ 'status': (r.get('fixture') or {}).get('status'), 'id': (r.get('fixture') or {}).get('id'),
+                        'league': (r.get('league') or {}).get('name'), 'score': r.get('score') }
+                      for r in data if str((r.get('fixture') or {}).get('id')) == fid] if not rejected and isinstance(data, list) else []
+              show('provider/fixture/' + fid, dict(d, rows=rows))
           if diagnostic['http'] != 200 or errors or not {'1644690','1649517'}.issubset({row['fixture_id'] for row in result}):
               raise SystemExit('The provider did not confirm both incident fixtures.')
