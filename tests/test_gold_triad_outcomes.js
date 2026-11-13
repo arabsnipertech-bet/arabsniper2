@@ -15,8 +15,9 @@ assert.equal(settle(match(),pick('btts','ft','yes')),true);
 assert.equal(settle(match(),pick('btts','ft','no')),false);
 assert.equal(settle(match(),pick('result','ft','1')),true);
 assert.equal(settle(match(),pick('result','ft','x')),false);
-assert.equal(settle(match(),pick('total','ht','over',1.5)),null,
- 'Without ArabLive half-time provider, remain neutral instead of inventing a score');
+assert.equal(settle(match(),pick('total','ht','over',1.5)),true,
+ 'Saved official halftime suffices when the public overlay is unavailable');
+assert.equal(settle(match('FT',[2,1],null),pick('total','ht','over',1.5)),null);
 assert.equal(settle(match('1H'),pick('total','ft','over',2.5)),null);
 const navalcarnero=match('AET',null,[0,1]);
 navalcarnero.fixture.live={status:'AET',goals:{home:2,away:3},fulltime:{home:2,away:2}};
@@ -31,9 +32,9 @@ const missing90=match('AET',null,[0,1]);
 missing90.fixture.live={status:'AET',goals:{home:2,away:3},fulltime:{home:null,away:null}};
 assert.equal(settle(missing90,pick('btts','ft','yes')),null);
 assert.equal(settle(match('FT',null),pick('total','ft','over',2.5)),null);
-assert.equal(settle(match(),pick('asian_total','ft','over',2.25)),null);
-assert.equal(settle(match(),pick('handicap','ft','home',-.5)),null);
-assert.equal(settle(match(),pick('halves_total','ft','over',.5,.5)),null);
+assert.equal(settle(match(),pick('asian_total','ft','over',2.25)),true);
+assert.equal(settle(match(),pick('handicap','ft','home',-.5)),true);
+assert.equal(settle(match(),pick('halves_total','ft','over',.5,.5)),true);
 assert.equal(settle(match(),{...pick('total','ft','over',2.5),signal:{quote_state:'model_estimate'}}),true);
 const old=globalThis.ArabLive;
 try{
@@ -58,4 +59,18 @@ try{
  assert.equal(settle(match(),pick('both_halves','ft','both')),false);
  assert.equal(settle(match('FT',[2,2],[1,1]),pick('both_halves','ft','both')),true);
 }finally{globalThis.ArabLive=old}
+const outcome=(m,p)=>matrix.triadSettlement(m,p.source.spec);
+assert.equal(outcome(match('HT',null,null),pick('total','ht','over',1.5)),'unverifiable');
+const halftime=match('HT',null,null);
+halftime.fixture.live={status:'HT',halftime:{home:0,away:0}};
+assert.equal(outcome(halftime,pick('btts','ht','no')),'won');
+assert.equal(outcome(halftime,pick('total','ft','under',3.5)),'pending');
+assert.equal(outcome(match('CANC',null,null),pick('total','ft','over',2.5)),'void');
+assert.equal(outcome(match('PST',null,null),pick('total','ft','over',2.5)),'pending');
+assert.equal(outcome(match('FT',[1,1]),pick('dnb','ft','1')),'void');
+assert.equal(outcome(match('FT',[1,1]),pick('asian_total','ft','under',2)),'void');
+assert.equal(outcome(match('FT',[1,1]),pick('asian_total','ft','over',2.25)),'half_lost');
+assert.equal(outcome(match('FT',[1,1]),pick('asian_total','ft','under',2.25)),'half_won');
+assert.equal(outcome(match('FT',[1,1]),pick('handicap','ft','away',.25)),'half_won');
+assert.equal(outcome(match('FT',[1,1]),pick('handicap','ft','away',-.25)),'half_lost');
 console.log('Gold V7 triad settlement tests passed');

@@ -1,132 +1,334 @@
-// One global poller. Public requests read stored data and NEVER call API-Sports.
 const WATCH_URL = 'https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper2/main/data/live_watchlist.json';
 const API = 'https://v3.football.api-sports.io/';
-const FINAL = new Set(['FT','AET','PEN','CANC','ABD','AWD','WO']);
+const MINUTE = 60_000, HOUR = 60 * MINUTE, DAY = 24 * HOUR;
+const FAST_WINDOW = 3 * HOUR, RETRY_WINDOW = 72 * HOUR, CACHE_WINDOW = 4 * DAY;
+const OVERDUE = 135 * MINUTE;
+const FINISHED = new Set(['FT', 'AET', 'PEN']);
+const ADMIN = new Set(['CANC', 'ABD', 'AWD', 'WO']);
+const HALF_COMPLETE = new Set(['HT', '2H', 'ET', 'BT', 'P', ...FINISHED]);
+const STATUSES = new Set(['TBD', 'NS', '1H', 'HT', '2H', 'ET', 'BT', 'P', 'SUSP', 'INT', 'PST', 'LIVE',
+  ...FINISHED, ...ADMIN]);
+const KNOWN_ERRORS = new Set(['token', 'key', 'headers', 'access', 'ip', 'rateLimit', 'requests', 'subscription', 'plan', 'date', 'timezone']);
+const rome = new Intl.DateTimeFormat('en-CA', {timeZone:'Europe/Rome', year:'numeric', month:'2-digit', day:'2-digit'});
 const iso = ms => new Date(ms).toISOString();
-const localDate = ms => new Intl.DateTimeFormat('en-CA', {timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(ms);
-const json = value => Response.json(value, {headers:{'Cache-Control':'public, max-age=30','X-Content-Type-Options':'nosniff'}});
-const number = x => Number.isFinite(x) && x >= 0 ? x : null;
-const score = x => ({home:number(x?.home),away:number(x?.away)});
+const timestamp = ms => Number.isFinite(ms) ? iso(ms) : null;
+const json = value => Response.json(value, {headers:{'Cache-Control':'no-store', 'X-Content-Type-Options':'nosniff'}});
+const number = value => Number.isInteger(value) && value >= 0 ? value : null;
+const score = value => ({home:number(value?.home), away:number(value?.away)});
+const validScore = value => number(value?.home) !== null && number(value?.away) !== null;
+const hasFinal = row => FINISHED.has(row?.status) && (validScore(row.fulltime) || row.status === 'FT' && validScore(row.goals));
+const complete = row => hasFinal(row) && validScore(row.halftime);
+const postponed = row => row?.status === 'PST' || ADMIN.has(row?.status);
+
 export function normalize(row, now) {
-  const f=row?.fixture, s=f?.status;
-  if(!Number.isInteger(f?.id)||typeof s?.short!=='string') return null;
-  return {fixture_id:String(f.id),status:s.short,elapsed:number(s.elapsed),extra:number(s.extra),
-    goals:score(row.goals),halftime:score(row.score?.halftime),fulltime:score(row.score?.fulltime),
-    observed_at:iso(now),refresh_failed:false,source:'API-Football'};
+  const f = row?.fixture, status = f?.status?.short;
+  if (!Number.isSafeInteger(f?.id) || f.id <= 0 || !STATUSES.has(status)) return null;
+  const goals = score(row.goals), fulltime = score(row.score?.fulltime);
+  const halftime = score(row.score?.halftime);
+  return {fixture_id:String(f.id), status, elapsed:number(f.status.elapsed), extra:number(f.status.extra),
+    goals, halftime:status === 'HT' && !validScore(halftime) ? goals : halftime,
+    fulltime:status === 'FT' && !validScore(fulltime) ? goals : fulltime,
+    extratime:score(row.score?.extratime), penalties:score(row.score?.penalty),
+    observed_at:iso(now), refresh_failed:false, source:'API-Football'};
 }
+
+function reconcile(previous, next) {
+  if (hasFinal(previous) && !FINISHED.has(next.status)) return previous;
+  if (FINISHED.has(previous?.status) && !FINISHED.has(next.status) && !ADMIN.has(next.status)) return previous;
+  const nextHalf = HALF_COMPLETE.has(next.status) && validScore(next.halftime);
+  if (!nextHalf && HALF_COMPLETE.has(previous?.status) && validScore(previous.halftime)) {
+    next.halftime = previous.halftime;
+    next.halftime_observed_at = previous.halftime_observed_at || previous.observed_at;
+  }
+  if (hasFinal(previous) && !hasFinal(next)) {
+    next.status = previous.status;
+    next.goals = previous.goals;
+    next.fulltime = validScore(previous.fulltime) ? previous.fulltime : previous.goals;
+    next.fulltime_observed_at = previous.fulltime_observed_at || previous.observed_at;
+  }
+  if (hasFinal(next) && validScore(next.halftime) &&
+      (next.halftime.home > next.fulltime.home || next.halftime.away > next.fulltime.away)) {
+    next.halftime = score(null);
+    delete next.halftime_observed_at;
+  }
+  for (const key of ['extratime', 'penalties']) {
+    if (previous?.status === next.status && !validScore(next[key]) && validScore(previous[key])) next[key] = previous[key];
+  }
+  return next;
+}
+
+function retryDelay(now, kickoff, row, checked) {
+  if (complete(row)) return checked === 1 ? HOUR : checked === 2 ? 8 * HOUR : DAY;
+  if (postponed(row)) return 6 * HOUR;
+  if (now - kickoff >= DAY) return 2 * HOUR;
+  return now - kickoff >= FAST_WINDOW ? 30 * MINUTE : 10 * MINUTE;
+}
+
+function retryAfter(headers, now) {
+  const value = headers.get('retry-after');
+  if (!value) return 0;
+  return /^\d+$/.test(value) ? now + Number(value) * 1000 : Date.parse(value) || 0;
+}
+
 export class ScoreStore {
-  constructor(ctx,env) { this.ctx=ctx;this.env=env;this.pending=null; }
+  constructor(ctx, env) {
+    this.ctx = ctx;
+    this.env = env;
+    this.pending = null;
+  }
+
   async fetch(request) {
-    if(new URL(request.url).pathname==='/refresh') {
-      if(!this.pending) this.pending=this.refresh().finally(()=>{this.pending=null;});
+    if (new URL(request.url).pathname === '/refresh') {
+      if (!this.pending) this.pending = this.refresh().finally(() => { this.pending = null; });
       await this.pending;
       return new Response('ok');
     }
-    const state=await this.ctx.storage.get('state');
-    return json({schema_version:1,enabled:this.env.LIVE_ENABLED==='true',
-      generated_at:state?.published_at||null,poll_interval_seconds:120,
-      status:state?.status||'not_configured',diagnostic:state?.diagnostic||null,fixtures:state?.scores||{}});
+    const s = await this.ctx.storage.get('state');
+    const id = new URL(request.url).searchParams.get('id');
+    if (id !== null) {
+      if (!/^\d{1,16}$/.test(id)) return new Response('Invalid fixture ID', {status:400});
+      const row = s?.scores[id] || await this.ctx.storage.get('final:' + id);
+      return json({schema_version:1, enabled:this.env.LIVE_ENABLED === 'true', fixtures:row ? {[id]:row} : {}});
+    }
+    const now = Date.now(), enabled = this.env.LIVE_ENABLED === 'true';
+    const last = s?.last_cron_at || s?.attempted_at;
+    let status = s?.status || 'not_configured';
+    if (!enabled) status = 'disabled';
+    else if (last && now - last > 6 * MINUTE) status = 'cron_stale';
+    const health = {...s?.health, last_cron_at:timestamp(last), last_successful_poll_at:timestamp(s?.last_successful_poll_at),
+      retry_after:timestamp(s?.retry_at), consecutive_errors:s?.consecutive_errors || 0};
+    return json({schema_version:1, enabled, generated_at:timestamp(s?.published_at), poll_interval_seconds:120,
+      status, diagnostic:s?.diagnostic || null, health, fixtures:s?.scores || {}});
   }
-  async refresh(now=Date.now()) {
-    if(this.env.LIVE_ENABLED!=='true'||!this.env.API_SPORTS_KEY) return;
-    const store=this.ctx.storage;
-    let s=await store.get('state')||{scores:{},watch:[],calls:0};
-    if(s.attempted_at && now-s.attempted_at<115000) return;
-    s.attempted_at=now;
-    s.diagnostic=null;
-    const today=iso(now).slice(0,10);
-    if(s.day!==today){s.day=today;s.calls=0;s.quota=null;}
-    // Persist the interval before network I/O, including failed attempts.
-    await store.put('state',s);
+
+  async refresh(now = Date.now()) {
+    const store = this.ctx.storage;
+    const s = await store.get('state') || {scores:{}, watch:[], calls:0};
+    if (s.attempted_at && now - s.attempted_at < 115_000) return;
+    s.attempted_at = s.last_cron_at = now;
+    if (this.env.LIVE_ENABLED !== 'true' || !this.env.API_SPORTS_KEY) {
+      s.status = this.env.LIVE_ENABLED === 'true' ? 'secret_missing' : 'disabled';
+      await store.put('state', s);
+      return;
+    }
+    const day = iso(now).slice(0, 10);
+    if (s.day !== day) Object.assign(s, {day, calls:0, quota:null});
+    s.followups ||= {};
+    s.pages ||= {};
+    const cap = Math.max(1, Math.min(1500, Number(this.env.MAX_CALLS_PER_DAY) || 1500));
+    const reserve = Math.max(1000, Number(this.env.RESERVE_REQUESTS) || 1000);
+    const remaining = () => s.quota.limit - s.quota.current;
+    const threshold = () => Math.max(reserve, Math.ceil(s.quota.limit * .1));
+    const archive = new Map();
+    // Retain already collected final scores when upgrading a running Durable Object.
+    if (!s.final_archive_initialized) {
+      for (const [id, row] of Object.entries(s.scores)) if (hasFinal(row)) archive.set(id, row);
+    }
+    await store.put('state', s);
+
+    const api = async path => {
+      if (s.calls >= cap) throw new Error('live_daily_cap');
+      if (path !== 'status' && remaining() <= threshold()) throw new Error('quota_reserve');
+      s.calls++;
+      await store.put('state', s);
+      const endpoint = path === 'status' ? 'status' : 'fixtures';
+      const response = await fetch(API + path, {headers:{'x-apisports-key':this.env.API_SPORTS_KEY}, signal:AbortSignal.timeout(12_000)});
+      const daily = response.headers.get('x-ratelimit-requests-remaining');
+      if (s.quota) {
+        s.quota.current++;
+        if (daily !== null && /^\d+$/.test(daily)) s.quota.current = Math.max(0, s.quota.limit - Number(daily));
+      }
+      const minute = response.headers.get('x-ratelimit-remaining');
+      const body = response.status === 204 ? {response:[]} : await response.json().catch(() => null);
+      const errors = Object.keys(body?.errors || {});
+      if (!response.ok || !body || errors.length) {
+        const categories = errors.filter(k => KNOWN_ERRORS.has(k));
+        s.diagnostic = {endpoint, http_status:response.status, categories:categories.length ? categories : ['other']};
+        const limited = response.status === 429 || errors.includes('rateLimit') || minute === '0';
+        s.provider_retry_after = retryAfter(response.headers, now);
+        throw new Error(limited ? 'provider_rate_limit' : errors.length ? 'provider_error' : 'provider_unavailable');
+      }
+      if (minute !== null && /^\d+$/.test(minute) && Number(minute) <= 2) {
+        s.retry_at = Math.max(s.retry_at || 0, now + MINUTE, retryAfter(response.headers, now));
+      }
+      return body;
+    };
+
+    let watchIssue = s.watch_issue || null;
     try {
-      if(!s.watch_at || now-s.watch_at>1800000) {
-        const response=await fetch(WATCH_URL,{signal:AbortSignal.timeout(15000)});
-        if(!response.ok) throw new Error('watchlist_unavailable');
-        const payload=await response.json();
-        if(!Array.isArray(payload.fixtures)||!Number.isFinite(Date.parse(payload.generated_at))) throw new Error('invalid_watchlist');
-        const byId=new Map((s.watch||[]).map(x=>[String(x.fixture_id),x]));
-        for(const f of payload.fixtures) if(/^\d+$/.test(String(f.fixture_id))&&Number.isFinite(Date.parse(f.kickoff))) byId.set(String(f.fixture_id),f);
-        s.watch=[...byId.values()].filter(f=>Date.parse(f.kickoff)>now-48*3600000);
-        s.watch_at=now;
-      }
-      const dates=[...new Set(s.watch.filter(f=> {
-        const t=Date.parse(f.kickoff),last=s.scores[String(f.fixture_id)];
-        return t<=now+600000 && t>now-24*3600000 && !FINAL.has(last?.status);
-      }).map(f=>localDate(Date.parse(f.kickoff))))].slice(0,2);
-      if(!dates.length){s.status='idle';s.published_at=iso(now);return;}
-      const cap=Math.max(0,Math.min(1500,Number(this.env.MAX_CALLS_PER_DAY)||1500));
-      const reserve=Math.max(1000,Number(this.env.RESERVE_REQUESTS)||1000);
-      const api=async path=> {
-        if(s.calls>=cap) throw new Error('live_daily_cap');
-        s.calls++; await store.put('state',s);
-        const response=await fetch(API+path,{headers:{'x-apisports-key':this.env.API_SPORTS_KEY},signal:AbortSignal.timeout(20000)});
-        if(s.quota) {s.quota.current++;}
-        const remaining=response.headers.get('x-ratelimit-requests-remaining');
-        if(s.quota && remaining!==null && /^\d+$/.test(remaining)) s.quota.current=Math.max(0,s.quota.limit-Number(remaining));
-        if(!response.ok) throw new Error('provider_unavailable');
-        const value=await response.json();
-        if(value.errors && Object.keys(value.errors).length) {
-          // Only fixed category names may leave the Worker; never upstream messages.
-          const known=['token','key','headers','access','ip','rateLimit','requests','subscription','plan','date','timezone'];
-          const categories=known.filter(k=>Object.prototype.hasOwnProperty.call(value.errors,k));
-          s.diagnostic={endpoint:path==='status'?'status':'fixtures',http_status:response.status,categories:categories.length?categories:['other']};
-          throw new Error('provider_error');
+      if (!s.watch_at || now - s.watch_at >= 15 * MINUTE) {
+        try {
+          const response = await fetch(WATCH_URL, {signal:AbortSignal.timeout(10_000)});
+          if (!response.ok) throw new Error('watchlist_unavailable');
+          const payload = await response.json();
+          if (!Array.isArray(payload.fixtures) || !Number.isFinite(Date.parse(payload.generated_at)))
+            throw new Error('invalid_watchlist');
+          const byId = new Map(s.watch.map(f => [String(f.fixture_id), f]));
+          for (const f of payload.fixtures) {
+            const id = String(f.fixture_id);
+            if (!/^\d+$/.test(id) || !Number.isFinite(Date.parse(f.kickoff))) continue;
+            const previous = byId.get(id);
+            byId.set(id, previous?.kickoff === f.kickoff ? previous : {fixture_id:id, kickoff:f.kickoff});
+          }
+          s.watch = [...byId.values()];
+          s.watch_at = now;
+          s.watch_generated_at = Date.parse(payload.generated_at);
+          watchIssue = null;
+        } catch (error) {
+          watchIssue = error.message === 'invalid_watchlist' ? 'invalid_watchlist' : 'watchlist_unavailable';
         }
-        return value;
+      }
+      if (!watchIssue && now - s.watch_generated_at > 4 * HOUR) watchIssue = 'watchlist_stale';
+      s.watch_issue = watchIssue;
+      const kickoff = f => Date.parse(f.provider_kickoff || f.kickoff);
+      s.watch = s.watch.filter(f => kickoff(f) > now - CACHE_WINDOW);
+      const tracked = new Map(s.watch.map(f => [String(f.fixture_id), f]));
+      for (const [id, row] of Object.entries(s.scores)) {
+        if (tracked.has(id) || !s.watch_at) continue;
+        if (hasFinal(row)) archive.set(id, row);
+        delete s.scores[id];
+        delete s.followups[id];
+      }
+      if (s.retry_at > now) return;
+      s.diagnostic = null;
+      s.provider_retry_after = null;
+      const active = s.watch.filter(f => {
+        const t = kickoff(f), row = s.scores[f.fixture_id];
+        return t <= now + 10 * MINUTE && t > now - FAST_WINDOW && !FINISHED.has(row?.status) && !postponed(row);
+      });
+      const dates = [...new Set(active.map(f => rome.format(kickoff(f))))];
+      const followup = f => {
+        const id = String(f.fixture_id), row = s.scores[id], t = kickoff(f), age = now - t, checked = s.followups[id];
+        if (postponed(row)) {
+          const rescheduled = f.provider_kickoff && f.provider_kickoff !== f.kickoff;
+          return age >= (rescheduled ? -10 * MINUTE : 6 * HOUR) && age < RETRY_WINDOW && !(checked?.next_at > now);
+        }
+        if (age < 0 || age >= RETRY_WINDOW || checked?.next_at > now) return false;
+        if (hasFinal(row)) return !complete(row) || now - Date.parse(row.observed_at) >= HOUR || checked?.count > 0;
+        return age >= FAST_WINDOW || age >= 15 * MINUTE && (!row || row.status === 'NS' || row.status === 'TBD' ||
+          row.refresh_failed || now - Date.parse(row.observed_at) > 6 * MINUTE);
       };
-      if(!s.quota || now-s.quota.checked_at>3600000) {
-        const q=(await api('status')).response;
-        if(!Number.isInteger(q?.requests?.current)||!Number.isInteger(q?.requests?.limit_day)||q.subscription?.active!==true) throw new Error('quota_unverified');
-        s.quota={current:q.requests.current,limit:q.requests.limit_day,checked_at:now};
+      if (!dates.length && !s.watch.some(followup)) {
+        s.status = watchIssue || 'idle';
+        s.published_at = now;
+        s.consecutive_errors = 0;
+        return;
       }
-      const allowed=new Set(s.watch.map(f=>String(f.fixture_id)));
-      // Recover tracked fixtures missing from a date feed with a bounded exact-ID lookup.
-      // Never infer a final score from kickoff or overwrite a confirmed final result.
-      const recovered=new Set();
-      for(const date of dates) {
-        if(s.quota.limit-s.quota.current<=Math.max(reserve,Math.ceil(s.quota.limit*.1))) throw new Error('quota_reserve');
-        const data=await api('fixtures?date='+date+'&timezone=Europe%2FRome');
-        if(!Array.isArray(data.response)) throw new Error('invalid_response');
-        const received=new Set();
-        for(const row of data.response) {
-          const live=normalize(row,now);
-          if(live&&allowed.has(live.fixture_id)){
-            if(!FINAL.has(s.scores[live.fixture_id]?.status)||FINAL.has(live.status)) s.scores[live.fixture_id]=live;
-            received.add(live.fixture_id);
+      if (!s.quota || now - s.quota.checked_at > HOUR) {
+        const q = (await api('status')).response;
+        if (!Number.isInteger(q?.requests?.current) || !Number.isInteger(q?.requests?.limit_day) ||
+            q.requests.limit_day <= 0 || q.subscription?.active !== true) throw new Error('quota_unverified');
+        s.quota = {current:q.requests.current, limit:q.requests.limit_day, checked_at:now};
+      }
+      let polled = false;
+      const accept = (rows, eligible) => {
+        if (!Array.isArray(rows)) throw new Error('invalid_response');
+        const received = new Set();
+        for (const raw of rows) {
+          const row = normalize(raw, now), id = row?.fixture_id;
+          if (!eligible.has(id) || !tracked.has(id)) continue;
+          const f = tracked.get(id), old = s.scores[id];
+          const reportedKickoff = Date.parse(raw.fixture.date);
+          if (Number.isFinite(reportedKickoff) && (postponed(old) || row.status === 'PST')) {
+            f.provider_kickoff = iso(reportedKickoff);
+          }
+          const next = reconcile(old, row);
+          if (hasFinal(next) && (!hasFinal(old) || ['status', 'halftime', 'fulltime', 'extratime', 'penalties']
+            .some(key => JSON.stringify(next[key]) !== JSON.stringify(old[key])))) archive.set(id, next);
+          s.scores[id] = next;
+          received.add(id);
+        }
+        polled = true;
+        s.last_successful_poll_at = now;
+        return received;
+      };
+      for (const date of dates) {
+        if (s.retry_at > now) break;
+        const page = s.pages[date] || 1;
+        const query = 'fixtures?date=' + date + '&timezone=Europe%2FRome' + (page > 1 ? '&page=' + page : '');
+        const data = await api(query);
+        const eligible = new Set(s.watch.filter(f => rome.format(kickoff(f)) === date).map(f => String(f.fixture_id)));
+        const received = accept(data.response, eligible);
+        const pages = Number(data.paging?.total);
+        s.pages[date] = Number.isInteger(pages) && pages > page && page < 3 ? page + 1 : 1;
+        if (page === 1 && s.pages[date] === 1) {
+          for (const f of active) {
+            const id = String(f.fixture_id);
+            if (eligible.has(id) && !received.has(id) && s.scores[id]) s.scores[id].refresh_failed = true;
           }
         }
-        for(const f of s.watch) {
-          const id=String(f.fixture_id),kickoff=Date.parse(f.kickoff);
-          if(localDate(kickoff)!==date||received.has(id)||FINAL.has(s.scores[id]?.status)) continue;
-          // The date feed can omit a fixture; retry by ID only after kickoff and
-          // at most twice per cycle, respecting both the collector cap and reserve.
-          if(now>=kickoff && now-kickoff<=24*3600000 && recovered.size<2 &&
-             s.calls<cap && s.quota.limit-s.quota.current>Math.max(reserve,Math.ceil(s.quota.limit*.1))) {
-            recovered.add(id);
-            const detail=await api('fixtures?id='+id);
-            if(!Array.isArray(detail.response)) throw new Error('invalid_response');
-            const live=detail.response.map(row=>normalize(row,now)).find(row=>row?.fixture_id===id);
-            if(live){s.scores[id]=live;continue;}
-          }
-          if(s.scores[id]) s.scores[id].refresh_failed=true;
+      }
+      s.pages = Object.fromEntries(dates.map(date => [date, s.pages[date] || 1]));
+      // A single bounded batch covers omitted, delayed and corrected fixtures, including overnight ones.
+      const due = s.watch.filter(followup).sort((a,b) =>
+        (s.followups[a.fixture_id]?.next_at || 0) - (s.followups[b.fixture_id]?.next_at || 0) ||
+        kickoff(a) - kickoff(b)).slice(0, 20);
+      if (due.length && !(s.retry_at > now) && s.calls < cap && remaining() > threshold()) {
+        const ids = due.map(f => String(f.fixture_id));
+        const data = await api('fixtures?ids=' + ids.join('-') + '&timezone=Europe%2FRome');
+        const received = accept(data.response, new Set(ids));
+        for (const f of due) {
+          const id = String(f.fixture_id), row = s.scores[id];
+          if (row && !received.has(id) && !hasFinal(row)) row.refresh_failed = true;
+          const count = (s.followups[id]?.count || 0) + 1;
+          s.followups[id] = {count, next_at:now + retryDelay(now, kickoff(f), row, count)};
         }
       }
-      s.scores=Object.fromEntries(Object.entries(s.scores).filter(([id])=>allowed.has(id)));
-      s.status='ok';s.published_at=iso(now);
-    } catch(error) {
-      // Error codes only: never publish upstream text, credentials or account data.
-      s.status=['watchlist_unavailable','invalid_watchlist','live_daily_cap','provider_unavailable','provider_error','quota_unverified','quota_reserve','invalid_response'].includes(error.message)?error.message:'refresh_failed';
-    } finally { await store.put('state',s); }
+      if (!polled && !(s.retry_at > now)) {
+        if (s.calls >= cap) throw new Error('live_daily_cap');
+        if (remaining() <= threshold()) throw new Error('quota_reserve');
+      }
+      s.status = watchIssue || (s.retry_at > now ? 'minute_quota_low' : 'ok');
+      s.published_at = now;
+      s.consecutive_errors = 0;
+      if (!(s.retry_at > now)) s.retry_at = null;
+    } catch (error) {
+      const codes = ['live_daily_cap', 'provider_unavailable', 'provider_error', 'provider_rate_limit',
+        'quota_unverified', 'quota_reserve', 'invalid_response'];
+      s.status = codes.includes(error.message) ? error.message : 'refresh_failed';
+      s.consecutive_errors = (s.consecutive_errors || 0) + 1;
+      const backoff = Math.min(30 * MINUTE, 2 * MINUTE * 2 ** Math.min(4, s.consecutive_errors - 1));
+      const reset = Date.parse(day + 'T00:00:00Z') + DAY;
+      s.retry_at = Math.max(s.provider_retry_after || 0,
+        s.status === 'live_daily_cap' ? reset : now + (s.status === 'quota_reserve' ? HOUR : backoff));
+    } finally {
+      let overdue = 0, missingHalftime = 0;
+      const overdueIds = [];
+      for (const f of s.watch) {
+        const age = now - Date.parse(f.provider_kickoff || f.kickoff), row = s.scores[String(f.fixture_id)];
+        if (age >= OVERDUE && !hasFinal(row) && !postponed(row)) {
+          overdue++;
+          if (overdueIds.length < 20) overdueIds.push(String(f.fixture_id));
+        }
+        if (hasFinal(row) && !validScore(row.halftime)) missingHalftime++;
+      }
+      if (overdue && (s.status === 'ok' || s.status === 'idle')) s.status = 'results_pending';
+      s.health = {overdue_fixtures:overdue, overdue_fixture_ids:overdueIds, missing_halftime:missingHalftime,
+        watchlist_generated_at:timestamp(s.watch_generated_at), watchlist_status:watchIssue};
+      for (const [id, row] of archive) await store.put('final:' + id, row);
+      s.final_archive_initialized = true;
+      await store.put('state', s);
+      if (s.status !== 'ok' && s.status !== 'idle' || overdue) {
+        console.warn(JSON.stringify({event:'live_scores_health', status:s.status, overdue,
+          consecutive_errors:s.consecutive_errors, diagnostic:s.diagnostic}));
+      }
+    }
   }
 }
+
 export default {
-  async fetch(request,env) {
-    if(request.method!=='GET'||new URL(request.url).pathname!=='/api/live-scores') return new Response('Not found',{status:404});
-    const stub=env.SCORES.get(env.SCORES.idFromName('global'));
-    return stub.fetch('https://scores.internal/read');
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    if (request.method !== 'GET' || url.pathname !== '/api/live-scores') return new Response('Not found', {status:404});
+    const stub = env.SCORES.get(env.SCORES.idFromName('global'));
+    const response = await stub.fetch('https://scores.internal/read' + url.search);
+    if (!env.CF_VERSION_METADATA?.id) return response;
+    const headers = new Headers(response.headers);
+    headers.set('X-Live-Scores-Version', env.CF_VERSION_METADATA.id);
+    return new Response(response.body, {status:response.status, headers});
   },
-  async scheduled(event,env,ctx) {
-    const stub=env.SCORES.get(env.SCORES.idFromName('global'));
+  scheduled(_event, env, ctx) {
+    const stub = env.SCORES.get(env.SCORES.idFromName('global'));
     ctx.waitUntil(stub.fetch('https://scores.internal/refresh'));
   }
 };

@@ -1001,54 +1001,83 @@
   const single=source.paired_books===1&&Number.isFinite(flow.value)&&!Number.isFinite(source.oci)&&!expired;
   return '<small>'+esc(summary+(single&&signal.motivation?' · OCI indicativo '+signed(flow.value):''))+'</small>';
  }
+ const FINISHED_SCORE=new Set(['FT','AET','PEN']);
+ const VOID_SCORE=new Set(['CANC','ABD','AWD','WO']);
+ const COMPLETED_HALF=new Set(['HT','2H','ET','BT','P',...FINISHED_SCORE]);
+ const validPair=pair=>pair.every(n=>Number.isInteger(n)&&n>=0);
  function regulationScore(f){
   const l=f.live||{},r=f.result||{};
-  const status=l.status||r.status||f.status_short;
-  if(!['FT','AET','PEN'].includes(status))return null;
-  const scores=[[l.fulltime?.home,l.fulltime?.away],[r.home_ft,r.away_ft]];
-  // The running goals are the regulation result only for an ordinary finish.
-  if(status==='FT')scores.push([l.goals?.home,l.goals?.away]);
-  return scores.find(pair=>pair.every(n=>Number.isInteger(n)&&n>=0))||null;
+  if(FINISHED_SCORE.has(l.status)){
+   const full=[l.fulltime?.home,l.fulltime?.away],goals=[l.goals?.home,l.goals?.away];
+   if(validPair(full))return full;
+   if(l.status==='FT'&&validPair(goals))return goals;
+  }
+  const saved=[r.home_ft,r.away_ft];
+  return FINISHED_SCORE.has(r.status)&&validPair(saved)?saved:null;
  }
- // Presentation-only settlement; unknown and complex markets remain neutral.
- function triadOutcome(m,p){
-  if(!m||!p)return null;
-  const score=regulationScore(root.ArabLive?.fixture?.(m)||m.fixture||{});
-  if(!score)return null;
-  const spec=p.source?.spec||{},kind=spec.kind;
+ function halftimeScore(m,f){
+  const l=f.live||{},r=f.result||{};
   const half=root.ArabLive?.firstHalf?.(m);
-  const nums=half?.status==='complete'&&typeof half.score==='string'?half.score.split(/[–-]/).map(Number):[];
-  const validHalf=nums.length===2&&nums.every(n=>Number.isInteger(n)&&n>=0)&&nums.every((n,i)=>n<=score[i]);
-  const second=validHalf?score.map((n,i)=>n-nums[i]):null;
-  const total=g=>g[0]+g[1];
-  const both=g=>g[0]>0&&g[1]>0;
-  const over=(g,line)=>total(g)>line;
-  if(kind==='halves_total'&&spec.period==='ft'&&spec.side==='over'&&spec.line===.5&&spec.extra===.5)
-   return validHalf?over(nums,.5)&&over(second,.5):null;
-  if(kind==='pt_ft_total'&&spec.period==='ft'&&spec.side==='over'&&spec.line===1.5&&spec.extra===2.5)
-   return validHalf?over(nums,1.5)&&over(score,2.5):null;
-  if(kind==='pt_btts_ft_total'&&spec.period==='ft'&&spec.side==='yes'&&spec.line===2.5&&spec.extra==null)
-   return validHalf?both(nums)&&over(score,2.5):null;
-  if(kind==='both_halves'&&spec.period==='ft'&&spec.side==='both'&&spec.line==null&&spec.extra==null)
-   return validHalf?both(nums)&&both(second):null;
-  const goals=spec.period==='ft'?score:spec.period==='ht'&&validHalf?nums:
-   spec.period==='sh'&&validHalf?second:null;
-  if(!goals||spec.extra!=null)return null;
-  if(['total','asian_total'].includes(kind)&&Number.isFinite(spec.line)&&spec.line%1===.5&&
-     ['over','under'].includes(spec.side))
-   return spec.side==='over'?over(goals,spec.line):total(goals)<spec.line;
-  if(kind==='btts'&&['yes','no'].includes(spec.side))
-   return spec.side==='yes'?both(goals):!both(goals);
-  if(kind==='result'&&spec.period==='ft'&&['1','x','2'].includes(spec.side))
-   return spec.side===(goals[0]>goals[1]?'1':goals[0]<goals[1]?'2':'x');
-  return null;
+  if(half?.status==='complete'&&typeof half.score==='string'&&/^\d+[–-]\d+$/.test(half.score))
+   return half.score.split(/[–-]/).map(Number);
+  const live=[l.halftime?.home,l.halftime?.away],saved=[r.home_ht,r.away_ht];
+  if(COMPLETED_HALF.has(l.status)&&validPair(live))return live;
+  return FINISHED_SCORE.has(r.status)&&validPair(saved)?saved:null;
  }
+ function lineSettlement(value,line){
+  const lower=Math.floor(line*2)/2,upper=Math.ceil(line*2)/2;
+  if(value>upper)return 'won';
+  if(value<lower)return 'lost';
+  if(lower===upper)return 'void';
+  return value===lower?'half_lost':value===upper?'half_won':'unverifiable';
+ }
+ function triadSettlement(m,spec){
+  if(!m||!spec||!coreMarket(spec))return 'unverifiable';
+  const f=root.ArabLive?.fixture?.(m)||m.fixture||{},l=f.live||{},r=f.result||{};
+  const ft=regulationScore(f),status=ft?'FT':l.status||r.status||f.status_short;
+  if(VOID_SCORE.has(status))return 'void';
+  const {kind,period,side,line,extra}=spec;
+  const ht=halftimeScore(m,f);
+  if(!FINISHED_SCORE.has(status)&&(period!=='ht'||!COMPLETED_HALF.has(status)))return 'pending';
+  const half=ht&&(!ft||ht.every((n,i)=>n<=ft[i]))?ht:null;
+  const second=half&&ft?ft.map((n,i)=>n-half[i]):null;
+  const goals=period==='ht'?half:period==='sh'?second:ft;
+  if(!goals||isJoint(spec)&&!half)return 'unverifiable';
+  const total=([home,away])=>home+away;
+  const both=([home,away])=>home>0&&away>0;
+  const decision=value=>value?'won':'lost';
+  const [home,away]=goals;
+  const result=home>away?'1':away>home?'2':'x';
+  switch(kind){
+   case 'halves_total': return decision(total(half)>line&&total(second)>extra);
+   case 'pt_ft_total': return decision(total(half)>line&&total(ft)>extra);
+   case 'pt_btts_ft_total': return decision(both(half)&&total(ft)>line);
+   case 'both_halves': return decision(both(half)&&both(second));
+   case 'total': return decision(side==='over'?total(goals)>line:total(goals)<line);
+   case 'asian_total': return side==='over'?lineSettlement(total(goals),line):lineSettlement(-total(goals),-line);
+   case 'handicap': return lineSettlement(side==='home'?home-away:away-home,-line);
+   case 'btts': return decision(both(goals)===(side==='yes'));
+   case 'result': return decision(side===result);
+   case 'dnb': return result==='x'?'void':decision(side===result);
+   default: return 'unverifiable';
+  }
+ }
+ function triadOutcome(m,p){
+  const outcome=triadSettlement(m,p?.source?.spec);
+  return outcome==='won'?true:outcome==='lost'?false:null;
+ }
+ const TRIAD_RESULT={
+  won:['✓ VINTA','Proposta vinta'],lost:['✕ PERSA','Proposta persa'],
+  void:['RIMBORSATA','Proposta rimborsata'],half_won:['MEZZA VINCITA','Metà vinta, metà rimborsata'],
+  half_lost:['MEZZA PERDITA','Metà persa, metà rimborsata'],
+  unverifiable:['Non verificabile','Esito non verificabile'],pending:['Esito in attesa','Esito in attesa'],
+ };
  function triadOutcomeBadge(m,spec,pending=false){
-  const won=triadOutcome(m,{source:{spec}});
-  return won===null?(pending?'<small role="status">Esito in attesa</small>':''):
-   '<span class="mx-triad-outcome '+(won?'mx-triad-won':'mx-triad-lost')+
-   '" role="status" aria-label="'+(won?'Proposta vinta':'Proposta persa')+'">'+
-   (won?'✓ VINTA':'✕ PERSA')+'</span>';
+  const outcome=triadSettlement(m,spec);
+  if(outcome==='pending'&&!pending&&Date.parse(m?.fixture?.kickoff)>Date.now())return '';
+  const [label,accessible]=TRIAD_RESULT[outcome];
+  if(outcome==='pending'||outcome==='unverifiable')return '<small role="status">'+label+'</small>';
+  return '<span class="mx-triad-outcome mx-triad-'+outcome+'" role="status" aria-label="'+accessible+'">'+label+'</span>';
  }
  function triadOutcomeSlot(match,spec,pending=false){
   if(!spec)return '';
@@ -1369,7 +1398,7 @@
   h.onchange=e=>{const fid=e.target.dataset?.mxInlineInstrument;if(fid!==undefined){inlineInstruments.set(fid,e.target.value||null);const m=(payload.matches||[]).find(x=>String(x.fixture?.fixture_id)===fid);if(m){e.target.closest('.mx-cockpit').outerHTML=cockpit(m,helpers,true);[...h.querySelectorAll('[data-mx-inline-instrument]')].find(x=>x.dataset.mxInlineInstrument===fid)?.focus();}return;}const key=e.target.dataset?.mxFilter;if(key&&key in state){state[key]=e.target.value;render(payload,host,helpers);}};
   updateModal();
  }
- const api={regulationScore,triadOutcome,publishedView,triadPanel,v7Panel,displayOci,proposalData,compactProposal,compactQuotes,card,operatorFair,observedMeans,goalPanels,studyDefaultRow,historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketOrigin,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
+ const api={regulationScore,triadOutcome,triadSettlement,publishedView,triadPanel,v7Panel,displayOci,proposalData,compactProposal,compactQuotes,card,operatorFair,observedMeans,goalPanels,studyDefaultRow,historyProposal,cockpitTier,cockpit,instrument,poissonEstimate,studyObservation,monitoringRows,PLATINUM,PLATINUM_POLICY,platinumSignals,flowSignalValid,halfTimeText,MARKET_SIGNAL,marketSignals,comboText,comboTone,comboReasons,extraGoalText,missingQuote,v61Valid,minOdd,MODEL,POLICY,SCOPE,state,render,rowsOf,matchingRows,selectMatches,phase,marketOrigin,marketRow,bestOpportunity,movementSignal,quoteCell,quoteBoard,opportunityPanel,timingContext,scopePayload,goalMarket,maxOdd,minProbability,firstHalfEvidence,coreMarket,sectionRows,esc};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.ArabMatrix=api;
 })(typeof window!=='undefined'?window:globalThis);

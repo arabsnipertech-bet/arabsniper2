@@ -244,14 +244,25 @@ class AuditLedger(Mapping):
 
 def settle_ledger(ledger, output):
     from prematch_audit import settle_predictions
+    from v7_archive import FINISHED, merge_verified_result
     # Each fixture is handled once, even when the feed contains duplicates.
     matches = {str(m.get('fixture', {}).get('fixture_id')): m
                for day in output.get('days', []) for m in day.get('matches', [])}
     for fid, match in matches.items():
-        if not ((match.get('fixture') or {}).get('result') or
-                (match.get('prediction_audit') or {}).get('result')):
+        fixture = match.get('fixture') or {}
+        incoming = fixture.get('result') or (match.get('prediction_audit') or {}).get('result')
+        if not incoming:
             continue
         store = ledger.fixture_store(fid)
+        if incoming.get('status') in FINISHED:
+            prior = next((result for collection in COLLECTIONS
+                          for record in store.get(collection, {}).values()
+                          if (result := (record.get('settlement') or {}).get('result') or {}).get('status') in FINISHED
+                          and result.get('home_ft') is not None and result.get('away_ft') is not None), {})
+            incoming = merge_verified_result(prior, incoming)
+            if None in (incoming.get('home_ft'), incoming.get('away_ft')):
+                continue
+            match = {**match, 'fixture': {**fixture, 'result': incoming}}
         settle_predictions(store, {'days': [{'matches': [match]}]})
         ledger.update_store(store)
 

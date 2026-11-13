@@ -89,6 +89,16 @@ def checked_score(result):
     return score
 
 
+def merge_verified_result(previous, incoming):
+    old, new = checked_score(previous or {}), checked_score(incoming or {})
+    if old.get('status') in FINISHED and None not in (old['home_ft'], old['away_ft']):
+        if new.get('status') not in FINISHED or None in (new['home_ft'], new['away_ft']):
+            return old
+        if None in (new['home_ht'], new['away_ht']) and None not in (old['home_ht'], old['away_ht']):
+            return checked_score(dict(new, home_ht=old['home_ht'], away_ht=old['away_ht']))
+    return new
+
+
 def results_for_day(store, day, at, fetched=None, previous=None):
     """Latest valid pre-kickoff publication per fixture; outcomes kept separately."""
     latest, invalid = {}, 0
@@ -112,7 +122,9 @@ def results_for_day(store, day, at, fetched=None, previous=None):
     fixtures, samples, progress = {}, [], Counter()
     for fid, (snapshot, settled) in sorted(latest.items()):
         prior_result = prior.get(fid, {}).get('result') or {}
-        result = checked_score((fetched or {}).get(fid) or settled or prior_result)
+        result = merge_verified_result(prior_result, settled) if settled else checked_score(prior_result)
+        if (fetched or {}).get(fid):
+            result = merge_verified_result(result, fetched[fid])
         status = result.get('status')
         observed_at = (prior.get(fid, {}).get('observed_at')
                        if result == prior_result and prior.get(fid, {}).get('observed_at') else utc(at))

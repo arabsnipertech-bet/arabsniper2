@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import sys
+from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
@@ -103,30 +104,53 @@ def archive_ledger(root, now, incoming, progress):
 
 
 def fetch_results(date, key):
-    request = Request('https://v3.football.api-sports.io/fixtures?date=' + date
-                      + '&timezone=Europe%2FRome', headers={'x-apisports-key': key})
-    with urlopen(request, timeout=45) as response:
-        payload = json.load(response)
-    if payload.get('errors'):
-        raise RuntimeError(f'API risultati: richiesta rifiutata per {date}')
-    if not isinstance(payload.get('response'), list):
-        raise ValueError('Risposta API risultati non valida')
-    matches = []
-    for item in payload['response']:
+    from v7_archive import FINISHED, checked_score, merge_verified_result
+
+    def fixtures(**params):
+        query = urlencode({'timezone': 'Europe/Rome', **params})
+        request = Request('https://v3.football.api-sports.io/fixtures?' + query, headers={'x-apisports-key': key})
+        with urlopen(request, timeout=30) as response:
+            payload = {'response': []} if getattr(response, 'status', 200) == 204 else json.load(response)
+            daily = response.headers.get('x-ratelimit-requests-remaining')
+            minute = response.headers.get('x-ratelimit-remaining')
+        if payload.get('errors'):
+            raise RuntimeError(f'API risultati: richiesta rifiutata per {date}')
+        if not isinstance(payload.get('response'), list):
+            raise ValueError('Risposta API risultati non valida')
+        return payload, daily, minute
+
+    payload, daily, minute = fixtures(date=date)
+    rows = list(payload['response'])
+    pages = (payload.get('paging') or {}).get('total', 1)
+    for page in range(2, min(pages, 3) + 1) if type(pages) is int else ():
+        if not daily or not daily.isdecimal() or int(daily) <= 1000 or minute == '0':
+            break
+        extra, daily, minute = fixtures(date=date, page=page)
+        rows.extend(extra['response'])
+    results = {}
+    for item in rows:
         fixture = item.get('fixture') or {}
+        fid = fixture.get('id')
+        if type(fid) is not int or fid <= 0:
+            continue
         score = item.get('score') or {}
         ht, ft = score.get('halftime') or {}, score.get('fulltime') or {}
+        status = (fixture.get('status') or {}).get('short')
+        if status == 'FT' and any(ft.get(side) is None for side in ('home', 'away')):
+            ft = item.get('goals') or {}
         # FT markets are settled at 90 minutes, including matches with extra time.
-        matches.append({'fixture': {'fixture_id': str(fixture.get('id')), 'result': {
-            'status': (fixture.get('status') or {}).get('short'),
+        result = checked_score({
+            'status': status,
             'home_ht': ht.get('home'), 'away_ht': ht.get('away'),
             'home_ft': ft.get('home'), 'away_ft': ft.get('away'),
-            'extra_time': score.get('extratime'), 'penalties': score.get('penalty')}}})
+            'extra_time': score.get('extratime'), 'penalties': score.get('penalty')})
+        results[fid] = merge_verified_result(results.get(fid), result)
+    matches = [{'fixture': {'fixture_id': str(fid), 'result': result}} for fid, result in results.items()]
     return {'days': [{'matches': matches}]}
 
 
 def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: None, combined=None,
-               *, legacy_evidence=True):
+               *, legacy_evidence=True, recheck_recent=False):
     from audit_ledger import AuditLedger, settle_ledger
     from selection_studies import build_studies, study_markdown
     from audit_storage import atomic_bytes
@@ -154,7 +178,8 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
         pending = any(not (r.get('settlement') or {}).get('outcomes') or
                       any(v is None for v in r['settlement']['outcomes'].values())
                       for _, _, r in day.records())
-        if pending and (now.astimezone(TZ).date() - date).days <= 14:
+        age = (now.astimezone(TZ).date() - date).days
+        if age <= 14 and (pending or recheck_recent and age <= 3):
             key = os.environ.get('API_SPORTS_KEY', '').strip()
             if not key:
                 raise RuntimeError('API_SPORTS_KEY mancante per verificare i risultati')
@@ -220,7 +245,7 @@ def settle_history_day(arguments):
     from task_progress import TaskProgress
     root, day, now = arguments
     with TaskProgress(f'Auditor {day}') as progress:
-        return settle_day(Path(root), day, now, progress=progress.update)
+        return settle_day(Path(root), day, now, progress=progress.update, recheck_recent=True)
 
 
 def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, prepared_date=None, workers=1, assemble_only=False):
