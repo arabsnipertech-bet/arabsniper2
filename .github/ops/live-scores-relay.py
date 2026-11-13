@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import time
+import subprocess
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
 
@@ -57,7 +58,9 @@ def run():
     def read(url, headers=None):
         with urlopen(Request(url,headers=headers or {}),timeout=15) as response:
             return json.load(response), response.headers
-    live, _ = read('https://arabsniperbet.com/api/live-scores', {'Cache-Control':'no-cache'})
+    public = subprocess.run(('curl','-fsS','--max-time','15','-H','Accept: application/json',
+        'https://arabsniperbet.com/api/live-scores'),check=True,capture_output=True)
+    live = json.loads(public.stdout)
     watch = json.loads(Path('data/live_watchlist.json').read_text())
     ids = due(watch, live, now)
     if not ids:

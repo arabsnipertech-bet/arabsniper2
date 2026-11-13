@@ -25,7 +25,7 @@ class NoRedirect(HTTPRedirectHandler):
 
 
 def api(path):
-    request = Request(API + path, headers={'Authorization': 'Bearer ' + os.environ['CLOUDFLARE_API_TOKEN']})
+    request = Request(API + path, headers={'Authorization': 'Bearer ' + os.environ['CLOUDFLARE_API_TOKEN'], 'Cache-Control': 'no-cache'})
     try:
         with build_opener(NoRedirect()).open(request, timeout=20) as response:
             body = json.load(response)
@@ -101,6 +101,16 @@ def same_script(first, second):
     return bool(expected_etag and expected_etag == served_etag)
 
 
+def wait_active(expected, equivalent=False):
+    for attempt in range(7):
+        current = active_version()
+        if current == expected or equivalent and same_script(expected, current):
+            return current
+        if attempt < 6:
+            sleep(5)
+    raise RuntimeError('Cloudflare active deployment did not converge to the expected version')
+
+
 def verify_runtime(expected, previous, timeout=250):
     until = monotonic() + timeout
     first_cron = None
@@ -113,6 +123,7 @@ def verify_runtime(expected, previous, timeout=250):
         if served and served != expected and same_script(expected, served):
             verify_configuration()
             if active_version() != served:
+                sleep(5)
                 continue
             print(f'Equivalent Worker script deployed as {served}; expected upload {expected}.', flush=True)
             expected = served
@@ -170,16 +181,15 @@ def main():
     summary(f'Uploaded `{target}` from `{commit}`')
     try:
         wrangler('versions', 'deploy', target + '@100%', '--yes', '--message', commit)
-        if active_version() != target:
-            raise RuntimeError('Cloudflare did not confirm the new active version')
+        wait_active(target, equivalent=True)
         verified = verify_runtime(target, (before.get('health') or {}).get('last_cron_at'))
         verify_configuration()
-    except (RuntimeError, ValueError, subprocess.SubprocessError, URLError):
+    except (RuntimeError, ValueError, subprocess.SubprocessError, URLError) as error:
+        summary('Release verification failed: ' + str(error))
         current = active_version()
         if current == target:
             wrangler('rollback', previous, '--yes', '--message', 'Live score release verification failed')
-            if active_version() != previous:
-                raise RuntimeError('Rollback requires manual verification') from None
+            wait_active(previous)
             public_response()
             summary(f'Rollback active: `{previous}`')
         raise
