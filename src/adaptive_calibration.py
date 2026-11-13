@@ -386,10 +386,14 @@ def fit(samples, as_of, previous=None, _minimum=MIN_N, _macro=False):
 def nightly_state(root, as_of):
     """Compact evidence is extracted during the Auditor's existing ledger traversal."""
     from audit_storage import read_store, open_verified_json
+    from auditor_schedule import EXCLUDED_RECOVERY_DAYS
     import ijson
-    rows, inputs, missing, empty, missing_results = [], [], [], [], []
+    rows, inputs, missing, empty, missing_results, excluded = [], [], [], [], [], []
     for days in range(1, WINDOW+1):
         day = as_of-timedelta(days=days)
+        if day in EXCLUDED_RECOVERY_DAYS:
+            excluded.append(str(day))
+            continue
         path = root / f'auditarchive/prematch_{day}_calibration.json'
         expected = any((root / f'auditarchive/prematch_{day}_{suffix}').exists()
                        for suffix in ('daily.json', 'results.json', 'checkpoint.json'))
@@ -441,6 +445,8 @@ def nightly_state(root, as_of):
         complete=state['training_evidence']['complete'],
         blockers=([dict(code='missing_calibration_evidence_for_settled_day', date=d) for d in sorted(missing)]
                   + [dict(code='missing_results_evidence_for_settled_day', date=d) for d in sorted(missing_results)]))
+    if excluded:
+        state['evidence_provenance']['excluded_recovery_dates'] = sorted(excluded)
     # The report is aggregate provenance. Its group counts are never training rows.
     report = root/'data/arab_quote_prematch_report.json'
     if not report.exists():

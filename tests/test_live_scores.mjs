@@ -19,6 +19,7 @@ test('one shared poll, score zero preserved, no fabricated fulltime, dedup inter
  const data=await (await s.fetch(new Request('https://internal/read'))).json();
  assert.equal(data.fixtures['123'].goals.away,0);assert.equal(data.fixtures['123'].fulltime.home,null);
  assert.equal(calls.filter(x=>x.includes('api-sports')).length,2);
+ assert(data.health.usage.provider.request_gap_ms >= 250);
  for(let i=0;i<20;i++)await s.fetch(new Request('https://internal/read'));
  assert.equal(calls.length,3);
  }finally{globalThis.fetch=original;}

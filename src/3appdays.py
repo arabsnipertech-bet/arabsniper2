@@ -82,7 +82,7 @@ REMOTE_OUTPUT_FILE = "data/arab_quote_dashboard.json"
 REMOTE_STATE_FILE = "data/arab_quote_state.json"
 REMOTE_BET_CATALOG_FILE = "data/arab_bet_catalog.json"
 
-API_MIN_INTERVAL = 0.14
+API_MIN_INTERVAL = 0.25
 API_RETRIES = (0, 2, 5)
 MAX_HISTORY_POINTS = 120
 MAX_TEAM_MATCHES = 8
@@ -280,7 +280,7 @@ class APIClient:
 
     def __post_init__(self) -> None:
         self.session = requests.Session()
-        self.last_call_ts = 0.0
+        self.last_call_ts: Optional[float] = None
         self.cache: Dict[str, Any] = {}
         self.request_count = 0
         self.odds_enricher = None
@@ -301,10 +301,11 @@ class APIClient:
         self.last_error: Optional[Dict[str, Any]] = None
 
     def _throttle(self) -> None:
-        elapsed = time.time() - self.last_call_ts
-        if elapsed < self.min_interval:
-            time.sleep(self.min_interval - elapsed)
-        self.last_call_ts = time.time()
+        if self.last_call_ts is not None:
+            wait = self.min_interval - (time.monotonic() - self.last_call_ts)
+            if wait > 0:
+                time.sleep(wait)
+        self.last_call_ts = time.monotonic()
 
     @staticmethod
     def _cache_key(path: str, params: Mapping[str, Any]) -> str:

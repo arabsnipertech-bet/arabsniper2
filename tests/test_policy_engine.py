@@ -9,6 +9,20 @@ sys.modules[spec.name]=engine
 spec.loader.exec_module(engine)
 
 class EngineTests(unittest.TestCase):
+    def test_api_client_spaces_request_starts_on_monotonic_clock(self):
+        from unittest.mock import patch
+
+        client = engine.APIClient(api_key='test')
+        clock = [100.0]
+        with patch.object(engine.time, 'monotonic', side_effect=lambda: clock[0]), \
+                patch.object(engine.time, 'sleep', side_effect=lambda delay: clock.__setitem__(0, clock[0] + delay)) as sleep:
+            client._throttle()
+            sleep.assert_not_called()
+            clock[0] += 0.0625
+            client._throttle()
+            sleep.assert_called_once_with(0.1875)
+            self.assertEqual(client.last_call_ts, 100.25)
+
     def test_complete_scan_keeps_quote_history_and_runs_v5(self):
         from unittest.mock import patch
         from test_statistics_first import NOW, KICKOFF

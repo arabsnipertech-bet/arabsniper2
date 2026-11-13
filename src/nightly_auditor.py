@@ -9,7 +9,9 @@ import sys
 
 from audit_storage import atomic_bytes, read_store, write_store
 from auditor_daily_priority import LEGACY_STATUS, ensure_priority, v7_ready
-from auditor_schedule import ROME, MARKER, admission, recovery_admission, already_completed, has_daily_report
+from auditor_schedule import (
+    EXCLUDED_RECOVERY_DAYS, ROME, MARKER, admission, recovery_admission, already_completed, has_daily_report,
+)
 
 
 def run_command(root, command, deadline, clock=lambda: datetime.now(ROME)):
@@ -42,6 +44,10 @@ def saved_batch(root, today):
     day = date.fromisoformat(checkpoint['work_date'])
     if day > today:
         raise ValueError('Future nightly Auditor checkpoint')
+    report_date = day - timedelta(days=1)
+    if report_date in EXCLUDED_RECOVERY_DAYS:
+        print(f'Skipping discontinued Auditor batch for {report_date}', flush=True)
+        return None
     return day, checkpoint['stage']
 
 
