@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - '.github/workflows/gold-history.yml'
+      - '.github/workflows/live-scores-health.yml'
+      - '.github/workflows/live-scores-relay.yml'
       - 'src/**'
       - 'tests/**'
       - 'auditor/current_audit.py'
@@ -34,7 +36,7 @@ on:
       - 'workers/live-scores/**'
   push:
     branches: [main]
-    paths: ['web/vendor/**', '.github/workflows/gold-history.yml', 'src/**', 'tests/**', 'auditor/current_audit.py', 'auditor/recover_daily.py', 'auditor/repair_calibration.py', 'auditor/repair_certificate.py', '.github/workflows/repair-learning-chain.yml', '.github/workflows/recover-daily-results.yml', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'web/index.html', 'web/homepage.js', 'web/competition-scope.js', 'web/statistics-first.js', 'web/statistics-first.css', 'web/lateral-matrix.js', 'web/lateral-matrix.css', 'web/results.js', '.github/workflows/policy_tests.yml', '.github/workflows/night_scan_backup.yml', '.github/workflows/auditor_backup.yml', '.github/workflows/run-auditor.yml', 'workers/live-scores/**']
+    paths: ['web/vendor/**', '.github/workflows/gold-history.yml', '.github/workflows/live-scores-health.yml', '.github/workflows/live-scores-relay.yml', 'src/**', 'tests/**', 'auditor/current_audit.py', 'auditor/recover_daily.py', 'auditor/repair_calibration.py', 'auditor/repair_certificate.py', '.github/workflows/repair-learning-chain.yml', '.github/workflows/recover-daily-results.yml', 'web/gold-dashboard-live.html', 'web/live-scores.js', 'web/index.html', 'web/homepage.js', 'web/competition-scope.js', 'web/statistics-first.js', 'web/statistics-first.css', 'web/lateral-matrix.js', 'web/lateral-matrix.css', 'web/results.js', '.github/workflows/policy_tests.yml', '.github/workflows/night_scan_backup.yml', '.github/workflows/auditor_backup.yml', '.github/workflows/run-auditor.yml', 'workers/live-scores/**']
 permissions:
   contents: read
 jobs:
