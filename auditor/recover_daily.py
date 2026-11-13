@@ -93,7 +93,7 @@ def recovery_files(root, paths):
                 pending.extend(str(Path(path).parent/'_audit_parts'/(part['sha256']+'.json.gz')) for part in value['parts'])
 
 
-def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=False):
+def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=False, recheck_results=False):
     if not 1 <= (now.astimezone(TZ).date() - day).days <= 14:
         raise ValueError('Recovery requires a closed Rome date within 14 days')
     index = previous_manifest(storage, bucket)
@@ -162,7 +162,7 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
         if not dated.exists() or sum(len(ledger.get(c,{})) for c in ledger.collections) != len(original):
             ledger.write(dated)
 
-    queried = settle_day(root, day, now, fetcher=fetcher, legacy_evidence=False,
+    queried = settle_day(root, day, now, fetcher=fetcher, legacy_evidence=False, recheck_results=recheck_results,
                          progress=lambda message: print(f'Recovery {day}: {message}', flush=True))
     report = read_store(root / report_path(day))
     v7 = read_store(root/f'auditarchive/prematch_{day}_v7.json')
@@ -270,7 +270,8 @@ def main():
     with TemporaryDirectory() as folder:
         root = Path(folder)
         if args.mode == 'prepare':
-            digest = prepare(storage, bucket, root, args.date, now, refresh=os.getenv("RECOVERY_REFRESH") == "true")
+            digest = prepare(storage, bucket, root, args.date, now, refresh=os.getenv('RECOVERY_REFRESH') == 'true',
+                             recheck_results=os.getenv('RECOVERY_RECHECK_RESULTS') == 'true')
             with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
                 out.write('digest='+digest+'\n')
             from auditor_history_chunks import receipt_path

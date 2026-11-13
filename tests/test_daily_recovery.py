@@ -1,11 +1,14 @@
 import copy
 from datetime import date, datetime
+from io import BytesIO
+import json
 import os
 from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import Mock, patch
+from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT/'src'), str(ROOT/'auditor')]
@@ -14,7 +17,7 @@ from gold_storage import collect, previous_manifest, sha, write_manifest
 from recover_daily import FORECASTS, install, prepare, report_path, source_set
 from test_daily_audit import record
 from test_gold_storage import Fake
-from current_audit import archive, settle_day
+from current_audit import archive, fetch_results, settle_day
 from audit_journal import ingest
 from nightly_auditor import PROGRESS
 
@@ -47,6 +50,28 @@ def sources(storage, root):
 
 
 class DailyRecoveryTests(unittest.TestCase):
+    def test_delayed_fixtures_recovered_by_id_without_regressing_completed_rows(self):
+        def row(fid, status, ft=None):
+            return {'fixture': {'id': fid, 'status': {'short': status}},
+                    'score': {'halftime': {'home': 0, 'away': 0}, 'fulltime': ft}}
+
+        ft = {'home': 1, 'away': 0}
+        responses = [[row(1, 'FT', ft), row(2, 'NS')], [row(2, 'FT', ft), row(3, 'FT', ft), row(4, 'FT', ft)]]
+        requests = []
+        def provider(request, timeout):
+            requests.append(parse_qs(urlparse(request.full_url).query))
+            response = BytesIO(json.dumps({'response': responses.pop(0)}).encode())
+            response.headers = {'x-ratelimit-requests-limit': '75000', 'x-ratelimit-requests-remaining': '10000',
+                                'x-ratelimit-remaining': '20'}
+            return response
+        with patch('current_audit.urlopen', provider):
+            output = fetch_results('2026-10-30', 'test', (1, 2, 3))
+        self.assertEqual(requests[1]['ids'], ['2-3'])
+        self.assertEqual(requests[1]['timezone'], ['Europe/Rome'])
+        results = {r['fixture']['fixture_id']: r['fixture']['result'] for r in output['days'][0]['matches']}
+        self.assertEqual(set(results), {'1', '2', '3'})
+        self.assertTrue(all(r['status'] == 'FT' and r['home_ft'] == 1 for r in results.values()))
+
     def test_policy_journals_recover_the_last_published_analysis_and_keep_original_sources(self):
         storage=Fake()
         policy='data/arab_quote_scan_journal_20261030T150000000000_policies.json'
