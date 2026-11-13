@@ -1,0 +1,65 @@
+name: Test current Gold Auditor checkpoint
+on:
+  push:
+    branches: [ops/gold-results-audit-20261113]
+    paths: [.github/workflows/gold-auditor-checkpoint-test.yml]
+permissions:
+  contents: read
+jobs:
+  replay:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/ops/gold-results-audit-20261113'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 8a16769e9420f0a4b2bc44bfd9f9ed6e0f6c52d2
+          persist-credentials: false
+          sparse-checkout: |
+            src
+            auditor
+      - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' ijson==3.6.0
+      - name: Read the frozen day and verify official results locally
+        env:
+          PYTHONPATH: src:auditor
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+        shell: python
+        run: |
+          from datetime import date, datetime
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+          import json, os
+          from audit_storage import read_store
+          from current_audit import TZ, settle_day
+          from gold_storage import client, previous_manifest, restore_subset, sha
+          from recover_daily import checkpoint_sources
+          day = date(2026, 11, 12)
+          s3, bucket = client(), os.environ['R2_BUCKET']
+          index = previous_manifest(s3, bucket)
+          sources = checkpoint_sources(index, day)
+          if len(sources) != 4:
+              raise SystemExit('Closed-day source missing')
+          with TemporaryDirectory() as directory:
+              root = Path(directory)
+              print('Restoring four closed-day sources', flush=True)
+              restore_subset(s3, bucket, root, index, sources)
+              file = root/f'auditarchive/prematch_{day}_v7.json'
+              before = read_store(file)
+              settle_day(root, day, datetime.now(TZ), legacy_evidence=False, recheck_results=True,
+                         progress=lambda msg:print(msg, flush=True))
+              after = read_store(file)
+              if before['fixtures'].keys() != after['fixtures'].keys() or any(
+                 before['fixtures'][fid]['forecast_sha256'] != after['fixtures'][fid]['forecast_sha256'] for fid in before['fixtures']):
+                  raise SystemExit('Frozen V7 forecast mismatch')
+              dated = f'auditordata/prematch_{day}.json'
+              if sha((root/dated).read_bytes()) != sources[dated]:
+                  raise SystemExit('Frozen archive changed')
+              recovered = {fid:after['fixtures'].get(fid,{}).get('status') for fid in ('1549868','1549870','1631607')}
+              print('Closed-day replay', json.dumps({'before':before['counts'], 'after':after['counts'],
+                'recovered':recovered, 'frozen_forecasts':len(before['fixtures'])}), flush=True)
+              if set(recovered.values()) != {'settled'}:
+                  raise SystemExit('Expected three official settled results')
