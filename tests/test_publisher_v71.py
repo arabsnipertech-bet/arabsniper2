@@ -1,6 +1,6 @@
 """Editorial tests exercise privacy, timing, immutable receipts and outcomes."""
 from contextlib import nullcontext
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
 from unittest import TestCase, mock
@@ -12,10 +12,11 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
-from publisher_v71 import delivery, editorial, live, monitor, public_feed, report, runner, scores, selection, studio
+from publisher_v71 import delivery, editorial, live, monitor, public_feed, report, runner, scores, selection, showcase, studio
 from publisher_v71.channels import DeliveryError, Telegram, TelegramHistory
 from publisher_v71.runner import add_group, plan_report, record_home_receipt
 from publisher_v71.storage import Storage
+from gold_storage import sha
 from v7_decision import GOAL, fingerprint
 
 NOW = datetime.fromisoformat('2026-11-10T22:55:00+00:00')
@@ -133,6 +134,81 @@ def fixture(phase, goals, events, *, halftime=None, fulltime=None):
 
 
 class PublisherTests(TestCase):
+    def test_streamed_gold_board_keeps_original_snapshot_and_price(self):
+        original = full_board(pick(1))
+        original['previous_day'] = {'matches': original['matches'] * 4}
+        original['matches'][0]['discarded_data'] = ['x' * 1000]
+        raw = json.dumps(original).encode()
+        client = mock.Mock()
+        client.get_object.return_value = {'Body': BytesIO(raw), 'ContentLength': 140_000_000}
+        board_view = Storage(client, 'private').gold_board(1)
+        self.assertEqual(board_view['source_bytes'], 140_000_000)
+        self.assertEqual(len(board_view['matches']), 1)
+        self.assertNotIn('previous_day', board_view)
+        self.assertNotIn('discarded_data', board_view['matches'][0])
+        with mock.patch('publisher_v71.selection.output_allowed', return_value=True):
+            self.assertEqual(selection.published_candidates([original], NOW),
+                             selection.published_candidates([board_view], NOW))
+        self.assertEqual(showcase.proposals(original['matches'][0], NOW),
+                         showcase.proposals(board_view['matches'][0], NOW))
+
+    def test_verified_daily_recovery_recaps_real_results_without_learning_marker(self):
+        day = date(2026, 11, 11)
+        now = datetime.fromisoformat('2026-11-12T10:00:00+00:00')
+        audit = certified_day()
+        fixture_ids = audit.pop('fixture_labels')
+        audit['version'] = report.VERSION
+        audit['generated_at'] = selection.utc(now)
+        prefix = f'auditarchive/prematch_{day}_'
+        source = f'auditordata/prematch_{day}.json'
+        outputs = {prefix + suffix: b'{}' for suffix in ('results.json', 'daily.md', 'calibration.json')}
+        outputs[prefix + 'daily.json'] = json.dumps({'audit_date': str(day), 'fixtures': [
+            {'fixture': {'fixture_id': fid, 'kickoff': audit['fixtures'][fid]['kickoff'], 'match': name}}
+            for fid, name in fixture_ids.items()]}).encode()
+        files = {source: b'{}', **outputs, prefix + 'v7.json': json.dumps(audit).encode()}
+        receipt = {'version': 1, 'day': str(day), 'checked_at': selection.utc(now), 'pending': True,
+                   'pending_summary': {'pending_fixtures_count': 9}, 'input_sha256': sha(files[source]),
+                   'outputs': {path: sha(raw) for path, raw in outputs.items()}}
+        files[prefix + 'checkpoint.json'] = json.dumps(receipt).encode()
+        index = {path: {'sha256': sha(raw), 'bytes': len(raw)} for path, raw in files.items()}
+        by_hash = {sha(raw): raw for raw in files.values()}
+        client = mock.Mock()
+        client.get_object.side_effect = lambda **request: {'Body': BytesIO(
+            json.dumps({'version': 1, 'files': index}).encode() if request['Key'] == 'state/current.json'
+            else by_hash[request['Key'].rsplit('/', 1)[-1]])}
+        storage = Storage(client, 'private')
+        evidence = report.certified(storage, day, with_fixture_labels=True)
+        view = report.build(evidence, [], [])
+        self.assertEqual(len(view['triad_examples']), 4)
+        self.assertEqual(view['recovered'], {'pending_fixtures': 9, 'pending': True})
+        copy = editorial.message('report', view, 'AS71-TEST', 'telegram', now=now, trial_ok=True)
+        self.assertIn('partite in verifica 9', copy)
+        self.assertIn('/prova', copy)
+        self.assertEqual(copy.count('✓'), 4)
+        index[prefix + 'results.json'] = {**index[prefix + 'results.json'], 'sha256': 'a' * 64}
+        self.assertIsNone(report.certified(storage, day, with_fixture_labels=True))
+
+    def test_gold_agenda_lists_only_today_with_locked_matches_and_trial(self):
+        now = datetime.fromisoformat('2026-11-13T11:30:00+00:00')
+        today = studio_board(now, 1, 235)
+        next_day = studio_board(now, 2, 24 * 60)
+        view = studio.agenda([next_day, today, today], now)
+        self.assertEqual(view['date'], '2026-11-13')
+        self.assertEqual([row['fixture_id'] for row in view['fixtures']], ['1'])
+        self.assertNotIn('market', view['fixtures'][0])
+        store = LocalStore()
+        store.state['runtime']['trial_verified'] = True
+        for _ in range(2):
+            delivery.queue(store, 'agenda', view['date'], view, ('telegram', 'facebook'), now,
+                           now + timedelta(hours=1))
+        self.assertEqual(len(store.state['posts']), 2)
+        for post in store.state['posts'].values():
+            self.assertIn('Le partite di oggi in Gold', post['text'])
+            self.assertIn('🔒 Club 1', post['text'])
+            self.assertIn('/prova', post['text'])
+            self.assertIsNone(delivery.can_send(post, now, {'1': view['fixtures'][0]}))
+            self.assertEqual(delivery.can_send(post, now, {}), 'agenda_source_changed')
+
     def test_accepts_real_v7_contract_and_rejects_tampering_and_staleness(self):
         item = pick(1)
         payload = board(item)
@@ -216,9 +292,9 @@ class PublisherTests(TestCase):
             runner.tick(store, {'telegram': telegram}, '', trial_ok=True)
             runner.tick(store, services, '', trial_ok=True)
             runner.tick(store, services, '', trial_ok=True)
-        telegram.send.assert_called_once()
-        facebook.send.assert_called_once()
-        post, image = telegram.send.call_args.args
+        for service in (telegram, facebook):
+            self.assertEqual([call.args[0]['kind'] for call in service.send.call_args_list], ['agenda', 'studio'])
+        post, image = telegram.send.call_args_list[-1].args
         self.assertEqual(post['kind'], 'studio')
         self.assertEqual(post['status'], 'sent')
         self.assertEqual(len(post['view']['previews']), 2)
@@ -232,7 +308,7 @@ class PublisherTests(TestCase):
         self.assertIn('gold-dashboard-live.html', post['text'])
         self.assertLessEqual(len(post['text'].encode('utf-16-le')) // 2, 1024)
         self.assertEqual(Image.open(BytesIO(image)).size, (1080, 1350))
-        page_post, page_image = facebook.send.call_args.args
+        page_post, page_image = facebook.send.call_args_list[-1].args
         self.assertEqual(page_post['view'], post['view'])
         self.assertEqual(page_post['text'].replace(page_post['marker'], post['marker']), post['text'])
         self.assertEqual(page_image, image)

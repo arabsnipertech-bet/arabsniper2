@@ -28,15 +28,11 @@ class Schedule(unittest.TestCase):
     def test_outside_period_never_calls_remote(self):
         with mock.patch.object(campaign.ops, 'request', side_effect=AssertionError('Unexpected remote call')):
             campaign.run(datetime.fromisoformat('2026-11-19T19:45:00+00:00'))
-    def test_publisher_recovery_starts_after_thirty_minutes_and_skips_received_slots(self):
-        lunch = datetime.fromisoformat('2026-11-12T12:15:00+00:00')
-        self.assertIsNone(campaign.selected(datetime.fromisoformat('2026-11-12T12:14:59+00:00'), recovery=True))
-        self.assertEqual(campaign.selected(lunch, recovery=True), ('2026-11-12', 0, 'pranzo'))
-        self.assertEqual(campaign.selected(datetime.fromisoformat('2026-11-12T20:15:00+00:00'), recovery=True),
-                         ('2026-11-12', 1, 'sera'))
+    def test_first_due_publisher_cycle_skips_received_slots(self):
+        lunch = datetime.fromisoformat('2026-11-12T11:45:00+00:00')
         with (mock.patch.object(campaign.ops, 'query', return_value=[{'status': 'sent', 'message_id': 123}]) as lookup,
               mock.patch.object(campaign.ops, 'request') as worker, mock.patch.object(campaign.ops, 'telegram') as bot):
-            campaign.run(lunch, recovery=True)
+            campaign.run(lunch)
         self.assertEqual(lookup.call_args.args[1], ['gold-engine-2026-11:2026-11-12:pranzo'])
         worker.assert_not_called()
         bot.assert_not_called()

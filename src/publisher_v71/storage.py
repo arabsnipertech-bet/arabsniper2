@@ -1,7 +1,9 @@
 """Editorial-only state. Conditional writes prevent overlapping sends."""
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from datetime import timedelta
 import json
+
+import ijson
 
 from multimarket_model import stamp
 
@@ -36,6 +38,39 @@ class Storage:
         if len(raw) > limit:
             raise ValueError('Publisher input exceeds bounded size')
         return json.loads(raw), result['ETag']
+
+    def gold_board(self, number):
+        """Stream the original Gold feed and retain only the Publisher inputs."""
+        try:
+            response = self.client.get_object(Bucket=self.bucket, Key=f'arab_quote_day{number}.json')
+        except Exception as exc:
+            if error_code(exc) in ('NoSuchKey', '404', 'NotFound'):
+                return {}
+            raise
+        board = {'source_bytes': response.get('ContentLength'), 'matches': []}
+
+        def matches(body):
+            for path, event, value in ijson.parse(body, use_float=True):
+                if path in ('date', 'updated_at') and event == 'string':
+                    board[path] = value
+                if path == 'matches.item' or path.startswith('matches.item.'):
+                    yield path, event, value
+
+        with closing(response['Body']) as body:
+            for item in ijson.items(matches(body), 'matches.item'):
+                fixture = item.get('fixture') or {}
+                if fixture.get('status_short') != 'NS' or fixture.get('result'):
+                    continue
+                matrix = (item.get('multimarket') or {}).get('matrix') or {}
+                snapshot = matrix.get('v7') or {}
+                sources = {pick['source_market_id'] for pick in (snapshot.get('triad') or {}).values()
+                           if pick and pick.get('source_market_id') is not None}
+                rows = [row for row in matrix.get('rows') or () if row.get('id') in sources]
+                board['matches'].append({'fixture': fixture,
+                                         'multimarket': {'matrix': {'v7': snapshot, 'rows': rows}}})
+        if not board.get('date') or not stamp(board.get('updated_at')):
+            raise ValueError('Invalid Gold board metadata')
+        return board
 
     def load(self):
         value, self.etag = self.read('state.json', limit=5_000_000)

@@ -51,6 +51,10 @@ def can_send(post, now, candidates):
             current = candidates.get(row['fixture_id']) or {}
             if any(current.get(field) != value for field, value in row.items()):
                 return 'studio_source_changed'
+    if post['kind'] == 'agenda':
+        for row in post['view']['fixtures']:
+            if candidates.get(row['fixture_id']) != row:
+                return 'agenda_source_changed'
     if post['kind'] == 'live' and post['view']['status'] == 'Prematch':
         if stamp(post['view']['kickoff']) - now < LEAD:
             return 'late_prematch'

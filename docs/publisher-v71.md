@@ -7,13 +7,14 @@ Il Publisher legge i board Gold già pubblicati in R2 e usa il primo ruolo V7 co
 | Contenuto | Quando | Destinazioni |
 | --- | --- | --- |
 | BEST | Verifica ogni 15 minuti e dopo Fast Scan. Gruppi di 2–3 gare entro 90 minuti. Primo kickoff entro 60 minuti e almeno 20 minuti di anticipo all’invio. | Telegram e homepage. Meta riceve al massimo una BEST Probabile Gold o Platinum per giornata. |
-| Spunto Studio | Una gara con analisi Studio già pubblicata in Gold per ciascuna fascia di kickoff 16–18, 18–20 e 20–24, da 60 a 20 minuti prima del via, quando la fascia non ha già una BEST sullo stesso canale. Fino a due anteprime con lucchetto. | Telegram e Facebook. |
+| Agenda Gold | Dal primo ciclo fra le 12:00 e le 16:00. Fino a quattro gare del giorno dalle 16:00, con squadre, competizione e orario. | Telegram e Facebook. |
+| Spunto Studio | Una gara con analisi già pubblicata in Gold per ciascuna fascia di kickoff 16–18, 18–20 e 20–24, da 60 a 20 minuti prima del via, quando la fascia non ha già una BEST sullo stesso canale. Fino a due anteprime con lucchetto. | Telegram e Facebook. |
 | Live | Una copertura per giornata di kickoff. Il backup avvia il monitor della gara annunciata e il monitor legge il feed ogni minuto circa dal calcio d’inizio. | Telegram aggiorna il post originale con le GIF di gol, rigore segnato e rigore sbagliato, poi con il parziale e il finale. Homepage e riepilogo finale su Facebook. |
-| Riscontri | Dal primo ciclo utile dopo le 10:45, con certificato Auditor della giornata precedente e coorti conciliabili. | Telegram, Meta, homepage. |
+| Riscontri | Dal primo ciclo utile dopo le 10:45, con archivio Auditor verificato della giornata precedente. Il recupero di una giornata può già mostrare gli esiti chiusi e indicare le gare ancora in verifica. | Telegram, Meta, homepage. |
 | Dentro i Numeri | Dalle 16:45, con rinvio in presenza di una BEST da inviare. | Telegram, Meta, homepage. |
 | Gold | Martedì e sabato dalle 12:15, se il webhook della prova risulta disponibile. | Telegram, Meta, homepage. |
 
-Il recupero editoriale già avviato dal timer esterno riattiva lo stesso Publisher quando manca un ciclo recente. La verifica avviene dopo il marcatore pubblico e usa il medesimo registro degli invii. BEST e Studio su Telegram e Facebook riportano il link a Gold, al bot e alle promozioni attive. Dal 12 al 18 novembre 2026 il Publisher recupera anche i richiami rimasti senza ricevuta per canale a partire dalle 13:15 e dalle 21:15, nelle finestre della campagna.
+Il recupero editoriale già avviato dal timer esterno riattiva lo stesso Publisher quando manca un ciclo recente. La verifica avviene dopo il marcatore pubblico e usa il medesimo registro degli invii. BEST, Studio, agenda e recap su Telegram e Facebook riportano il link a Gold, al bot e alle promozioni attive. Dal 12 al 18 novembre 2026 il Publisher recupera i richiami rimasti senza ricevuta dal primo ciclo a partire dalle 12:45 e dalle 20:45, nelle finestre della campagna.
 
 Una singola richiede una proposta Probabile di livello Gold o Platinum e una finestra fra 20 e 45 minuti. Nei giorni con più gare, il Publisher può creare ulteriori gruppi se superano gli stessi controlli. L’ora UTC identifica gli eventi nel registro, l’ora di Roma determina giorno e orari editoriali.
 
