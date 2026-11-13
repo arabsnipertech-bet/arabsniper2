@@ -13,8 +13,10 @@ on:
     paths:
       - '.github/workflows/live-scores-health.yml'
       - '.github/ops/live-scores-health.py'
+      - '.github/ops/live-scores-repair.py'
 permissions:
   contents: read
+  actions: write
 concurrency:
   group: arabsniper-live-scores-health
   cancel-in-progress: false
@@ -37,6 +39,7 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/live-score-audit"
           "$RUNNER_TEMP/live-score-audit/bin/pip" install 'boto3>=1.42,<2' 'requests>=2.32,<3' ijson==3.6.0
       - name: Check freshness, results and Auditor
+        id: health
         env:
           API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
           R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -46,8 +49,14 @@ jobs:
           FIXTURE_IDS: ${{ inputs.fixture_ids }}
         run: |
           args=()
-          # Compare with the prior-day Auditor every hour, after its night window.
-          if [ "$(TZ=Europe/Rome date +%H%M)" -ge 600 ] && [ "$(date -u +%M)" -lt 18 ]; then
+          # Reconcile the last two closed dates; this reads R2 and costs no provider calls.
+          if [ "$(TZ=Europe/Rome date +%H%M)" -ge 600 ]; then
             args+=(--compare-auditor)
           fi
           "$RUNNER_TEMP/live-score-audit/bin/python" .github/ops/live-scores-health.py --fixtures "$FIXTURE_IDS" "${args[@]}"
+      - name: Request bounded certificate repair
+        if: ${{ failure() && steps.health.outputs.recovery_date != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RECOVERY_DATE: ${{ steps.health.outputs.recovery_date }}
+        run: python3 .github/ops/live-scores-repair.py "$RECOVERY_DATE"

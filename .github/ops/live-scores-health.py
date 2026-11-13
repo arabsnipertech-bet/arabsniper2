@@ -135,13 +135,21 @@ def run(ids, compare_auditor):
     live, summary, reasons = inspect_live(now)
     fixtures = live['fixtures']
     if compare_auditor:
-        yesterday = now.astimezone(ROME).date() - timedelta(days=1)
-        differences = reconcile(recent_audit(yesterday), fixtures)
-        summary['auditor_date'] = str(yesterday)
-        summary['auditor_differences'] = len(differences)
-        summary['difference_sample'] = differences[:20]
-        if differences:
+        summary['auditor_days'] = []
+        recovery_dates = []
+        for age in (2, 1):
+            day = now.astimezone(ROME).date() - timedelta(days=age)
+            audit = recent_audit(day)
+            differences = reconcile(audit, fixtures)
+            summary['auditor_days'].append({'date': str(day), 'available': bool(audit),
+                'differences': len(differences), 'sample': differences[:20]})
+            if differences:
+                recovery_dates.append(str(day))
+        if recovery_dates:
             reasons.append('Discrepancies between acquired scores and Auditor certification')
+            if os.environ.get('GITHUB_OUTPUT'):
+                with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
+                    out.write('recovery_date=' + recovery_dates[0] + '\n')
     if ids:
         official = provider_results(ids)
         summary['verification'] = {fid: {'provider': official.get(fid), 'worker': score(fixtures[fid]) if fid in fixtures else None}
