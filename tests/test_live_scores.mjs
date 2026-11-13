@@ -283,3 +283,27 @@ test('missing results take priority over routine final-score rechecks',async()=>
  try{await new ScoreStore(context,env).refresh(now);assert.equal(requested[0],'21');assert.equal(requested.length,20);}
  finally{globalThis.fetch=original;}
 });
+
+test('repeated provider throttling cannot impose a thirty-minute internal pause',async()=>{
+ const original=globalThis.fetch,context=ctx();
+ await context.storage.put('state',{scores:{},watch:[{fixture_id:'123',kickoff:new Date(now-4*3600000).toISOString()}],
+  calls:1,watch_at:now,watch_generated_at:now,day:new Date(now).toISOString().slice(0,10),
+  quota:{current:100,limit:75000,checked_at:now},consecutive_errors:8,
+  status:'provider_rate_limit',retry_at:now+30*60000});
+ let calls=0;
+ globalThis.fetch=async()=>{calls++;return Response.json({errors:{rateLimit:'temporary'}});};
+ try{
+  await new ScoreStore(context,env).refresh(now);
+  assert.equal((await context.storage.get('state')).retry_at,now+4*60000);
+  await new ScoreStore(context,env).refresh(now+4*60000);
+  assert.equal(calls,1);
+  assert.equal((await context.storage.get('state')).retry_at,now+8*60000);
+ }finally{globalThis.fetch=original;}
+});
+test('backoff migration preserves a longer explicit provider Retry-After',async()=>{
+ const context=ctx(),retry=now+40*60000;
+ await context.storage.put('state',{scores:{},watch:[],calls:1,watch_at:now,watch_generated_at:now,
+  status:'provider_rate_limit',retry_at:retry,provider_retry_after:retry});
+ await new ScoreStore(context,env).refresh(now);
+ assert.equal((await context.storage.get('state')).retry_at,retry);
+});
