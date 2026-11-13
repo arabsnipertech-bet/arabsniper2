@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import time
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
@@ -14,8 +15,10 @@ sys.path.insert(0, str(ROOT / 'src'))
 from prematch_audit import build_report, settle_predictions
 from audit_storage import read_store, write_store
 from daily_audit import build_daily, markdown, fingerprint
+from auditor_schedule import EXCLUDED_RECOVERY_DAYS, ensure_recoverable_day
 
 TZ = ZoneInfo('Europe/Rome')
+RESULTS_MIN_REQUEST_GAP = 0.25
 from audit_ledger import COLLECTIONS
 
 
@@ -106,9 +109,17 @@ def archive_ledger(root, now, incoming, progress):
 def fetch_results(date, key, fixture_ids=()):
     from v7_archive import FINISHED, VOID, checked_score, merge_verified_result
 
+    last_request_at = None
+
     def fixtures(**params):
+        nonlocal last_request_at
         query = urlencode({'timezone': 'Europe/Rome', **params})
         request = Request('https://v3.football.api-sports.io/fixtures?' + query, headers={'x-apisports-key': key})
+        if last_request_at is not None:
+            wait = RESULTS_MIN_REQUEST_GAP - (time.monotonic() - last_request_at)
+            if wait > 0:
+                time.sleep(wait)
+        last_request_at = time.monotonic()
         with urlopen(request, timeout=30) as response:
             payload = {'response': []} if getattr(response, 'status', 200) == 204 else json.load(response)
             daily = response.headers.get('x-ratelimit-requests-remaining')
@@ -172,6 +183,7 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
     from audit_ledger import AuditLedger, settle_ledger
     from selection_studies import build_studies, study_markdown
     from audit_storage import atomic_bytes
+    ensure_recoverable_day(date)
     if date >= now.astimezone(TZ).date():
         raise ValueError('Only closed Rome dates can be settled')
     path = root / f'auditordata/prematch_{date}.json'
@@ -289,7 +301,8 @@ def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, p
     end = prepared_date + timedelta(days=1) if prepared_date else now.astimezone(TZ).date()
     dates = [datetime.strptime(path.stem.removeprefix('prematch_'), '%Y-%m-%d').date()
              for path in sorted((root / 'auditordata').glob('prematch_????-??-??.json'))]
-    dates = [day for day in dates if day < end]
+    excluded = [str(day) for day in dates if day < end and day in EXCLUDED_RECOVERY_DAYS]
+    dates = [day for day in dates if day < end and day not in EXCLUDED_RECOVERY_DAYS]
     if assemble_only:
         from auditor_history_chunks import receipt_path
         for day in dates:
@@ -332,6 +345,8 @@ def settle(root, now, fetcher=fetch_results, progress=lambda message: None, *, p
         report.update({'generated_at': now.isoformat(), 'results_dates_queried': queried,
                        'archived_forecasts': len(combined['fixtures']),
                        'archived_quality_evaluations': len(combined['quality_evaluations'])})
+        if excluded:
+            report['excluded_recovery_dates'] = excluded
         progress('salvataggio rapporto complessivo')
         write_store(root / 'data/arab_quote_prematch_report.json', report)
         write(root / 'auditarchive/prematch_last_report.json', report)

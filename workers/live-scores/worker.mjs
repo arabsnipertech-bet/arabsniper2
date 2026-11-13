@@ -3,6 +3,7 @@ const API = 'https://v3.football.api-sports.io/';
 const MINUTE = 60_000, HOUR = 60 * MINUTE, DAY = 24 * HOUR;
 const FAST_WINDOW = 3 * HOUR, RETRY_WINDOW = 72 * HOUR, CACHE_WINDOW = 4 * DAY;
 const OVERDUE = 135 * MINUTE;
+const PROVIDER_MIN_GAP_MS = 250;
 const FINISHED = new Set(['FT', 'AET', 'PEN']);
 const ADMIN = new Set(['CANC', 'ABD', 'AWD', 'WO']);
 const HALF_COMPLETE = new Set(['HT', '2H', 'ET', 'BT', 'P', ...FINISHED]);
@@ -145,19 +146,31 @@ export class ScoreStore {
     }
     await store.put('state', s);
 
+    let lastProviderRequestAt = null;
     const api = async path => {
       if (s.calls >= cap) throw new Error('live_daily_cap');
       if (path !== 'status' && remaining() <= threshold()) throw new Error('quota_reserve');
       s.calls++;
       await store.put('state', s);
       const endpoint = path === 'status' ? 'status' : 'fixtures';
+      if (lastProviderRequestAt !== null) {
+        const next = lastProviderRequestAt + PROVIDER_MIN_GAP_MS;
+        let wait = next - Date.now();
+        while (wait > 0) {
+          await new Promise(resolve => setTimeout(resolve, wait));
+          wait = next - Date.now();
+        }
+      }
+      const requestAt = Date.now();
+      const requestGap = lastProviderRequestAt === null ? null : requestAt - lastProviderRequestAt;
+      lastProviderRequestAt = requestAt;
       const response = await fetch(API + path, {headers:{'x-apisports-key':this.env.API_SPORTS_KEY,
         'Cache-Control':'no-cache'}, cache:'no-store', signal:AbortSignal.timeout(12_000)});
       const numericHeader = name => {
         const value = response.headers.get(name);
         return value !== null && /^\d+$/.test(value) ? Number(value) : null;
       };
-      s.provider_usage = {observed_at:iso(now), endpoint,
+      s.provider_usage = {observed_at:iso(now), endpoint, request_gap_ms:requestGap,
         daily_remaining:numericHeader('x-ratelimit-requests-remaining'),
         daily_limit:numericHeader('x-ratelimit-requests-limit'),
         minute_remaining:numericHeader('x-ratelimit-remaining'),

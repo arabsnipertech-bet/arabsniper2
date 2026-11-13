@@ -50,6 +50,17 @@ def sources(storage, root):
 
 
 class DailyRecoveryTests(unittest.TestCase):
+    def test_discontinued_dates_are_rejected_before_storage_or_provider_access(self):
+        now = datetime.fromisoformat('2026-11-13T08:00:00+01:00')
+        storage, fetcher = Mock(), Mock()
+        for day in (date(2026, 11, 7), date(2026, 11, 8)):
+            with self.assertRaisesRegex(ValueError, 'recovery has been discontinued'):
+                prepare(storage, 'test', None, day, now, fetcher)
+            with self.assertRaisesRegex(ValueError, 'recovery has been discontinued'):
+                install(storage, 'test', None, day, 'existing', now)
+        self.assertEqual(storage.mock_calls, [])
+        fetcher.assert_not_called()
+
     def test_refresh_uses_existing_closed_day_and_rechecks_the_certificate(self):
         storage = Fake()
         with TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest, patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):
@@ -86,8 +97,11 @@ class DailyRecoveryTests(unittest.TestCase):
             response.headers = {'x-ratelimit-requests-limit': '75000', 'x-ratelimit-requests-remaining': '10000',
                                 'x-ratelimit-remaining': '20'}
             return response
-        with patch('current_audit.urlopen', provider):
+        with patch('current_audit.urlopen', provider), \
+                patch('current_audit.time.monotonic', side_effect=[100.0, 100.0625, 100.25]), \
+                patch('current_audit.time.sleep') as sleep:
             output = fetch_results('2026-10-30', 'test', (1, 2, 3))
+        sleep.assert_called_once_with(0.1875)
         self.assertEqual(requests[1]['ids'], ['2-3'])
         self.assertEqual(requests[1]['timezone'], ['Europe/Rome'])
         results = {r['fixture']['fixture_id']: r['fixture']['result'] for r in output['days'][0]['matches']}

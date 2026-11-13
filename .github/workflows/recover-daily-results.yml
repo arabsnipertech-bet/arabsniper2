@@ -13,9 +13,6 @@ on:
         description: 'Verifica di nuovo i risultati ufficiali di una giornata chiusa'
         type: boolean
         default: false
-  push:
-    branches: [main]
-    paths: ['.github/workflows/recover-daily-results.yml', 'auditor/recover_daily.py']
 permissions:
   contents: read
 env:
@@ -64,13 +61,16 @@ jobs:
       - id: day
         env:
           REQUESTED_DAY: ${{ inputs.date }}
+          PYTHONPATH: src
         run: |
           python - <<'PY'
           from datetime import date, datetime, timedelta
           from zoneinfo import ZoneInfo
           import os
+          from auditor_schedule import ensure_recoverable_day
           today = datetime.now(ZoneInfo('Europe/Rome')).date()
           day = date.fromisoformat(os.environ['REQUESTED_DAY']) if os.environ.get('REQUESTED_DAY') else today - timedelta(days=1)
+          ensure_recoverable_day(day)
           if not 1 <= (today-day).days <= 14: raise ValueError('Expected a closed day within 14 days')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out: print(f'date={day}', file=out)
           PY

@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT / 'src'))
 from audit_journal import PREFIX, ForecastHistory, merge_forecast
 from audit_ledger import AuditLedger, entries
 from audit_storage import FORMAT, atomic_bytes, read_store, write_store
+from auditor_schedule import ensure_recoverable_day
 from current_audit import TZ, fetch_results, forecast_day, settle_day
 from daily_audit import markdown
 from gold_storage import allowed, client, previous_manifest, sha, write_manifest
@@ -101,6 +102,7 @@ def recovery_files(root, paths):
 
 def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=False, recheck_results=False,
             existing_forecasts=False):
+    ensure_recoverable_day(day)
     if not 1 <= (now.astimezone(TZ).date() - day).days <= 14:
         raise ValueError('Recovery requires a closed Rome date within 14 days')
     index = previous_manifest(storage, bucket)
@@ -218,6 +220,7 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
 
 def install(storage, bucket, root, day, digest, now):
     """Called only by the short publication job holding the normal writer mutex."""
+    ensure_recoverable_day(day)
     index = previous_manifest(storage, bucket)
     target = report_path(day)
     if digest != 'existing':

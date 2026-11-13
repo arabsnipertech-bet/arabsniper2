@@ -132,6 +132,17 @@ class AdaptiveCalibration(unittest.TestCase):
         self.assertEqual(a['matrix']['rows'][0]['win_weight'],.66)
         self.assertNotIn('calibration',a['matrix'])
 
+    def test_discontinued_days_are_recorded_without_hiding_other_missing_evidence(self):
+        with TemporaryDirectory() as folder:
+            root = Path(folder)
+            for day in ('2026-11-07', '2026-11-08', '2026-11-12'):
+                write_store(root/f'auditordata/prematch_{day}.json', {'audit_date': day})
+            state = nightly_state(root, date(2026, 11, 13))
+            self.assertEqual(state['evidence_provenance']['excluded_recovery_dates'], ['2026-11-07', '2026-11-08'])
+            self.assertEqual(state['training_evidence']['missing_results_dates'], ['2026-11-12'])
+            self.assertEqual(state['training_evidence']['missing_dates'], ['2026-11-12'])
+            self.assertFalse(state['training_evidence']['complete'])
+
     def test_daily_auditor_handoff_and_first_half_leg_share_original_feed(self):
         e = Evidence()
         day = {'multimarket_evaluations':{'1':frozen()},'analysis_updates':{'later':frozen(at='2026-10-30T19:10:00Z',odd=1.9)}}

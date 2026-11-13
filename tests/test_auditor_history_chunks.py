@@ -25,6 +25,31 @@ def seed(root):
 
 
 class HistoryChunks(unittest.TestCase):
+    def test_discontinued_days_do_not_block_assembly_or_replace_archived_inputs(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            seed(root)
+            before = {}
+            for day in ('2026-11-07', '2026-11-08'):
+                path = root / f'auditordata/prematch_{day}.json'
+                write_store(path, {'audit_date': day, 'fixtures': {}})
+                before[path] = path.read_bytes()
+
+            def phase(script, action, *args):
+                if script != 'auditor/current_audit.py':
+                    return
+                if action == 'daily':
+                    current_audit.settle_day(root, date.fromisoformat(args[1]), NOW)
+                else:
+                    current_audit.settle(root, NOW, prepared_date=date.fromisoformat(args[1]), assemble_only=True)
+
+            self.assertTrue(advance(root, NOW.date(), phase, NOW+timedelta(minutes=45), lambda: NOW))
+            report = read_store(root/'data/arab_quote_prematch_report.json')
+            self.assertEqual(report['excluded_recovery_dates'], ['2026-11-07', '2026-11-08'])
+            self.assertEqual(report['archived_forecasts'], 3)
+            self.assertEqual({path: path.read_bytes() for path in before}, before)
+            self.assertFalse(list((root/'auditarchive').glob('prematch_2026-11-0[78]*')))
+
     def test_time_budget_then_resume_without_repeating_saved_days_and_same_report(self):
         with tempfile.TemporaryDirectory() as folder, tempfile.TemporaryDirectory() as expected:
             root, serial = Path(folder), Path(expected)

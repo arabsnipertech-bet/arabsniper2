@@ -1,5 +1,5 @@
 """Admit the daily Auditor only in its protected Europe/Rome window."""
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 import json
 import os
 from pathlib import Path
@@ -11,6 +11,12 @@ ROME = ZoneInfo('Europe/Rome')
 MARKER = 'data/arab_quote_auditor_status.json'
 START = time(0, 30)
 STOP = time(5, 30)
+EXCLUDED_RECOVERY_DAYS = frozenset({date(2026, 11, 7), date(2026, 11, 8)})
+
+
+def ensure_recoverable_day(day):
+    if day in EXCLUDED_RECOVERY_DAYS:
+        raise ValueError(f'Auditor recovery has been discontinued for {day}')
 
 
 def recovery_admission(now, work_date):

@@ -13,7 +13,7 @@ from unittest.mock import Mock, patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
 from auditor_schedule import admission, recovery_admission, preflight, already_completed, MARKER
-from nightly_auditor import PROGRESS, run, run_command
+from nightly_auditor import PROGRESS, run, run_command, saved_batch
 from audit_journal import capture_forecasts, capture_policies, ingest, PREFIX
 from audit_storage import read_store, write_store
 
@@ -28,6 +28,16 @@ class NightlySchedule(unittest.TestCase):
         priority = patch('nightly_auditor.ensure_priority')
         priority.start()
         self.addCleanup(priority.stop)
+
+    def test_discontinued_recovery_checkpoint_is_ignored(self):
+        today = datetime.fromisoformat('2026-11-13T00:40:00+01:00').date()
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for work_date in ('2026-11-08', '2026-11-09'):
+                write_store(root/PROGRESS, {'version': 1, 'work_date': work_date, 'stage': 'preparing'})
+                self.assertIsNone(saved_batch(root, today))
+            write_store(root/PROGRESS, {'version': 1, 'work_date': today.isoformat(), 'stage': 'daily'})
+            self.assertEqual(saved_batch(root, today), (today, 'daily'))
 
     def test_recovery_is_date_bound_and_requires_its_production_workflow(self):
         now = datetime.fromisoformat('2026-11-05T20:00:00+01:00')

@@ -4,6 +4,7 @@ from hashlib import sha256
 from pathlib import Path
 
 from audit_storage import read_store, write_store
+from auditor_schedule import EXCLUDED_RECOVERY_DAYS
 
 CURSOR = 'data/arab_quote_auditor_history_progress.json'
 RESERVE = timedelta(minutes=20)
@@ -85,7 +86,8 @@ def advance(root, work_date, phase, deadline, clock):
         raise ValueError('Invalid history clock')
     days = [date.fromisoformat(p.stem.removeprefix('prematch_'))
             for p in sorted((root/'auditordata').glob('prematch_????-??-??.json'))]
-    pending = [day for day in days if day < report_date and not reusable(root, day, as_of)]
+    pending = [day for day in days
+               if day < report_date and day not in EXCLUDED_RECOVERY_DAYS and not reusable(root, day, as_of)]
     needed = max(RESERVE.total_seconds(), cursor.get('largest_block_seconds', 0)*1.25+300)
     for day in pending:
         if (deadline-clock()).total_seconds() < needed:
