@@ -616,6 +616,39 @@ class PublisherTests(TestCase):
                 self.assertEqual(scores.detailed(store, '1', NOW, lambda: NOW, mock.Mock()), {})
         provider.assert_called_once_with('status', 'fake')
 
+    def test_live_monitor_uses_the_public_score_when_event_details_are_unavailable(self):
+        match = pick(1)
+        kickoff = datetime.fromisoformat(match['kickoff'])
+        now = kickoff + timedelta(minutes=51)
+        day = selection.rome_day(kickoff)
+        store = LocalStore()
+        state = store.state['live'][day] = live.start_state(match, None, NOW)
+        delivery.queue(store, 'live', day + '/start', state['view'], ['telegram'], NOW, kickoff)
+        store.state['posts'][f'telegram/live/{day}/start'].update(
+            status='sent', receipt={'id': '181', 'at': selection.utc(NOW)})
+        row = scores.fixture_view(fixture('HT', (1, 1), [], halftime=(1, 1)), selection.utc(now))
+        with (mock.patch.object(store, 'cycle', return_value=nullcontext(True)),
+              mock.patch.object(runner, 'clock', return_value=now),
+              mock.patch.object(scores, 'detailed', return_value={}),
+              mock.patch.object(scores, 'public_cache', return_value=scores.feed({'1': row})),
+              mock.patch.object(runner, 'send_live')):
+            self.assertEqual(monitor.poll(store, {}, '1'), 'polled')
+        self.assertEqual(state['view']['status'], 'Intervallo')
+        self.assertEqual(state['view']['halftime'], [1, 1])
+        self.assertNotIn('event_monitor_at', state)
+
+    def test_publisher_reloads_the_saved_ledger_across_monitor_polls(self):
+        store = Storage(mock.Mock(), 'bucket')
+        ledger = {**store.state, 'schema': 1, 'future_metadata': 'value'}
+        with mock.patch.object(store, 'read', return_value=(ledger, 'etag')):
+            store.load()
+            store.load()
+        self.assertEqual(store.state, ledger)
+        self.assertEqual(store.etag, 'etag')
+        with mock.patch.object(store, 'read', return_value=({**ledger, 'live': None}, 'bad')):
+            with self.assertRaisesRegex(ValueError, 'Unrecognized editorial ledger'):
+                store.load()
+
     def test_publisher_cycle_respects_a_lease_and_releases_only_its_own(self):
         client = mock.Mock()
         store = Storage(client, 'bucket')

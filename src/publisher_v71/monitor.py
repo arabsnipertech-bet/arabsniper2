@@ -31,15 +31,19 @@ def poll(store, services, fixture):
             return 'waiting_for_kickoff'
         feed = runner.safe_read('live_event_feed', lambda: scores.detailed(
             store, fixture, now, runner.clock, runner.event_log), {})
+        detailed = bool(feed)
+        if not detailed:
+            feed = runner.safe_read('live_score_cache', scores.public_cache, {})
         now = runner.clock()
-        if feed:
+        row = (feed.get('fixtures') or {}).get(fixture)
+        if row:
             runner.update_live(store, day, state, feed, now, {}, services)
-            observed_at = feed['fixtures'][fixture]['observed_at']
-            if observed_at == (state.get('confirmed') or {}).get('at'):
+            observed_at = row.get('observed_at')
+            if detailed and observed_at and observed_at == (state.get('confirmed') or {}).get('at'):
                 state['event_monitor_at'] = observed_at
             store.save()
         runner.send_live(store, services, {}, now, day=day)
-        return 'finished' if state['done'] else 'polled' if feed else 'provider_unavailable'
+        return 'finished' if state['done'] else 'polled' if row else 'provider_unavailable'
 
 
 def main():

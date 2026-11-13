@@ -385,7 +385,21 @@ test('relay refuses stale live, future timestamps, wrong source and oversized ba
  assert.equal(relayRows(payload,now).length,0);
  assert.equal(relayRows({...payload,captured_at:new Date(now+60000).toISOString()},now).length,0);
  assert.equal(relayRows({...payload,source:'unknown'},now).length,0);
- assert.equal(relayRows({...payload,captured_at:new Date(now).toISOString(),fixtures:Array(21).fill(row)},now).length,0);
+ assert.equal(relayRows({...payload,captured_at:new Date(now).toISOString(),fixtures:Array(41).fill(row)},now).length,0);
+});
+test('accepts both groups of relayed results while the direct provider is limited',async()=>{
+ const context=ctx(),captured=new Date(now-60000).toISOString();
+ const fixtures=Array.from({length:28},(_,i)=>({...row,fixture:{id:i+100,status:{short:'HT'}},
+  goals:{home:1,away:1},score:{halftime:{home:1,away:1}}}));
+ const watch=fixtures.map(f=>({fixture_id:String(f.fixture.id),kickoff:new Date(now-3600000).toISOString()}));
+ await context.storage.put('state',{scores:{},watch,calls:20,watch_at:now,watch_generated_at:now,
+  day:new Date(now).toISOString().slice(0,10),retry_at:now+240000,status:'provider_rate_limit',minute_backoff_v2:true});
+ const relay={schema_version:1,source:'API-Football',captured_at:captured,fixtures};
+ await new ScoreStore(context,{...env,OFFICIAL_RESULTS:{get:async()=>({size:10000,json:async()=>relay})}}).refresh(now);
+ const state=await context.storage.get('state');
+ assert.equal(state.relay.accepted,28);
+ assert.equal(state.calls,20);
+ assert.deepEqual(state.scores['127'].halftime,{home:1,away:1});
 });
 test('older relay cannot overwrite a newer official score',async()=>{
  const context=ctx(),old=normalize({...row,fixture:{id:123,status:{short:'FT'}},score:{fulltime:{home:2,away:0},halftime:{home:1,away:0}}},now);

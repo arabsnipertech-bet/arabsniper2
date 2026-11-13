@@ -50,7 +50,11 @@ and is released separately by `publish-site.yml`.
 score recovery and on its 15-minute schedule. It reports stalled collection,
 provider failures, live scores missing or more than five minutes old, and
 fixtures past their expected finish without a final result. The GitHub relay
-prioritizes the stale live fixture IDs reported by the Worker. An automated
+prioritizes the stale live fixture IDs reported by the Worker. When the direct
+collector is rate-limited, the relay can pick up active fixtures after two
+minutes and carry up to two groups of 20 in the existing private snapshot.
+It keeps the first successful group if the second fails and honors the relay's
+own Retry-After and daily allowance. An automated
 check can give a short provider rate limit up to five
 minutes to clear when the cron and watchlist are healthy, all due scores are
 present, and the collector has a retry within the window. The recheck reads
