@@ -1,0 +1,57 @@
+name: Inspect Gold Auditor recovery inputs
+on:
+  push:
+    branches: [ops/gold-results-audit-20261113]
+    paths: [.github/workflows/gold-auditor-recovery-inspect.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/ops/gold-results-audit-20261113'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout: |
+            src
+            auditor
+      - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' ijson==3.6.0
+      - name: Read sizes and checksums without restoring or publishing
+        env:
+          PYTHONPATH: src:auditor
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        shell: python
+        run: |
+          from datetime import date
+          from gold_storage import client, previous_manifest
+          from recover_daily import source_set
+          import hashlib, json, os
+          bucket = os.environ['R2_BUCKET']
+          s3 = client()
+          index = previous_manifest(s3, bucket)
+          day = date(2026, 11, 12)
+          sources = source_set(index, day)
+          print('Sources', json.dumps({'count':len(sources), 'listed_bytes':sum(index[p]['bytes'] for p in sources),
+                                      'master':index.get('data/arab_quote_prematch_audit.json'),
+                                      'dated':index.get(f'auditordata/prematch_{day}.json')}), flush=True)
+          for suffix in ('checkpoint', 'v7'):
+              name = f'auditarchive/prematch_{day}_{suffix}.json'
+              item = index.get(name)
+              if not item:
+                  print(name, 'missing', flush=True)
+                  continue
+              with s3.get_object(Bucket=bucket, Key='state/objects/'+item['sha256'])['Body'] as stream:
+                  raw = stream.read()
+              if len(raw) != item['bytes'] or hashlib.sha256(raw).hexdigest() != item['sha256']:
+                  raise ValueError('Audit source checksum mismatch')
+              value = json.loads(raw)
+              scores = value.get('fixtures', {})
+              print(name, json.dumps({'generated_at':value.get('generated_at') or value.get('checked_at'),
+                 'counts':value.get('counts'), 'pending':value.get('pending'),
+                 'cases':{fid:scores.get(fid,{}).get('status') for fid in ('1549868','1549870','1631607')}}), flush=True)
