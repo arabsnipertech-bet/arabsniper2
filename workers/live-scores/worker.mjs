@@ -7,6 +7,7 @@ const PROVIDER_MIN_GAP_MS = 250;
 const MAX_FIXTURE_BATCH = 20;
 const MAX_RELAY_FIXTURES = 40;
 const LIVE_FRESHNESS = 5 * MINUTE;
+const HALFTIME_RECHECK = 30 * MINUTE;
 const FINISHED = new Set(['FT', 'AET', 'PEN']);
 const LIVE = new Set(['1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE']);
 const ADMIN = new Set(['CANC', 'ABD', 'AWD', 'WO']);
@@ -75,6 +76,7 @@ function reconcile(previous, next) {
 
 function retryDelay(now, kickoff, row, checked) {
   if (complete(row)) return checked === 1 ? HOUR : checked === 2 ? 8 * HOUR : DAY;
+  if (hasFinal(row)) return now - kickoff >= DAY ? 2 * HOUR : HALFTIME_RECHECK;
   if (postponed(row)) return 6 * HOUR;
   if (now - kickoff >= DAY) return 2 * HOUR;
   return now - kickoff >= FAST_WINDOW ? 30 * MINUTE : 10 * MINUTE;
@@ -278,7 +280,11 @@ export class ScoreStore {
           return age >= (rescheduled ? -10 * MINUTE : 6 * HOUR) && age < RETRY_WINDOW && !(checked?.next_at > now);
         }
         if (age < 0 || age >= RETRY_WINDOW || checked?.next_at > now) return false;
-        if (hasFinal(row)) return !complete(row) || now - Date.parse(row.observed_at) >= HOUR || checked?.count > 0;
+        if (hasFinal(row)) {
+          const observed = Date.parse(row.observed_at);
+          if (!complete(row)) return !Number.isFinite(observed) || now - observed >= retryDelay(now, t, row, 1);
+          return now - observed >= HOUR || checked?.count > 0;
+        }
         return age >= FAST_WINDOW || age >= 15 * MINUTE && (!row || row.status === 'NS' || row.status === 'TBD' ||
           row.refresh_failed || now - Date.parse(row.observed_at) > 6 * MINUTE);
       };
@@ -379,10 +385,11 @@ export class ScoreStore {
       s.retry_at = Math.max(s.provider_retry_after || 0,
         s.status === 'live_daily_cap' ? reset : now + (s.status === 'quota_reserve' ? HOUR : backoff));
     } finally {
-      let overdue = 0, missingHalftime = 0, staleLive = 0;
+      let overdue = 0, missingHalftime = 0, staleLive = 0, trackingLive = 0;
       const overdueIds = [], staleLiveIds = [];
       for (const f of s.watch) {
         const age = now - Date.parse(f.provider_kickoff || f.kickoff), row = s.scores[String(f.fixture_id)];
+        if (age >= 0 && age < FAST_WINDOW && !hasFinal(row) && !postponed(row)) trackingLive++;
         if (age >= OVERDUE && !hasFinal(row) && !postponed(row)) {
           overdue++;
           if (overdueIds.length < 20) overdueIds.push(String(f.fixture_id));
@@ -398,6 +405,7 @@ export class ScoreStore {
       if (overdue && (s.status === 'ok' || s.status === 'idle')) s.status = 'results_pending';
       s.health = {overdue_fixtures:overdue, overdue_fixture_ids:overdueIds, missing_halftime:missingHalftime,
         stale_live_fixtures:staleLive, stale_live_fixture_ids:staleLiveIds,
+        live_tracking_fixtures:trackingLive,
         watchlist_generated_at:timestamp(s.watch_generated_at), watchlist_status:watchIssue};
       for (const [id, row] of archive) await store.put('final:' + id, row);
       s.final_archive_initialized = true;

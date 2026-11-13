@@ -17,6 +17,11 @@ LIVE = {'1H','HT','2H','ET','BT','P','LIVE'}
 BATCH_SIZE = 20
 DAILY_CAP = 600
 
+
+class ProviderThrottled(Exception):
+    """A deferred attempt with the provider cooldown already recorded."""
+
+
 def stamp(value):
     try:
         d = datetime.fromisoformat(value.replace('Z','+00:00'))
@@ -45,6 +50,11 @@ def needs_midpoint(watch, live, now):
     return False
 
 
+def has_score(pair):
+    pair = pair or {}
+    return all(type(pair.get(side)) is int and pair[side] >= 0 for side in ('home', 'away'))
+
+
 def due(watch, live, now):
     fixtures = live.get('fixtures') or {}
     limited = temporarily_limited(live)
@@ -58,14 +68,20 @@ def due(watch, live, now):
         row = fixtures.get(fid, {})
         if row.get('status') in ADMIN:
             continue
-        complete = row.get('status') in FINISHED and all(
-            type((row.get(part) or {}).get(side)) is int
-            for part in ('halftime','fulltime') for side in ('home','away'))
+        status = row.get('status')
+        final = status in FINISHED and (
+            has_score(row.get('fulltime')) or status == 'FT' and has_score(row.get('goals')))
+        if final and has_score(row.get('halftime')):
+            continue
         observed = stamp(row.get('observed_at'))
-        active = now - kickoff <= timedelta(hours=3)
-        freshness = timedelta(minutes=2 if limited and active else 4)
-        if not complete and (not observed or now - observed >= freshness):
-            candidates[fid] = (0 if active else 1,
+        age = now - kickoff
+        active = age <= timedelta(hours=3)
+        if final:
+            freshness = timedelta(minutes=30 if age < timedelta(days=1) else 120)
+        else:
+            freshness = timedelta(minutes=2 if limited and active else 4)
+        if not observed or now - observed >= freshness:
+            candidates[fid] = (2 if final else 0 if active else 1,
                 observed or datetime.min.replace(tzinfo=timezone.utc), kickoff)
     # The Worker retains watched fixtures when the published list rolls over.
     health = live.get('health') or {}
@@ -169,12 +185,20 @@ def run():
         except HTTPError as error:
             if error.code == 429:
                 defer(error.headers, limited=True)
+                raise ProviderThrottled from None
             raise ValueError(f'Official provider HTTP {error.code}') from None
         if value.get('errors'):
-            defer(headers, limited='rateLimit' in value['errors'])
+            limited = 'rateLimit' in value['errors']
+            defer(headers, limited=limited)
+            if limited:
+                raise ProviderThrottled
             raise ValueError('Provider rejected bounded relay request')
         return value['response'], headers
-    quota, headers = provider('status')
+    try:
+        quota, headers = provider('status')
+    except ProviderThrottled:
+        print('::warning title=Gold score recovery::API-Football limited the quota check. Recovery deferred.')
+        return
     usage = quota.get('requests') or {}
     used, limit = usage.get('current'), usage.get('limit_day')
     if quota.get('subscription',{}).get('active') is not True or not all(type(x) is int for x in (used,limit)):
@@ -190,7 +214,11 @@ def run():
             break
         batch = ids[offset:offset+BATCH_SIZE]
         time.sleep(.25)
-        received, headers = provider('fixtures?'+urlencode({'ids':'-'.join(batch),'timezone':'Europe/Rome'}))
+        try:
+            received, headers = provider('fixtures?'+urlencode({'ids':'-'.join(batch),'timezone':'Europe/Rome'}))
+        except ProviderThrottled:
+            print('::warning title=Gold score recovery::API-Football limited the fixture request. Recovery deferred.')
+            break
         if not isinstance(received, list) or len(received) > BATCH_SIZE:
             raise ValueError('Invalid official response')
         daily = headers.get('x-ratelimit-requests-remaining') or ''

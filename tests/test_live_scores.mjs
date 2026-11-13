@@ -409,3 +409,37 @@ test('older relay cannot overwrite a newer official score',async()=>{
  await new ScoreStore(context,{...env,OFFICIAL_RESULTS:{get:async()=>({size:1000,json:async()=>relay})}}).refresh(now);
  assert.deepEqual((await context.storage.get('state')).scores['123'],old);
 });
+test('closed matches without halftime keep the final and retry only when due',async()=>{
+ const original=globalThis.fetch,context=ctx(),requests=[];
+ const kickoff=new Date(now-2*3600000).toISOString();
+ const final={fixture:{id:123,status:{short:'FT'}},goals:{home:5,away:0},
+  score:{halftime:{home:null,away:null},fulltime:{home:5,away:0}}};
+ const watch=[{fixture_id:'123',kickoff}];
+ const observed=now-10*60000;
+ await context.storage.put('state',{scores:{'123':normalize(final,observed)},watch,calls:10,
+  watch_at:now,watch_generated_at:now,day:new Date(now).toISOString().slice(0,10),
+  quota:{current:100,limit:75000,checked_at:now}});
+ globalThis.fetch=async url=>{
+  if(url.includes('raw.githubusercontent'))
+   return Response.json({generated_at:new Date(now).toISOString(),fixtures:watch});
+  requests.push(url);
+  return Response.json({response:[{...final,score:{...final.score,halftime:{home:2,away:0}}}]});
+ };
+ try{
+  const store=new ScoreStore(context,env);
+  await store.refresh(now);
+  const before=await context.storage.get('state');
+  assert.equal(requests.length,0);
+  assert.equal(before.status,'idle');
+  assert.equal(before.health.live_tracking_fixtures,0);
+  assert.equal(before.health.missing_halftime,1);
+  assert.deepEqual(before.scores['123'].fulltime,{home:5,away:0});
+  assert.deepEqual(before.scores['123'].halftime,{home:null,away:null});
+  await store.refresh(observed+30*60000);
+  const after=await context.storage.get('state');
+  assert.equal(requests.length,1);
+  assert.equal(after.health.missing_halftime,0);
+  assert.deepEqual(after.scores['123'].halftime,{home:2,away:0});
+  assert.deepEqual((await context.storage.get('final:123')).fulltime,{home:5,away:0});
+ }finally{globalThis.fetch=original;}
+});
