@@ -1,0 +1,70 @@
+name: Read updated Gold score certificates
+on:
+  push:
+    branches: [ops/gold-results-audit-20261113]
+    paths: [.github/workflows/gold-score-certificate-check.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/ops/gold-results-audit-20261113'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - run: pip install 'boto3>=1.42,<2'
+      - name: Confirm current production results and certificate
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+        shell: python
+        run: |
+          import boto3, hashlib, json, os, subprocess
+          from datetime import datetime, timezone
+          from urllib.request import urlopen, Request
+          from urllib.parse import urlencode
+          from botocore.config import Config
+          ids = ('1644690','1649517','1520978','1549868','1549870','1631607')
+          def emit(name, result):
+              print(name, json.dumps(result, sort_keys=True), flush=True)
+          curl = subprocess.run(['curl','-fsS','--max-time','12','-i',
+                                 'https://arabsniperbet.com/api/live-scores'], capture_output=True, check=True)
+          h, _, body = curl.stdout.rpartition(b'\r\n\r\n')
+          headers = dict(line.decode().split(': ',1) for line in h.splitlines() if b': ' in line)
+          live = json.loads(body)
+          emit('Worker', {'checked_at':datetime.now(timezone.utc).isoformat(),
+              'version':headers.get('x-live-scores-version'), 'status':live.get('status'),
+              'health':live.get('health'), 'cases':{i:{k:live['fixtures'].get(i,{}).get(k)
+                for k in ('status','halftime','fulltime','observed_at')} for i in ids}})
+          api = 'https://v3.football.api-sports.io/'
+          def read(path):
+              with urlopen(Request(api+path, headers={'x-apisports-key':os.environ['API_SPORTS_KEY']}), timeout=15) as response:
+                  value = json.load(response)
+                  if value.get('errors'):
+                      raise ValueError('Provider rejected score check')
+                  return value['response'], response.headers
+          quota, headers = read('status')
+          daily = quota['requests']['limit_day']-quota['requests']['current']
+          if daily <= max(1000, (quota['requests']['limit_day']+9)//10) or headers.get('x-ratelimit-remaining') in ('0','1','2'):
+              raise ValueError('Provider quota did not permit the check')
+          rows, _ = read('fixtures?' + urlencode({'ids':'-'.join(ids),'timezone':'Europe/Rome'}))
+          emit('Provider', {'daily_remaining':daily, 'cases':{str(r['fixture']['id']):{
+              'status':r['fixture']['status']['short'], 'halftime':r['score'].get('halftime'),
+              'fulltime':r['score'].get('fulltime')} for r in rows if str(r['fixture']['id']) in ids}})
+          s3=boto3.client('s3',region_name='auto',
+                endpoint_url='https://dfdb02b4139b31c0ab4456a50eb371a2.r2.cloudflarestorage.com',
+                aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
+                config=Config(connect_timeout=5,read_timeout=18,retries={'total_max_attempts':2}))
+          def raw(name):
+              with s3.get_object(Bucket='arabsniper-gold',Key=name)['Body'] as stream:
+                  return stream.read()
+          index=json.loads(raw('state/current.json'))['files']
+          name='auditarchive/prematch_2026-11-12_v7.json'
+          ref=index[name]
+          evidence=raw('state/objects/'+ref['sha256'])
+          if len(evidence)!=ref['bytes'] or hashlib.sha256(evidence).hexdigest()!=ref['sha256']:
+              raise ValueError('Auditor evidence checksum failed')
+          audit=json.loads(evidence)
+          emit('Auditor', {'date':audit['date'],'generated_at':audit['generated_at'],'counts':audit['counts'],
+              'targets':{fid:{'status':audit['fixtures'].get(fid,{}).get('status'),
+              'score':audit['fixtures'].get(fid,{}).get('result')} for fid in ids[3:]}})
