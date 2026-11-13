@@ -78,6 +78,12 @@ def source_set(index, day):
     return {p: index[p]['sha256'] for p in sorted(names) if p in index}
 
 
+def checkpoint_sources(index, day):
+    paths = (f'auditordata/prematch_{day}.json', f'auditarchive/prematch_{day}_results.json',
+             f'auditarchive/prematch_{day}_daily.json', f'auditarchive/prematch_{day}_v7.json')
+    return {p: index[p]['sha256'] for p in paths} if all(p in index for p in paths) else {}
+
+
 def recovery_files(root, paths):
     """Yield one verified stored object at a time; no full checkpoint in RAM."""
     pending = list(paths); seen = set()
@@ -93,7 +99,8 @@ def recovery_files(root, paths):
                 pending.extend(str(Path(path).parent/'_audit_parts'/(part['sha256']+'.json.gz')) for part in value['parts'])
 
 
-def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=False, recheck_results=False):
+def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=False, recheck_results=False,
+            existing_forecasts=False):
     if not 1 <= (now.astimezone(TZ).date() - day).days <= 14:
         raise ValueError('Recovery requires a closed Rome date within 14 days')
     index = previous_manifest(storage, bucket)
@@ -107,9 +114,15 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
         receipt = read_store(root/f'auditarchive/prematch_{day}_checkpoint.json')
         if receipt.get('pending') is False and legacy.get('status') != 'partial_v51_skip':
             return 'existing'
-    sources = source_set(index, day)
+    checkpoint = checkpoint_sources(index, day) if existing_forecasts else {}
+    sources = checkpoint or source_set(index, day)
     restore_subset(storage, bucket, root, index, sources)
     dated = root / f'auditordata/prematch_{day}.json'
+    certified = read_store(root/f'auditarchive/prematch_{day}_v7.json', {}) if checkpoint else {}
+    if checkpoint and (certified.get('date') != str(day) or not isinstance(certified.get('fixtures'), dict)
+                       or read_store(root/report_path(day), {}).get('audit_date') != str(day)):
+        raise ValueError('Invalid saved closed-day certificate')
+    frozen_dated = index[dated.relative_to(root).as_posix()]['sha256'] if checkpoint else None
     with AuditLedger(dated) as ledger:
         if dated.exists() and ledger.metadata.get('audit_date') != day.isoformat():
             raise ValueError('Private archive date mismatch')
@@ -166,6 +179,15 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
                          progress=lambda message: print(f'Recovery {day}: {message}', flush=True))
     report = read_store(root / report_path(day))
     v7 = read_store(root/f'auditarchive/prematch_{day}_v7.json')
+    if checkpoint:
+        if sha(dated.read_bytes()) != frozen_dated:
+            raise ValueError('Result refresh changed the frozen ledger')
+        before = certified['fixtures']
+        after = v7['fixtures']
+        if before.keys() != after.keys() or any(before[fid]['forecast_sha256'] != after[fid]['forecast_sha256']
+                                               for fid in before):
+            raise ValueError('Result refresh changed an existing V7 forecast')
+        print(json.dumps({'v7_result_refresh': v7['counts'], 'frozen_v7_fixtures': len(before)}), flush=True)
     if not any(r.get('outcome') is not None for r in report['markets']) and not v7['counts'].get('settled'):
         raise ValueError('No verified outcomes in the recovered report')
     status, reason = recover_legacy(root, day, now, queried)
@@ -185,6 +207,8 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
         bundle[path] = {'sha256': checksum, 'bytes': len(raw_file)}
     staged = {'version': 3, 'date': day.isoformat(), 'sources': sources, 'files': bundle,
               'legacy_status': status}
+    if checkpoint:
+        staged['source_mode'] = 'closed_day'
     raw = gzip.compress(json.dumps(staged, ensure_ascii=False, allow_nan=False,
                                    separators=(',', ':')).encode(), mtime=0)
     digest = sha(raw)
@@ -203,8 +227,10 @@ def install(storage, bucket, root, day, digest, now):
         if sha(raw) != digest:
             raise ValueError('Staged chain checksum mismatch')
         staged = json.loads(gzip.decompress(raw))
+        source_mode = staged.get('source_mode')
+        sources = checkpoint_sources(index, day) if source_mode == 'closed_day' else source_set(index, day)
         if (staged.get('version') not in (2, 3) or staged.get('date') != day.isoformat()
-                or source_set(index, day) != staged.get('sources')):
+                or source_mode not in (None, 'closed_day') or not sources or sources != staged.get('sources')):
             raise ValueError('Frozen sources changed; prepare the day again')
         additions = staged['files']
         partial = staged['version'] == 3 and staged.get('legacy_status') == 'partial_v51_skip'
@@ -271,7 +297,7 @@ def main():
         root = Path(folder)
         if args.mode == 'prepare':
             digest = prepare(storage, bucket, root, args.date, now, refresh=os.getenv('RECOVERY_REFRESH') == 'true',
-                             recheck_results=os.getenv('RECOVERY_RECHECK_RESULTS') == 'true')
+                             recheck_results=os.getenv('RECOVERY_RECHECK_RESULTS') == 'true', existing_forecasts=True)
             with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
                 out.write('digest='+digest+'\n')
             from auditor_history_chunks import receipt_path
