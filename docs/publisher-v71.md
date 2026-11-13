@@ -16,8 +16,6 @@ Il Publisher legge i board Gold già pubblicati in R2 e usa il primo ruolo V7 co
 
 Il recupero editoriale già avviato dal timer esterno riattiva lo stesso Publisher quando manca un ciclo recente. La verifica avviene dopo il marcatore pubblico e usa il medesimo registro degli invii. BEST, Studio, agenda e recap su Telegram e Facebook riportano il link a Gold, al bot e alle promozioni attive. Dal 12 al 18 novembre 2026 il Publisher recupera i richiami rimasti senza ricevuta dal primo ciclo a partire dalle 12:45 e dalle 20:45, nelle finestre della campagna.
 
-Quando scatta un orario editoriale, il timer avvia un ciclo se l’ultimo è iniziato prima della fascia. Il normale intervallo di recupero si applica dopo il primo ciclo della fascia.
-
 Una singola richiede una proposta Probabile di livello Gold o Platinum e una finestra fra 20 e 45 minuti. Nei giorni con più gare, il Publisher può creare ulteriori gruppi se superano gli stessi controlli. L’ora UTC identifica gli eventi nel registro, l’ora di Roma determina giorno e orari editoriali.
 
 ## Ricevute e riscontri
