@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import worker,{ScoreStore,normalize} from '../workers/live-scores/worker.mjs';
+import worker,{ScoreStore,normalize,relayRows} from '../workers/live-scores/worker.mjs';
 const now=Date.now();
 const ctx=()=>{const data=new Map();return {storage:{get:async k=>structuredClone(data.get(k)),put:async(k,v)=>{data.set(k,structuredClone(v));}}};};
 const env={LIVE_ENABLED:'true',API_SPORTS_KEY:'test-only',MAX_CALLS_PER_DAY:'1500',RESERVE_REQUESTS:'1000'};
@@ -306,4 +306,37 @@ test('backoff migration preserves a longer explicit provider Retry-After',async(
   status:'provider_rate_limit',retry_at:retry,provider_retry_after:retry});
  await new ScoreStore(context,env).refresh(now);
  assert.equal((await context.storage.get('state')).retry_at,retry);
+});
+
+test('trusted relay preserves official time, final persistence and provider backoff',async()=>{
+ const context=ctx(),captured=new Date(now-60000).toISOString();
+ await context.storage.put('state',{scores:{},watch:[{fixture_id:'123',kickoff:new Date(now-4*3600000).toISOString()}],
+  calls:20,watch_at:now,watch_generated_at:now,day:new Date(now).toISOString().slice(0,10),
+  retry_at:now+600000,status:'provider_rate_limit',minute_backoff_v2:true});
+ const fixture={fixture:{id:123,status:{short:'FT'}},goals:{home:1,away:0},score:{halftime:{home:0,away:0},fulltime:{home:1,away:0}}};
+ const relay={schema_version:1,source:'API-Football',captured_at:captured,fixtures:[fixture]};
+ const s=new ScoreStore(context,{...env,OFFICIAL_RESULTS:{get:async()=>({size:1000,json:async()=>relay})}});
+ await s.refresh(now);
+ const data=await(await s.fetch(new Request('https://internal/read'))).json();
+ assert.equal(data.fixtures['123'].fulltime.home,1);
+ assert.equal(data.fixtures['123'].observed_at,captured);
+ assert.equal(data.health.usage.worker_requests,20);
+ assert.equal((await context.storage.get('final:123')).fulltime.home,1);
+ const reboot=new ScoreStore(context,env);
+ assert.equal((await(await reboot.fetch(new Request('https://internal/read?id=123'))).json()).fixtures['123'].fulltime.home,1);
+});
+test('relay refuses stale live, future timestamps, wrong source and oversized batches',()=>{
+ const payload={schema_version:1,source:'API-Football',captured_at:new Date(now-6*60000).toISOString(),fixtures:[row]};
+ assert.equal(relayRows(payload,now).length,0);
+ assert.equal(relayRows({...payload,captured_at:new Date(now+60000).toISOString()},now).length,0);
+ assert.equal(relayRows({...payload,source:'unknown'},now).length,0);
+ assert.equal(relayRows({...payload,captured_at:new Date(now).toISOString(),fixtures:Array(21).fill(row)},now).length,0);
+});
+test('older relay cannot overwrite a newer official score',async()=>{
+ const context=ctx(),old=normalize({...row,fixture:{id:123,status:{short:'FT'}},score:{fulltime:{home:2,away:0},halftime:{home:1,away:0}}},now);
+ await context.storage.put('state',{scores:{123:old},watch:[{fixture_id:'123',kickoff:new Date(now-4*3600000).toISOString()}],
+  calls:20,watch_at:now,watch_generated_at:now,day:new Date(now).toISOString().slice(0,10),retry_at:now+600000,status:'provider_rate_limit',minute_backoff_v2:true});
+ const relay={schema_version:1,source:'API-Football',captured_at:new Date(now-60000).toISOString(),fixtures:[row]};
+ await new ScoreStore(context,{...env,OFFICIAL_RESULTS:{get:async()=>({size:1000,json:async()=>relay})}}).refresh(now);
+ assert.deepEqual((await context.storage.get('state')).scores['123'],old);
 });

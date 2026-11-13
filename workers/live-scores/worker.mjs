@@ -32,6 +32,17 @@ export function normalize(row, now) {
     observed_at:iso(now), refresh_failed:false, source:'API-Football'};
 }
 
+
+export function relayRows(payload, now) {
+  const at = Date.parse(payload?.captured_at);
+  if (payload?.schema_version !== 1 || payload?.source !== 'API-Football' ||
+      !Number.isFinite(at) || at > now + 30_000 || now - at > 7 * DAY ||
+      !Array.isArray(payload.fixtures) || payload.fixtures.length > 20) return [];
+  return payload.fixtures.map(raw => normalize(raw, at)).filter(row =>
+    row && (hasFinal(row) || now - at <= 5 * MINUTE)).map(row =>
+      ({...row, transport:'GitHub Actions/R2'}));
+}
+
 function reconcile(previous, next) {
   if (hasFinal(previous) && !FINISHED.has(next.status)) return previous;
   if (FINISHED.has(previous?.status) && !FINISHED.has(next.status) && !ADMIN.has(next.status)) return previous;
@@ -97,6 +108,7 @@ export class ScoreStore {
     else if (last && now - last > 6 * MINUTE) status = 'cron_stale';
     const health = {...s?.health, last_cron_at:timestamp(last), last_successful_poll_at:timestamp(s?.last_successful_poll_at),
       retry_after:timestamp(s?.retry_at), consecutive_errors:s?.consecutive_errors || 0,
+      relay:s?.relay || null,
       usage:{day:s?.day, worker_requests:s?.calls || 0, provider:s?.provider_usage || null}};
     return json({schema_version:1, enabled, generated_at:timestamp(s?.published_at), poll_interval_seconds:120,
       status, diagnostic:s?.diagnostic || null, health, fixtures:s?.scores || {}});
@@ -208,6 +220,29 @@ export class ScoreStore {
         if (hasFinal(row)) archive.set(id, row);
         delete s.scores[id];
         delete s.followups[id];
+      }
+      if (this.env.OFFICIAL_RESULTS) {
+        try {
+          const object = await this.env.OFFICIAL_RESULTS.get('live-scores/provider-relay.json');
+          if (object && object.size <= 200_000) {
+            const relay = await object.json();
+            let accepted = 0;
+            for (const row of relayRows(relay, now)) {
+              const id = row.fixture_id, old = s.scores[id];
+              if (!tracked.has(id) || Date.parse(old?.observed_at) >= Date.parse(row.observed_at)) continue;
+              const next = reconcile(old, row);
+              if (next === old) continue;
+              s.scores[id] = next;
+              if (hasFinal(next)) archive.set(id, next);
+              accepted++;
+            }
+            s.relay = {captured_at:relay.captured_at || null, accepted,
+              provider_calls:relay.calls || 0, day:relay.day || null};
+            if (accepted) s.published_at = now;
+          }
+        } catch {
+          s.relay = {...s.relay, error:'relay_unavailable'};
+        }
       }
       if (s.retry_at > now) return;
       s.diagnostic = null;
