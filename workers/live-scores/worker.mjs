@@ -114,6 +114,12 @@ export class ScoreStore {
     }
     const day = iso(now).slice(0, 10);
     if (s.day !== day) Object.assign(s, {day, calls:0, quota:null});
+    // Upgrade old exponential pauses once, never shorten the provider's Retry-After.
+    if (!s.minute_backoff_v2) {
+      if (s.status === 'provider_rate_limit' && s.retry_at > now + 4 * MINUTE)
+        s.retry_at = Math.max(s.provider_retry_after || 0, now + 4 * MINUTE);
+      s.minute_backoff_v2 = true;
+    }
     s.followups ||= {};
     s.pages ||= {};
     const cap = Math.max(1, Math.min(1500, Number(this.env.MAX_CALLS_PER_DAY) || 1500));
@@ -302,7 +308,7 @@ export class ScoreStore {
         'quota_unverified', 'quota_reserve', 'invalid_response'];
       s.status = codes.includes(error.message) ? error.message : 'refresh_failed';
       s.consecutive_errors = (s.consecutive_errors || 0) + 1;
-      const backoff = Math.min(30 * MINUTE, 2 * MINUTE * 2 ** Math.min(4, s.consecutive_errors - 1));
+      const backoff = Math.min((s.status === 'provider_rate_limit' ? 4 : 30) * MINUTE, 2 * MINUTE * 2 ** Math.min(4, s.consecutive_errors - 1));
       const reset = Date.parse(day + 'T00:00:00Z') + DAY;
       s.retry_at = Math.max(s.provider_retry_after || 0,
         s.status === 'live_daily_cap' ? reset : now + (s.status === 'quota_reserve' ? HOUR : backoff));

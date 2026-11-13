@@ -91,6 +91,16 @@ def public_response():
     return version.group(1).decode() if version else None, live
 
 
+def same_script(first, second):
+    if not first or not second:
+        return False
+    def identity(identifier):
+        data = api('/versions/' + version_id(identifier))
+        return (data.get('resources') or {}).get('script', {}).get('etag')
+    expected_etag, served_etag = identity(first), identity(second)
+    return bool(expected_etag and expected_etag == served_etag)
+
+
 def verify_runtime(expected, previous, timeout=250):
     until = monotonic() + timeout
     first_cron = None
@@ -100,13 +110,19 @@ def verify_runtime(expected, previous, timeout=250):
         except (subprocess.SubprocessError, ValueError):
             served, data = None, {}
         cron = (data.get('health') or {}).get('last_cron_at')
+        if served and served != expected and same_script(expected, served):
+            verify_configuration()
+            if active_version() != served:
+                continue
+            print(f'Equivalent Worker script deployed as {served}; expected upload {expected}.', flush=True)
+            expected = served
         if served == expected and cron:
             first_cron = first_cron or cron
             if cron > first_cron or previous and cron > previous:
                 print(f'Version {served} served on the production route. Cron advanced to {cron}.', flush=True)
                 print(json.dumps({'status': data.get('status'), 'health': data.get('health'),
                                   'fixtures': len(data['fixtures'])}), flush=True)
-                return
+                return served
         sleep(10)
     raise RuntimeError('The production route or Cron advancement could not be verified')
 
@@ -156,7 +172,7 @@ def main():
         wrangler('versions', 'deploy', target + '@100%', '--yes', '--message', commit)
         if active_version() != target:
             raise RuntimeError('Cloudflare did not confirm the new active version')
-        verify_runtime(target, (before.get('health') or {}).get('last_cron_at'))
+        verified = verify_runtime(target, (before.get('health') or {}).get('last_cron_at'))
         verify_configuration()
     except (RuntimeError, ValueError, subprocess.SubprocessError, URLError):
         current = active_version()
@@ -167,7 +183,7 @@ def main():
             public_response()
             summary(f'Rollback active: `{previous}`')
         raise
-    summary(f'Production Worker version verified: `{target}`')
+    summary(f'Production Worker version verified: `{verified}` (uploaded `{target}`)')
 
 
 if __name__ == '__main__':
