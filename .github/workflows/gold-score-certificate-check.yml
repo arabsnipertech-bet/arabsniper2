@@ -84,7 +84,13 @@ jobs:
               emit('Day', {'date':a.get('date'),'counts':a.get('counts'),
                   'pending_ids':[fid for fid,v in fixtures.items() if v.get('status')!='settled'],
                   'triad_picks':sum(len(v.get('triad') or {}) for v in fixtures.values()),
-                  'outcomes':sum(len(v.get('outcomes') or {}) for v in fixtures.values())})
+                  'outcomes':sum(len(v.get('outcomes') or {}) for v in fixtures.values()),
+                  'certified_triad_picks':sum(1 for v in fixtures.values() for pick in (v.get('triad') or {}).values()
+                      if isinstance(pick,dict) and isinstance((v.get('outcomes') or {}).get(pick.get('market_id')),dict)),
+                  'targets':{fid:{'status':v.get('status'),'result':v.get('result'),
+                      'roles':{role:{k:((v.get('outcomes') or {}).get(pick.get('market_id')) or {}).get(k) for k in ('win','loss')}
+                          for role,pick in (v.get('triad') or {}).items() if isinstance(pick,dict)}}
+                      for fid,v in fixtures.items() if fid in ids}})
           cf='https://api.cloudflare.com/client/v4/accounts/dfdb02b4139b31c0ab4456a50eb371a2/workers/scripts/arabsniper-live-scores'
           def cfread(path):
               with urlopen(Request(cf+path,headers={'Authorization':'Bearer '+os.environ['CF_TOKEN']}),timeout=15) as response:
@@ -119,3 +125,10 @@ jobs:
               emit('WorkerBuildTriggers',[{k:t.get(k) for k in ('trigger_uuid','trigger_name','branch_includes','branch_excludes','path_includes','path_excludes','root_directory','deploy_command','build_command')} for t in triggers])
           except HTTPError as error:
               emit('WorkerBuildInspection',{'http_status':error.code})
+
+          ref=index.get('data/arab_quote_usage_history.json')
+          if ref:
+              evidence=raw('state/objects/'+ref['sha256'])
+              if hashlib.sha256(evidence).hexdigest()!=ref['sha256']: raise ValueError('Usage checksum')
+              history=json.loads(evidence)
+              emit('ScanUsage', {'note':history.get('note'),'runs':history.get('runs',[])[-5:]})
