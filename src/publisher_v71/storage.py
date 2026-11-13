@@ -8,6 +8,7 @@ import ijson
 from multimarket_model import stamp
 
 PREFIX = 'publisher/v7.1/'
+LEDGER_SECTIONS = ('groups', 'posts', 'live', 'reports', 'legacy', 'runtime')
 
 
 def encoded(value):
@@ -24,7 +25,7 @@ class Storage:
         self.client = client
         self.bucket = bucket
         self.etag = None
-        self.state = {'groups': {}, 'posts': {}, 'live': {}, 'reports': {}, 'legacy': {}, 'runtime': {}}
+        self.state = {section: {} for section in LEDGER_SECTIONS}
 
     def read(self, key, default=None, *, root=False, limit=100_000_000):
         try:
@@ -73,11 +74,13 @@ class Storage:
         return board
 
     def load(self):
-        value, self.etag = self.read('state.json', limit=5_000_000)
+        value, etag = self.read('state.json', limit=5_000_000)
         if value is not None:
-            if value.get('schema') != 1 or not all(isinstance(value.get(k), dict) for k in self.state):
+            if (not isinstance(value, dict) or value.get('schema') != 1 or
+                    not all(isinstance(value.get(k), dict) for k in LEDGER_SECTIONS)):
                 raise ValueError('Unrecognized editorial ledger')
             self.state = value
+        self.etag = etag
 
     def save(self):
         self.state['schema'] = 1

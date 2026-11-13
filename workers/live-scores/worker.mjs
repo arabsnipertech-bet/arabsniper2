@@ -5,6 +5,7 @@ const FAST_WINDOW = 3 * HOUR, RETRY_WINDOW = 72 * HOUR, CACHE_WINDOW = 4 * DAY;
 const OVERDUE = 135 * MINUTE;
 const PROVIDER_MIN_GAP_MS = 250;
 const MAX_FIXTURE_BATCH = 20;
+const MAX_RELAY_FIXTURES = 40;
 const LIVE_FRESHNESS = 5 * MINUTE;
 const FINISHED = new Set(['FT', 'AET', 'PEN']);
 const LIVE = new Set(['1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE']);
@@ -41,7 +42,7 @@ export function relayRows(payload, now) {
   const at = Date.parse(payload?.captured_at);
   if (payload?.schema_version !== 1 || payload?.source !== 'API-Football' ||
       !Number.isFinite(at) || at > now + 30_000 || now - at > 7 * DAY ||
-      !Array.isArray(payload.fixtures) || payload.fixtures.length > MAX_FIXTURE_BATCH) return [];
+      !Array.isArray(payload.fixtures) || payload.fixtures.length > MAX_RELAY_FIXTURES) return [];
   return payload.fixtures.map(raw => normalize(raw, at)).filter(row =>
     row && (hasFinal(row) || now - at <= LIVE_FRESHNESS)).map(row =>
       ({...row, transport:'GitHub Actions/R2'}));
@@ -110,7 +111,8 @@ export class ScoreStore {
     let status = s?.status || 'not_configured';
     if (!enabled) status = 'disabled';
     else if (last && now - last > 6 * MINUTE) status = 'cron_stale';
-    const health = {...s?.health, last_cron_at:timestamp(last), last_successful_poll_at:timestamp(s?.last_successful_poll_at),
+    const health = {...s?.health, relay_fixture_capacity:MAX_RELAY_FIXTURES,
+      last_cron_at:timestamp(last), last_successful_poll_at:timestamp(s?.last_successful_poll_at),
       retry_after:timestamp(s?.retry_at), consecutive_errors:s?.consecutive_errors || 0,
       relay:s?.relay || null,
       usage:{day:s?.day, worker_requests:s?.calls || 0, provider:s?.provider_usage || null}};
