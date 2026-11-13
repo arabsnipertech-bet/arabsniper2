@@ -38,8 +38,13 @@ def due(watch, live, now):
         if not complete and (not observed or now-observed >= timedelta(minutes=4)):
             candidates[fid] = (0 if now-kickoff <= timedelta(hours=3) else 1,
                 observed or datetime.min.replace(tzinfo=timezone.utc), kickoff)
-    # Overdue IDs come from the retained DO watchlist, which also spans midnight.
-    for fid in live.get('health',{}).get('overdue_fixture_ids',[]):
+    # The Worker retains watched fixtures when the published list rolls over.
+    health = live.get('health') or {}
+    for fid in health.get('stale_live_fixture_ids', []):
+        if str(fid).isascii() and str(fid).isdecimal():
+            observed = stamp(fixtures.get(str(fid), {}).get('observed_at'))
+            candidates[str(fid)] = (-1, observed or datetime.min.replace(tzinfo=timezone.utc), now)
+    for fid in health.get('overdue_fixture_ids', []):
         if str(fid).isascii() and str(fid).isdecimal():
             observed = stamp(fixtures.get(str(fid),{}).get('observed_at'))
             candidates.setdefault(str(fid), (1, observed or datetime.min.replace(tzinfo=timezone.utc), now-timedelta(hours=72)))

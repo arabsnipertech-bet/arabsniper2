@@ -6,10 +6,12 @@ The browser and Auditor read stored observations. Public requests do not trigger
 
 The worker imports tracked fixture IDs and kickoffs from `data/live_watchlist.json`
 on `main` every 15 minutes. It keeps the prior watchlist through temporary failures.
-API-Football date queries use Europe/Rome, including the date before midnight when
-a match is still in progress. One supplementary request per cycle can check up
-to 20 specific fixture IDs. This covers fixtures omitted by the date feed,
-fixtures still reported as not started after kickoff, and later corrections.
+With up to 20 live or soon-to-start fixtures, a single ID query covers them and
+uses any available slots for overdue or incomplete results. With more live
+fixtures, the collector queries the necessary Rome dates, including a match's
+previous Rome date after midnight, and can send one supplementary ID query.
+This covers fixtures omitted by the date feed, fixtures still reported as not
+started after kickoff, and later corrections.
 Unresolved fixtures receive slower retries after three hours, for up to 72 hours.
 Final results are rechecked after one hour, then after eight hours, then daily
 within the recovery window. A result missing the halftime score is rechecked
@@ -46,8 +48,10 @@ and is released separately by `publish-site.yml`.
 
 **Verify Gold live results** checks the public response and timestamps after
 score recovery and on its 15-minute schedule. It reports stalled collection,
-provider failures, and fixtures past their expected finish without a final
-result. An automated check can give a short provider rate limit up to five
+provider failures, live scores missing or more than five minutes old, and
+fixtures past their expected finish without a final result. The GitHub relay
+prioritizes the stale live fixture IDs reported by the Worker. An automated
+check can give a short provider rate limit up to five
 minutes to clear when the cron and watchlist are healthy, all due scores are
 present, and the collector has a retry within the window. The recheck reads
 only the stored public feed. If the feed recovers, the workflow records a

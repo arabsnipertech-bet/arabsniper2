@@ -40,13 +40,13 @@ test('provider error retains last observation with original timestamp',async()=>
  assert.equal(data.fixtures['123'].observed_at,new Date(now).toISOString());assert.equal(data.status,'provider_error');
  }finally{globalThis.fetch=original;}
 });
-test('midnight polls previous date for unfinished match; final is retained',async()=>{
+test('a small batch polls an unfinished match across Rome midnight and retains the final',async()=>{
  const original=globalThis.fetch,calls=[];globalThis.fetch=async url=>{
  calls.push(url);if(url.includes('raw.githubusercontent'))return Response.json({generated_at:new Date(now).toISOString(),fixtures:[{fixture_id:'123',kickoff:'2026-10-21T21:30:00Z'}]});
  if(url.endsWith('/status'))return Response.json({response:{subscription:{active:true},requests:{current:0,limit_day:7500}}});
  return Response.json({response:[{...row,fixture:{id:123,status:{short:'FT',elapsed:90}}}]});};
  try{const s=new ScoreStore(ctx(),env);await s.refresh(Date.parse('2026-10-21T22:30:00Z'));
- assert(calls.some(x=>x.includes('date=2026-10-21')));
+ assert(calls.some(x=>x.includes('fixtures?ids=123')));
  await s.refresh(Date.parse('2026-10-21T22:32:00Z'));
  assert.equal(calls.filter(x=>x.includes('/fixtures?')).length,1);
  }finally{globalThis.fetch=original;}
@@ -106,12 +106,14 @@ test('poll works without AbortSignal.timeout and releases its timer',async()=>{
 
 test('missing date-feed fixture is recovered by exact ID without inventing results',async()=>{
  const original=globalThis.fetch,calls=[];
+ const watch=Array.from({length:21},(_,i)=>({fixture_id:String(123+i),kickoff:new Date(now-3600000).toISOString()}));
  globalThis.fetch=async url=>{
   calls.push(url);
-  if(url.includes('raw.githubusercontent'))return Response.json({generated_at:new Date(now).toISOString(),fixtures:[{fixture_id:'123',kickoff:new Date(now-3600000).toISOString()}]});
+  if(url.includes('raw.githubusercontent'))return Response.json({generated_at:new Date(now).toISOString(),fixtures:watch});
   if(url.endsWith('/status'))return Response.json({response:{subscription:{active:true},requests:{current:100,limit_day:7500}}});
   if(url.includes('fixtures?date='))return Response.json({response:[]});
   if(url.includes('fixtures?ids=123'))return Response.json({response:[{...row,fixture:{id:123,status:{short:'FT',elapsed:90}},score:{halftime:{home:0,away:0},fulltime:{home:2,away:1}}}]});
+  if(url.includes('fixtures?ids='))return Response.json({response:[]});
   throw Error('unexpected fetch');
  };
  try{
@@ -120,10 +122,62 @@ test('missing date-feed fixture is recovered by exact ID without inventing resul
   assert.equal(data.fixtures['123'].status,'FT');
   assert.equal(data.fixtures['123'].fulltime.home,2);
   assert.equal(data.fixtures['123'].fulltime.away,1);
+  assert(calls.some(x=>x.includes('fixtures?date=')));
   assert(calls.some(x=>x.includes('fixtures?ids=123')));
   await s.refresh(now+120000);
   assert.equal(calls.filter(x=>x.includes('fixtures?ids=123')).length,1,'Final fixtures are not queried again');
  }finally{globalThis.fetch=original;}
+});
+
+test('one fixture request updates a live match and a pending final',async()=>{
+ const original=globalThis.fetch,context=ctx(),requests=[];
+ const watch=[{fixture_id:'123',kickoff:new Date(now-3600000).toISOString()},
+  {fixture_id:'124',kickoff:new Date(now-4*3600000).toISOString()}];
+ const final={fixture:{id:124,status:{short:'FT'}},goals:{home:2,away:0},
+  score:{halftime:{home:1,away:0},fulltime:{home:2,away:0}}};
+ await context.storage.put('state',{scores:{},watch,calls:0,watch_at:now,watch_generated_at:now,
+  day:new Date(now).toISOString().slice(0,10),quota:{current:100,limit:75000,checked_at:now}});
+ globalThis.fetch=async url=>{requests.push(new URL(url));return Response.json({response:[row,final]});};
+ try{
+  const s=new ScoreStore(context,env);
+  await s.refresh(now);
+  assert.equal(requests.length,1);
+  assert.equal(requests[0].searchParams.get('ids'),'123-124');
+  const state=await context.storage.get('state');
+  assert.equal(state.scores['123'].status,'2H');
+  assert.equal(state.scores['124'].status,'FT');
+  assert.equal(state.provider_usage.query,'by_id');
+  assert.equal(state.health.stale_live_fixtures,0);
+ }finally{globalThis.fetch=original;}
+});
+
+test('a full live batch leaves room to recover a missing final',async()=>{
+ const original=globalThis.fetch,context=ctx(),queries=[];
+ const watch=Array.from({length:20},(_,i)=>({fixture_id:String(123+i),kickoff:new Date(now-3600000).toISOString()}));
+ watch.push({fixture_id:'900',kickoff:new Date(now-4*3600000).toISOString()});
+ await context.storage.put('state',{scores:{},watch,calls:0,watch_at:now,watch_generated_at:now,
+  day:new Date(now).toISOString().slice(0,10),quota:{current:100,limit:75000,checked_at:now}});
+ globalThis.fetch=async url=>{queries.push(new URL(url).searchParams);return Response.json({response:[]});};
+ try{
+  await new ScoreStore(context,env).refresh(now);
+  assert.equal(queries.length,2);
+  assert(queries[0].has('date'));
+  assert(queries[1].get('ids').split('-').includes('900'));
+ }finally{globalThis.fetch=original;}
+});
+
+test('a provider pause reports stale live IDs while keeping known scores',async()=>{
+ const context=ctx(),observed=now-8*60000;
+ await context.storage.put('state',{scores:{'123':normalize(row,observed)},calls:20,
+  watch:[{fixture_id:'123',kickoff:new Date(now-3600000).toISOString()}],
+  watch_at:now,watch_generated_at:now,day:new Date(now).toISOString().slice(0,10),
+  retry_at:now+120000,status:'provider_rate_limit',minute_backoff_v2:true});
+ await new ScoreStore(context,env).refresh(now);
+ const state=await context.storage.get('state');
+ assert.equal(state.health.overdue_fixtures,0);
+ assert.equal(state.health.stale_live_fixtures,1);
+ assert.deepEqual(state.health.stale_live_fixture_ids,['123']);
+ assert.equal(state.scores['123'].observed_at,new Date(observed).toISOString());
 });
 
 test('missing date feed and exact ID cannot fabricate a final score',async()=>{
