@@ -247,3 +247,39 @@ test('watchlist outage retains recent fixtures and a postponed fixture is recove
   assert(calls.some(url=>url.includes('fixtures?ids=123')));
  }finally{globalThis.fetch=original;}
 });
+
+test('provider quota telemetry is bounded and authenticated fetches bypass cache',async()=>{
+ const original=globalThis.fetch, context=ctx();
+ globalThis.fetch=async (url,options)=>{
+  if(url.includes('raw.githubusercontent'))return Response.json({generated_at:new Date(now).toISOString(),fixtures:[{fixture_id:'123',kickoff:new Date(now-4*3600000).toISOString()}]});
+  assert.equal(options.cache,'no-store');
+  if(url.endsWith('/status'))return Response.json({response:{subscription:{active:true},requests:{current:100,limit_day:75000}}});
+  return Response.json({errors:{rateLimit:'SECRET MUST NOT LEAK'}},{headers:{
+   'x-ratelimit-remaining':'0','x-ratelimit-limit':'450','x-ratelimit-requests-remaining':'62940','age':'42'}});
+ };
+ try{
+  const s=new ScoreStore(context,env);await s.refresh(now);
+  const body=await(await s.fetch(new Request('https://internal/read'))).json();
+  assert.equal(body.diagnostic.limit_scope,'minute');
+  assert.equal(body.diagnostic.quota.daily_remaining,62940);
+  assert.equal(body.diagnostic.quota.response_age_seconds,42);
+  assert.equal(body.health.usage.worker_requests,2);
+  assert(!JSON.stringify(body).includes('SECRET MUST NOT LEAK'));
+ }finally{globalThis.fetch=original;}
+});
+
+test('missing results take priority over routine final-score rechecks',async()=>{
+ const original=globalThis.fetch,context=ctx(),watch=[],scores={};
+ for(let i=1;i<=21;i++){
+  watch.push({fixture_id:String(i),kickoff:new Date(now-4*3600000).toISOString()});
+  if(i<21)scores[String(i)]={fixture_id:String(i),status:'FT',fulltime:{home:0,away:0},halftime:{home:0,away:0},observed_at:new Date(now-2*3600000).toISOString()};
+ }
+ await context.storage.put('state',{scores,watch,calls:0,watch_at:now,watch_generated_at:now});
+ let requested;
+ globalThis.fetch=async url=>{
+  if(url.endsWith('/status'))return Response.json({response:{subscription:{active:true},requests:{current:100,limit_day:75000}}});
+  requested=new URL(url).searchParams.get('ids').split('-');return Response.json({response:[]});
+ };
+ try{await new ScoreStore(context,env).refresh(now);assert.equal(requested[0],'21');assert.equal(requested.length,20);}
+ finally{globalThis.fetch=original;}
+});

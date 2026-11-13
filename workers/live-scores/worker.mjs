@@ -96,7 +96,8 @@ export class ScoreStore {
     if (!enabled) status = 'disabled';
     else if (last && now - last > 6 * MINUTE) status = 'cron_stale';
     const health = {...s?.health, last_cron_at:timestamp(last), last_successful_poll_at:timestamp(s?.last_successful_poll_at),
-      retry_after:timestamp(s?.retry_at), consecutive_errors:s?.consecutive_errors || 0};
+      retry_after:timestamp(s?.retry_at), consecutive_errors:s?.consecutive_errors || 0,
+      usage:{day:s?.day, worker_requests:s?.calls || 0, provider:s?.provider_usage || null}};
     return json({schema_version:1, enabled, generated_at:timestamp(s?.published_at), poll_interval_seconds:120,
       status, diagnostic:s?.diagnostic || null, health, fixtures:s?.scores || {}});
   }
@@ -132,7 +133,17 @@ export class ScoreStore {
       s.calls++;
       await store.put('state', s);
       const endpoint = path === 'status' ? 'status' : 'fixtures';
-      const response = await fetch(API + path, {headers:{'x-apisports-key':this.env.API_SPORTS_KEY}, signal:AbortSignal.timeout(12_000)});
+      const response = await fetch(API + path, {headers:{'x-apisports-key':this.env.API_SPORTS_KEY,
+        'Cache-Control':'no-cache'}, cache:'no-store', signal:AbortSignal.timeout(12_000)});
+      const numericHeader = name => {
+        const value = response.headers.get(name);
+        return value !== null && /^\d+$/.test(value) ? Number(value) : null;
+      };
+      s.provider_usage = {observed_at:iso(now), endpoint,
+        daily_remaining:numericHeader('x-ratelimit-requests-remaining'),
+        daily_limit:numericHeader('x-ratelimit-requests-limit'),
+        minute_remaining:numericHeader('x-ratelimit-remaining'),
+        minute_limit:numericHeader('x-ratelimit-limit'), response_age_seconds:numericHeader('age')};
       const daily = response.headers.get('x-ratelimit-requests-remaining');
       if (s.quota) {
         s.quota.current++;
@@ -143,7 +154,10 @@ export class ScoreStore {
       const errors = Object.keys(body?.errors || {});
       if (!response.ok || !body || errors.length) {
         const categories = errors.filter(k => KNOWN_ERRORS.has(k));
-        s.diagnostic = {endpoint, http_status:response.status, categories:categories.length ? categories : ['other']};
+        s.diagnostic = {endpoint, http_status:response.status, categories:categories.length ? categories : ['other'],
+          observed_at:iso(now), quota:s.provider_usage,
+          limit_scope:response.headers.get('x-ratelimit-requests-remaining') === '0' ? 'daily' :
+            minute === '0' ? 'minute' : 'unconfirmed'};
         const limited = response.status === 429 || errors.includes('rateLimit') || minute === '0';
         s.provider_retry_after = retryAfter(response.headers, now);
         throw new Error(limited ? 'provider_rate_limit' : errors.length ? 'provider_error' : 'provider_unavailable');
@@ -261,6 +275,7 @@ export class ScoreStore {
       s.pages = Object.fromEntries(dates.map(date => [date, s.pages[date] || 1]));
       // A single bounded batch covers omitted, delayed and corrected fixtures, including overnight ones.
       const due = s.watch.filter(followup).sort((a,b) =>
+        Number(hasFinal(s.scores[a.fixture_id])) - Number(hasFinal(s.scores[b.fixture_id])) ||
         (s.followups[a.fixture_id]?.next_at || 0) - (s.followups[b.fixture_id]?.next_at || 0) ||
         kickoff(a) - kickoff(b)).slice(0, 20);
       if (due.length && !(s.retry_at > now) && s.calls < cap && remaining() > threshold()) {
