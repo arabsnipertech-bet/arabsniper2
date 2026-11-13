@@ -94,6 +94,16 @@ def merge_live(target, row):
     target.update(live=row, status_short=row.get('status') or target.get('status_short'), elapsed=row.get('elapsed'))
 
 
+def historical_score(row):
+    if not final_live(row):
+        return None
+    ft = row['fulltime'] if live_pair(row, 'fulltime') else row['goals']
+    ht = row.get('halftime') or {}
+    return {'status': row['status'], 'settled_at': row['observed_at'], 'source': row.get('source'),
+            'home_ft': ft['home'], 'away_ft': ft['away'],
+            'home_ht': ht.get('home'), 'away_ht': ht.get('away')}
+
+
 def frozen_display(matches, root):
     """Use the existing display rules at the saved prematch time, in isolation."""
     result = subprocess.run(['node', str(Path(__file__).with_name('gold_history_display.cjs'))],
@@ -159,6 +169,11 @@ def refresh_scores(days, payload):
             if not isinstance(row, dict) or str(row.get('fixture_id')) != str(f['fixture_id']):
                 continue
             merge_live(f, row)
+            accepted = f.get('live') or {}
+            if accepted and accepted.get('observed_at') == row.get('observed_at'):
+                final = historical_score(accepted)
+                if final:
+                    f['result'] = merge_result(f.get('result'), final)
 
 
 def project(root, day1, *, now=None, scores=None, display=None, seed=None):
@@ -188,3 +203,15 @@ def project(root, day1, *, now=None, scores=None, display=None, seed=None):
     # Already available at midnight, before the next scan publishes a new day1.
     result['current_day_archive'] = days.get(today.isoformat())
     return result
+
+
+def project_browser_scores(board):
+    """Copy accepted scores onto today's browser projection without editing its scans."""
+    archive = board.get('current_day_archive') or {}
+    if archive.get('date') != board.get('date'):
+        return board
+    rows = {str(f['fixture_id']): f['live'] for match in archive['matches']
+            if (f := match.get('fixture') or {}).get('live') and f.get('fixture_id') is not None}
+    projected = deepcopy(board)
+    refresh_scores({'today': projected}, {'schema_version': 1, 'enabled': True, 'fixtures': rows})
+    return projected

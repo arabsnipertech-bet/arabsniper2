@@ -114,6 +114,9 @@ def prematch_coverage(day, now=None):
 def project(value, upload, page_bytes=PAGE_BYTES, *, triad_history=None):
     if not isinstance(value, dict) or not isinstance(value.get('matches'), list):
         return value
+    if value.get('current_day_archive'):
+        from gold_history import project_browser_scores
+        value = project_browser_scores(value)
     result = {k: v for k, v in value.items() if k != 'matches'}
     for key in ('previous_day', 'current_day_archive'):
         if isinstance(result.get(key), dict):

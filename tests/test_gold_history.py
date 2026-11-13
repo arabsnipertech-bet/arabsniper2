@@ -6,7 +6,7 @@ from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'src'))
-from gold_history import project, FILE, merge_day, frozen_display, refresh_scores
+from gold_history import project, FILE, merge_day, frozen_display, refresh_scores, project_browser_scores
 from audit_storage import read_store
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -77,5 +77,21 @@ class History(unittest.TestCase):
         m=match();m['_gold_history']={'captured_at':'2026-11-05T22:00:00+01:00'}
         before=deepcopy(m);v=frozen_display([m],ROOT)
         self.assertEqual(m,before);self.assertEqual(v[0]['category'],'studio')
+
+    def test_current_gold_feed_persists_final_and_preserves_frozen_selection(self):
+        today = board('2026-11-05', [match()])
+        original = deepcopy(today)
+        with tempfile.TemporaryDirectory() as d:
+            row = {'fixture_id':'1','status':'FT','observed_at':'2026-11-05T23:55:00+01:00',
+                   'fulltime':{'home':1,'away':0}, 'halftime':{'home':0,'away':0}}
+            feed = {'schema_version':1,'enabled':True,'fixtures':{'1':row}}
+            archive = project(d,today,now=time('2026-11-05T23:56:00+01:00'),scores=feed,display=view)
+            self.assertEqual(archive['matches'], original['matches'])
+            projected = project_browser_scores(archive)
+            fixture = projected['matches'][0]['fixture']
+            self.assertEqual(fixture['result']['home_ft'],1)
+            self.assertEqual(fixture['result']['home_ht'],0)
+            self.assertEqual(projected['matches'][0]['multimarket'],original['matches'][0]['multimarket'])
+            self.assertEqual(today,original)
 
 if __name__=='__main__':unittest.main()
