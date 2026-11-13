@@ -1,0 +1,77 @@
+name: Verify two official halftime scores
+on:
+  push:
+    branches: [ops/verify-two-halftimes-20261113]
+    paths: [.github/workflows/verify-two-halftimes-20261113.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Compare bounded read-only official score responses
+        env:
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import time
+          from urllib.error import HTTPError
+          from urllib.parse import urlencode
+          from urllib.request import Request, urlopen
+
+          key = os.environ.get('API_SPORTS_KEY')
+          if not key:
+              raise SystemExit('Official provider key unavailable')
+          base = 'https://v3.football.api-sports.io/'
+          def read(endpoint, parameters=None):
+              path = endpoint + ('?' + urlencode(parameters) if parameters else '')
+              request = Request(base+path, headers={'x-apisports-key':key,'Cache-Control':'no-cache'})
+              try:
+                  with urlopen(request, timeout=12) as reply:
+                      value = json.load(reply)
+                      headers = reply.headers
+              except HTTPError as error:
+                  raise SystemExit('Official provider HTTP ' + str(error.code)) from None
+              if value.get('errors'):
+                  raise SystemExit('Official provider rejected bounded request to ' + endpoint)
+              remaining = headers.get('x-ratelimit-remaining') or ''
+              daily = headers.get('x-ratelimit-requests-remaining') or ''
+              if headers.get('Retry-After') or remaining.isdecimal() and int(remaining) <= 2:
+                  raise SystemExit('Official provider cooldown or per-minute allowance reached')
+              if daily.isdecimal() and int(daily) <= 1000:
+                  raise SystemExit('Official provider daily reserve reached')
+              return value['response']
+          status = read('status')
+          calls = status.get('requests') or {}
+          if (status.get('subscription',{}).get('active') is not True
+              or not all(type(calls.get(k)) is int for k in ('current','limit_day'))
+              or calls['limit_day']-calls['current'] <= max(1000,(calls['limit_day']+9)//10)):
+              raise SystemExit('Official provider usage unavailable or reserve reached')
+          print(json.dumps({'remaining_day':calls['limit_day']-calls['current']}), flush=True)
+          for fixture in (1564928, 1564933):
+              time.sleep(0.30)
+              rows = read('fixtures', {'id':fixture,'timezone':'Europe/Rome'})
+              for row in rows:
+                  fields = row['fixture']
+                  assert fields['id'] == fixture
+                  print(json.dumps({
+                      'fixture_id':fixture,
+                      'fixture_status':fields['status']['short'],
+                      'teams':[row['teams'][side]['name'] for side in ('home','away')],
+                      'league':row['league']['name'],
+                      'goals':row.get('goals'),
+                      'score':row.get('score'),
+                      'goals_events':[{
+                          'elapsed':item.get('time',{}).get('elapsed'),
+                          'extra':item.get('time',{}).get('extra'),
+                          'team':item.get('team',{}).get('name'),
+                          'detail':item.get('detail')
+                      } for item in row.get('events') or [] if item.get('type') == 'Goal'],
+                  }), flush=True)
+              if not rows:
+                  print(json.dumps({'fixture_id':fixture, 'response':'no record'}), flush=True)
+          PY
