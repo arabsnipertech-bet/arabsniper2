@@ -101,3 +101,42 @@ test('poll works without AbortSignal.timeout and releases its timer',async()=>{
  vm.createContext(scope);vm.runInContext(fs.readFileSync('web/live-scores.js','utf8'),scope);
  await scope.ArabLive.poll();assert.equal(called,1);assert.equal(cleared,1);
 });
+
+
+test('missing date-feed fixture is recovered by exact ID without inventing results',async()=>{
+ const original=globalThis.fetch,calls=[];
+ globalThis.fetch=async url=>{
+  calls.push(url);
+  if(url.includes('raw.githubusercontent'))return Response.json({generated_at:new Date(now).toISOString(),fixtures:[{fixture_id:'123',kickoff:'2026-10-21T17:00:00Z'}]});
+  if(url.endsWith('/status'))return Response.json({response:{subscription:{active:true},requests:{current:100,limit_day:7500}}});
+  if(url.includes('fixtures?date='))return Response.json({response:[]});
+  if(url.includes('fixtures?id=123'))return Response.json({response:[{...row,fixture:{id:123,status:{short:'FT',elapsed:90}},score:{halftime:{home:0,away:0},fulltime:{home:2,away:1}}}]});
+  throw Error('unexpected fetch');
+ };
+ try{
+  const s=new ScoreStore(ctx(),env);await s.refresh(now);
+  const data=await(await s.fetch(new Request('https://internal/read'))).json();
+  assert.equal(data.fixtures['123'].status,'FT');
+  assert.equal(data.fixtures['123'].fulltime.home,2);
+  assert.equal(data.fixtures['123'].fulltime.away,1);
+  assert(calls.some(x=>x.includes('fixtures?id=123')));
+  await s.refresh(now+120000);
+  assert.equal(calls.filter(x=>x.includes('fixtures?id=123')).length,1,'Final fixtures are not queried again');
+ }finally{globalThis.fetch=original;}
+});
+
+test('missing date feed and exact ID cannot fabricate a final score',async()=>{
+ const original=globalThis.fetch,calls=[];
+ globalThis.fetch=async url=>{
+  calls.push(url);
+  if(url.includes('raw.githubusercontent'))return Response.json({generated_at:new Date(now).toISOString(),fixtures:[{fixture_id:'123',kickoff:'2026-10-21T17:00:00Z'}]});
+  if(url.endsWith('/status'))return Response.json({response:{subscription:{active:true},requests:{current:100,limit_day:7500}}});
+  return Response.json({response:[]});
+ };
+ try{
+  const s=new ScoreStore(ctx(),env);await s.refresh(now);
+  const data=await(await s.fetch(new Request('https://internal/read'))).json();
+  assert.equal(data.fixtures['123'],undefined);
+  assert.equal(data.status,'ok');
+ }finally{globalThis.fetch=original;}
+});
