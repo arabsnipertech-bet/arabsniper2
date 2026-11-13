@@ -15,7 +15,7 @@ on:
         default: false
   push:
     branches: [main]
-    paths: ['.github/workflows/recover-daily-results.yml']
+    paths: ['.github/workflows/recover-daily-results.yml', 'auditor/recover_daily.py']
 permissions:
   contents: read
 env:
