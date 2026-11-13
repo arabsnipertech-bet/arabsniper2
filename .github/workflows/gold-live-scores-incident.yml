@@ -14,7 +14,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install 'boto3>=1.42,<2'
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout: |
+            src
+            web
+      - run: pip install 'boto3>=1.42,<2' cryptography ijson==3.6.0 requests
       - name: Read live Worker and official fixtures
         env:
           CF_DEDICATED: ${{ secrets.CLOUDFLARE_LIVE_SCORES_API_TOKEN }}
@@ -27,7 +34,7 @@ jobs:
           API_KEY: ${{ secrets.API_SPORTS_KEY }}
         shell: python
         run: |
-          import email.parser, email.policy, hashlib, json, os, subprocess
+          import base64, email.parser, email.policy, hashlib, json, os, subprocess, tempfile
           from datetime import datetime, timezone
           from urllib.error import HTTPError, URLError
           from urllib.parse import urlencode
@@ -192,11 +199,14 @@ jobs:
 
           selected = {'1644690', '1649517'}
           found = {}
+          real_gold = {}
           def record(match, origin):
               f = match.get('fixture') or {}
               fid = str(f.get('fixture_id'))
               if fid not in selected:
                   return
+              if origin == 'browser_today':
+                  real_gold[fid] = match
               v7 = ((match.get('multimarket') or {}).get('matrix') or {}).get('v7') or {}
               triad = v7.get('triad') or match.get('triad') or {}
               found.setdefault(fid, []).append({'location':origin,
@@ -238,3 +248,79 @@ jobs:
                    'verified':True, 'generated_at':audit.get('generated_at')})
           else:
               show('gold_auditor', {'date':day, 'available':False})
+
+          import sys
+          sys.path.insert(0, 'src')
+          from lateral_matrix import settle_spec
+          from v7_archive import FINISHED, checked_score
+          public_checks = {
+              '1644690': {'status':'FT', 'home_ht':0, 'away_ht':0, 'home_ft':0, 'away_ft':0},
+              '1649517': {'status':'FT', 'home_ht':0, 'away_ht':0, 'home_ft':1, 'away_ft':0},
+          }
+          if set(real_gold) != selected:
+              raise SystemExit('Both original Gold fixtures are required for the replay')
+          script = """
+          const fs = require('node:fs');
+          const matrix = require('./web/lateral-matrix.js');
+          require('./web/live-scores.js');
+          const {matches, scores, live} = JSON.parse(fs.readFileSync(0, 'utf8'));
+          const out = {};
+          const states = {won:[1,0],lost:[0,1],void:[0,0],half_won:[.5,0],half_lost:[0,.5]};
+          for (const [id, match] of Object.entries(matches)) {
+            const before = JSON.stringify(match);
+            const result = scores[id];
+            const view = matrix.publishedView(match);
+            if (!view || Object.values(view.triad).filter(Boolean).length !== 3) throw Error('Missing rendered proposal');
+            const observed = new Date().toISOString(), fulltime = {home:result.home_ft,away:result.away_ft};
+            const feed = {schema_version:1,enabled:true,fixtures:{[id]:{fixture_id:id,status:'FT',
+              fulltime,goals:fulltime,halftime:{home:result.home_ht,away:result.away_ht},observed_at:observed}}};
+            if (live.enabled) ArabLive.accept(live);
+            const production = Object.fromEntries(Object.entries(view.triad).map(([role,pick])=>[role,matrix.triadSettlement(match,pick.source.spec)]));
+            ArabLive.accept(feed);
+            const replay = Object.fromEntries(Object.entries(view.triad).map(([role,pick])=>[role,{
+              label:pick.record.label, market_id:pick.signal.market_id,
+              captured_at:view.v7.captured_at, outcome:matrix.triadSettlement(match,pick.source.spec)}]));
+            if (JSON.stringify(match) !== before) throw Error('Original forecast changed during settlement');
+            out[id] = {production, replay, score:ArabLive.view(match).score, ht:ArabLive.firstHalf(match).score};
+            for (const item of Object.values(replay)) if (!states[item.outcome]) throw Error('Missing replay outcome');
+          }
+          process.stdout.write(JSON.stringify(out));
+          """
+          replay = json.loads(subprocess.check_output(['node', '-e', script],
+              input=json.dumps({'matches':real_gold, 'scores':public_checks, 'live':live}).encode(), timeout=20))
+          weights = {'won':(1,0), 'lost':(0,1), 'void':(0,0), 'half_won':(.5,0), 'half_lost':(0,.5)}
+          for fid, item in replay.items():
+              for pick in item['replay'].values():
+                  if settle_spec(json.loads(pick['market_id']), public_checks[fid]) != weights[pick['outcome']]:
+                      raise SystemExit('Browser and Auditor disagree on the real archived proposals')
+          show('gold_replay', {'fixtures': len(replay), 'proposals': 6, 'browser_auditor_agree': True})
+          pending_ids = []
+          if item := manifest.get(path):
+              pending_ids = sorted(fid for fid, row in audit.get('fixtures', {}).items() if row.get('status') == 'pending')
+          if pending_ids and len(pending_ids) <= 20 and diagnostic['headers'].get('x-ratelimit-remaining') not in ('0','1','2'):
+              result, provider_rows, rejected = provider('fixtures?' + urlencode({'ids':'-'.join(pending_ids),'timezone':'Europe/Rome'}))
+              states = {}
+              for row in provider_rows if isinstance(provider_rows, list) else []:
+                  fixture = row.get('fixture') or {}
+                  fid = str(fixture.get('id'))
+                  if fid not in pending_ids:
+                      continue
+                  score = row.get('score') or {}
+                  ft, ht = score.get('fulltime') or {}, score.get('halftime') or {}
+                  state = (fixture.get('status') or {}).get('short')
+                  states[fid] = checked_score({'status':state, 'home_ft':ft.get('home'), 'away_ft':ft.get('away'),
+                     'home_ht':ht.get('home'), 'away_ht':ht.get('away')})
+              from collections import Counter
+              show('yesterday_provider', dict(result, checked=len(pending_ids),
+                   statuses=dict(Counter(states.get(fid, {}).get('status') or 'missing' for fid in pending_ids)),
+                   usable_finals=[fid for fid, row in states.items() if row['status'] in FINISHED and row['home_ft'] is not None and row['away_ft'] is not None]))
+          from cryptography.hazmat.primitives import hashes, serialization
+          from cryptography.hazmat.primitives.asymmetric import padding
+          from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+          public = serialization.load_pem_public_key(("-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAy6YcG8X/s0xONGrdA1zy\n9ktycgp8FjmRCGTriZVhK3mgvKtlmZKQrW+XvmzOkB5XbrQfwcU93IZnM9g/1Nc0\nKKZem6LRuF+dlQRtcIBnkAYl45yJCADatxYBNZ0YMjz0V82QNrXUJGmqSwu+Qnlv\nYSxoSw6scbmiiD4bAmfeaG0LDotUFhTxvXwzDYGMBZQbqKFrRXNI/o/YkVaqbGfi\nwZ0b8jKHm5adSiJ460+eLMSGAl/258XQoHTL0S3Sl4x+0pBBdyYgNlTeJK6WzuXd\nl7/TTii+WoZ/GC83TtfKBwb5F4Xh43nR8MXmj3aigW2rYWm2ehjwGuJQ2nsE+UEp\nDfLfh0rhumcVmHQSiQpaV3YTKHnnyd04aDR38Tg8JPuInWZ3y/U+JrT5n6qHVspW\naRcap9IuhfJnvEEJZYcrNq5cEeARh4z0FsUFG1rtMaUUgby9lMafFHI73khjNWct\nF8Tz1aa7b7Px1J0QHZLALrKC4EqNORkArrmMpn87jCCrAgMBAAE=\n-----END PUBLIC KEY-----\n").encode())
+          aes_key, nonce = AESGCM.generate_key(bit_length=256), os.urandom(12)
+          aad = b'arabsniper-gold-results-incident'
+          wrapped = public.encrypt(aes_key, padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),algorithm=hashes.SHA256(),label=None))
+          ciphertext = AESGCM(aes_key).encrypt(nonce, json.dumps(replay).encode(), aad)
+          show('encrypted_replay', {key:base64.b64encode(value).decode() for key, value in
+             {'key':wrapped,'nonce':nonce,'ciphertext':ciphertext}.items()})
