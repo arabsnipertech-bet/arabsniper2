@@ -6,7 +6,7 @@ on:
     branches: [main]
     types: [completed]
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '2-57/5 * * * *'
   push:
     branches: [main]
     paths:
@@ -21,7 +21,7 @@ jobs:
   recover:
     if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-24.04
-    timeout-minutes: 3
+    timeout-minutes: 9
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,6 +32,7 @@ jobs:
             data/live_watchlist.json
       - run: pip install 'boto3>=1.42,<2'
       - name: Recover only tracked missing or stale scores
+        id: relay
         env:
           API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
           R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -39,3 +40,14 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: python3 .github/ops/live-scores-relay.py
+      - name: Recover live scores between Fast Backup runs
+        if: ${{ !cancelled() && github.event_name == 'workflow_run' && steps.relay.outputs.live_followup == 'true' }}
+        env:
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          sleep 250
+          python3 .github/ops/live-scores-relay.py

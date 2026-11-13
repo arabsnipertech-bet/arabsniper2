@@ -51,6 +51,7 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           FIXTURE_IDS: ${{ inputs.fixture_ids }}
+          RELAY_FINISHED_AT: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.updated_at || '' }}
         run: |
           args=()
           # Reconcile the last two closed dates; this reads R2 and costs no provider calls.

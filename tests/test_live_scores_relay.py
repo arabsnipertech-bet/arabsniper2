@@ -46,6 +46,16 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(relay.due(watch(28),{'fixtures':rows},NOW),[])
         self.assertEqual(set(relay.due(watch(28),live,NOW)),set(rows))
         self.assertEqual(len(relay.due(watch(50),live,NOW)),40)
+    def test_midpoint_checks_only_affected_live_or_just_started_fixtures(self):
+        candidate = {'fixtures': [{'fixture_id': '1', 'kickoff': (NOW-timedelta(minutes=10)).isoformat()}]}
+        live = {'fixtures': {'1': {'status': '1H'}}, 'status': 'provider_rate_limit'}
+        self.assertTrue(relay.needs_midpoint(candidate, live, NOW))
+        self.assertTrue(relay.needs_midpoint(candidate, {**live, 'fixtures': {}}, NOW))
+        self.assertTrue(relay.needs_midpoint(watch(0), {**live, 'health': {'stale_live_fixtures': 1}}, NOW))
+        self.assertFalse(relay.needs_midpoint(candidate, {**live, 'status': 'ok'}, NOW))
+        self.assertFalse(relay.needs_midpoint(candidate, {**live, 'diagnostic': {'limit_scope': 'daily'}}, NOW))
+        self.assertFalse(relay.needs_midpoint(candidate, {**live, 'fixtures': {'1': {'status': 'FT'}}}, NOW))
+        self.assertFalse(relay.needs_midpoint(candidate, {**live, 'fixtures': {}}, NOW+timedelta(minutes=10)))
     def test_cap_and_cooldown_include_failed_requests(self):
         self.assertFalse(relay.allowed({'day':'2026-11-13','calls':599},NOW))
         self.assertFalse(relay.allowed({'day':'2026-11-13','calls':2,'attempted_at':NOW.isoformat()},NOW))
