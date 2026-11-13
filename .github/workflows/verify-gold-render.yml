@@ -1,0 +1,65 @@
+name: Verify published Gold rendering with real scores
+on:
+  push:
+    branches: [ops/gold-results-audit-20261113]
+    paths: [.github/workflows/verify-gold-render.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout: web
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: pip install 'boto3>=1.42,<2'
+      - name: Evaluate exact published picks and production score overlay
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        shell: python
+        run: |
+          import boto3, hashlib, json, os, subprocess
+          from botocore.config import Config
+          ids={'1644690','1649517','1520978','1549868','1549870','1631607'}
+          storage=boto3.client('s3',region_name='auto',endpoint_url='https://dfdb02b4139b31c0ab4456a50eb371a2.r2.cloudflarestorage.com',
+              aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
+              config=Config(connect_timeout=5,read_timeout=15,retries={'total_max_attempts':2}))
+          matches=[]
+          for slot in range(1,6):
+              key=f'arab_quote_day{slot}.json'
+              raw=storage.get_object(Bucket='arabsniper-gold',Key=key)['Body'].read()
+              data=json.loads(raw)
+              selected=[m for m in data.get('matches',[]) if str(m.get('fixture',{}).get('fixture_id')) in ids]
+              print('Published feed',json.dumps({'file':key,'sha256':hashlib.sha256(raw).hexdigest(),'date':data.get('date'),'generated_at':data.get('generated_at'),'target_count':len(selected)}),flush=True)
+              matches.extend(selected)
+          response=subprocess.run(['curl','-fsS','--max-time','15','https://arabsniperbet.com/api/live-scores'],capture_output=True,check=True)
+          live=json.loads(response.stdout)
+          script="""
+          const matrix=require('./web/lateral-matrix.js');
+          let input='';process.stdin.on('data',b=>input+=b);process.stdin.on('end',()=>{
+            const {matches,live}=JSON.parse(input);
+            const seen=new Set();
+            for(const original of matches){
+              const m=structuredClone(original),id=String(m.fixture.fixture_id);
+              if(seen.has(id))continue;seen.add(id);
+              m.fixture.live=live.fixtures[id]||m.fixture.live;
+              const view=matrix.publishedView(m);
+              const saved=m.multimarket?.matrix?.v7?.triad||{};
+              const roles=Object.fromEntries(Object.entries(view?.triad||{}).map(([role,p])=>[role,p?matrix.triadSettlement(m,p.source.spec):null]));
+              const html=view?.triad?matrix.triadPanel(view,true,m):'';
+              console.log(JSON.stringify({fixture_id:id,kickoff:m.fixture.kickoff,live_status:m.fixture.live?.status,
+                halftime:m.fixture.live?.halftime,fulltime:m.fixture.live?.fulltime,saved_roles:Object.entries(saved).filter(([k,v])=>v).map(([k])=>k),
+                rendered_roles:roles,rendered_slots:(html.match(/data-v7-slot=/g)||[]).length}));
+            }
+            console.log(JSON.stringify({missing_target_ids:[...['1644690','1649517']].filter(id=>!seen.has(id))}));
+          });
+          """
+          result=subprocess.run(['node','-e',script],input=json.dumps({'matches':matches,'live':live}),text=True,capture_output=True,check=True)
+          print(result.stdout,flush=True)
