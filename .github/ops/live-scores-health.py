@@ -148,19 +148,25 @@ def current_delivery(live, summary, reasons, now):
         return None
     health = summary['health']
     live_due = health.get('live_tracking_fixtures')
+    tracked_ids = health.get('live_tracking_fixture_ids')
     earliest = now - LIVE_FRESHNESS
     latest = now + timedelta(seconds=30)
+    covered = set()
     active_scores = 0
     direct_fresh = relay_fresh = False
-    for row in live['fixtures'].values():
+    for fid, row in live['fixtures'].items():
         observed = stamp(row.get('observed_at'))
         fresh = observed is not None and earliest <= observed <= latest and not row.get('refresh_failed')
         active = row.get('status') in LIVE_PHASES
+        pair = row.get('goals') or {}
+        live_score = active and all(type(pair.get(side)) is int and pair[side] >= 0 for side in ('home', 'away'))
         if active:
             active_scores += 1
-            if not fresh:
+            if not fresh or not live_score:
                 return None
         if fresh and row.get('source') == 'API-Football':
+            if active or row.get('status') in ('NS', 'TBD'):
+                covered.add(fid)
             if row.get('transport') == 'GitHub Actions/R2':
                 relay_fresh = True
             elif active:
@@ -168,7 +174,11 @@ def current_delivery(live, summary, reasons, now):
     if type(live_due) is int:
         if live_due == active_scores == 0:
             return 'idle'
-        if live_due > active_scores:
+        if tracked_ids is not None:
+            if not isinstance(tracked_ids, list) or len(tracked_ids) != live_due or any(
+                    not isinstance(fid, str) or fid not in covered for fid in tracked_ids):
+                return None
+        elif live_due > len(covered):
             return None
     if relay_fresh and not (health.get('relay') or {}).get('error'):
         return 'relay'

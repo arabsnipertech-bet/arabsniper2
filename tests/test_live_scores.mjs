@@ -443,3 +443,19 @@ test('closed matches without halftime keep the final and retry only when due',as
   assert.deepEqual((await context.storage.get('final:123')).fulltime,{home:5,away:0});
  }finally{globalThis.fetch=original;}
 });
+test('live tracking lists exact fixtures and allows confirmed kickoff delays',async()=>{
+ const context=ctx(), watch=[
+  {fixture_id:'123',kickoff:new Date(now-20*60000).toISOString()},
+  {fixture_id:'124',kickoff:new Date(now-4*60000).toISOString()},
+  {fixture_id:'125',kickoff:new Date(now-6*60000).toISOString()},
+  {fixture_id:'126',kickoff:new Date(now+2*60000).toISOString()},
+ ];
+ const notStarted=id=>normalize({fixture:{id,status:{short:'NS'}}},now);
+ await context.storage.put('state',{scores:{'123':notStarted(123),'124':notStarted(124),'126':notStarted(126)},
+  watch,calls:20,watch_at:now,watch_generated_at:now,day:new Date(now).toISOString().slice(0,10),
+  retry_at:now+600000,status:'provider_rate_limit',minute_backoff_v2:true});
+ await new ScoreStore(context,env).refresh(now);
+ const {health}=await context.storage.get('state');
+ assert.equal(health.live_tracking_fixtures,2);
+ assert.deepEqual(health.live_tracking_fixture_ids,['124','125']);
+});
