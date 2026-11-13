@@ -1,9 +1,11 @@
 import importlib.util
+import json
 import sys
 from contextlib import redirect_stdout
 from datetime import datetime, timedelta, timezone
 from io import StringIO
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest import TestCase, mock
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,8 +19,9 @@ NOW = datetime(2026, 11, 13, 15, 56, 21, tzinfo=timezone.utc)
 
 
 def feed(status='provider_rate_limit', *, cron_age=2, overdue=0, missing_halftime=0,
-         watchlist_status=None, limit_scope='unconfirmed', retry_minutes=3, stale_live=0):
-    limited = status == 'provider_rate_limit'
+         watchlist_status=None, limit_scope='unconfirmed', retry_minutes=3, stale_live=0,
+         live_due=None):
+    limited = status in ('provider_rate_limit', 'minute_quota_low')
     return {
         'enabled': True,
         'schema_version': 1,
@@ -33,6 +36,7 @@ def feed(status='provider_rate_limit', *, cron_age=2, overdue=0, missing_halftim
             'missing_halftime': missing_halftime,
             'stale_live_fixtures': stale_live,
             'watchlist_status': watchlist_status,
+            'live_tracking_fixtures': live_due,
         },
     }
 
@@ -83,7 +87,6 @@ class LiveScoresHealthTests(TestCase):
         cases = (
             ('overdue fixture', feed(overdue=1)),
             ('stale live fixture', feed(stale_live=1)),
-            ('missing halftime', feed(missing_halftime=1)),
             ('stale cron', feed(cron_age=9)),
             ('stale watchlist', feed(watchlist_status='watchlist_stale')),
             ('daily limit', feed(limit_scope='daily')),
@@ -127,7 +130,7 @@ class LiveScoresHealthTests(TestCase):
         summary, reasons, waits, reads, log = self.inspect([current])
         self.assertEqual(reasons, [])
         self.assertEqual(summary['status'], 'provider_rate_limit')
-        self.assertTrue(summary['relay_serves_live_scores'])
+        self.assertEqual(summary['delivery_during_provider_limit'], 'relay')
         self.assertIn('::warning', log)
         self.assertEqual((waits, reads), ([], 1))
 
@@ -138,7 +141,7 @@ class LiveScoresHealthTests(TestCase):
         summary, reasons, waits, reads, log = self.inspect(
             [initial, updated], relay_finished_at=NOW - timedelta(seconds=10))
         self.assertEqual(reasons, [])
-        self.assertTrue(summary['relay_serves_live_scores'])
+        self.assertEqual(summary['delivery_during_provider_limit'], 'relay')
         self.assertFalse(summary['rate_limit_recheck']['cleared'])
         self.assertIn('::warning', log)
         self.assertEqual((waits, reads), ([15], 2))
@@ -148,21 +151,20 @@ class LiveScoresHealthTests(TestCase):
         summary, reasons, waits, reads, _ = self.inspect(
             [feed(stale_live=21), still_stale], relay_finished_at=NOW - timedelta(seconds=10))
         self.assertIn('Tracked live scores missing or older than five minutes', reasons)
-        self.assertNotIn('relay_serves_live_scores', summary)
+        self.assertNotIn('delivery_during_provider_limit', summary)
         self.assertEqual((waits, reads), ([15], 2))
 
     def test_relay_without_a_new_worker_cycle_times_out(self):
         stale = feed(stale_live=21)
         summary, reasons, waits, reads, _ = self.inspect([stale] * 10, relay_finished_at=NOW)
         self.assertIn('Tracked live scores missing or older than five minutes', reasons)
-        self.assertNotIn('relay_serves_live_scores', summary)
+        self.assertNotIn('delivery_during_provider_limit', summary)
         self.assertEqual((sum(waits), reads), (135, 10))
 
     def test_daily_limits_and_delivery_gaps_remain_errors(self):
         cases = (
             ('daily', feed(limit_scope='daily'), relayed_score()),
             ('overdue', feed(overdue=1, retry_minutes=8), relayed_score()),
-            ('missing halftime', feed(missing_halftime=1), relayed_score()),
             ('watchlist', feed(watchlist_status='watchlist_stale'), relayed_score()),
             ('stale relay', feed(retry_minutes=8), relayed_score(NOW - timedelta(minutes=6))),
             ('stale worker', feed(retry_minutes=8),
@@ -176,6 +178,56 @@ class LiveScoresHealthTests(TestCase):
                     del current['fixtures']['123']
                 summary, reasons, waits, reads, log = self.inspect([current])
                 self.assertTrue(reasons)
-                self.assertNotIn('relay_serves_live_scores', summary)
+                self.assertNotIn('delivery_during_provider_limit', summary)
                 self.assertNotIn('::warning', log)
                 self.assertEqual((waits, reads), ([], 1))
+
+    def test_throttling_with_no_live_matches_is_an_operational_warning(self):
+        for status in ('provider_rate_limit', 'minute_quota_low'):
+            with self.subTest(status=status):
+                summary, reasons, waits, reads, log = self.inspect(
+                    [feed(status, live_due=0, missing_halftime=2)])
+                self.assertEqual(reasons, [])
+                self.assertEqual(summary['delivery_during_provider_limit'], 'idle')
+                self.assertIn('No live or overdue score updates are due', log)
+                self.assertEqual((waits, reads), ([], 1))
+
+    def test_fresh_direct_scores_cover_a_limited_followup(self):
+        current = feed(live_due=1, missing_halftime=2)
+        current['fixtures']['123'] = relayed_score(transport=None)
+        summary, reasons, waits, reads, _ = self.inspect([current])
+        self.assertEqual(reasons, [])
+        self.assertEqual(summary['delivery_during_provider_limit'], 'direct')
+        self.assertEqual((waits, reads), ([], 1))
+
+    def test_recent_relay_does_not_cover_a_missing_live_score(self):
+        current = feed(live_due=2, retry_minutes=8)
+        current['fixtures']['123'] = relayed_score()
+        summary, reasons, waits, reads, _ = self.inspect([current])
+        self.assertEqual(reasons, ['Collector state: provider_rate_limit'])
+        self.assertNotIn('delivery_during_provider_limit', summary)
+        self.assertEqual((waits, reads), ([], 1))
+
+    def test_completed_finals_with_unknown_halftimes_exit_successfully_and_report_coverage(self):
+        current = feed('ok', missing_halftime=2)
+        matches = {'1564928': 5, '1564933': 2}
+        for fid, goals in matches.items():
+            current['fixtures'][fid] = {
+                'status': 'FT', 'fulltime': {'home': goals, 'away': 0},
+                'halftime': {'home': None, 'away': None},
+            }
+        with TemporaryDirectory() as temp, redirect_stdout(StringIO()) as log:
+            path = Path(temp) / 'summary.md'
+            with (mock.patch.object(health, 'get_json', return_value=current),
+                  mock.patch.object(health, 'datetime', wraps=datetime) as clock,
+                  mock.patch.object(health, 'recent_audit', return_value={}),
+                  mock.patch.dict(health.os.environ, {'GITHUB_STEP_SUMMARY': str(path)})):
+                clock.now.return_value = NOW
+                health.run([], True)
+            block = path.read_text().split('```json\n', 1)[1]
+            report = json.loads(block.split('\n```', 1)[0])
+        self.assertEqual(report['missing_halftime_fixture_ids'], list(matches))
+        self.assertEqual(report['health']['missing_halftime'], 2)
+        self.assertEqual([x['differences'] for x in report['auditor_days']], [0, 0])
+        self.assertIn('::warning title=Gold halftime coverage::2 finished fixtures', log.getvalue())
+        self.assertIn('Markets that require halftime remain unverified', log.getvalue())

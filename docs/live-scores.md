@@ -53,9 +53,10 @@ fixtures past their expected finish without a final result. The GitHub relay
 prioritizes the stale live fixture IDs reported by the Worker. When the direct
 collector is rate-limited, the relay can pick up active fixtures after two
 minutes and carry up to two groups of 20 in the existing private snapshot.
-It keeps the first successful group if the second fails and honors the relay's
-own Retry-After and daily allowance. If Fast Backup starts the relay while
-the direct collector is temporarily limited and fixtures are active, the
+It keeps the first successful group if the second is limited, records the
+deferral as a warning, and honors the relay's own Retry-After and daily
+allowance. The monitor still checks the resulting feed. If Fast Backup starts
+the relay while the direct collector is temporarily limited and fixtures are active, the
 same run checks again just over four minutes later. This bridges the gap
 between ten-minute Fast Backup checks when a GitHub scheduled run is delayed.
 The same cooldown and daily allowance apply to both attempts. An automated
@@ -65,10 +66,15 @@ present, and the collector has a retry within the window. The recheck reads
 only the stored public feed. If the feed recovers, the workflow records a
 warning and preserves the initial diagnostic. After a successful relay run,
 the monitor can wait for the next Worker cron before evaluating freshness.
-A temporary provider limit is recorded as a warning when recent official
-relay results are visible and all tracked live and due scores are healthy.
-Missing, stale or overdue scores, an exhausted daily quota or a limit with
-no recent relay evidence still fail the check.
+A temporary provider limit is recorded as a warning while no live or overdue
+matches need an update, or while an official score from the Worker or relay
+is still fresh and covers the matches in progress. A stalled feed, stale live
+scores, overdue finals, exhausted daily quota and Auditor discrepancies fail
+the check. A confirmed final with a missing halftime is reported as a coverage
+warning with fixture IDs. Its halftime markets remain unverified. The Worker
+and relay retry those records after 30 minutes on the first day and after two
+hours thereafter, inside the existing recovery window. Live and overdue
+fixtures have priority.
 The monitor compares the two most recent closed Rome dates with the
 checksummed Auditor archive after the nightly window. A manual run can compare
 up to 20 fixture IDs against API-Football using the existing GitHub Secret.

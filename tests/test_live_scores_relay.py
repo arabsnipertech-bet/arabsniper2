@@ -1,4 +1,5 @@
 import importlib.util
+from contextlib import redirect_stdout
 from pathlib import Path
 import unittest
 from unittest import mock
@@ -25,6 +26,21 @@ class RelayTests(unittest.TestCase):
     def test_complete_zero_score_needs_no_provider_call(self):
         row={'status':'FT','halftime':{'home':0,'away':0},'fulltime':{'home':0,'away':0}}
         self.assertEqual(relay.due(watch(),{'fixtures':{'1':row}},NOW),[])
+    def test_halftime_only_recovery_uses_slower_cadence_and_yields_to_live_scores(self):
+        fixtures = watch(2)
+        fixtures['fixtures'][1]['kickoff'] = (NOW - timedelta(hours=1)).isoformat()
+        half_missing = {'status': 'FT', 'goals': {'home': 5, 'away': 0},
+                        'observed_at': (NOW - timedelta(minutes=10)).isoformat()}
+        live = {'status': 'provider_rate_limit', 'fixtures': {
+            '1': half_missing, '2': {'status': '2H', 'observed_at': (NOW - timedelta(minutes=3)).isoformat()},
+        }}
+        self.assertEqual(relay.due(fixtures, live, NOW), ['2'])
+        half_missing['observed_at'] = (NOW - timedelta(minutes=30)).isoformat()
+        self.assertEqual(relay.due(fixtures, live, NOW), ['2', '1'])
+        fixtures['fixtures'][0]['kickoff'] = (NOW - timedelta(days=1)).isoformat()
+        self.assertEqual(relay.due(fixtures, live, NOW), ['2'])
+        half_missing['observed_at'] = (NOW - timedelta(hours=2)).isoformat()
+        self.assertEqual(relay.due(fixtures, live, NOW), ['2', '1'])
     def test_fresh_live_is_deduplicated(self):
         row={'status':'1H','observed_at':NOW.isoformat()}
         self.assertEqual(relay.due(watch(),{'fixtures':{'1':row}},NOW),[])
@@ -99,11 +115,13 @@ class RelayTests(unittest.TestCase):
               mock.patch.object(relay.Path, 'read_text', return_value=json.dumps(fixtures)),
               mock.patch.object(relay.subprocess, 'run', return_value=SimpleNamespace(stdout=json.dumps(feed))),
               mock.patch.object(relay.time, 'sleep'),
-              mock.patch.object(relay, 'urlopen', side_effect=[response(quota), response(body), limited]) as provider):
+              mock.patch.object(relay, 'urlopen', side_effect=[response(quota), response(body), limited]) as provider,
+              redirect_stdout(io.StringIO()) as log):
             clock.now.return_value = NOW
-            with self.assertRaisesRegex(ValueError, 'Official provider HTTP 429'):
-                relay.run()
+            relay.run()
         self.assertEqual(provider.call_count, 3)
+        self.assertIn('::warning title=Gold score recovery::', log.getvalue())
+        self.assertIn('"relay_saved": 20', log.getvalue())
         persisted = json.loads(storage.put_object.call_args.kwargs['Body'])
         self.assertEqual(persisted['calls'], 3)
         self.assertEqual([str(r['fixture']['id']) for r in persisted['fixtures']], first_ids)
