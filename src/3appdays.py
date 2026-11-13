@@ -43,6 +43,7 @@ import time
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple
 
@@ -84,6 +85,7 @@ REMOTE_BET_CATALOG_FILE = "data/arab_bet_catalog.json"
 
 API_MIN_INTERVAL = 0.25
 API_RETRIES = (0, 2, 5)
+API_MAX_RETRY_WAIT = 60
 MAX_HISTORY_POINTS = 120
 MAX_TEAM_MATCHES = 8
 MAX_H2H_MATCHES = 5
@@ -281,6 +283,7 @@ class APIClient:
     def __post_init__(self) -> None:
         self.session = requests.Session()
         self.last_call_ts: Optional[float] = None
+        self.provider_retry_at = 0.0
         self.cache: Dict[str, Any] = {}
         self.request_count = 0
         self.odds_enricher = None
@@ -306,6 +309,30 @@ class APIClient:
             if wait > 0:
                 time.sleep(wait)
         self.last_call_ts = time.monotonic()
+
+    def _record_provider_cooldown(self, response, fallback=0):
+        daily_empty = response.headers.get('x-ratelimit-requests-remaining') == '0'
+        minute_empty = response.headers.get('x-ratelimit-remaining') == '0'
+        if not (fallback or daily_empty or minute_empty):
+            return
+        now = datetime.now(timezone.utc)
+        wait = max(fallback, 60 if minute_empty else 0)
+        if daily_empty:
+            reset = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            wait = max(wait, (reset - now).total_seconds())
+        retry_after = response.headers.get('Retry-After')
+        if isinstance(retry_after, str):
+            retry_after = retry_after.strip()
+            try:
+                if retry_after.isascii() and retry_after.isdecimal():
+                    wait = max(wait, int(retry_after))
+                else:
+                    retry_at = parsedate_to_datetime(retry_after)
+                    if retry_at.tzinfo is not None:
+                        wait = max(wait, (retry_at - now).total_seconds())
+            except (ValueError, OverflowError):
+                pass
+        self.provider_retry_at = max(self.provider_retry_at, time.monotonic() + wait)
 
     @staticmethod
     def _cache_key(path: str, params: Mapping[str, Any]) -> str:
@@ -397,12 +424,18 @@ class APIClient:
             return json.loads(json.dumps(cached))
 
         headers = {"x-apisports-key": self.api_key}
-        for delay in API_RETRIES:
+        for attempt, delay in enumerate(API_RETRIES):
             if self._http_remaining is not None and self._http_remaining <= 0:
                 self.last_error = {"path": path, "errors": "hard_http_budget", "at": iso_now()}
                 return None
-            if delay:
-                time.sleep(delay)
+            cooldown = self.provider_retry_at - time.monotonic()
+            if cooldown > API_MAX_RETRY_WAIT:
+                # Keep the provider's deadline for subsequent queries in this scan.
+                self.last_error = {"path": path, "errors": "provider_cooldown", "at": iso_now()}
+                return None
+            wait = max(delay, cooldown)
+            if wait > 0:
+                time.sleep(wait)
             try:
                 self._throttle()
                 if self._http_remaining is not None: self._http_remaining -= 1
@@ -414,12 +447,18 @@ class APIClient:
                     timeout=25,
                 )
                 if response.status_code != 200:
+                    limited = response.status_code == 429
+                    self._record_provider_cooldown(response, 2 ** (attempt + 1) if limited else 0)
+                    self.last_error = {"path": path, "errors": "rateLimit" if limited else "http_error",
+                                       "status_code": response.status_code, "at": iso_now()}
                     log(f"⚠️ API {path} HTTP {response.status_code}: {response.text[:180]}")
                     continue
                 payload = response.json()
                 if not isinstance(payload, dict):
                     continue
                 errors = payload.get("errors") or {}
+                limited = isinstance(errors, dict) and 'rateLimit' in errors
+                self._record_provider_cooldown(response, 2 ** (attempt + 1) if limited else 0)
                 if errors:
                     # API-Sports usa chiavi diverse a seconda del problema
                     # (rateLimit, requests, token, subscription, plan...).

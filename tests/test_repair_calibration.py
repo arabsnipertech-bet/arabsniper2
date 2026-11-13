@@ -36,3 +36,21 @@ class RepairTrainingTests(unittest.TestCase):
         after = previous_manifest(storage, 'test')
         self.assertEqual({p:after[p] for p in before}, before)
         self.assertIn('data/arab_calibration_weights.json', after)
+
+    def test_abandoned_archives_do_not_block_training_for_other_days(self):
+        storage = self.storage()
+        before = previous_manifest(storage, 'test')
+        for day in ('2026-11-07', '2026-11-08'):
+            path = f'auditordata/prematch_{day}.json'
+            raw = b'{}'
+            checksum = sha(raw)
+            storage.put_object(Bucket='test', Key='state/objects/'+checksum, Body=raw)
+            before[path] = dict(sha256=checksum, bytes=len(raw))
+        write_manifest(storage, 'test', before)
+        with TemporaryDirectory() as folder:
+            state = refresh(storage, 'test', Path(folder), datetime.fromisoformat('2026-11-13T12:00:00+01:00'))
+        self.assertTrue(state['training_evidence']['complete'])
+        self.assertEqual(state['evidence_provenance']['excluded_recovery_dates'], ['2026-11-07', '2026-11-08'])
+        self.assertEqual(state['evidence_provenance']['dates'], ['2026-11-05'])
+        after = previous_manifest(storage, 'test')
+        self.assertEqual({path: after[path] for path in before}, before)

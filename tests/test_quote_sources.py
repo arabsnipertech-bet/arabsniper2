@@ -391,6 +391,49 @@ class HttpBudget(unittest.TestCase):
         self.assertEqual(c.session.get.call_count,3)
         self.assertIs(c.odds_enricher,enricher);enricher.enrich.assert_not_called()
 
+    def test_retry_after_is_honored_for_http_and_json_limits(self):
+        now = self.e.datetime.fromisoformat('2026-11-13T17:00:00+00:00')
+        for status, retry_after in ((429, '11'), (200, 'Fri, 13 Nov 2026 17:00:11 GMT')):
+            with self.subTest(status=status), patch.object(self.e, 'time') as clock, patch.object(self.e, 'datetime', wraps=self.e.datetime) as calendar:
+                client = self.e.APIClient('test-only', min_interval=0)
+                client.session = Mock()
+                clock.monotonic.return_value = 100
+                calendar.now.return_value = now
+                rejected = Mock(status_code=status, headers={'Retry-After': retry_after}, text='limited',
+                                json=Mock(return_value={'errors': {'rateLimit': 'limited'}}))
+                accepted = Mock(status_code=200, headers={}, json=Mock(return_value=feed()))
+                client.session.get.side_effect = [rejected, accepted]
+                payload, used = client.get_bounded('fixtures', {'id': 100}, 2)
+                self.assertIsNotNone(payload)
+                self.assertEqual(used, 2)
+                clock.sleep.assert_called_once_with(11)
+
+    def test_long_retry_after_does_not_spend_budget_on_subsequent_queries(self):
+        client = self.e.APIClient('test-only')
+        client.session = Mock()
+        client.session.get.return_value = Mock(status_code=429, headers={'Retry-After': '120'}, text='limited')
+        with patch.object(self.e, 'time') as clock:
+            clock.monotonic.return_value = 100
+            self.assertEqual(client.get_bounded('fixtures', {'id': 100}, 3), (None, 1))
+            self.assertEqual(client.get_bounded('odds', {'fixture': 100}, 3), (None, 0))
+            self.assertEqual(client.provider_retry_at, 220)
+            clock.sleep.assert_not_called()
+        self.assertEqual(client.last_error['errors'], 'provider_cooldown')
+
+    def test_zero_daily_quota_defers_the_next_request_after_a_success(self):
+        now = self.e.datetime.fromisoformat('2026-11-13T17:00:00+00:00')
+        client = self.e.APIClient('test-only')
+        client.session = Mock()
+        client.session.get.return_value = Mock(status_code=200, headers={'x-ratelimit-requests-remaining': '0'},
+                                               json=Mock(return_value=feed()))
+        with patch.object(self.e, 'time') as clock, patch.object(self.e, 'datetime', wraps=self.e.datetime) as calendar:
+            clock.monotonic.return_value = 100
+            calendar.now.return_value = now
+            self.assertIsNotNone(client.get('fixtures', {'id': 100}))
+            self.assertEqual(client.get_bounded('fixtures', {'id': 101}, 2), (None, 0))
+            self.assertEqual(client.provider_retry_at, 100 + 7 * 3600)
+            clock.sleep.assert_not_called()
+
 
 class CoverageMeasurement(unittest.TestCase):
     def test_equivalent_asian_rows_are_not_double_counted(self):

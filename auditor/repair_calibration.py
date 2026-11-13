@@ -35,7 +35,8 @@ def refresh(storage, bucket, root, now, *, certify_dates=()):
     from adaptive_calibration import WINDOW
     evidence = state['training_evidence']
     seen = {r['date'] for r in evidence['files']}
-    absent = [d for d in expected if 1 <= (now.astimezone(TZ).date()-date.fromisoformat(d)).days <= WINDOW and d not in seen]
+    expected -= seen | set(state['evidence_provenance'].get('excluded_recovery_dates', ()))
+    absent = [d for d in expected if 1 <= (now.astimezone(TZ).date()-date.fromisoformat(d)).days <= WINDOW]
     evidence['missing_dates'] = sorted(set(evidence['missing_dates']) | set(absent))
     evidence['complete'] = not evidence['missing_dates'] and not evidence['missing_results_dates']
     if not evidence['complete']:
