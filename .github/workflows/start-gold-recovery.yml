@@ -1,0 +1,21 @@
+name: Start authorized Gold result recovery
+on:
+  push:
+    branches: [ops/gold-results-audit-20261113]
+    paths: [.github/workflows/start-gold-recovery.yml]
+permissions:
+  actions: write
+  contents: read
+jobs:
+  dispatch:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/ops/gold-results-audit-20261113'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Recover closed days using the existing production workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for day in 2026-11-07 2026-11-08 2026-11-09 2026-11-11 2026-11-12; do
+            gh workflow run recover-daily-results.yml --repo arabsnipertech-bet/arabsniper2 --ref main -f date="$day" -f refresh=true
+          done

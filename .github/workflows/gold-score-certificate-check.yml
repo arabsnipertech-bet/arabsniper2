@@ -99,3 +99,7 @@ jobs:
           settings=cfread('/settings')
           emit('Bindings', [{'name':b.get('name'),'type':b.get('type'),'text':b.get('text') if b.get('name') in ('LIVE_ENABLED','MAX_CALLS_PER_DAY','RESERVE_REQUESTS') else None} for b in settings.get('bindings',[])])
           emit('Schedules',cfread('/schedules'))
+
+          for vid in ('3107a825-630f-44da-b153-86577718eb15',active):
+              v=cfread('/versions/'+vid)
+              emit('ScriptIdentity', {'version':vid,'script':v.get('resources',{}).get('script')})
