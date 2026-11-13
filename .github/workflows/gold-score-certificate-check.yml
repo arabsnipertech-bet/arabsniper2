@@ -35,7 +35,7 @@ jobs:
           live = json.loads(body)
           emit('Worker', {'checked_at':datetime.now(timezone.utc).isoformat(),
               'version':headers.get('x-live-scores-version'), 'status':live.get('status'),
-              'health':live.get('health'), 'cases':{i:{k:live['fixtures'].get(i,{}).get(k)
+              'health':live.get('health'), 'diagnostic':live.get('diagnostic'), 'cases':{i:{k:live['fixtures'].get(i,{}).get(k)
                 for k in ('status','halftime','fulltime','observed_at')} for i in ids}})
           api = 'https://v3.football.api-sports.io/'
           def read(path):
@@ -103,3 +103,19 @@ jobs:
           for vid in ('3107a825-630f-44da-b153-86577718eb15',active):
               v=cfread('/versions/'+vid)
               emit('ScriptIdentity', {'version':vid,'script':v.get('resources',{}).get('script')})
+
+          from urllib.error import HTTPError
+          try:
+              account=cf.split('/workers/scripts/')[0]
+              def account_read(path):
+                  with urlopen(Request(account+path,headers={'Authorization':'Bearer '+os.environ['CF_TOKEN']}),timeout=15) as response:
+                      value=json.load(response)
+                      if value.get('success') is not True: raise ValueError('Cloudflare build read failed')
+                      return value['result']
+              scripts=account_read('/workers/scripts')
+              script=next(s for s in scripts if s.get('id')=='arabsniper-live-scores')
+              tag=script['tag']
+              triggers=account_read('/builds/workers/'+tag+'/triggers')
+              emit('WorkerBuildTriggers',[{k:t.get(k) for k in ('trigger_uuid','trigger_name','branch_includes','branch_excludes','path_includes','path_excludes','root_directory','deploy_command','build_command')} for t in triggers])
+          except HTTPError as error:
+              emit('WorkerBuildInspection',{'http_status':error.code})
