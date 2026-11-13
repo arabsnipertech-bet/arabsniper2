@@ -1,0 +1,150 @@
+name: Gold live scores incident diagnostics
+on:
+  push:
+    branches: [ops/gold-results-audit-20261113]
+    paths: [.github/workflows/gold-live-scores-incident.yml]
+permissions:
+  contents: read
+jobs:
+  audit:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/ops/gold-results-audit-20261113'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - name: Read live Worker and official fixtures
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_LIVE_SCORES_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN || secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          API_KEY: ${{ secrets.API_SPORTS_KEY }}
+        shell: python
+        run: |
+          import email.parser, email.policy, hashlib, json, os
+          from datetime import datetime, timezone
+          from urllib.error import HTTPError, URLError
+          from urllib.parse import urlencode
+          from urllib.request import build_opener, HTTPRedirectHandler, Request
+
+          class NoRedirect(HTTPRedirectHandler):
+              def redirect_request(self, *args):
+                  return None
+
+          def get(url, headers=None):
+              try:
+                  with build_opener(NoRedirect()).open(Request(url, headers=headers or {}), timeout=18) as r:
+                      return r.status, r.headers, r.read()
+              except HTTPError as exc:
+                  return exc.code, exc.headers, exc.read()
+              except (URLError, TimeoutError):
+                  return 0, {}, b''
+
+          def decode(data):
+              try:
+                  return json.loads(data)
+              except (ValueError, UnicodeError):
+                  return {}
+
+          def show(name, data):
+              print(name, json.dumps(data, sort_keys=True), flush=True)
+
+          cf = 'https://api.cloudflare.com/client/v4'
+          acct = cf + '/accounts/dfdb02b4139b31c0ab4456a50eb371a2'
+          worker = '/workers/scripts/arabsniper-live-scores'
+          token = os.environ.get('CF_TOKEN')
+          if token:
+              headers = {'Authorization': 'Bearer ' + token}
+              for part in ('/settings', '/schedules', '/deployments', '/content/v2'):
+                  code, meta, data = get(acct + worker + part, headers)
+                  payload = decode(data) if part != '/content/v2' or code != 200 else {}
+                  result = payload.get('result') or {}
+                  safe = {'http': code, 'errors': [e.get('code') for e in payload.get('errors', [])]}
+                  if code == 200:
+                      if part == '/settings':
+                          bindings = {b['name']: b for b in result.get('bindings', [])}
+                          safe.update(compatibility_date=result.get('compatibility_date'),
+                                      scores_binding={k: bindings.get('SCORES', {}).get(k) for k in ('type', 'class_name')},
+                                      api_secret_type=bindings.get('API_SPORTS_KEY', {}).get('type'),
+                                      live_enabled=bindings.get('LIVE_ENABLED', {}).get('text') == 'true',
+                                      budget={k: str(bindings.get(k, {}).get('text', '')) if str(bindings.get(k, {}).get('text', '')).isdigit() else None for k in ('MAX_CALLS_PER_DAY', 'RESERVE_REQUESTS')})
+                      if part == '/schedules':
+                          schedules = result if isinstance(result, list) else result.get('schedules', [])
+                          safe['cron'] = [s.get('cron') for s in schedules]
+                      if part == '/deployments':
+                          safe['deployments'] = [{k: d.get(k) for k in ('id', 'created_on', 'source', 'versions')}
+                                                 for d in result.get('deployments', [])[:3]]
+                      if part == '/content/v2':
+                          content_type = meta.get('Content-Type', '')
+                          modules = [data]
+                          if 'multipart/' in content_type:
+                              message = email.parser.BytesParser(policy=email.policy.default).parsebytes(
+                                  ('Content-Type: ' + content_type + '\r\n\r\n').encode() + data)
+                              modules = [p.get_payload(decode=True) for p in message.iter_parts()]
+                          safe['modules'] = [{'sha256': hashlib.sha256(m).hexdigest(), 'bytes': len(m),
+                                              'exact_id_recovery': b'fixtures?id=' in m,
+                                              'live_score_collector': b'scores.internal/refresh' in m} for m in modules if m]
+                  show('cloudflare' + part, safe)
+              code, _, data = get(cf + '/zones?name=arabsniperbet.com', headers)
+              zones = decode(data).get('result') or []
+              if code == 200 and len(zones) == 1:
+                  code, _, data = get(cf + '/zones/' + zones[0]['id'] + '/workers/routes', headers)
+                  routes = decode(data).get('result') or []
+                  show('cloudflare/routes', {'http': code, 'expected_route': any(
+                      r.get('pattern') == 'arabsniperbet.com/api/live-scores*' and r.get('script') == 'arabsniper-live-scores' for r in routes)})
+              else:
+                  show('cloudflare/routes', {'zones_http': code})
+          else:
+              show('cloudflare', {'credential_configured': False})
+
+          ids = {'1644690', '1649517'}
+          observed = datetime.now(timezone.utc)
+          status, _, body = get('https://arabsniperbet.com/api/live-scores')
+          live = decode(body)
+          scores = live.get('fixtures') or {}
+          show('public_worker', {'http': status, 'checked_at': observed.isoformat(),
+                                'generated_at': live.get('generated_at'), 'status': live.get('status'),
+                                'diagnostic': live.get('diagnostic'),
+                                'cases': {fid: scores.get(fid) for fid in sorted(ids)}})
+          status, _, body = get('https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper2/main/data/live_watchlist.json')
+          watch = decode(body)
+          due = []
+          for row in watch.get('fixtures', []):
+              kickoff = datetime.fromisoformat(row['kickoff'])
+              fid = str(row['fixture_id'])
+              age = (observed - kickoff).total_seconds()
+              if 135 * 60 < age <= 48 * 3600 and (scores.get(fid) or {}).get('status') not in ('FT', 'AET', 'PEN', 'PST', 'CANC', 'ABD', 'AWD', 'WO'):
+                  due.append((kickoff, fid))
+          show('watchlist', {'http': status, 'generated_at': watch.get('generated_at'),
+                             'count': len(watch.get('fixtures', [])), 'overdue_in_sample_window': len(due)})
+          key = os.environ.get('API_KEY')
+          if not key:
+              raise SystemExit('API-Football secret unavailable.')
+          headers = {'x-apisports-key': key}
+          football = 'https://v3.football.api-sports.io/'
+          safe_headers = ('x-ratelimit-requests-limit', 'x-ratelimit-requests-remaining',
+                          'x-ratelimit-limit', 'x-ratelimit-remaining', 'retry-after')
+          def provider(path):
+              code, meta, data = get(football + path, headers)
+              payload = decode(data)
+              errors = payload.get('errors') or {}
+              diagnostic = {'http': code, 'headers': {k: meta[k] for k in safe_headers if k in meta},
+                            'error_categories': sorted(set(errors) & {'rateLimit', 'requests', 'token', 'key', 'access', 'plan', 'ip'}) if isinstance(errors, dict) else []}
+              return diagnostic, payload.get('response'), bool(errors)
+          diagnostic, info, errors = provider('status')
+          info = info if isinstance(info, dict) else {}
+          quota = info.get('requests') or {}
+          show('provider/status', dict(diagnostic, active=info.get('subscription', {}).get('active'), quota={k: quota.get(k) for k in ('current','limit_day')}))
+          used, limit = quota.get('current'), quota.get('limit_day')
+          if diagnostic['http'] != 200 or errors or info.get('subscription', {}).get('active') is not True or not isinstance(used, int) or not isinstance(limit, int) or limit - used <= max(1000, (limit + 9) // 10) or diagnostic['headers'].get('x-ratelimit-remaining') == '0':
+              raise SystemExit('Fixture query deferred by provider quota or status.')
+          ids.update(fid for _, fid in sorted(due, reverse=True)[:16])
+          diagnostic, rows, errors = provider('fixtures?' + urlencode({'ids': '-'.join(sorted(ids)), 'timezone': 'Europe/Rome'}))
+          result = []
+          for row in rows if isinstance(rows, list) else []:
+              f = row.get('fixture') or {}
+              fid = str(f.get('id'))
+              if fid not in ids:
+                  continue
+              score = row.get('score') or {}
+              result.append({'fixture_id': fid, 'date': f.get('date'), 'status': (f.get('status') or {}).get('short'),
+                             'halftime': score.get('halftime'), 'fulltime': score.get('fulltime')})
+          show('provider/fixtures', dict(diagnostic, rows=result, missing=sorted(ids - {row['fixture_id'] for row in result})))
+          if diagnostic['http'] != 200 or errors or not {'1644690','1649517'}.issubset({row['fixture_id'] for row in result}):
+              raise SystemExit('The provider did not confirm both incident fixtures.')
