@@ -80,6 +80,9 @@ export class ScoreStore {
         s.quota={current:q.requests.current,limit:q.requests.limit_day,checked_at:now};
       }
       const allowed=new Set(s.watch.map(f=>String(f.fixture_id)));
+      // Recover tracked fixtures missing from a date feed with a bounded exact-ID lookup.
+      // Never infer a final score from kickoff or overwrite a confirmed final result.
+      const recovered=new Set();
       for(const date of dates) {
         if(s.quota.limit-s.quota.current<=Math.max(reserve,Math.ceil(s.quota.limit*.1))) throw new Error('quota_reserve');
         const data=await api('fixtures?date='+date+'&timezone=Europe%2FRome');
@@ -87,9 +90,26 @@ export class ScoreStore {
         const received=new Set();
         for(const row of data.response) {
           const live=normalize(row,now);
-          if(live&&allowed.has(live.fixture_id)){s.scores[live.fixture_id]=live;received.add(live.fixture_id);}
+          if(live&&allowed.has(live.fixture_id)){
+            if(!FINAL.has(s.scores[live.fixture_id]?.status)||FINAL.has(live.status)) s.scores[live.fixture_id]=live;
+            received.add(live.fixture_id);
+          }
         }
-        for(const f of s.watch) if(localDate(Date.parse(f.kickoff))===date&&!received.has(String(f.fixture_id))&&s.scores[String(f.fixture_id)]) s.scores[String(f.fixture_id)].refresh_failed=true;
+        for(const f of s.watch) {
+          const id=String(f.fixture_id),kickoff=Date.parse(f.kickoff);
+          if(localDate(kickoff)!==date||received.has(id)||FINAL.has(s.scores[id]?.status)) continue;
+          // The date feed can omit a fixture; retry by ID only after kickoff and
+          // at most twice per cycle, respecting both the collector cap and reserve.
+          if(now>=kickoff && now-kickoff<=24*3600000 && recovered.size<2 &&
+             s.calls<cap && s.quota.limit-s.quota.current>Math.max(reserve,Math.ceil(s.quota.limit*.1))) {
+            recovered.add(id);
+            const detail=await api('fixtures?id='+id);
+            if(!Array.isArray(detail.response)) throw new Error('invalid_response');
+            const live=detail.response.map(row=>normalize(row,now)).find(row=>row?.fixture_id===id);
+            if(live){s.scores[id]=live;continue;}
+          }
+          if(s.scores[id]) s.scores[id].refresh_failed=true;
+        }
       }
       s.scores=Object.fromEntries(Object.entries(s.scores).filter(([id])=>allowed.has(id)));
       s.status='ok';s.published_at=iso(now);
