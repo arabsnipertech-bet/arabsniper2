@@ -138,7 +138,7 @@ assert(!api.quoteCell({quote_status:'missing'},'GG PT').includes('Ultima quota �
 assert(api.extraGoalText([{...over25ht,quote_status:'missing',odd:null}]).includes('Non valutabile'));
 assert(api.timingContext({pt_priority_active:true,preferred_pt_market:'over15_ht'}).includes('Precedenza tra idonei'));
 assert(api.timingContext({pt_priority_active:false}).includes('Confronto dei cinque mercati gol'));
-assert(releaseHtml.includes('<title>ArabSniper · Gold v6.1</title>'));
+assert(releaseHtml.includes('<title>ArabSniper · Gold V7</title>'));
 console.log('PASS Gold v6.1: visible combo decisions, real quote coverage and explicit evaluation order');
 
 // Proximity is a visual cue only: every eligibility boundary stays strict.
