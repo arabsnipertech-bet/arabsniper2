@@ -43,7 +43,7 @@ def feed(status='provider_rate_limit', *, cron_age=2, overdue=0, missing_halftim
 
 def relayed_score(at=NOW, **values):
     return {'status': '2H', 'observed_at': at.isoformat(), 'source': 'API-Football',
-            'transport': 'GitHub Actions/R2', **values}
+            'transport': 'GitHub Actions/R2', 'goals': {'home': 1, 'away': 0}, **values}
 
 
 class LiveScoresHealthTests(TestCase):
@@ -203,6 +203,26 @@ class LiveScoresHealthTests(TestCase):
     def test_recent_relay_does_not_cover_a_missing_live_score(self):
         current = feed(live_due=2, retry_minutes=8)
         current['fixtures']['123'] = relayed_score()
+        summary, reasons, waits, reads, _ = self.inspect([current])
+        self.assertEqual(reasons, ['Collector state: provider_rate_limit'])
+        self.assertNotIn('delivery_during_provider_limit', summary)
+        self.assertEqual((waits, reads), ([], 1))
+
+    def test_recent_official_not_started_status_covers_a_tracked_fixture(self):
+        current = feed(live_due=2, missing_halftime=2)
+        current['health']['live_tracking_fixture_ids'] = ['123', '124']
+        current['fixtures']['123'] = relayed_score()
+        current['fixtures']['124'] = relayed_score(status='NS')
+        summary, reasons, waits, reads, _ = self.inspect([current])
+        self.assertEqual(reasons, [])
+        self.assertEqual(summary['delivery_during_provider_limit'], 'relay')
+        self.assertEqual((waits, reads), ([], 1))
+
+    def test_a_future_game_cannot_count_for_a_different_missing_tracked_fixture(self):
+        current = feed(live_due=2, retry_minutes=8)
+        current['health']['live_tracking_fixture_ids'] = ['123', '124']
+        current['fixtures']['123'] = relayed_score()
+        current['fixtures']['125'] = relayed_score(status='NS')
         summary, reasons, waits, reads, _ = self.inspect([current])
         self.assertEqual(reasons, ['Collector state: provider_rate_limit'])
         self.assertNotIn('delivery_during_provider_limit', summary)
