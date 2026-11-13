@@ -3,6 +3,7 @@
   "main": "worker.mjs",
   "compatibility_date": "2026-10-01",
   "workers_dev": false,
+  "version_metadata": {"binding": "CF_VERSION_METADATA"},
   "routes": [{"pattern": "arabsniperbet.com/api/live-scores*", "zone_name": "arabsniperbet.com"}],
   "triggers": {"crons": ["*/2 * * * *"]},
   "durable_objects": {"bindings": [{"name": "SCORES", "class_name": "ScoreStore"}]},

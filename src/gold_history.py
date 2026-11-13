@@ -15,6 +15,8 @@ from audit_storage import read_store, write_store
 FILE = 'data/arab_quote_history.json'
 ROME = ZoneInfo('Europe/Rome')
 VERSION = 'gold-history-v1'
+FINISHED = {'FT', 'AET', 'PEN'}
+HALF_COMPLETE = FINISHED | {'HT', '2H', 'ET', 'BT', 'P'}
 
 
 def stamp(value):
@@ -34,6 +36,62 @@ def forecast_time(match):
     assessment = match.get('multimarket') or {}
     v7 = (assessment.get('matrix') or {}).get('v7') or {}
     return stamp(v7.get('captured_at') if v7.get('status') == 'published' else assessment.get('captured_at'))
+
+
+def valid_pair(home, away):
+    return all(type(n) is int and n >= 0 for n in (home, away))
+
+
+def live_pair(row, key):
+    pair = row.get(key) or {}
+    return valid_pair(pair.get('home'), pair.get('away'))
+
+
+def final_live(row):
+    return row.get('status') in FINISHED and (live_pair(row, 'fulltime') or
+           row['status'] == 'FT' and live_pair(row, 'goals'))
+
+
+def merge_result(old, new):
+    if not new:
+        return old
+    if not old or old.get('status') not in FINISHED or not valid_pair(old.get('home_ft'), old.get('away_ft')):
+        return new
+    if new.get('status') not in FINISHED or not valid_pair(new.get('home_ft'), new.get('away_ft')):
+        return old
+    old_at, new_at = stamp(old.get('settled_at')), stamp(new.get('settled_at'))
+    if old_at and new_at and new_at < old_at:
+        return old
+    if (not valid_pair(new.get('home_ht'), new.get('away_ht'))
+            and valid_pair(old.get('home_ht'), old.get('away_ht'))
+            and old['home_ht'] <= new['home_ft'] and old['away_ht'] <= new['away_ft']):
+        return dict(new, home_ht=old['home_ht'], away_ht=old['away_ht'])
+    return new
+
+
+def merge_live(target, row):
+    previous = target.get('live') or {}
+    at, before = stamp(row.get('observed_at')), stamp(previous.get('observed_at'))
+    if not at or before and at <= before:
+        return
+    result = target.get('result') or {}
+    result_at = stamp(result.get('settled_at'))
+    known_final = result.get('status') in FINISHED and valid_pair(result.get('home_ft'), result.get('away_ft'))
+    if known_final and (row.get('status') not in FINISHED or result_at and at < result_at):
+        return
+    if final_live(previous) and row.get('status') not in FINISHED:
+        return
+    row = deepcopy(row)
+    if final_live(previous) and not final_live(row):
+        row['status'] = previous['status']
+        row['fulltime'] = deepcopy(previous.get('fulltime') if live_pair(previous, 'fulltime') else previous['goals'])
+        row['goals'] = deepcopy(previous.get('goals'))
+        row['fulltime_observed_at'] = previous.get('fulltime_observed_at') or previous['observed_at']
+    if (row.get('status') in HALF_COMPLETE and not live_pair(row, 'halftime')
+            and previous.get('status') in HALF_COMPLETE and live_pair(previous, 'halftime')):
+        row['halftime'] = deepcopy(previous['halftime'])
+        row['halftime_observed_at'] = previous.get('halftime_observed_at') or previous['observed_at']
+    target.update(live=row, status_short=row.get('status') or target.get('status_short'), elapsed=row.get('elapsed'))
 
 
 def frozen_display(matches, root):
@@ -71,12 +129,17 @@ def merge_day(previous, feed, now, display):
             if valid:
                 pending.append(candidate)
         target = saved[fid]['fixture']
-        incoming_at = stamp((f.get('live') or {}).get('observed_at'))
-        saved_at = stamp((target.get('live') or {}).get('observed_at'))
-        keys = ('result',) if saved_at and (not incoming_at or incoming_at < saved_at) else ('result', 'live', 'status_short', 'elapsed')
-        for key in keys:
-            if key in f and f[key] is not None:
-                target[key] = deepcopy(f[key])
+        if f.get('result'):
+            target['result'] = deepcopy(merge_result(target.get('result'), f['result']))
+        if f.get('live'):
+            merge_live(target, f['live'])
+        known = target.get('result') or {}
+        if not final_live(target.get('live') or {}) and known.get('status') in FINISHED:
+            target['status_short'] = known['status']
+        elif not target.get('live'):
+            for key in ('status_short', 'elapsed'):
+                if f.get(key) is not None:
+                    target[key] = f[key]
     if pending:
         metadata = display(pending)
         for m, view in zip(pending, metadata, strict=True):
@@ -95,13 +158,7 @@ def refresh_scores(days, payload):
             f = m['fixture']; row = payload.get('fixtures', {}).get(str(f['fixture_id']))
             if not isinstance(row, dict) or str(row.get('fixture_id')) != str(f['fixture_id']):
                 continue
-            at = stamp(row.get('observed_at'))
-            previous = stamp((f.get('live') or {}).get('observed_at'))
-            if not at or (previous and at <= previous):
-                continue
-            f['live'] = deepcopy(row)
-            f['status_short'] = row.get('status', f.get('status_short'))
-            f['elapsed'] = row.get('elapsed')
+            merge_live(f, row)
 
 
 def project(root, day1, *, now=None, scores=None, display=None, seed=None):
@@ -118,7 +175,9 @@ def project(root, day1, *, now=None, scores=None, display=None, seed=None):
     if scores is None and days:
         try:
             # Shared score cache only. No new API-Football calls or scan changes.
-            with urllib.request.urlopen('https://arabsniperbet.com/api/live-scores', timeout=8) as response:
+            request = urllib.request.Request('https://arabsniperbet.com/api/live-scores',
+                                             headers={'Accept': 'application/json', 'User-Agent': 'ArabSniperBet-Gold-History/1.0'})
+            with urllib.request.urlopen(request, timeout=8) as response:
                 scores = json.load(response)
         except Exception:
             scores = {}

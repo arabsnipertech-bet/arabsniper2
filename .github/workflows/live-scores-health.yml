@@ -1,0 +1,53 @@
+name: Verify Gold live results
+on:
+  workflow_dispatch:
+    inputs:
+      fixture_ids:
+        description: 'Optional official verification of up to 20 fixture IDs, separated by commas'
+        type: string
+        required: false
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/live-scores-health.yml'
+      - '.github/ops/live-scores-health.py'
+permissions:
+  contents: read
+concurrency:
+  group: arabsniper-live-scores-health
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    env:
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/ops
+            src
+      - name: Prepare read-only audit reconciliation
+        run: |
+          python3 -m venv "$RUNNER_TEMP/live-score-audit"
+          "$RUNNER_TEMP/live-score-audit/bin/pip" install 'boto3>=1.42,<2' 'requests>=2.32,<3' ijson==3.6.0
+      - name: Check freshness, results and Auditor
+        env:
+          API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          FIXTURE_IDS: ${{ inputs.fixture_ids }}
+        run: |
+          args=()
+          # Compare with the prior-day Auditor every hour, after its night window.
+          if [ "$(TZ=Europe/Rome date +%H%M)" -ge 600 ] && [ "$(date -u +%M)" -lt 18 ]; then
+            args+=(--compare-auditor)
+          fi
+          "$RUNNER_TEMP/live-score-audit/bin/python" .github/ops/live-scores-health.py --fixtures "$FIXTURE_IDS" "${args[@]}"

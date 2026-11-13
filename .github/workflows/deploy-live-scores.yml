@@ -1,0 +1,56 @@
+name: Deploy Gold live scores Worker
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Inspect configuration, deploy main, or roll back to a known version'
+        type: choice
+        options: [inspect, deploy, rollback]
+        default: inspect
+      version:
+        description: 'Cloudflare version UUID for rollback'
+        type: string
+        required: false
+  push:
+    branches: [main]
+    paths:
+      - 'workers/live-scores/**'
+      - '.github/workflows/deploy-live-scores.yml'
+      - '.github/ops/live-scores-release.py'
+permissions:
+  contents: read
+concurrency:
+  group: arabsniper-live-scores-production
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/ops
+            tests
+            web
+            workers/live-scores
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Test scores, quotas and Gold settlement
+        run: |
+          node --check workers/live-scores/worker.mjs
+          node --test tests/test_live_scores.mjs tests/test_gold_triad_outcomes.js
+          python3 -m py_compile .github/ops/live-scores-release.py
+          npx --yes wrangler@4.161.0 versions upload --dry-run --config workers/live-scores/wrangler.jsonc --outdir "$RUNNER_TEMP/live-scores"
+      - name: Verify and release only arabsniper-live-scores
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_LIVE_SCORES_API_TOKEN }}
+          RELEASE_ACTION: ${{ inputs.action || 'deploy' }}
+          ROLLBACK_VERSION: ${{ inputs.version }}
+        run: python3 .github/ops/live-scores-release.py "$RELEASE_ACTION" --version "$ROLLBACK_VERSION"

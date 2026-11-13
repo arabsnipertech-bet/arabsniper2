@@ -884,9 +884,9 @@
   <link rel="stylesheet" href="/statistics-first.css?v=4.0">
   <script src="/statistics-first.js?v=4.0"></script>
   <link rel="stylesheet" href="/lateral-matrix.css?v=0a727de9ab7a">
-  <script src="/competition-scope.js?v=cdb648e824eb"></script><script src="/lateral-matrix.js?v=11bf761e9e4b"></script>
+  <script src="/competition-scope.js?v=cdb648e824eb"></script><script src="/lateral-matrix.js?v=4b9be5a45b21"></script>
   <script src="/vendor/fflate-0.8.2.js"></script>
-  <script src="/live-scores.js?v=a17ad119a2d0"></script>
+  <script src="/live-scores.js?v=4b6cbe59ed49"></script>
   <link rel="stylesheet" href="/gold-access.css?v=1">
   <script src="/gold-access.js?v=1"></script>
   <script>
@@ -1923,7 +1923,7 @@
 
     function contextFixture(match) { return typeof window!=='undefined' && window.ArabLive ? window.ArabLive.fixture(match) : match.fixture||{}; }
     function contextLiveView(match) { return typeof window!=='undefined' && window.ArabLive ? window.ArabLive.view(match) : {visible:false}; }
-    function contextFirstHalf(match) { return window.ArabLive?.firstHalf?.(match) || {status:'pending',score:null}; }
+    function contextFirstHalf(match) { return globalThis.ArabLive?.firstHalf?.(match) || {status:'pending',score:null}; }
     function contextLiveClass(match) { const v=contextLiveView(match);return v.active?' cx-is-live':v.stale?' cx-live-stale':''; }
     function contextLiveBadge(match) {
       const v=contextLiveView(match);if(!v.visible)return '';
@@ -1973,8 +1973,13 @@
     function contextLivePanel(match) {
       if(contextState(match)==='upcoming')return '';
       const f=contextFixture(match),l=f.live||{},r=f.result||{};
-      const score=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)?a+'–'+b:'non disponibile';
-      return `<section class="cx-context"><strong>${escapeHtml(contextStateLabel(match))}</strong><p>Punteggio osservato: ${score(l.goals?.home??r.home_ft,l.goals?.away??r.away_ft)} · PT: ${score(l.halftime?.home??r.home_ht,l.halftime?.away??r.away_ht)} · FT (90 minuti): ${score(l.fulltime?.home??r.home_ft,l.fulltime?.away??r.away_ft)}</p><p>Aggiornamento risultato: ${l.observed_at?escapeHtml(formatTimestamp(l.observed_at)):'non disponibile'}${l.refresh_failed?' · ultimo recupero fallito, dati precedenti conservati':''}.</p><p><b>Analisi e quote prematch conservate</b> · ${escapeHtml(formatTimestamp(match.multimarket?.captured_at))}. Le percentuali sotto non sono probabilità live.</p><p>Quote live non disponibili in questa versione. Risultato aggiornato separatamente quando il servizio live è attivo; verifica sempre l’ora dell’ultima osservazione. Nessuna proposta live calcolata.</p></section>`;
+      const status=l.status||r.status||f.status_short;
+      const complete=['FT','AET','PEN'].includes(status);
+      const score=(a,b)=>Number.isInteger(a)&&Number.isInteger(b)&&a>=0&&b>=0?a+'–'+b:'non disponibile';
+      const regulation=complete?(globalThis.ArabMatrix?.regulationScore?.(f)||[r.home_ft,r.away_ft]):[];
+      const half=contextFirstHalf(match);
+      const observed=complete&&status==='FT'?score(...regulation):score(l.goals?.home,l.goals?.away);
+      return `<section class="cx-context"><strong>${escapeHtml(contextStateLabel(match))}</strong><p>Punteggio osservato: ${observed} · PT: ${half.status==='complete'&&half.score?escapeHtml(half.score):'non disponibile'} · FT (90 minuti): ${score(...regulation)}</p><p>Aggiornamento risultato: ${l.observed_at?escapeHtml(formatTimestamp(l.observed_at)):'non disponibile'}${l.refresh_failed?' · ultimo recupero fallito, dati precedenti conservati':''}.</p><p><b>Analisi e quote prematch conservate</b> · ${escapeHtml(formatTimestamp(match.multimarket?.captured_at))}. Le percentuali sotto non sono probabilità live.</p><p>Quote live non disponibili in questa versione. Risultato aggiornato separatamente quando il servizio live è attivo; verifica sempre l’ora dell’ultima osservazione. Nessuna proposta live calcolata.</p></section>`;
     }
     function contextComparisonRow(match) {
       return (match.multimarket?.markets||[]).find(r=>r.market===contextCompareMarket&&r.selection==='over');
