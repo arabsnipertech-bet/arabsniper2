@@ -22,6 +22,12 @@ jobs:
     if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    env:
+      PYTHONPATH: src
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,22 +44,13 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
         run: python3 src/fast_backup_dispatch.py
-      - name: Recover missing Telegram publication windows
-        id: editorial_watchdog
+      - name: Prepare Publisher watchdog and home projection
         if: always()
+        run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'Pillow>=11,<13' ijson==3.6.0
+      - name: Recover the Publisher workflow in the owning repository
+        if: always() && !cancelled()
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          PUBLISHER_GROWTH_DISPATCH_TOKEN: ${{ secrets.PUBLISHER_GROWTH_DISPATCH_TOKEN }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
-        run: python3 src/telegram_watchdog.py
-      - name: Wake or recover the daily Telegram live
-        if: ${{ always() && steps.editorial_watchdog.outputs.legacy_editorial == 'true' }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-          FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
-        run: python3 src/sports_daily_live.py dispatch
-      - name: Recover Facebook independently from Telegram completion
-        if: ${{ always() && steps.editorial_watchdog.outputs.legacy_editorial == 'true' }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
-        run: python3 src/telegram_watchdog.py facebook
+        run: python -m publisher_v71.bridge

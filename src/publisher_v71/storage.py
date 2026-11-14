@@ -21,15 +21,17 @@ def error_code(error):
 
 
 class Storage:
-    def __init__(self, client, bucket):
+    def __init__(self, client, bucket, *, editorial=None):
         self.client = client
+        self.editorial = editorial if editorial is not None else client
         self.bucket = bucket
         self.etag = None
         self.state = {section: {} for section in LEDGER_SECTIONS}
 
     def read(self, key, default=None, *, root=False, limit=100_000_000):
         try:
-            result = self.client.get_object(Bucket=self.bucket, Key=key if root else PREFIX + key)
+            client = self.client if root else self.editorial
+            result = client.get_object(Bucket=self.bucket, Key=key if root else PREFIX + key)
         except Exception as exc:
             if error_code(exc) in ('NoSuchKey', '404', 'NotFound'):
                 return default, None
@@ -85,7 +87,7 @@ class Storage:
     def save(self):
         self.state['schema'] = 1
         options = {'IfMatch': self.etag} if self.etag else {'IfNoneMatch': '*'}
-        result = self.client.put_object(
+        result = self.editorial.put_object(
             Bucket=self.bucket, Key=PREFIX + 'state.json', Body=encoded(self.state),
             ContentType='application/json', CacheControl='private, no-store', **options)
         self.etag = result['ETag']
@@ -100,7 +102,7 @@ class Storage:
         key = PREFIX + 'cycle.json'
         condition = {'IfMatch': tag} if tag else {'IfNoneMatch': '*'}
         try:
-            result = self.client.put_object(
+            result = self.editorial.put_object(
                 Bucket=self.bucket, Key=key, **condition,
                 Body=encoded({'until': (now + timedelta(minutes=8)).isoformat()}))
         except Exception as exc:
@@ -112,7 +114,7 @@ class Storage:
             yield True
         finally:
             try:
-                self.client.put_object(Bucket=self.bucket, Key=key, IfMatch=result['ETag'],
+                self.editorial.put_object(Bucket=self.bucket, Key=key, IfMatch=result['ETag'],
                                        Body=encoded({'until': now.isoformat()}))
             except Exception as exc:
                 if error_code(exc) not in ('409', '412', 'ConditionalRequestConflict', 'PreconditionFailed'):
@@ -120,7 +122,7 @@ class Storage:
 
     def freeze(self, key, data):
         try:
-            self.client.put_object(
+            self.editorial.put_object(
                 Bucket=self.bucket, Key=PREFIX + 'evidence/' + key, Body=encoded(data),
                 ContentType='application/json', CacheControl='private, no-store', IfNoneMatch='*')
         except Exception as exc:
@@ -128,6 +130,13 @@ class Storage:
                 raise
             return False
         return True
+
+    def stage_homepage(self, view):
+        raw = encoded(view)
+        if len(raw) > 100_000:
+            raise ValueError('Public projection too large')
+        self.editorial.put_object(Bucket=self.bucket, Key=PREFIX + 'homepage.json', Body=raw,
+                                  ContentType='application/json', CacheControl='private, no-store')
 
     def remember(self, key, data):
         if self.freeze(key, data):
@@ -139,7 +148,7 @@ class Storage:
 
     def snapshots(self, key):
         prefix = 'evidence/' + key
-        pages = self.client.get_paginator('list_objects_v2').paginate(
+        pages = self.editorial.get_paginator('list_objects_v2').paginate(
             Bucket=self.bucket, Prefix=PREFIX + prefix)
         for page in pages:
             for item in page.get('Contents', []):

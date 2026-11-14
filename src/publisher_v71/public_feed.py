@@ -14,6 +14,9 @@ from .storage import encoded
 
 BRANCH = 'publisher-public-v71'
 REF = 'refs/heads/' + BRANCH
+PUBLIC_REPOSITORY = 'https://github.com/arabsnipertech-bet/arabsniper2.git'
+HOME_FIELDS = frozenset({'schema_version', 'publisher', 'updated_at', 'groups', 'gold_previews',
+                         'gold_schedule', 'live', 'report', 'historical', 'academy', 'trial_verified'})
 
 
 def historical(source):
@@ -71,6 +74,18 @@ def branch_head():
     return output[0] if output else None
 
 
+def published_revision(remote):
+    git('fetch', '--no-tags', '--depth=1', remote, REF)
+    parent = git('rev-parse', 'FETCH_HEAD')
+    if not re.fullmatch(r'[0-9a-f]{40}', parent):
+        raise ValueError('Unexpected public branch reference')
+    existing = json.loads(git('show', parent + ':homepage.json'))
+    if existing.get('publisher') != 'v7.1':
+        raise ValueError('Unexpected existing public branch content')
+    published = stamp(git('show', '-s', '--format=%cI', parent))
+    return existing, parent, published
+
+
 def publish(view):
     # Build a fresh single-file tree. Neither the index nor main is ever a source.
     raw = encoded(view)
@@ -82,15 +97,8 @@ def publish(view):
         parent = branch_head()
         previous = None
         if parent:
-            git('fetch', '--no-tags', '--depth=1', 'origin', REF)
-            parent = git('rev-parse', 'FETCH_HEAD')
-            if not re.fullmatch(r'[0-9a-f]{40}', parent):
-                raise ValueError('Unexpected public branch reference')
-            existing = json.loads(git('show', parent + ':homepage.json'))
-            if existing.get('publisher') != 'v7.1':
-                raise ValueError('Unexpected existing public branch content')
-            published = stamp(git('show', '-s', '--format=%cI', parent))
-            previous = (existing, parent, published)
+            previous = published_revision('origin')
+            existing, parent, _ = previous
             if all(existing.get(key) == value for key, value in view.items() if key != 'updated_at'):
                 return parent, previous
         args = ['-p', parent] if parent else []
