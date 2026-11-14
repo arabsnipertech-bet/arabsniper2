@@ -1,5 +1,5 @@
 """Wake Growth from the existing Fast watchdog and forward its public home view."""
-from base64 import b64encode, urlsafe_b64encode
+from base64 import b64decode, b64encode, urlsafe_b64encode
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
@@ -73,10 +73,10 @@ def refresh_session(store, now):
 
 
 def wake(store, now, *, dry_run=False):
-    if not dry_run:
-        refresh_session(store, now)
     store.load()
     repository = cutover.owner(store)
+    if repository == cutover.GROWTH and not dry_run:
+        refresh_session(store, now)
     primary_api = GitHub(os.environ['GITHUB_TOKEN'])
     if repository == cutover.PRIMARY:
         api = primary_api
