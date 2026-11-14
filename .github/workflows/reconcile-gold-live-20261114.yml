@@ -1,0 +1,32 @@
+name: Reconcile the two affected Gold result archives
+on:
+  push:
+    branches: [ops/verify-gold-live-2026-11-14]
+    paths: ['.github/workflows/reconcile-gold-live-20261114.yml']
+permissions:
+  actions: write
+jobs:
+  dispatch:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.run_attempt == '1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Start the existing verified recovery for 12 and 13 November
+        run: |
+          set -euo pipefail
+          if [ "$(TZ=Europe/Rome date +%F)" != '2026-11-14' ]; then
+            exit 1
+          fi
+          api="repos/$GITHUB_REPOSITORY/actions/workflows/recover-daily-results.yml"
+          active=$(gh api "$api/runs?branch=main&per_page=10" --jq '[.workflow_runs[] | select(.status != "completed")] | length')
+          if [ "$active" != '0' ]; then
+            echo 'A recovery is already active'
+            exit 1
+          fi
+          for day in 2026-11-13 2026-11-12; do
+            jq -nc --arg day "$day" '{ref:"main",inputs:{date:$day,refresh:"true"}}' |
+              gh api --method POST "$api/dispatches" --input -
+            echo "Requested verified results recovery for $day"
+          done
