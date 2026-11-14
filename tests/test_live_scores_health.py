@@ -3,7 +3,8 @@ import json
 import sys
 from contextlib import redirect_stdout
 from datetime import datetime, timedelta, timezone
-from io import StringIO
+from io import BytesIO, StringIO
+from types import SimpleNamespace
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase, mock
@@ -241,7 +242,8 @@ class LiveScoresHealthTests(TestCase):
             with (mock.patch.object(health, 'get_json', return_value=current),
                   mock.patch.object(health, 'datetime', wraps=datetime) as clock,
                   mock.patch.object(health, 'recent_audit', return_value={}),
-                  mock.patch.dict(health.os.environ, {'GITHUB_STEP_SUMMARY': str(path)})):
+                  mock.patch.object(health, 'client'),
+                  mock.patch.dict(health.os.environ, {'GITHUB_STEP_SUMMARY': str(path), 'R2_BUCKET': 'test'})):
                 clock.now.return_value = NOW
                 health.run([], True)
             block = path.read_text().split('```json\n', 1)[1]
@@ -251,3 +253,30 @@ class LiveScoresHealthTests(TestCase):
         self.assertEqual([x['differences'] for x in report['auditor_days']], [0, 0])
         self.assertIn('::warning title=Gold halftime coverage::2 finished fixtures', log.getvalue())
         self.assertIn('Markets that require halftime remain unverified', log.getvalue())
+
+    def test_automatic_monitor_reports_the_same_fault_once_and_rearms_after_recovery(self):
+        class ClientError(Exception):
+            response = {'Error': {'Code': 'NoSuchKey'}}
+
+        s3 = mock.Mock()
+        data = {}
+
+        def get(**request):
+            if request['Key'] not in data:
+                raise ClientError()
+            return {'Body': BytesIO(data[request['Key']])}
+
+        def put(**request):
+            data[request['Key']] = request['Body']
+
+        s3.get_object.side_effect = get
+        s3.put_object.side_effect = put
+        fault = 'Tracked fixtures overdue without a confirmed result'
+        with mock.patch.dict(sys.modules, {'botocore.exceptions': SimpleNamespace(ClientError=ClientError)}):
+            self.assertEqual(health.update_incidents(s3, 'test', [fault, 'Collector state: results_pending']), [fault])
+            self.assertEqual(health.update_incidents(s3, 'test', [fault, 'Collector state: provider_rate_limit']), [])
+            self.assertEqual(s3.put_object.call_count, 1)
+            self.assertEqual(health.update_incidents(s3, 'test', [fault, 'Cron Trigger missing or stale']),
+                             ['Cron Trigger missing or stale'])
+            self.assertEqual(health.update_incidents(s3, 'test', []), [])
+            self.assertEqual(health.update_incidents(s3, 'test', [fault]), [fault])

@@ -14,6 +14,7 @@ KEY = 'live-scores/provider-relay.json'
 FINISHED = {'FT','AET','PEN'}
 ADMIN = {'PST','CANC','ABD','AWD','WO'}
 LIVE = {'1H','HT','2H','ET','BT','P','LIVE'}
+SCHEDULED = {'NS','TBD'}
 BATCH_SIZE = 20
 DAILY_CAP = 600
 
@@ -30,7 +31,7 @@ def stamp(value):
         return None
 
 def temporarily_limited(live):
-    return (live.get('status') == 'provider_rate_limit' and
+    return (live.get('status') in ('provider_rate_limit', 'minute_quota_low') and
             (live.get('diagnostic') or {}).get('limit_scope') != 'daily')
 
 
@@ -38,7 +39,8 @@ def needs_midpoint(watch, live, now):
     if not temporarily_limited(live):
         return False
     fixtures = live.get('fixtures') or {}
-    if (live.get('health') or {}).get('stale_live_fixtures'):
+    health = live.get('health') or {}
+    if health.get('stale_live_fixtures') or health.get('live_tracking_fixture_ids'):
         return True
     for f in watch.get('fixtures', []):
         kickoff = stamp(f.get('kickoff'))
@@ -55,9 +57,25 @@ def has_score(pair):
     return all(type(pair.get(side)) is int and pair[side] >= 0 for side in ('home', 'away'))
 
 
+def is_fresh(row, now, interval):
+    observed = stamp(row.get('observed_at'))
+    return observed is not None and not row.get('refresh_failed') and (
+        -timedelta(seconds=30) <= now - observed < interval
+    )
+
+
+def scheduled_retry(age):
+    if age >= timedelta(days=1):
+        return timedelta(hours=2)
+    return timedelta(hours=1) if age >= timedelta(hours=3) else timedelta(minutes=15)
+
+
 def due(watch, live, now):
     fixtures = live.get('fixtures') or {}
     limited = temporarily_limited(live)
+    health = live.get('health') or {}
+    stale = set(health.get('stale_live_fixture_ids', []))
+    tracked = set(health.get('live_tracking_fixture_ids', []))
     candidates = {}
     for f in watch.get('fixtures', []):
         fid, kickoff = str(f.get('fixture_id','')), stamp(f.get('kickoff'))
@@ -75,24 +93,34 @@ def due(watch, live, now):
             continue
         observed = stamp(row.get('observed_at'))
         age = now - kickoff
-        active = age <= timedelta(hours=3)
+        active = fid in tracked or age <= timedelta(hours=3)
         if final:
             freshness = timedelta(minutes=30 if age < timedelta(days=1) else 120)
+        elif status in SCHEDULED and age >= timedelta(minutes=15):
+            freshness = scheduled_retry(age)
         else:
-            freshness = timedelta(minutes=2 if limited and active else 4)
-        if not observed or now - observed >= freshness:
+            freshness = timedelta(minutes=4)
+        if fid in stale or not is_fresh(row, now, freshness):
             candidates[fid] = (2 if final else 0 if active else 1,
                 observed or datetime.min.replace(tzinfo=timezone.utc), kickoff)
     # The Worker retains watched fixtures when the published list rolls over.
-    health = live.get('health') or {}
-    for fid in health.get('stale_live_fixture_ids', []):
+    for fid in stale:
         if str(fid).isascii() and str(fid).isdecimal():
             observed = stamp(fixtures.get(str(fid), {}).get('observed_at'))
             candidates[str(fid)] = (-1, observed or datetime.min.replace(tzinfo=timezone.utc), now)
     for fid in health.get('overdue_fixture_ids', []):
-        if str(fid).isascii() and str(fid).isdecimal():
-            observed = stamp(fixtures.get(str(fid),{}).get('observed_at'))
+        row = fixtures.get(str(fid), {})
+        interval = timedelta(hours=2) if row.get('status') in SCHEDULED else timedelta(minutes=4)
+        if str(fid).isascii() and str(fid).isdecimal() and not is_fresh(row, now, interval):
+            observed = stamp(row.get('observed_at'))
             candidates.setdefault(str(fid), (1, observed or datetime.min.replace(tzinfo=timezone.utc), now-timedelta(hours=72)))
+    for fid in health.get('provider_pending_fixture_ids', []):
+        row = fixtures.get(str(fid), {})
+        if row.get('status') in SCHEDULED and str(fid).isascii() and str(fid).isdecimal() and not is_fresh(
+            row, now, timedelta(hours=1)
+        ):
+            observed = stamp(row.get('observed_at'))
+            candidates.setdefault(str(fid), (1, observed or datetime.min.replace(tzinfo=timezone.utc), now))
     limit = BATCH_SIZE * (2 if limited else 1)
     return sorted(candidates, key=lambda fid:(candidates[fid],fid))[:limit]
 
@@ -142,7 +170,7 @@ def run():
         print('Official daily quota exhausted; zero provider calls.')
         return
     if not ids:
-        print('No missing or stale tracked results; zero provider calls.')
+        print('No tracked results are due for recovery; zero provider calls.')
         return
     storage = boto3.client('s3',region_name='auto',
         endpoint_url='https://'+os.environ['R2_ACCOUNT_ID']+'.r2.cloudflarestorage.com',

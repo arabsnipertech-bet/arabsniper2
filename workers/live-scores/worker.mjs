@@ -3,10 +3,12 @@ const API = 'https://v3.football.api-sports.io/';
 const MINUTE = 60_000, HOUR = 60 * MINUTE, DAY = 24 * HOUR;
 const FAST_WINDOW = 3 * HOUR, RETRY_WINDOW = 72 * HOUR, CACHE_WINDOW = 4 * DAY;
 const OVERDUE = 135 * MINUTE;
+const EXTENDED_LIVE_WINDOW = 4 * HOUR, SCHEDULED_RESULT_WINDOW = 48 * HOUR;
 const PROVIDER_MIN_GAP_MS = 250;
 const MAX_FIXTURE_BATCH = 20;
 const MAX_RELAY_FIXTURES = 40;
 const LIVE_FRESHNESS = 5 * MINUTE;
+const RELAY_REUSE = 4 * MINUTE;
 const HALFTIME_RECHECK = 30 * MINUTE;
 const START_STATUS_GRACE = 15 * MINUTE;
 const FINISHED = new Set(['FT', 'AET', 'PEN']);
@@ -26,6 +28,11 @@ const validScore = value => number(value?.home) !== null && number(value?.away) 
 const hasFinal = row => FINISHED.has(row?.status) && (validScore(row.fulltime) || row.status === 'FT' && validScore(row.goals));
 const complete = row => hasFinal(row) && validScore(row.halftime);
 const postponed = row => row?.status === 'PST' || ADMIN.has(row?.status);
+const scheduled = row => row?.status === 'NS' || row?.status === 'TBD';
+const inPlay = row => LIVE.has(row?.status);
+const liveWindow = row => inPlay(row) ? EXTENDED_LIVE_WINDOW : FAST_WINDOW;
+const freshRelay = (row, now) => row?.transport === 'GitHub Actions/R2' && !row.refresh_failed &&
+  now - Date.parse(row.observed_at) >= -30_000 && now - Date.parse(row.observed_at) < RELAY_REUSE;
 
 export function normalize(row, now) {
   const f = row?.fixture, status = f?.status?.short;
@@ -79,8 +86,18 @@ function retryDelay(now, kickoff, row, checked) {
   if (complete(row)) return checked === 1 ? HOUR : checked === 2 ? 8 * HOUR : DAY;
   if (hasFinal(row)) return now - kickoff >= DAY ? 2 * HOUR : HALFTIME_RECHECK;
   if (postponed(row)) return 6 * HOUR;
+  if (scheduled(row)) {
+    if (now - kickoff >= DAY) return 2 * HOUR;
+    return now - kickoff >= FAST_WINDOW ? HOUR : START_STATUS_GRACE;
+  }
   if (now - kickoff >= DAY) return 2 * HOUR;
   return now - kickoff >= FAST_WINDOW ? 30 * MINUTE : 10 * MINUTE;
+}
+
+function overdueWindow(row) {
+  if (scheduled(row)) return SCHEDULED_RESULT_WINDOW;
+  if (inPlay(row)) return EXTENDED_LIVE_WINDOW;
+  return OVERDUE;
 }
 
 function retryAfter(headers, now) {
@@ -271,7 +288,9 @@ export class ScoreStore {
       s.provider_retry_after = null;
       const active = s.watch.filter(f => {
         const t = kickoff(f), row = s.scores[f.fixture_id];
-        return t <= now + 10 * MINUTE && t > now - FAST_WINDOW && !FINISHED.has(row?.status) && !postponed(row);
+        return t <= now + 10 * MINUTE && now - t < liveWindow(row) &&
+          !FINISHED.has(row?.status) && !postponed(row) && !freshRelay(row, now) &&
+          (!scheduled(row) || now - t < START_STATUS_GRACE);
       });
       const activeIds = new Set(active.map(f => String(f.fixture_id)));
       const followup = f => {
@@ -280,7 +299,11 @@ export class ScoreStore {
           const rescheduled = f.provider_kickoff && f.provider_kickoff !== f.kickoff;
           return age >= (rescheduled ? -10 * MINUTE : 6 * HOUR) && age < RETRY_WINDOW && !(checked?.next_at > now);
         }
-        if (age < 0 || age >= RETRY_WINDOW || checked?.next_at > now) return false;
+        if (age < 0 || age >= RETRY_WINDOW || checked?.next_at > now || freshRelay(row, now)) return false;
+        if (scheduled(row)) {
+          return age >= START_STATUS_GRACE && (row.refresh_failed ||
+            now - Date.parse(row.observed_at) >= retryDelay(now, t, row, 1));
+        }
         if (hasFinal(row)) {
           const observed = Date.parse(row.observed_at);
           if (!complete(row)) return !Number.isFinite(observed) || now - observed >= retryDelay(now, t, row, 1);
@@ -302,6 +325,7 @@ export class ScoreStore {
         s.quota = {current:q.requests.current, limit:q.requests.limit_day, checked_at:now};
       }
       let polled = false;
+      const updatedThisCycle = new Set();
       const accept = (rows, eligible) => {
         if (!Array.isArray(rows)) throw new Error('invalid_response');
         const received = new Set();
@@ -318,6 +342,7 @@ export class ScoreStore {
             .some(key => JSON.stringify(next[key]) !== JSON.stringify(old[key])))) archive.set(id, next);
           s.scores[id] = next;
           received.add(id);
+          updatedThisCycle.add(id);
         }
         polled = true;
         s.last_successful_poll_at = now;
@@ -348,7 +373,7 @@ export class ScoreStore {
         s.pages = {};
       }
       // With a small live schedule, one ID query covers live and recovery together.
-      const due = new Set(s.watch.filter(followup).sort((a,b) =>
+      const due = new Set(s.watch.filter(f => !updatedThisCycle.has(String(f.fixture_id)) && followup(f)).sort((a,b) =>
         Number(hasFinal(s.scores[a.fixture_id])) - Number(hasFinal(s.scores[b.fixture_id])) ||
         (s.followups[a.fixture_id]?.next_at || 0) - (s.followups[b.fixture_id]?.next_at || 0) ||
         kickoff(a) - kickoff(b)));
@@ -386,24 +411,29 @@ export class ScoreStore {
       s.retry_at = Math.max(s.provider_retry_after || 0,
         s.status === 'live_daily_cap' ? reset : now + (s.status === 'quota_reserve' ? HOUR : backoff));
     } finally {
-      let overdue = 0, missingHalftime = 0, staleLive = 0, trackingLive = 0;
-      const overdueIds = [], staleLiveIds = [], trackingIds = [];
+      let overdue = 0, missingHalftime = 0, staleLive = 0, trackingLive = 0, providerPending = 0;
+      const overdueIds = [], staleLiveIds = [], trackingIds = [], providerPendingIds = [];
       for (const f of s.watch) {
         const id = String(f.fixture_id), row = s.scores[id];
         const age = now - Date.parse(f.provider_kickoff || f.kickoff);
-        if (age >= 0 && age < FAST_WINDOW && !hasFinal(row) && !postponed(row)) {
+        if (age >= 0 && age < liveWindow(row) && !hasFinal(row) && !postponed(row)) {
           // A confirmed not-started match leaves the live count after the kickoff grace.
-          if (age < START_STATUS_GRACE || row?.status !== 'NS' && row?.status !== 'TBD') {
+          if (age < START_STATUS_GRACE || !scheduled(row)) {
             trackingLive++;
             trackingIds.push(id);
           }
         }
         if (age >= OVERDUE && !hasFinal(row) && !postponed(row)) {
-          overdue++;
-          if (overdueIds.length < 20) overdueIds.push(String(f.fixture_id));
+          if (age < overdueWindow(row)) {
+            providerPending++;
+            if (providerPendingIds.length < 20) providerPendingIds.push(id);
+          } else {
+            overdue++;
+            if (overdueIds.length < 20) overdueIds.push(id);
+          }
         }
         const scoreAge = now - Date.parse(row?.observed_at);
-        if (age >= 0 && age < FAST_WINDOW && LIVE.has(row?.status) &&
+        if (age >= 0 && age < EXTENDED_LIVE_WINDOW && inPlay(row) &&
             (!validScore(row.goals) || row.refresh_failed || !(scoreAge >= -30_000 && scoreAge <= LIVE_FRESHNESS))) {
           staleLive++;
           if (staleLiveIds.length < MAX_FIXTURE_BATCH) staleLiveIds.push(String(f.fixture_id));
@@ -412,6 +442,7 @@ export class ScoreStore {
       }
       if (overdue && (s.status === 'ok' || s.status === 'idle')) s.status = 'results_pending';
       s.health = {overdue_fixtures:overdue, overdue_fixture_ids:overdueIds, missing_halftime:missingHalftime,
+        provider_pending_fixtures:providerPending, provider_pending_fixture_ids:providerPendingIds,
         stale_live_fixtures:staleLive, stale_live_fixture_ids:staleLiveIds,
         live_tracking_fixtures:trackingLive, live_tracking_fixture_ids:trackingIds,
         watchlist_generated_at:timestamp(s.watch_generated_at), watchlist_status:watchIssue};
