@@ -147,7 +147,7 @@ def retry_at(headers, now):
     except (TypeError, ValueError, OverflowError):
         return None
 
-def run():
+def run(storage=None):
     import boto3
     from botocore.config import Config
     from botocore.exceptions import ClientError
@@ -161,7 +161,8 @@ def run():
             'https://arabsniperbet.com/api/live-scores'),check=True,capture_output=True)
         return json.loads(public.stdout)
     live = public_feed()
-    if (os.environ.get('GITHUB_EVENT_NAME') == 'workflow_run' and os.environ.get('GITHUB_OUTPUT')
+    if ((os.environ.get('GITHUB_EVENT_NAME') == 'workflow_run' or os.environ.get('GOLD_RELAY_FOLLOWUP') == 'true')
+            and os.environ.get('GITHUB_OUTPUT')
             and needs_midpoint(watch, live, now)):
         with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
             out.write('live_followup=true\n')
@@ -179,10 +180,11 @@ def run():
     if not ids:
         print('No tracked results are due for recovery; zero provider calls.')
         return
-    storage = boto3.client('s3',region_name='auto',
-        endpoint_url='https://'+os.environ['R2_ACCOUNT_ID']+'.r2.cloudflarestorage.com',
-        aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
-        config=Config(connect_timeout=5,read_timeout=15,retries={'total_max_attempts':2}))
+    if storage is None:
+        storage = boto3.client('s3',region_name='auto',
+            endpoint_url='https://'+os.environ['R2_ACCOUNT_ID']+'.r2.cloudflarestorage.com',
+            aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
+            config=Config(connect_timeout=5,read_timeout=15,retries={'total_max_attempts':2}))
     bucket = os.environ['R2_BUCKET']
     try:
         state = json.loads(storage.get_object(Bucket=bucket,Key=KEY)['Body'].read())
@@ -270,4 +272,8 @@ def run():
                       'calls_today':state['calls'],'captured_at':state['captured_at']}))
 
 if __name__ == '__main__':
-    run()
+    from gold_results_handoff import cycle
+
+    with cycle('relay') as store:
+        if store is not None:
+            run(store.editorial)

@@ -17,27 +17,35 @@ from .storage import PREFIX, encoded
 SESSION_KEY = PREFIX + 'growth-session.json'
 WRAP_KEY = 'growth-wrap-key.json'
 SESSION_TTL = timedelta(hours=2)
+GOLD_RESULTS_PREFIX = 'live-scores/growth/'
+GOLD_RESULTS_KEYS = ('live-scores/provider-relay.json', 'live-scores/verification-incidents.json')
+GOLD_RESULTS_READY = GOLD_RESULTS_PREFIX + 'owner.json'
+GOLD_RESULTS_SESSION = 'growth-gold-results-session.json'
+GOLD_RESULTS_WORKFLOW = 'gold-results.yml'
+GOLD_RESULTS_REPAIR = GOLD_RESULTS_PREFIX + 'repair.json'
+PRIMARY_GOLD_REPAIR = 'live-scores-health.yml'
 
 
-def session_credentials(source, bucket):
+def session_credentials(source, bucket, *, key=SESSION_KEY):
     from nacl.public import PrivateKey, SealedBox
 
-    with closing(source.get_object(Bucket=bucket, Key=SESSION_KEY)['Body']) as body:
+    with closing(source.get_object(Bucket=bucket, Key=key)['Body']) as body:
         envelope = json.loads(body.read(8192))
-    key = PrivateKey(b64decode(os.environ['PUBLISHER_SESSION_PRIVATE_KEY'], validate=True))
-    credentials = json.loads(SealedBox(key).decrypt(b64decode(envelope['sealed'], validate=True)))
+    private_key = PrivateKey(b64decode(os.environ['PUBLISHER_SESSION_PRIVATE_KEY'], validate=True))
+    credentials = json.loads(SealedBox(private_key).decrypt(b64decode(envelope['sealed'], validate=True)))
     expires = datetime.fromisoformat(credentials['expiry_time'])
     if expires.isoformat() != envelope['expiry_time'] or expires <= datetime.now(timezone.utc) + timedelta(minutes=4):
         raise RuntimeError('Growth Publisher storage session is stale')
     return credentials
 
 
-def refresh_session(store, now):
+def refresh_session(store, now, *, name='growth-session.json', prefix=PREFIX,
+                    objects=(), actions=('GetObject', 'ListObjectsV2', 'PutObject')):
     wrapping, _ = store.read(WRAP_KEY, limit=512)
     if not wrapping:
         return
     try:
-        stored, _ = store.read('growth-session.json', limit=8192)
+        stored, _ = store.read(name, limit=8192)
         if (stored and stored.get('sealed') and stored.get('recipient') == wrapping['public_key']
                 and datetime.fromisoformat(stored['expiry_time']) > now + timedelta(minutes=75)):
             return
@@ -51,8 +59,8 @@ def refresh_session(store, now):
     claims = {
         'sub': account, 'iss': access_key, 'aud': f'{account}.r2.cloudflarestorage.com',
         'iat': int(now.timestamp()), 'exp': int(expires.timestamp()), 'bucket': store.bucket,
-        'actions': ['GetObject', 'ListObjectsV2', 'PutObject'],
-        'paths': {'prefixPaths': [PREFIX], 'objectPaths': []},
+        'actions': list(actions),
+        'paths': {'prefixPaths': [prefix], 'objectPaths': list(objects)},
     }
 
     def segment(data):
@@ -67,9 +75,51 @@ def refresh_session(store, now):
     box = SealedBox(PublicKey(b64decode(recipient, validate=True)))
     envelope = {'recipient': recipient, 'expiry_time': credentials['expiry_time'],
                 'sealed': b64encode(box.encrypt(encoded(credentials))).decode()}
-    store.editorial.put_object(Bucket=store.bucket, Key=SESSION_KEY, Body=encoded(envelope),
+    store.editorial.put_object(Bucket=store.bucket, Key=PREFIX + name, Body=encoded(envelope),
                               ContentType='application/json', CacheControl='private, no-store')
-    event_log('publisher_bridge', 'editorial_session_refreshed')
+    event_log('publisher_bridge', 'editorial_session_refreshed', file=name)
+
+
+def gold_results_storage(source, bucket):
+    import boto3
+    from botocore.config import Config
+    from botocore.credentials import RefreshableCredentials
+    from botocore.session import get_session
+
+    def refresh():
+        return session_credentials(source, bucket, key=PREFIX + GOLD_RESULTS_SESSION)
+
+    session = get_session()
+    session._credentials = RefreshableCredentials.create_from_metadata(
+        metadata=refresh(), refresh_using=refresh, method='gold-results-r2')
+    return boto3.Session(botocore_session=session).client(
+        's3', endpoint_url=source.meta.endpoint_url, region_name='auto',
+        config=Config(connect_timeout=7, read_timeout=20, retries={'total_max_attempts': 2}))
+
+
+def wake_gold_results(store, api, now, *, dry_run=False):
+    if not dry_run:
+        refresh_session(store, now, name=GOLD_RESULTS_SESSION, prefix=GOLD_RESULTS_PREFIX,
+                        objects=GOLD_RESULTS_KEYS, actions=('GetObject', 'PutObject'))
+    ready, _ = store.read(GOLD_RESULTS_READY, root=True, limit=512)
+    path = 'workflows/' + GOLD_RESULTS_WORKFLOW
+    if api.request(path).get('state') != 'active':
+        return 'workflow_disabled'
+    runs = api.runs(GOLD_RESULTS_WORKFLOW, now - timedelta(minutes=20))
+    if any(run['status'] != 'completed' for run in runs):
+        return 'already_running'
+    if ready and any(run.get('conclusion') == 'success' and
+                     now - datetime.fromisoformat(run['updated_at']) < timedelta(minutes=4)
+                     for run in runs):
+        return 'recent_cycle'
+    if dry_run:
+        return 'would_dispatch'
+    operation = 'fallback' if ready else 'activate'
+    if not ready and any(run['status'] != 'completed' for workflow in ('live-scores-relay.yml', PRIMARY_GOLD_REPAIR)
+                         for run in GitHub(os.environ['GITHUB_TOKEN']).runs(workflow, now - timedelta(minutes=15))):
+        return 'primary_cycle_running'
+    api.request(path + '/dispatches', {'ref': 'main', 'inputs': {'operation': operation}})
+    return 'dispatched_' + operation
 
 
 def wake(store, now, *, dry_run=False):
@@ -88,6 +138,38 @@ def wake(store, now, *, dry_run=False):
             target.write(f'owner={repository}\n')
     event_log('publisher_watchdog', wake_publisher(api, now, dry_run=dry_run), repository=repository)
     event_log('telegram_live_watchdog', wake_live_monitor(api, now, dry_run=dry_run), repository=repository)
+
+
+def wake_results(store, now):
+    token = os.environ.get('PUBLISHER_GROWTH_DISPATCH_TOKEN')
+    if not token:
+        return
+    wrapping, _ = store.read(WRAP_KEY, limit=512)
+    if not wrapping:
+        return
+    dry_run = os.environ.get('FAST_BACKUP_DRY_RUN') == 'true'
+    api = GitHub(token, repository=cutover.GROWTH)
+    try:
+        status = wake_gold_results(store, api, now, dry_run=dry_run)
+    except RuntimeError as error:
+        if str(error) != 'GitHub HTTP 404':
+            raise
+        status = 'workflow_unavailable'
+    event_log('gold_results_watchdog', status, repository=cutover.GROWTH)
+    if not dry_run:
+        repair, _ = store.read(GOLD_RESULTS_REPAIR, root=True, limit=512)
+        if repair and timedelta() <= now - datetime.fromisoformat(repair['at']) < timedelta(minutes=20):
+            primary = GitHub(os.environ['GITHUB_TOKEN'])
+            runs = primary.runs(PRIMARY_GOLD_REPAIR, now - timedelta(minutes=20))
+            # The primary workflow has access to the verified checkpoint and its own Actions token.
+            if not any(run.get('display_title') == 'Gold results repair requested by Growth'
+                       and (run['status'] != 'completed' or
+                            run.get('conclusion') == 'success' and
+                            datetime.fromisoformat(run['created_at']) >= datetime.fromisoformat(repair['at']))
+                       for run in runs):
+                primary.request(f'workflows/{PRIMARY_GOLD_REPAIR}/dispatches', {
+                    'ref': 'main', 'inputs': {'repair': 'true'}})
+                event_log('gold_results_watchdog', 'repair_dispatched', repository=cutover.PRIMARY)
 
 
 def publish_home_if_due(store, api, now, *, dry_run=False):
@@ -191,6 +273,8 @@ def main():
         publish_home(store, now)
     elif sys.argv[1:] == ['--prepare']:
         prepare(store, now)
+    elif sys.argv[1:] == ['--gold-results']:
+        wake_results(store, now)
     else:
         wake(store, now, dry_run=os.environ.get('FAST_BACKUP_DRY_RUN') == 'true')
 

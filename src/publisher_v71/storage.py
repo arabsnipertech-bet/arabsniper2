@@ -93,13 +93,14 @@ class Storage:
         self.etag = result['ETag']
 
     @contextmanager
-    def cycle(self, now):
+    def cycle(self, now, *, key='cycle.json', root=False):
         """Serialize the short publishing cycles shared by both workflows."""
-        record, tag = self.read('cycle.json', limit=512)
+        record, tag = self.read(key, root=root, limit=512)
         if record and stamp(record['until']) > now:
             yield False
             return
-        key = PREFIX + 'cycle.json'
+        if not root:
+            key = PREFIX + key
         condition = {'IfMatch': tag} if tag else {'IfNoneMatch': '*'}
         try:
             result = self.editorial.put_object(

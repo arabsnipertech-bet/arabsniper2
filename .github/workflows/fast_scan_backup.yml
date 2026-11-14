@@ -55,6 +55,13 @@ jobs:
           PUBLISHER_GROWTH_DISPATCH_TOKEN: ${{ secrets.PUBLISHER_GROWTH_DISPATCH_TOKEN }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
         run: python -m publisher_v71.bridge
+      - name: Wake the Growth Gold results workflow when due
+        if: always() && !cancelled()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLISHER_GROWTH_DISPATCH_TOKEN: ${{ secrets.PUBLISHER_GROWTH_DISPATCH_TOKEN }}
+          FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+        run: python -m publisher_v71.bridge --gold-results
       # Until November 18 the existing campaign uses its D1 receipts and a separate fallback schedule.
       - name: Recover due Telegram campaign reminders
         if: always() && !cancelled() && !inputs.dry_run && steps.editorial.outputs.owner == 'arabsnipertech-bet/arabsniper-growth' && vars.PUBLISHER_V71_TRIAL_DISABLED != 'true'

@@ -22,6 +22,8 @@ jobs:
     if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 9
+    env:
+      PYTHONPATH: src
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,8 +31,9 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             .github/ops
+            src
             data/live_watchlist.json
-      - run: pip install 'boto3>=1.42,<2'
+      - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' ijson==3.6.0
       - name: Recover only tracked missing or stale scores
         id: relay
         env:
