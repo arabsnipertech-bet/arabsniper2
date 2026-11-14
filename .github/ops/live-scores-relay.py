@@ -18,6 +18,7 @@ SCHEDULED = {'NS','TBD'}
 BATCH_SIZE = 20
 DAILY_CAP = 600
 POLL_INTERVAL = timedelta(minutes=5)
+LIVE_FRESHNESS = POLL_INTERVAL + timedelta(minutes=1)
 
 
 class ProviderThrottled(Exception):
@@ -77,6 +78,15 @@ def due(watch, live, now):
     health = live.get('health') or {}
     stale = set(health.get('stale_live_fixture_ids', []))
     tracked = set(health.get('live_tracking_fixture_ids', []))
+    # The public list of stale IDs is capped at one batch, even when more are stale.
+    needs_second_batch = (health.get('relay_fixture_capacity') == 2 * BATCH_SIZE and
+                          (health.get('stale_live_fixtures') or 0) > BATCH_SIZE)
+    if needs_second_batch:
+        for fid in tracked - stale:
+            row = fixtures.get(fid, {})
+            if not row or (row.get('status') in LIVE and
+                           (not has_score(row.get('goals')) or not is_fresh(row, now, LIVE_FRESHNESS))):
+                stale.add(fid)
     cron = stamp(health.get('last_cron_at'))
     primary_active = (live.get('status') in ('ok', 'idle') and cron is not None and
                       -timedelta(seconds=30) <= now - cron <= timedelta(minutes=2))
@@ -128,7 +138,7 @@ def due(watch, live, now):
         ):
             observed = stamp(row.get('observed_at'))
             candidates.setdefault(str(fid), (1, observed or datetime.min.replace(tzinfo=timezone.utc), now))
-    limit = BATCH_SIZE * (2 if limited else 1)
+    limit = BATCH_SIZE * (2 if limited or needs_second_batch else 1)
     return sorted(candidates, key=lambda fid:(candidates[fid],fid))[:limit]
 
 def allowed(state, now):
