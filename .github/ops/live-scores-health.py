@@ -29,8 +29,9 @@ INCIDENT_KEY = 'live-scores/verification-incidents.json'
 FEED_ERROR = 'Public score feed unavailable or invalid'
 INVALID_FEED = 'Invalid public score feed'
 INVALID_COUNTERS = 'Invalid score feed health counters'
-SCORE_FAULTS = {'Tracked fixtures overdue without a confirmed result',
-                'Tracked live scores missing or older than five minutes'}
+OVERDUE_FAULT = 'Tracked fixtures overdue without a confirmed result'
+STALE_FAULT = 'Tracked live scores missing or older than five minutes'
+SCORE_FAULT_IDS = {OVERDUE_FAULT: 'overdue_fixture_ids', STALE_FAULT: 'stale_live_fixture_ids'}
 
 
 def stamp(value):
@@ -128,9 +129,9 @@ def inspect_live(now):
     if status == 'ok' and (not last_poll or now - last_poll > timedelta(minutes=12)):
         reasons.append('No recent successful provider poll')
     if health.get('overdue_fixtures'):
-        reasons.append('Tracked fixtures overdue without a confirmed result')
+        reasons.append(OVERDUE_FAULT)
     if health.get('stale_live_fixtures'):
-        reasons.append('Tracked live scores missing or older than five minutes')
+        reasons.append(STALE_FAULT)
     summary = {'status': live.get('status'), 'checked_at': now.isoformat(),
                'health': health, 'diagnostic': live.get('diagnostic')}
     return live, summary, reasons
@@ -276,13 +277,23 @@ def report_provider_pending(summary):
               'The provider reports that they are scheduled or still in play.', flush=True)
 
 
-def update_incidents(s3, bucket, reasons):
+def update_incidents(s3, bucket, reasons, summary):
     """Alert on new faults once and rearm them when the feed recovers."""
     from botocore.exceptions import ClientError
 
-    if SCORE_FAULTS.intersection(reasons):
+    if SCORE_FAULT_IDS.keys() & set(reasons):
         collector_variants = {f'Collector state: {status}' for status in THROTTLED | {'results_pending'}}
+        if (summary.get('diagnostic') or {}).get('limit_scope') == 'daily':
+            collector_variants.discard('Collector state: provider_rate_limit')
         reasons = [reason for reason in reasons if reason not in collector_variants]
+    incidents = {}
+    for reason in reasons:
+        fixture_ids = summary['health'].get(SCORE_FAULT_IDS.get(reason), [])
+        if fixture_ids:
+            for fixture_id in fixture_ids:
+                incidents[f'{reason} ({fixture_id})'] = reason
+        else:
+            incidents[reason] = reason
     try:
         with closing(s3.get_object(Bucket=bucket, Key=INCIDENT_KEY)['Body']) as body:
             saved = json.load(body)
@@ -292,11 +303,11 @@ def update_incidents(s3, bucket, reasons):
         saved = []
     if not isinstance(saved, list) or any(not isinstance(reason, str) for reason in saved):
         raise ValueError('Invalid live verification incident state')
-    active = sorted(set(reasons))
+    active = sorted(incidents)
     if active != saved:
         s3.put_object(Bucket=bucket, Key=INCIDENT_KEY, Body=json.dumps(active).encode(),
                       ContentType='application/json')
-    return [reason for reason in reasons if reason not in saved]
+    return list(dict.fromkeys(reason for key, reason in incidents.items() if key not in saved))
 
 
 def provider_results(ids):
@@ -362,7 +373,7 @@ def run(ids, compare_auditor, *, track_incidents=False):
                None in (v['provider']['home_ft'], v['provider']['away_ft']) or v['provider'] != v['worker']
                for v in summary['verification'].values()):
             reasons.append('Official fixture results have not all been confirmed and delivered by the Worker')
-    failures = update_incidents(storage, bucket, reasons) if track_incidents else reasons
+    failures = update_incidents(storage, bucket, reasons, summary) if track_incidents else reasons
     note = ''
     if reasons:
         summary['verification_state'] = 'failed' if failures else 'known_incident'

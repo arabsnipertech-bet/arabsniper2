@@ -272,11 +272,16 @@ class LiveScoresHealthTests(TestCase):
         s3.get_object.side_effect = get
         s3.put_object.side_effect = put
         fault = 'Tracked fixtures overdue without a confirmed result'
+        summary = {'health': {'overdue_fixture_ids': ['1631640']}}
+        def update(reasons):
+            return health.update_incidents(s3, 'test', reasons, summary)
+
         with mock.patch.dict(sys.modules, {'botocore.exceptions': SimpleNamespace(ClientError=ClientError)}):
-            self.assertEqual(health.update_incidents(s3, 'test', [fault, 'Collector state: results_pending']), [fault])
-            self.assertEqual(health.update_incidents(s3, 'test', [fault, 'Collector state: provider_rate_limit']), [])
+            self.assertEqual(update([fault, 'Collector state: results_pending']), [fault])
+            self.assertEqual(update([fault, 'Collector state: provider_rate_limit']), [])
             self.assertEqual(s3.put_object.call_count, 1)
-            self.assertEqual(health.update_incidents(s3, 'test', [fault, 'Cron Trigger missing or stale']),
-                             ['Cron Trigger missing or stale'])
-            self.assertEqual(health.update_incidents(s3, 'test', []), [])
-            self.assertEqual(health.update_incidents(s3, 'test', [fault]), [fault])
+            summary['health']['overdue_fixture_ids'].append('1636033')
+            self.assertEqual(update([fault]), [fault])
+            self.assertEqual(update([fault, 'Cron Trigger missing or stale']), ['Cron Trigger missing or stale'])
+            self.assertEqual(update([]), [])
+            self.assertEqual(update([fault]), [fault])
