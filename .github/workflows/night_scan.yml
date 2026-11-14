@@ -117,6 +117,11 @@ jobs:
           test -f data/arab_quote_day4.json
           test -f data/arab_quote_day5.json
 
+      - name: Hand off verified fixture IDs to the live score collector
+        if: steps.night_guard.outputs.run == 'true' && vars.GOLD_PRIVATE == 'true'
+        continue-on-error: true
+        run: python src/private_publication.py --watchlist-only
+
       - name: Save verified state in private storage
         if: steps.night_guard.outputs.run == 'true' && (vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true')
         run: python src/gold_storage.py publish

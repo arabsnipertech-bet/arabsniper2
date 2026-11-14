@@ -16,9 +16,12 @@ def allowed(path):
     if path in ('data/arab_calibration_weights.json', 'data/'+OPENING_SNAPSHOT): return True
     return path not in PUBLIC and bool(re.fullmatch(r'(data/arab_quote_[a-zA-Z0-9_]+\.json|(auditordata|auditarchive)/prematch_[a-zA-Z0-9_.-]+\.(json|md)|(data|data/private|auditordata|auditarchive)/_audit_parts/[a-f0-9]{64}\.json\.gz)',path))
 
-def collect(root, verified=None, *, patterns=None):
-    root=Path(root); files={}
+def checkpoint_files(root, verified=None, *, patterns=None):
+    """Yield checkpoint files without retaining the historical archive in memory."""
+    root = Path(root)
     verified=verified or {}
+    trusted_chunks = {}
+
     def unchanged(key, raw):
         item=verified.get(key, {})
         return item.get('bytes')==len(raw) and item.get('sha256')==sha(raw)
@@ -28,23 +31,30 @@ def collect(root, verified=None, *, patterns=None):
         for p in root.glob(pattern):
             key=p.relative_to(root).as_posix()
             if not allowed(key) or not p.is_file() or p.is_symlink(): continue
-            files[key]=p.read_bytes()
+            raw = p.read_bytes()
+            yield key, raw
             if p.suffix=='.json':
-                value=json.loads(files[key])
+                value=json.loads(raw)
                 if isinstance(value,dict) and value.get('_storage')==FORMAT:
-                    trusted=unchanged(key,files[key])
+                    trusted=unchanged(key,raw)
                     for part in value['parts']:
                         if not re.fullmatch('[a-f0-9]{64}',part['sha256']):
                             raise ValueError('Invalid audit part identifier')
                         chunk=p.parent/'_audit_parts'/(part['sha256']+'.json.gz')
                         chunk_key=chunk.relative_to(root).as_posix()
-                        files[chunk_key]=chunk.read_bytes()
-                        trusted=unchanged(chunk_key,files[chunk_key]) and trusted
+                        if chunk_key not in trusted_chunks:
+                            chunk_bytes = chunk.read_bytes()
+                            trusted_chunks[chunk_key] = unchanged(chunk_key, chunk_bytes)
+                            yield chunk_key, chunk_bytes
+                        trusted = trusted_chunks[chunk_key] and trusted
                     # Unchanged pointers AND compressed parts were verified in the
                     # published checkpoint. Do not reparse historical JSON hourly.
                     if not trusted:
                         validate_store(p)
-    return files
+
+
+def collect(root, verified=None, *, patterns=None):
+    return dict(checkpoint_files(root, verified, patterns=patterns))
 
 def read_checkpoint_object(storage, bucket, key, consume=None):
     try:
@@ -93,18 +103,21 @@ def publish(s3,bucket,root, *, checkpoint_only=False, selected_paths=None):
             gold['arab_quote_day1.json']=json.dumps(projection,ensure_ascii=False,separators=(',',':')).encode()
         except Exception as error:
             print('Gold yesterday archive deferred: '+type(error).__name__,flush=True)
-    files = collect(root, verified, patterns=selected_paths)
     index = dict(verified) if selected_paths is not None else {}
     known = {item['sha256'] for item in verified.values()}
-    uploads={}
-    for path,data in files.items():
-        digest=sha(data)
-        if digest not in known: uploads[digest]=data
-        index[path]={'sha256':digest,'bytes':len(data)}
+    uploads = {}
+    for path, raw in checkpoint_files(root, verified, patterns=selected_paths):
+        digest = sha(raw)
+        if digest not in known:
+            uploads[digest] = root / path
+        index[path] = {'sha256': digest, 'bytes': len(raw)}
     print(f'Uploading {len(uploads)} changed objects; reusing unchanged data',flush=True)
     def upload(item):
-        digest,data=item
-        s3.put_object(Bucket=bucket,Key='state/objects/'+digest,Body=data,Metadata={'sha256':digest})
+        digest, path = item
+        raw = path.read_bytes()
+        if sha(raw) != digest:
+            raise ValueError('Checkpoint file changed during publication')
+        s3.put_object(Bucket=bucket,Key='state/objects/'+digest,Body=raw,Metadata={'sha256':digest})
     with ThreadPoolExecutor(max_workers=8) as pool:
         tasks=[pool.submit(upload,item) for item in uploads.items()]
         for count,task in enumerate(as_completed(tasks),1):
@@ -349,7 +362,8 @@ def restore(s3,bucket,root,manifest_sha=None):
                 pending[weights] = local
 
         # Leave the checkout untouched until every remote object is verified.
-        for path in collect(root):
+        existing = [path for path, _ in checkpoint_files(root)]
+        for path in existing:
             if path not in pending:
                 (root / path).unlink()
         for path, source in pending.items():

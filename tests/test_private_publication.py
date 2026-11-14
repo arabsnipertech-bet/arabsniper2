@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
-from private_publication import stage_public, git
+from private_publication import stage_public, git, publish_watchlist, WATCHLIST
 
 
 class PublicBoundary(unittest.TestCase):
@@ -41,6 +41,42 @@ class PublicBoundary(unittest.TestCase):
             git(root, 'add', '.')
             with self.assertRaises(ValueError):
                 stage_public(root, {})
+
+    def test_watchlist_handoff_preserves_scan_checkout_and_only_updates_the_projection(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / 'scan'
+            remote = Path(folder) / 'origin.git'
+            remote.mkdir()
+            git(remote, 'init', '--bare', '-q')
+            root.mkdir()
+            git(root, 'init', '-q', '-b', 'main')
+            git(root, 'config', 'user.email', 'test@example.com')
+            git(root, 'config', 'user.name', 'Test')
+            (root / WATCHLIST).parent.mkdir()
+            (root / WATCHLIST).write_text('{"generated_at":"2026-11-14T09:00:00+00:00","fixtures":[]}')
+            (root / 'README.md').write_text('baseline')
+            git(root, 'add', '.')
+            git(root, 'commit', '-qm', 'initial')
+            git(root, 'remote', 'add', 'origin', str(remote))
+            git(root, 'push', '-q', 'origin', 'main')
+            base = git(root, 'rev-parse', 'HEAD')
+            watch = ('{"generated_at":"2026-11-14T10:00:00+00:00",'
+                     '"fixtures":[{"fixture_id":"10","kickoff":"2026-11-14T13:00:00+01:00"}]}')
+            (root / WATCHLIST).write_text(watch)
+            (root / 'README.md').write_text('unpublished edit')
+            private = root / 'data/arab_quote_day1.json'
+            private.write_text('private Gold data')
+
+            publish_watchlist(root)
+
+            self.assertEqual(git(root, 'rev-parse', 'HEAD'), base)
+            self.assertEqual((root / 'README.md').read_text(), 'unpublished edit')
+            self.assertEqual(private.read_text(), 'private Gold data')
+            self.assertEqual(git(remote, 'show', 'main:' + WATCHLIST).decode(), watch)
+            self.assertEqual(git(remote, 'diff', '--name-only', 'main^', 'main').decode().splitlines(), [WATCHLIST])
+            (root / WATCHLIST).write_text(watch.replace('T10:00:00', 'T09:30:00'))
+            publish_watchlist(root)
+            self.assertEqual(git(remote, 'show', 'main:' + WATCHLIST).decode(), watch)
 
 
 if __name__ == '__main__':
