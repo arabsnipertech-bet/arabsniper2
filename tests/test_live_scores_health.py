@@ -122,7 +122,7 @@ class LiveScoresHealthTests(TestCase):
     def test_successful_poll_with_stale_live_fixture_is_reported(self):
         summary, reasons, waits, reads, _ = self.inspect([feed('ok', stale_live=1)])
         self.assertEqual(summary['status'], 'ok')
-        self.assertEqual(reasons, ['Tracked live scores missing or older than five minutes'])
+        self.assertEqual(reasons, ['Tracked live scores missing or older than six minutes'])
         self.assertEqual((waits, reads), ([], 1))
 
     def test_recent_relay_delivery_keeps_the_limit_as_a_warning(self):
@@ -151,14 +151,14 @@ class LiveScoresHealthTests(TestCase):
         still_stale = feed(stale_live=21, cron_age=-0.25)
         summary, reasons, waits, reads, _ = self.inspect(
             [feed(stale_live=21), still_stale], relay_finished_at=NOW - timedelta(seconds=10))
-        self.assertIn('Tracked live scores missing or older than five minutes', reasons)
+        self.assertIn('Tracked live scores missing or older than six minutes', reasons)
         self.assertNotIn('delivery_during_provider_limit', summary)
         self.assertEqual((waits, reads), ([15], 2))
 
     def test_relay_without_a_new_worker_cycle_times_out(self):
         stale = feed(stale_live=21)
         summary, reasons, waits, reads, _ = self.inspect([stale] * 10, relay_finished_at=NOW)
-        self.assertIn('Tracked live scores missing or older than five minutes', reasons)
+        self.assertIn('Tracked live scores missing or older than six minutes', reasons)
         self.assertNotIn('delivery_during_provider_limit', summary)
         self.assertEqual((sum(waits), reads), (135, 10))
 
@@ -166,10 +166,9 @@ class LiveScoresHealthTests(TestCase):
         cases = (
             ('daily', feed(limit_scope='daily'), relayed_score()),
             ('overdue', feed(overdue=1, retry_minutes=8), relayed_score()),
-            ('watchlist', feed(watchlist_status='watchlist_stale'), relayed_score()),
-            ('stale relay', feed(retry_minutes=8), relayed_score(NOW - timedelta(minutes=6))),
+            ('stale relay', feed(retry_minutes=8), relayed_score(NOW - timedelta(minutes=7))),
             ('stale worker', feed(retry_minutes=8),
-             relayed_score(NOW - timedelta(minutes=6), transport='Worker')),
+             relayed_score(NOW - timedelta(minutes=7), transport='Worker')),
         )
         for name, current, row in cases:
             with self.subTest(name=name):
@@ -192,6 +191,14 @@ class LiveScoresHealthTests(TestCase):
                 self.assertEqual(summary['delivery_during_provider_limit'], 'idle')
                 self.assertIn('No live or overdue score updates are due', log)
                 self.assertEqual((waits, reads), ([], 1))
+
+    def test_idle_throttle_does_not_hide_a_stale_watchlist_or_raise_a_second_fault(self):
+        summary, reasons, waits, reads, log = self.inspect([
+            feed(live_due=0, watchlist_status='watchlist_stale')])
+        self.assertEqual(reasons, ['Fixture watchlist: watchlist_stale'])
+        self.assertEqual(summary['delivery_during_provider_limit'], 'idle')
+        self.assertIn('::warning', log)
+        self.assertEqual((waits, reads), ([], 1))
 
     def test_fresh_direct_scores_cover_a_limited_followup(self):
         current = feed(live_due=1, missing_halftime=2)

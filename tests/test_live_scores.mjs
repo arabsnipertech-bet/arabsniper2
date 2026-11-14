@@ -36,7 +36,7 @@ test('provider error retains last observation with original timestamp',async()=>
  const original=globalThis.fetch,calls=[];globalThis.fetch=fakeFetch(calls);
  try{const c=ctx(),s=new ScoreStore(c,env);await s.refresh(now);
  globalThis.fetch=async()=>Response.json({errors:{requests:'private provider error'},response:[]});
- await s.refresh(now+120000);const data=await(await s.fetch(new Request('https://internal/read'))).json();
+ await s.refresh(now+300000);const data=await(await s.fetch(new Request('https://internal/read'))).json();
  assert.equal(data.fixtures['123'].observed_at,new Date(now).toISOString());assert.equal(data.status,'provider_error');
  }finally{globalThis.fetch=original;}
 });
@@ -220,11 +220,11 @@ test('rate limit backs off persistently, then recovers a delayed fixture in a si
   await restarted.refresh(now+120000);
   assert.equal(calls.filter(u=>u.includes('/fixtures?')).length,1);
   limited=false;
-  await restarted.refresh(now+240000);
+  await restarted.refresh(now+300000);
   const restored=await(await restarted.fetch(new Request('https://scores.internal/read'))).json();
   assert.equal(restored.fixtures['123'].status,'FT');
   assert.equal(restored.health.overdue_fixtures,0);
-  assert.equal(restored.health.last_successful_poll_at,new Date(now+240000).toISOString());
+  assert.equal(restored.health.last_successful_poll_at,new Date(now+300000).toISOString());
   assert.equal((await context.storage.get('final:123')).fulltime.home,1);
  }finally{globalThis.fetch=original;}
 });
@@ -469,7 +469,7 @@ test('provider still scheduled or in play is not an invented missing final',asyn
  ];
  const scheduled=id=>normalize({fixture:{id,status:{short:'NS'}}},now);
  await context.storage.put('state',{scores:{'123':scheduled(123),'124':normalize({...row,
-  fixture:{id:124,status:{short:'2H'}}},now-6*60000),'125':scheduled(125)},
+  fixture:{id:124,status:{short:'2H'}}},now-7*60000),'125':scheduled(125)},
   watch,calls:20,watch_at:now,watch_generated_at:now,day:new Date(now).toISOString().slice(0,10),
   retry_at:now+600000,status:'provider_rate_limit',minute_backoff_v2:true});
  await new ScoreStore(context,env).refresh(now);
@@ -492,8 +492,56 @@ test('direct collector reuses recent relay data before polling the fixture again
   await s.refresh(now);
   await s.refresh(now+120000);
   assert.equal(calls.length,0);
+  await s.refresh(now+180000);
+  assert.equal(calls.length,0);
   await s.refresh(now+240000);
   assert.equal(calls.length,1);
   assert.equal((await context.storage.get('state')).health.stale_live_fixtures,0);
+ }finally{globalThis.fetch=original;}
+});
+
+test('the cron can import frequently while each healthy live fixture polls once per five minutes',async()=>{
+ const original=globalThis.fetch,calls=[];
+ globalThis.fetch=fakeFetch(calls);
+ try{
+  const c=ctx(),s=new ScoreStore(c,env);
+  const requests=()=>calls.filter(x=>x.includes('/fixtures?')).length;
+  await s.refresh(now);
+  for(let minutes=1;minutes<5;minutes++)await s.refresh(now+minutes*60000);
+  assert.equal(requests(),1);
+  await s.refresh(now+300000);
+  assert.equal(requests(),2);
+  const data=await(await s.fetch(new Request('https://internal/read'))).json();
+  assert.equal(data.poll_interval_seconds,300);
+  assert.equal(data.stale_after_seconds,360);
+  assert.equal(data.fixtures['123'].observed_at,new Date(now+300000).toISOString());
+ }finally{globalThis.fetch=original;}
+});
+
+test('near-simultaneous browser refresh events reuse the same snapshot request',async()=>{
+ let requests=0;
+ const scope={console,Date,Number,Set,Object,AbortController,Event,setTimeout:()=>1,clearTimeout(){},dispatchEvent(){},
+  fetch:async()=>{requests++;return {ok:true,json:async()=>({schema_version:1,enabled:true,fixtures:{}})};}};
+ vm.createContext(scope);vm.runInContext(fs.readFileSync('web/live-scores.js','utf8'),scope);
+ await scope.ArabLive.poll();
+ await scope.ArabLive.poll();
+ assert.equal(requests,1);
+});
+
+test('missing provider rows do not cause a call at each one-minute heartbeat',async()=>{
+ const original=globalThis.fetch,calls=[];
+ const read=fakeFetch(calls);
+ globalThis.fetch=async url=>{
+  const result=await read(url);
+  return url.includes('/fixtures?')?Response.json({response:[]}):result;
+ };
+ try{
+  const c=ctx(),s=new ScoreStore(c,env);
+  await s.refresh(now);
+  for(let minutes=1;minutes<5;minutes++)await s.refresh(now+minutes*60000);
+  assert.equal(calls.filter(x=>x.includes('/fixtures?')).length,1);
+  assert.deepEqual((await c.storage.get('state')).health.stale_live_fixture_ids,['123']);
+  await s.refresh(now+300000);
+  assert.equal(calls.filter(x=>x.includes('/fixtures?')).length,2);
  }finally{globalThis.fetch=original;}
 });

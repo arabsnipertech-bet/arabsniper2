@@ -7,8 +7,9 @@ const EXTENDED_LIVE_WINDOW = 4 * HOUR, SCHEDULED_RESULT_WINDOW = 48 * HOUR;
 const PROVIDER_MIN_GAP_MS = 250;
 const MAX_FIXTURE_BATCH = 20;
 const MAX_RELAY_FIXTURES = 40;
-const LIVE_FRESHNESS = 5 * MINUTE;
-const RELAY_REUSE = 4 * MINUTE;
+const POLL_INTERVAL = 5 * MINUTE;
+// One minute covers cron/import latency; observation timestamps never move without data.
+const LIVE_FRESHNESS = POLL_INTERVAL + MINUTE;
 const HALFTIME_RECHECK = 30 * MINUTE;
 const START_STATUS_GRACE = 15 * MINUTE;
 const FINISHED = new Set(['FT', 'AET', 'PEN']);
@@ -31,8 +32,9 @@ const postponed = row => row?.status === 'PST' || ADMIN.has(row?.status);
 const scheduled = row => row?.status === 'NS' || row?.status === 'TBD';
 const inPlay = row => LIVE.has(row?.status);
 const liveWindow = row => inPlay(row) ? EXTENDED_LIVE_WINDOW : FAST_WINDOW;
-const freshRelay = (row, now) => row?.transport === 'GitHub Actions/R2' && !row.refresh_failed &&
-  now - Date.parse(row.observed_at) >= -30_000 && now - Date.parse(row.observed_at) < RELAY_REUSE;
+const freshScore = (row, now) => row?.source === 'API-Football' && !row.refresh_failed &&
+  (scheduled(row) || validScore(row.goals) || hasFinal(row)) &&
+  now - Date.parse(row.observed_at) >= -30_000 && now - Date.parse(row.observed_at) < POLL_INTERVAL;
 
 export function normalize(row, now) {
   const f = row?.fixture, status = f?.status?.short;
@@ -53,7 +55,7 @@ export function relayRows(payload, now) {
       !Number.isFinite(at) || at > now + 30_000 || now - at > 7 * DAY ||
       !Array.isArray(payload.fixtures) || payload.fixtures.length > MAX_RELAY_FIXTURES) return [];
   return payload.fixtures.map(raw => normalize(raw, at)).filter(row =>
-    row && (hasFinal(row) || now - at <= LIVE_FRESHNESS)).map(row =>
+    row && (hasFinal(row) || now - at <= POLL_INTERVAL)).map(row =>
       ({...row, transport:'GitHub Actions/R2'}));
 }
 
@@ -136,14 +138,14 @@ export class ScoreStore {
       retry_after:timestamp(s?.retry_at), consecutive_errors:s?.consecutive_errors || 0,
       relay:s?.relay || null,
       usage:{day:s?.day, worker_requests:s?.calls || 0, provider:s?.provider_usage || null}};
-    return json({schema_version:1, enabled, generated_at:timestamp(s?.published_at), poll_interval_seconds:120,
+    return json({schema_version:1, enabled, generated_at:timestamp(s?.published_at), poll_interval_seconds:300, stale_after_seconds:360,
       status, diagnostic:s?.diagnostic || null, health, fixtures:s?.scores || {}});
   }
 
   async refresh(now = Date.now()) {
     const store = this.ctx.storage;
     const s = await store.get('state') || {scores:{}, watch:[], calls:0};
-    if (s.attempted_at && now - s.attempted_at < 115_000) return;
+    if (s.attempted_at && now - s.attempted_at < 55_000) return;
     s.attempted_at = s.last_cron_at = now;
     if (this.env.LIVE_ENABLED !== 'true' || !this.env.API_SPORTS_KEY) {
       s.status = this.env.LIVE_ENABLED === 'true' ? 'secret_missing' : 'disabled';
@@ -227,7 +229,9 @@ export class ScoreStore {
 
     let watchIssue = s.watch_issue || null;
     try {
-      if (!s.watch_at || now - s.watch_at >= 15 * MINUTE) {
+      const watchAttempt = s.watch_attempted_at || s.watch_at;
+      if (!watchAttempt || now - watchAttempt >= (watchIssue ? 5 : 15) * MINUTE) {
+        s.watch_attempted_at = now;
         try {
           const response = await fetch(WATCH_URL, {signal:AbortSignal.timeout(10_000)});
           if (!response.ok) throw new Error('watchlist_unavailable');
@@ -250,6 +254,7 @@ export class ScoreStore {
         }
       }
       if (!watchIssue && now - s.watch_generated_at > 4 * HOUR) watchIssue = 'watchlist_stale';
+      if (!watchIssue && s.status === s.watch_issue) s.status = 'idle';
       s.watch_issue = watchIssue;
       const kickoff = f => Date.parse(f.provider_kickoff || f.kickoff);
       s.watch = s.watch.filter(f => kickoff(f) > now - CACHE_WINDOW);
@@ -283,13 +288,13 @@ export class ScoreStore {
           s.relay = {...s.relay, error:'relay_unavailable'};
         }
       }
-      if (s.retry_at > now) return;
+      if (s.retry_at > now || (s.provider_cycle_at && now - s.provider_cycle_at < POLL_INTERVAL)) return;
       s.diagnostic = null;
       s.provider_retry_after = null;
       const active = s.watch.filter(f => {
         const t = kickoff(f), row = s.scores[f.fixture_id];
         return t <= now + 10 * MINUTE && now - t < liveWindow(row) &&
-          !FINISHED.has(row?.status) && !postponed(row) && !freshRelay(row, now) &&
+          !FINISHED.has(row?.status) && !postponed(row) && !freshScore(row, now) &&
           (!scheduled(row) || now - t < START_STATUS_GRACE);
       });
       const activeIds = new Set(active.map(f => String(f.fixture_id)));
@@ -299,7 +304,7 @@ export class ScoreStore {
           const rescheduled = f.provider_kickoff && f.provider_kickoff !== f.kickoff;
           return age >= (rescheduled ? -10 * MINUTE : 6 * HOUR) && age < RETRY_WINDOW && !(checked?.next_at > now);
         }
-        if (age < 0 || age >= RETRY_WINDOW || checked?.next_at > now || freshRelay(row, now)) return false;
+        if (age < 0 || age >= RETRY_WINDOW || checked?.next_at > now || freshScore(row, now)) return false;
         if (scheduled(row)) {
           return age >= START_STATUS_GRACE && (row.refresh_failed ||
             now - Date.parse(row.observed_at) >= retryDelay(now, t, row, 1));
@@ -318,6 +323,8 @@ export class ScoreStore {
         s.consecutive_errors = 0;
         return;
       }
+      // This guard also applies to empty or partial provider responses.
+      s.provider_cycle_at = now;
       if (!s.quota || now - s.quota.checked_at > HOUR) {
         const q = (await api('status')).response;
         if (!Number.isInteger(q?.requests?.current) || !Number.isInteger(q?.requests?.limit_day) ||
@@ -433,8 +440,9 @@ export class ScoreStore {
           }
         }
         const scoreAge = now - Date.parse(row?.observed_at);
-        if (age >= 0 && age < EXTENDED_LIVE_WINDOW && inPlay(row) &&
-            (!validScore(row.goals) || row.refresh_failed || !(scoreAge >= -30_000 && scoreAge <= LIVE_FRESHNESS))) {
+        const missingLive = !row && age >= POLL_INTERVAL && age < FAST_WINDOW;
+        if (missingLive || (age >= 0 && age < EXTENDED_LIVE_WINDOW && inPlay(row) &&
+            (!validScore(row.goals) || row.refresh_failed || !(scoreAge >= -30_000 && scoreAge <= LIVE_FRESHNESS)))) {
           staleLive++;
           if (staleLiveIds.length < MAX_FIXTURE_BATCH) staleLiveIds.push(String(f.fixture_id));
         }

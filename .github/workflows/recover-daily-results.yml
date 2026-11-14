@@ -1,4 +1,5 @@
 name: Recover verified daily results
+run-name: Recover verified daily results · ${{ inputs.date || 'yesterday' }}
 on:
   workflow_run:
     workflows: [Run Auditor]

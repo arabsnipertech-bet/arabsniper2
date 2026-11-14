@@ -32,7 +32,7 @@ class RelayTests(unittest.TestCase):
         half_missing = {'status': 'FT', 'goals': {'home': 5, 'away': 0},
                         'observed_at': (NOW - timedelta(minutes=10)).isoformat()}
         live = {'status': 'provider_rate_limit', 'fixtures': {
-            '1': half_missing, '2': {'status': '2H', 'observed_at': (NOW - timedelta(minutes=4)).isoformat()},
+            '1': half_missing, '2': {'status': '2H', 'observed_at': (NOW - timedelta(minutes=5)).isoformat()},
         }}
         self.assertEqual(relay.due(fixtures, live, NOW), ['2'])
         half_missing['observed_at'] = (NOW - timedelta(minutes=30)).isoformat()
@@ -44,6 +44,13 @@ class RelayTests(unittest.TestCase):
     def test_fresh_live_is_deduplicated(self):
         row={'status':'1H','observed_at':NOW.isoformat()}
         self.assertEqual(relay.due(watch(),{'fixtures':{'1':row}},NOW),[])
+    def test_a_healthy_primary_owns_tracked_live_fixtures_until_there_is_a_delivery_gap(self):
+        row = {'status': '1H', 'observed_at': (NOW - timedelta(minutes=5)).isoformat()}
+        live = {'status': 'ok', 'fixtures': {'1': row},
+                'health': {'live_tracking_fixture_ids': ['1'], 'last_cron_at': NOW.isoformat()}}
+        self.assertEqual(relay.due(watch(), live, NOW), [])
+        live['health']['stale_live_fixture_ids'] = ['1']
+        self.assertEqual(relay.due(watch(), live, NOW), ['1'])
     def test_batch_is_bounded_and_retained_overnight_ids_survive(self):
         self.assertEqual(len(relay.due(watch(100),{},NOW)),20)
         self.assertEqual(relay.due({'fixtures':[]},{'health':{'overdue_fixture_ids':['1644690']}},NOW),['1644690'])
@@ -61,8 +68,8 @@ class RelayTests(unittest.TestCase):
         live={'fixtures':rows,'status':'provider_rate_limit','diagnostic':{'limit_scope':'unconfirmed'}}
         self.assertEqual(relay.due(watch(28),{'fixtures':rows},NOW),[])
         self.assertEqual(relay.due(watch(28),live,NOW),[])
-        self.assertEqual(set(relay.due(watch(28),live,NOW+timedelta(minutes=1))),set(rows))
-        self.assertEqual(len(relay.due(watch(50),live,NOW+timedelta(minutes=1))),40)
+        self.assertEqual(set(relay.due(watch(28),live,NOW+timedelta(minutes=2))),set(rows))
+        self.assertEqual(len(relay.due(watch(50),live,NOW+timedelta(minutes=2))),40)
     def test_midpoint_checks_only_affected_live_or_just_started_fixtures(self):
         candidate = {'fixtures': [{'fixture_id': '1', 'kickoff': (NOW-timedelta(minutes=10)).isoformat()}]}
         live = {'fixtures': {'1': {'status': '1H'}}, 'status': 'provider_rate_limit'}
@@ -88,7 +95,7 @@ class RelayTests(unittest.TestCase):
 
     def test_second_batch_rate_limit_keeps_first_batch_and_persists_cooldown(self):
         fixtures = watch(28)
-        observed = (NOW - timedelta(minutes=4)).isoformat()
+        observed = (NOW - timedelta(minutes=5)).isoformat()
         feed = {
             'status': 'provider_rate_limit', 'health': {'relay_fixture_capacity': 40},
             'fixtures': {f['fixture_id']: {'status': 'HT', 'observed_at': observed}
