@@ -33,11 +33,12 @@ def due_slots(now):
 
 
 class GitHub:
-    def __init__(self,token):
+    def __init__(self,token, *, repository=REPO):
         if not token:raise RuntimeError("Missing GITHUB_TOKEN")
         self.token=token
+        self.repository=repository
     def request(self,path,body=None):
-        url=f"https://api.github.com/repos/{REPO}/actions/{path}"
+        url=f"https://api.github.com/repos/{self.repository}/actions/{path}"
         req=Request(url,data=None if body is None else json.dumps(body).encode(),
             headers={"Authorization":"Bearer "+self.token,
                      "Accept":"application/vnd.github+json",
