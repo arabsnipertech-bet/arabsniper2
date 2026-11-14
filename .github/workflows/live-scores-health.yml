@@ -15,12 +15,6 @@ on:
         description: 'Applica una riparazione richiesta da Growth'
         type: boolean
         default: false
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/live-scores-health.yml'
-      - '.github/ops/live-scores-health.py'
-      - '.github/ops/live-scores-repair.py'
 permissions:
   contents: read
   actions: write

@@ -98,13 +98,20 @@ def gold_results_storage(source, bucket):
         config=Config(connect_timeout=7, read_timeout=20, retries={'total_max_attempts': 2}))
 
 
-def wake_gold_results(store, api, now, *, dry_run=False):
+def wake_gold_results(store, api, primary, now, *, dry_run=False):
+    owner, _ = store.read(GOLD_RESULTS_OWNER, root=True, limit=512)
+    if owner and owner['repository'] == cutover.PRIMARY:
+        if any(run['status'] != 'completed' for run in primary.runs('live-scores-relay.yml', now - timedelta(minutes=20))):
+            return 'primary_already_running'
+        if dry_run:
+            return 'primary_restored'
+        primary.request('workflows/live-scores-relay.yml/dispatches', {'ref': 'main'})
+        return 'dispatched_primary'
+    if not api:
+        return 'growth_token_unavailable'
     if not dry_run:
         refresh_session(store, now, name=GOLD_RESULTS_SESSION, prefix=GOLD_RESULTS_PREFIX,
                         objects=GOLD_RESULTS_KEYS, actions=('GetObject', 'PutObject'))
-    owner, _ = store.read(GOLD_RESULTS_OWNER, root=True, limit=512)
-    if owner and owner['repository'] == cutover.PRIMARY:
-        return 'primary_restored'
     ready = owner is not None
     path = 'workflows/' + GOLD_RESULTS_WORKFLOW
     if api.request(path).get('state') != 'active':
@@ -147,15 +154,14 @@ def wake_results(store, now):
     from .runner import event_log
 
     token = os.environ.get('PUBLISHER_GROWTH_DISPATCH_TOKEN')
-    if not token:
-        return
     wrapping, _ = store.read(WRAP_KEY, limit=512)
     if not wrapping:
         return
     dry_run = os.environ.get('FAST_BACKUP_DRY_RUN') == 'true'
-    api = GitHub(token, repository=cutover.GROWTH)
+    api = GitHub(token, repository=cutover.GROWTH) if token else None
+    primary = GitHub(os.environ['GITHUB_TOKEN'])
     try:
-        status = wake_gold_results(store, api, now, dry_run=dry_run)
+        status = wake_gold_results(store, api, primary, now, dry_run=dry_run)
     except RuntimeError as error:
         if str(error) != 'GitHub HTTP 404':
             raise
@@ -164,7 +170,6 @@ def wake_results(store, now):
     if not dry_run:
         repair, _ = store.read(GOLD_RESULTS_REPAIR, root=True, limit=512)
         if repair and timedelta() <= now - datetime.fromisoformat(repair['at']) < timedelta(minutes=20):
-            primary = GitHub(os.environ['GITHUB_TOKEN'])
             runs = primary.runs(PRIMARY_GOLD_REPAIR, now - timedelta(minutes=20))
             # The primary workflow has access to the verified checkpoint and its own Actions token.
             if not any(run.get('display_title') == 'Gold results repair requested by Growth'
