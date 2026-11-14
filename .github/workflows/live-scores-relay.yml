@@ -1,6 +1,11 @@
 name: Recover official live scores
 on:
   workflow_dispatch:
+    inputs:
+      restore_primary:
+        description: Riporta il recupero degli esiti Gold su arabsniper2
+        type: boolean
+        default: false
   workflow_run:
     workflows: [ArabSniper Fast Backup]
     branches: [main]
@@ -22,6 +27,8 @@ jobs:
     if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 9
+    env:
+      PYTHONPATH: src
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,8 +36,17 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             .github/ops
+            src
             data/live_watchlist.json
-      - run: pip install 'boto3>=1.42,<2'
+      - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' ijson==3.6.0
+      - name: Restore the primary repository as owner
+        if: inputs.restore_primary
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python -m gold_results_handoff restore-primary
       - name: Recover only tracked missing or stale scores
         id: relay
         env:

@@ -1,4 +1,5 @@
 name: Verify Gold live results
+run-name: ${{ inputs.repair && 'Gold results repair requested by Growth' || 'Verify Gold live results' }}
 on:
   workflow_run:
     workflows: [Recover official live scores]
@@ -10,6 +11,10 @@ on:
         description: 'Optional official verification of up to 20 fixture IDs, separated by commas'
         type: string
         required: false
+      repair:
+        description: 'Applica una riparazione richiesta da Growth'
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -28,7 +33,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 7
     outputs:
-      watchlist_repair: ${{ steps.health.outputs.watchlist_repair }}
+      watchlist_repair: ${{ steps.health.outputs.watchlist_repair || steps.repair.outputs.watchlist_repair }}
     env:
       PYTHONPATH: src
     steps:
@@ -44,6 +49,7 @@ jobs:
           "$RUNNER_TEMP/live-score-audit/bin/pip" install 'boto3>=1.42,<2' 'requests>=2.32,<3' ijson==3.6.0
       - name: Check freshness, results and Auditor
         id: health
+        if: ${{ !inputs.repair }}
         env:
           API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
           R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -62,11 +68,20 @@ jobs:
             args+=(--track-incidents)
           fi
           "$RUNNER_TEMP/live-score-audit/bin/python" .github/ops/live-scores-health.py --fixtures "$FIXTURE_IDS" "${args[@]}"
+      - name: Read the repair requested by Growth
+        id: repair
+        if: inputs.repair
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: '"$RUNNER_TEMP/live-score-audit/bin/python" -m gold_results_handoff repair'
       - name: Request bounded certificate repair
-        if: ${{ !cancelled() && steps.health.outputs.recovery_date != '' }}
+        if: ${{ !cancelled() && (steps.health.outputs.recovery_date != '' || steps.repair.outputs.recovery_date != '') }}
         env:
           GH_TOKEN: ${{ github.token }}
-          RECOVERY_DATE: ${{ steps.health.outputs.recovery_date }}
+          RECOVERY_DATE: ${{ steps.health.outputs.recovery_date || steps.repair.outputs.recovery_date }}
         run: python3 .github/ops/live-scores-repair.py "$RECOVERY_DATE"
 
   refresh-watchlist:

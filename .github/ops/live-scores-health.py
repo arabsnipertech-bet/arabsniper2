@@ -330,7 +330,7 @@ def provider_results(ids):
             if str(row.get('fixture', {}).get('id')) in ids}
 
 
-def run(ids, compare_auditor, *, track_incidents=False):
+def run(ids, compare_auditor, *, track_incidents=False, store=None):
     now = datetime.now(timezone.utc)
     try:
         if ids:
@@ -343,19 +343,21 @@ def run(ids, compare_auditor, *, track_incidents=False):
         live = {'fixtures': {}}
         summary = {'status': 'unavailable', 'checked_at': now.isoformat(), 'health': {}}
         reasons = [str(error)]
-    if summary['health'] and summary['health'].get('watchlist_status') in (
-            'watchlist_stale', 'watchlist_unavailable', 'invalid_watchlist') and os.environ.get('GITHUB_OUTPUT'):
+    watchlist_repair = summary['health'].get('watchlist_status') in (
+        'watchlist_stale', 'watchlist_unavailable', 'invalid_watchlist')
+    if watchlist_repair and os.environ.get('GITHUB_OUTPUT'):
         with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
             out.write('watchlist_repair=true\n')
     if summary['health']:
         report_halftime_coverage(live, summary)
         report_provider_pending(summary)
     fixtures = live['fixtures']
-    storage = client() if compare_auditor or track_incidents else None
+    storage = (store.client if store is not None else client()) if compare_auditor or track_incidents else None
+    incidents = store.editorial if store is not None else storage
     bucket = os.environ['R2_BUCKET'] if storage else None
+    recovery_dates = []
     if compare_auditor and summary['health']:
         summary['auditor_days'] = []
-        recovery_dates = []
         with storage.get_object(Bucket=bucket, Key='state/current.json')['Body'] as stream:
             index = json.load(stream)['files']
         for age in (1, 2):
@@ -379,7 +381,11 @@ def run(ids, compare_auditor, *, track_incidents=False):
                None in (v['provider']['home_ft'], v['provider']['away_ft']) or v['provider'] != v['worker']
                for v in summary['verification'].values()):
             reasons.append('Official fixture results have not all been confirmed and delivered by the Worker')
-    failures = update_incidents(storage, bucket, reasons, summary) if track_incidents else reasons
+    failures = update_incidents(incidents, bucket, reasons, summary) if track_incidents else reasons
+    if store is not None:
+        from gold_results_handoff import report_repair
+
+        report_repair(store, watchlist=watchlist_repair, audit=recovery_dates[0] if recovery_dates else None)
     note = ''
     if reasons:
         summary['verification_state'] = 'failed' if failures else 'known_incident'
@@ -412,6 +418,10 @@ if __name__ == '__main__':
     if len(ids) > 20 or any(not fid.isascii() or not fid.isdecimal() or not 1 <= len(fid) <= 16 for fid in ids):
         parser.error('Provide up to 20 comma-separated fixture IDs.')
     try:
-        run(ids, args.compare_auditor, track_incidents=args.track_incidents and not ids)
+        from gold_results_handoff import cycle
+
+        with cycle('health') as store:
+            if store is not None:
+                run(ids, args.compare_auditor, track_incidents=args.track_incidents and not ids, store=store)
     except Exception as error:
         raise SystemExit(f'Gold live results verification failed: {type(error).__name__}') from None
