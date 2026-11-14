@@ -52,8 +52,10 @@ class Storage(unittest.TestCase):
    pass
 
   class InterruptedBody(io.BytesIO):
-   def read(self):
-    raise StreamFailure()
+   def read(self, size=-1):
+    if self.tell():
+     raise StreamFailure()
+    return super().read(1)
 
   with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
    source = Path(a) / 'data'
@@ -63,9 +65,9 @@ class Storage(unittest.TestCase):
    storage = Fake()
    publish(storage, 'test', a)
    get = storage.get_object
-   body = InterruptedBody()
    object_keys = [key for key in storage.objects if key.startswith('state/objects/')]
    interrupted_key = object_keys[0]
+   body = InterruptedBody(storage.objects[interrupted_key])
    calls = Counter()
 
    def interrupted(**request):
@@ -86,6 +88,7 @@ class Storage(unittest.TestCase):
    self.assertEqual(calls, expected)
    retry.assert_called_once_with(1)
    self.assertTrue((Path(b) / 'data' / GOLD[0]).is_file())
+   self.assertFalse(list(Path(b).glob('.gold-restore-*')))
 
  def test_reuses_unchanged_objects_and_pointer_survives_failed_upload(self):
   with tempfile.TemporaryDirectory() as a:
