@@ -26,6 +26,7 @@ LIVE_FRESHNESS = timedelta(minutes=6)
 LIVE_PHASES = {'1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE'}
 THROTTLED = {'provider_rate_limit', 'minute_quota_low'}
 INCIDENT_KEY = 'live-scores/verification-incidents.json'
+RELAY_KEY = 'live-scores/provider-relay.json'
 FEED_ERROR = 'Public score feed unavailable or invalid'
 INVALID_FEED = 'Invalid public score feed'
 INVALID_COUNTERS = 'Invalid score feed health counters'
@@ -208,11 +209,36 @@ def waiting_for_relay(summary, finished_at, now):
     )
 
 
-def inspect_with_rate_limit_recheck(now, relay_finished_at=None):
+def recent_relay_saved(store, finished_at, now):
+    if store is None or finished_at is None:
+        return False
+    earliest = now - timedelta(seconds=RELAY_CRON_GRACE_SECONDS)
+    if not earliest <= finished_at <= now:
+        return False
+    relay, _ = store.read(RELAY_KEY, root=True, limit=200_000)
+    if not isinstance(relay, dict) or not relay.get('fixtures'):
+        return False
+    captured_at = stamp(relay.get('captured_at'))
+    # The workflow records its completion timestamp in whole seconds.
+    return captured_at is not None and earliest <= captured_at <= min(now, finished_at + timedelta(seconds=1))
+
+
+def inspect_with_rate_limit_recheck(now, relay_finished_at=None, *, store=None):
     live, summary, reasons = inspect_live(now)
+    started = monotonic()
+    if (reasons == [STALE_FAULT] and summary['status'] in ('ok', 'idle') and
+            recent_relay_saved(store, relay_finished_at, now)):
+        print('Rechecking the public feed after a recent score recovery.', flush=True)
+        while reasons == [STALE_FAULT] and summary['status'] in ('ok', 'idle'):
+            remaining = RELAY_CRON_GRACE_SECONDS - (monotonic() - started)
+            if remaining <= 0:
+                break
+            sleep(min(RELAY_POLL_SECONDS, remaining))
+            now = datetime.now(timezone.utc)
+            live, summary, reasons = inspect_live(now)
+
     initial = {'checked_at': summary['checked_at'], 'retry_after': summary['health'].get('retry_after'),
                'diagnostic': summary['diagnostic']}
-    started = monotonic()
     rechecked = False
     while temporary_limit(summary):
         delivery = current_delivery(live, summary, reasons, now)
@@ -336,7 +362,8 @@ def run(ids, compare_auditor, *, track_incidents=False, store=None):
         if ids:
             live, summary, reasons = inspect_live(now)
         else:
-            live, summary, reasons = inspect_with_rate_limit_recheck(now, stamp(os.environ.get('RELAY_FINISHED_AT')))
+            live, summary, reasons = inspect_with_rate_limit_recheck(
+                now, stamp(os.environ.get('RELAY_FINISHED_AT')), store=store)
     except ValueError as error:
         if str(error) not in (FEED_ERROR, INVALID_FEED, INVALID_COUNTERS):
             raise

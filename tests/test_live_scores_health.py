@@ -48,7 +48,7 @@ def relayed_score(at=NOW, **values):
 
 
 class LiveScoresHealthTests(TestCase):
-    def inspect(self, feeds, *, relay_finished_at=None):
+    def inspect(self, feeds, *, relay_finished_at=None, store=None):
         output = StringIO()
         waits = []
 
@@ -63,7 +63,7 @@ class LiveScoresHealthTests(TestCase):
               redirect_stdout(output)):
             clock.fromisoformat.side_effect = datetime.fromisoformat
             clock.now.side_effect = lambda _: now()
-            _, summary, reasons = health.inspect_with_rate_limit_recheck(NOW, relay_finished_at)
+            _, summary, reasons = health.inspect_with_rate_limit_recheck(NOW, relay_finished_at, store=store)
         provider.assert_not_called()
         return summary, reasons, waits, read.call_count, output.getvalue()
 
@@ -123,6 +123,35 @@ class LiveScoresHealthTests(TestCase):
         summary, reasons, waits, reads, _ = self.inspect([feed('ok', stale_live=1)])
         self.assertEqual(summary['status'], 'ok')
         self.assertEqual(reasons, ['Tracked live scores missing or older than six minutes'])
+        self.assertEqual((waits, reads), ([], 1))
+
+    def test_healthy_worker_has_time_to_publish_recently_recovered_scores(self):
+        store = mock.Mock()
+        captured = NOW - timedelta(seconds=4)
+        store.read.return_value = ({'captured_at': captured.isoformat(), 'fixtures': [{}]}, None)
+        _, reasons, waits, reads, _ = self.inspect(
+            [feed('ok', stale_live=24), feed('ok')], relay_finished_at=NOW - timedelta(seconds=3), store=store)
+        self.assertEqual(reasons, [])
+        self.assertEqual((waits, reads), ([15], 2))
+        store.read.assert_called_once_with(health.RELAY_KEY, root=True, limit=200_000)
+
+    def test_stale_scores_remain_a_fault_after_the_import_grace(self):
+        store = mock.Mock()
+        captured = NOW - timedelta(seconds=3, milliseconds=500)
+        store.read.return_value = ({'captured_at': captured.isoformat(), 'fixtures': [{}]}, None)
+        stale = feed('ok', stale_live=4)
+        _, reasons, waits, reads, _ = self.inspect(
+            [stale] * 10, relay_finished_at=NOW - timedelta(seconds=4), store=store)
+        self.assertEqual(reasons, [health.STALE_FAULT])
+        self.assertEqual((sum(waits), reads), (135, 10))
+
+    def test_old_recovery_does_not_delay_a_stale_score_alert(self):
+        store = mock.Mock()
+        store.read.return_value = ({'captured_at': (NOW - timedelta(minutes=5)).isoformat(),
+                                    'fixtures': [{}]}, None)
+        _, reasons, waits, reads, _ = self.inspect(
+            [feed('ok', stale_live=1)], relay_finished_at=NOW - timedelta(seconds=3), store=store)
+        self.assertEqual(reasons, [health.STALE_FAULT])
         self.assertEqual((waits, reads), ([], 1))
 
     def test_recent_relay_delivery_keeps_the_limit_as_a_warning(self):

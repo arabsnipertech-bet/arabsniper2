@@ -70,6 +70,21 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(relay.due(watch(28),live,NOW),[])
         self.assertEqual(set(relay.due(watch(28),live,NOW+timedelta(minutes=2))),set(rows))
         self.assertEqual(len(relay.due(watch(50),live,NOW+timedelta(minutes=2))),40)
+
+    def test_stale_live_fixtures_beyond_one_batch_are_recovered_before_a_provider_limit(self):
+        fixtures = watch(23)
+        rows = {str(number): {'status': '2H', 'goals': {'home': 0, 'away': 0},
+                              'observed_at': (NOW - timedelta(minutes=7)).isoformat()}
+                for number in range(1, 26)}
+        rows['25']['observed_at'] = NOW.isoformat()
+        live = {'status': 'ok', 'fixtures': rows, 'health': {
+            'last_cron_at': NOW.isoformat(), 'relay_fixture_capacity': 40, 'stale_live_fixtures': 24,
+            'stale_live_fixture_ids': list(rows)[:20], 'live_tracking_fixture_ids': list(rows),
+        }}
+        self.assertEqual(set(relay.due(fixtures, live, NOW)), set(list(rows)[:24]))
+        live['health']['relay_fixture_capacity'] = 20
+        self.assertEqual(set(relay.due(fixtures, live, NOW)), set(list(rows)[:20]))
+
     def test_midpoint_checks_only_affected_live_or_just_started_fixtures(self):
         candidate = {'fixtures': [{'fixture_id': '1', 'kickoff': (NOW-timedelta(minutes=10)).isoformat()}]}
         live = {'fixtures': {'1': {'status': '1H'}}, 'status': 'provider_rate_limit'}
