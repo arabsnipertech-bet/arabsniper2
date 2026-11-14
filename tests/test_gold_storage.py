@@ -1,7 +1,9 @@
 import sys,unittest,tempfile,json,io
 import gzip, hashlib
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
 from gold_storage import publish,restore,allowed,GOLD
@@ -45,6 +47,46 @@ class Storage(unittest.TestCase):
    key=next(k for k in s.objects if k.startswith('state/objects/'));s.objects[key]=b'corrupt'
    with self.assertRaises(ValueError):restore(s,'test',b)
    self.assertEqual((local/GOLD[0]).read_text(),'{"original":true}')
+ def test_restore_retries_only_the_interrupted_object(self):
+  class StreamFailure(Exception):
+   pass
+
+  class InterruptedBody(io.BytesIO):
+   def read(self):
+    raise StreamFailure()
+
+  with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
+   source = Path(a) / 'data'
+   source.mkdir()
+   for name in GOLD:
+    (source / name).write_text('{"matches": []}')
+   storage = Fake()
+   publish(storage, 'test', a)
+   get = storage.get_object
+   body = InterruptedBody()
+   object_keys = [key for key in storage.objects if key.startswith('state/objects/')]
+   interrupted_key = object_keys[0]
+   calls = Counter()
+
+   def interrupted(**request):
+    key = request['Key']
+    calls[key] += 1
+    if key == interrupted_key and calls[key] == 1:
+     return {'Body': body}
+    return get(**request)
+
+   exceptions = SimpleNamespace(IncompleteReadError=StreamFailure, ReadTimeoutError=StreamFailure,
+                                ResponseStreamingError=StreamFailure)
+   with (patch.dict(sys.modules, {'botocore.exceptions': exceptions}),
+         patch.object(storage, 'get_object', side_effect=interrupted),
+         patch('gold_storage.sleep') as retry):
+    restore(storage, 'test', b)
+   self.assertTrue(body.closed)
+   expected = Counter(['state/current.json', *object_keys, interrupted_key])
+   self.assertEqual(calls, expected)
+   retry.assert_called_once_with(1)
+   self.assertTrue((Path(b) / 'data' / GOLD[0]).is_file())
+
  def test_reuses_unchanged_objects_and_pointer_survives_failed_upload(self):
   with tempfile.TemporaryDirectory() as a:
    p=Path(a)/'data';p.mkdir()
