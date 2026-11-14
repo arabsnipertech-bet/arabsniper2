@@ -1,5 +1,6 @@
 """Verify live score delivery, report provider coverage and reconcile the Auditor."""
 import argparse
+from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 import json
@@ -24,6 +25,13 @@ RELAY_POLL_SECONDS = 15
 LIVE_FRESHNESS = timedelta(minutes=5)
 LIVE_PHASES = {'1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE'}
 THROTTLED = {'provider_rate_limit', 'minute_quota_low'}
+INCIDENT_KEY = 'live-scores/verification-incidents.json'
+FEED_ERROR = 'Public score feed unavailable or invalid'
+INVALID_FEED = 'Invalid public score feed'
+INVALID_COUNTERS = 'Invalid score feed health counters'
+OVERDUE_FAULT = 'Tracked fixtures overdue without a confirmed result'
+STALE_FAULT = 'Tracked live scores missing or older than five minutes'
+SCORE_FAULT_IDS = {OVERDUE_FAULT: 'overdue_fixture_ids', STALE_FAULT: 'stale_live_fixture_ids'}
 
 
 def stamp(value):
@@ -40,8 +48,7 @@ def get_json(url):
     return json.loads(result.stdout)
 
 
-def recent_audit(day):
-    s3, bucket = client(), os.environ['R2_BUCKET']
+def recent_audit(day, s3, bucket):
     with s3.get_object(Bucket=bucket, Key='state/current.json')['Body'] as stream:
         index = json.load(stream)['files']
     entry = index.get(f'auditarchive/prematch_{day}_v7.json')
@@ -97,13 +104,17 @@ def reconcile(audit, fixtures):
 
 
 def inspect_live(now):
-    live = get_json(LIVE)
-    if live.get('enabled') is not True or live.get('schema_version') != 1 or not isinstance(live.get('fixtures'), dict):
-        raise ValueError('Invalid public score feed')
+    try:
+        live = get_json(LIVE)
+    except (subprocess.SubprocessError, ValueError) as error:
+        raise ValueError(FEED_ERROR) from error
+    if (not isinstance(live, dict) or live.get('enabled') is not True
+            or live.get('schema_version') != 1 or not isinstance(live.get('fixtures'), dict)):
+        raise ValueError(INVALID_FEED)
     health = live.get('health') or {}
     for count in ('overdue_fixtures', 'stale_live_fixtures', 'missing_halftime'):
         if type(health.get(count)) is not int or health[count] < 0:
-            raise ValueError('Invalid score feed health counters')
+            raise ValueError(INVALID_COUNTERS)
     cron = stamp(health.get('last_cron_at'))
     last_poll = stamp(health.get('last_successful_poll_at'))
     reasons = []
@@ -118,9 +129,9 @@ def inspect_live(now):
     if status == 'ok' and (not last_poll or now - last_poll > timedelta(minutes=12)):
         reasons.append('No recent successful provider poll')
     if health.get('overdue_fixtures'):
-        reasons.append('Tracked fixtures overdue without a confirmed result')
+        reasons.append(OVERDUE_FAULT)
     if health.get('stale_live_fixtures'):
-        reasons.append('Tracked live scores missing or older than five minutes')
+        reasons.append(STALE_FAULT)
     summary = {'status': live.get('status'), 'checked_at': now.isoformat(),
                'health': health, 'diagnostic': live.get('diagnostic')}
     return live, summary, reasons
@@ -259,6 +270,46 @@ def report_halftime_coverage(live, summary):
           'Final results are available. Markets that require halftime remain unverified.', flush=True)
 
 
+def report_provider_pending(summary):
+    count = summary['health'].get('provider_pending_fixtures', 0)
+    if count:
+        print(f'::warning title=Gold outstanding results::{count} fixtures still have no official final. '
+              'The provider reports that they are scheduled or still in play.', flush=True)
+
+
+def update_incidents(s3, bucket, reasons, summary):
+    """Alert on new faults once and rearm them when the feed recovers."""
+    from botocore.exceptions import ClientError
+
+    if SCORE_FAULT_IDS.keys() & set(reasons):
+        collector_variants = {f'Collector state: {status}' for status in THROTTLED | {'results_pending'}}
+        if (summary.get('diagnostic') or {}).get('limit_scope') == 'daily':
+            collector_variants.discard('Collector state: provider_rate_limit')
+        reasons = [reason for reason in reasons if reason not in collector_variants]
+    incidents = {}
+    for reason in reasons:
+        fixture_ids = summary['health'].get(SCORE_FAULT_IDS.get(reason), [])
+        if fixture_ids:
+            for fixture_id in fixture_ids:
+                incidents[f'{reason} ({fixture_id})'] = reason
+        else:
+            incidents[reason] = reason
+    try:
+        with closing(s3.get_object(Bucket=bucket, Key=INCIDENT_KEY)['Body']) as body:
+            saved = json.load(body)
+    except ClientError as error:
+        if error.response['Error']['Code'] not in ('NoSuchKey', '404'):
+            raise
+        saved = []
+    if not isinstance(saved, list) or any(not isinstance(reason, str) for reason in saved):
+        raise ValueError('Invalid live verification incident state')
+    active = sorted(incidents)
+    if active != saved:
+        s3.put_object(Bucket=bucket, Key=INCIDENT_KEY, Body=json.dumps(active).encode(),
+                      ContentType='application/json')
+    return list(dict.fromkeys(reason for key, reason in incidents.items() if key not in saved))
+
+
 def provider_results(ids):
     def fetch(path):
         with urlopen(Request(FOOTBALL + path, headers={'x-apisports-key': os.environ['API_SPORTS_KEY']}), timeout=15) as response:
@@ -279,20 +330,31 @@ def provider_results(ids):
             if str(row.get('fixture', {}).get('id')) in ids}
 
 
-def run(ids, compare_auditor):
+def run(ids, compare_auditor, *, track_incidents=False):
     now = datetime.now(timezone.utc)
-    if ids:
-        live, summary, reasons = inspect_live(now)
-    else:
-        live, summary, reasons = inspect_with_rate_limit_recheck(now, stamp(os.environ.get('RELAY_FINISHED_AT')))
-    report_halftime_coverage(live, summary)
+    try:
+        if ids:
+            live, summary, reasons = inspect_live(now)
+        else:
+            live, summary, reasons = inspect_with_rate_limit_recheck(now, stamp(os.environ.get('RELAY_FINISHED_AT')))
+    except ValueError as error:
+        if str(error) not in (FEED_ERROR, INVALID_FEED, INVALID_COUNTERS):
+            raise
+        live = {'fixtures': {}}
+        summary = {'status': 'unavailable', 'checked_at': now.isoformat(), 'health': {}}
+        reasons = [str(error)]
+    if summary['health']:
+        report_halftime_coverage(live, summary)
+        report_provider_pending(summary)
     fixtures = live['fixtures']
-    if compare_auditor:
+    storage = client() if compare_auditor or track_incidents else None
+    bucket = os.environ['R2_BUCKET'] if storage else None
+    if compare_auditor and summary['health']:
         summary['auditor_days'] = []
         recovery_dates = []
         for age in (2, 1):
             day = now.astimezone(ROME).date() - timedelta(days=age)
-            audit = recent_audit(day)
+            audit = recent_audit(day, storage, bucket)
             differences = reconcile(audit, fixtures)
             summary['auditor_days'].append({'date': str(day), 'available': bool(audit),
                 'differences': len(differences), 'sample': differences[:20]})
@@ -311,25 +373,39 @@ def run(ids, compare_auditor):
                None in (v['provider']['home_ft'], v['provider']['away_ft']) or v['provider'] != v['worker']
                for v in summary['verification'].values()):
             reasons.append('Official fixture results have not all been confirmed and delivered by the Worker')
+    failures = update_incidents(storage, bucket, reasons, summary) if track_incidents else reasons
+    note = ''
+    if reasons:
+        summary['verification_state'] = 'failed' if failures else 'known_incident'
+        summary['faults'] = reasons
+        if not failures:
+            note = 'This incident is still open. A failure notification was already recorded.'
+            print('::warning title=Gold live scores::This incident is still open. '
+                  'A failure notification was already recorded.', flush=True)
+    else:
+        summary['verification_state'] = 'ok'
     message = json.dumps(summary, indent=2)
     print(message, flush=True)
     with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as out:
         out.write('## Gold live results\n\n```json\n' + message + '\n```\n')
         for reason in reasons:
             out.write(f'\n- {reason}\n')
-    if reasons:
-        raise SystemExit(' / '.join(reasons))
+        if note:
+            out.write(f'\n{note}\n')
+    if failures:
+        raise SystemExit(' / '.join(failures))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--fixtures', default='')
     parser.add_argument('--compare-auditor', action='store_true')
+    parser.add_argument('--track-incidents', action='store_true')
     args = parser.parse_args()
     ids = list(dict.fromkeys(args.fixtures.split(','))) if args.fixtures else []
     if len(ids) > 20 or any(not fid.isascii() or not fid.isdecimal() or not 1 <= len(fid) <= 16 for fid in ids):
         parser.error('Provide up to 20 comma-separated fixture IDs.')
     try:
-        run(ids, args.compare_auditor)
+        run(ids, args.compare_auditor, track_incidents=args.track_incidents and not ids)
     except Exception as error:
         raise SystemExit(f'Gold live results verification failed: {type(error).__name__}') from None

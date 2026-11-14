@@ -459,3 +459,41 @@ test('live tracking lists exact fixtures and allows confirmed kickoff delays',as
  assert.equal(health.live_tracking_fixtures,2);
  assert.deepEqual(health.live_tracking_fixture_ids,['124','125']);
 });
+
+test('provider still scheduled or in play is not an invented missing final',async()=>{
+ const context=ctx(), watch=[
+  {fixture_id:'123',kickoff:new Date(now-6*3600000).toISOString()},
+  {fixture_id:'124',kickoff:new Date(now-3*3600000).toISOString()},
+  {fixture_id:'125',kickoff:new Date(now-49*3600000).toISOString()},
+  {fixture_id:'126',kickoff:new Date(now-3*3600000).toISOString()},
+ ];
+ const scheduled=id=>normalize({fixture:{id,status:{short:'NS'}}},now);
+ await context.storage.put('state',{scores:{'123':scheduled(123),'124':normalize({...row,
+  fixture:{id:124,status:{short:'2H'}}},now-6*60000),'125':scheduled(125)},
+  watch,calls:20,watch_at:now,watch_generated_at:now,day:new Date(now).toISOString().slice(0,10),
+  retry_at:now+600000,status:'provider_rate_limit',minute_backoff_v2:true});
+ await new ScoreStore(context,env).refresh(now);
+ const {health}=await context.storage.get('state');
+ assert.equal(health.provider_pending_fixtures,2);
+ assert.deepEqual(health.provider_pending_fixture_ids,['123','124']);
+ assert.deepEqual(health.stale_live_fixture_ids,['124']);
+ assert.deepEqual(health.overdue_fixture_ids,['125','126']);
+});
+
+test('direct collector reuses recent relay data before polling the fixture again',async()=>{
+ const original=globalThis.fetch, context=ctx(), calls=[];
+ const watch=[{fixture_id:'123',kickoff:new Date(now-3600000).toISOString()}];
+ await context.storage.put('state',{scores:{123:{...normalize(row,now-60000),transport:'GitHub Actions/R2'}},
+  watch,calls:8,watch_at:now,watch_generated_at:now,day:new Date(now).toISOString().slice(0,10),
+  quota:{current:100,limit:75000,checked_at:now}});
+ globalThis.fetch=async url=>{calls.push(url);return Response.json({response:[row]});};
+ try{
+  const s=new ScoreStore(context,env);
+  await s.refresh(now);
+  await s.refresh(now+120000);
+  assert.equal(calls.length,0);
+  await s.refresh(now+240000);
+  assert.equal(calls.length,1);
+  assert.equal((await context.storage.get('state')).health.stale_live_fixtures,0);
+ }finally{globalThis.fetch=original;}
+});

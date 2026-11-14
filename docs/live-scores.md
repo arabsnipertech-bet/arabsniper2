@@ -47,12 +47,13 @@ and is released separately by `publish-site.yml`.
 ## Production verification
 
 **Verify Gold live results** checks the public response and timestamps after
-score recovery and on its 15-minute schedule. It reports stalled collection,
+each score recovery. A manual run is also available. It reports stalled collection,
 provider failures, live scores missing or more than five minutes old, and
 fixtures past their expected finish without a final result. The GitHub relay
-prioritizes the stale live fixture IDs reported by the Worker. When the direct
-collector is rate-limited, the relay can pick up active fixtures after two
-minutes and carry up to two groups of 20 in the existing private snapshot.
+prioritizes the stale live fixture IDs reported by the Worker. The Worker
+reuses recent relay scores for four minutes, and the relay reuses recent
+Worker scores for the same interval. When the direct collector is rate-limited,
+the relay can carry up to two groups of 20 in the existing private snapshot.
 It keeps the first successful group if the second is limited, records the
 deferral as a warning, and honors the relay's own Retry-After and daily
 allowance. The monitor still checks the resulting feed. If Fast Backup starts
@@ -75,6 +76,12 @@ warning with fixture IDs. Its halftime markets remain unverified. The Worker
 and relay retry those records after 30 minutes on the first day and after two
 hours thereafter, inside the existing recovery window. Live and overdue
 fixtures have priority.
+An official in-play state keeps the match live for up to four hours, with the
+same freshness checks throughout. A match still reported as not started or
+not scheduled remains pending for up to 48 hours, with less frequent
+provider requests and no inferred final. Feed failures are recorded in the
+private incident state. A new fault fails the automated check once. Further
+occurrences remain visible in its summary until the fault clears.
 The monitor compares the two most recent closed Rome dates with the
 checksummed Auditor archive after the nightly window. A manual run can compare
 up to 20 fixture IDs against API-Football using the existing GitHub Secret.
