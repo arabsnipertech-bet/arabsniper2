@@ -1,0 +1,125 @@
+name: Restore the confirmed La Neuvillette regulation score
+on:
+  push:
+    branches: [ops/verify-gold-live-2026-11-14]
+    paths: ['.github/workflows/correct-la-neuvillette-20261114.yml']
+permissions:
+  contents: read
+concurrency:
+  group: arabsniper-live-scores-relay
+  cancel-in-progress: false
+jobs:
+  relay:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.run_attempt == '1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    env:
+      API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: pip install boto3
+      - name: Pass the confirmed 90-minute score through the existing relay
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          import json
+          import os
+          import subprocess
+          from datetime import datetime, timedelta, timezone
+          from urllib.error import HTTPError
+          from urllib.request import Request, urlopen
+          from zoneinfo import ZoneInfo
+
+          import boto3
+          from botocore.config import Config
+
+          spec = importlib.util.spec_from_file_location('relay', '.github/ops/live-scores-relay.py')
+          relay = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(relay)
+          now = datetime.now(timezone.utc)
+          if now.astimezone(ZoneInfo('Europe/Rome')).date().isoformat() != '2026-11-14':
+              raise SystemExit('Recovery date closed')
+          url = 'https://arabsniperbet.com/api/live-scores'
+          public = json.loads(subprocess.check_output(('curl', '-fsS', '--max-time', '12', url)))
+          fixture_id = '1647959'
+          expected = {'home': 2, 'away': 2}
+          if public['fixtures'].get(fixture_id, {}).get('fulltime') == expected:
+              print('The live feed already has the confirmed 2–2')
+              raise SystemExit(0)
+          health = public['health']
+          if health['live_tracking_fixtures'] or health['overdue_fixtures']:
+              raise SystemExit('Live or overdue scores have priority in the relay')
+          if public.get('status') in ('provider_rate_limit', 'minute_quota_low', 'quota_reserve', 'live_daily_cap'):
+              raise SystemExit('Provider cooldown or reserve is active')
+
+          s3 = boto3.client('s3', region_name='auto',
+              endpoint_url='https://' + os.environ['R2_ACCOUNT_ID'] + '.r2.cloudflarestorage.com',
+              aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],
+              aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
+              config=Config(connect_timeout=5, read_timeout=15, retries={'total_max_attempts': 2}))
+          bucket = os.environ['R2_BUCKET']
+          obj = s3.get_object(Bucket=bucket, Key=relay.KEY)
+          with obj['Body'] as stream:
+              state = json.load(stream)
+          if not relay.allowed(state, now):
+              raise SystemExit('The existing relay cooldown or budget is active')
+          if state.get('day') != now.date().isoformat():
+              state.update(day=now.date().isoformat(), calls=0)
+          state['attempted_at'] = now.isoformat()
+
+          def save():
+              global obj
+              obj = s3.put_object(Bucket=bucket, Key=relay.KEY,
+                  IfMatch=obj['ETag'], Body=json.dumps(state, separators=(',', ':')).encode(),
+                  ContentType='application/json')
+
+          def provider(path):
+              state['calls'] += 1
+              save()
+              request = Request('https://v3.football.api-sports.io/' + path,
+                                headers={'x-apisports-key': os.environ['API_SPORTS_KEY'], 'Cache-Control': 'no-cache'})
+              try:
+                  with urlopen(request, timeout=15) as response:
+                      data = json.load(response)
+                      headers = response.headers
+              except HTTPError as error:
+                  if error.code == 429:
+                      defer(error.headers)
+                  raise SystemExit(f'Official score request returned HTTP {error.code}') from None
+              if data.get('errors'):
+                  if 'rateLimit' in data['errors']:
+                      defer(headers)
+                  raise SystemExit('Provider deferred the verified recovery')
+              return data['response'], headers
+
+          def defer(headers):
+              checked = datetime.now(timezone.utc)
+              minimum = checked + timedelta(minutes=4)
+              state['retry_after'] = max(relay.retry_at(headers, checked) or minimum, minimum).isoformat()
+              save()
+
+          status, headers = provider('status')
+          usage = status.get('requests') or {}
+          used, limit = usage.get('current'), usage.get('limit_day')
+          if (status.get('subscription', {}).get('active') is not True or
+                  not all(type(n) is int for n in (used, limit)) or
+                  limit - used <= max(1000, (limit + 9) // 10) or
+                  headers.get('x-ratelimit-remaining') in ('0', '1', '2') or relay.retry_at(headers, now)):
+              raise SystemExit('Official quota reserve or cooldown is active')
+          rows, _ = provider('fixtures?ids=1647959&timezone=Europe%2FRome')
+          row, = rows
+          if (str(row['fixture']['id']) != fixture_id or row['fixture']['status']['short'] != 'PEN'
+                  or row['score']['fulltime'] != expected or row['score']['halftime'] != {'home': 0, 'away': 0}):
+              raise SystemExit('The provider did not corroborate the club result')
+          state.update(schema_version=1, source='API-Football',
+                       captured_at=datetime.now(timezone.utc).isoformat(),
+                       fixtures=[{key: row.get(key) for key in ('fixture', 'goals', 'score')}])
+          save()
+          print('Confirmed live relay publication: fixture 1647959, 0–0 at halftime and 2–2 at 90 minutes')
+          PY
