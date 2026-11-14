@@ -22,7 +22,7 @@ def storage():
 
 
 def owner(store):
-    record, _ = store.read(bridge.GOLD_RESULTS_READY, root=True, limit=512)
+    record, _ = store.read(bridge.GOLD_RESULTS_OWNER, root=True, limit=512)
     repository = record['repository'] if record else cutover.PRIMARY
     if repository not in (cutover.PRIMARY, cutover.GROWTH):
         raise ValueError('Invalid Gold results owner')
@@ -62,12 +62,13 @@ def report_repair(store, *, watchlist, audit):
                                Body=encoded(value), ContentType='application/json')
 
 
-def activate():
+def change_owner(target):
     repository = origin()
-    if repository != cutover.GROWTH:
-        raise ValueError('Activate Gold results from Growth main')
+    if repository != target:
+        raise ValueError('Change the Gold results owner from the target repository')
     store = storage()
-    store.editorial = bridge.gold_results_storage(store.client, store.bucket)
+    if target == cutover.GROWTH:
+        store.editorial = bridge.gold_results_storage(store.client, store.bucket)
     now = datetime.now(timezone.utc)
     prefix = bridge.GOLD_RESULTS_PREFIX
     with (store.cycle(now, key=prefix + 'relay-cycle.json', root=True) as relay,
@@ -76,21 +77,22 @@ def activate():
             raise RuntimeError('A Gold results cycle is already running')
         if owner(store) == repository:
             return
-        from publisher_v71.scores import public_cache
+        if target == cutover.GROWTH:
+            from publisher_v71.scores import public_cache
 
-        current = public_cache()
-        if current.get('poll_interval_seconds') != 300:
-            raise ValueError('Expected the live scores feed at five minutes')
-        # Check both exact write grants, preserving the existing budget, scores and alerts.
-        for key, initial in zip(bridge.GOLD_RESULTS_KEYS, ({}, []), strict=True):
-            saved, tag = store.read(key, root=True, limit=200_000)
-            condition = {'IfMatch': tag} if tag else {'IfNoneMatch': '*'}
-            store.editorial.put_object(Bucket=store.bucket, Key=key, Body=encoded(saved if tag else initial),
-                                       ContentType='application/json', **condition)
+            current = public_cache()
+            if current.get('poll_interval_seconds') != 300:
+                raise ValueError('Expected the live scores feed at five minutes')
+            # Check the exact write grants without discarding existing relay or alert state.
+            for key, initial in zip(bridge.GOLD_RESULTS_KEYS, ({}, []), strict=True):
+                saved, tag = store.read(key, root=True, limit=200_000)
+                condition = {'IfMatch': tag} if tag else {'IfNoneMatch': '*'}
+                store.editorial.put_object(Bucket=store.bucket, Key=key, Body=encoded(saved if tag else initial),
+                                           ContentType='application/json', **condition)
         value = {'repository': repository, 'activated_at': now.isoformat()}
-        _, tag = store.read(bridge.GOLD_RESULTS_READY, root=True, limit=512)
+        _, tag = store.read(bridge.GOLD_RESULTS_OWNER, root=True, limit=512)
         condition = {'IfMatch': tag} if tag else {'IfNoneMatch': '*'}
-        store.editorial.put_object(Bucket=store.bucket, Key=bridge.GOLD_RESULTS_READY,
+        store.editorial.put_object(Bucket=store.bucket, Key=bridge.GOLD_RESULTS_OWNER,
                                    Body=encoded(value), ContentType='application/json', **condition)
         print(json.dumps(value), flush=True)
 
@@ -113,6 +115,8 @@ if __name__ == '__main__':
     if sys.argv[1:] == ['repair']:
         read_repair()
     elif sys.argv[1:] == ['activate']:
-        activate()
+        change_owner(cutover.GROWTH)
+    elif sys.argv[1:] == ['restore-primary']:
+        change_owner(cutover.PRIMARY)
     else:
-        raise SystemExit('Expected activate or repair')
+        raise SystemExit('Expected activate, repair or restore-primary')

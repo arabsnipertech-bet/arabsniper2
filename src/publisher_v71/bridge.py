@@ -11,7 +11,6 @@ import sys
 from telegram_watchdog import GitHub, wake_live_monitor, wake_publisher
 
 from . import cutover, public_feed
-from .runner import event_log, production_store
 from .storage import PREFIX, encoded
 
 SESSION_KEY = PREFIX + 'growth-session.json'
@@ -19,7 +18,7 @@ WRAP_KEY = 'growth-wrap-key.json'
 SESSION_TTL = timedelta(hours=2)
 GOLD_RESULTS_PREFIX = 'live-scores/growth/'
 GOLD_RESULTS_KEYS = ('live-scores/provider-relay.json', 'live-scores/verification-incidents.json')
-GOLD_RESULTS_READY = GOLD_RESULTS_PREFIX + 'owner.json'
+GOLD_RESULTS_OWNER = GOLD_RESULTS_PREFIX + 'owner.json'
 GOLD_RESULTS_SESSION = 'growth-gold-results-session.json'
 GOLD_RESULTS_WORKFLOW = 'gold-results.yml'
 GOLD_RESULTS_REPAIR = GOLD_RESULTS_PREFIX + 'repair.json'
@@ -77,6 +76,8 @@ def refresh_session(store, now, *, name='growth-session.json', prefix=PREFIX,
                 'sealed': b64encode(box.encrypt(encoded(credentials))).decode()}
     store.editorial.put_object(Bucket=store.bucket, Key=PREFIX + name, Body=encoded(envelope),
                               ContentType='application/json', CacheControl='private, no-store')
+    from .runner import event_log
+
     event_log('publisher_bridge', 'editorial_session_refreshed', file=name)
 
 
@@ -101,7 +102,10 @@ def wake_gold_results(store, api, now, *, dry_run=False):
     if not dry_run:
         refresh_session(store, now, name=GOLD_RESULTS_SESSION, prefix=GOLD_RESULTS_PREFIX,
                         objects=GOLD_RESULTS_KEYS, actions=('GetObject', 'PutObject'))
-    ready, _ = store.read(GOLD_RESULTS_READY, root=True, limit=512)
+    owner, _ = store.read(GOLD_RESULTS_OWNER, root=True, limit=512)
+    if owner and owner['repository'] == cutover.PRIMARY:
+        return 'primary_restored'
+    ready = owner is not None
     path = 'workflows/' + GOLD_RESULTS_WORKFLOW
     if api.request(path).get('state') != 'active':
         return 'workflow_disabled'
@@ -115,14 +119,13 @@ def wake_gold_results(store, api, now, *, dry_run=False):
     if dry_run:
         return 'would_dispatch'
     operation = 'fallback' if ready else 'activate'
-    if not ready and any(run['status'] != 'completed' for workflow in ('live-scores-relay.yml', PRIMARY_GOLD_REPAIR)
-                         for run in GitHub(os.environ['GITHUB_TOKEN']).runs(workflow, now - timedelta(minutes=15))):
-        return 'primary_cycle_running'
     api.request(path + '/dispatches', {'ref': 'main', 'inputs': {'operation': operation}})
     return 'dispatched_' + operation
 
 
 def wake(store, now, *, dry_run=False):
+    from .runner import event_log
+
     store.load()
     repository = cutover.owner(store)
     if repository == cutover.GROWTH and not dry_run:
@@ -141,6 +144,8 @@ def wake(store, now, *, dry_run=False):
 
 
 def wake_results(store, now):
+    from .runner import event_log
+
     token = os.environ.get('PUBLISHER_GROWTH_DISPATCH_TOKEN')
     if not token:
         return
@@ -186,6 +191,7 @@ def prepare(store, now):
     """Install the Publisher's secrets in the private Growth repository."""
     from nacl.public import PrivateKey, PublicKey, SealedBox
     import requests
+    from .runner import event_log
 
     store.load()
     if cutover.owner(store) != cutover.PRIMARY:
@@ -235,6 +241,8 @@ def prepare(store, now):
 
 
 def publish_home(store, now):
+    from .runner import event_log
+
     store.load()
     if cutover.owner(store) != cutover.GROWTH:
         return
@@ -264,6 +272,8 @@ def publish_home(store, now):
 
 
 def main():
+    from .runner import production_store
+
     if (os.environ.get('GITHUB_REPOSITORY') != cutover.PRIMARY
             or os.environ.get('GITHUB_REF') != 'refs/heads/main'):
         raise ValueError('Publisher bridge requires primary main')
@@ -283,5 +293,7 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as error:
+        from .runner import event_log
+
         event_log('publisher_bridge', 'failed', error=type(error).__name__)
         raise SystemExit(1) from None
