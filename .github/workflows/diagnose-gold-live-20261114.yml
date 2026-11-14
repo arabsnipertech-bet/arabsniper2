@@ -1,0 +1,90 @@
+name: Diagnose November 14 Gold live results
+on:
+  push:
+    branches: [ops/verify-gold-live-2026-11-14]
+    paths: ['.github/workflows/diagnose-gold-live-20261114.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.run_attempt == '1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    env:
+      PYTHONPATH: src
+      API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
+      R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+      R2_BUCKET: arabsniper-gold
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 -m pip install boto3 requests ijson==3.6.0
+      - name: Compare the three affected fixtures and confirm provider quota
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          import json
+          import os
+          from datetime import datetime, timezone
+          from urllib.error import HTTPError
+          from urllib.parse import urlencode
+          from urllib.request import Request, urlopen
+
+          spec = importlib.util.spec_from_file_location('verify_scores', '.github/ops/live-scores-health.py')
+          health = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(health)
+          wanted = {'1631640', '1647959', '1549869'}
+          public = health.get_json(health.LIVE)
+          storage = health.client()
+          bucket = os.environ['R2_BUCKET']
+          with storage.get_object(Bucket=bucket, Key='state/current.json')['Body'] as stream:
+              index = json.load(stream)['files']
+          for day in ('2026-11-13', '2026-11-12'):
+              rows = health.recent_audit(day, storage, bucket, index)
+              print(json.dumps({'archive_day': day, 'fixtures': {
+                  fid: {key: row.get(key) for key in ('kickoff', 'status', 'result', 'observed_at')}
+                  for fid, row in rows.items() if fid in wanted}}, sort_keys=True))
+          print(json.dumps({'live': {fid: public['fixtures'].get(fid) for fid in sorted(wanted)},
+                            'collector': public.get('status'), 'watchlist': public['health'].get('watchlist_generated_at')},
+                           sort_keys=True))
+
+          def read(path):
+              request = Request(health.FOOTBALL + path, headers={'x-apisports-key': os.environ['API_SPORTS_KEY']})
+              with urlopen(request, timeout=15) as response:
+                  payload = json.load(response)
+                  remaining = response.headers.get('x-ratelimit-remaining', '')
+                  if payload.get('errors'):
+                      print(json.dumps({'provider_error': sorted(payload['errors']), 'scope': path.split('?')[0]}))
+                      return None, remaining
+                  return payload['response'], remaining
+
+          if (public.get('diagnostic') or {}).get('limit_scope') == 'daily':
+              raise SystemExit('Daily provider reserve reached')
+          if public.get('status') in health.THROTTLED:
+              retry = health.stamp(public['health'].get('retry_after'))
+              if retry and retry > datetime.now(timezone.utc):
+                  print('Provider probe deferred until cooldown ends')
+                  raise SystemExit(0)
+          try:
+              plan, minute = read('status')
+              if not plan:
+                  raise SystemExit(0)
+              usage = plan.get('requests') or {}
+              print(json.dumps({'provider_quota': usage, 'minute_remaining': minute}))
+              used, limit = usage.get('current'), usage.get('limit_day')
+              if (plan.get('subscription', {}).get('active') is not True or
+                      not all(type(n) is int for n in (used, limit)) or
+                      limit - used <= max(1000, (limit + 9) // 10) or minute in ('0', '1', '2')):
+                  raise SystemExit(0)
+              matches, _ = read('fixtures?' + urlencode({'ids': '-'.join(sorted(wanted)), 'timezone': 'Europe/Rome'}))
+              for row in matches or ():
+                  f = row['fixture']
+                  if str(f['id']) in wanted:
+                      print(json.dumps({'official_provider': f['id'], 'kickoff': f['date'],
+                          'status': f['status']['short'], 'goals': row.get('goals'), 'score': row.get('score')}))
+          except HTTPError as error:
+              print(json.dumps({'provider_http': error.code}))
+          PY
