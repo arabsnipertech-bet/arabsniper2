@@ -8,7 +8,7 @@
   const finalScore=l=>FINAL.has(l?.status)&&(validScore(l.fulltime)||l.status==='FT'&&validScore(l.goals));
   const savedScore=r=>({home:r?.home_ft,away:r?.away_ft});
   const observationTime=l=>Date.parse(l?.observed_at)||0;
-  let scores={},enabled=false,polling=false;
+  let scores={},enabled=false,polling=false,lastPollAt=0,staleAfter=300000;
   function reconcile(previous,row) {
     if(!previous)return row;
     if(observationTime(row)<observationTime(previous)||finalScore(previous)&&!FINAL.has(row.status))return previous;
@@ -38,7 +38,7 @@
   }
   function view(match,now=Date.now()) {
     const f=fixture(match),l=f.live||{},status=l.status||f.status_short||f.result?.status;
-    const observed=Date.parse(l.observed_at),fresh=Number.isFinite(observed)&&now-observed<=300000&&now>=observed-30000&&!l.refresh_failed;
+    const observed=Date.parse(l.observed_at),fresh=Number.isFinite(observed)&&now-observed<=staleAfter&&now>=observed-30000&&!l.refresh_failed;
     const active=ACTIVE.has(status),finished=FINAL.has(status);
     const pair=status==='FT'&&validScore(l.fulltime)?l.fulltime:
       (active||finished||status==='SUSP'||status==='INT')&&validScore(l.goals)?l.goals:
@@ -51,6 +51,7 @@
   }
   function accept(data) {
     if(data?.schema_version!==1||!data.fixtures||typeof data.fixtures!=='object'||Array.isArray(data.fixtures)) throw new Error('Invalid live data');
+    staleAfter=data.stale_after_seconds===360?360000:300000;
     enabled=data.enabled===true;
     if(!enabled){scores={};return;}
     const next={};
@@ -72,8 +73,8 @@
     return {status:'complete',score:half?`${half.home}–${half.away}`:null};
   }
   async function poll() {
-    if(polling||root.document?.hidden)return;
-    polling=true;
+    if(polling||root.document?.hidden||Date.now()-lastPollAt<15000)return;
+    polling=true;lastPollAt=Date.now();
     const controller=new AbortController(), timeout=setTimeout(()=>controller.abort(),10000);
     try {
       const response=await root.fetch('/api/live-scores',{cache:'no-store',signal:controller.signal});

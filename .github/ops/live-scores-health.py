@@ -22,7 +22,7 @@ MAX_AGE = timedelta(minutes=8)
 RATE_LIMIT_GRACE = timedelta(minutes=5)
 RELAY_CRON_GRACE_SECONDS = 135
 RELAY_POLL_SECONDS = 15
-LIVE_FRESHNESS = timedelta(minutes=5)
+LIVE_FRESHNESS = timedelta(minutes=6)
 LIVE_PHASES = {'1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE'}
 THROTTLED = {'provider_rate_limit', 'minute_quota_low'}
 INCIDENT_KEY = 'live-scores/verification-incidents.json'
@@ -30,7 +30,7 @@ FEED_ERROR = 'Public score feed unavailable or invalid'
 INVALID_FEED = 'Invalid public score feed'
 INVALID_COUNTERS = 'Invalid score feed health counters'
 OVERDUE_FAULT = 'Tracked fixtures overdue without a confirmed result'
-STALE_FAULT = 'Tracked live scores missing or older than five minutes'
+STALE_FAULT = 'Tracked live scores missing or older than six minutes'
 SCORE_FAULT_IDS = {OVERDUE_FAULT: 'overdue_fixture_ids', STALE_FAULT: 'stale_live_fixture_ids'}
 
 
@@ -119,10 +119,10 @@ def inspect_live(now):
     if not cron or not -timedelta(seconds=30) <= now - cron <= MAX_AGE:
         reasons.append('Cron Trigger missing or stale')
     status = live.get('status')
-    if status not in ('ok', 'idle'):
-        reasons.append(f'Collector state: {status}')
     watch_state = health.get('watchlist_status')
-    if watch_state and watch_state != status:
+    if status not in ('ok', 'idle') and status != watch_state:
+        reasons.append(f'Collector state: {status}')
+    if watch_state:
         reasons.append(f'Fixture watchlist: {watch_state}')
     if status == 'ok' and (not last_poll or now - last_poll > timedelta(minutes=12)):
         reasons.append('No recent successful provider poll')
@@ -153,7 +153,9 @@ def short_rate_limit_retry(summary, reasons, now):
 
 
 def current_delivery(live, summary, reasons, now):
-    if not temporary_limit(summary) or not collector_only(summary, reasons):
+    # Watchlist repair is independent: keep that fault without misreporting a score outage.
+    delivery_reasons = [reason for reason in reasons if not reason.startswith('Fixture watchlist: ')]
+    if not temporary_limit(summary) or not collector_only(summary, delivery_reasons):
         return None
     health = summary['health']
     live_due = health.get('live_tracking_fixtures')
@@ -216,7 +218,7 @@ def inspect_with_rate_limit_recheck(now, relay_finished_at=None):
         delivery = current_delivery(live, summary, reasons, now)
         if delivery:
             summary['delivery_during_provider_limit'] = delivery
-            reasons = []
+            reasons = [reason for reason in reasons if reason != f"Collector state: {summary['status']}"]
             detail = {
                 'idle': 'No live or overdue score updates are due.',
                 'relay': 'The relay has delivered recent official scores.',
@@ -341,6 +343,10 @@ def run(ids, compare_auditor, *, track_incidents=False):
         live = {'fixtures': {}}
         summary = {'status': 'unavailable', 'checked_at': now.isoformat(), 'health': {}}
         reasons = [str(error)]
+    if summary['health'] and summary['health'].get('watchlist_status') in (
+            'watchlist_stale', 'watchlist_unavailable', 'invalid_watchlist') and os.environ.get('GITHUB_OUTPUT'):
+        with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
+            out.write('watchlist_repair=true\n')
     if summary['health']:
         report_halftime_coverage(live, summary)
         report_provider_pending(summary)

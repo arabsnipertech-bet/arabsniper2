@@ -17,6 +17,7 @@ LIVE = {'1H','HT','2H','ET','BT','P','LIVE'}
 SCHEDULED = {'NS','TBD'}
 BATCH_SIZE = 20
 DAILY_CAP = 600
+POLL_INTERVAL = timedelta(minutes=5)
 
 
 class ProviderThrottled(Exception):
@@ -76,6 +77,9 @@ def due(watch, live, now):
     health = live.get('health') or {}
     stale = set(health.get('stale_live_fixture_ids', []))
     tracked = set(health.get('live_tracking_fixture_ids', []))
+    cron = stamp(health.get('last_cron_at'))
+    primary_active = (live.get('status') in ('ok', 'idle') and cron is not None and
+                      -timedelta(seconds=30) <= now - cron <= timedelta(minutes=2))
     candidates = {}
     for f in watch.get('fixtures', []):
         fid, kickoff = str(f.get('fixture_id','')), stamp(f.get('kickoff'))
@@ -91,6 +95,9 @@ def due(watch, live, now):
             has_score(row.get('fulltime')) or status == 'FT' and has_score(row.get('goals')))
         if final and has_score(row.get('halftime')):
             continue
+        if primary_active and fid in tracked and fid not in stale and not final:
+            # The healthy Worker owns this live fixture. The relay only fills gaps.
+            continue
         observed = stamp(row.get('observed_at'))
         age = now - kickoff
         active = fid in tracked or age <= timedelta(hours=3)
@@ -99,7 +106,7 @@ def due(watch, live, now):
         elif status in SCHEDULED and age >= timedelta(minutes=15):
             freshness = scheduled_retry(age)
         else:
-            freshness = timedelta(minutes=4)
+            freshness = POLL_INTERVAL
         if fid in stale or not is_fresh(row, now, freshness):
             candidates[fid] = (2 if final else 0 if active else 1,
                 observed or datetime.min.replace(tzinfo=timezone.utc), kickoff)
@@ -110,7 +117,7 @@ def due(watch, live, now):
             candidates[str(fid)] = (-1, observed or datetime.min.replace(tzinfo=timezone.utc), now)
     for fid in health.get('overdue_fixture_ids', []):
         row = fixtures.get(str(fid), {})
-        interval = timedelta(hours=2) if row.get('status') in SCHEDULED else timedelta(minutes=4)
+        interval = timedelta(hours=2) if row.get('status') in SCHEDULED else POLL_INTERVAL
         if str(fid).isascii() and str(fid).isdecimal() and not is_fresh(row, now, interval):
             observed = stamp(row.get('observed_at'))
             candidates.setdefault(str(fid), (1, observed or datetime.min.replace(tzinfo=timezone.utc), now-timedelta(hours=72)))
@@ -127,7 +134,7 @@ def due(watch, live, now):
 def allowed(state, now):
     last = stamp(state.get('attempted_at'))
     retry = stamp(state.get('retry_after'))
-    return (not last or now-last >= timedelta(minutes=4)) and (
+    return (not last or now-last >= POLL_INTERVAL) and (
         not retry or retry <= now) and (
         state.get('day') != now.date().isoformat() or state.get('calls',DAILY_CAP) <= DAILY_CAP - 2)
 
@@ -199,7 +206,7 @@ def run():
         checked = datetime.now(timezone.utc)
         retry = retry_at(headers, checked)
         if limited:
-            retry = max(retry or checked, checked + timedelta(minutes=4))
+            retry = max(retry or checked, checked + POLL_INTERVAL)
         if retry:
             state['retry_after'] = retry.isoformat()
             save()

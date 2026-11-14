@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
@@ -24,6 +25,21 @@ class ReleaseIdentityTests(unittest.TestCase):
         with patch.object(release,'active_version',side_effect=[B,B,A]), patch.object(release,'sleep') as sleep:
             self.assertEqual(release.wait_active(A),A)
             self.assertEqual(sleep.call_count,2)
+    def test_legacy_schedule_is_only_allowed_before_migration(self):
+        bindings = [{'name':'SCORES','type':'durable_object_namespace','class_name':'ScoreStore'},
+                    {'name':'API_SPORTS_KEY','type':'secret_text'}]
+        bindings.extend({'name':key,'text':value} for key,value in release.EXPECTED_VARS.items())
+        def api(path):
+            if path == '/settings':
+                return {'bindings': bindings}
+            return {'schedules': [{'cron': release.LEGACY_CRON}]}
+        config = {'name': release.WORKER, 'vars': release.EXPECTED_VARS,
+                  'triggers': {'crons': [release.CRON]}}
+        with patch.object(release, 'api', side_effect=api), patch.object(
+                release.Path, 'read_text', return_value=json.dumps(config)):
+            release.verify_configuration(allow_previous=True)
+            with self.assertRaisesRegex(RuntimeError, 'Cron Trigger'):
+                release.verify_configuration()
     def test_unrelated_version_cannot_satisfy_deployment(self):
         with patch.object(release,'active_version',return_value=B), patch.object(release,'same_script',return_value=False), patch.object(release,'sleep') as sleep:
             with self.assertRaises(RuntimeError): release.wait_active(A,True)

@@ -1,11 +1,16 @@
 # Gold live scores
 
 The standalone Cloudflare Worker `arabsniper-live-scores` serves `GET /api/live-scores`.
-A two-minute Cron Trigger invokes the SQLite Durable Object `SCORES`, named `global`.
+A one-minute Cron Trigger invokes the SQLite Durable Object `SCORES`, named `global`.
+The trigger imports relay data and checks freshness. A tracked live fixture with a
+valid observation is only requested from the provider again after five minutes.
 The browser and Auditor read stored observations. Public requests do not trigger provider calls.
 
 The worker imports tracked fixture IDs and kickoffs from `data/live_watchlist.json`
 on `main` every 15 minutes. It keeps the prior watchlist through temporary failures.
+If the watchlist is stale or unavailable, the monitor can rebuild its public IDs and
+kickoffs from the five checksummed private Gold day files, without a scan or a
+provider request.
 With up to 20 live or soon-to-start fixtures, a single ID query covers them and
 uses any available slots for overdue or incomplete results. With more live
 fixtures, the collector queries the necessary Rome dates, including a match's
@@ -34,10 +39,10 @@ unverifiable. The display does not rewrite prematch selections or prices.
 
 Use **Deploy Gold live scores Worker** from `main`. The workflow uses
 `CLOUDFLARE_LIVE_SCORES_API_TOKEN` in GitHub Secrets. A Cloudflare token with edit
-permission for the existing Worker is sufficient when its route and triggers
-are already configured. Keep `API_SPORTS_KEY` in the existing Worker binding.
+permission for the existing Worker is required to verify and update its triggers. Keep `API_SPORTS_KEY` in the existing Worker binding.
 The workflow checks the bindings, runtime variables and Cron Trigger before
-upload, records the active version, and uses Wrangler to deploy a new version.
+upload, records the active version and schedule, and uses Wrangler to deploy a
+new version. It updates the existing schedule and restores it on release rollback.
 It verifies the version on the public route and checks that the Cron Trigger
 advances. A failed release verification rolls back to the previous version
 when the failed version is still serving traffic. The workflow can also roll
@@ -48,17 +53,18 @@ and is released separately by `publish-site.yml`.
 
 **Verify Gold live results** checks the public response and timestamps after
 each score recovery. A manual run is also available. It reports stalled collection,
-provider failures, live scores missing or more than five minutes old, and
+provider failures, live scores missing or more than six minutes old (five minutes
+plus one minute for the next cron/import), and
 fixtures past their expected finish without a final result. The GitHub relay
 prioritizes the stale live fixture IDs reported by the Worker. The Worker
-reuses recent relay scores for four minutes, and the relay reuses recent
-Worker scores for the same interval. When the direct collector is rate-limited,
+reuses its own and relayed observations for five minutes; the relay also reuses
+recent Worker scores for that interval. When the direct collector is rate-limited,
 the relay can carry up to two groups of 20 in the existing private snapshot.
 It keeps the first successful group if the second is limited, records the
 deferral as a warning, and honors the relay's own Retry-After and daily
 allowance. The monitor still checks the resulting feed. If Fast Backup starts
 the relay while the direct collector is temporarily limited and fixtures are active, the
-same run checks again just over four minutes later. This bridges the gap
+same run checks again after five minutes. This bridges the gap
 between ten-minute Fast Backup checks when a GitHub scheduled run is delayed.
 The same cooldown and daily allowance apply to both attempts. An automated
 check can give a short provider rate limit up to five

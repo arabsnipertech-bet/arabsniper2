@@ -16,6 +16,8 @@ CONFIG = 'workers/live-scores/wrangler.jsonc'
 API = f'https://api.cloudflare.com/client/v4/accounts/{ACCOUNT}/workers/scripts/{WORKER}'
 PUBLIC = 'https://arabsniperbet.com/api/live-scores'
 WRANGLER = ('npx', '--yes', 'wrangler@4.161.0')
+CRON = '* * * * *'
+LEGACY_CRON = '*/2 * * * *'
 EXPECTED_VARS = {'LIVE_ENABLED': 'true', 'MAX_CALLS_PER_DAY': '1500', 'RESERVE_REQUESTS': '1000'}
 
 
@@ -24,8 +26,11 @@ class NoRedirect(HTTPRedirectHandler):
         return None
 
 
-def api(path):
-    request = Request(API + path, headers={'Authorization': 'Bearer ' + os.environ['CLOUDFLARE_API_TOKEN'], 'Cache-Control': 'no-cache'})
+def api(path, data=None):
+    request = Request(API + path, data=json.dumps(data).encode() if data is not None else None,
+                      method='PUT' if data is not None else 'GET',
+                      headers={'Authorization': 'Bearer ' + os.environ['CLOUDFLARE_API_TOKEN'],
+                               'Content-Type': 'application/json', 'Cache-Control': 'no-cache'})
     try:
         with build_opener(NoRedirect()).open(request, timeout=20) as response:
             body = json.load(response)
@@ -51,7 +56,7 @@ def active_version():
     return version_id(versions[0]['version_id'])
 
 
-def verify_configuration():
+def verify_configuration(*, allow_previous=False):
     settings = api('/settings')
     bindings = {binding['name']: binding for binding in settings['bindings']}
     score = bindings.get('SCORES') or {}
@@ -64,10 +69,11 @@ def verify_configuration():
         if (bindings.get(key) or {}).get('text') != expected:
             raise RuntimeError(f'Runtime setting {key} differs from the release configuration')
     cron = api('/schedules')['schedules']
-    if sorted(row['cron'] for row in cron) != ['*/2 * * * *']:
+    if [row['cron'] for row in cron] not in ([[CRON], [LEGACY_CRON]] if allow_previous else [[CRON]]):
         raise RuntimeError('Unexpected live scores Cron Trigger configuration')
     config = json.loads(Path(CONFIG).read_text())
-    if config.get('name') != WORKER or config.get('vars') != EXPECTED_VARS:
+    if (config.get('name') != WORKER or config.get('vars') != EXPECTED_VARS
+            or config.get('triggers', {}).get('crons') != [CRON]):
         raise RuntimeError('Unexpected Wrangler target or variables')
 
 
@@ -154,7 +160,8 @@ def main():
     if not os.environ.get('CLOUDFLARE_API_TOKEN'):
         raise SystemExit('GitHub Secret CLOUDFLARE_LIVE_SCORES_API_TOKEN is missing.')
     os.environ['CLOUDFLARE_ACCOUNT_ID'] = ACCOUNT
-    verify_configuration()
+    verify_configuration(allow_previous=True)
+    previous_schedule = api('/schedules')['schedules']
     previous = active_version()
     _, before = public_response()
     summary(f'Active Worker version and rollback reference: `{previous}`')
@@ -182,6 +189,8 @@ def main():
     try:
         wrangler('versions', 'deploy', target + '@100%', '--yes', '--message', commit)
         wait_active(target, equivalent=True)
+        if [row['cron'] for row in previous_schedule] != [CRON]:
+            api('/schedules', [{'cron': CRON}])
         verified = verify_runtime(target, (before.get('health') or {}).get('last_cron_at'))
         verify_configuration()
     except (RuntimeError, ValueError, subprocess.SubprocessError, URLError) as error:
@@ -190,6 +199,8 @@ def main():
         if current == target:
             wrangler('rollback', previous, '--yes', '--message', 'Live score release verification failed')
             wait_active(previous)
+            if [row['cron'] for row in previous_schedule] != [CRON]:
+                api('/schedules', [{'cron': row['cron']} for row in previous_schedule])
             public_response()
             summary(f'Rollback active: `{previous}`')
         raise

@@ -3,6 +3,7 @@ import argparse
 from datetime import date, datetime, timedelta, timezone
 import json
 import os
+import re
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
@@ -20,7 +21,11 @@ def permitted(day, now, runs):
         if run.get('conclusion') == 'skipped':
             continue
         created = datetime.fromisoformat(run['created_at'].replace('Z', '+00:00'))
-        if now - created < timedelta(hours=12):
+        # Explicit dates distinguish repairs of separate closed days. Legacy scheduled
+        # runs defaulted to yesterday in Rome; active runs still serialize all repairs.
+        target = re.search(r'\b\d{4}-\d{2}-\d{2}\b', run.get('display_title') or '')
+        run_day = target.group(0) if target else str(created.astimezone(ROME).date() - timedelta(days=1))
+        if day == run_day and now - created < timedelta(hours=12):
             return False
     return True
 

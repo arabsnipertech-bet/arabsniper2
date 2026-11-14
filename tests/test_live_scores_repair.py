@@ -16,6 +16,11 @@ class RepairBoundsTests(unittest.TestCase):
         self.assertFalse(repair.permitted('2026-11-12', NOW, [{'status':'in_progress'}]))
     def test_failed_recovery_also_consumes_cooldown(self):
         self.assertFalse(repair.permitted('2026-11-12', NOW, [{'status':'completed','conclusion':'failure','created_at':'2026-11-13T09:00:00Z'}]))
+    def test_recent_repair_for_another_date_does_not_block_this_date(self):
+        run = {'status': 'completed', 'conclusion': 'success', 'created_at': '2026-11-13T11:55:00Z',
+               'display_title': 'Recover verified daily results · 2026-11-11'}
+        self.assertTrue(repair.permitted('2026-11-12', NOW, [run]))
+        self.assertFalse(repair.permitted('2026-11-11', NOW, [run]))
     def test_skipped_recovery_does_not_consume_cooldown(self):
         runs = [{'status': 'completed', 'conclusion': 'skipped', 'created_at': '2026-11-13T09:00:00Z'}]
         self.assertTrue(repair.permitted('2026-11-12', NOW, runs))
