@@ -3,7 +3,8 @@ on:
   push:
     branches: [ops/telegram-bayswater-2026-11-14]
     paths: ['.github/workflows/telegram-bayswater-20261114.yml']
-permissions: {}
+permissions:
+  contents: read
 concurrency:
   group: telegram-bayswater-halftime-1640365
   cancel-in-progress: false
@@ -13,6 +14,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     env:
+      GH_TOKEN: ${{ github.token }}
       BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       POST_TEXT: |-
         ☀️ Buongiorno da ArabSniperBet!
@@ -27,6 +29,7 @@ jobs:
       - name: Verify archived preview and halftime, then post once
         run: |
           python3 - <<'PY'
+          from base64 import b64decode
           import json
           import os
           from datetime import datetime
@@ -41,17 +44,18 @@ jobs:
           if now.date().isoformat() != '2026-11-14' or now.hour >= 12:
               raise SystemExit('Outside the authorized morning publication window')
 
-          def read(url, fields=None):
+          def read(stage, url, fields=None, headers=None):
               data = urlencode(fields).encode() if fields is not None else None
               try:
-                  with urlopen(Request(url, data=data), timeout=15) as response:
+                  with urlopen(Request(url, data=data, headers=headers or {}), timeout=15) as response:
                       return json.load(response)
               except HTTPError as exc:
-                  raise SystemExit(f'Request rejected with HTTP {exc.code}') from None
+                  raise SystemExit(f'{stage} rejected with HTTP {exc.code}') from None
               except Exception:
-                  raise SystemExit('No confirmed response; check the channel before retrying') from None
+                  raise SystemExit(f'{stage}: no confirmed response') from None
 
-          preview = read('https://raw.githubusercontent.com/arabsnipertech-bet/arabsniper2/bd6cfca33b710182967f973ed330d69508210e17/homepage.json')
+          archived = read('Archived Gold preview', 'https://api.github.com/repos/arabsnipertech-bet/arabsniper2/contents/homepage.json?ref=bd6cfca33b710182967f973ed330d69508210e17', headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'User-Agent': 'ArabSniperBet-GitHub-Actions'})
+          preview = json.loads(b64decode(archived['content']))
           match = next(row for row in preview['gold_previews'] if row['fixture_id'] == fixture_id)
           assert preview['updated_at'].startswith('2026-11-14T06:46:27')
           assert match['kickoff'] == '2026-11-14T08:30:00+00:00'
@@ -60,7 +64,7 @@ jobs:
           assert any(p['market'] == 'Over 2,5 PT' and p['odd'] == 4.5
                      and p['quote_at'] == '2026-11-14T06:01:11+00:00'
                      and p['study_only'] is True for p in match['proposals'])
-          result = read('https://arabsniperbet.com/api/live-scores?id=' + fixture_id)['fixtures'][fixture_id]
+          result = read('Halftime score', 'https://arabsniperbet.com/api/live-scores?id=' + fixture_id)['fixtures'][fixture_id]
           assert result['status'] in {'HT', '2H', 'FT', 'AET', 'PEN'}
           assert result['halftime'] == {'home': 2, 'away': 1}
 
@@ -69,7 +73,7 @@ jobs:
               raise SystemExit('Telegram token unavailable')
 
           def telegram(method, fields):
-              payload = read('https://api.telegram.org/bot' + token + '/' + method, fields)
+              payload = read('Telegram ' + method, 'https://api.telegram.org/bot' + token + '/' + method, fields)
               assert payload['ok'] is True
               return payload['result']
 
