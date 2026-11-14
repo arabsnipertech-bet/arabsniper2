@@ -1,14 +1,6 @@
 name: Publish Growth home projection
 on:
   workflow_dispatch:
-    inputs:
-      prepare:
-        description: Verifica il collegamento a Growth e prepara l'accesso al registro
-        type: boolean
-        default: false
-  push:
-    branches: [main]
-    paths: ['.github/workflows/publisher-home-bridge.yml']
 permissions:
   contents: write
 concurrency:
@@ -24,7 +16,7 @@ jobs:
         with:
           ref: main
           sparse-checkout: src
-      - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'Pillow>=11,<13' ijson==3.6.0
+      - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'Pillow>=11,<13' 'PyNaCl>=1.5,<2' ijson==3.6.0
       - name: Publish the verified public projection
         env:
           PYTHONPATH: src
@@ -32,11 +24,4 @@ jobs:
           R2_BUCKET: arabsniper-gold
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          PUBLISHER_GROWTH_DISPATCH_TOKEN: ${{ secrets.PUBLISHER_GROWTH_DISPATCH_TOKEN }}
-          PREPARE: ${{ github.event_name == 'push' || inputs.prepare }}
-        run: |
-          if [[ "$PREPARE" == true ]]; then
-            python -m publisher_v71.bridge --prepare
-          else
-            python -m publisher_v71.bridge --homepage
-          fi
+        run: python -m publisher_v71.bridge --homepage

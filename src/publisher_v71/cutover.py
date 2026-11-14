@@ -6,6 +6,7 @@ PRIMARY = 'arabsnipertech-bet/arabsniper2'
 GROWTH = 'arabsnipertech-bet/arabsniper-growth'
 OWNER_FIELD = 'publisher_repository'
 READY_KEY = 'growth-ready.json'
+HOME_BRIDGE = 'publisher-home-bridge.yml'
 
 
 def owner(store):

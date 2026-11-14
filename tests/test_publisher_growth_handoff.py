@@ -1,5 +1,5 @@
 """Exercise ownership and scoped storage across the existing delivery outbox."""
-from base64 import b64decode, urlsafe_b64decode
+from base64 import b64decode, b64encode, urlsafe_b64decode
 from contextlib import nullcontext
 from datetime import datetime, timezone
 from hashlib import sha256
@@ -9,6 +9,8 @@ import os
 from pathlib import Path
 import sys
 from unittest import TestCase, mock
+
+from nacl.public import PrivateKey, SealedBox
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 from publisher_v71 import bridge, cutover, monitor, runner
@@ -41,14 +43,19 @@ class PublisherGrowthHandoffTests(TestCase):
     def test_bridge_signs_a_time_limited_editorial_session(self):
         source = mock.Mock()
         store = Storage(source, 'test')
+        private_key = PrivateKey.generate()
+        wrapping = {'public_key': b64encode(bytes(private_key.public_key)).decode()}
         now = datetime(2026, 11, 14, 12, tzinfo=timezone.utc)
         env = {'R2_ACCOUNT_ID': 'account', 'R2_ACCESS_KEY_ID': 'example-id',
                'R2_SECRET_ACCESS_KEY': 'example-key'}
-        with mock.patch.object(store, 'read', return_value=(None, None)), mock.patch.dict(os.environ, env):
+        with (mock.patch.object(store, 'read', side_effect=[(wrapping, '"key"'), (None, None)]),
+              mock.patch.dict(os.environ, env)):
             bridge.refresh_session(store, now)
         call = source.put_object.call_args.kwargs
         self.assertEqual(call['Key'], bridge.SESSION_KEY)
-        credentials = json.loads(call['Body'])
+        envelope = json.loads(call['Body'])
+        self.assertNotIn('secret_key', envelope)
+        credentials = json.loads(SealedBox(private_key).decrypt(b64decode(envelope['sealed'])))
         jwt = b64decode(credentials['token']).removeprefix(b'jwt/')
         unsigned, signature = jwt.rsplit(b'.', 1)
         self.assertEqual(urlsafe_b64decode(signature + b'='), hmac.digest(b'example-key', unsigned, 'sha256'))

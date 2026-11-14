@@ -46,11 +46,28 @@ jobs:
         run: python3 src/fast_backup_dispatch.py
       - name: Prepare Publisher watchdog and home projection
         if: always()
-        run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'Pillow>=11,<13' ijson==3.6.0
+        run: python3 -m pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'Pillow>=11,<13' 'PyNaCl>=1.5,<2' ijson==3.6.0
       - name: Recover the Publisher workflow in the owning repository
+        id: editorial
         if: always() && !cancelled()
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUBLISHER_GROWTH_DISPATCH_TOKEN: ${{ secrets.PUBLISHER_GROWTH_DISPATCH_TOKEN }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
         run: python -m publisher_v71.bridge
+      # Until November 18 the existing campaign uses its D1 receipts and a separate fallback schedule.
+      - name: Recover due Telegram campaign reminders
+        if: always() && !cancelled() && !inputs.dry_run && steps.editorial.outputs.owner == 'arabsnipertech-bet/arabsniper-growth' && vars.PUBLISHER_V71_TRIAL_DISABLED != 'true'
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+        run: python scripts/gold-campaign-repeat.py
+      - name: Recover due Facebook campaign reminders
+        if: always() && !cancelled() && !inputs.dry_run && steps.editorial.outputs.owner == 'arabsnipertech-bet/arabsniper-growth' && vars.PUBLISHER_V71_TRIAL_DISABLED != 'true' && vars.PUBLISHER_V71_FACEBOOK_DISABLED != 'true'
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          META_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+        run: python scripts/gold-campaign-facebook.py

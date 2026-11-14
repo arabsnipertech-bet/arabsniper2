@@ -1,16 +1,10 @@
 """Verify a Growth installation without sending a post."""
-import importlib.util
 import os
-from pathlib import Path
-import uuid
 
 import requests
 
-from telegram_watchdog import GitHub
-
 from . import cutover, public_feed, runner, scores
 from .channels import CHANNEL, GRAPH, PAGE
-from .editorial import campaign_active
 from .storage import PREFIX
 
 
@@ -25,13 +19,10 @@ def verify(store, *, activation=False):
         if ready != {'growth_workflows_active': True}:
             raise ValueError('The external watchdog has not verified dispatch access to Growth')
 
-    probe = PREFIX + 'preflight/' + uuid.uuid4().hex
-    tag = store.editorial.put_object(Bucket=store.bucket, Key=probe, Body=b'{}',
-                                    IfNoneMatch='*')['ETag']
-    try:
-        store.editorial.put_object(Bucket=store.bucket, Key=probe, Body=b'{"verified":true}', IfMatch=tag)
-    finally:
-        store.editorial.delete_object(Bucket=store.bucket, Key=probe)
+    probe, tag = store.read('preflight/status.json', limit=512)
+    condition = {'IfMatch': tag} if probe is not None else {'IfNoneMatch': '*'}
+    store.editorial.put_object(Bucket=store.bucket, Key=PREFIX + 'preflight/status.json',
+                               Body=b'{"verified":true}', ContentType='application/json', **condition)
     runner.event_log('preflight', 'editorial_storage_verified')
 
     services = runner.social_services()
@@ -64,18 +55,7 @@ def verify(store, *, activation=False):
     runner.preflight(store)
 
     public_feed.published_revision(public_feed.PUBLIC_REPOSITORY)
-    api = GitHub(os.environ['PUBLISHER_PRIMARY_ACTIONS_TOKEN'])
-    if api.request('workflows/publisher-home-bridge.yml').get('state') != 'active':
-        raise ValueError('The workflow that publishes the home projection is unavailable')
-    api.request('workflows/publisher-home-bridge.yml/dispatches', {'ref': 'main'})
     runner.event_log('preflight', 'homepage_source_verified')
-    if (os.environ.get('TRIAL_DISABLED') != 'true'
-            and campaign_active(runner.clock().astimezone(runner.ROME).date())):
-        script = Path(__file__).resolve().parents[2] / 'scripts/gold-campaign-facebook.py'
-        spec = importlib.util.spec_from_file_location('verify_campaign', script)
-        campaign = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(campaign)
-        campaign.verify_ready()
 
 
 if __name__ == '__main__':

@@ -407,21 +407,16 @@ def production_store():
     from botocore.session import get_session
     from .bridge import session_credentials
 
+    def refresh():
+        return session_credentials(source, bucket)
+
     session = get_session()
     session._credentials = RefreshableCredentials.create_from_metadata(
-        metadata=session_credentials(), refresh_using=session_credentials, method='publisher-r2')
+        metadata=refresh(), refresh_using=refresh, method='publisher-r2')
     editorial = boto3.Session(botocore_session=session).client(
         's3', endpoint_url=source.meta.endpoint_url, region_name='auto',
         config=Config(connect_timeout=7, read_timeout=20, retries={'total_max_attempts': 2}))
     return Storage(source, bucket, editorial=editorial)
-
-
-def running_owner(store):
-    repository = cutover.owner(store)
-    if output := os.environ.get('GITHUB_OUTPUT'):
-        with open(output, 'a', encoding='utf-8') as target:
-            target.write(f'owner={repository}\n')
-    return repository
 
 
 def change_owner(store, repository, *, verify=None):
@@ -472,7 +467,7 @@ def main():
     elif args:
         raise ValueError('Unsupported Publisher arguments')
     store.load()
-    if running_owner(store) != repository:
+    if cutover.owner(store) != repository:
         event_log('publisher', 'owned_by_other_repository')
         return
     services = social_services()
