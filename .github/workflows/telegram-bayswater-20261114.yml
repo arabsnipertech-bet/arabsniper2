@@ -15,6 +15,7 @@ jobs:
     timeout-minutes: 2
     env:
       GH_TOKEN: ${{ github.token }}
+      API_SPORTS_KEY: ${{ secrets.API_SPORTS_KEY }}
       BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       POST_TEXT: |-
         ☀️ Buongiorno da ArabSniperBet!
@@ -64,9 +65,12 @@ jobs:
           assert any(p['market'] == 'Over 2,5 PT' and p['odd'] == 4.5
                      and p['quote_at'] == '2026-11-14T06:01:11+00:00'
                      and p['study_only'] is True for p in match['proposals'])
-          result = read('Halftime score', 'https://arabsniperbet.com/api/live-scores?id=' + fixture_id)['fixtures'][fixture_id]
-          assert result['status'] in {'HT', '2H', 'FT', 'AET', 'PEN'}
-          assert result['halftime'] == {'home': 2, 'away': 1}
+          observed = read('API-Football halftime', 'https://v3.football.api-sports.io/fixtures?id=' + fixture_id, headers={'x-apisports-key': os.environ['API_SPORTS_KEY'], 'User-Agent': 'ArabSniperBet-GitHub-Actions'})
+          assert not observed.get('errors') and len(observed['response']) == 1
+          result = observed['response'][0]
+          assert str(result['fixture']['id']) == fixture_id
+          assert result['fixture']['status']['short'] in {'HT', '2H', 'FT', 'AET', 'PEN'}
+          assert result['score']['halftime'] == {'home': 2, 'away': 1}
 
           token = os.environ['BOT_TOKEN']
           if not token:
