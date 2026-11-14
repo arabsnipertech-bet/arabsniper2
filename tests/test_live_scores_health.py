@@ -242,14 +242,18 @@ class LiveScoresHealthTests(TestCase):
             with (mock.patch.object(health, 'get_json', return_value=current),
                   mock.patch.object(health, 'datetime', wraps=datetime) as clock,
                   mock.patch.object(health, 'recent_audit', return_value={}),
-                  mock.patch.object(health, 'client'),
+                  mock.patch.object(health, 'client') as client,
                   mock.patch.dict(health.os.environ, {'GITHUB_STEP_SUMMARY': str(path), 'R2_BUCKET': 'test'})):
                 clock.now.return_value = NOW
+                storage = client.return_value
+                storage.get_object.return_value = {'Body': BytesIO(b'{"files": {}}')}
                 health.run([], True)
+                storage.get_object.assert_called_once_with(Bucket='test', Key='state/current.json')
             block = path.read_text().split('```json\n', 1)[1]
             report = json.loads(block.split('\n```', 1)[0])
         self.assertEqual(report['missing_halftime_fixture_ids'], list(matches))
         self.assertEqual(report['health']['missing_halftime'], 2)
+        self.assertEqual([x['date'] for x in report['auditor_days']], ['2026-11-12', '2026-11-11'])
         self.assertEqual([x['differences'] for x in report['auditor_days']], [0, 0])
         self.assertIn('::warning title=Gold halftime coverage::2 finished fixtures', log.getvalue())
         self.assertIn('Markets that require halftime remain unverified', log.getvalue())

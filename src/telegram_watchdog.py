@@ -184,6 +184,9 @@ def main():
     if os.environ.get("GITHUB_REPOSITORY")!=REPO or os.environ.get("GITHUB_REF")!="refs/heads/main":
         raise RuntimeError("Production main only")
     from publisher_v71.cutover import ENABLED
+    if output := os.environ.get('GITHUB_OUTPUT'):
+        with open(output, 'a', encoding='utf-8') as out:
+            out.write(f'legacy_editorial={str(not ENABLED).lower()}\n')
     if ENABLED:
         public_path = Path(__file__).resolve().parents[1] / 'data/arab_quote_homepage.json'
         with public_path.open(encoding='utf-8') as source:

@@ -4,17 +4,21 @@ from datetime import date, datetime, timedelta, timezone
 import json
 import os
 from urllib.request import Request, urlopen
+from zoneinfo import ZoneInfo
 
 REPO = 'arabsnipertech-bet/arabsniper2'
 WORKFLOW = 'recover-daily-results.yml'
+ROME = ZoneInfo('Europe/Rome')
 
 def permitted(day, now, runs):
-    age = (now.date() - date.fromisoformat(day)).days
+    age = (now.astimezone(ROME).date() - date.fromisoformat(day)).days
     if not 1 <= age <= 3:
         return False
     for run in runs:
         if run.get('status') != 'completed':
             return False
+        if run.get('conclusion') == 'skipped':
+            continue
         created = datetime.fromisoformat(run['created_at'].replace('Z', '+00:00'))
         if now - created < timedelta(hours=12):
             return False
