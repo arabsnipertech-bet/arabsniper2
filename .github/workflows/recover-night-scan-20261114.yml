@@ -1,0 +1,33 @@
+name: Request guarded Night Scan recovery
+on:
+  push:
+    branches: [ops/recover-night-scan-2026-11-14]
+    paths: ['.github/workflows/recover-night-scan-20261114.yml']
+permissions:
+  actions: write
+jobs:
+  dispatch:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.run_attempt == '1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Dispatch Night Scan on main without force
+        run: |
+          set -euo pipefail
+          if [ "$(TZ=Europe/Rome date +%F)" != '2026-11-14' ]; then
+            echo 'Recovery date closed'
+            exit 1
+          fi
+          active=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/night_scan.yml/runs?branch=main&per_page=20" \
+            --jq '[.workflow_runs[] | select(.status != "completed")] | length')
+          if [ "$active" -gt 0 ]; then
+            echo 'Night Scan already active'
+            exit 0
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/night_scan.yml/dispatches" \
+            --input - <<'JSON'
+          {"ref":"main","inputs":{"force_night":false}}
+          JSON
+          echo 'Guarded Night Scan requested on main'
