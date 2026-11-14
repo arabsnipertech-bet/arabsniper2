@@ -270,6 +270,16 @@ def publish_home(store, candidates, now, boards):
     past = safe_read('historical_results', lambda: read_local('data/arab_quote_results_public.json'), {})
     upcoming = chain(boards, (read_board(store, number) for number in (3, 4, 5)))
     view = public_feed.projection(store.state, now, past, boards=upcoming)
+    if os.environ.get('GITHUB_REPOSITORY') == cutover.GROWTH:
+        store.stage_homepage(view)
+        previous = safe_read('homepage_receipt', lambda: public_feed.published_revision(
+            public_feed.PUBLIC_REPOSITORY), None)
+        if previous:
+            record_home_receipt(store, *previous)
+            store.save()
+        event_log('homepage', 'ready_for_publication', groups=len(view['groups']),
+                  previews=len(view['gold_previews']), scheduled=len(view['gold_schedule']))
+        return
     result = safe_read('homepage', lambda: public_feed.publish(view), None)
     if result:
         revision, previous = result
@@ -282,9 +292,12 @@ def publish_home(store, candidates, now, boards):
                   recap_examples=len((view['report'] or {}).get('triad_examples', [])))
 
 
-def tick(store, services, gh_token, *, trial_ok):
+def tick(store, services, gh_token, *, trial_ok, repository=None):
     now = clock()
     store.load()
+    if repository and repository != cutover.owner(store):
+        event_log('publisher', 'owned_by_other_repository')
+        return
     store.prune(now)
     store.state['runtime']['trial_verified'] = trial_ok
     candidate_feed = read_local(legacy.PUBLIC_PATH)
@@ -378,8 +391,56 @@ def preflight(store):
 
 def production_enabled():
     return (cutover.ENABLED and os.environ.get('PUBLISHER_DISABLED') != 'true'
-            and os.environ.get('GITHUB_REPOSITORY') == legacy.REPO
+            and os.environ.get('GITHUB_REPOSITORY') in (cutover.PRIMARY, cutover.GROWTH)
             and os.environ.get('GITHUB_REF') == 'refs/heads/main')
+
+
+def production_store():
+    source = client()
+    bucket = os.environ['R2_BUCKET']
+    if os.environ.get('GITHUB_REPOSITORY') != cutover.GROWTH:
+        return Storage(source, bucket)
+
+    import boto3
+    from botocore.config import Config
+    from botocore.credentials import RefreshableCredentials
+    from botocore.session import get_session
+    from .bridge import session_credentials
+
+    session = get_session()
+    session._credentials = RefreshableCredentials.create_from_metadata(
+        metadata=session_credentials(), refresh_using=session_credentials, method='publisher-r2')
+    editorial = boto3.Session(botocore_session=session).client(
+        's3', endpoint_url=source.meta.endpoint_url, region_name='auto',
+        config=Config(connect_timeout=7, read_timeout=20, retries={'total_max_attempts': 2}))
+    return Storage(source, bucket, editorial=editorial)
+
+
+def running_owner(store):
+    repository = cutover.owner(store)
+    if output := os.environ.get('GITHUB_OUTPUT'):
+        with open(output, 'a', encoding='utf-8') as target:
+            target.write(f'owner={repository}\n')
+    return repository
+
+
+def change_owner(store, repository, *, verify=None):
+    """Switch the owner inside the same lock that protects the sending outbox."""
+    for _ in range(10):
+        with store.cycle(clock()) as acquired:
+            if acquired:
+                store.load()
+                if not store.etag or not store.state['legacy'].get('handoff'):
+                    raise ValueError('No existing Publisher receipts to hand off')
+                if cutover.owner(store) != repository:
+                    if verify:
+                        verify(store)
+                    store.state['runtime'][cutover.OWNER_FIELD] = repository
+                    store.save()
+                event_log('publisher', 'delivery_owner', repository=repository)
+                return
+        time.sleep(3)
+    raise RuntimeError('Publisher delivery cycle is busy')
 
 
 def social_services():
@@ -390,13 +451,30 @@ def social_services():
 
 
 def main():
-    if sys.argv[1:] == ['--preflight']:
+    args = sys.argv[1:]
+    if args == ['--preflight']:
         preflight(Storage(client(), os.environ['R2_BUCKET']))
         return
     if not production_enabled():
         event_log('publisher', 'disabled_or_non_production')
         return
-    store = Storage(client(), os.environ['R2_BUCKET'])
+    repository = os.environ['GITHUB_REPOSITORY']
+    store = production_store()
+    if args in (['--activate-growth'], ['--restore-primary']):
+        if repository != cutover.GROWTH:
+            raise ValueError('Publisher handoff must run from Growth main')
+        if args == ['--restore-primary']:
+            change_owner(store, cutover.PRIMARY)
+            return
+        from .preflight import verify
+
+        change_owner(store, cutover.GROWTH, verify=lambda ledger: verify(ledger, activation=True))
+    elif args:
+        raise ValueError('Unsupported Publisher arguments')
+    store.load()
+    if running_owner(store) != repository:
+        event_log('publisher', 'owned_by_other_repository')
+        return
     services = social_services()
     trial_ok = cutover.TRIAL_PROVEN and os.environ.get('TRIAL_DISABLED') != 'true'
     if trial_ok:
@@ -404,7 +482,7 @@ def main():
     for _ in range(10):
         with store.cycle(clock()) as acquired:
             if acquired:
-                tick(store, services, os.environ['GH_TOKEN'], trial_ok=trial_ok)
+                tick(store, services, os.environ['GH_TOKEN'], trial_ok=trial_ok, repository=repository)
                 return
         time.sleep(3)
     event_log('publisher', 'deferred_to_next_cycle')

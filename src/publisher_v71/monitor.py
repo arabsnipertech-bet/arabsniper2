@@ -3,21 +3,21 @@ from datetime import timedelta
 import os
 import time
 
-from gold_storage import client
 from multimarket_model import stamp
 
-from . import live, runner, scores
-from .storage import Storage
+from . import cutover, runner, scores
 
 POLL_SECONDS = 60
 MATCH_WINDOW = timedelta(minutes=190)
 
 
-def poll(store, services, fixture):
+def poll(store, services, fixture, *, repository=None):
     with store.cycle(runner.clock()) as acquired:
         if not acquired:
             return 'busy'
         store.load()
+        if repository and cutover.owner(store) != repository:
+            return 'owned_by_other_repository'
         now = runner.clock()
         match = next(((day, state) for day, state in store.state['live'].items()
                       if state['pick']['fixture_id'] == fixture and runner.live_receipt(store, day)), None)
@@ -51,14 +51,19 @@ def main():
     if not runner.production_enabled() or not fixture.isascii() or not fixture.isdecimal():
         runner.event_log('live_monitor', 'disabled_or_invalid_fixture')
         return
-    store = Storage(client(), os.environ['R2_BUCKET'])
+    store = runner.production_store()
+    repository = os.environ['GITHUB_REPOSITORY']
+    store.load()
+    if cutover.owner(store) != repository:
+        runner.event_log('live_monitor', 'owned_by_other_repository')
+        return
     services = runner.social_services()
     deadline = time.monotonic() + 210 * 60
     while time.monotonic() < deadline:
         started = time.monotonic()
-        result = poll(store, services, fixture)
+        result = poll(store, services, fixture, repository=repository)
         runner.event_log('live_monitor', result, fixture=fixture)
-        if result in ('finished', 'no_announced_live'):
+        if result in ('finished', 'no_announced_live', 'owned_by_other_repository'):
             return
         time.sleep(max(0, POLL_SECONDS - (time.monotonic() - started)))
 
