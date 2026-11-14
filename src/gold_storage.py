@@ -1,7 +1,9 @@
 """Private R2 checkpoint + Gold projection. Activate only after staging verification."""
+from contextlib import closing
 from pathlib import Path
 from datetime import datetime, timezone
 import hashlib, json, os, re, sys
+from time import sleep
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from audit_storage import read_store, atomic_bytes, FORMAT, validate_store
 from quote_history import OPENING_SNAPSHOT
@@ -43,9 +45,29 @@ def collect(root, verified=None, *, patterns=None):
                         validate_store(p)
     return files
 
+def read_checkpoint_object(storage, bucket, key):
+    try:
+        from botocore.exceptions import IncompleteReadError, ReadTimeoutError, ResponseStreamingError
+    except ImportError:
+        # Local tests and offline callers can inject a storage implementation.
+        streaming_errors = ()
+    else:
+        streaming_errors = (IncompleteReadError, ReadTimeoutError, ResponseStreamingError)
+
+    def read_body():
+        with closing(storage.get_object(Bucket=bucket, Key=key)['Body']) as body:
+            return body.read()
+
+    try:
+        return read_body()
+    except streaming_errors:
+        sleep(1)
+        return read_body()
+
+
 def previous_manifest(s3,bucket):
     try:
-        value=json.loads(s3.get_object(Bucket=bucket,Key='state/current.json')['Body'].read())
+        value=json.loads(read_checkpoint_object(s3,bucket,'state/current.json'))
     except Exception as error:
         code=getattr(error,'response',{}).get('Error',{}).get('Code')
         if code in ('NoSuchKey','404'):return {}
@@ -207,7 +229,7 @@ def restore_subset(storage, bucket, root, index, paths):
         digest = info['sha256']
         if not allowed(path) or not re.fullmatch('[0-9a-f]{64}', digest):
             raise ValueError('Invalid private object reference')
-        raw = storage.get_object(Bucket=bucket, Key='state/objects/'+digest)['Body'].read()
+        raw = read_checkpoint_object(storage, bucket, 'state/objects/'+digest)
         if len(raw) != info['bytes'] or sha(raw) != digest:
             raise ValueError('Private object checksum mismatch')
         target = root / path
@@ -260,7 +282,7 @@ def restore(s3,bucket,root,manifest_sha=None):
     if manifest_sha is not None and not re.fullmatch('[a-f0-9]{64}',manifest_sha):
         raise ValueError('Invalid immutable checkpoint identifier')
     key='state/manifests/'+manifest_sha+'.json' if manifest_sha else 'state/current.json'
-    raw=s3.get_object(Bucket=bucket,Key=key)['Body'].read()
+    raw=read_checkpoint_object(s3,bucket,key)
     if manifest_sha and sha(raw)!=manifest_sha:raise ValueError('Immutable checkpoint checksum mismatch')
     manifest=json.loads(raw)
     if manifest.get('version')!=1 or not isinstance(manifest.get('files'),dict):raise ValueError('Invalid checkpoint')
@@ -274,15 +296,19 @@ def restore(s3,bucket,root,manifest_sha=None):
     print(f'Restoring {len(objects)} unique objects',flush=True)
     def download(item):
         digest,size=item
-        raw=s3.get_object(Bucket=bucket,Key='state/objects/'+digest)['Body'].read()
+        raw=read_checkpoint_object(s3,bucket,'state/objects/'+digest)
         if len(raw)!=size or sha(raw)!=digest:raise ValueError('Checkpoint checksum mismatch')
         return digest,raw
     downloaded={}
     with ThreadPoolExecutor(max_workers=8) as pool:
         tasks=[pool.submit(download,item) for item in objects.items()]
-        for count,task in enumerate(as_completed(tasks),1):
-            digest,raw=task.result();downloaded[digest]=raw
-            if count%25==0 or count==len(tasks):print(f'Restored {count}/{len(tasks)} objects',flush=True)
+        try:
+            for count,task in enumerate(as_completed(tasks),1):
+                digest,raw=task.result();downloaded[digest]=raw
+                if count%25==0 or count==len(tasks):print(f'Restored {count}/{len(tasks)} objects',flush=True)
+        except Exception:
+            pool.shutdown(cancel_futures=True)
+            raise
     for path,item in manifest['files'].items():pending[path]=downloaded[item['sha256']]
     if not pending:raise ValueError('Empty checkpoint')
     # Weights are also certified in git: retain the newer certified publication
