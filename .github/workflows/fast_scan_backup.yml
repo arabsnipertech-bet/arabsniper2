@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.sha }}
           persist-credentials: false
       - name: Recover nightly Auditor within protected windows
         if: always()
@@ -39,26 +39,21 @@ jobs:
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
         run: python3 src/fast_backup_dispatch.py
       - name: Recover missing Telegram publication windows
+        id: editorial_watchdog
         if: always()
         env:
           GITHUB_TOKEN: ${{ github.token }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
         run: python3 src/telegram_watchdog.py
       - name: Wake or recover the daily Telegram live
-        if: always()
+        if: ${{ always() && steps.editorial_watchdog.outputs.legacy_editorial == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
         run: python3 src/sports_daily_live.py dispatch
       - name: Recover Facebook independently from Telegram completion
-        if: always()
+        if: ${{ always() && steps.editorial_watchdog.outputs.legacy_editorial == 'true' }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
           FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
         run: python3 src/telegram_watchdog.py facebook
-      - name: Recover authorized three-match sports coverage on 6 November
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-          FAST_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
-        run: python3 src/editorial_live_three_20261106.py dispatch

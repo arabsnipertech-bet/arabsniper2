@@ -48,9 +48,7 @@ def get_json(url):
     return json.loads(result.stdout)
 
 
-def recent_audit(day, s3, bucket):
-    with s3.get_object(Bucket=bucket, Key='state/current.json')['Body'] as stream:
-        index = json.load(stream)['files']
+def recent_audit(day, s3, bucket, index):
     entry = index.get(f'auditarchive/prematch_{day}_v7.json')
     if not entry:
         return {}
@@ -352,9 +350,11 @@ def run(ids, compare_auditor, *, track_incidents=False):
     if compare_auditor and summary['health']:
         summary['auditor_days'] = []
         recovery_dates = []
-        for age in (2, 1):
+        with storage.get_object(Bucket=bucket, Key='state/current.json')['Body'] as stream:
+            index = json.load(stream)['files']
+        for age in (1, 2):
             day = now.astimezone(ROME).date() - timedelta(days=age)
-            audit = recent_audit(day, storage, bucket)
+            audit = recent_audit(day, storage, bucket, index)
             differences = reconcile(audit, fixtures)
             summary['auditor_days'].append({'date': str(day), 'available': bool(audit),
                 'differences': len(differences), 'sample': differences[:20]})
