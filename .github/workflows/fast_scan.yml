@@ -185,6 +185,11 @@ jobs:
           FAST_REQUESTED_AT: ${{ steps.fast_guard.outputs.started_at }}
         run: python src/fast_scan_guard.py --record
 
+      - name: Hand off verified fixture IDs to the live score collector
+        if: steps.fast_guard.outputs.run == 'true' && steps.refresh.outputs.mode != 'cached' && vars.GOLD_PRIVATE == 'true'
+        continue-on-error: true
+        run: python src/private_publication.py --watchlist-only
+
       - name: Save verified state in private storage
         if: steps.fast_guard.outputs.run == 'true' && (vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true')
         run: python src/gold_storage.py publish

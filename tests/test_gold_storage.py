@@ -103,6 +103,31 @@ class Storage(unittest.TestCase):
    s.put_object=fail;(p/GOLD[0]).write_text('{"changed":true}')
    with self.assertRaises(RuntimeError):publish(s,'test',a)
    self.assertEqual(s.objects['state/current.json'],pointer)
+
+ def test_changed_local_object_does_not_advance_checkpoint(self):
+  from gold_storage import checkpoint_files
+
+  with tempfile.TemporaryDirectory() as directory:
+   root = Path(directory)
+   data = root / 'data'
+   data.mkdir()
+   for name in GOLD:
+    (data / name).write_text('{"matches":[]}')
+   storage = Fake()
+   publish(storage, 'test', root)
+   pointer = storage.objects['state/current.json']
+   target = data / GOLD[0]
+   target.write_text('{"matches":[],"revision":1}')
+
+   def changed(*args, **kwargs):
+    yield from checkpoint_files(*args, **kwargs)
+    target.write_text('{"matches":[],"revision":2}')
+
+   with patch('gold_storage.checkpoint_files', side_effect=changed):
+    with self.assertRaisesRegex(ValueError, 'changed during publication'):
+     publish(storage, 'test', root)
+   self.assertEqual(storage.objects['state/current.json'], pointer)
+
  def test_missing_checkpoint_fails_closed(self):
   with tempfile.TemporaryDirectory() as a:
    with self.assertRaises(Missing):restore(Fake(),'test',a)
