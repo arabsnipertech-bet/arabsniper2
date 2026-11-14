@@ -3,6 +3,7 @@ from contextlib import closing
 from pathlib import Path
 from datetime import datetime, timezone
 import hashlib, json, os, re, sys
+from tempfile import TemporaryDirectory
 from time import sleep
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from audit_storage import read_store, atomic_bytes, FORMAT, validate_store
@@ -45,7 +46,7 @@ def collect(root, verified=None, *, patterns=None):
                         validate_store(p)
     return files
 
-def read_checkpoint_object(storage, bucket, key):
+def read_checkpoint_object(storage, bucket, key, consume=None):
     try:
         from botocore.exceptions import IncompleteReadError, ReadTimeoutError, ResponseStreamingError
     except ImportError:
@@ -56,7 +57,7 @@ def read_checkpoint_object(storage, bucket, key):
 
     def read_body():
         with closing(storage.get_object(Bucket=bucket, Key=key)['Body']) as body:
-            return body.read()
+            return body.read() if consume is None else consume(body)
 
     try:
         return read_body()
@@ -286,50 +287,75 @@ def restore(s3,bucket,root,manifest_sha=None):
     if manifest_sha and sha(raw)!=manifest_sha:raise ValueError('Immutable checkpoint checksum mismatch')
     manifest=json.loads(raw)
     if manifest.get('version')!=1 or not isinstance(manifest.get('files'),dict):raise ValueError('Invalid checkpoint')
-    pending={}; objects={}
+    objects={}
     for path,item in manifest['files'].items():
         if not allowed(path) or not re.fullmatch('[a-f0-9]{64}',item['sha256']):raise ValueError('Invalid checkpoint path')
         if not isinstance(item['bytes'],int) or item['bytes']<0:raise ValueError('Invalid checkpoint size')
         digest=item['sha256']
         if digest in objects and objects[digest]!=item['bytes']:raise ValueError('Conflicting object sizes')
         objects[digest]=item['bytes']
-    print(f'Restoring {len(objects)} unique objects',flush=True)
-    def download(item):
-        digest,size=item
-        raw=read_checkpoint_object(s3,bucket,'state/objects/'+digest)
-        if len(raw)!=size or sha(raw)!=digest:raise ValueError('Checkpoint checksum mismatch')
-        return digest,raw
-    downloaded={}
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        tasks=[pool.submit(download,item) for item in objects.items()]
-        try:
-            for count,task in enumerate(as_completed(tasks),1):
-                digest,raw=task.result();downloaded[digest]=raw
-                if count%25==0 or count==len(tasks):print(f'Restored {count}/{len(tasks)} objects',flush=True)
-        except Exception:
-            pool.shutdown(cancel_futures=True)
-            raise
-    for path,item in manifest['files'].items():pending[path]=downloaded[item['sha256']]
-    if not pending:raise ValueError('Empty checkpoint')
-    # Weights are also certified in git: retain the newer certified publication
-    # across a crash between the git and private-checkpoint writes.
-    weights = 'data/arab_calibration_weights.json'
-    local = root/weights
-    if local.is_file():
-        from adaptive_calibration import VERSION
-        from multimarket_model import stamp
-        current = json.loads(local.read_bytes())
-        remote = json.loads(pending.get(weights, b'{}'))
-        at, before = stamp(current.get('trained_at')), stamp(remote.get('trained_at'))
-        if current.get('version') == VERSION and at and (not before or at > before):
-            pending[weights] = local.read_bytes()
-        elif weights not in pending:
-            pending[weights] = local.read_bytes()  # migration from pre-calibration checkpoints
-    # Validate/download all objects first. No fallback to stale public data.
-    for path in collect(root):
-        if path not in pending: (root/path).unlink()
-    for path,raw in pending.items():atomic_bytes(root/path,raw)
-    print(f'Private checkpoint restored: {len(pending)} files')
+    if not objects:
+        raise ValueError('Empty checkpoint')
+    print(f'Restoring {len(objects)} unique objects ({sum(objects.values()):,} bytes) to temporary storage', flush=True)
+    with TemporaryDirectory(prefix='.gold-restore-', dir=root) as directory:
+        staging = Path(directory)
+
+        def download(item):
+            digest, size = item
+
+            def stage(body):
+                checksum = hashlib.sha256()
+                received = 0
+                # Start a new file on each attempt so an interrupted read
+                # cannot leave partial bytes in the retried object.
+                with (staging / digest).open('wb') as target:
+                    while block := body.read(1024 * 1024):
+                        received += len(block)
+                        if received > size:
+                            raise ValueError('Checkpoint checksum mismatch')
+                        checksum.update(block)
+                        target.write(block)
+                if received != size or checksum.hexdigest() != digest:
+                    raise ValueError('Checkpoint checksum mismatch')
+
+            read_checkpoint_object(s3, bucket, 'state/objects/' + digest, stage)
+
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            tasks = [pool.submit(download, item) for item in objects.items()]
+            try:
+                for count, task in enumerate(as_completed(tasks), 1):
+                    task.result()
+                    if count % 25 == 0 or count == len(tasks):
+                        print(f'Restored {count}/{len(tasks)} objects', flush=True)
+            except Exception:
+                pool.shutdown(cancel_futures=True)
+                raise
+
+        pending = {path: staging / item['sha256'] for path, item in manifest['files'].items()}
+        # Weights are also certified in git. Keep the newer certified publication
+        # or the local copy when migrating from a pre-calibration checkpoint.
+        weights = 'data/arab_calibration_weights.json'
+        local = root / weights
+        keep_local_weights = False
+        if local.is_file():
+            from adaptive_calibration import VERSION
+            from multimarket_model import stamp
+            current = json.loads(local.read_bytes())
+            remote = json.loads(pending[weights].read_bytes()) if weights in pending else {}
+            at, before = stamp(current.get('trained_at')), stamp(remote.get('trained_at'))
+            keep_local_weights = weights not in pending or (
+                current.get('version') == VERSION and at and (not before or at > before))
+            if keep_local_weights:
+                pending[weights] = local
+
+        # Leave the checkout untouched until every remote object is verified.
+        for path in collect(root):
+            if path not in pending:
+                (root / path).unlink()
+        for path, source in pending.items():
+            if source != root / path:
+                atomic_bytes(root / path, source.read_bytes())
+    print(f'Private checkpoint restored: {len(pending)} files', flush=True)
 
 def client():
     import boto3
