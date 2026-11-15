@@ -15,7 +15,7 @@ from zoneinfo import ZoneInfo
 from audit_storage import read_store
 from auditor_schedule import EXCLUDED_RECOVERY_DAYS
 from gold_storage import client, restore_subset
-from v7_archive import FINISHED, checked_score
+from v7_archive import FINISHED, VOID, checked_score
 from lateral_matrix import settle_spec
 
 LIVE = 'https://arabsniperbet.com/api/live-scores'
@@ -36,6 +36,8 @@ INVALID_COUNTERS = 'Invalid score feed health counters'
 OVERDUE_FAULT = 'Tracked fixtures overdue without a confirmed result'
 STALE_FAULT = 'Tracked live scores missing or older than six minutes'
 SCORE_FAULT_IDS = {OVERDUE_FAULT: 'overdue_fixture_ids', STALE_FAULT: 'stale_live_fixture_ids'}
+MAX_PENDING_FINAL_PCT = 5
+NO_FINAL_EXPECTED = VOID | {'PST', 'SUSP', 'INT'}
 
 
 def stamp(value):
@@ -74,33 +76,66 @@ def score(row):
                           'home_ht': ht.get('home'), 'away_ht': ht.get('away')})
 
 
+def has_final(result):
+    return result.get('status') in FINISHED and None not in (result['home_ft'], result['away_ft'])
+
+
 def reconcile(audit, fixtures):
-    differences = []
+    expected_fixtures = 0
+    pending = {}
+    halftime_pending = []
+    conflicts = []
     for fid, evidence in audit.items():
-        row = fixtures.get(fid)
-        if not row or row.get('status') not in FINISHED:
+        result = score(fixtures.get(fid) or {})
+        audited = checked_score(evidence.get('result') or {})
+        state = evidence.get('status')
+        official_final = has_final(result)
+        archived_final = state == 'settled' and has_final(audited)
+        if (not archived_final and not official_final and
+                (state in ('void', 'postponed', 'suspended') or result.get('status') in NO_FINAL_EXPECTED)):
             continue
-        result = score(row)
-        if None in (result['home_ft'], result['away_ft']):
+        expected_fixtures += 1
+        if not archived_final:
+            if state == 'void' and official_final:
+                conflicts.append({'fixture_id': fid, 'kind': 'score_mismatch'})
+            else:
+                pending[fid] = 'auditor_pending' if official_final else 'final_unavailable'
             continue
-        audited = evidence.get('result') or {}
-        if evidence.get('status') == 'settled':
-            if any(result[k] != audited.get(k) for k in ('status', 'home_ft', 'away_ft', 'home_ht', 'away_ht')
-                   if result[k] is not None):
-                differences.append({'fixture_id': fid, 'kind': 'score_mismatch'})
-                continue
-        elif evidence.get('status') != 'settled':
-            differences.append({'fixture_id': fid, 'kind': 'auditor_pending'})
+        if not official_final:
             continue
+        if any(result[k] != audited[k] for k in ('status', 'home_ft', 'away_ft', 'home_ht', 'away_ht')
+               if result[k] is not None and audited[k] is not None):
+            conflicts.append({'fixture_id': fid, 'kind': 'score_mismatch'})
+            continue
+        new_halftime = audited['home_ht'] is None and result['home_ht'] is not None
+        if new_halftime:
+            halftime_pending.append({'fixture_id': fid, 'kind': 'auditor_halftime_pending'})
         for role, pick in (evidence.get('triad') or {}).items():
             market = (pick or {}).get('market_id')
             if not market:
                 continue
-            expected = settle_spec(json.loads(market), result)
+            spec = json.loads(market)
+            expected = settle_spec(spec, result)
+            if expected is None:
+                continue
             saved = (evidence.get('outcomes') or {}).get(market)
-            if expected is not None and (not saved or (saved.get('win'), saved.get('loss')) != expected):
-                differences.append({'fixture_id': fid, 'kind': 'outcome_mismatch', 'role': role})
-    return differences
+            if saved is None and new_halftime and settle_spec(spec, audited) is None:
+                continue
+            if not saved or (saved.get('win'), saved.get('loss')) != expected:
+                conflicts.append({'fixture_id': fid, 'kind': 'outcome_mismatch', 'role': role})
+    differences = conflicts + [{'fixture_id': fid, 'kind': kind} for fid, kind in pending.items()] + halftime_pending
+    pending_fixtures = len(pending)
+    return {
+        'expected_fixtures': expected_fixtures,
+        'pending_fixtures': pending_fixtures,
+        'pending_pct': round(pending_fixtures * 100 / expected_fixtures, 2) if expected_fixtures else None,
+        'pending_limit_pct': MAX_PENDING_FINAL_PCT,
+        'coverage_exceeded': pending_fixtures * 100 > expected_fixtures * MAX_PENDING_FINAL_PCT,
+        'conflicts': len(conflicts),
+        'halftime_pending_fixtures': len(halftime_pending),
+        'differences': len(differences),
+        'sample': differences[:20],
+    }, pending.keys()
 
 
 def inspect_live(now):
@@ -200,6 +235,21 @@ def current_delivery(live, summary, reasons, now):
     return None
 
 
+def accept_recent_delivery(live, summary, reasons, now):
+    delivery = current_delivery(live, summary, reasons, now)
+    if not delivery:
+        return False
+    summary['delivery_during_provider_limit'] = delivery
+    reasons.remove(f"Collector state: {summary['status']}")
+    detail = {
+        'idle': 'No live score updates are due.',
+        'relay': 'The relay has delivered recent official scores.',
+        'direct': 'The live feed still holds recent official scores.',
+    }[delivery]
+    print(f'::warning title=Gold live scores::API-Football limited the direct collector. {detail}', flush=True)
+    return True
+
+
 def waiting_for_relay(summary, finished_at, now):
     cron = stamp(summary['health'].get('last_cron_at'))
     return (
@@ -242,16 +292,7 @@ def inspect_with_rate_limit_recheck(now, relay_finished_at=None, *, store=None):
                'diagnostic': summary['diagnostic']}
     rechecked = False
     while temporary_limit(summary):
-        delivery = current_delivery(live, summary, reasons, now)
-        if delivery:
-            summary['delivery_during_provider_limit'] = delivery
-            reasons = [reason for reason in reasons if reason != f"Collector state: {summary['status']}"]
-            detail = {
-                'idle': 'No live or overdue score updates are due.',
-                'relay': 'The relay has delivered recent official scores.',
-                'direct': 'The live feed still holds recent official scores.',
-            }[delivery]
-            print(f'::warning title=Gold live scores::API-Football limited the direct collector. {detail}', flush=True)
+        if accept_recent_delivery(live, summary, reasons, now):
             break
         elapsed = monotonic() - started
         remaining = RATE_LIMIT_GRACE.total_seconds() - elapsed
@@ -288,7 +329,7 @@ def report_halftime_coverage(live, summary):
         if row.get('status') not in FINISHED:
             continue
         result = score(row)
-        if None not in (result['home_ft'], result['away_ft']) and None in (result['home_ht'], result['away_ht']):
+        if has_final(result) and result['home_ht'] is None:
             missing.append(fid)
             if len(missing) == 20:
                 break
@@ -304,6 +345,23 @@ def report_provider_pending(summary):
               'The provider reports that they are scheduled or still in play.', flush=True)
 
 
+def account_for_closed_overdue(live, summary, reasons, pending, now):
+    if OVERDUE_FAULT not in reasons or not pending:
+        return
+    health = summary['health']
+    fixture_ids = health.get('overdue_fixture_ids')
+    if (not isinstance(fixture_ids, list) or any(not isinstance(fid, str) for fid in fixture_ids)
+            or len(set(fixture_ids)) != health['overdue_fixtures']):
+        return  # The Worker may return only a sample. Unidentified fixtures still need an alert.
+    remaining = [fid for fid in fixture_ids if fid not in pending]
+    if len(remaining) == len(fixture_ids):
+        return
+    summary['overdue_outside_auditor_fixture_ids'] = remaining
+    if not remaining:
+        reasons[:] = [r for r in reasons if r not in (OVERDUE_FAULT, 'Collector state: results_pending')]
+        accept_recent_delivery(live, summary, reasons, stamp(summary['checked_at']) or now)
+
+
 def update_incidents(s3, bucket, reasons, summary):
     """Alert on new faults once and rearm them when the feed recovers."""
     from botocore.exceptions import ClientError
@@ -316,6 +374,8 @@ def update_incidents(s3, bucket, reasons, summary):
     incidents = {}
     for reason in reasons:
         fixture_ids = summary['health'].get(SCORE_FAULT_IDS.get(reason), [])
+        if reason == OVERDUE_FAULT:
+            fixture_ids = summary.get('overdue_outside_auditor_fixture_ids', fixture_ids)
         if fixture_ids:
             for fixture_id in fixture_ids:
                 incidents[f'{reason} ({fixture_id})'] = reason
@@ -386,6 +446,7 @@ def run(ids, compare_auditor, *, track_incidents=False, store=None):
     recovery_dates = []
     if compare_auditor and summary['health']:
         summary['auditor_days'] = []
+        closed_pending = set()
         with storage.get_object(Bucket=bucket, Key='state/current.json')['Body'] as stream:
             index = json.load(stream)['files']
         for age in (1, 2):
@@ -393,15 +454,26 @@ def run(ids, compare_auditor, *, track_incidents=False, store=None):
             if day in EXCLUDED_RECOVERY_DAYS:
                 continue
             audit = recent_audit(day, storage, bucket, index)
-            differences = reconcile(audit, fixtures) if audit is not None else []
-            summary['auditor_days'].append({'date': str(day), 'available': audit is not None,
-                'differences': len(differences), 'sample': differences[:20]})
-            if differences:
+            if audit is None:
+                summary['auditor_days'].append({'date': str(day), 'available': False, 'differences': 0, 'sample': []})
+                if age == 1:
+                    reasons.append(f'Missing Auditor results certificate for {day}')
+                    recovery_dates.append(str(day))
+                continue
+            coverage, pending = reconcile(audit, fixtures)
+            closed_pending.update(pending)
+            summary['auditor_days'].append({'date': str(day), 'available': True, **coverage})
+            if coverage['coverage_exceeded']:
+                reasons.append(f'Auditor final result coverage below {100 - MAX_PENDING_FINAL_PCT}% for {day}')
+            elif pending:
+                print(f"::warning title=Gold Auditor coverage::{day}: {len(pending)}/{coverage['expected_fixtures']} "
+                      f'finals await scheduled recovery ({coverage["pending_pct"]:.2f}%, limit {MAX_PENDING_FINAL_PCT}%).',
+                      flush=True)
+            if coverage['coverage_exceeded'] or coverage['conflicts']:
                 recovery_dates.append(str(day))
-            elif age == 1 and audit is None:
-                reasons.append(f'Missing Auditor results certificate for {day}')
-                recovery_dates.append(str(day))
-        if any(day['differences'] for day in summary['auditor_days']):
+        if not ids:
+            account_for_closed_overdue(live, summary, reasons, closed_pending, now)
+        if any(day.get('conflicts') for day in summary['auditor_days']):
             reasons.append('Discrepancies between acquired scores and Auditor certification')
         if recovery_dates and os.environ.get('GITHUB_OUTPUT'):
             with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
@@ -410,8 +482,7 @@ def run(ids, compare_auditor, *, track_incidents=False, store=None):
         official = provider_results(ids)
         summary['verification'] = {fid: {'provider': official.get(fid), 'worker': score(fixtures[fid]) if fid in fixtures else None}
                                    for fid in ids}
-        if any(not v['provider'] or v['provider']['status'] not in FINISHED or
-               None in (v['provider']['home_ft'], v['provider']['away_ft']) or v['provider'] != v['worker']
+        if any(not v['provider'] or not has_final(v['provider']) or v['provider'] != v['worker']
                for v in summary['verification'].values()):
             reasons.append('Official fixture results have not all been confirmed and delivered by the Worker')
     failures = update_incidents(incidents, bucket, reasons, summary) if track_incidents else reasons
