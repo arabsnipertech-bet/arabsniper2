@@ -933,7 +933,10 @@
   if(matrix?.publication_model!==V7&&matrix?.v7?.status!=='published')return null;
   const v7=v7Snapshot(m,now);
   if(v7?.status!=='published'||m._gold_history?.verified_prematch===false){
-   return {tier:'studio',triad:m.triad?Object.fromEntries(Object.keys(TRIAD).map(role=>[role,null])):null};
+   const waiting=matrix?.v7_waiting_commitments;
+   const commitments=waiting?.fixture_id===String(m.fixture?.fixture_id)&&
+    Date.parse(waiting.kickoff)===Date.parse(m.fixture?.kickoff)?waiting.slots:null;
+   return {tier:'studio',commitments,triad:m.triad?Object.fromEntries(Object.keys(TRIAD).map(role=>[role,null])):null};
   }
   const sources=new Map(rowsOf(m).map(row=>[row.id,row]));
   const kickoff=Date.parse(v7.kickoff),archived=kickoff<=now;
@@ -1090,19 +1093,22 @@
   const at=Date.parse(value);
   return Number.isFinite(at)?'<time datetime="'+esc(value)+'">'+triadDateFormat.format(at)+'</time>':'';
  }
+ function triadMarketSpec(selection){
+  if(typeof selection?.market_id!=='string')return null;
+  try{return JSON.parse(selection?.market_id);}catch{return null;}
+ }
  function triadHistoryPanel(match,role){
   const versions=match?._gold_triad_history?.[role];
   if(!Array.isArray(versions)||!versions.length)return '';
   const items=versions.slice().reverse().map(version=>{
-   let spec;
-   try{spec=JSON.parse(version.market_id);}catch{return '';}
+   const spec=triadMarketSpec(version);
    const time=triadTime(version.captured_at);
    if(!spec||!time||!version.label)return '';
    const price=Number.isFinite(version.odd)&&version.odd>1?'Quota '+num(version.odd,2):
     Number.isFinite(version.model_fair_odd)&&version.model_fair_odd>1?
      'Quota equa V7 '+num(version.model_fair_odd,2):'Quota non disponibile';
    return '<li class="mx-triad-version">'+time+'<strong>'+esc(version.label)+'</strong>'+
-    '<small>'+price+'</small>'+triadOutcomeSlot(match,spec,true)+'</li>';
+    '<small>'+(version.study_only?'Studio · ':'')+price+'</small>'+triadOutcomeSlot(match,spec,true)+'</li>';
   }).join('');
   return items?'<details class="mx-triad-history" data-mx-triad-history="'+role+'"><summary>'+
    (versions.length===1?'Vedi precedente':'Vedi precedenti')+'</summary>'+
@@ -1110,18 +1116,23 @@
  }
  function triadPanel(view,compact=false,match=null){
   const saved=view.v7?.triad;
-  if(!Object.values(view.triad).some(Boolean)){
+  const commitments=view.v7?.triad_commitments||view.commitments||{};
+  if(!Object.values(view.triad).some(Boolean)&&!Object.values(commitments).some(Boolean)){
    const message=Object.values(saved||{}).some(Boolean)?'Quota da aggiornare':'Nessuna proposta prematch disponibile.';
    return '<p class="mx-v7-empty">'+message+'</p>';
   }
   return '<ul class="mx-triad'+(compact?' mx-triad-compact':'')+'" aria-label="Triade prematch V7">'+
    Object.entries(TRIAD).map(([role,title])=>{
     const p=view.triad[role],s=p?.signal;
+    const commitment=commitments[role];
     const estimate=s?.quote_state==='model_estimate';
     const badge=s&&levelBadge(String(s.tier).toLowerCase(),s.badge);
-    const previous=p?triadHistoryPanel(match,role):'';
-    return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+title+'</span>'+(badge||'')+
-     (p?triadOutcomeSlot(match,p.source.spec):'')+'</div>'+
+    const previous=p||commitment?triadHistoryPanel(match,role):'';
+    const fixed=commitment?'<small>Mercato fissato il '+triadTime(commitment.captured_at)+
+     ' · quota alla scelta '+num(commitment.odd,2)+'</small>':'';
+    const study=s?.study_only??commitment?.study_only;
+    return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+title+(study?' · Studio':'')+'</span>'+(badge||'')+
+     triadOutcomeSlot(match,p?.source.spec||triadMarketSpec(commitment))+'</div>'+
      (p?'<div class="mx-triad-market"><b>'+esc(p.record.label)+'</b>'+(estimate?'':'<strong>'+num(p.record.odd,2)+'</strong>')+'</div>'+
       '<div class="mx-triad-meta"><span>'+esc(s.horizon_label)+'</span><span>'+v7Estimate(p.record.calibrated)+' V7</span>'+
       (Number.isFinite(p.record.model_fair_odd)?'<span>Quota equa '+num(p.record.model_fair_odd,2)+'</span>':'')+
@@ -1129,9 +1140,10 @@
       (Number.isFinite(s.ev)?'<span>EV '+signed(100*s.ev)+'%</span>':'')+
       originBadge(marketOrigin(p.source,{rates:view.v7?.rates,record:p.record,signal:s,expired:p.expired,
        conversion:view.v7?.signals?.observations?.conversion===true}))+'</div>'+
-      (compact?'':triadMotivation(p))+
-      (previous?'<small>Analisi '+triadTime(view.v7?.captured_at)+'</small>'+previous:''):
-      '<small>'+(saved?.[role]?'Quota da aggiornare':'Nessun mercato idoneo')+'</small>')+'</li>';
+      (compact?'':triadMotivation(p)):
+      (commitment?'<div class="mx-triad-market"><b>'+esc(commitment.label)+'</b></div>':'')+
+      '<small>'+(saved?.[role]||commitment?'Quota da aggiornare':'Nessun mercato idoneo')+'</small>')+
+      fixed+(p&&(previous||commitment)?'<small>Analisi '+triadTime(view.v7?.captured_at)+'</small>':'')+previous+'</li>';
    }).join('')+'</ul>';
  }
  function modelReferences(v7){

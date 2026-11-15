@@ -353,19 +353,22 @@ def signal(key, row, reason, *, relaxed=False):
                 **{field: row[field] for field in ('origin_badge', 'origin_tooltip') if field in row})
 
 
-def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced):
+def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked):
     model_only = not any(finite(row['odd']) for row in records.values())
     if model_only and not allow_unpriced:
         return
-    fixed = [pick['market_id'] for pick in triad.values() if pick]
+    fixed = set(locked.values()) | {pick['market_id'] for pick in triad.values() if pick}
     options, standard = {}, {}
     for role, pick in triad.items():
         if pick:
             continue
         floor, minimum, maximum = STUDY_LIMITS[role]
+        locked_market = locked.get(role)
         candidates, preferred = [None], set()
-        for key, row in records.items():
-            if key in fixed or row['spec_kind'] not in ('result', 'total', 'btts', *JOINT_KINDS):
+        available = {locked_market} & records.keys() if locked_market else records.keys() - fixed
+        for key in available:
+            row = records[key]
+            if row['spec_kind'] not in ('result', 'total', 'btts', *JOINT_KINDS):
                 continue
             is_estimate = not finite(row['odd'])
             if is_estimate and not (model_only or allow_model_estimates):
@@ -376,7 +379,7 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced):
                 continue
             within_limits = (row.get('study_supported') and row['calibrated'] >= floor
                              and minimum <= value <= maximum and (in_role or not model_only))
-            if (within_limits or in_role) and compatible(key, *fixed):
+            if (locked_market or within_limits or in_role) and compatible(key, *fixed):
                 candidates.append(key)
                 if within_limits:
                     preferred.add(key)
@@ -413,13 +416,17 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced):
                                     relaxed=key not in standard[role]), 'study_only': True}
 
 
-def route(records, observed, *, study=False, allow_model_estimates=False, allow_unpriced=False):
+def route(records, observed, *, study=False, allow_model_estimates=False, allow_unpriced=False,
+          locked=None):
+    locked = locked or {}
+    reserved = set(locked.values())
     triad = dict.fromkeys(TRIAD_MARKETS)
     chosen = []
     for role, markets in TRIAD_MARKETS.items():
         floor, minimum, maximum = TRIAD_LIMITS[role]
         candidates = []
-        for key in markets & records.keys():
+        available = {locked[role]} if role in locked else markets - reserved
+        for key in available & markets & records.keys():
             row = records[key]
             odd, ev, low = row['odd'], row['ev'], row['ev_low']
             if not (row['tier'] and finite(odd) and minimum <= odd <= maximum
@@ -432,7 +439,7 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
             delta = row['features'].get('net_delta_pct')
             if role == 'high_odds_shot' and key == AWAY and (odd < 4.50 or not finite(delta) or delta <= 0):
                 continue
-            if key not in chosen and all(compatible(other, key) for other in chosen):
+            if key not in chosen and compatible(key, *reserved, *chosen):
                 candidates.append(key)
         if not candidates:
             continue
@@ -455,11 +462,38 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
     signals['radar_sorprese'] = signal(best, records[best], 'quota_alta_in_salita') if best else None
     signals['observations'] = observed
     if study:
-        fill_study_slots(triad, records, allow_model_estimates, allow_unpriced)
+        fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked)
     return triad, signals
 
 
-def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
+def commit_priced_slots(triad, captured_at, previous):
+    commitments = dict(previous)
+    for role, pick in triad.items():
+        if not pick or not finite(pick.get('odd')) or pick['odd'] <= 1 or role in commitments:
+            continue
+        commitments[role] = {field: pick[field] for field in ('market_id', 'label', 'odd', 'horizon')}
+        commitments[role].update(captured_at=captured_at, study_only=pick.get('study_only') is True)
+    return commitments
+
+
+def prior_triad_commitments(assessment, meta, as_of):
+    """Use the last verified publication when upgrading an already visible fixture."""
+    from v7_archive import valid_snapshot
+
+    matrix = assessment.get('matrix') or {}
+    saved = matrix.get('v7') or {}
+    if saved.get('status') == 'published' and valid_snapshot(saved, meta, as_of):
+        if 'triad_commitments' in saved:
+            return saved['triad_commitments']
+        return commit_priced_slots(saved.get('triad') or {}, saved['captured_at'], {})
+    waiting = matrix.get('v7_waiting_commitments') or {}
+    if (waiting.get('fixture_id') == str(meta.get('fixture_id')) and stamp(meta.get('kickoff'))
+            and stamp(waiting.get('kickoff')) == stamp(meta['kickoff'])):
+        return waiting.get('slots') or {}
+    return {}
+
+
+def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, commitments=None):
     at, kickoff = stamp(as_of), stamp(meta.get('kickoff'))
     if (not at or not kickoff or at >= kickoff or meta.get('result') or
             meta.get('status_short') not in ('NS', 'TBD')):
@@ -549,8 +583,9 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
 
     rome = ZoneInfo('Europe/Rome')
     days_ahead = (kickoff.astimezone(rome).date()-at.astimezone(rome).date()).days
+    locked = {role: slot['market_id'] for role, slot in (commitments or {}).items()}
     triad, signals = route(records, observed_patterns, study=True,
-                           allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True)
+                           allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True, locked=locked)
     first = next((pick for pick in triad.values() if pick), None)
     tier = max((pick['tier'] for pick in triad.values() if pick), key=TIER_RANK.__getitem__,
                default='BLU' if niches or any(row['tier'] for row in records.values()) else None)
@@ -566,6 +601,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None):
                    horizon=first['horizon'] if first else None,
                    niche_id=(first and first['niche_id']) or next(iter(niches), None),
                    niches={name: sorted(keys) for name, keys in niches.items()})
+    if commitments is not None:
+        payload['triad_commitments'] = commit_priced_slots(triad, payload['captured_at'], commitments)
     return {**payload, 'sha256': fingerprint(payload)}
 
 

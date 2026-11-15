@@ -637,6 +637,16 @@ triadRow.quote_observed_at=triadStart;
 assert.match(api.card(triadMatch,{}),/Quota da aggiornare/);
 assert(!api.card(triadMatch,{}).includes('Over 1,5 ST'));
 
+const committed=structuredClone(triadMatch);
+committed.multimarket.matrix.v7.triad_commitments={most_probable:{
+ market_id:JSON.stringify(triadRow.spec),label:'Over 1,5 ST',odd:2.10,captured_at:triadAt
+}};
+const committedHtml=api.card(committed,{});
+assert.match(committedHtml,/Over 1,5 ST/);
+assert.match(committedHtml,/Mercato fissato il/);
+assert.match(committedHtml,/Quota da aggiornare/);
+assert.doesNotMatch(committedHtml,/<strong>2,10<\/strong>/);
+
 const scope=require('../web/competition-scope.js');
 assert(scope.allows(scope.id,'World','UEFA Nations League - League C'));
 assert(scope.allows(scope.id,'World','World Cup - Qualification CONMEBOL'));
@@ -659,6 +669,7 @@ studyMatrix.v7.triad.recommended_alternative={market_id:estimate.id,source_marke
 const studyHtml=api.card(study,{});
 for(const label of ['Stabile da apertura','Quota equa 1,85','Quota equa 2,50','Stima V7 · in attesa di quote bookmaker'])
  assert(studyHtml.includes(label),label);
+assert.match(studyHtml,/Consigliata · Studio/);
 assert.equal(api.publishedView(study,triadNow).tier,'blu');
 studyMatrix.rows[0].quote_status='recent';
 studyMatrix.rows[0].prematch_stable=false;

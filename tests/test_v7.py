@@ -19,12 +19,14 @@ from matrix_pipeline import build_board
 from matrix_quotes import collect
 from v7_archive import ROME, WEIGHTS, day_path, quote_evidence, results_for_day, valid_snapshot
 from v7_decision import (AWAY, BOTH_GOALS, COMBOS, GG, GG_BOTH, GG_CARRY, GG_FT, GOAL,
-                         OVER_CARRY, capture, market_origin, quote_rows, route, stored_offers)
+                         OVER_CARRY, capture, commit_priced_slots, market_origin, prior_triad_commitments,
+                         quote_rows, route, stored_offers)
 from v7_learning import STATE, active_weight, deduplicated, fit, run
 from v7_maintenance import MARKER, complete_price_pages, consolidate, price_window
 from v7_probability import BASE_WEIGHT, blend_rates, market_rates, price_usable, raw_rates, result_probabilities, score_model
 
 AT = '2026-11-09T22:30:00+01:00'
+LATER = '2026-11-09T22:40:00+01:00'
 START = '2026-11-09T23:45:00+01:00'
 META = dict(fixture_id=321, kickoff=START, status_short='NS')
 RATES = dict(home_ft=1.25, away_ft=1.20, home_ht=.55, away_ht=.50)
@@ -35,6 +37,8 @@ PATTERNS = dict(conversion=False, rebound_gg=False)
 FT = GOAL['over25_ft']
 HT = GOAL['over15_ht']
 HIGH = GOAL['over35_ht']
+UNDER_ST = market_id(specification('total', 'sh', 'under', 1.5))
+OVER_ST = GOAL['over25_sh']
 
 
 def row(spec, odd=2.50, p=.45, fair=.40):
@@ -50,6 +54,35 @@ def assessment():
 
 
 class MathAndRouting(unittest.TestCase):
+    def test_recommended_under_survives_a_higher_ranked_opposite_offer(self):
+        def priced(key, p, odd, label):
+            return dict(source_market_id=key, label=label, calibrated=p, odd=odd, ev=-.01, ev_low=-.02,
+                        tier=None, niche_id=None, horizon='ST', spec_kind='total', model_fair_odd=1/p,
+                        quote_state='moving', study_supported=True, features={})
+
+        under = priced(UNDER_ST, .40, 2.54, 'Under 1,5 ST')
+        first, _ = route({UNDER_ST: under}, PATTERNS, study=True)
+        commitments = commit_priced_slots(first, AT, {})
+        self.assertEqual(commitments['recommended_alternative']['market_id'], UNDER_ST)
+        records = {UNDER_ST: {**under, 'odd': 2.42}, OVER_ST: priced(OVER_ST, .44, 2.80, 'Over 2,5 ST')}
+        fresh, _ = route(records, PATTERNS, study=True)
+        self.assertEqual(fresh['recommended_alternative']['market_id'], OVER_ST)
+        locked = {'recommended_alternative': UNDER_ST}
+        updated, _ = route(records, PATTERNS, study=True, locked=locked)
+        pick = updated['recommended_alternative']
+        self.assertEqual((pick['market_id'], pick['odd']), (UNDER_ST, 2.42))
+        self.assertNotIn(OVER_ST, (pick['market_id'] for pick in updated.values() if pick))
+        self.assertEqual(commit_priced_slots(updated, LATER, commitments), commitments)
+
+        records[UNDER_ST]['odd'] = None
+        waiting, signals = route(records, PATTERNS, study=True, allow_model_estimates=True, locked=locked)
+        self.assertEqual(waiting['recommended_alternative']['quote_state'], 'model_estimate')
+        self.assertEqual(waiting['recommended_alternative']['market_id'], UNDER_ST)
+        self.assertIsNone(signals['consigliata'])
+        del records[UNDER_ST]
+        missing, _ = route(records, PATTERNS, study=True, allow_model_estimates=True, locked=locked)
+        self.assertFalse(any(missing.values()))
+
     def test_origin_badges_cover_every_market_and_slot_in_a_v7_snapshot(self):
         a = build_matrix(dict(rates=RATES, profiles={}), AT)
         snapshot = capture(a, META, AT)
@@ -282,6 +315,31 @@ class MathAndRouting(unittest.TestCase):
             self.assertEqual(matrix['v7'], snapshot)
             self.assertEqual(list(stored_offers(a, meta, START)), [])
 
+    def test_fresh_scan_resumes_the_existing_selection_after_missing_analysis(self):
+        old = assessment()
+        old['matrix']['v7'] = capture(old, META, AT)
+        meta = dict(META, country='Italy', league='Serie A')
+        commitments = prior_triad_commitments(old, meta, LATER)
+        self.assertTrue(commitments)
+        saved = {'321': {'fixture': meta, 'multimarket': old}}
+        a = build_matrix(dict(rates=RATES, profiles=PROFILES, markets=[]), LATER)
+        a.pop('rates')
+        item = {'fixture': meta, 'multimarket': a}
+        build_board({'matches': [item]}, LATER, previous_matches=saved)
+        self.assertIsNone(a['matrix']['v7'])
+        self.assertEqual(a['matrix']['v7_waiting_commitments']['slots'], commitments)
+
+        refreshed = build_matrix(dict(rates=RATES, profiles=PROFILES, markets=[]), LATER)
+        new = {'fixture': meta, 'multimarket': refreshed}
+        build_board({'matches': [new]}, LATER, previous_matches={'321': item})
+        snapshot = refreshed['matrix']['v7']
+        self.assertTrue(valid_snapshot(snapshot, meta, LATER))
+        self.assertEqual(snapshot['triad_commitments'], commitments)
+        for role, commitment in commitments.items():
+            self.assertEqual(snapshot['triad'][role]['market_id'], commitment['market_id'])
+        postponed = dict(meta, kickoff='2026-11-10T20:45:00+01:00')
+        self.assertEqual(prior_triad_commitments(a, postponed, LATER), {})
+
     def test_triad_orders_by_probability_and_enforces_exact_role_limits(self):
         def priced(key, p, odd, tier='BLU', niche_id=None, delta=None):
             spec = json.loads(key)
@@ -343,6 +401,25 @@ class MathAndRouting(unittest.TestCase):
 
 
 class ArchiveAndWorkflow(unittest.TestCase):
+    def test_auditor_settles_the_committed_market_even_when_the_card_has_no_current_quote(self):
+        commitment = dict(market_id=UNDER_ST, label='Under 1,5 ST', odd=2.54, horizon='ST',
+                          captured_at=AT, study_only=True)
+        a = assessment()
+        snapshot = capture(a, META, LATER, commitments={'recommended_alternative': commitment})
+        self.assertNotIn(UNDER_ST, snapshot['markets'])
+        self.assertIsNone(snapshot['triad']['recommended_alternative'])
+        record = dict(fixture=META, captured_at=LATER, publication_snapshot=True,
+                      multimarket=dict(matrix=dict(v7=snapshot)))
+        now = datetime.fromisoformat('2026-11-10T02:01:00+01:00')
+        ledger = {'analysis_updates': {'saved': record}}
+        late_goals = {'321': dict(status='FT', home_ht=1, away_ht=0, home_ft=3, away_ft=1)}
+        evidence = results_for_day(ledger, date(2026, 11, 9), now, late_goals)['fixtures']['321']
+        self.assertEqual(evidence['triad']['recommended_alternative'], commitment)
+        self.assertEqual(evidence['outcomes'][UNDER_ST], {'win': 0., 'loss': 1., 'roi': -1.})
+        early_goals = {'321': dict(status='FT', home_ht=2, away_ht=0, home_ft=3, away_ft=0)}
+        evidence = results_for_day(ledger, date(2026, 11, 9), now, early_goals)['fixtures']['321']
+        self.assertEqual(evidence['outcomes'][UNDER_ST], {'win': 1., 'loss': 0., 'roi': 1.54})
+
     def test_price_writers_cannot_select_a_different_engine(self):
         for filename in ('v7-maintenance.yml', 'fast_scan.yml', 'night_scan.yml'):
             workflow = (ROOT/'.github/workflows'/filename).read_text()

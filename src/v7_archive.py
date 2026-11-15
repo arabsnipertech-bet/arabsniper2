@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from audit_storage import open_verified_json, read_store, write_store
 from lateral_matrix import market_id, settle_spec, specification
 from multimarket_model import stamp
-from v7_decision import canonical, fingerprint, COMBOS, GOAL, GG, GG_SH
+from v7_decision import canonical, fingerprint, COMBOS, GOAL, GG, GG_SH, SIGNAL_ROLES
 from v7_probability import VERSION, blend_rates, finite, score_model, utc
 
 ROME = ZoneInfo('Europe/Rome')
@@ -141,7 +141,14 @@ def results_for_day(store, day, at, fetched=None, previous=None):
         rows = snapshot['markets']
         role_for_market = defaultdict(list)
         role_prices = defaultdict(dict)
-        for role, signal in snapshot['signals'].items():
+        commitments = snapshot.get('triad_commitments')
+        signals = snapshot['signals']
+        if commitments is not None:
+            signals = dict(signals)
+            for slot, role in SIGNAL_ROLES.items():
+                pick = commitments.get(slot)
+                signals[role] = pick if pick and not pick.get('study_only') else None
+        for role, signal in signals.items():
             if role == 'observations' or not signal:
                 continue
             market = signal.get('market_id')
@@ -179,11 +186,21 @@ def results_for_day(store, day, at, fetched=None, previous=None):
                 features=row['features'], edge_exclusions=row['edge_exclusions'],
                 policy_exclusions=row['policy_exclusions'], raw=row['raw'], corrected=row['corrected'],
                 calibrated=row['calibrated'], v51=row['v51'], fair=row['fair'], variants=variants))
+        for pick in (commitments or {}).values():
+            market = pick['market_id']
+            weights = settle_spec(json.loads(market), result) if state == 'settled' else None
+            if weights is None:
+                outcomes[market] = None
+            else:
+                win, loss = weights
+                outcomes[market] = dict(win=win, loss=loss, roi=win * (pick['odd'] - 1) - loss)
         fixtures[fid] = dict(forecast_sha256=snapshot['sha256'], kickoff=snapshot['kickoff'],
                              captured_at=snapshot['captured_at'], observed_at=observed_at,
                              status=state, result=result, outcomes=outcomes)
         if 'triad' in snapshot:
             fixtures[fid].update({key: snapshot.get(key) for key in ('triad', 'tier', 'badge', 'horizon', 'niche_id')})
+            if commitments is not None:
+                fixtures[fid]['triad'] = {role: commitments.get(role) for role in SIGNAL_ROLES}
     return dict(version=VERSION, date=str(day), generated_at=utc(at),
                 counts=dict(progress), rejected_forecasts=invalid, fixtures=fixtures, samples=samples)
 

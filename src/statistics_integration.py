@@ -194,7 +194,7 @@ def install(ns, matrix_mode=False):
         if matrix_mode:
             # Project the matrix into the four legacy exports; no second quote
             # parser, ledger, OCI or overround calculation is required.
-            build_board({'matches': [output]}, observed)
+            build_board({'matches': [output]}, observed, provisional=True)
             if assessment.get('favorite_trap_pattern'):
                 output['model']['favorite_trap_pattern'] = assessment['favorite_trap_pattern']
         return output
@@ -233,7 +233,8 @@ def install(ns, matrix_mode=False):
                     day['matches'][index] = restored
                 elif matrix_mode and old and kickoff and kickoff > stamp(as_of):
                     seed_stability(old.get('multimarket') or {}, match.get('multimarket') or {})
-            board = build_board(day, as_of) if matrix_mode else build_selection_board(day, as_of)
+            board = (build_board(day, as_of, previous_matches=previous) if matrix_mode
+                     else build_selection_board(day, as_of))
             if matrix_mode:
                 summary = day['matrix_summary']
                 coverage = day.get('universal_coverage', {})
