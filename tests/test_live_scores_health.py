@@ -290,9 +290,39 @@ class LiveScoresHealthTests(TestCase):
         self.assertEqual(report['missing_halftime_fixture_ids'], list(matches))
         self.assertEqual(report['health']['missing_halftime'], 2)
         self.assertEqual([x['date'] for x in report['auditor_days']], ['2026-11-12', '2026-11-11'])
+        self.assertTrue(all(x['available'] for x in report['auditor_days']))
         self.assertEqual([x['differences'] for x in report['auditor_days']], [0, 0])
         self.assertIn('::warning title=Gold halftime coverage::2 finished fixtures', log.getvalue())
         self.assertIn('Markets that require halftime remain unverified', log.getvalue())
+
+    def test_missing_yesterday_certificate_queues_repair_before_older_pending_result(self):
+        current = feed('ok')
+        current['fixtures']['123'] = {'status': 'FT', 'fulltime': {'home': 2, 'away': 1},
+                                      'halftime': {'home': 1, 'away': 1}}
+        saved = b'{"fixtures":{"123":{"status":"pending"}}}'
+        digest = health.sha256(saved).hexdigest()
+        manifest = json.dumps({'files': {'auditarchive/prematch_2026-11-11_v7.json': {
+            'sha256': digest, 'bytes': len(saved),
+        }}}).encode()
+        objects = {'state/current.json': manifest, 'state/objects/' + digest: saved}
+        with TemporaryDirectory() as temp, redirect_stdout(StringIO()) as log:
+            outputs = Path(temp) / 'outputs'
+            with (mock.patch.object(health, 'get_json', return_value=current),
+                  mock.patch.object(health, 'datetime', wraps=datetime) as clock,
+                  mock.patch.object(health, 'client') as client,
+                  mock.patch.dict(health.os.environ, {'GITHUB_STEP_SUMMARY': str(Path(temp) / 'summary'),
+                                                     'GITHUB_OUTPUT': str(outputs), 'R2_BUCKET': 'test'})):
+                clock.now.return_value = NOW
+                client.return_value.get_object.side_effect = lambda **kw: {'Body': BytesIO(objects[kw['Key']])}
+                with self.assertRaisesRegex(SystemExit, 'Missing Auditor results certificate for 2026-11-12'):
+                    health.run([], True)
+            self.assertEqual(outputs.read_text(), 'recovery_date=2026-11-12\n')
+        report = json.loads(log.getvalue())
+        self.assertEqual(report['auditor_days'], [
+            {'date': '2026-11-12', 'available': False, 'differences': 0, 'sample': []},
+            {'date': '2026-11-11', 'available': True, 'differences': 1,
+             'sample': [{'fixture_id': '123', 'kind': 'auditor_pending'}]},
+        ])
 
     def test_automatic_monitor_reports_the_same_fault_once_and_rearms_after_recovery(self):
         class ClientError(Exception):

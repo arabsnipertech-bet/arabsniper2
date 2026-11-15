@@ -260,7 +260,7 @@ def install(storage, bucket, root, day, digest, now):
                         updated = after.get(collection, {}).get(key)
                         if updated is None or fingerprint(updated) != fingerprint(record):
                             raise ValueError('Frozen archive changed')
-        from auditor_history_chunks import reusable
+        from auditor_history_chunks import verified_receipt
         if partial:
             from v7_probability import VERSION
             v7 = read_store(root/f'auditarchive/prematch_{day}_v7.json', {})
@@ -270,7 +270,9 @@ def install(storage, bucket, root, day, digest, now):
                     or status.get('status') != 'partial_v51_skip' or status.get('date') != str(day)
                     or daily.get('audit_date') != str(day)):
                 raise ValueError('Unverified V7 recovery')
-        elif not reusable(root, day, now):
+        # A pending result needs a new check the next day. It does not invalidate
+        # the verified receipt if preparation and publication crossed midnight.
+        elif verified_receipt(root, day) is None:
             raise ValueError('Recovered chain does not have a verified receipt')
         if previous_manifest(storage, bucket) != index:
             raise RuntimeError('Private checkpoint advanced during publication')
