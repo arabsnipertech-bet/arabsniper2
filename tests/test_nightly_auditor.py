@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
 from auditor_schedule import admission, recovery_admission, preflight, already_completed, MARKER
 from nightly_auditor import PROGRESS, run, run_command, saved_batch
-from audit_journal import capture_forecasts, capture_policies, ingest, PREFIX
+from audit_journal import capture_forecasts, capture_policies, ingest, DATED_PREFIX
 from audit_storage import read_store, write_store
 
 
@@ -255,7 +255,7 @@ class ScanJournal(unittest.TestCase):
             client.get.assert_not_called()
             self.assertEqual(report['status'], 'nightly_audit_pending')
             self.assertEqual(old.read_text(), 'historical archive must not be read by this scan')
-            self.assertEqual(len(list(directory.glob(PREFIX+'*.json'))), 1)
+            self.assertEqual(len(list(directory.glob(DATED_PREFIX+'*.json'))), 1)
 
     def test_ingestion_preserves_first_latest_and_is_retry_safe(self):
         from test_policy_engine import engine
@@ -272,20 +272,20 @@ class ScanJournal(unittest.TestCase):
             root = Path(folder); directory = root/'data'
             for now in (first, second):
                 capture_forecasts(self.namespace(directory, now), output)
-            pending = {p: p.read_bytes() for p in directory.glob(PREFIX+'*.json')}
+            pending = {p: p.read_bytes() for p in directory.glob(DATED_PREFIX+'*.json')}
             self.assertEqual(ingest(root), 2)
             self.assertEqual(read_store(directory/'arab_quote_prematch_audit.json'), expected)
             for p, raw in pending.items(): p.write_bytes(raw)
             ingest(root)
             self.assertEqual(read_store(directory/'arab_quote_prematch_audit.json'), expected)
-            self.assertFalse(list(directory.glob(PREFIX+'*.json')))
+            self.assertFalse(list(directory.glob(DATED_PREFIX+'*.json')))
 
     def test_policy_choices_survive_deferred_ingestion_with_original_times(self):
         from test_gold_policy_audit import fixture, NOW
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             write_store(root/'data/arab_quote_day1.json', {'matches': [fixture()]})
-            journal = capture_policies(root, NOW)
+            journal, = capture_policies(root, NOW)
             frozen = read_store(journal)['gold']['fixtures']
             self.assertTrue(frozen)
             ingest(root)
@@ -296,7 +296,7 @@ class ScanJournal(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             write_store(root/'data/arab_quote_day1.json', {'matches': [fixture()]})
-            journal = capture_policies(root, NOW)
+            journal, = capture_policies(root, NOW)
             frozen = read_store(journal)
             snapshots = frozen['platinum']['fixtures']['100']['snapshots']
             self.assertTrue(snapshots)
@@ -311,7 +311,7 @@ class ScanJournal(unittest.TestCase):
         now = datetime.fromisoformat('2026-10-30T16:00:00+01:00')
         with tempfile.TemporaryDirectory() as folder:
             ns = self.namespace(Path(folder), now)
-            path = capture_forecasts(ns, {'days': []}); original = path.read_bytes()
+            path, = capture_forecasts(ns, {'days': []}); original = path.read_bytes()
             with self.assertRaises(ValueError): capture_forecasts(ns, {'days': []})
             self.assertEqual(path.read_bytes(), original)
 

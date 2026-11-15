@@ -91,6 +91,8 @@ def checked_score(result):
 
 def merge_verified_result(previous, incoming):
     old, new = checked_score(previous or {}), checked_score(incoming or {})
+    if new.get('status') in VOID and new.get('transport') == 'audit_api':
+        return new
     if old.get('status') in FINISHED and None not in (old['home_ft'], old['away_ft']):
         if new.get('status') not in FINISHED or None in (new['home_ft'], new['away_ft']):
             return old
@@ -126,8 +128,10 @@ def results_for_day(store, day, at, fetched=None, previous=None):
         if (fetched or {}).get(fid):
             result = merge_verified_result(result, fetched[fid])
         status = result.get('status')
+        score_fields = ('status', 'home_ft', 'away_ft', 'home_ht', 'away_ht')
+        same_score = all(result.get(key) == prior_result.get(key) for key in score_fields)
         observed_at = (prior.get(fid, {}).get('observed_at')
-                       if result == prior_result and prior.get(fid, {}).get('observed_at') else utc(at))
+                       if same_score and prior.get(fid, {}).get('observed_at') else utc(at))
         state = ('void' if status in VOID else 'postponed' if status == 'PST' else
                  'suspended' if status in ('SUSP', 'INT') else
                  'settled' if status in FINISHED and result.get('home_ft') is not None

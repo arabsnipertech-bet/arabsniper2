@@ -106,7 +106,7 @@ def archive_ledger(root, now, incoming, progress):
             'rejected_without_valid_prematch_evidence': rejected}
 
 
-def fetch_results(date, key, fixture_ids=()):
+def fetch_results(date, key, fixture_ids=(), *, only_ids=False):
     from v7_archive import FINISHED, VOID, checked_score, merge_verified_result
 
     last_request_at = None
@@ -132,14 +132,6 @@ def fetch_results(date, key, fixture_ids=()):
         reserve = max(1000, (int(limit) + 9) // 10) if limit and limit.isdecimal() else 1000
         return payload, bool(daily and daily.isdecimal() and int(daily) > reserve and minute not in ('0', '1'))
 
-    payload, can_continue = fixtures(date=date)
-    rows = list(payload['response'])
-    pages = (payload.get('paging') or {}).get('total', 1)
-    for page in range(2, min(pages, 3) + 1) if type(pages) is int else ():
-        if not can_continue:
-            break
-        extra, can_continue = fixtures(date=date, page=page)
-        rows.extend(extra['response'])
     def accept(item):
         fixture = item.get('fixture') or {}
         fid = fixture.get('id')
@@ -155,9 +147,36 @@ def fetch_results(date, key, fixture_ids=()):
             'status': status,
             'home_ht': ht.get('home'), 'away_ht': ht.get('away'),
             'home_ft': ft.get('home'), 'away_ft': ft.get('away'),
-            'extra_time': score.get('extratime'), 'penalties': score.get('penalty')})
+            'extra_time': score.get('extratime'), 'penalties': score.get('penalty'),
+            'source': 'API-Football', 'transport': 'audit_api'})
         results[fid] = merge_verified_result(results.get(fid), result)
+
     results = {}
+    if only_ids:
+        selected_ids = list(dict.fromkeys(fixture_ids))
+        for start in range(0, len(selected_ids), 20):
+            batch = selected_ids[start:start+20]
+            try:
+                payload, can_continue = fixtures(ids='-'.join(map(str, batch)))
+            except (OSError, RuntimeError, ValueError) as error:
+                print(f'API risultati {date}: verifica ID rinviata ({type(error).__name__})', flush=True)
+                break
+            for row in payload['response']:
+                if (row.get('fixture') or {}).get('id') in batch:
+                    accept(row)
+            if not can_continue:
+                break
+        from audit_official_scores import as_output
+        return as_output({str(fid): result for fid, result in results.items()})
+
+    payload, can_continue = fixtures(date=date)
+    rows = list(payload['response'])
+    pages = (payload.get('paging') or {}).get('total', 1)
+    for page in range(2, min(pages, 3) + 1) if type(pages) is int else ():
+        if not can_continue:
+            break
+        extra, can_continue = fixtures(date=date, page=page)
+        rows.extend(extra['response'])
     for row in rows:
         accept(row)
     delayed = [fid for fid in dict.fromkeys(fixture_ids)
@@ -178,11 +197,50 @@ def fetch_results(date, key, fixture_ids=()):
     return {'days': [{'matches': matches}]}
 
 
+def official_scores(day, now, fixtures, saved, priorities, recheck, reviews, progress):
+    from audit_official_scores import LOOKBACK_DAYS, needs_result, read_live_scores, use_stored_scores
+    from v7_archive import FINISHED, VOID, merge_verified_result
+
+    age = (now.astimezone(TZ).date()-day).days
+    if not fixtures or age > LOOKBACK_DAYS:
+        return saved, reviews, False
+    scores, disputes = saved.copy(), set(reviews)
+    if age <= 4:
+        progress(f'lettura risultati live già salvati {day}')
+        scores, live_disputes = use_stored_scores(fixtures, saved, read_live_scores(fixtures, now))
+        disputes.update(live_disputes)
+    targets = [fid for fid in fixtures if fid.isascii() and fid.isdecimal() and int(fid) > 0
+               and (recheck or fid in disputes or needs_result(scores.get(fid)))]
+    if not targets:
+        return scores, disputes, False
+    key = os.environ.get('API_SPORTS_KEY', '').strip()
+    if not key:
+        progress(f'risultati in attesa di verifica API-Football {day}')
+        return scores, disputes, False
+    ordered = sorted(targets, key=lambda fid: (not priorities.get(fid), int(fid)))
+    progress(f'richiesta risultati API-Football {day}: {len(ordered)} fixture da verificare')
+    fetched = fetch_results(str(day), key, (int(fid) for fid in ordered), only_ids=True)
+    for match in fetched['days'][0]['matches']:
+        fixture = match['fixture']
+        fid, result = fixture['fixture_id'], fixture['result']
+        if result.get('status') not in FINISHED | VOID | {'PST', 'INT', 'SUSP'}:
+            continue
+        scores[fid] = merge_verified_result(scores.get(fid), result)
+        if not needs_result(result):
+            disputes.discard(fid)
+    return scores, disputes, True
+
+
 def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: None, combined=None,
-               *, legacy_evidence=True, recheck_results=False):
+               *, legacy_evidence=True, recheck_results=False, ledger=None):
+    from contextlib import nullcontext
+    from audit_daily_evidence import read_receipt, seal_evidence
+    from audit_official_scores import as_output, needs_result
     from audit_ledger import AuditLedger, settle_ledger
     from selection_studies import build_studies, study_markdown
     from audit_storage import atomic_bytes
+    from v7_archive import FINISHED, VOID, archive_day
+    from v7_learning import signal_diagnostics
     ensure_recoverable_day(date)
     if date >= now.astimezone(TZ).date():
         raise ValueError('Only closed Rome dates can be settled')
@@ -193,7 +251,7 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
     fetched = None
     progress(f'caricamento e verifica previsioni {date}')
     results_path = root / f'auditarchive/prematch_{date}_results.json'
-    with AuditLedger(path, progress=progress) as day:
+    with (nullcontext(ledger) if ledger is not None else AuditLedger(path, progress=progress)) as day:
         if day.metadata['audit_date'] != str(date):
             raise ValueError(f'Audit date does not match filename: {path.name}')
         with AuditLedger(results_path, progress=progress) as previous:
@@ -206,37 +264,56 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
                     record['settlement'] = old['settlement']
                     day.put(collection, key, record)
         from audit_pending import unresolved
-        pending_fixtures = {}
+        previous_scores = (read_receipt(root, date) or {}).get('fixtures', {})
+        fixtures, captured, scores, priorities = {}, {}, {}, {}
         pending = False
         for _, _, record in day.records():
-            if not unresolved(record):
-                continue
-            pending = True
             fixture = record.get('fixture') or {}
-            fid = str(fixture.get('fixture_id'))
-            if fid.isascii() and fid.isdecimal():
-                pending_fixtures[int(fid)] = max(pending_fixtures.get(int(fid), False),
-                                                bool(record.get('publication_snapshot')))
+            pending = pending or unresolved(record)
+            if fixture.get('fixture_id') is None:
+                continue
+            fid = str(fixture['fixture_id'])
+            at = stamp(record.get('captured_at'))
+            if fid not in fixtures or at and (captured[fid] is None or at > captured[fid]):
+                fixtures[fid], captured[fid] = fixture.get('kickoff'), at
+            saved = (record.get('settlement') or {}).get('result')
+            if saved and (fid not in scores or needs_result(scores[fid])):
+                scores[fid] = saved
+            priorities[fid] = priorities.get(fid, False) or bool(record.get('publication_snapshot'))
+        reviews = set()
+        for fid, kickoff in fixtures.items():
+            prior = previous_scores.get(fid) or {}
+            if prior.get('kickoff') == kickoff and prior.get('result'):
+                scores[fid] = prior['result']
+                if prior.get('pending') is True and not needs_result(scores[fid]):
+                    reviews.add(fid)
         age = (now.astimezone(TZ).date() - date).days
-        if age <= 14 and (pending or recheck_results):
+        disputes = set()
+        if fetcher is fetch_results:
+            scores, disputes, queried = official_scores(date, now, fixtures, scores, priorities,
+                                                        recheck_results, reviews, progress)
+            if scores:
+                fetched = as_output(scores)
+        elif age <= 14 and (pending or recheck_results):
             key = os.environ.get('API_SPORTS_KEY', '').strip()
             if not key:
                 raise RuntimeError('API_SPORTS_KEY mancante per verificare i risultati')
             progress(f'richiesta risultati API-Football {date}')
-            if fetcher is fetch_results:
-                ordered = sorted(pending_fixtures, key=lambda fid: (not pending_fixtures[fid], fid))
-                fetched = fetcher(str(date), key, ordered)
-            else:
-                fetched = fetcher(str(date), key)
-            settle_ledger(day, fetched)
+            fetched = fetcher(str(date), key)
+            for batch in fetched.get('days', []):
+                for match in batch.get('matches', []):
+                    fixture = match.get('fixture') or {}
+                    fid = str(fixture.get('fixture_id'))
+                    if fid in fixtures and fixture.get('result'):
+                        scores[fid] = fixture['result']
             queried = True
+        if fetched:
+            settle_ledger(day, fetched)
         day.metadata = {'schema_version': 1}
         for collection in COLLECTIONS:
             day.add_collection(collection)
         progress(f'salvataggio esiti {date}')
         day.write(results_path)
-        from v7_archive import archive_day
-        from v7_learning import signal_diagnostics
         v7_signals = signal_diagnostics(archive_day(root, day, date, now, fetched)['samples'])
         progress(f'costruzione rapporto giornaliero {date}')
         daily = build_daily(day, str(date), now.isoformat(), os.environ.get('GITHUB_SHA'))
@@ -253,9 +330,18 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
             results_path.relative_to(root).as_posix(): digest(results_path)}
         daily['selection_studies'] = build_studies(daily)
         daily['v7_signals'] = v7_signals
+        incomplete = disputes | {fid for fid in fixtures if needs_result(scores.get(fid))}
+        daily['score_coverage'] = {
+            'observed_fixtures': len(fixtures),
+            'confirmed_finals': sum(score.get('status') in FINISHED and not any(
+                score.get(key) is None for key in ('home_ft', 'away_ft')) for score in scores.values()),
+            'void_fixtures': sum(score.get('status') in VOID for score in scores.values()),
+            'pending_fixtures': len(incomplete),
+        }
         write(root / f'auditarchive/prematch_{date}_daily.json', daily)
         atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md',
                      (markdown(daily)+study_markdown(daily['selection_studies'])).encode())
+        seal_evidence(root, date, now, fixtures, scores, incomplete)
         if legacy_evidence:
             seal_legacy_day(root, date, now, queried, ledger=day)
         del daily

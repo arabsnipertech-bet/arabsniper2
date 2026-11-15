@@ -1,6 +1,9 @@
 name: Recover verified daily results
 run-name: Recover verified daily results · ${{ inputs.date || 'yesterday' }}
 on:
+  schedule:
+    - cron: '25 7,13,19 * * *'
+      timezone: 'Europe/Rome'
   workflow_run:
     workflows: [Run Auditor]
     branches: [main]
@@ -46,6 +49,10 @@ jobs:
     needs: eligibility
     if: needs.eligibility.outputs.recover == 'true'
     runs-on: ubuntu-24.04
+    concurrency:
+      group: arabsniper-audit-recovery-prepare
+      cancel-in-progress: false
+      queue: max
     # Preparation reads immutable archives outside the writer mutex.
     timeout-minutes: 240
     outputs:
@@ -59,27 +66,43 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests boto3 ijson==3.6.0
-      - id: day
+      - name: Find the next closed day requiring verification
+        id: plan
+        if: github.event_name == 'schedule'
         env:
-          REQUESTED_DAY: ${{ inputs.date }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python auditor/recover_daily.py plan
+      - id: day
+        if: github.event_name != 'schedule' || steps.plan.outputs.date != ''
+        env:
+          REQUESTED_DAY: ${{ inputs.date || steps.plan.outputs.date }}
+          AUDITOR_STARTED: ${{ github.event.workflow_run.run_started_at }}
           PYTHONPATH: src
         run: |
           python - <<'PY'
           from datetime import date, datetime, timedelta
           from zoneinfo import ZoneInfo
           import os
+          from audit_official_scores import LOOKBACK_DAYS
           from auditor_schedule import ensure_recoverable_day
-          today = datetime.now(ZoneInfo('Europe/Rome')).date()
-          day = date.fromisoformat(os.environ['REQUESTED_DAY']) if os.environ.get('REQUESTED_DAY') else today - timedelta(days=1)
+          rome = ZoneInfo('Europe/Rome')
+          today = datetime.now(rome).date()
+          reference = today
+          if started := os.environ.get('AUDITOR_STARTED'):
+              reference = datetime.fromisoformat(started).astimezone(rome).date()
+          requested = os.environ.get('REQUESTED_DAY')
+          day = date.fromisoformat(requested) if requested else reference - timedelta(days=1)
           ensure_recoverable_day(day)
-          if not 1 <= (today-day).days <= 14: raise ValueError('Expected a closed day within 14 days')
+          if not 1 <= (today-day).days <= LOOKBACK_DAYS: raise ValueError('Expected a recent closed day')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out: print(f'date={day}', file=out)
           PY
       - name: Verify frozen observations and official scores for one day
         id: recover
+        if: steps.day.outputs.date != ''
         env:
           DAY: ${{ steps.day.outputs.date }}
-          RECOVERY_REFRESH: ${{ inputs.refresh && 'true' || 'false' }}
+          RECOVERY_REFRESH: ${{ (inputs.refresh || github.event_name == 'schedule') && 'true' || 'false' }}
           RECOVERY_RECHECK_RESULTS: ${{ inputs.refresh && 'true' || 'false' }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -87,6 +110,7 @@ jobs:
         run: python auditor/recover_daily.py prepare --date "$DAY"
   publish:
     needs: prepare
+    if: needs.prepare.outputs.digest != ''
     permissions:
       contents: write
     concurrency:

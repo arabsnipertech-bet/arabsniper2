@@ -1,5 +1,5 @@
 """Build yesterday from immutable dated evidence and still-pending scan journals."""
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 import sys
 
@@ -37,17 +37,25 @@ def v7_ready(root, today):
             and learning.get('date') == str(today) and learning.get('state') == weights)
 
 
+def record_v7_status(root, today):
+    day = today-timedelta(days=1)
+    checksums = {key: signature(root/path) for key, path in v7_paths(day).items()}
+    write_store(root/STATUS, {'version': 2, 'date': str(today), 'report_date': str(day), **checksums})
+
+
 def ensure_priority(root, today, phase):
+    from audit_daily_evidence import verified_evidence
     from auditor_schedule import has_daily_report
     root = Path(root)
     day = today-timedelta(days=1)
     if not v7_ready(root, today):
-        phase('src/auditor_daily_priority.py', '--date', str(day))
-        if not has_daily_report(root, today):
-            raise ValueError('Missing priority daily Auditor report')
+        if verified_evidence(root, day) is None:
+            phase('src/auditor_daily_priority.py', '--date', str(day))
+            if not has_daily_report(root, today):
+                raise ValueError('Missing priority daily Auditor report')
+            phase('src/gold_storage.py', 'checkpoint-results', '--date', str(day))
         phase('auditor/current_audit.py', 'learn-v7')
-        checksums = {key: signature(root/path) for key, path in v7_paths(day).items()}
-        write_store(root/STATUS, {'version': 2, 'date': str(today), 'report_date': str(day), **checksums})
+        record_v7_status(root, today)
         phase('src/gold_storage.py', 'checkpoint-day', '--date', str(day))
     print(f'V7 results, report and learning checkpoint verified: {day}', flush=True)
 
@@ -55,14 +63,14 @@ def ensure_priority(root, today, phase):
 def build_yesterday(root, day, now, fetcher=None):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'auditor'))
     from current_audit import forecast_day, settle_day, fetch_results, TZ
-    from audit_journal import ForecastHistory, pending_journals, merge_forecast
+    from audit_journal import ForecastHistory, LEGACY_PRIORITY_DAYS, journals_for_day, pending_journals, merge_forecast
     from audit_ledger import AuditLedger, entries
     if day != now.astimezone(TZ).date()-timedelta(days=1):
         raise ValueError('Priority phase is restricted to yesterday in Rome')
     root = Path(root)
     path = root/f'auditordata/prematch_{day}.json'
-    cutoff = datetime.combine(day+timedelta(days=1), time(), TZ)
-    journals = pending_journals(root, cutoff)
+    journals = list(journals_for_day(pending_journals(root), day, legacy_days=LEGACY_PRIORITY_DAYS))
+    print(f'V7: {day}: {len(journals)} journal files selected', flush=True)
     # Match the ordinary ingestion order: forecasts first, then policies.
     forecasts = [p for p in journals if p.name.endswith('_forecasts.json')]
     policies = [p for p in journals if p.name.endswith('_policies.json')]
@@ -95,9 +103,10 @@ def build_yesterday(root, day, now, fetcher=None):
                         merge_forecast(ledger, col, key, record, history=history)
             if metadata != {'schema_version':1,'journal_type':'policies'}:
                 raise ValueError('Invalid policy journal')
+        print(f'V7: writing frozen observations for {day}', flush=True)
         ledger.write(path)
-    return settle_day(root, day, now, fetcher=fetcher or fetch_results, legacy_evidence=False,
-                      progress=lambda message: print('V7: '+message, flush=True))
+        return settle_day(root, day, now, fetcher=fetcher or fetch_results, legacy_evidence=False,
+                          ledger=ledger, progress=lambda message: print('V7: '+message, flush=True))
 
 
 if __name__ == '__main__':

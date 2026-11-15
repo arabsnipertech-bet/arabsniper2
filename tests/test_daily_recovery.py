@@ -67,6 +67,7 @@ class DailyRecoveryTests(unittest.TestCase):
         fetcher.assert_not_called()
 
     def test_refresh_uses_existing_closed_day_and_rechecks_the_certificate(self):
+        from audit_daily_evidence import receipt_path
         storage = Fake()
         with TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest, patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):
             root = Path(seed)
@@ -74,7 +75,7 @@ class DailyRecoveryTests(unittest.TestCase):
             original = prepare(storage, 'test', Path(work), DAY, NOW, lambda *args: official)
             install(storage, 'test', Path(dest), DAY, original, NOW)
             index = previous_manifest(storage, 'test')
-            self.assertEqual(len(checkpoint_sources(index, DAY)), 4)
+            self.assertIn(receipt_path(DAY), checkpoint_sources(index, DAY))
             correction = copy.deepcopy(official)
             result = correction['days'][0]['matches'][0]['fixture']['result']
             result.update(home_ht=0, away_ht=0, home_ft=0, away_ft=0)
@@ -269,11 +270,16 @@ class DailyRecoveryTests(unittest.TestCase):
             self.assertIn(f'auditarchive/prematch_{DAY}_v7.json',previous_manifest(storage,'test'))
             self.assertEqual(read_store(Path(dest)/recovery_status(DAY))['status'],'partial_v51_skip')
 
-    def test_empty_official_results_are_never_published_as_a_completed_report(self):
+    def test_empty_official_results_keep_the_frozen_day_pending(self):
+        from audit_daily_evidence import read_receipt
         storage = Fake()
-        with TemporaryDirectory() as seed, TemporaryDirectory() as work, patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):
+        with (TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest,
+              patch.dict(os.environ,{'API_SPORTS_KEY':'test'})):
             sources(storage,Path(seed))
             before = storage.objects['state/current.json']
-            with self.assertRaisesRegex(ValueError,'No verified outcomes'):
-                prepare(storage,'test',Path(work),DAY,NOW,lambda *args: {'days':[]})
+            digest = prepare(storage,'test',Path(work),DAY,NOW,lambda *args: {'days':[]})
             self.assertEqual(storage.objects['state/current.json'],before)
+            report = install(storage, 'test', Path(dest), DAY, digest, NOW)
+            self.assertFalse(report['available'])
+            self.assertEqual(report['daily']['settled'], 0)
+            self.assertEqual(read_receipt(dest, DAY)['pending_fixtures'], 1)

@@ -1,75 +1,121 @@
 """Immutable per-scan evidence; historical merges run only in the nightly Auditor."""
+from collections import defaultdict
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime, time, timedelta, timezone
 from hashlib import sha256
 import json
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from audit_ledger import AuditLedger, capture_ledger
+from audit_ledger import AuditLedger, capture_ledger, kickoff_day
 from audit_storage import read_store, write_store
 from multimarket_model import stamp
 
 PREFIX = 'arab_quote_scan_journal_'
+DATED_PREFIX = 'arab_quote_scan_dated_'
+KINDS = ('forecasts', 'policies')
+ROME = ZoneInfo('Europe/Rome')
+LEGACY_PRIORITY_DAYS = 7
 
 
-def journal_path(directory, kind, observed_at):
+def journal_path(directory, kind, observed_at, fixture_day=None):
     at = stamp(observed_at)
     if not at:
         raise ValueError('Journal requires an aware observation time')
     # UTC sorts scans chronologically across DST changes; each phase is separate.
-    return Path(directory)/(PREFIX + at.astimezone(ZoneInfo('UTC')).strftime('%Y%m%dT%H%M%S%f')
-                            + '_' + kind + '.json')
+    scope = '' if fixture_day is None else '_' + (fixture_day.replace('-', '') or 'undated')
+    prefix = PREFIX if fixture_day is None else DATED_PREFIX
+    return Path(directory)/(prefix + at.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%S%f')
+                            + scope + '_' + kind + '.json')
+
+
+def journal_fields(path):
+    name = Path(path).name
+    prefix = DATED_PREFIX if name.startswith(DATED_PREFIX) else PREFIX
+    if not name.startswith(prefix) or not name.endswith('.json'):
+        return None
+    observed, *scope, kind = name[len(prefix):-5].split('_')
+    if len(scope) != (1 if prefix == DATED_PREFIX else 0) or kind not in KINDS:
+        raise ValueError('Unknown audit journal phase')
+    return observed, scope[0] if scope else None, kind
+
+
+def journals_for_day(paths, day, *, legacy_days=None):
+    """Select exact kickoff-date shards and compatible legacy mixed-date journals."""
+    end = datetime.combine(day+timedelta(days=1), time.min, ROME)
+    cutoff = end.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%S%f')
+    earliest = ((end-timedelta(days=legacy_days)).astimezone(timezone.utc).strftime('%Y%m%dT%H%M%S%f')
+                if legacy_days else '')
+    target = day.strftime('%Y%m%d')
+    for path in paths:
+        fields = journal_fields(path)
+        if fields and fields[0] < cutoff and (fields[1] == target or fields[1] is None and fields[0] >= earliest):
+            yield path
+
+
+def new_journal(directory, kind, observed_at):
+    original = journal_path(directory, kind, observed_at)
+    prefix = DATED_PREFIX + original.stem[len(PREFIX):].removesuffix('_'+kind)
+    if original.exists() or any(original.parent.glob(prefix+'_*_'+kind+'.json')):
+        raise ValueError('Refusing to overwrite frozen scan evidence')
 
 
 def capture_forecasts(ns, output):
     now = ns['now_rome']()
-    path = journal_path(ns['DATA_DIR'], 'forecasts', now.isoformat())
-    if path.exists():
-        raise ValueError('Refusing to overwrite frozen scan evidence')
+    directory = ns['DATA_DIR']
+    new_journal(directory, 'forecasts', now)
+    paths = []
     # Deliberately start empty: no indexing or settlement of historical records.
     with AuditLedger() as ledger:
         ledger.metadata.update(schema_version=1, journal_type='forecasts')
         capture_ledger(ledger, output, ns['capture_prematch_predictions'], now)
-        ledger.write(path)
-    print('Frozen scan evidence: ' + path.name, flush=True)
-    return path
+        days = [day or '' for (day,) in ledger.db.execute('SELECT DISTINCT day FROM records ORDER BY day')]
+        for day in days or ['']:
+            path = journal_path(directory, 'forecasts', now, day)
+            ledger.write(path, day=day)
+            paths.append(path)
+    print(f'Frozen scan evidence: {len(paths)} kickoff-date files', flush=True)
+    return tuple(paths)
 
 
 def capture_policies(root, observed_at=None):
     from gold_policy_audit import capture as gold_capture
     from platinum_audit import capture as platinum_capture
     root = Path(root)
-    now = observed_at or datetime.now(ZoneInfo('Europe/Rome')).isoformat()
-    path = journal_path(root/'data', 'policies', now)
-    if path.exists():
-        raise ValueError('Refusing to overwrite frozen policy evidence')
+    now = observed_at or datetime.now(ROME).isoformat()
+    new_journal(root/'data', 'policies', now)
     from selection_studies import freeze_study
-    studies, publications = {}, {}
-    gold, platinum, seen = {'fixtures': {}}, {'fixtures': {}}, set()
+
+    def policy_journal():
+        return {'schema_version': 1, 'journal_type': 'policies', 'observed_at': now,
+                'gold': {'fixtures': {}}, 'platinum': {'fixtures': {}},
+                'study_observations': {}, 'analysis_updates': {}}
+
+    journals, seen = defaultdict(policy_journal), set()
     for day in sorted((root/'data').glob('arab_quote_day[1-5].json')):
         for match in read_store(day, {}).get('matches', []):
             fid = str(match.get('fixture', {}).get('fixture_id'))
             if fid in seen:
                 continue
             seen.add(fid)
+            meta, assessment = match.get('fixture') or {}, match.get('multimarket') or {}
+            journal = journals[kickoff_day(meta) or '']
             # These existing functions validate decisions and kickoff boundaries.
             study = freeze_study(match, now)
             if study:
-                studies[f'{fid}::{now}'] = study
-            meta, assessment = match.get('fixture') or {}, match.get('multimarket') or {}
+                journal['study_observations'][f'{fid}::{now}'] = study
             at, kickoff = stamp(now), stamp(meta.get('kickoff'))
             if (at and kickoff and at < kickoff and meta.get('status_short') in ('NS','TBD')
                     and not meta.get('result') and assessment.get('model_id')):
                 key = f"{assessment['model_id']}::{fid}::publication::{now}"
-                publications[key] = deepcopy(dict(fixture=meta, captured_at=now,
+                journal['analysis_updates'][key] = deepcopy(dict(fixture=meta, captured_at=now,
                     model_version=assessment['model_id'], multimarket=assessment, publication_snapshot=True))
-            gold_capture(gold, match, now)
-            platinum_capture(platinum, match, now)
+            gold_capture(journal['gold'], match, now)
+            platinum_capture(journal['platinum'], match, now)
     # The browser and social feeds do not need per-operator price evidence.
     from v7_archive import quote_evidence, read_quote_state, valid_snapshot
     forecasts = [(record, (record['multimarket'].get('matrix') or {}).get('v7'))
-                 for record in publications.values()]
+                 for journal in journals.values() for record in journal['analysis_updates'].values()]
     forecasts = [(record, v7) for record, v7 in forecasts if v7]
     quotes = read_quote_state(root/'data/arab_quote_state.json', {v7['fixture_id'] for _, v7 in forecasts})
     for record, v7 in forecasts:
@@ -78,11 +124,13 @@ def capture_policies(root, observed_at=None):
         record['v7_quote_evidence'] = quote_evidence(quotes.get(v7['fixture_id'], {}), v7)
         if 'triad' in v7:
             record.update({key:v7[key] for key in ('triad','tier','horizon','niche_id','badge')})
-    write_store(path, {'schema_version': 1, 'journal_type': 'policies',
-                      'observed_at': now, 'gold': gold, 'platinum': platinum, 'study_observations': studies, 'analysis_updates': publications})
-    print(f'Frozen current policy evidence: Gold {len(gold["fixtures"])}; '
-          f'Platinum {len(platinum["fixtures"])}; no historical reports', flush=True)
-    return path
+    paths = []
+    for day, journal in sorted(journals.items() or {'': policy_journal()}.items()):
+        path = journal_path(root/'data', 'policies', now, day)
+        write_store(path, journal)
+        paths.append(path)
+    print(f'Frozen current policy evidence: {len(paths)} kickoff-date files', flush=True)
+    return tuple(paths)
 
 
 def merge_policy(target, incoming, kind):
@@ -181,12 +229,17 @@ def merge_forecast(ledger, collection, key, record, *, history=None):
 
 
 def pending_journals(root, before=None):
-    paths = sorted((Path(root)/'data').glob(PREFIX+'*.json'))
+    directory = Path(root)/'data'
+    def order(path):
+        observed, scope, kind = journal_fields(path)
+        return observed, kind, scope or ''
+
+    paths = sorted((*directory.glob(PREFIX+'*.json'), *directory.glob(DATED_PREFIX+'*.json')), key=order)
     if before is not None:
         if before.tzinfo is None:
             raise ValueError('Journal cutoff requires a timezone')
-        cutoff = PREFIX+before.astimezone(ZoneInfo('UTC')).strftime('%Y%m%dT%H%M%S%f')
-        paths = [p for p in paths if p.name < cutoff]
+        cutoff = before.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%S%f')
+        paths = [p for p in paths if journal_fields(p)[0] < cutoff]
     return paths
 
 
@@ -199,7 +252,11 @@ def ingest(root, after_forecasts=None, *, limit=None, partition_delta=False, bef
     if limit is not None:
         if limit < 1:
             raise ValueError('Journal limit must be positive')
-        paths = paths[:limit]
+        batches = {}
+        for path in paths:
+            observed, _, kind = journal_fields(path)
+            batches.setdefault((observed, kind), []).append(path)
+        paths = [path for batch in list(batches.values())[:limit] for path in batch]
     forecasts = [p for p in paths if p.name.endswith('_forecasts.json')]
     policies = [p for p in paths if p.name.endswith('_policies.json')]
     if len(forecasts) + len(policies) != len(paths):
@@ -210,18 +267,19 @@ def ingest(root, after_forecasts=None, *, limit=None, partition_delta=False, bef
             delta.add_collection('fixtures')
             ledger.metadata.setdefault('schema_version', 1)
             ledger.add_collection('fixtures')
+            history = ForecastHistory(ledger)
             for path in forecasts:
                 with AuditLedger(path) as journal:
                     if journal.metadata.get('journal_type') != 'forecasts':
                         raise ValueError('Invalid forecast journal')
                     for collection, key, record in journal.records():
-                        merge_forecast(ledger, collection, key, record)
+                        merge_forecast(ledger, collection, key, record, history=history)
                         delta.put(collection, key, ledger[collection][key], overwrite=False)
                     ledger.metadata['updated_at'] = journal.metadata['updated_at']
             for path in policies:
                 journal = read_store(path)
                 for key, record in journal.get('analysis_updates', {}).items():
-                    merge_forecast(ledger, 'analysis_updates', key, record)
+                    merge_forecast(ledger, 'analysis_updates', key, record, history=history)
                     delta.put('analysis_updates', key, ledger['analysis_updates'][key], overwrite=False)
                 for key, record in journal.get('study_observations', {}).items():
                     ledger.put('study_observations', key, record, overwrite=False)

@@ -7,7 +7,11 @@ COLLECTIONS = ('fixtures', 'quality_evaluations', 'multimarket_evaluations',
 
 
 def unresolved(record):
-    outcomes = (record.get('settlement') or {}).get('outcomes')
+    from v7_archive import VOID
+    settlement = record.get('settlement') or {}
+    if (settlement.get('result') or {}).get('status') in VOID:
+        return False
+    outcomes = settlement.get('outcomes')
     return not outcomes or any(value is None for value in outcomes.values())
 
 
