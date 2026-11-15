@@ -1,0 +1,95 @@
+name: Count Telegram Gold activations
+
+on:
+  push:
+    branches: ['ops/count-gold-telegram-20261115']
+    paths: ['.github/workflows/count-gold-telegram-20261115.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  totals:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && startsWith(github.event.head_commit.message, 'Read aggregate Telegram Gold trial counts')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: scripts/deploy-telegram-campaign.py
+      - name: Read aggregate totals from D1
+        env:
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64
+          from datetime import datetime
+          import json
+          from pathlib import Path
+          import runpy
+          import subprocess
+          
+          query = runpy.run_path('scripts/deploy-telegram-campaign.py')['query']
+          today = int(datetime.fromisoformat('2026-11-15T00:00:00+01:00').timestamp())
+          post = int(datetime.fromisoformat('2026-11-15T09:38:29+01:00').timestamp())
+          rows = query("""
+          WITH
+          clock AS (SELECT unixepoch() AS as_of),
+          legacy AS (
+            SELECT lower(trim(email)) AS account, telegram_id, expires_at
+            FROM telegram_trial_claims WHERE status = 'granted'
+          ),
+          campaign AS (
+            SELECT lower(trim(email)) AS account, telegram_id, expires_at, campaign, granted_at
+            FROM telegram_campaign_claims WHERE status = 'granted'
+          ),
+          all_grants AS (
+            SELECT account, telegram_id, expires_at FROM legacy
+            UNION ALL
+            SELECT account, telegram_id, expires_at FROM campaign
+          ),
+          current_campaign AS (
+            SELECT * FROM campaign WHERE campaign = ?
+          )
+          SELECT
+            as_of,
+            (SELECT count(DISTINCT account) FROM all_grants) AS total_gold_accounts,
+            (SELECT count(DISTINCT telegram_id) FROM all_grants) AS total_telegram_accounts,
+            (SELECT count(DISTINCT account) FROM all_grants WHERE expires_at > as_of) AS active_trial_accounts,
+            (SELECT count(*) FROM legacy) AS previous_trial_grants,
+            (SELECT count(*) FROM current_campaign) AS current_campaign_grants,
+            (SELECT count(*) FROM current_campaign WHERE granted_at BETWEEN ? AND as_of) AS today_grants,
+            (SELECT count(*) FROM current_campaign WHERE granted_at BETWEEN ? AND as_of) AS grants_after_post,
+            (SELECT count(*) FROM current_campaign c
+              WHERE c.granted_at BETWEEN ? AND as_of
+              AND NOT EXISTS (SELECT 1 FROM legacy l WHERE l.account = c.account OR l.telegram_id = c.telegram_id)
+              AND NOT EXISTS (SELECT 1 FROM campaign g WHERE g.campaign <> c.campaign
+                AND g.granted_at < c.granted_at AND (g.account = c.account OR g.telegram_id = c.telegram_id))
+            ) AS first_bot_grants_after_post
+          FROM clock;
+          """, ['gold-engine-2026-11', today, post, post])
+          fields = ('as_of', 'total_gold_accounts', 'total_telegram_accounts', 'active_trial_accounts',
+                    'previous_trial_grants', 'current_campaign_grants', 'today_grants',
+                    'grants_after_post', 'first_bot_grants_after_post')
+          if len(rows) != 1 or any(type(rows[0].get(key)) is not int for key in fields):
+              raise ValueError('The count query did not return the expected aggregates')
+          key = Path('aggregate-public-key.pem')
+          key.write_text("""-----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu+qCl6YZGF2syZ4f7EK9
+          0GjK9ROL21WRZ2pISkRIO7iGy7EzVJ72wTqus4m+eST81gOSZgBBaZCHg6OWJu8M
+          PUeW15iexfgPK3BIi8BCU1HHCua7eSjwP98YdH0CFSMKdcrO+On1DAb6j8UuQ2J2
+          0mKRAYL9ZiD3AyBrqtBAVLSS8oE30MBFlNrslZotUhprGX6R/mxs/RRZWV8p0d87
+          g7O0iqV3bJfkIDlIf1hvOA7FK3utKg1/GOoDl/XtBzX9QeTU2c/kjJCkcreccpNs
+          wRJdaAFJq4oDpm4ueWVNgWGlnnq8J68Io99cpm9LWA0nuqnKDjIJOPVDZLO/pawo
+          NwIDAQAB
+          -----END PUBLIC KEY-----
+          """)
+          data = json.dumps([rows[0][field] for field in fields], separators=(',', ':')).encode()
+          sealed = subprocess.check_output(
+              ['openssl', 'pkeyutl', '-encrypt', '-pubin', '-inkey', str(key),
+               '-pkeyopt', 'rsa_padding_mode:oaep', '-pkeyopt', 'rsa_oaep_md:sha256',
+               '-pkeyopt', 'rsa_mgf1_md:sha256'], input=data)
+          print('GOLD_TRIAL_TOTALS_V1 ' + base64.b64encode(sealed).decode('ascii'), flush=True)
+          PY
