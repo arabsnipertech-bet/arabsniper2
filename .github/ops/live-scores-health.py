@@ -2,17 +2,19 @@
 import argparse
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
-from hashlib import sha256
 import json
 import os
+from pathlib import Path
 import subprocess
+from tempfile import TemporaryDirectory
 from time import monotonic, sleep
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
+from audit_storage import read_store
 from auditor_schedule import EXCLUDED_RECOVERY_DAYS
-from gold_storage import client
+from gold_storage import client, restore_subset
 from v7_archive import FINISHED, checked_score
 from lateral_matrix import settle_spec
 
@@ -51,16 +53,14 @@ def get_json(url):
 
 
 def recent_audit(day, s3, bucket, index):
-    entry = index.get(f'auditarchive/prematch_{day}_v7.json')
-    if not entry:
+    path = f'auditarchive/prematch_{day}_v7.json'
+    if path not in index:
         return None
-    digest = entry['sha256']
-    with s3.get_object(Bucket=bucket, Key='state/objects/' + digest)['Body'] as stream:
-        raw = stream.read()
-    if len(raw) != entry['bytes'] or sha256(raw).hexdigest() != digest:
-        raise ValueError('Auditor checkpoint checksum mismatch')
-    data = json.loads(raw)
-    if not isinstance(data.get('fixtures'), dict):
+    with TemporaryDirectory(prefix='gold-live-audit-') as directory:
+        root = Path(directory)
+        restore_subset(s3, bucket, root, index, [path])
+        data = read_store(root / path)
+    if not isinstance(data, dict) or not isinstance(data.get('fixtures'), dict):
         raise ValueError('Auditor result index cannot be reconciled')
     return data['fixtures']
 

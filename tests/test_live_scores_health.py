@@ -3,6 +3,7 @@ import json
 import sys
 from contextlib import redirect_stdout
 from datetime import datetime, timedelta, timezone
+from hashlib import sha256
 from io import BytesIO, StringIO
 from types import SimpleNamespace
 from pathlib import Path
@@ -11,6 +12,9 @@ from unittest import TestCase, mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
+from audit_storage import write_store
+from gold_storage import collect
+
 SCRIPT = ROOT / '.github/ops/live-scores-health.py'
 SPEC = importlib.util.spec_from_file_location('live_scores_health', SCRIPT)
 health = importlib.util.module_from_spec(SPEC)
@@ -295,12 +299,32 @@ class LiveScoresHealthTests(TestCase):
         self.assertIn('::warning title=Gold halftime coverage::2 finished fixtures', log.getvalue())
         self.assertIn('Markets that require halftime remain unverified', log.getvalue())
 
+    def test_reconcile_chunked_auditor_checkpoint(self):
+        day = '2026-11-12'
+        path = f'auditarchive/prematch_{day}_v7.json'
+        fixtures = {'123': {'status': 'pending'}}
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_store(root / path, {'fixtures': fixtures, 'samples': []}, chunk_bytes=16)
+            files = collect(root, patterns=[path])
+        index = {name: {'sha256': sha256(raw).hexdigest(), 'bytes': len(raw)}
+                 for name, raw in files.items()}
+        objects = {'state/objects/' + index[name]['sha256']: raw for name, raw in files.items()}
+        storage = mock.Mock()
+        storage.get_object.side_effect = lambda **kw: {'Body': BytesIO(objects[kw['Key']])}
+        self.assertEqual(health.recent_audit(day, storage, 'test', index), fixtures)
+
+        part = next(name for name in index if name.endswith('.json.gz'))
+        objects['state/objects/' + index[part]['sha256']] = b'corrupt part'
+        with self.assertRaisesRegex(ValueError, 'Private object checksum mismatch'):
+            health.recent_audit(day, storage, 'test', index)
+
     def test_missing_yesterday_certificate_queues_repair_before_older_pending_result(self):
         current = feed('ok')
         current['fixtures']['123'] = {'status': 'FT', 'fulltime': {'home': 2, 'away': 1},
                                       'halftime': {'home': 1, 'away': 1}}
         saved = b'{"fixtures":{"123":{"status":"pending"}}}'
-        digest = health.sha256(saved).hexdigest()
+        digest = sha256(saved).hexdigest()
         manifest = json.dumps({'files': {'auditarchive/prematch_2026-11-11_v7.json': {
             'sha256': digest, 'bytes': len(saved),
         }}}).encode()
