@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 from audit_storage import write_store
 from gold_storage import collect
+from lateral_matrix import market_id, specification
 
 SCRIPT = ROOT / '.github/ops/live-scores-health.py'
 SPEC = importlib.util.spec_from_file_location('live_scores_health', SCRIPT)
@@ -222,7 +223,7 @@ class LiveScoresHealthTests(TestCase):
                     [feed(status, live_due=0, missing_halftime=2)])
                 self.assertEqual(reasons, [])
                 self.assertEqual(summary['delivery_during_provider_limit'], 'idle')
-                self.assertIn('No live or overdue score updates are due', log)
+                self.assertIn('No live score updates are due', log)
                 self.assertEqual((waits, reads), ([], 1))
 
     def test_idle_throttle_does_not_hide_a_stale_watchlist_or_raise_a_second_fault(self):
@@ -319,6 +320,99 @@ class LiveScoresHealthTests(TestCase):
         with self.assertRaisesRegex(ValueError, 'Private object checksum mismatch'):
             health.recent_audit(day, storage, 'test', index)
 
+    def check_closed_day(self, audit, current, failure=None):
+        with TemporaryDirectory() as temp, redirect_stdout(StringIO()) as log:
+            summary, outputs = Path(temp) / 'summary', Path(temp) / 'outputs'
+            with (mock.patch.object(health, 'get_json', return_value=current),
+                  mock.patch.object(health, 'datetime', wraps=datetime) as clock,
+                  mock.patch.object(health, 'recent_audit', side_effect=[audit, {}]),
+                  mock.patch.object(health, 'client') as client,
+                  mock.patch.dict(health.os.environ, {'GITHUB_STEP_SUMMARY': str(summary),
+                                                     'GITHUB_OUTPUT': str(outputs), 'R2_BUCKET': 'test'})):
+                clock.now.return_value = NOW
+                client.return_value.get_object.return_value = {'Body': BytesIO(b'{"files": {}}')}
+                if failure:
+                    with self.assertRaisesRegex(SystemExit, failure):
+                        health.run([], True)
+                else:
+                    health.run([], True)
+                client.return_value.put_object.assert_not_called()
+            data = summary.read_text().split('```json\n', 1)[1].split('\n```', 1)[0]
+            return json.loads(data), outputs.read_text() if outputs.exists() else '', log.getvalue()
+
+    def test_pending_final_threshold_uses_distinct_expected_fixtures(self):
+        done = {'status': 'settled', 'result': {'status': 'FT', 'home_ft': 2, 'away_ft': 1}}
+        alert = 'Auditor final result coverage below 95% for 2026-11-12'
+        for total, missing, pct, failure in [(300, 10, 3.33, None), (100, 5, 5.0, None), (100, 10, 10.0, alert)]:
+            with self.subTest(total=total, missing=missing):
+                waiting = [str(i) for i in range(missing)]
+                audit = {str(i): {'status': 'pending'} if str(i) in waiting else done for i in range(total)}
+                # Games with no final expected cannot dilute the denominator.
+                audit.update({str(i + total): {'status': 'postponed'} for i in range(100)})
+                audit['void'] = {'status': 'void'}
+                current = feed('results_pending', overdue=missing)
+                current['health']['overdue_fixture_ids'] = waiting
+                report, outputs, log = self.check_closed_day(audit, current, failure)
+                day = report['auditor_days'][0]
+                self.assertEqual((day['expected_fixtures'], day['pending_fixtures'], day['pending_pct']),
+                                 (total, missing, pct))
+                self.assertEqual(day['sample'][0]['kind'], 'final_unavailable')
+                self.assertEqual(report['overdue_outside_auditor_fixture_ids'], [])
+                self.assertEqual(outputs, 'recovery_date=2026-11-12\n' if failure else '')
+                if failure:
+                    self.assertEqual(report['faults'], [alert])
+                else:
+                    self.assertNotIn('faults', report)
+                    self.assertIn(f'{missing}/{total} finals await scheduled recovery', log)
+
+    def test_available_final_awaits_certification_within_the_limit(self):
+        done = {'status': 'settled', 'result': {'status': 'FT', 'home_ft': 2, 'away_ft': 1}}
+        audit = {str(i): done for i in range(19)}
+        audit['123'] = {'status': 'pending'}
+        current = feed('ok')
+        current['fixtures']['123'] = {'status': 'FT', 'fulltime': {'home': 2, 'away': 1}}
+        report, outputs, _ = self.check_closed_day(audit, current)
+        self.assertEqual(report['auditor_days'][0]['sample'], [{'fixture_id': '123', 'kind': 'auditor_pending'}])
+        self.assertEqual(report['verification_state'], 'ok')
+        self.assertEqual(outputs, '')
+
+    def test_score_and_outcome_conflicts_remain_fatal_with_full_coverage(self):
+        done = {'status': 'settled', 'result': {'status': 'FT', 'home_ft': 2, 'away_ft': 1}}
+        audit = {str(i): done for i in range(100)}
+        market = market_id(specification('total', 'ft', 'over', 1.5))
+        audit['101'] = {**done, 'triad': {'recommended': {'market_id': market}},
+                        'outcomes': {market: {'win': 0, 'loss': 1}}}
+        current = feed('ok')
+        current['fixtures'] = {'0': {'status': 'FT', 'fulltime': {'home': 2, 'away': 0}},
+                               '101': {'status': 'FT', 'fulltime': {'home': 2, 'away': 1}}}
+        report, outputs, _ = self.check_closed_day(audit, current, 'Discrepancies between acquired scores')
+        day = report['auditor_days'][0]
+        self.assertEqual((day['pending_fixtures'], day['conflicts']), (0, 2))
+        self.assertEqual([issue['kind'] for issue in day['sample']], ['score_mismatch', 'outcome_mismatch'])
+        self.assertEqual(outputs, 'recovery_date=2026-11-12\n')
+
+    def test_newly_available_halftime_does_not_invalidate_the_archived_final(self):
+        market = market_id(specification('total', 'ht', 'over', 1.5))
+        audit = {'123': {'status': 'settled', 'result': {'status': 'FT', 'home_ft': 2, 'away_ft': 1},
+                         'triad': {'recommended': {'market_id': market}}, 'outcomes': {market: None}}}
+        current = feed('ok')
+        current['fixtures']['123'] = {'status': 'FT', 'fulltime': {'home': 2, 'away': 1},
+                                       'halftime': {'home': 1, 'away': 1}}
+        report, _, _ = self.check_closed_day(audit, current)
+        day = report['auditor_days'][0]
+        self.assertEqual((day['pending_fixtures'], day['conflicts'], day['halftime_pending_fixtures']), (0, 0, 1))
+
+    def test_unknown_or_uncovered_worker_overdue_fixtures_still_trigger_alerts(self):
+        done = {'status': 'settled', 'result': {'status': 'FT', 'home_ft': 2, 'away_ft': 1}}
+        audit = {str(i): done for i in range(19)}
+        audit['123'] = {'status': 'pending'}
+        for sample, remainder in [(['123', '124'], ['124']), (['123'], None)]:
+            with self.subTest(sample=sample):
+                current = feed('results_pending', overdue=2)
+                current['health']['overdue_fixture_ids'] = sample
+                report, _, _ = self.check_closed_day(audit, current, health.OVERDUE_FAULT)
+                self.assertEqual(report.get('overdue_outside_auditor_fixture_ids'), remainder)
+
     def test_missing_yesterday_certificate_queues_repair_before_older_pending_result(self):
         current = feed('ok')
         current['fixtures']['123'] = {'status': 'FT', 'fulltime': {'home': 2, 'away': 1},
@@ -342,11 +436,10 @@ class LiveScoresHealthTests(TestCase):
                     health.run([], True)
             self.assertEqual(outputs.read_text(), 'recovery_date=2026-11-12\n')
         report = json.loads(log.getvalue())
-        self.assertEqual(report['auditor_days'], [
-            {'date': '2026-11-12', 'available': False, 'differences': 0, 'sample': []},
-            {'date': '2026-11-11', 'available': True, 'differences': 1,
-             'sample': [{'fixture_id': '123', 'kind': 'auditor_pending'}]},
-        ])
+        missing, older = report['auditor_days']
+        self.assertEqual(missing, {'date': '2026-11-12', 'available': False, 'differences': 0, 'sample': []})
+        self.assertEqual(older['date'], '2026-11-11')
+        self.assertEqual(older['sample'], [{'fixture_id': '123', 'kind': 'auditor_pending'}])
 
     def test_automatic_monitor_reports_the_same_fault_once_and_rearms_after_recovery(self):
         class ClientError(Exception):
