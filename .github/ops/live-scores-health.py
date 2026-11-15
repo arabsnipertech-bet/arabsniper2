@@ -11,6 +11,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
+from auditor_schedule import EXCLUDED_RECOVERY_DAYS
 from gold_storage import client
 from v7_archive import FINISHED, checked_score
 from lateral_matrix import settle_spec
@@ -52,7 +53,7 @@ def get_json(url):
 def recent_audit(day, s3, bucket, index):
     entry = index.get(f'auditarchive/prematch_{day}_v7.json')
     if not entry:
-        return {}
+        return None
     digest = entry['sha256']
     with s3.get_object(Bucket=bucket, Key='state/objects/' + digest)['Body'] as stream:
         raw = stream.read()
@@ -389,17 +390,22 @@ def run(ids, compare_auditor, *, track_incidents=False, store=None):
             index = json.load(stream)['files']
         for age in (1, 2):
             day = now.astimezone(ROME).date() - timedelta(days=age)
+            if day in EXCLUDED_RECOVERY_DAYS:
+                continue
             audit = recent_audit(day, storage, bucket, index)
-            differences = reconcile(audit, fixtures)
-            summary['auditor_days'].append({'date': str(day), 'available': bool(audit),
+            differences = reconcile(audit, fixtures) if audit is not None else []
+            summary['auditor_days'].append({'date': str(day), 'available': audit is not None,
                 'differences': len(differences), 'sample': differences[:20]})
             if differences:
                 recovery_dates.append(str(day))
-        if recovery_dates:
+            elif age == 1 and audit is None:
+                reasons.append(f'Missing Auditor results certificate for {day}')
+                recovery_dates.append(str(day))
+        if any(day['differences'] for day in summary['auditor_days']):
             reasons.append('Discrepancies between acquired scores and Auditor certification')
-            if os.environ.get('GITHUB_OUTPUT'):
-                with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
-                    out.write('recovery_date=' + recovery_dates[0] + '\n')
+        if recovery_dates and os.environ.get('GITHUB_OUTPUT'):
+            with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
+                out.write('recovery_date=' + recovery_dates[0] + '\n')
     if ids:
         official = provider_results(ids)
         summary['verification'] = {fid: {'provider': official.get(fid), 'worker': score(fixtures[fid]) if fid in fixtures else None}

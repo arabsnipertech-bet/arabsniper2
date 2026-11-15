@@ -27,14 +27,19 @@ JOURNAL = 'data/arab_quote_scan_journal_20261030T130000000000_forecasts.json'
 LATER = 'data/arab_quote_scan_journal_20261031T060000000000_forecasts.json'
 
 
-def sources(storage, root):
+def sources(storage, root, *, with_pending=False):
     model = 'lateral-matrix-v5.0'
     r = record('2026-10-30T09:00:00+01:00')
     r['fixture'].update(kickoff='2026-10-30T17:00:00+01:00', match='Casa - Ospite')
     r['model_version'] = r['multimarket']['model_id'] = model
     r['multimarket']['markets'][0]['published_selection'] = True
     scores = r.pop('settlement')['result']
-    write_store(root / FORECASTS, {'fixtures':{}, 'multimarket_evaluations':{model+'::1':r}}, chunk_bytes=120)
+    forecasts = {model+'::1': r}
+    if with_pending:
+        pending = copy.deepcopy(r)
+        pending['fixture'].update(fixture_id='2', match='Casa B - Ospite B')
+        forecasts[model+'::2'] = pending
+    write_store(root / FORECASTS, {'fixtures':{}, 'multimarket_evaluations':forecasts}, chunk_bytes=120)
     latest = copy.deepcopy(r)
     latest['captured_at'] = '2026-10-30T14:00:00+01:00'
     latest['multimarket']['markets'][0]['odd'] = 2.75
@@ -82,6 +87,23 @@ class DailyRecoveryTests(unittest.TestCase):
             public = install(storage, 'test', Path(dest), DAY, digest, NOW)
             self.assertEqual(public['daily']['losses'], 1)
             self.assertEqual(previous_manifest(storage, 'test')[dated], index[dated])
+
+    def test_recovery_can_publish_a_verified_pending_receipt_after_midnight(self):
+        from auditor_history_chunks import receipt_path, reusable
+
+        storage = Fake()
+        prepared_at = datetime.fromisoformat('2026-10-31T23:50:00+01:00')
+        published_at = datetime.fromisoformat('2026-11-01T00:10:00+01:00')
+        with (TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest,
+              patch.dict(os.environ, {'API_SPORTS_KEY': 'test'})):
+            official = sources(storage, Path(seed), with_pending=True)
+            digest = prepare(storage, 'test', Path(work), DAY, prepared_at, lambda *args: official)
+            self.assertTrue(read_store(receipt_path(work, DAY))['pending'])
+            self.assertFalse(reusable(work, DAY, published_at))
+            install(storage, 'test', Path(dest), DAY, digest, published_at)
+            receipt = read_store(receipt_path(dest, DAY))
+            self.assertTrue(receipt['pending'])
+            self.assertIn(report_path(DAY), previous_manifest(storage, 'test'))
 
     def test_delayed_fixtures_recovered_by_id_without_regressing_completed_rows(self):
         def row(fid, status, ft=None):

@@ -39,20 +39,20 @@ def seal_day(root, day, now, pending, queried=False, *, pending_summary=None):
     write_store(receipt_path(root, day), receipt)
 
 
-def reusable(root, day, as_of):
+def verified_receipt(root, day):
     root = Path(root)
     receipt = read_store(receipt_path(root, day), {})
     if not receipt:
-        return False
+        return None
     if receipt.get('version') != 1 or receipt.get('day') != str(day):
         raise ValueError('Invalid historical day receipt')
     if receipt['input_sha256'] != digest(root/f'auditordata/prematch_{day}.json'):
-        return False  # Newly ingested evidence requires a new report.
+        return None  # Newly ingested evidence requires a new report.
     expected = {f'auditarchive/prematch_{day}_{suffix}' for suffix in
                 ('results.json', 'daily.json', 'daily.md')}
     calibration = f'auditarchive/prematch_{day}_calibration.json'
     if calibration not in receipt['outputs'] or not (root/calibration).is_file():
-        return False  # A report without learning evidence is not a complete day.
+        return None  # A report without learning evidence is not a complete day.
     expected.add(calibration)
     if not expected <= receipt['outputs'].keys():
         raise ValueError('Incomplete historical day receipt')
@@ -60,12 +60,19 @@ def reusable(root, day, as_of):
     if (status.get('status') == 'partial_v51_skip'
             and any(not (root/path).is_file() or digest(root/path) != checksum
                     for path, checksum in receipt['outputs'].items() if path in expected)):
-        return False
+        return None
     for path, checksum in receipt['outputs'].items():
         if path not in expected | {f'auditarchive/prematch_{day}_calibration.json'}:
             raise ValueError('Invalid historical receipt output')
         if not (root/path).is_file() or digest(root/path) != checksum:
             raise ValueError('Historical checkpoint output changed or missing')
+    return receipt
+
+
+def reusable(root, day, as_of):
+    receipt = verified_receipt(root, day)
+    if receipt is None:
+        return False
     checked = datetime.fromisoformat(receipt['checked_at'])
     # Unresolved outcomes remain pending. Retry them on the next audit date,
     # within the existing 14-day provider lookup window; never call them losses.
