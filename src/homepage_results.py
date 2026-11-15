@@ -57,11 +57,14 @@ def build(reports, now=None):
                 for r in project(report, day, PREVIOUS_MODEL)]
     latest_day = next((day for day in sorted(by_day, reverse=True) if totals(by_day[day])['settled']), None)
     latest = {'date':latest_day, 'daily':totals(by_day[latest_day]), 'all_results':by_day[latest_day]} if latest_day else None
+    coverage = (reports.get(yesterday.isoformat()) or {}).get('score_coverage')
+    available = yesterday.isoformat() in by_day and (coverage is None or
+                bool(coverage.get('confirmed_finals') or coverage.get('void_fixtures')))
     return {'schema_version':3,'generated_at':now.isoformat(),'date':yesterday.isoformat(),'model_id':MODEL,
             'validation_from':VALIDATION_FROM,
             'previous_model':{'model_id':PREVIOUS_MODEL, 'history':totals(previous)},
             'cohort':'Mercati principali con valore teorico stabile V5 nell’ultima analisi prima del calcio d’inizio. La stessa partita può avere più mercati; gli esiti sono correlati.',
-            'available':yesterday.isoformat() in by_day,'daily':totals(rows),
+            'available':available,'daily':totals(rows),
             'history':dict(totals(history),from_date=start.isoformat(),to_date=yesterday.isoformat(),days_with_data=sum(bool(v) for v in by_day.values())),
             'examples':sorted([r for r in rows if r['outcome']=='won' and r['market'].startswith('over') and r['odd'] is not None], key=lambda r:(-r['odd'],r['kickoff'],r['fixture_id']))[:10],
             'all_results':rows, 'latest_verified':latest}

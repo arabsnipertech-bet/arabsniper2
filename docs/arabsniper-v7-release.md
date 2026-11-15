@@ -96,4 +96,17 @@ L'OCI-AS attribuisce 15 punti alla persistenza mediana quando è strettamente co
 
 Auditor ripristina per primi gli oggetti del giorno chiuso, i journal prematch pertinenti e gli esiti V7 della finestra mobile. Liquida i risultati, genera il report di apprendimento e aggiorna `data/arab_quote_v7_weights.json`. Il checkpoint R2 verifica i quattro file con SHA-256 prima di avviare lo storico V5.1. Il ripristino dello storico e la calibrazione V5.1 hanno budget separati di 15 e 6 minuti entro la finestra protetta. Un’interruzione V5.1 registra `partial_v51_skip` e conserva il checkpoint V7. La pubblicazione dei risultati pubblici usa lo storico disponibile dopo il ripristino.
 
+### Evidenze giornaliere per il confronto per partita
+
+Fast, Night e il refresh quote congelano le osservazioni in file immutabili per data di calcio d’inizio in `Europe/Rome`. Si conserva ogni osservazione utile, inclusi i dati delle gare fuori Gold. L’Auditor salva il registro giornaliero nel checkpoint privato prima di avviare la calibrazione. Un nuovo tentativo può ripartire dal registro già verificato.
+
+| File nel checkpoint privato | Contenuto |
+| --- | --- |
+| `auditordata/prematch_<data>.json` | Osservazioni originali per gara, con orario, quote, probabilità, calcoli e valutazioni disponibili al momento della cattura |
+| `auditarchive/prematch_<data>_results.json` | Osservazioni collegate ai punteggi e agli esiti per mercato |
+| `auditarchive/prematch_<data>_v7.json` | Ultima analisi V7 valida prima del calcio d’inizio, esiti per mercato e campioni per l’apprendimento |
+| `auditarchive/prematch_<data>_v7_evidence.json` | Impronte dei file, punteggi PT e FT disponibili, provenienza e gare che richiedono ancora una verifica |
+
+Il recupero verifica una data alla volta nella finestra degli ultimi 35 giorni chiusi. Usa i risultati del live già confermati da API-Football e richiede per ID quelli incompleti o discordanti. Una partita con il solo finale può alimentare i mercati FT. I mercati che richiedono il punteggio all’intervallo restano pendenti fino alla conferma. I 35 giorni definiscono la finestra dei tentativi automatici e gli archivi datati sono conservati anche oltre quella finestra.
+
 Per ripristinare la revisione precedente, fare revert del merge di questa release su `main`, distribuire il nuovo `main` su Cloudflare e avviare Fast Scan con `force_fast`. Il riferimento precedente è `26814f3c34136fc7a91463f27a36e193f909b4ac`. La variabile `V7_SHADOW_ONLY` appartiene alla versione precedente. Conservare gli oggetti R2 correnti e verificare feed e accesso Gold dopo il refresh.

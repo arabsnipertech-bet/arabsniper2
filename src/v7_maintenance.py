@@ -189,10 +189,11 @@ def price_pass(storage, bucket, root, budget, clock=local_now):
     from refresh_opportunities import main as reprice
     from audit_journal import capture_policies
     reprice(root/'data')
-    journal = capture_policies(root)
+    journals = capture_policies(root)
     if previous_manifest(storage, bucket) != index:
         raise RuntimeError('Private checkpoint advanced during the price refresh')
-    paths = required | {'data/arab_quote_history.json', journal.relative_to(root).as_posix()}
+    paths = required | {'data/arab_quote_history.json'}
+    paths.update(path.relative_to(root).as_posix() for path in journals)
     paths.update(p.relative_to(root).as_posix() for p in (root/'data').glob('arab_quote_selections_day[1-5].json'))
     paths.update(p.relative_to(root).as_posix() for p in (root/'data').glob(PRICE_HISTORY_PREFIX+'*.json'))
     paths.add('data/'+OPENING_SNAPSHOT)

@@ -11,7 +11,7 @@ import sqlite3
 import tempfile
 from zoneinfo import ZoneInfo
 
-from audit_storage import open_verified_json, publish_spool
+from audit_storage import FORMAT, MAX_MATERIALIZED_AUDIT_BYTES, open_verified_json, publish_spool
 
 COLLECTIONS = ('fixtures', 'quality_evaluations', 'multimarket_evaluations',
                'signal_observations', 'analysis_updates', 'study_observations')
@@ -21,13 +21,64 @@ def encoded(value):
     return json.dumps(value, ensure_ascii=False, separators=(',', ':'), allow_nan=False)
 
 
+def kickoff_day(fixture):
+    try:
+        at = datetime.fromisoformat(str(fixture.get('kickoff')).replace('Z', '+00:00'))
+        return at.astimezone(ZoneInfo('Europe/Rome')).date().isoformat() if at.tzinfo else None
+    except (ValueError, TypeError):
+        return None
+
+
+def bounded_date_entries(path, fixture_date):
+    """Decode one bounded journal at a time while verifying each compressed part."""
+    path = Path(path)
+    size = path.stat().st_size
+    if size <= 1024*1024:
+        header = json.loads(path.read_bytes())
+        if isinstance(header, dict) and header.get('_storage') == FORMAT:
+            size = header['bytes']
+    if size > MAX_MATERIALIZED_AUDIT_BYTES:
+        return None
+
+    def invalid_constant(value):
+        raise ValueError(f'Invalid audit number: {value}')
+
+    with open_verified_json(path) as stream:
+        raw = stream.read(MAX_MATERIALIZED_AUDIT_BYTES+1)
+    if len(raw) > MAX_MATERIALIZED_AUDIT_BYTES:
+        raise ValueError('Audit exceeds its declared size')
+    document = json.loads(raw, parse_constant=invalid_constant)
+    if not isinstance(document, dict):
+        raise ValueError('Audit root must be an object')
+
+    def records():
+        for collection, value in document.items():
+            if collection not in COLLECTIONS:
+                yield None, collection, value
+                continue
+            if not isinstance(value, dict):
+                raise ValueError('Audit collection must be an object')
+            yield collection, None, None
+            for key, record in value.items():
+                if not isinstance(record, dict):
+                    raise ValueError('Audit record must be an object')
+                if kickoff_day(record.get('fixture') or {}) in (None, fixture_date):
+                    yield collection, key, record
+    return records()
+
+
 def entries(path, *, fixture_date=None):
     """Yield one forecast at a time, optionally retaining only a Rome fixture date.
 
-    Filtering avoids constructing irrelevant nested payloads. Every JSON token
-    and every original chunk is still read and verified, including the tail.
-    Records with unknown/naive dates remain available for caller validation.
+    Large archives are streamed. One bounded journal can use the JSON decoder
+    directly. Every original chunk is verified in both paths.
     """
+    if fixture_date is not None:
+        bounded = bounded_date_entries(path, fixture_date)
+        if bounded is not None:
+            yield from bounded
+            return
+
     import ijson
     from ijson.common import ObjectBuilder
 
@@ -165,16 +216,11 @@ class AuditLedger(Mapping):
     def put(self, collection, key, record, *, overwrite=True):
         self.add_collection(collection)
         fixture = record.get('fixture') or {}
-        try:
-            at = datetime.fromisoformat(str(fixture.get('kickoff')).replace('Z', '+00:00'))
-            day = at.astimezone(ZoneInfo('Europe/Rome')).date().isoformat() if at.tzinfo else None
-        except (ValueError, TypeError):
-            day = None
         query = ('INSERT INTO records VALUES(?,?,?,?,?) ON CONFLICT(collection,key) '
                  'DO UPDATE SET fixture_id=excluded.fixture_id,day=excluded.day,value=excluded.value'
                  if overwrite else 'INSERT OR IGNORE INTO records VALUES(?,?,?,?,?)')
         return self.db.execute(query, (collection, str(key), str(fixture.get('fixture_id')),
-                                       day, encoded(record))).rowcount
+                                       kickoff_day(fixture), encoded(record))).rowcount
 
     def load(self, path):
         count = 0
@@ -217,7 +263,7 @@ class AuditLedger(Mapping):
             else:
                 self.metadata[name] = value
 
-    def write(self, path):
+    def write(self, path, *, day=None):
         """Export one record at a time; pointer is replaced only after all parts."""
         self.db.commit()
         with tempfile.TemporaryFile(mode='w+b') as spool:
@@ -232,8 +278,13 @@ class AuditLedger(Mapping):
                 first = False
                 spool.write((encoded(collection)+':{').encode())
                 first_record = True
-                for key, raw in self.db.execute('SELECT key,value FROM records WHERE collection=? ORDER BY rowid',
-                                                 (collection,)):
+                query = 'SELECT key,value FROM records WHERE collection=?'
+                if day is None:
+                    params = (collection,)
+                else:
+                    query += ' AND day IS ?'
+                    params = (collection, day or None)
+                for key, raw in self.db.execute(query+' ORDER BY rowid', params):
                     if not first_record: spool.write(b',')
                     first_record = False
                     spool.write((encoded(key)+':'+raw).encode())
@@ -244,7 +295,7 @@ class AuditLedger(Mapping):
 
 def settle_ledger(ledger, output):
     from prematch_audit import settle_predictions
-    from v7_archive import FINISHED, merge_verified_result
+    from v7_archive import FINISHED, VOID, merge_verified_result
     # Each fixture is handled once, even when the feed contains duplicates.
     matches = {str(m.get('fixture', {}).get('fixture_id')): m
                for day in output.get('days', []) for m in day.get('matches', [])}
@@ -254,12 +305,18 @@ def settle_ledger(ledger, output):
         if not incoming:
             continue
         store = ledger.fixture_store(fid)
-        if incoming.get('status') in FINISHED:
+        if incoming.get('status') in FINISHED | VOID:
             prior = next((result for collection in COLLECTIONS
                           for record in store.get(collection, {}).values()
                           if (result := (record.get('settlement') or {}).get('result') or {}).get('status') in FINISHED
                           and result.get('home_ft') is not None and result.get('away_ft') is not None), {})
             incoming = merge_verified_result(prior, incoming)
+            if incoming.get('status') in VOID:
+                for collection in COLLECTIONS:
+                    for record in store.get(collection, {}).values():
+                        record['settlement'] = {'result': incoming, 'outcomes': {}}
+                ledger.update_store(store)
+                continue
             if None in (incoming.get('home_ft'), incoming.get('away_ft')):
                 continue
             match = {**match, 'fixture': {**fixture, 'result': incoming}}

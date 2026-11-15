@@ -89,7 +89,8 @@ class PerthStudyTests(unittest.TestCase):
             root = Path(temp)
             write_store(root/'data/arab_quote_day1.json', {'matches':[m]})
             for when in (at, '2026-11-01T07:20:00Z'):
-                journal = read_store(capture_policies(root, when))
+                file, = capture_policies(root, when)
+                journal = read_store(file)
                 for category in ('gold', 'platinum'):
                     self.assertFalse(journal[category]['fixtures'])
             self.assertIsNone(freeze_study(m, m['fixture']['kickoff']))

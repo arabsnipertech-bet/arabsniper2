@@ -1,6 +1,7 @@
 """Pack legacy scan outputs and reject oversized publication files before git push."""
 import json
 from pathlib import Path
+from audit_journal import DATED_PREFIX, PREFIX
 from audit_storage import read_store, write_store, FORMAT, validate_store
 
 
@@ -9,7 +10,7 @@ def prepare(directory, scan_only=False):
     from homepage_preview import publish
     publish(directory)
     for path in sorted(directory.glob('arab_quote_*.json')):
-        if scan_only and (path.name.startswith('arab_quote_scan_journal_') or path.name in {
+        if scan_only and (path.name.startswith((PREFIX, DATED_PREFIX)) or path.name in {
                 'arab_quote_prematch_audit.json', 'arab_quote_prematch_report.json',
                 'arab_quote_multimarket_report.json', 'arab_quote_model_research.json',
                 'arab_quote_gold_policy_audit.json', 'arab_quote_gold_policy_report.json',

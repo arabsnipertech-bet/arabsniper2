@@ -230,6 +230,18 @@ def checkpoint_day(s3, bucket, root, day, *, legacy=False):
     write_manifest(s3,bucket,{**verified,**additions})
     print(f'Priority daily checkpoint saved: {day}; {len(additions)} files; Gold feeds unchanged',flush=True)
 
+def checkpoint_results(storage, bucket, root, day):
+    from audit_daily_evidence import evidence_paths, receipt_path, verified_evidence
+    if verified_evidence(root, day) is None:
+        raise ValueError('Unverified daily results')
+    paths = evidence_paths(day) | {receipt_path(day)}
+    promo = f'auditarchive/prematch_{day}_promo.json'
+    if (Path(root)/promo).is_file():
+        paths.add(promo)
+    publish(storage, bucket, root, checkpoint_only=True, selected_paths=sorted(paths))
+    print(f'Daily forecasts and results saved independently: {day}', flush=True)
+
+
 def write_manifest(s3, bucket, index):
     manifest = json.dumps({'version': 1, 'files': index}, sort_keys=True, separators=(',', ':')).encode()
     s3.put_object(Bucket=bucket, Key='state/manifests/'+sha(manifest)+'.json', Body=manifest)
@@ -268,26 +280,27 @@ def restore_subset(storage, bucket, root, index, paths):
 
 def restore_v7_priority(storage, bucket, root, day):
     """Restore only the closed day, eligible journals and V7 learning inputs."""
-    from datetime import datetime, time, timedelta
-    from zoneinfo import ZoneInfo
-    from audit_journal import PREFIX
-    from auditor_daily_priority import STATUS, v7_paths
-    from auditor_schedule import MARKER, ROME
+    from datetime import timedelta
+    from audit_daily_evidence import evidence_paths, receipt_path, verified_evidence
+    from audit_journal import LEGACY_PRIORITY_DAYS, journals_for_day
+    from auditor_daily_priority import STATUS, v7_paths, v7_ready
+    from auditor_schedule import MARKER
     from v7_archive import day_path
     from v7_learning import STATE, WINDOW
 
     index = previous_manifest(storage, bucket)
     if not index:
         raise ValueError('Private checkpoint required for V7 priority')
-    cutoff = datetime.combine(day+timedelta(days=1), time(), ROME).astimezone(ZoneInfo('UTC'))
-    journal_cutoff = 'data/'+PREFIX+cutoff.strftime('%Y%m%dT%H%M%S%f')
-    paths = {STATUS, MARKER, STATE, *v7_paths(day).values(),
-             f'auditordata/prematch_{day}.json'}
-    paths.update(f'auditarchive/prematch_{day}_{suffix}' for suffix in ('results.json', 'daily.md', 'promo.json'))
+    paths = {STATUS, MARKER, STATE, *v7_paths(day).values(), *evidence_paths(day), receipt_path(day),
+             f'auditarchive/prematch_{day}_promo.json'}
     paths.update(day_path(Path('.'), day-timedelta(days=i)).as_posix() for i in range(1, WINDOW))
-    paths.update(path for path in index if path.startswith('data/'+PREFIX) and path < journal_cutoff)
     selected = paths & index.keys()
-    restore_subset(storage, bucket, Path(root), index, selected)
+    root = Path(root)
+    restore_subset(storage, bucket, root, index, selected)
+    if verified_evidence(root, day) is None and not v7_ready(root, day+timedelta(days=1)):
+        sources = list(journals_for_day(index, day, legacy_days=LEGACY_PRIORITY_DAYS))
+        restore_subset(storage, bucket, root, index, sources)
+        print(f'Priority V7 journal sources restored: {len(sources)}', flush=True)
     print(f'Priority V7 inputs restored: {len(selected)} verified files', flush=True)
 
 
@@ -384,18 +397,20 @@ if __name__=='__main__':
     import argparse
     from datetime import date
     parser=argparse.ArgumentParser()
-    parser.add_argument('command',choices=('publish','restore','restore-v7-priority','checkpoint','checkpoint-day'))
+    parser.add_argument('command',choices=('publish','restore','restore-v7-priority','checkpoint',
+                                           'checkpoint-day','checkpoint-results'))
     parser.add_argument('--date',type=date.fromisoformat)
     parser.add_argument('--legacy',action='store_true')
     parser.add_argument('--manifest-sha',help='Restore an existing immutable checkpoint to this checkout')
     args=parser.parse_args()
-    if (args.command in ('checkpoint-day','restore-v7-priority')) != (args.date is not None):
+    if (args.command in ('checkpoint-day','checkpoint-results','restore-v7-priority')) != (args.date is not None):
         parser.error('--date is required for dated priority operations')
     if args.manifest_sha and args.command!='restore':parser.error('--manifest-sha applies only to restore')
     try:
         storage,bucket,root=client(),os.environ['R2_BUCKET'],Path(__file__).resolve().parents[1]
         if args.command=='checkpoint':publish(storage,bucket,root,checkpoint_only=True)
         elif args.command=='checkpoint-day':checkpoint_day(storage,bucket,root,args.date,legacy=args.legacy)
+        elif args.command=='checkpoint-results':checkpoint_results(storage,bucket,root,args.date)
         elif args.command=='restore-v7-priority':restore_v7_priority(storage,bucket,root,args.date)
         elif args.command=='restore':restore(storage,bucket,root,args.manifest_sha)
         else:globals()[args.command](storage,bucket,root)
