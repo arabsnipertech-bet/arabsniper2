@@ -46,6 +46,7 @@ on:
       - 'src/gold_policy_audit.py'
       - 'src/market_scope.py'
       - 'src/proposal_stability.py'
+      - 'src/v7_decision.py'
   schedule:
     - cron: "0 6-23 * * *"
       timezone: "Europe/Rome"
