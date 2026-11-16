@@ -13,10 +13,10 @@ from multimarket_model import stamp, number, fair, normalized, SPECS
 from context_analysis import movement
 from lateral_matrix import specification, market_id, matrix_rows
 from opportunity_policy import annotate
-from market_scope import CORE_BET_IDS, STUDY_RESULT_TOTAL_IDS, core_market, trim_matrix
+from market_scope import CORE_BET_IDS, STUDY_RESULT_TOTAL_IDS, canonical_market, core_market, trim_matrix
 from quote_sources import (normalize_payload, synthetic_combo_groups, synthetic_margin,
                            synthetic_fair, direct_combo_groups, fresh, PREMATCH_WINDOW,
-                           valid_prematch_quote)
+                           valid_prematch_quote, halfline_provenance)
 
 # Verified API-Football prematch catalogue identities. Never identify a market
 # by the presence of 'over' alone (corners/cards/team totals are different).
@@ -359,10 +359,18 @@ def ledger_offers(state, fid, captured, observed_at, kickoff):
         for token, spec in group['specs'].items():
             if token not in group['odds']:
                 continue
+            canonical = canonical_market(spec)
+            source = {}
+            if canonical is not spec:
+                if not group['complete']:
+                    continue
+                source = {'quote_source': 'asian_halfline', 'quote_provenance': halfline_provenance(
+                    spec, group['bet_id'], CATALOG.get(group['bet_id'], (None,))[0],
+                    group.get('provider_updated_at'), group.get('quote_provenance'))}
             usable = [p for p in points if token in p['odds']]
             complete = [p for p in usable if p['complete'] and set(p['odds']) == set(group['odds'])]
             first = openings[token]
-            offers[market_id(spec)].append({**group, 'spec': spec, 'token': token,
+            offers[market_id(canonical)].append({**group, **source, 'spec': canonical, 'token': token,
                 'observed_at': points[-1]['observed_at'],
                 'odd': group['odds'][token], 'first_odd': first['odd'],
                 'stable_price': token in points[-1].get('stable_tokens', ()),
@@ -446,6 +454,9 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         restore(row, as_of, kickoff, allow_cached)
         return
     complete_books = [o for o in recent if complete_book(o)]
+    if row['spec']['kind'] == 'total' and not cached:
+        native = [o for o in complete_books if o.get('quote_source') != 'asian_halfline']
+        complete_books = native or complete_books
     # A single bookmaker is enough for price and EV. A complete partition at
     # that bookmaker also gives its own fair probability and overround.
     best = max(complete_books or recent, key=lambda o: (o['odd'], o.get('provider_updated_at') or o.get('observed_at') or '', o['bookmaker_id']))
@@ -599,7 +610,7 @@ def attach(assessment, payload, state, meta, as_of):
     offers = ledger_offers(state, meta['fixture_id'], captured, as_of, meta['kickoff'])
     matrix = assessment['matrix']
     matrix['study_combo_quotes'] = study_combo_quotes(payload, meta, as_of)
-    trim_matrix(matrix)
+    trim_matrix(matrix, as_of, meta['kickoff'])
     existing = {r['id'] for r in matrix['rows']}
     extra = {key: values[0]['spec'] for key, values in offers.items() if key not in existing}
     if extra: matrix['rows'].extend(matrix_rows(assessment, extra))
@@ -641,7 +652,7 @@ def expire(assessment, meta, as_of):
     allowed = output_allowed({'fixture': meta})
     now, start = stamp(as_of), stamp(meta.get('kickoff'))
     if meta.get('result') or now and start and now >= start: return
-    trim_matrix(assessment.setdefault('matrix', {}))
+    trim_matrix(assessment.setdefault('matrix', {}), as_of, meta.get('kickoff'))
     age = 1 if now and start and 0 < (start-now).total_seconds() <= 10800 else 6
     matrix = assessment.get('matrix', {})
     reference = matrix.get('calibration_reference')

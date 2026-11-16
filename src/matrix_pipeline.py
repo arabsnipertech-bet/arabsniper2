@@ -172,7 +172,7 @@ def build_board(day, as_of, *, previous_matches=None, provisional=False):
             if a.get('rates') and not standard.keys() <= existing:
                 missing = {key: spec for key, spec in standard.items() if key not in existing}
                 matrix.setdefault('rows', []).extend(matrix_rows(a, missing))
-                trim_matrix(matrix)
+                trim_matrix(matrix, as_of, meta['kickoff'])
             expire(a, meta, as_of)
             matrix.pop('decision_shadow', None)
             matrix.pop('v51_stability', None)

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from math import isfinite
 import re
 from market_discovery import clean, discover_payload
-from market_scope import COMBO_SPECS
+from market_scope import COMBO_SPECS, TOTAL_LINES
 
 SOURCE_VERSION = 'quote-sources-v1'
 PREMATCH_HOURS = 120
@@ -102,6 +102,15 @@ def total_pairs(payload):
                            '_record': record, '_book': book}
 
 
+def halfline_provenance(spec, bet_id, name, updated, discovery=None):
+    discovery = discovery or {}
+    return {'version': SOURCE_VERSION, 'kind': 'asian_halfline',
+            'source_bet_id': discovery.get('source_bet_id', bet_id),
+            'source_bet_name': discovery.get('source_bet_name', name),
+            'discovery': discovery, 'source_period': spec['period'], 'source_line': spec['line'],
+            'provider_updated_at': updated}
+
+
 def normalize_payload(payload, observed_at):
     """Keep complete pre-match pairs across all books and alias the exact Asian .5.
 
@@ -119,7 +128,7 @@ def normalize_payload(payload, observed_at):
     candidates = {}
     for pair in pairs:
         key = (pair['fixture_id'], pair['bookmaker_id'], pair['period'], pair['line'])
-        if not pair['asian'] or (pair['period'], pair['line']) not in TARGETS | {('ht', .5)}:
+        if not pair['asian'] or pair['line'] not in TOTAL_LINES[pair['period']]:
             continue
         if key in native and (native[key] or not fresh(pair['provider_updated_at'], observed_at, pair['kickoff'])):
             continue
@@ -128,12 +137,8 @@ def normalize_payload(payload, observed_at):
             candidates[key] = pair
     for pair in candidates.values():
         bid = 6 if pair['period'] == 'ht' else 5
-        provenance = {'version': SOURCE_VERSION, 'kind': 'asian_halfline',
-                      'source_bet_id': pair['discovery'].get('source_bet_id',pair['bet_id']),
-                      'source_bet_name': pair['discovery'].get('source_bet_name',pair['bet_name']),
-                      'discovery': pair['discovery'],
-                      'source_period': pair['period'], 'source_line': pair['line'],
-                      'provider_updated_at': pair['provider_updated_at']}
+        provenance = halfline_provenance(pair, pair['bet_id'], pair['bet_name'],
+                                         pair['provider_updated_at'], pair['discovery'])
         bet = {'id': bid, 'name': TOTALS[bid][2][0], '_quote_provenance': provenance,
                'values': [{'value': f'{side.title()} {pair["line"]:g}', 'odd': odd}
                           for side, odd in pair['odds'].items()]}

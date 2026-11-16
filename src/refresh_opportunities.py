@@ -11,7 +11,7 @@ from multimarket_model import stamp
 from opportunity_policy import POLICY_ID
 from platinum_policy import POLICY_ID as PLATINUM_POLICY_ID
 from gold_competitions import SCOPE_ID, SCOPE_DESCRIPTION, enforce_day
-from market_scope import MARKET_SCOPE_ID, trim_matrix, core_market
+from market_scope import MARKET_SCOPE_ID, canonical_market, trim_matrix, core_market
 from proposal_stability import seed_stability
 from copy import deepcopy
 
@@ -43,10 +43,16 @@ def captured_prices(fixture, rows):
     for row in rows:
         spec = row.get('spec')
         if not core_market(spec): continue
-        group, token, _ = partition(spec)
-        for bid, (_, kind, period) in CATALOG.items():
-            if period == spec['period'] and (kind == spec['kind'] or kind == 'total' and spec['kind'] == 'asian_total'):
-                specs.setdefault(f'{bid}|{group}', {})[token] = spec
+        equivalents = [spec]
+        if spec['kind'] == 'total':
+            asian = {**spec, 'kind': 'asian_total'}
+            if canonical_market(asian) == spec:
+                equivalents.append(asian)
+        for equivalent in equivalents:
+            group, token, _ = partition(equivalent)
+            for bid, (_, kind, period) in CATALOG.items():
+                if period == equivalent['period'] and (kind == equivalent['kind'] or kind == 'total' and equivalent['kind'] == 'asian_total'):
+                    specs.setdefault(f'{bid}|{group}', {})[token] = equivalent
     captured = {}
     for key, points in fixture.get('groups', {}).items():
         if not points: continue
@@ -94,7 +100,7 @@ def refresh_day(day, state, as_of):
         matrix = a.setdefault('matrix', {})
         # Save the published choice before repricing can expire its quote.
         seed_stability(deepcopy(a), a)
-        trim_matrix(matrix)
+        trim_matrix(matrix, as_of, meta['kickoff'])
         rows = matrix.get('rows', [])
         if a.get('rates'):
             existing = {r['id'] for r in rows}

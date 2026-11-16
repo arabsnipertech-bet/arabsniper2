@@ -13,7 +13,7 @@ from audit_storage import read_store
 from v7_probability import price_usable
 from refresh_opportunities import captured_prices, refresh_day
 from near_kickoff_quotes import NearKickoffRefresher, needs_refresh
-from lateral_matrix import build_matrix, base_specs
+from lateral_matrix import build_matrix, base_specs, market_id, specification
 from statistics_first import statistical_analysis
 from test_statistics_first import match
 
@@ -152,7 +152,7 @@ class ExactSources(unittest.TestCase):
         self.assertFalse(over['opportunity']['eligible'])
 
     def test_all_requested_exact_lines_and_all_books(self):
-        for bid, line in ((72,1.5),(72,2.5),(50,2.5),(336,3.5)):
+        for bid, line in ((72,.5),(72,1.5),(72,2.5),(72,3.5),(50,1.5),(50,2.5),(336,3.5)):
             with self.subTest(bid=bid, line=line):
                 raw=feed([bet(bid,line)])
                 normalized=normalize_payload(raw,NOW)
@@ -177,6 +177,34 @@ class ExactSources(unittest.TestCase):
         row=next(r for r in a['matrix']['rows'] if r['spec']=={'kind':'total','period':'ft','side':'over','line':2.5})
         self.assertEqual(row['quote_source'],'asian_halfline')
         self.assertEqual(row['odd'],2.1)
+
+    def test_only_one_halfline_in_the_matrix_and_refresh_reuses_its_real_source(self):
+        from market_scope import canonical_market
+
+        for updated, source, price in ((NOW, 'bookmaker', 1.9),
+                ('2026-10-26T16:00:00+00:00', 'asian_halfline', 2.1)):
+            with self.subTest(source=source):
+                native = feed([bet(5, 1.5)], at=updated)
+                asian = feed([bet(50, 1.5, 2.1, 1.8), bet(50, 2.25)], book=900)
+                payload = {'response': native['response'] + asian['response']}
+                assessment = build_matrix(statistical_analysis(match(), NOW), NOW)
+                state = {}
+                attach(assessment, payload, state, META, NOW)
+                rows = assessment['matrix']['rows']
+                contract = specification('total', 'ft', 'over', 1.5)
+                matching = [r for r in rows if canonical_market(r['spec']) == contract]
+                self.assertEqual([(r['id'], r['quote_source'], r['odd']) for r in matching],
+                                 [(market_id(contract), source, price)])
+                self.assertIn(market_id(specification('asian_total', 'ft', 'over', 2.25)), [r['id'] for r in rows])
+                ledger = state['matrix_quotes']['100']
+                # A checkpoint from before fallback aliases were generated for FT 1.5.
+                ledger['groups'] = {key: points for key, points in ledger['groups'].items() if not key.startswith('asian')}
+                rebuilt = captured_prices(ledger, rows)
+                refresh_at = '2026-10-26T18:01:00+00:00'
+                offers = ledger_offers(state, 100, rebuilt, refresh_at, START)
+                selected = deepcopy(matching[0])
+                analyse_prices(selected, offers[market_id(contract)], refresh_at, START, allow_cached=True)
+                self.assertEqual((selected['quote_source'], selected['odd'], selected['first_odd']), (source, price, price))
 
     def test_no_quarter_integer_partial_ambiguous_wrong_identity_or_stale_alias(self):
         inputs=[feed([bet(50,2.25)]),feed([bet(50,2)]),feed([bet(50,2.5,name='Total Corners')]),
