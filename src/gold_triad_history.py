@@ -63,10 +63,12 @@ def observe_day(history, day, now):
                 continue
             price = record.get('odd')
             fair = record.get('model_fair_odd')
-            versions.append(dict(market_id=market_id, label=record['label'],
-                                 captured_at=v7['captured_at'],
-                                 odd=price if finite(price) and price > 1 else None,
-                                 model_fair_odd=fair if finite(fair) and fair > 1 else None))
+            version = dict(market_id=market_id, label=record['label'], captured_at=v7['captured_at'],
+                           odd=price if finite(price) and price > 1 else None,
+                           model_fair_odd=fair if finite(fair) and fair > 1 else None)
+            if signal.get('study_only') is True:
+                version['study_only'] = True
+            versions.append(version)
         entry['seen_at'] = v7['captured_at']
 
 

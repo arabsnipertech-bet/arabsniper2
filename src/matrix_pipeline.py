@@ -144,9 +144,9 @@ def complete_day(ns, client, day, as_of):
     enforce_day(day)
 
 
-def build_board(day, as_of):
+def build_board(day, as_of, *, previous_matches=None, provisional=False):
     from adaptive_calibration import calibration_status, market_of
-    from v7_decision import TRIAD_MARKETS, VERSION, capture, recheck_policies
+    from v7_decision import TRIAD_MARKETS, VERSION, capture, prior_triad_commitments, recheck_policies
     from v7_learning import active_weight
 
     day['calibration_status'] = calibration_status(as_of=as_of)
@@ -178,7 +178,17 @@ def build_board(day, as_of):
             matrix.pop('v51_stability', None)
             matrix['publication_model'] = VERSION
             weight, learning = active_weight(as_of)
-            snapshot = matrix['v7'] = capture(a, meta, as_of, weight, learning)
+            commitments = None
+            if not provisional:
+                prior = a if previous_matches is None else (
+                    (previous_matches.get(str(meta.get('fixture_id'))) or {}).get('multimarket') or {})
+                commitments = prior_triad_commitments(prior, meta, as_of)
+            snapshot = matrix['v7'] = capture(a, meta, as_of, weight, learning, commitments=commitments)
+            if not provisional:
+                matrix.pop('v7_waiting_commitments', None)
+                if snapshot is None and commitments:
+                    matrix['v7_waiting_commitments'] = {'fixture_id': str(meta['fixture_id']),
+                                                        'kickoff': meta['kickoff'], 'slots': commitments}
             if snapshot is None:
                 for row in matrix.get('rows', []):
                     row.update(v7_supported=False, statistical_pct=None, low_pct=None, high_pct=None,
