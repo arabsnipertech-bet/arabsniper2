@@ -1,0 +1,68 @@
+name: Verifica attivazioni Gold tramite Telegram
+on:
+  push:
+    branches: ['ops/read-gold-telegram-count-20261116']
+    paths: ['.github/workflows/read-gold-telegram-count-20261116.yml']
+permissions: {}
+jobs:
+  count:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'a964c7d98557fdde937888b753f2f021156e5317' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Leggi i conteggi aggregati dal registro Gold
+        env:
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          from base64 import b64encode
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          from tempfile import TemporaryDirectory
+          from urllib.error import HTTPError
+          from urllib.request import HTTPRedirectHandler, Request, build_opener
+          
+          class RejectRedirect(HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          
+          public_key = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArNI+cHzirsHWygY+jwCM\nESaS3vpCeo2iCYdlLPvTBKifijMkE12Vk7m6HoT/cgK+0FFCLSl+YpUGIlWLqI1v\nE9wf0HbZ59uxTUNA8MSwtf1XnZwK/R00Y4U3IctPNQkaKDDwtbgFBecbYPu/WH9f\ntcawuj2o/li6yd+m4UO/qVp8yNciWjV1572VaNhJvpVqevfOtVega2dRcS2RtU57\nRZFWmUxESiZcoIKG9Xp6cICenlDIFXm//7l2RjlHLe1iAznhPtup6Mw0jyvTM3vy\nihhJflwhIHDxXg5Iu9/Mx2xuuY12EaMUSFPWm56xEPVvwVY9tG0OzMTWa3aOK4Qj\nswIDAQAB\n-----END PUBLIC KEY-----\n"
+          sql = "WITH claims AS (\n  SELECT telegram_id, email, status, expires_at, started_at AS recorded_at, NULL AS campaign\n  FROM telegram_trial_claims\n  UNION ALL\n  SELECT telegram_id, email, status, expires_at, COALESCE(granted_at, requested_at), campaign\n  FROM telegram_campaign_claims\n)\nSELECT\n  unixepoch('now') AS measured_at,\n  COUNT(DISTINCT telegram_id) AS verified_requests,\n  COUNT(DISTINCT CASE WHEN status = 'granted' THEN telegram_id END) AS activated_accounts,\n  COUNT(DISTINCT CASE WHEN status = 'granted' THEN email END) AS activated_emails,\n  COUNT(DISTINCT CASE WHEN status = 'granted' AND expires_at > unixepoch('now') THEN telegram_id END) AS unexpired_accounts,\n  COUNT(DISTINCT CASE WHEN status = 'granted' AND campaign = 'gold-engine-2026-11' THEN telegram_id END) AS campaign_accounts,\n  (\n    SELECT COUNT(DISTINCT current.telegram_id)\n    FROM claims AS current\n    WHERE current.status = 'granted' AND current.campaign = 'gold-engine-2026-11'\n      AND EXISTS (\n        SELECT 1 FROM claims AS previous\n        WHERE previous.status = 'granted'\n          AND COALESCE(previous.campaign, '') <> current.campaign\n          AND previous.recorded_at <= current.recorded_at\n          AND (previous.telegram_id = current.telegram_id OR previous.email = current.email)\n      )\n  ) AS repeat_campaign_accounts\nFROM claims"
+          fields = ["measured_at","verified_requests","activated_accounts","activated_emails","unexpired_accounts","campaign_accounts","repeat_campaign_accounts"]
+          url = (
+              'https://api.cloudflare.com/client/v4/accounts/dfdb02b4139b31c0ab4456a50eb371a2'
+              '/d1/database/2f9dbeae-4b26-494d-9b88-a3a89a1c4f25/query'
+          )
+          request = Request(
+              url,
+              json.dumps({'sql': sql}).encode(),
+              {'Authorization': 'Bearer ' + os.environ['D1_TOKEN'], 'Content-Type': 'application/json'},
+              method='POST',
+          )
+          try:
+              with build_opener(RejectRedirect()).open(request, timeout=16) as response:
+                  payload = json.load(response)
+          except HTTPError as exc:
+              raise SystemExit(f'D1_HTTP_{exc.code}') from None
+          except Exception as exc:
+              raise SystemExit(f'D1_{type(exc).__name__}') from None
+          result = payload.get('result', [])
+          if not payload.get('success') or len(result) != 1 or not result[0].get('success'):
+              raise SystemExit('D1_QUERY_FAILED')
+          rows = result[0].get('results', [])
+          if len(rows) != 1 or any(type(rows[0].get(key)) is not int or rows[0][key] < 0 for key in fields):
+              raise SystemExit('D1_COUNT_UNVERIFIED')
+          data = json.dumps([rows[0][key] for key in fields], separators=(',', ':')).encode()
+          with TemporaryDirectory() as tmp:
+              key = Path(tmp) / 'public.pem'
+              key.write_text(public_key)
+              encrypted = subprocess.run(
+                  ['/usr/bin/openssl', 'pkeyutl', '-encrypt', '-pubin', '-inkey', str(key),
+                   '-pkeyopt', 'rsa_padding_mode:oaep', '-pkeyopt', 'rsa_oaep_md:sha256',
+                   '-pkeyopt', 'rsa_mgf1_md:sha256'],
+                  input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, env={},
+              ).stdout
+          print('GOLD_COUNTS_ENCRYPTED=' + b64encode(encrypted).decode(), flush=True)
+          PY
