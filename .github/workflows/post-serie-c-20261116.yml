@@ -1,0 +1,202 @@
+name: Pubblica il caso Serie C del 16 novembre
+
+on:
+  push:
+    branches: ['ops/publish-serie-c-20261116']
+    paths: ['.github/workflows/post-serie-c-20261116.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arabsniper-serie-c-post-20261116
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == '778ad7ac5e263ec7d5a51677644d0b660459dfc4' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: src
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'requests>=2.32,<3' 'Pillow>=11,<13'
+      - name: Crea e verifica la grafica 1080 × 1350
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageDraw, ImageFont
+
+          WIDTH, HEIGHT = 1080, 1350
+          path = Path("ArabSniperBet_Serie_C_16_novembre.png")
+          canvas = Image.new("RGB", (WIDTH, HEIGHT))
+          paint = ImageDraw.Draw(canvas)
+          for line in range(HEIGHT):
+              ratio = line / HEIGHT
+              color = (int(12 - 4 * ratio), int(25 - 9 * ratio), int(44 - 14 * ratio))
+              paint.line((0, line, WIDTH, line), fill=color)
+
+          white = "#F2F6FD"
+          muted = "#B8CAEA"
+          mint = "#7CE4C6"
+          gold = "#FFDB93"
+          outline = "#39526F"
+          left, right = 68, 1012
+
+          # A pitch motif behind the top section.
+          paint.rounded_rectangle((733, 104, 1165, 319), 18, outline="#1F3852", width=2)
+          paint.line((943, 104, 943, 319), fill="#1F3852", width=2)
+          paint.ellipse((895, 164, 991, 260), outline="#1F3852", width=2)
+          paint.rectangle((733, 155, 795, 268), outline="#1F3852", width=2)
+
+          def label(value, x, y, size, fill=white, bold=False, anchor="lt"):
+              face = ImageFont.truetype("DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf", size)
+              x0, y0, x1, y1 = paint.textbbox((x, y), value, font=face, anchor=anchor)
+              if x0 < 0 or y0 < 0 or x1 > WIDTH or y1 > HEIGHT:
+                  raise ValueError(f"Text area exceeds the graphic: {value}")
+              paint.text((x, y), value, font=face, fill=fill, anchor=anchor)
+
+          paint.rounded_rectangle((left, 58, left + 39, 97), 10, outline=mint, width=2)
+          paint.line((77, 86, 83, 79, 89, 83, 98, 69), fill=mint, width=3, joint="curve")
+          label("ArabSniperBet", 126, 58, 32, bold=True)
+          label("ANALISI CALCISTICA", right, 69, 22, muted, anchor="rt")
+          label("Serie C", left, 132, 49, bold=True)
+          label("6 su 6", left - 5, 191, 128, gold, bold=True)
+          label("letture confermate", 562, 219, 37, bold=True)
+          label("su due partite", 562, 270, 32, muted)
+          label("16 NOVEMBRE 2026  ·  SCHEDE BLU / STUDIO", left, 337, 23, muted, bold=True)
+
+          sorrento_pt, sorrento_ft = (2, 0), (2, 1)
+          perugia_pt, perugia_ft = (0, 0), (0, 1)
+          games = (
+              (
+                  "Sorrento – Monopoli",
+                  "GIRONE C",
+                  sorrento_pt,
+                  sorrento_ft,
+                  (
+                      ("Under 1,5 nel secondo tempo", sum(sorrento_ft) - sum(sorrento_pt) < 2),
+                      ("Over 2,5 a fine gara", sum(sorrento_ft) >= 3),
+                      ("Over 1,5 nel primo tempo", sum(sorrento_pt) >= 2),
+                  ),
+              ),
+              (
+                  "Perugia – Torres",
+                  "GIRONE B",
+                  perugia_pt,
+                  perugia_ft,
+                  (
+                      ("Under 1,5 nel secondo tempo", sum(perugia_ft) - sum(perugia_pt) < 2),
+                      ("No Goal a fine gara", min(perugia_ft) == 0),
+                      ("Vittoria della Torres", perugia_ft[1] > perugia_ft[0]),
+                  ),
+              ),
+          )
+          assert sum(len(rows) for _, _, _, _, rows in games) == 6
+          assert all(ok for _, _, _, _, rows in games for _, ok in rows)
+
+          def score(pair):
+              return "–".join(str(goals) for goals in pair)
+
+          for top, (name, league, half, full, rows) in zip((391, 710), games, strict=True):
+              paint.rounded_rectangle((left, top, right, top + 297), 22, fill="#152842", outline=outline, width=2)
+              label(name, 100, top + 33, 42, bold=True)
+              label(f"{league}  ·  INTERVALLO {score(half)}", 102, top + 91, 23, muted)
+              label("FINALE", 977, top + 23, 19, muted, bold=True, anchor="rt")
+              label(score(full), 977, top + 48, 64, gold, bold=True, anchor="rt")
+              paint.line((102, top + 132, 978, top + 132), fill=outline, width=2)
+              for index, (condition, _) in enumerate(rows):
+                  y = top + 150 + 44 * index
+                  paint.ellipse((103, y + 1, 126, y + 24), fill="#244744")
+                  paint.line((109, y + 12, 114, y + 17, 121, y + 8), fill=mint, width=2)
+                  label(condition, 143, y, 28)
+
+          label("Quote osservate", left, 1047, 35, bold=True)
+          label("Sorrento · Under 1,5 ST", left, 1104, 28, muted)
+          label("1,52 → 1,50", right, 1102, 29, mint, bold=True, anchor="rt")
+          label("Perugia · Vittoria Torres (1X2)", left, 1151, 28, muted)
+          label("4,91 → 3,90", right, 1149, 29, mint, bold=True, anchor="rt")
+          paint.line((left, 1210, right, 1210), fill=outline, width=2)
+          label("Esiti verificati sui referti dei club", left, 1235, 22, muted)
+          label("ARABSNIPERBET.COM", right, 1237, 18, muted, bold=True, anchor="rt")
+
+          canvas.save(path, optimize=True)
+          with Image.open(path) as verified:
+              assert verified.size == (1080, 1350)
+              verified.verify()
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ArabSniperBet_Serie_C_16_novembre
+          path: ArabSniperBet_Serie_C_16_novembre.png
+          if-no-files-found: error
+          retention-days: 14
+      - name: Pubblica una sola volta su Telegram
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          PYTHONPATH: src
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+          import os
+          from requests import RequestException
+          from publisher_v71.channels import CHANNEL, DeliveryError, Telegram
+
+          caption = "⚽ Serie C · 6 letture su 6\n16 novembre 2026 · Due partite, sei analisi BLU · Studio.\n\nSorrento–Monopoli 2–1 (2–0 all’intervallo)\n✓ Under 1,5 nella ripresa · Over 2,5 a fine gara · Over 1,5 nel primo tempo\n\nPerugia–Torres 0–1 (0–0 all’intervallo)\n✓ Under 1,5 nella ripresa · No Goal a fine gara · Vittoria della Torres\n\nQuote osservate. L’Under 1,5 nella ripresa a Sorrento passa da 1,52 alla scelta a 1,50 in scheda. La vittoria della Torres passa da 4,91 a 3,90 tra la prima e l’ultima rilevazione 1X2 prepartita.\n\nIl riscontro riguarda queste due gare. Per la tua prima prova Gold di 7 giorni, apri @ArabSniperBot e tocca Avvia."
+          if CHANNEL != "arabsniper_signals" or len(caption) > 1024:
+              raise SystemExit("Invalid approved channel or caption")
+
+          sender = Telegram(os.environ.get("BOT_TOKEN"))
+          now = datetime.now(timezone.utc)
+          post = {"marker": "6 letture su 6", "created_at": (now - timedelta(hours=3)).isoformat()}
+
+          def prior_receipt():
+              try:
+                  return sender.reconcile(post, datetime.now(timezone.utc))
+              except (RequestException, ValueError):
+                  return None
+
+          def receipt(message_id):
+              if not str(message_id).isdigit():
+                  raise SystemExit("Missing or invalid Telegram post ID")
+              url = f"https://t.me/{CHANNEL}/{message_id}"
+              print(f"TELEGRAM_URL={url}", flush=True)
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+                  summary.write(f"[Post Telegram]({url})\n")
+
+          try:
+              bot = sender.call("getMe")
+              chat = sender.call("getChat", {"chat_id": "@" + CHANNEL})
+              if bot.get("username", "").lower() != "arabsniperbot":
+                  raise SystemExit("Unexpected bot")
+              if chat.get("type") != "channel" or chat.get("username", "").lower() != CHANNEL:
+                  raise SystemExit("Unexpected channel")
+              existing = prior_receipt()
+              if existing:
+                  receipt(existing["id"])
+                  print("TELEGRAM_VERIFIED=previous_post")
+                  raise SystemExit(0)
+              file = Path("ArabSniperBet_Serie_C_16_novembre.png")
+              result = sender.call("sendPhoto", {"chat_id": chat["id"], "caption": caption},
+                                   files={"photo": (file.name, file.read_bytes(), "image/png")})
+              if result.get("chat", {}).get("username", "").lower() != CHANNEL:
+                  raise SystemExit("Telegram reported a different channel")
+              if result.get("caption") != caption or not result.get("photo"):
+                  raise SystemExit("Telegram receipt does not match the photo or caption")
+              receipt(result.get("message_id"))
+              print("TELEGRAM_VERIFIED=photo_and_caption", flush=True)
+          except DeliveryError as error:
+              if error.kind == "uncertain":
+                  existing = prior_receipt()
+                  if existing:
+                      receipt(existing["id"])
+                      print("TELEGRAM_VERIFIED=reconciled")
+                      raise SystemExit(0)
+              raise SystemExit(f"Telegram delivery: {error.kind} / {error.reason}") from None
+          PY
