@@ -1,0 +1,48 @@
+name: Leggi numero iscritti Telegram
+on:
+  push:
+    branches: ['ops/telegram-subscriber-count-20261116']
+    paths: ['.github/workflows/telegram-subscriber-count-20261116.yml']
+permissions: {}
+jobs:
+  count:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'a964c7d98557fdde937888b753f2f021156e5317' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Leggi il totale da Telegram
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          from datetime import datetime
+          import json
+          import os
+          from urllib.error import HTTPError
+          from urllib.request import HTTPRedirectHandler, Request, build_opener
+          from zoneinfo import ZoneInfo
+          
+          class RejectRedirect(HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          
+          token = os.environ['TELEGRAM_TOKEN']
+          request = Request(
+              f'https://api.telegram.org/bot{token}/getChatMemberCount',
+              json.dumps({'chat_id': '@arabsniper_signals'}).encode(),
+              {'Content-Type': 'application/json'},
+              method='POST',
+          )
+          try:
+              with build_opener(RejectRedirect()).open(request, timeout=8) as response:
+                  payload = json.load(response)
+          except HTTPError as exc:
+              raise SystemExit(f'TELEGRAM_HTTP_{exc.code}') from None
+          except Exception as exc:
+              raise SystemExit(f'TELEGRAM_{type(exc).__name__}') from None
+          members = payload.get('result')
+          if payload.get('ok') is not True or type(members) is not int or members < 0:
+              raise SystemExit('TELEGRAM_COUNT_UNAVAILABLE')
+          print(f'SUBSCRIBERS={members}', flush=True)
+          print('OBSERVED_AT=' + datetime.now(ZoneInfo('Europe/Rome')).isoformat(timespec='seconds'), flush=True)
+          PY
