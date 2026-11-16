@@ -1,0 +1,73 @@
+name: Verifica accesso all’account pubblicitario Meta
+
+on:
+  push:
+    branches: ['ops/publish-serie-c-20261116']
+    paths: ['.github/workflows/check-meta-ad-account-20261116.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == '0345d1b49183f8f964282efa0c4496fafa574b74' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Verifica in sola lettura
+        env:
+          META_PAGE_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import http.client
+          import json
+          import os
+          from urllib.parse import urlencode
+
+          token = os.environ.get("META_PAGE_TOKEN")
+          if not token:
+              raise SystemExit("ADS_ACCOUNT_ACCESS=missing_configured_page_connection")
+
+          def fetch(path, fields, **options):
+              query = urlencode({"fields": fields, **options})
+              conn = http.client.HTTPSConnection("graph.facebook.com", timeout=12)
+              try:
+                  conn.request("GET", f"/v27.0/{path}?{query}", headers={"Authorization": "Bearer " + token})
+                  response = conn.getresponse()
+                  result = json.loads(response.read())
+                  return response.status, result
+              except (OSError, ValueError, http.client.HTTPException):
+                  raise SystemExit("META_API=unavailable") from None
+              finally:
+                  conn.close()
+
+          status, account = fetch("act_37084747", "id,currency,account_status,timezone_name")
+          if status != 200:
+              error = account.get("error", {})
+              code = error.get("code")
+              subcode = error.get("error_subcode")
+              print(f"ADS_ACCOUNT_ACCESS=denied HTTP={status} CODE={code if isinstance(code, int) else 'none'} SUBCODE={subcode if isinstance(subcode, int) else 'none'}")
+              raise SystemExit(1)
+
+          if account.get("id") != "act_37084747":
+              raise SystemExit("ADS_ACCOUNT_ACCESS=unexpected_account")
+          print("ADS_ACCOUNT_ACCESS=read_confirmed")
+          print(f"ADS_ACCOUNT_EUR={account.get('currency') == 'EUR'}")
+          print(f"ADS_ACCOUNT_ACTIVE={account.get('account_status') == 1}")
+
+          status, page = fetch("me", "id")
+          if status == 200 and page.get("id") == "604216843376166":
+              print("META_IDENTITY=facebook_page")
+          elif status == 200:
+              print("META_IDENTITY=other")
+
+          status, permissions = fetch("me/permissions", "permission,status")
+          if status == 200:
+              granted = any(
+                  item.get("permission") == "ads_management" and item.get("status") == "granted"
+                  for item in permissions.get("data", [])
+              )
+              print(f"ADS_MANAGEMENT_GRANTED={granted}")
+          else:
+              print(f"ADS_MANAGEMENT_SCOPE=unverified HTTP={status}")
+          PY
