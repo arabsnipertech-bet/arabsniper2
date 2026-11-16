@@ -1,4 +1,4 @@
-name: Confronto prematch Gold del 16 novembre
+name: Verifica revisioni Gold sulle schede di domani
 on:
   push:
     branches: ['ops/read-v7-lock-evidence-20261116']
@@ -6,17 +6,18 @@ on:
 permissions:
   contents: read
 jobs:
-  evidence:
-    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'bfb3c0a0469516ef74a6639e8cb6fc805a1cad34' && github.run_attempt == 1
+  verify:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == '1ba9e37efbf692f247185af1642c05a2bd7a368f' && github.run_attempt == 1
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: '778ad7ac5e263ec7d5a51677644d0b660459dfc4'
           persist-credentials: false
           sparse-checkout: src
       - run: python3 -m pip install boto3 ijson==3.6.0 requests
-      - name: Confronta solo fotografie prematch e risultati già acquisiti
+      - name: Riproduci le decisioni sulle fotografie prematch del 17 novembre
         env:
           PYTHONPATH: src
           R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -25,85 +26,58 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           python3 - <<'PY'
-          from collections import Counter, defaultdict
-          from datetime import datetime, timezone
+          from collections import Counter
           import json
           import os
           from pathlib import Path
           from tempfile import TemporaryDirectory
-          from zoneinfo import ZoneInfo
           
-          from audit_official_scores import read_live_scores, use_stored_scores
           from audit_storage import read_store
-          from decision_shadow import V7_VERSION, settle_v7
           from gold_competitions import national_competition
-          from gold_history import FILE
           from gold_storage import client, previous_manifest, restore_subset
           from multimarket_model import stamp
-          from v7_archive import FINISHED, checked_score, valid_snapshot
+          from v7_archive import valid_snapshot
+          from v7_decision import revise_priced_slots, route
           
           def main():
               storage, bucket = client(), os.environ['R2_BUCKET']
               index = previous_manifest(storage, bucket)
-              paths = [FILE, *(f'data/arab_quote_day{i}.json' for i in (1, 2))]
+              paths = [f'data/arab_quote_day{i}.json' for i in (1, 2, 3)]
               with TemporaryDirectory() as tmp:
                   root = Path(tmp)
                   restore_subset(storage, bucket, root, index, set(paths) & index.keys())
-                  history = read_store(root/FILE, {}).get('days', {})
-                  boards = [read_store(root/name, {}) for name in paths[1:]]
-              
-              now = datetime.now(timezone.utc)
-              rome = ZoneInfo('Europe/Rome')
-              today, tomorrow = '2026-11-16', '2026-11-17'
-              best, dates, saved = {}, {}, {}
-              for day in [*history.values(), *boards]:
-                  for match in day.get('matches', []):
-                      fixture = match.get('fixture') or {}
-                      fid, kickoff = str(fixture.get('fixture_id')), stamp(fixture.get('kickoff'))
-                      if not fid.isdecimal() or not kickoff or kickoff.astimezone(rome).date().isoformat() not in (today, tomorrow):
-                          continue
-                      dates[fid] = kickoff
-                      if fixture.get('result'):
-                          score = checked_score(fixture['result'])
-                          if fid not in saved or score.get('status') in FINISHED and score.get('home_ft') is not None:
-                              saved[fid] = score
-                      snapshot = ((match.get('multimarket') or {}).get('matrix') or {}).get('v7') or {}
-                      captured = stamp(snapshot.get('captured_at'))
-                      if (snapshot.get('status') == 'published' and captured and captured <= now
-                              and valid_snapshot(snapshot, fixture, snapshot['captured_at'])
-                              and (fid not in best or captured > best[fid][0])):
-                          best[fid] = (captured, fixture, snapshot)
-              
-              live = read_live_scores({fid: start for fid, start in dates.items() if start < now}, now)
-              results, disputed = use_stored_scores(dates, saved, live)
-              report = defaultdict(Counter)
-              for fid, (_, fixture, snapshot) in best.items():
-                  date = dates[fid].astimezone(rome).date().isoformat()
-                  national = bool(national_competition(fixture.get('league')))
-                  group = report[date + ('_national' if national else '_club')]
-                  group['verified_prematch'] += 1
-                  group['with_supported_model'] += any(row.get('supported') for row in snapshot['markets'].values())
-                  score = results.get(fid, {})
-                  final = fid not in disputed and score.get('status') in FINISHED and score.get('home_ft') is not None
-                  group['final_results'] += bool(final)
-                  shadow = snapshot.get('decision_shadow') or {}
-                  if shadow.get('version') != V7_VERSION:
+                  days = [read_store(root/name, {}) for name in paths]
+              day = next(d for d in days if d.get('date') == '2026-11-17')
+              report = {'national': Counter(), 'club': Counter()}
+              for match in day.get('matches', []):
+                  fixture = match.get('fixture') or {}
+                  v7 = ((match.get('multimarket') or {}).get('matrix') or {}).get('v7') or {}
+                  captured, kickoff = stamp(v7.get('captured_at')), stamp(fixture.get('kickoff'))
+                  if not (captured and kickoff and valid_snapshot(v7, fixture, v7['captured_at'])):
                       continue
-                  group['with_shadow'] += 1
-                  variants = settle_v7(snapshot, score if final else {})['variants']
-                  for role, old in variants['published'].items():
-                      new = variants['without_lock'][role]
-                      if not old or not new or old['market_id'] == new['market_id'] or old['odd'] is None or new['odd'] is None:
-                          continue
-                      group['different_priced_pairs'] += 1
-                      if final and old['roi'] is not None and new['roi'] is not None:
-                          group['settled_pairs'] += 1
-                          group['old_win'] += old['win'] == 1
-                          group['new_win'] += new['win'] == 1
-              print('GOLD_LOCK_EVIDENCE=' + json.dumps({'summary': report, 'disputed': len(disputed)}, sort_keys=True))
+                  national = bool(national_competition(fixture.get('league')))
+                  tally = report['national' if national else 'club']
+                  tally['verified_snapshots'] += 1
+                  old = v7.get('triad_commitments') or {}
+                  if not old:
+                      continue
+                  tally['existing_commitments'] += 1
+                  tally['already_revised'] += any(pick.get('replaces') for pick in old.values())
+                  markets, observed = v7['markets'], v7['signals']['observations']
+                  new = revise_priced_slots(markets, observed, old, captured, kickoff, national=national)
+                  changed = [role for role in old if old[role]['market_id'] != new[role]['market_id']]
+                  assert len(changed) <= 1
+                  if not changed:
+                      continue
+                  role = changed[0]
+                  assert new[role]['replaces'] == old[role]
+                  active, _ = route(markets, observed, locked={r: pick['market_id'] for r, pick in new.items()})
+                  assert active[role] and active[role]['market_id'] == new[role]['market_id']
+                  tally['eligible_revisions_on_recorded_prices'] += 1
+              print('GOLD_REVISION_REPLAY=' + json.dumps(report, sort_keys=True))
           
           try:
               main()
           except Exception as exc:
-              raise SystemExit('Gold evidence read failed: ' + type(exc).__name__) from None
+              raise SystemExit('Gold replay failed: ' + type(exc).__name__) from None
           PY
