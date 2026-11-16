@@ -1,5 +1,6 @@
-"""The prematch V7 decision, with one frozen triad per fixture."""
+"""Build and record the prematch V7 triad."""
 from collections import defaultdict
+from datetime import timedelta
 from functools import lru_cache
 from hashlib import sha256
 from itertools import product
@@ -412,6 +413,12 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
                                     relaxed=key not in standard[role]), 'study_only': True}
 
 
+def role_rank(role, key, row):
+    if role == 'most_probable':
+        return row['calibrated'], row['ev_low'], row['ev'], key
+    return bool(row['niche_id']), row['ev'], row['calibrated'], key
+
+
 def route(records, observed, *, study=False, allow_model_estimates=False, allow_unpriced=False,
           locked=None, role_markets=TRIAD_MARKETS, limits=TRIAD_LIMITS):
     locked = locked or {}
@@ -439,10 +446,7 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
                 candidates.append(key)
         if not candidates:
             continue
-        if role == 'most_probable':
-            key = max(candidates, key=lambda k: (records[k]['calibrated'], records[k]['ev_low'], records[k]['ev'], k))
-        else:
-            key = max(candidates, key=lambda k: (bool(records[k]['niche_id']), records[k]['ev'], records[k]['calibrated'], k))
+        key = max(candidates, key=lambda key: role_rank(role, key, records[key]))
         triad[role] = signal(key, records[key], role)
         chosen.append(key)
 
@@ -470,6 +474,46 @@ def commit_priced_slots(triad, captured_at, previous):
         commitments[role] = {field: pick[field] for field in ('market_id', 'label', 'odd', 'horizon')}
         commitments[role].update(captured_at=captured_at, study_only=pick.get('study_only') is True)
     return commitments
+
+
+def improves_slot(role, candidate, incumbent, gain):
+    low, ev = candidate.get('ev_low'), candidate.get('ev')
+    return (candidate.get('supported') is True and finite(candidate.get('fair'))
+            and (candidate.get('quote') or {}).get('quote_status') == 'recent'
+            and finite(low) and low >= 0 and low + 1e-9 >= incumbent['ev_low'] + gain
+            and finite(ev) and ev >= incumbent['ev']
+            and (role != 'most_probable' or candidate['calibrated'] >= incumbent['calibrated']))
+
+
+def revise_priced_slots(records, observed, previous, at, kickoff, *, national):
+    """Allow one supported upgrade until one hour before kickoff."""
+    if (not previous or kickoff - at < timedelta(hours=1)
+            or any(pick.get('replaces') for pick in previous.values())):
+        return previous
+
+    gain = .04 if national else .02
+    locked = {role: pick['market_id'] for role, pick in previous.items()}
+    reserved = set(locked.values())
+    current, _ = route(records, observed, locked=locked)
+
+    for role, market_set in TRIAD_MARKETS.items():
+        original = previous.get(role)
+        if not original:
+            continue
+        incumbent = records.get(original['market_id']) or {}
+        if not (finite(incumbent.get('ev_low')) and finite(incumbent.get('ev'))):
+            continue
+        candidates = [key for key in (market_set & records.keys()) - reserved
+                      if improves_slot(role, records[key], incumbent, gain)]
+        for key in sorted(candidates, key=lambda key: role_rank(role, key, records[key]), reverse=True):
+            proposed, _ = route(records, observed, locked={**locked, role: key})
+            if not proposed[role] or any(current[other] and not proposed[other]
+                                         for other in locked if other != role):
+                continue
+            replacement = commit_priced_slots({role: proposed[role]}, utc(at), {})[role]
+            replacement['replaces'] = original
+            return {**previous, role: replacement}
+    return previous
 
 
 def prior_triad_commitments(assessment, meta, as_of):
@@ -579,6 +623,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
 
     rome = ZoneInfo('Europe/Rome')
     days_ahead = (kickoff.astimezone(rome).date()-at.astimezone(rome).date()).days
+    commitments = revise_priced_slots(records, observed_patterns, commitments, at, kickoff,
+                                      national=bool(national_competition(meta.get('league'))))
     locked = {role: slot['market_id'] for role, slot in (commitments or {}).items()}
     triad, signals = route(records, observed_patterns, study=True,
                            allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True, locked=locked)

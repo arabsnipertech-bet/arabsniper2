@@ -20,7 +20,7 @@ from matrix_quotes import collect
 from v7_archive import ROME, WEIGHTS, day_path, quote_evidence, results_for_day, valid_snapshot
 from v7_decision import (AWAY, BOTH_GOALS, COMBOS, GG, GG_BOTH, GG_CARRY, GG_FT, GOAL,
                          OVER_CARRY, capture, commit_priced_slots, market_origin, prior_triad_commitments,
-                         quote_rows, route, stored_offers)
+                         quote_rows, revise_priced_slots, route, stored_offers)
 from v7_learning import STATE, active_weight, deduplicated, fit, run
 from v7_maintenance import MARKER, complete_price_pages, consolidate, price_window
 from v7_probability import BASE_WEIGHT, blend_rates, market_rates, price_usable, raw_rates, result_probabilities, score_model
@@ -518,6 +518,77 @@ class ArchiveAndWorkflow(unittest.TestCase):
                 return {'paging':{'current':1,'total':2}, 'response':[{'fixture':321}]}
         self.assertIsNone(complete_price_pages(API(),321,lambda: False))
         self.assertIsNone(complete_price_pages(API(),321,lambda: True))
+
+
+class TriadRevision(unittest.TestCase):
+    role = 'recommended_alternative'
+    candidate = GOAL['over35_ft']
+
+    @staticmethod
+    def priced(key, probability, odd, low, horizon):
+        return dict(source_market_id=key, label=key, calibrated=probability, odd=odd,
+                    ev=probability*odd-1, ev_low=low, tier='BLU', niche_id=None, horizon=horizon,
+                    spec_kind=json.loads(key)['kind'], model_fair_odd=1/probability, supported=True,
+                    fair=.40, quote={'quote_status': 'recent'}, features={})
+
+    def setUp(self):
+        original = self.priced(UNDER_ST, .45, 2.42, .01, 'ST')
+        self.previous = commit_priced_slots({self.role: {**original, 'market_id': UNDER_ST,
+                                                        'study_only': True}}, AT, {})
+        self.records = {UNDER_ST: original, self.candidate: self.priced(self.candidate, .44, 2.70, .04, 'FT')}
+        self.kickoff = datetime.fromisoformat(START)
+
+    def revise(self, *, national=False, at=LATER, previous=None):
+        return revise_priced_slots(self.records, PATTERNS, self.previous if previous is None else previous,
+                                   datetime.fromisoformat(at), self.kickoff, national=national)
+
+    def test_one_upgrade_retains_the_original_market_price_and_time(self):
+        original = deepcopy(self.previous)
+        updated = self.revise()
+        self.assertEqual(self.previous, original)
+        replacement = updated[self.role]
+        self.assertEqual(replacement['market_id'], self.candidate)
+        self.assertEqual(replacement['odd'], 2.70)
+        self.assertEqual(datetime.fromisoformat(replacement['captured_at']), datetime.fromisoformat(LATER))
+        self.assertFalse(replacement['study_only'])
+        self.assertEqual(replacement['replaces'], original[self.role])
+        self.records[HT] = self.priced(HT, .62, 2.75, .10, 'PT')
+        self.assertEqual(self.revise(previous=updated), updated)
+
+    def test_national_gain_and_prematch_cutoff(self):
+        self.assertEqual(self.revise(national=True), self.previous)
+        self.records[self.candidate]['ev_low'] = .05
+        upgraded = self.revise(national=True, at='2026-11-09T22:45:00+01:00')
+        self.assertEqual(upgraded[self.role]['market_id'], self.candidate)
+        self.assertEqual(self.revise(at='2026-11-09T22:46:00+01:00'), self.previous)
+
+    def test_candidate_requires_comparable_real_quotes_and_model_support(self):
+        recent = self.records[self.candidate]
+        for change in ({'quote': {'quote_status': 'cached_stable'}}, {'fair': None}, {'supported': False},
+                       {'ev_low': .02}, {'ev': .01}):
+            with self.subTest(change=change):
+                self.records[self.candidate] = {**recent, **change}
+                self.assertEqual(self.revise(), self.previous)
+        self.records[self.candidate] = recent
+        self.records[UNDER_ST]['ev_low'] = None
+        self.assertEqual(self.revise(), self.previous)
+
+    def test_primary_switch_must_keep_the_other_priced_slot(self):
+        current = GOAL['over25_ft']
+        self.records = {
+            current: self.priced(current, .55, 1.98, .01, 'FT'),
+            GG_FT: self.priced(GG_FT, .57, 2.15, .06, 'FT'),
+            HT: self.priced(HT, .49, 2.15, .01, 'PT'),
+        }
+        previous = commit_priced_slots({
+            'most_probable': {**self.records[current], 'market_id': current},
+            self.role: {**self.records[HT], 'market_id': HT},
+        }, AT, {})
+        self.assertEqual(self.revise(previous=previous), previous)
+        self.records[HT]['odd'] = 2.20
+        upgraded = self.revise(previous=previous)
+        self.assertEqual(upgraded['most_probable']['market_id'], GG_FT)
+        self.assertEqual(upgraded[self.role], previous[self.role])
 
 
 class TriadShadow(unittest.TestCase):
