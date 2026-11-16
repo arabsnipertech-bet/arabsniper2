@@ -1,4 +1,4 @@
-name: Verifica revisioni Gold sulle schede di domani
+name: Verifica candidati ammissibili della Gold del 17 novembre
 on:
   push:
     branches: ['ops/read-v7-lock-evidence-20261116']
@@ -7,7 +7,7 @@ permissions:
   contents: read
 jobs:
   verify:
-    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == '1ba9e37efbf692f247185af1642c05a2bd7a368f' && github.run_attempt == 1
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'b393241baedea428ed34ec52a58d0af755816b06' && github.run_attempt == 1
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
@@ -37,7 +37,8 @@ jobs:
           from gold_storage import client, previous_manifest, restore_subset
           from multimarket_model import stamp
           from v7_archive import valid_snapshot
-          from v7_decision import revise_priced_slots, route
+          from v7_decision import TRIAD_MARKETS, improves_slot, revise_priced_slots, route
+          from v7_probability import finite
           
           def main():
               storage, bucket = client(), os.environ['R2_BUCKET']
@@ -64,6 +65,35 @@ jobs:
                   tally['existing_commitments'] += 1
                   tally['already_revised'] += any(pick.get('replaces') for pick in old.values())
                   markets, observed = v7['markets'], v7['signals']['observations']
+                  locked = {role: pick['market_id'] for role, pick in old.items()}
+                  incumbent, _ = route(markets, observed, locked=locked)
+                  reasons = set()
+                  for role, original in old.items():
+                      current = markets.get(original['market_id']) or {}
+                      for key in (TRIAD_MARKETS[role] & markets.keys()) - set(locked.values()):
+                          revised, _ = route(markets, observed, locked={**locked, role: key})
+                          if not revised[role] or any(incumbent[r] and not revised[r] for r in old if r != role):
+                              continue
+                          reasons.add('with_admissible_alternative')
+                          candidate = markets[key]
+                          if not (candidate['supported'] and finite(candidate.get('fair'))
+                                  and (candidate.get('quote') or {}).get('quote_status') == 'recent'):
+                              continue
+                          reasons.add('with_fresh_supported_alternative')
+                          low = candidate.get('ev_low')
+                          if not finite(low) or low < 0:
+                              continue
+                          reasons.add('with_nonnegative_prudent_alternative')
+                          gain = .04 if national else .02
+                          if not (finite(current.get('ev_low')) and finite(current.get('ev'))):
+                              reasons.add('with_missing_comparison')
+                              if low >= gain:
+                                  reasons.add('with_strong_alternative_and_missing_comparison')
+                              continue
+                          reasons.add('with_comparable_alternative')
+                          if improves_slot(role, candidate, current, gain):
+                              reasons.add('with_sufficient_gain')
+                  tally.update(reasons)
                   new = revise_priced_slots(markets, observed, old, captured, kickoff, national=national)
                   changed = [role for role in old if old[role]['market_id'] != new[role]['market_id']]
                   assert len(changed) <= 1
