@@ -248,7 +248,9 @@ class MathAndRouting(unittest.TestCase):
         asian = row(dict(spec, kind='asian_total'), 8.)
         picks, _ = quote_rows([classic, asian], AT, START)
         self.assertEqual(list(picks), [HIGH])
-        self.assertEqual(picks[HIGH][0]['odd'], 8.)
+        self.assertEqual(picks[HIGH][0]['odd'], 7.)
+        fallback, _ = quote_rows([dict(classic, quote_status='stale'), asian], AT, START)
+        self.assertEqual(fallback[HIGH][0]['odd'], 8.)
         self.assertFalse(price_usable(dict(asian, quote_observed_at=START), AT, START))
         self.assertFalse(price_usable(dict(asian, quote_executable=False), AT, START))
         odds = {'response': [{'fixture': {'id': 321}, 'update': AT, 'bookmakers': [
@@ -401,6 +403,34 @@ class MathAndRouting(unittest.TestCase):
 
 
 class ArchiveAndWorkflow(unittest.TestCase):
+    def test_shadow_uses_the_last_published_snapshot_at_or_before_one_hour(self):
+        from decision_shadow import V7_VERSION
+
+        def publication(captured, published, meta=META):
+            snapshot = capture(assessment(), meta, captured, commitments={})
+            self.assertTrue(valid_snapshot(snapshot, meta, published))
+            return dict(fixture=meta, captured_at=published, publication_snapshot=True,
+                        multimarket=dict(matrix=dict(v7=snapshot)))
+
+        at_hour = '2026-11-09T22:45:00+01:00'
+        after_hour = '2026-11-09T22:46:00+01:00'
+        records = {'old': publication(AT, AT), 'hour': publication(at_hour, at_hour),
+                   'late': publication(after_hour, after_hour)}
+        store = {'analysis_updates': records}
+        now = datetime.fromisoformat('2026-11-10T02:01:00+01:00')
+        day = date(2026, 11, 9)
+        score = {'321': dict(status='FT', home_ht=2, away_ht=1, home_ft=3, away_ft=2)}
+        audited = results_for_day(store, day, now, score)['fixtures']['321']['decision_shadow']
+        hour, latest = audited['before_hour'], audited['latest']
+        self.assertEqual(hour['captured_at'], '2026-11-09T21:45:00+00:00')
+        self.assertEqual(latest['captured_at'], '2026-11-09T21:46:00+00:00')
+        self.assertEqual(hour['version'], V7_VERSION)
+        self.assertTrue(any(pick and pick['v51'] is not None and pick['win'] is not None
+                            for pick in hour['variants']['published'].values()))
+        records['moved'] = publication(AT, AT, dict(META, kickoff='2026-11-10T00:45:00+01:00'))
+        disputed = results_for_day(store, day, now, score)['fixtures']['321']['decision_shadow']
+        self.assertEqual(disputed, {'status': 'kickoff_conflict'})
+
     def test_auditor_settles_the_committed_market_even_when_the_card_has_no_current_quote(self):
         commitment = dict(market_id=UNDER_ST, label='Under 1,5 ST', odd=2.54, horizon='ST',
                           captured_at=AT, study_only=True)
@@ -488,6 +518,60 @@ class ArchiveAndWorkflow(unittest.TestCase):
                 return {'paging':{'current':1,'total':2}, 'response':[{'fixture':321}]}
         self.assertIsNone(complete_price_pages(API(),321,lambda: False))
         self.assertIsNone(complete_price_pages(API(),321,lambda: True))
+
+
+class TriadShadow(unittest.TestCase):
+    def record(self, key, *, odd, probability, ev_low):
+        spec = json.loads(key)
+        return dict(source_market_id=key, label=key, spec_kind=spec['kind'], calibrated=probability,
+                    odd=odd, ev=probability*odd-1, ev_low=ev_low, tier='BLU', horizon='FT', niche_id=None,
+                    study_supported=True, model_fair_odd=1/probability, quote_state='observed',
+                    quote={'quote_status':'recent'}, features={}, v51=probability-.02)
+
+    def variants(self, records, sources=None):
+        from decision_shadow import capture_v7
+
+        published, _ = route(records, PATTERNS, study=True)
+        saved = deepcopy(published)
+        shadow = capture_v7(records, sources or {key:{} for key in records}, PATTERNS, published,
+                            locked=False, allow_model_estimates=False)
+        self.assertTrue(shadow['shadow_only'])
+        self.assertEqual(published, saved)
+        self.assertEqual(shadow['variants']['published'], shadow['variants']['without_lock'])
+        return shadow['variants']
+
+    def test_under_floor_respects_price_and_prudent_edge(self):
+        for odd, ev_low, retained in ((1.74,.01,False),(1.75,-.01,False),(1.75,.01,True)):
+            with self.subTest(odd=odd, ev_low=ev_low):
+                result = self.variants({UNDER_ST:self.record(UNDER_ST, odd=odd, probability=.7, ev_low=ev_low)})
+                self.assertTrue(any(result['published'].values()))
+                self.assertEqual(any(result['under_15_floor_175'].values()), retained)
+
+    def test_recommended_market_and_price_are_compared_as_separate_hypotheses(self):
+        for key, price, variant in ((HT,2.1,'recommended_185_260'),(GG_FT,2.3,'gg_ft_recommended')):
+            with self.subTest(variant=variant):
+                result = self.variants({key:self.record(key, odd=price, probability=.52, ev_low=.02)})
+                baseline = result['published']['recommended_alternative']
+                candidate = result[variant]['recommended_alternative']
+                self.assertTrue(baseline is None or baseline.get('study_only'))
+                self.assertEqual(candidate['market_id'], key)
+                self.assertFalse(candidate['study_only'])
+                self.assertEqual(candidate['v51'], .5)
+
+    def test_flow_requires_positive_direction_agreement_margin_and_prudent_edge(self):
+        movement = dict(delta_pct=-3., fair_delta_pp=1., persistence=.65, reversal=False)
+        confirmed = dict(oci=25., selected_margin_pct=8., movement_confirmed=True, fair_direction_coherent=True,
+                         paired_books=3, agreeing_books=2, selected_movement=movement)
+        for source, ev_low, status, retained in (
+                (confirmed,.01,'recent',True), ({**confirmed,'oci':24.9},.01,'recent',False),
+                ({**confirmed,'selected_margin_pct':8.1},.01,'recent',False),
+                ({**confirmed,'agreeing_books':1},.01,'recent',False),
+                (confirmed,-.01,'recent',False), (confirmed,.01,'cached_stable',False)):
+            with self.subTest(source=source, ev_low=ev_low, status=status):
+                record = self.record(GG, odd=4., probability=.30, ev_low=ev_low)
+                record['quote']['quote_status'] = status
+                result = self.variants({GG:record}, {GG:source})
+                self.assertEqual(any(result['goals_confirmed_flow_25'].values()), retained)
 
 
 class Learning(unittest.TestCase):

@@ -10,11 +10,12 @@ import json
 from adaptive_calibration import number
 from adaptive_pricing import BASE_FIELDS, reprice
 from multimarket_model import stamp
-from opportunity_policy import POLICY_ID, annotate, goal_market
+from opportunity_policy import POLICY_ID, annotate, confirmed_flow, goal_market
 from platinum_policy import POLICY_ID as PLATINUM_ID, evaluate as platinum_evaluate
 
 VERSION='decision-shadow-v2.2'
 FAIR_PROTOCOL='fair_quote_probability_flow_v1'
+V7_VERSION = 'v7-triad-shadow-v1'
 PATHS=('market_fair','poisson_base','favorite_anchor_only','calibrated_v51')
 FIELDS=('id','spec','family','period','quality','statistical_pct','low_pct','high_pct','win_weight','loss_weight',
         'fair_odd','sensitivity_weights','odd','ev_pct','ev_low_pct','edge_pp','oci','selected_margin_pct',
@@ -186,6 +187,84 @@ def capture(assessment, meta, as_of, prior_stability=None):
             shadow_reasons=published['reasons']+([] if positive else ['nonnegative_ev_and_prudent_ev_required'])))
     out['platinum_nonnegative_ev']=platinum
     return out
+
+def capture_v7(records, sources, observed, published, *, locked, allow_model_estimates):
+    """Compare one change at a time on the same quote and model estimates."""
+    from lateral_matrix import market_id, specification
+    from v7_decision import GG, GG_FT, GOAL, TRIAD_LIMITS, TRIAD_MARKETS, route
+    from v7_probability import finite
+
+    under = {market_id(specification('total', period, 'under', 1.5)) for period in ('ht', 'sh')}
+    goals = {GG, GG_FT, GOAL['over35_ft']}
+    recommended = 'recommended_alternative'
+
+    def simulation(rows, **policy):
+        triad, _ = route(rows, observed, study=True, allow_model_estimates=allow_model_estimates,
+                         allow_unpriced=True, **policy)
+        return triad
+
+    def positive_price(row):
+        ev, low = row.get('ev'), row.get('ev_low')
+        return finite(ev) and ev > 0 and finite(low) and low >= 0
+
+    def flow_matches(row):
+        source = sources[row['source_market_id']]
+        oci, margin = source.get('oci'), source.get('selected_margin_pct')
+        return ((row.get('quote') or {}).get('quote_status') == 'recent' and positive_price(row)
+                and finite(margin) and 0 <= margin <= 8 and finite(oci) and oci >= 25
+                and confirmed_flow(source, minimum_oci=25))
+
+    def encode(triad):
+        result = {}
+        for role, pick in triad.items():
+            if not pick:
+                result[role] = None
+                continue
+            row = records[pick['market_id']]
+            result[role] = {**{key: pick.get(key) for key in ('market_id', 'odd', 'probability', 'tier', 'study_only')},
+                            'v51': row.get('v51'), 'quote': row.get('quote')}
+        return result
+
+    unlocked = simulation(records) if locked else published
+    price_floor = {key: row for key, row in records.items() if key not in under or (
+        finite(row.get('odd')) and row['odd'] >= 1.75 and positive_price(row))}
+    flow = {key: row for key, row in records.items() if key not in goals or flow_matches(row)}
+    variants = {
+        'published': published,
+        'without_lock': unlocked,
+        'under_15_floor_175': simulation(price_floor) if len(price_floor) != len(records) else unlocked,
+        'recommended_185_260': simulation(records, limits={**TRIAD_LIMITS,
+            recommended: (TRIAD_LIMITS[recommended][0], 1.85, 2.60)}),
+        'gg_ft_recommended': simulation(records, role_markets={**TRIAD_MARKETS,
+            recommended: TRIAD_MARKETS[recommended] | {GG_FT}}),
+        'goals_confirmed_flow_25': simulation(flow) if len(flow) != len(records) else unlocked,
+    }
+    return {'version': V7_VERSION, 'shadow_only': True,
+            'variants': {name: encode(triad) for name, triad in variants.items()}}
+
+
+def settle_v7(snapshot, score):
+    """Settle frozen variants at their own recorded price, including studies."""
+    from lateral_matrix import settle_spec
+    from v7_probability import finite
+
+    frozen = snapshot['decision_shadow']
+    variants = {}
+    for name, triad in frozen['variants'].items():
+        settled = {}
+        for role, pick in triad.items():
+            if not pick:
+                settled[role] = None
+                continue
+            weights = settle_spec(json.loads(pick['market_id']), score)
+            odd = pick.get('odd')
+            win, loss = weights if weights is not None else (None, None)
+            settled[role] = {**pick, 'win': win, 'loss': loss,
+                             'roi': win*(odd-1)-loss if weights is not None and finite(odd) and odd > 1 else None}
+        variants[name] = settled
+    return {**frozen, 'captured_at': snapshot['captured_at'], 'forecast_sha256': snapshot['sha256'],
+            'variants': variants}
+
 
 class DecisionAudit:
     """Bounded report: first/latest decisions plus counts over all snapshots."""

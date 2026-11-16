@@ -6,6 +6,7 @@ The browser consumes these decisions/ranks rather than reimplementing scoring.
 from collections import Counter
 from math import isfinite, sqrt
 from statistics import mean, median
+from market_scope import canonical_market
 
 POLICY_ID = 'gold-goals-v6.1'
 RULES_REVISION = 'v7-unified-v1'
@@ -65,12 +66,11 @@ def numeric(value):
 
 
 def goal_market(row):
-    spec = row.get('spec') or {}
+    spec = canonical_market(row.get('spec') or {})
     if spec.get('extra') is not None: return None
     # Only identical half-line settlements are equivalent. Quarter/integer
     # Asian lines keep their existing reference role, not new proposal rights.
-    kind = 'total' if spec.get('kind') == 'asian_total' else spec.get('kind')
-    return GOALS.get((kind, spec.get('period'), spec.get('side'), spec.get('line')))
+    return GOALS.get((spec.get('kind'), spec.get('period'), spec.get('side'), spec.get('line')))
 
 
 def study_blockers(row):
@@ -134,11 +134,11 @@ def market_tier(row):
     return 0 if goal_market(row) is not None else None
 
 
-def confirmed_flow(row):
+def confirmed_flow(row, minimum_oci=40):
     oci = row.get('oci')
     pairs, agreeing = row.get('paired_books', 0), row.get('agreeing_books', 0)
     selected = row.get('selected_movement') or {}
-    return bool(numeric(oci) and abs(oci) >= 40 and
+    return bool(numeric(oci) and abs(oci) >= minimum_oci and
         row.get('movement_confirmed') is True and row.get('fair_direction_coherent') is True and
         numeric(pairs) and numeric(agreeing) and pairs >= 2 and agreeing >= 2 and agreeing > pairs/2 and
         numeric(selected.get('delta_pct')) and selected['delta_pct'] * oci < 0 and

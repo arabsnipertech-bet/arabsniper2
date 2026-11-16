@@ -10,7 +10,7 @@ from adaptive_pricing import BASE_FIELDS, reprice
 from context_analysis import congruence_triggers
 from gold_competitions import national_competition
 from lateral_matrix import label, market_id, payout_weights, quality, specification
-from market_scope import COMBO_SPECS, JOINT_KINDS
+from market_scope import COMBO_SPECS, JOINT_KINDS, canonical_market as canonical
 from matrix_quotes import safe_price_row
 from multimarket_model import fair, stamp
 from opportunity_policy import annotate as annotate_gold
@@ -66,12 +66,6 @@ def fingerprint(value):
                              ensure_ascii=False, allow_nan=False).encode()).hexdigest()
 
 
-def canonical(spec):
-    if spec['kind'] == 'asian_total' and finite(spec.get('line')) and spec['line'] % 1 == .5:
-        return dict(spec, kind='total')
-    return spec
-
-
 def quote_rows(rows, as_of, kickoff):
     groups = defaultdict(list)
     for original in rows:
@@ -82,7 +76,9 @@ def quote_rows(rows, as_of, kickoff):
     chosen, inputs = {}, []
     for key, group in groups.items():
         usable = [r for r in group if price_usable(r, as_of, kickoff)]
-        pick = max(usable, key=lambda r: (r['odd'], stamp(r['quote_observed_at']), r['id'] == key, r['id']),
+        native = [r for r in usable if r['spec']['kind'] == 'total' and r.get('quote_source') != 'asian_halfline'
+                  and r.get('quote_status') == 'recent' and outcome_fair(r) is not None]
+        pick = max(native or usable, key=lambda r: (r['odd'], stamp(r['quote_observed_at']), r['id'] == key, r['id']),
                    default=next((r for r in group if r['id'] == key), group[0]))
         chosen[key] = pick, bool(usable)
         inputs.extend(dict(r, spec=canonical(r['spec'])) for r in usable if outcome_fair(r) is not None)
@@ -353,7 +349,7 @@ def signal(key, row, reason, *, relaxed=False):
                 **{field: row[field] for field in ('origin_badge', 'origin_tooltip') if field in row})
 
 
-def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked):
+def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked, role_markets):
     model_only = not any(finite(row['odd']) for row in records.values())
     if model_only and not allow_unpriced:
         return
@@ -374,7 +370,7 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
             if is_estimate and not (model_only or allow_model_estimates):
                 continue
             value = row['model_fair_odd'] if is_estimate else row['odd']
-            in_role = key in TRIAD_MARKETS[role]
+            in_role = key in role_markets[role]
             if not (finite(value) and value > 1 and 0 < row['calibrated'] <= 1):
                 continue
             within_limits = (row.get('study_supported') and row['calibrated'] >= floor
@@ -417,13 +413,13 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
 
 
 def route(records, observed, *, study=False, allow_model_estimates=False, allow_unpriced=False,
-          locked=None):
+          locked=None, role_markets=TRIAD_MARKETS, limits=TRIAD_LIMITS):
     locked = locked or {}
     reserved = set(locked.values())
     triad = dict.fromkeys(TRIAD_MARKETS)
     chosen = []
-    for role, markets in TRIAD_MARKETS.items():
-        floor, minimum, maximum = TRIAD_LIMITS[role]
+    for role, markets in role_markets.items():
+        floor, minimum, maximum = limits[role]
         candidates = []
         available = {locked[role]} if role in locked else markets - reserved
         for key in available & markets & records.keys():
@@ -462,7 +458,7 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
     signals['radar_sorprese'] = signal(best, records[best], 'quota_alta_in_salita') if best else None
     signals['observations'] = observed
     if study:
-        fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked)
+        fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked, role_markets)
     return triad, signals
 
 
@@ -602,7 +598,10 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
                    niche_id=(first and first['niche_id']) or next(iter(niches), None),
                    niches={name: sorted(keys) for name, keys in niches.items()})
     if commitments is not None:
+        from decision_shadow import capture_v7
         payload['triad_commitments'] = commit_priced_slots(triad, payload['captured_at'], commitments)
+        payload['decision_shadow'] = capture_v7(records, sources, observed_patterns, triad,
+                                                locked=bool(locked), allow_model_estimates=0 <= days_ahead <= 5)
     return {**payload, 'sha256': fingerprint(payload)}
 
 

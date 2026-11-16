@@ -103,7 +103,11 @@ def merge_verified_result(previous, incoming):
 
 def results_for_day(store, day, at, fetched=None, previous=None):
     """Latest valid pre-kickoff publication per fixture; outcomes kept separately."""
+    from decision_shadow import V7_VERSION, settle_v7
+
     latest, invalid = {}, 0
+    before_hour = {}
+    kickoffs = defaultdict(set)
     for record in store.get('analysis_updates', {}).values():
         if not record.get('publication_snapshot') or record.get('retrospective'):
             continue
@@ -115,11 +119,17 @@ def results_for_day(store, day, at, fetched=None, previous=None):
             invalid += 1
             continue
         kickoff = stamp(snapshot['kickoff'])
+        fid = snapshot['fixture_id']
+        kickoffs[fid].add(kickoff)
         if kickoff.astimezone(ROME).date() != day or kickoff >= at:
             continue
-        fid = snapshot['fixture_id']
         if fid not in latest or snapshot['captured_at'] > latest[fid][0]['captured_at']:
             latest[fid] = (snapshot, (record.get('settlement') or {}).get('result'))
+        if ((snapshot.get('decision_shadow') or {}).get('version') == V7_VERSION
+                and stamp(record['captured_at']) <= kickoff - timedelta(hours=1)):
+            earlier = before_hour.get(fid)
+            if earlier is None or snapshot['captured_at'] > earlier['captured_at']:
+                before_hour[fid] = snapshot
     prior = (previous or {}).get('fixtures', {})
     fixtures, samples, progress = {}, [], Counter()
     for fid, (snapshot, settled) in sorted(latest.items()):
@@ -201,6 +211,14 @@ def results_for_day(store, day, at, fetched=None, previous=None):
             fixtures[fid].update({key: snapshot.get(key) for key in ('triad', 'tier', 'badge', 'horizon', 'niche_id')})
             if commitments is not None:
                 fixtures[fid]['triad'] = {role: commitments.get(role) for role in SIGNAL_ROLES}
+        if (snapshot.get('decision_shadow') or {}).get('version') == V7_VERSION:
+            if len(kickoffs[fid]) > 1:
+                fixtures[fid]['decision_shadow'] = {'status': 'kickoff_conflict'}
+            else:
+                score = result if state == 'settled' else {}
+                fixtures[fid]['decision_shadow'] = {
+                    'latest': settle_v7(snapshot, score),
+                    'before_hour': settle_v7(before_hour[fid], score) if fid in before_hour else None}
     return dict(version=VERSION, date=str(day), generated_at=utc(at),
                 counts=dict(progress), rejected_forecasts=invalid, fixtures=fixtures, samples=samples)
 
