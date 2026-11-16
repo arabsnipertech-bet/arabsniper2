@@ -1,0 +1,116 @@
+name: Pubblica il metodo IA di ArabSniperBet
+
+on:
+  push:
+    branches: ['ops/publish-ai-match-method-20261116']
+    paths: ['.github/workflows/post-ia-metodo-20261116.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arabsniper-ia-post-20261116
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'a964c7d98557fdde937888b753f2f021156e5317' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            src
+            ops/media
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'requests>=2.32,<3'
+      - name: Invia la grafica e i testi approvati
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          META_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+          PYTHONPATH: src
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timedelta, timezone
+          from html import escape
+          import os
+          from pathlib import Path
+          import re
+          from urllib.parse import urlsplit
+          
+          from publisher_v71.channels import CHANNEL, PAGE, DeliveryError, Facebook, Telegram
+          from requests import RequestException
+          
+          telegram_text = "⚽ Cosa vede l’IA in una partita?\n\nPrima del calcio d’inizio, il motore di ArabSniperBet Gold incrocia le variazioni delle quote, Over/Under, handicap, medie gol e statistiche di attacco e difesa. Da questi dati stima diversi scenari.\n\nQuando i segnali puntano in direzioni diverse, entra la lettura umana. Guardiamo il contesto della gara e spieghiamo quali scenari hanno più sostegno nei dati.\n\nDopo il fischio finale confrontiamo l’analisi con il risultato effettivo. È lì che vediamo quali letture hanno retto e quali vanno corrette.\n\n🎁 Per la tua prima prova Gold di 7 giorni, apri @ArabSniperBot in privato, scrivi /prova e conferma la tua email."
+          facebook_text = "⚽ Come legge una partita l’IA di ArabSniperBet Gold?\n\nIl motore incrocia quote, Over/Under, handicap, medie gol e statistiche delle squadre. L’analista mette gli scenari nel contesto della gara. Dopo il fischio finale, confrontiamo l’analisi con il risultato reale.\n\nSegui le analisi prima della partita e i riscontri dopo sul canale Telegram. https://t.me/arabsniper_signals"
+          image = Path("ops/media/ArabSniperBet_Cosa_vede_IA.jpg").read_bytes()
+          if not image.startswith(b'\xff\xd8') or len(telegram_text) > 1024:
+              raise SystemExit('The approved photo or caption is invalid')
+          if CHANNEL != 'arabsniper_signals' or PAGE != '604216843376166':
+              raise SystemExit('Publication destination differs from the approved channel or page')
+          
+          now = datetime.now(timezone.utc)
+          window = (now - timedelta(hours=4)).isoformat()
+          
+          def send_telegram():
+              sender = Telegram(os.environ.get('BOT_TOKEN'))
+              if sender.call('getMe').get('username', '').lower() != 'arabsniperbot':
+                  raise ValueError('Telegram bot identity changed')
+              chat = sender.call('getChat', {'chat_id': '@' + CHANNEL})
+              if chat.get('type') != 'channel' or chat.get('username', '').lower() != CHANNEL:
+                  raise ValueError('Telegram channel identity changed')
+              try:
+                  existing = sender.reconcile({'marker': telegram_text.splitlines()[0][2:], 'created_at': window}, now)
+              except RequestException:
+                  existing = None
+              if existing:
+                  print('TELEGRAM_URL=https://t.me/' + CHANNEL + '/' + existing['id'], flush=True)
+                  return
+              title, rest = telegram_text.split('\n', 1)
+              photo = sender.call(
+                  'sendPhoto',
+                  {'chat_id': chat['id'], 'caption': '<b>' + escape(title) + '</b>\n' + escape(rest), 'parse_mode': 'HTML'},
+                  files={'photo': ('arabsniperbet-metodo-ia.jpg', image, 'image/jpeg')},
+              )
+              if photo.get('chat', {}).get('username', '').lower() != CHANNEL or not photo.get('message_id'):
+                  raise ValueError('Telegram did not confirm the channel and post ID')
+              print('TELEGRAM_URL=https://t.me/' + CHANNEL + '/' + str(photo['message_id']), flush=True)
+              if photo.get('caption') != telegram_text or not photo.get('photo'):
+                  raise ValueError('Telegram receipt did not match the approved photo and caption')
+              print('TELEGRAM_VERIFIED=photo_and_caption', flush=True)
+          
+          def send_facebook():
+              sender = Facebook(os.environ.get('META_TOKEN'))
+              sender.identify()
+              existing = sender.reconcile({'marker': facebook_text.splitlines()[0][2:], 'created_at': window}, now)
+              published_id = (existing or sender.send({'text': facebook_text}, image))['id']
+              if not re.fullmatch(PAGE + r'_\d+', published_id):
+                  raise ValueError('Facebook did not confirm the expected Page and post ID')
+              print('FACEBOOK_RECEIPT=https://www.facebook.com/' + PAGE + '/posts/' + published_id.split('_', 1)[1], flush=True)
+              published = sender.request('GET', published_id, params={'fields': 'id,message,permalink_url'})
+              permalink = published.get('permalink_url', '')
+              if published.get('id') != published_id or published.get('message', '').strip() != facebook_text:
+                  raise ValueError('Facebook receipt did not match the approved caption')
+              url = urlsplit(permalink)
+              if url.scheme != 'https' or url.hostname not in ('www.facebook.com', 'facebook.com'):
+                  raise ValueError('Facebook permalink was not verified')
+              print('FACEBOOK_URL=' + permalink, flush=True)
+              print('FACEBOOK_VERIFIED=page_and_caption', flush=True)
+          
+          failed = []
+          for name, publish in (('TELEGRAM', send_telegram), ('FACEBOOK', send_facebook)):
+              try:
+                  publish()
+              except DeliveryError as exc:
+                  failed.append(name)
+                  print(f'{name}_ERROR={exc.kind}:{exc.reason}', flush=True)
+              except Exception as exc:
+                  failed.append(name)
+                  print(f'{name}_ERROR={type(exc).__name__}', flush=True)
+          if failed:
+              raise SystemExit('Check receipts for ' + ', '.join(failed))
+          PY
