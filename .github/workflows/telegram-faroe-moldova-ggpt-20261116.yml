@@ -1,0 +1,73 @@
+name: Pubblica GG PT Fær Øer – Moldavia
+on:
+  push:
+    branches: ['ops/telegram-faroe-moldova-ggpt-20261116']
+    paths: ['.github/workflows/telegram-faroe-moldova-ggpt-20261116.yml']
+permissions:
+  contents: read
+concurrency:
+  group: telegram-faroe-moldova-ggpt-20261116
+  cancel-in-progress: false
+jobs:
+  telegram:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'a964c7d98557fdde937888b753f2f021156e5317' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Pubblica su Telegram entro la finestra prepartita
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          from datetime import datetime, timezone
+          import json
+          import os
+          from urllib.error import HTTPError
+          from urllib.request import HTTPRedirectHandler, Request, build_opener
+          
+          deadline = datetime.fromisoformat('2026-11-16T14:59:15+00:00')
+          channel = 'arabsniper_signals'
+          caption = "⚽ Fær Øer – Moldavia · ore 16:00\n\n🎯 Colpaccio Gold · GG PT @ 6,00\nEntrambe le squadre devono segnare nel primo tempo.\n\nStake basso · Probabilità stimata V7 16,9%"
+          
+          def check_deadline():
+              if datetime.now(timezone.utc) >= deadline:
+                  raise SystemExit('DEADLINE_PASSED')
+          
+          class RejectRedirect(HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          
+          opener = build_opener(RejectRedirect())
+          token = os.environ['TELEGRAM_TOKEN']
+          
+          def telegram(method, payload):
+              req = Request(
+                  f'https://api.telegram.org/bot{token}/{method}',
+                  json.dumps(payload).encode(),
+                  {'Content-Type': 'application/json'},
+                  method='POST',
+              )
+              try:
+                  with opener.open(req, timeout=5) as response:
+                      result = json.load(response)
+              except HTTPError as exc:
+                  raise SystemExit(f'TELEGRAM_{method}_HTTP_{exc.code}') from None
+              except Exception as exc:
+                  raise SystemExit(f'TELEGRAM_{method}_{type(exc).__name__}') from None
+              if not result.get('ok'):
+                  raise SystemExit(f'TELEGRAM_{method}_REJECTED')
+              return result['result']
+          
+          check_deadline()
+          chat = telegram('getChat', {'chat_id': '@' + channel})
+          if chat.get('type') != 'channel' or chat.get('username', '').lower() != channel:
+              raise SystemExit('TELEGRAM_CHANNEL_MISMATCH')
+          check_deadline()
+          post = telegram('sendMessage', {'chat_id': chat['id'], 'text': caption})
+          if post.get('chat', {}).get('username', '').lower() != channel or not post.get('message_id'):
+              raise SystemExit('TELEGRAM_RECEIPT_UNVERIFIED')
+          print(f'TELEGRAM_URL=https://t.me/{channel}/{post["message_id"]}', flush=True)
+          if post.get('text') != caption:
+              raise SystemExit('TELEGRAM_TEXT_MISMATCH')
+          print('TELEGRAM_VERIFIED=chat_and_text', flush=True)
+          PY
