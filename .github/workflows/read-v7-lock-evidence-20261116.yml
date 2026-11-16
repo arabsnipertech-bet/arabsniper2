@@ -1,4 +1,4 @@
-name: Verifica candidati ammissibili della Gold del 17 novembre
+name: Verifica il feed Gold pubblicato per il 17 novembre
 on:
   push:
     branches: ['ops/read-v7-lock-evidence-20261116']
@@ -7,9 +7,9 @@ permissions:
   contents: read
 jobs:
   verify:
-    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'b393241baedea428ed34ec52a58d0af755816b06' && github.run_attempt == 1
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == '805f86bc490332dfe2618507c281f1670595b558' && github.run_attempt == 1
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -17,7 +17,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: src
       - run: python3 -m pip install boto3 ijson==3.6.0 requests
-      - name: Riproduci le decisioni sulle fotografie prematch del 17 novembre
+      - name: Verifica le schede dal feed privato pubblicato
         env:
           PYTHONPATH: src
           R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -26,88 +26,52 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           python3 - <<'PY'
-          from collections import Counter
           import json
           import os
-          from pathlib import Path
-          from tempfile import TemporaryDirectory
           
-          from audit_storage import read_store
-          from gold_competitions import national_competition
-          from gold_storage import client, previous_manifest, restore_subset
+          from gold_storage import client, read_checkpoint_object
           from multimarket_model import stamp
           from v7_archive import valid_snapshot
-          from v7_decision import TRIAD_MARKETS, improves_slot, revise_priced_slots, route
-          from v7_probability import finite
           
           def main():
               storage, bucket = client(), os.environ['R2_BUCKET']
-              index = previous_manifest(storage, bucket)
-              paths = [f'data/arab_quote_day{i}.json' for i in (1, 2, 3)]
-              with TemporaryDirectory() as tmp:
-                  root = Path(tmp)
-                  restore_subset(storage, bucket, root, index, set(paths) & index.keys())
-                  days = [read_store(root/name, {}) for name in paths]
-              day = next(d for d in days if d.get('date') == '2026-11-17')
-              report = {'national': Counter(), 'club': Counter()}
-              for match in day.get('matches', []):
-                  fixture = match.get('fixture') or {}
-                  v7 = ((match.get('multimarket') or {}).get('matrix') or {}).get('v7') or {}
-                  captured, kickoff = stamp(v7.get('captured_at')), stamp(fixture.get('kickoff'))
-                  if not (captured and kickoff and valid_snapshot(v7, fixture, v7['captured_at'])):
+              boards = []
+              for key in ('arab_quote_day2.json', 'arab_quote_day1.json'):
+                  payload = json.loads(read_checkpoint_object(storage, bucket, key))
+                  if payload.get('date') == '2026-11-17':
+                      boards.append(payload)
+                      break
+              if not boards:
+                  raise ValueError('Gold date not found')
+              board = boards[0]
+              refreshed = stamp(board.get('opportunity_refreshed_at') or board.get('updated_at'))
+              minimum = stamp('2026-11-16T22:52:24+00:00')
+              if not refreshed or refreshed < minimum:
+                  raise ValueError('Gold date has not been refreshed by this release')
+              verified, complete, revisions, matches = 0, 0, 0, {}
+              for match in board['matches']:
+                  fixture = match['fixture']
+                  matches[str(fixture['fixture_id'])] = match
+              if len(matches) != len(board['matches']):
+                  raise ValueError('Repeated fixture identifiers')
+              for match in matches.values():
+                  fixture = match['fixture']
+                  snapshot = ((match.get('multimarket') or {}).get('matrix') or {}).get('v7') or {}
+                  if not valid_snapshot(snapshot, fixture, snapshot.get('captured_at')):
                       continue
-                  national = bool(national_competition(fixture.get('league')))
-                  tally = report['national' if national else 'club']
-                  tally['verified_snapshots'] += 1
-                  old = v7.get('triad_commitments') or {}
-                  if not old:
-                      continue
-                  tally['existing_commitments'] += 1
-                  tally['already_revised'] += any(pick.get('replaces') for pick in old.values())
-                  markets, observed = v7['markets'], v7['signals']['observations']
-                  locked = {role: pick['market_id'] for role, pick in old.items()}
-                  incumbent, _ = route(markets, observed, locked=locked)
-                  reasons = set()
-                  for role, original in old.items():
-                      current = markets.get(original['market_id']) or {}
-                      for key in (TRIAD_MARKETS[role] & markets.keys()) - set(locked.values()):
-                          revised, _ = route(markets, observed, locked={**locked, role: key})
-                          if not revised[role] or any(incumbent[r] and not revised[r] for r in old if r != role):
-                              continue
-                          reasons.add('with_admissible_alternative')
-                          candidate = markets[key]
-                          if not (candidate['supported'] and finite(candidate.get('fair'))
-                                  and (candidate.get('quote') or {}).get('quote_status') == 'recent'):
-                              continue
-                          reasons.add('with_fresh_supported_alternative')
-                          low = candidate.get('ev_low')
-                          if not finite(low) or low < 0:
-                              continue
-                          reasons.add('with_nonnegative_prudent_alternative')
-                          gain = .04 if national else .02
-                          if not (finite(current.get('ev_low')) and finite(current.get('ev'))):
-                              reasons.add('with_missing_comparison')
-                              if low >= gain:
-                                  reasons.add('with_strong_alternative_and_missing_comparison')
-                              continue
-                          reasons.add('with_comparable_alternative')
-                          if improves_slot(role, candidate, current, gain):
-                              reasons.add('with_sufficient_gain')
-                  tally.update(reasons)
-                  new = revise_priced_slots(markets, observed, old, captured, kickoff, national=national)
-                  changed = [role for role in old if old[role]['market_id'] != new[role]['market_id']]
-                  assert len(changed) <= 1
-                  if not changed:
-                      continue
-                  role = changed[0]
-                  assert new[role]['replaces'] == old[role]
-                  active, _ = route(markets, observed, locked={r: pick['market_id'] for r, pick in new.items()})
-                  assert active[role] and active[role]['market_id'] == new[role]['market_id']
-                  tally['eligible_revisions_on_recorded_prices'] += 1
-              print('GOLD_REVISION_REPLAY=' + json.dumps(report, sort_keys=True))
+                  verified += 1
+                  complete += sum(bool(pick) for pick in snapshot['triad'].values()) == 3
+                  revised = [p for p in (snapshot.get('triad_commitments') or {}).values() if p.get('replaces')]
+                  if len(revised) > 1 or any(p['market_id'] == p['replaces']['market_id'] for p in revised):
+                      raise ValueError('Invalid revision history')
+                  revisions += len(revised)
+              print('PUBLISHED_GOLD_RECEIPT=' + json.dumps({
+                  'date': board['date'], 'refreshed_at': refreshed.isoformat(), 'fixtures': len(matches),
+                  'verified_snapshots': verified, 'complete_triads': complete, 'revisions': revisions,
+              }, sort_keys=True), flush=True)
           
           try:
               main()
           except Exception as exc:
-              raise SystemExit('Gold replay failed: ' + type(exc).__name__) from None
+              raise SystemExit('Published Gold verification failed: ' + type(exc).__name__) from None
           PY
