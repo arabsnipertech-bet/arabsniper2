@@ -15,7 +15,7 @@ Campaign: `gold-engine-2026-11`. Requested by the owner: seven free days through
 
 ## Behavior
 
-With TELEGRAM_TRIAL_ENABLED=true, the new campaign is the default when TELEGRAM_TRIAL_CAMPAIGN is absent. Setting TELEGRAM_TRIAL_CAMPAIGN=disabled returns to the legacy eligibility logic; it does not revoke granted access. Setting TELEGRAM_TRIAL_ENABLED=false disables new bot requests altogether.
+With `TELEGRAM_TRIAL_ENABLED=true`, the special campaign is available through 18 November 2026 in Europe/Rome. From midnight on 19 November, `/prova` offers seven days to first-time users and checks both trial ledgers by verified email or Telegram account. Codes sent before the cutoff remain valid until their original expiry. The rules at verification determine eligibility, and verified pending reservations can finish using their original expiry. An operator can set `TELEGRAM_TRIAL_CAMPAIGN=disabled` to end the special offer earlier or `TELEGRAM_TRIAL_ENABLED=false` to disable new bot requests.
 
 One grant per email and Telegram account per campaign. Requires a fresh verified email OTP. Existing continuous access is preserved and extended by seven days. Suitable active Stripe trials are extended in place; paid subscriptions are not changed. Otherwise, a capped free Stripe trial provides the entitlement. Trial end and cancellation time must both match the immutable reserved expiry. Infinite VIP access remains unchanged.
 
