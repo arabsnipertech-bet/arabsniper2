@@ -73,7 +73,9 @@ class MarketOddsCaps(unittest.TestCase):
                 {'id': 50, 'name': 'Goal Line', 'values': [
                     {'value': 'Over 3.5', 'odd': '4.20'}, {'value': 'Under 3.5', 'odd': '1.25'}]}]}]}]}
         attach(a, payload, state, m['fixture'], NOW)
-        r = next(r for r in a['matrix']['rows'] if r['spec'] == S('asian_total', 'ft', 'over', 3.5))
+        r = next(r for r in a['matrix']['rows'] if r['spec'] == S('total', 'ft', 'over', 3.5))
+        self.assertEqual(r['quote_source'], 'asian_halfline')
+        self.assertEqual(r['quote_provenance']['source_bet_id'], 50)
         # The model is unchanged; use its genuine probability/EV in both paths.
         self.assertEqual(r['opportunity']['odds_max'], 4.5)
         self.assertNotIn('price', r['opportunity']['reasons'])
