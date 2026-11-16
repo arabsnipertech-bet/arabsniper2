@@ -1,9 +1,13 @@
-"""Patch only verified renewal module, preserving the rest of production."""
+"""Patch only the verified Telegram trial module in the production Worker."""
 import importlib.util, os, json, email.parser, email.policy, tempfile, subprocess, shutil
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('ops',Path(__file__).with_name('deploy-telegram-campaign.py'))
 ops=importlib.util.module_from_spec(spec);spec.loader.exec_module(ops)
-REF='b9c44bfc5fccb4cc99f8212df783cca572f51874'
+REF='13666389fc0af2dbda4f685cdecc8d6442823a66'
+TRIAL_SCENARIOS=(
+    ('2026-11-18T23:59:59+01:00','anche se hai già provato Gold'),
+    ('2026-11-19T00:00:00+01:00','Una sola prova per email o account Telegram'),
+)
 def download():
     raw,h=ops.request(ops.BASE+ops.WORKER+'/content/v2',os.environ['CF_TOKEN'])
     ct=h.get('Content-Type','')
@@ -34,7 +38,7 @@ def main():
             result=subprocess.run(['node','--test',str(root/'tests/test_gold_renewal.mjs')],capture_output=True,text=True)
             assert result.returncode==0,'Actual Worker failed isolated renewal integration tests'
         print('Actual Worker: 18 renewal tests passed (simulated Stripe and email)')
-    test_actual(patched);ops.smoke(patched)
+    test_actual(patched);ops.smoke(patched,TRIAL_SCENARIOS)
     import boto3
     s3=boto3.client('s3',endpoint_url='https://'+ops.ACCOUNT+'.r2.cloudflarestorage.com',region_name='auto',aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'])
     s3.put_object(Bucket='arabsniper-gold',Key='ops-backups/telegram-campaign/'+ops.CAMPAIGN+'/trial-eligibility-'+os.environ['GITHUB_RUN_ID']+'.json',Body=json.dumps({'worker':code,'module':name,'settings':settings}).encode(),ContentType='application/json')
@@ -49,9 +53,10 @@ def main():
     assert sorted(settings['bindings'],key=lambda b:b['name'])==sorted(after['bindings'],key=lambda b:b['name'])
     for k in ['compatibility_date','compatibility_flags','observability','limits','placement','logpush','tail_consumers']:
         assert settings.get(k)==after.get(k),'Configuration changed unexpectedly'
-    test_actual(download()[1]);ops.smoke(download()[1]);ops.health()
-    print('Permanent trial eligibility deployed; SHA256:',ops.digest(patched))
-    with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:out.write('Campaign beneficiaries are permanently excluded from later free trials by email or Telegram ID. Existing campaign history retained. Renewal module unchanged and 18 tests passed.\n')
+    test_actual(patched);ops.smoke(patched,TRIAL_SCENARIOS);ops.health()
+    print('Gold trial campaign cutover deployed. SHA256:',ops.digest(patched))
+    with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
+        out.write('The repeat campaign closes at 00:00 Europe/Rome on 19 November 2026. First-time users can continue to claim a seven-day trial. Both sides of the cutoff were tested against the deployed Worker.\n')
 if __name__=='__main__':
     try:main()
     except Exception as e:

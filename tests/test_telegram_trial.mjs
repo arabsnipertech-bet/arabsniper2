@@ -13,6 +13,7 @@ async function claimCampaign(s,access=async()=>({active:false}),chat=42,email='p
 }
 
 const START=1793685000;
+const CAMPAIGN_END=Date.parse('2026-11-19T00:00:00+01:00')/1000;
 function setup(campaign=false){
   const db=new DatabaseSync(':memory:');
   db.exec(readFileSync(new URL('../workers/stripe-access/telegram-trial-schema.sql',import.meta.url),'utf8'));
@@ -219,4 +220,94 @@ test('Eligibility is checked again after OTP verification',async()=>{
 test('Unfulfilled past campaign reservation does not disqualify a new campaign',async()=>{
   const s=setup(true);previousCampaign(s,'earlier-campaign','reserved');
   await claimCampaign(s);assert.equal(s.subs.length,1);
+});
+
+test('The last second of 18 November includes returning legacy trial users',async()=>{
+  const s=setup(true);
+  const now=CAMPAIGN_END-1;
+  s.db.prepare('INSERT INTO telegram_trial_claims VALUES (?,?,?,?,?,?)')
+    .run('person@example.com','42',START-700000,START-95200,'granted','sub_old');
+  const check=msg=>telegramTrialRoute(s.request(42,msg),s.env,async()=>({active:false}),'price_monthly',now);
+  await check('/prova');
+  assert.match(s.outs.at(-1).message,/18 novembre incluso/);
+  await check('person@example.com');
+  await check(s.outs.find(x=>x.type==='email').code);
+  assert.equal(s.db.prepare('SELECT expires_at FROM telegram_campaign_claims').get().expires_at,now+604800);
+});
+
+test('New users receive a seven-day standard trial from midnight in Rome',async()=>{
+  const s=setup(true);
+  delete s.env.TELEGRAM_TRIAL_CAMPAIGN;
+  s.db.exec(readFileSync(new URL('../workers/stripe-access/renewal-schema.sql',import.meta.url),'utf8'));
+  s.db.prepare('INSERT INTO gold_access_cache(email,payload,valid_until) VALUES (?,?,?)')
+    .run('person@example.com','{"active":false}',CAMPAIGN_END+300);
+  const check=msg=>telegramTrialRoute(s.request(42,msg),s.env,async()=>({active:false}),'price_monthly',CAMPAIGN_END);
+  await check('/start gold');
+  assert.match(s.outs.at(-1).message,/Una sola prova per email o account Telegram/);
+  await check('person@example.com');
+  await check(s.outs.find(x=>x.type==='email').code);
+  const claim=s.db.prepare('SELECT * FROM telegram_trial_claims').get();
+  assert.equal(claim.status,'granted');
+  assert.equal(claim.expires_at,CAMPAIGN_END+604800);
+  assert.equal(s.subs[0].cancel_at,claim.expires_at);
+  assert.equal(s.db.prepare('SELECT COUNT(*) AS n FROM telegram_campaign_claims').get().n,0);
+  assert.equal(s.db.prepare('SELECT COUNT(*) AS n FROM gold_access_cache').get().n,0);
+});
+
+test('After the campaign ends both trial ledgers block either reused identifier',async()=>{
+  const s=setup(true);
+  previousCampaign(s);
+  s.db.prepare('INSERT INTO telegram_trial_claims VALUES (?,?,?,?,?,?)')
+    .run('legacy@example.com','44',START-700000,START-95200,'granted','sub_old');
+  for(const [chat,email] of [[43,'PERSON@example.com'],[42,'other@example.com'],[45,'legacy@example.com'],[44,'another@example.com']]) {
+    await telegramTrialRoute(s.request(chat,email),s.env,async()=>({active:false}),'price_monthly',CAMPAIGN_END);
+  }
+  assert.equal(s.outs.filter(x=>x.type==='email').length,0);
+  assert.equal(s.outs.filter(x=>x.type==='telegram').length,4);
+  assert.equal(s.subs.length,0);
+});
+
+test('A code issued just before closing keeps its validity without reopening the campaign',async()=>{
+  for(const returning of [false,true]) {
+    const s=setup(true);
+    if(returning)s.db.prepare('INSERT INTO telegram_trial_claims VALUES (?,?,?,?,?,?)')
+      .run('person@example.com','42',START-700000,START-95200,'granted','sub_old');
+    const check=(msg,now)=>telegramTrialRoute(s.request(42,msg),s.env,async()=>({active:false}),'price_monthly',now);
+    await check('person@example.com',CAMPAIGN_END-1);
+    await check(s.outs.find(x=>x.type==='email').code,CAMPAIGN_END);
+    assert.equal(s.db.prepare('SELECT COUNT(*) AS n FROM telegram_campaign_claims').get().n,0);
+    assert.equal(s.subs.length,returning?0:1);
+    assert.match(s.outs.at(-1).message,returning?/già stata richiesta/:/Prova Gold attivata/);
+  }
+});
+
+test('An in-flight campaign reservation blocks a simultaneous standard grant',async()=>{
+  const s=setup(true);
+  const email='person@example.com';
+  const check=(chat,msg,now)=>telegramTrialRoute(s.request(chat,msg),s.env,async()=>({active:false}),'price_monthly',now);
+  await check(42,email,CAMPAIGN_END-10);
+  const campaignCode=s.outs.find(x=>x.type==='email').code;
+  let releaseStripe,reserved;
+  const waitForStripe=new Promise(resolve=>{releaseStripe=resolve;});
+  const reservationReady=new Promise(resolve=>{reserved=resolve;});
+  const send=globalThis.fetch;
+  globalThis.fetch=async(url,options)=>{
+    if(new URL(url).pathname==='/v1/subscriptions' && options.body?.has('metadata[gold_trial_campaign]')) {
+      reserved();
+      await waitForStripe;
+    }
+    return send(url,options);
+  };
+  const grant=check(42,campaignCode,CAMPAIGN_END-1);
+  await reservationReady;
+  try {
+    await check(43,email,CAMPAIGN_END);
+    await check(43,s.outs.filter(x=>x.type==='email').at(-1).code,CAMPAIGN_END);
+    assert.equal(s.db.prepare('SELECT COUNT(*) AS n FROM telegram_trial_claims').get().n,0);
+  } finally {
+    releaseStripe();
+    await grant;
+  }
+  assert.equal(s.subs.length,1);
+  assert.equal(s.db.prepare('SELECT status FROM telegram_campaign_claims').get().status,'granted');
 });

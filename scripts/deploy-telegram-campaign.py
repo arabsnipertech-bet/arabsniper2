@@ -52,7 +52,7 @@ def fingerprint():
     rows=query('SELECT * FROM telegram_trial_claims ORDER BY email')
     return digest(json.dumps(rows,sort_keys=True)),len(rows),rows
 
-def smoke(code):
+def smoke(code, scenarios=((None, 'anche se hai già provato Gold'),)):
     # Exercise the actual downloaded module with synthetic env and blocked network.
     with tempfile.TemporaryDirectory() as d:
         p=Path(d)/'worker.mjs';p.write_text(code)
@@ -64,10 +64,16 @@ import worker from './worker.mjs';
 const sent=[];
 globalThis.fetch=async(url,opts)=>{assert.equal(url,'https://api.telegram.org/botfake/sendMessage');sent.push(JSON.parse(opts.body));return Response.json({ok:true});};
 const env={TELEGRAM_TRIAL_ENABLED:'true',ACCESS_DB:{},TELEGRAM_BOT_TOKEN:'fake',TELEGRAM_WEBHOOK_SECRET:'fake',TELEGRAM_TRIAL_HMAC_SECRET:'fake',STRIPE_SECRET_KEY:'fake',RESEND_API_KEY:'fake',EMAIL_FROM:'fake@example.org'};
-const req=new Request('https://stripe-checker.arabsnipertech.workers.dev/api/telegram-webhook',{method:'POST',headers:{'X-Telegram-Bot-Api-Secret-Token':'fake'},body:JSON.stringify({message:{chat:{id:42,type:'private'},from:{id:42},text:'/prova'}})});
-assert.equal((await worker.fetch(req,env)).status,200);
-assert.equal(sent.length,1);assert.match(sent[0].text,/anche se hai già provato Gold/);
-console.log('Actual deployed module: new campaign /prova smoke passed (synthetic, no network)');
+const systemNow=Date.now;
+for(const [time,expected] of """+json.dumps(scenarios)+""") {
+  Date.now=time ? () => Date.parse(time) : systemNow;
+  const req=new Request('https://stripe-checker.arabsnipertech.workers.dev/api/telegram-webhook',{method:'POST',headers:{'X-Telegram-Bot-Api-Secret-Token':'fake'},body:JSON.stringify({message:{chat:{id:42,type:'private'},from:{id:42},text:'/prova'}})});
+  sent.length=0;
+  assert.equal((await worker.fetch(req,env)).status,200);
+  assert.equal(sent.length,1);
+  assert.ok(sent[0].text.includes(expected));
+}
+console.log('Actual module /prova smoke passed (synthetic, no network)');
 """)
         subprocess.run(['node',str(harness)],check=True,capture_output=True)
     print('Deployed module synthetic /prova test: OK')
