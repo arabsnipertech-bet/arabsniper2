@@ -1,0 +1,71 @@
+name: Verifica gli accessi Gold pagati
+on:
+  push:
+    branches: ['ops/read-gold-paid-status-20261116']
+    paths: ['.github/workflows/read-gold-paid-status-20261116.yml']
+permissions: {}
+jobs:
+  count:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'a964c7d98557fdde937888b753f2f021156e5317' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Leggi scadenze e corrispondenze dal registro Gold
+        env:
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          from base64 import b64encode
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          from tempfile import TemporaryDirectory
+          from urllib.error import HTTPError
+          from urllib.request import HTTPRedirectHandler, Request, build_opener
+          
+          class RejectRedirect(HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          
+          public_key = "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAuQ9HB5UDKSJTWSofdzBo\n9x1qczWDC54Fw8ft6q5xcCtcrJfHmqyAOyuOytss8wogr4r0feUiC3L2qd7fhrwn\n9Dfm6RVbYz+c6uYV2ZhEvqKJLeAFxJkjHbyvSCQZozkcNVOrPjNhIybIZW2hspus\n9cVNtQooIRp5pKiuGJkELi4u1SlXxjrFdeDBu6ELW1OfF6/QXJTQVuXDxrgcSVbU\nJ0NAfEps9QLUfYd2vAn39Irsi9RivhggDRhA3BGwKnVNd4xWPcRys9q0nVcX4g1P\n5ZwsdwJLvmS9jZPjqAu/egCtEWl8LQDhNa9+thmqP2nVC2siqJhS5LNnT4LoQQeo\ngf3a+0H6o+qQgD1p6Q+wurmo6XDnyn1IgyplVrWTpZhp+nV27jmZ6DvkZQZpr2BY\nRqVZ6oc6ak9Z1xUagq+OHuqziFMIKnvtTVkbLd/+M+4Xh2qBhpqiASDQ7AhYyjik\ni0YDzxtKMyvdx9p3nlRUBMqPKXNKuBMz2GLiu6mZ/Rn7AgMBAAE=\n-----END PUBLIC KEY-----\n"
+          sql = "WITH trials AS (\n  SELECT lower(trim(email)) AS account, started_at AS granted_at\n  FROM telegram_trial_claims WHERE status = 'granted'\n  UNION ALL\n  SELECT lower(trim(email)), COALESCE(granted_at, requested_at)\n  FROM telegram_campaign_claims WHERE status = 'granted'\n), entries AS (\n  SELECT p.payment_intent, p.plan, p.starts_at, p.expires_at, p.revoked,\n         lower(trim(p.email)) AS account,\n         (SELECT MIN(t.granted_at) FROM trials t WHERE t.account = lower(trim(p.email))) AS first_trial\n  FROM passes p\n), recent AS (\n  SELECT payment_intent, plan, starts_at, expires_at, revoked, first_trial\n  FROM entries ORDER BY starts_at DESC, payment_intent LIMIT 2\n)\nSELECT\n  unixepoch('now') AS measured_at,\n  COUNT(*) AS passes_count,\n  COUNT(DISTINCT account) AS paying_accounts,\n  COUNT(CASE WHEN revoked = 0 AND expires_at <= unixepoch('now') THEN 1 END) AS expired_passes,\n  COUNT(CASE WHEN revoked = 0 AND starts_at <= unixepoch('now') AND expires_at > unixepoch('now') THEN 1 END) AS active_passes,\n  COUNT(CASE WHEN revoked <> 0 THEN 1 END) AS revoked_passes,\n  (SELECT json_group_array(json_array(payment_intent, plan, starts_at, expires_at, revoked, first_trial)) FROM recent) AS recent_passes\nFROM entries"
+          fields = ["measured_at","passes_count","paying_accounts","expired_passes","active_passes","revoked_passes","recent_passes"]
+          url = (
+              'https://api.cloudflare.com/client/v4/accounts/dfdb02b4139b31c0ab4456a50eb371a2'
+              '/d1/database/2f9dbeae-4b26-494d-9b88-a3a89a1c4f25/query'
+          )
+          req = Request(
+              url,
+              json.dumps({'sql': sql}).encode(),
+              {'Authorization': 'Bearer ' + os.environ['D1_TOKEN'], 'Content-Type': 'application/json'},
+              method='POST',
+          )
+          try:
+              with build_opener(RejectRedirect()).open(req, timeout=16) as response:
+                  payload = json.load(response)
+          except HTTPError as exc:
+              raise SystemExit(f'D1_HTTP_{exc.code}') from None
+          except Exception as exc:
+              raise SystemExit(f'D1_{type(exc).__name__}') from None
+          result = payload.get('result', [])
+          if not payload.get('success') or len(result) != 1 or not result[0].get('success'):
+              raise SystemExit('D1_QUERY_FAILED')
+          rows = result[0].get('results', [])
+          if len(rows) != 1 or any(type(rows[0].get(key)) is not int or rows[0][key] < 0 for key in fields[:-1]):
+              raise SystemExit('D1_COUNT_UNVERIFIED')
+          data = [rows[0][key] for key in fields[:-1]] + [json.loads(rows[0]['recent_passes'])]
+          message = json.dumps(data, separators=(',', ':')).encode()
+          if len(message) > 318:
+              raise SystemExit('D1_RESULT_TOO_LONG')
+          with TemporaryDirectory() as tmp:
+              key = Path(tmp) / 'public.pem'
+              key.write_text(public_key)
+              result = subprocess.run(
+                  ['/usr/bin/openssl', 'pkeyutl', '-encrypt', '-pubin', '-inkey', str(key),
+                   '-pkeyopt', 'rsa_padding_mode:oaep', '-pkeyopt', 'rsa_oaep_md:sha256',
+                   '-pkeyopt', 'rsa_mgf1_md:sha256'],
+                  input=message, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, env={},
+              )
+          print('PAID_STATUS_ENCRYPTED=' + b64encode(result.stdout).decode(), flush=True)
+          PY
