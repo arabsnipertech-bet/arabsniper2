@@ -43,7 +43,7 @@ def main():
         # Allow the independently triggered Pages build to finish.
         for attempt in range(24):
             assets=session.get(ORIGIN+'/gold-explorer.mjs',timeout=30)
-            if assets.status_code==200 and '/api/auth/explorer/' in assets.text:break
+            if assets.status_code==200 and '/api/auth/explorer/' in assets.text and 'archiveLoader' in assets.text:break
             time.sleep(5)
         else:raise AssertionError('Pages has not published Explorer assets')
         with tempfile.TemporaryDirectory() as folder:

@@ -1,3 +1,4 @@
+import {archiveLoader} from './explorer-loader.mjs';
 import {categories,modes,text,numeric,romeDay,fresh,matches,rank,outcome,statistics,historyRows} from './explorer-core.mjs';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const number=(v,d=2)=>numeric(v)?v.toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
@@ -13,8 +14,8 @@ async function api(path,input){
  return data;
 }
 async function action(fn,button){if(button)button.disabled=true;try{await fn();}catch(e){message(e.message||'Connessione non disponibile. Riprova.');}finally{if(button)button.disabled=false;}}
-async function getObject(hash){if(!state.objects.has(hash))state.objects.set(hash,await api('objects/'+hash));return state.objects.get(hash);}
-async function getPages(hashes){const rows=[];for(let i=0;i<hashes.length;i+=4){const parts=await Promise.all(hashes.slice(i,i+4).map(async hash=>({hash,data:await getObject(hash)})));for(const {hash,data} of parts)rows.push(...(data.rows||[]).map(r=>({...r,object:hash})));}return rows;}
+const getObject=archiveLoader(hash=>api('objects/'+hash),12);
+async function getPages(hashes){const parts=await Promise.all(hashes.map(async hash=>({hash,data:await getObject(hash)})));return parts.flatMap(({hash,data})=>(data.rows||[]).map(r=>({...r,object:hash})));}
 async function getSnapshot(hash){if(!state.snapshots.has(hash)){const data=await getObject(hash);state.snapshots.set(hash,{...data,rows:await getPages(data.pages||[])});}return state.snapshots.get(hash);}
 const filters=()=>({...Object.fromEntries(new FormData($('filterForm'))),diversify:$('filterForm').elements.diversify.checked});
 const empty=(node,value='Nessuna selezione corrisponde ai criteri.')=>node.innerHTML='<p class="empty">'+esc(value)+'</p>';
