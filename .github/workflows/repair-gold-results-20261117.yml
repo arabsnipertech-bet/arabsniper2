@@ -1,0 +1,29 @@
+name: Sostituisci il recupero Gold avviato con la vecchia verifica
+on:
+  push:
+    branches: ['ops/repair-gold-results-20261117']
+    paths: ['.github/workflows/repair-gold-results-20261117.yml']
+permissions:
+  actions: write
+jobs:
+  stop-preparation:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'b6e470aeee0eac50c222fab870e72b7764ddc1ab' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Ferma solo la preparazione precedente alla verifica della data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: 'arabsnipertech-bet/arabsniper2'
+        run: |
+          set -euo pipefail
+          run="repos/$GH_REPO/actions/runs/44022940423"
+          details=$(gh api "$run")
+          jobs=$(gh api "$run/jobs")
+          if jq -e '.path == ".github/workflows/recover-daily-results.yml" and .head_sha == "b6e470aeee0eac50c222fab870e72b7764ddc1ab" and .head_branch == "main" and .status == "in_progress"' <<<"$details" >/dev/null &&
+             jq -e 'any(.jobs[]; .name == "prepare" and .status == "in_progress") and all(.jobs[]; .name != "publish")' <<<"$jobs" >/dev/null; then
+              gh run cancel 44022940423 --repo "$GH_REPO"
+              echo 'GOLD_RECOVERY_CANCELLATION=requested'
+          else
+              echo 'GOLD_RECOVERY_CANCELLATION=not_needed'
+          fi
