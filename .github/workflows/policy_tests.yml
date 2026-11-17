@@ -267,3 +267,52 @@ jobs:
           report['explorer_flag_present']=any(b.get('name')=='GOLD_EXPLORER_ENABLED' for b in settings['bindings'])
           print(json.dumps(report,indent=2))
           PYTHON
+
+  explorer-finalize-release:
+    # Bruno authorized merge/deploy in chat. One-shot marker prevents later runs.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[activate-explorer-v1]')
+    needs: tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    concurrency:
+      group: gold-explorer-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3 requests ijson==3.6.0
+      - name: Activate exact verified Worker after propagation
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          PYTHONUNBUFFERED: '1'
+        run: python scripts/activate-gold-explorer.py
+      - name: Prepare live browser verification
+        run: npm install --prefix /tmp/arabsniper-browser playwright@1.62.1
+      - name: Verify live API and owner interface
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          NODE_PATH: /tmp/arabsniper-browser/node_modules
+        run: python scripts/explorer-online-smoke.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: explorer-release-report
+          path: test-artifacts/explorer-*.json
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: explorer-live-screenshots
+          path: test-artifacts/explorer-live-*.png
+          retention-days: 30
+          if-no-files-found: error
+
