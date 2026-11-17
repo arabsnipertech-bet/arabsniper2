@@ -1,3 +1,17 @@
+# Aggiornamento operativo 17 novembre 2026
+
+Bruno ha autorizzato merge, deploy e lancio (Meta: 40 € totali / 6 giorni), subordinati ai controlli e alla reale disponibilità online. Le precedenti indicazioni di attesa autorizzazione sotto sono superate.
+
+La verifica reale su R2, D1 e Worker è riuscita. Il Worker online differisce da main: `scripts/explorer-worker-patch.py` aggiunge Explorer preservando byte per byte il codice precedente. Il codice reale modificato ha superato le suite auth, rinnovi ed Explorer. Il percorso usato dal client è `/api/auth/explorer/*`, già coperto dalla route Gold: nessuna nuova route DNS/Worker.
+
+Rilascio: merge con messaggio `[release-explorer-v1]`. Il job una tantum nell'esistente workflow di test attende i test verdi, acquisisce il mutex già usato dagli archivi, salva il Worker in R2 privato `ops-backups/gold-explorer/`, applica le due tabelle personali, importa gli archivi esistenti e distribuisce solo la patch additiva. Attiva poi il flag Worker e verifica il rifiuto degli anonimi. Nessuna credenziale calcistica è assegnata al job. I workflow ordinari aggiornano Explorer dopo il salvataggio Gold; una variabile GitHub esplicita `GOLD_EXPLORER_ENABLED=false` disabilita la proiezione.
+
+Rollback: disabilitare il flag Worker `GOLD_EXPLORER_ENABLED`, impostare la variabile GitHub a `false`, ripristinare il contenuto Worker dal backup privato e ripristinare gli asset Pages precedenti. Conservare tabelle personali e oggetti Explorer; non cambiare archivi Gold. Un errore durante il caricamento Worker/attivazione rimuove il nuovo flag e ripristina il precedente contenuto se non sono intervenuti altri deploy.
+
+La verifica in sola lettura è documentata in Actions run 44049819676. Il rilascio e il collaudo online devono ancora essere registrati; questi test non equivalgono a una verifica di produzione completata.
+
+---
+
 # Gold Explorer V1 — integrazione e collaudo
 
 Data: 17 novembre 2026. Branch `feature/gold-explorer-v1`, PR [#220](https://github.com/arabsnipertech-bet/arabsniper2/pull/220).
