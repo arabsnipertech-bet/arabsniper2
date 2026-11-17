@@ -198,3 +198,72 @@ jobs:
               assert all(j['status']=='completed' or j['name']=='explorer-authorized-release' for j in jobs)
               call(base+'/cancel','POST')
           print('Superseded Explorer release cancelled or already complete; no Night/Fast job touched')
+
+  explorer-post-release-verification:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[explorer-verify]')
+    needs: tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - run: npm install --prefix /tmp/arabsniper-browser playwright@1.62.1
+      - name: Verify live Explorer including seven-day history
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          NODE_PATH: /tmp/arabsniper-browser/node_modules
+        run: python scripts/explorer-online-smoke.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: explorer-online-final-verification
+          path: test-artifacts/explorer-live-*
+          retention-days: 30
+          if-no-files-found: error
+
+  explorer-release-progress:
+    # Read-only aggregate diagnostics for this owner-authored release PR only.
+    if: github.event_name == 'pull_request' && github.event.pull_request.number == 222 && github.event.pull_request.head.repo.full_name == 'arabsnipertech-bet/arabsniper2' && github.event.pull_request.head.ref == 'fix/explorer-onboarding-smoke'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3 requests ijson==3.6.0
+      - name: Read Explorer progress without writes or provider access
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+        run: |
+          python - <<'PYTHON'
+          import sys, os, json
+          sys.path.insert(0,'src')
+          from gold_storage import client, previous_manifest
+          from gold_explorer import read
+          from pathlib import Path
+          s3=client();bucket=os.environ['R2_BUCKET']
+          catalog=read(s3,bucket,'explorer/catalog.json',{})
+          current=read(s3,bucket,'explorer/current.json',{})
+          lease=read(s3,bucket,'explorer/writer-lease.json',{})
+          manifest=previous_manifest(s3,bucket)
+          legacy=[p for p in manifest if p.startswith('auditordata/prematch_') and p.endswith('.json') and len(Path(p).stem)==19]
+          report={'current_rows':current.get('count'),'updated_at':catalog.get('updated_at'),'days':len(catalog.get('days',{})), 'legacy_archives_total':len(legacy), 'legacy_days_imported':sum('legacy_sha' in d for d in catalog.get('days',{}).values()), 'legacy_rows_imported':sum(d.get('legacy_count',0) for d in catalog.get('days',{}).values()),'results':sum(d.get('results',0) for d in catalog.get('days',{}).values()),'lease_expires_at':lease.get('expires_at'),'writes':0,'football_requests':0}
+          import importlib.util
+          spec=importlib.util.spec_from_file_location('release','scripts/deploy-gold-explorer.py');release=importlib.util.module_from_spec(spec);spec.loader.exec_module(release)
+          live=release.ops.live();settings=release.ops.cf(release.ops.WORKER+'/settings',os.environ['CF_TOKEN'])
+          report['worker_sha']=release.ops.digest(live)
+          report['explorer_flag_present']=any(b.get('name')=='GOLD_EXPLORER_ENABLED' for b in settings['bindings'])
+          print(json.dumps(report,indent=2))
+          PYTHON
