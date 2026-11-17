@@ -1,3 +1,4 @@
+import {officialGoldRecords} from './explorer-official-records.mjs';
 import {archiveLoader} from './explorer-loader.mjs';
 import {categories,modes,text,numeric,romeDay,fresh,matches,rank,outcome,statistics,historyRows} from './explorer-core.mjs';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -22,7 +23,7 @@ const empty=(node,value='Nessuna selezione corrisponde ai criteri.')=>node.inner
 const roleNames={most_probable:'Più Probabile',recommended_alternative:'Consigliata',high_odds_shot:'Colpaccio'};
 const originalRoles=row=>row.roles?.length?row.roles.map(r=>roleNames[r]||r).join(', '):'Fuori dalla triade ufficiale';
 function emptyResults(){
- empty($('results'),!state.rows.length?'Archivio corrente caricato: nessuna analisi prematch disponibile.':$('mode').value==='recommended'?'Nessuna voce della categoria Consigliate soddisfa i filtri e i requisiti prematch attuali. Il caricamento è riuscito; questa vista non coincide con tutta la triade Gold.':'Dati caricati: nessuna voce corrisponde alla vista e ai filtri attuali.');
+ empty($('results'),!state.rows.length?'Archivio corrente caricato: nessuna analisi prematch disponibile.':$('mode').value==='recommended'?'Nessuna Consigliata ufficiale Gold registrata corrisponde ai filtri attuali. Il caricamento è riuscito.':'Dati caricati: nessuna voce corrisponde alla vista e ai filtri attuali.');
 }
 function cards(rows,node,options={}){
  if(!rows.length){empty(node);return;}
@@ -33,9 +34,9 @@ function cards(rows,node,options={}){
 }
 function render(){
  $('marketIndex').replaceChildren();$('marketNavigation').hidden=true;
- $('viewExplanation').textContent=$('mode').value==='recommended'?'La categoria Explorer e i ruoli della triade Gold sono distinti. Il ruolo originale Gold è riportato nelle schede e nel dettaglio.':$('mode').value==='markets'?'Gruppi in ordine alfabetico. Usa l’indice per raggiungere un mercato senza scorrere tutti i precedenti.':'I ruoli originali Gold sono riportati senza modifiche nelle schede e nel dettaglio.';
+ $('viewExplanation').textContent=$('mode').value==='recommended'?'Consigliate ufficiali già registrate dalla Gold, in ordine di inizio partita. Nessun nuovo punteggio Explorer. Gli indicatori sono quelli dello snapshot; la quota ufficiale originale, se documentata, è nel dettaglio.':$('mode').value==='markets'?'Gruppi in ordine alfabetico. Usa l’indice per raggiungere un mercato senza scorrere tutti i precedenti.':'I ruoli originali Gold sono riportati senza modifiche nelle schede e nel dettaglio.';
  const f=filters(),mode=$('mode').value,now=Date.now();let rows=state.rows.filter(r=>matches(r,f,now)&&(!state.focusFixture||r.fixture_id===state.focusFixture));
- if(mode!=='search')rows=rows.filter(r=>fresh(r,now));
+ if(mode!=='search'&&mode!=='recommended')rows=rows.filter(r=>fresh(r,now));
  if(mode==='markets'){
   $('results').replaceChildren();let more=false,count=0;
   for(const label of [...new Set(rows.map(r=>r.label))].sort()){
@@ -46,7 +47,7 @@ function render(){
   }
   if(!count)emptyResults();$('marketNavigation').hidden=!count;$('more').hidden=!more;
  }else{
-  rows=mode==='search'?rows.sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||b.probability-a.probability):rank(rows,mode,f.diversify);
+  rows=mode==='recommended'?officialGoldRecords(rows):mode==='search'?rows.sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||b.probability-a.probability):rank(rows,mode,f.diversify);
   if(rows.length)cards(rows.slice(0,state.limit),$('results'));else emptyResults();$('more').hidden=rows.length<=state.limit;
  }
 }
@@ -109,7 +110,7 @@ async function certificate(scan,h){
 function detail(row){
  const fast=row.latest_fast||row.fast_reference;
  $('detailBody').innerHTML='<h2>'+esc(row.label)+'</h2><p>'+esc(text(row.home)+' — '+text(row.away))+'</p><dl>'+[
- ['Categoria Explorer',categories[row.category]],['Ruolo originale Gold',originalRoles(row)],['Probabilità V7',percent(row.probability)],['Apertura',number(row.opening)],['Prima quota osservata',number(row.first_odd)],['Quota del riferimento',number(row.odd)],['Quota Night',row.night_reference?number(row.night_reference.odd)+' · '+date(row.night_reference.captured_at):'Non disponibile'],['Ultima quota Fast valida',fast?number(fast.odd)+' · '+date(fast.captured_at)+(Date.parse(fast.quote_valid_until)>Date.now()?'':' · storica / scaduta'):'Nessun aggiornamento Fast documentato'],['EV / EV_low',percent(row.ev)+' / '+percent(row.ev_low)],['OCI',number(row.oci)],['Affidabilità',row.reliability==='supported'?'Supporto statistico V7':'Limitata'],['Fonte',text(row.quote?.bookmaker)||row.quote?.bookmaker_id||'Non disponibile'],['Quota osservata',date(row.quote?.quote_observed_at)],['Aggiornata dalla fonte',date(row.quote?.provider_updated_at)],['Utilizzabile fino a',date(row.quote_valid_until)],['Snapshot V7',date(row.captured_at)],['Registrazione Explorer',row.legacy_v7?'Archivio V7 precedente':date(row.published_at)],['Salvata tra i preferiti',row.saved_at?date(row.saved_at*1000):'—'],['Riferimento finale',row.fallback_night?'Night: Fast successivo assente':row.reference||'Corrente'],['Esito',row.outcome?.label||'Non verificato'],['Risultato FT',row.outcome&&numeric(row.result?.result?.home_ft)&&numeric(row.result?.result?.away_ft)?row.result.result.home_ft+' – '+row.result.result.away_ft:'Non disponibile'],['Risultato PT',row.outcome&&numeric(row.result?.result?.home_ht)&&numeric(row.result?.result?.away_ht)?row.result.result.home_ht+' – '+row.result.result.away_ht:'Non disponibile'],['Motivi di attenzione',(row.exclusions||[]).join(', ')||'—'],['Impronta snapshot',row.forecast_sha256]
+ ['Categoria Explorer',categories[row.category]],['Ruolo originale Gold',originalRoles(row)],['Quota originale Consigliata Gold',row.roles?.includes('recommended_alternative')?number(row.official_references?.recommended_alternative?.odd):'—'],['Registrazione Consigliata Gold',row.roles?.includes('recommended_alternative')?date(row.official_references?.recommended_alternative?.captured_at):'—'],['Probabilità V7',percent(row.probability)],['Apertura',number(row.opening)],['Prima quota osservata',number(row.first_odd)],['Quota del riferimento',number(row.odd)],['Quota Night',row.night_reference?number(row.night_reference.odd)+' · '+date(row.night_reference.captured_at):'Non disponibile'],['Ultima quota Fast valida',fast?number(fast.odd)+' · '+date(fast.captured_at)+(Date.parse(fast.quote_valid_until)>Date.now()?'':' · storica / scaduta'):'Nessun aggiornamento Fast documentato'],['EV / EV_low',percent(row.ev)+' / '+percent(row.ev_low)],['OCI',number(row.oci)],['Affidabilità',row.reliability==='supported'?'Supporto statistico V7':'Limitata'],['Fonte',text(row.quote?.bookmaker)||row.quote?.bookmaker_id||'Non disponibile'],['Quota osservata',date(row.quote?.quote_observed_at)],['Aggiornata dalla fonte',date(row.quote?.provider_updated_at)],['Utilizzabile fino a',date(row.quote_valid_until)],['Snapshot V7',date(row.captured_at)],['Registrazione Explorer',row.legacy_v7?'Archivio V7 precedente':date(row.published_at)],['Salvata tra i preferiti',row.saved_at?date(row.saved_at*1000):'—'],['Riferimento finale',row.fallback_night?'Night: Fast successivo assente':row.reference||'Corrente'],['Esito',row.outcome?.label||'Non verificato'],['Risultato FT',row.outcome&&numeric(row.result?.result?.home_ft)&&numeric(row.result?.result?.away_ft)?row.result.result.home_ft+' – '+row.result.result.away_ft:'Non disponibile'],['Risultato PT',row.outcome&&numeric(row.result?.result?.home_ht)&&numeric(row.result?.result?.away_ht)?row.result.result.home_ht+' – '+row.result.result.away_ht:'Non disponibile'],['Motivi di attenzione',(row.exclusions||[]).join(', ')||'—'],['Impronta snapshot',row.forecast_sha256]
  ].map(([k,v])=>'<dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd>').join('')+'</dl><p class="note">Dati relativi al riferimento indicato. Explorer non ricalcola le probabilità V7.</p><button id="allAlternatives">Altre analisi della partita</button>';
  $('allAlternatives').onclick=()=>action(async()=>{
   if(row.snapshot){const snap=await getSnapshot(row.snapshot);$('detailBody').innerHTML='<h2>Mercati nello stesso snapshot</h2><div id="alternateRows"></div>';cards(snap.rows.filter(r=>r.fixture_id===row.fixture_id),$('alternateRows'),{historical:true});}
