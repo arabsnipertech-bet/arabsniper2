@@ -1,3 +1,5 @@
+> **Esito aggiornato:** Explorer è attivo e il collaudo online finale è passato. Vedere il [report di rilascio del 17 novembre](gold-explorer-release-2026-11-17.md) per risultati, tempi, limitazioni e rollback. Le indicazioni di stato pendente riportate sotto descrivono la fase precedente al rilascio.
+
 # Gold Explorer V1 — architettura, collaudo e rilascio
 
 Aggiornamento: 17 novembre 2026. URL canonico previsto: https://arabsniperbet.com/gold-explorer.
