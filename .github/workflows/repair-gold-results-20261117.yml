@@ -1,29 +1,36 @@
-name: Sostituisci il recupero Gold avviato con la vecchia verifica
+name: Avvia il recupero certificato del 15 e 16 novembre
 on:
   push:
     branches: ['ops/repair-gold-results-20261117']
     paths: ['.github/workflows/repair-gold-results-20261117.yml']
 permissions:
+  contents: read
   actions: write
 jobs:
-  stop-preparation:
-    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'b6e470aeee0eac50c222fab870e72b7764ddc1ab' && github.run_attempt == 1
+  request-recovery:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.event.before == 'f4f03ddef88e5930622d171e755c9e7e0b2604d2' && github.run_attempt == 1
     runs-on: ubuntu-24.04
-    timeout-minutes: 3
+    timeout-minutes: 5
     steps:
-      - name: Ferma solo la preparazione precedente alla verifica della data
+      - name: Avvia il workflow di recupero di produzione
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: 'arabsnipertech-bet/arabsniper2'
         run: |
           set -euo pipefail
-          run="repos/$GH_REPO/actions/runs/44022940423"
-          details=$(gh api "$run")
-          jobs=$(gh api "$run/jobs")
-          if jq -e '.path == ".github/workflows/recover-daily-results.yml" and .head_sha == "b6e470aeee0eac50c222fab870e72b7764ddc1ab" and .head_branch == "main" and .status == "in_progress"' <<<"$details" >/dev/null &&
-             jq -e 'any(.jobs[]; .name == "prepare" and .status == "in_progress") and all(.jobs[]; .name != "publish")' <<<"$jobs" >/dev/null; then
-              gh run cancel 44022940423 --repo "$GH_REPO"
-              echo 'GOLD_RECOVERY_CANCELLATION=requested'
-          else
-              echo 'GOLD_RECOVERY_CANCELLATION=not_needed'
+          status=$(gh api "repos/$GH_REPO/compare/4996d2e6126f4cd8d2435f43bd6f7c6f0ee2cdb9...main" --jq .status)
+          if [[ "$status" != "ahead" && "$status" != "identical" ]]; then
+              echo 'The official kickoff checks are absent from main.' >&2
+              exit 1
           fi
+          path="repos/$GH_REPO/actions/workflows/recover-daily-results.yml"
+          for day in 2026-11-15 2026-11-16; do
+              runs=$(gh api "$path/runs?branch=main&per_page=50")
+              if jq -e --arg title "Recover verified daily results · $day" --arg sha "4996d2e6126f4cd8d2435f43bd6f7c6f0ee2cdb9"                   'any(.workflow_runs[]; .display_title == $title and (.status != "completed" or (.head_sha == $sha and .conclusion == "success")))' <<<"$runs" >/dev/null; then
+                  echo "GOLD_RECOVERY_ALREADY_REQUESTED=$day"
+                  continue
+              fi
+              jq -n --arg day "$day" '{ref:"main",inputs:{date:$day,refresh:"true"}}' |
+                  gh api --method POST "$path/dispatches" --input -
+              echo "GOLD_RECOVERY_DISPATCHED=$day"
+          done
