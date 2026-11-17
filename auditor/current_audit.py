@@ -107,6 +107,7 @@ def archive_ledger(root, now, incoming, progress):
 
 
 def fetch_results(date, key, fixture_ids=(), *, only_ids=False):
+    from audit_official_scores import result_for_day
     from v7_archive import FINISHED, VOID, checked_score, merge_verified_result
 
     last_request_at = None
@@ -149,7 +150,9 @@ def fetch_results(date, key, fixture_ids=(), *, only_ids=False):
             'home_ft': ft.get('home'), 'away_ft': ft.get('away'),
             'extra_time': score.get('extratime'), 'penalties': score.get('penalty'),
             'source': 'API-Football', 'transport': 'audit_api'})
-        results[fid] = merge_verified_result(results.get(fid), result)
+        if kickoff := stamp(fixture.get('date')):
+            result['provider_kickoff'] = kickoff.isoformat()
+        results[fid] = merge_verified_result(results.get(fid), result_for_day(result, date))
 
     results = {}
     if only_ids:

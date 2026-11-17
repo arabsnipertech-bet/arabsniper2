@@ -12,10 +12,11 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
+from audit_official_scores import result_for_day
 from audit_storage import read_store
 from auditor_schedule import EXCLUDED_RECOVERY_DAYS
 from gold_storage import client, restore_subset
-from v7_archive import FINISHED, VOID, checked_score
+from v7_archive import FINISHED, VOID, checked_score, rescheduled_result
 from lateral_matrix import settle_spec
 
 LIVE = 'https://arabsniperbet.com/api/live-scores'
@@ -86,11 +87,22 @@ def reconcile(audit, fixtures):
     halftime_pending = []
     conflicts = []
     for fid, evidence in audit.items():
-        result = score(fixtures.get(fid) or {})
+        row = fixtures.get(fid) or {}
+        result = score(row)
         audited = checked_score(evidence.get('result') or {})
         state = evidence.get('status')
-        official_final = has_final(result)
         archived_final = state == 'settled' and has_final(audited)
+        kickoff, provider_kickoff = stamp(evidence.get('kickoff')), stamp(row.get('provider_kickoff'))
+        if kickoff and provider_kickoff:
+            result = result_for_day({**result, 'provider_kickoff': provider_kickoff.isoformat()},
+                                    kickoff.astimezone(ROME).date())
+        if rescheduled_result(result):
+            if archived_final:
+                conflicts.append({'fixture_id': fid, 'kind': 'schedule_mismatch'})
+            continue
+        if state == 'postponed' and rescheduled_result(audited) and not provider_kickoff:
+            continue
+        official_final = has_final(result)
         if (not archived_final and not official_final and
                 (state in ('void', 'postponed', 'suspended') or result.get('status') in NO_FINAL_EXPECTED)):
             continue

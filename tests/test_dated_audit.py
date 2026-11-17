@@ -15,7 +15,9 @@ from audit_daily_evidence import receipt_path, verified_evidence
 from audit_journal import capture_forecasts, ingest, journals_for_day
 from audit_storage import read_store
 from auditor_daily_priority import build_yesterday, ensure_priority, v7_ready
-from current_audit import archive, settle_day
+from current_audit import archive, fetch_results, settle_day
+from audit_official_scores import needs_result, read_live_scores
+from v7_archive import merge_verified_result
 from gold_storage import checkpoint_day, checkpoint_results, previous_manifest, publish, restore_v7_priority
 from recover_daily import next_recovery_day, recover_learning
 from v7_learning import STATE, run as learn_v7
@@ -87,6 +89,39 @@ class DatedAuditTests(TestCase):
             ensure_priority(restored, NOW.date(), resume)
             self.assertTrue(v7_ready(restored, NOW.date()))
             self.assertEqual(previous_manifest(store, 'test')[receipt_path(DAY)], index[receipt_path(DAY)])
+
+    def test_id_lookup_checks_rome_date_before_certifying_a_final(self):
+        moved = (DAY+timedelta(days=1)).isoformat()+'T00:30:00+01:00'
+        stayed = (DAY-timedelta(days=1)).isoformat()+'T23:30:00+00:00'
+        rows = [{'fixture': {'id': fid, 'date': kickoff, 'status': {'short': 'PEN'}},
+                 'goals': {'home': 3, 'away': 2},
+                 'score': {'fulltime': {'home': 2, 'away': 2}, 'halftime': {'home': 1, 'away': 1}}}
+                for fid, kickoff in ((1, moved), (2, stayed))]
+        response = BytesIO(json.dumps({'response': rows}).encode())
+        response.headers = {}
+        with patch('current_audit.urlopen', return_value=response):
+            result = fetch_results(str(DAY), 'test', [1, 2], only_ids=True)
+        first, second = [row['fixture']['result'] for row in result['days'][0]['matches']]
+        self.assertEqual((first['status'], first['rescheduled_to'], first['home_ft']), ('PST', moved, None))
+        self.assertFalse(needs_result(first))
+        self.assertEqual(merge_verified_result(second, first), first)
+        self.assertEqual((second['status'], second['home_ft'], second['away_ft']), ('PEN', 2, 2))
+
+    def test_legacy_cache_needs_an_official_kickoff_and_moved_dates_keep_no_score(self):
+        observed = NOW-timedelta(minutes=1)
+        kickoff = (NOW-timedelta(days=1)).isoformat()
+        elsewhere = (NOW-timedelta(hours=2)).isoformat()
+        row = {'status': 'FT', 'fulltime': {'home': 2, 'away': 0}, 'source': 'API-Football',
+               'observed_at': observed.isoformat()}
+        fixtures = {'1': {**row, 'fixture_id': '1'}, '2': {**row, 'fixture_id': '2',
+                                                         'provider_kickoff': elsewhere}}
+        response = BytesIO(json.dumps({'enabled': True, 'schema_version': 1,
+                                        'fixtures': fixtures}).encode())
+        with patch('audit_official_scores.urlopen', return_value=response):
+            results = read_live_scores({'1': kickoff, '2': kickoff}, NOW)
+        self.assertEqual(list(results), ['2'])
+        self.assertEqual((results['2']['status'], results['2']['rescheduled_to'], results['2']['home_ft']),
+                         ('PST', elsewhere, None))
 
     def test_uses_stored_live_scores_and_requests_only_the_missing_fixture(self):
         with (TemporaryDirectory() as folder, TemporaryDirectory() as plan,

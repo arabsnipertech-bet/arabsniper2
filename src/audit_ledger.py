@@ -295,7 +295,7 @@ class AuditLedger(Mapping):
 
 def settle_ledger(ledger, output):
     from prematch_audit import settle_predictions
-    from v7_archive import FINISHED, VOID, merge_verified_result
+    from v7_archive import FINISHED, VOID, merge_verified_result, rescheduled_result
     # Each fixture is handled once, even when the feed contains duplicates.
     matches = {str(m.get('fixture', {}).get('fixture_id')): m
                for day in output.get('days', []) for m in day.get('matches', [])}
@@ -305,13 +305,13 @@ def settle_ledger(ledger, output):
         if not incoming:
             continue
         store = ledger.fixture_store(fid)
-        if incoming.get('status') in FINISHED | VOID:
+        if incoming.get('status') in FINISHED | VOID or rescheduled_result(incoming):
             prior = next((result for collection in COLLECTIONS
                           for record in store.get(collection, {}).values()
                           if (result := (record.get('settlement') or {}).get('result') or {}).get('status') in FINISHED
                           and result.get('home_ft') is not None and result.get('away_ft') is not None), {})
             incoming = merge_verified_result(prior, incoming)
-            if incoming.get('status') in VOID:
+            if incoming.get('status') in VOID or rescheduled_result(incoming):
                 for collection in COLLECTIONS:
                     for record in store.get(collection, {}).values():
                         record['settlement'] = {'result': incoming, 'outcomes': {}}

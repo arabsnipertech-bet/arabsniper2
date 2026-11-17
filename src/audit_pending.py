@@ -7,9 +7,10 @@ COLLECTIONS = ('fixtures', 'quality_evaluations', 'multimarket_evaluations',
 
 
 def unresolved(record):
-    from v7_archive import VOID
+    from v7_archive import VOID, rescheduled_result
     settlement = record.get('settlement') or {}
-    if (settlement.get('result') or {}).get('status') in VOID:
+    result = settlement.get('result') or {}
+    if result.get('status') in VOID or rescheduled_result(result):
         return False
     outcomes = settlement.get('outcomes')
     return not outcomes or any(value is None for value in outcomes.values())
