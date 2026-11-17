@@ -133,9 +133,8 @@ jobs:
     permissions:
       contents: read
     concurrency:
-      group: arabsniper-quote-data-writer
+      group: gold-explorer-release
       cancel-in-progress: false
-      queue: max
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -172,3 +171,30 @@ jobs:
           path: test-artifacts/explorer-live-*.png
           retention-days: 30
           if-no-files-found: error
+
+  cancel-superseded-explorer-release:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'arabsnipertech-bet/arabsniper2' && github.event.pull_request.head.ref == 'fix/explorer-release-isolation'
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Cancel only the superseded pending Explorer release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: python
+        run: |
+          import os,json,urllib.request
+          base='https://api.github.com/repos/arabsnipertech-bet/arabsniper2/actions/runs/44051059081'
+          def call(url,method='GET'):
+              req=urllib.request.Request(url,method=method,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=30) as r:return json.load(r) if method=='GET' else None
+          run=call(base)
+          assert run['head_sha']=='d5ff9b9bee0f5d4c43bd31e05bc41a062e24f4f2'
+          if run['status']!='completed':
+              jobs=call(base+'/jobs')['jobs']
+              pending=[j for j in jobs if j['name']=='explorer-authorized-release']
+              assert len(pending)==1 and pending[0]['status'] in ('queued','pending','waiting'), 'Release already running; do not cancel'
+              assert all(j['status']=='completed' or j['name']=='explorer-authorized-release' for j in jobs)
+              call(base+'/cancel','POST')
+          print('Superseded Explorer release cancelled or already complete; no Night/Fast job touched')

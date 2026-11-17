@@ -169,8 +169,13 @@ def publish(s3,bucket,root, *, checkpoint_only=False, selected_paths=None):
             started = os.environ.get('EXPLORER_SCAN_STARTED_AT')
             if phase in ('night', 'fast') and not started:
                 phase = 'refresh'
-            publish_explorer(s3, bucket, root, [json.loads(gold[name]) for name in GOLD[:5]],
-                             phase, scan_started=started, source_manifest=index)
+            from explorer_lease import writer
+            with writer(s3, bucket) as explorer_store:
+                if explorer_store is not None:
+                    publish_explorer(explorer_store, bucket, root, [json.loads(gold[name]) for name in GOLD[:5]],
+                                     phase, scan_started=started, source_manifest=index)
+                else:
+                    print('Explorer writer busy; Gold publication already complete', flush=True)
         except Exception as error:
             print('Explorer projection deferred: '+type(error).__name__, flush=True)
 

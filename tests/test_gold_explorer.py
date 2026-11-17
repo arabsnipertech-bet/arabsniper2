@@ -1,4 +1,5 @@
 """Archive projection contract tests; outbound network is forbidden."""
+from contextlib import nullcontext
 import copy
 import io
 import json
@@ -81,8 +82,9 @@ class Projection(unittest.TestCase):
         data=self.root/'data';data.mkdir()
         for name in GOLD:(data/name).write_text('{"matches":[]}')
         store=Fake()
-        with patch.dict('os.environ', {'GOLD_EXPLORER_ENABLED':'true'}), patch('gold_explorer.publish', side_effect=RuntimeError('isolated')):
+        with patch.dict('os.environ', {'GOLD_EXPLORER_ENABLED':'true'}), patch('explorer_lease.writer', return_value=nullcontext(store)), patch('gold_explorer.publish', side_effect=RuntimeError('isolated')) as projection:
             publish(store,'test',self.root)
+        projection.assert_called_once()
         self.assertIn('state/current.json',store.objects)
         for name in GOLD[:5]:self.assertEqual(json.loads(store.objects[name])['matches'],[])
     def test_reuses_gold_manifest_checksums(self):
