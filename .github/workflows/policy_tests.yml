@@ -245,6 +245,7 @@ jobs:
           R2_BUCKET: arabsniper-gold
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
         run: |
           python - <<'PYTHON'
           import sys, os, json
@@ -259,5 +260,10 @@ jobs:
           manifest=previous_manifest(s3,bucket)
           legacy=[p for p in manifest if p.startswith('auditordata/prematch_') and p.endswith('.json') and len(Path(p).stem)==19]
           report={'current_rows':current.get('count'),'updated_at':catalog.get('updated_at'),'days':len(catalog.get('days',{})), 'legacy_archives_total':len(legacy), 'legacy_days_imported':sum('legacy_sha' in d for d in catalog.get('days',{}).values()), 'legacy_rows_imported':sum(d.get('legacy_count',0) for d in catalog.get('days',{}).values()),'results':sum(d.get('results',0) for d in catalog.get('days',{}).values()),'lease_expires_at':lease.get('expires_at'),'writes':0,'football_requests':0}
+          import importlib.util
+          spec=importlib.util.spec_from_file_location('release','scripts/deploy-gold-explorer.py');release=importlib.util.module_from_spec(spec);spec.loader.exec_module(release)
+          live=release.ops.live();settings=release.ops.cf(release.ops.WORKER+'/settings',os.environ['CF_TOKEN'])
+          report['worker_sha']=release.ops.digest(live)
+          report['explorer_flag_present']=any(b.get('name')=='GOLD_EXPLORER_ENABLED' for b in settings['bindings'])
           print(json.dumps(report,indent=2))
           PYTHON

@@ -33,8 +33,13 @@ class ExplorerStore:
 def upload(code):
     boundary='----ArabSniperExplorer20261117'
     body=(f'--{boundary}\r\nContent-Disposition: form-data; name="metadata"\r\nContent-Type: application/json\r\n\r\n'+json.dumps({'main_module':'worker.js'})+f'\r\n--{boundary}\r\nContent-Disposition: form-data; name="worker.js"; filename="worker.js"\r\nContent-Type: application/javascript+module\r\n\r\n'+code+f'\r\n--{boundary}--\r\n').encode()
-    raw,_=ops.request(ops.BASE+ops.WORKER+'/content',os.environ['CF_TOKEN'],body,'PUT',{'Content-Type':'multipart/form-data; boundary='+boundary})
-    assert json.loads(raw).get('success'),'Worker content update failed'
+    import requests
+    response=requests.put(ops.BASE+ops.WORKER+'/content',headers={'Authorization':'Bearer '+os.environ['CF_TOKEN'],'Content-Type':'multipart/form-data; boundary='+boundary},data=body,timeout=60,allow_redirects=False)
+    try:result=response.json()
+    except ValueError:result={}
+    codes=[e.get('code') for e in result.get('errors',[]) if isinstance(e,dict)]
+    assert response.ok and result.get('success'), 'Worker upload HTTP '+str(response.status_code)+'; Cloudflare error codes '+str(codes)
+
 
 def release(s3,target):
     assert os.environ.get('GITHUB_REF')=='refs/heads/main','Release must run from main'
@@ -59,7 +64,12 @@ def release(s3,target):
         restore_subset(s3,bucket,root,index,feeds+results)
         days=[read_store(root/p) for p in feeds]
         publish(target,bucket,root,days,'refresh',legacy_limit=None,source_manifest=index)
+        imported=read(target,bucket,'explorer/catalog.json',{}).get('days',{})
         for i,path in enumerate(legacy):
+            day=Path(path).stem[len('prematch_'):]
+            if imported.get(day,{}).get('legacy_sha')==index[path]['sha256']:
+                print('Existing historical archive already verified',i+1,'/',len(legacy),flush=True)
+                continue
             restore_subset(s3,bucket,root,index,[path])
             publish(target,bucket,root,[],'results',legacy_limit=None,source_manifest=index)
             (root/path).unlink()
@@ -69,14 +79,18 @@ def release(s3,target):
             print('Existing historical archive imported',i+1,'/',len(legacy),flush=True)
     current=read(target,bucket,'explorer/current.json',{})
     assert current.get('count',0)>0,'No real Explorer data available'
+    print('Archive import complete; checking live Worker before upload',flush=True)
     assert ops.live()==live,'Concurrent Worker change detected; no deployment performed'
     flag_added=False;uploaded=False
     try:
+        print('Uploading additive Worker content',flush=True)
         upload(patched);uploaded=True
+        print('Verifying uploaded Worker and bindings',flush=True)
         assert ops.live()==patched,'Worker verification failed'
         after=ops.cf(ops.WORKER+'/settings',os.environ['CF_TOKEN'])
         assert sorted(settings['bindings'],key=lambda b:b['name'])==sorted(after['bindings'],key=lambda b:b['name']),'Existing bindings changed'
         # Adding one secret binding leaves all existing configuration untouched.
+        print('Activating Explorer flag',flush=True)
         ops.cf(ops.WORKER+'/secrets',os.environ['CF_TOKEN'],{'name':'GOLD_EXPLORER_ENABLED','text':'true','type':'secret_text'},'PUT');flag_added=True
         import requests
         response=requests.get('https://arabsniperbet.com/api/auth/explorer/current',timeout=30,allow_redirects=False)
@@ -105,4 +119,4 @@ def main():
 
 if __name__=='__main__':
     try:main()
-    except Exception as e:raise SystemExit('Explorer release stopped: '+(str(e) if isinstance(e,AssertionError) else type(e).__name__)) from None
+    except Exception as e:raise SystemExit('Explorer release stopped: '+(str(e) if isinstance(e,AssertionError) or str(e).startswith(('Remote request failed','Cloudflare operation rejected')) else type(e).__name__)) from None
