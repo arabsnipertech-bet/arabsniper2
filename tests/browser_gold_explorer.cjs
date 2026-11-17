@@ -17,9 +17,9 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   const request=route.request(),url=new URL(request.url());if(url.origin!=='https://explorer.test'){external.push(url.href);return route.abort();}
   if(url.pathname==='/api/auth/session')return route.fulfill({contentType:'application/json',body:JSON.stringify({active:true,authenticated:true,email:'qa@example.test',server_time:now/1000,expires_at:now/1000+86400,session_expires_at:now/1000+86400})});
   if(url.pathname.startsWith('/api/gold-data/'))return route.fulfill({contentType:'application/json',body:JSON.stringify({date:'2026-11-17',matches:[]})});
-  if(url.pathname.startsWith('/api/explorer/')){
+  if(url.pathname.startsWith('/api/auth/explorer/')){
    calls.push(url.pathname);if(fail)return route.abort();if(status!==200)return route.fulfill({status,contentType:'application/json',body:JSON.stringify({error:status===401?'Accedi dalla Gold':'Errore temporaneo'})});
-   const endpoint=url.pathname.slice('/api/explorer/'.length),input=request.method()==='POST'?request.postDataJSON():null;let result={};
+   const endpoint=url.pathname.slice('/api/auth/explorer/'.length),input=request.method()==='POST'?request.postDataJSON():null;let result={};
    if(endpoint==='current')result={pages:empty?[]:pages,count:empty?0:rows.length,generated_at:new Date(now).toISOString()};
    else if(endpoint.startsWith('objects/'))result=objects[endpoint.slice(8)];
    else if(endpoint==='catalog')result={days:{'2026-11-17':{}},legacy_import_pending:0};

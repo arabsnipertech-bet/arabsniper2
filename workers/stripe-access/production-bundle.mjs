@@ -698,7 +698,7 @@ async function archive(env,key){
  return item.json();
 }
 async function explorerRoute(request,env,{sessionEmail,access},now=Math.floor(Date.now()/1000)){
- const u=new URL(request.url),path=u.pathname;
+ const u=new URL(request.url),path=u.pathname.replace(/^\/api\/auth\/explorer\//,'/api/explorer/');
  if(!path.startsWith('/api/explorer/'))return null;
  if(env.AUTH_ENABLED!=='true'||env.GOLD_EXPLORER_ENABLED!=='true'||!env.ACCESS_DB||!env.GOLD_DATA)return json({error:'Explorer in preparazione.'},503);
  if(u.origin!==env.AUTH_ORIGIN||request.method!=='GET'&&request.headers.get('Origin')!==u.origin)return json({error:'Origine non valida.'},403);

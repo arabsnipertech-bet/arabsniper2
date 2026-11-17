@@ -7,7 +7,7 @@ const state={rows:[],searches:[],limit:10,viewRows:new Map(),objects:new Map(),s
 if(new URLSearchParams(location.search).has('panel'))document.body.classList.add('embed');
 const message=v=>$('message').textContent=v;
 async function api(path,input){
- const response=await fetch('/api/explorer/'+path,{credentials:'same-origin',cache:'no-store',...(input?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)}:{})});
+ const response=await fetch('/api/auth/explorer/'+path,{credentials:'same-origin',cache:'no-store',...(input?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)}:{})});
  let data;try{data=await response.json();}catch{throw Error('Risposta non valida. Riprova.');}
  if(!response.ok){if([401,403].includes(response.status)){$('app').hidden=true;$('locked').hidden=false;}const error=Error(data.error||'Errore di rete');error.status=response.status;throw error;}
  return data;

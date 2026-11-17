@@ -69,3 +69,11 @@ test('Certified cohorts use stored membership; official original probability una
  assert.equal(historyRows(history,snapshots,'final','top').length,0);assert.equal(historyRows(history,snapshots,'night','top').length,1);
  const saved=historyRows(history,snapshots,'final','official')[0];assert.equal(saved.odd,2.4);assert.equal(saved.probability,null);assert.equal(saved.ev,null);
 });
+
+test('Existing auth route alias enforces the same server authorization',async()=>{
+ const s=setup();s.objects.set('explorer/current.json','{}');
+ const req=new Request(origin+'/api/auth/explorer/current');
+ assert.equal((await explorerRoute(req,s.env,{sessionEmail,access:async()=>({active:true})},now)).status,401);
+ const allowed=await explorerRoute(req,s.env,{sessionEmail:async()=> 'authorized@test.it',access:async()=>({active:true})},now);
+ assert.equal(allowed.status,200);
+});

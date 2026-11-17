@@ -90,6 +90,10 @@ def main():
     result.update(worker_read=True,d1_read=True,worker_sha=ops.digest(live),worker_matches_main=live.strip()==base.strip(),
         explorer_flag=bindings.get('GOLD_EXPLORER_ENABLED',{}).get('text','disabled'),
         personal_schema_present={'explorer_searches','explorer_favorites'} <= {r['name'] for r in tables})
+    patch_spec=importlib.util.spec_from_file_location('explorer_patch',ROOT/'scripts/explorer-worker-patch.py')
+    patcher=importlib.util.module_from_spec(patch_spec);patch_spec.loader.exec_module(patcher)
+    patched=patcher.patch_worker(live)
+    result.update(additive_patch_reversible=True,patched_worker_sha=ops.digest(patched),live_patch_suites=patcher.verify(patched))
     output=ROOT/'test-artifacts/explorer-real-preflight.json';output.parent.mkdir(exist_ok=True);output.write_text(json.dumps(result,indent=2))
     print(json.dumps(result,indent=2))
     with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
