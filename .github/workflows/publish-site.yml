@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - .github/workflows/publish-site.yml
+      - web/gold-explorer*
+      - web/explorer-core.mjs
       - web/gold-dashboard-live.html
       - web/index.html
       - web/_redirects

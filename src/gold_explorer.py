@@ -192,7 +192,7 @@ def publish(storage, bucket, root, days, phase, now=None, scan_started=None, leg
                     row['scan_phase'] = phase if fresh else 'retained'
                     active[row['id']] = row
     dates = {r['date'] for r in active.values()}
-    dates.update(day for day in catalog['days'] if day >= (now.astimezone(ROME).date()-timedelta(days=1)).isoformat())
+    dates.update(day for day in catalog['days'] if catalog['days'][day].get('pending_freeze') or day >= (now.astimezone(ROME).date()-timedelta(days=1)).isoformat())
     result_inputs, pending = {}, []
     for path in (root/'auditarchive').glob('prematch_*_v7.json'):
         day, checksum = path.name[len('prematch_'):-len('_v7.json')], file_signature(path)
@@ -228,7 +228,7 @@ def publish(storage, bucket, root, days, phase, now=None, scan_started=None, leg
                     continue
                 ref = history['references'].setdefault(row['episode'], {'kickoff': row['kickoff'],
                     'night': None, 'fast': None, 'final': None, 'frozen': False, 'fallback_night': False})
-                if not ref['frozen'] and (phase == 'fast' or not ref['night']):
+                if not ref['frozen'] and (phase != 'fast' or row['quote_usable']) and (phase == 'fast' or not ref['night']):
                     ref[phase] = digest
         for ref in history['references'].values():
             if not ref['frozen'] and now >= stamp(ref['kickoff'])-MARGIN:
@@ -247,7 +247,8 @@ def publish(storage, bucket, root, days, phase, now=None, scan_started=None, leg
             saved = history['market_references'].get(row['id'], {})
             row['night_reference'], row['fast_reference'] = saved.get('night'), saved.get('fast')
         put(storage, bucket, key, history)
-        catalog['days'][day] = {**info, 'scans': len(history['scans']), 'results': len(history['results'])}
+        catalog['days'][day] = {**info, 'scans': len(history['scans']), 'results': len(history['results']),
+            'pending_freeze': any(not r['frozen'] for r in history['references'].values())}
     if phase in ('night', 'fast', 'refresh'):
         rows = sorted(active.values(), key=lambda r: r['id'])
         put(storage, bucket, PREFIX+'current.json', {'version': 1, 'generated_at': now.isoformat(),

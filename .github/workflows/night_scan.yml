@@ -28,6 +28,7 @@ jobs:
     timeout-minutes: 120
 
     env:
+      GOLD_EXPLORER_ENABLED: ${{ vars.GOLD_EXPLORER_ENABLED }}
       GOLD_PRIVATE: ${{ vars.GOLD_PRIVATE }}
       R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
       R2_BUCKET: arabsniper-gold
@@ -80,7 +81,9 @@ jobs:
 
       - name: Run Night Scan
         if: steps.night_guard.outputs.run == 'true'
-        run: python src/3appdays_runner.py --night --days 5
+        run: |
+          python -c "import os; from datetime import datetime,timezone; open(os.environ['GITHUB_ENV'],'a').write('EXPLORER_SCAN_STARTED_AT='+datetime.now(timezone.utc).isoformat()+'\n')"
+          python src/3appdays_runner.py --night --days 5
 
       - name: Preserve legacy model comparison archive
         if: steps.night_guard.outputs.run == 'true'

@@ -33,6 +33,9 @@ on:
       - 'web/statistics-first.css'
       - 'web/results.js'
       - 'web/live-scores.js'
+      - 'workers/stripe-access/**'
+      - 'web/gold-explorer*'
+      - 'web/explorer-core.mjs'
       - 'workers/live-scores/**'
   push:
     branches: [main]
@@ -75,6 +78,8 @@ jobs:
         run: NODE_PATH=/tmp/arabsniper-browser/node_modules node tests/browser_lateral_matrix.cjs
       - name: Check public Publisher on desktop and mobile
         run: NODE_PATH=/tmp/arabsniper-browser/node_modules node tests/browser_publisher_v71.cjs
+      - name: Check Gold Explorer
+        run: NODE_PATH=/tmp/arabsniper-browser/node_modules node tests/browser_gold_explorer.cjs
       - name: Save dashboard previews
         if: always()
         uses: actions/upload-artifact@v4
