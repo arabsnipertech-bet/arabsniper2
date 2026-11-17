@@ -160,6 +160,19 @@ def publish(s3,bucket,root, *, checkpoint_only=False, selected_paths=None):
         s3.put_object(Bucket=bucket,Key=name,Body=data,ContentType='application/json',CacheControl='private, no-store')
     write_manifest(s3,bucket,index)
     print(f'Private checkpoint saved: {len(index)} files; {len(gold)} Gold feeds')
+    # Gold is committed first. Explorer cannot fail a scan or change its feeds.
+    if os.environ.get('GOLD_EXPLORER_ENABLED') == 'true':
+        try:
+            from gold_explorer import publish as publish_explorer
+            workflow = os.environ.get('GITHUB_WORKFLOW', '').lower()
+            phase = 'night' if 'night scan' in workflow else 'fast' if 'fast scan' in workflow else 'results'
+            started = os.environ.get('EXPLORER_SCAN_STARTED_AT')
+            if phase in ('night', 'fast') and not started:
+                phase = 'refresh'
+            publish_explorer(s3, bucket, root, [json.loads(gold[name]) for name in GOLD[:5]],
+                             phase, scan_started=started, source_manifest=index)
+        except Exception as error:
+            print('Explorer projection deferred: '+type(error).__name__, flush=True)
 
 
 def checkpoint_day(s3, bucket, root, day, *, legacy=False):

@@ -70,6 +70,7 @@ jobs:
     timeout-minutes: 75
 
     env:
+      GOLD_EXPLORER_ENABLED: ${{ vars.GOLD_EXPLORER_ENABLED || 'true' }}
       GOLD_PRIVATE: ${{ vars.GOLD_PRIVATE }}
       R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
       R2_BUCKET: arabsniper-gold
@@ -137,7 +138,9 @@ jobs:
 
       - name: Run Fast Scan
         if: steps.fast_guard.outputs.run == 'true' && steps.refresh.outputs.mode != 'cached'
-        run: python src/3appdays_runner.py --fast
+        run: |
+          python -c "import os; from datetime import datetime,timezone; open(os.environ['GITHUB_ENV'],'a').write('EXPLORER_SCAN_STARTED_AT='+datetime.now(timezone.utc).isoformat()+'\n')"
+          python src/3appdays_runner.py --fast
 
       # A full Fast scan recollects only days 1-2. Migrate saved days 3-5 too,
       # or a model/policy release leaves the later tabs on the previous policy.

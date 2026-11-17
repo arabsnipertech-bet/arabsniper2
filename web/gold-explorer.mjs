@@ -1,0 +1,121 @@
+import {categories,modes,text,numeric,romeDay,fresh,matches,rank,outcome,statistics,historyRows} from './explorer-core.mjs';
+const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const number=(v,d=2)=>numeric(v)?v.toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+const percent=v=>numeric(v)?number(v*100,1)+'%':'—';
+const date=v=>v?new Date(v).toLocaleString('it-IT',{timeZone:'Europe/Rome',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+const state={rows:[],searches:[],limit:10,viewRows:new Map(),objects:new Map(),snapshots:new Map(),history:[],historyLimit:10,legacyLimit:10,favorites:[],next:0};
+if(new URLSearchParams(location.search).has('panel'))document.body.classList.add('embed');
+const message=v=>$('message').textContent=v;
+async function api(path,input){
+ const response=await fetch('/api/auth/explorer/'+path,{credentials:'same-origin',cache:'no-store',...(input?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)}:{})});
+ let data;try{data=await response.json();}catch{throw Error('Risposta non valida. Riprova.');}
+ if(!response.ok){if([401,403].includes(response.status)){$('app').hidden=true;$('locked').hidden=false;}const error=Error(data.error||'Errore di rete');error.status=response.status;throw error;}
+ return data;
+}
+async function action(fn,button){if(button)button.disabled=true;try{await fn();}catch(e){message(e.message||'Connessione non disponibile. Riprova.');}finally{if(button)button.disabled=false;}}
+async function getObject(hash){if(!state.objects.has(hash))state.objects.set(hash,await api('objects/'+hash));return state.objects.get(hash);}
+async function getPages(hashes){const rows=[];for(let i=0;i<hashes.length;i+=4){const parts=await Promise.all(hashes.slice(i,i+4).map(async hash=>({hash,data:await getObject(hash)})));for(const {hash,data} of parts)rows.push(...(data.rows||[]).map(r=>({...r,object:hash})));}return rows;}
+async function getSnapshot(hash){if(!state.snapshots.has(hash)){const data=await getObject(hash);state.snapshots.set(hash,{...data,rows:await getPages(data.pages||[])});}return state.snapshots.get(hash);}
+const filters=()=>({...Object.fromEntries(new FormData($('filterForm'))),diversify:$('filterForm').elements.diversify.checked});
+const empty=(node,value='Nessuna selezione corrisponde ai criteri.')=>node.innerHTML='<p class="empty">'+esc(value)+'</p>';
+function cards(rows,node,options={}){
+ if(!rows.length){empty(node);return;}
+ const roleNames={most_probable:'Più Probabile',recommended_alternative:'Consigliata',high_odds_shot:'Colpaccio'};
+ node.innerHTML=rows.map(row=>{
+  const key=row.id+'-'+(row.object||'current')+'-'+(options.favorite?'favorite':'view');state.viewRows.set(key,{row,...options});
+  return `<article class="selection"><div><span class="badge ${esc(row.category)}">${esc(categories[row.category]||'Archivio')}</span><p class="small">${esc(text(row.league))} · ${date(row.kickoff)}</p><h3>${esc(text(row.home))} — ${esc(text(row.away))}</h3></div><div><strong class="market">${esc(row.label)}</strong><p class="small">${row.roles?.length?'Triade: '+esc(row.roles.map(r=>roleNames[r]||r).join(', ')):'Fuori dalla triade ufficiale'}</p><p class="small">${row.reliability==='supported'?'Supporto statistico V7':'Affidabilità limitata'} · ${row.validated?'Validata':'Non raccomandata'}</p>${row.outcome?`<b class="${row.outcome.win===1?'won':row.outcome.loss===1?'lost':''}">${esc(row.outcome.label)}</b>`:options.historical?'<span class="small">Esito non verificato</span>':''}</div><div class="numbers"><div><strong>${percent(row.probability)}</strong><small>Probabilità V7</small></div><div><strong>${number(row.odd)}</strong><small>${row.official_original?'Quota ufficiale originale':options.historical?'Quota snapshot':fresh(row)?'Quota di riferimento':'Quota storica / scaduta'}</small></div><p class="small">EV ${percent(row.ev)} · EV_low ${percent(row.ev_low)} · OCI ${number(row.oci,1)}</p></div><div class="actions"><button data-detail="${key}">Dettaglio</button><button ${options.favorite?'data-remove':'data-favorite'}="${key}" aria-label="${options.favorite?'Rimuovi preferito':'Salva preferito'}">${options.favorite?'Rimuovi':'☆'}</button></div></article>`;
+ }).join('');
+}
+function render(){
+ const f=filters(),mode=$('mode').value,now=Date.now();let rows=state.rows.filter(r=>matches(r,f,now)&&(!state.focusFixture||r.fixture_id===state.focusFixture));
+ if(mode!=='search')rows=rows.filter(r=>fresh(r,now));
+ if(mode==='markets'){
+  $('results').replaceChildren();let more=false,count=0;
+  for(const label of [...new Set(rows.map(r=>r.label))].sort()){
+   const list=rank(rows.filter(r=>r.label===label),'best',f.diversify);if(!list.length)continue;count+=list.length;more ||=list.length>state.limit;
+   const section=document.createElement('section'),title=document.createElement('h3'),content=document.createElement('div');title.textContent=label;section.append(title,content);cards(list.slice(0,state.limit),content);$('results').append(section);
+  }
+  if(!count)empty($('results'));$('more').hidden=!more;
+ }else{
+  rows=mode==='search'?rows.sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||b.probability-a.probability):rank(rows,mode,f.diversify);
+  cards(rows.slice(0,state.limit),$('results'));$('more').hidden=rows.length<=state.limit;
+ }
+}
+function metrics(rows,node){const s=statistics(rows);node.innerHTML='<div class="metrics">'+[
+ ['Selezioni nel campione',s.n],['Esiti verificati',s.verified],['Vinte / perse',s.won+' / '+s.lost],['Copertura risultati',percent(s.coverage)],['Hit rate · binari',percent(s.hitRate)],['ROI teorico · '+s.roiN+' quote',percent(s.roi)],['EV prematch medio',percent(s.ev)],['Brier · '+s.binaryN+' esiti',number(s.brier,4)]
+ ].map(([label,value])=>`<div class="metric"><strong>${esc(value)}</strong><span>${esc(label)}</span></div>`).join('')+'</div>';return s;}
+function table(headers,rows){return '<div class="table-wrap"><table><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+esc(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
+function dashboard(){const now=Date.now(),rows=state.rows.filter(r=>Date.parse(r.kickoff)>now),valid=rows.filter(r=>r.validated&&fresh(r,now));$('metrics').innerHTML=[['Partite disponibili',new Set(rows.map(r=>r.fixture_id)).size],['Mercati analizzati',rows.length],['Opportunità validate',valid.length],['Campionati',new Set(rows.map(r=>text(r.league))).size]].map(([label,value])=>`<div class="metric"><strong>${value}</strong><span>${label}</span></div>`).join('');}
+function scheduleExpiry(){clearTimeout(state.timer);const now=Date.now(),next=Math.min(...state.rows.flatMap(r=>[Date.parse(r.kickoff),Date.parse(r.quote_valid_until)]).filter(t=>t>now));if(Number.isFinite(next))state.timer=setTimeout(()=>{render();dashboard();scheduleExpiry();},Math.min(2147483647,next-now+25));}
+async function loadSearches(){const data=await api('searches');state.searches=data.items||[];const selected=$('savedSearches').value;$('savedSearches').replaceChildren(new Option('Le tue ricerche',''),...state.searches.map(s=>new Option(s.name,s.id)));$('savedSearches').value=state.searches.some(s=>s.id===selected)?selected:'';}
+async function refreshData(){
+ message('Lettura degli archivi Gold…');let data;try{data=await api('current');}catch(e){if(e.status!==404)throw e;data={pages:[],count:0};}
+ state.rows=await getPages(data.pages||[]);$('app').hidden=false;$('locked').hidden=true;$('updated').textContent='Ultima pubblicazione: '+date(data.generated_at);
+ for(const [name,values] of [['league',state.rows.map(r=>text(r.league))],['market',state.rows.map(r=>r.label)]]){const select=$('filterForm').elements[name],previous=select.value;select.replaceChildren(new Option('Tutti',''),...[...new Set(values.filter(Boolean))].sort().map(v=>new Option(v,v)));select.value=previous;}
+ const today=romeDay(Date.now()),last=romeDay(Date.parse(today+'T12:00:00Z')+4*86400000);for(const key of ['from','to']){const input=$('filterForm').elements[key];input.min=today;input.max=last;}
+ state.limit=10;render();dashboard();scheduleExpiry();await loadSearches();message(state.rows.length?'Dati caricati.':'Nessuna analisi prematch disponibile. Puoi consultare lo storico.');
+}
+function refresh(){return state.refreshPromise ||=refreshData().finally(()=>state.refreshPromise=null);}
+async function favorites(reset=true){
+ if(reset){state.favorites=[];state.next=0;}
+ const data=await api('favorites?offset='+(state.next||0));state.favorites.push(...data.items);state.next=data.next;
+ const rows=state.favorites.map(f=>({...f.snapshot,saved_at:f.saved_at,latest_fast:f.references?.fast,result:f.result,outcome:outcome(f.snapshot,f.result)}));
+ metrics(rows,$('favoriteMetrics'));cards(rows,$('favoriteRows'),{favorite:true,historical:true});$('moreFavorites').hidden=state.next===null;
+}
+function renderLegacy(){const rows=state.legacyRows||[];cards(rows.slice(0,state.legacyLimit),$('legacyRows'),{historical:true});$('moreLegacy').hidden=rows.length<=state.legacyLimit;}
+function renderHistory(){
+ const f=filters(),reference=$('historyReference').value,cohort=$('historyCohort').value;
+ const all=(ref,group)=>state.history.flatMap(h=>historyRows(h,state.snapshots,ref,group)).filter(r=>matches(r,f,Date.now(),true));
+ const rows=all(reference,cohort),stats=metrics(rows,$('historyMetrics')),comparison=[];
+ for(const ref of ['night','final'])for(const group of ['official','alternative']){const s=statistics(all(ref,group));comparison.push([ref==='night'?'Night':'Finale',group==='official'?'Triade':'Alternative',s.n,s.verified,percent(s.hitRate),percent(s.roi)]);}
+ $('comparisons').innerHTML='<h3>Campioni separati · stessi filtri</h3>'+table(['Riferimento','Campione','N','Verificati','Hit rate','ROI'],comparison)+'<h3>Calibrazione probabilistica</h3>'+table(['Fascia','N','Probabilità media','Frequenza osservata'],stats.bins.filter(b=>b.n).map(b=>[b.range,b.n,percent(b.predicted),percent(b.observed)]));
+ for(const field of ['label','league']){$('comparisons').innerHTML+='<h3>'+ (field==='label'?'Per mercato':'Per campionato')+'</h3>'+table(['Gruppo','N','Verificati','Hit rate','ROI'],[...new Set(rows.map(r=>text(r[field])))].map(g=>{const s=statistics(rows.filter(r=>text(r[field])===g));return[g,s.n,s.verified,percent(s.hitRate),percent(s.roi)];}));}
+ cards(rows.slice(0,state.historyLimit),$('historyRows'),{historical:true});$('moreHistory').hidden=rows.length<=state.historyLimit;
+ state.legacyRows=state.history.flatMap(h=>(h.legacyRows||[]).map(r=>({...r,result:h.results?.[r.fixture_id],outcome:outcome(r,h.results?.[r.fixture_id])}))).filter(r=>matches(r,f,Date.now(),true));
+ metrics(state.legacyRows,$('legacyMetrics'));renderLegacy();$('legacyState').textContent=`Ultima pubblicazione V7 verificabile per mercato prima del margine prematch. Nessuna classifica Explorer ricostruita. Giornate ancora da importare: ${state.legacyPending||0}.`;
+}
+async function loadHistory(){
+ message('Caricamento dello storico certificato…');const catalog=await api('catalog'),today=romeDay(Date.now()),period=$('historyPeriod').value;
+ state.legacyPending=catalog.legacy_import_pending;const since=period==='all'?'0000-00-00':romeDay(Date.parse(today+'T12:00:00Z')-(Number(period)-1)*86400000);
+ const dates=Object.keys(catalog.days||{}).filter(d=>d>=since&&d<=today).sort().reverse();state.history=[];$('certificates').replaceChildren();
+ for(const day of dates){
+  const h=await api('days/'+day),refs=[...new Set(Object.values(h.references||{}).flatMap(r=>[r.night,r.final]).filter(Boolean))];
+  for(let i=0;i<refs.length;i+=4)await Promise.all(refs.slice(i,i+4).map(getSnapshot));h.legacyRows=await getPages(h.legacy_pages||[]);state.history.push(h);
+  for(const scan of h.scans||[]){const button=document.createElement('button');button.textContent=day+' · '+scan.phase+' · '+date(scan.published_at);button.onclick=()=>action(()=>certificate(scan,h),button);$('certificates').append(button);}
+  message(`Storico: ${state.history.length} di ${dates.length} giornate caricate.`);
+ }
+ state.historyLimit=state.legacyLimit=10;renderHistory();message(dates.length?'Storico caricato. I giorni senza evidenza non sono inventati.':'Nessun archivio disponibile nel periodo.');
+}
+async function certificate(scan,h){
+ const snap=await getSnapshot(scan.sha256),map=new Map(snap.rows.map(r=>[r.id,r]));
+ $('detailBody').innerHTML='<h2>Classifica certificata</h2><p>'+esc(scan.phase)+' · '+date(scan.published_at)+'</p><select id="certificateMode" aria-label="Classifica certificata"></select><div id="certificateRows"></div>';
+ const select=$('certificateMode');for(const key of ['best','probable','recommended','shots'])select.add(new Option(modes[key],key));for(const label of Object.keys(snap.boards.markets||{}))select.add(new Option(label,'market:'+label));
+ const draw=()=>{const ids=select.value.startsWith('market:')?snap.boards.markets[select.value.slice(7)]:snap.boards[select.value];cards((ids||[]).slice(0,10).map(id=>({...map.get(id),snapshot:scan.sha256,result:h.results?.[map.get(id).fixture_id],outcome:outcome(map.get(id),h.results?.[map.get(id).fixture_id])})),$('certificateRows'),{historical:true});};select.onchange=draw;draw();$('detail').showModal();
+}
+function detail(row){
+ const fast=row.latest_fast||row.fast_reference;
+ $('detailBody').innerHTML='<h2>'+esc(row.label)+'</h2><p>'+esc(text(row.home)+' — '+text(row.away))+'</p><dl>'+[
+ ['Categoria',categories[row.category]],['Probabilità V7',percent(row.probability)],['Apertura',number(row.opening)],['Prima quota osservata',number(row.first_odd)],['Quota del riferimento',number(row.odd)],['Quota Night',row.night_reference?number(row.night_reference.odd)+' · '+date(row.night_reference.captured_at):'Non disponibile'],['Ultima quota Fast valida',fast?number(fast.odd)+' · '+date(fast.captured_at)+(Date.parse(fast.quote_valid_until)>Date.now()?'':' · storica / scaduta'):'Nessun aggiornamento Fast documentato'],['EV / EV_low',percent(row.ev)+' / '+percent(row.ev_low)],['OCI',number(row.oci)],['Affidabilità',row.reliability==='supported'?'Supporto statistico V7':'Limitata'],['Fonte',text(row.quote?.bookmaker)||row.quote?.bookmaker_id||'Non disponibile'],['Quota osservata',date(row.quote?.quote_observed_at)],['Aggiornata dalla fonte',date(row.quote?.provider_updated_at)],['Utilizzabile fino a',date(row.quote_valid_until)],['Snapshot V7',date(row.captured_at)],['Registrazione Explorer',row.legacy_v7?'Archivio V7 precedente':date(row.published_at)],['Salvata tra i preferiti',row.saved_at?date(row.saved_at*1000):'—'],['Riferimento finale',row.fallback_night?'Night: Fast successivo assente':row.reference||'Corrente'],['Esito',row.outcome?.label||'Non verificato'],['Risultato FT',row.outcome&&numeric(row.result?.result?.home_ft)&&numeric(row.result?.result?.away_ft)?row.result.result.home_ft+' – '+row.result.result.away_ft:'Non disponibile'],['Risultato PT',row.outcome&&numeric(row.result?.result?.home_ht)&&numeric(row.result?.result?.away_ht)?row.result.result.home_ht+' – '+row.result.result.away_ht:'Non disponibile'],['Motivi di attenzione',(row.exclusions||[]).join(', ')||'—'],['Impronta snapshot',row.forecast_sha256]
+ ].map(([k,v])=>'<dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd>').join('')+'</dl><p class="note">Dati relativi al riferimento indicato. Explorer non ricalcola le probabilità V7.</p><button id="allAlternatives">Altre analisi della partita</button>';
+ $('allAlternatives').onclick=()=>action(async()=>{
+  if(row.snapshot){const snap=await getSnapshot(row.snapshot);$('detailBody').innerHTML='<h2>Mercati nello stesso snapshot</h2><div id="alternateRows"></div>';cards(snap.rows.filter(r=>r.fixture_id===row.fixture_id),$('alternateRows'),{historical:true});}
+  else if(row.legacy_v7){$('detailBody').innerHTML='<h2>Archivio V7 della partita</h2><div id="alternateRows"></div>';cards((state.legacyRows||[]).filter(r=>r.episode===row.episode),$('alternateRows'),{historical:true});}
+  else{$('detail').close();document.querySelector('[data-tab=explore]').click();$('filterForm').reset();state.focusFixture=row.fixture_id;$('filterForm').elements.team.value=text(row.home);$('filterForm').elements.period.value='all';$('mode').value='search';render();}
+ });$('detail').showModal();
+}
+document.addEventListener('click',e=>{const button=e.target.closest('button');if(!button)return;
+ if(button.dataset.detail)detail(state.viewRows.get(button.dataset.detail).row);
+ if(button.dataset.favorite)action(async()=>{const row=state.viewRows.get(button.dataset.favorite).row;await api('favorites',{id:row.id,object:row.object});message('Selezione salvata nei tuoi preferiti.');},button);
+ if(button.dataset.remove)action(async()=>{await api('delete',{type:'favorite',id:state.viewRows.get(button.dataset.remove).row.id});await favorites();message('Preferito rimosso.');},button);
+ if(button.dataset.tab){for(const id of ['explore','favorites','history'])$(id).hidden=id!==button.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-current',b===button?'page':'false'));if(button.dataset.tab==='favorites')action(()=>favorites(),button);if(button.dataset.tab==='history')renderHistory();}
+});
+$('closeDetail').onclick=()=>$('detail').close();$('refresh').onclick=()=>action(refresh,$('refresh'));
+$('filterForm').onsubmit=e=>e.preventDefault();$('filterForm').oninput=()=>{state.focusFixture=null;state.limit=10;render();};$('filterForm').onreset=()=>{state.focusFixture=null;queueMicrotask(()=>{state.limit=10;render();});};$('mode').onchange=()=>{state.limit=10;render();};
+$('more').onclick=()=>{state.limit+=10;render();};$('moreFavorites').onclick=()=>action(()=>favorites(false),$('moreFavorites'));$('moreHistory').onclick=()=>{state.historyLimit+=10;renderHistory();};$('moreLegacy').onclick=()=>{state.legacyLimit+=10;renderLegacy();};$('loadHistory').onclick=()=>action(loadHistory,$('loadHistory'));
+for(const id of ['historyReference','historyCohort'])$(id).onchange=renderHistory;
+$('saveSearch').onclick=()=>action(async()=>{await api('searches',{name:$('searchName').value,filters:filters()});await loadSearches();message('Ricerca salvata nel tuo account.');},$('saveSearch'));
+$('updateSearch').onclick=()=>action(async()=>{const id=$('savedSearches').value;if(!id)throw Error('Seleziona prima una ricerca salvata.');await api('searches',{id,name:$('searchName').value,filters:filters()});await loadSearches();message('Ricerca aggiornata.');},$('updateSearch'));
+$('deleteSearch').onclick=()=>action(async()=>{const id=$('savedSearches').value;if(!id)throw Error('Seleziona prima una ricerca salvata.');await api('delete',{type:'search',id});await loadSearches();message('Ricerca eliminata.');},$('deleteSearch'));
+$('savedSearches').onchange=()=>action(async()=>{const s=state.searches.find(s=>s.id===$('savedSearches').value);if(!s)return;await refresh();$('filterForm').reset();for(const [k,v] of Object.entries(s.filters)){const el=$('filterForm').elements[k];if(el){if(el.type==='checkbox')el.checked=v===true;else el.value=v;}}$('searchName').value=s.name;$('mode').value='search';render();message('Ricerca applicata ai dati Gold appena aggiornati.');});
+window.addEventListener('focus',()=>{if(state.rows.length){render();dashboard();}});
+action(refresh);

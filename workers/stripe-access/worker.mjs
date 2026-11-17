@@ -1,4 +1,5 @@
-import {authRoute, cleanupAuth} from './auth.mjs';
+import {authRoute, cleanupAuth, sessionEmail} from './auth.mjs';
+import {explorerRoute} from './explorer.mjs';
 import {renewalEnabled, cachedAccess, invalidateAccessCache, renewalStatus, renewalCheckout, renewalOrder, markRenewalPaid, closeFailedRenewal} from './renewal.mjs';
 import {telegramTrialRoute} from './telegram-trial.mjs';
 import {goldTestLoginPage} from './test-login.mjs';
@@ -242,6 +243,9 @@ async function subscriptionAccess(env,email,now,summary=false) {
 export default {
   async scheduled(event,env) { if(env.AUTH_ENABLED==='true')await cleanupAuth(env); },
   async fetch(request,env) {
+    const explorer=await explorerRoute(request,env,{sessionEmail,
+      access:(e,email,now)=>cachedAccess(e,email,now,()=>access(e,email,now))});
+    if(explorer)return explorer;
     const testLogin=goldTestLoginPage(request,env);
     if(testLogin)return testLogin;
     const trialResponse=await telegramTrialRoute(request,env,access,subscriptionPrice(env));
