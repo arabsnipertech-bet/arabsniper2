@@ -18,6 +18,7 @@ const {chromium}=require('playwright'),fs=require('fs'),assert=require('node:ass
  for(const [name,width,height] of [['desktop',1440,1000],['tablet',820,1180],['mobile',390,844]]){
   await page.setViewportSize({width,height});
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  await page.evaluate(()=>scrollTo(0,0));
   await page.screenshot({path:'test-artifacts/explorer-live-'+name+'.png',fullPage:false});
  }
  let requests=0;page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/auth/explorer/'))requests++;});

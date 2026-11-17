@@ -1,3 +1,4 @@
+import {archiveLoader} from './explorer-loader.mjs';
 import {categories,modes,text,numeric,romeDay,fresh,matches,rank,outcome,statistics,historyRows} from './explorer-core.mjs';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const number=(v,d=2)=>numeric(v)?v.toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
@@ -13,8 +14,8 @@ async function api(path,input){
  return data;
 }
 async function action(fn,button){if(button)button.disabled=true;try{await fn();}catch(e){message(e.message||'Connessione non disponibile. Riprova.');}finally{if(button)button.disabled=false;}}
-async function getObject(hash){if(!state.objects.has(hash))state.objects.set(hash,await api('objects/'+hash));return state.objects.get(hash);}
-async function getPages(hashes){const rows=[];for(let i=0;i<hashes.length;i+=4){const parts=await Promise.all(hashes.slice(i,i+4).map(async hash=>({hash,data:await getObject(hash)})));for(const {hash,data} of parts)rows.push(...(data.rows||[]).map(r=>({...r,object:hash})));}return rows;}
+const getObject=archiveLoader(hash=>api('objects/'+hash),12);
+async function getPages(hashes){const parts=await Promise.all(hashes.map(async hash=>({hash,data:await getObject(hash)})));return parts.flatMap(({hash,data})=>(data.rows||[]).map(r=>({...r,object:hash})));}
 async function getSnapshot(hash){if(!state.snapshots.has(hash)){const data=await getObject(hash);state.snapshots.set(hash,{...data,rows:await getPages(data.pages||[])});}return state.snapshots.get(hash);}
 const filters=()=>({...Object.fromEntries(new FormData($('filterForm'))),diversify:$('filterForm').elements.diversify.checked});
 const empty=(node,value='Nessuna selezione corrisponde ai criteri.')=>node.innerHTML='<p class="empty">'+esc(value)+'</p>';
@@ -66,6 +67,7 @@ function renderLegacy(){const rows=state.legacyRows||[];cards(rows.slice(0,state
 function renderHistory(){
  const f=filters(),reference=$('historyReference').value,cohort=$('historyCohort').value;
  const all=(ref,group)=>state.history.flatMap(h=>historyRows(h,state.snapshots,ref,group)).filter(r=>matches(r,f,Date.now(),true));
+ const certified=state.history.some(h=>(h.scans||[]).length);$('certificateState').hidden=certified;$('certificateState').textContent='Le certificazioni Explorer iniziano dalla sua attivazione. In questo periodo non sono ancora presenti; i dati V7 precedenti sono disponibili nella sezione Archivio V7 qui sotto.';if(!certified)$('legacyArchive').open=true;
  const rows=all(reference,cohort),stats=metrics(rows,$('historyMetrics')),comparison=[];
  for(const ref of ['night','final'])for(const group of ['official','alternative']){const s=statistics(all(ref,group));comparison.push([ref==='night'?'Night':'Finale',group==='official'?'Triade':'Alternative',s.n,s.verified,percent(s.hitRate),percent(s.roi)]);}
  $('comparisons').innerHTML='<h3>Campioni separati · stessi filtri</h3>'+table(['Riferimento','Campione','N','Verificati','Hit rate','ROI'],comparison)+'<h3>Calibrazione probabilistica</h3>'+table(['Fascia','N','Probabilità media','Frequenza osservata'],stats.bins.filter(b=>b.n).map(b=>[b.range,b.n,percent(b.predicted),percent(b.observed)]));
