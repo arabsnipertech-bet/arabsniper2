@@ -198,3 +198,30 @@ jobs:
               assert all(j['status']=='completed' or j['name']=='explorer-authorized-release' for j in jobs)
               call(base+'/cancel','POST')
           print('Superseded Explorer release cancelled or already complete; no Night/Fast job touched')
+
+  explorer-post-release-verification:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[explorer-verify]')
+    needs: tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - run: npm install --prefix /tmp/arabsniper-browser playwright@1.62.1
+      - name: Verify live Explorer including seven-day history
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          D1_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          NODE_PATH: /tmp/arabsniper-browser/node_modules
+        run: python scripts/explorer-online-smoke.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: explorer-online-final-verification
+          path: test-artifacts/explorer-live-*
+          retention-days: 30
+          if-no-files-found: error
