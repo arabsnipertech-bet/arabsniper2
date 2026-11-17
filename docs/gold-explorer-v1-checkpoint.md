@@ -1,3 +1,5 @@
+> Checkpoint storico superato dalla ripresa del lavoro. Per implementazione, test e stato attuale consultare [gold-explorer-v1.md](gold-explorer-v1.md).
+
 # Gold Explorer V1 — checkpoint di sviluppo, 17 novembre 2026
 
 ## Stato reale

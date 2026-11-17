@@ -12,7 +12,7 @@ renewal_import = "import {renewalEnabled, cachedAccess, invalidateAccessCache, r
 import_line = "import {authRoute, cleanupAuth, sessionEmail} from './auth.mjs';"
 trial_import = "import {telegramTrialRoute} from './telegram-trial.mjs';"
 test_import = "import {goldTestLoginPage} from './test-login.mjs';"
-if worker.count(import_line) != 1 or worker.count(trial_import) != 1 or worker.count(test_import) != 1 or worker.count(renewal_import) != 1:
+if worker.count(explorer_import) != 1 or worker.count(import_line) != 1 or worker.count(trial_import) != 1 or worker.count(test_import) != 1 or worker.count(renewal_import) != 1:
     raise ValueError('Unexpected auth import; inspect bundle generation')
 bundle = ("// Production bundle: generated from worker.mjs and auth.mjs. Keep AUTH_ENABLED=false until cutover.\n"
           "const {authRoute, cleanupAuth, sessionEmail} = (() => {\n"

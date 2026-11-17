@@ -47,13 +47,13 @@ function metrics(rows,node){const s=statistics(rows);node.innerHTML='<div class=
 function table(headers,rows){return '<div class="table-wrap"><table><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+esc(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
 function dashboard(){const now=Date.now(),rows=state.rows.filter(r=>Date.parse(r.kickoff)>now),valid=rows.filter(r=>r.validated&&fresh(r,now));$('metrics').innerHTML=[['Partite disponibili',new Set(rows.map(r=>r.fixture_id)).size],['Mercati analizzati',rows.length],['Opportunità validate',valid.length],['Campionati',new Set(rows.map(r=>text(r.league))).size]].map(([label,value])=>`<div class="metric"><strong>${value}</strong><span>${label}</span></div>`).join('');}
 function scheduleExpiry(){clearTimeout(state.timer);const now=Date.now(),next=Math.min(...state.rows.flatMap(r=>[Date.parse(r.kickoff),Date.parse(r.quote_valid_until)]).filter(t=>t>now));if(Number.isFinite(next))state.timer=setTimeout(()=>{render();dashboard();scheduleExpiry();},Math.min(2147483647,next-now+25));}
-async function loadSearches(){const data=await api('searches');state.searches=data.items||[];const selected=$('savedSearches').value;$('savedSearches').replaceChildren(new Option('Le tue ricerche',''),...state.searches.map(s=>new Option(s.name,s.id)));$('savedSearches').value=selected;}
+async function loadSearches(){const data=await api('searches');state.searches=data.items||[];const selected=$('savedSearches').value;$('savedSearches').replaceChildren(new Option('Le tue ricerche',''),...state.searches.map(s=>new Option(s.name,s.id)));$('savedSearches').value=state.searches.some(s=>s.id===selected)?selected:'';}
 async function refreshData(){
  message('Lettura degli archivi Gold…');let data;try{data=await api('current');}catch(e){if(e.status!==404)throw e;data={pages:[],count:0};}
  state.rows=await getPages(data.pages||[]);$('app').hidden=false;$('locked').hidden=true;$('updated').textContent='Ultima pubblicazione: '+date(data.generated_at);
  for(const [name,values] of [['league',state.rows.map(r=>text(r.league))],['market',state.rows.map(r=>r.label)]]){const select=$('filterForm').elements[name],previous=select.value;select.replaceChildren(new Option('Tutti',''),...[...new Set(values.filter(Boolean))].sort().map(v=>new Option(v,v)));select.value=previous;}
  const today=romeDay(Date.now()),last=romeDay(Date.parse(today+'T12:00:00Z')+4*86400000);for(const key of ['from','to']){const input=$('filterForm').elements[key];input.min=today;input.max=last;}
- state.limit=10;render();dashboard();scheduleExpiry();await loadSearches();message(state.rows.length?'Dati caricati. I filtri non avviano scansioni.':'Nessuna analisi prematch disponibile. Puoi consultare lo storico.');
+ state.limit=10;render();dashboard();scheduleExpiry();await loadSearches();message(state.rows.length?'Dati caricati.':'Nessuna analisi prematch disponibile. Puoi consultare lo storico.');
 }
 function refresh(){return state.refreshPromise ||=refreshData().finally(()=>state.refreshPromise=null);}
 async function favorites(reset=true){
