@@ -15,6 +15,8 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  let searches=[],favorites=[],status=200,empty=false,fail=false;
  await page.route('**/*',async route=>{
   const request=route.request(),url=new URL(request.url());if(url.origin!=='https://explorer.test'){external.push(url.href);return route.abort();}
+  if(url.pathname==='/api/auth/session')return route.fulfill({contentType:'application/json',body:JSON.stringify({active:true,authenticated:true,email:'qa@example.test',server_time:now/1000,expires_at:now/1000+86400,session_expires_at:now/1000+86400})});
+  if(url.pathname.startsWith('/api/gold-data/'))return route.fulfill({contentType:'application/json',body:JSON.stringify({date:'2026-11-17',matches:[]})});
   if(url.pathname.startsWith('/api/explorer/')){
    calls.push(url.pathname);if(fail)return route.abort();if(status!==200)return route.fulfill({status,contentType:'application/json',body:JSON.stringify({error:status===401?'Accedi dalla Gold':'Errore temporaneo'})});
    const endpoint=url.pathname.slice('/api/explorer/'.length),input=request.method()==='POST'?request.postDataJSON():null;let result={};
@@ -30,7 +32,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   const file=path.join(__dirname,'../web',url.pathname);if(fs.existsSync(file)&&fs.statSync(file).isFile())return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.html')?'text/html':file.endsWith('.css')?'text/css':'text/javascript'});
   return route.fulfill({status:404,body:'Not found'});
  });
- await page.goto('https://explorer.test/gold-explorer.html');await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor();
+ await page.goto('https://explorer.test/gold-explorer.html');await page.locator('h1').evaluate(el=>el.prepend('COLLAUDO QA — DATI SINTETICI · '));await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor();
  assert.equal(await page.locator('#results .selection').count(),10);const initial=calls.length;
  for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);}
  await page.click('#more');assert.equal(await page.locator('#results .selection').count(),20);

@@ -53,7 +53,7 @@ export function historyRows(history,snapshots,reference='final',cohort='validate
     const original=Object.values(row.official_references||{})[0];
     if(original){const same=Date.parse(original.captured_at)===Date.parse(row.captured_at);selected={...row,odd:original.odd??null,probability:same?row.probability:null,ev:same?row.ev:null,ev_low:same?row.ev_low:null,official_original:true};}
    }
-   result.push({...selected,snapshot:hash,reference,fallback_night:ref.fallback_night,outcome:outcome(selected,history.results?.[row.fixture_id])});
+   result.push({...selected,snapshot:hash,reference,fallback_night:ref.fallback_night,result:history.results?.[row.fixture_id],outcome:outcome(selected,history.results?.[row.fixture_id])});
   }
  }
  return result;

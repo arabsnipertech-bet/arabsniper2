@@ -170,7 +170,7 @@ def publish(s3,bucket,root, *, checkpoint_only=False, selected_paths=None):
             if phase in ('night', 'fast') and not started:
                 phase = 'refresh'
             publish_explorer(s3, bucket, root, [json.loads(gold[name]) for name in GOLD[:5]],
-                             phase, scan_started=started)
+                             phase, scan_started=started, source_manifest=index)
         except Exception as error:
             print('Explorer projection deferred: '+type(error).__name__, flush=True)
 

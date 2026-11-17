@@ -177,7 +177,7 @@ def legacy_universe(path):
     return sorted(latest.values(), key=lambda r: r['id'])
 
 
-def publish(storage, bucket, root, days, phase, now=None, scan_started=None, legacy_limit=1):
+def publish(storage, bucket, root, days, phase, now=None, scan_started=None, legacy_limit=1, source_manifest=None):
     now, root = now or datetime.now(timezone.utc), Path(root)
     catalog = read(storage, bucket, PREFIX+'catalog.json', {'version': 1, 'days': {}})
     if catalog.get('version') != 1:
@@ -193,14 +193,17 @@ def publish(storage, bucket, root, days, phase, now=None, scan_started=None, leg
                     active[row['id']] = row
     dates = {r['date'] for r in active.values()}
     dates.update(day for day in catalog['days'] if catalog['days'][day].get('pending_freeze') or day >= (now.astimezone(ROME).date()-timedelta(days=1)).isoformat())
+    def source_sha(path):
+        known = (source_manifest or {}).get(path.relative_to(root).as_posix(), {}).get('sha256')
+        return known or file_signature(path)
     result_inputs, pending = {}, []
     for path in (root/'auditarchive').glob('prematch_*_v7.json'):
-        day, checksum = path.name[len('prematch_'):-len('_v7.json')], file_signature(path)
+        day, checksum = path.name[len('prematch_'):-len('_v7.json')], source_sha(path)
         if catalog['days'].get(day, {}).get('result_sha') != checksum:
             result_inputs[day] = (path, checksum)
             dates.add(day)
     for path in sorted((root/'auditordata').glob('prematch_????-??-??.json'), reverse=True):
-        day, checksum = path.stem[len('prematch_'):], file_signature(path)
+        day, checksum = path.stem[len('prematch_'):], source_sha(path)
         if catalog['days'].get(day, {}).get('legacy_sha') != checksum:
             pending.append((day, path, checksum))
     legacy_inputs = {day: (path, checksum) for day, path, checksum in pending[:legacy_limit]}

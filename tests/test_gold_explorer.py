@@ -75,6 +75,21 @@ class Projection(unittest.TestCase):
         self.publish();m=fixture(AT+timedelta(minutes=5));m['multimarket']['matrix']['rows'][0]['quote_executable']=False
         self.publish(m,phase='fast',at=AT+timedelta(minutes=5));self.publish(phase='results',at=AT+timedelta(hours=2))
         self.assertTrue(next(iter(self.history()['references'].values()))['fallback_night'])
+    def test_gold_publication_survives_explorer_failure(self):
+        from gold_storage import publish, GOLD
+        from test_gold_storage import Fake
+        data=self.root/'data';data.mkdir()
+        for name in GOLD:(data/name).write_text('{"matches":[]}')
+        store=Fake()
+        with patch.dict('os.environ', {'GOLD_EXPLORER_ENABLED':'true'}), patch('gold_explorer.publish', side_effect=RuntimeError('isolated')):
+            publish(store,'test',self.root)
+        self.assertIn('state/current.json',store.objects)
+        for name in GOLD[:5]:self.assertEqual(json.loads(store.objects[name])['matches'],[])
+    def test_reuses_gold_manifest_checksums(self):
+        (self.root/'auditarchive').mkdir();path=self.root/'auditarchive/prematch_2026-11-17_v7.json';path.write_text('{"fixtures":{}}')
+        with patch('gold_explorer.file_signature',side_effect=AssertionError('duplicate hashing')):
+            self.publish(source_manifest={'auditarchive/'+path.name:{'sha256':'known'}})
+        self.assertEqual(self.store.read('catalog.json')['days']['2026-11-17']['result_sha'],'known')
     def test_pages_scope_and_checksum(self):
         hashes=e.pages(self.store,'bucket',list(range(501)));self.assertEqual([len(self.store.read('objects/'+h+'.json')['rows']) for h in hashes],[250,250,1])
         self.store.data['explorer/objects/'+hashes[0]+'.json']=b'{}'
