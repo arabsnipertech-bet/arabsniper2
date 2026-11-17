@@ -1,34 +1,8 @@
-# Isolamento del rilascio — aggiornamento 17 novembre 2026
+# Gold Explorer V1 — architettura, collaudo e rilascio
 
-La PR #220 è stata integrata in main al commit d5ff9b9b. Test PR e main superati; asset Pages verificati nel browser. Il backend inizialmente attendeva il mutex Gold occupato dalla Night programmata, partita alle 09:56 italiane.
+Aggiornamento: 17 novembre 2026. URL canonico previsto: https://arabsniperbet.com/gold-explorer.
 
-La correzione separa il deploy dal mutex Gold. Tutti i writer Explorer (hook ordinario, CLI e import iniziale) acquisiscono un lease R2 esclusivo su `explorer/writer-lease.json`, con precondizioni atomiche If-None-Match/If-Match. Se occupato, l'hook rinvia soltanto Explorer senza attendere né compromettere Gold. Scadenza di tre ore superiore ai timeout dei job; rilascio condizionale che non può cancellare il lease di un successore. Test: contesa, gara atomica, crash/scadenza, vecchio writer, errore e isolamento degli originali.
-
-Il precedente job Explorer ancora in coda viene annullato in modo mirato, verificando run ID, SHA e stato pending. Nessuna Night/Fast/Auditor viene annullata. Il nuovo rilascio mantiene backup, verifica SHA Worker, import dei soli archivi già esistenti, migrazione D1 e smoke online. I chunk locali di ogni giornata storica vengono rimossi dopo l'import per limitare lo spazio disco; gli originali remoti restano immutati.
-
-Questa sezione aggiorna il precedente riferimento al mutex Gold. Nessuna nuova raccolta calcistica, nessun nuovo modello, nessuna modifica del cron Night.
-
----
-
-# Aggiornamento operativo 17 novembre 2026
-
-Bruno ha autorizzato merge, deploy e lancio (Meta: 40 € totali / 6 giorni), subordinati ai controlli e alla reale disponibilità online. Le precedenti indicazioni di attesa autorizzazione sotto sono superate.
-
-La verifica reale su R2, D1 e Worker è riuscita. Il Worker online differisce da main: `scripts/explorer-worker-patch.py` aggiunge Explorer preservando byte per byte il codice precedente. Il codice reale modificato ha superato le suite auth, rinnovi ed Explorer. Il percorso usato dal client è `/api/auth/explorer/*`, già coperto dalla route Gold: nessuna nuova route DNS/Worker.
-
-Rilascio: merge con messaggio `[release-explorer-v1]`. Il job una tantum nell'esistente workflow di test attende i test verdi, acquisisce il mutex già usato dagli archivi, salva il Worker in R2 privato `ops-backups/gold-explorer/`, applica le due tabelle personali, importa gli archivi esistenti e distribuisce solo la patch additiva. Attiva poi il flag Worker e verifica il rifiuto degli anonimi. Nessuna credenziale calcistica è assegnata al job. I workflow ordinari aggiornano Explorer dopo il salvataggio Gold; una variabile GitHub esplicita `GOLD_EXPLORER_ENABLED=false` disabilita la proiezione.
-
-Rollback: disabilitare il flag Worker `GOLD_EXPLORER_ENABLED`, impostare la variabile GitHub a `false`, ripristinare il contenuto Worker dal backup privato e ripristinare gli asset Pages precedenti. Conservare tabelle personali e oggetti Explorer; non cambiare archivi Gold. Un errore durante il caricamento Worker/attivazione rimuove il nuovo flag e ripristina il precedente contenuto se non sono intervenuti altri deploy.
-
-La verifica in sola lettura è documentata in Actions run 44049819676. Il rilascio e il collaudo online devono ancora essere registrati; questi test non equivalgono a una verifica di produzione completata.
-
----
-
-# Gold Explorer V1 — integrazione e collaudo
-
-Data: 17 novembre 2026. Branch `feature/gold-explorer-v1`, PR [#220](https://github.com/arabsnipertech-bet/arabsniper2/pull/220).
-
-Il precedente checkpoint documentava una disconnessione. Il codice è stato ricostruito, salvato sul branch e sottoposto a collaudo. Questo documento descrive l'implementazione effettiva. **Nessun merge, deploy, modifica D1/configurazione produzione o lancio promozionale è autorizzato da questa consegna.**
+Bruno ha autorizzato merge e deploy. [PR #220](https://github.com/arabsnipertech-bet/arabsniper2/pull/220) e [PR #221](https://github.com/arabsnipertech-bet/arabsniper2/pull/221) integrate; [PR #222](https://github.com/arabsnipertech-bet/arabsniper2/pull/222) con test verdi, in attesa del completamento del backend. Nessuna modifica al cron Night.
 
 ## Architettura e audit
 
@@ -44,7 +18,7 @@ Fonti individuate nel codice:
 - `src/gold_storage.py`: feed privati R2 e checkpoint `state/current.json`. Explorer parte solo dopo il commit Gold; la sua eccezione viene contenuta.
 - `workers/stripe-access/auth.mjs`, `worker.mjs`, `renewal.mjs`: cookie OTP, sessione di 24 ore e diritto Gold/prova esistente. `ACCESS_DB` e `GOLD_DATA` sono riutilizzati. Nessun prezzo, piano o durata Stripe cambia.
 
-Il ramo era basato su `eb9abe79`; è stato confrontato con main `9547ed29`. Le differenze recenti di main osservate erano proiezioni pubbliche generate, non sorgenti da sovrascrivere. La PR conserva il lavoro di altre correzioni. Lo stato dei dati privati correnti non è certificato dall'audit dei sorgenti: l'ambiente ripreso non dispone di un checkpoint R2 autenticato completo. I collaudi end-to-end qui descritti usano dati di prova esplicitamente marcati, non quote o risultati inventati per la produzione.
+L'audit reale ha verificato R2, D1 e il Worker di produzione. Il Worker online contiene correzioni non presenti nel bundle del repository: il rilascio applica una patch additiva al codice effettivamente scaricato e verifica che, rimuovendo solo le aggiunte Explorer, si ottenga il codice originale byte per byte. Le suite autenticazione, rinnovi ed Explorer sono state eseguite anche sul Worker reale modificato.
 
 ## Matrice di compatibilità
 
@@ -101,45 +75,40 @@ R2: letture/scritture del projector confinate a `explorer/`; nessuna scrittura n
 
 Pagine da 250 righe e caricamento di quattro pagine per gruppo; rendering progressivo. Filtri/ranking locali senza richieste di rete. Preferiti paginati. Checksum degli archivi riutilizzati dal manifest Gold già calcolato; import storico ordinario limitato a una giornata modificata per pubblicazione. L'import completo opzionale legge soltanto gli archivi restaurati. Gli errori Explorer non fanno fallire la pubblicazione Gold già conclusa.
 
-Limite: caricando lo storico completo il browser conserva in memoria le pagine richieste. Il costo cresce con l'archivio; usare i periodi limitati per la consultazione ordinaria. Non è ancora misurato il costo R2 della proiezione sul checkpoint privato completo corrente. Prima dell'attivazione controllare durata e dimensioni con quel checkpoint; se necessario lasciare il flag disabilitato, senza toccare i processi di raccolta.
+Limite: caricando lo storico completo il browser conserva in memoria le pagine richieste; il costo cresce con l'archivio. La verifica reale prima del rilascio ha elaborato 419 snapshot V7 e 30.149 righe (413 partite, 73 mercati), con 2.741 righe validate nel campione. Proiezione circa 64 secondi e 42,7 MB di output; 639 letture R2 per circa 299,6 MB. Sono misure del campione verificato, non del caricamento browser o dello storico completo. La prima importazione completa viene misurata separatamente dal job di rilascio.
 
 ## Collaudo ed evidenze
 
-- Test dedicati Python: 11 superati, con socket outbound negati, validità/impronte, cutoff, stati match, idempotenza, congelamento dopo interruzione, fallback, Fast inutilizzabile, mancata mutazione degli originali, paging, scope storage, risultati esistenti e storico senza classifiche retroattive. Eccezione Explorer iniettata durante pubblicazione Gold: checkpoint e feed Gold preservati.
-- Test Node dedicati: 7 superati. Sessione reale D1/cookie, accesso attivo/prova simulato attraverso la stessa funzione di autorizzazione, scadenza/revoca, isolamento CRUD, CSRF, limiti, favoriti canonici, checksum, filtri, ranking e statistiche. Fetch outbound vietato durante questi test.
-- Test auth esistenti: 8 superati. Nessuna modifica ad autenticazione/prezzi.
-- Prima CI: tutti i 877 test Python e tutti i file Node superati; tutti i browser Gold/Publisher esistenti superati. Il browser Explorer è arrivato a filtri, CRUD, storico, quattro viewport e stati di errore, poi ha rilevato una sessione Gold non simulata nel test del pannello; corretta la fixture di sessione e rilanciato.
-- La suite locale completa ha eseguito 877 test con una dipendenza `cryptography` assente; non dichiarata verde. In CI la dipendenza è installata e lo stesso test è passato.
-- Benchmark locale del solo filtro/ranking: 10.000 righe sintetiche, 10 ripetizioni, circa 75 ms per iterazione in questo ambiente. Non è una misura delle latenze produzione.
-- CI del commit `5693c277`: [run 44044240731](https://github.com/arabsnipertech-bet/arabsniper2/actions/runs/44044240731) interamente verde: **879 test Python**, tutti i file Node, tutti i browser Gold/Publisher ed Explorer. Browser Explorer: 1.250 righe, quattro viewport (1440/768/390/360 px), zero errori JavaScript, zero chiamate calcistiche, nessuna richiesta durante i filtri. Anche la CI Telegram/Stripe è verde. Le successive rifiniture e la consegna sono sottoposte a nuova CI.
-- Screenshot QA verificati visivamente: [desktop](qa/explorer-desktop.png), [tablet](qa/explorer-tablet.png), [smartphone](qa/explorer-mobile.png), [360 px](qa/explorer-small-mobile.png). Dati sintetici, non materiale promozionale.
+- CI PR #221 e main: **884 test Python**, suite Node e browser Gold/Publisher/Explorer superati. [Run main 44054034194](https://github.com/arabsnipertech-bet/arabsniper2/actions/runs/44054034194).
+- CI PR #222 superata: [run 44055883996](https://github.com/arabsnipertech-bet/arabsniper2/actions/runs/44055883996).
+- Test dedicati Python: validità/impronte, cutoff, stati, idempotenza, congelamento dopo interruzione, fallback, Fast inutilizzabile, originali immutati, paging, scope storage e storico senza classifiche retroattive. Socket outbound negati durante i test dedicati.
+- Cinque test del lease: contesa, gara atomica, recupero dopo crash, scadenza e rilascio condizionale, contenimento degli errori. Il lease protegge soltanto Explorer e non blocca Gold.
+- Test Node: sessione D1/cookie, diritto attivo/prova, revoca/scadenza, isolamento CRUD, CSRF, limiti, preferiti canonici, checksum, filtri, ranking e statistiche. Questi test usano diritti controllati: non equivalgono a login con abbonamenti reali di terzi.
+- Browser sintetico: 1.250 righe, quattro viewport, CRUD, storico, pannello, errori/rete, zero errori JavaScript e zero richieste calcistiche; filtri senza richieste. Screenshot in `docs/qa/` esplicitamente sintetici, non schermate autentiche di produzione.
+- Preflight reale: [run 44049819676](https://github.com/arabsnipertech-bet/arabsniper2/actions/runs/44049819676). Lettura archivi autenticata; nessuna scrittura remota né chiamata calcistica. Patch sul Worker reale e suite di accesso superate.
+- Collaudo online: il rilascio esegue CRUD personale e browser con sessione temporanea del proprietario; sessione e soli record QA vengono eliminati. Non invia OTP, non modifica abbonamenti, non usa sessioni di terzi. Il controllo aggiuntivo verifica cinque classifiche e storico reale di sette giorni.
 
-I test di prova gratuita e abbonamento usano diritti controllati in isolamento; non sono login eseguiti su account reali in produzione. Il vincolo zero provider è verificato sul codice e sulle esecuzioni strumentate, non attraverso una nuova scansione calcistica.
+**Stato al 17 novembre 2026, durante l'importazione:** il job di deploy è ancora in esecuzione; il collaudo autenticato online non è ancora dichiarato superato. Non dichiarare il servizio pronto sulla sola base della presenza degli asset Pages.
 
-## Distribuzione proposta — solo dopo approvazione
+## Procedura effettiva di rilascio
 
-1. Verificare CI e diff aggiornati, assenza di conflitti e confronto con il nuovo main. Conservare versione precedente del Worker e deployment Pages. Nessun dispatch Night/Fast per Explorer.
-2. Applicare `workers/stripe-access/explorer-schema.sql` al D1 `ACCESS_DB` esistente (due tabelle e un indice, istruzioni idempotenti). Conservare le tabelle in caso di rollback per non perdere preferiti/ricerche.
-3. Generare con `python workers/stripe-access/build_production.py`, distribuire il bundle sul Worker esistente, conservando tutti i binding/segreti/route precedenti. Aggiungere esclusivamente la route `arabsniperbet.com/api/explorer/*` allo stesso Worker; verificare dominio canonico e `AUTH_ORIGIN`.
-4. Verificare `AUTH_ENABLED=true`, `ACCESS_DB`, `GOLD_DATA`. Il nuovo `GOLD_EXPLORER_ENABLED` resta inizialmente disabilitato sia nel Worker sia nelle variabili GitHub.
-5. Merge autorizzato della PR e pubblicazione Pages con le nuove risorse. URL previsto: `https://arabsniperbet.com/gold-explorer.html`. Non considerarlo online sulla base della sola presenza del link.
-6. Prima del flag, eseguire la proiezione di verifica su copia privata isolata del checkpoint e bucket di staging. `python src/gold_explorer.py --seed-current --complete-backfill` legge solo i file Gold/archivi già restaurati. Non esegue scan, non fabbrica certificati Night/Fast pregressi. Se non disponibile un ambiente isolato, la verifica di integrazione resta pendente.
-7. Dopo controllo dei dati reali, abilitare il flag GitHub per agganciarsi alla prossima pubblicazione Night/Fast già prevista; nessuna scansione dedicata. Abilitare il flag Worker quando l'indice è disponibile. L'import storico continua progressivamente; il catalogo espone le giornate ancora da importare.
-8. Smoke test reale Gold pagato, prova valida, utente senza diritto e due account distinti; preferito su due dispositivi; ricerche CRUD; completezza campi/risultati; quote scadute; pannello e pagina; immutabilità Night/Fast. Confrontare feed/triade e contatori provider prima/dopo consultazione/filtri. Verificare che Night/Fast/Auditor/Publisher continuino normalmente.
-9. Solo dopo esito positivo comunicare URL attivo e chiedere approvazione ai contenuti social.
+1. CI verde prima della distribuzione. Il job isolato `explorer-authorized-release` nell'esistente workflow di test si attiva dal messaggio di merge `[release-explorer-v1]`; non avvia Night/Fast/Auditor.
+2. Lease R2 esclusivo su `explorer/writer-lease.json`, precondizioni atomiche e scadenza di tre ore. Se occupato, l'hook Gold salta soltanto Explorer senza attendere. Il precedente rilascio in coda è stato annullato verificando run, SHA e stato; nessun job calcistico annullato.
+3. Backup privato del Worker e dei binding sotto `ops-backups/gold-explorer/`; verifica SHA del codice online, patch additiva e suite sul codice reale. Non distribuire ciecamente il bundle del repository.
+4. Due tabelle personali e un indice D1 con istruzioni idempotenti. Lettura dei feed e degli archivi già esistenti, importazione sotto `explorer/`; nessun originale modificato. Rimozione dei soli chunk temporanei locali dopo ciascuna giornata.
+5. Aggiornamento del solo contenuto Worker, conservazione dei binding, aggiunta del flag `GOLD_EXPLORER_ENABLED`. Il client usa `/api/auth/explorer/*`, coperto dalla route Gold esistente: nessuna nuova route necessaria.
+6. Rifiuto anonimi HTTP 401, controllo autenticato API e browser, report e screenshot autentici negli artifact Actions. L'ulteriore verifica `[explorer-verify]` non ripete il deploy.
+7. I workflow ordinari proiettano Explorer dopo il commit Gold. La variabile GitHub esplicita `GOLD_EXPLORER_ENABLED=false` disabilita questo passaggio. Nessuna nuova raccolta né credenziale calcistica nel job di rilascio.
 
-Rollback: disabilitare i due flag Explorer, ripristinare Worker e Pages precedenti se necessario e rimuovere soltanto la nuova route. Conservare `explorer/` e tabelle personali. Nessun rollback dei dati Gold, dei forecast certificati, dei pagamenti o del motore V7. Il flag disabilitato rende l'API 503 e interrompe la proiezione, lasciando intatti i workflow esistenti.
+Il deploy una tantum verifica il codice originale e l'assenza del flag: dopo un deploy riuscito non va rilanciato indiscriminatamente per correggere un eventuale solo errore del browser. Usare il job di verifica separato.
 
-## Lancio successivo
+## Rollback
 
-La fase promozionale viene preparata e approvata **dopo** la verifica online, nel repository `arabsnipertech-bet/arabsniper-growth`. Nessuna automazione o campagna è stata creata.
+Disabilitare il flag Worker e impostare la variabile GitHub Explorer a `false`. Ripristinare il contenuto Worker dal backup privato verificando prima che non siano intervenute modifiche concorrenti; ripristinare gli asset Pages precedenti se necessario. Conservare tabelle personali e oggetti Explorer. Non modificare archivi Gold, pagamenti, probabilità o risultati originali. Il deploy ripristina automaticamente il codice precedente se fallisce durante caricamento/attivazione, salvo modifiche concorrenti.
 
-Bozza editoriale subordinata al rilascio:
+## Limiti e attività residue
 
-> ARABSNIPER GOLD EXPLORER — LA NUOVA DIMENSIONE DELL'ANALISI CALCISTICA
->
-> Esplora i mercati analizzati da Gold, confronta probabilità e quote, salva le tue ricerche e ritrova le selezioni nei preferiti. Consulta risultati e statistiche con riferimenti Night e prematch separati. La triade ufficiale V7 resta sempre riconoscibile.
->
-> Incluso nel tuo accesso Gold, anche durante una prova gratuita valida. Scopri Explorer dalla pagina Gold. Analisi probabilistiche: nessuna garanzia di vincita.
-
-Prima di pubblicare: verificare ogni funzione nominata e il link attivo; acquisire screenshot autentici senza dati personali; realizzare grafica Telegram/Facebook e creatività Meta coerenti con tali schermate; CTA alla prova Gold secondo i requisiti di ammissibilità esistenti (nessuna nuova prova promessa a chi non ne ha diritto). Definire obiettivo, pubblico maggiorenne, posizionamenti, budget e durata, verificare le policy Meta allora applicabili e chiedere l'approvazione specifica. Le immagini QA non sostituiscono screenshot autentici del servizio online.
+- Copertura di quote e risultati determinata dagli archivi esistenti. Dati mancanti indicati, non ricostruiti con nuove chiamate.
+- Certificazione Explorer solo prospettica: lo storico V7 preesistente resta un universo separato.
+- Verifica online autenticata e misure del primo import completo pendenti fino all'esito del job; nessuna dichiarazione anticipata di completezza.
+- Nessuna campagna o pubblicazione promozionale avviata da questa consegna. Le immagini di test non costituiscono screenshot autentici del servizio.
