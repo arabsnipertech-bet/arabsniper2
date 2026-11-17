@@ -391,6 +391,22 @@ class LiveScoresHealthTests(TestCase):
         self.assertEqual([issue['kind'] for issue in day['sample']], ['score_mismatch', 'outcome_mismatch'])
         self.assertEqual(outputs, 'recovery_date=2026-11-12\n')
 
+    def test_rescheduled_fixture_reports_old_settlement_and_excludes_certified_move(self):
+        old = '2026-11-11T20:00:00+00:00'
+        new = '2026-11-12T00:30:00+01:00'
+        row = {'status': 'FT', 'fulltime': {'home': 2, 'away': 1}, 'provider_kickoff': new}
+        moved = {'kickoff': old, 'status': 'postponed',
+                 'result': {'status': 'PST', 'rescheduled_to': new}}
+        settled = {'kickoff': old, 'status': 'settled',
+                   'result': {'status': 'FT', 'home_ft': 2, 'away_ft': 1}}
+        report, _ = health.reconcile({'1': settled, '2': moved}, {'1': row, '2': row})
+        self.assertEqual(report['sample'], [{'fixture_id': '1', 'kind': 'schedule_mismatch'}])
+        legacy = {key: value for key, value in row.items() if key != 'provider_kickoff'}
+        report, _ = health.reconcile({'2': moved}, {'2': legacy})
+        self.assertEqual((report['expected_fixtures'], report['differences']), (0, 0))
+        report, _ = health.reconcile({'2': moved}, {'2': {**row, 'provider_kickoff': old}})
+        self.assertEqual(report['sample'], [{'fixture_id': '2', 'kind': 'auditor_pending'}])
+
     def test_newly_available_halftime_does_not_invalidate_the_archived_final(self):
         market = market_id(specification('total', 'ht', 'over', 1.5))
         audit = {'123': {'status': 'settled', 'result': {'status': 'FT', 'home_ft': 2, 'away_ft': 1},

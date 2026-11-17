@@ -40,8 +40,9 @@ export function normalize(row, now) {
   const f = row?.fixture, status = f?.status?.short;
   if (!Number.isSafeInteger(f?.id) || f.id <= 0 || !STATUSES.has(status)) return null;
   const goals = score(row.goals), fulltime = score(row.score?.fulltime);
-  const halftime = score(row.score?.halftime);
+  const halftime = score(row.score?.halftime), providerKickoff = timestamp(Date.parse(f.date));
   return {fixture_id:String(f.id), status, elapsed:number(f.status.elapsed), extra:number(f.status.extra),
+    ...(providerKickoff ? {provider_kickoff:providerKickoff} : {}),
     goals, halftime:status === 'HT' && !validScore(halftime) ? goals : halftime,
     fulltime:status === 'FT' && !validScore(fulltime) ? goals : fulltime,
     extratime:score(row.score?.extratime), penalties:score(row.score?.penalty),

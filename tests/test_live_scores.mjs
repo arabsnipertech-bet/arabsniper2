@@ -7,6 +7,11 @@ const now=Date.now();
 const ctx=()=>{const data=new Map();return {storage:{get:async k=>structuredClone(data.get(k)),put:async(k,v)=>{data.set(k,structuredClone(v));}}};};
 const env={LIVE_ENABLED:'true',API_SPORTS_KEY:'test-only',MAX_CALLS_PER_DAY:'1500',RESERVE_REQUESTS:'1000'};
 const row={fixture:{id:123,status:{short:'2H',elapsed:63}},goals:{home:1,away:0},score:{halftime:{home:0,away:0}}};
+test('a provider kickoff is retained with the score across a Rome date change',()=>{
+ const result=normalize({...row,fixture:{...row.fixture,date:'2026-11-17T00:30:00+01:00'}},now);
+ assert.equal(result.provider_kickoff,'2026-11-16T23:30:00.000Z');
+ assert.equal(normalize(row,now).provider_kickoff,undefined);
+});
 function fakeFetch(counter,quota=7500){return async url=>{
  counter.push(url);
  if(url.includes('raw.githubusercontent'))return Response.json({generated_at:new Date(now).toISOString(),fixtures:[{fixture_id:'123',kickoff:new Date(now-3600000).toISOString()}]});

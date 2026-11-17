@@ -3,16 +3,28 @@ import json
 from urllib.request import urlopen
 
 from multimarket_model import stamp
-from v7_archive import FINISHED, VOID, checked_score, merge_verified_result
+from v7_archive import FINISHED, ROME, VOID, checked_score, merge_verified_result, rescheduled_result
 
 LOOKBACK_DAYS = 35
 LIVE_URL = 'https://arabsniperbet.com/api/live-scores'
 SCORE_FIELDS = ('home_ft', 'away_ft', 'home_ht', 'away_ht')
 
 
+def result_for_day(result, day):
+    """A confirmed move to another Rome date closes the old schedule without a score."""
+    kickoff = stamp(result.get('provider_kickoff'))
+    if not kickoff or kickoff.astimezone(ROME).date().isoformat() == str(day):
+        return result
+    return checked_score({**{key: result.get(key) for key in ('source', 'transport', 'provider_observed_at')},
+                          'status': 'PST', 'rescheduled_to': kickoff.isoformat(),
+                          'provider_status': result.get('status')})
+
+
 def needs_result(score):
     if not score:
         return True
+    if rescheduled_result(score):
+        return False
     return score.get('status') not in VOID and (score.get('status') not in FINISHED
                                                or any(score.get(field) is None for field in SCORE_FIELDS))
 
@@ -26,7 +38,8 @@ def worker_score(row):
                           'home_ft': ft.get('home'), 'away_ft': ft.get('away'),
                           'extra_time': row.get('extratime'), 'penalties': row.get('penalties'),
                           'source': 'API-Football', 'transport': 'live_worker',
-                          'provider_observed_at': row.get('observed_at')})
+                          'provider_observed_at': row.get('observed_at'),
+                          'provider_kickoff': row.get('provider_kickoff')})
 
 
 def read_live_scores(fixtures, now):
@@ -41,9 +54,11 @@ def read_live_scores(fixtures, now):
             row = data['fixtures'].get(fid) or {}
             observed, began = stamp(row.get('observed_at')), stamp(kickoff)
             if not (row.get('fixture_id') == fid and row.get('source') == 'API-Football'
-                    and row.get('status') in FINISHED | VOID and observed and began and began < observed <= now):
+                    and stamp(row.get('provider_kickoff')) and observed and began and began < observed <= now):
                 continue
-            scores[fid] = worker_score(row)
+            result = result_for_day(worker_score(row), began.astimezone(ROME).date())
+            if result['status'] in FINISHED | VOID or rescheduled_result(result):
+                scores[fid] = result
         return scores
     except (OSError, TypeError, ValueError, AttributeError) as error:
         print('Stored live scores unavailable: '+type(error).__name__, flush=True)

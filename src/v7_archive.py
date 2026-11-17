@@ -89,9 +89,13 @@ def checked_score(result):
     return score
 
 
+def rescheduled_result(result):
+    return result.get('status') == 'PST' and bool(stamp(result.get('rescheduled_to')))
+
+
 def merge_verified_result(previous, incoming):
     old, new = checked_score(previous or {}), checked_score(incoming or {})
-    if new.get('status') in VOID and new.get('transport') == 'audit_api':
+    if new.get('transport') == 'audit_api' and (new.get('status') in VOID or rescheduled_result(new)):
         return new
     if old.get('status') in FINISHED and None not in (old['home_ft'], old['away_ft']):
         if new.get('status') not in FINISHED or None in (new['home_ft'], new['away_ft']):
