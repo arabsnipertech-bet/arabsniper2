@@ -99,7 +99,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+      - name: Fetch only the production baseline
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git fetch --no-tags --depth=1 origin "$BASE_SHA"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

@@ -86,7 +86,7 @@ def main():
     assert bindings['AUTH_ENABLED']['text']=='true'
     tables=ops.query("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('gold_sessions','gold_codes','passes','explorer_searches','explorer_favorites')")
     assert {'gold_sessions','gold_codes','passes'} <= {r['name'] for r in tables}
-    live=ops.live();base=__import__('subprocess').check_output(['git','show','origin/main:workers/stripe-access/production-bundle.mjs'],cwd=ROOT,text=True)
+    live=ops.live();base=__import__('subprocess').check_output(['git','show','FETCH_HEAD:workers/stripe-access/production-bundle.mjs'],cwd=ROOT,text=True)
     result.update(worker_read=True,d1_read=True,worker_sha=ops.digest(live),worker_matches_main=live.strip()==base.strip(),
         explorer_flag=bindings.get('GOLD_EXPLORER_ENABLED',{}).get('text','disabled'),
         personal_schema_present={'explorer_searches','explorer_favorites'} <= {r['name'] for r in tables})
