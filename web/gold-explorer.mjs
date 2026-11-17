@@ -67,6 +67,7 @@ function renderLegacy(){const rows=state.legacyRows||[];cards(rows.slice(0,state
 function renderHistory(){
  const f=filters(),reference=$('historyReference').value,cohort=$('historyCohort').value;
  const all=(ref,group)=>state.history.flatMap(h=>historyRows(h,state.snapshots,ref,group)).filter(r=>matches(r,f,Date.now(),true));
+ const certified=state.history.some(h=>(h.scans||[]).length);$('certificateState').hidden=certified;$('certificateState').textContent='Le certificazioni Explorer iniziano dalla sua attivazione. In questo periodo non sono ancora presenti; i dati V7 precedenti sono disponibili nella sezione Archivio V7 qui sotto.';if(!certified)$('legacyArchive').open=true;
  const rows=all(reference,cohort),stats=metrics(rows,$('historyMetrics')),comparison=[];
  for(const ref of ['night','final'])for(const group of ['official','alternative']){const s=statistics(all(ref,group));comparison.push([ref==='night'?'Night':'Finale',group==='official'?'Triade':'Alternative',s.n,s.verified,percent(s.hitRate),percent(s.roi)]);}
  $('comparisons').innerHTML='<h3>Campioni separati · stessi filtri</h3>'+table(['Riferimento','Campione','N','Verificati','Hit rate','ROI'],comparison)+'<h3>Calibrazione probabilistica</h3>'+table(['Fascia','N','Probabilità media','Frequenza osservata'],stats.bins.filter(b=>b.n).map(b=>[b.range,b.n,percent(b.predicted),percent(b.observed)]));
