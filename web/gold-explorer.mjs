@@ -19,27 +19,35 @@ async function getPages(hashes){const parts=await Promise.all(hashes.map(async h
 async function getSnapshot(hash){if(!state.snapshots.has(hash)){const data=await getObject(hash);state.snapshots.set(hash,{...data,rows:await getPages(data.pages||[])});}return state.snapshots.get(hash);}
 const filters=()=>({...Object.fromEntries(new FormData($('filterForm'))),diversify:$('filterForm').elements.diversify.checked});
 const empty=(node,value='Nessuna selezione corrisponde ai criteri.')=>node.innerHTML='<p class="empty">'+esc(value)+'</p>';
+const roleNames={most_probable:'Più Probabile',recommended_alternative:'Consigliata',high_odds_shot:'Colpaccio'};
+const originalRoles=row=>row.roles?.length?row.roles.map(r=>roleNames[r]||r).join(', '):'Fuori dalla triade ufficiale';
+function emptyResults(){
+ empty($('results'),!state.rows.length?'Archivio corrente caricato: nessuna analisi prematch disponibile.':$('mode').value==='recommended'?'Nessuna voce della categoria Consigliate soddisfa i filtri e i requisiti prematch attuali. Il caricamento è riuscito; questa vista non coincide con tutta la triade Gold.':'Dati caricati: nessuna voce corrisponde alla vista e ai filtri attuali.');
+}
 function cards(rows,node,options={}){
  if(!rows.length){empty(node);return;}
- const roleNames={most_probable:'Più Probabile',recommended_alternative:'Consigliata',high_odds_shot:'Colpaccio'};
  node.innerHTML=rows.map(row=>{
   const key=row.id+'-'+(row.object||'current')+'-'+(options.favorite?'favorite':'view');state.viewRows.set(key,{row,...options});
   return `<article class="selection"><div><span class="badge ${esc(row.category)}">${esc(categories[row.category]||'Archivio')}</span><p class="small">${esc(text(row.league))} · ${date(row.kickoff)}</p><h3>${esc(text(row.home))} — ${esc(text(row.away))}</h3></div><div><strong class="market">${esc(row.label)}</strong><p class="small">${row.roles?.length?'Triade: '+esc(row.roles.map(r=>roleNames[r]||r).join(', ')):'Fuori dalla triade ufficiale'}</p><p class="small">${row.reliability==='supported'?'Supporto statistico V7':'Affidabilità limitata'} · ${row.validated?'Validata':'Non raccomandata'}</p>${row.outcome?`<b class="${row.outcome.win===1?'won':row.outcome.loss===1?'lost':''}">${esc(row.outcome.label)}</b>`:options.historical?'<span class="small">Esito non verificato</span>':''}</div><div class="numbers"><div><strong>${percent(row.probability)}</strong><small>Probabilità V7</small></div><div><strong>${number(row.odd)}</strong><small>${row.official_original?'Quota ufficiale originale':options.historical?'Quota snapshot':fresh(row)?'Quota di riferimento':'Quota storica / scaduta'}</small></div><p class="small">EV ${percent(row.ev)} · EV_low ${percent(row.ev_low)} · OCI ${number(row.oci,1)}</p></div><div class="actions"><button data-detail="${key}">Dettaglio</button><button ${options.favorite?'data-remove':'data-favorite'}="${key}" aria-label="${options.favorite?'Rimuovi preferito':'Salva preferito'}">${options.favorite?'Rimuovi':'☆'}</button></div></article>`;
  }).join('');
 }
 function render(){
+ $('marketIndex').replaceChildren();$('marketNavigation').hidden=true;
+ $('viewExplanation').textContent=$('mode').value==='recommended'?'La categoria Explorer e i ruoli della triade Gold sono distinti. Il ruolo originale Gold è riportato nelle schede e nel dettaglio.':$('mode').value==='markets'?'Gruppi in ordine alfabetico. Usa l’indice per raggiungere un mercato senza scorrere tutti i precedenti.':'I ruoli originali Gold sono riportati senza modifiche nelle schede e nel dettaglio.';
  const f=filters(),mode=$('mode').value,now=Date.now();let rows=state.rows.filter(r=>matches(r,f,now)&&(!state.focusFixture||r.fixture_id===state.focusFixture));
  if(mode!=='search')rows=rows.filter(r=>fresh(r,now));
  if(mode==='markets'){
   $('results').replaceChildren();let more=false,count=0;
   for(const label of [...new Set(rows.map(r=>r.label))].sort()){
    const list=rank(rows.filter(r=>r.label===label),'best',f.diversify);if(!list.length)continue;count+=list.length;more ||=list.length>state.limit;
-   const section=document.createElement('section'),title=document.createElement('h3'),content=document.createElement('div');title.textContent=label;section.append(title,content);cards(list.slice(0,state.limit),content);$('results').append(section);
+   const section=document.createElement('section'),title=document.createElement('h3'),content=document.createElement('div');title.textContent=label+' · '+list.length;title.id='market-group-'+$('marketIndex').children.length;title.tabIndex=-1;
+   const jump=document.createElement('a');jump.href='#'+title.id;jump.textContent=label+' ('+list.length+')';jump.className='button';jump.onclick=e=>{e.preventDefault();title.focus({preventScroll:true});title.scrollIntoView({block:'start'});};$('marketIndex').append(jump);
+   section.append(title,content);cards(list.slice(0,state.limit),content);$('results').append(section);
   }
-  if(!count)empty($('results'));$('more').hidden=!more;
+  if(!count)emptyResults();$('marketNavigation').hidden=!count;$('more').hidden=!more;
  }else{
   rows=mode==='search'?rows.sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||b.probability-a.probability):rank(rows,mode,f.diversify);
-  cards(rows.slice(0,state.limit),$('results'));$('more').hidden=rows.length<=state.limit;
+  if(rows.length)cards(rows.slice(0,state.limit),$('results'));else emptyResults();$('more').hidden=rows.length<=state.limit;
  }
 }
 function metrics(rows,node){const s=statistics(rows);node.innerHTML='<div class="metrics">'+[
@@ -56,7 +64,11 @@ async function refreshData(){
  const today=romeDay(Date.now()),last=romeDay(Date.parse(today+'T12:00:00Z')+4*86400000);for(const key of ['from','to']){const input=$('filterForm').elements[key];input.min=today;input.max=last;}
  state.limit=10;render();dashboard();scheduleExpiry();await loadSearches();message(state.rows.length?'Dati caricati.':'Nessuna analisi prematch disponibile. Puoi consultare lo storico.');
 }
-function refresh(){return state.refreshPromise ||=refreshData().finally(()=>state.refreshPromise=null);}
+function refresh(){return state.refreshPromise ||=(async()=>{
+ $('dataState').textContent='Caricamento in corso…';
+ try{await refreshData();$('dataState').textContent='';}
+ catch(e){$('dataState').textContent=[401,403].includes(e.status)?'Accesso richiesto: rientra dalla Gold.':state.rows.length?'Aggiornamento non riuscito: restano visibili i dati dell’ultimo caricamento. Premi Aggiorna dati per riprovare.':'Caricamento non riuscito: non è possibile stabilire se ci siano risultati. Premi Aggiorna dati per riprovare.';throw e;}
+ })().finally(()=>state.refreshPromise=null);}
 async function favorites(reset=true){
  if(reset){state.favorites=[];state.next=0;}
  const data=await api('favorites?offset='+(state.next||0));state.favorites.push(...data.items);state.next=data.next;
@@ -97,7 +109,7 @@ async function certificate(scan,h){
 function detail(row){
  const fast=row.latest_fast||row.fast_reference;
  $('detailBody').innerHTML='<h2>'+esc(row.label)+'</h2><p>'+esc(text(row.home)+' — '+text(row.away))+'</p><dl>'+[
- ['Categoria',categories[row.category]],['Probabilità V7',percent(row.probability)],['Apertura',number(row.opening)],['Prima quota osservata',number(row.first_odd)],['Quota del riferimento',number(row.odd)],['Quota Night',row.night_reference?number(row.night_reference.odd)+' · '+date(row.night_reference.captured_at):'Non disponibile'],['Ultima quota Fast valida',fast?number(fast.odd)+' · '+date(fast.captured_at)+(Date.parse(fast.quote_valid_until)>Date.now()?'':' · storica / scaduta'):'Nessun aggiornamento Fast documentato'],['EV / EV_low',percent(row.ev)+' / '+percent(row.ev_low)],['OCI',number(row.oci)],['Affidabilità',row.reliability==='supported'?'Supporto statistico V7':'Limitata'],['Fonte',text(row.quote?.bookmaker)||row.quote?.bookmaker_id||'Non disponibile'],['Quota osservata',date(row.quote?.quote_observed_at)],['Aggiornata dalla fonte',date(row.quote?.provider_updated_at)],['Utilizzabile fino a',date(row.quote_valid_until)],['Snapshot V7',date(row.captured_at)],['Registrazione Explorer',row.legacy_v7?'Archivio V7 precedente':date(row.published_at)],['Salvata tra i preferiti',row.saved_at?date(row.saved_at*1000):'—'],['Riferimento finale',row.fallback_night?'Night: Fast successivo assente':row.reference||'Corrente'],['Esito',row.outcome?.label||'Non verificato'],['Risultato FT',row.outcome&&numeric(row.result?.result?.home_ft)&&numeric(row.result?.result?.away_ft)?row.result.result.home_ft+' – '+row.result.result.away_ft:'Non disponibile'],['Risultato PT',row.outcome&&numeric(row.result?.result?.home_ht)&&numeric(row.result?.result?.away_ht)?row.result.result.home_ht+' – '+row.result.result.away_ht:'Non disponibile'],['Motivi di attenzione',(row.exclusions||[]).join(', ')||'—'],['Impronta snapshot',row.forecast_sha256]
+ ['Categoria Explorer',categories[row.category]],['Ruolo originale Gold',originalRoles(row)],['Probabilità V7',percent(row.probability)],['Apertura',number(row.opening)],['Prima quota osservata',number(row.first_odd)],['Quota del riferimento',number(row.odd)],['Quota Night',row.night_reference?number(row.night_reference.odd)+' · '+date(row.night_reference.captured_at):'Non disponibile'],['Ultima quota Fast valida',fast?number(fast.odd)+' · '+date(fast.captured_at)+(Date.parse(fast.quote_valid_until)>Date.now()?'':' · storica / scaduta'):'Nessun aggiornamento Fast documentato'],['EV / EV_low',percent(row.ev)+' / '+percent(row.ev_low)],['OCI',number(row.oci)],['Affidabilità',row.reliability==='supported'?'Supporto statistico V7':'Limitata'],['Fonte',text(row.quote?.bookmaker)||row.quote?.bookmaker_id||'Non disponibile'],['Quota osservata',date(row.quote?.quote_observed_at)],['Aggiornata dalla fonte',date(row.quote?.provider_updated_at)],['Utilizzabile fino a',date(row.quote_valid_until)],['Snapshot V7',date(row.captured_at)],['Registrazione Explorer',row.legacy_v7?'Archivio V7 precedente':date(row.published_at)],['Salvata tra i preferiti',row.saved_at?date(row.saved_at*1000):'—'],['Riferimento finale',row.fallback_night?'Night: Fast successivo assente':row.reference||'Corrente'],['Esito',row.outcome?.label||'Non verificato'],['Risultato FT',row.outcome&&numeric(row.result?.result?.home_ft)&&numeric(row.result?.result?.away_ft)?row.result.result.home_ft+' – '+row.result.result.away_ft:'Non disponibile'],['Risultato PT',row.outcome&&numeric(row.result?.result?.home_ht)&&numeric(row.result?.result?.away_ht)?row.result.result.home_ht+' – '+row.result.result.away_ht:'Non disponibile'],['Motivi di attenzione',(row.exclusions||[]).join(', ')||'—'],['Impronta snapshot',row.forecast_sha256]
  ].map(([k,v])=>'<dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd>').join('')+'</dl><p class="note">Dati relativi al riferimento indicato. Explorer non ricalcola le probabilità V7.</p><button id="allAlternatives">Altre analisi della partita</button>';
  $('allAlternatives').onclick=()=>action(async()=>{
   if(row.snapshot){const snap=await getSnapshot(row.snapshot);$('detailBody').innerHTML='<h2>Mercati nello stesso snapshot</h2><div id="alternateRows"></div>';cards(snap.rows.filter(r=>r.fixture_id===row.fixture_id),$('alternateRows'),{historical:true});}

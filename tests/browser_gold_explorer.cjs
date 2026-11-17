@@ -35,6 +35,10 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  await page.goto('https://explorer.test/gold-explorer.html');await page.locator('h1').evaluate(el=>el.prepend('COLLAUDO QA — DATI SINTETICI · '));await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor();
  assert.equal(await page.locator('#results .selection').count(),10);const initial=calls.length;
  for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);}
+ await page.selectOption('#mode','markets');assert.equal(await page.locator('#marketIndex a').count(),5);
+ await page.locator('#marketIndex a').filter({hasText:'Under 3,5 FT'}).click();assert((await page.evaluate(()=>document.activeElement.textContent)).startsWith('Under 3,5 FT'));
+ await page.selectOption('#mode','recommended');await page.fill('[name=team]','impossibile');assert((await page.locator('#results').innerText()).includes('Il caricamento è riuscito'));await page.fill('[name=team]','');
+ await page.selectOption('#mode','best');assert(await page.locator('#marketNavigation').isHidden());
  await page.click('#more');assert.equal(await page.locator('#results .selection').count(),20);
  await page.fill('[name=team]','impossibile');assert.equal(await page.locator('#results .selection').count(),0);await page.fill('[name=team]','');
  await page.fill('[name=probMin]','70');assert.equal(await page.locator('#results .selection').count(),0);await page.fill('[name=probMin]','');assert.equal(calls.length,initial,'Filtering must not issue requests');
@@ -43,7 +47,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  await page.fill('#searchName','GG aggiornata');await page.click('#updateSearch');await page.locator('#message').filter({hasText:'Ricerca aggiornata'}).waitFor();assert.equal(searches[0].name,'GG aggiornata');
  await page.click('#deleteSearch');await page.locator('#message').filter({hasText:'Ricerca eliminata'}).waitFor();assert.equal(searches.length,0);
  await page.locator('#results [data-favorite]').first().click();await page.locator('#message').filter({hasText:'Selezione salvata'}).waitFor();await page.click('[data-tab=favorites]');await page.locator('#favoriteRows .selection').waitFor();assert.equal(await page.locator('#favoriteRows .won').count(),1);
- await page.locator('#favoriteRows [data-detail]').click();assert(await page.locator('#detail').isVisible());assert((await page.locator('#detailBody').innerText()).includes('Ultima quota Fast valida'));await page.click('#closeDetail');
+ await page.locator('#favoriteRows [data-detail]').click();assert(await page.locator('#detail').isVisible());assert((await page.locator('#detailBody').innerText()).includes('Ultima quota Fast valida'));assert((await page.locator('#detailBody').innerText()).includes('Ruolo originale Gold'));await page.click('#closeDetail');
  await page.locator('#favoriteRows [data-remove]').click();await page.locator('#message').filter({hasText:'Preferito rimosso'}).waitFor();assert.equal(favorites.length,0);
  await page.click('[data-tab=history]');await page.click('#loadHistory');await page.locator('#message').filter({hasText:'Storico caricato'}).waitFor();assert.equal(await page.locator('#historyRows .selection').count(),10);assert((await page.locator('#comparisons').innerText()).includes('Calibrazione'));
  await page.selectOption('#historyReference','night');await page.selectOption('#historyCohort','top');assert.equal(await page.locator('#historyRows .selection').count(),2); // GG FT filter, exact stored top10
@@ -54,8 +58,9 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   await page.screenshot({path:'test-artifacts/explorer-'+name+'.png',fullPage:true});
  }
  await page.clock.setFixedTime(new Date('2026-11-17T14:01:00Z'));await page.selectOption('#mode','probable');assert.equal(await page.locator('#results .selection').count(),0,'Started fixtures removed');
- await page.clock.setFixedTime(new Date(now));empty=true;await page.click('#refresh');await page.locator('#message').filter({hasText:'Nessuna analisi'}).waitFor();assert.equal(await page.locator('#results .selection').count(),0);
- fail=true;await page.click('#refresh');await page.locator('#message').filter({hasText:/fetch|Connessione|network/i}).waitFor();fail=false;status=401;await page.click('#refresh');await page.locator('#locked').waitFor();assert(await page.locator('#app').isHidden());
+ await page.clock.setFixedTime(new Date(now));await page.selectOption('#mode','best');const retained=await page.locator('#results .selection').count();fail=true;await page.click('#refresh');await page.locator('#dataState').filter({hasText:'Aggiornamento non riuscito'}).waitFor();assert.equal(await page.locator('#results .selection').count(),retained);fail=false;
+ empty=true;await page.click('#refresh');await page.locator('#message').filter({hasText:'Nessuna analisi'}).waitFor();assert.equal(await page.locator('#results .selection').count(),0);
+ fail=true;await page.click('#refresh');await page.locator('#message').filter({hasText:/fetch|Connessione|network/i}).waitFor();assert((await page.locator('#dataState').innerText()).includes('Caricamento non riuscito'));fail=false;await page.click('#refresh');await page.locator('#message').filter({hasText:'Nessuna analisi'}).waitFor();assert.equal(await page.locator('#dataState').innerText(),'');status=401;await page.click('#refresh');await page.locator('#locked').waitFor();assert(await page.locator('#app').isHidden());
  status=200;empty=false;await page.goto('https://explorer.test/gold-dashboard-live.html');await page.locator('button').filter({hasText:'Gold Explorer'}).waitFor();const before=calls.length;assert.equal(await page.locator('iframe[src*="gold-explorer"]').count(),0);await page.getByRole('button',{name:'Gold Explorer ↗'}).click();await page.frameLocator('iframe[title="Gold Explorer"]').locator('#results .selection').first().waitFor();assert(calls.length>before);await page.getByRole('button',{name:'Chiudi ×',exact:true}).click();
  assert.deepEqual(errors,[]); // Gold page may make its own existing requests, blocked by this isolated mock.
  assert.equal(external.filter(u=>/api-football|api-sports|odds/.test(u)).length,0);
