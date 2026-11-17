@@ -1,5 +1,6 @@
 """Read-only archived quote identity diagnostic. Never calls a provider or writes R2."""
 import json, sys, tempfile
+from statistics import median
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
@@ -35,6 +36,26 @@ def main():
    for fid in ids:
     entry=ledger.get(fid,{})
     result['ledger'][fid]={'kickoff':entry.get('kickoff'),'groups':{k:points for k,points in entry.get('groups',{}).items() if any(any(spec.get('period')=='ft' and spec.get('line') in [2.5,3.5] for spec in p.get('specs',{}).values()) for p in points)}}
+   comparisons=[]
+   for fid,entry in ledger.items():
+    by_market={}
+    for key,points in entry.get('groups',{}).items():
+     if not points:continue
+     last=points[-1]
+     if not key.startswith('5|total|ft|') or last.get('quote_source','bookmaker')!='bookmaker':continue
+     for token,spec in last.get('specs',{}).items():
+      if spec.get('side')!='over' or spec.get('line') not in [2.5,3.5]:continue
+      value=last.get('odds',{}).get(token)
+      if not isinstance(value,(int,float)):continue
+      mk=(spec['line'],last.get('provider_updated_at'))
+      by_market.setdefault(mk,{})[key.split('|')[-1]]={'odd':value,'book':last.get('bookmaker')}
+    for (line,at),books in by_market.items():
+     if '3' not in books or len(books)<4:continue
+     others=[v['odd'] for k,v in books.items() if k!='3'];mid=median(others)
+     comparisons.append({'fixture':fid,'line':line,'provider_updated_at':at,'betfair':books['3']['odd'],'other_median':mid,'other_books':len(others),'ratio':round(books['3']['odd']/mid,4)})
+   result['same_timestamp_comparisons']=len(comparisons)
+   result['betfair_double_median_cases']=[c for c in comparisons if c['ratio']>=2]
+   result['largest_discrepancies']=sorted(comparisons,key=lambda c:c['ratio'],reverse=True)[:15]
    # Within each retained group, specs must identify the same market over time.
    for fid,entry in ledger.items():
     for key,points in entry.get('groups',{}).items():
