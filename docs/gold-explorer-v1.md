@@ -1,3 +1,15 @@
+# Isolamento del rilascio — aggiornamento 17 novembre 2026
+
+La PR #220 è stata integrata in main al commit d5ff9b9b. Test PR e main superati; asset Pages verificati nel browser. Il backend inizialmente attendeva il mutex Gold occupato dalla Night programmata, partita alle 09:56 italiane.
+
+La correzione separa il deploy dal mutex Gold. Tutti i writer Explorer (hook ordinario, CLI e import iniziale) acquisiscono un lease R2 esclusivo su `explorer/writer-lease.json`, con precondizioni atomiche If-None-Match/If-Match. Se occupato, l'hook rinvia soltanto Explorer senza attendere né compromettere Gold. Scadenza di tre ore superiore ai timeout dei job; rilascio condizionale che non può cancellare il lease di un successore. Test: contesa, gara atomica, crash/scadenza, vecchio writer, errore e isolamento degli originali.
+
+Il precedente job Explorer ancora in coda viene annullato in modo mirato, verificando run ID, SHA e stato pending. Nessuna Night/Fast/Auditor viene annullata. Il nuovo rilascio mantiene backup, verifica SHA Worker, import dei soli archivi già esistenti, migrazione D1 e smoke online. I chunk locali di ogni giornata storica vengono rimossi dopo l'import per limitare lo spazio disco; gli originali remoti restano immutati.
+
+Questa sezione aggiorna il precedente riferimento al mutex Gold. Nessuna nuova raccolta calcistica, nessun nuovo modello, nessuna modifica del cron Night.
+
+---
+
 # Aggiornamento operativo 17 novembre 2026
 
 Bruno ha autorizzato merge, deploy e lancio (Meta: 40 € totali / 6 giorni), subordinati ai controlli e alla reale disponibilità online. Le precedenti indicazioni di attesa autorizzazione sotto sono superate.

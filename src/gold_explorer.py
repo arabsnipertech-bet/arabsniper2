@@ -270,5 +270,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     days = [read_store(root/'data'/name, {}) for name in GOLD[:5]] if args.seed_current else []
-    publish(client(), os.environ['R2_BUCKET'], root, days, 'refresh' if args.seed_current else 'results',
-            legacy_limit=None if args.complete_backfill else 1)
+    from explorer_lease import writer
+    with writer(client(), os.environ['R2_BUCKET']) as storage:
+        if storage is None:
+            raise SystemExit('Explorer writer busy; no changes made')
+        publish(storage, os.environ['R2_BUCKET'], root, days, 'refresh' if args.seed_current else 'results',
+                legacy_limit=None if args.complete_backfill else 1)
