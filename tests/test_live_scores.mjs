@@ -569,6 +569,10 @@ test('idle preflight only trusts recent settled in-memory state', async () => {
     {scores:{1:{status:'FT',goals:{home:0,away:0}}}}])
     assert.equal(await check(changes), 'review');
   const pair = {home:0,away:0};
+  const oldKickoff = new Date(at - 80 * 3_600_000).toISOString();
+  const unfinished = {status:'FT',fulltime:pair,provider_kickoff:oldKickoff};
+  assert.equal(await check({scores:{1:{...unfinished, observed_at:new Date(at-10*3_600_000).toISOString()}}}), 'review');
+  assert.equal(await check({scores:{1:{...unfinished, observed_at:new Date(at-5*3_600_000).toISOString()}}}), 'idle');
   assert.equal(await check({watch:[{fixture_id:1,kickoff:new Date(at).toISOString()}],
     scores:{1:{status:'FT',halftime:pair,fulltime:pair}}}), 'idle');
 });
