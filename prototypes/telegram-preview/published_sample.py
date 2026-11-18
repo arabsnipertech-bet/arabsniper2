@@ -40,16 +40,19 @@ for mid,post in sorted(latest.items(),key=lambda pair:int(pair[0]),reverse=True)
         if not photo:
             print(kind,'no public still image');continue
         match=re.search(r"background-image:\s*url\(['\"]?(https://[^)'\"]+)",photo.get('style',''))
-        if not match: continue
+        if not match:
+            print(kind,'public photo URL unavailable');continue
         url=match.group(1)
         host=urlsplit(url).hostname or ''
-        if not host.endswith('.cdn-telegram.org'): continue
+        if not (re.fullmatch(r'cdn\d*\.cdn-telegram\.org',host) or host.endswith('.cdn-telegram.org') or host.endswith('.telesco.pe') or re.fullmatch(r'cdn\d*\.telegram-cdn\.org',host)):
+            print(kind,'public photo host excluded',host);continue
         with requests.get(url,timeout=(4,10),stream=True,allow_redirects=False) as media:
             media.raise_for_status()
             buf=media.raw.read(4_000_001)
             if len(buf)>4_000_000: continue
         with Image.open(io.BytesIO(buf)) as remote,Image.open(io.BytesIO(card(post['kind'],post['view']))) as ref:
-            if max(remote.size)>3000: continue
+            if max(remote.size)>3000:
+                print(kind,'oversized public preview');continue
             diff=ImageChops.difference(remote.convert('RGB'),ref.convert('RGB').resize(remote.size,Image.Resampling.LANCZOS))
             print(kind,'public photo',remote.size,'mean absolute channel error',round(max(ImageStat.Stat(diff).mean),3))
     except (requests.RequestException,OSError,ValueError) as exc:

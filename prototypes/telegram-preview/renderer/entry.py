@@ -14,6 +14,10 @@ class Default(WorkerEntrypoint):
         if request.method != 'POST':
             return Response('Method not allowed', status=405)
         data = json.loads(await request.text())
+        if data['mode'] == 'features':
+            from PIL import features, __version__
+            return Response(json.dumps({'pillow':__version__, 'raqm':features.check('raqm'),
+                'freetype':features.version('freetype2'), 'jpeg':features.version('jpg')}))
         post = data['post']
         view = post['view']
         if data['mode'] == 'caption':

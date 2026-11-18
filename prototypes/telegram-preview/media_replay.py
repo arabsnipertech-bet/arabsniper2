@@ -62,6 +62,16 @@ def compare_images(reference, raw):
               'byte identical',reference==raw,flush=True)
         return worst
 
+from PIL import features, __version__, ImageFont
+from unittest.mock import patch
+print('native renderer', __version__, 'raqm',features.check('raqm'),'freetype',features.version('freetype2'),
+      'jpeg',features.version('jpg'),flush=True)
+print('worker renderer',requests.post('http://127.0.0.1:8787',json={'mode':'features'},timeout=10).json(),flush=True)
+native_font = ImageFont.truetype
+def basic_font(*args, **kwargs):
+    kwargs['layout_engine'] = ImageFont.Layout.BASIC
+    return native_font(*args, **kwargs)
+
 failures = []
 for post in samples:
     kind, view = post['kind'], post['view']
@@ -83,7 +93,15 @@ for post in samples:
                  now=at,trial_ok=trial) == post['text']]
         if not flags or call(post,'caption',flags[0]).decode() != post['text']:
             raise ValueError('Recorded caption mismatch')
-        if compare_images(editorial.card(kind,view),call(post,'jpeg')) > 1:
+        worker_jpeg = call(post,'jpeg')
+        if compare_images(editorial.card(kind,view),worker_jpeg) > 1:
+            editorial.font.cache_clear()
+            try:
+                with patch.object(ImageFont,'truetype',side_effect=basic_font):
+                    print('BASIC layout control',kind,flush=True)
+                    compare_images(editorial.card(kind,view),worker_jpeg)
+            finally:
+                editorial.font.cache_clear()
             failures.append((kind,'JPEG','visual mismatch'))
         if post.get('edit_id') and view.get('animation'):
             badge = f"{view['home']}–{view['away']} · {view['status'].upper()}"
