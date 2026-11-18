@@ -48,7 +48,10 @@ on:
       - 'src/proposal_stability.py'
       - 'src/v7_decision.py'
   schedule:
-    - cron: "0 6-23 * * *"
+    # Every 90 minutes, 06:00-22:30 Europe/Rome. Day-scope changes follow separately.
+    - cron: "0 6-21/3 * * *"
+      timezone: "Europe/Rome"
+    - cron: "30 7-22/3 * * *"
       timezone: "Europe/Rome"
 
 permissions:

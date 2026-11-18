@@ -17,7 +17,7 @@ WRITERS = {'.github/workflows/' + name for name in (
     'fast_scan.yml', 'night_scan.yml', 'freeze-audit-source.yml', 'gold-storage-check.yml',
     'manual-auditor.yml', 'odds-probe.yml', 'repair-matrix-quotes.yml',
     'run-auditor.yml', 'recover-auditor.yml', 'storage-cleanup.yml', 'v7-maintenance.yml')}
-INTERVAL = timedelta(minutes=60)
+INTERVAL = timedelta(minutes=90)
 RETRY_DELAY = timedelta(minutes=10)
 MAX_FAILED_ATTEMPTS = 2
 
@@ -33,13 +33,11 @@ def instant(value):
 
 
 def fresh_for_hour(started, now):
-    """Keep one collection per Rome hour, with a 50-minute floor at boundaries."""
+    """Keep one collection per 90-minute interval."""
     start = started.astimezone(timezone.utc)
     end = now.astimezone(timezone.utc)
     age = end - start
-    same_hour = (start.replace(minute=0, second=0, microsecond=0) ==
-                 end.replace(minute=0, second=0, microsecond=0))
-    return timedelta() <= age < INTERVAL and (same_hour or age < timedelta(minutes=50))
+    return timedelta() <= age < INTERVAL
 
 
 class IncompleteListing(RuntimeError):
