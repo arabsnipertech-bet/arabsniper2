@@ -293,6 +293,7 @@ class APIClient:
         self.odds_acquisition_session = uuid4().hex
         self.odds_observation_sequence = 0
         self.history_cache = None
+        self.fixture_schedules = {}
         self._http_remaining = None
         self.odds_extra_pages = 0
         self.odds_books_recovered = 0
@@ -2047,7 +2048,7 @@ def scan_dates(
     output_days: List[Dict[str, Any]] = []
     excluded = set(excluded_countries)
 
-    for day_index, target_date in enumerate(target_dates, start=1):
+    for day_index, target_date in enumerate(target_dates, start=1 + getattr(client, 'fast_day_offset', 0)):
         log(f"📅 Scan day{day_index}: {target_date}")
         day_path = DATA_DIR / f"arab_quote_day{day_index}.json"
         existing_payload = _existing_day_payload(day_index, target_date)
@@ -2063,6 +2064,10 @@ def scan_dates(
             {"date": target_date, "timezone": "Europe/Rome"},
             use_cache=False,
         )
+        if not isinstance((fixtures_payload or {}).get('response'), list):
+            fixtures_payload = None
+        if isinstance(client, APIClient):
+            client.fixture_schedules[target_date] = fixtures_payload
 
         # Mai cancellare dati buoni per un errore API, rate limit o risposta temporaneamente vuota.
         if not fixtures_payload:
@@ -3221,7 +3226,8 @@ def scan_dates(client: APIClient, target_dates: Sequence[str], excluded_countrie
     # Un Night Scan globale con zero fixture su tutti i giorni è quasi sempre
     # quota API esaurita, chiave non valida o risposta API anomala.
     # Falliamo PRIMA del commit GitHub, evitando di pubblicare altri JSON vuoti.
-    if len(target_dates) >= 2 and total_api_fixtures == 0 and total_matches == 0:
+    if (len(target_dates) >= 2 and total_api_fixtures == 0 and total_matches == 0
+            and not getattr(client, 'fast_scope', None)):
         detail = client.last_error or {"reason": "all_requested_days_empty"}
         log(f"❌ API GUARD: zero fixture su {len(target_dates)} giorni. Dettaglio: {detail}")
         raise RuntimeError(
@@ -3270,7 +3276,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="ArabSniper Statistics First V4")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--today", action="store_true", help="Scansiona il giorno corrente")
-    mode.add_argument("--fast", action="store_true", help="Scansiona oggi e domani riusando la cache xG")
+    mode.add_argument("--fast", action="store_true", help="Scansiona il perimetro Fast riusando la cache xG")
     mode.add_argument("--night", action="store_true", help="Scansione rolling da oggi")
     mode.add_argument("--date", type=str, help="Data iniziale YYYY-MM-DD")
     mode.add_argument("--catalog", action="store_true", help="Aggiorna solo il catalogo odds/bets")
@@ -3279,6 +3285,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--days", type=int, default=5, help="Numero giorni per --night/--date")
     parser.add_argument("--github", action="store_true", help="Pubblica output, stato e file day su GitHub")
     parser.add_argument("--include-country", action="append", default=[], help="Rimuove un paese dalla blacklist")
+    parser.add_argument('--fast-scope', choices=('ordinary', 'extended', 'forced'), default='ordinary')
+    parser.add_argument('--fast-slot', default='')
     return parser.parse_args()
 
 
@@ -3329,8 +3337,25 @@ def main() -> None:
         except Exception:
             log("❌ Formato --date non valido. Usa YYYY-MM-DD")
             raise SystemExit(2)
-    from fast_scan_guard import fast_day_count
-    days = fast_day_count() if args.fast else 1 if args.today else 5 if args.night else max(1, min(args.days, 7))
+    reused_dates = []
+    if args.fast:
+        from fast_scan_guard import align_fast_window, fast_day_count, reuse_today, scan_scope
+        from fast_schedule import EXTENDED, explicit_slot
+
+        planned_at = now_rome()
+        client.fast_scope = scan_scope(args.fast_scope)
+        if args.fast_slot:
+            explicit_slot(args.fast_slot, client.fast_scope, planned_at)
+        start = planned_at.date()
+        days = fast_day_count(client.fast_scope)
+        align_fast_window(DATA_DIR, get_target_dates(start, 5))
+        if client.fast_scope == EXTENDED and reuse_today(PROJECT_ROOT, planned_at):
+            reused_dates = [start.isoformat()]
+    else:
+        days = 1 if args.today else 5 if args.night else max(1, min(args.days, 7))
+    dates = get_target_dates(start, days)
+    collected_dates = dates[len(reused_dates):]
+    client.fast_day_offset = len(reused_dates)
     # Refresh reference IDs daily and preserve the last good catalog on errors.
     from quote_history import QuoteHistory
     client.odds_observer = QuoteHistory(DATA_DIR)
@@ -3348,12 +3373,20 @@ def main() -> None:
     client.history_cache = HistoryCache(DATA_DIR / 'arab_quote_history_cache.json',
                                        clock=now_rome, reuse=bool(args.fast or args.today))
     try:
-        output = scan_dates(client, get_target_dates(start, days), excluded)
+        output = scan_dates(client, collected_dates, excluded)
         client.odds_observer.save_openings((match for day in output['days'] for match in day['matches']), iso_now())
     finally:
         client.odds_observer.flush()
         client.history_cache.save()
         log('History cache: ' + json.dumps(client.history_cache.report, sort_keys=True))
+    if args.fast:
+        fresh = {day['date']: day for day in output['days']}
+        output['days'] = [fresh[day] if day in fresh else read_json(DATA_DIR / f'arab_quote_day{i}.json', {})
+                          for i, day in enumerate(get_target_dates(start, 5), 1)]
+        output['fast_scan'] = {'scope': client.fast_scope, 'dates': dates, 'collected_dates': collected_dates,
+                               'reused_dates': reused_dates, 'planned_at': planned_at.isoformat()}
+        output['api_health']['requests_this_run'] = client.request_count
+        atomic_write_json(OUTPUT_FILE, output)
     log(f"✅ Output scritto: {OUTPUT_FILE}")
     log(f"✅ Stato quote scritto: {STATE_FILE}")
     log(f"✅ Cache xG scritta: {XG_CACHE_FILE}")

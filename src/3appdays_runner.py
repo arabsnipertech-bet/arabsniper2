@@ -67,11 +67,14 @@ def atomic_write_json(path: Path, payload) -> None:
     os.replace(tmp, path)
 
 
-def build_command(mode: str, github: bool = False, days: int = 5, audit_date: str = "") -> list[str]:
+def build_command(mode: str, github: bool = False, days: int = 5, audit_date: str = "",
+                  *, fast_scope: str = "ordinary", fast_slot: str = "") -> list[str]:
     python_exe = sys.executable or "python"
     command = [python_exe, str(resolve_engine_file())]
     if mode == "fast":
-        command.append("--fast")
+        command.extend(["--fast", "--fast-scope", fast_scope])
+        if fast_slot:
+            command.extend(["--fast-slot", fast_slot])
     elif mode == "night":
         command.extend(["--night", "--days", "5"])
     elif mode == "catalog":
@@ -184,7 +187,8 @@ def stream_process(command: list[str], *, heartbeat_seconds: float = 60,
     return subprocess.CompletedProcess(command, code, tails["stdout"], tails["stderr"])
 
 
-def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "", force_night: bool = False) -> int:
+def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "", force_night: bool = False,
+        *, fast_scope: str = "ordinary", fast_slot: str = "") -> int:
     if mode == "night":
         from night_scan_guard import completed_today
         force_night = force_night or os.getenv("ARAB_FORCE_NIGHT") == "true"
@@ -198,14 +202,16 @@ def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "", fo
 
     if engine_file.name != "3appdays.py":
         log(f"⚠️ Uso copia fallback {engine_file.name}; online è preferibile rinominarla 3appdays.py")
-    command = build_command(mode, github=github, days=days, audit_date=audit_date)
+    from fast_scan_guard import fast_day_count, scan_scope
+    fast_scope = scan_scope(fast_scope)
+    command = build_command(mode, github=github, days=days, audit_date=audit_date,
+                            fast_scope=fast_scope, fast_slot=fast_slot)
     log(f"🚀 Avvio: {' '.join(command)}")
     started_at = now_iso()
-    from fast_scan_guard import fast_day_count
     report = {
         "mode": mode,
         "github": github,
-        "days": fast_day_count() if mode == "fast" else 5 if mode == "night" else days,
+        "days": fast_day_count(fast_scope) if mode == "fast" else 5 if mode == "night" else days,
         "audit_date": audit_date,
         "command": command,
         "returncode": None,
@@ -213,6 +219,8 @@ def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "", fo
         "generated_at": started_at,
         "started_at": started_at,
     }
+    if mode == 'fast':
+        report.update(fast_scope=fast_scope, fast_slot=fast_slot or None)
     atomic_write_json(RUN_STATE_FILE, report)
     result = stream_process(command)
     if mode == "night" and result.returncode == 0:
@@ -241,7 +249,7 @@ def run(mode: str, github: bool = False, days: int = 5, audit_date: str = "", fo
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Runner ArabSniper Quote Engine")
     modes = parser.add_mutually_exclusive_group(required=True)
-    modes.add_argument("--fast", action="store_true", help="Scansiona oggi e domani")
+    modes.add_argument("--fast", action="store_true", help="Scansiona oggi o i tre giorni del Fast esteso")
     modes.add_argument("--night", action="store_true", help="Scansiona rolling più giorni")
     modes.add_argument("--catalog", action="store_true", help="Aggiorna catalogo mercati API")
     modes.add_argument("--audit-markets", action="store_true", help="Esegue l'audit dei mercati quota")
@@ -249,6 +257,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--days", type=int, default=5, help="Giorni del night, massimo 7")
     parser.add_argument("--github", action="store_true", help="Pubblica i JSON dedicati")
     parser.add_argument("--force-night", action="store_true", help="Ripeti esplicitamente il Night Scan già completato")
+    parser.add_argument("--fast-scope", choices=('ordinary', 'extended', 'forced'), default='ordinary')
+    parser.add_argument("--fast-slot", default='')
     return parser.parse_args()
 
 
@@ -257,7 +267,7 @@ def main() -> None:
     mode = "fast" if args.fast else "night" if args.night else "catalog" if args.catalog else "audit"
     raise SystemExit(run(
         mode, github=args.github, days=max(1, min(args.days, 7)), audit_date=args.audit_date,
-        force_night=args.force_night,
+        force_night=args.force_night, fast_scope=args.fast_scope, fast_slot=args.fast_slot,
     ))
 
 

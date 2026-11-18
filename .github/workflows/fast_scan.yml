@@ -1,13 +1,23 @@
 name: ArabSniper Fast Scan
+run-name: Fast Scan [${{ inputs.force_fast && 'forced' || (inputs.fast_scope == 'extended' || github.event.schedule == '30 15 * * *') && 'extended' || 'ordinary' }}]${{ inputs.fast_slot && format(' {0}', inputs.fast_slot) || github.event_name == 'schedule' && format(' {0}', github.event.schedule) || '' }}
 
 on:
   workflow_dispatch:
     inputs:
       force_fast:
-        description: 'Ripeti un Fast recente (solo recupero manuale esplicito)'
+        description: 'Forza il recupero manuale su cinque giorni'
         type: boolean
         required: false
         default: false
+      fast_scope:
+        description: 'Perimetro Fast'
+        type: choice
+        options: [ordinary, extended]
+        default: ordinary
+      fast_slot:
+        description: 'Slot Europe/Rome ISO 8601 (usato dal backup)'
+        type: string
+        required: false
   push:
     branches: [main]
     paths:
@@ -48,14 +58,17 @@ on:
       - 'src/proposal_stability.py'
       - 'src/v7_decision.py'
   schedule:
-    # Every 90 minutes, 06:00-22:30 Europe/Rome. Day-scope changes follow separately.
+    # Every 90 minutes, 06:00-22:30 Europe/Rome.
     - cron: "0 6-21/3 * * *"
       timezone: "Europe/Rome"
     - cron: "30 7-22/3 * * *"
       timezone: "Europe/Rome"
+    - cron: "30 15 * * *"
+      timezone: "Europe/Rome"
 
 permissions:
   contents: write
+  actions: read
 
 # Stesso gruppo del Night Scan: mai due writer sui JSON contemporaneamente.
 concurrency:
@@ -99,22 +112,25 @@ jobs:
           cache: pip
 
       - name: Install dependencies
+        env:
+          WITH_PRIVATE_STORAGE: ${{ vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true' }}
         run: |
-          python -m pip install --upgrade pip
-          pip install requests PyGithub ijson==3.6.0
-
-      - name: Prepare private storage client
-        if: vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true'
-        run: pip install boto3 ijson==3.6.0
+          packages=(requests PyGithub ijson==3.6.0)
+          if [ "$WITH_PRIVATE_STORAGE" = true ]; then packages+=(boto3); fi
+          python -m pip install "${packages[@]}"
 
       - name: Restore authoritative private checkpoint
         if: vars.GOLD_PRIVATE == 'true'
-        run: python src/gold_storage.py restore
+        run: python src/gold_storage.py restore-fast
 
       - name: Check completed Fast Scan before collecting again
         id: fast_guard
         env:
           EVENT_NAME: ${{ github.event_name }}
+          GITHUB_TOKEN: ${{ github.token }}
+          FAST_SCHEDULE: ${{ github.event.schedule }}
+          FAST_SCOPE: ${{ inputs.fast_scope }}
+          FAST_BACKUP_SLOT: ${{ inputs.fast_slot }}
         run: python src/fast_scan_guard.py
 
       - name: Select cached refresh for price-only releases
@@ -141,14 +157,17 @@ jobs:
 
       - name: Run Fast Scan
         if: steps.fast_guard.outputs.run == 'true' && steps.refresh.outputs.mode != 'cached'
+        env:
+          FAST_SCOPE: ${{ steps.fast_guard.outputs.scope }}
+          FAST_SLOT: ${{ steps.fast_guard.outputs.slot }}
         run: |
           python -c "import os; from datetime import datetime,timezone; open(os.environ['GITHUB_ENV'],'a').write('EXPLORER_SCAN_STARTED_AT='+datetime.now(timezone.utc).isoformat()+'\n')"
-          python src/3appdays_runner.py --fast
+          python src/3appdays_runner.py --fast --fast-scope "$FAST_SCOPE" --fast-slot "$FAST_SLOT"
 
-      # A full Fast scan recollects only days 1-2. Migrate saved days 3-5 too,
-      # or a model/policy release leaves the later tabs on the previous policy.
+      # Code releases migrate saved boards to the active policy. The normal
+      # Fast runner already builds boards for the dates it collects.
       - name: Refresh all five saved days to the active Gold policy (zero API calls)
-        if: steps.fast_guard.outputs.run == 'true'
+        if: steps.fast_guard.outputs.run == 'true' && github.event_name == 'push'
         run: python src/refresh_opportunities.py
 
       - name: Preserve legacy model comparison archive
@@ -167,9 +186,15 @@ jobs:
 
       - name: Freeze current decisions and verify scan publication
         if: steps.fast_guard.outputs.run == 'true'
+        env:
+          EVENT_NAME: ${{ github.event_name }}
         # Gold decisions and both shadow variants are frozen before publication.
         run: |
-          python src/audit_journal.py capture
+          if [ "$EVENT_NAME" = push ]; then
+            python src/audit_journal.py capture
+          else
+            python src/audit_journal.py capture --fast
+          fi
           python src/publication_storage.py --scan-only
 
       - name: Refresh public results for the active model
@@ -183,23 +208,17 @@ jobs:
           ls -lh data/arab_quote_*.json
           test -f data/arab_quote_dashboard.json
           test -f data/arab_quote_state.json
-          test -f data/arab_quote_day1.json
-          test -f data/arab_quote_day2.json
+          for day in {1..5}; do test -f "data/arab_quote_day$day.json"; done
 
-      - name: Record verified Fast completion
+      - name: Record verified Fast completion [${{ steps.fast_guard.outputs.scope }} ${{ steps.fast_guard.outputs.slot }}]
         if: steps.fast_guard.outputs.run == 'true' && steps.refresh.outputs.mode != 'cached'
         env:
           FAST_REQUESTED_AT: ${{ steps.fast_guard.outputs.started_at }}
         run: python src/fast_scan_guard.py --record
 
-      - name: Hand off verified fixture IDs to the live score collector
-        if: steps.fast_guard.outputs.run == 'true' && steps.refresh.outputs.mode != 'cached' && vars.GOLD_PRIVATE == 'true'
-        continue-on-error: true
-        run: python src/private_publication.py --watchlist-only
-
       - name: Save verified state in private storage
         if: steps.fast_guard.outputs.run == 'true' && (vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true')
-        run: python src/gold_storage.py publish
+        run: python src/gold_storage.py publish-fast
 
       - name: Preserve observed prices if the scan fails
         if: failure() && (vars.GOLD_STORAGE_ENABLED == 'true' || vars.GOLD_PRIVATE == 'true')

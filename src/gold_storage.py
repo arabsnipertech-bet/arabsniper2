@@ -10,6 +10,8 @@ from audit_storage import read_store, atomic_bytes, FORMAT, validate_store
 from quote_history import OPENING_SNAPSHOT
 PUBLIC = {'data/arab_quote_homepage.json','data/arab_quote_results_public.json'}
 GOLD = [f'arab_quote_day{i}.json' for i in range(1,6)]+['arab_quote_prediction_audit.json','arab_quote_model_research.json']
+WEIGHTS = 'data/arab_calibration_weights.json'
+FAST_DATA = (WEIGHTS, 'data/'+OPENING_SNAPSHOT, 'data/arab_quote_*.json')
 
 def sha(data): return hashlib.sha256(data).hexdigest()
 def allowed(path):
@@ -322,6 +324,46 @@ def restore_v7_priority(storage, bucket, root, day):
     print(f'Priority V7 inputs restored: {len(selected)} verified files', flush=True)
 
 
+def keep_calibration(local, remote):
+    if not local.is_file():
+        return False
+    if remote is None:
+        return True
+    from adaptive_calibration import VERSION
+    from multimarket_model import stamp
+    current = json.loads(local.read_bytes())
+    saved = json.loads(remote.read_bytes())
+    at, before = stamp(current.get('trained_at')), stamp(saved.get('trained_at'))
+    return current.get('version') == VERSION and at and (not before or at > before)
+
+
+def restore_fast(storage, bucket, root):
+    """Restore current scan state plus the existing Gold/Explorer read inputs."""
+    from audit_journal import DATED_PREFIX, PREFIX
+    from fnmatch import fnmatchcase
+
+    index = previous_manifest(storage, bucket)
+    root = Path(root)
+    paths = {path for path in index if (
+        path.startswith('data/') and any(fnmatchcase(path, pattern) for pattern in FAST_DATA)
+        and not Path(path).name.startswith((DATED_PREFIX, PREFIX))
+        or re.fullmatch(r'auditordata/prematch_\d{4}-\d{2}-\d{2}\.json', path)
+        or re.fullmatch(r'auditarchive/prematch_\d{4}-\d{2}-\d{2}_(daily|v7)\.json', path)
+    )}
+    if not all('data/'+name in paths for name in GOLD):
+        raise ValueError('Private Fast checkpoint is missing Gold feeds')
+    with TemporaryDirectory(prefix='.gold-fast-', dir=root) as directory:
+        staging = Path(directory)
+        restore_subset(storage, bucket, staging, index, paths)
+        for path in staging.rglob('*'):
+            if path.is_file():
+                target = root/path.relative_to(staging)
+                if target != root/WEIGHTS or not keep_calibration(target, path):
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    os.replace(path, target)
+    print(f'Fast checkpoint inputs restored: {len(paths)} pointers; archive and existing journals retained in R2', flush=True)
+
+
 def restore(s3,bucket,root,manifest_sha=None):
     root=Path(root)
     if manifest_sha is not None and not re.fullmatch('[a-f0-9]{64}',manifest_sha):
@@ -378,19 +420,8 @@ def restore(s3,bucket,root,manifest_sha=None):
         pending = {path: staging / item['sha256'] for path, item in manifest['files'].items()}
         # Weights are also certified in git. Keep the newer certified publication
         # or the local copy when migrating from a pre-calibration checkpoint.
-        weights = 'data/arab_calibration_weights.json'
-        local = root / weights
-        keep_local_weights = False
-        if local.is_file():
-            from adaptive_calibration import VERSION
-            from multimarket_model import stamp
-            current = json.loads(local.read_bytes())
-            remote = json.loads(pending[weights].read_bytes()) if weights in pending else {}
-            at, before = stamp(current.get('trained_at')), stamp(remote.get('trained_at'))
-            keep_local_weights = weights not in pending or (
-                current.get('version') == VERSION and at and (not before or at > before))
-            if keep_local_weights:
-                pending[weights] = local
+        if keep_calibration(root / WEIGHTS, pending.get(WEIGHTS)):
+            pending[WEIGHTS] = root / WEIGHTS
 
         # Leave the checkout untouched until every remote object is verified.
         existing = [path for path, _ in checkpoint_files(root)]
@@ -415,7 +446,7 @@ if __name__=='__main__':
     import argparse
     from datetime import date
     parser=argparse.ArgumentParser()
-    parser.add_argument('command',choices=('publish','restore','restore-v7-priority','checkpoint',
+    parser.add_argument('command',choices=('publish','restore','publish-fast','restore-fast','restore-v7-priority','checkpoint',
                                            'checkpoint-day','checkpoint-results'))
     parser.add_argument('--date',type=date.fromisoformat)
     parser.add_argument('--legacy',action='store_true')
@@ -427,6 +458,8 @@ if __name__=='__main__':
     try:
         storage,bucket,root=client(),os.environ['R2_BUCKET'],Path(__file__).resolve().parents[1]
         if args.command=='checkpoint':publish(storage,bucket,root,checkpoint_only=True)
+        elif args.command=='publish-fast':publish(storage,bucket,root,selected_paths=FAST_DATA)
+        elif args.command=='restore-fast':restore_fast(storage,bucket,root)
         elif args.command=='checkpoint-day':checkpoint_day(storage,bucket,root,args.date,legacy=args.legacy)
         elif args.command=='checkpoint-results':checkpoint_results(storage,bucket,root,args.date)
         elif args.command=='restore-v7-priority':restore_v7_priority(storage,bucket,root,args.date)

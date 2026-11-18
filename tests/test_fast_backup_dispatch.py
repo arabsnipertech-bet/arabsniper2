@@ -12,9 +12,10 @@ import fast_backup_dispatch as backup
 NOW = backup.instant('2026-10-30T10:05:00+01:00')
 
 
-def run(finished=None, conclusion='success'):
-    return {'id': 12, 'head_branch': 'main', 'status': 'completed', 'conclusion': conclusion,
-            'updated_at': (finished or NOW - timedelta(minutes=5)).isoformat()}
+def run(finished=None, conclusion='success', *, created=None, title=None, id=12):
+    return {'id': id, 'head_branch': 'main', 'status': 'completed', 'conclusion': conclusion,
+            'created_at': (created or NOW.replace(minute=0, hour=9)).isoformat(),
+            'updated_at': (finished or NOW - timedelta(minutes=5)).isoformat(), 'display_title': title}
 
 
 def jobs(started=None, overrides=None):
@@ -39,7 +40,9 @@ class FakeAPI:
     def active_runs(self, status): return self.active.get(status, [])
     def recent_fast_runs(self, now): return self.runs
     def jobs(self, run): return self.job_list
-    def dispatch(self): self.dispatched += 1
+    def dispatch(self, scope, slot):
+        self.dispatched += 1
+        self.target = (scope, slot)
 
 
 class FastBackupTests(unittest.TestCase):
@@ -70,14 +73,15 @@ class FastBackupTests(unittest.TestCase):
             self.assertEqual(api.dispatched, 0)
 
     def test_new_publication_of_old_collection_does_not_delay_next_scan(self):
-        api = FakeAPI([run()], jobs(started=NOW - timedelta(minutes=61)))
+        start = NOW - timedelta(minutes=81)
+        api = FakeAPI([run(created=start)], jobs(started=start))
         self.assertEqual(backup.wake_fast(api, NOW)['action'], 'dispatched')
 
     def test_skipped_cached_unvalidated_and_unpublished_runs_are_not_fresh(self):
         for name in ('Run Fast Scan', 'Record verified Fast completion',
                      'Validate generated files', 'Save verified state in private storage'):
             with self.subTest(name=name):
-                api = FakeAPI([run()], jobs(overrides={name: 'skipped'}))
+                api = FakeAPI([run(NOW - timedelta(minutes=15))], jobs(overrides={name: 'skipped'}))
                 self.assertEqual(backup.wake_fast(api, NOW)['action'], 'dispatched')
 
     def test_failed_publication_cools_down_then_retries_and_is_bounded(self):
@@ -92,7 +96,7 @@ class FastBackupTests(unittest.TestCase):
         self.assertEqual(api.dispatched, 0)
 
     def test_old_failures_do_not_permanently_lock_recovery(self):
-        api = FakeAPI([run(NOW - timedelta(minutes=61), 'failure')], [])
+        api = FakeAPI([run(NOW - timedelta(minutes=81), 'failure', created=NOW - timedelta(minutes=90))], [])
         self.assertEqual(backup.wake_fast(api, NOW)['action'], 'dispatched')
 
     def test_window_rome_summer_winter_and_midnight(self):
@@ -100,7 +104,7 @@ class FastBackupTests(unittest.TestCase):
             api = FakeAPI()
             self.assertEqual(backup.wake_fast(api, NOW.replace(hour=hour))['action'], 'outside_fast_window')
             self.assertEqual(api.dispatched, 0)
-        for at in ('2026-11-03T23:05:00Z', '2026-11-04T03:05:00Z', '2026-07-11T04:05:00Z', '2026-10-30T05:05:00Z', '2026-10-30T22:55:00Z'):
+        for at in ('2026-07-11T04:15:00Z', '2026-10-30T05:15:00Z', '2026-10-30T22:55:00Z'):
             self.assertEqual(backup.wake_fast(FakeAPI(), backup.instant(at))['action'], 'dispatched')
 
     def test_active_race_and_malformed_data_fail_closed(self):
@@ -127,9 +131,11 @@ class FastBackupTests(unittest.TestCase):
 
     def test_http_payload_does_not_force_or_change_branch(self):
         with patch.object(backup.GitHub, 'request', return_value={}) as request:
-            backup.GitHub('test-placeholder').dispatch()
+            slot = backup.latest_slot(NOW, backup.ORDINARY)
+            backup.GitHub('test-placeholder').dispatch(backup.ORDINARY, slot)
             request.assert_called_once_with('workflows/fast_scan.yml/dispatches',
-                                           {'ref': 'main', 'inputs': {'force_fast': False}})
+                                           {'ref': 'main', 'inputs': {'force_fast': False,
+                                            'fast_scope': 'ordinary', 'fast_slot': slot.isoformat()}})
 
     def test_truncated_or_malformed_listings_are_rejected(self):
         for value in ({}, {'total_count': 101, 'workflow_runs': []},
@@ -161,12 +167,28 @@ class FastBackupTests(unittest.TestCase):
         with patch.object(api, 'request', side_effect=[first, {'total_count': 101, 'jobs': [{'id': 1}]}]*3), patch.object(backup, 'sleep'):
             with self.assertRaises(backup.IncompleteListing): api.jobs({'id': 42})
 
-    def test_hourly_wake_does_not_drift_with_runner_setup(self):
+    def test_90_minute_slot_does_not_drift_with_runner_setup(self):
         start = backup.instant('2026-10-31T06:09:14+01:00')
-        self.assertFalse(backup.fresh_for_hour(start, backup.instant('2026-10-31T07:05:23+01:00')))
-        self.assertTrue(backup.fresh_for_hour(start, backup.instant('2026-10-31T06:55:00+01:00')))
-        late = backup.instant('2026-10-31T06:48:00+01:00')
-        self.assertTrue(backup.fresh_for_hour(late, backup.instant('2026-10-31T07:05:00+01:00')))
+        prior = run(backup.instant('2026-10-31T06:55:00+01:00'), created=start)
+        api = FakeAPI([prior], jobs(started=start))
+        self.assertEqual(backup.wake_fast(api, backup.instant('2026-10-31T07:20:00+01:00'))['action'], 'already_published')
+        self.assertEqual(backup.wake_fast(api, backup.instant('2026-10-31T07:35:00+01:00'))['action'], 'waiting_for_schedule')
+        self.assertEqual(backup.wake_fast(api, backup.instant('2026-10-31T07:45:00+01:00'))['action'], 'dispatched')
+        self.assertEqual(api.target[1].strftime('%H:%M'), '07:30')
+
+    def test_ordinary_and_extended_have_independent_receipts(self):
+        today = backup.instant('2026-10-30T16:08:00+01:00')
+        ordinary, extended = [backup.latest_slot(today, scope) for scope in (backup.ORDINARY, backup.EXTENDED)]
+        records = [run(today-timedelta(minutes=1), created=extended, title='Fast Scan [extended] 30 15 * * *'),
+                   run(extended, created=ordinary, id=13)]
+        api = FakeAPI(records[1:], jobs(started=ordinary))
+        result = backup.wake_fast(api, today)
+        self.assertEqual((result['scope'], result['reason']), ('extended', 'missed_schedule'))
+        self.assertEqual(api.target, ('extended', extended))
+        v2 = jobs(started=extended)
+        v2[0]['steps'][1]['name'] = f'Record verified Fast completion [extended {extended.isoformat()}]'
+        api = FakeAPI(records[:1], v2)
+        self.assertEqual(backup.wake_fast(api, today)['scope'], 'ordinary')
 
     def test_auth_errors_do_not_print_tokens_or_response_bodies(self):
         error = HTTPError('https://api.github.com', 403, 'secret', {}, io.BytesIO(b'secret'))

@@ -30,9 +30,9 @@ def window(now):
     return [(day + timedelta(days=i)).isoformat() for i in range(5)]
 
 
-def valid_window(root, dates, started_at=None, completed_at=None):
+def valid_window(root, dates, started_at=None, completed_at=None, *, start_index=1):
     """Inspect actual payload dates, including checksummed multipart files."""
-    for i, day in enumerate(dates, 1):
+    for i, day in enumerate(dates, start_index):
         payload = read_store(Path(root) / f'data/arab_quote_day{i}.json', {})
         if not isinstance(payload, dict) or payload.get('date') != day or not isinstance(payload.get('matches'), list):
             return False
