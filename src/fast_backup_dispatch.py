@@ -36,6 +36,10 @@ def instant(value):
     raise ValueError('Invalid GitHub timestamp')
 
 
+class TemporaryReadError(RuntimeError):
+    pass
+
+
 class IncompleteListing(RuntimeError):
     pass
 
@@ -57,6 +61,8 @@ class GitHub:
                 raw = response.read()
                 return json.loads(raw) if raw else {}
         except HTTPError as error:
+            if body is None and error.code in (502, 503, 504):
+                raise TemporaryReadError(f'GitHub HTTP {error.code} on read') from None
             raise RuntimeError(f'GitHub HTTP {error.code}; no dispatch retry') from None
         except (URLError, TimeoutError, json.JSONDecodeError):
             raise RuntimeError('GitHub unavailable or invalid response; no dispatch retry') from None
@@ -69,7 +75,7 @@ class GitHub:
                 sleep(delay)
             try:
                 return self._read_listing(suffix, key)
-            except IncompleteListing:
+            except (IncompleteListing, TemporaryReadError):
                 if delay == 2:
                     raise
 
