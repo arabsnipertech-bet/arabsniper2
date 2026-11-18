@@ -4,6 +4,7 @@ from email.utils import parsedate_to_datetime
 import json
 import os
 from pathlib import Path
+import sys
 import time
 import subprocess
 from urllib.error import HTTPError
@@ -157,6 +158,45 @@ def retry_at(headers, now):
     except (TypeError, ValueError, OverflowError):
         return None
 
+
+def public_feed():
+    try:
+        result = subprocess.run(('curl', '-fsS', '--max-time', '12', '-H', 'Accept: application/json',
+                                 'https://arabsniperbet.com/api/live-scores'), check=True, capture_output=True)
+        value = json.loads(result.stdout)
+        if (value.get('schema_version') == 1 and isinstance(value.get('fixtures'), dict)
+                and isinstance(value.get('health'), dict)):
+            return value
+    except (OSError, subprocess.SubprocessError, ValueError, AttributeError):
+        pass
+    return {}
+
+
+def recovery_plan(watch, live, now):
+    health = live.get('health') or {}
+    last_cron = stamp(health.get('last_cron_at'))
+    anomaly = (not live or not last_cron or now - last_cron > LIVE_FRESHNESS
+               or bool(health.get('watchlist_status')) or bool(health.get('stale_live_fixtures'))
+               or live.get('status') in ('cron_stale', 'disabled', 'secret_missing', 'not_configured'))
+    retry = stamp(health.get('retry_after'))
+    if (live.get('diagnostic') or {}).get('limit_scope') == 'daily':
+        return [], anomaly, 'daily_quota'
+    if temporarily_limited(live) and retry and retry > now:
+        return [], anomaly, 'provider_cooldown'
+    ids = due(watch, live, now)
+    return ids, anomaly or bool(ids), 'fixtures_due' if ids else 'feed_anomaly' if anomaly else 'no_work'
+
+
+def preflight():
+    watch = json.loads(Path('data/live_watchlist.json').read_text())
+    live = public_feed()
+    ids, health, reason = recovery_plan(watch, live, datetime.now(timezone.utc))
+    print(json.dumps({'action': reason, 'worker_status': live.get('status', 'unavailable'),
+                      'candidate_fixtures': len(ids), 'football_calls': 0, 'verify': health}), flush=True)
+    with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
+        print(f'relay={str(bool(ids)).lower()}', f'verify={str(health).lower()}', sep='\n', file=out)
+
+
 def run(storage=None):
     import boto3
     from botocore.config import Config
@@ -166,29 +206,15 @@ def run(storage=None):
         with urlopen(Request(url,headers=headers or {}),timeout=15) as response:
             return json.load(response), response.headers
     watch = json.loads(Path('data/live_watchlist.json').read_text())
-    def public_feed():
-        public = subprocess.run(('curl','-fsS','--max-time','15','-H','Accept: application/json',
-            'https://arabsniperbet.com/api/live-scores'),check=True,capture_output=True)
-        return json.loads(public.stdout)
     live = public_feed()
     if ((os.environ.get('GITHUB_EVENT_NAME') == 'workflow_run' or os.environ.get('GOLD_RELAY_FOLLOWUP') == 'true')
             and os.environ.get('GITHUB_OUTPUT')
             and needs_midpoint(watch, live, now)):
         with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
             out.write('live_followup=true\n')
-    ids = due(watch, live, now)
-    if not ids and live.get('status') == 'provider_rate_limit':
-        retry = stamp((live.get('health') or {}).get('retry_after'))
-        if retry and now < retry <= now + timedelta(seconds=60):
-            time.sleep((retry - now).total_seconds() + 5)
-            now = datetime.now(timezone.utc)
-            live = public_feed()
-            ids = due(watch, live, now)
-    if (live.get('diagnostic') or {}).get('limit_scope') == 'daily':
-        print('Official daily quota exhausted; zero provider calls.')
-        return
+    ids, _, reason = recovery_plan(watch, live, now)
     if not ids:
-        print('No tracked results are due for recovery; zero provider calls.')
+        print(f'No score recovery scheduled ({reason}); zero provider calls.')
         return
     if storage is None:
         storage = boto3.client('s3',region_name='auto',
@@ -282,8 +308,13 @@ def run(storage=None):
                       'calls_today':state['calls'],'captured_at':state['captured_at']}))
 
 if __name__ == '__main__':
-    from gold_results_handoff import cycle
+    if sys.argv[1:] == ['--preflight']:
+        preflight()
+    elif len(sys.argv) == 1:
+        from gold_results_handoff import cycle
 
-    with cycle('relay') as store:
-        if store is not None:
-            run(store.editorial)
+        with cycle('relay') as store:
+            if store is not None:
+                run(store.editorial)
+    else:
+        raise SystemExit('Expected no arguments or --preflight')

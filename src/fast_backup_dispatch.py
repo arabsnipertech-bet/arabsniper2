@@ -1,25 +1,29 @@
 """External Fast watchdog: inspect GitHub, dispatch only a due guarded scan."""
 import json
 import os
+import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from time import sleep
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
-from zoneinfo import ZoneInfo
+from fast_schedule import (AFTERNOON, EXTENDED, FORCED, HALF_HOUR, ON_HOUR,
+                           ORDINARY, TZ as ROME, explicit_slot, latest_slot)
 
 REPOSITORY = 'arabsnipertech-bet/arabsniper2'
 WORKFLOW = 'fast_scan.yml'
-ROME = ZoneInfo('Europe/Rome')
 ACTIVE = ('in_progress', 'queued', 'waiting', 'pending', 'requested')
 WRITERS = {'.github/workflows/' + name for name in (
     'fast_scan.yml', 'night_scan.yml', 'freeze-audit-source.yml', 'gold-storage-check.yml',
     'manual-auditor.yml', 'odds-probe.yml', 'repair-matrix-quotes.yml',
     'run-auditor.yml', 'recover-auditor.yml', 'storage-cleanup.yml', 'v7-maintenance.yml')}
-INTERVAL = timedelta(minutes=90)
+GRACE = timedelta(minutes=15)
 RETRY_DELAY = timedelta(minutes=10)
 MAX_FAILED_ATTEMPTS = 2
+FAILED = {'failure', 'cancelled', 'timed_out', 'startup_failure', 'action_required'}
+RUN_TITLE = re.compile(r'^Fast Scan \[(ordinary|extended|forced)\](?: (.*))?$')
+RECORD_STEP = re.compile(r'^Record verified Fast completion \[(ordinary|extended|forced) (.*)\]$')
 
 
 def instant(value):
@@ -30,14 +34,6 @@ def instant(value):
     except (AttributeError, TypeError, ValueError):
         pass
     raise ValueError('Invalid GitHub timestamp')
-
-
-def fresh_for_hour(started, now):
-    """Keep one collection per 90-minute interval."""
-    start = started.astimezone(timezone.utc)
-    end = now.astimezone(timezone.utc)
-    age = end - start
-    return timedelta() <= age < INTERVAL
 
 
 class IncompleteListing(RuntimeError):
@@ -115,35 +111,67 @@ class GitHub:
             raise ValueError('Invalid run id')
         return self.listing(f'runs/{run_id}/jobs?filter=latest&per_page=100', 'jobs')
 
-    def dispatch(self):
-        self.request(f'workflows/{WORKFLOW}/dispatches', {'ref': 'main', 'inputs': {'force_fast': False}})
+    def dispatch(self, scope, slot):
+        self.request(f'workflows/{WORKFLOW}/dispatches', {'ref': 'main', 'inputs': {
+            'force_fast': False, 'fast_scope': scope, 'fast_slot': slot.isoformat()}})
 
 
-def published_start(jobs):
+def publication(jobs):
     for job in jobs:
         steps = {s.get('name'): s for s in job.get('steps', [])}
         good = lambda name: steps.get(name, {}).get('conclusion') == 'success'
-        if (good('Run Fast Scan') and good('Record verified Fast completion')
-                and good('Validate generated files')
+        if not (good('Run Fast Scan') and good('Validate generated files')
                 and (good('Save verified state in private storage') or good('Publish Fast Scan safely'))):
-            # A later public homepage push failure does not undo published Gold.
-            return instant(steps['Run Fast Scan'].get('started_at'))
+            continue
+        started = instant(steps['Run Fast Scan'].get('started_at'))
+        for name in steps:
+            match = RECORD_STEP.fullmatch(name) if isinstance(name, str) else None
+            if match and good(name):
+                kind, raw = match.groups()
+                return kind, explicit_slot(raw, kind, started) if raw else None, started
+        if good('Record verified Fast completion'):
+            # A two-day publication performed by the previous revision still covers today.
+            return ORDINARY, latest_slot(started, ORDINARY), started
     return None
+
+
+def run_slot(run, created):
+    match = RUN_TITLE.fullmatch(run.get('display_title') or '')
+    scope, detail = match.groups() if match else (ORDINARY, None)
+    if scope == FORCED:
+        return scope, None
+    if not detail or detail in (ON_HOUR, HALF_HOUR, AFTERNOON):
+        return scope, latest_slot(created, scope, detail)
+    try:
+        return scope, explicit_slot(detail, scope, created)
+    except ValueError:
+        return scope, None
 
 
 def wake_fast(api, now=None, dry_run=False):
     now = (now or datetime.now(ROME)).astimezone(ROME)
     result = {'observed_at': now.isoformat(), 'dry_run': dry_run,
               'football_calls': 0, 'dispatched': False}
-    if now.hour not in (0, 4) and not 6 <= now.hour <= 23:
+    if not 6 <= now.hour <= 23:
         return dict(result, action='outside_fast_window')
-    failures = []
-    for run in api.recent_fast_runs(now):
+    targets = [(scope, latest_slot(now, scope)) for scope in (ORDINARY, EXTENDED)]
+    due = {(scope, slot): [] for scope, slot in targets if slot and now - slot >= GRACE}
+    if not due:
+        return dict(result, action='waiting_for_schedule')
+    covered = {}
+    runs = api.recent_fast_runs(now)
+    for run in runs:
         if not isinstance(run, dict) or run.get('head_branch') != 'main':
             raise RuntimeError('Unexpected Fast run; no dispatch')
         if run.get('status') != 'completed':
             return dict(result, action='fast_active', run_id=run.get('id'))
+    first_due = min(slot for _, slot in due)
+    for run in runs:
         finished = instant(run.get('updated_at'))
+        if finished < first_due:
+            continue
+        created = instant(run.get('created_at'))
+        target = run_slot(run, created)
         jobs = None
         if finished > now:
             # The run envelope can disagree with the runner timestamps. Use
@@ -158,23 +186,40 @@ def wake_fast(api, now=None, dry_run=False):
             finished = instant(terminal[0]['completed_at'])
             if finished > now:
                 raise RuntimeError('Future GitHub run; no dispatch')
-        if now - finished >= INTERVAL:
-            continue
         if jobs is None:
             jobs = api.jobs(run)
-        started = published_start(jobs)
-        if started:
-            if not started <= finished:
+        published = publication(jobs)
+        if published:
+            scope, slot, started = published
+            if not created <= started <= finished:
                 raise RuntimeError('Inconsistent Fast times; no dispatch')
-            if started.astimezone(ROME).date() == now.date() and fresh_for_hour(started, now):
-                return dict(result, action='already_published', run_id=run.get('id'),
-                            collection_started_at=started.isoformat())
-        elif run.get('conclusion') in ('failure', 'cancelled', 'timed_out', 'startup_failure', 'action_required'):
-            failures.append(finished)
-    if len(failures) >= MAX_FAILED_ATTEMPTS:
-        return dict(result, action='retry_limit', failed_attempts=len(failures))
-    if failures and now - max(failures) < RETRY_DELAY:
-        return dict(result, action='retry_cooldown')
+            if (scope, slot) in due and started.astimezone(ROME).date() == now.date():
+                covered[(scope, slot)] = run['id']
+        elif target in due:
+            failed = run.get('conclusion') in FAILED
+            collected = any(s.get('name') == 'Run Fast Scan' and s.get('conclusion') == 'success'
+                            for job in jobs for s in job.get('steps', []))
+            if failed or collected:
+                due[target].append((finished, 'unpublished' if collected else 'failed'))
+
+    blocked = []
+    for (scope, slot), failures in sorted(due.items(), key=lambda entry: entry[0][1], reverse=True):
+        if (scope, slot) in covered:
+            continue
+        details = dict(result, scope=scope, slot=slot.isoformat(), failed_attempts=len(failures))
+        if len(failures) >= MAX_FAILED_ATTEMPTS:
+            blocked.append(dict(details, action='retry_limit'))
+        elif failures and now - max(failures)[0] < RETRY_DELAY:
+            blocked.append(dict(details, action='retry_cooldown'))
+        else:
+            reason = max(failures)[1] if failures else 'missed_schedule'
+            return recover(api, scope, slot, dict(details, reason=reason), dry_run)
+    if blocked:
+        return blocked[0]
+    return dict(result, action='already_published', run_ids=list(covered.values()))
+
+
+def recover(api, scope, slot, result, dry_run):
     # Do not replace a pending writer: all these workflows share one mutex.
     for status in ACTIVE:
         for run in api.active_runs(status):
@@ -184,7 +229,7 @@ def wake_fast(api, now=None, dry_run=False):
                 return dict(result, action='writer_busy', run_id=run.get('id'))
     if dry_run:
         return dict(result, action='would_dispatch')
-    api.dispatch()
+    api.dispatch(scope, slot)
     return dict(result, action='dispatched', dispatched=True)
 
 
@@ -200,9 +245,11 @@ def main():
     if os.getenv('GITHUB_STEP_SUMMARY'):
         with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as out:
             out.write('Fast backup: **' + result['action'] + '**\n\n'
+                      + (f"Scope {result['scope']}, slot {result['slot']}, "
+                         f"reason {result.get('reason', result['action'])}.\n\n" if 'slot' in result else '')
                       + 'No API-Football calls are made by this check.\n')
     if result['action'] == 'retry_limit':
-        raise RuntimeError('Fast recovery stopped after two failed attempts within 60 minutes')
+        raise RuntimeError('Fast recovery stopped after two failed attempts for the same Rome slot')
 
 
 if __name__ == '__main__':

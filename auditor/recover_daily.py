@@ -259,9 +259,12 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
     if status == 'partial_v51_skip':
         optional = {f'auditarchive/prematch_{day}_{suffix}' for suffix in ('calibration.json', 'checkpoint.json')}
         pointers = [path for path in pointers if path not in optional]
+    verified_objects = {item['sha256'] for item in index.values()}
     for path, raw_file in recovery_files(root, pointers):
         checksum = sha(raw_file)
-        storage.put_object(Bucket=bucket, Key='state/objects/'+checksum, Body=raw_file)
+        if checksum not in verified_objects:
+            storage.put_object(Bucket=bucket, Key='state/objects/'+checksum, Body=raw_file)
+            verified_objects.add(checksum)
         bundle[path] = {'sha256': checksum, 'bytes': len(raw_file)}
     staged = {'version': 4, 'date': day.isoformat(), 'sources': sources, 'files': bundle,
               'legacy_status': status}

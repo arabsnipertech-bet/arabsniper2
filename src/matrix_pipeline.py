@@ -87,7 +87,11 @@ def quote_monitoring(matrix, as_of, kickoff=None):
 
 def complete_day(ns, client, day, as_of):
     """Keep coverage explicit, including fixtures with failed data or no snapshot."""
-    response = client.get('fixtures', {'date': day['date'], 'timezone': 'Europe/Rome'}) if client is not None else None
+    schedules = getattr(client, 'fixture_schedules', {})
+    if day['date'] in schedules:
+        response = schedules[day['date']]
+    else:
+        response = client.get('fixtures', {'date': day['date'], 'timezone': 'Europe/Rome'}) if client is not None else None
     rows = (response or {}).get('response', [])
     enforce_day(day)
     seen = {str(m.get('fixture', {}).get('fixture_id')) for m in day.get('matches', [])}

@@ -78,7 +78,7 @@ def capture_forecasts(ns, output):
     return tuple(paths)
 
 
-def capture_policies(root, observed_at=None):
+def capture_policies(root, observed_at=None, *, dates=None):
     from gold_policy_audit import capture as gold_capture
     from platinum_audit import capture as platinum_capture
     root = Path(root)
@@ -93,7 +93,10 @@ def capture_policies(root, observed_at=None):
 
     journals, seen = defaultdict(policy_journal), set()
     for day in sorted((root/'data').glob('arab_quote_day[1-5].json')):
-        for match in read_store(day, {}).get('matches', []):
+        saved = read_store(day, {})
+        if dates is not None and saved.get('date') not in dates:
+            continue
+        for match in saved.get('matches', []):
             fid = str(match.get('fixture', {}).get('fixture_id'))
             if fid in seen:
                 continue
@@ -316,7 +319,10 @@ if __name__ == '__main__':
     root = Path(__file__).resolve().parents[1]
     if sys.argv[1:] == ['capture']:
         capture_policies(root)
+    elif sys.argv[1:] == ['capture', '--fast']:
+        scope = read_store(root/'data/arab_quote_dashboard.json')['fast_scan']
+        capture_policies(root, dates=set(scope['collected_dates']))
     elif sys.argv[1:] == ['ingest']:
         ingest(root)
     else:
-        raise SystemExit('Expected capture or ingest')
+        raise SystemExit('Expected capture [--fast] or ingest')

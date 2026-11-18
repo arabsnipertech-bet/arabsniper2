@@ -11,7 +11,11 @@ if __name__ == '__main__':
     history=read_store(target,{'runs':[]})
     row={'run_id':os.getenv('GITHUB_RUN_ID',dashboard['generated_at']),
          'generated_at':dashboard['generated_at'],'mode':state.get('mode'),
-         'days':len(dashboard.get('days',[])),**dashboard.get('api_health',{})}
+         'days':state.get('days',len(dashboard.get('days',[]))),**dashboard.get('api_health',{})}
+    if state.get('mode') == 'fast':
+        scope = dashboard['fast_scan']
+        row.update(fast_scope=scope['scope'], collected_dates=scope['collected_dates'],
+                   reused_dates=scope['reused_dates'])
     # Keep only non-sensitive usage counters, not response bodies/error details.
     row.pop('last_error',None)
     cutoff=(datetime.now(timezone.utc)-timedelta(days=30)).isoformat()

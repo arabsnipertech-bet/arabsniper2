@@ -112,6 +112,7 @@ class RelayTests(unittest.TestCase):
         fixtures = watch(28)
         observed = (NOW - timedelta(minutes=5)).isoformat()
         feed = {
+            'schema_version': 1,
             'status': 'provider_rate_limit', 'health': {'relay_fixture_capacity': 40},
             'fixtures': {f['fixture_id']: {'status': 'HT', 'observed_at': observed}
                          for f in fixtures['fixtures']},
@@ -157,4 +158,42 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(relay.due({'fixtures': []}, live, NOW), [])
         delayed['observed_at'] = (NOW - timedelta(hours=2)).isoformat()
         self.assertEqual(relay.due({'fixtures': []}, live, NOW), ['1'])
+
+    def test_preflight_has_no_work_on_a_healthy_idle_worker(self):
+        feed = {'status': 'idle', 'health': {'last_cron_at': NOW.isoformat()}, 'fixtures': {}}
+        self.assertEqual(relay.recovery_plan(watch(0), feed, NOW), ([], False, 'no_work'))
+
+    def test_preflight_skips_fresh_active_fixtures_but_recovers_the_stale_ones(self):
+        rows = {str(i): {'status': '2H', 'goals': {'home': 0, 'away': 0}, 'observed_at': NOW.isoformat()}
+                for i in range(1, 4)}
+        health = {'last_cron_at': NOW.isoformat(), 'live_tracking_fixture_ids': list(rows)}
+        feed = {'status': 'ok', 'health': health, 'fixtures': rows}
+        self.assertEqual(relay.recovery_plan(watch(3), feed, NOW), ([], False, 'no_work'))
+        health.update(stale_live_fixtures=1, stale_live_fixture_ids=['2'])
+        self.assertEqual(relay.recovery_plan(watch(3), feed, NOW), (['2'], True, 'fixtures_due'))
+
+    def test_preflight_is_independent_of_the_worker_endpoint_and_honors_rate_limits(self):
+        fixtures = watch(3)
+        self.assertEqual(relay.recovery_plan(fixtures, {}, NOW), (['1', '2', '3'], True, 'fixtures_due'))
+        rate_limit = {'status': 'provider_rate_limit', 'health': {
+            'last_cron_at': NOW.isoformat(), 'retry_after': (NOW+timedelta(minutes=1)).isoformat(),
+        }, 'fixtures': {}}
+        self.assertEqual(relay.recovery_plan(fixtures, rate_limit, NOW), ([], False, 'provider_cooldown'))
+        rate_limit['diagnostic'] = {'limit_scope': 'daily'}
+        self.assertEqual(relay.recovery_plan(fixtures, rate_limit, NOW), ([], False, 'daily_quota'))
+
+    def test_preflight_works_without_private_storage_or_provider_key(self):
+        watchlist = json.dumps(watch(0))
+        feed = {'status': 'idle', 'health': {'last_cron_at': NOW.isoformat()}, 'fixtures': {}}
+        output = io.StringIO()
+        with (mock.patch.object(relay.Path, 'read_text', return_value=watchlist),
+              mock.patch.object(relay, 'public_feed', return_value=feed),
+              mock.patch.object(relay, 'datetime', wraps=datetime) as clock,
+              mock.patch.object(relay, 'urlopen') as provider, mock.patch.dict(os.environ, {'GITHUB_OUTPUT': '/mock'}),
+              mock.patch('builtins.open', mock.mock_open()) as opened, redirect_stdout(output)):
+            clock.now.return_value = NOW
+            relay.preflight()
+        provider.assert_not_called()
+        self.assertEqual(json.loads(output.getvalue())['football_calls'], 0)
+        self.assertEqual(''.join(call.args[0] for call in opened().write.call_args_list), 'relay=false\nverify=false\n')
 if __name__=='__main__': unittest.main()

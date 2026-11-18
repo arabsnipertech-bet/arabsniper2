@@ -23,6 +23,7 @@ GOLD_RESULTS_SESSION = 'growth-gold-results-session.json'
 GOLD_RESULTS_WORKFLOW = 'gold-results.yml'
 GOLD_RESULTS_REPAIR = GOLD_RESULTS_PREFIX + 'repair.json'
 PRIMARY_GOLD_REPAIR = 'live-scores-health.yml'
+GOLD_RESULTS_WATCHDOG = timedelta(minutes=30)
 
 
 def session_credentials(source, bucket, *, key=SESSION_KEY):
@@ -116,11 +117,13 @@ def wake_gold_results(store, api, primary, now, *, dry_run=False):
     path = 'workflows/' + GOLD_RESULTS_WORKFLOW
     if api.request(path).get('state') != 'active':
         return 'workflow_disabled'
-    runs = api.runs(GOLD_RESULTS_WORKFLOW, now - timedelta(minutes=20))
+    # Growth owns the independent periodic check. Dispatch externally only if
+    # that check has stopped arriving, while continuing to renew R2 sessions.
+    runs = api.runs(GOLD_RESULTS_WORKFLOW, now - GOLD_RESULTS_WATCHDOG)
     if any(run['status'] != 'completed' for run in runs):
         return 'already_running'
     if ready and any(run.get('conclusion') == 'success' and
-                     now - datetime.fromisoformat(run['updated_at']) < timedelta(minutes=4)
+                     now - datetime.fromisoformat(run['updated_at']) < GOLD_RESULTS_WATCHDOG
                      for run in runs):
         return 'recent_cycle'
     if dry_run:
