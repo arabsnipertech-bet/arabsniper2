@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 from PIL import Image, ImageChops, ImageStat
 import requests
+import subprocess
 from publisher_v71 import editorial
 from telegram_live_art import animation
 
@@ -48,16 +49,16 @@ def call(post, mode, trial=False):
 
 def compare_images(reference, raw):
     with Image.open(io.BytesIO(reference)) as a, Image.open(io.BytesIO(raw)) as b:
-        if (a.format,a.size,a.n_frames) != (b.format,b.size,b.n_frames):
+        if (a.format,a.size,getattr(a,'n_frames',1)) != (b.format,b.size,getattr(b,'n_frames',1)):
             raise ValueError('Different media dimensions, format or frame count')
         worst = 0
-        for i in range(a.n_frames):
+        for i in range(getattr(a,'n_frames',1)):
             a.seek(i); b.seek(i)
             if a.info.get('duration') != b.info.get('duration'):
                 raise ValueError('Different frame timing')
             diff = ImageChops.difference(a.convert('RGB'),b.convert('RGB'))
             worst = max(worst, max(ImageStat.Stat(diff).mean))
-        print(a.format,a.size,a.n_frames,'worst channel mean absolute pixel error',round(worst,3),
+        print(a.format,a.size,getattr(a,'n_frames',1),'worst channel mean absolute pixel error',round(worst,3),
               'byte identical',reference==raw,flush=True)
         return worst
 
@@ -69,13 +70,21 @@ for post in samples:
             raise ValueError('Invalid recorded identity')
         if post.get('edit_id') and str(post['edit_id']) != str(post['receipt']['id']):
             raise ValueError('Edit receipt mismatch')
+        args = {'post':post}
+        replay = subprocess.run(['node',str(Path(__file__).with_name('replay-envelope.mjs'))],
+                                input=json.dumps(args).encode(),capture_output=True,check=True)
+        proposal = json.loads(replay.stdout)
+        method = 'editMessageMedia' if post.get('edit_id') else 'sendPhoto'
+        expected = (post['id'],post['marker'],post['text'],method,post.get('edit_id'))
+        if tuple(proposal[k] for k in ('id','marker','caption','method','message_id')) != expected:
+            raise ValueError('Worker envelope mismatch')
         at = datetime.fromisoformat(post['created_at'])
         flags = [trial for trial in (False,True) if editorial.message(kind,view,post['marker'],'telegram',
                  now=at,trial_ok=trial) == post['text']]
         if not flags or call(post,'caption',flags[0]).decode() != post['text']:
             raise ValueError('Recorded caption mismatch')
         if compare_images(editorial.card(kind,view),call(post,'jpeg')) > 1:
-            raise ValueError('JPEG visual mismatch')
+            failures.append((kind,'JPEG','visual mismatch'))
         if post.get('edit_id') and view.get('animation'):
             badge = f"{view['home']}–{view['away']} · {view['status'].upper()}"
             if compare_images(animation(view['animation'],badge), call(post,'gif')) > 1:

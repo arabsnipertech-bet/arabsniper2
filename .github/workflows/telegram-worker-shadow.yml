@@ -29,7 +29,7 @@ jobs:
       - name: Prepare local runtimes
         run: |
           echo "SHADOW_INPUT=$RUNNER_TEMP/shadow-input" >> "$GITHUB_ENV"
-          python -m pip install boto3 requests ijson==3.6.0 'Pillow>=11,<13' PyNaCl cryptography uv
+          python -m pip install boto3 requests ijson==3.6.0 'Pillow>=11,<13' PyNaCl cryptography beautifulsoup4 uv
           cd prototypes/telegram-preview
           npm install --no-save miniflare@4 esbuild @streamparser/json@0.0.22 wrangler@4.161.0
           python stage_renderer.py "$RUNNER_TEMP/shadow-worker"
@@ -60,8 +60,12 @@ jobs:
           if [[ "$code" != 405 ]]; then tail -65 "$RUNNER_TEMP/shadow-log"; exit 1; fi
           cd "$GITHUB_WORKSPACE"
           python prototypes/telegram-preview/media_replay.py
+      - name: Read back public Telegram receipt samples
+        if: ${{ !cancelled() }}
+        run: python prototypes/telegram-preview/published_sample.py
       - name: Exercise no-send and receipt rules
         if: always()
         run: |
           node --test prototypes/telegram-preview/worker.test.mjs
+          node prototypes/telegram-preview/receipt-replay.mjs
           python -m unittest discover -s tests -p test_publisher_v71.py
