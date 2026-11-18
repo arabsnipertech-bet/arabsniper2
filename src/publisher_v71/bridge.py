@@ -40,13 +40,13 @@ def session_credentials(source, bucket, *, key=SESSION_KEY):
 
 
 def refresh_session(store, now, *, name='growth-session.json', prefix=PREFIX,
-                    objects=(), actions=('GetObject', 'ListObjectsV2', 'PutObject')):
+                    objects=(), actions=('GetObject', 'ListObjectsV2', 'PutObject'), force=False):
     wrapping, _ = store.read(WRAP_KEY, limit=512)
     if not wrapping:
         return
     try:
         stored, _ = store.read(name, limit=8192)
-        if (stored and stored.get('sealed') and stored.get('recipient') == wrapping['public_key']
+        if (not force and stored and stored.get('sealed') and stored.get('recipient') == wrapping['public_key']
                 and datetime.fromisoformat(stored['expiry_time']) > now + timedelta(minutes=75)):
             return
     except (TypeError, KeyError, ValueError):
@@ -71,6 +71,7 @@ def refresh_session(store, now, *, name='growth-session.json', prefix=PREFIX,
     jwt = unsigned + b'.' + urlsafe_b64encode(signature).rstrip(b'=')
     credentials = {'access_key': access_key, 'secret_key': sha256(jwt).hexdigest(),
                    'token': b64encode(b'jwt/' + jwt).decode(), 'expiry_time': expires.isoformat()}
+    verify_session_write(store, credentials, prefix)
     recipient = wrapping['public_key']
     box = SealedBox(PublicKey(b64decode(recipient, validate=True)))
     envelope = {'recipient': recipient, 'expiry_time': credentials['expiry_time'],
@@ -80,6 +81,31 @@ def refresh_session(store, now, *, name='growth-session.json', prefix=PREFIX,
     from .runner import event_log
 
     event_log('publisher_bridge', 'editorial_session_refreshed', file=name)
+
+
+def verify_session_write(store, credentials, prefix):
+    """Check the replacement session before handing it to either Growth writer."""
+    import boto3
+    from botocore.config import Config
+    from botocore.exceptions import ClientError
+
+    key = prefix + 'diagnostics/session-write.json'
+    with boto3.client('s3', endpoint_url=store.client.meta.endpoint_url, region_name='auto',
+                      aws_access_key_id=credentials['access_key'],
+                      aws_secret_access_key=credentials['secret_key'],
+                      aws_session_token=credentials['token'],
+                      config=Config(connect_timeout=5, read_timeout=10,
+                                    retries={'total_max_attempts': 2})) as client:
+        try:
+            obj = client.get_object(Bucket=store.bucket, Key=key)
+            obj['Body'].close()
+            condition = {'IfMatch': obj['ETag']}
+        except ClientError as exc:
+            if exc.response['Error']['Code'] != 'NoSuchKey':
+                raise
+            condition = {'IfNoneMatch': '*'}
+        body = encoded({'expires': credentials['expiry_time']})
+        client.put_object(Bucket=store.bucket, Key=key, Body=body, **condition)
 
 
 def gold_results_storage(source, bucket):
