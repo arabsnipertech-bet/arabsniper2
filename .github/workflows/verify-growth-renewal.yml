@@ -1,23 +1,32 @@
-name: Verify and renew Growth storage access
+name: Restore GitHub production writers
 on:
   push:
     branches: [repair/verify-growth-r2-renewal]
 permissions:
   contents: read
+  actions: write
+concurrency:
+  group: r2-recovery-owner-switch
+  cancel-in-progress: false
 jobs:
-  renew:
+  restore:
     runs-on: ubuntu-24.04
-    timeout-minutes: 4
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           persist-credentials: false
           sparse-checkout: src
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'PyNaCl>=1.5,<2' 'Pillow>=11,<13' ijson==3.6.0
-      - name: Renew after verifying the scoped R2 writes
+      - name: Restore Gold through its official main workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run live-scores-relay.yml --ref main -f restore_primary=true
+      - name: Restore Publisher under the production receipt lock
         env:
           PYTHONPATH: src
           R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
@@ -26,10 +35,18 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           python - <<'PY'
-          from datetime import datetime, timezone
           from gold_results_handoff import storage
-          from publisher_v71 import bridge
+          from publisher_v71 import cutover
+          from publisher_v71.runner import change_owner
           s = storage()
-          for params in [{}, dict(name=bridge.GOLD_RESULTS_SESSION, prefix=bridge.GOLD_RESULTS_PREFIX, objects=bridge.GOLD_RESULTS_KEYS, actions=('GetObject','PutObject'))]:
-              bridge.refresh_session(s,datetime.now(timezone.utc),force=True,**params)
+          s.load()
+          if cutover.owner(s) != cutover.PRIMARY:
+              change_owner(s,cutover.PRIMARY)
+          s.load()
+          assert cutover.owner(s) == cutover.PRIMARY
+          print('Confirmed primary Publisher ownership')
           PY
+      - name: Run the official Publisher using its receipt ledger
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run publisher-v71.yml --ref main -f dry_run=false
