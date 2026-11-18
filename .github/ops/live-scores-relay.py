@@ -20,6 +20,10 @@ BATCH_SIZE = 20
 DAILY_CAP = 600
 POLL_INTERVAL = timedelta(minutes=5)
 LIVE_FRESHNESS = POLL_INTERVAL + timedelta(minutes=1)
+# Match the cutoff and retained score lifetime in the Live Scores Worker.
+WORKER_RETRY_WINDOW = timedelta(hours=72)
+WORKER_CACHE_WINDOW = timedelta(days=4)
+HALFTIME_RECHECK_GAP = timedelta(hours=2)
 
 
 class ProviderThrottled(Exception):
@@ -56,8 +60,32 @@ def needs_midpoint(watch, live, now):
 
 
 def has_score(pair):
-    pair = pair or {}
-    return all(type(pair.get(side)) is int and pair[side] >= 0 for side in ('home', 'away'))
+    return isinstance(pair, dict) and all(type(pair.get(side)) is int and pair[side] >= 0
+                                          for side in ('home', 'away'))
+
+
+def has_final(row):
+    status = row.get('status')
+    return status in FINISHED and (has_score(row.get('fulltime'))
+                                   or status == 'FT' and has_score(row.get('goals')))
+
+
+def retained_halftime_gaps(fixtures, now):
+    """Give unresolved finals one last poll before the Worker drops them."""
+    for fid, row in fixtures.items():
+        if (not isinstance(fid, str) or not fid.isascii() or not fid.isdecimal() or not isinstance(row, dict)
+                or row.get('source') != 'API-Football' or not has_final(row)
+                or has_score(row.get('halftime'))):
+            continue
+        kickoff = stamp(row.get('provider_kickoff'))
+        observed = stamp(row.get('observed_at'))
+        if kickoff is None or observed is None:
+            continue
+        cutoff = kickoff + WORKER_RETRY_WINDOW
+        # A relay observation at or after the cutoff records the final poll.
+        if (cutoff <= now < kickoff + WORKER_CACHE_WINDOW and kickoff <= observed < cutoff
+                and now - observed >= HALFTIME_RECHECK_GAP):
+            yield fid, observed, kickoff
 
 
 def is_fresh(row, now, interval):
@@ -96,14 +124,13 @@ def due(watch, live, now):
         fid, kickoff = str(f.get('fixture_id','')), stamp(f.get('kickoff'))
         if not fid.isascii() or not fid.isdecimal() or not kickoff:
             continue
-        if not now-timedelta(hours=72) < kickoff <= now:
+        if not now - WORKER_RETRY_WINDOW < kickoff <= now:
             continue
         row = fixtures.get(fid, {})
         if row.get('status') in ADMIN:
             continue
         status = row.get('status')
-        final = status in FINISHED and (
-            has_score(row.get('fulltime')) or status == 'FT' and has_score(row.get('goals')))
+        final = has_final(row)
         if final and has_score(row.get('halftime')):
             continue
         if primary_active and fid in tracked and fid not in stale and not final:
@@ -131,7 +158,8 @@ def due(watch, live, now):
         interval = timedelta(hours=2) if row.get('status') in SCHEDULED else POLL_INTERVAL
         if str(fid).isascii() and str(fid).isdecimal() and not is_fresh(row, now, interval):
             observed = stamp(row.get('observed_at'))
-            candidates.setdefault(str(fid), (1, observed or datetime.min.replace(tzinfo=timezone.utc), now-timedelta(hours=72)))
+            candidates.setdefault(str(fid), (1, observed or datetime.min.replace(tzinfo=timezone.utc),
+                                              now - WORKER_RETRY_WINDOW))
     for fid in health.get('provider_pending_fixture_ids', []):
         row = fixtures.get(str(fid), {})
         if row.get('status') in SCHEDULED and str(fid).isascii() and str(fid).isdecimal() and not is_fresh(
@@ -139,6 +167,8 @@ def due(watch, live, now):
         ):
             observed = stamp(row.get('observed_at'))
             candidates.setdefault(str(fid), (1, observed or datetime.min.replace(tzinfo=timezone.utc), now))
+    for fid, observed, kickoff in retained_halftime_gaps(fixtures, now):
+        candidates.setdefault(fid, (3, observed, kickoff))
     limit = BATCH_SIZE * (2 if limited or needs_second_batch else 1)
     return sorted(candidates, key=lambda fid:(candidates[fid],fid))[:limit]
 
