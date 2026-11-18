@@ -1,22 +1,41 @@
-name: Verify restored Gold coverage
+name: Read restored score coverage
 on:
   push:
     branches: [repair/verify-growth-r2-renewal]
 permissions:
   contents: read
-  actions: write
 jobs:
-  check:
+  inspect:
     runs-on: ubuntu-24.04
     steps:
-      - name: Check the independent verifier after the restored relay
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout: src
+      - run: pip install boto3
+      - name: Compare six pending fixtures with the existing official relay
         env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: arabsnipertech-bet/arabsniper2
+          PYTHONPATH: src
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          set -eu
-          finished=$(gh api repos/$GH_REPO/actions/runs/44368243756 --jq '.updated_at')
-          count=$(gh api "repos/$GH_REPO/actions/workflows/live-scores-health.yml/runs?branch=main&per_page=10" | jq --arg after "$finished" '[.workflow_runs[] | select(.created_at >= $after)] | length')
-          if [ "$count" -eq 0 ]; then
-            gh workflow run live-scores-health.yml --ref main
-          fi
+          python - <<'PY'
+          import json,os,urllib.request
+          from gold_storage import client
+          ids = {'1549555','1549561','1549562','1564907','1631644','1631807'}
+          with client().get_object(Bucket=os.environ['R2_BUCKET'],Key='live-scores/provider-relay.json')['Body'] as b:
+              relay = json.load(b)
+          for r in relay['fixtures']:
+              f = r['fixture']
+              if str(f['id']) in ids:
+                  print('Official relay',f['id'],f['date'],f['status']['short'],r['score'])
+          with urllib.request.urlopen('https://arabsniperbet.com/api/live-scores',timeout=15) as b:
+              live = json.load(b)
+          print('Health',live['status'],live['health']['stale_live_fixtures'],live['health']['overdue_fixtures'],live['health'].get('provider_pending_fixtures'))
+          for fid in sorted(ids):
+              r = live['fixtures'].get(fid) or {}
+              print('Live cache',fid,{k:v for k,v in r.items() if k in ('status','status_short','goals','score','halftime','fulltime','provider_kickoff','observed_at','updated_at','provider_pending','ht','ft')})
+          PY
