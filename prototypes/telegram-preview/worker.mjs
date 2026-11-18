@@ -10,6 +10,8 @@ export async function preview(bucket, now = Date.now()) {
     if (post?.channel !== 'telegram' || post.id !== id ||
         id !== [post.channel, post.kind, post.key].join('/') || post.receipt ||
         !['ready', 'retry'].includes(post.status)) continue;
+    if (!Number.isInteger(post.attempts ?? 0) || (post.attempts ?? 0) < 0 ||
+        (post.attempts ?? 0) >= 3 || (post.status === 'retry' && !post.retry_at)) continue;
     if (!(Date.parse(post.expires_at) > now) || (post.retry_at && !(Date.parse(post.retry_at) <= now))) continue;
     if (typeof post.text !== 'string' || !post.text.trim() || !post.marker ||
         !post.text.includes(post.marker)) continue;
