@@ -109,6 +109,59 @@ function retryAfter(headers, now) {
   return /^\d+$/.test(value) ? now + Number(value) * 1000 : Date.parse(value) || 0;
 }
 
+// Return review unless the in-memory snapshot can rule out a due recovery.
+export function recoveryPreflight(state, enabled, now) {
+  const review = {decision: 'review'};
+  const health = state?.health;
+  const recent = (at, limit) => Number.isFinite(at) && at <= now && now - at < limit;
+  if (!enabled || !['ok', 'idle', 'results_pending'].includes(state?.status) || !health ||
+      !recent(state.last_cron_at, 2 * MINUTE) || !recent(state.watch_at, 16 * MINUTE) ||
+      !recent(state.watch_generated_at, 4 * HOUR) || !Array.isArray(state.watch) ||
+      !state.scores || health.watchlist_status || state.watch_issue || state.consecutive_errors ||
+      health.stale_live_fixtures)
+    return review;
+  const fresh = (row, interval) => row && !row.refresh_failed && recent(Date.parse(row.observed_at), interval);
+  const tracked = new Set(health.live_tracking_fixture_ids || []);
+  for (const fixture of state.watch) {
+    const kickoff = Date.parse(fixture.kickoff);
+    if (!Number.isFinite(kickoff)) return review;
+    if (kickoff > now + 15 * MINUTE) continue;
+    if (kickoff > now) return review;
+    const row = state.scores[fixture.fixture_id];
+    const age = now - kickoff;
+    if (age >= RETRY_WINDOW || complete(row) || postponed(row)) continue;
+    if (hasFinal(row)) {
+      if (!fresh(row, age < DAY ? 30 * MINUTE : 2 * HOUR)) return review;
+      continue;
+    }
+    if (state.status !== 'results_pending' && tracked.has(String(fixture.fixture_id))) continue;
+    let interval = POLL_INTERVAL;
+    if (scheduled(row) && age >= 15 * MINUTE)
+      interval = age >= DAY ? 2 * HOUR : age >= FAST_WINDOW ? HOUR : 15 * MINUTE;
+    if (!fresh(row, interval)) return review;
+  }
+  for (const id of health.overdue_fixture_ids || []) {
+    const row = state.scores[id];
+    if (!fresh(row, scheduled(row) ? 2 * HOUR : POLL_INTERVAL)) return review;
+  }
+  for (const id of health.provider_pending_fixture_ids || []) {
+    const row = state.scores[id];
+    if (scheduled(row) && !fresh(row, HOUR)) return review;
+  }
+  // Match the final 72–96h halftime recheck added in PR #233.
+  for (const row of Object.values(state.scores)) {
+    if (!hasFinal(row) || validScore(row.halftime)) continue;
+    const kickoff = Date.parse(row.provider_kickoff);
+    const observed = Date.parse(row.observed_at);
+    if (!Number.isFinite(kickoff) || !Number.isFinite(observed)) return review;
+    if (now >= kickoff + RETRY_WINDOW && now < kickoff + CACHE_WINDOW &&
+        observed >= kickoff && observed < kickoff + RETRY_WINDOW && now - observed >= 2 * HOUR)
+      return review;
+  }
+  return {decision: 'idle', watch_generated_at: timestamp(state.watch_generated_at),
+    cron_at: timestamp(state.last_cron_at)};
+}
+
 export class ScoreStore {
   constructor(ctx, env) {
     this.ctx = ctx;
@@ -123,7 +176,10 @@ export class ScoreStore {
       return new Response('ok');
     }
     const s = await this.ctx.storage.get('state');
-    const id = new URL(request.url).searchParams.get('id');
+    const params = new URL(request.url).searchParams;
+    if (params.get('preflight') === '1')
+      return json(recoveryPreflight(s, this.env.LIVE_ENABLED === 'true', Date.now()));
+    const id = params.get('id');
     if (id !== null) {
       if (!/^\d{1,16}$/.test(id)) return new Response('Invalid fixture ID', {status:400});
       const row = s?.scores[id] || await this.ctx.storage.get('final:' + id);

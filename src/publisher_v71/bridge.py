@@ -99,6 +99,33 @@ def gold_results_storage(source, bucket):
         config=Config(connect_timeout=7, read_timeout=20, retries={'total_max_attempts': 2}))
 
 
+def confirmed_idle(now):
+    """Treat a stale decision, new watchlist or unavailable Worker as a normal recovery."""
+    import requests
+    from pathlib import Path
+
+    try:
+        watch = json.loads(Path('data/live_watchlist.json').read_text(encoding='utf-8'))
+        response = requests.get('https://arabsniperbet.com/api/live-scores?preflight=1',
+                                timeout=(2, 3), allow_redirects=False, stream=True)
+        with response:
+            if response.status_code != 200:
+                return False
+            body = next(response.iter_content(chunk_size=513), b'')
+        if len(body) > 512:
+            return False
+        result = json.loads(body)
+        if result.get('decision') != 'idle':
+            return False
+        cron = datetime.fromisoformat(result['cron_at'])
+        generation = datetime.fromisoformat(result['watch_generated_at'])
+        return (generation == datetime.fromisoformat(watch['generated_at']) and
+                timedelta() <= now - generation < timedelta(hours=4) and
+                timedelta() <= now - cron < timedelta(minutes=2))
+    except (OSError, ValueError, AttributeError, KeyError, TypeError, requests.RequestException):
+        return False
+
+
 def wake_gold_results(store, api, primary, now, *, dry_run=False):
     owner, _ = store.read(GOLD_RESULTS_OWNER, root=True, limit=512)
     if owner and owner['repository'] == cutover.PRIMARY:
@@ -128,6 +155,16 @@ def wake_gold_results(store, api, primary, now, *, dry_run=False):
         return 'recent_cycle'
     if dry_run:
         return 'would_dispatch'
+    # Keep an independent full cycle at least hourly when the external scheduler is active.
+    # The 08:07 Europe/Rome reconciliation in Growth remains independently scheduled.
+    if ready:
+        try:
+            previous = api.runs(GOLD_RESULTS_WORKFLOW, now - timedelta(hours=1))
+        except RuntimeError:
+            previous = []
+        latest = max(previous, key=lambda run: run.get('created_at', ''), default={})
+        if latest.get('conclusion') == 'success' and confirmed_idle(now):
+            return 'worker_confirmed_idle'
     operation = 'fallback' if ready else 'activate'
     api.request(path + '/dispatches', {'ref': 'main', 'inputs': {'operation': operation}})
     return 'dispatched_' + operation
