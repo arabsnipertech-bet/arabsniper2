@@ -158,7 +158,7 @@ export function recoveryPreflight(state, enabled, now) {
         observed >= kickoff && observed < kickoff + RETRY_WINDOW && now - observed >= 2 * HOUR)
       return review;
   }
-  return {decision: 'idle', watch_generated_at: timestamp(state.watch_generated_at),
+  return {decision: 'idle', watch_generated_at: state.watch_generation_source || timestamp(state.watch_generated_at),
     cron_at: timestamp(state.last_cron_at)};
 }
 
@@ -305,6 +305,7 @@ export class ScoreStore {
           s.watch = [...byId.values()];
           s.watch_at = now;
           s.watch_generated_at = Date.parse(payload.generated_at);
+          s.watch_generation_source = payload.generated_at;
           watchIssue = null;
         } catch (error) {
           watchIssue = error.message === 'invalid_watchlist' ? 'invalid_watchlist' : 'watchlist_unavailable';

@@ -563,6 +563,10 @@ test('idle preflight only trusts recent settled in-memory state', async () => {
     return (await response.json()).decision;
   };
   assert.equal(await check({}), 'idle');
+  const generation = new Date(at).toISOString().replace('Z','525+00:00');
+  await context.storage.put('state', {...state, watch_generation_source:generation});
+  const exact = await store.fetch(new Request('https://scores.internal/read?preflight=1'));
+  assert.equal((await exact.json()).watch_generated_at, generation);
   for (const changes of [{status:'provider_rate_limit'}, {last_cron_at:at-180_000},
     {watch_at:at-17*60_000}, {health:{stale_live_fixtures:1}}, {consecutive_errors:1},
     {watch:[{fixture_id:1,kickoff:new Date(at).toISOString()}]},
