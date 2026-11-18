@@ -90,12 +90,12 @@ def verify_session_write(store, credentials, prefix):
     from botocore.exceptions import ClientError
 
     key = prefix + 'diagnostics/session-write.json'
-    with boto3.client('s3', endpoint_url=store.client.meta.endpoint_url, region_name='auto',
+    with closing(boto3.client('s3', endpoint_url=store.client.meta.endpoint_url, region_name='auto',
                       aws_access_key_id=credentials['access_key'],
                       aws_secret_access_key=credentials['secret_key'],
                       aws_session_token=credentials['token'],
                       config=Config(connect_timeout=5, read_timeout=10,
-                                    retries={'total_max_attempts': 2})) as client:
+                                    retries={'total_max_attempts': 2}))) as client:
         try:
             obj = client.get_object(Bucket=store.bucket, Key=key)
             obj['Body'].close()
