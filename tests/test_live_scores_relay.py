@@ -41,6 +41,33 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(relay.due(fixtures, live, NOW), ['2'])
         half_missing['observed_at'] = (NOW - timedelta(hours=2)).isoformat()
         self.assertEqual(relay.due(fixtures, live, NOW), ['2', '1'])
+    def test_final_halftime_is_rechecked_once_after_the_worker_stops_polling(self):
+        kickoff = NOW - timedelta(hours=82)
+        observed = kickoff + timedelta(hours=70)
+        final = {'status': 'FT', 'provider_kickoff': kickoff.isoformat(), 'observed_at': observed.isoformat(),
+                 'source': 'API-Football', 'fulltime': {'home': 2, 'away': 1}, 'halftime': None}
+        live = {'status': 'idle', 'fixtures': {'1631642': final}, 'health': {'last_cron_at': NOW.isoformat()}}
+        self.assertEqual(relay.recovery_plan(watch(0), live, NOW), (['1631642'], True, 'fixtures_due'))
+
+        # Even a null halftime from the final retry records a fresh observation.
+        final['observed_at'] = NOW.isoformat()
+        self.assertEqual(relay.due(watch(0), live, NOW + timedelta(hours=3)), [])
+        final['observed_at'] = observed.isoformat()
+        final['halftime'] = {'home': 0, 'away': 0}
+        self.assertEqual(relay.due(watch(0), live, NOW), [])
+
+    def test_retained_halftime_retry_respects_age_freshness_and_live_priority(self):
+        def row(age, observed_age=3):
+            return {'status': 'FT', 'provider_kickoff': (NOW - timedelta(hours=age)).isoformat(),
+                    'observed_at': (NOW - timedelta(hours=observed_age)).isoformat(),
+                    'source': 'API-Football', 'fulltime': {'home': 2, 'away': 1}}
+
+        live = {'fixtures': {'2': row(73), '3': row(71), '4': row(96), '5': row(72, 1),
+                             '6': {**row(73), 'status': 'NS'}, 'junk': row(73)}}
+        self.assertEqual(relay.due(watch(), live, NOW), ['1', '2'])
+        live['diagnostic'] = {'limit_scope': 'daily'}
+        self.assertEqual(relay.recovery_plan(watch(), live, NOW)[0], [])
+
     def test_fresh_live_is_deduplicated(self):
         row={'status':'1H','observed_at':NOW.isoformat()}
         self.assertEqual(relay.due(watch(),{'fixtures':{'1':row}},NOW),[])
