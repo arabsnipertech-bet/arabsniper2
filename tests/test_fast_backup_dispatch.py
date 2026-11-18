@@ -190,6 +190,19 @@ class FastBackupTests(unittest.TestCase):
         api = FakeAPI(records[:1], v2)
         self.assertEqual(backup.wake_fast(api, today)['scope'], 'ordinary')
 
+    def test_gateway_error_retries_job_lookup_but_never_dispatch(self):
+        api = backup.GitHub('test-placeholder')
+        def unavailable():
+            return HTTPError('https://api.github.com', 502, 'Bad Gateway', {}, io.BytesIO())
+        response = io.BytesIO(b'{"total_count":1,"jobs":[{"id":12}]}')
+        with patch.object(backup, 'urlopen', side_effect=[unavailable(), response]) as send, patch.object(backup, 'sleep'):
+            self.assertEqual(api.jobs({'id': 42}), [{'id': 12}])
+            self.assertEqual([call.args[0].method for call in send.call_args_list], ['GET', 'GET'])
+        with patch.object(backup, 'urlopen', side_effect=unavailable()) as send:
+            with self.assertRaises(RuntimeError):
+                api.dispatch(backup.ORDINARY, NOW)
+            send.assert_called_once()
+
     def test_auth_errors_do_not_print_tokens_or_response_bodies(self):
         error = HTTPError('https://api.github.com', 403, 'secret', {}, io.BytesIO(b'secret'))
         with patch.object(backup, 'urlopen', side_effect=error):
