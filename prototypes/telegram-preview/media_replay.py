@@ -25,12 +25,25 @@ for p in posts:
         seen.add(group)
         samples.append(p)
 
+def cpu_ticks():
+    ticks = 0
+    for comm in Path('/proc').glob('[0-9]*/comm'):
+        try:
+            if comm.read_text().strip() == 'workerd':
+                fields = (comm.parent/'stat').read_text().split(') ',1)[1].split()
+                ticks += int(fields[11]) + int(fields[12])
+        except (FileNotFoundError, PermissionError):
+            continue
+    return ticks
+
 def call(post, mode, trial=False):
+    before = cpu_ticks()
     start = time.perf_counter()
     res = requests.post('http://127.0.0.1:8787',json={'post':post,'mode':mode,'trial_ok':trial},timeout=180)
     if res.status_code != 200:
         raise RuntimeError(f'Worker {mode} HTTP {res.status_code}')
-    print(post['kind'],mode,'bytes',len(res.content),'ms wall',round(1000*(time.perf_counter()-start)),flush=True)
+    print(post['kind'],mode,'bytes',len(res.content),'ms wall',round(1000*(time.perf_counter()-start)),
+          'ms workerd process CPU', round(1000*(cpu_ticks()-before)/os.sysconf('SC_CLK_TCK')),flush=True)
     return res.content
 
 def compare_images(reference, raw):

@@ -11,6 +11,7 @@ ROOT = HERE.parents[1]
 src = ROOT / 'src'
 out = Path(sys.argv[1])
 shutil.copytree(HERE / 'renderer', out, dirs_exist_ok=True)
+(out / 'wrangler.json').rename(out / 'wrangler.jsonc')
 pkg = out / 'publisher_v71'
 pkg.mkdir(exist_ok=True)
 for name in ('__init__.py', 'editorial.py', 'live_events.py'):

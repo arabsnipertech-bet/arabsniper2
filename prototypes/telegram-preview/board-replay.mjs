@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import {Readable} from 'node:stream';
+import {isDeepStrictEqual} from 'node:util';
 import {join} from 'node:path';
 import assert from 'node:assert/strict';
 import {Miniflare} from 'miniflare';
@@ -11,7 +11,7 @@ const {outputFiles} = await build({stdin:{contents:`
     return Response.json(await readBoard(env.GOLD,Number(new URL(request.url).pathname.slice(1))));
   }};`, resolveDir:process.cwd()}, bundle:true, format:'esm', write:false});
 const mf = new Miniflare({modules:true,script:outputFiles[0].text,r2Buckets:['GOLD'],
-  compatibilityDate:'2026-11-01',outboundService:()=>{throw Error('Unexpected outbound call');}});
+  compatibilityDate:'2026-06-01',outboundService:()=>{throw Error('Unexpected outbound call');}});
 try {
   const bucket = await mf.getR2Bucket('GOLD');
   for (let i=1;i<=5;i++) {
@@ -28,7 +28,7 @@ try {
     assert.equal(res.status,200);
     const actual=await res.json();
     const expected=JSON.parse(fs.readFileSync(join(input,'ref'+i+'.json')));
-    assert.deepEqual(actual,expected);
+    if (!isDeepStrictEqual(actual,expected)) throw Error('Board projection mismatch on day '+i);
     console.log('board parity',i,size,'bytes',actual.matches.length,'prematch',Date.now()-t,'ms wall');
   }
 } finally {await mf.dispose();}
