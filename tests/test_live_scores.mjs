@@ -550,3 +550,25 @@ test('missing provider rows do not cause a call at each one-minute heartbeat',as
   assert.equal(calls.filter(x=>x.includes('/fixtures?')).length,2);
  }finally{globalThis.fetch=original;}
 });
+
+test('idle preflight only trusts recent settled in-memory state', async () => {
+  const context = ctx();
+  const store = new ScoreStore(context, env);
+  const at = Date.now() - 1000;
+  const state = {status:'idle', last_cron_at:at, watch_at:at, watch_generated_at:at,
+    scores:{}, watch:[{fixture_id:1,kickoff:new Date(at + 3_600_000).toISOString()}], health:{}};
+  const check = async changes => {
+    await context.storage.put('state', {...state,...changes});
+    const response = await store.fetch(new Request('https://scores.internal/read?preflight=1'));
+    return (await response.json()).decision;
+  };
+  assert.equal(await check({}), 'idle');
+  for (const changes of [{status:'provider_rate_limit'}, {last_cron_at:at-180_000},
+    {watch_at:at-17*60_000}, {health:{stale_live_fixtures:1}}, {consecutive_errors:1},
+    {watch:[{fixture_id:1,kickoff:new Date(at).toISOString()}]},
+    {scores:{1:{status:'FT',goals:{home:0,away:0}}}}])
+    assert.equal(await check(changes), 'review');
+  const pair = {home:0,away:0};
+  assert.equal(await check({watch:[{fixture_id:1,kickoff:new Date(at).toISOString()}],
+    scores:{1:{status:'FT',halftime:pair,fulltime:pair}}}), 'idle');
+});
