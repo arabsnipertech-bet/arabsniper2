@@ -395,8 +395,9 @@ def production_enabled():
             and os.environ.get('GITHUB_REF') == 'refs/heads/main')
 
 
-def production_store():
-    source = client()
+def production_store(source=None):
+    if source is None:
+        source = client()
     bucket = os.environ['R2_BUCKET']
     if os.environ.get('GITHUB_REPOSITORY') != cutover.GROWTH:
         return Storage(source, bucket)
@@ -454,7 +455,15 @@ def main():
         event_log('publisher', 'disabled_or_non_production')
         return
     repository = os.environ['GITHUB_REPOSITORY']
-    store = production_store()
+    source = client()
+    if repository == cutover.GROWTH and not args:
+        # The read-only Gold client survives a failure of the delegated write session.
+        owner_view = Storage(source, os.environ['R2_BUCKET'])
+        owner_view.load()
+        if cutover.owner(owner_view) != repository:
+            event_log('publisher', 'owned_by_other_repository')
+            return
+    store = production_store(source)
     if args in (['--activate-growth'], ['--restore-primary']):
         if repository != cutover.GROWTH:
             raise ValueError('Publisher handoff must run from Growth main')
