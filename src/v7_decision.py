@@ -5,6 +5,7 @@ from functools import lru_cache
 from hashlib import sha256
 from itertools import product
 import json
+from math import isclose
 from zoneinfo import ZoneInfo
 
 from adaptive_pricing import BASE_FIELDS, reprice
@@ -60,6 +61,8 @@ NICHE_LABELS = {
     'pt_st_symmetry_11_22': 'Simmetria 1°+2°T',
 }
 PAYOUT_FIELDS = ('push_probability', 'half_win_probability', 'half_loss_probability')
+# Independent role switches. Roll back this gate without changing prices or models.
+EV_RECOVERY_AGGIO_V1 = {'enabled': True, 'min_ev': -.10, 'roles': ('most_probable',)}
 
 
 def fingerprint(value):
@@ -225,6 +228,8 @@ def selection_motivation(row, reason, relaxed):
     if reason in ('solo_studio', 'stima_modello'):
         summary = ('Studio · scelta compatibile per probabilità V7' if relaxed else
                    'Studio · probabilità e fascia quota del ruolo')
+    if reason == 'ev_recovery_aggio_v1':
+        summary = f"Rivalutazione statistica · EV originale {100*row['ev']:+.1f}%"
     parts = [summary, f"Probabilità V7 {100*row['calibrated']:.1f}%",
              f'Fair bookmaker {100*fair:.1f}%' if finite(fair) else 'Fair bookmaker non disponibile']
     if finite(odd):
@@ -419,8 +424,60 @@ def role_rank(role, key, row):
     return bool(row['niche_id']), row['ev'], row['calibrated'], key
 
 
+def ev_recovery_candidates(records, sources, as_of, kickoff, statistics_at, commitments=None, *, policy=None):
+    """Compare independent statistics and a prudent scenario with same-book fair.
+
+    This is statistical qualification, never positive value at the offered price.
+    Missing evidence fails closed. Old commitments cannot be promoted or replaced.
+    """
+    policy = EV_RECOVERY_AGGIO_V1 if policy is None else policy
+    minimum = policy.get('min_ev')
+    at, stats_at = stamp(as_of), stamp(statistics_at)
+    if (policy.get('enabled') is not True or not finite(minimum) or not -.10 <= minimum < 0
+            or not at or not stats_at or stats_at > at):
+        return {}
+    candidates = {}
+    for role in policy.get('roles', ()):
+        if role not in TRIAD_MARKETS:
+            continue
+        prior = (commitments or {}).get(role)
+        if prior and (prior.get('ev_recovery') or {}).get('policy_id') != 'EV_RECOVERY_AGGIO_V1':
+            continue
+        for key in TRIAD_MARKETS[role] & records.keys():
+            if prior and prior['market_id'] != key:
+                continue
+            row = records[key]
+            source = sources.get(row['source_market_id']) or {}
+            odd, ev, low = (row.get(k) for k in ('odd', 'ev', 'ev_low'))
+            if (row.get('supported') is not True or source.get('v7_supported') is not True
+                    or source.get('quality') != 'supported' or source.get('prematch_stable')
+                    or source.get('probability_model') != VERSION or source.get('quote_source') == 'synthetic_combo'
+                    or not all(finite(v) for v in (odd, ev, low)) or not minimum <= ev < 0
+                    or odd != source.get('odd') or not price_usable(source, as_of, kickoff)):
+                continue
+            fair_p, margin = outcome_fair(source), source.get('selected_margin_pct')
+            statistical, calibrated = row.get('statistics'), row.get('calibrated')
+            prudent = (1 + low) / odd
+            if (fair_p is None or fair_p != row.get('fair')
+                    or not all(finite(p) and 0 < p <= 1 for p in (statistical, calibrated, prudent))
+                    or min(statistical, calibrated, prudent) < fair_p
+                    # Probability is stored to 8 decimals; prudent EV to 4 percent decimals.
+                    or not isclose(ev, calibrated*odd-1, rel_tol=0, abs_tol=odd*5e-9+1e-12)
+                    or low > ev + 5e-7 + 1e-12
+                    or not isclose(fair_p, 1 / odd / (1 + margin / 100), rel_tol=1e-9, abs_tol=1e-12)):
+                continue
+            # The margin only identifies the fair benchmark. No price-derived bonus.
+            candidates.setdefault(role, {})[key] = dict(
+                policy_id='EV_RECOVERY_AGGIO_V1', role=role, qualification='statistical_recovery',
+                original_ev=ev, original_ev_low=low, probability=calibrated,
+                statistical_probability=statistical, prudent_probability=prudent,
+                fair_probability=fair_p, margin_pct=margin,
+                bookmaker_id=source['bookmaker_id'], statistics_at=utc(stats_at))
+    return candidates
+
+
 def route(records, observed, *, study=False, allow_model_estimates=False, allow_unpriced=False,
-          locked=None, role_markets=TRIAD_MARKETS, limits=TRIAD_LIMITS):
+          locked=None, role_markets=TRIAD_MARKETS, limits=TRIAD_LIMITS, ev_recoveries=None):
     locked = locked or {}
     reserved = set(locked.values())
     triad = dict.fromkeys(TRIAD_MARKETS)
@@ -450,6 +507,34 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
         triad[role] = signal(key, records[key], role)
         chosen.append(key)
 
+    # Finish every ordinary positive-EV choice first. Recovery cannot displace it.
+    for role, proofs in (ev_recoveries or {}).items():
+        if role not in role_markets or triad[role]:
+            continue
+        floor, minimum, maximum = limits[role]
+        available = {locked[role]} if role in locked else role_markets[role] - reserved
+        candidates = []
+        for key in available & proofs.keys() & records.keys():
+            row, proof = records[key], proofs[key]
+            odd = row['odd']
+            if (not finite(odd) or not minimum <= odd <= maximum or row['calibrated'] < floor
+                    or proof['original_ev'] != row['ev'] or proof['probability'] != row['calibrated']
+                    or key in chosen or not compatible(key, *reserved, *chosen)):
+                continue
+            primary, alternative = triad['most_probable'], triad['recommended_alternative']
+            if (role == 'most_probable' and alternative and odd >= alternative['odd']
+                    or role == 'recommended_alternative' and primary and odd <= primary['odd']):
+                continue
+            delta = row['features'].get('net_delta_pct')
+            if role == 'high_odds_shot' and key == AWAY and (odd < 4.50 or not finite(delta) or delta <= 0):
+                continue
+            candidates.append(key)
+        if candidates:
+            key = max(candidates, key=lambda k: role_rank(role, k, records[k]))
+            triad[role] = {**signal(key, {**records[key], 'tier': 'BLU'}, 'ev_recovery_aggio_v1'),
+                           'ev_recovery': dict(proofs[key])}
+            chosen.append(key)
+
     signals = {name: triad[role] for role, name in SIGNAL_ROLES.items()}
     for tier in ('GOLD', 'PLATINUM'):
         signals[tier.lower()] = next((pick for pick in triad.values() if pick and pick['tier'] == tier), None)
@@ -473,6 +558,8 @@ def commit_priced_slots(triad, captured_at, previous):
             continue
         commitments[role] = {field: pick[field] for field in ('market_id', 'label', 'odd', 'horizon')}
         commitments[role].update(captured_at=captured_at, study_only=pick.get('study_only') is True)
+        if pick.get('ev_recovery'):
+            commitments[role]['ev_recovery'] = dict(pick['ev_recovery'])
     return commitments
 
 
@@ -626,8 +713,13 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     commitments = revise_priced_slots(records, observed_patterns, commitments, at, kickoff,
                                       national=bool(national_competition(meta.get('league'))))
     locked = {role: slot['market_id'] for role, slot in (commitments or {}).items()}
+    recoveries = ev_recovery_candidates(records, sources, as_of, meta['kickoff'], statistics_at, commitments)
     triad, signals = route(records, observed_patterns, study=True,
-                           allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True, locked=locked)
+                           allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True, locked=locked,
+                           ev_recoveries=recoveries)
+    for pick in triad.values():
+        if pick and pick.get('ev_recovery'):
+            records[pick['market_id']].update(tier='BLU', ev_recovery=dict(pick['ev_recovery']))
     first = next((pick for pick in triad.values() if pick), None)
     tier = max((pick['tier'] for pick in triad.values() if pick), key=TIER_RANK.__getitem__,
                default='BLU' if niches or any(row['tier'] for row in records.values()) else None)

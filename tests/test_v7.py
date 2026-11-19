@@ -18,9 +18,9 @@ from lateral_matrix import FAMILIES, build_matrix, market_id, settle_spec, speci
 from matrix_pipeline import build_board
 from matrix_quotes import collect
 from v7_archive import ROME, WEIGHTS, day_path, quote_evidence, results_for_day, valid_snapshot
-from v7_decision import (AWAY, BOTH_GOALS, COMBOS, GG, GG_BOTH, GG_CARRY, GG_FT, GOAL,
+from v7_decision import (AWAY, BOTH_GOALS, COMBOS, EV_RECOVERY_AGGIO_V1, GG, GG_BOTH, GG_CARRY, GG_FT, GOAL,
                          OVER_CARRY, capture, commit_priced_slots, market_origin, prior_triad_commitments,
-                         quote_rows, revise_priced_slots, route, stored_offers)
+                         ev_recovery_candidates, quote_rows, revise_priced_slots, route, stored_offers)
 from v7_learning import STATE, active_weight, deduplicated, fit, run
 from v7_maintenance import MARKER, complete_price_pages, consolidate, price_window
 from v7_probability import BASE_WEIGHT, blend_rates, market_rates, price_usable, raw_rates, result_probabilities, score_model
@@ -400,6 +400,185 @@ class MathAndRouting(unittest.TestCase):
         self.assertAlmostEqual(reference['model_fair_odd'], 1/reference['calibrated'], places=5)
         rows[FT]['quote_observed_at'] = START
         self.assertNotIn('reference_legs', capture(assessment, META, AT)['markets'][GG_CARRY])
+
+
+class EVRecovery(unittest.TestCase):
+    def candidate(self, key=FT, *, p=.60, odd=1.60, fair=.58, low=-.05):
+        spec = json.loads(key)
+        source = row(spec, odd, p, fair)
+        source.update(v7_supported=True, probability_model='arabsniper-v7.0', bookmaker='Single book',
+                      selected_margin_pct=100*(1/(odd*fair)-1))
+        record = dict(source_market_id=key, label=key, calibrated=p, statistics=.62, odd=odd,
+                      fair=fair, ev=p*odd-1, ev_low=low, supported=True, tier=None, niche_id=None,
+                      horizon='FT' if spec['period'] == 'ft' else 'PT', spec_kind=spec['kind'],
+                      model_fair_odd=1/p, quote_state='stable', study_supported=True,
+                      quote={'first_odd':odd}, features={'margin_pct':source['selected_margin_pct']})
+        return record, source
+
+    def recoveries(self, records, sources, **kwargs):
+        return ev_recovery_candidates(records, sources, AT, START, AT, **kwargs)
+
+    def fixture(self):
+        a = assessment()
+        a['rates'] = dict(home_ft=1.6, away_ft=1.5, home_ht=.7, away_ht=.6)
+        _, source = self.candidate()
+        a['matrix']['rows'] = [source]
+        return a
+
+    def test_negative_ev_and_prudent_ev_remain_visible_and_unchanged(self):
+        record, source = self.candidate()
+        records, sources = {FT:record}, {FT:source}
+        before = deepcopy((records,sources))
+        ordinary, ordinary_signals = route(records, PATTERNS, study=True)
+        triad, signals = route(records, PATTERNS, study=True, ev_recoveries=self.recoveries(records,sources))
+        self.assertTrue(ordinary['most_probable']['study_only'])
+        self.assertIsNone(ordinary_signals['primary'])
+        pick = triad['most_probable']
+        self.assertIs(signals['primary'],pick)
+        self.assertEqual((pick['market_id'],pick['odd'],pick['probability'],pick['ev'],pick['ev_low']),
+                         (FT,record['odd'],record['calibrated'],record['ev'],record['ev_low']))
+        self.assertLess(pick['ev'],0)
+        self.assertLess(pick['ev_low'],0)
+        self.assertEqual(pick['tier'],'BLU')
+        self.assertFalse(pick.get('study_only'))
+        self.assertIn('EV originale -4,0%',pick['motivation'])
+        self.assertFalse(signals['gold'] or signals['platinum'])
+        self.assertEqual((records,sources),before)
+
+    def test_configured_ev_band_has_exact_user_boundaries_and_no_margin_compensation(self):
+        for ev, accepted in ((-.10000001,False),(-.10,True),(-.000001,True),(0.,False),(.01,False)):
+            with self.subTest(ev=ev):
+                record, source = self.candidate(p=(1+ev)/1.6,fair=.5,low=ev-.01)
+                record['ev'] = ev
+                self.assertEqual(bool(self.recoveries({FT:record},{FT:source})),accepted)
+        record, source = self.candidate()
+        for ev in (None,float('nan'),float('inf')):
+            with self.subTest(ev=ev):
+                self.assertFalse(self.recoveries({FT:{**record,'ev':ev}},{FT:source}))
+
+    def test_requires_independent_statistics_prudent_probability_and_same_book_fair(self):
+        record, source = self.candidate()
+        for changes in ({'statistics':None},{'statistics':.57},{'ev_low':None},{'ev_low':-.08},
+                        {'ev':-.02},{'ev_low':-.02},{'calibrated':.57},{'fair':.59},{'supported':False}):
+            with self.subTest(changes=changes):
+                self.assertFalse(self.recoveries({FT:{**record,**changes}},{FT:source}))
+        for changes in ({'selected_margin_pct':None},{'selected_margin_pct':30.},
+                        {'selected_market_fair_pct':None},{'quality':'limited'}, {'v7_supported':False},
+                        {'probability_model':'other'},{'quote_source':'synthetic_combo'},
+                        {'quote_executable':False},{'quote_status':'missing'},{'prematch_stable':True},
+                        {'bookmaker_id':None},{'provider_updated_at':LATER},{'quote_observed_at':LATER}):
+            with self.subTest(changes=changes):
+                self.assertFalse(self.recoveries({FT:record},{FT:{**source,**changes}}))
+        for statistics_at in (None,LATER):
+            self.assertFalse(ev_recovery_candidates({FT:record},{FT:source},AT,START,statistics_at))
+        self.assertFalse(ev_recovery_candidates({FT:record},{FT:source},START,START,AT))
+
+    def test_flag_off_and_invalid_configuration_reproduce_ordinary_routing(self):
+        record, source = self.candidate()
+        for policy in ({**EV_RECOVERY_AGGIO_V1,'enabled':False},
+                       {**EV_RECOVERY_AGGIO_V1,'min_ev':-.11},
+                       {**EV_RECOVERY_AGGIO_V1,'min_ev':0},
+                       {**EV_RECOVERY_AGGIO_V1,'roles':()}):
+            with self.subTest(policy=policy):
+                recoveries = self.recoveries({FT:record},{FT:source},policy=policy)
+                self.assertFalse(recoveries)
+                self.assertEqual(route({FT:record},PATTERNS,study=True,ev_recoveries=recoveries),
+                                 route({FT:record},PATTERNS,study=True))
+
+    def test_roi_and_duplicate_price_signals_cannot_supply_statistical_evidence(self):
+        record, source = self.candidate()
+        ordinary = self.recoveries({FT:record},{FT:source})
+        for roi, oci in ((1e6,100),(-1e6,-100)):
+            changed = {**record,'roi':roi,'features':{**record['features'],'oci':oci}}
+            self.assertEqual(self.recoveries({FT:changed},{FT:{**source,'roi':roi}}),ordinary)
+            self.assertFalse(self.recoveries({FT:{**changed,'statistics':None}},{FT:source}))
+
+    def test_considered_roles_are_configured_separately(self):
+        records, sources = {}, {}
+        for key, p, odd, fair in ((FT,.60,1.60,.58),(HT,.38,2.50,.36),(GG,.23,4.,.21)):
+            records[key],sources[key] = self.candidate(key,p=p,odd=odd,fair=fair,low=-.06)
+        recoveries = self.recoveries(records,sources)
+        self.assertEqual(set(recoveries),{'most_probable'})
+        _, signals = route(records,PATTERNS,study=True,ev_recoveries=recoveries)
+        self.assertIsNotNone(signals['primary'])
+        self.assertIsNone(signals['consigliata'])
+        self.assertIsNone(signals['colpaccio'])
+
+    def test_positive_ev_selections_for_every_role_are_identical(self):
+        records, sources = {}, {}
+        records[FT],sources[FT] = self.candidate()
+        for key, p, odd, tier in ((GG_FT,.55,2.,'BLU'),(HT,.46,2.6,'GOLD'),(GG,.30,4.,'PLATINUM')):
+            records[key],sources[key] = self.candidate(key,p=p,odd=odd,fair=.95/odd,low=.05)
+            records[key]['tier'] = tier
+        ordinary = route(records,PATTERNS,study=True)
+        self.assertEqual(route(records,PATTERNS,study=True,ev_recoveries=self.recoveries(records,sources)),ordinary)
+        self.assertTrue(all(pick for pick in ordinary[0].values()))
+
+    def test_recovery_cannot_contradict_or_displace_an_existing_colpaccio(self):
+        home = market_id(specification('result','ft','1'))
+        record, source = self.candidate(home)
+        away, away_source = self.candidate(AWAY,p=.25,odd=5.,fair=.18,low=.1)
+        away.update(tier='BLU',features={'net_delta_pct':3.})
+        records,sources = {home:record,AWAY:away},{home:source,AWAY:away_source}
+        ordinary = route(records,PATTERNS)
+        changed = route(records,PATTERNS,ev_recoveries=self.recoveries(records,sources))
+        self.assertEqual(changed,ordinary)
+        self.assertIsNone(changed[0]['most_probable'])
+        self.assertEqual(changed[0]['high_odds_shot']['market_id'],AWAY)
+
+    def test_recovery_ranks_by_probability_and_keeps_role_price_order(self):
+        records,sources = {},{}
+        records[FT],sources[FT] = self.candidate()
+        records[GG_FT],sources[GG_FT] = self.candidate(GG_FT,p=.59,low=-.07)
+        triad,_ = route(records,PATTERNS,ev_recoveries=self.recoveries(records,sources))
+        self.assertEqual(triad['most_probable']['market_id'],FT)
+        records,sources = {},{}
+        records[FT],sources[FT] = self.candidate(p=.46,odd=2.15,fair=.44,low=-.04)
+        records[HT],sources[HT] = self.candidate(HT,p=.5,odd=2.15,fair=.4,low=.05)
+        records[HT]['tier'] = 'BLU'
+        triad,_ = route(records,PATTERNS,ev_recoveries=self.recoveries(records,sources))
+        self.assertIsNone(triad['most_probable'])
+        self.assertEqual(triad['recommended_alternative']['market_id'],HT)
+
+    def test_old_commitments_cannot_be_promoted_and_new_recoveries_can_be_retained(self):
+        record,source = self.candidate()
+        records,sources = {FT:record},{FT:source}
+        old,_ = route(records,PATTERNS,study=True)
+        old_commitments = commit_priced_slots(old,AT,{})
+        self.assertFalse(self.recoveries(records,sources,commitments=old_commitments))
+        triad,_ = route(records,PATTERNS,ev_recoveries=self.recoveries(records,sources))
+        commitments = commit_priced_slots(triad,AT,{})
+        before = deepcopy(commitments)
+        recoveries = self.recoveries(records,sources,commitments=commitments)
+        retained,_ = route(records,PATTERNS,locked={'most_probable':FT},ev_recoveries=recoveries)
+        self.assertEqual(retained['most_probable'],triad['most_probable'])
+        self.assertEqual(commit_priced_slots(retained,LATER,commitments),before)
+
+    def test_capture_preserves_probabilities_prices_policies_and_snapshot_hash_contract(self):
+        before,after = self.fixture(),self.fixture()
+        with patch.dict(EV_RECOVERY_AGGIO_V1,enabled=False):
+            baseline = capture(before,META,AT,commitments={})
+        changed = capture(after,META,AT,commitments={})
+        self.assertIsNone(baseline['signals']['primary'])
+        self.assertIn('ev_recovery',changed['signals']['primary'])
+        for key in ('statistics','raw_rates','market_projection','rates','weight','means','calibration'):
+            self.assertEqual(changed[key],baseline[key])
+        for key in baseline['markets']:
+            stripped = {k:v for k,v in changed['markets'][key].items() if k not in ('tier','ev_recovery')}
+            self.assertEqual(stripped,{k:v for k,v in baseline['markets'][key].items() if k!='tier'})
+        self.assertEqual(after['matrix']['rows'],before['matrix']['rows'])
+        self.assertFalse(changed['signals']['gold'] or changed['signals']['platinum'])
+        self.assertTrue(valid_snapshot(changed,META,AT))
+        after['matrix']['v7'] = changed
+        offers = list(stored_offers(after,META,AT))
+        self.assertEqual(len(offers),1)
+        self.assertEqual(offers[0][1]['ev'],baseline['triad']['most_probable']['ev'])
+        retained = capture(deepcopy(after),META,LATER,commitments=changed['triad_commitments'])
+        self.assertIn('ev_recovery',retained['triad']['most_probable'])
+        self.assertEqual(retained['triad_commitments'],changed['triad_commitments'])
+        old = capture(self.fixture(),META,LATER,commitments=baseline['triad_commitments'])
+        self.assertTrue(old['triad']['most_probable']['study_only'])
+        self.assertIsNone(old['signals']['primary'])
 
 
 class ArchiveAndWorkflow(unittest.TestCase):
