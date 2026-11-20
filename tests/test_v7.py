@@ -408,7 +408,7 @@ class EVRecovery(unittest.TestCase):
         source = row(spec, odd, p, fair)
         source.update(v7_supported=True, probability_model='arabsniper-v7.0', bookmaker='Single book',
                       selected_margin_pct=100*(1/(odd*fair)-1))
-        record = dict(source_market_id=key, label=key, calibrated=p, statistics=.62, odd=odd,
+        record = dict(source_market_id=key, label=key, calibrated=p, statistics=.62, raw=.61, odd=odd,
                       fair=fair, ev=p*odd-1, ev_low=low, supported=True, tier=None, niche_id=None,
                       horizon='FT' if spec['period'] == 'ft' else 'PT', spec_kind=spec['kind'],
                       model_fair_odd=1/p, quote_state='stable', study_supported=True,
@@ -496,13 +496,111 @@ class EVRecovery(unittest.TestCase):
     def test_considered_roles_are_configured_separately(self):
         records, sources = {}, {}
         for key, p, odd, fair in ((FT,.60,1.60,.58),(HT,.38,2.50,.36),(GG,.23,4.,.21)):
-            records[key],sources[key] = self.candidate(key,p=p,odd=odd,fair=fair,low=-.06)
+            records[key],sources[key] = self.candidate(key,p=p,odd=odd,fair=fair,low=p*odd-1-.01)
         recoveries = self.recoveries(records,sources)
-        self.assertEqual(set(recoveries),{'most_probable'})
+        self.assertEqual(set(recoveries),set(EV_RECOVERY_AGGIO_V1['roles']))
         _, signals = route(records,PATTERNS,study=True,ev_recoveries=recoveries)
         self.assertIsNotNone(signals['primary'])
-        self.assertIsNone(signals['consigliata'])
-        self.assertIsNone(signals['colpaccio'])
+        self.assertIsNotNone(signals['consigliata'])
+        self.assertIsNotNone(signals['colpaccio'])
+        for role in EV_RECOVERY_AGGIO_V1['roles']:
+            policy = {**EV_RECOVERY_AGGIO_V1, 'roles': (role,)}
+            self.assertEqual(set(self.recoveries(records,sources,policy=policy)), {role})
+
+    def test_recommended_and_colpaccio_require_poisson_and_statistics_to_support_the_price(self):
+        for role,key,p,odd,fair in (('recommended_alternative',HT,.38,2.50,.36),
+                                    ('high_odds_shot',GG,.23,4.,.21)):
+            with self.subTest(role=role):
+                record,source = self.candidate(key,p=p,odd=odd,fair=fair,low=p*odd-1-.01)
+                boundary = 1/odd
+                record.update(raw=boundary,statistics=boundary)
+                proofs = self.recoveries({key:record},{key:source})
+                triad,signals = route({key:record},PATTERNS,study=True,ev_recoveries=proofs)
+                pick = triad[role]
+                self.assertFalse(pick.get('study_only'))
+                self.assertEqual(pick['ev'],record['ev'])
+                self.assertEqual(pick['probability'],p)
+                self.assertEqual(pick['tier'],'BLU')
+                self.assertIn('Poisson grezzo',pick['motivation'])
+                self.assertIn('Pareggio alla quota',pick['motivation'])
+                self.assertEqual(pick['ev_recovery']['break_even_probability'],boundary)
+                for field in ('raw','statistics'):
+                    for value in (None,float('nan'),0,boundary-1e-7):
+                        self.assertFalse(self.recoveries({key:{**record,field:value}},{key:source}))
+                self.assertFalse(signals['gold'] or signals['platinum'])
+
+    def test_aggio_cannot_replace_price_support_for_the_new_roles(self):
+        for key,p,odd,fair in ((HT,.38,2.50,.36),(GG,.23,4.,.21)):
+            record,source = self.candidate(key,p=p,odd=odd,fair=fair,low=p*odd-1-.01)
+            record.update(raw=(fair+1/odd)/2,statistics=(fair+1/odd)/2)
+            self.assertFalse(self.recoveries({key:record},{key:source}))
+            record.update(raw=.8,statistics=.8)
+            self.assertTrue(self.recoveries({key:record},{key:source}))
+            for roi in (1e6,-1e6):
+                changed = {**record,'roi':roi}
+                self.assertEqual(self.recoveries({key:changed},{key:{**source,'roi':roi}}),
+                                 self.recoveries({key:record},{key:source}))
+
+    def test_new_roles_cannot_promote_frozen_study_commitments(self):
+        for role,key,p,odd,fair in (('recommended_alternative',HT,.38,2.50,.36),
+                                    ('high_odds_shot',GG,.23,4.,.21)):
+            record,source = self.candidate(key,p=p,odd=odd,fair=fair,low=p*odd-1-.01)
+            records,sources = {key:record},{key:source}
+            old,_ = route(records,PATTERNS,study=True)
+            commitments = commit_priced_slots(old,AT,{})
+            self.assertTrue(commitments[role]['study_only'])
+            self.assertFalse(self.recoveries(records,sources,commitments=commitments))
+            triad,_ = route(records,PATTERNS,ev_recoveries=self.recoveries(records,sources))
+            new = commit_priced_slots(triad,AT,{})
+            retained,_ = route(records,PATTERNS,locked={role:key},
+                               ev_recoveries=self.recoveries(records,sources,commitments=new))
+            self.assertEqual(retained[role],triad[role])
+
+    def test_new_roles_keep_their_existing_probability_and_price_limits(self):
+        for key,p,odd,fair in ((HT,.31,2.50,.28),(HT,.45,2.14,.40),
+                               (GG,.15,6.,.14),(GG,.27,3.49,.25)):
+            record,source = self.candidate(key,p=p,odd=odd,fair=fair,low=p*odd-1-.01)
+            role = 'recommended_alternative' if key == HT else 'high_odds_shot'
+            _,signals = route({key:record},PATTERNS,study=True,
+                             ev_recoveries=self.recoveries({key:record},{key:source}))
+            self.assertIsNone(signals['consigliata' if role == 'recommended_alternative' else 'colpaccio'])
+
+    def test_new_roles_keep_the_exact_negative_ev_band(self):
+        for role,key,odd in (('recommended_alternative',HT,2.5),('high_odds_shot',GG,4.)):
+            for ev,accepted in ((-.10000001,False),(-.10,True),(-.000001,True),(0.,False),(.01,False)):
+                with self.subTest(role=role,ev=ev):
+                    record,source = self.candidate(key,p=(1+ev)/odd,odd=odd,fair=.8/odd,low=ev-.01)
+                    record['ev'] = ev
+                    self.assertEqual(bool(self.recoveries({key:record},{key:source})),accepted)
+
+    def test_capture_recovers_both_new_roles_with_real_poisson_without_repricing(self):
+        fixture = assessment()
+        fixture['rates'] = dict(home_ft=1.7,away_ft=1.6,home_ht=.7,away_ht=.7)
+        fixture['matrix']['rows'] = [row(json.loads(key),odd,.4,1/(odd*1.09))
+                                     for key,odd in ((FT,1.8),(HT,2.5),(GG,4.))]
+        for source in fixture['matrix']['rows']:
+            source['selected_margin_pct'] = 9.
+        before,after = deepcopy(fixture),deepcopy(fixture)
+        with patch.dict(EV_RECOVERY_AGGIO_V1,roles=('most_probable',)):
+            baseline = capture(before,META,AT,commitments={})
+        changed = capture(after,META,AT,commitments={})
+        for role,signal_key in (('recommended_alternative','consigliata'),('high_odds_shot','colpaccio')):
+            self.assertTrue(baseline['triad'][role]['study_only'])
+            self.assertIsNone(baseline['signals'][signal_key])
+            promoted = changed['signals'][signal_key]
+            self.assertFalse(promoted.get('study_only'))
+            self.assertLess(promoted['ev'],0)
+            self.assertEqual(promoted['ev'],baseline['triad'][role]['ev'])
+            self.assertEqual(promoted['probability'],baseline['triad'][role]['probability'])
+        self.assertEqual(changed['triad']['most_probable'],baseline['triad']['most_probable'])
+        for key in ('statistics','raw_rates','market_projection','rates','weight','means','calibration'):
+            self.assertEqual(changed[key],baseline[key])
+        for key in baseline['markets']:
+            omitted = ('tier','ev_recovery')
+            self.assertEqual({k:v for k,v in changed['markets'][key].items() if k not in omitted},
+                             {k:v for k,v in baseline['markets'][key].items() if k not in omitted})
+        self.assertEqual(before['matrix']['rows'],after['matrix']['rows'])
+        self.assertTrue(valid_snapshot(changed,META,AT))
 
     def test_positive_ev_selections_for_every_role_are_identical(self):
         records, sources = {}, {}
