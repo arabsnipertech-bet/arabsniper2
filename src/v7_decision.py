@@ -62,7 +62,10 @@ NICHE_LABELS = {
 }
 PAYOUT_FIELDS = ('push_probability', 'half_win_probability', 'half_loss_probability')
 # Independent role switches. Roll back this gate without changing prices or models.
-EV_RECOVERY_AGGIO_V1 = {'enabled': True, 'min_ev': -.10, 'roles': ('most_probable',)}
+EV_RECOVERY_AGGIO_V1 = {
+    'enabled': True, 'min_ev': -.10, 'roles': tuple(TRIAD_MARKETS),
+    'price_support_roles': ('recommended_alternative', 'high_odds_shot'),
+}
 
 
 def fingerprint(value):
@@ -232,6 +235,11 @@ def selection_motivation(row, reason, relaxed):
         summary = f"Rivalutazione statistica · EV originale {100*row['ev']:+.1f}%"
     parts = [summary, f"Probabilità V7 {100*row['calibrated']:.1f}%",
              f'Fair bookmaker {100*fair:.1f}%' if finite(fair) else 'Fair bookmaker non disponibile']
+    recovery = row.get('ev_recovery') or {}
+    if reason == 'ev_recovery_aggio_v1' and recovery.get('break_even_probability') is not None:
+        parts.extend((f"Poisson grezzo {100*recovery['poisson_probability']:.1f}%",
+                      f"Statistiche {100*recovery['statistical_probability']:.1f}%",
+                      f"Pareggio alla quota {100*recovery['break_even_probability']:.1f}%"))
     if finite(odd):
         parts.append(f'Prima osservata {first:.2f}' if finite(first) else 'Prima osservata non disponibile')
         state = 'Ultima osservata stabile' if row.get('quote_state') == 'stable' else 'Quota osservata'
@@ -467,12 +475,23 @@ def ev_recovery_candidates(records, sources, as_of, kickoff, statistics_at, comm
                     or not isclose(fair_p, 1 / odd / (1 + margin / 100), rel_tol=1e-9, abs_tol=1e-12)):
                 continue
             # The margin only identifies the fair benchmark. No price-derived bonus.
+            price_support = {}
+            if role in policy.get('price_support_roles', ()):
+                poisson, break_even = row.get('raw'), 1 / odd
+                # These estimates share goal history. Require agreement, never
+                # count them as two independent votes or add margin to EV.
+                # Stored probabilities have eight decimals: half a final digit.
+                if (not finite(poisson) or not 0 < poisson <= 1
+                        or min(poisson, statistical) + 5e-9 < break_even):
+                    continue
+                price_support = dict(poisson_probability=poisson,
+                                     break_even_probability=break_even)
             candidates.setdefault(role, {})[key] = dict(
                 policy_id='EV_RECOVERY_AGGIO_V1', role=role, qualification='statistical_recovery',
                 original_ev=ev, original_ev_low=low, probability=calibrated,
                 statistical_probability=statistical, prudent_probability=prudent,
                 fair_probability=fair_p, margin_pct=margin,
-                bookmaker_id=source['bookmaker_id'], statistics_at=utc(stats_at))
+                bookmaker_id=source['bookmaker_id'], statistics_at=utc(stats_at), **price_support)
     return candidates
 
 
@@ -531,7 +550,8 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
             candidates.append(key)
         if candidates:
             key = max(candidates, key=lambda k: role_rank(role, k, records[k]))
-            triad[role] = {**signal(key, {**records[key], 'tier': 'BLU'}, 'ev_recovery_aggio_v1'),
+            triad[role] = {**signal(key, {**records[key], 'tier': 'BLU', 'ev_recovery': proofs[key]},
+                                   'ev_recovery_aggio_v1'),
                            'ev_recovery': dict(proofs[key])}
             chosen.append(key)
 
