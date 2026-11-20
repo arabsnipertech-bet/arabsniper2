@@ -18,7 +18,7 @@ from multimarket_model import fair, stamp
 from opportunity_policy import annotate as annotate_gold
 from platinum_policy import annotate as annotate_platinum
 from v7_probability import (BASE_WEIGHT, VERSION, blend_rates, fair_inputs, finite,
-                            market_rates, outcome_fair, price_usable, raw_rates,
+                            goal_structure, market_rates, outcome_fair, price_usable, pricing_evidence, raw_rates,
                             score_model, statistical_rates, utc)
 
 GOAL = {
@@ -678,6 +678,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
         original_p = baseline.get(row.get('id'))
         odd = row.get('odd') if usable else None
         estimate = learned_model.estimate(spec)
+        raw_estimate, statistical_estimate = raw_model.estimate(spec), stat_model.estimate(spec)
         ev = estimate['win_weight']*(odd-1)-estimate['loss_weight'] if odd else None
         ev_low = source.get('ev_low_pct')
         supported = source.get('v7_supported') is True
@@ -698,14 +699,15 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
                        else 'moving' if evidence.get('net_delta_pct') else 'observed' if usable else 'missing')
         records[key] = dict(source_market_id=row['id'], label=label(spec), spec_kind=spec['kind'], side=spec['side'],
                             horizon='PT+ST' if spec['kind'] in JOINT_KINDS else HORIZONS[spec['period']],
-                            raw=round(bounded_probability(raw_model, spec), 8),
-                            statistics=round(bounded_probability(stat_model, spec), 8),
+                            raw=round(min(1., max(0., raw_estimate['p'])), 8),
+                            statistics=round(min(1., max(0., statistical_estimate['p'])), 8),
                             corrected=round(bounded_probability(fixed_model, spec), 8),
                             calibrated=round(min(1., max(0., estimate['p'])), 8), fair=fair_p,
                             v51=original_p/100 if finite(original_p) else None, odd=odd, ev=ev, supported=supported,
                             study_supported=bool(supported or limited_national_history), quote_state=quote_state,
                             ev_low=ev_low/100 if usable and finite(ev_low) else None,
                             model_fair_odd=estimate['fair_odd'], quote=quote, features=evidence,
+                            pricing_evidence=pricing_evidence(row, estimate, raw_estimate, statistical_estimate, usable),
                             edge_exclusions=exclusions, policy_exclusions=(source.get('opportunity') or {}).get('reasons') or [],
                             platinum_exclusions=(source.get('platinum') or {}).get('reasons') or [])
     niches, observed_patterns = niche_evidence(records, assessment, calibrated, stats, totals, weight,
@@ -746,6 +748,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     payload = dict(version=VERSION, status='published', fixture_id=str(meta['fixture_id']),
                    captured_at=utc(at), kickoff=utc(kickoff), statistics_at=utc(statistics_at),
                    statistics=stats, raw_rates=raw, market_projection=projected, rates=calibrated,
+                   goal_structure=goal_structure(calibrated),
                    weight=weight if projected else 0., calibration=calibration or 'baseline',
                    fair_inputs=dict(totals={p: {str(k): v for k, v in lines.items()} for p, lines in totals.items()},
                                     result=fair_result),
