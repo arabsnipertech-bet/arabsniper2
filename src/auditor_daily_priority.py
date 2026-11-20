@@ -60,7 +60,7 @@ def ensure_priority(root, today, phase):
     print(f'V7 results, report and learning checkpoint verified: {day}', flush=True)
 
 
-def build_yesterday(root, day, now, fetcher=None):
+def build_yesterday(root, day, now, fetcher=None, *, max_result_ids=None):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'auditor'))
     from current_audit import forecast_day, settle_day, fetch_results, TZ
     from audit_journal import ForecastHistory, LEGACY_PRIORITY_DAYS, journals_for_day, pending_journals, merge_forecast
@@ -106,7 +106,8 @@ def build_yesterday(root, day, now, fetcher=None):
         print(f'V7: writing frozen observations for {day}', flush=True)
         ledger.write(path)
         return settle_day(root, day, now, fetcher=fetcher or fetch_results, legacy_evidence=False,
-                          ledger=ledger, progress=lambda message: print('V7: '+message, flush=True))
+                          ledger=ledger, max_result_ids=max_result_ids,
+                          progress=lambda message: print('V7: '+message, flush=True))
 
 
 if __name__ == '__main__':
@@ -114,8 +115,9 @@ if __name__ == '__main__':
     from auditor_schedule import ROME, admission
     parser = argparse.ArgumentParser()
     parser.add_argument('--date', type=lambda value: datetime.fromisoformat(value).date(), required=True)
+    parser.add_argument('--max-result-ids', type=int)
     args = parser.parse_args()
     now = datetime.now(ROME)
     if not admission(now)['run']:
         parser.error('Priority audit requires the protected nighttime admission window')
-    build_yesterday(Path(__file__).resolve().parents[1], args.date, now)
+    build_yesterday(Path(__file__).resolve().parents[1], args.date, now, max_result_ids=args.max_result_ids)

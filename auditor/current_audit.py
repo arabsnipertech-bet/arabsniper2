@@ -200,7 +200,8 @@ def fetch_results(date, key, fixture_ids=(), *, only_ids=False):
     return {'days': [{'matches': matches}]}
 
 
-def official_scores(day, now, fixtures, saved, priorities, recheck, reviews, progress):
+def official_scores(day, now, fixtures, saved, priorities, recheck, reviews, progress,
+                    *, max_result_ids=None, after_fixture_id=None, attempted=None):
     from audit_official_scores import LOOKBACK_DAYS, needs_result, read_live_scores, use_stored_scores
     from v7_archive import FINISHED, VOID, merge_verified_result
 
@@ -208,9 +209,11 @@ def official_scores(day, now, fixtures, saved, priorities, recheck, reviews, pro
     if not fixtures or age > LOOKBACK_DAYS:
         return saved, reviews, False
     scores, disputes = saved.copy(), set(reviews)
-    if age <= 4:
+    missing = {fid: kickoff for fid, kickoff in fixtures.items()
+               if recheck or fid in reviews or needs_result(saved.get(fid))}
+    if age <= 4 and missing:
         progress(f'lettura risultati live già salvati {day}')
-        scores, live_disputes = use_stored_scores(fixtures, saved, read_live_scores(fixtures, now))
+        scores, live_disputes = use_stored_scores(missing, saved, read_live_scores(missing, now))
         disputes.update(live_disputes)
     targets = [fid for fid in fixtures if fid.isascii() and fid.isdecimal() and int(fid) > 0
                and (recheck or fid in disputes or needs_result(scores.get(fid)))]
@@ -221,6 +224,16 @@ def official_scores(day, now, fixtures, saved, priorities, recheck, reviews, pro
         progress(f'risultati in attesa di verifica API-Football {day}')
         return scores, disputes, False
     ordered = sorted(targets, key=lambda fid: (not priorities.get(fid), int(fid)))
+    if max_result_ids is not None:
+        if type(max_result_ids) is not int or not 1 <= max_result_ids <= 20:
+            raise ValueError('Bounded Auditor supports 1 to 20 result IDs')
+        # Rotate unavailable IDs, so one missing halftime cannot starve the rest.
+        if after_fixture_id in ordered:
+            offset = ordered.index(after_fixture_id) + 1
+            ordered = ordered[offset:] + ordered[:offset]
+        ordered = ordered[:max_result_ids]
+    if attempted is not None:
+        attempted.extend(ordered)
     progress(f'richiesta risultati API-Football {day}: {len(ordered)} fixture da verificare')
     fetched = fetch_results(str(day), key, (int(fid) for fid in ordered), only_ids=True)
     for match in fetched['days'][0]['matches']:
@@ -235,7 +248,8 @@ def official_scores(day, now, fixtures, saved, priorities, recheck, reviews, pro
 
 
 def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: None, combined=None,
-               *, legacy_evidence=True, recheck_results=False, ledger=None):
+               *, legacy_evidence=True, recheck_results=False, ledger=None,
+               max_result_ids=None, after_fixture_id=None):
     from contextlib import nullcontext
     from audit_daily_evidence import read_receipt, seal_evidence
     from audit_official_scores import as_output, needs_result
@@ -291,10 +305,12 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
                 if prior.get('pending') is True and not needs_result(scores[fid]):
                     reviews.add(fid)
         age = (now.astimezone(TZ).date() - date).days
-        disputes = set()
+        disputes, attempted = set(), []
         if fetcher is fetch_results:
             scores, disputes, queried = official_scores(date, now, fixtures, scores, priorities,
-                                                        recheck_results, reviews, progress)
+                                                        recheck_results, reviews, progress,
+                                                        max_result_ids=max_result_ids,
+                                                        after_fixture_id=after_fixture_id, attempted=attempted)
             if scores:
                 fetched = as_output(scores)
         elif age <= 14 and (pending or recheck_results):
@@ -341,6 +357,9 @@ def settle_day(root, date, now, fetcher=fetch_results, progress=lambda message: 
             'void_fixtures': sum(score.get('status') in VOID for score in scores.values()),
             'pending_fixtures': len(incomplete),
         }
+        if max_result_ids is not None:
+            daily['result_recovery'] = {'max_result_ids': max_result_ids,
+                                       'attempted_fixture_ids': attempted}
         write(root / f'auditarchive/prematch_{date}_daily.json', daily)
         atomic_bytes(root / f'auditarchive/prematch_{date}_daily.md',
                      (markdown(daily)+study_markdown(daily['selection_studies'])).encode())
@@ -453,6 +472,9 @@ def main():
     parser.add_argument('--as-of', type=datetime.fromisoformat)
     parser.add_argument('--root', type=Path, default=ROOT, help=argparse.SUPPRESS)
     parser.add_argument('--results-queried', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--no-legacy-evidence', action='store_true')
+    parser.add_argument('--max-result-ids', type=int)
+    parser.add_argument('--after-fixture-id')
     args = parser.parse_args()
     now = args.as_of or datetime.now(TZ)
     if now.tzinfo is None:
@@ -482,7 +504,9 @@ def main():
             if args.date is None:
                 parser.error('daily requires --date')
             summary = {'daily': str(args.date), 'results_queried':
-                       settle_day(ROOT, args.date, now, progress=progress.update)}
+                       settle_day(ROOT, args.date, now, progress=progress.update,
+                                  legacy_evidence=not args.no_legacy_evidence,
+                                  max_result_ids=args.max_result_ids, after_fixture_id=args.after_fixture_id)}
         elif args.mode == 'history':
             summary = {'settlement': settle(ROOT, now, progress=progress.update, prepared_date=args.date,
                                            workers=2, assemble_only=args.assemble_only)}

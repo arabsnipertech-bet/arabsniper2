@@ -70,12 +70,18 @@ def already_completed(root, now):
 
 
 def preflight(api, now, run_id):
-    from fast_backup_dispatch import ACTIVE, WRITERS
+    from fast_backup_dispatch import ACTIVE, WRITERS, IncompleteListing, TemporaryReadError
     result = admission(now)
     if not result['run']:
         return result  # No provider/storage/GitHub access outside the window.
     for status in ACTIVE:
-        for run in api.active_runs(status):
+        try:
+            runs = api.active_runs(status)
+        except (IncompleteListing, TemporaryReadError):
+            # An unverifiable read must never admit a competing writer.
+            # The normal watchdog can try again; no scan is dispatched here.
+            return {**result, 'run': False, 'reason': 'github_listing_unavailable'}
+        for run in runs:
             if not isinstance(run, dict) or not isinstance(run.get('path'), str):
                 raise ValueError('Invalid writer listing')
             if str(run.get('id')) != str(run_id) and run['path'].split('@')[0] in WRITERS:

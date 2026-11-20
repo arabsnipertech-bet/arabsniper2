@@ -31,7 +31,7 @@ jobs:
       - name: Record intentionally skipped duplicate or out-of-window Auditor
         if: steps.window.outputs.run == 'false'
         run: |
-          echo "Auditor was not admitted: another data writer is running or the protected nightly window has passed."
+          echo "Auditor was deferred by its admission guard: writer busy, protected window closed, or GitHub listing temporarily unavailable."
           echo "The admission guard succeeded by preventing a redundant Auditor run."
           echo "Skipped admission is NOT a failed Auditor execution. Actual errors in admission or the Auditor job still fail the workflow." >> "$GITHUB_STEP_SUMMARY"
 
@@ -39,7 +39,7 @@ jobs:
     needs: admission
     if: needs.admission.outputs.run == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 85
+    timeout-minutes: 15
     # Final checkpoint mutex; the runner also enforces an absolute 05:30 cutoff.
     concurrency:
       group: arabsniper-quote-data-writer
@@ -68,7 +68,7 @@ jobs:
         run: python src/nightly_auditor.py
       - name: Record verified daily Auditor completion
         if: steps.nightly.outputs.completed == 'true'
-        run: echo "Daily Auditor completion verified in the published checkpoint."
+        run: echo "Daily V7 forecasts, results and learning verified in the published checkpoint; historical recovery and V5.1 status remain separate."
       - name: Record the independent V7 checkpoint
         if: always() && steps.nightly.outputs.v7_completed == 'true'
         run: echo "V7 results, daily report and learning state verified in the published checkpoint." >> "$GITHUB_STEP_SUMMARY"
@@ -77,4 +77,4 @@ jobs:
         run: echo "V5.1 skipped within its bounded window. The V7 checkpoint was saved independently." >> "$GITHUB_STEP_SUMMARY"
       - name: Record saved partial progress
         if: steps.nightly.outputs.paused == 'true'
-        run: echo "Historical chunk saved. More dates remain; this is NOT full Auditor certification."
+        run: echo "Auditor paused at its work budget. Only previously published blocks are retained; no full daily completion is claimed."

@@ -1,5 +1,58 @@
 # Auditor notturno e Fast leggeri
 
+## Percorso ordinario V7 dal 20 novembre 2026
+
+`nightly_auditor.py` usa per impostazione predefinita `auditor_light.py`.
+Il processo ha un massimo di **12 minuti**, comprende anche le letture private
+ed è contenuto in un job Actions limitato a **15 minuti**, preparazione inclusa.
+Le singole elaborazioni si fermano 90 secondi prima della scadenza per lasciare
+spazio al salvataggio. Restano le finestre protette italiane e il mutex esistenti.
+Il calendario effettivo è quello di `run-auditor.yml`: 00:30 e 04:30 Europe/Rome.
+
+1. Ripristina soltanto la giornata precedente, i suoi journal se necessari e
+   gli archivi compatti utilizzati dalla calibrazione V7. Nessun ripristino
+   globale dello storico, consolidamento cumulativo o ricostruzione V5.1.
+2. Riusa risultati e ricevute già verificati. Per gli esiti mancanti legge prima
+   il feed risultati della Gold (`/api/live-scores`), che conserva la provenienza
+   API-Football e verifica ID, calcio d'inizio e timestamp. Una pagina o un
+   risultato privo di provenienza verificabile non diventa una certificazione.
+3. Interroga API-Football solo per gli ID ancora mancanti o contestati: massimo
+   **20 ID per giornata**, una richiesta batch, mantenendo le riserve API esistenti.
+   I parziali mancanti restano pending. Nessun nuovo recupero del 7–8 novembre.
+4. Verifica e salva rapporto, esiti, fotografia prepartita e apprendimento V7.
+   Se rimane tempo, recupera **una sola giornata arretrata già archiviata** nella
+   finestra risultati esistente di 35 giorni. Salva tale blocco autonomamente.
+5. Il cursore privato `arab_quote_auditor_light_progress.json` registra i giorni
+   verificati e l'ultimo ID interrogato. Gli ID indisponibili ruotano, le giornate
+   complete con impronte coerenti non sono ricalcolate. Gli arretrati recuperati
+   entrano nella successiva calibrazione V7; non viene applicato un secondo
+   aggiornamento dei pesi durante la stessa notte.
+
+Il marcatore `scope: v7_daily` significa completamento **giornaliero V7**, anche
+quando alcuni risultati restano esplicitamente pending. Non certifica la chiusura
+di tutti gli arretrati o della vecchia V5.1, il cui stato rimane separato e differito.
+Il backup riconosce il completamento giornaliero e non rilancia l'Auditor ogni
+20 minuti per attendere V5.1. Una lettura GitHub temporaneamente incompleta
+impedisce l'ammissione con `github_listing_unavailable`; errori strutturali
+continuano a fallire visibilmente.
+
+Le pubblicazioni private conservano tutte le altre voci del manifest, i journal,
+le fotografie e gli archivi precedenti. Nessuna pubblicazione dei feed Gold o
+dei dati storici, invio Telegram o nuova scansione è effettuato da questo percorso.
+Non sono introdotti servizi esterni a pagamento o scraping di siti di risultati.
+
+Verifica locale: test mirati su timeout, ripresa, provenienza Gold, limiti e
+rotazione ID, impronte, pubblicazione interrotta, archivio globale non scaricato,
+regressioni del percorso legacy e invarianti V7. La durata reale del primo ciclo
+ordinario va misurata dai log; il limite è una protezione, non una stima di durata.
+Rollback: revert del commit di questa modifica. `AUDITOR_MODE=legacy` conserva
+il vecchio percorso per diagnostica esplicita; il limite del job resta 15 minuti.
+
+## Riferimento del percorso legacy
+
+Le sezioni seguenti descrivono il precedente consolidamento globale e non il
+percorso ordinario V7 descritto sopra.
+
 Configurazione del 1 novembre 2026, fuso `Europe/Rome`.
 
 | Processo | Pianificazione | Protezioni |

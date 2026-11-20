@@ -52,7 +52,8 @@ class Priority(unittest.TestCase):
         for error in (subprocess.CalledProcessError(1, 'V5.1 incomplete 2026-11-08'),
                       TimeoutError('V5.1 timed out')):
             with self.subTest(error=error), tempfile.TemporaryDirectory() as folder, patch.dict(
-                    os.environ, {'GOLD_PRIVATE':'true', 'GITHUB_OUTPUT':str(Path(folder)/'outputs')}):
+                    os.environ, {'GOLD_PRIVATE':'true', 'AUDITOR_MODE':'legacy',
+                                 'GITHUB_OUTPUT':str(Path(folder)/'outputs')}):
                 root=Path(folder); calls=[]
                 write_store(root/PROGRESS,{'version':1,'work_date':'2026-11-05','stage':'daily'})
                 write_store(root/'auditarchive/prematch_2026-11-04_daily.json',{'audit_date':'2026-11-04'})
