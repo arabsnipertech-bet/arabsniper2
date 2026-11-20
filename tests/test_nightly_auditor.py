@@ -25,6 +25,9 @@ def daily_report(root, day='2026-10-30'):
 class NightlySchedule(unittest.TestCase):
     def setUp(self):
         # Priority is integration-tested separately; isolate legacy history sequencing.
+        mode = patch.dict(os.environ, {'AUDITOR_MODE': 'legacy'})
+        mode.start()
+        self.addCleanup(mode.stop)
         priority = patch('nightly_auditor.ensure_priority')
         priority.start()
         self.addCleanup(priority.stop)

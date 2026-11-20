@@ -51,7 +51,7 @@ def saved_batch(root, today):
     return day, checkpoint['stage']
 
 
-def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, recovery_date=None):
+def run_legacy(root, clock=lambda: datetime.now(ROME), command_runner=run_command, recovery_date=None):
     root = Path(root)
     started = clock()
     gate = recovery_admission(started, recovery_date) if recovery_date else admission(started)
@@ -180,6 +180,34 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
             atomic_bytes(root / MARKER, json.dumps(marker, separators=(',', ':')).encode()+b'\n')
         phase('src/gold_storage.py', 'checkpoint')
         print(f'Nightly Auditor batch completed and published: {work_date}', flush=True)
+    return 'complete'
+
+
+def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, recovery_date=None):
+    if os.getenv('AUDITOR_MODE') == 'legacy':
+        return run_legacy(root, clock, command_runner, recovery_date)
+    from auditor_light import WORK_BUDGET
+    started = clock()
+    gate = recovery_admission(started, recovery_date) if recovery_date else admission(started)
+    if not gate['run']:
+        return gate['reason']
+    if os.getenv('GOLD_PRIVATE') != 'true':
+        raise ValueError('Nightly Auditor requires the authoritative private checkpoint')
+    deadline = min(datetime.fromisoformat(gate['deadline']), started+WORK_BUDGET)
+    previous = os.environ.get('AUDITOR_LIGHT_DEADLINE')
+    os.environ['AUDITOR_LIGHT_DEADLINE'] = deadline.isoformat()
+    try:
+        command_runner(Path(root), [sys.executable, 'src/auditor_light.py'], deadline, clock)
+    except TimeoutError:
+        print('Lightweight Auditor budget reached; only published blocks are retained', flush=True)
+        return 'paused'
+    finally:
+        if previous is None:
+            os.environ.pop('AUDITOR_LIGHT_DEADLINE', None)
+        else:
+            os.environ['AUDITOR_LIGHT_DEADLINE'] = previous
+    if not already_completed(root, clock()):
+        raise ValueError('Lightweight Auditor did not publish its daily completion')
     return 'complete'
 
 
