@@ -45,6 +45,44 @@ def outcome_fair(row):
     return None
 
 
+def goal_structure(rates):
+    """Describe the existing calibrated intensities; never add a model vote."""
+    names = ('home_ht', 'away_ht', 'home_st', 'away_st')
+    if not all(finite(rates.get(k)) and rates[k] >= 0 for k in names):
+        return None
+    home, away = rates['home_ht'], rates['away_ht']
+    first, second = home+away, rates['home_st']+rates['away_st']
+    total = first+second
+    return dict(lambda_pt=first, lambda_st=second, lambda_ft=total,
+                pt_share=first/total if total else None,
+                # Normalized factors avoid an arbitrary epsilon and underflow
+                # at tiny nonzero intensities. Zero volume has no symmetry.
+                pt_symmetry=min(1., max(0., 4*(home/first)*(away/first))) if first else None)
+
+
+def pricing_evidence(row, estimate, raw_estimate, statistical_estimate, usable):
+    """Trace alternative estimates on one real price; never change admission.
+
+    EV always uses settlement weights, including pushes and partial payouts.
+    The plain probability break-even is meaningful only for binary contracts.
+    The related statistical/Poisson estimates are not independent confirmations.
+    """
+    odd = row.get('odd')
+    if not usable or not finite(odd) or odd <= 1:
+        return None
+    fair_p, margin = outcome_fair(row), row.get('selected_margin_pct')
+    win, loss = estimate['win_weight'], estimate['loss_weight']
+    settled = win+loss
+    binary = all(estimate.get(k, 0.) == 0 for k in
+                 ('push_probability', 'half_win_probability', 'half_loss_probability'))
+    return dict(basis='binary' if binary else 'settlement_weights',
+                break_even_probability=1/odd if binary else None,
+                edge_fair_pp=100*(win/settled-fair_p) if fair_p is not None and settled else None,
+                fair_identity_error_pp=100*(fair_p-1/odd/(1+margin/100)) if fair_p is not None else None,
+                raw_ev=raw_estimate['win_weight']*(odd-1)-raw_estimate['loss_weight'],
+                statistical_ev=statistical_estimate['win_weight']*(odd-1)-statistical_estimate['loss_weight'])
+
+
 def poisson_over(volume, line):
     term = exp(-volume)
     under = term

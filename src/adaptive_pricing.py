@@ -56,10 +56,19 @@ def set_probability(row, p):
 def reprice(row):
     from quote_cache import recalculate
     from matrix_quotes import value_profile
+    from v7_probability import VERSION as V7_VERSION, outcome_fair
     if row.get('quote_status') not in ('recent', 'cached_stable') or not recalculate(row):
         return
     fair = row.get('market_fair_pct')
     settled = row['win_weight']+row['loss_weight']
+    if row.get('probability_model') == V7_VERSION:
+        selected = outcome_fair(row)
+        # The consensus fair remains available as market_fair_pct. An edge on
+        # the selected executable price must use that operator's own partition.
+        fair = 100*selected if selected is not None else None
+        row['edge_fair_basis'] = 'selected_bookmaker'
+    else:
+        row.pop('edge_fair_basis', None)
     row['edge_pp'] = 100*row['win_weight']/settled-fair if number(fair) and settled else None
     oci = row.get('oci')
     strong = number(oci) and abs(oci) >= 40 and row.get('movement_confirmed') and row.get('fair_direction_coherent')
