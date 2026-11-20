@@ -173,10 +173,52 @@ def recheck_policies(assessment, meta, as_of, rates):
     annotate_platinum(matrix, meta, as_of, probability_model=VERSION, quote_filter=quote_filter)
 
 
-def publish_prices(assessment, meta, as_of, model, projection, weight, means):
+def scenario_means(assessment, scenario, index, as_of):
+    """Rebuild ST observations from the same history as a verified rate probe."""
+    from statistics_first import frozen_goal_observations
+
+    sources = assessment.get('sensitivity_sources') or []
+    histories = (assessment.get('inputs') or {}).get('histories') or {}
+    if (not isinstance(sources, list) or index >= len(sources) or not all(isinstance(histories.get(s), list)
+                                       for s in ('home', 'away'))):
+        return None
+    source = sources[index]
+    if (not isinstance(source, dict) or source.get('rates') != scenario
+            or 'omitted' not in source):
+        return None
+    omitted = source['omitted']
+    if omitted is not None:
+        if not isinstance(omitted, dict) or omitted.get('side') not in ('home', 'away'):
+            return None
+        side, fid = omitted['side'], omitted.get('fixture_id')
+        rows = histories[side]
+        if fid is None or sum(str(r.get('fixture_id')) == str(fid) for r in rows) != 1:
+            return None
+        histories = {**histories, side: [r for r in rows if str(r.get('fixture_id')) != str(fid)]}
+    return frozen_goal_observations(histories, {}, as_of)[0]['teams']
+
+
+def publish_prices(assessment, meta, as_of, model, projection, weight, means, *,
+                   fair_totals=None, fair_result=None):
     scenarios = assessment.get('pure_poisson_sensitivity_rates', assessment.get('sensitivity_rates', []))
-    models = [model, *(score_model(blend_rates(statistical_rates(rates, means), projection, weight))
-                       for scenario in scenarios or [] if (rates := raw_rates({'rates': scenario})) is not None)]
+    models, verified = [model], 0
+    for index, scenario in enumerate(scenarios or []):
+        rates = raw_rates({'rates': scenario})
+        if rates is None:
+            continue
+        trial_means = scenario_means(assessment, scenario, index, as_of)
+        complete = trial_means is not None and fair_totals is not None
+        trial_stats = statistical_rates(rates, trial_means if complete else means)
+        # Prices and the calibrated weight stay fixed. Refit the same model:
+        # its period shares also depend on the omitted statistical observation.
+        trial_projection = market_rates(trial_stats, fair_totals, fair_result) if complete else projection
+        models.append(score_model(blend_rates(trial_stats, trial_projection, weight)))
+        verified += complete
+    assessment['matrix']['v7_sensitivity'] = dict(
+        method='leave_one_history_out_full_estimator_v1',
+        scenarios=len(models)-1, verified_contexts=verified,
+        complete=bool(verified and verified == len(models)-1),
+        legacy_fallback_contexts=len(models)-1-verified)
     supported = all(quality(assessment, period) == 'supported' for period in ('ft', 'ht'))
     for row in assessment['matrix']['rows']:
         if not row.get('spec'):
@@ -664,7 +706,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     raw_model, stat_model, fixed_model = (score_model(r) for r in (raw, stats, corrected))
     learned_model = fixed_model if calibrated == corrected else score_model(calibrated)
     baseline = {r['id']: (r.get('v51_pricing') or r).get('statistical_pct') for r in original_rows}
-    publish_prices(assessment, meta, as_of, learned_model, projected, weight, means)
+    publish_prices(assessment, meta, as_of, learned_model, projected, weight, means,
+                   fair_totals=totals, fair_result=fair_result)
     records = {}
     sources = {r['id']: r for r in original_rows}
     profiles = assessment.get('profiles') or {}
@@ -749,6 +792,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
                    captured_at=utc(at), kickoff=utc(kickoff), statistics_at=utc(statistics_at),
                    statistics=stats, raw_rates=raw, market_projection=projected, rates=calibrated,
                    goal_structure=goal_structure(calibrated),
+                   sensitivity=dict(matrix['v7_sensitivity']),
                    weight=weight if projected else 0., calibration=calibration or 'baseline',
                    fair_inputs=dict(totals={p: {str(k): v for k, v in lines.items()} for p, lines in totals.items()},
                                     result=fair_result),
