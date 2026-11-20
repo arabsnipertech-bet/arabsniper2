@@ -1,6 +1,6 @@
 """V7 prematch probabilities. All prices enter once, at the score-distribution level."""
 from datetime import timezone
-from math import exp, isfinite, sqrt
+from math import exp, isclose, isfinite, log, sqrt
 
 from lateral_matrix import ScoreModel, poisson
 from multimarket_model import fair, stamp
@@ -57,10 +57,92 @@ def goal_structure(rates):
                 pt_share=first/total if total else None,
                 # Normalized factors avoid an arbitrary epsilon and underflow
                 # at tiny nonzero intensities. Zero volume has no symmetry.
-                pt_symmetry=min(1., max(0., 4*(home/first)*(away/first))) if first else None)
+                pt_symmetry=min(1., max(0., 4*(home/first)*(away/first))) if first else None,
+                periods={period: dict(lambda_home=h, lambda_away=a, lambda_total=h+a,
+                                      weaker_side_lambda=min(h, a),
+                                      symmetry=min(1., max(0., 4*(h/(h+a))*(a/(h+a)))) if h+a else None)
+                         for period, h, a in (('pt', home, away),
+                                             ('st', rates['home_st'], rates['away_st']),
+                                             ('ft', home+rates['home_st'], away+rates['away_st']))})
 
 
-def pricing_evidence(row, estimate, raw_estimate, statistical_estimate, usable):
+def value_relation(row, estimate):
+    """Explain a binary price, without fitting weights or altering admission.
+
+    Fair is proportional devig at one operator, not a certified true probability.
+    A positive gap to fair can still fall short of covering that operator's margin.
+    Refund/Asian settlements retain their existing payout-weight EV calculation.
+    """
+    if any(estimate.get(k, 0.) != 0 for k in
+           ('push_probability', 'half_win_probability', 'half_loss_probability')):
+        return dict(status='settlement_weights_only')
+    odd, margin, fair_p = row.get('odd'), row.get('selected_margin_pct'), outcome_fair(row)
+    p, loss = estimate.get('win_weight'), estimate.get('loss_weight')
+    if fair_p is None or row.get('bookmaker_id') is None:
+        return dict(status='same_book_fair_unavailable')
+    if (not all(finite(v) for v in (odd, p, loss)) or odd <= 1 or not 0 <= p <= 1
+            or not isclose(p+loss, 1., rel_tol=0, abs_tol=1e-10)
+            or not isclose(fair_p, 1/odd/(1+margin/100), rel_tol=1e-9, abs_tol=1e-12)):
+        return dict(status='inconsistent_price_reference')
+    ev = p*(odd-1)-loss
+    advantage = p/fair_p-1
+    return dict(status='verified', basis='same_book_proportional_devig',
+                bookmaker_id=row.get('bookmaker_id'), fair_probability=fair_p,
+                break_even_probability=1/odd, model_probability=p,
+                edge_fair_pp=100*(p-fair_p), relative_advantage_pct=100*advantage,
+                margin_pct=margin, ev_pct=100*ev,
+                fair_advantage_below_margin=bool(p > fair_p and ev < 0),
+                identity_error_pp=100*(ev-(advantage-margin/100)/(1+margin/100)))
+
+
+def movement_relation(row, as_of):
+    """Decompose one comparable window, never a post-reversal leg or mixed book.
+
+    References are preserved from already computed complete-partition movements.
+    Missing/legacy evidence stays explicitly unavailable, without reconstruction
+    from a median margin, a different operator, OCI or the current opening quote.
+    """
+    if row.get('prematch_stable') or row.get('quote_status') == 'cached_stable':
+        return dict(status='stable_quote_no_live_flow')
+    move = row.get('selected_movement') or {}
+    ref = move.get('price_reference') or {}
+    if not ref:
+        return dict(status='comparable_reference_unavailable')
+    if (ref.get('basis') != 'same_book_complete_partition' or row.get('bookmaker_id') is None
+            or str(ref.get('bookmaker_id')) != str(row['bookmaker_id'])):
+        return dict(status='inconsistent_bookmaker')
+    start, end, seen, now = (stamp(v) for v in (move.get('observed_from'), move.get('observed_to'),
+                                              row.get('quote_observed_at'), as_of))
+    if not all((start, end, seen, now)) or not start < end <= seen <= now:
+        return dict(status='inconsistent_observation_window')
+    fields = ('odd_from', 'odd_to', 'fair_from', 'fair_to', 'margin_from_pct', 'margin_to_pct')
+    if not all(finite(ref.get(k)) for k in fields):
+        return dict(status='incomplete_price_reference')
+    q0, q1, f0, f1, m0, m1 = (ref[k] for k in fields)
+    if not (q0 > 1 and q1 > 1 and 0 < f0 < 1 and 0 < f1 < 1 and 0 <= m0 <= 30 and 0 <= m1 <= 30):
+        return dict(status='inconsistent_price_reference')
+    # The saved window can end earlier than a repeated observation, but its
+    # complete current price reference must still match the selected quotation.
+    current = row.get('odd'), outcome_fair(row), row.get('selected_margin_pct')
+    if (not all(finite(v) for v in current)
+            or not all(isclose(a, b, rel_tol=1e-9, abs_tol=1e-12)
+                       for a, b in zip((q1, f1, m1), current))
+            or not all(isclose(f, 1/q/(1+m/100), rel_tol=1e-9, abs_tol=1e-12)
+                       for q, f, m in ((q0, f0, m0), (q1, f1, m1)))):
+        return dict(status='inconsistent_price_reference')
+    implied, fair_move, margin_move = log(q0/q1), log(f1/f0), log((1+m1/100)/(1+m0/100))
+    price_moves = not isclose(implied, 0., rel_tol=0, abs_tol=1e-12)
+    return dict(status='verified', basis='same_book_proportional_devig',
+                bookmaker_id=row['bookmaker_id'], observed_from=utc(start), observed_to=utc(end),
+                net_delta_pct=100*(q1/q0-1), fair_delta_pp=100*(f1-f0), margin_delta_pp=m1-m0,
+                implied_log_move=implied, fair_log_move=fair_move, margin_log_move=margin_move,
+                margin_share_of_log_move=margin_move/implied if price_moves else None,
+                fair_rises=bool(f1 > f0 and not isclose(f1, f0, rel_tol=0, abs_tol=1e-12)),
+                identity_error=implied-fair_move-margin_move)
+
+
+def pricing_evidence(row, estimate, raw_estimate, statistical_estimate, usable, *, as_of=None,
+                     include_relations=True):
     """Trace alternative estimates on one real price; never change admission.
 
     EV always uses settlement weights, including pushes and partial payouts.
@@ -75,12 +157,17 @@ def pricing_evidence(row, estimate, raw_estimate, statistical_estimate, usable):
     settled = win+loss
     binary = all(estimate.get(k, 0.) == 0 for k in
                  ('push_probability', 'half_win_probability', 'half_loss_probability'))
-    return dict(basis='binary' if binary else 'settlement_weights',
+    evidence = dict(basis='binary' if binary else 'settlement_weights',
                 break_even_probability=1/odd if binary else None,
                 edge_fair_pp=100*(win/settled-fair_p) if fair_p is not None and settled else None,
                 fair_identity_error_pp=100*(fair_p-1/odd/(1+margin/100)) if fair_p is not None else None,
                 raw_ev=raw_estimate['win_weight']*(odd-1)-raw_estimate['loss_weight'],
                 statistical_ev=statistical_estimate['win_weight']*(odd-1)-statistical_estimate['loss_weight'])
+    if include_relations:
+        evidence.update(relations_version='V7_MARKET_RELATION_V1', statistical_votes_independent=False,
+                        value_relation=value_relation(row, estimate),
+                        movement_relation=movement_relation(row, as_of) if binary else dict(status='settlement_weights_only'))
+    return evidence
 
 
 def poisson_over(volume, line):

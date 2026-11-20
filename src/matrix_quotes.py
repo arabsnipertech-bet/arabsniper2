@@ -523,7 +523,16 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
                selected_movement={
                    'delta_pct': selected['delta_pct'], 'fair_delta_pp': selected['leg_fair_delta_pp'],
                    'persistence': selected['persistence'], 'reversal': selected['reversal'],
-                   'observed_from': selected['observed_from'], 'observed_to': selected['observed_to']
+                   'observed_from': selected['observed_from'], 'observed_to': selected['observed_to'],
+                   # Retain an already computed, same-book complete-partition
+                   # window. delta_pct above remains the post-reversal leg.
+                   'price_reference': dict(basis='same_book_complete_partition',
+                       bookmaker_id=selected['bookmaker_id'],
+                       odd_from=selected['initial'], odd_to=selected['current'],
+                       fair_from=selected['fair_initial_pct']/100,
+                       fair_to=selected['fair_current_pct']/100,
+                       margin_from_pct=selected['margin_initial_pct'],
+                       margin_to_pct=selected['margin_current_pct'])
                } if selected else None)
     if operators:
         row.update(movement_hours=median(o['hours'] for o in operators),
