@@ -319,6 +319,17 @@ def market_origin(spec, rates, record, *, conversion=False):
     prob = origin_number(100*record['calibrated'], 1)
     fair_odd = origin_number(record['model_fair_odd'])
     comparison = f'Prob. V7 {prob}% → Quota equa {fair_odd}.'
+    evidence = record.get('pricing_evidence') or {}
+    value, movement = evidence.get('value_relation') or {}, evidence.get('movement_relation') or {}
+    if value.get('status') == 'verified':
+        comparison += (f" Fair stesso operatore {origin_number(100*value['fair_probability'], 1)}%"
+                       f" · Pareggio economico {origin_number(100*value['break_even_probability'], 1)}%.")
+        if value['fair_advantage_below_margin']:
+            comparison += ' Il vantaggio sul fair non copre interamente l’aggio; EV originale negativo.'
+    if movement.get('status') == 'verified':
+        comparison += (f" Finestra stesso operatore: quota {origin_number(movement['net_delta_pct'], 1, True)}%"
+                       f" · fair {origin_number(movement['fair_delta_pp'], 1, True)} pp"
+                       f" · aggio {origin_number(movement['margin_delta_pp'], 1, True)} pp.")
     niche = record['niche_id']
     if niche == 'fav_home_pt_vulnerable':
         badge = NICHE_LABELS[niche]
@@ -708,7 +719,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     baseline = {r['id']: (r.get('v51_pricing') or r).get('statistical_pct') for r in original_rows}
     publish_prices(assessment, meta, as_of, learned_model, projected, weight, means,
                    fair_totals=totals, fair_result=fair_result)
-    records = {}
+    records, pricing_context = {}, {}
     sources = {r['id']: r for r in original_rows}
     profiles = assessment.get('profiles') or {}
     limited_national_history = national_competition(meta.get('league')) and all(
@@ -722,6 +733,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
         odd = row.get('odd') if usable else None
         estimate = learned_model.estimate(spec)
         raw_estimate, statistical_estimate = raw_model.estimate(spec), stat_model.estimate(spec)
+        pricing_context[key] = row, estimate, raw_estimate, statistical_estimate, usable
         ev = estimate['win_weight']*(odd-1)-estimate['loss_weight'] if odd else None
         ev_low = source.get('ev_low_pct')
         supported = source.get('v7_supported') is True
@@ -750,7 +762,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
                             study_supported=bool(supported or limited_national_history), quote_state=quote_state,
                             ev_low=ev_low/100 if usable and finite(ev_low) else None,
                             model_fair_odd=estimate['fair_odd'], quote=quote, features=evidence,
-                            pricing_evidence=pricing_evidence(row, estimate, raw_estimate, statistical_estimate, usable),
+                            pricing_evidence=pricing_evidence(row, estimate, raw_estimate, statistical_estimate, usable,
+                                                              include_relations=False),
                             edge_exclusions=exclusions, policy_exclusions=(source.get('opportunity') or {}).get('reasons') or [],
                             platinum_exclusions=(source.get('platinum') or {}).get('reasons') or [])
     niches, observed_patterns = niche_evidence(records, assessment, calibrated, stats, totals, weight,
@@ -785,6 +798,17 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     for pick in triad.values():
         if pick and pick.get('ev_recovery'):
             records[pick['market_id']].update(tier='BLU', ev_recovery=dict(pick['ev_recovery']))
+    # Add explanations only after selection, with the estimates already computed.
+    # This bounds payload growth and cannot influence admission, ranking or weights.
+    for pick in triad.values():
+        if not pick:
+            continue
+        key = pick['market_id']
+        record, source = records[key], sources[records[key]['source_market_id']]
+        record['pricing_evidence'] = pricing_evidence(*pricing_context[key], as_of=as_of)
+        record.update(market_origin(source['spec'], calibrated, record,
+                                    conversion=observed_patterns['conversion']))
+        pick.update({field: record[field] for field in ('origin_badge', 'origin_tooltip')})
     first = next((pick for pick in triad.values() if pick), None)
     tier = max((pick['tier'] for pick in triad.values() if pick), key=TIER_RANK.__getitem__,
                default='BLU' if niches or any(row['tier'] for row in records.values()) else None)
