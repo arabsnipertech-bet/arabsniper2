@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import hashlib, json, os, re, sys
 from tempfile import TemporaryDirectory
 from time import sleep
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed, wait, FIRST_COMPLETED
 from audit_storage import read_store, atomic_bytes, FORMAT, validate_store
 from quote_history import OPENING_SNAPSHOT
 PUBLIC = {'data/arab_quote_homepage.json','data/arab_quote_results_public.json'}
@@ -268,14 +268,15 @@ def write_manifest(s3, bucket, index):
     # Pointer last: a failed upload leaves the previous checkpoint recoverable.
     s3.put_object(Bucket=bucket, Key='state/current.json', Body=manifest, ContentType='application/json')
 
-def restore_subset(storage, bucket, root, index, paths):
+def restore_subset(storage, bucket, root, index, paths, *, fast_restore=False):
     """Download only named pointers and their verified content-addressed chunks."""
-    def download(path):
+    def download(path, raw=None):
         info = index[path]
         digest = info['sha256']
         if not allowed(path) or not re.fullmatch('[0-9a-f]{64}', digest):
             raise ValueError('Invalid private object reference')
-        raw = read_checkpoint_object(storage, bucket, 'state/objects/'+digest)
+        if raw is None:
+            raw = read_checkpoint_object(storage, bucket, 'state/objects/'+digest)
         if len(raw) != info['bytes'] or sha(raw) != digest:
             raise ValueError('Private object checksum mismatch')
         target = root / path
@@ -291,6 +292,63 @@ def restore_subset(storage, bucket, root, index, paths):
                     parts.append(str(Path(path).parent/'_audit_parts'/(name+'.json.gz')))
                 return parts
         return []
+
+    if fast_restore:
+        def batch(paths, phase):
+            # One immutable object can be referenced by several local paths,
+            # including identical chunks in different historical directories.
+            groups, sizes = {}, {}
+            for path in sorted(set(paths)):
+                info = index[path]
+                digest = info['sha256']
+                if not allowed(path) or not re.fullmatch('[0-9a-f]{64}', digest):
+                    raise ValueError('Invalid private object reference')
+                if digest in sizes and sizes[digest] != info['bytes']:
+                    raise ValueError('Conflicting private object sizes')
+                sizes[digest] = info['bytes']
+                groups.setdefault(digest, []).append(path)
+            print(f'Fast restore {phase}: {sum(map(len, groups.values()))} paths; '
+                  f'{len(groups)} unique objects', flush=True)
+
+            def grouped(item):
+                digest, aliases = item
+                try:
+                    raw = read_checkpoint_object(storage, bucket, 'state/objects/'+digest)
+                    return [part for path in aliases for part in download(path, raw)]
+                except Exception as error:
+                    # Safe path/type only: never SDK messages, headers or keys.
+                    print(f'Fast restore object failed: {aliases[0]} ({type(error).__name__})', flush=True)
+                    raise
+
+            parts = set()
+            with ThreadPoolExecutor(max_workers=8) as pool:
+                remaining = iter(groups.items())
+                tasks = {pool.submit(grouped, item) for _, item in zip(range(8), remaining)}
+                count = 0
+                try:
+                    while tasks:
+                        done, tasks = wait(tasks, return_when=FIRST_COMPLETED)
+                        # Inspect every finished read before queueing another
+                        # batch. At most eight object reads can be outstanding.
+                        for task in done:
+                            parts.update(task.result())
+                        count += len(done)
+                        if count//25 != (count-len(done))//25 or count == len(groups):
+                            print(f'Fast restore {phase}: verified {count}/{len(groups)} objects', flush=True)
+                        for _, item in zip(done, remaining):
+                            tasks.add(pool.submit(grouped, item))
+                except BaseException:
+                    # Do not drain hundreds of queued reads after one required
+                    # object failed. Join running reads before staging cleanup.
+                    for task in tasks:
+                        task.cancel()
+                    pool.shutdown(cancel_futures=True)
+                    raise
+            return parts
+
+        chunks = batch(paths, 'pointers')
+        batch(chunks, 'chunks')
+        return
 
     with ThreadPoolExecutor(max_workers=8) as pool:
         chunks = {part for parts in pool.map(download, sorted(set(paths))) for part in parts}
@@ -342,6 +400,7 @@ def restore_fast(storage, bucket, root):
     from audit_journal import DATED_PREFIX, PREFIX
     from fnmatch import fnmatchcase
 
+    print('Reading authoritative Fast checkpoint manifest', flush=True)
     index = previous_manifest(storage, bucket)
     root = Path(root)
     paths = {path for path in index if (
@@ -354,7 +413,7 @@ def restore_fast(storage, bucket, root):
         raise ValueError('Private Fast checkpoint is missing Gold feeds')
     with TemporaryDirectory(prefix='.gold-fast-', dir=root) as directory:
         staging = Path(directory)
-        restore_subset(storage, bucket, staging, index, paths)
+        restore_subset(storage, bucket, staging, index, paths, fast_restore=True)
         for path in staging.rglob('*'):
             if path.is_file():
                 target = root/path.relative_to(staging)
@@ -433,14 +492,16 @@ def restore(s3,bucket,root,manifest_sha=None):
                 atomic_bytes(root / path, source.read_bytes())
     print(f'Private checkpoint restored: {len(pending)} files', flush=True)
 
-def client():
+def client(*, fast_restore=False):
     import boto3
     from botocore.config import Config
     account=os.environ.get('R2_ACCOUNT_ID','')
     if not re.fullmatch('[a-f0-9]{32}',account):raise ValueError('R2_ACCOUNT_ID missing/invalid')
     for key in ('R2_ACCESS_KEY_ID','R2_SECRET_ACCESS_KEY','R2_BUCKET'):
         if not os.environ.get(key):raise ValueError(key+' missing')
-    return boto3.client('s3',endpoint_url=f'https://{account}.r2.cloudflarestorage.com',region_name='auto',aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],config=Config(retries={'max_attempts':3},connect_timeout=15,read_timeout=60))
+    config = (Config(retries={'total_max_attempts':2}, connect_timeout=5, read_timeout=20) if fast_restore
+              else Config(retries={'max_attempts':3}, connect_timeout=15, read_timeout=60))
+    return boto3.client('s3',endpoint_url=f'https://{account}.r2.cloudflarestorage.com',region_name='auto',aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],config=config)
 
 if __name__=='__main__':
     import argparse
@@ -456,7 +517,7 @@ if __name__=='__main__':
         parser.error('--date is required for dated priority operations')
     if args.manifest_sha and args.command!='restore':parser.error('--manifest-sha applies only to restore')
     try:
-        storage,bucket,root=client(),os.environ['R2_BUCKET'],Path(__file__).resolve().parents[1]
+        storage,bucket,root=client(fast_restore=args.command=='restore-fast'),os.environ['R2_BUCKET'],Path(__file__).resolve().parents[1]
         if args.command=='checkpoint':publish(storage,bucket,root,checkpoint_only=True)
         elif args.command=='publish-fast':publish(storage,bucket,root,selected_paths=FAST_DATA)
         elif args.command=='restore-fast':restore_fast(storage,bucket,root)
