@@ -99,7 +99,7 @@ def cycle(storage, bucket, root, started, deadline, command_runner, clock):
     def phase(*args, end=None):
         options = list(args)
         if options[0] == 'src/auditor_daily_priority.py':
-            options.extend(['--max-result-ids', str(RESULT_IDS)])
+            options.extend(['--checkpoint-freeze', '--max-result-ids', str(RESULT_IDS)])
         command_runner(root, [sys.executable, *options], min(end or deadline, deadline-SAVE_RESERVE), clock)
 
     def save_progress():

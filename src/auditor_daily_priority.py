@@ -1,6 +1,7 @@
 """Build yesterday from immutable dated evidence and still-pending scan journals."""
 from datetime import datetime, timedelta
 from pathlib import Path
+import re
 import sys
 
 from audit_storage import read_store, write_store
@@ -60,7 +61,18 @@ def ensure_priority(root, today, phase):
     print(f'V7 results, report and learning checkpoint verified: {day}', flush=True)
 
 
-def build_yesterday(root, day, now, fetcher=None, *, max_result_ids=None):
+def save_frozen_checkpoint(root, day):
+    """Save prematch work only; this is not a results or learning certificate."""
+    import os
+    from gold_storage import client, publish
+    if os.getenv('GOLD_PRIVATE') != 'true':
+        raise ValueError('Priority freeze checkpoint requires private production storage')
+    publish(client(), os.environ['R2_BUCKET'], root, checkpoint_only=True,
+            selected_paths=[f'auditordata/prematch_{day}.json'])
+    print(f'V7: frozen observations checkpointed; results still require verification: {day}', flush=True)
+
+
+def build_yesterday(root, day, now, fetcher=None, *, max_result_ids=None, checkpoint_frozen=None):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'auditor'))
     from current_audit import forecast_day, settle_day, fetch_results, TZ
     from audit_journal import ForecastHistory, LEGACY_PRIORITY_DAYS, journals_for_day, pending_journals, merge_forecast
@@ -71,17 +83,30 @@ def build_yesterday(root, day, now, fetcher=None, *, max_result_ids=None):
     path = root/f'auditordata/prematch_{day}.json'
     journals = list(journals_for_day(pending_journals(root), day, legacy_days=LEGACY_PRIORITY_DAYS))
     print(f'V7: {day}: {len(journals)} journal files selected', flush=True)
-    # Match the ordinary ingestion order: forecasts first, then policies.
-    forecasts = [p for p in journals if p.name.endswith('_forecasts.json')]
-    policies = [p for p in journals if p.name.endswith('_policies.json')]
-    if len(forecasts)+len(policies) != len(journals):
-        raise ValueError('Unknown priority journal phase')
+    checksums = {p.relative_to(root).as_posix(): signature(p) for p in journals}
     with AuditLedger(path) as ledger:
         if path.exists() and ledger.metadata.get('audit_date') != str(day):
             raise ValueError('Priority archive date mismatch')
         ledger.metadata.update(schema_version=1, audit_date=str(day))
         ledger.add_collection('fixtures')
-        history = ForecastHistory(ledger)
+        saved = ledger.metadata.get('priority_journals', {'version': 1, 'sha256': {}})
+        if (not isinstance(saved, dict) or saved.get('version') != 1
+                or not isinstance(saved.get('sha256'), dict)
+                or any(not isinstance(key, str) or not isinstance(value, str)
+                       or not re.fullmatch('[0-9a-f]{64}', value)
+                       for key, value in saved['sha256'].items())):
+            raise ValueError('Invalid priority journal checkpoint')
+        processed = saved['sha256']
+        if any(key in processed and processed[key] != digest for key, digest in checksums.items()):
+            raise ValueError('Previously frozen priority journal changed')
+        pending = [p for p in journals if p.relative_to(root).as_posix() not in processed]
+        print(f'V7: journal replay: {len(pending)} new; {len(journals)-len(pending)} already frozen', flush=True)
+        # Match the ordinary ingestion order: forecasts first, then policies.
+        forecasts = [p for p in pending if p.name.endswith('_forecasts.json')]
+        policies = [p for p in pending if p.name.endswith('_policies.json')]
+        if len(forecasts)+len(policies) != len(pending):
+            raise ValueError('Unknown priority journal phase')
+        history = ForecastHistory(ledger) if pending else None
         for source in forecasts:
             kind = None
             for col, key, record in entries(source, fixture_date=str(day)):
@@ -103,8 +128,15 @@ def build_yesterday(root, day, now, fetcher=None, *, max_result_ids=None):
                         merge_forecast(ledger, col, key, record, history=history)
             if metadata != {'schema_version':1,'journal_type':'policies'}:
                 raise ValueError('Invalid policy journal')
-        print(f'V7: writing frozen observations for {day}', flush=True)
-        ledger.write(path)
+        if not path.exists() or pending:
+            if any(signature(root/key) != digest for key, digest in checksums.items()):
+                raise ValueError('Priority journal changed during replay')
+            if checksums or processed:
+                ledger.metadata['priority_journals'] = {'version': 1, 'sha256': {**processed, **checksums}}
+            print(f'V7: writing frozen observations for {day}', flush=True)
+            ledger.write(path)
+        if checkpoint_frozen is not None:
+            checkpoint_frozen(root, day)
         return settle_day(root, day, now, fetcher=fetcher or fetch_results, legacy_evidence=False,
                           ledger=ledger, max_result_ids=max_result_ids,
                           progress=lambda message: print('V7: '+message, flush=True))
@@ -116,8 +148,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--date', type=lambda value: datetime.fromisoformat(value).date(), required=True)
     parser.add_argument('--max-result-ids', type=int)
+    parser.add_argument('--checkpoint-freeze', action='store_true')
     args = parser.parse_args()
     now = datetime.now(ROME)
     if not admission(now)['run']:
         parser.error('Priority audit requires the protected nighttime admission window')
-    build_yesterday(Path(__file__).resolve().parents[1], args.date, now, max_result_ids=args.max_result_ids)
+    build_yesterday(Path(__file__).resolve().parents[1], args.date, now, max_result_ids=args.max_result_ids,
+                    checkpoint_frozen=save_frozen_checkpoint if args.checkpoint_freeze else None)
