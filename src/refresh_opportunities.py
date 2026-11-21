@@ -16,6 +16,33 @@ from proposal_stability import seed_stability
 from copy import deepcopy
 
 
+def selection_coverage(day, as_of):
+    """Aggregate availability only: no private picks or future prices in logs."""
+    roles = ('most_probable', 'recommended_alternative', 'high_odds_shot')
+    counts, policies = Counter(), Counter()
+    now = stamp(as_of)
+    for match in day.get('matches', []):
+        meta = match.get('fixture') or {}
+        kickoff = stamp(meta.get('kickoff'))
+        if not kickoff or kickoff <= now or meta.get('status_short') not in ('NS', 'TBD') or meta.get('result'):
+            continue
+        snapshot = ((match.get('multimarket') or {}).get('matrix') or {}).get('v7') or {}
+        policies[(snapshot.get('triad_timing') or {}).get('id') or 'legacy'] += 1
+        counts['fixtures'] += 1
+        quoted = 0
+        for role in roles:
+            pick = (snapshot.get('triad') or {}).get(role)
+            if not pick:
+                counts[role+'_empty'] += 1
+            elif isinstance(pick.get('odd'), (int, float)) and pick['odd'] > 1 and pick.get('quote_state') != 'model_estimate':
+                counts[role+'_quoted'] += 1
+                quoted += 1
+            else:
+                counts[role+'_estimate'] += 1
+        counts['three_quoted'] += quoted == 3
+    return dict(counts= dict(counts), policies=dict(policies))
+
+
 def cached_refresh_safe(paths):
     """A price/UI-only push needs no new statistical collection.
 
@@ -25,7 +52,8 @@ def cached_refresh_safe(paths):
                    'src/homepage_preview.py', 'src/context_analysis.py', 'src/refresh_opportunities.py',
                    'src/statistics_integration.py', 'src/gold_policy_audit.py',
                    'src/market_scope.py', 'src/proposal_stability.py',
-                   'src/platinum_policy.py', 'src/platinum_audit.py', 'src/v7_decision.py'}
+                   'src/platinum_policy.py', 'src/platinum_audit.py', 'src/v7_decision.py',
+                   'src/v7_recent_selection.py'}
     # This migration changes the computed market universe, not the Poisson
     # kernel or source statistics; the dedicated tests require identical core probabilities.
     if 'src/market_scope.py' in paths: price_files.add('src/lateral_matrix.py')
@@ -141,7 +169,10 @@ def main(directory='data'):
     refreshed, counters = {}, {}
     for path in sorted(directory.glob('arab_quote_day[1-5].json')):
         day = read_store(path)
+        before_selection = selection_coverage(day, as_of)
         count = refresh_day(day, state, as_of)
+        print('Prematch selection availability '+str(day.get('date'))+': '+str(
+            dict(before=before_selection, after=selection_coverage(day, as_of))), flush=True)
         # Empty allowed schedules are valid. Publish the scope even when every
         # former fixture was excluded; otherwise stale minor leagues reappear.
         write_store(path, day)
