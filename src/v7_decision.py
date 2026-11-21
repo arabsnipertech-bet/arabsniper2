@@ -20,6 +20,7 @@ from platinum_policy import annotate as annotate_platinum
 from v7_probability import (BASE_WEIGHT, VERSION, blend_rates, fair_inputs, finite,
                             goal_structure, market_rates, outcome_fair, price_usable, pricing_evidence, raw_rates,
                             score_model, statistical_rates, utc)
+from v7_recent_selection import clock as selection_clock, routing_records, save as save_recent_selection
 
 GOAL = {
     name: market_id(specification('total', period, 'over', line))
@@ -786,7 +787,7 @@ def prior_triad_commitments(assessment, meta, as_of):
 
 
 def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, commitments=None,
-            triad_refresh=None):
+            triad_refresh=None, recent_selection=None):
     at, kickoff = stamp(as_of), stamp(meta.get('kickoff'))
     if (not at or not kickoff or at >= kickoff or meta.get('result') or
             meta.get('status_short') not in ('NS', 'TBD')):
@@ -884,19 +885,34 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     policy = TRIAD_QUALIFIED_REFRESH_V1 if triad_refresh is None else triad_refresh
     alternative_roles = policy.get('alternative_roles', ()) if policy.get('enabled') is True else ()
     national = bool(national_competition(meta.get('league')))
-    recoveries = ev_recovery_candidates(records, sources, as_of, meta['kickoff'], statistics_at, commitments)
+    # Provisional model comparisons (commitments=None) keep their existing
+    # semantics. Every real board publication passes a commitment dictionary.
+    timing = selection_clock(as_of, meta['kickoff'], commitments, recent_selection) if commitments is not None else None
+    previous_commitments = commitments
+    if timing and timing['reselect']:
+        commitments = {}  # Re-elect all roles from this scan, including healthy old slots.
+    candidates = routing_records(records, timing, commitments)
+    recoveries = ev_recovery_candidates(candidates, sources, as_of, meta['kickoff'], statistics_at, commitments)
     revised = (refresh_unqualified_slots(records, observed_patterns, commitments, at, kickoff,
                 national=national, ev_recoveries=recoveries, alternative_roles=alternative_roles)
-               if policy.get('enabled') is True and policy.get('repair_commitments') is True else commitments)
-    if revised is commitments:
+               if not timing and policy.get('enabled') is True and policy.get('repair_commitments') is True else commitments)
+    if not timing and revised is commitments:
         revised = revise_priced_slots(records, observed_patterns, commitments, at, kickoff, national=national)
     if revised is not commitments:
         commitments = revised
         recoveries = ev_recovery_candidates(records, sources, as_of, meta['kickoff'], statistics_at, commitments)
     locked = {role: slot['market_id'] for role, slot in (commitments or {}).items()}
-    triad, signals = route(records, observed_patterns, study=True,
+    triad, signals = route(candidates, observed_patterns, study=True,
                            allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True, locked=locked,
                            ev_recoveries=recoveries, qualified_alternatives=alternative_roles)
+    recent_commitments = save_recent_selection(triad, records, previous_commitments, timing) if timing else None
+    if timing:
+        for role, name in SIGNAL_ROLES.items():
+            pick = triad[role]
+            signals[name] = pick if pick and not pick.get('study_only') else None
+        for tier in ('GOLD', 'PLATINUM'):
+            signals[tier.lower()] = next((pick for pick in triad.values()
+                if pick and not pick.get('study_only') and pick['tier'] == tier), None)
     for pick in triad.values():
         if pick and pick.get('ev_recovery'):
             records[pick['market_id']].update(tier='BLU', ev_recovery=dict(pick['ev_recovery']))
@@ -930,7 +946,10 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
                    niches={name: sorted(keys) for name, keys in niches.items()})
     if commitments is not None:
         from decision_shadow import capture_v7
-        payload['triad_commitments'] = commit_priced_slots(triad, payload['captured_at'], commitments)
+        payload['triad_commitments'] = (recent_commitments if timing else
+                                      commit_priced_slots(triad, payload['captured_at'], commitments))
+        if timing:
+            payload['triad_timing'] = timing
         payload['decision_shadow'] = capture_v7(records, sources, observed_patterns, triad,
                                                 locked=bool(locked), allow_model_estimates=0 <= days_ahead <= 5)
     return {**payload, 'sha256': fingerprint(payload)}
