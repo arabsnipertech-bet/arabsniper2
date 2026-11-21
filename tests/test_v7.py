@@ -338,7 +338,7 @@ class MathAndRouting(unittest.TestCase):
         self.assertTrue(valid_snapshot(snapshot, meta, LATER))
         self.assertEqual(snapshot['triad_commitments'], {})
         self.assertEqual(item['multimarket']['matrix']['v7_waiting_commitments']['slots'], commitments)
-        self.assertEqual(snapshot['triad_timing']['status'], 'provisional')
+        self.assertEqual(snapshot['triad_timing']['status'], 'current')
         postponed = dict(meta, kickoff='2026-11-10T20:45:00+01:00')
         self.assertEqual(prior_triad_commitments(a, postponed, LATER), {})
 

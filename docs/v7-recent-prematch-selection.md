@@ -1,68 +1,65 @@
-# Triade: scelta recente prima del calcio d’inizio
+# Ripristino della selezione prematch — 21 novembre 2026
 
-21 novembre 2026. `TRIAD_RECENT_SELECTION_V1`, implementata in
-`src/v7_recent_selection.py` e applicata da `v7_decision.capture` alle pubblicazioni
-effettive della bacheca, sostituisce il blocco precoce delle prime scelte quotate.
+La politica `TRIAD_RECENT_SELECTION_V1` di #248 è ritirata dal percorso attivo.
+Il suo filtro aggiuntivo confrontava sia l’osservazione sia l’aggiornamento del
+provider con l’inizio della finestra di tre ore: scartava anche cache quotate
+ancora valide secondo il motore. Il salvataggio dei soli slot con quota poteva
+così perdere tutti gli impegni e il ciclo successivo nell’ultima ora dichiarava
+«prima analisi tardiva», senza dimostrare l’assenza di pubblicazioni precedenti.
 
-Ogni Fast prima del limite di un’ora dal kickoff rielegge **tutti e tre i ruoli**
-con le stime e i prezzi disponibili nella scansione. Un precedente miglioramento
-in un altro ruolo non impedisce la nuova elezione. Anche una scelta sana può
-lasciare posto alla candidata che vince il ranking corrente. Se lo stesso mercato
-rimane primo, viene registrata la conferma effettiva della nuova scansione, con la
-relativa quota: non resta una finta data di fissaggio di diversi giorni prima.
+## Comportamento ripristinato
 
-Fino al limite le scelte sono esplicitamente provvisorie. Esattamente a T−60 è
-ancora ammessa una nuova elezione; dopo il limite si conservano mercato, quota e
-data dell’ultima selezione valida. I numeri della matrice possono continuare ad
-aggiornarsi, mentre la quota alla scelta rimane nello storico della conferma.
+`TRIAD_LATEST_PREMATCH_V1` rielegge i ruoli dalla matrice dell’ultima analisi
+prematch disponibile. Questo ripristina la modalità senza blocchi della triade
+di sabato 14 novembre, verificata su
+`58d48e745e2159516ae2c57ad5902b145ef01521`: stesso insieme di mercati, stesse fasce
+di quota/probabilità, scelta sulla matrice corrente senza lock storico.
 
-La selezione finale deve provenire dalle **ultime tre ore prima del kickoff**;
-sono verificate anche le date reali di osservazione e aggiornamento del provider.
-Una cache riletta oggi non rende recente un prezzo vecchio. La finestra copre due
-slot Fast ordinari da 90 minuti, ma non promette una scansione esattamente a T−60.
-Non si aggiungono calendari, workflow, richieste API-Football o servizi.
+La prima quotazione di giorni prima resta una prova di apertura, non impone il
+mercato attuale. Non ci sono scarti aggiuntivi per T−60/T−180 né declassamenti
+automatici per l’ora del primo arrivo. Continuano a valere `price_usable`, i limiti
+di validità della cache, le quote non eseguibili, i requisiti statistici, i
+controlli di compatibilità e le qualifiche Gold/Platinum. Una quota realmente
+scaduta non viene resa recente o riattivata. Le combo senza quota restano stime.
 
-Nella finestra recente, i prezzi più vecchi restano consultabili nella matrice
-completa e nei journal, ma non possono vincere la nuova elezione. Le stime senza
-quota restano esplicitamente Studio e non costituiscono una conferma quotata.
-Se prima del limite manca una selezione recente, o la prima analisi arriva
-nell’ultima ora, la pubblicazione lo dichiara e rimane Studio: non attribuisce una
-conferma al passato né promuove quella scelta ai segnali Gold/Platinum o alle
-offerte operative. Gli slot mancanti non vengono riempiti con nuovi mercati
-dopo la scadenza. I primi snapshot legacy già nell’ultima ora rimangono leggibili,
-senza diventare conferme retroattive della nuova politica.
+La nuova conferma registra data e prezzo effettivi; il predecessore completo
+resta in `replaces` quando cambia il mercato o si migra dalla politica ritirata.
+Il vecchio `study_only` imposto dal calendario non contamina la qualifica della
+nuova elezione. Le qualifiche correnti derivano di nuovo dai dati del mercato.
+Gli snapshot originali e gli esiti delle partite iniziate non vengono riscritti.
 
-Le pubblicazioni precedenti sono immutabili nei journal. Quando un mercato
-cambia, `replaces` conserva il precedente impegno completo; l’avvio della nuova
-politica conserva anche l’originale legacy. Confermare lo stesso mercato non
-allunga inutilmente la catena. Il kickoff diverso invalida la vecchia prova.
-Le partite iniziate non vengono ricalcolate da questa modifica.
+La Gold mostra «Ultima scelta prematch» per le nuove pubblicazioni. Per gli
+snapshot della politica ritirata mostra «Fotografia prematch precedente» e la
+data effettiva; rimuove l’affermazione non dimostrata «prima analisi tardiva».
+Non trasforma retroattivamente uno Studio in una proposta qualificata.
 
-La Gold distingue «Scelta provvisoria rivalutata», «Mercato confermato», «Scelta
-precedente» e «Studio tardivo». Il bundle ha un nuovo hash per aggiornare anche
-i browser con risorse in cache. I vecchi snapshot mantengono la loro lettura.
-
-Le formule, lambda, probabilità, EV, EV prudente e il ranking dei ruoli restano
-identici. Rimangono i controlli di compatibilità, le alternative qualificate di
-#247, il recupero EV–aggio e i requisiti Gold/Platinum. Il ROI non entra nella
-scelta. Le etichette «Ritmo», «Trend» e «Valore +EV» restano spiegazioni degli
-indicatori; questa patch riguarda il momento di elezione, non introduce pesi
-appresi dagli esiti degli screenshot.
+Lambda, probabilità, fair dello stesso bookmaker, EV centrale/prudente e
+ranking restano invariati. Si conservano le correzioni matematiche e il recupero
+EV–aggio già in produzione, senza nuovi pesi basati sulle sconfitte del giorno.
+Il ROI non entra nella selezione.
+Il confronto AST con il 14 novembre conferma identiche anche le funzioni
+`statistical_rates`, `market_rates`, `blend_rates` e `score_model`.
 
 ## Verifica e rilascio
 
-I test verificano rielezioni ripetute, conservazione dell’originale, conferme senza
-crescita della catena, T−60 incluso e minuto successivo escluso, prezzi vecchi o
-futuri, provider non aggiornato, scansioni mancanti, primo arrivo tardivo,
-posticipi, formule invarianti, blocco delle offerte tardive e testi della Gold.
-Sono prove cronologiche e strutturali, non un backtest di rendimento.
+I test riproducono cache con provider vecchio e osservazione recente, prima
+analisi nell’ultima ora, impegni contaminati da #248, rielezione completa, cambio
+ripetuto di mercato, timestamp invariati, quote scadute, partite già iniziate e
+assenza di quote inventate. L’override esplicito `recent_selection={'enabled':
+False}` conserva il percorso legacy per confronti controllati; non è il default.
 
-Il collaudo PR usa la CI esistente. Il merge con `[night-before-fast]` evita una
-scansione aggiuntiva da push; la normale CI main e la pubblicazione del sito
-rimangono attive. Non usare `[skip ci]` su questo rilascio, perché salterebbe anche
-la pubblicazione automatica dell’interfaccia. La nuova elezione viene prodotta
-dal primo Fast ordinario che utilizza il nuovo main, senza cambiare lo storico.
+Il rilascio usa una singola ripubblicazione delle cinque giornate dai dati
+privati già salvati. `cached_refresh_safe` include il helper di sola selezione;
+una modifica delle probabilità o del raccoglitore continua a richiedere una
+scansione normale. Per questo ripristino **non** usare `[night-before-fast]` o
+`[skip ci]`: il Fast da push deve eseguire il refresh cached esistente, senza
+chiamate API-Football. Calendari e workflow restano invariati.
 
-Rollback: revert di questi file, conservando `[night-before-fast]` nel commit.
-In alternativa `POLICY['enabled'] = False` ripristina il percorso di elezione
-precedente; i nuovi campi archiviati restano prove leggibili, senza migrazioni.
+Il log di refresh riporta, prima/dopo per giornata, proposte quotate, stime,
+slot vuoti e policy attiva. Sono soli aggregati: niente selezioni future,
+quote, credenziali o dati di clienti. Verificare questi risultati e il successivo
+salvataggio R2 prima di dichiarare completato il ripristino del servizio.
+
+La suite tecnica e il confronto di disponibilità non sono una prova di maggiore
+rendimento sportivo. Il rollback di emergenza deve preservare archivi e risultati,
+senza riattivare il filtro ritirato o ricostruire pronostici a partita iniziata.

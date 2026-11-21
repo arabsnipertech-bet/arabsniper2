@@ -647,20 +647,23 @@ assert.match(committedHtml,/Mercato fissato il/);
 assert.match(committedHtml,/Quota da aggiornare/);
 assert.doesNotMatch(committedHtml,/<strong>2,10<\/strong>/);
 
-// New publications distinguish current previews, real final confirmations,
-// outdated choices and analyses that first arrived after the deadline.
-for(const [status,label] of [
- ['provisional','Scelta provvisoria rivalutata il'],['frozen','Mercato confermato il'],
- ['stale','Scelta precedente del'],['late','Studio tardivo del']
-]){
+// The withdrawn clock is history, never proof that no earlier analysis existed.
+for(const status of ['provisional','frozen','stale','late']){
  const timed=structuredClone(committed),snapshot=timed.multimarket.matrix.v7;
  snapshot.triad_timing={id:'TRIAD_RECENT_SELECTION_V1',status,freeze_at:triadAt};
  snapshot.triad_commitments.most_probable.selection_timing={id:'TRIAD_RECENT_SELECTION_V1',status};
  const html=api.card(timed,{});
- assert(html.includes(label),status);
+ assert(html.includes('Scelta registrata il'),status);
+ assert(html.includes('Fotografia prematch precedente'),status);
+ assert(!html.includes('Prima analisi oltre il limite'),status);
  assert(html.includes('data-v7-selection-timing="'+status+'"'),status);
  assert(!html.includes('Mercato fissato il'),status);
 }
+const latestPrematch=structuredClone(committed),latestSnapshot=latestPrematch.multimarket.matrix.v7;
+latestSnapshot.triad_timing={id:'TRIAD_LATEST_PREMATCH_V1',status:'current'};
+latestSnapshot.triad_commitments.most_probable.selection_timing={id:'TRIAD_LATEST_PREMATCH_V1'};
+assert.match(api.card(latestPrematch,{}),/Ultima scelta prematch del/);
+assert.match(api.card(latestPrematch,{}),/Selezioni dall’ultima analisi prematch disponibile/);
 
 const scope=require('../web/competition-scope.js');
 assert(scope.allows(scope.id,'World','UEFA Nations League - League C'));
