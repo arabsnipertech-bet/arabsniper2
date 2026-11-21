@@ -76,7 +76,11 @@ class LightweightAuditor(unittest.TestCase):
                 commands.append(args)
                 if args[0] == 'src/auditor_daily_priority.py':
                     self.assertEqual(args[-2:], ['--max-result-ids', '20'])
-                    build_yesterday(root, DAY, NOW, max_result_ids=20)
+                    self.assertIn('--checkpoint-freeze', args)
+                    build_yesterday(root, DAY, NOW, max_result_ids=20,
+                                    checkpoint_frozen=lambda root, day: publish(
+                                        storage, 'test', root, checkpoint_only=True,
+                                        selected_paths=[f'auditordata/prematch_{day}.json']))
                 elif args[:2] == ['auditor/current_audit.py', 'learn-v7']:
                     learn_v7(root, NOW)
                 elif args[1] == 'checkpoint-results':
