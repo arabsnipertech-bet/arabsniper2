@@ -1,0 +1,81 @@
+{
+  "population": "synthetic fixtures; no outcome data; not a profitability backtest",
+  "fixtures": 96,
+  "grid": {
+    "ft_volume": [
+      1.6,
+      2.1,
+      2.6,
+      3.1,
+      3.8,
+      4.6
+    ],
+    "home_share": [
+      0.3,
+      0.45,
+      0.55,
+      0.7
+    ],
+    "market_factor": [
+      0.78,
+      0.9,
+      1.0,
+      1.12
+    ]
+  },
+  "fresh": {
+    "most_probable": {
+      "market_changes": 0,
+      "study_to_qualified": 0,
+      "qualified_displaced": 0,
+      "missing_before": 0,
+      "missing_after": 0,
+      "originals_preserved": 0
+    },
+    "recommended_alternative": {
+      "market_changes": 10,
+      "study_to_qualified": 11,
+      "qualified_displaced": 0,
+      "missing_before": 0,
+      "missing_after": 0,
+      "originals_preserved": 0
+    },
+    "high_odds_shot": {
+      "market_changes": 2,
+      "study_to_qualified": 0,
+      "qualified_displaced": 0,
+      "missing_before": 0,
+      "missing_after": 0,
+      "originals_preserved": 0
+    }
+  },
+  "inherited_commitments": {
+    "most_probable": {
+      "market_changes": 0,
+      "study_to_qualified": 0,
+      "qualified_displaced": 0,
+      "missing_before": 0,
+      "missing_after": 0,
+      "originals_preserved": 0
+    },
+    "recommended_alternative": {
+      "market_changes": 6,
+      "study_to_qualified": 11,
+      "qualified_displaced": 0,
+      "missing_before": 0,
+      "missing_after": 0,
+      "originals_preserved": 6
+    },
+    "high_odds_shot": {
+      "market_changes": 0,
+      "study_to_qualified": 0,
+      "qualified_displaced": 0,
+      "missing_before": 0,
+      "missing_after": 0,
+      "originals_preserved": 0
+    }
+  },
+  "market_records_checked": 14016,
+  "model_price_ev_changes": 0,
+  "complete_compatible_triads": true
+}
