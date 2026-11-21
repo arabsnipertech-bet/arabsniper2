@@ -1117,18 +1117,30 @@
  function triadPanel(view,compact=false,match=null){
   const saved=view.v7?.triad;
   const commitments=view.v7?.triad_commitments||view.commitments||{};
+  const timing=view.v7?.triad_timing;
+  const timingMessage=timing?.id==='TRIAD_RECENT_SELECTION_V1'?{
+   provisional:'Scelte provvisorie · rivalutazione a ogni scansione fino alle '+triadTime(timing.freeze_at)+'.',
+   frozen:'Mercati congelati sull’ultima scelta recente disponibile prima delle '+triadTime(timing.freeze_at)+'.',
+   stale:'Manca una conferma recente prima del limite: le scelte precedenti restano Studio.',
+   late:'Prima analisi oltre il limite di un’ora: solo Studio, senza scelta finale certificata.'
+  }[timing.status]||'':'';
+  const timingNote=timingMessage?'<p class="mx-v7-empty" data-v7-selection-timing="'+esc(timing.status)+'">'+timingMessage+'</p>':'';
   if(!Object.values(view.triad).some(Boolean)&&!Object.values(commitments).some(Boolean)){
    const message=Object.values(saved||{}).some(Boolean)?'Quota da aggiornare':'Nessuna proposta prematch disponibile.';
-   return '<p class="mx-v7-empty">'+message+'</p>';
+   return timingNote+'<p class="mx-v7-empty">'+message+'</p>';
   }
-  return '<ul class="mx-triad'+(compact?' mx-triad-compact':'')+'" aria-label="Triade prematch V7">'+
+  return timingNote+'<ul class="mx-triad'+(compact?' mx-triad-compact':'')+'" aria-label="Triade prematch V7">'+
    Object.entries(TRIAD).map(([role,title])=>{
     const p=view.triad[role],s=p?.signal;
     const commitment=commitments[role];
     const estimate=s?.quote_state==='model_estimate';
     const badge=s&&levelBadge(String(s.tier).toLowerCase(),s.badge);
     const previous=p||commitment?triadHistoryPanel(match,role):'';
-    const fixed=commitment?'<small>Mercato fissato il '+triadTime(commitment.captured_at)+
+    const selected=commitment?.selection_timing;
+    const recent=selected?.id==='TRIAD_RECENT_SELECTION_V1';
+    const selectionLabel=recent?({provisional:'Scelta provvisoria rivalutata il ',frozen:'Mercato confermato il ',
+     stale:'Scelta precedente del ',late:'Studio tardivo del '}[selected.status]||'Ultima scelta del '):'Mercato fissato il ';
+    const fixed=commitment?'<small>'+selectionLabel+triadTime(commitment.captured_at)+
      ' · quota alla scelta '+num(commitment.odd,2)+'</small>':'';
     const study=s?.study_only??commitment?.study_only;
     return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+title+(study?' · Studio':'')+'</span>'+(badge||'')+

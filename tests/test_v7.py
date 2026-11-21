@@ -317,7 +317,7 @@ class MathAndRouting(unittest.TestCase):
             self.assertEqual(matrix['v7'], snapshot)
             self.assertEqual(list(stored_offers(a, meta, START)), [])
 
-    def test_fresh_scan_resumes_the_existing_selection_after_missing_analysis(self):
+    def test_fresh_scan_reranks_after_missing_analysis_without_reusing_old_price_locks(self):
         old = assessment()
         old['matrix']['v7'] = capture(old, META, AT)
         meta = dict(META, country='Italy', league='Serie A')
@@ -336,9 +336,9 @@ class MathAndRouting(unittest.TestCase):
         build_board({'matches': [new]}, LATER, previous_matches={'321': item})
         snapshot = refreshed['matrix']['v7']
         self.assertTrue(valid_snapshot(snapshot, meta, LATER))
-        self.assertEqual(snapshot['triad_commitments'], commitments)
-        for role, commitment in commitments.items():
-            self.assertEqual(snapshot['triad'][role]['market_id'], commitment['market_id'])
+        self.assertEqual(snapshot['triad_commitments'], {})
+        self.assertEqual(item['multimarket']['matrix']['v7_waiting_commitments']['slots'], commitments)
+        self.assertEqual(snapshot['triad_timing']['status'], 'provisional')
         postponed = dict(meta, kickoff='2026-11-10T20:45:00+01:00')
         self.assertEqual(prior_triad_commitments(a, postponed, LATER), {})
 
@@ -673,8 +673,13 @@ class EVRecovery(unittest.TestCase):
         self.assertEqual(offers[0][1]['ev'],baseline['triad']['most_probable']['ev'])
         retained = capture(deepcopy(after),META,LATER,commitments=changed['triad_commitments'])
         self.assertIn('ev_recovery',retained['triad']['most_probable'])
-        self.assertEqual(retained['triad_commitments'],changed['triad_commitments'])
-        old = capture(self.fixture(),META,LATER,commitments=baseline['triad_commitments'])
+        self.assertEqual(retained['triad_commitments']['most_probable']['captured_at'], retained['captured_at'])
+        self.assertEqual(retained['triad_commitments']['most_probable']['market_id'],
+                         changed['triad_commitments']['most_probable']['market_id'])
+        self.assertEqual(changed['triad_commitments']['most_probable']['captured_at'], baseline['captured_at'])
+        # Explicit rollback still preserves the legacy recovery gate on old locks.
+        old = capture(self.fixture(),META,LATER,commitments=baseline['triad_commitments'],
+                      recent_selection={'enabled': False})
         self.assertTrue(old['triad']['most_probable']['study_only'])
         self.assertIsNone(old['signals']['primary'])
 
@@ -712,7 +717,8 @@ class ArchiveAndWorkflow(unittest.TestCase):
         commitment = dict(market_id=UNDER_ST, label='Under 1,5 ST', odd=2.54, horizon='ST',
                           captured_at=AT, study_only=True)
         a = assessment()
-        snapshot = capture(a, META, LATER, commitments={'recommended_alternative': commitment})
+        snapshot = capture(a, META, LATER, commitments={'recommended_alternative': commitment},
+                           recent_selection={'enabled': False})
         self.assertNotIn(UNDER_ST, snapshot['markets'])
         self.assertIsNone(snapshot['triad']['recommended_alternative'])
         record = dict(fixture=META, captured_at=LATER, publication_snapshot=True,
