@@ -66,6 +66,10 @@ EV_RECOVERY_AGGIO_V1 = {
     'enabled': True, 'min_ev': -.10, 'roles': tuple(TRIAD_MARKETS),
     'price_support_roles': ('recommended_alternative', 'high_odds_shot'),
 }
+TRIAD_QUALIFIED_REFRESH_V1 = {
+    'enabled': True, 'alternative_roles': ('recommended_alternative',),
+    'repair_commitments': True,
+}
 
 
 def fingerprint(value):
@@ -275,6 +279,8 @@ def selection_motivation(row, reason, relaxed):
                    'Studio · probabilità e fascia quota del ruolo')
     if reason == 'ev_recovery_aggio_v1':
         summary = f"Rivalutazione statistica · EV originale {100*row['ev']:+.1f}%"
+    if reason == 'alternativa_qualificata':
+        summary = 'Alternativa con valore e margine prudente confermati'
     parts = [summary, f"Probabilità V7 {100*row['calibrated']:.1f}%",
              f'Fair bookmaker {100*fair:.1f}%' if finite(fair) else 'Fair bookmaker non disponibile']
     recovery = row.get('ev_recovery') or {}
@@ -485,6 +491,47 @@ def role_rank(role, key, row):
     return bool(row['niche_id']), row['ev'], row['calibrated'], key
 
 
+def qualified_refresh_candidate(row):
+    """Use documented binary prices and existing conservative value requirements."""
+    odd, p, ev, low = (row.get(k) for k in ('odd', 'calibrated', 'ev', 'ev_low'))
+    quote = row.get('quote') or {}
+    return (row.get('spec_kind') in ('result', 'total', 'btts', *JOINT_KINDS)
+            and row.get('tier') in BADGES and row.get('supported') is True
+            and finite(row.get('fair')) and 0 < row['fair'] < 1
+            and quote.get('quote_status') == 'recent' and quote.get('bookmaker_id') is not None
+            and all(finite(v) for v in (odd, p, ev, low)) and odd > 1 and 0 < p <= 1
+            and ev > 0 and 0 <= low <= ev + 5e-7 + 1e-12
+            and isclose(ev, p*odd-1, rel_tol=0, abs_tol=odd*5e-9+1e-12))
+
+
+def coherent_slot_prices(records, slots):
+    prices = {role: records.get(key, {}).get('odd') for role, key in slots.items()}
+    primary, recommended, shot = (prices.get(role) for role in TRIAD_MARKETS)
+    return (not (finite(primary) and finite(recommended) and recommended <= primary)
+            and not (finite(recommended) and finite(shot) and shot < recommended))
+
+
+def fill_qualified_alternatives(triad, records, observed, locked, limits, ev_recoveries, roles):
+    """Only an otherwise empty Consigliata may use another qualified market."""
+    role = 'recommended_alternative'
+    if role not in roles or triad[role]:
+        return
+    candidates = {key for key, row in records.items() if qualified_refresh_candidate(row)}
+    if not candidates:
+        return
+    held = {**locked, **{slot: pick['market_id'] for slot, pick in triad.items() if pick}}
+    proposed, _ = route(records, observed, locked=held, limits=limits,
+                        role_markets={**TRIAD_MARKETS, role: candidates}, ev_recoveries=ev_recoveries)
+    pick = proposed[role]
+    if (not pick or not coherent_slot_prices(records, {**held, role: pick['market_id']})
+            or any(triad[other] and (not proposed[other]
+                   or proposed[other]['market_id'] != triad[other]['market_id'])
+                   for other in triad if other != role)):
+        return
+    triad[role] = signal(pick['market_id'], records[pick['market_id']], 'alternativa_qualificata')
+    triad[role]['selection_policy'] = {'id': 'TRIAD_QUALIFIED_REFRESH_V1', 'action': 'qualified_alternative'}
+
+
 def ev_recovery_candidates(records, sources, as_of, kickoff, statistics_at, commitments=None, *, policy=None):
     """Compare independent statistics and a prudent scenario with same-book fair.
 
@@ -549,7 +596,8 @@ def ev_recovery_candidates(records, sources, as_of, kickoff, statistics_at, comm
 
 
 def route(records, observed, *, study=False, allow_model_estimates=False, allow_unpriced=False,
-          locked=None, role_markets=TRIAD_MARKETS, limits=TRIAD_LIMITS, ev_recoveries=None):
+          locked=None, role_markets=TRIAD_MARKETS, limits=TRIAD_LIMITS, ev_recoveries=None,
+          qualified_alternatives=()):
     locked = locked or {}
     reserved = set(locked.values())
     triad = dict.fromkeys(TRIAD_MARKETS)
@@ -608,6 +656,9 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
                            'ev_recovery': dict(proofs[key])}
             chosen.append(key)
 
+    if qualified_alternatives:
+        fill_qualified_alternatives(triad, records, observed, locked, limits,
+                                    ev_recoveries, qualified_alternatives)
     signals = {name: triad[role] for role, name in SIGNAL_ROLES.items()}
     for tier in ('GOLD', 'PLATINUM'):
         signals[tier.lower()] = next((pick for pick in triad.values() if pick and pick['tier'] == tier), None)
@@ -633,6 +684,8 @@ def commit_priced_slots(triad, captured_at, previous):
         commitments[role].update(captured_at=captured_at, study_only=pick.get('study_only') is True)
         if pick.get('ev_recovery'):
             commitments[role]['ev_recovery'] = dict(pick['ev_recovery'])
+        if pick.get('selection_policy'):
+            commitments[role]['selection_policy'] = dict(pick['selection_policy'])
     return commitments
 
 
@@ -676,6 +729,45 @@ def revise_priced_slots(records, observed, previous, at, kickoff, *, national):
     return previous
 
 
+def refresh_unqualified_slots(records, observed, previous, at, kickoff, *, national,
+                              ev_recoveries, alternative_roles):
+    """Repair one currently unqualified slot; retain its complete original record."""
+    if not previous or kickoff-at < timedelta(hours=1):
+        return previous
+    locked = {role: pick['market_id'] for role, pick in previous.items()}
+    current, _ = route(records, observed, locked=locked, ev_recoveries=ev_recoveries,
+                       qualified_alternatives=alternative_roles)
+    reserved = set(locked.values())
+    gain = .04 if national else .02  # Existing revision hysteresis, not a learned threshold.
+    for role, market_set in TRIAD_MARKETS.items():
+        if role not in previous or current[role]:
+            continue
+        incumbent = records.get(previous[role]['market_id']) or {}
+        # Missing prices/evidence are not proof that a frozen choice deteriorated.
+        if not all(finite(incumbent.get(k)) for k in ('odd', 'calibrated', 'ev', 'ev_low')):
+            continue
+        pool = records.keys() if role in alternative_roles else market_set
+        candidates = [key for key in pool if key in records and key not in reserved
+                      and qualified_refresh_candidate(records[key])
+                      and records[key]['ev_low']+1e-9 >= incumbent['ev_low']+gain]
+        for key in sorted(candidates, key=lambda k: role_rank(role, k, records[k]), reverse=True):
+            proposed, _ = route(records, observed, locked={**locked, role: key},
+                                 ev_recoveries=ev_recoveries, qualified_alternatives=alternative_roles)
+            pick = proposed[role]
+            if (not pick or pick.get('ev_recovery')
+                    or not coherent_slot_prices(records, {**locked, role: key})
+                    or any(current[other] and (not proposed[other]
+                           or proposed[other]['market_id'] != current[other]['market_id'])
+                           for other in locked if other != role)):
+                continue
+            replacement = commit_priced_slots({role: pick}, utc(at), {})[role]
+            replacement['replaces'] = previous[role]
+            replacement['selection_policy'] = {'id': 'TRIAD_QUALIFIED_REFRESH_V1',
+                                               'action': 'replace_unqualified'}
+            return {**previous, role: replacement}
+    return previous
+
+
 def prior_triad_commitments(assessment, meta, as_of):
     """Use the last verified publication when upgrading an already visible fixture."""
     from v7_archive import valid_snapshot
@@ -693,7 +785,8 @@ def prior_triad_commitments(assessment, meta, as_of):
     return {}
 
 
-def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, commitments=None):
+def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, commitments=None,
+            triad_refresh=None):
     at, kickoff = stamp(as_of), stamp(meta.get('kickoff'))
     if (not at or not kickoff or at >= kickoff or meta.get('result') or
             meta.get('status_short') not in ('NS', 'TBD')):
@@ -788,13 +881,22 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
 
     rome = ZoneInfo('Europe/Rome')
     days_ahead = (kickoff.astimezone(rome).date()-at.astimezone(rome).date()).days
-    commitments = revise_priced_slots(records, observed_patterns, commitments, at, kickoff,
-                                      national=bool(national_competition(meta.get('league'))))
-    locked = {role: slot['market_id'] for role, slot in (commitments or {}).items()}
+    policy = TRIAD_QUALIFIED_REFRESH_V1 if triad_refresh is None else triad_refresh
+    alternative_roles = policy.get('alternative_roles', ()) if policy.get('enabled') is True else ()
+    national = bool(national_competition(meta.get('league')))
     recoveries = ev_recovery_candidates(records, sources, as_of, meta['kickoff'], statistics_at, commitments)
+    revised = (refresh_unqualified_slots(records, observed_patterns, commitments, at, kickoff,
+                national=national, ev_recoveries=recoveries, alternative_roles=alternative_roles)
+               if policy.get('enabled') is True and policy.get('repair_commitments') is True else commitments)
+    if revised is commitments:
+        revised = revise_priced_slots(records, observed_patterns, commitments, at, kickoff, national=national)
+    if revised is not commitments:
+        commitments = revised
+        recoveries = ev_recovery_candidates(records, sources, as_of, meta['kickoff'], statistics_at, commitments)
+    locked = {role: slot['market_id'] for role, slot in (commitments or {}).items()}
     triad, signals = route(records, observed_patterns, study=True,
                            allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True, locked=locked,
-                           ev_recoveries=recoveries)
+                           ev_recoveries=recoveries, qualified_alternatives=alternative_roles)
     for pick in triad.values():
         if pick and pick.get('ev_recovery'):
             records[pick['market_id']].update(tier='BLU', ev_recovery=dict(pick['ev_recovery']))
