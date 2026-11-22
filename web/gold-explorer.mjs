@@ -34,7 +34,7 @@ function quoteContext(row,{historical=false}={}){
   const arrow={unknown:'—',down:'↓',up:'↑',flat:'→'}[direction];
   const change=delta===null?'—':arrow+' '+(delta>0?'+':'')+number(delta,1)+'%';
   const current=q.quote_usable&&Date.parse(q.quote_valid_until)>Date.now();
-  const note=last===null?'Non disponibile':!historical&&!current?'Da aggiornare':delta===null?'Prima rilevazione':'';
+  const note=last===null?'Non disponibile':!historical&&!current?'Da aggiornare':delta===null?'Variazione non disponibile':'';
   return '<div title="'+esc((q.bookmaker||'Fonte Gold')+' · osservata '+date(q.quote_observed_at))+'"><b>'+side.toUpperCase()+'</b><span class="selection-quote-values">'+number(first)+' → <strong>'+number(last)+'</strong></span><span class="selection-movement" data-movement="'+direction+'">'+change+'</span>'+(note?'<small>'+esc(note)+'</small>':'')+'</div>';
  }).join('')+'</div></section>';
 }
