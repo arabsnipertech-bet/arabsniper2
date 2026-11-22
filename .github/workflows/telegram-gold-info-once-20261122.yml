@@ -1,0 +1,77 @@
+name: Send owner-authorized Gold information once
+on:
+  push:
+    branches: ['ops/telegram-gold-info-20261122-2046']
+    paths: ['.github/workflows/telegram-gold-info-once-20261122.yml']
+permissions: {}
+concurrency:
+  group: owner-gold-info-20261122-2046
+  cancel-in-progress: false
+jobs:
+  send:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/ops/telegram-gold-info-20261122-2046' && github.run_attempt == '1' && github.event.before == '86aa16d3f0cd45059b2712f9eb280cbf5f2cc526'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Verify the existing bot and deliver the authorized message once
+        shell: python
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          import json, os, re
+          from datetime import datetime, timezone
+          from urllib.request import Request, build_opener, HTTPRedirectHandler
+          
+          if datetime.now(timezone.utc) >= datetime(2026, 11, 22, 21, 30, tzinfo=timezone.utc):
+              raise SystemExit("One-time sending window ended; no message sent.")
+          token = os.environ.get("BOT_TOKEN", "").strip()
+          if not re.fullmatch(r"\d+:[A-Za-z0-9_-]+", token):
+              raise SystemExit("Configured bot credential unavailable; no message sent.")
+          class NoRedirect(HTTPRedirectHandler):
+              def redirect_request(self, *args):
+                  return None
+          client = build_opener(NoRedirect())
+          def call(method, data=None):
+              if method not in {"getMe", "getChat", "getChatMember", "sendMessage"}:
+                  raise SystemExit("Unsupported operation.")
+              request = Request("https://api.telegram.org/bot" + token + "/" + method,
+                  data=json.dumps(data or {}, ensure_ascii=False).encode("utf-8"),
+                  headers={"Content-Type": "application/json"}, method="POST")
+              try:
+                  with client.open(request, timeout=25) as response:
+                      result = json.load(response)
+              except Exception:
+                  raise SystemExit("Telegram response not confirmed; do not retry a send before checking the channel.") from None
+              if result.get("ok") is not True:
+                  raise SystemExit("Telegram operation rejected; no credential information logged.")
+              return result["result"]
+          bot = call("getMe")
+          if bot.get("is_bot") is not True or bot.get("username", "").lower() != "arabsniperbot":
+              raise SystemExit("Unexpected bot identity; no message sent.")
+          chat = call("getChat", {"chat_id": "@arabsniper_signals"})
+          if chat.get("type") != "channel" or chat.get("username", "").lower() != "arabsniper_signals":
+              raise SystemExit("Unexpected channel identity; no message sent.")
+          member = call("getChatMember", {"chat_id": chat["id"], "user_id": bot["id"]})
+          if member.get("status") != "administrator" or not member.get("can_post_messages"):
+              raise SystemExit("Bot posting permission unavailable; no message sent.")
+          message = "⚽ SCOPRI L’AREA GOLD DI ARABSNIPERBET\n\nApprofondisci il calcio attraverso i dati: schede delle partite, parziali, risultati e strumenti di consultazione Explorer.\n\n🤖 Per le istruzioni di accesso apri @ArabSniperBot e premi Avvia:\nhttps://t.me/ArabSniperBot\n\n⭐ Hai già un accesso Gold? Entra nella dashboard con la tua email:\nhttps://arabsniperbet.com/gold-dashboard-live.html\n\n🌐 Visita il sito:\nhttps://arabsniperbet.com/\n\n📲 Il nostro canale:\nhttps://t.me/arabsniper_signals"
+          sent = call("sendMessage", {
+              "chat_id": chat["id"], "text": message,
+              "link_preview_options": {"is_disabled": True},
+              "reply_markup": {"inline_keyboard": [
+                  [{"text": "🤖 Apri il bot", "url": "https://t.me/ArabSniperBot"},
+                   {"text": "⭐ Accedi a Gold", "url": "https://arabsniperbet.com/gold-dashboard-live.html"}],
+                  [{"text": "🌐 Visita il sito", "url": "https://arabsniperbet.com/"}]
+              ]}
+          })
+          if sent.get("chat", {}).get("id") != chat["id"] or not sent.get("message_id") or sent.get("text") != message:
+              raise SystemExit("Send result requires reconciliation; do not retry.")
+          receipt = {
+              "message_id": sent["message_id"],
+              "url": "https://t.me/" + chat["username"] + "/" + str(sent["message_id"]),
+              "sent_at": datetime.fromtimestamp(sent["date"], timezone.utc).isoformat()
+          }
+          print(json.dumps(receipt, ensure_ascii=False))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+              summary.write("Verified delivery: [" + str(sent["message_id"]) + "](" + receipt["url"] + ")\n")
+          
