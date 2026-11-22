@@ -17,6 +17,9 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  // Put the observation on the first original-role page, independent of best ranking.
  const observedRow=rows.filter(r=>r.roles?.includes('recommended_alternative')).sort((a,b)=>a.id.localeCompare(b.id))[0];
  observedRow.observation_only=true;observedRow.oci=0;
+ const opposedRow=rows.find(r=>r.label==='GG FT'&&!r.roles.length);
+ opposedRow.roles=['recommended_alternative']; // Exercise the separate original-Gold-role view too.
+ opposedRow.coherence_status='opposed';opposedRow.coherence_opposed_to=['No Goal FT'];
  const pages=[];for(let i=0;i<rows.length;i+=250)pages.push(add({version:1,rows:rows.slice(i,i+250)}));
  const boards={best:rows.slice(0,10).map(r=>r.id),probable:rows.slice(0,10).map(r=>r.id),recommended:rows.slice(0,10).map(r=>r.id),shots:rows.slice(0,10).map(r=>r.id),markets:{'GG FT':rows.filter(r=>r.label==='GG FT').slice(0,10).map(r=>r.id)}};
  const snapshot=add({pages,count:rows.length,boards}),hist={references:{},results:{},scans:[{sha256:snapshot,phase:'night',published_at:'2026-11-17T10:00:00Z'}],legacy_pages:[pages[0]]};
@@ -46,7 +49,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  const first=page.locator('#results .selection').first();assert.equal(await first.locator('.selection-1x2>div').count(),3);
  assert((await first.locator('[data-movement=down]').innerText()).includes('↓ -10,0%'));assert((await first.locator('[data-movement=up]').innerText()).includes('↑ +10,0%'));assert((await first.locator('[data-movement=flat]').innerText()).includes('→ 0,0%'));
  await first.locator('.selection-origin summary').click();assert(await first.getByText('Motivo originale Gold · proiezione statistica del primo tempo',{exact:true}).isVisible());assert.equal(calls.length,initial,'Reading the explanation adds no requests');
- for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);}
+ for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);assert.equal(await page.locator('#results [data-coherence]').count(),0,'Opposites excluded from '+mode);}
  await page.selectOption('#mode','markets');assert.equal(await page.locator('#marketIndex a').count(),4);
  await page.locator('#marketIndex a').filter({hasText:'Under 3,5 FT'}).click();assert((await page.evaluate(()=>document.activeElement.textContent)).startsWith('Under 3,5 FT'));
  await page.selectOption('#mode','recommended');assert.equal(await page.locator('#results .selection').count(),10);
@@ -56,6 +59,11 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  assert((await observation.innerText()).includes('OCI 0 · neutro'));
  assert((await page.locator('#results').innerText()).includes('Triade: Consigliata'),'Other original-role cards stay unchanged');
  await observation.locator('[data-detail]').click();assert((await page.locator('#detailBody').innerText()).includes('2,05'));await page.click('#closeDetail');await page.fill('[name=team]','impossibile');assert((await page.locator('#results').innerText()).includes('Il caricamento è riuscito'));await page.fill('[name=team]','');
+ await page.selectOption('#mode','search');await page.fill('[name=team]','QA Casa 0');
+ const opposite=page.locator('#results .selection').filter({has:page.locator('[data-coherence="opposed"]')});
+ assert.equal(await opposite.count(),1);assert((await opposite.innerText()).includes('Scenario opposto alla triade Gold'));
+ assert((await opposite.innerText()).includes('No Goal FT'));assert((await opposite.innerText()).includes('escluso dalle proposte principali'));
+ await page.fill('[name=team]','');
  await page.selectOption('#mode','best');assert(await page.locator('#marketNavigation').isHidden());
  await page.click('#more');assert.equal(await page.locator('#results .selection').count(),20);
  await page.fill('[name=team]','impossibile');assert.equal(await page.locator('#results .selection').count(),0);await page.fill('[name=team]','');

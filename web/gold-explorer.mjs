@@ -1,6 +1,6 @@
 import {officialGoldRecords} from './explorer-official-records.mjs';
 import {archiveLoader} from './explorer-loader.mjs';
-import {categories,modes,text,numeric,romeDay,fresh,matches,rank,outcome,statistics,historyRows} from './explorer-core.mjs';
+import {categories,modes,text,numeric,romeDay,fresh,matches,rank,outcome,statistics,historyRows} from './explorer-core.mjs?v=1086029b2649';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const number=(v,d=2)=>numeric(v)?v.toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
 const percent=v=>numeric(v)?number(v*100,1)+'%':'—';
@@ -46,6 +46,11 @@ function proposalOrigin(row){
  const evidence=['Probabilità V7 '+percent(row.probability),numeric(row.ev)?'EV '+percent(row.ev):'',numeric(row.delta)?'Variazione quota '+number(row.delta,1)+'%':''].filter(Boolean).join(' · ');
  return '<details class="selection-origin"><summary>Motivo · dati dello snapshot</summary><p>'+esc(evidence)+'</p></details>';
 }
+function proposalCoherence(row){
+ if(row.coherence_status==='opposed')return '<p class="small" data-coherence="opposed"><b>Scenario opposto alla triade Gold</b> · '+esc((row.coherence_opposed_to||[]).join(', '))+'. Consultabile come alternativa; escluso dalle proposte principali.</p>';
+ if(row.coherence_status==='inconsistent_gold_triad')return '<p class="small" data-coherence="inconsistent">Triade da verificare: le proposte confermate non possono vincere insieme.</p>';
+ return '';
+}
 function emptyResults(){
  empty($('results'),!state.rows.length?'Archivio corrente caricato: nessuna analisi prematch disponibile.':$('mode').value==='recommended'?'Nessuna Consigliata ufficiale Gold registrata corrisponde ai filtri attuali. Il caricamento è riuscito.':'Dati caricati: nessuna voce corrisponde alla vista e ai filtri attuali.');
 }
@@ -53,13 +58,14 @@ function cards(rows,node,options={}){
  if(!rows.length){empty(node);return;}
  node.innerHTML=rows.map(row=>{
   const key=row.id+'-'+(row.object||'current')+'-'+(options.favorite?'favorite':'view');state.viewRows.set(key,{row,...options});
-  return `<article class="selection"><div><span class="badge ${esc(row.category)}">${esc(row.observation_only?'Osservazione V7':categories[row.category]||'Archivio')}</span><p class="small">${esc(text(row.league))} · ${date(row.kickoff)}</p><h3>${esc(text(row.home))} — ${esc(text(row.away))}</h3>${quoteContext(row,options)}</div><div><strong class="market">${esc(row.label)}</strong>${proposalOrigin(row)}<p class="small">${row.roles?.length?(row.observation_only?'Osservazione · ruolo originale: ':'Triade: ')+esc(row.roles.map(r=>roleNames[r]||r).join(', ')):'Fuori dalla triade ufficiale'}</p><p class="small">${row.reliability==='supported'?'Supporto statistico V7':'Affidabilità limitata'} · ${row.validated?'Validata da Explorer':'Non validata da Explorer'}</p>${row.outcome?`<b class="${row.outcome.win===1?'won':row.outcome.loss===1?'lost':''}">${esc(row.outcome.label)}</b>`:options.historical?'<span class="small">Esito non verificato</span>':''}</div><div class="numbers"><div><strong>${percent(row.probability)}</strong><small>Probabilità V7</small></div><div><strong>${number(row.odd)}</strong><small>${row.official_original?'Quota ufficiale originale':options.historical?'Quota snapshot':fresh(row)?'Quota di riferimento':'Quota storica / scaduta'}</small></div><p class="small">EV ${percent(row.ev)} · EV_low ${percent(row.ev_low)} · OCI ${row.oci===0?'0 · neutro':numeric(row.oci)?number(row.oci,1):'non disponibile'}</p></div><div class="actions"><button data-detail="${key}">Dettaglio</button><button ${options.favorite?'data-remove':'data-favorite'}="${key}" aria-label="${options.favorite?'Rimuovi preferito':'Salva preferito'}">${options.favorite?'Rimuovi':'☆'}</button></div></article>`;
+  return `<article class="selection"><div><span class="badge ${esc(row.category)}">${esc(row.observation_only?'Osservazione V7':categories[row.category]||'Archivio')}</span><p class="small">${esc(text(row.league))} · ${date(row.kickoff)}</p><h3>${esc(text(row.home))} — ${esc(text(row.away))}</h3>${quoteContext(row,options)}</div><div><strong class="market">${esc(row.label)}</strong>${proposalOrigin(row)}${proposalCoherence(row)}<p class="small">${row.roles?.length?(row.observation_only?'Osservazione · ruolo originale: ':'Triade: ')+esc(row.roles.map(r=>roleNames[r]||r).join(', ')):'Fuori dalla triade ufficiale'}</p><p class="small">${row.reliability==='supported'?'Supporto statistico V7':'Affidabilità limitata'} · ${row.coherence_status==='opposed'?'Scenario alternativo · fuori dalle proposte principali':row.validated?'Validata da Explorer':'Non validata da Explorer'}</p>${row.outcome?`<b class="${row.outcome.win===1?'won':row.outcome.loss===1?'lost':''}">${esc(row.outcome.label)}</b>`:options.historical?'<span class="small">Esito non verificato</span>':''}</div><div class="numbers"><div><strong>${percent(row.probability)}</strong><small>Probabilità V7</small></div><div><strong>${number(row.odd)}</strong><small>${row.official_original?'Quota ufficiale originale':options.historical?'Quota snapshot':fresh(row)?'Quota di riferimento':'Quota storica / scaduta'}</small></div><p class="small">EV ${percent(row.ev)} · EV_low ${percent(row.ev_low)} · OCI ${row.oci===0?'0 · neutro':numeric(row.oci)?number(row.oci,1):'non disponibile'}</p></div><div class="actions"><button data-detail="${key}">Dettaglio</button><button ${options.favorite?'data-remove':'data-favorite'}="${key}" aria-label="${options.favorite?'Rimuovi preferito':'Salva preferito'}">${options.favorite?'Rimuovi':'☆'}</button></div></article>`;
  }).join('');
 }
 function render(){
  $('marketIndex').replaceChildren();$('marketNavigation').hidden=true;
  $('viewExplanation').textContent=$('mode').value==='recommended'?'Consigliate ufficiali già registrate dalla Gold, in ordine di inizio partita. Nessun nuovo punteggio Explorer. Gli indicatori sono quelli dello snapshot; la quota ufficiale originale, se documentata, è nel dettaglio.':$('mode').value==='markets'?'Gruppi in ordine alfabetico. Usa l’indice per raggiungere un mercato senza scorrere tutti i precedenti.':'I ruoli originali Gold sono riportati senza modifiche nelle schede e nel dettaglio.';
  const f=filters(),mode=$('mode').value,now=Date.now();let rows=state.rows.filter(r=>matches(r,f,now)&&(!state.focusFixture||r.fixture_id===state.focusFixture));
+ if(mode!=='search')rows=rows.filter(r=>!['opposed','inconsistent_gold_triad'].includes(r.coherence_status));
  if(mode!=='search'&&mode!=='recommended')rows=rows.filter(r=>fresh(r,now));
  if(mode==='markets'){
   $('results').replaceChildren();let more=false,count=0;

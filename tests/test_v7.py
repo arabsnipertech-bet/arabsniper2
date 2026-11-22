@@ -54,19 +54,20 @@ def assessment():
 
 
 class MathAndRouting(unittest.TestCase):
-    def test_recommended_under_survives_a_higher_ranked_opposite_offer(self):
+    def test_legacy_recommended_under_survives_a_higher_ranked_opposite_offer(self):
         def priced(key, p, odd, label):
             return dict(source_market_id=key, label=label, calibrated=p, odd=odd, ev=-.01, ev_low=-.02,
                         tier=None, niche_id=None, horizon='ST', spec_kind='total', model_fair_odd=1/p,
                         quote_state='moving', study_supported=True, features={})
 
         under = priced(UNDER_ST, .40, 2.54, 'Under 1,5 ST')
-        first, _ = route({UNDER_ST: under}, PATTERNS, study=True)
+        first, _ = route({UNDER_ST: under}, PATTERNS, study=True,
+                         locked={'recommended_alternative': UNDER_ST})
         commitments = commit_priced_slots(first, AT, {})
         self.assertEqual(commitments['recommended_alternative']['market_id'], UNDER_ST)
         records = {UNDER_ST: {**under, 'odd': 2.42}, OVER_ST: priced(OVER_ST, .44, 2.80, 'Over 2,5 ST')}
         fresh, _ = route(records, PATTERNS, study=True)
-        self.assertEqual(fresh['recommended_alternative']['market_id'], OVER_ST)
+        self.assertIsNone(fresh['recommended_alternative'], 'New studies must respect the declared role universe')
         locked = {'recommended_alternative': UNDER_ST}
         updated, _ = route(records, PATTERNS, study=True, locked=locked)
         pick = updated['recommended_alternative']
@@ -884,10 +885,10 @@ class TriadShadow(unittest.TestCase):
                     study_supported=True, model_fair_odd=1/probability, quote_state='observed',
                     quote={'quote_status':'recent'}, features={}, v51=probability-.02)
 
-    def variants(self, records, sources=None):
+    def variants(self, records, sources=None, *, legacy_locked=None):
         from decision_shadow import capture_v7
 
-        published, _ = route(records, PATTERNS, study=True)
+        published, _ = route(records, PATTERNS, study=True, locked=legacy_locked)
         saved = deepcopy(published)
         shadow = capture_v7(records, sources or {key:{} for key in records}, PATTERNS, published,
                             locked=False, allow_model_estimates=False)
@@ -896,10 +897,13 @@ class TriadShadow(unittest.TestCase):
         self.assertEqual(shadow['variants']['published'], shadow['variants']['without_lock'])
         return shadow['variants']
 
-    def test_under_floor_respects_price_and_prudent_edge(self):
+    def test_legacy_under_floor_respects_price_and_prudent_edge(self):
         for odd, ev_low, retained in ((1.74,.01,False),(1.75,-.01,False),(1.75,.01,True)):
             with self.subTest(odd=odd, ev_low=ev_low):
-                result = self.variants({UNDER_ST:self.record(UNDER_ST, odd=odd, probability=.7, ev_low=ev_low)})
+                # Replay an explicitly retained legacy choice. New weak studies
+                # outside the role universe no longer populate the triad.
+                result = self.variants({UNDER_ST:self.record(UNDER_ST, odd=odd, probability=.7, ev_low=ev_low)},
+                                       legacy_locked={'most_probable':UNDER_ST})
                 self.assertTrue(any(result['published'].values()))
                 self.assertEqual(any(result['under_15_floor_175'].values()), retained)
 

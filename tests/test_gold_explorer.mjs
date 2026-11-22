@@ -57,6 +57,15 @@ test('Ranking diversifies and obeys V7 order; unqualified never enter; all five 
  const rows=[row,{...row,id:'b',probability:.8,ev:.1},{...row,id:'c',fixture_id:'2',niche:true},{...row,id:'d',fixture_id:'3',validated:false,ev:5}];
  assert.deepEqual(rank(rows).map(r=>r.id),['c','a']);assert.deepEqual(rank(rows,'probable').map(r=>r.id),['b','c']);assert.equal(rank(rows,'best',false).length,3);assert.equal(rank(rows,'shots').length,0);assert.equal(rank(rows,'recommended').length,2);
 });
+test('Opposed alternatives stay searchable but cannot enter main rankings; legacy and compatible rows survive',()=>{
+ const opposite={...row,id:'opposed',fixture_id:'2',ev:.8,coherence_status:'opposed'};
+ const compatible={...row,id:'aligned',fixture_id:'3',coherence_status:'compatible'};
+ const broken={...row,id:'broken',fixture_id:'4',coherence_status:'inconsistent_gold_triad'};
+ const rows=[row,opposite,compatible,broken],before=JSON.stringify(rows);
+ for(const mode of ['best','probable','recommended'])assert.deepEqual(new Set(rank(rows,mode).map(r=>r.id)),new Set(['a','aligned']));
+ assert(matches(opposite,{},Date.parse('2026-11-17T17:00:00Z')),'Advanced search retains the original alternative');
+ assert.equal(JSON.stringify(rows),before);
+});
 test('Outcome, ROI, Brier and partial refunds; no result without matching kickoff, no imputed odds',()=>{
  const result={kickoff:row.kickoff,status:'settled',outcomes:{m:{win:1,loss:0}}},won={...row,outcome:outcome(row,result)},lost={...row,probability:.4,outcome:{win:0,loss:1,binary:true,profit:-1}};
  const s=statistics([won,lost,{...row,outcome:null}]);assert.equal(s.coverage,2/3);assert.equal(s.hitRate,.5);assert.equal(s.roi,0);assert(Math.abs(s.brier-.16)<1e-10);

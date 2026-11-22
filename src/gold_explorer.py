@@ -13,7 +13,7 @@ from audit_storage import open_verified_json, read_store
 from multimarket_model import stamp
 from quote_sources import PREMATCH_HOURS
 from v7_archive import valid_snapshot
-from v7_decision import TRIAD_LIMITS, TRIAD_MARKETS, AWAY
+from v7_decision import TRIAD_LIMITS, TRIAD_MARKETS, AWAY, compatible, confirmed_triad_coherent, stored_offers
 from v7_probability import finite, price_usable
 
 ROME = ZoneInfo('Europe/Rome')
@@ -124,6 +124,9 @@ def project_match(match, observed):
         return []
     sources = {r['id']: r for r in matrix.get('rows', []) if r.get('id')}
     official = snap.get('triad_commitments', snap.get('triad')) or {}
+    coherent = confirmed_triad_coherent(snap.get('triad') or {})
+    anchors = {pick['market_id']: pick.get('label') or 'Proposta Gold'
+               for _, pick, _ in stored_offers(match.get('multimarket') or {}, meta, observed.isoformat())}
     episode = str(meta['fixture_id'])+'::'+kickoff.isoformat()
     prices = match_odds(matrix, snap, observed)
     rows = []
@@ -144,6 +147,23 @@ def project_match(match, observed):
         observation = confirmation.get('observation_only') is True
         valid = bool(not observation and usable and original.get('supported') is True and original.get('tier')
                      and finite(ev) and ev > 0 and finite(low) and low >= 0)
+        opposed = []
+        if not coherent:
+            relation = 'inconsistent_gold_triad'
+            valid = False
+        elif not anchors:
+            relation = 'no_confirmed_triad'
+        elif market in anchors:
+            relation = 'official'
+        else:
+            try:
+                aligned = compatible(market, *anchors)
+                opposed = [label for key, label in anchors.items() if not compatible(market, key)]
+            except (TypeError, ValueError, KeyError):
+                aligned = False
+            relation = 'compatible' if aligned else 'opposed'
+            if not aligned and not opposed:
+                opposed = list(anchors.values())
         roles = [role for role, pick in official.items() if pick and pick.get('market_id') == market]
         quote = original.get('quote') or {}
         expiry = quote_expiry(source, kickoff, usable)
@@ -165,6 +185,8 @@ def project_match(match, observed):
                    captured_at=snap['captured_at'], published_at=observed.isoformat(),
                    forecast_sha256=snap['sha256'], exclusions=original.get('edge_exclusions', []))
         row.update(match_odds=prices, confirmation=confirmation, observation_only=observation,
+                   coherence_status=relation, coherence_opposed_to=opposed,
+                   coherence_forecast_sha256=snap['sha256'],
                    opening_delta_pct=(original.get('features') or {}).get('opening_delta_pct'),
                    last_leg_delta_pct=(original.get('features') or {}).get('delta_pct'),
                    oci_state=(original.get('features') or {}).get('oci_state'),
@@ -180,7 +202,9 @@ def project_match(match, observed):
 
 def rank(rows, mode='best', diversify=True):
     role = {'recommended': 'recommended_alternative', 'shots': 'high_odds_shot'}.get(mode)
-    candidates = [r for r in rows if r['validated'] and (not role or role in r['ranking_roles'])]
+    candidates = [r for r in rows if r['validated']
+                  and r.get('coherence_status') not in ('opposed', 'inconsistent_gold_triad')
+                  and (not role or role in r['ranking_roles'])]
     def order(r):
         return ((r['probability'], r['ev_low'], r['ev']) if mode == 'probable' else
                 (r['niche'], r['ev'], r['probability'])) + (r['market'], r['id'])

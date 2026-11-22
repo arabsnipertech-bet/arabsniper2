@@ -22,7 +22,7 @@ export function matches(r,f,now=Date.now(),historical=false){
 }
 export function rank(rows,mode='best',diversify=true){
  const role={recommended:'recommended_alternative',shots:'high_odds_shot'}[mode];
- const candidates=rows.filter(r=>r.validated&&(!role||r.ranking_roles?.includes(role)));
+ const candidates=rows.filter(r=>r.validated&&!['opposed','inconsistent_gold_triad'].includes(r.coherence_status)&&(!role||r.ranking_roles?.includes(role)));
  const tie=(a,b)=>a.market===b.market?(a.id===b.id?0:a.id>b.id?-1:1):a.market>b.market?-1:1;
  candidates.sort((a,b)=>mode==='probable'?b.probability-a.probability||b.ev_low-a.ev_low||b.ev-a.ev||tie(a,b):Number(b.niche)-Number(a.niche)||b.ev-a.ev||b.probability-a.probability||tie(a,b));
  const seen=new Set();return candidates.filter(r=>{if(diversify&&seen.has(r.fixture_id))return false;seen.add(r.fixture_id);return true;});
