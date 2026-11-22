@@ -46,8 +46,17 @@ class Projection(unittest.TestCase):
         e.publish(self.store,'bucket',self.root,[{'matches':[match or fixture()]}],phase,now=at,**kwargs)
     def history(self):return self.store.read('days/2026-11-17.json')
     def test_authentic_fields_and_no_source_mutation(self):
-        original=fixture();before=copy.deepcopy(original);row=e.project_match(original,AT)[0]
+        original=fixture();matrix=original['multimarket']['matrix']
+        matrix['v7']['markets'][KEY].update(origin_badge='Valore +EV (20,0%)',origin_tooltip='Motivo originale Gold')
+        matrix['rows'].append(dict(id='result_home',spec={'kind':'result','period':'ft','side':'1'},
+            odd=1.9,first_odd=2.1,quote_status='recent',bookmaker_id=1,bookmaker='Book QA',
+            quote_observed_at=AT.isoformat(),provider_updated_at=AT.isoformat(),quote_executable=True))
+        resign(original);before=copy.deepcopy(original);row=e.project_match(original,AT)[0]
         self.assertEqual(original,before);self.assertEqual((row['probability'],row['odd'],row['ev']),(.6,2.,.2));self.assertTrue(row['validated']);self.assertEqual(row['category'],'official')
+        self.assertEqual((row['origin_badge'],row['origin_tooltip']),('Valore +EV (20,0%)','Motivo originale Gold'))
+        self.assertEqual((row['match_odds']['1']['first_odd'],row['match_odds']['1']['odd']),(2.1,1.9))
+        self.assertTrue(row['match_odds']['1']['quote_usable']);self.assertNotIn('x',row['match_odds'])
+        self.assertFalse(e.project_match(fixture(),AT)[0]['match_odds'])
     def test_cutoff_and_started_postponed(self):
         for status in ('1H','FT','PST','CANC'):
             m=fixture();m['fixture']['status_short']=status;self.assertEqual(e.project_match(m,AT),[])

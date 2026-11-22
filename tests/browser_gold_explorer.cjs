@@ -10,6 +10,10 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  const rows=Array.from({length:1250},(_,i)=>({id:createHash('sha256').update(String(i)).digest('hex'),fixture_id:String(Math.floor(i/5)),episode:Math.floor(i/5)+'::k',home:'QA Casa '+Math.floor(i/5),away:'QA Ospite',league:'Campionato QA '+i%3,kickoff:'2026-11-17T14:00:00Z',date:'2026-11-17',market:'m'+i%5,label:['GG PT','GG FT','Over 2,5 FT','Under 3,5 FT','1X2 Casa'][i%5],probability:.6,odd:2.2,opening:2.1,ev:.32,ev_low:.1,oci:55,reliability:'supported',category:i%10?'alternative':'official',roles:i%10?[]:['most_probable'],validated:true,niche:false,quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z',ranking_roles:['recommended_alternative','high_odds_shot'],captured_at:'2026-11-17T09:30:00Z',published_at:'2026-11-17T10:00:00Z',forecast_sha256:'f'.repeat(64),quote:{bookmaker:'Fonte sintetica QA'}}));
  // Official records deliberately lack Explorer eligibility: this is a display regression.
  for(let i=0;i<rows.length;i+=5){rows[i].roles=['recommended_alternative'];rows[i].ranking_roles=[];rows[i].validated=false;rows[i].quote_usable=false;rows[i].official_references={recommended_alternative:{odd:2.05,captured_at:'2026-11-17T08:00:00Z'}};}
+ for(const row of rows){row.origin_badge='Ritmo 1°T (λ 1,20)';row.origin_tooltip='Motivo originale Gold · proiezione statistica del primo tempo';row.match_odds={
+  '1':{first_odd:2,odd:1.8,bookmaker:'Book QA',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'},
+  x:{first_odd:3,odd:3.3,bookmaker:'Book QA',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'},
+  '2':{first_odd:4,odd:4,first_observed_at:'2026-11-17T08:00:00Z',quote_observed_at:'2026-11-17T09:30:00Z',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'}};}
  const pages=[];for(let i=0;i<rows.length;i+=250)pages.push(add({version:1,rows:rows.slice(i,i+250)}));
  const boards={best:rows.slice(0,10).map(r=>r.id),probable:rows.slice(0,10).map(r=>r.id),recommended:rows.slice(0,10).map(r=>r.id),shots:rows.slice(0,10).map(r=>r.id),markets:{'GG FT':rows.filter(r=>r.label==='GG FT').slice(0,10).map(r=>r.id)}};
  const snapshot=add({pages,count:rows.length,boards}),hist={references:{},results:{},scans:[{sha256:snapshot,phase:'night',published_at:'2026-11-17T10:00:00Z'}],legacy_pages:[pages[0]]};
@@ -36,6 +40,9 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  });
  await page.goto('https://explorer.test/gold-explorer.html');await page.locator('h1').evaluate(el=>el.prepend('COLLAUDO QA — DATI SINTETICI · '));await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor();
  assert.equal(await page.locator('#results .selection').count(),10);const initial=calls.length;
+ const first=page.locator('#results .selection').first();assert.equal(await first.locator('.selection-1x2>div').count(),3);
+ assert((await first.locator('[data-movement=down]').innerText()).includes('↓ -10,0%'));assert((await first.locator('[data-movement=up]').innerText()).includes('↑ +10,0%'));assert((await first.locator('[data-movement=flat]').innerText()).includes('→ 0,0%'));
+ await first.locator('.selection-origin summary').click();assert(await first.getByText('Motivo originale Gold · proiezione statistica del primo tempo',{exact:true}).isVisible());assert.equal(calls.length,initial,'Reading the explanation adds no requests');
  for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);}
  await page.selectOption('#mode','markets');assert.equal(await page.locator('#marketIndex a').count(),4);
  await page.locator('#marketIndex a').filter({hasText:'Under 3,5 FT'}).click();assert((await page.evaluate(()=>document.activeElement.textContent)).startsWith('Under 3,5 FT'));

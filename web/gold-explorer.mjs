@@ -22,6 +22,30 @@ const filters=()=>({...Object.fromEntries(new FormData($('filterForm'))),diversi
 const empty=(node,value='Nessuna selezione corrisponde ai criteri.')=>node.innerHTML='<p class="empty">'+esc(value)+'</p>';
 const roleNames={most_probable:'Più Probabile',recommended_alternative:'Consigliata',high_odds_shot:'Colpaccio'};
 const originalRoles=row=>row.roles?.length?row.roles.map(r=>roleNames[r]||r).join(', '):'Fuori dalla triade ufficiale';
+function quoteContext(row,{historical=false}={}){
+ const prices=row.match_odds||{};
+ if(!Object.values(prices).some(q=>numeric(q.first_odd)||numeric(q.opening_odd)||numeric(q.odd)))return '';
+ const valid=v=>numeric(v)&&v>1?v:null;
+ return '<section class="selection-quotes" aria-label="Quote 1X2"><p class="small">1X2 · Apertura / prima osservata → '+(historical?'Ultima prematch':'Attuale')+'</p><div class="selection-1x2">'+['1','x','2'].map(side=>{
+  const q=prices[side]||{},first=valid(q.opening_odd)??valid(q.first_odd),last=valid(q.odd);
+  const repeated=Date.parse(q.first_observed_at)<Date.parse(q.quote_observed_at);
+  const delta=first!==null&&last!==null&&(first!==last||repeated)?Math.round((last/first-1)*1000)/10||0:null;
+  const direction=delta===null?'unknown':delta<0?'down':delta>0?'up':'flat';
+  const arrow={unknown:'—',down:'↓',up:'↑',flat:'→'}[direction];
+  const change=delta===null?'—':arrow+' '+(delta>0?'+':'')+number(delta,1)+'%';
+  const current=q.quote_usable&&Date.parse(q.quote_valid_until)>Date.now();
+  const note=last===null?'Non disponibile':!historical&&!current?'Da aggiornare':delta===null?'Prima rilevazione':'';
+  return '<div title="'+esc((q.bookmaker||'Fonte Gold')+' · osservata '+date(q.quote_observed_at))+'"><b>'+side.toUpperCase()+'</b><span class="selection-quote-values">'+number(first)+' → <strong>'+number(last)+'</strong></span><span class="selection-movement" data-movement="'+direction+'">'+change+'</span>'+(note?'<small>'+esc(note)+'</small>':'')+'</div>';
+ }).join('')+'</div></section>';
+}
+function proposalOrigin(row){
+ if(row.official_original&&row.probability===null)return '<p class="small">Motivazione della scelta originale non documentata nel riferimento salvato.</p>';
+ const detail=row.origin_tooltip||row.motivation;
+ if(detail)return '<details class="selection-origin"><summary>'+esc(row.origin_badge||'Perché questa analisi')+'</summary><p>'+esc(detail)+'</p></details>';
+ // Older immutable snapshots retain only their documented numerical evidence.
+ const evidence=['Probabilità V7 '+percent(row.probability),numeric(row.ev)?'EV '+percent(row.ev):'',numeric(row.delta)?'Variazione quota '+number(row.delta,1)+'%':''].filter(Boolean).join(' · ');
+ return '<details class="selection-origin"><summary>Motivo · dati dello snapshot</summary><p>'+esc(evidence)+'</p></details>';
+}
 function emptyResults(){
  empty($('results'),!state.rows.length?'Archivio corrente caricato: nessuna analisi prematch disponibile.':$('mode').value==='recommended'?'Nessuna Consigliata ufficiale Gold registrata corrisponde ai filtri attuali. Il caricamento è riuscito.':'Dati caricati: nessuna voce corrisponde alla vista e ai filtri attuali.');
 }
@@ -29,7 +53,7 @@ function cards(rows,node,options={}){
  if(!rows.length){empty(node);return;}
  node.innerHTML=rows.map(row=>{
   const key=row.id+'-'+(row.object||'current')+'-'+(options.favorite?'favorite':'view');state.viewRows.set(key,{row,...options});
-  return `<article class="selection"><div><span class="badge ${esc(row.category)}">${esc(categories[row.category]||'Archivio')}</span><p class="small">${esc(text(row.league))} · ${date(row.kickoff)}</p><h3>${esc(text(row.home))} — ${esc(text(row.away))}</h3></div><div><strong class="market">${esc(row.label)}</strong><p class="small">${row.roles?.length?'Triade: '+esc(row.roles.map(r=>roleNames[r]||r).join(', ')):'Fuori dalla triade ufficiale'}</p><p class="small">${row.reliability==='supported'?'Supporto statistico V7':'Affidabilità limitata'} · ${row.validated?'Validata da Explorer':'Non validata da Explorer'}</p>${row.outcome?`<b class="${row.outcome.win===1?'won':row.outcome.loss===1?'lost':''}">${esc(row.outcome.label)}</b>`:options.historical?'<span class="small">Esito non verificato</span>':''}</div><div class="numbers"><div><strong>${percent(row.probability)}</strong><small>Probabilità V7</small></div><div><strong>${number(row.odd)}</strong><small>${row.official_original?'Quota ufficiale originale':options.historical?'Quota snapshot':fresh(row)?'Quota di riferimento':'Quota storica / scaduta'}</small></div><p class="small">EV ${percent(row.ev)} · EV_low ${percent(row.ev_low)} · OCI ${number(row.oci,1)}</p></div><div class="actions"><button data-detail="${key}">Dettaglio</button><button ${options.favorite?'data-remove':'data-favorite'}="${key}" aria-label="${options.favorite?'Rimuovi preferito':'Salva preferito'}">${options.favorite?'Rimuovi':'☆'}</button></div></article>`;
+  return `<article class="selection"><div><span class="badge ${esc(row.category)}">${esc(categories[row.category]||'Archivio')}</span><p class="small">${esc(text(row.league))} · ${date(row.kickoff)}</p><h3>${esc(text(row.home))} — ${esc(text(row.away))}</h3>${quoteContext(row,options)}</div><div><strong class="market">${esc(row.label)}</strong>${proposalOrigin(row)}<p class="small">${row.roles?.length?'Triade: '+esc(row.roles.map(r=>roleNames[r]||r).join(', ')):'Fuori dalla triade ufficiale'}</p><p class="small">${row.reliability==='supported'?'Supporto statistico V7':'Affidabilità limitata'} · ${row.validated?'Validata da Explorer':'Non validata da Explorer'}</p>${row.outcome?`<b class="${row.outcome.win===1?'won':row.outcome.loss===1?'lost':''}">${esc(row.outcome.label)}</b>`:options.historical?'<span class="small">Esito non verificato</span>':''}</div><div class="numbers"><div><strong>${percent(row.probability)}</strong><small>Probabilità V7</small></div><div><strong>${number(row.odd)}</strong><small>${row.official_original?'Quota ufficiale originale':options.historical?'Quota snapshot':fresh(row)?'Quota di riferimento':'Quota storica / scaduta'}</small></div><p class="small">EV ${percent(row.ev)} · EV_low ${percent(row.ev_low)} · OCI ${number(row.oci,1)}</p></div><div class="actions"><button data-detail="${key}">Dettaglio</button><button ${options.favorite?'data-remove':'data-favorite'}="${key}" aria-label="${options.favorite?'Rimuovi preferito':'Salva preferito'}">${options.favorite?'Rimuovi':'☆'}</button></div></article>`;
  }).join('');
 }
 function render(){
@@ -109,7 +133,7 @@ async function certificate(scan,h){
 }
 function detail(row){
  const fast=row.latest_fast||row.fast_reference;
- $('detailBody').innerHTML='<h2>'+esc(row.label)+'</h2><p>'+esc(text(row.home)+' — '+text(row.away))+'</p><dl>'+[
+ $('detailBody').innerHTML='<h2>'+esc(row.label)+'</h2><p>'+esc(text(row.home)+' — '+text(row.away))+'</p>'+quoteContext(row,{historical:Date.parse(row.kickoff)<=Date.now()})+proposalOrigin(row)+'<dl>'+[
  ['Categoria Explorer',categories[row.category]],['Ruolo originale Gold',originalRoles(row)],['Quota originale Consigliata Gold',row.roles?.includes('recommended_alternative')?number(row.official_references?.recommended_alternative?.odd):'—'],['Registrazione Consigliata Gold',row.roles?.includes('recommended_alternative')?date(row.official_references?.recommended_alternative?.captured_at):'—'],['Probabilità V7',percent(row.probability)],['Apertura',number(row.opening)],['Prima quota osservata',number(row.first_odd)],['Quota del riferimento',number(row.odd)],['Quota Night',row.night_reference?number(row.night_reference.odd)+' · '+date(row.night_reference.captured_at):'Non disponibile'],['Ultima quota Fast valida',fast?number(fast.odd)+' · '+date(fast.captured_at)+(Date.parse(fast.quote_valid_until)>Date.now()?'':' · storica / scaduta'):'Nessun aggiornamento Fast documentato'],['EV / EV_low',percent(row.ev)+' / '+percent(row.ev_low)],['OCI',number(row.oci)],['Affidabilità',row.reliability==='supported'?'Supporto statistico V7':'Limitata'],['Fonte',text(row.quote?.bookmaker)||row.quote?.bookmaker_id||'Non disponibile'],['Quota osservata',date(row.quote?.quote_observed_at)],['Aggiornata dalla fonte',date(row.quote?.provider_updated_at)],['Utilizzabile fino a',date(row.quote_valid_until)],['Snapshot V7',date(row.captured_at)],['Registrazione Explorer',row.legacy_v7?'Archivio V7 precedente':date(row.published_at)],['Salvata tra i preferiti',row.saved_at?date(row.saved_at*1000):'—'],['Riferimento finale',row.fallback_night?'Night: Fast successivo assente':row.reference||'Corrente'],['Esito',row.outcome?.label||'Non verificato'],['Risultato FT',row.outcome&&numeric(row.result?.result?.home_ft)&&numeric(row.result?.result?.away_ft)?row.result.result.home_ft+' – '+row.result.result.away_ft:'Non disponibile'],['Risultato PT',row.outcome&&numeric(row.result?.result?.home_ht)&&numeric(row.result?.result?.away_ht)?row.result.result.home_ht+' – '+row.result.result.away_ht:'Non disponibile'],['Motivi di attenzione',(row.exclusions||[]).join(', ')||'—'],['Impronta snapshot',row.forecast_sha256]
  ].map(([k,v])=>'<dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd>').join('')+'</dl><p class="note">Dati relativi al riferimento indicato. Explorer non ricalcola le probabilità V7.</p><button id="allAlternatives">Altre analisi della partita</button>';
  $('allAlternatives').onclick=()=>action(async()=>{
