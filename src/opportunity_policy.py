@@ -134,11 +134,22 @@ def market_tier(row):
     return 0 if goal_market(row) is not None else None
 
 
+def opening_change(row):
+    """Keep the existing opening-based gates when delta_pct names the last leg."""
+    if row.get('prematch_stable'):
+        return 0.  # A repeated cache quote must not reactivate past flow.
+    if numeric(row.get('opening_delta_pct')):
+        return row['opening_delta_pct']
+    if row.get('delta_basis') == 'last_leg':
+        return None
+    return row.get('delta_pct')
+
+
 def confirmed_flow(row, minimum_oci=40):
     oci = row.get('oci')
     pairs, agreeing = row.get('paired_books', 0), row.get('agreeing_books', 0)
     selected = row.get('selected_movement') or {}
-    return bool(numeric(oci) and abs(oci) >= minimum_oci and
+    return bool(not row.get('historical_oci') and numeric(oci) and oci != 0 and abs(oci) >= minimum_oci and
         row.get('movement_confirmed') is True and row.get('fair_direction_coherent') is True and
         numeric(pairs) and numeric(agreeing) and pairs >= 2 and agreeing >= 2 and agreeing > pairs/2 and
         numeric(selected.get('delta_pct')) and selected['delta_pct'] * oci < 0 and
@@ -246,8 +257,8 @@ def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None,
     if market == 'over25_ft' and over25_floor is not None: minimum_odd = over25_floor
     margin, oci = row.get('selected_margin_pct'), row.get('oci')
     movement = row.get('selected_movement') or {}
-    delta = row.get('delta_pct')
-    if not numeric(delta): delta = movement.get('delta_pct')
+    delta = opening_change(row)
+    if not numeric(delta) and row.get('delta_basis') != 'last_leg': delta = movement.get('delta_pct')
     persistence = movement.get('persistence')
     ft_over = market in FT_OVER_MARKETS
     saturated = ft_over and (

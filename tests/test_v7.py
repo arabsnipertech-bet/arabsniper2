@@ -125,7 +125,7 @@ class MathAndRouting(unittest.TestCase):
             ({'tier': 'PLATINUM', 'features': {'oci': 30, 'opening_delta_pct': -3}}, 'Flusso OCI +30,0', '-3,0%'),
             ({'features': {'oci': -12}}, 'Valore Contrarian', 'EV prudente +4,0%'),
             ({'features': {'margin_pct': 5.4}}, 'Valore +EV (16,6%)', 'Aggio 5,4%'),
-            ({'ev': -.02, 'ev_low': -.05, 'features': {'oci': 8}}, 'Trend Quota -4,0%', '2,25 a 2,16'),
+            ({'ev': -.02, 'ev_low': -.05, 'features': {'oci': 8}}, 'Quota in calo, conferma insufficiente', '2,25 a 2,16'),
         ):
             with self.subTest(expected=expected):
                 origin = market_origin(spec, rates, {**priced, **patch}, conversion=True)
@@ -283,10 +283,10 @@ class MathAndRouting(unittest.TestCase):
         matrix = a['matrix']
         over = next(r for r in matrix['rows'] if r['id'] == FT)
         baseline = over['statistical_pct']
-        quote = row(json.loads(FT), 2.10, fair=.60)
+        quote = row(json.loads(FT), 2.10, fair=1/(2.10*1.05))
         quote.pop('statistical_pct')
         over.update(quote, first_odd=2.10/.96, bookmaker='Test', oci=38,
-                    market_fair_pct=60, delta_pct=-4, paired_books=4, agreeing_books=3,
+                    market_fair_pct=100/(2.10*1.05), delta_pct=-4, paired_books=4, agreeing_books=3,
                     movement_confirmed=True, fair_direction_coherent=True,
                     selected_movement=dict(delta_pct=-4, fair_delta_pp=2, persistence=.67, reversal=False))
         meta = dict(META, country='Italy', league='Serie A')
@@ -596,7 +596,7 @@ class EVRecovery(unittest.TestCase):
         for key in ('statistics','raw_rates','market_projection','rates','weight','means','calibration'):
             self.assertEqual(changed[key],baseline[key])
         for key in baseline['markets']:
-            omitted = ('tier','ev_recovery')
+            omitted = ('tier','ev_recovery','confirmation','origin_badge','origin_tooltip')
             self.assertEqual({k:v for k,v in changed['markets'][key].items() if k not in omitted},
                              {k:v for k,v in baseline['markets'][key].items() if k not in omitted})
         self.assertEqual(before['matrix']['rows'],after['matrix']['rows'])
@@ -662,8 +662,10 @@ class EVRecovery(unittest.TestCase):
         for key in ('statistics','raw_rates','market_projection','rates','weight','means','calibration'):
             self.assertEqual(changed[key],baseline[key])
         for key in baseline['markets']:
-            stripped = {k:v for k,v in changed['markets'][key].items() if k not in ('tier','ev_recovery')}
-            self.assertEqual(stripped,{k:v for k,v in baseline['markets'][key].items() if k!='tier'})
+            # Qualification metadata changes; every estimate and price remains identical.
+            presentation={'tier','ev_recovery','confirmation','origin_badge','origin_tooltip'}
+            stripped = {k:v for k,v in changed['markets'][key].items() if k not in presentation}
+            self.assertEqual(stripped,{k:v for k,v in baseline['markets'][key].items() if k not in presentation})
         self.assertEqual(after['matrix']['rows'],before['matrix']['rows'])
         self.assertFalse(changed['signals']['gold'] or changed['signals']['platinum'])
         self.assertTrue(valid_snapshot(changed,META,AT))

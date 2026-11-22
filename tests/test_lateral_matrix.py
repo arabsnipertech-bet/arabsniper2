@@ -41,11 +41,12 @@ class MatrixMath(unittest.TestCase):
 
         confirmed = dict(cached, quote_status='recent')
         preserve_confirmed_oci(confirmed, history, later)
-        self.assertEqual(history['gg_ht'], {'value': 0, 'observed_at': later})
+        self.assertEqual(history['gg_ht'], {'value': -58.42, 'observed_at': first})
+        self.assertEqual(confirmed['oci'], 0)
         replay = {'id': 'gg_ht', 'oci': None, 'last_confirmed_oci': history['gg_ht']}
-        preserve_confirmed_oci(replay, history, first)
+        preserve_confirmed_oci(replay, history, '2026-11-10T11:31:00+01:00')
         self.assertNotIn('last_confirmed_oci', replay)
-        self.assertEqual(history['gg_ht']['observed_at'], later)
+        self.assertEqual(history['gg_ht']['observed_at'], first)
 
     @classmethod
     def setUpClass(cls):
@@ -180,6 +181,28 @@ class MatrixMath(unittest.TestCase):
         self.assertEqual(row['oci'], 0)
         self.assertEqual(row['market_behavior'], 'neutral')
         self.assertEqual(row['margin_trend'], 'compressing')
+
+    def test_opening_and_post_reversal_leg_survive_repricing_separately(self):
+        from quote_cache import recalculate
+        from v7_decision import features
+        a, state = deepcopy(self.a), {}
+        for at, odd in [('2026-10-26T06:00:00Z', 2.4),
+                        ('2026-10-26T07:00:00Z', 2.0), (NOW, 2.2)]:
+            attach(a, payload(at, over=odd), state, match()['fixture'], at)
+        row = next(r for r in a['matrix']['rows'] if r['spec'] == S('total', 'ft', 'over', 2.5))
+        self.assertAlmostEqual(row['opening_delta_pct'], 100*(2.2/2.4-1))
+        self.assertAlmostEqual(row['delta_pct'], 10.)
+        self.assertEqual(row['opening_odd'], 2.4)
+        self.assertEqual(row['delta_basis'], 'last_leg')
+        self.assertEqual(row['oci_state'], 'current')
+        numeric = {k: row[k] for k in ('odd', 'statistical_pct', 'win_weight', 'loss_weight', 'ev_pct')}
+        self.assertTrue(recalculate(row))
+        self.assertEqual(numeric, {k: row[k] for k in numeric})
+        self.assertAlmostEqual(row['delta_pct'], 10.)
+        feature = features(row, True, NOW)
+        self.assertAlmostEqual(feature['delta_pct'], 10.)
+        self.assertAlmostEqual(feature['opening_delta_pct'], 100*(2.2/2.4-1))
+        self.assertEqual(feature['delta_observed_from'], '2026-10-26T07:00:00+00:00')
 
     def test_stale_prices_and_only_one_book_do_not_create_confirmation(self):
         a = deepcopy(self.a)

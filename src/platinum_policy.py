@@ -1,5 +1,5 @@
 """Gold admission with additional confirmed multi-operator flow."""
-from opportunity_policy import RULES_REVISION, evaluate as evaluate_gold, goal_market, numeric, probability_order
+from opportunity_policy import RULES_REVISION, evaluate as evaluate_gold, goal_market, numeric, probability_order, opening_change
 from multimarket_model import stamp
 
 LEGACY_POLICY_ID = 'platinum-flow-v1'
@@ -19,8 +19,8 @@ def flow_rejections(row, as_of, max_drop):
         at, end, now = stamp(row.get('cache_source_at')), stamp(row.get('cache_expires_at')), stamp(as_of)
         if not at or not end or not now or not at <= now <= end:
             reasons.append('cache_expired')
-    oci, margin, delta = row.get('oci'), row.get('selected_margin_pct'), row.get('delta_pct')
-    if not numeric(oci) or not LIMITS['min_oci'] <= oci <= 100: reasons.append('oci')
+    oci, margin, delta = row.get('oci'), row.get('selected_margin_pct'), opening_change(row)
+    if row.get('historical_oci') or not numeric(oci) or not LIMITS['min_oci'] <= oci <= 100: reasons.append('oci')
     if not numeric(margin) or not 0 <= margin <= LIMITS['max_margin_pct']: reasons.append('margin')
     if (not numeric(first) or first <= 1 or not numeric(odd) or not numeric(delta)
             or delta > max_drop+1e-9
@@ -84,7 +84,7 @@ def annotate(matrix, meta, as_of, *, probability_model=None, quote_filter=None):
     if probability_model:
         candidates.sort(key=probability_order)
     else:
-        candidates.sort(key=lambda r: (-r['oci'], r['delta_pct'], -r['odd'], str(r['id'])))
+        candidates.sort(key=lambda r: (-r['oci'], opening_change(r), -r['odd'], str(r['id'])))
     for rank, row in enumerate(candidates, 1): row['platinum']['rank'] = rank
     matrix['platinum_policy'] = {'id': POLICY_ID, 'rules_revision': RULES_REVISION,
         'evaluated_at': as_of, 'limits': dict(LIMITS),

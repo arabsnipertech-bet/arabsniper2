@@ -204,7 +204,7 @@ assert(api.marketRow(signal,{}, {marketSignal:true}).includes('Scartato · stima
 assert(api.marketRow(signal,{}, {marketSignal:true}).includes('Radar di Mercato · Solo studio'));
 assert.equal(JSON.stringify(signal),signalSnapshot,'Display and classification cannot mutate the stored decision');
 const excludedPatches=[
- {oci:29.999},{oci:-48},{oci:null},{oci:101},
+ {oci:29.999},{oci:-48},{oci:null},{oci:0},{oci:101},{historical_oci:true},
  {delta_pct:-1.999},{delta_pct:3},{delta_pct:null},{first_odd:null},{first_odd:3},{bookmaker:''},{bookmaker:' '},{bookmaker:true},
  {selected_margin_pct:9.001},{selected_margin_pct:-.1},{selected_margin_pct:null},
  {odd:1},{odd:null},{odd:NaN},{odd:Infinity},
@@ -727,7 +727,7 @@ for(const [patch,label,detail] of [
  [{},'Flusso OCI +38,0','2/3 · EV +16,6%'],
  [{oci:-12},'Valore Contrarian','EV prudente +4,0%'],
  [{oci:8},'Valore +EV (16,6%)','Aggio 5,4%'],
- [{oci:8,ev_pct:-2,ev_low_pct:-5},'Trend Quota -4,0%','2,25 a 2,16']
+ [{oci:8,ev_pct:-2,ev_low_pct:-5},'Quota in calo, conferma insufficiente','2,25 a 2,16']
 ]){
  const origin=api.marketOrigin({...originQuote,...patch},{rates:originRates});
  assert.equal(origin.origin_badge,label);

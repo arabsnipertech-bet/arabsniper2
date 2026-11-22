@@ -206,6 +206,7 @@ def run(root, cutoff):
             write_store(root/STATE, existing['state'])
         return existing
     rows, days, anomalies, previous = [], {}, {}, active_weight(cutoff, root)[0]
+    shadow_archives = []
     for offset in range(1, WINDOW + 1):
         day = today - timedelta(days=offset)
         try:
@@ -223,6 +224,8 @@ def run(root, cutoff):
             continue
         days[str(day)] = {**data['counts'], 'rejected_forecasts': data.get('rejected_forecasts', 0)}
         rows.extend(data['samples'])
+        shadow_archives.append({'fixtures':{fid:{'observed_at':r.get('observed_at'),
+            'decision_shadow':r.get('decision_shadow')} for fid,r in data.get('fixtures',{}).items()}})
     settled = deduplicated(rows, cutoff)
     learned = fit(settled, cutoff, previous)
     state = dict(version=VERSION, trained_at=utc(cutoff), weight=learned['weight'],
@@ -232,6 +235,8 @@ def run(root, cutoff):
                   comparison=evaluate([r for r in settled if r.get('benchmark', True)], today), update=learned,
                   diagnostics=diagnostics(settled, today),
                   manual_review=['structural_parameters', 'market_feature_weights', 'gold_promotion'])
+    from v7_shadow_metrics import report as shadow_report
+    report['movement_shadow'] = shadow_report(shadow_archives,cutoff)
     write_store(path, report)
     write_store(root/STATE, state)
     return report

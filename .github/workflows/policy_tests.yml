@@ -81,6 +81,8 @@ jobs:
         run: NODE_PATH=/tmp/arabsniper-browser/node_modules node tests/browser_publisher_v71.cjs
       - name: Check Gold Explorer
         run: NODE_PATH=/tmp/arabsniper-browser/node_modules node tests/browser_gold_explorer.cjs
+      - name: Check V7 qualifications in desktop and mobile browser
+        run: NODE_PATH=/tmp/arabsniper-browser/node_modules node tests/browser_v7_confirmation.cjs
       - name: Save dashboard previews
         if: always()
         uses: actions/upload-artifact@v4

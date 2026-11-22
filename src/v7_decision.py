@@ -22,6 +22,7 @@ from v7_probability import (BASE_WEIGHT, VERSION, blend_rates, fair_inputs, fini
                             score_model, statistical_rates, utc)
 from v7_recent_selection import POLICY_ID as LATEST_PREMATCH_POLICY, save as save_latest_selection
 from v7_over15_deficit import single_deficit, priority_bonus, explain as explain_deficit
+from v7_confirmation import confirmation, oci_context
 
 GOAL = {
     name: market_id(specification('total', period, 'over', line))
@@ -102,18 +103,24 @@ def features(row, usable, as_of):
     if not usable:
         return {}
     move = row.get('selected_movement') or {}
-    from_at, to_at, now = (stamp(t) for t in (move.get('observed_from'), move.get('observed_to'), as_of))
+    from_at, to_at, now = (stamp(t) for t in (move.get('leg_observed_from',move.get('observed_from')),
+                                           move.get('leg_observed_to',move.get('observed_to')), as_of))
     repeated = bool(from_at and to_at and from_at < to_at <= now)
     first, odd = row.get('first_odd'), row['odd']
     first_at, last_at = (stamp(row.get(k)) for k in ('first_observed_at', 'quote_observed_at'))
     opening_delta = 100*(odd/first-1) if first_at and last_at and first_at < last_at <= now and finite(first) and first > 1 else None
     net = 0. if row.get('prematch_stable') else opening_delta
-    oci = None if row.get('historical_oci') else row.get('oci')
+    context = oci_context(row)
+    oci = context['oci']
     return dict(delta_pct=move.get('delta_pct') if repeated else None, net_delta_pct=net,
                 opening_delta_pct=opening_delta,
+                delta_basis='last_leg', oci_state=context['oci_state'],
+                delta_observed_from=utc(from_at) if repeated else None,
+                delta_observed_to=utc(to_at) if repeated else None,
+                last_confirmed_oci=context['last_confirmed_oci'],
                 oci=oci if finite(oci) else None, oci_method=row.get('oci_method'),
                 oci_band=('below_-50' if oci < -50 else '-50_to_0' if oci < 0 else
-                          '0_to_50' if oci < 50 else '50_plus') if finite(oci) else None,
+                          'zero' if oci == 0 else '0_to_50' if oci < 50 else '50_plus') if finite(oci) else None,
                 persistence=move.get('persistence') if repeated else None,
                 reversal=move.get('reversal') if repeated else None,
                 margin_pct=row.get('selected_margin_pct'),
@@ -283,6 +290,8 @@ def selection_motivation(row, reason, relaxed):
         summary = f"Rivalutazione statistica · EV originale {100*row['ev']:+.1f}%"
     if reason == 'alternativa_qualificata':
         summary = 'Alternativa con valore e margine prudente confermati'
+    if reason == 'solo_osservazione':
+        summary = 'Osservazione · qualifica non confermata al prezzo osservato'
     parts = [summary, f"Probabilità V7 {100*row['calibrated']:.1f}%",
              f'Fair bookmaker {100*fair:.1f}%' if finite(fair) else 'Fair bookmaker non disponibile']
     recovery = row.get('ev_recovery') or {}
@@ -308,7 +317,7 @@ def selection_motivation(row, reason, relaxed):
     if move.get('paired_books') == 1:
         parts.append('OCI a singolo bookmaker, in attesa di conferma')
     else:
-        parts.append(f'OCI {oci:+.1f}' if finite(oci) else 'OCI non disponibile')
+        parts.append('OCI 0 · neutro' if oci == 0 else f'OCI {oci:+.1f}' if finite(oci) else 'OCI non disponibile')
     return ' · '.join(parts).replace('.', ',')
 
 
@@ -338,6 +347,10 @@ def market_origin(spec, rates, record, *, conversion=False):
         comparison += (f" Finestra stesso operatore: quota {origin_number(movement['net_delta_pct'], 1, True)}%"
                        f" · fair {origin_number(movement['fair_delta_pp'], 1, True)} pp"
                        f" · aggio {origin_number(movement['margin_delta_pp'], 1, True)} pp.")
+    qualification = record.get('confirmation') or {}
+    if qualification.get('label'):
+        return explain_deficit(dict(origin_badge=qualification['label'],
+            origin_tooltip=f"{qualification['detail']} {comparison}"),market_id(spec),record)
     niche = record['niche_id']
     if niche == 'fav_home_pt_vulnerable':
         badge = NICHE_LABELS[niche]
@@ -370,7 +383,8 @@ def market_origin(spec, rates, record, *, conversion=False):
         change, flow = origin_number(delta, 1, True), origin_number(oci, 1, True)
         ev_pct = origin_number(100*ev, 1, True)+'%' if finite(ev) else '—'
         low_pct = origin_number(100*low, 1, True)+'%' if finite(low) else '—'
-        if finite(oci) and (record['tier'] == 'PLATINUM' or oci >= 30 and finite(delta) and delta <= -3+1e-9):
+        if (finite(oci) and oci > 0 and (not qualification or qualification.get('flow_confirmed'))
+                and (record['tier'] == 'PLATINUM' or oci >= 30 and finite(delta) and delta <= -3+1e-9)):
             badge = f'Flusso OCI {flow}'
             books = '/'.join(origin_number(move.get(key), 0) for key in ('agreeing_books', 'paired_books'))
             change_pct = change+'%' if finite(delta) else '—'
@@ -384,8 +398,8 @@ def market_origin(spec, rates, record, *, conversion=False):
                 aggio = origin_number(margin, 1)+'%' if finite(margin) else 'non disponibile'
                 text = f'Quota bookmaker {shown_odd} sopra la quota equa V7 · Aggio {aggio}.'
         elif finite(delta) and abs(delta) >= 2.5-1e-9:
-            badge = f'Trend Quota {change}%'
-            text = f"Variazione dall’apertura {opening} a {shown_odd} · OCI {flow}."
+            badge = 'Rialzo senza conferma' if delta > 0 else 'Quota in calo, conferma insufficiente'
+            text = f"Variazione dalla prima osservata {opening} a {shown_odd} ({change}%) · OCI {flow}. Il solo movimento non qualifica la proposta."
         if badge:
             return explain_deficit(dict(origin_badge=badge, origin_tooltip=f'{text} {comparison}'), market_id(spec), record)
 
@@ -424,7 +438,8 @@ def signal(key, row, reason, *, relaxed=False):
                 **{field: row[field] for field in ('origin_badge', 'origin_tooltip', 'selection_context') if field in row})
 
 
-def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked, role_markets):
+def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked, role_markets,
+                     ranker=None, candidate_filter=None):
     model_only = not any(finite(row['odd']) for row in records.values())
     if model_only and not allow_unpriced:
         return
@@ -439,6 +454,8 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
         available = {locked_market} & records.keys() if locked_market else records.keys() - fixed
         for key in available:
             row = records[key]
+            if candidate_filter and not candidate_filter(role,key,row,fixed):
+                continue
             if row['spec_kind'] not in ('result', 'total', 'btts', *JOINT_KINDS):
                 continue
             is_estimate = not finite(row['odd'])
@@ -468,8 +485,8 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
                 continue
             row = records[key]
             preferred = key in standard[role]
-            ranks.append((2 if preferred else 1, preferred and finite(row['odd']),
-                          row['calibrated'], row['ev'] or 0., key))
+            ranking = ranker(role,key,row) if ranker else (row['calibrated'],row['ev'] or 0.,key)
+            ranks.append((2 if preferred else 1, preferred and finite(row['odd']),*ranking))
         return (sum(rank[0] > 0 for rank in ranks), sum(rank[0] == 2 for rank in ranks),
                 sum(rank[1] for rank in ranks), ranks)
 
@@ -513,7 +530,8 @@ def coherent_slot_prices(records, slots):
             and not (finite(recommended) and finite(shot) and shot < recommended))
 
 
-def fill_qualified_alternatives(triad, records, observed, locked, limits, ev_recoveries, roles):
+def fill_qualified_alternatives(triad, records, observed, locked, limits, ev_recoveries, roles,
+                                role_markets=TRIAD_MARKETS, ranker=None, candidate_filter=None):
     """Only an otherwise empty Consigliata may use another qualified market."""
     role = 'recommended_alternative'
     if role not in roles or triad[role]:
@@ -523,7 +541,8 @@ def fill_qualified_alternatives(triad, records, observed, locked, limits, ev_rec
         return
     held = {**locked, **{slot: pick['market_id'] for slot, pick in triad.items() if pick}}
     proposed, _ = route(records, observed, locked=held, limits=limits,
-                        role_markets={**TRIAD_MARKETS, role: candidates}, ev_recoveries=ev_recoveries)
+                        role_markets={**role_markets, role: candidates}, ev_recoveries=ev_recoveries,
+                        ranker=ranker,candidate_filter=candidate_filter)
     pick = proposed[role]
     if (not pick or not coherent_slot_prices(records, {**held, role: pick['market_id']})
             or any(triad[other] and (not proposed[other]
@@ -599,7 +618,7 @@ def ev_recovery_candidates(records, sources, as_of, kickoff, statistics_at, comm
 
 def route(records, observed, *, study=False, allow_model_estimates=False, allow_unpriced=False,
           locked=None, role_markets=TRIAD_MARKETS, limits=TRIAD_LIMITS, ev_recoveries=None,
-          qualified_alternatives=()):
+          qualified_alternatives=(), ranker=None, candidate_filter=None):
     locked = locked or {}
     reserved = set(locked.values())
     triad = dict.fromkeys(TRIAD_MARKETS)
@@ -610,6 +629,8 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
         available = {locked[role]} if role in locked else markets - reserved
         for key in available & markets & records.keys():
             row = records[key]
+            if candidate_filter and not candidate_filter(role,key,row,reserved|set(chosen)):
+                continue
             odd, ev, low = row['odd'], row['ev'], row['ev_low']
             if not (row['tier'] and finite(odd) and minimum <= odd <= maximum
                     and row['calibrated'] >= floor and finite(ev) and ev > 0):
@@ -625,7 +646,7 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
                 candidates.append(key)
         if not candidates:
             continue
-        key = max(candidates, key=lambda key: role_rank(role, key, records[key]))
+        key = max(candidates, key=lambda key: (ranker or role_rank)(role,key,records[key]))
         triad[role] = signal(key, records[key], role)
         chosen.append(key)
 
@@ -638,6 +659,8 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
         candidates = []
         for key in available & proofs.keys() & records.keys():
             row, proof = records[key], proofs[key]
+            if candidate_filter and not candidate_filter(role,key,row,reserved|set(chosen)):
+                continue
             odd = row['odd']
             if (not finite(odd) or not minimum <= odd <= maximum or row['calibrated'] < floor
                     or proof['original_ev'] != row['ev'] or proof['probability'] != row['calibrated']
@@ -652,7 +675,7 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
                 continue
             candidates.append(key)
         if candidates:
-            key = max(candidates, key=lambda k: role_rank(role, k, records[k]))
+            key = max(candidates, key=lambda k: (ranker or role_rank)(role,k,records[k]))
             triad[role] = {**signal(key, {**records[key], 'tier': 'BLU', 'ev_recovery': proofs[key]},
                                    'ev_recovery_aggio_v1'),
                            'ev_recovery': dict(proofs[key])}
@@ -660,7 +683,7 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
 
     if qualified_alternatives:
         fill_qualified_alternatives(triad, records, observed, locked, limits,
-                                    ev_recoveries, qualified_alternatives)
+                                    ev_recoveries, qualified_alternatives,role_markets,ranker,candidate_filter)
     signals = {name: triad[role] for role, name in SIGNAL_ROLES.items()}
     for tier in ('GOLD', 'PLATINUM'):
         signals[tier.lower()] = next((pick for pick in triad.values() if pick and pick['tier'] == tier), None)
@@ -673,7 +696,8 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
     signals['radar_sorprese'] = signal(best, records[best], 'quota_alta_in_salita') if best else None
     signals['observations'] = observed
     if study:
-        fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked, role_markets)
+        fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked, role_markets,
+                         ranker,candidate_filter)
     return triad, signals
 
 
@@ -916,17 +940,38 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     for pick in triad.values():
         if pick and pick.get('ev_recovery'):
             records[pick['market_id']].update(tier='BLU', ev_recovery=dict(pick['ev_recovery']))
-    # Add explanations only after selection, with the estimates already computed.
-    # This bounds payload growth and cannot influence admission, ranking or weights.
-    for pick in triad.values():
+    # Describe current qualification separately from the role. The observations
+    # remain inspectable; no movement alone can publish a confirmed signal.
+    selected = {pick['market_id']:pick for pick in triad.values() if pick}
+    for key, record in records.items():
+        pick = selected.get(key)
+        source = sources[record['source_market_id']]
+        if pick:
+            record['pricing_evidence'] = pricing_evidence(*pricing_context[key], as_of=as_of)
+        record['confirmation'] = confirmation(json.loads(key),record,source,as_of,meta['kickoff'],
+                                               pick=pick,patterns=observed_patterns)
+        record.update(market_origin(source['spec'],calibrated,record,conversion=observed_patterns['conversion']))
+        if pick:
+            pick.update({field:record[field] for field in ('origin_badge','origin_tooltip','confirmation')})
+            pick['observation_only'] = record['confirmation']['observation_only']
+    for role,pick in triad.items():
+        if pick and pick['observation_only']:
+            pick.update(study_only=True,tier='BLU',badge=BADGES['BLU'])
+            pick['motivation'] = selection_motivation(records[pick['market_id']],'solo_osservazione',True)
+            signals[SIGNAL_ROLES[role]] = None
+    for name in ('radar_conversione','radar_sorprese'):
+        pick = signals.get(name)
         if not pick:
             continue
-        key = pick['market_id']
-        record, source = records[key], sources[records[key]['source_market_id']]
-        record['pricing_evidence'] = pricing_evidence(*pricing_context[key], as_of=as_of)
-        record.update(market_origin(source['spec'], calibrated, record,
-                                    conversion=observed_patterns['conversion']))
-        pick.update({field: record[field] for field in ('origin_badge', 'origin_tooltip')})
+        record = records[pick['market_id']]
+        pick.update({field:record[field] for field in ('origin_badge','origin_tooltip','confirmation')})
+        pick['observation_only'] = record['confirmation']['observation_only']
+        if pick['observation_only']:
+            pick.update(study_only=True,tier='BLU',badge=BADGES['BLU'])
+            pick['motivation'] = selection_motivation(record,'solo_osservazione',True)
+    for tier_name in ('gold','platinum'):
+        signals[tier_name] = next((p for p in triad.values() if p and not p.get('observation_only')
+                                   and p['tier'] == tier_name.upper()),None)
     first = next((pick for pick in triad.values() if pick), None)
     tier = max((pick['tier'] for pick in triad.values() if pick), key=TIER_RANK.__getitem__,
                default='BLU' if niches or any(row['tier'] for row in records.values()) else None)
@@ -952,7 +997,9 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
             payload['triad_timing'] = dict(id=LATEST_PREMATCH_POLICY, status='current',
                                           evaluated_at=payload['captured_at'])
         payload['decision_shadow'] = capture_v7(records, sources, observed_patterns, triad,
-                                                locked=bool(locked), allow_model_estimates=0 <= days_ahead <= 5)
+                                                locked=bool(locked), allow_model_estimates=0 <= days_ahead <= 5,
+                                                as_of=as_of,kickoff=meta['kickoff'],profiles=profiles,
+                                                ev_recoveries=recoveries,qualified_alternatives=alternative_roles)
     return {**payload, 'sha256': fingerprint(payload)}
 
 

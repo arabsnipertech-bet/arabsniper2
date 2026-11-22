@@ -34,6 +34,9 @@
  const num=(v,n=1)=>typeof v==='number'&&Number.isFinite(v)?v.toLocaleString('it-IT',{minimumFractionDigits:n,maximumFractionDigits:n}):'—';
  const pct=v=>typeof v==='number'&&Number.isFinite(v)?num(v)+'%':'—';
  const signed=v=>typeof v==='number'&&Number.isFinite(v)?(v>0?'+':'')+num(v):'—';
+ const openingChange=r=>r.prematch_stable?0:Number.isFinite(r.opening_delta_pct)?r.opening_delta_pct:
+  r.delta_basis==='last_leg'?null:r.delta_pct;
+ const ociLabel=r=>!Number.isFinite(r?.oci)?'Non disponibile':r.oci===0?'0 · neutro':signed(r.oci);
  const originLabels={fav_home_pt_vulnerable:'Favorita PT',balanced_1x2_inversion:'Inversione 1X2',
   bookmaker_shift_rebound:'Rimbalzo PT',pt_st_symmetry_11_22:'Simmetria 1°+2°T'};
  const hasOrigin=value=>typeof value?.origin_badge==='string'&&value.origin_badge.trim()&&
@@ -79,7 +82,7 @@
    const ev=Number.isFinite(record?.ev)?100*record.ev:row.ev_pct,low=Number.isFinite(record?.ev_low)?100*record.ev_low:row.ev_low_pct;
    const tier=signal?.tier??record?.tier??(row.platinum?.eligible?'PLATINUM':row.opportunity?.eligible?'GOLD':null);
    const change=Number.isFinite(delta)?signed(delta)+'%':'—',evPct=Number.isFinite(ev)?signed(ev)+'%':'—';
-   if(Number.isFinite(oci)&&(tier==='PLATINUM'||oci>=30&&Number.isFinite(delta)&&delta<=-3+1e-9)){
+   if(Number.isFinite(oci)&&oci>0&&!row.historical_oci&&(tier==='PLATINUM'||oci>=30&&Number.isFinite(delta)&&delta<=-3+1e-9)){
     const books=num(move.agreeing_books??row.agreeing_books,0)+'/'+num(move.paired_books??row.paired_books,0);
     return result('Flusso OCI '+signed(oci),'Calo quota '+change+' dall’apertura ('+num(first,2)+' → '+num(odd,2)+
      '). Operatori concordi '+books+' · EV '+evPct+'.');
@@ -91,8 +94,8 @@
     return result('Valore +EV ('+pct(ev)+')','Quota bookmaker '+num(odd,2)+' sopra la quota equa · Aggio '+
      (Number.isFinite(margin)?pct(margin):'non disponibile')+'.');
    }
-   if(Number.isFinite(delta)&&Math.abs(delta)>=2.5-1e-9)return result('Trend Quota '+change,
-    'Variazione dall’apertura '+num(first,2)+' a '+num(odd,2)+' · OCI '+signed(oci)+'.');
+   if(Number.isFinite(delta)&&Math.abs(delta)>=2.5-1e-9)return result(delta>0?'Rialzo senza conferma':'Quota in calo, conferma insufficiente',
+    'Variazione dalla prima osservata '+num(first,2)+' a '+num(odd,2)+' ('+change+') · OCI '+ociLabel({oci})+'. Il solo movimento non qualifica la proposta.');
   }
   if(isJoint(spec))return result('Incrocio 1°T+2°T','Probabilità congiunta dalle distribuzioni del 1°T (λ '+h+') e del 2°T (λ '+s+').');
   if(period==='ht')return kind==='btts'?result('Bilanciamento 1°T',
@@ -338,7 +341,7 @@
  }
  function v61Valid(r,now,archived){
   const d=r.opportunity;if(d?.policy_id!==POLICY)return true;
-  const m=goalMarket(r),margin=r.selected_margin_pct,delta=Number.isFinite(r.delta_pct)?r.delta_pct:r.selected_movement?.delta_pct;
+  const m=goalMarket(r),margin=r.selected_margin_pct,delta=openingChange(r);
   if(!d.structural_supported||!d.market_checks_passed||!Number.isFinite(margin)||margin<0||margin>8||r.oci< -20||delta>2+1e-9)return false;
   if(d.rules_revision===RULES_REVISION){
    if(!Number.isFinite(r.ev_low_pct)||!Number.isFinite(d.min_ev_low_pct)||r.ev_low_pct+1e-9<d.min_ev_low_pct)return false;
@@ -443,11 +446,11 @@
     const at=Date.parse(r.cache_source_at),end=Date.parse(r.cache_expires_at);
     if(!Number.isFinite(at)||!Number.isFinite(end)||now<at||now>end)return false;
    }
-   if(!Number.isFinite(r.oci)||r.oci<limits.min_oci||r.oci>100||
+   if(r.historical_oci||!Number.isFinite(r.oci)||r.oci===0||r.oci<limits.min_oci||r.oci>100||
       !Number.isFinite(r.selected_margin_pct)||r.selected_margin_pct<0||r.selected_margin_pct>limits.max_margin_pct||
       !Number.isFinite(r.first_odd)||r.first_odd<=1||typeof r.bookmaker!=='string'||!r.bookmaker.trim()||
-      !Number.isFinite(r.delta_pct)||r.delta_pct>limits.max_delta_pct+1e-9||
-      Math.abs(r.delta_pct-100*(r.odd/r.first_odd-1))>.01)return false;
+      !Number.isFinite(openingChange(r))||openingChange(r)>limits.max_delta_pct+1e-9||
+      Math.abs(openingChange(r)-100*(r.odd/r.first_odd-1))>.01)return false;
    return r.movement_confirmed===true&&r.fair_direction_coherent===true&&
     Number.isInteger(r.paired_books)&&Number.isInteger(r.agreeing_books)&&r.paired_books>=limits.min_agreeing_books&&
     r.agreeing_books>=limits.min_agreeing_books&&r.agreeing_books<=r.paired_books&&r.agreeing_books>r.paired_books/2&&
@@ -1139,7 +1142,9 @@
     const fixed=commitment?'<small>'+selectionLabel+triadTime(commitment.captured_at)+
      ' · quota alla scelta '+num(commitment.odd,2)+'</small>':'';
     const study=s?.study_only??commitment?.study_only;
-    return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+title+(study?' · Studio':'')+'</span>'+(badge||'')+
+    const observation=s?.observation_only??commitment?.observation_only;
+    const heading=observation?'Osservazione · '+title:title+(study?' · Studio':'');
+    return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+heading+'</span>'+(badge||'')+
      triadOutcomeSlot(match,p?.source.spec||triadMarketSpec(commitment))+'</div>'+
      (p?'<div class="mx-triad-market"><b>'+esc(p.record.label)+'</b>'+(estimate?'':'<strong>'+num(p.record.odd,2)+'</strong>')+'</div>'+
       '<div class="mx-triad-meta"><span>'+esc(s.horizon_label)+'</span><span>'+v7Estimate(p.record.calibrated)+' V7</span>'+
@@ -1172,7 +1177,7 @@
    item(longshot,'Colpaccio','Quota alta · esito meno probabile','colpaccio');
   const record=primary?.record,source=primary?.source;
   const metrics=record&&Number.isFinite(record.odd)?'<div class="mx-v7-odds"><span>Prima → ultima quota <b>'+num(record.quote?.first_odd,2)+' → '+num(record.odd,2)+'</b></span>'+
-   '<span>Movimento quota <b>'+pct(source.delta_pct)+'</b></span><span>OCI <b>'+signed(record.features?.oci)+'</b></span><span>Aggio <b>'+pct(record.features?.margin_pct)+'</b></span>'+
+   '<span>Dalla prima osservata <b>'+pct(record.features?.opening_delta_pct)+'</b></span><span>Ultimo tratto <b>'+pct(record.features?.delta_pct)+'</b></span><span>OCI <b>'+ociLabel(record.features)+'</b></span><span>Aggio <b>'+pct(record.features?.margin_pct)+'</b></span>'+
    '<span>Poisson originale <b>'+v7Estimate(record.raw)+'</b></span><span>Calibrata V7 <b>'+v7Estimate(record.calibrated)+'</b></span>'+
    '<span>Fair mercato <b>'+v7Estimate(record.fair)+'</b></span><span>Quota '+(source.quote_status==='cached_stable'?'da cache':'rilevata')+
    '<b>'+esc(record.quote?.bookmaker||'—')+'</b></span></div>':'';
