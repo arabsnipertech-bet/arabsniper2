@@ -188,7 +188,8 @@ def capture(assessment, meta, as_of, prior_stability=None):
     out['platinum_nonnegative_ev']=platinum
     return out
 
-def capture_v7(records, sources, observed, published, *, locked, allow_model_estimates):
+def capture_v7(records, sources, observed, published, *, locked, allow_model_estimates,
+               as_of=None, kickoff=None, profiles=None, ev_recoveries=None, qualified_alternatives=()):
     """Compare one change at a time on the same quote and model estimates."""
     from lateral_matrix import market_id, specification
     from v7_decision import GG, GG_FT, GOAL, TRIAD_LIMITS, TRIAD_MARKETS, route
@@ -222,7 +223,11 @@ def capture_v7(records, sources, observed, published, *, locked, allow_model_est
                 continue
             row = records[pick['market_id']]
             result[role] = {**{key: pick.get(key) for key in ('market_id', 'odd', 'probability', 'tier', 'study_only')},
-                            'v51': row.get('v51'), 'quote': row.get('quote')}
+                            'v51': row.get('v51'), 'quote': row.get('quote'),
+                            'ev':row.get('ev'),'ev_low':row.get('ev_low'),
+                            'statistics':row.get('statistics')}
+            if pick.get('ev_recovery'):
+                result[role]['ev_recovery']=deepcopy(pick['ev_recovery'])
         return result
 
     unlocked = simulation(records) if locked else published
@@ -239,7 +244,12 @@ def capture_v7(records, sources, observed, published, *, locked, allow_model_est
             recommended: TRIAD_MARKETS[recommended] | {GG_FT}}),
         'goals_confirmed_flow_25': simulation(flow) if len(flow) != len(records) else unlocked,
     }
-    return {'version': V7_VERSION, 'shadow_only': True,
+    from v7_movement_shadow import capture as capture_movement
+    ledger, additions = capture_movement(records,sources,observed,published,
+                                         as_of=as_of,kickoff=kickoff,profiles=profiles,
+                                         ev_recoveries=ev_recoveries,qualified_alternatives=qualified_alternatives)
+    variants.update(additions)
+    return {'version': V7_VERSION, 'shadow_only': True, 'movement_study':ledger,
             'variants': {name: encode(triad) for name, triad in variants.items()}}
 
 
@@ -262,8 +272,19 @@ def settle_v7(snapshot, score):
             settled[role] = {**pick, 'win': win, 'loss': loss,
                              'roi': win*(odd-1)-loss if weights is not None and finite(odd) and odd > 1 else None}
         variants[name] = settled
-    return {**frozen, 'captured_at': snapshot['captured_at'], 'forecast_sha256': snapshot['sha256'],
+    result={**frozen, 'captured_at': snapshot['captured_at'], 'forecast_sha256': snapshot['sha256'],
             'variants': variants}
+    ledger=frozen.get('movement_study')
+    if ledger and ledger.get('available') is True:
+        cohorts=[]
+        for row in ledger.get('cohorts',[]):
+            weights=settle_spec(json.loads(row['market_id']),score)
+            win,loss=weights if weights is not None else (None,None)
+            odd=row.get('odd')
+            cohorts.append({**row,'win':win,'loss':loss,
+                'roi':win*(odd-1)-loss if weights is not None and finite(odd) and odd>1 else None})
+        result['movement_study']={**ledger,'cohorts':cohorts}
+    return result
 
 
 class DecisionAudit:

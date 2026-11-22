@@ -53,7 +53,9 @@ def cached_refresh_safe(paths):
                    'src/statistics_integration.py', 'src/gold_policy_audit.py',
                    'src/market_scope.py', 'src/proposal_stability.py',
                    'src/platinum_policy.py', 'src/platinum_audit.py', 'src/v7_decision.py',
-                   'src/v7_recent_selection.py', 'src/v7_over15_deficit.py'}
+                   'src/v7_recent_selection.py', 'src/v7_over15_deficit.py', 'src/v7_confirmation.py',
+                   'src/v7_movement_shadow.py','src/v7_shadow_metrics.py','src/decision_shadow.py',
+                   'src/v7_learning.py','src/selection_studies.py','src/gold_explorer.py'}
     # This migration changes the computed market universe, not the Poisson
     # kernel or source statistics; the dedicated tests require identical core probabilities.
     if 'src/market_scope.py' in paths: price_files.add('src/lateral_matrix.py')

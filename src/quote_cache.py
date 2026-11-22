@@ -11,7 +11,7 @@ PRICE_FIELDS = ('odd', 'first_odd', 'opening_odd', 'opening_delta_pct', 'first_o
     'bet_id', 'provider_updated_at', 'quote_observed_at', 'selected_margin_pct',
     'selected_margin_delta_pp', 'selected_market_fair_pct', 'selected_market_odds',
     'market_fair_pct', 'margin_pct', 'margin_delta_pp', 'margin_band', 'margin_trend',
-    'delta_pct', 'oci', 'oci_method', 'oci_previous', 'oci_direction', 'selected_movement',
+    'delta_pct', 'delta_basis', 'oci', 'oci_state', 'oci_method', 'oci_previous', 'oci_direction', 'selected_movement',
     'movement_confirmed', 'fair_direction_coherent', 'speed_pp_per_hour', 'fair_delta_pp', 'paired_books', 'agreeing_books',
     'market_behavior', 'category', 'category_reason', 'quote_adapter_version',
     'quote_source', 'quote_executable', 'quote_provenance', 'fair_basis', 'opening_market_odds',
@@ -86,7 +86,11 @@ def recalculate(row):
     if valid_number(row.get('first_odd')) and row['first_odd'] > 1:
         row['opening_odd'] = row['first_odd']
         row['opening_delta_pct'] = 100*(odd/row['first_odd']-1)
-        row['delta_pct'] = 0. if row.get('prematch_stable') else row['opening_delta_pct']
+        if row.get('delta_basis') == 'last_leg':
+            leg = (row.get('selected_movement') or {}).get('delta_pct')
+            row['delta_pct'] = 0. if row.get('prematch_stable') else leg if valid_number(leg) else None
+        else:
+            row['delta_pct'] = 0. if row.get('prematch_stable') else row['opening_delta_pct']
     return True
 
 
@@ -104,7 +108,7 @@ def mark_stable(row, kickoff):
     expires_at = kickoff if start and start <= expires else expires.isoformat()
     row.update(prematch_stable=True, cache_expires_at=expires_at,
                quote_status_label='Stabile da apertura' if row.get('first_odd') == row.get('odd') else 'Ultima quota osservata · stabile',
-               delta_pct=0., oci=0., oci_method=None, oci_previous=None, oci_direction=None,
+               delta_pct=0., delta_basis='last_leg', oci=0., oci_state='neutral', oci_method=None, oci_previous=None, oci_direction=None,
                oci_observed_at=None, oci_unavailable_reason=None, selected_movement=None,
                paired_books=0, agreeing_books=0, persistence=None, speed_pp_per_hour=None,
                fair_delta_pp=None, amplitude_pct=None, movement_hours=None, movement_volatile=False,

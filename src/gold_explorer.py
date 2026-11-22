@@ -140,7 +140,9 @@ def project_match(match, observed):
                   and source.get('odd') == original.get('odd')
                   and stamp(source.get('quote_observed_at')) <= stamp(snap['captured_at']))
         ev, low = original.get('ev'), original.get('ev_low')
-        valid = bool(usable and original.get('supported') is True and original.get('tier')
+        confirmation = original.get('confirmation') or {}
+        observation = confirmation.get('observation_only') is True
+        valid = bool(not observation and usable and original.get('supported') is True and original.get('tier')
                      and finite(ev) and ev > 0 and finite(low) and low >= 0)
         roles = [role for role, pick in official.items() if pick and pick.get('market_id') == market]
         quote = original.get('quote') or {}
@@ -162,7 +164,12 @@ def project_match(match, observed):
                    quote=quote, quote_usable=bool(usable), quote_valid_until=expiry,
                    captured_at=snap['captured_at'], published_at=observed.isoformat(),
                    forecast_sha256=snap['sha256'], exclusions=original.get('edge_exclusions', []))
-        row.update(match_odds=prices, origin_badge=original.get('origin_badge'),
+        row.update(match_odds=prices, confirmation=confirmation, observation_only=observation,
+                   opening_delta_pct=(original.get('features') or {}).get('opening_delta_pct'),
+                   last_leg_delta_pct=(original.get('features') or {}).get('delta_pct'),
+                   oci_state=(original.get('features') or {}).get('oci_state'),
+                   last_confirmed_oci=(original.get('features') or {}).get('last_confirmed_oci'),
+                   origin_badge=original.get('origin_badge'),
                    origin_tooltip=original.get('origin_tooltip'),
                    motivation=next((pick.get('motivation') for pick in (snap.get('triad') or {}).values()
                                     if pick and pick.get('market_id') == market), None))

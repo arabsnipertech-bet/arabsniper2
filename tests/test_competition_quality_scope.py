@@ -156,7 +156,7 @@ class CompetitionQualityScope(unittest.TestCase):
         m['multimarket'] = assessment = build_matrix(
             dict(rates=dict(RATES, home_ft=2.0, away_ft=1.3), profiles=PROFILES), NOW)
         over = next(r for r in assessment['matrix']['rows'] if r['id'] == FT)
-        over.update(row(over['spec'], 2.10, fair=.60), first_odd=2.10/.96,
+        over.update(row(over['spec'], 2.10, fair=1/(2.10*1.05)), first_odd=2.10/.96,
                     quote_observed_at=NOW, provider_updated_at=NOW, bookmaker='Test',
                     oci=38, delta_pct=-4, paired_books=4, agreeing_books=3,
                     movement_confirmed=True, fair_direction_coherent=True,

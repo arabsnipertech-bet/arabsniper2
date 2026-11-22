@@ -282,11 +282,11 @@ def safe_price_row(row):
     # promote prices produced by the former handicap adapter.
     clean = dict(row)
     for key in ('odd', 'first_odd', 'last_odd', 'ev_pct', 'ev_low_pct', 'ev_high_pct',
-                'oci', 'oci_previous', 'margin_pct', 'margin_delta_pp', 'delta_pct',
+                'oci', 'oci_previous', 'margin_pct', 'margin_delta_pp', 'delta_pct', 'opening_delta_pct',
                 'market_fair_pct', 'edge_pp', 'implied_pct', 'persistence',
                 'speed_pp_per_hour', 'amplitude_pct', 'fair_delta_pp'):
         clean[key] = None
-    clean.update(quote_status='invalid_adapter', category='no_quote',
+    clean.update(quote_status='invalid_adapter', category='no_quote', oci_state='missing',
                  category_reason='Quota handicap della versione precedente: associazione da aggiornare',
                  market_behavior='unavailable', margin_band='unavailable', margin_trend='unavailable',
                  theoretical_value=False, stable_value=False, paired_books=0, agreeing_books=0)
@@ -402,6 +402,7 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     row['quote_adapter_version'] = HANDICAP_ADAPTER_VERSION
     row.update(speed_pp_per_hour=None, selected_margin_pct=None, selected_margin_delta_pp=None, selected_market_fair_pct=None,
                selected_movement=None, selected_market_odds=None, opening_market_odds=None,
+               opening_delta_pct=None, delta_pct=None, delta_basis='last_leg', oci_state='missing',
                movement_confirmed=False, fair_direction_coherent=False, prematch_stable=False)
     now = stamp(as_of)
     offers = [o for o in offers if number(o.get('odd')) is not None and o['odd'] > 1 and
@@ -524,6 +525,8 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
                    'delta_pct': selected['delta_pct'], 'fair_delta_pp': selected['leg_fair_delta_pp'],
                    'persistence': selected['persistence'], 'reversal': selected['reversal'],
                    'observed_from': selected['observed_from'], 'observed_to': selected['observed_to'],
+                   'delta_basis': 'last_leg', 'leg_observed_from': selected['leg_from'],
+                   'leg_observed_to': selected['observed_to'],
                    # Retain an already computed, same-book complete-partition
                    # window. delta_pct above remains the post-reversal leg.
                    'price_reference': dict(basis='same_book_complete_partition',
@@ -534,6 +537,8 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
                        margin_from_pct=selected['margin_initial_pct'],
                        margin_to_pct=selected['margin_current_pct'])
                } if selected else None)
+    row['delta_pct'] = selected['delta_pct'] if selected else None
+    row['oci_state'] = 'missing' if oci is None else 'neutral' if oci == 0 else 'current'
     if operators:
         row.update(movement_hours=median(o['hours'] for o in operators),
                    persistence=median(o['persistence'] for o in operators),
@@ -592,9 +597,9 @@ def preserve_confirmed_oci(row, history, as_of):
     candidates = (saved, row.pop('last_confirmed_oci', None))
     observed = row.get('oci_observed_at') or row.get('quote_observed_at')
     if (row.get('quote_status') == 'recent' and row.get('movement_confirmed') is True
-            and not row.get('historical_oci') and number(row.get('oci')) is not None):
+            and not row.get('historical_oci') and number(row.get('oci')) is not None and row['oci'] != 0):
         candidates += ({'value': row['oci'], 'observed_at': observed},)
-    valid = [item for item in candidates if item and number(item.get('value')) is not None
+    valid = [item for item in candidates if item and number(item.get('value')) is not None and item['value'] != 0
              and stamp(item.get('observed_at')) and stamp(item['observed_at']) <= cutoff]
     if valid:
         latest = max(valid, key=lambda item: stamp(item['observed_at']))

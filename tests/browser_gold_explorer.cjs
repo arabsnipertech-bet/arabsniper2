@@ -14,6 +14,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   '1':{first_odd:2,odd:1.8,bookmaker:'Book QA',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'},
   x:{first_odd:3,odd:3.3,bookmaker:'Book QA',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'},
   '2':{first_odd:4,odd:4,first_observed_at:'2026-11-17T08:00:00Z',quote_observed_at:'2026-11-17T09:30:00Z',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'}};}
+ rows[0].observation_only=true;rows[0].oci=0;
  const pages=[];for(let i=0;i<rows.length;i+=250)pages.push(add({version:1,rows:rows.slice(i,i+250)}));
  const boards={best:rows.slice(0,10).map(r=>r.id),probable:rows.slice(0,10).map(r=>r.id),recommended:rows.slice(0,10).map(r=>r.id),shots:rows.slice(0,10).map(r=>r.id),markets:{'GG FT':rows.filter(r=>r.label==='GG FT').slice(0,10).map(r=>r.id)}};
  const snapshot=add({pages,count:rows.length,boards}),hist={references:{},results:{},scans:[{sha256:snapshot,phase:'night',published_at:'2026-11-17T10:00:00Z'}],legacy_pages:[pages[0]]};
@@ -41,6 +42,9 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  await page.goto('https://explorer.test/gold-explorer.html');await page.locator('h1').evaluate(el=>el.prepend('COLLAUDO QA — DATI SINTETICI · '));await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor();
  assert.equal(await page.locator('#results .selection').count(),10);const initial=calls.length;
  const first=page.locator('#results .selection').first();assert.equal(await first.locator('.selection-1x2>div').count(),3);
+ assert((await first.innerText()).includes('Osservazione V7'));
+ assert((await first.innerText()).includes('Osservazione · ruolo originale: Consigliata'));
+ assert((await first.innerText()).includes('OCI 0 · neutro'));
  assert((await first.locator('[data-movement=down]').innerText()).includes('↓ -10,0%'));assert((await first.locator('[data-movement=up]').innerText()).includes('↑ +10,0%'));assert((await first.locator('[data-movement=flat]').innerText()).includes('→ 0,0%'));
  await first.locator('.selection-origin summary').click();assert(await first.getByText('Motivo originale Gold · proiezione statistica del primo tempo',{exact:true}).isVisible());assert.equal(calls.length,initial,'Reading the explanation adds no requests');
  for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);}

@@ -2,6 +2,7 @@
 from collections import defaultdict
 from math import isfinite
 from multimarket_audit import metrics
+from opportunity_policy import opening_change
 
 STUDY_ID = 'goal-convergence-study-v1'
 VALIDATION_FROM = '2026-10-22'
@@ -234,7 +235,7 @@ def generate_ideas(assessment, as_of, kickoff, suppressed=None):
         source = max(previous, key=lambda o: o.get('quote_observed_at') or '', default={})
         historical = not valid(current, -100, 100)
         oci = source.get('oci') if historical else current
-        delta = row.get('delta_pct') if live else None
+        delta = opening_change(row) if live else None
         if delta is None and live:
             delta = (row.get('selected_movement') or {}).get('delta_pct')
         fair_delta = row.get('fair_delta_pp') if live else None
