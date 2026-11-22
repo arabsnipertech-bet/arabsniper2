@@ -21,6 +21,7 @@ from v7_probability import (BASE_WEIGHT, VERSION, blend_rates, fair_inputs, fini
                             goal_structure, market_rates, outcome_fair, price_usable, pricing_evidence, raw_rates,
                             score_model, statistical_rates, utc)
 from v7_recent_selection import POLICY_ID as LATEST_PREMATCH_POLICY, save as save_latest_selection
+from v7_over15_deficit import single_deficit, priority_bonus, explain as explain_deficit
 
 GOAL = {
     name: market_id(specification('total', period, 'over', line))
@@ -356,7 +357,7 @@ def market_origin(spec, rates, record, *, conversion=False):
     else:
         badge, text = None, None
     if badge:
-        return dict(origin_badge=badge, origin_tooltip=f'{text} {comparison}')
+        return explain_deficit(dict(origin_badge=badge, origin_tooltip=f'{text} {comparison}'), market_id(spec), record)
 
     odd, ev, low = (record[key] for key in ('odd', 'ev', 'ev_low'))
     move, quote = record['features'], record.get('quote') or {}
@@ -386,7 +387,7 @@ def market_origin(spec, rates, record, *, conversion=False):
             badge = f'Trend Quota {change}%'
             text = f"Variazione dall’apertura {opening} a {shown_odd} · OCI {flow}."
         if badge:
-            return dict(origin_badge=badge, origin_tooltip=f'{text} {comparison}')
+            return explain_deficit(dict(origin_badge=badge, origin_tooltip=f'{text} {comparison}'), market_id(spec), record)
 
     if kind in JOINT_KINDS:
         badge = 'Incrocio 1°T+2°T'
@@ -409,7 +410,7 @@ def market_origin(spec, rates, record, *, conversion=False):
     else:
         badge = f"Volume 90' (λ {ft})"
         text = f"Proiezione Poisson sui 90′ · λ totale {ft}."
-    return dict(origin_badge=badge, origin_tooltip=f'{text} {comparison}')
+    return explain_deficit(dict(origin_badge=badge, origin_tooltip=f'{text} {comparison}'), market_id(spec), record)
 
 
 def signal(key, row, reason, *, relaxed=False):
@@ -420,7 +421,7 @@ def signal(key, row, reason, *, relaxed=False):
                 horizon_label=TAGS[row['horizon']], niche_id=row['niche_id'],
                 niche_label=NICHE_LABELS.get(row['niche_id']), reasons=[reason],
                 motivation=selection_motivation(row, reason, relaxed),
-                **{field: row[field] for field in ('origin_badge', 'origin_tooltip') if field in row})
+                **{field: row[field] for field in ('origin_badge', 'origin_tooltip', 'selection_context') if field in row})
 
 
 def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked, role_markets):
@@ -489,7 +490,7 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
 def role_rank(role, key, row):
     if role == 'most_probable':
         return row['calibrated'], row['ev_low'], row['ev'], key
-    return bool(row['niche_id']), row['ev'], row['calibrated'], key
+    return bool(row['niche_id']), row['ev']+priority_bonus(key, role, row), row['calibrated'], key
 
 
 def qualified_refresh_candidate(row):
@@ -862,6 +863,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
                             platinum_exclusions=(source.get('platinum') or {}).get('reasons') or [])
     niches, observed_patterns = niche_evidence(records, assessment, calibrated, stats, totals, weight,
                                                [r for r in fair_rows if r['quote_status'] == 'recent'], means)
+    deficit_context = single_deficit(assessment, meta, as_of)
     for key, row in records.items():
         row['niche_id'] = next((name for name, keys in niches.items() if key in keys), None)
         source = sources[row['source_market_id']]
@@ -874,6 +876,12 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
             row['tier'] = 'BLU'
         else:
             row['tier'] = None
+        if key == GOAL['over15_ht'] and deficit_context:
+            floor, minimum, maximum = TRIAD_LIMITS['recommended_alternative']
+            if (row['calibrated'] >= floor and finite(row['odd']) and minimum <= row['odd'] <= maximum):
+                row['selection_context'] = deficit_context
+                if not priority_bonus(key, 'recommended_alternative', row):
+                    row.pop('selection_context')
         row.update(market_origin(source['spec'], calibrated, row, conversion=observed_patterns['conversion']))
         legs = COMBO_LEGS.get(key)
         if legs and row['odd'] is None and all(finite(records.get(leg, {}).get('odd')) for leg in legs):
