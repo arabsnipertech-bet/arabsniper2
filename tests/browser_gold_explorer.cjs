@@ -42,15 +42,18 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  await page.goto('https://explorer.test/gold-explorer.html');await page.locator('h1').evaluate(el=>el.prepend('COLLAUDO QA — DATI SINTETICI · '));await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor();
  assert.equal(await page.locator('#results .selection').count(),10);const initial=calls.length;
  const first=page.locator('#results .selection').first();assert.equal(await first.locator('.selection-1x2>div').count(),3);
- assert((await first.innerText()).includes('Osservazione V7'));
- assert((await first.innerText()).includes('Osservazione · ruolo originale: Consigliata'));
- assert((await first.innerText()).includes('OCI 0 · neutro'));
  assert((await first.locator('[data-movement=down]').innerText()).includes('↓ -10,0%'));assert((await first.locator('[data-movement=up]').innerText()).includes('↑ +10,0%'));assert((await first.locator('[data-movement=flat]').innerText()).includes('→ 0,0%'));
  await first.locator('.selection-origin summary').click();assert(await first.getByText('Motivo originale Gold · proiezione statistica del primo tempo',{exact:true}).isVisible());assert.equal(calls.length,initial,'Reading the explanation adds no requests');
  for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);}
  await page.selectOption('#mode','markets');assert.equal(await page.locator('#marketIndex a').count(),4);
  await page.locator('#marketIndex a').filter({hasText:'Under 3,5 FT'}).click();assert((await page.evaluate(()=>document.activeElement.textContent)).startsWith('Under 3,5 FT'));
- await page.selectOption('#mode','recommended');assert.equal(await page.locator('#results .selection').count(),10);assert((await page.locator('#results .selection').first().innerText()).includes('Triade: Consigliata'));await page.locator('#results [data-detail]').first().click();assert((await page.locator('#detailBody').innerText()).includes('2,05'));await page.click('#closeDetail');await page.fill('[name=team]','impossibile');assert((await page.locator('#results').innerText()).includes('Il caricamento è riuscito'));await page.fill('[name=team]','');
+ await page.selectOption('#mode','recommended');assert.equal(await page.locator('#results .selection').count(),10);
+ const observation=page.locator('#results .selection').filter({hasText:'Osservazione V7'});
+ assert.equal(await observation.count(),1,'Unvalidated observations stay in their original-role view');
+ assert((await observation.innerText()).includes('Osservazione · ruolo originale: Consigliata'));
+ assert((await observation.innerText()).includes('OCI 0 · neutro'));
+ assert((await page.locator('#results').innerText()).includes('Triade: Consigliata'),'Other original-role cards stay unchanged');
+ await observation.locator('[data-detail]').click();assert((await page.locator('#detailBody').innerText()).includes('2,05'));await page.click('#closeDetail');await page.fill('[name=team]','impossibile');assert((await page.locator('#results').innerText()).includes('Il caricamento è riuscito'));await page.fill('[name=team]','');
  await page.selectOption('#mode','best');assert(await page.locator('#marketNavigation').isHidden());
  await page.click('#more');assert.equal(await page.locator('#results .selection').count(),20);
  await page.fill('[name=team]','impossibile');assert.equal(await page.locator('#results .selection').count(),0);await page.fill('[name=team]','');

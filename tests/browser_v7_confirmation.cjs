@@ -22,7 +22,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
     const saved={origin_badge:'Trend Quota +5,5%',origin_tooltip:'Motivazione storica congelata'};
     if(ArabMatrix.marketOrigin(source,{record:saved}).origin_badge!==saved.origin_badge)throw Error('Historical explanation rewritten');
    });
-   const text=await page.locator('#results').innerText();
+   const text=await page.locator('#results').textContent();
    assert(text.includes('Osservazione · Consigliata'));
    assert(text.includes('Rialzo senza conferma'));assert(!text.includes('Trend Quota'));
    assert.equal(await page.locator('[data-v7-slot="recommended_alternative"] .mx-origin-badge').getAttribute('data-mx-origin-tooltip'),'Prima osservata 2,25 → 2,50. OCI attuale 0: neutro. Solo osservazione.');
