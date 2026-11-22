@@ -75,6 +75,42 @@ def eligible(market, row, role):
     return role != 'high_odds_shot' or market != AWAY or row['odd'] >= 4.5 and (row['delta'] or 0) > 0
 
 
+def quote_expiry(source, kickoff, usable):
+    provider = stamp(source.get('provider_updated_at'))
+    if not usable or not provider:
+        return None
+    expiry = provider+timedelta(hours=PREMATCH_HOURS)
+    if source.get('quote_status') == 'recent':
+        expiry = provider+timedelta(hours=6)
+        if expiry > kickoff-timedelta(hours=3):
+            expiry = max(kickoff-timedelta(hours=3), provider+timedelta(hours=1))
+    return min(expiry, kickoff).isoformat()
+
+
+def match_odds(matrix, snap, observed):
+    """Copy the same-bookmaker 1X2 observations; never estimate missing prices."""
+    result = {}
+    for source in matrix.get('rows', []):
+        spec = source.get('spec') or {}
+        if (spec.get('kind') != 'result' or spec.get('period') != 'ft'
+                or spec.get('side') not in ('1', 'x', '2')
+                or spec.get('line') is not None or spec.get('extra') is not None):
+            continue
+        seen = stamp(source.get('quote_observed_at'))
+        if seen and seen > stamp(snap['captured_at']):
+            continue
+        current = source.get('odd')
+        if not finite(current) or current <= 1:
+            current = source.get('last_odd')
+        item = {key: source.get(key) for key in ('opening_odd', 'first_odd', 'first_observed_at',
+            'quote_observed_at', 'provider_updated_at', 'bookmaker', 'bookmaker_id', 'quote_status')}
+        usable = price_usable(source, observed.isoformat(), snap['kickoff'])
+        item.update(odd=current, quote_usable=bool(usable),
+                    quote_valid_until=quote_expiry(source, stamp(snap['kickoff']), usable))
+        result[spec['side']] = item
+    return result
+
+
 def project_match(match, observed):
     meta = match.get('fixture') or {}
     matrix = (match.get('multimarket') or {}).get('matrix') or {}
@@ -89,6 +125,7 @@ def project_match(match, observed):
     sources = {r['id']: r for r in matrix.get('rows', []) if r.get('id')}
     official = snap.get('triad_commitments', snap.get('triad')) or {}
     episode = str(meta['fixture_id'])+'::'+kickoff.isoformat()
+    prices = match_odds(matrix, snap, observed)
     rows = []
     for market, original in snap.get('markets', {}).items():
         probability = original.get('calibrated')
@@ -107,15 +144,7 @@ def project_match(match, observed):
                      and finite(ev) and ev > 0 and finite(low) and low >= 0)
         roles = [role for role, pick in official.items() if pick and pick.get('market_id') == market]
         quote = original.get('quote') or {}
-        expiry = None
-        provider = stamp(source.get('provider_updated_at'))
-        if usable and provider:
-            expiry = provider+timedelta(hours=PREMATCH_HOURS)
-            if source.get('quote_status') == 'recent':
-                expiry = provider+timedelta(hours=6)
-                if expiry > kickoff-timedelta(hours=3):
-                    expiry = max(kickoff-timedelta(hours=3), provider+timedelta(hours=1))
-            expiry = min(expiry, kickoff).isoformat()
+        expiry = quote_expiry(source, kickoff, usable)
         row = dict(id=sha256((episode+'::'+market).encode()).hexdigest(), episode=episode,
                    fixture_id=str(meta['fixture_id']), home=meta.get('home'), away=meta.get('away'),
                    league=meta.get('league'), kickoff=kickoff.isoformat(),
@@ -133,6 +162,10 @@ def project_match(match, observed):
                    quote=quote, quote_usable=bool(usable), quote_valid_until=expiry,
                    captured_at=snap['captured_at'], published_at=observed.isoformat(),
                    forecast_sha256=snap['sha256'], exclusions=original.get('edge_exclusions', []))
+        row.update(match_odds=prices, origin_badge=original.get('origin_badge'),
+                   origin_tooltip=original.get('origin_tooltip'),
+                   motivation=next((pick.get('motivation') for pick in (snap.get('triad') or {}).values()
+                                    if pick and pick.get('market_id') == market), None))
         row['ranking_roles'] = [role for role in TRIAD_MARKETS if eligible(market, row, role)]
         rows.append(row)
     return rows
