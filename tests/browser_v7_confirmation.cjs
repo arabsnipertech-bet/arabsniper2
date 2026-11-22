@@ -10,6 +10,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
    await page.route('**/*',r=>{external.push(r.request().url());return r.abort();});
    await page.setContent('<!doctype html><meta name="viewport" content="width=device-width"><style>body{margin:0;padding:12px;box-sizing:border-box;background:#101720;color:white}*{box-sizing:border-box}</style><main id="qa"><p>QA — DATI SINTETICI</p><div id="results"></div></main>');
    await page.addStyleTag({content:fs.readFileSync('web/lateral-matrix.css','utf8')});
+   await page.addScriptTag({content:fs.readFileSync('web/competition-scope.js','utf8')});
    await page.addScriptTag({content:fs.readFileSync('web/lateral-matrix.js','utf8')});
    await page.evaluate(()=>{
     const spec={kind:'total',period:'ht',side:'over',line:1.5},key=JSON.stringify(spec);
