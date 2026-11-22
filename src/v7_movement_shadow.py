@@ -8,6 +8,7 @@ from v7_probability import finite, price_usable, utc
 
 PROTOCOL = 'V7_MOVEMENT_SHADOW_20261122_V1'
 CONFIG = dict(oci_min=0,oci_max=50,ft_saturation_drop=-5,
+              routing_revision='TRIAD_ROLE_COHERENCE_V1',
               margin_reference_ft=6.5,margin_reference_half=8.,
               favorite_band=[1.35,1.70],conversion_ft_band=[1.80,2.50],
               under_floor=1.75,primary_preferred=[1.75,2.15],recommended_band=[1.85,2.60],

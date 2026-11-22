@@ -51,6 +51,7 @@ TRIAD_LIMITS = {'most_probable': (.45, 1.55, 2.15),
                 'recommended_alternative': (.32, 2.15, 3.50),
                 'high_odds_shot': (.16, 3.50, float('inf'))}
 STUDY_LIMITS = {**TRIAD_LIMITS, 'most_probable': (.45, 1.50, 2.15)}
+STUDY_SELECTION_POLICY = 'TRIAD_ROLE_COHERENCE_V1'
 SIGNAL_ROLES = dict(zip(TRIAD_MARKETS, ('primary', 'consigliata', 'colpaccio')))
 BADGES = {'BLU': '◆ BLU', 'GOLD': '● GOLD', 'PLATINUM': '★ PLATINUM'}
 TIER_RANK = {tier: rank for rank, tier in enumerate(BADGES)}
@@ -274,6 +275,19 @@ def compatible(first, *others):
     return bool(mask)
 
 
+def confirmed_triad_coherent(triad):
+    """Fail closed for mutually exclusive confirmed offers; never rewrite history."""
+    if not isinstance(triad, dict):
+        return False
+    keys = [pick.get('market_id') for role, pick in triad.items()
+            if role in TRIAD_MARKETS and pick and not pick.get('study_only')
+            and not pick.get('observation_only') and pick.get('tier') in TIER_RANK]
+    try:
+        return len(set(keys)) == len(keys) and (not keys or compatible(keys[0], *keys[1:]))
+    except (TypeError, ValueError, KeyError):
+        return False
+
+
 def selection_motivation(row, reason, relaxed):
     quote, move = row.get('quote') or {}, row['features']
     fair, first, odd = row.get('fair'), quote.get('first_odd'), row['odd']
@@ -463,13 +477,15 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
                 continue
             value = row['model_fair_odd'] if is_estimate else row['odd']
             in_role = key in role_markets[role]
+            if not in_role and not locked_market:
+                continue  # Outside-role observations belong in the full matrix.
             if not (finite(value) and value > 1 and 0 < row['calibrated'] <= 1):
                 continue
             within_limits = (row.get('study_supported') and row['calibrated'] >= floor
                              and minimum <= value <= maximum and (in_role or not model_only))
             if (locked_market or within_limits or in_role) and compatible(key, *fixed):
                 candidates.append(key)
-                if within_limits:
+                if within_limits and in_role:
                     preferred.add(key)
         options[role], standard[role] = candidates, preferred
     if not options:
@@ -487,7 +503,8 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
             preferred = key in standard[role]
             ranking = ranker(role,key,row) if ranker else (row['calibrated'],row['ev'] or 0.,key)
             ranks.append((2 if preferred else 1, preferred and finite(row['odd']),*ranking))
-        return (sum(rank[0] > 0 for rank in ranks), sum(rank[0] == 2 for rank in ranks),
+        # A third relaxed filler must not displace a standard role candidate.
+        return (sum(rank[0] == 2 for rank in ranks), sum(rank[0] > 0 for rank in ranks),
                 sum(rank[1] for rank in ranks), ranks)
 
     def valid(picks):
@@ -976,6 +993,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     tier = max((pick['tier'] for pick in triad.values() if pick), key=TIER_RANK.__getitem__,
                default='BLU' if niches or any(row['tier'] for row in records.values()) else None)
     payload = dict(version=VERSION, status='published', fixture_id=str(meta['fixture_id']),
+                   study_selection_policy=STUDY_SELECTION_POLICY,
                    captured_at=utc(at), kickoff=utc(kickoff), statistics_at=utc(statistics_at),
                    statistics=stats, raw_rates=raw, market_projection=projected, rates=calibrated,
                    goal_structure=goal_structure(calibrated),
@@ -1014,6 +1032,8 @@ def stored_offers(assessment, fixture, as_of):
             or snapshot.get('fixture_id') != str(fixture.get('fixture_id'))
             or kickoff != stamp(snapshot.get('kickoff'))
             or not (at and captured and kickoff and captured <= at < kickoff)):
+        return
+    if not confirmed_triad_coherent(triad):
         return
     rows = {row['id']: row for row in matrix.get('rows', [])}
     for role in TRIAD_MARKETS:
