@@ -5,7 +5,7 @@ from random import Random
 
 from multimarket_model import stamp
 from v7_probability import finite
-from v7_movement_shadow import CONFIG, CONTROL, PROTOCOL, VARIANTS
+from v7_movement_shadow import CONFIG, CONTROL, PROTOCOL, VARIANTS, GG_FT_SAME_RULES
 
 
 def totals(rows):
@@ -86,10 +86,14 @@ def report(archives,cutoff,draws=None):
     reports={}
     for (timing,config),items in sorted(grouped.items()):
         selections=defaultdict(list);cohorts=defaultdict(list);margin_counts=defaultdict(int)
+        variant_available=defaultdict(int)
         matched=defaultdict(lambda:dict(identical_target=0,different_target=0,absent=0,brier_delta_sum=0.,log_loss_delta_sum=0.))
         for fid,ledger,frozen in items:
             variants=frozen.get('variants') or {};baseline=variants.get(CONTROL) or {}
             for name in ('published',CONTROL,*VARIANTS):
+                if not isinstance(variants.get(name),dict):
+                    continue  # A missing historical experiment is not an empty selection.
+                variant_available[name]+=1
                 triad=variants.get(name) or {}
                 for role,pick in triad.items():
                     if not pick:continue
@@ -125,9 +129,18 @@ def report(archives,cutoff,draws=None):
                 if row.get('negative_ev_becomes_nonnegative_at_reference_margin') is True:
                     margin_counts['negative_at_quote_nonnegative_at_reference_margin']+=1
         available=len(items)
+        def variant_summary(name,role=None):
+            count=variant_available[name]
+            selected=selections.get(name,[])
+            if role is not None:selected=[r for r in selected if r['role']==role]
+            return dict(**summary(selected,count,draws),available=count>0,
+                        unavailable_fixtures=available-count,
+                        missing_reason=None if count else 'variant_not_frozen')
         reports[timing+'|'+config]=dict(timing=timing,config_sha256=config,available_fixtures=available,
             comparison_baseline=CONTROL,
-            variants={name:summary(selections.get(name,[]),available,draws) for name in ('published',CONTROL,*VARIANTS)},
+            variants={name:variant_summary(name) for name in ('published',CONTROL,*VARIANTS)},
+            role_variants={'recommended_alternative':{
+                name:variant_summary(name,'recommended_alternative') for name in (CONTROL,GG_FT_SAME_RULES)}},
             cohorts={name:summary(rows,available,draws) for name,rows in sorted(cohorts.items())},
             margin_counterfactual_counts=dict(margin_counts),
             identical_event_comparisons={name:{**s,

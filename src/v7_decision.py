@@ -1017,7 +1017,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
         payload['decision_shadow'] = capture_v7(records, sources, observed_patterns, triad,
                                                 locked=bool(locked), allow_model_estimates=0 <= days_ahead <= 5,
                                                 as_of=as_of,kickoff=meta['kickoff'],profiles=profiles,
-                                                ev_recoveries=recoveries,qualified_alternatives=alternative_roles)
+                                                ev_recoveries=recoveries,qualified_alternatives=alternative_roles,
+                                                statistical_rates=stats,statistics_at=utc(statistics_at))
     return {**payload, 'sha256': fingerprint(payload)}
 
 
