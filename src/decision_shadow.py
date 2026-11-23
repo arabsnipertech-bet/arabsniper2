@@ -189,7 +189,8 @@ def capture(assessment, meta, as_of, prior_stability=None):
     return out
 
 def capture_v7(records, sources, observed, published, *, locked, allow_model_estimates,
-               as_of=None, kickoff=None, profiles=None, ev_recoveries=None, qualified_alternatives=()):
+               as_of=None, kickoff=None, profiles=None, ev_recoveries=None, qualified_alternatives=(),
+               statistical_rates=None, statistics_at=None):
     """Compare one change at a time on the same quote and model estimates."""
     from lateral_matrix import market_id, specification
     from v7_decision import GG, GG_FT, GOAL, TRIAD_LIMITS, TRIAD_MARKETS, route
@@ -247,7 +248,8 @@ def capture_v7(records, sources, observed, published, *, locked, allow_model_est
     from v7_movement_shadow import capture as capture_movement
     ledger, additions = capture_movement(records,sources,observed,published,
                                          as_of=as_of,kickoff=kickoff,profiles=profiles,
-                                         ev_recoveries=ev_recoveries,qualified_alternatives=qualified_alternatives)
+                                         ev_recoveries=ev_recoveries,qualified_alternatives=qualified_alternatives,
+                                         statistical_rates=statistical_rates,statistics_at=statistics_at)
     variants.update(additions)
     return {'version': V7_VERSION, 'shadow_only': True, 'movement_study':ledger,
             'variants': {name: encode(triad) for name, triad in variants.items()}}

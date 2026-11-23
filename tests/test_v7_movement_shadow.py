@@ -7,8 +7,8 @@ from unittest.mock import patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
 from decision_shadow import capture_v7,settle_v7
-from v7_decision import GG,GOAL,RESULTS,route
-from v7_movement_shadow import capture,CONTROL,PROTOCOL,VARIANTS
+from v7_decision import GG,GG_FT,GOAL,RESULTS,TRIAD_MARKETS,route
+from v7_movement_shadow import capture,CONTROL,PROTOCOL,VARIANTS,GG_FT_SAME_RULES
 from v7_shadow_metrics import report
 
 AT='2026-11-22T09:00:00+00:00';START='2026-11-22T11:30:00+00:00'
@@ -42,6 +42,70 @@ def freeze(rows,sources,**kwargs):
                       as_of=AT,kickoff=START,profiles=PROFILES,**kwargs)
 
 class Variants(unittest.TestCase):
+    def test_gg_same_rules_changes_only_recommended_market_admission(self):
+        rows,sources=fixture()
+        rows[GG_FT],sources[GG_FT]=candidate(GG_FT,2.3,.52)
+        before=deepcopy((rows,sources));live_roles=deepcopy(TRIAD_MARKETS);qualified=('recommended_alternative',)
+        proof=dict(policy_id='EV_RECOVERY_AGGIO_V1',role='recommended_alternative',
+                   original_ev=rows[GOAL['over15_ht']]['ev'],probability=rows[GOAL['over15_ht']]['calibrated'])
+        with patch('v7_decision.route',wraps=route) as routed:
+            frozen=freeze(rows,sources,ev_recoveries={'recommended_alternative':{GOAL['over15_ht']:proof}},
+                          qualified_alternatives=qualified)
+        baseline=next(call for call in routed.call_args_list if call.kwargs.get('allow_unpriced') is False
+                      and 'role_markets' not in call.kwargs and 'ranker' not in call.kwargs)
+        expected={**TRIAD_MARKETS,'recommended_alternative':TRIAD_MARKETS['recommended_alternative']|{GG_FT}}
+        trial=next(call for call in routed.call_args_list if call.kwargs.get('role_markets')==expected
+                   and call.kwargs.get('allow_unpriced') is False)
+        self.assertEqual(trial.args,baseline.args)
+        self.assertEqual({k:v for k,v in trial.kwargs.items() if k!='role_markets'},baseline.kwargs)
+        self.assertEqual(frozen['variants'][GG_FT_SAME_RULES]['recommended_alternative']['market_id'],GG_FT)
+        self.assertEqual(frozen['variants'][CONTROL]['recommended_alternative']['market_id'],GOAL['over15_ht'])
+        self.assertEqual((rows,sources),before)
+        self.assertEqual(TRIAD_MARKETS,live_roles)
+        self.assertNotIn(GG_FT,TRIAD_MARKETS['recommended_alternative'])
+
+    def test_gg_same_rules_does_not_force_a_worse_or_unquoted_candidate(self):
+        rows,sources=fixture();rows[GG_FT],sources[GG_FT]=candidate(GG_FT,2.3,.4,tier=None,low=-.1)
+        frozen=freeze(rows,sources)
+        self.assertEqual(frozen['variants'][GG_FT_SAME_RULES],frozen['variants'][CONTROL])
+        rows[GG_FT],sources[GG_FT]=candidate(GG_FT,2.3,.52)
+        sources[GG_FT]['quote_executable']=False
+        frozen=freeze(rows,sources)
+        self.assertEqual(frozen['variants'][GG_FT_SAME_RULES],frozen['variants'][CONTROL])
+
+    def test_native_statistical_lambdas_are_copied_without_changing_choices(self):
+        rows,sources=fixture();rates=dict(home_ht=.8,away_ht=.5,home_ft=1.7,away_ft=1.2)
+        before=deepcopy(rates);baseline=freeze(rows,sources)
+        frozen=freeze(rows,sources,statistical_rates=rates,statistics_at=FIRST)
+        context=frozen['movement_study']['statistical_context']
+        self.assertTrue(context['available']);self.assertEqual(context['rates'],rates)
+        self.assertAlmostEqual(context['lambda_ht_total'],1.3)
+        self.assertEqual(frozen['variants'],baseline['variants']);self.assertEqual(rates,before)
+        rates['home_ft']=9
+        self.assertEqual(context['rates']['home_ft'],1.7)
+
+    def test_missing_or_future_native_lambdas_are_not_fabricated(self):
+        rows,sources=fixture()
+        missing=freeze(rows,sources)['movement_study']['statistical_context']
+        self.assertFalse(missing['available']);self.assertNotIn('rates',missing)
+        rates=dict(home_ht=.8,away_ht=.5,home_ft=1.7,away_ft=1.2)
+        for at in (None,'2026-11-22T10:00:00Z'):
+            context=freeze(rows,sources,statistical_rates=rates,statistics_at=at)['movement_study']['statistical_context']
+            self.assertFalse(context['available']);self.assertNotIn('rates',context)
+
+    def test_gg_context_distinguishes_a_different_1x2_operator_without_changing_old_cross_arm(self):
+        rows,sources=fixture();key=RESULTS['1'];initial={'1':1.5,'x':4.2,'2':6.5};current={'1':1.6,'x':4.,'2':6.}
+        margin=100*(sum(1/x for x in current.values())-1)
+        rows[key],sources[key]=candidate(key,1.6,.6,first=1.5,margin=margin)
+        sources[key].update(opening_market_odds=initial,selected_market_odds=current)
+        rows[GG_FT],sources[GG_FT]=candidate(GG_FT,2.3,.52)
+        sources[GG_FT]['bookmaker_id']='different'
+        cohort=next(r for r in freeze(rows,sources)['movement_study']['cohorts'] if r['market_id']==GG_FT)
+        context=cohort['over_gg_1x2_context']
+        self.assertTrue(context['available']);self.assertFalse(context['same_operator'])
+        self.assertEqual(context['current_favorite_odd'],1.6)
+        self.assertFalse(cohort['cross_1x2_available'])
+
     def test_missing_live_context_does_not_reconstruct_a_historical_protocol(self):
         rows,sources=fixture()
         ledger,variants=capture(rows,sources,FLAGS,{},profiles=PROFILES)
@@ -145,6 +209,29 @@ class Variants(unittest.TestCase):
 
 
 class ProspectiveMetrics(unittest.TestCase):
+    def test_absent_new_arm_is_unavailable_not_a_historical_empty_selection(self):
+        rows,sources=fixture();frozen=freeze(rows,sources)
+        del frozen['variants'][GG_FT_SAME_RULES]
+        old=deepcopy(frozen)
+        settled=settle_v7(dict(decision_shadow=frozen,captured_at=AT,sha256='sha'),
+                         dict(status='FT',home_ht=1,away_ht=1,home_ft=2,away_ft=1))
+        archive={'fixtures':{'1':{'decision_shadow':{'latest':settled}}}}
+        metrics=next(iter(report([archive],datetime.fromisoformat('2026-11-23T00:00:00+00:00'),draws=5)['reports'].values()))
+        arm=metrics['variants'][GG_FT_SAME_RULES]
+        self.assertFalse(arm['available']);self.assertEqual(arm['available_fixtures'],0)
+        self.assertIsNone(arm['coverage']);self.assertEqual(arm['missing_reason'],'variant_not_frozen')
+        self.assertEqual(old,frozen)
+
+    def test_recommended_role_is_reported_separately_from_the_other_slots(self):
+        rows,sources=fixture();frozen=freeze(rows,sources)
+        settled=settle_v7(dict(decision_shadow=frozen,captured_at=AT,sha256='sha'),
+                         dict(status='FT',home_ht=1,away_ht=1,home_ft=2,away_ft=1))
+        archive={'fixtures':{'1':{'decision_shadow':{'latest':settled}}}}
+        metrics=next(iter(report([archive],datetime.fromisoformat('2026-11-23T00:00:00+00:00'),draws=5)['reports'].values()))
+        arm=metrics['role_variants']['recommended_alternative'][GG_FT_SAME_RULES]
+        self.assertTrue(arm['available']);self.assertEqual(arm['selected'],1)
+        self.assertGreater(metrics['variants'][GG_FT_SAME_RULES]['selected'],arm['selected'])
+
     def test_metrics_cluster_roles_by_fixture_and_ignore_absent_historical_protocol(self):
         rows,sources=fixture();frozen=freeze(rows,sources)
         s=settle_v7(dict(decision_shadow=frozen,captured_at=AT,sha256='sha'),

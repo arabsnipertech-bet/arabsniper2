@@ -9,14 +9,16 @@ from v7_probability import finite, price_usable, utc
 PROTOCOL = 'V7_MOVEMENT_SHADOW_20261122_V1'
 CONFIG = dict(oci_min=0,oci_max=50,ft_saturation_drop=-5,
               routing_revision='TRIAD_ROLE_COHERENCE_V1',
+              gg_ft_review='SAME_RULES_NATIVE_CONTEXT_V1',
               margin_reference_ft=6.5,margin_reference_half=8.,
               favorite_band=[1.35,1.70],conversion_ft_band=[1.80,2.50],
               under_floor=1.75,primary_preferred=[1.75,2.15],recommended_band=[1.85,2.60],
               recommended_margin=6.5,gg_floors=[.21,.25],gg_min_odd=4.20,
               bootstrap_draws=400,automatic_promotion=False)
 VARIANTS = ('nov22_oci_window','nov22_cross_markets','nov22_margin_friction',
-            'nov22_triad_rank_21','nov22_triad_rank_25')
+            'nov22_triad_rank_21','nov22_triad_rank_25','nov23_gg_ft_same_rules')
 CONTROL = 'nov22_control'
+GG_FT_SAME_RULES = 'nov23_gg_ft_same_rules'
 
 
 def fingerprint(value):
@@ -25,6 +27,21 @@ def fingerprint(value):
 
 def direction(value):
     return 'missing' if not finite(value) else 'down' if value < -1e-9 else 'up' if value > 1e-9 else 'stable'
+
+
+def statistical_context(rates, observed_at, as_of):
+    """Record the existing statistical lambdas, never infer them from outcomes."""
+    at, now = stamp(observed_at), stamp(as_of)
+    required = ('home_ht','away_ht','home_ft','away_ft')
+    if not isinstance(rates,dict) or not all(finite(rates.get(k)) and rates[k]>=0 for k in required):
+        return dict(available=False,reason='missing_native_statistical_rates')
+    if not at or not now or at>now:
+        return dict(available=False,reason='missing_or_future_statistics_timestamp')
+    values = {k:rates[k] for k in (*required,'home_st','away_st') if finite(rates.get(k)) and rates[k]>=0}
+    return dict(available=True,source='v7.statistics',observed_at=utc(at),rates=values,
+                lambda_ht_total=values['home_ht']+values['away_ht'],
+                lambda_ft_total=values['home_ft']+values['away_ft'],
+                independence='Lambdas underlie statistical probabilities; not an additional independent vote')
 
 
 def opening(record, source, as_of, kickoff):
@@ -76,7 +93,7 @@ def anchor(records,sources,as_of,kickoff):
 
 
 def capture(records,sources,observed,published,*,as_of=None,kickoff=None,profiles=None,
-            ev_recoveries=None,qualified_alternatives=()):
+            ev_recoveries=None,qualified_alternatives=(),statistical_rates=None,statistics_at=None):
     """Return private variants plus a compact same-snapshot cohort ledger."""
     from v7_decision import (GG,GG_FT,GOAL,RESULTS,TRIAD_LIMITS,TRIAD_MARKETS,
                              compatible,route,role_rank)
@@ -85,6 +102,7 @@ def capture(records,sources,observed,published,*,as_of=None,kickoff=None,profile
     if not at or not start or not at<start:
         return dict(protocol=PROTOCOL,shadow_only=True,available=False,reason='missing_live_prematch_context'),{}
     profiles=profiles or {}
+    statistics = statistical_context(statistical_rates,statistics_at,as_of)
     # Never mutate records used by the production selector, not even temporary EV.
     pool=deepcopy(records)
     names=['most_probable','recommended_alternative','high_odds_shot']
@@ -137,6 +155,17 @@ def capture(records,sources,observed,published,*,as_of=None,kickoff=None,profile
     goalkeys={GOAL['over15_ht'],GG,GOAL['over25_ft'],GOAL['over35_ft']}
     for row in rows:
         key=row['market_id'];ft=deltas.get(GOAL['over25_ft']);gg=deltas.get(GG)
+        if key in (GOAL['over15_ht'],GG_FT):
+            available = same_book['available']
+            initial = same_book.get('initial_favorite')
+            current = same_book.get('current_favorite')
+            row['over_gg_1x2_context'] = dict(available=available,
+                same_operator=str(row['bookmaker_id'])==same_book.get('bookmaker_id') if available else None,
+                initial_favorite=initial,current_favorite=current,
+                current_favorite_odd=(same_book.get('current') or {}).get(current) if available else None,
+                initial_favorite_delta_pct=(same_book.get('deltas') or {}).get(initial) if available else None,
+                favorite_inversion=same_book.get('favorite_inversion') if available else None,
+                interpretation='context association; same_operator distinguishes single-book confirmation')
         row['cross_1x2_available']=same_book['available'] and key in goalkeys and row['opening_delta_pct'] is not None
         row['favorite_135_170']=same_book.get('favorite_135_170') if row['cross_1x2_available'] else None
         row['favorite_inversion']=same_book.get('favorite_inversion') if row['cross_1x2_available'] else None
@@ -169,6 +198,8 @@ def capture(records,sources,observed,published,*,as_of=None,kickoff=None,profile
         ranking[index]+=friction.get(key,row['ev'])-row['ev']
         return tuple(ranking)
     variants={CONTROL:simulate(quoted)}
+    variants[GG_FT_SAME_RULES]=simulate(quoted,role_markets={
+        **TRIAD_MARKETS,recommended:TRIAD_MARKETS[recommended]|{GG_FT}})
     variants.update(nov22_oci_window=simulate(moderate),nov22_cross_markets=simulate(cross),
                     nov22_margin_friction=simulate(quoted,ranker=friction_rank))
     under={market_id(specification('total',p,'under',1.5)) for p in ('ht','sh')}
@@ -201,10 +232,15 @@ def capture(records,sources,observed,published,*,as_of=None,kickoff=None,profile
                                                                ranker=ranking,candidate_filter=candidate_filter)
     ledger=dict(protocol=PROTOCOL,config=deepcopy(CONFIG),config_sha256=fingerprint(CONFIG),shadow_only=True,
         available=True,captured_at=as_of,kickoff=kickoff,cohorts=rows,anchor_1x2=same_book,
+        statistical_context=statistics,
+        gg_ft_same_rules=dict(variant=GG_FT_SAME_RULES,control=CONTROL,
+            only_change='GG FT admitted to the recommended role; same candidate pool, limits and qualifications',
+            production_selector_changed=False,lower_quote_floor=False),
         coverage=dict(matrix_rows=len(pool),usable_quoted_rows=len(rows),statistically_supported_quoted_rows=sum(eligible.values())),
         comparison_control=CONTROL,control_scope='same executable statistically supported pool; current routing, recovery certificates and Plus PT retained',
         probability_weights_changed=False,automatic_promotion=False,
         margin_protocol='EV unchanged; shadow ranking score subtracts an explicit extra prudence cost. Reference-margin return is a counterfactual, not causal attribution.',
         prospective_protocol='Evaluate only frozen ledgers; never reconstruct absent variants on historical snapshots.')
-    ledger['evidence_sha256']=fingerprint(dict(captured_at=as_of,kickoff=kickoff,cohorts=rows,anchor_1x2=same_book))
+    ledger['evidence_sha256']=fingerprint(dict(captured_at=as_of,kickoff=kickoff,cohorts=rows,
+                                              anchor_1x2=same_book,statistical_context=statistics))
     return ledger,variants
