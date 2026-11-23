@@ -12,7 +12,7 @@ sys.path[:0] = [str(ROOT/'src'), str(ROOT/'auditor')]
 from audit_daily_evidence import read_receipt, receipt_path, verified_evidence
 from audit_storage import read_store, write_store
 from auditor_daily_priority import record_v7_status, v7_ready
-from auditor_light import PROGRESS, WORK_BUDGET, cycle, recovery_candidate, remote_receipt
+from auditor_light import PROGRESS, WORK_BUDGET, PAUSED_EXIT, cycle, recovery_candidate, remote_receipt
 from auditor_schedule import MARKER, preflight
 from current_audit import official_scores, settle_day
 from fast_backup_dispatch import IncompleteListing, TemporaryReadError
@@ -212,6 +212,38 @@ class LightweightAuditor(unittest.TestCase):
             self.assertEqual(run(work, lambda: NOW, runner), 'paused')
             self.assertEqual(runner.call_args.args[2], NOW+WORK_BUDGET)
             self.assertFalse((Path(work)/MARKER).exists())
+
+    def test_priority_timeout_saves_only_partial_progress_and_never_certifies(self):
+        storage=Fake()
+        with TemporaryDirectory() as seed, TemporaryDirectory() as work:
+            seeded(storage,Path(seed))
+            before=previous_manifest(storage,'test')
+            with patch('auditor_light.ensure_priority',side_effect=TimeoutError('protected budget')):
+                result=cycle(storage,'test',work,NOW,NOW+WORK_BUDGET,Mock(),lambda:NOW)
+            self.assertEqual(result,'paused')
+            self.assertFalse((Path(work)/MARKER).exists())
+            after=previous_manifest(storage,'test')
+            self.assertNotIn(MARKER,after)
+            self.assertEqual({key:after[key] for key in before},before)
+            self.assertEqual(read_store(Path(work)/PROGRESS)['priority'],
+                             {'date':str(DAY),'status':'deferred_budget'})
+
+    def test_parent_recognises_only_the_explicit_partial_exit_code(self):
+        with TemporaryDirectory() as work, patch.dict(os.environ,{'GOLD_PRIVATE':'true'}):
+            paused=Mock(side_effect=subprocess.CalledProcessError(PAUSED_EXIT,['auditor_light.py']))
+            self.assertEqual(run(work,lambda:NOW,paused),'paused')
+            failed=Mock(side_effect=subprocess.CalledProcessError(1,['auditor_light.py']))
+            with self.assertRaises(subprocess.CalledProcessError):
+                run(work,lambda:NOW,failed)
+
+    def test_longer_work_budget_still_stops_at_the_protected_window_cutoff(self):
+        for at in ('2026-11-20T01:20:00+01:00','2026-11-20T05:00:00+01:00'):
+            started=datetime.fromisoformat(at)
+            with TemporaryDirectory() as work:
+                runner=Mock(side_effect=TimeoutError)
+                self.assertEqual(run(work,lambda:started,runner),'paused')
+                self.assertEqual(runner.call_args.args[2],
+                                 started.replace(minute=50 if started.hour == 1 else 30))
 
     def test_incomplete_github_listing_defers_without_admitting_a_writer(self):
         for error in (IncompleteListing('moving listing'), TemporaryReadError('HTTP 503')):

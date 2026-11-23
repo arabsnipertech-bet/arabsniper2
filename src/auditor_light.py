@@ -14,8 +14,11 @@ from auditor_schedule import EXCLUDED_RECOVERY_DAYS, MARKER, ROME
 from gold_storage import previous_manifest, publish, restore_subset, restore_v7_priority
 
 PROGRESS = 'data/arab_quote_auditor_light_progress.json'
-WORK_BUDGET = timedelta(minutes=12)
+# The measured closed-day report needs about 30 minutes on a busy match day.
+# One bounded pass costs less than repeated 12-minute failures plus full replay.
+WORK_BUDGET = timedelta(minutes=40)
 SAVE_RESERVE = timedelta(seconds=90)
+PAUSED_EXIT = 75
 RESULT_IDS = 20
 DAY_FILE = re.compile(r'auditordata/prematch_(\d{4}-\d{2}-\d{2})\.json')
 
@@ -106,7 +109,15 @@ def cycle(storage, bucket, root, started, deadline, command_runner, clock):
         write_store(root/PROGRESS, progress)
         publish(storage, bucket, root, checkpoint_only=True, selected_paths=[PROGRESS])
 
-    ensure_priority(root, today, phase)
+    try:
+        ensure_priority(root, today, phase)
+    except TimeoutError:
+        # Frozen inputs have their independent checkpoint. Persist only the
+        # partial status; never certify incomplete results or overwrite feeds.
+        progress['priority'] = {'date': str(yesterday), 'status': 'deferred_budget'}
+        save_progress()
+        print('Daily V7 paused at its budget; only saved evidence is retained', flush=True)
+        return 'paused'
     if not v7_ready(root, today) or verified_evidence(root, yesterday) is None:
         raise ValueError('Daily V7 certification is incomplete')
     output('v7_completed', True)
@@ -167,8 +178,10 @@ def main():
         raise ValueError('Lightweight Auditor requires the protected private production window')
     deadline = min(datetime.fromisoformat(os.environ['AUDITOR_LIGHT_DEADLINE']),
                    datetime.fromisoformat(gate['deadline']), started+WORK_BUDGET)
-    cycle(client(), os.environ['R2_BUCKET'], Path(__file__).resolve().parents[1],
-          started, deadline, run_command, lambda: datetime.now(ROME))
+    result = cycle(client(), os.environ['R2_BUCKET'], Path(__file__).resolve().parents[1],
+                   started, deadline, run_command, lambda: datetime.now(ROME))
+    if result == 'paused':
+        raise SystemExit(PAUSED_EXIT)
 
 
 if __name__ == '__main__':

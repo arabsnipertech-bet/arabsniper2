@@ -39,7 +39,7 @@ jobs:
     needs: admission
     if: needs.admission.outputs.run == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 45
     # Final checkpoint mutex; the runner also enforces an absolute 05:30 cutoff.
     concurrency:
       group: arabsniper-quote-data-writer

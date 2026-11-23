@@ -55,6 +55,101 @@ def sources(storage, root, *, with_pending=False):
 
 
 class DailyRecoveryTests(unittest.TestCase):
+    def priority_freeze(self, storage, root):
+        from audit_ledger import AuditLedger, entries
+        from gold_storage import publish
+        official = sources(storage, root)
+        index = previous_manifest(storage, 'test')
+        dated = f'auditordata/prematch_{DAY}.json'
+        with AuditLedger() as ledger:
+            ledger.metadata.update(schema_version=1, audit_date=str(DAY),
+                priority_journals={'version':1, 'sha256':{JOURNAL:index[JOURNAL]['sha256']}})
+            for name in (FORECASTS, JOURNAL):
+                for collection,key,row in entries(root/name):
+                    if collection and key is not None:
+                        ledger.put(collection,key,row)
+            ledger.write(root/dated)
+        publish(storage,'test',root,checkpoint_only=True,selected_paths=[dated])
+        return official
+
+    def test_saved_priority_freeze_avoids_global_replay_and_survives_unrelated_master_updates(self):
+        import gzip
+        from audit_ledger import AuditLedger
+        storage=Fake()
+        with TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest, \
+                patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):
+            root=Path(seed);official=self.priority_freeze(storage,root)
+            dated=f'auditordata/prematch_{DAY}.json'
+            frozen=previous_manifest(storage,'test')[dated]
+            with patch('recover_daily.entries',side_effect=AssertionError('Journal replay forbidden')), \
+                    patch('recover_daily.ForecastHistory',side_effect=AssertionError('No history rebuild')), \
+                    patch('recover_daily.AuditLedger',wraps=AuditLedger) as load:
+                digest=prepare(storage,'test',Path(work),DAY,NOW,lambda *_:official,existing_forecasts=True)
+            self.assertEqual(sum(str(call.args[0]).endswith(dated) for call in load.call_args_list),1)
+            staged=json.loads(gzip.decompress(storage.objects['audit-recovery/'+digest+'.json.gz']))
+            self.assertEqual(staged['source_mode'],'frozen_day')
+            self.assertNotIn(FORECASTS,staged['sources'])
+            self.assertEqual(staged['sources'][JOURNAL],previous_manifest(storage,'test')[JOURNAL]['sha256'])
+            index=previous_manifest(storage,'test')
+            # Today's master can advance while yesterday's evidence is unchanged.
+            write_manifest(storage,'test',{**index,FORECASTS:{'sha256':'f'*64,'bytes':10}})
+            install(storage,'test',Path(dest),DAY,digest,NOW)
+            self.assertEqual(previous_manifest(storage,'test')[dated],frozen)
+            self.assertEqual(previous_manifest(storage,'test')[FORECASTS],{'sha256':'f'*64,'bytes':10})
+
+    def test_priority_recovery_still_rejects_a_changed_journal_before_publication(self):
+        storage=Fake()
+        with TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest, \
+                patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):
+            official=self.priority_freeze(storage,Path(seed))
+            digest=prepare(storage,'test',Path(work),DAY,NOW,lambda *_:official,existing_forecasts=True)
+            index=previous_manifest(storage,'test')
+            write_manifest(storage,'test',{**index,JOURNAL:{'sha256':'0'*64,'bytes':12}})
+            pointer=storage.objects['state/current.json']
+            with self.assertRaisesRegex(ValueError,'sources changed'):
+                install(storage,'test',Path(dest),DAY,digest,NOW)
+            self.assertEqual(storage.objects['state/current.json'],pointer)
+
+    def test_priority_recovery_rejects_a_changed_processed_journal_before_result_calls(self):
+        storage=Fake();fetch=Mock()
+        with TemporaryDirectory() as seed, TemporaryDirectory() as work:
+            self.priority_freeze(storage,Path(seed))
+            index=previous_manifest(storage,'test')
+            write_manifest(storage,'test',{**index,JOURNAL:{'sha256':'0'*64,'bytes':12}})
+            with self.assertRaisesRegex(ValueError,'Previously frozen priority journal changed'):
+                prepare(storage,'test',Path(work),DAY,NOW,fetch,existing_forecasts=True)
+            fetch.assert_not_called()
+
+    def test_new_journal_prevents_reuse_of_an_incomplete_priority_freeze(self):
+        import gzip
+        from gold_storage import publish
+        storage=Fake()
+        with TemporaryDirectory() as seed, TemporaryDirectory() as work, \
+                patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):
+            root=Path(seed);official=self.priority_freeze(storage,root)
+            new=JOURNAL.replace('T130000','T150000')
+            write_store(root/new,read_store(root/JOURNAL))
+            publish(storage,'test',root,checkpoint_only=True,selected_paths=[new])
+            digest=prepare(storage,'test',Path(work),DAY,NOW,lambda *_:official,existing_forecasts=True)
+            staged=json.loads(gzip.decompress(storage.objects['audit-recovery/'+digest+'.json.gz']))
+            self.assertNotEqual(staged.get('source_mode'),'frozen_day')
+            self.assertIn(new,staged['sources'])
+            self.assertIn(FORECASTS,staged['sources'])
+
+    def test_priority_recovery_rejects_a_concurrent_frozen_day_update(self):
+        storage=Fake()
+        with TemporaryDirectory() as seed, TemporaryDirectory() as work, TemporaryDirectory() as dest, \
+                patch.dict(os.environ,{'API_SPORTS_KEY':'test'}):
+            official=self.priority_freeze(storage,Path(seed))
+            digest=prepare(storage,'test',Path(work),DAY,NOW,lambda *_:official,existing_forecasts=True)
+            dated=f'auditordata/prematch_{DAY}.json'
+            index=previous_manifest(storage,'test')
+            write_manifest(storage,'test',{**index,dated:{'sha256':'1'*64,'bytes':12}})
+            pointer=storage.objects['state/current.json']
+            with self.assertRaisesRegex(ValueError,'sources changed'):
+                install(storage,'test',Path(dest),DAY,digest,NOW)
+            self.assertEqual(storage.objects['state/current.json'],pointer)
+
     def test_discontinued_dates_are_rejected_before_storage_or_provider_access(self):
         now = datetime.fromisoformat('2026-11-13T08:00:00+01:00')
         storage, fetcher = Mock(), Mock()
