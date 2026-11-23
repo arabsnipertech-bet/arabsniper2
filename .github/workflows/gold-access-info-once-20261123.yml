@@ -1,0 +1,111 @@
+name: Publish owner-authorized Gold access information once
+on:
+  push:
+    branches: ['ops/gold-access-info-20261123-0800']
+    paths: ['.github/workflows/gold-access-info-once-20261123.yml']
+permissions: {}
+concurrency:
+  group: gold-access-info-20261123-0800
+  cancel-in-progress: false
+jobs:
+  send:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/ops/gold-access-info-20261123-0800' && github.run_attempt == '1' && github.event.before == 'dae5d9e16c817ba63cd155c39fa96f50c20c5e03'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify the trial path and publish the authorized information once
+        shell: python
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+        run: |
+          import json, os, re, time
+          from datetime import datetime, timezone
+          from urllib.request import Request, build_opener, HTTPRedirectHandler
+          from urllib.parse import urlsplit
+          
+          if datetime.now(timezone.utc) >= datetime.fromisoformat("2026-11-23T07:42:32.050+00:00"):
+              raise SystemExit("One-time publication window ended; nothing sent.")
+          class NoRedirect(HTTPRedirectHandler):
+              def redirect_request(self, *args):
+                  return None
+          client = build_opener(NoRedirect())
+          def read_json(request):
+              try:
+                  with client.open(request, timeout=25) as response:
+                      return json.load(response)
+              except Exception:
+                  raise SystemExit("Remote response not confirmed; credentials withheld. Reconcile before retrying any send.") from None
+          cf_token = os.environ.get("CF_TOKEN", "").strip()
+          if not cf_token:
+              raise SystemExit("Trial setup cannot be verified; nothing sent.")
+          settings = read_json(Request(
+              "https://api.cloudflare.com/client/v4/accounts/dfdb02b4139b31c0ab4456a50eb371a2/workers/scripts/stripe-checker/settings",
+              headers={"Authorization": "Bearer " + cf_token}))
+          if settings.get("success") is not True:
+              raise SystemExit("Worker settings unavailable; nothing sent.")
+          bindings = {b["name"]: b for b in settings["result"].get("bindings", [])}
+          required = {"TELEGRAM_BOT_TOKEN", "TELEGRAM_WEBHOOK_SECRET", "TELEGRAM_TRIAL_HMAC_SECRET", "STRIPE_SECRET_KEY", "RESEND_API_KEY", "EMAIL_FROM", "ACCESS_DB"}
+          if bindings.get("TELEGRAM_TRIAL_ENABLED", {}).get("text") != "true" or not required.issubset(bindings):
+              raise SystemExit("Free-trial configuration not confirmed; nothing sent.")
+          print("Free trial configuration: enabled; required bindings present.", flush=True)
+          token = os.environ.get("BOT_TOKEN", "").strip()
+          if not re.fullmatch(r"\d+:[A-Za-z0-9_-]+", token):
+              raise SystemExit("Bot credential unavailable; nothing sent.")
+          def tg(method, data=None):
+              if method not in {"getMe", "getChat", "getChatMember", "getWebhookInfo", "sendMessage", "pinChatMessage"}:
+                  raise SystemExit("Unsupported operation.")
+              result = read_json(Request("https://api.telegram.org/bot" + token + "/" + method,
+                  data=json.dumps(data or {}, ensure_ascii=False).encode("utf-8"),
+                  headers={"Content-Type": "application/json"}, method="POST"))
+              if result.get("ok") is not True:
+                  raise SystemExit("Telegram operation rejected; credentials withheld. Check receipts before retrying.")
+              return result["result"]
+          bot = tg("getMe")
+          if not bot.get("is_bot") or bot.get("username", "").lower() != "arabsniperbot":
+              raise SystemExit("Unexpected bot identity; nothing sent.")
+          chat = tg("getChat", {"chat_id": "@arabsniper_signals"})
+          if chat.get("type") != "channel" or chat.get("username", "").lower() != "arabsniper_signals":
+              raise SystemExit("Unexpected channel; nothing sent.")
+          member = tg("getChatMember", {"chat_id": chat["id"], "user_id": bot["id"]})
+          if member.get("status") != "administrator" or not member.get("can_post_messages"):
+              raise SystemExit("Posting permission unavailable; nothing sent.")
+          hook = tg("getWebhookInfo")
+          target = urlsplit(hook.get("url", ""))
+          recent_error = hook.get("last_error_date") and time.time() - hook["last_error_date"] < 3600
+          if target.scheme != "https" or target.hostname not in {"arabsniperbet.com", "www.arabsniperbet.com", "stripe-checker.arabsnipertech.workers.dev"} or target.path != "/api/telegram-webhook" or hook.get("pending_update_count", 0) >= 20 or recent_error:
+              raise SystemExit("Bot trial webhook health not confirmed; nothing sent.")
+          print("Existing bot, destination, posting rights and trial webhook: verified.", flush=True)
+          posts = [{"kind":"gold_overview","text":"⭐ <b>GOLD · IL CALCIO ATTRAVERSO I DATI</b>\n\nSegui le analisi giornaliere delle partite e approfondisci i dati nella pagina Gold di ArabSniperBet.\n\n📅 Schede e aggiornamenti delle partite\n📊 Dati e statistiche da consultare\n⏱ Parziali e risultati per confrontare l’analisi con ciò che accade sul campo\n\n🎁 <b>Vuoi conoscere Gold? Richiedi la prova gratuita di 7 giorni tramite @ArabSniperBot.</b>\n\nLa prova è disponibile se non ne hai già usufruito: una sola per email o account Telegram. Nessuna carta, nessun addebito e nessun rinnovo automatico della prova.\n\n⭐ Pagina Gold:\nhttps://arabsniperbet.com/gold-dashboard-live.html\n\n🌐 Sito:\nhttps://arabsniperbet.com/\n\nEntra anche tu e scopri gli strumenti di analisi calcistica.","silent":False},{"kind":"free_access_guide","text":"🎁 <b>COME RICHIEDERE I 7 GIORNI GRATUITI DI GOLD</b>\n\n1️⃣ Apri il bot ufficiale:\nhttps://t.me/ArabSniperBot\n\n2️⃣ Premi <b>Avvia</b> oppure scrivi <b>/prova</b>.\n\n3️⃣ Invia la tua email nella chat privata del bot e segui le istruzioni per confermarla.\n\n4️⃣ Dopo la conferma dell’attivazione, apri Gold e accedi con la stessa email:\nhttps://arabsniperbet.com/gold-dashboard-live.html\n\n✅ Nessuna carta richiesta\n✅ Nessun addebito per la prova\n✅ Nessun rinnovo automatico della prova\n\nUna sola prova per email o account Telegram, se non già utilizzata. Se hai già un accesso Gold attivo, entra direttamente dalla pagina Gold.\n\n📲 Puoi condividere questo messaggio con chi vuole conoscere la piattaforma.","silent":True}]
+          keyboard = {"inline_keyboard": [
+              [{"text": "🎁 Richiedi la prova gratuita", "url": "https://t.me/ArabSniperBot"}],
+              [{"text": "⭐ Apri Gold", "url": "https://arabsniperbet.com/gold-dashboard-live.html"},
+               {"text": "🌐 Visita il sito", "url": "https://arabsniperbet.com/"}]
+          ]}
+          receipts = []
+          for post in posts:
+              if receipts:
+                  time.sleep(1.2)
+              sent = tg("sendMessage", {
+                  "chat_id": chat["id"], "text": post["text"], "parse_mode": "HTML",
+                  "link_preview_options": {"is_disabled": True},
+                  "disable_notification": post["silent"], "reply_markup": keyboard
+              })
+              if sent.get("chat", {}).get("id") != chat["id"] or not sent.get("message_id"):
+                  raise SystemExit("Message result requires reconciliation; do not resend completed items.")
+              receipt = {
+                  "kind": post["kind"], "message_id": sent["message_id"],
+                  "url": "https://t.me/" + chat["username"] + "/" + str(sent["message_id"]),
+                  "sent_at": datetime.fromtimestamp(sent["date"], timezone.utc).isoformat()
+              }
+              receipts.append(receipt)
+              print(json.dumps(receipt, ensure_ascii=False), flush=True)
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+                  summary.write("Verified publication: [" + post["kind"] + "](" + receipt["url"] + ")\n\n")
+          if member.get("can_edit_messages"):
+              time.sleep(1.2)
+              pinned = tg("pinChatMessage", {"chat_id": chat["id"], "message_id": receipts[0]["message_id"], "disable_notification": True})
+              print(json.dumps({"pinned": pinned is True, "message_id": receipts[0]["message_id"]}), flush=True)
+          else:
+              print(json.dumps({"pinned": False, "reason": "existing bot has no channel pin permission"}), flush=True)
+          
