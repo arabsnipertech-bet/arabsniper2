@@ -35,6 +35,8 @@ jobs:
           persist-credentials: false
       - name: Recover nightly Auditor within protected windows
         if: always()
+        # An exhausted Auditor retry must not suppress the independent Fast check.
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
           AUDITOR_BACKUP_DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}

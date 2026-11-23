@@ -18,7 +18,7 @@ from tempfile import TemporaryDirectory
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 from audit_daily_evidence import evidence_paths, read_receipt, receipt_path as evidence_receipt_path, verified_evidence
-from audit_journal import ForecastHistory, journal_fields, journals_for_day, merge_forecast
+from audit_journal import ForecastHistory, LEGACY_PRIORITY_DAYS, journal_fields, journals_for_day, merge_forecast
 from audit_ledger import AuditLedger, entries
 from audit_official_scores import LOOKBACK_DAYS
 from audit_storage import FORMAT, atomic_bytes, read_store, write_store
@@ -80,6 +80,32 @@ def checkpoint_sources(index, day):
         return {}
     receipt = evidence_receipt_path(day)
     return {p: index[p]['sha256'] for p in (*paths, receipt) if p in index}
+
+
+def frozen_day_sources(index, day):
+    """Bind recovery to this day's evidence, not the changing global master."""
+    dated = f'auditordata/prematch_{day}.json'
+    if dated not in index:
+        return {}
+    paths = {dated, *journals_for_day(index, day, legacy_days=LEGACY_PRIORITY_DAYS),
+             *evidence_paths(day), evidence_receipt_path(day)}
+    return {path:index[path]['sha256'] for path in sorted(paths) if path in index}
+
+
+def frozen_day_covered(ledger, index, day):
+    """A priority checkpoint proves exactly which immutable journals it contains."""
+    saved = ledger.metadata.get('priority_journals')
+    if saved is None:
+        return False
+    hashes = saved.get('sha256') if isinstance(saved, dict) and saved.get('version') == 1 else None
+    if not isinstance(hashes, dict) or any(
+            not isinstance(key, str) or not isinstance(value, str)
+            or not re.fullmatch('[0-9a-f]{64}', value) for key,value in hashes.items()):
+        raise ValueError('Invalid priority journal checkpoint')
+    paths = list(journals_for_day(index, day, legacy_days=LEGACY_PRIORITY_DAYS))
+    if any(path in hashes and hashes[path] != index[path]['sha256'] for path in paths):
+        raise ValueError('Previously frozen priority journal changed')
+    return bool(hashes) and all(path in hashes for path in paths)
 
 
 def next_recovery_day(storage, bucket, root, now):
@@ -174,15 +200,27 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
         frozen_inputs = prior_report.get('evidence_provenance', {}).get('input_files', {})
         if frozen_inputs.get(dated.relative_to(root).as_posix()) != checkpoint[dated.relative_to(root).as_posix()]:
             checkpoint = {}  # The full archive now contains additional frozen observations.
-    sources = checkpoint or source_set(index, day)
-    if not checkpoint:
-        restore_subset(storage, bucket, root, index, sources)
+    # A failed nightly run may already have saved every original observation,
+    # but not yet its results/report. Reuse that authoritative dated checkpoint.
+    if not checkpoint and dated.relative_to(root).as_posix() in index:
+        restore_subset(storage, bucket, root, index, [dated.relative_to(root).as_posix()])
+    sources = checkpoint
     certified = read_store(root/f'auditarchive/prematch_{day}_v7.json', {}) if checkpoint else {}
     if checkpoint and (certified.get('date') != str(day) or not isinstance(certified.get('fixtures'), dict)
                        or read_store(root/report_path(day), {}).get('audit_date') != str(day)):
         raise ValueError('Invalid saved closed-day certificate')
     frozen_dated = index[dated.relative_to(root).as_posix()]['sha256'] if checkpoint else None
+    frozen_only = False
     with AuditLedger(dated) as ledger:
+        if not checkpoint:
+            frozen_only = bool(existing_forecasts and frozen_day_covered(ledger, index, day))
+            sources = frozen_day_sources(index, day) if frozen_only else source_set(index, day)
+            paths = [p for p in sources if p != dated.relative_to(root).as_posix()
+                     and (not frozen_only or not journal_fields(p))]
+            restore_subset(storage, bucket, root, index, paths)
+            if frozen_only:
+                frozen_dated = index[dated.relative_to(root).as_posix()]['sha256']
+                print(f'Reusing verified priority freeze for {day}; no global or journal replay', flush=True)
         if dated.exists() and ledger.metadata.get('audit_date') != day.isoformat():
             raise ValueError('Private archive date mismatch')
         ledger.metadata.update(schema_version=1, audit_date=day.isoformat())
@@ -191,14 +229,14 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
                 raise ValueError('Invalid frozen archive entry')
         # Existing per-date archive wins, then the original master, then each
         # journal in observation order, as in normal archival/ingestion.
-        pending = [p for p in sources if journal_fields(p)]
+        pending = [p for p in sources if journal_fields(p)] if not frozen_only else []
         # Match ordinary ingestion: forecast journals first, policy journals
         # second. Preserve policy publication markers and Study observations.
         pending.sort(key=lambda p:(p.endswith('_policies.json'), journal_fields(p)[0]))
         from daily_audit import fingerprint
-        original = {(c,k): fingerprint(r) for c,k,r in ledger.records()}
-        history = ForecastHistory(ledger)
         paths = ([FORECASTS] if FORECASTS in sources else []) + pending
+        original = {(c,k): fingerprint(r) for c,k,r in ledger.records()} if paths else {}
+        history = ForecastHistory(ledger) if paths else None
         for path in paths:
             print('Verifying original source for '+str(day)+': '+path, flush=True)
             journal = path != FORECASTS
@@ -231,15 +269,17 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
         for (c,k), checksum in original.items():
             if fingerprint(ledger[c][k]) != checksum:
                 raise ValueError('Existing frozen prediction changed during recovery')
-        if not dated.exists() or sum(len(ledger.get(c,{})) for c in ledger.collections) != len(original):
+        if not (checkpoint or frozen_only) and (not dated.exists()
+                or sum(len(ledger.get(c,{})) for c in ledger.collections) != len(original)):
             ledger.write(dated)
-
-    queried = settle_day(root, day, now, fetcher=fetcher, legacy_evidence=False, recheck_results=recheck_results,
-                         progress=lambda message: print(f'Recovery {day}: {message}', flush=True))
+        # Reuse the checked disk index instead of decoding the whole day twice.
+        queried = settle_day(root, day, now, fetcher=fetcher, legacy_evidence=False, recheck_results=recheck_results,
+                             ledger=ledger, progress=lambda message: print(f'Recovery {day}: {message}', flush=True))
     v7 = read_store(root/f'auditarchive/prematch_{day}_v7.json')
-    if checkpoint:
+    if checkpoint or frozen_only:
         if sha(dated.read_bytes()) != frozen_dated:
             raise ValueError('Result refresh changed the frozen ledger')
+    if checkpoint:
         before = certified['fixtures']
         after = v7['fixtures']
         if before.keys() != after.keys() or any(before[fid]['forecast_sha256'] != after[fid]['forecast_sha256']
@@ -266,10 +306,12 @@ def prepare(storage, bucket, root, day, now, fetcher=fetch_results, *, refresh=F
             storage.put_object(Bucket=bucket, Key='state/objects/'+checksum, Body=raw_file)
             verified_objects.add(checksum)
         bundle[path] = {'sha256': checksum, 'bytes': len(raw_file)}
-    staged = {'version': 4, 'date': day.isoformat(), 'sources': sources, 'files': bundle,
+    staged = {'version': 5, 'date': day.isoformat(), 'sources': sources, 'files': bundle,
               'legacy_status': status}
     if checkpoint:
         staged['source_mode'] = 'closed_day'
+    elif frozen_only:
+        staged['source_mode'] = 'frozen_day'
     raw = gzip.compress(json.dumps(staged, ensure_ascii=False, allow_nan=False,
                                    separators=(',', ':')).encode(), mtime=0)
     digest = sha(raw)
@@ -290,11 +332,14 @@ def install(storage, bucket, root, day, digest, now):
             raise ValueError('Staged chain checksum mismatch')
         staged = json.loads(gzip.decompress(raw))
         source_mode = staged.get('source_mode')
-        sources = checkpoint_sources(index, day) if source_mode == 'closed_day' else source_set(index, day)
+        sources = (checkpoint_sources(index, day) if source_mode == 'closed_day' else
+                   frozen_day_sources(index, day) if source_mode == 'frozen_day' else source_set(index, day))
         if staged.get('version') in (2, 3) and source_mode == 'closed_day':
             sources.pop(evidence_receipt_path(day), None)
-        if (staged.get('version') not in (2, 3, 4) or staged.get('date') != day.isoformat()
-                or source_mode not in (None, 'closed_day') or not sources or sources != staged.get('sources')):
+        if (staged.get('version') not in (2, 3, 4, 5) or staged.get('date') != day.isoformat()
+                or source_mode not in (None, 'closed_day', 'frozen_day')
+                or source_mode == 'frozen_day' and staged.get('version') != 5
+                or not sources or sources != staged.get('sources')):
             raise ValueError('Frozen sources changed; prepare the day again')
         additions = staged['files']
         partial = staged['version'] >= 3 and staged.get('legacy_status') == 'partial_v51_skip'

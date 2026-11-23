@@ -186,7 +186,7 @@ def run_legacy(root, clock=lambda: datetime.now(ROME), command_runner=run_comman
 def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, recovery_date=None):
     if os.getenv('AUDITOR_MODE') == 'legacy':
         return run_legacy(root, clock, command_runner, recovery_date)
-    from auditor_light import WORK_BUDGET
+    from auditor_light import WORK_BUDGET, PAUSED_EXIT
     started = clock()
     gate = recovery_admission(started, recovery_date) if recovery_date else admission(started)
     if not gate['run']:
@@ -200,6 +200,11 @@ def run(root, clock=lambda: datetime.now(ROME), command_runner=run_command, reco
         command_runner(Path(root), [sys.executable, 'src/auditor_light.py'], deadline, clock)
     except TimeoutError:
         print('Lightweight Auditor budget reached; only published blocks are retained', flush=True)
+        return 'paused'
+    except subprocess.CalledProcessError as error:
+        if error.returncode != PAUSED_EXIT:
+            raise
+        print('Daily Auditor checkpointed a partial block; certification remains pending', flush=True)
         return 'paused'
     finally:
         if previous is None:
