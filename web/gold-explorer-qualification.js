@@ -39,7 +39,8 @@
    const fair=value.model_fair_odd;
    parts.push(finite(value.odd)&&finite(fair)&&value.odd>fair?
     'Quota '+number(value.odd)+' superiore alla quota equa V7 '+number(fair)+'.':
-    'Rapporto tra quota e probabilità sostenuto dalla qualifica di valore registrata.');
+    finite(ev)&&ev>0?'Valore stimato alla quota offerta: EV '+percent(ev)+'.':
+    'Supporto di valore registrato nella fotografia prematch.');
   }else if(type==='statistical_recovery')parts.push('Supporto statistico e stima prudente almeno in linea con il fair dello stesso operatore: recupero statistico registrato.');
   else if(type==='contrarian_study')parts.push('Contesto GG PT contrarian registrato dal motore, da seguire in studio.');
   if(!parts.length)parts.push('Osservazione del modello; motivazione originale non documentata in questo riferimento.');
