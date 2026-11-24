@@ -7,5 +7,17 @@
  const link=document.createElement('a');link.href='/gold-explorer.html';link.textContent='Apri Explorer completo ↗';link.style.color='#edc66c';
  const close=document.createElement('button');close.type='button';close.textContent='Chiudi ×';close.onclick=()=>panel.close();bar.append(link,close);panel.append(bar);
  const frame=document.createElement('iframe');frame.title='Gold Explorer';frame.style.cssText='border:0;width:100%;height:calc(100% - 52px)';panel.append(frame);document.body.append(panel);
- launch.onclick=()=>{if(!frame.getAttribute('src'))frame.src='/gold-explorer.html?panel=1';panel.showModal();};
+ function open(fixture){
+  const url=new URL('/gold-explorer.html',location.origin);url.searchParams.set('panel','1');
+  if(fixture)url.searchParams.set('fixture',fixture);
+  if(frame.getAttribute('src')!==url.pathname+url.search)frame.src=url.pathname+url.search;
+  link.href='/gold-explorer.html'+(fixture?'?fixture='+encodeURIComponent(fixture):'');panel.showModal();
+ }
+ launch.onclick=()=>open(null);
+ document.addEventListener('click',event=>{
+  const anchor=event.target.closest?.('a[data-explorer-fixture]');
+  const fixture=anchor?.dataset.explorerFixture;
+  if(!/^\d+$/.test(fixture||'')||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+  event.preventDefault();open(fixture);
+ });
 })();

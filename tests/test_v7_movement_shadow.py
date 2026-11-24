@@ -42,6 +42,23 @@ def freeze(rows,sources,**kwargs):
                       as_of=AT,kickoff=START,profiles=PROFILES,**kwargs)
 
 class Variants(unittest.TestCase):
+    def test_away_symmetric_is_shadow_only_and_preserves_the_offered_price(self):
+        rows,sources=fixture()
+        away=RESULTS['2']
+        rows[away],sources[away]=candidate(away,5.,.30,first=5.5,low=.20)
+        del rows[GG];del sources[GG]
+        before=deepcopy((rows,sources))
+        live=route(rows,FLAGS,study=False)[0]
+        self.assertIsNone(live['high_odds_shot'])
+        ledger,variants=capture(rows,sources,FLAGS,live,as_of=AT,kickoff=START,profiles=PROFILES)
+        trial=variants['nov24_away_symmetric']['high_odds_shot']
+        self.assertEqual(trial['market_id'],away)
+        self.assertEqual(trial['odd'],5.)
+        self.assertEqual(trial['probability'],.30)
+        self.assertFalse(ledger['away_symmetric']['production_selector_changed'])
+        self.assertEqual((rows,sources),before)
+        self.assertIsNone(route(rows,FLAGS,study=False)[0]['high_odds_shot'])
+
     def test_gg_same_rules_changes_only_recommended_market_admission(self):
         rows,sources=fixture()
         rows[GG_FT],sources[GG_FT]=candidate(GG_FT,2.3,.52)

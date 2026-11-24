@@ -74,6 +74,7 @@ TRIAD_QUALIFIED_REFRESH_V1 = {
     'enabled': True, 'alternative_roles': ('recommended_alternative',),
     'repair_commitments': True,
 }
+POSITIVE_ALTERNATIVES_POLICY = 'TRIAD_POSITIVE_ALTERNATIVES_V2'
 
 
 def fingerprint(value):
@@ -548,8 +549,9 @@ def coherent_slot_prices(records, slots):
 
 
 def fill_qualified_alternatives(triad, records, observed, locked, limits, ev_recoveries, roles,
-                                role_markets=TRIAD_MARKETS, ranker=None, candidate_filter=None):
-    """Only an otherwise empty Consigliata may use another qualified market."""
+                                role_markets=TRIAD_MARKETS, ranker=None, candidate_filter=None,
+                                away_symmetric_shadow=False):
+    """Fill an empty Consigliata with positive value before considering recovery."""
     role = 'recommended_alternative'
     if role not in roles or triad[role]:
         return
@@ -559,7 +561,8 @@ def fill_qualified_alternatives(triad, records, observed, locked, limits, ev_rec
     held = {**locked, **{slot: pick['market_id'] for slot, pick in triad.items() if pick}}
     proposed, _ = route(records, observed, locked=held, limits=limits,
                         role_markets={**role_markets, role: candidates}, ev_recoveries=ev_recoveries,
-                        ranker=ranker,candidate_filter=candidate_filter)
+                        ranker=ranker,candidate_filter=candidate_filter,
+                        away_symmetric_shadow=away_symmetric_shadow)
     pick = proposed[role]
     if (not pick or not coherent_slot_prices(records, {**held, role: pick['market_id']})
             or any(triad[other] and (not proposed[other]
@@ -567,7 +570,7 @@ def fill_qualified_alternatives(triad, records, observed, locked, limits, ev_rec
                    for other in triad if other != role)):
         return
     triad[role] = signal(pick['market_id'], records[pick['market_id']], 'alternativa_qualificata')
-    triad[role]['selection_policy'] = {'id': 'TRIAD_QUALIFIED_REFRESH_V1', 'action': 'qualified_alternative'}
+    triad[role]['selection_policy'] = {'id': POSITIVE_ALTERNATIVES_POLICY, 'action': 'qualified_alternative'}
 
 
 def ev_recovery_candidates(records, sources, as_of, kickoff, statistics_at, commitments=None, *, policy=None):
@@ -633,9 +636,20 @@ def ev_recovery_candidates(records, sources, as_of, kickoff, statistics_at, comm
     return candidates
 
 
+def away_shot_admitted(row, *, symmetric_shadow=False):
+    """Keep live admission; the private trial removes direction only at 4.50-7.50."""
+    odd = row.get('odd')
+    if not finite(odd) or odd < 4.50:
+        return False
+    if symmetric_shadow and odd <= 7.50:
+        return True
+    delta = (row.get('features') or {}).get('net_delta_pct')
+    return finite(delta) and delta > 0
+
+
 def route(records, observed, *, study=False, allow_model_estimates=False, allow_unpriced=False,
           locked=None, role_markets=TRIAD_MARKETS, limits=TRIAD_LIMITS, ev_recoveries=None,
-          qualified_alternatives=(), ranker=None, candidate_filter=None):
+          qualified_alternatives=(), ranker=None, candidate_filter=None, away_symmetric_shadow=False):
     locked = locked or {}
     reserved = set(locked.values())
     triad = dict.fromkeys(TRIAD_MARKETS)
@@ -656,8 +670,8 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
                 continue
             if role == 'recommended_alternative' and chosen and odd <= records[chosen[0]]['odd']:
                 continue
-            delta = row['features'].get('net_delta_pct')
-            if role == 'high_odds_shot' and key == AWAY and (odd < 4.50 or not finite(delta) or delta <= 0):
+            if role == 'high_odds_shot' and key == AWAY and not away_shot_admitted(
+                    row, symmetric_shadow=away_symmetric_shadow):
                 continue
             if key not in chosen and compatible(key, *reserved, *chosen):
                 candidates.append(key)
@@ -667,7 +681,15 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
         triad[role] = signal(key, records[key], role)
         chosen.append(key)
 
-    # Finish every ordinary positive-EV choice first. Recovery cannot displace it.
+    # Also consider already-qualified positive alternatives before negative EV
+    # recovery can occupy the empty slot. Existing positive native picks stay.
+    if qualified_alternatives:
+        fill_qualified_alternatives(triad, records, observed, locked, limits,
+                                    ev_recoveries, qualified_alternatives, role_markets, ranker, candidate_filter,
+                                    away_symmetric_shadow=away_symmetric_shadow)
+        chosen = [pick['market_id'] for pick in triad.values() if pick]
+
+    # Finish every positive-EV choice first. Recovery cannot displace it.
     for role, proofs in (ev_recoveries or {}).items():
         if role not in role_markets or triad[role]:
             continue
@@ -687,8 +709,8 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
             if (role == 'most_probable' and alternative and odd >= alternative['odd']
                     or role == 'recommended_alternative' and primary and odd <= primary['odd']):
                 continue
-            delta = row['features'].get('net_delta_pct')
-            if role == 'high_odds_shot' and key == AWAY and (odd < 4.50 or not finite(delta) or delta <= 0):
+            if role == 'high_odds_shot' and key == AWAY and not away_shot_admitted(
+                    row, symmetric_shadow=away_symmetric_shadow):
                 continue
             candidates.append(key)
         if candidates:
@@ -698,9 +720,6 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
                            'ev_recovery': dict(proofs[key])}
             chosen.append(key)
 
-    if qualified_alternatives:
-        fill_qualified_alternatives(triad, records, observed, locked, limits,
-                                    ev_recoveries, qualified_alternatives,role_markets,ranker,candidate_filter)
     signals = {name: triad[role] for role, name in SIGNAL_ROLES.items()}
     for tier in ('GOLD', 'PLATINUM'):
         signals[tier.lower()] = next((pick for pick in triad.values() if pick and pick['tier'] == tier), None)
@@ -993,6 +1012,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     tier = max((pick['tier'] for pick in triad.values() if pick), key=TIER_RANK.__getitem__,
                default='BLU' if niches or any(row['tier'] for row in records.values()) else None)
     payload = dict(version=VERSION, status='published', fixture_id=str(meta['fixture_id']),
+                   qualification_policy=POSITIVE_ALTERNATIVES_POLICY,
                    study_selection_policy=STUDY_SELECTION_POLICY,
                    captured_at=utc(at), kickoff=utc(kickoff), statistics_at=utc(statistics_at),
                    statistics=stats, raw_rates=raw, market_projection=projected, rates=calibrated,

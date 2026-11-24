@@ -19,7 +19,7 @@ from copy import deepcopy
 def selection_coverage(day, as_of):
     """Aggregate availability only: no private picks or future prices in logs."""
     roles = ('most_probable', 'recommended_alternative', 'high_odds_shot')
-    counts, policies = Counter(), Counter()
+    counts, policies, qualifications = Counter(), Counter(), Counter()
     now = stamp(as_of)
     for match in day.get('matches', []):
         meta = match.get('fixture') or {}
@@ -28,10 +28,15 @@ def selection_coverage(day, as_of):
             continue
         snapshot = ((match.get('multimarket') or {}).get('matrix') or {}).get('v7') or {}
         policies[(snapshot.get('triad_timing') or {}).get('id') or 'legacy'] += 1
+        qualifications[snapshot.get('qualification_policy') or 'legacy'] += 1
         counts['fixtures'] += 1
         quoted = 0
         for role in roles:
             pick = (snapshot.get('triad') or {}).get(role)
+            if pick:
+                counts['documented_recoveries'] += bool(pick.get('ev_recovery'))
+                counts['positive_qualified_alternatives'] += (
+                    (pick.get('selection_policy') or {}).get('id') == 'TRIAD_POSITIVE_ALTERNATIVES_V2')
             if not pick:
                 counts[role+'_empty'] += 1
             elif isinstance(pick.get('odd'), (int, float)) and pick['odd'] > 1 and pick.get('quote_state') != 'model_estimate':
@@ -40,7 +45,7 @@ def selection_coverage(day, as_of):
             else:
                 counts[role+'_estimate'] += 1
         counts['three_quoted'] += quoted == 3
-    return dict(counts= dict(counts), policies=dict(policies))
+    return dict(counts=dict(counts), policies=dict(policies), qualification_policies=dict(qualifications))
 
 
 def cached_refresh_safe(paths):

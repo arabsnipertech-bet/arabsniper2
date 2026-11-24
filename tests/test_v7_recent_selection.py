@@ -126,6 +126,7 @@ class LatestPrematch(unittest.TestCase):
         self.assertEqual(summary['counts']['fixtures'], 1)
         self.assertEqual(summary['counts']['most_probable_quoted'], 1)
         self.assertEqual(summary['policies'], {POLICY_ID:1})
+        self.assertEqual(summary['qualification_policies'], {'TRIAD_POSITIVE_ALTERNATIVES_V2':1})
 
 
 if __name__ == '__main__':
