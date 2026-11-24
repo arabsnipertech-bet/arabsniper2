@@ -21,10 +21,11 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  opposedRow.roles=['recommended_alternative']; // Exercise the separate original-Gold-role view too.
  opposedRow.coherence_status='opposed';opposedRow.coherence_opposed_to=['No Goal FT'];
  const pages=[];for(let i=0;i<rows.length;i+=250)pages.push(add({version:1,rows:rows.slice(i,i+250)}));
+ const futurePages=[add({version:1,rows:rows.slice(0,250).map(r=>r.fixture_id==='1'?{...r,kickoff:'2026-11-18T14:00:00Z',date:'2026-11-18'}:r)}),...pages.slice(1)];
  const boards={best:rows.slice(0,10).map(r=>r.id),probable:rows.slice(0,10).map(r=>r.id),recommended:rows.slice(0,10).map(r=>r.id),shots:rows.slice(0,10).map(r=>r.id),markets:{'GG FT':rows.filter(r=>r.label==='GG FT').slice(0,10).map(r=>r.id)}};
  const snapshot=add({pages,count:rows.length,boards}),hist={references:{},results:{},scans:[{sha256:snapshot,phase:'night',published_at:'2026-11-17T10:00:00Z'}],legacy_pages:[pages[0]]};
  for(const r of rows){hist.references[r.episode]={night:snapshot,final:snapshot,fallback_night:true};hist.results[r.fixture_id]={kickoff:r.kickoff,status:'settled',outcomes:{...hist.results[r.fixture_id]?.outcomes,[r.market]:{win:1,loss:0}}};}
- let searches=[],favorites=[],status=200,empty=false,fail=false;
+ let searches=[],favorites=[],status=200,empty=false,fail=false,futureFixture=false;
  await page.route('**/*',async route=>{
   const request=route.request(),url=new URL(request.url());if(url.origin!=='https://explorer.test'){external.push(url.href);return route.abort();}
   if(url.pathname==='/api/auth/session')return route.fulfill({contentType:'application/json',body:JSON.stringify({active:true,authenticated:true,email:'qa@example.test',server_time:now/1000,expires_at:now/1000+86400,session_expires_at:now/1000+86400})});
@@ -32,7 +33,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   if(url.pathname.startsWith('/api/auth/explorer/')){
    calls.push(url.pathname);if(fail)return route.abort();if(status!==200)return route.fulfill({status,contentType:'application/json',body:JSON.stringify({error:status===401?'Accedi dalla Gold':'Errore temporaneo'})});
    const endpoint=url.pathname.slice('/api/auth/explorer/'.length),input=request.method()==='POST'?request.postDataJSON():null;let result={};
-   if(endpoint==='current')result={pages:empty?[]:pages,count:empty?0:rows.length,generated_at:new Date(now).toISOString()};
+   if(endpoint==='current')result={pages:empty?[]:futureFixture?futurePages:pages,count:empty?0:rows.length,generated_at:new Date(now).toISOString()};
    else if(endpoint.startsWith('objects/'))result=objects[endpoint.slice(8)];
    else if(endpoint==='catalog')result={days:{'2026-11-17':{}},legacy_import_pending:0};
    else if(endpoint.startsWith('days/'))result=hist;
@@ -100,6 +101,12 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  assert(await page.locator('#fixtureFocus').isHidden());
  assert.equal(await page.locator('#results .selection').count(),10);
  assert.equal(calls.length,focusedCalls,'Leaving the fixture filter adds no requests');
+ futureFixture=true;await page.goto('https://explorer.test/gold-explorer.html?fixture=1');
+ await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor();
+ assert.equal(await page.inputValue('[name=period]'),'all','A fixture link must include future saved days');
+ assert.equal(await page.locator('#results .selection').count(),5,'Tomorrow\'s selected fixture stays visible');
+ assert((await page.locator('#fixtureFocusText').innerText()).includes('QA Casa 1'));
+ assert.deepEqual(errors,[]);
  console.log(JSON.stringify({status:'PASS',rows:1250,viewports:4,explorer_requests:calls.length,page_errors:errors,football_requests:0,fixture:'synthetic QA only'}));
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});
