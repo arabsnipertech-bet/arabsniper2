@@ -23,6 +23,12 @@ vm.createContext(c);vm.runInContext(source,c);
  await assert.rejects(c.loadJson(null,{...index,pages:[{...pages[0],bytes:123},...pages.slice(1)]}),/Integrità/);
  const controller=new AbortController();controller.abort();
  await assert.rejects(c.loadJson(null,index,controller.signal),e=>e.name==='AbortError');
+ let catalogCalls=0,releaseCatalog;const catalogGate=new Promise(r=>releaseCatalog=r);
+ c.fetch=async()=>{catalogCalls++;await catalogGate;return new Response('{}');};
+ const firstCatalog=c.loadGoldCatalog(),secondCatalog=c.loadGoldCatalog();
+ releaseCatalog();await Promise.all([firstCatalog,secondCatalog]);
+ assert.equal(catalogCalls,1,'Audit and day opening share one concurrent authenticated catalog read');
+ await c.loadGoldCatalog();assert.equal(catalogCalls,2,'A later opening authenticates again');
  // Even a fully cached day still reads its authenticated catalog.
  c.fetch=async()=>new Response('{}',{status:401});c.document={getElementById:id=>id==='app'?{}:{classList:{add(){}}}};c.resetCodeLogin=()=>{};c.loginMessage=()=>{};
  await assert.rejects(c.loadCalendarDay(1,'2026-11-08'),e=>e.code==='GOLD_AUTH_REQUIRED');

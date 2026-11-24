@@ -756,7 +756,7 @@
       .cx-oci-summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin:10px 0;padding:10px 12px;border:1px solid #485a70;border-radius:10px;background:#101e30;color:#e8edf5}
     .cx-oci-summary strong{font-size:.95rem}.cx-oci-summary strong b{font-variant-numeric:tabular-nums}.cx-oci-summary small{display:block;flex-basis:100%;font-size:.75rem;color:#b9c6d8;overflow-wrap:anywhere}
     </style>
-<link rel="stylesheet" href="/gold-explorer-qualification.css?v=59c6987c8340"></head>
+<link rel="stylesheet" href="/gold-explorer-qualification.css?v=a43d762b9386"></head>
 <body data-gold-ui="2026-11" data-gold-design="matchroom-v6">
   <div class="page" id="app" hidden>
     <aside class="gold-sidebar" aria-label="Navigazione Gold"><a class="gold-sidebar-brand" href="/gold-dashboard-live.html">ARABSNIPER<small>GOLD / MATCHROOM</small></a><nav><a class="active" href="#matchResearch">◈ &nbsp; Partite</a><button type="button" onclick="ArabMatrix.state.category='saved';renderMatchResearch(currentPayload||{})">☆ &nbsp; Osservate</button><button type="button" onclick="document.querySelectorAll('.day-btn')[0]?.click()">↶ &nbsp; Riscontri di ieri</button><a href="#goldGuide" onclick="document.getElementById('goldGuide').open=true">◎ &nbsp; Come leggere i dati</a></nav><div class="gold-sidebar-foot">LA TUA RICERCA<p>Quote, movimento e modello.<br>Una lettura più chiara.</p><small>18+ · Le stime possono essere sbagliate.</small></div></aside>
@@ -884,7 +884,7 @@
   <link rel="stylesheet" href="/statistics-first.css?v=4.0">
   <script src="/statistics-first.js?v=4.0"></script>
   <link rel="stylesheet" href="/lateral-matrix.css?v=0a727de9ab7a">
-  <script src="/gold-explorer-qualification.js?v=8d51ffe1a8b5"></script><script src="/competition-scope.js?v=cdb648e824eb"></script><script src="/lateral-matrix.js?v=919fe1e4f970"></script>
+  <script src="/gold-explorer-qualification.js?v=b928aceb1e45"></script><script src="/competition-scope.js?v=cdb648e824eb"></script><script src="/lateral-matrix.js?v=dad6de5e70a8"></script>
   <script src="/vendor/fflate-0.8.2.js"></script>
   <script src="/live-scores.js?v=3024b483bfb7"></script>
   <link rel="stylesheet" href="/gold-access.css?v=1">
@@ -1203,7 +1203,7 @@
     async function loadAuditSummary() {
       const strip = document.getElementById('auditStrip');
       try {
-        const catalog = await loadJson('arab_quote_model_research.json');
+        const catalog = await loadGoldCatalog();
         const payload = catalog?._gold_audit_summary || await loadJson(AUDIT_FILE);
         const summary = payload?.summary || {};
         const over = summary?.by_market?.over25_ft || {};
@@ -1276,6 +1276,7 @@
             const response=await fetch(rawUrl(path),{cache:'no-store',credentials:'same-origin',signal:controller.signal});
             if(response.status===401||response.status===403) {
               cache.clear();
+              resetGoldCatalog();
               if(response.status===403&&globalThis.GoldAccess?.deny()) {
                 void GoldAccess.refresh(true);
                 const error=new Error('Accesso Gold non attivo. Puoi rinnovare dal riquadro del tuo account.');error.code='GOLD_AUTH_REQUIRED';throw error;
@@ -1357,9 +1358,26 @@
       return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(joined));
     }
 
+    function resetGoldCatalog() {
+      loadGoldCatalog.pending?.controller.abort();loadGoldCatalog.pending=null;
+    }
+
+    function loadGoldCatalog(signal = null) {
+      if(!loadGoldCatalog.pending){
+        const entry={controller:new AbortController()};
+        entry.promise=loadJson('arab_quote_model_research.json',null,entry.controller.signal)
+          .finally(()=>{if(loadGoldCatalog.pending===entry)loadGoldCatalog.pending=null;});
+        loadGoldCatalog.pending=entry;
+      }
+      return loadGoldCatalog.pending.promise.then(value=>{
+        if(signal?.aborted)throw new DOMException('Aborted','AbortError');
+        return value;
+      });
+    }
+
     async function loadCalendarDay(day, targetDate, signal = null, onProgress = null) {
       let catalog=null;
-      try {catalog=await loadJson('arab_quote_model_research.json',null,signal);} catch(error) {if(error.code==='GOLD_AUTH_REQUIRED'||signal?.aborted)throw error;}
+      try {catalog=await loadGoldCatalog(signal);} catch(error) {if(error.code==='GOLD_AUTH_REQUIRED'||signal?.aborted)throw error;}
       const progress=partial=>{if(partial.date===targetDate)onProgress?.(partial);};
       const readDay=(file,indexOnly=false)=>loadJson(file,catalog?._gold_browser_days?.[file]||null,signal,indexOnly,progress);
       // File positions belong to the last scan, not necessarily to today's date.
@@ -1724,7 +1742,7 @@
     }
     function clearResearchComparison() {researchComparison.clear();renderMatchResearch(currentPayload||{});}
     async function loadModelResearch() {
-      try { modelResearchSummary=await loadJson('arab_quote_model_research.json');
+      try { modelResearchSummary=await loadGoldCatalog();
         renderMatchResearch(currentPayload||{});
       } catch (_) { /* Day payload still shows the current version and validation state. */ }
     }
@@ -2715,7 +2733,7 @@
     window.addEventListener('focus', checkCalendarRollover);
     window.setInterval(checkCalendarRollover, 60000);
     window.addEventListener('gold-access-expired',()=>{
-      loadJson.pageCache?.clear();currentPayload=null;currentMatches=[];filteredMatches=[];
+      loadJson.pageCache?.clear();resetGoldCatalog();currentPayload=null;currentMatches=[];filteredMatches=[];
       document.getElementById('detailOverlay').classList.remove('show');
       for(const dialog of document.querySelectorAll('dialog.mx-modal[open]'))dialog.close();
     });

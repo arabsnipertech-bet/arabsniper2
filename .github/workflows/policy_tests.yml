@@ -44,6 +44,78 @@ on:
 permissions:
   contents: read
 jobs:
+  explorer-current-pages:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[explorer-current-pages]')
+    needs: tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    concurrency:
+      group: arabsniper-explorer-current-index
+      cancel-in-progress: false
+      queue: max
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3 requests ijson==3.6.0
+      - name: Index current Explorer pages and verify identical rows
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python scripts/explorer-current-pages.py
+
+  explorer-current-pages-after-scan:
+    # One release-only check after an older scan: its old publisher can replace
+    # the current projection. No recurring workflow or provider collection.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[explorer-current-pages]')
+    needs: tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    concurrency:
+      group: arabsniper-quote-data-writer
+      cancel-in-progress: false
+      queue: max
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3 requests ijson==3.6.0
+      - name: Verify current page layout after any older scan
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python scripts/explorer-current-pages.py
+
+  gold-explorer-loading-profile:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'arabsnipertech-bet/arabsniper2' && github.event.pull_request.head.ref == 'fix/gold-selection-reasons-loading-20261124'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3 requests ijson==3.6.0
+      - name: Measure payloads without writes or provider calls
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python scripts/gold-loading-profile.py
+
   selection-release-storage-preflight:
     # Read-only check of the pre-existing Fast restore failure, for this release only.
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'arabsnipertech-bet/arabsniper2' && github.event.pull_request.head.ref == 'fix/gold-selection-clarity-20261124'

@@ -1,6 +1,7 @@
 """Archive projection contract tests; outbound network is forbidden."""
 from contextlib import nullcontext
 import copy
+import importlib.util
 import io
 import json
 import socket
@@ -106,6 +107,45 @@ class Projection(unittest.TestCase):
         self.store.data['explorer/objects/'+hashes[0]+'.json']=b'{}'
         with self.assertRaises(ValueError):self.store.read('objects/'+hashes[0]+'.json')
         with self.assertRaises(ValueError):e.put(self.store,'bucket','gold/forbidden',{})
+
+    def test_current_page_index_preserves_every_row_and_groups_fixtures_without_reclassifying(self):
+        rows=[dict(id=str(i),fixture_id=str(i//100),date='2026-11-'+str(17+i//200),
+                   kickoff='2026-11-'+str(17+i//200)+'T14:00:00Z',league='Campionato',label='Mercato',
+                   probability=.25,odd=3.,ev=-.25,confirmation={'observation_only':True}) for i in range(600)]
+        before=copy.deepcopy(rows)
+        result=e.indexed_current(self.store,'bucket',rows,{'count':600,'generated_at':AT.isoformat(),'phase':'fast'})
+        restored=[r for h in result['pages'] for r in self.store.read('objects/'+h+'.json')['rows']]
+        self.assertEqual(sorted(restored,key=lambda r:int(r['id'])),rows)
+        self.assertEqual(rows,before)
+        self.assertEqual(result['generated_at'],AT.isoformat())
+        self.assertEqual(result['phase'],'fast')
+        for header in result['page_index']:
+            part=self.store.read('objects/'+header['sha256']+'.json')['rows']
+            self.assertEqual(header['count'],len(part))
+            self.assertEqual(header['fixtures'],sorted({r['fixture_id'] for r in part}))
+            self.assertEqual(header['dates'],sorted({r['date'] for r in part}))
+        self.assertEqual(sum('2026-11-17' in h['dates'] for h in result['page_index']),1)
+        self.assertFalse(any('/days/' in key for key in self.store.data))
+        with self.assertRaises(ValueError):e.indexed_current(self.store,'bucket',rows,{'count':599})
+
+    def test_current_repack_roundtrips_identical_values_and_leaves_history_untouched(self):
+        from contextlib import redirect_stdout
+        script=Path(__file__).resolve().parents[1]/'scripts/explorer-current-pages.py'
+        spec=importlib.util.spec_from_file_location('current_repack',script)
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        rows=[dict(id=str(i),fixture_id=str(i),date='2026-11-17',kickoff='2026-11-17T14:00:00Z',
+                   label='Mercato',league='Campionato',probability=.25,odd=3.,ev=-.25) for i in range(10)]
+        e.put(self.store,'bucket','explorer/current.json',dict(count=len(rows),phase='fast',
+              generated_at=AT.isoformat(),pages=e.pages(self.store,'bucket',rows)))
+        e.put(self.store,'bucket','explorer/days/2026-11-17.json',{'unchanged':'certificate'})
+        certificate=self.store.data['explorer/days/2026-11-17.json']
+        with redirect_stdout(io.StringIO()) as output:module.repack(self.store,'bucket')
+        result=self.store.read('current.json')
+        actual=[r for h in result['pages'] for r in self.store.read('objects/'+h+'.json')['rows']]
+        self.assertEqual(sorted(actual,key=lambda r:int(r['id'])),rows)
+        self.assertEqual(result['generated_at'],AT.isoformat())
+        self.assertEqual(self.store.data['explorer/days/2026-11-17.json'],certificate)
+        self.assertEqual(json.loads(output.getvalue())['row_values_changed'],0)
     def test_results_only_joins_existing_results(self):
         self.publish();(self.root/'auditarchive').mkdir();data={'fixtures':{'1':{'kickoff':fixture()['fixture']['kickoff'],'status':'settled','outcomes':{KEY:{'win':1,'loss':0}}}}}
         (self.root/'auditarchive/prematch_2026-11-17_v7.json').write_text(json.dumps(data));self.publish(phase='results',at=AT+timedelta(hours=3))
