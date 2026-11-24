@@ -141,7 +141,8 @@ jobs:
         run: |
           mode=full
           if [ "$EVENT_NAME" = push ]; then
-            mode=$(git diff-tree --no-commit-id --name-only -r HEAD | python src/refresh_opportunities.py --classify-push)
+            # Compare with deployed main's first parent, including two-parent merges.
+            mode=$(git diff --name-only HEAD^1 HEAD | python src/refresh_opportunities.py --classify-push)
           fi
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
           echo "Refresh mode: $mode"

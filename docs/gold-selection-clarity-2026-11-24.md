@@ -37,3 +37,8 @@ selection/UI paths as cached refresh, rebuilding saved future boards without new
 provider collection. Normal scheduled Fast runs use the updated selector. The
 existing Pages deployment publishes the versioned UI assets. Verify both the
 actual deployed assets and the Fast run before reporting online availability.
+
+The initial two-parent release merge exposed an empty `diff-tree` result, so
+that push used normal provider collection. The follow-up compares `HEAD^1` with
+`HEAD`, with real linear/merge Git regression cases. Future eligible policy
+merges can use cached refresh; provider changes still require normal collection.
