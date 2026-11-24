@@ -8,7 +8,7 @@ const percent=v=>numeric(v)?number(v*100,1)+'%':'—';
 const date=v=>v?new Date(v).toLocaleString('it-IT',{timeZone:'Europe/Rome',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 const state={rows:[],searches:[],limit:10,viewRows:new Map(),objects:new Map(),snapshots:new Map(),history:[],historyLimit:10,legacyLimit:10,favorites:[],next:0};
 const requestedFixture=new URLSearchParams(location.search).get('fixture');
-if(/^\d+$/.test(requestedFixture||'')){state.focusFixture=requestedFixture;$('mode').value='search';}
+if(/^\d+$/.test(requestedFixture||'')){state.focusFixture=requestedFixture;$('filterForm').elements.period.value='all';$('mode').value='search';}
 if(new URLSearchParams(location.search).has('panel'))document.body.classList.add('embed');
 const message=v=>$('message').textContent=v;
 async function api(path,input){
