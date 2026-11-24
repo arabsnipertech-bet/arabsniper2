@@ -1,10 +1,12 @@
 # Choice explanations and current-view loading
 
-The small Gold/Explorer box now explains the saved role, model probability,
-documented value and recorded tactical context. Failed qualification gates and
-original EV remain in the collapsed Dati e limiti section. Observation headings,
-qualification types, probabilities, prices, tiers and selection remain unchanged.
-No positive evidence is invented for a study selection.
+The small Gold/Explorer box contains at most three numerical references: native
+period lambda, saved V7 probability, healthy margin, confirmed opening drop or
+documented positive EV. No role narrative or explanatory paragraph is displayed.
+Unavailable references are omitted. Failed qualification gates and original EV
+remain in collapsed Dati e limiti. Status, prices, probabilities and tiers stay
+unchanged. Explorer receives only saved facts matched to the exact prematch SHA
+and original probability/price/EV values; no newer snapshot is substituted.
 
 A read-only production profile found 36,354 current Explorer rows in 146 pages,
 123,088,594 raw JSON bytes. Each sampled page mixed all five dates and roughly

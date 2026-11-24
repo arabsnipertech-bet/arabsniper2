@@ -15,6 +15,7 @@ from quote_sources import PREMATCH_HOURS
 from v7_archive import valid_snapshot
 from v7_decision import TRIAD_LIMITS, TRIAD_MARKETS, AWAY, compatible, confirmed_triad_coherent, stored_offers
 from v7_probability import finite, price_usable
+from selection_display_facts import selection_facts
 
 ROME = ZoneInfo('Europe/Rome')
 MARGIN = timedelta(minutes=5)
@@ -203,7 +204,8 @@ def project_match(match, observed):
                    quote=quote, quote_usable=bool(usable), quote_valid_until=expiry,
                    captured_at=snap['captured_at'], published_at=observed.isoformat(),
                    forecast_sha256=snap['sha256'], exclusions=original.get('edge_exclusions', []))
-        row.update(match_odds=prices, confirmation=confirmation, observation_only=observation,
+        row.update(selection_facts=selection_facts(spec, original, snap),
+                   match_odds=prices, confirmation=confirmation, observation_only=observation,
                    coherence_status=relation, coherence_opposed_to=opposed,
                    coherence_forecast_sha256=snap['sha256'],
                    opening_delta_pct=(original.get('features') or {}).get('opening_delta_pct'),

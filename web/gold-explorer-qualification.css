@@ -1,7 +1,7 @@
 /* Shared saved qualification: cyan for value, amber for study, never outcome green. */
 .v7-qualification{display:grid;gap:5px;min-width:0;margin:10px 0;padding:9px 11px;border:1px solid #37525f;border-left:3px solid #65dfdf;border-radius:9px;background:rgba(101,223,223,.035);text-align:left;overflow-wrap:anywhere}
 .v7-qualification-label{font-size:.78rem;line-height:1.4;color:#a4f4f4}
-.v7-qualification-text{font-size:.74rem;line-height:1.5;color:#c4d0d8}
+.v7-qualification-text{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.78rem;font-weight:600;line-height:1.5;color:#c4d0d8}
 .v7-qualification-details{margin:0 0 10px;font-size:.74rem;line-height:1.5;color:#aebfc9;text-align:left;overflow-wrap:anywhere}
 .v7-qualification-details summary{cursor:pointer;min-height:32px;padding:4px 0}
 .v7-qualification-details p{margin:5px 0 9px}
