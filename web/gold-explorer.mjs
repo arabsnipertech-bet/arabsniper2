@@ -1,6 +1,6 @@
 import {officialGoldRecords} from './explorer-official-records.mjs';
 import './gold-explorer-qualification.js?v=b928aceb1e45';
-import {archiveLoader} from './explorer-loader.mjs';
+import {archiveLoader,currentPageHashes} from './explorer-loader.mjs?v=4c5be96bbe7b';
 import {categories,modes,text,numeric,romeDay,fresh,matches,rank,outcome,statistics,historyRows} from './explorer-core.mjs?v=1086029b2649';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const number=(v,d=2)=>numeric(v)?v.toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
@@ -19,7 +19,7 @@ async function api(path,input){
 }
 async function action(fn,button){if(button)button.disabled=true;try{await fn();}catch(e){message(e.message||'Connessione non disponibile. Riprova.');}finally{if(button)button.disabled=false;}}
 const getObject=archiveLoader(hash=>api('objects/'+hash),12);
-async function getPages(hashes){const parts=await Promise.all(hashes.map(async hash=>({hash,data:await getObject(hash)})));return parts.flatMap(({hash,data})=>(data.rows||[]).map(r=>({...r,object:hash})));}
+async function getPages(hashes,onProgress){let done=0;const parts=await Promise.all(hashes.map(async hash=>{const data=await getObject(hash);if(!Array.isArray(data.rows))throw Error('Pagina Explorer incompleta. Premi Aggiorna dati.');onProgress?.(++done,hashes.length);return {hash,data};}));return parts.flatMap(({hash,data})=>data.rows.map(r=>({...r,object:hash})));}
 async function getSnapshot(hash){if(!state.snapshots.has(hash)){const data=await getObject(hash);state.snapshots.set(hash,{...data,rows:await getPages(data.pages||[])});}return state.snapshots.get(hash);}
 const filters=()=>({...Object.fromEntries(new FormData($('filterForm'))),diversify:$('filterForm').elements.diversify.checked});
 const empty=(node,value='Nessuna selezione corrisponde ai criteri.')=>node.innerHTML='<p class="empty">'+esc(value)+'</p>';
@@ -55,7 +55,7 @@ function proposalCoherence(row){
  return '';
 }
 function emptyResults(){
- empty($('results'),!state.rows.length?'Archivio corrente caricato: nessuna analisi prematch disponibile.':$('mode').value==='recommended'?'Nessuna Consigliata ufficiale Gold registrata corrisponde ai filtri attuali. Il caricamento è riuscito.':'Dati caricati: nessuna voce corrisponde alla vista e ai filtri attuali.');
+ empty($('results'),!state.rows.length?'Archivio corrente caricato: nessuna analisi prematch per questa vista.':$('mode').value==='recommended'?'Nessuna Consigliata ufficiale Gold registrata corrisponde ai filtri attuali. Il caricamento è riuscito.':'Dati caricati: nessuna voce corrisponde alla vista e ai filtri attuali.');
 }
 function cards(rows,node,options={}){
  if(!rows.length){empty(node);return;}
@@ -66,6 +66,9 @@ function cards(rows,node,options={}){
 }
 function render(){
  $('marketIndex').replaceChildren();$('marketNavigation').hidden=true;
+ $('fixtureFocus').hidden=!state.focusFixture;
+ if(state.loadingView&&state.focusFixture)$('fixtureFocusText').textContent='Caricamento delle analisi della partita…';
+ if(state.loadingView||state.viewError){$('more').hidden=true;empty($('results'),state.viewError||'Caricamento dei mercati per la vista selezionata…');return;}
  $('fixtureFocus').hidden=!state.focusFixture;
  if(state.focusFixture){
   const row=state.rows.find(r=>String(r.fixture_id)===state.focusFixture);
@@ -85,7 +88,7 @@ function render(){
   }
   if(!count)emptyResults();$('marketNavigation').hidden=!count;$('more').hidden=!more;
  }else{
-  rows=mode==='recommended'?officialGoldRecords(rows):mode==='search'?rows.sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||b.probability-a.probability):rank(rows,mode,f.diversify);
+  rows=mode==='recommended'?officialGoldRecords(rows):mode==='search'?rows.sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||b.probability-a.probability||a.id.localeCompare(b.id)):rank(rows,mode,f.diversify);
   if(rows.length)cards(rows.slice(0,state.limit),$('results'));else emptyResults();$('more').hidden=rows.length<=state.limit;
  }
 }
@@ -93,15 +96,38 @@ function metrics(rows,node){const s=statistics(rows);node.innerHTML='<div class=
  ['Selezioni nel campione',s.n],['Esiti verificati',s.verified],['Vinte / perse',s.won+' / '+s.lost],['Copertura risultati',percent(s.coverage)],['Hit rate · binari',percent(s.hitRate)],['ROI teorico · '+s.roiN+' quote',percent(s.roi)],['EV prematch medio',percent(s.ev)],['Brier · '+s.binaryN+' esiti',number(s.brier,4)]
  ].map(([label,value])=>`<div class="metric"><strong>${esc(value)}</strong><span>${esc(label)}</span></div>`).join('')+'</div>';return s;}
 function table(headers,rows){return '<div class="table-wrap"><table><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+esc(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
-function dashboard(){const now=Date.now(),rows=state.rows.filter(r=>Date.parse(r.kickoff)>now),valid=rows.filter(r=>r.validated&&fresh(r,now));$('metrics').innerHTML=[['Partite disponibili',new Set(rows.map(r=>r.fixture_id)).size],['Mercati analizzati',rows.length],['Opportunità validate',valid.length],['Campionati',new Set(rows.map(r=>text(r.league))).size]].map(([label,value])=>`<div class="metric"><strong>${value}</strong><span>${label}</span></div>`).join('');}
-function scheduleExpiry(){clearTimeout(state.timer);const now=Date.now(),next=Math.min(...state.rows.flatMap(r=>[Date.parse(r.kickoff),Date.parse(r.quote_valid_until)]).filter(t=>t>now));if(Number.isFinite(next))state.timer=setTimeout(()=>{render();dashboard();scheduleExpiry();},Math.min(2147483647,next-now+25));}
+function dashboard(){const now=Date.now(),f=filters(),rows=state.rows.filter(r=>matches(r,f,now)&&(!state.focusFixture||r.fixture_id===state.focusFixture)),valid=rows.filter(r=>r.validated&&fresh(r,now));$('metrics').innerHTML=[['Partite nella vista',new Set(rows.map(r=>r.fixture_id)).size],['Mercati nella vista',rows.length],['Opportunità validate',valid.length],['Campionati nella vista',new Set(rows.map(r=>text(r.league))).size]].map(([label,value])=>`<div class="metric"><strong>${value}</strong><span>${label}</span></div>`).join('');}
+function scheduleExpiry(){clearTimeout(state.timer);const now=Date.now(),today=romeDay(now);let low=now,midnight=now+27*3600000;while(midnight-low>1000){const mid=Math.floor((low+midnight)/2);if(romeDay(mid)===today)low=mid;else midnight=mid;}const next=Math.min(midnight,...state.rows.flatMap(r=>[Date.parse(r.kickoff),Date.parse(r.quote_valid_until)]).filter(t=>t>now));state.timer=setTimeout(()=>action(loadCurrentView),Math.min(2147483647,next-now+25));}
 async function loadSearches(){const data=await api('searches');state.searches=data.items||[];const selected=$('savedSearches').value;$('savedSearches').replaceChildren(new Option('Le tue ricerche',''),...state.searches.map(s=>new Option(s.name,s.id)));$('savedSearches').value=state.searches.some(s=>s.id===selected)?selected:'';}
+function viewPages(){
+ const f=filters(),now=Date.now(),today=romeDay(now),noon=Date.parse(today+'T12:00:00Z');
+ let dates=Array.from({length:5},(_,i)=>romeDay(noon+i*86400000));
+ if(f.period==='today')dates=[today];
+ if(f.period==='tomorrow')dates=[dates[1]];
+ if(['3','6'].includes(f.period))dates=dates.filter(d=>d<=romeDay(now+Number(f.period)*3600000));
+ if(f.period==='custom')dates=dates.filter(d=>(!f.from||d>=f.from)&&(!f.to||d<=f.to));
+ return currentPageHashes(state.index||{},{dates,fixture:state.focusFixture});
+}
+async function loadCurrentView(){
+ if(!state.index)return;
+ const sequence=state.pageSequence=(state.pageSequence||0)+1;
+ const hashes=viewPages(),key=JSON.stringify([state.index.generated_at,hashes]);
+ if(state.loadedKey===key){state.loadingView=false;state.viewError=null;render();dashboard();scheduleExpiry();$('dataState').textContent='';message(state.rows.length?'Dati caricati.':'Nessuna analisi prematch disponibile per questa vista. Puoi consultare lo storico.');return;}
+ state.loadingView=true;state.viewError=null;render();
+ try{
+  const rows=await getPages(hashes,(done,total)=>{if(sequence===state.pageSequence)$('dataState').textContent='Caricamento mercati · '+Math.round(done/total*100)+'%';});
+  if(sequence!==state.pageSequence)return;
+  if(state.index.page_index_version){const selected=new Set(hashes),expected=state.index.page_index.filter(p=>selected.has(p.sha256)).reduce((n,p)=>n+p.count,0);if(rows.length!==expected)throw Error('Conteggio mercati incompleto. Premi Aggiorna dati.');}
+  state.rows=rows;state.loadedKey=key;state.loadingView=false;state.limit=10;
+  for(const [name,values] of [['league',state.index.facets?.leagues||rows.map(r=>text(r.league))],['market',state.index.facets?.markets||rows.map(r=>r.label)]]){const select=$('filterForm').elements[name],previous=select.value;select.replaceChildren(new Option('Tutti',''),...[...new Set(values.filter(Boolean))].sort().map(v=>new Option(v,v)));select.value=previous;}
+  render();dashboard();scheduleExpiry();$('dataState').textContent='';message(rows.length?'Dati caricati.':'Nessuna analisi prematch disponibile per questa vista. Puoi consultare lo storico.');
+ }catch(e){if(sequence===state.pageSequence){state.loadingView=false;state.viewError='Caricamento non riuscito. Premi Aggiorna dati per riprovare.';render();}throw e;}
+}
 async function refreshData(){
  message('Lettura degli archivi Gold…');let data;try{data=await api('current');}catch(e){if(e.status!==404)throw e;data={pages:[],count:0};}
- state.rows=await getPages(data.pages||[]);$('app').hidden=false;$('locked').hidden=true;$('updated').textContent='Ultima pubblicazione: '+date(data.generated_at);
- for(const [name,values] of [['league',state.rows.map(r=>text(r.league))],['market',state.rows.map(r=>r.label)]]){const select=$('filterForm').elements[name],previous=select.value;select.replaceChildren(new Option('Tutti',''),...[...new Set(values.filter(Boolean))].sort().map(v=>new Option(v,v)));select.value=previous;}
+ currentPageHashes(data);state.index=data;$('app').hidden=false;$('locked').hidden=true;$('updated').textContent='Ultima pubblicazione: '+date(data.generated_at);
  const today=romeDay(Date.now()),last=romeDay(Date.parse(today+'T12:00:00Z')+4*86400000);for(const key of ['from','to']){const input=$('filterForm').elements[key];input.min=today;input.max=last;}
- state.limit=10;render();dashboard();scheduleExpiry();await loadSearches();message(state.rows.length?'Dati caricati.':'Nessuna analisi prematch disponibile. Puoi consultare lo storico.');
+ await loadCurrentView();await loadSearches();
 }
 function refresh(){return state.refreshPromise ||=(async()=>{
  $('dataState').textContent='Caricamento in corso…';
@@ -153,7 +179,7 @@ function detail(row){
  $('allAlternatives').onclick=()=>action(async()=>{
   if(row.snapshot){const snap=await getSnapshot(row.snapshot);$('detailBody').innerHTML='<h2>Mercati nello stesso snapshot</h2><div id="alternateRows"></div>';cards(snap.rows.filter(r=>r.fixture_id===row.fixture_id),$('alternateRows'),{historical:true});}
   else if(row.legacy_v7){$('detailBody').innerHTML='<h2>Archivio V7 della partita</h2><div id="alternateRows"></div>';cards((state.legacyRows||[]).filter(r=>r.episode===row.episode),$('alternateRows'),{historical:true});}
-  else{$('detail').close();document.querySelector('[data-tab=explore]').click();$('filterForm').reset();state.focusFixture=row.fixture_id;$('filterForm').elements.team.value=text(row.home);$('filterForm').elements.period.value='all';$('mode').value='search';render();}
+  else{$('detail').close();document.querySelector('[data-tab=explore]').click();resetFilters();state.focusFixture=row.fixture_id;$('filterForm').elements.team.value=text(row.home);$('filterForm').elements.period.value='all';$('mode').value='search';await loadCurrentView();}
  });$('detail').showModal();
 }
 document.addEventListener('click',e=>{const button=e.target.closest('button');if(!button)return;
@@ -163,13 +189,14 @@ document.addEventListener('click',e=>{const button=e.target.closest('button');if
  if(button.dataset.tab){for(const id of ['explore','favorites','history'])$(id).hidden=id!==button.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-current',b===button?'page':'false'));if(button.dataset.tab==='favorites')action(()=>favorites(),button);if(button.dataset.tab==='history')renderHistory();}
 });
 $('closeDetail').onclick=()=>$('detail').close();$('refresh').onclick=()=>action(refresh,$('refresh'));
-$('clearFixtureFocus').onclick=()=>{state.focusFixture=null;$('filterForm').reset();$('mode').value='best';state.limit=10;render();};
-$('filterForm').onsubmit=e=>e.preventDefault();$('filterForm').oninput=()=>{state.focusFixture=null;state.limit=10;render();};$('filterForm').onreset=()=>{state.focusFixture=null;queueMicrotask(()=>{state.limit=10;render();});};$('mode').onchange=()=>{state.limit=10;render();};
+function resetFilters(){state.silentReset=true;$('filterForm').reset();state.silentReset=false;}
+$('clearFixtureFocus').onclick=()=>action(async()=>{state.focusFixture=null;resetFilters();$('mode').value='best';state.limit=10;await loadCurrentView();});
+$('filterForm').onsubmit=e=>e.preventDefault();$('filterForm').oninput=()=>action(async()=>{state.focusFixture=null;state.limit=10;await loadCurrentView();});$('filterForm').onreset=()=>{if(state.silentReset)return;state.focusFixture=null;queueMicrotask(()=>action(async()=>{state.limit=10;await loadCurrentView();}));};$('mode').onchange=()=>{state.limit=10;render();};
 $('more').onclick=()=>{state.limit+=10;render();};$('moreFavorites').onclick=()=>action(()=>favorites(false),$('moreFavorites'));$('moreHistory').onclick=()=>{state.historyLimit+=10;renderHistory();};$('moreLegacy').onclick=()=>{state.legacyLimit+=10;renderLegacy();};$('loadHistory').onclick=()=>action(loadHistory,$('loadHistory'));
 for(const id of ['historyReference','historyCohort'])$(id).onchange=renderHistory;
 $('saveSearch').onclick=()=>action(async()=>{await api('searches',{name:$('searchName').value,filters:filters()});await loadSearches();message('Ricerca salvata nel tuo account.');},$('saveSearch'));
 $('updateSearch').onclick=()=>action(async()=>{const id=$('savedSearches').value;if(!id)throw Error('Seleziona prima una ricerca salvata.');await api('searches',{id,name:$('searchName').value,filters:filters()});await loadSearches();message('Ricerca aggiornata.');},$('updateSearch'));
 $('deleteSearch').onclick=()=>action(async()=>{const id=$('savedSearches').value;if(!id)throw Error('Seleziona prima una ricerca salvata.');await api('delete',{type:'search',id});await loadSearches();message('Ricerca eliminata.');},$('deleteSearch'));
-$('savedSearches').onchange=()=>action(async()=>{const s=state.searches.find(s=>s.id===$('savedSearches').value);if(!s)return;await refresh();$('filterForm').reset();for(const [k,v] of Object.entries(s.filters)){const el=$('filterForm').elements[k];if(el){if(el.type==='checkbox')el.checked=v===true;else el.value=v;}}$('searchName').value=s.name;$('mode').value='search';render();message('Ricerca applicata ai dati Gold appena aggiornati.');});
-window.addEventListener('focus',()=>{if(state.rows.length){render();dashboard();}});
+$('savedSearches').onchange=()=>action(async()=>{const s=state.searches.find(s=>s.id===$('savedSearches').value);if(!s)return;await refresh();resetFilters();for(const [k,v] of Object.entries(s.filters)){const el=$('filterForm').elements[k];if(el){if(el.type==='checkbox')el.checked=v===true;else el.value=v;}}$('searchName').value=s.name;$('mode').value='search';await loadCurrentView();message('Ricerca applicata ai dati Gold appena aggiornati.');});
+window.addEventListener('focus',()=>{if(state.index)action(loadCurrentView);});
 action(refresh);

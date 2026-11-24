@@ -67,6 +67,25 @@ def pages(storage, bucket, rows):
             for i in range(0, len(rows), PAGE_SIZE)]
 
 
+def indexed_current(storage, bucket, rows, metadata):
+    """Group only the mutable current projection; preserve every saved row."""
+    if metadata.get('count') != len(rows) or len({r['id'] for r in rows}) != len(rows):
+        raise ValueError('Current row count/identity mismatch')
+    ordered = sorted(rows, key=lambda r: (r['date'], r['kickoff'], r['fixture_id'], r['id']))
+    index = []
+    for start in range(0, len(ordered), PAGE_SIZE):
+        part = ordered[start:start+PAGE_SIZE]
+        digest = object_put(storage, bucket, {'version': 1, 'rows': part})
+        index.append(dict(sha256=digest, count=len(part), dates=sorted({r['date'] for r in part}),
+                          fixtures=sorted({str(r['fixture_id']) for r in part})))
+    def text(value):
+        return value if isinstance(value, str) else str(value) if isinstance(value, (int, float)) else (value or {}).get('name', '')
+    return {**metadata, 'pages': [p['sha256'] for p in index],
+            'page_index_version': 'fixture-pages-v1', 'page_index': index,
+            'facets': {'leagues': sorted({text(r.get('league')) for r in rows}-{''}),
+                       'markets': sorted({r['label'] for r in rows if r.get('label')})}}
+
+
 def eligible(market, row, role):
     floor, low, high = TRIAD_LIMITS[role]
     if not (row['validated'] and market in TRIAD_MARKETS[role]
@@ -318,8 +337,9 @@ def publish(storage, bucket, root, days, phase, now=None, scan_started=None, leg
             'pending_freeze': any(not r['frozen'] for r in history['references'].values())}
     if phase in ('night', 'fast', 'refresh'):
         rows = sorted(active.values(), key=lambda r: r['id'])
-        put(storage, bucket, PREFIX+'current.json', {'version': 1, 'generated_at': now.isoformat(),
-            'phase': phase, 'count': len(rows), 'pages': pages(storage, bucket, rows), 'margin_seconds': 300})
+        put(storage, bucket, PREFIX+'current.json', indexed_current(storage, bucket, rows,
+            {'version': 1, 'generated_at': now.isoformat(), 'phase': phase,
+             'count': len(rows), 'margin_seconds': 300}))
     catalog['updated_at'] = now.isoformat()
     put(storage, bucket, PREFIX+'catalog.json', catalog)
 
