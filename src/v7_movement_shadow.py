@@ -8,7 +8,8 @@ from v7_probability import finite, price_usable, utc
 
 PROTOCOL = 'V7_MOVEMENT_SHADOW_20261122_V1'
 CONFIG = dict(oci_min=0,oci_max=50,ft_saturation_drop=-5,
-              routing_revision='TRIAD_ROLE_COHERENCE_V1',
+              routing_revision='TRIAD_POSITIVE_ALTERNATIVES_V2',
+              away_symmetric_band=[4.50,7.50],
               gg_ft_review='SAME_RULES_NATIVE_CONTEXT_V1',
               margin_reference_ft=6.5,margin_reference_half=8.,
               favorite_band=[1.35,1.70],conversion_ft_band=[1.80,2.50],
@@ -16,7 +17,7 @@ CONFIG = dict(oci_min=0,oci_max=50,ft_saturation_drop=-5,
               recommended_margin=6.5,gg_floors=[.21,.25],gg_min_odd=4.20,
               bootstrap_draws=400,automatic_promotion=False)
 VARIANTS = ('nov22_oci_window','nov22_cross_markets','nov22_margin_friction',
-            'nov22_triad_rank_21','nov22_triad_rank_25','nov23_gg_ft_same_rules')
+            'nov22_triad_rank_21','nov22_triad_rank_25','nov23_gg_ft_same_rules','nov24_away_symmetric')
 CONTROL = 'nov22_control'
 GG_FT_SAME_RULES = 'nov23_gg_ft_same_rules'
 
@@ -200,6 +201,7 @@ def capture(records,sources,observed,published,*,as_of=None,kickoff=None,profile
     variants={CONTROL:simulate(quoted)}
     variants[GG_FT_SAME_RULES]=simulate(quoted,role_markets={
         **TRIAD_MARKETS,recommended:TRIAD_MARKETS[recommended]|{GG_FT}})
+    variants['nov24_away_symmetric']=simulate(quoted,away_symmetric_shadow=True)
     variants.update(nov22_oci_window=simulate(moderate),nov22_cross_markets=simulate(cross),
                     nov22_margin_friction=simulate(quoted,ranker=friction_rank))
     under={market_id(specification('total',p,'under',1.5)) for p in ('ht','sh')}
@@ -236,6 +238,9 @@ def capture(records,sources,observed,published,*,as_of=None,kickoff=None,profile
         gg_ft_same_rules=dict(variant=GG_FT_SAME_RULES,control=CONTROL,
             only_change='GG FT admitted to the recommended role; same candidate pool, limits and qualifications',
             production_selector_changed=False,lower_quote_floor=False),
+        away_symmetric=dict(variant='nov24_away_symmetric',control=CONTROL,band=[4.50,7.50],
+            only_change='2 FT high-odds admission accepts any direction inside the declared band',
+            production_selector_changed=False),
         coverage=dict(matrix_rows=len(pool),usable_quoted_rows=len(rows),statistically_supported_quoted_rows=sum(eligible.values())),
         comparison_control=CONTROL,control_scope='same executable statistically supported pool; current routing, recovery certificates and Plus PT retained',
         probability_weights_changed=False,automatic_promotion=False,

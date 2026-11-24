@@ -34,7 +34,8 @@ def confirmation(spec, record, source, as_of, kickoff, *, pick=None, patterns=No
         # The matrix already stores the missing quote and model numbers. Do not
         # repeat a full price explanation for every unquoted market in each scan.
         return dict(id=VERSION,status='observation',observation_only=True,
-                    direction='missing',oci_state=current['oci_state'],label=None)
+                    direction='missing',oci_state=current['oci_state'],label=None,
+                    qualification_type='observation',qualification_reasons=['quote_unusable'])
     comparable = bool(usable and all((start,end,now)) and start < end <= now
                       and finite(first) and first > 1 and finite(odd) and odd > 1
                       and source.get('bookmaker_id') is not None
@@ -85,6 +86,25 @@ def confirmation(spec, record, source, as_of, kickoff, *, pick=None, patterns=No
         label = 'Calo con conferma statistica' if qualified else 'Quota in calo, conferma insufficiente'
     if label is None and not qualified:
         label = 'Osservazione statistica'
+    # Describe the existing qualification without tightening value admission or
+    # changing probabilities, original EV, Studio, Gold or Platinum decisions.
+    qualification = ('statistical_recovery' if qualified and recovery else
+                     'documented_value' if qualified else 'contrarian_study' if contrarian else
+                     'study' if study else 'observation')
+    reasons = []
+    if not qualified:
+        if not supported: reasons.append('statistics_unsupported')
+        if not same_book: reasons.append('same_book_reference_missing')
+        if not finite(margin): reasons.append('margin_missing')
+        elif not healthy and not recovery: reasons.append('margin_out_of_range')
+        if not finite(ev): reasons.append('ev_missing')
+        elif ev < 0 and not recovery: reasons.append('ev_negative')
+        if not finite(low): reasons.append('ev_low_missing')
+        elif low < 0 and not recovery: reasons.append('ev_low_negative')
+        if study: reasons.append('study_only')
+    if qualified and recovery:
+        label = ('Rialzo · recupero statistico' if direction == 'up' else
+                 'Calo · recupero statistico' if direction == 'down' else 'Recupero statistico documentato')
     detail = []
     if comparable:
         detail.append(f'Prima osservata stesso operatore {number(first,2)} → {number(odd,2)} ({number(net,signed=True)}%).')
@@ -98,6 +118,7 @@ def confirmation(spec, record, source, as_of, kickoff, *, pick=None, patterns=No
     elif contrarian: detail.append('Caso specifico GG PT con supporto statistico; nessuna promozione automatica Gold.')
     else: detail.append('Solo osservazione: il movimento non sostituisce una qualifica documentata.')
     return dict(id=VERSION, status='qualified' if qualified else 'specific_study' if contrarian else 'observation',
+                qualification_type=qualification,qualification_reasons=reasons,
                 observation_only=not qualified, direction=direction, opening_delta_pct=net,
                 last_leg_delta_pct=leg_delta, flow_confirmed=flow, statistical_support=supported,
                 value_qualified=value, statistical_recovery=recovery, contrarian_study=contrarian,

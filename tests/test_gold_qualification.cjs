@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict');
+const {describe,render}=require('../web/gold-explorer-qualification.js');
+assert.equal(describe({ev:.40,ev_low:.20}),null,'Numbers alone never manufacture qualification');
+const row={ev:-.06,confirmation:{observation_only:false,statistical_recovery:true}};
+const before=JSON.stringify(row),summary=describe(row);
+assert.equal(summary.type,'statistical_recovery');
+assert(summary.summary.includes('-6,0%'));
+assert(summary.summary.includes('non confermato'));
+assert.equal(JSON.stringify(row),before);
+const study={confirmation:{qualification_type:'study',observation_only:true,qualification_reasons:['ev_low_negative','study_only']}};
+assert(render(study).includes('scenario prudente negativo'));
+assert(render(study).includes('data-qualification="study"'));
+assert.equal(describe({confirmation:{value_qualified:true,observation_only:true}}).type,'observation');
+assert.equal(render({confirmation:{qualification_type:'<img src=x>'}}),'');
+assert.equal(describe({confirmation:{observation_only:false,value_qualified:true}}).type,'documented_value');
+console.log('Gold/Explorer saved qualifications: original EV, Studio, legacy flags and no inferred promotion.');

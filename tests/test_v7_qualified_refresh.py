@@ -248,6 +248,7 @@ class DeterioratedCommitments(unittest.TestCase):
 class RecoveryAndIntegration(unittest.TestCase):
     def test_valid_ev_recovery_is_preserved_with_its_original_probability_and_ev(self):
         records = fixture()
+        del records[GG_FT]  # No eligible positive alternative: keep documented recovery.
         recovered = priced(HT, .39, 2.50, -.04, tier=None)
         recovered.update(raw=.42, statistics=.42)
         records[HT] = recovered
@@ -264,6 +265,25 @@ class RecoveryAndIntegration(unittest.TestCase):
         self.assertIs(repair(records, previous, recoveries=fresh), previous)
         self.assertEqual(new[0][ROLE]['probability'], .39)
         self.assertEqual(new[0][ROLE]['ev'], recovered['ev'])
+
+    def test_positive_qualified_alternative_precedes_negative_ev_recovery(self):
+        records = fixture()
+        records[HT] = priced(HT, .39, 2.50, -.04, tier=None)
+        records[HT].update(raw=.42, statistics=.42)
+        source = row(json.loads(HT), 2.50, .42, 1/2.50/1.05)
+        source.update(v7_supported=True, probability_model=VERSION)
+        proofs = ev_recovery_candidates(records, {HT: source}, AT, START, AT)
+        before = deepcopy((records, proofs))
+        old, _ = published(records, recoveries=proofs)
+        new, signals = published(records, alternatives=ALTERNATIVES, recoveries=proofs)
+        self.assertEqual(old[ROLE]['market_id'], HT)
+        self.assertEqual(new[ROLE]['market_id'], GG_FT)
+        self.assertGreater(new[ROLE]['ev'], 0)
+        self.assertNotIn('ev_recovery', new[ROLE])
+        self.assertIs(signals['consigliata'], new[ROLE])
+        self.assertEqual((records, proofs), before)
+        for other in ('most_probable', 'high_odds_shot'):
+            self.assertEqual(new[other], old[other])
 
     def test_negative_outside_preferred_markets_cannot_be_promoted_by_the_new_pass(self):
         records = fixture()

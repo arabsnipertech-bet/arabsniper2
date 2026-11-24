@@ -10,13 +10,13 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  const rows=Array.from({length:1250},(_,i)=>({id:createHash('sha256').update(String(i)).digest('hex'),fixture_id:String(Math.floor(i/5)),episode:Math.floor(i/5)+'::k',home:'QA Casa '+Math.floor(i/5),away:'QA Ospite',league:'Campionato QA '+i%3,kickoff:'2026-11-17T14:00:00Z',date:'2026-11-17',market:'m'+i%5,label:['GG PT','GG FT','Over 2,5 FT','Under 3,5 FT','1X2 Casa'][i%5],probability:.6,odd:2.2,opening:2.1,ev:.32,ev_low:.1,oci:55,reliability:'supported',category:i%10?'alternative':'official',roles:i%10?[]:['most_probable'],validated:true,niche:false,quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z',ranking_roles:['recommended_alternative','high_odds_shot'],captured_at:'2026-11-17T09:30:00Z',published_at:'2026-11-17T10:00:00Z',forecast_sha256:'f'.repeat(64),quote:{bookmaker:'Fonte sintetica QA'}}));
  // Official records deliberately lack Explorer eligibility: this is a display regression.
  for(let i=0;i<rows.length;i+=5){rows[i].roles=['recommended_alternative'];rows[i].ranking_roles=[];rows[i].validated=false;rows[i].quote_usable=false;rows[i].official_references={recommended_alternative:{odd:2.05,captured_at:'2026-11-17T08:00:00Z'}};}
- for(const row of rows){row.origin_badge='Ritmo 1°T (λ 1,20)';row.origin_tooltip='Motivo originale Gold · proiezione statistica del primo tempo';row.match_odds={
+ for(const row of rows){row.confirmation={qualification_type:'documented_value',observation_only:false,value_qualified:true};row.origin_badge='Ritmo 1°T (λ 1,20)';row.origin_tooltip='Motivo originale Gold · proiezione statistica del primo tempo';row.match_odds={
   '1':{first_odd:2,odd:1.8,bookmaker:'Book QA',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'},
   x:{first_odd:3,odd:3.3,bookmaker:'Book QA',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'},
   '2':{first_odd:4,odd:4,first_observed_at:'2026-11-17T08:00:00Z',quote_observed_at:'2026-11-17T09:30:00Z',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'}};}
  // Put the observation on the first original-role page, independent of best ranking.
  const observedRow=rows.filter(r=>r.roles?.includes('recommended_alternative')).sort((a,b)=>a.id.localeCompare(b.id))[0];
- observedRow.observation_only=true;observedRow.oci=0;
+ observedRow.observation_only=true;observedRow.oci=0;observedRow.confirmation={qualification_type:'study',qualification_reasons:['study_only'],observation_only:true};
  const opposedRow=rows.find(r=>r.label==='GG FT'&&!r.roles.length);
  opposedRow.roles=['recommended_alternative']; // Exercise the separate original-Gold-role view too.
  opposedRow.coherence_status='opposed';opposedRow.coherence_opposed_to=['No Goal FT'];
@@ -47,6 +47,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  await page.goto('https://explorer.test/gold-explorer.html');await page.locator('h1').evaluate(el=>el.prepend('COLLAUDO QA — DATI SINTETICI · '));await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor();
  assert.equal(await page.locator('#results .selection').count(),10);const initial=calls.length;
  const first=page.locator('#results .selection').first();assert.equal(await first.locator('.selection-1x2>div').count(),3);
+ assert.equal(await first.locator('[data-qualification="documented_value"]').count(),1);
  assert((await first.locator('[data-movement=down]').innerText()).includes('↓ -10,0%'));assert((await first.locator('[data-movement=up]').innerText()).includes('↑ +10,0%'));assert((await first.locator('[data-movement=flat]').innerText()).includes('→ 0,0%'));
  await first.locator('.selection-origin summary').click();assert(await first.getByText('Motivo originale Gold · proiezione statistica del primo tempo',{exact:true}).isVisible());assert.equal(calls.length,initial,'Reading the explanation adds no requests');
  for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);assert.equal(await page.locator('#results [data-coherence]').count(),0,'Opposites excluded from '+mode);}
@@ -90,6 +91,15 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  status=200;empty=false;await page.goto('https://explorer.test/gold-dashboard-live.html');await page.locator('button').filter({hasText:'Gold Explorer'}).waitFor();const before=calls.length;assert.equal(await page.locator('iframe[src*="gold-explorer"]').count(),0);await page.getByRole('button',{name:'Gold Explorer ↗'}).click();await page.frameLocator('iframe[title="Gold Explorer"]').locator('#results .selection').first().waitFor();assert(calls.length>before);await page.getByRole('button',{name:'Chiudi ×',exact:true}).click();
  assert.deepEqual(errors,[]); // Gold page may make its own existing requests, blocked by this isolated mock.
  assert.equal(external.filter(u=>/api-football|api-sports|odds/.test(u)).length,0);
+ status=200;empty=false;await page.goto('https://explorer.test/gold-explorer.html?fixture=1');
+ await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor();
+ assert(await page.locator('#fixtureFocus').isVisible());
+ assert((await page.locator('#fixtureFocusText').innerText()).includes('QA Casa 1'));
+ assert.equal(await page.locator('#results .selection').count(),5);
+ const focusedCalls=calls.length;await page.click('#clearFixtureFocus');
+ assert(await page.locator('#fixtureFocus').isHidden());
+ assert.equal(await page.locator('#results .selection').count(),10);
+ assert.equal(calls.length,focusedCalls,'Leaving the fixture filter adds no requests');
  console.log(JSON.stringify({status:'PASS',rows:1250,viewports:4,explorer_requests:calls.length,page_errors:errors,football_requests:0,fixture:'synthetic QA only'}));
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

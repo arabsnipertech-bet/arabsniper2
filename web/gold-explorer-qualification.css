@@ -1,0 +1,17 @@
+/* Shared saved qualification: cyan for value, amber for study, never outcome green. */
+.v7-qualification{display:grid;gap:5px;min-width:0;margin:10px 0;padding:9px 11px;border:1px solid #37525f;border-left:3px solid #65dfdf;border-radius:9px;background:rgba(101,223,223,.035);text-align:left;overflow-wrap:anywhere}
+.v7-qualification-label{font-size:.78rem;line-height:1.4;color:#a4f4f4}
+.v7-qualification-text{font-size:.74rem;line-height:1.5;color:#c4d0d8}
+.v7-qualification[data-qualification=statistical_recovery]{border-left-color:#c4b5fd}
+.v7-qualification[data-qualification=statistical_recovery] .v7-qualification-label{color:#ddd6fe}
+.v7-qualification[data-qualification=study],.v7-qualification[data-qualification=contrarian_study]{border-left-color:#edc66c}
+.v7-qualification[data-qualification=study] .v7-qualification-label,.v7-qualification[data-qualification=contrarian_study] .v7-qualification-label{color:#edc66c}
+.v7-qualification[data-qualification=observation]{border-left-color:#8295a5}
+.v7-qualification[data-qualification=observation] .v7-qualification-label{color:#c4d0d8}
+.mx-explorer-match{display:inline-flex;align-items:center;min-height:44px;margin-top:9px;color:#a4f4f4;font-size:.82rem;font-weight:700;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.mx-explorer-match:focus-visible{outline:2px solid #a4f4f4;outline-offset:4px}
+.fixture-focus{margin:12px 0;padding:12px 15px;border:1px solid #37525f;border-left:3px solid #65dfdf;border-radius:12px;background:rgba(101,223,223,.04)}
+.fixture-focus[hidden]{display:none}
+.fixture-focus p{margin:0 0 8px;overflow-wrap:anywhere}
+.fixture-focus button{min-height:44px}
+@media(max-width:600px){.v7-qualification{padding:8px 10px}.mx-explorer-match{width:100%}}

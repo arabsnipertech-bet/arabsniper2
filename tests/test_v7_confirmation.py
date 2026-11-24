@@ -91,9 +91,24 @@ class Qualifications(unittest.TestCase):
             bookmaker_id='8',statistics_at=FIRST)
         q=confirmation(SPEC,r,s,AT,START)
         self.assertTrue(q['statistical_recovery']);self.assertFalse(q['value_qualified'])
-        self.assertEqual(q['label'],'Rialzo con supporto documentato');self.assertLess(r['ev'],0)
+        self.assertEqual(q['label'],'Rialzo · recupero statistico');self.assertLess(r['ev'],0)
+        self.assertEqual(q['qualification_type'],'statistical_recovery')
         r['ev_recovery']['original_ev']=-.5
         self.assertTrue(confirmation(SPEC,r,s,AT,START)['observation_only'])
+
+    def test_reasons_explain_failed_qualification_without_turning_missing_flow_into_a_gate(self):
+        r,s=case(low=-.01)
+        q=confirmation(SPEC,r,s,AT,START)
+        self.assertEqual(q['qualification_type'],'observation')
+        self.assertIn('ev_low_negative',q['qualification_reasons'])
+        r,s=case()
+        q=confirmation(SPEC,r,s,AT,START)
+        self.assertEqual(q['qualification_type'],'documented_value')
+        self.assertEqual(q['qualification_reasons'],[])
+        self.assertFalse(q['flow_confirmed'])
+        study=confirmation(SPEC,r,s,AT,START,pick={'study_only':True})
+        self.assertEqual(study['qualification_type'],'study')
+        self.assertEqual(study['qualification_reasons'],['study_only'])
 
     def test_temporal_and_operator_mismatch_do_not_invent_an_opening(self):
         r,s=case();r['quote']['bookmaker_id']='other'

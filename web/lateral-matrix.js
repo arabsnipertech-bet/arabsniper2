@@ -3,6 +3,7 @@
  'use strict';
  const MODEL='lateral-matrix-v5.0',V7='arabsniper-v7.0';
  const competition=typeof module==='object'&&module.exports?require('./competition-scope.js'):globalThis.ArabCompetitionScope;
+ const qualifications=typeof module==='object'&&module.exports?require('./gold-explorer-qualification.js'):globalThis.ArabV7Qualification;
  const POLICY='gold-goals-v6.1',SCOPE=competition.id;
  const RULES_REVISION='v7-prudence-v1';
  const acceptedScope=competition.accepts;
@@ -1153,11 +1154,16 @@
       (Number.isFinite(s.ev)?'<span>EV '+signed(100*s.ev)+'%</span>':'')+
       originBadge(marketOrigin(p.source,{rates:view.v7?.rates,record:p.record,signal:s,expired:p.expired,
        conversion:view.v7?.signals?.observations?.conversion===true}))+'</div>'+
-      (compact?'':triadMotivation(p)):
+      (qualifications?.render(p.record)||'')+(compact?'':triadMotivation(p)):
       (commitment?'<div class="mx-triad-market"><b>'+esc(commitment.label)+'</b></div>':'')+
       '<small>'+(saved?.[role]||commitment?'Quota da aggiornare':'Nessun mercato idoneo')+'</small>')+
       fixed+(p&&(previous||commitment)?'<small>Analisi '+triadTime(view.v7?.captured_at)+'</small>':'')+previous+'</li>';
-   }).join('')+'</ul>';
+   }).join('')+'</ul>'+explorerMatchLink(match,view.v7);
+ }
+ function explorerMatchLink(match,v7){
+  const id=String(match?.fixture?.fixture_id??v7?.fixture_id??'');
+  return /^\d+$/.test(id)?'<a class="mx-explorer-match" data-explorer-fixture="'+esc(id)+
+   '" href="/gold-explorer.html?fixture='+encodeURIComponent(id)+'">Confronta questa partita in Explorer ↗</a>':'';
  }
  function modelReferences(v7){
   const references=Object.values(v7?.markets||{}).filter(r=>r.odd==null&&Array.isArray(r.reference_legs)&&
