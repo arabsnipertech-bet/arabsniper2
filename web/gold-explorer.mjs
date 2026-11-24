@@ -1,5 +1,5 @@
 import {officialGoldRecords} from './explorer-official-records.mjs';
-import './gold-explorer-qualification.js?v=8d51ffe1a8b5';
+import './gold-explorer-qualification.js?v=b928aceb1e45';
 import {archiveLoader} from './explorer-loader.mjs';
 import {categories,modes,text,numeric,romeDay,fresh,matches,rank,outcome,statistics,historyRows} from './explorer-core.mjs?v=1086029b2649';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

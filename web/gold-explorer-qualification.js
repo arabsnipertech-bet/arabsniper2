@@ -11,7 +11,14 @@
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const finite=v=>typeof v==='number'&&Number.isFinite(v);
  const percent=v=>(v>0?'+':'')+(100*v).toLocaleString('it-IT',{maximumFractionDigits:1,minimumFractionDigits:1})+'%';
- function describe(value){
+ const probability=v=>(100*v).toLocaleString('it-IT',{maximumFractionDigits:1,minimumFractionDigits:1})+'%';
+ const number=v=>v.toLocaleString('it-IT',{maximumFractionDigits:2,minimumFractionDigits:2});
+ const roles={most_probable:'Base della triade per probabilità stimata',recommended_alternative:'Alternativa della triade per probabilità e quota',high_odds_shot:'Scelta a quota alta della triade'};
+ const niches={fav_home_pt_vulnerable:'Spinta precoce della casa e vulnerabilità difensiva registrate.',
+  balanced_1x2_inversion:'Contesto registrato: equilibrio 1X2 e movimento incrociato delle quote.',
+  bookmaker_shift_rebound:'Contesto registrato: ritmo del primo tempo e confronto con il finale.',
+  pt_st_symmetry_11_22:'Proiezione dei gol distribuita tra primo e secondo tempo.'};
+ function describe(value,context={}){
   const q=value?.confirmation;
   if(!q||typeof q!=='object')return null;
   // Older snapshots can expose explicit original flags, never inferred gates.
@@ -21,17 +28,33 @@
   if(q.observation_only===true&&['documented_value','statistical_recovery'].includes(type))type='observation';
   if(!labels[type])return null;
   const attention=(Array.isArray(q.qualification_reasons)?q.qualification_reasons:[]).map(key=>reasons[key]).filter(Boolean);
-  const ev=value.ev;
-  const summary=type==='statistical_recovery'?(finite(ev)?'EV originale '+percent(ev)+'. ':'')+'Supporto statistico; valore economico positivo non confermato.':
-   type==='documented_value'?'Statistica e scenario prudente sostengono il prezzo dello snapshot. Il livello Gold applica requisiti separati.':
-   type==='contrarian_study'?'Ipotesi specifica in studio, senza promozione automatica.':
-   attention.length?attention.slice(0,2).join(' · ')+'.':type==='study'?'Ipotesi in studio, distinta dalle proposte qualificate.':'Qualifica non confermata al prezzo osservato.';
-  return {type,label:labels[type],summary,reasons:attention};
+  const ev=value.ev,p=value.probability??value.calibrated;
+  const role=context.role||(value.roles?.length===1?value.roles[0]:null);
+  const parts=[];
+  if(roles[role])parts.push(roles[role]+'.');
+  if(finite(p)&&p>=0&&p<=1)parts.push('Il modello V7 stima '+probability(p)+' per questo esito.');
+  const niche=value.niche_id||context.signal?.niche_id;
+  if(niches[niche])parts.push(niches[niche]);
+  if(type==='documented_value'){
+   const fair=value.model_fair_odd;
+   parts.push(finite(value.odd)&&finite(fair)&&value.odd>fair?
+    'Quota '+number(value.odd)+' superiore alla quota equa V7 '+number(fair)+'.':
+    'Rapporto tra quota e probabilità sostenuto dalla qualifica di valore registrata.');
+  }else if(type==='statistical_recovery')parts.push('Supporto statistico e stima prudente almeno in linea con il fair dello stesso operatore: recupero statistico registrato.');
+  else if(type==='contrarian_study')parts.push('Contesto GG PT contrarian registrato dal motore, da seguire in studio.');
+  if(!parts.length)parts.push('Osservazione del modello; motivazione originale non documentata in questo riferimento.');
+  const detail=[labels[type]+'.',finite(ev)?'EV originale '+percent(ev)+'.':'',
+   ...attention.map(v=>v+'.'),type==='statistical_recovery'?'Il recupero statistico non certifica valore economico positivo.':'',
+   ['study','observation','contrarian_study'].includes(type)?'Spunto in osservazione, distinto da una proposta qualificata.':'',
+   type==='documented_value'?'Il livello Gold applica requisiti separati.':''].filter(Boolean).join(' ');
+  return {type,label:['study','observation','contrarian_study'].includes(type)?'Perché questo spunto':
+   type==='statistical_recovery'?'Perché questo recupero':'Perché questa scelta',summary:parts.join(' '),reasons:attention,detail};
  }
- function render(value){
-  const q=describe(value);if(!q)return '';
+ function render(value,context){
+  const q=describe(value,context);if(!q)return '';
   return '<div class="v7-qualification" data-qualification="'+esc(q.type)+'"><b class="v7-qualification-label">'+
-   esc(q.label)+'</b><span class="v7-qualification-text">'+esc(q.summary)+'</span></div>';
+   esc(q.label)+'</b><span class="v7-qualification-text">'+esc(q.summary)+'</span></div>'+
+   '<details class="v7-qualification-details"><summary>Dati e limiti</summary><p>'+esc(q.detail)+'</p></details>';
  }
  const api=Object.freeze({describe,render});
  if(typeof module==='object'&&module.exports)module.exports=api;
