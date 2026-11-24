@@ -45,7 +45,7 @@ permissions:
   contents: read
 jobs:
   explorer-current-pages:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[explorer-current-pages]')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[explorer-current-pages]') || contains(github.event.head_commit.message, '[compact-choice-facts]'))
     needs: tests
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -67,12 +67,12 @@ jobs:
           R2_BUCKET: arabsniper-gold
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: python scripts/explorer-current-pages.py
+        run: python ${{ contains(github.event.head_commit.message, '[compact-choice-facts]') && 'scripts/explorer-compact-facts.py' || 'scripts/explorer-current-pages.py' }}
 
   explorer-current-pages-after-scan:
     # One release-only check after an older scan: its old publisher can replace
     # the current projection. No recurring workflow or provider collection.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[explorer-current-pages]')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[explorer-current-pages]') || contains(github.event.head_commit.message, '[compact-choice-facts]'))
     needs: tests
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -94,7 +94,7 @@ jobs:
           R2_BUCKET: arabsniper-gold
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: python scripts/explorer-current-pages.py
+        run: python ${{ contains(github.event.head_commit.message, '[compact-choice-facts]') && 'scripts/explorer-compact-facts.py' || 'scripts/explorer-current-pages.py' }}
 
   gold-explorer-loading-profile:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'arabsnipertech-bet/arabsniper2' && github.event.pull_request.head.ref == 'fix/gold-selection-reasons-loading-20261124'
