@@ -1154,7 +1154,8 @@
       (Number.isFinite(s.ev)?'<span>EV '+signed(100*s.ev)+'%</span>':'')+
       originBadge(marketOrigin(p.source,{rates:view.v7?.rates,record:p.record,signal:s,expired:p.expired,
        conversion:view.v7?.signals?.observations?.conversion===true}))+'</div>'+
-      (qualifications?.render(p.record,{statistics:view.v7?.statistics,spec:p.source.spec})||'')+(compact?'':triadMotivation(p)):
+      (qualifications?.render(p.record,{statistics:view.v7?.statistics,spec:p.source.spec,
+       evidence:view.v7?.measurement?.markets?.[s.market_id],evidence_protocol:view.v7?.measurement?.protocol})||'')+(compact?'':triadMotivation(p)):
       (commitment?'<div class="mx-triad-market"><b>'+esc(commitment.label)+'</b></div>':'')+
       '<small>'+(saved?.[role]||commitment?'Quota da aggiornare':'Nessun mercato idoneo')+'</small>')+
       fixed+(p&&(previous||commitment)?'<small>Analisi '+triadTime(view.v7?.captured_at)+'</small>':'')+previous+'</li>';

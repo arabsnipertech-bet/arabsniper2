@@ -10,7 +10,10 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  const rows=Array.from({length:1250},(_,i)=>({id:createHash('sha256').update(String(i)).digest('hex'),fixture_id:String(Math.floor(i/5)),episode:Math.floor(i/5)+'::k',home:'QA Casa '+Math.floor(i/5),away:'QA Ospite',league:'Campionato QA '+i%3,kickoff:'2026-11-17T14:00:00Z',date:'2026-11-17',market:'m'+i%5,label:['GG PT','GG FT','Over 2,5 FT','Under 3,5 FT','1X2 Casa'][i%5],probability:.6,odd:2.2,opening:2.1,ev:.32,ev_low:.1,oci:55,reliability:'supported',category:i%10?'alternative':'official',roles:i%10?[]:['most_probable'],validated:true,niche:false,quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z',ranking_roles:['recommended_alternative','high_odds_shot'],captured_at:'2026-11-17T09:30:00Z',published_at:'2026-11-17T10:00:00Z',forecast_sha256:'f'.repeat(64),quote:{bookmaker:'Fonte sintetica QA'}}));
  // Official records deliberately lack Explorer eligibility: this is a display regression.
  for(let i=0;i<rows.length;i+=5){rows[i].roles=['recommended_alternative'];rows[i].ranking_roles=[];rows[i].validated=false;rows[i].quote_usable=false;rows[i].official_references={recommended_alternative:{odd:2.05,captured_at:'2026-11-17T08:00:00Z'}};}
- for(const row of rows){row.confirmation={qualification_type:'documented_value',observation_only:false,value_qualified:true};row.origin_badge='Ritmo 1°T (λ 1,20)';row.origin_tooltip='Motivo originale Gold · proiezione statistica del primo tempo';row.match_odds={
+ for(const row of rows){row.selection_facts={evidence_protocol:'V7_RESEARCH_TRACE_20261125_V1',
+  kind:row.label.startsWith('GG')?'btts':'total',period:row.label.endsWith('PT')?'ht':'ft',lambda_home:.9,lambda_away:.78,
+  sample_home:8,sample_away:4,without_peak:true,paired_books:2,agreeing_books:2};
+  row.confirmation={qualification_type:'documented_value',observation_only:false,value_qualified:true};row.origin_badge='Ritmo 1°T (λ 1,20)';row.origin_tooltip='Motivo originale Gold · proiezione statistica del primo tempo';row.match_odds={
   '1':{first_odd:2,odd:1.8,bookmaker:'Book QA',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'},
   x:{first_odd:3,odd:3.3,bookmaker:'Book QA',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'},
   '2':{first_odd:4,odd:4,first_observed_at:'2026-11-17T08:00:00Z',quote_observed_at:'2026-11-17T09:30:00Z',quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z'}};}
@@ -49,6 +52,11 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  assert.equal(await page.locator('#results .selection').count(),10);const initial=calls.length;
  const first=page.locator('#results .selection').first();assert.equal(await first.locator('.selection-1x2>div').count(),3);
  assert.equal(await first.locator('[data-qualification="documented_value"]').count(),1);
+ assert.equal(await first.locator('.v7-qualification-label').innerText(),'Valore documentato');
+ await first.locator('.v7-qualification-details summary').click();
+ assert((await first.locator('.v7-qualification-details').innerText()).includes('casa 8, ospite 4'));
+ assert((await first.locator('.v7-qualification-details').innerText()).includes('Tenuta senza picco: verificata'));
+ await first.locator('.v7-qualification-details summary').click();
  assert((await first.locator('[data-movement=down]').innerText()).includes('↓ -10,0%'));assert((await first.locator('[data-movement=up]').innerText()).includes('↑ +10,0%'));assert((await first.locator('[data-movement=flat]').innerText()).includes('→ 0,0%'));
  await first.locator('.selection-origin summary').click();assert(await first.getByText('Motivo originale Gold · proiezione statistica del primo tempo',{exact:true}).isVisible());assert.equal(calls.length,initial,'Reading the explanation adds no requests');
  for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);assert.equal(await page.locator('#results [data-coherence]').count(),0,'Opposites excluded from '+mode);}
@@ -57,9 +65,10 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  await page.selectOption('#mode','recommended');assert.equal(await page.locator('#results .selection').count(),10);
  const observation=page.locator('#results .selection').filter({hasText:'Osservazione V7'});
  assert.equal(await observation.count(),1,'Unvalidated observations stay in their original-role view');
- assert((await observation.innerText()).includes('Osservazione · ruolo originale: Consigliata'));
+ assert((await observation.innerText()).includes('Osservazione · Consigliata · Gold'));
  assert((await observation.innerText()).includes('OCI 0 · neutro'));
- assert((await page.locator('#results').innerText()).includes('Triade: Consigliata'),'Other original-role cards stay unchanged');
+ assert.equal(await observation.locator('.v7-qualification-label').innerText(),'Osservazione');
+ assert((await page.locator('#results').innerText()).includes('Consigliata · Gold'),'Other original-role cards stay unchanged');
  await observation.locator('[data-detail]').click();assert((await page.locator('#detailBody').innerText()).includes('2,05'));await page.click('#closeDetail');await page.fill('[name=team]','impossibile');assert((await page.locator('#results').innerText()).includes('Il caricamento è riuscito'));await page.fill('[name=team]','');
  await page.selectOption('#mode','search');await page.fill('[name=team]','QA Casa 0');
  const opposite=page.locator('#results .selection').filter({has:page.locator('[data-coherence="opposed"]')});

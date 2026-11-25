@@ -20,6 +20,21 @@ spec.loader.exec_module(script)
 
 
 class SavedNumericalReferences(unittest.TestCase):
+    def test_new_saved_measurements_are_visible_without_zero_or_false_fills(self):
+        from lateral_matrix import market_id
+        from v7_probability import MEASUREMENT_PROTOCOL
+        spec={'kind':'total','period':'ht','side':'over','line':1.5}
+        evidence=dict(sample_sizes={'home':{'for_ht':0},'away':{'for_ht':4}},
+                      without_peak=None,flow_fields={'paired_books':0,'agreeing_books':None})
+        snapshot={'measurement':{'protocol':MEASUREMENT_PROTOCOL,'markets':{market_id(spec):evidence}}}
+        original=deepcopy(snapshot)
+        facts=selection_facts(spec,{},snapshot)
+        self.assertEqual((facts['sample_home'],facts['sample_away']),(0,4))
+        self.assertEqual(facts['paired_books'],0)
+        self.assertIsNone(facts['agreeing_books']);self.assertIsNone(facts['without_peak'])
+        self.assertEqual(snapshot,original)
+        self.assertNotIn('sample_home',selection_facts(spec,{},{}))
+
     def test_native_period_values_and_missing_data_are_never_market_estimates_or_zero_fills(self):
         snapshot={'statistics':{'home_ht':.9,'away_ht':.78,'home_st':1.1,'away_st':.8,'home_ft':2.,'away_ft':1.58},'rates':{'home_ht':8.,'away_ht':9.}}
         record={'features':{'margin_pct':0},'confirmation':{'opening_delta_pct':-3.2}}

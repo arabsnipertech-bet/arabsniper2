@@ -20,7 +20,19 @@ assert(describe(recovery).detail.includes('-6,0%'));assert(!describe(recovery).s
 assert.equal(describe({confirmation:{observation_only:true,value_qualified:true}}).type,'observation');
 assert.equal(render({confirmation:{qualification_type:'<img src=x>'}}),'');
 assert(!render(pick,context).includes('open>'));
-assert(!render(pick,context).includes('v7-qualification-label'));
+assert(render(pick,context).includes('<strong class="v7-qualification-label">Osservazione</strong>'));
+assert(render(value).includes('<strong class="v7-qualification-label">Valore documentato</strong>'));
+assert.equal(describe(recovery).label,'Recupero statistico');
+assert(!render(pick,context).includes('<strong class="v7-qualification-label">Valore documentato</strong>'));
+assert.equal(describe({...value,confirmation:{observation_only:true,value_qualified:true}}).label,'Osservazione');
+const trace={evidence_protocol:'V7_RESEARCH_TRACE_20261125_V1',period:'ht',sample_home:0,sample_away:4,without_peak:null,paired_books:0,agreeing_books:null};
+const measured={...saved,selection_facts:{...saved.selection_facts,...trace}};
+assert.equal(describe(measured).summary,explained.summary,'More trace never changes the three numerical references');
+assert(describe(measured).detail.includes('Campioni PT: casa 0, ospite 4'));
+assert(describe(measured).detail.includes('Tenuta senza picco: non registrata'));
+assert(describe(measured).detail.includes('Bookmaker confrontabili: 0; concordi: non registrato'));
+assert.equal(describe(measured).detail,describe(pick,{...context,evidence_protocol:trace.evidence_protocol,evidence:{sample_sizes:{home:{for_ht:0},away:{for_ht:4}},without_peak:null,flow_fields:{paired_books:0,agreeing_books:null}}}).detail,'Same saved trace in Gold and Explorer');
+assert(describe({...measured,selection_facts:{...measured.selection_facts,without_peak:false}}).detail.includes('Tenuta senza picco: non verificata'));
 assert.equal(describe({...saved,features:{margin_pct:0},selection_facts:{...saved.selection_facts,margin_pct:null}}).summary,'λ stat PT 1,68 · P V7 45,9% · Aggio 0,0%');
 const under={probability:.47564,odd:2.24,ev:.47564*2.24-1,
  selection_facts:{kind:'total',period:'ft',lambda_home:1.30,lambda_away:1.16},
