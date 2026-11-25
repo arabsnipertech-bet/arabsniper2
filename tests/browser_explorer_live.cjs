@@ -1,21 +1,29 @@
 /* Live deployment smoke. Short-lived owner session supplied only via a private temp file. */
 const {chromium}=require('playwright'),fs=require('fs'),assert=require('node:assert/strict');
+const checkpoint=(stage,counts={})=>console.log('EXPLORER_LIVE_CHECKPOINT '+JSON.stringify({stage,...counts}));
 (async()=>{
  const secret=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/google-chrome',args:['--no-sandbox']});
  const context=await browser.newContext({viewport:{width:1440,height:1000}});
  await context.addCookies([{name:'__Host-gold_session_24h',value:secret.token,domain:'arabsniperbet.com',path:'/',secure:true,httpOnly:true,sameSite:'Lax'}]);
  const page=await context.newPage(),errors=[],forbidden=[];
- page.on('pageerror',e=>errors.push(e.name));
+ page.on('pageerror',e=>{errors.push(e.name);checkpoint('browser_error',{errorsN:errors.length});});
+ page.on('response',response=>{const url=new URL(response.url());if(url.hostname==='arabsniperbet.com'&&response.status()>=400){
+  if(url.pathname.startsWith('/api/auth/explorer/'))checkpoint('api_error',{httpStatus:response.status()});
+  else if(/\.(mjs|css|html)$/.test(url.pathname))checkpoint('asset_error',{httpStatus:response.status()});
+ }});
  await context.route('**/*',async route=>{const u=new URL(route.request().url());if(/api-football|api-sports|odds-api/i.test(u.hostname)){forbidden.push(u.hostname);return route.abort();}return route.continue();});
  const started=Date.now();
+ checkpoint('opening');
  await page.goto('https://arabsniperbet.com/gold-explorer.html',{waitUntil:'domcontentloaded'});
  await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor({timeout:180000});
  const loadMs=Date.now()-started;
+ checkpoint('current_loaded',{loadMs});
  const count=await page.locator('#metrics .metric strong').nth(1).textContent();assert(Number(count.replace(/\D/g,''))>0);
  assert.equal(await page.locator('#mode').inputValue(),'goals','The live default must be the goal view');
  const goalLabels=await page.locator('#results .market').allTextContents(),goalsN=goalLabels.length;
  assert(goalLabels.every(label=>/^(Over |GG )/.test(label)),'Advanced markets leaked into the default goal view');
+ checkpoint('goal_default_verified',{goalsN});
  fs.mkdirSync('test-artifacts',{recursive:true});
  await page.locator('#filterForm').screenshot({path:'test-artifacts/explorer-live-controls.png'});
  for(const [name,width,height] of [['desktop',1440,1000],['tablet',820,1180],['mobile',390,844]]){
@@ -35,6 +43,7 @@ const {chromium}=require('playwright'),fs=require('fs'),assert=require('node:ass
  await page.locator('[data-market-view=all]').click();
  assert.equal(await page.locator('#mode').inputValue(),'best');
  assert.equal(requests,0,'Goal views unexpectedly fetched data');
+ checkpoint('goal_filters_verified',{over15N});
  await page.locator('#mode').selectOption('search');await page.locator('[name=team]').fill('zzzz-no-match');
  await page.locator('#filterForm').dispatchEvent('input');
  assert.equal(requests,0,'Local filters unexpectedly fetched data');
@@ -45,8 +54,10 @@ const {chromium}=require('playwright'),fs=require('fs'),assert=require('node:ass
  await page.locator('[data-tab=history]').click();
  await page.locator('#historyPeriod').selectOption('7');
  const historyStarted=Date.now();await page.locator('#loadHistory').click();
+ checkpoint('history_loading');
  await page.locator('#message').filter({hasText:'Storico caricato.'}).waitFor({timeout:180000});
  const historyMs=Date.now()-historyStarted;
+ checkpoint('history_loaded',{historyMs});
  const legacyN=Number((await page.locator('#legacyMetrics .metric strong').nth(0).textContent()).replace(/\D/g,''));
  const legacyVerified=Number((await page.locator('#legacyMetrics .metric strong').nth(1).textContent()).replace(/\D/g,''));
  assert(legacyN>0&&legacyVerified>0,'Real historical universe or results missing');
