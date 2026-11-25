@@ -34,7 +34,8 @@ Le scelte precedenti prive di P restano prive di P: niente riempimenti dal futur
 Le partizioni sono copiate dalla traccia già acquisita, anche per Over/Under e
 GG. Una quota da cache senza la relativa traccia resta senza partizione; nessuna
 ricostruzione da margini mediani o bookmaker diversi. Una tenuta ST assente è
-`missing`, mai un test fallito.
+`missing`, mai un test fallito. Il flag `reversal=False` è `no_reversal`, non
+un fallimento: `reversal=True` è `reversal_detected`.
 
 I risultati normalizzati `home_ft/away_ft` sono esclusivamente regolamentari.
 `score_periods` separa 90 minuti, supplementari e rigori. Se manca il risultato

@@ -95,7 +95,8 @@ def instrument(snapshot, sources, profiles):
             observed_goal_samples={side: {period: values.get('sample') for period, values in
                     (snapshot.get('means', {}).get(side) or {}).items() if isinstance(values, dict)}
                     for side in ('home', 'away')},
-            flow_fields=flow, flow_states={k: evidence_state(v) for k, v in flow.items()},
+            flow_fields=flow, flow_states={k: ('no_reversal' if v is False else 'reversal_detected')
+                if k == 'reversal' and type(v) is bool else evidence_state(v) for k, v in flow.items()},
             flow_origins={k: 'selected_movement.reversal' if k == 'reversal' and k not in source else k
                           for k in FLOW_FIELDS},
             missing_flow_fields=[k for k, v in flow.items() if v is None],

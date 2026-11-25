@@ -85,6 +85,8 @@ class ResearchTrace(unittest.TestCase):
         self.assertEqual(snapshot,frozen)
         self.assertTrue(slots)
         self.assertTrue(all(slot['forecast_sha256']==snapshot['sha256'] for slot in slots.values()))
+        info=snapshot['measurement']['markets'][GG_FT]
+        self.assertEqual(info['flow_states']['reversal'],'no_reversal')
 
     def test_raw_native_final_origins_and_weak_side_do_not_mix(self):
         a,meta=inputs();snapshot=capture(a,meta,AT,commitments={})
