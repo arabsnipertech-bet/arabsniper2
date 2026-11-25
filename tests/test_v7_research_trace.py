@@ -60,6 +60,8 @@ class ResearchTrace(unittest.TestCase):
         self.assertTrue(valid_snapshot(measured,meta,AT))
         trace = measured['measurement']
         self.assertEqual(trace['protocol'],MEASUREMENT_PROTOCOL)
+        self.assertEqual(trace['config_sha256'],fingerprint(trace['config']))
+        self.assertEqual(trace['config']['control']['weight'],measured['weight'])
         self.assertEqual(trace['prematch_evidence_sha256'],fingerprint({k:measured.get(k) for k in trace['evidence_fields']}))
         self.assertEqual(control['decision_shadow']['variants'],measured['decision_shadow']['variants'])
         # Pricing is the pre-existing mutation; measurement adds no change to sources.
@@ -146,6 +148,19 @@ class ResearchTrace(unittest.TestCase):
         self.assertEqual(len(research_report([reduced],cutoff,draws=30)['reports']),1)
         data['fixtures']['321'].pop('measurement');data['fixtures']['321'].pop('decision_shadow')
         self.assertEqual(research_report([data],cutoff,draws=30)['reports'],{})
+
+    def test_control_configurations_and_conflicting_kickoffs_are_not_pooled(self):
+        a,meta=inputs();snapshot=capture(a,meta,AT,commitments={});first=archive(snapshot,meta)
+        a,meta=inputs();other=capture(a,meta,AT,commitments={})
+        other['calibration']='separate_audit_config'
+        trace_snapshot(other,{r['id']:r for r in a['matrix']['rows']},a['profiles'])
+        self.assertNotEqual(other['measurement']['config_sha256'],snapshot['measurement']['config_sha256'])
+        second=deepcopy(first);second['fixtures']['321']['measurement']=other['measurement']
+        cutoff=datetime.fromisoformat('2026-11-26T04:00:00+00:00')
+        self.assertEqual(len(research_report([first,second],cutoff,draws=20)['reports']),2)
+        second['fixtures']['321']['kickoff']='2026-11-25T22:00:00Z'
+        report=research_report([first,second],cutoff,draws=20)
+        self.assertEqual(report['reports'],{});self.assertEqual(report['kickoff_conflict_fixtures'],['321'])
 
 
 class SettlementAndEquivalence(unittest.TestCase):

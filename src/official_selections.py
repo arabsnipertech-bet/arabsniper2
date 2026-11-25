@@ -19,8 +19,11 @@ def trace_snapshot(snapshot, sources, profiles):
                        'raw_rates', 'statistics', 'rates', 'market_projection', 'means', 'markets')
     # Compute before any measurement additions, and record the exact body keys.
     evidence_sha = fingerprint({k: snapshot.get(k) for k in evidence_fields})
-    trace = dict(protocol=MEASUREMENT_PROTOCOL, config=deepcopy(MEASUREMENT_CONFIG),
-                 config_sha256=fingerprint(MEASUREMENT_CONFIG),
+    config = dict(deepcopy(MEASUREMENT_CONFIG), control={k: deepcopy(snapshot.get(k))
+        for k in ('version', 'weight', 'calibration', 'qualification_policy', 'study_selection_policy')},
+        movement_config_sha256=(((snapshot.get('decision_shadow') or {}).get('movement_study') or {}).get('config_sha256')))
+    trace = dict(protocol=MEASUREMENT_PROTOCOL, config=config,
+                 config_sha256=fingerprint(config),
                  prematch_evidence_sha256=evidence_sha, evidence_fields=list(evidence_fields),
                  probability_origins=probability_origins(snapshot), shadow_only=True,
                  historical_backfill=False, production_selector_changed=False)

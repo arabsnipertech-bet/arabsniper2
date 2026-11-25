@@ -70,7 +70,9 @@ non una previsione alternativa pubblicata prima della partita.
 ## Report e verifica successiva
 
 Il report esistente `movement_shadow` include `research_trace`, calcolato solo
-su prove nuove. Le configurazioni sono separate, i kickoff conflittuali esclusi,
+su prove nuove. Il certificato di configurazione include soglie di ricerca,
+versione, peso, stato di calibrazione e policy del controllo e configurazione
+shadow precedente. Le configurazioni sono separate, i kickoff conflittuali esclusi,
 le fotografie deduplicate per fixture e i timestamp successivi al cutoff esclusi.
 Sono pubblicate coorti corrispondenti e complementari, scelte ufficiali e
 candidati non scelti, anche sfavorevoli, e celle per giornata.
