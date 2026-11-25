@@ -5,7 +5,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {explorerRoute} from '../workers/stripe-access/explorer.mjs';
 import {sessionEmail} from '../workers/stripe-access/auth.mjs';
-import {matches,rank,outcome,statistics,historyRows,romeDay} from '../web/explorer-core.mjs';
+import {matches,rank,goalRows,outcome,statistics,historyRows,romeDay} from '../web/explorer-core.mjs';
 const origin='https://arabsniperbet.com',now=1800000000;
 const hash=s=>createHash('sha256').update(s).digest('hex');
 function setup(){
@@ -65,6 +65,35 @@ test('Opposed alternatives stay searchable but cannot enter main rankings; legac
  for(const mode of ['best','probable','recommended'])assert.deepEqual(new Set(rank(rows,mode).map(r=>r.id)),new Set(['a','aligned']));
  assert(matches(opposite,{},Date.parse('2026-11-17T17:00:00Z')),'Advanced search retains the original alternative');
  assert.equal(JSON.stringify(rows),before);
+});
+test('Goal browsing gives each familiar market space without changing prices, probabilities, roles or existing rankings',()=>{
+ const proposal=(id,kind,period,side,line,ev,fixture=id)=>Object.freeze({...row,id,fixture_id:fixture,market:JSON.stringify({kind,period,side,...(line===undefined?{}:{line})}),ev});
+ const over=proposal('ht','total','ht','over',1.5,.05,'shared');
+ const ft=proposal('ft','total','ft','over',2.5,.20,'shared');
+ const ftNext=proposal('ft-next','total','ft','over',2.5,.10);
+ const gg=proposal('gg','btts','ft','yes',undefined,.30);
+ const ggNext=proposal('gg-next','btts','ft','yes',undefined,.25);
+ const ah=proposal('ah','handicap','ft','home',-.25,9);
+ const noGoal=proposal('no-goal','btts','sh','no',undefined,8);
+ const under=proposal('under','total','ft','under',2.5,7);
+ const asian=proposal('asian','asian_total','ht','over',1.5,6);
+ const bad={...over,id:'bad',fixture_id:'bad',validated:false,ev:5};
+ const opposed={...over,id:'opposed',fixture_id:'opposed',coherence_status:'opposed',ev:4};
+ const rows=Object.freeze([ah,noGoal,under,asian,ggNext,ft,gg,over,ftNext,bad,opposed]);
+ const before=JSON.stringify(rows),originalOrder=rank(rows).map(r=>r.id);
+ const selected=goalRows(rows);
+ assert.deepEqual(selected.map(r=>r.id),['ht','ft-next','gg','gg-next']);
+ assert.strictEqual(selected[0],over);assert.equal(new Set(selected.map(r=>r.fixture_id)).size,selected.length);
+ assert.deepEqual(goalRows(rows,false).map(r=>r.id),['ht','ft','gg','ft-next','gg-next']);
+ assert.deepEqual(rank(rows).map(r=>r.id),originalOrder);assert.equal(originalOrder[0],'ah');
+ assert.equal(JSON.stringify(rows),before);
+ assert.deepEqual(goalRows([ah,noGoal,under,asian,bad,opposed]),[],'No weaker or incompatible substitute is invented');
+});
+test('A canonical Asian specification cannot masquerade as a binary Over, while old exact goal labels remain readable',()=>{
+ const exact={...row,id:'old',label:'Over 1,5 PT',market:'legacy-market',kind:'total',period:'ht'};
+ const disguised={...exact,id:'asian',market:JSON.stringify({kind:'asian_total',period:'ht',side:'over',line:1.5})};
+ const contradictory={...exact,id:'handicap',kind:'handicap'};
+ assert.deepEqual(goalRows([exact,disguised,contradictory],false).map(r=>r.id),['old']);
 });
 test('Outcome, ROI, Brier and partial refunds; no result without matching kickoff, no imputed odds',()=>{
  const result={kickoff:row.kickoff,status:'settled',outcomes:{m:{win:1,loss:0}}},won={...row,outcome:outcome(row,result)},lost={...row,probability:.4,outcome:{win:0,loss:1,binary:true,profit:-1}};

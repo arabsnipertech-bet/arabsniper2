@@ -1,5 +1,5 @@
 export const categories={official:'Ufficiale V7',alternative:'Alternativa Explorer',observation:'In osservazione',unqualified:'Non qualificata',legacy:'Archivio V7'};
-export const modes={best:'Migliori del giorno',probable:'Più probabili',recommended:'Consigliate',shots:'Colpacci',markets:'Migliori per mercato',search:'Ricerca avanzata'};
+export const modes={goals:'Gol e Over',best:'Migliori del giorno',probable:'Più probabili',recommended:'Consigliate',shots:'Colpacci',markets:'Migliori per mercato',search:'Ricerca avanzata'};
 export const text=v=>typeof v==='string'?v:typeof v==='number'?String(v):v?.name||'';
 export const numeric=v=>typeof v==='number'&&Number.isFinite(v);
 const formatter=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'});
@@ -26,6 +26,39 @@ export function rank(rows,mode='best',diversify=true){
  const tie=(a,b)=>a.market===b.market?(a.id===b.id?0:a.id>b.id?-1:1):a.market>b.market?-1:1;
  candidates.sort((a,b)=>mode==='probable'?b.probability-a.probability||b.ev_low-a.ev_low||b.ev-a.ev||tie(a,b):Number(b.niche)-Number(a.niche)||b.ev-a.ev||b.probability-a.probability||tie(a,b));
  const seen=new Set();return candidates.filter(r=>{if(diversify&&seen.has(r.fixture_id))return false;seen.add(r.fixture_id);return true;});
+}
+// A browsing preference only: one existing best-ranked candidate per goal market
+// in each round. Official roles, certified boards and their ranking stay intact.
+const goalSpecs=[
+ ['Over 1,5 PT','total','ht','over',1.5],['Over 2,5 FT','total','ft','over',2.5],
+ ['GG FT','btts','ft','yes'],['GG PT','btts','ht','yes'],
+ ['Over 3,5 FT','total','ft','over',3.5],['Over 1,5 ST','total','sh','over',1.5],
+ ['GG ST','btts','sh','yes'],['Over 2,5 PT','total','ht','over',2.5],
+ ['Over 2,5 ST','total','sh','over',2.5],
+ ['Over 0,5 PT + Over 0,5 ST','halves_total','ft','over',.5,.5]
+];
+export const goalMarketLabels=Object.freeze(goalSpecs.map(s=>s[0]));
+function goalMarketIndex(row){
+ let spec;try{spec=JSON.parse(row.market);}catch{}
+ if(spec&&typeof spec==='object')return goalSpecs.findIndex(([,kind,period,side,line,extra])=>
+  spec.kind===kind&&spec.period===period&&spec.side===side&&spec.line===line&&spec.extra===extra);
+ // Older compact rows can lack a specification. Never reinterpret a recorded
+ // handicap/asian-total as a binary Over merely because its label resembles one.
+ return goalSpecs.findIndex(([label,kind,period])=>row.label===label&&(!row.kind||row.kind===kind)&&(!row.period||row.period===period));
+}
+export function goalRows(rows,diversify=true){
+ const groups=goalSpecs.map(()=>[]),positions=goalSpecs.map(()=>0),seen=new Set(),result=[];
+ for(const row of rank(rows,'best',false)){const i=goalMarketIndex(row);if(i>=0)groups[i].push(row);}
+ let added;
+ do{
+  added=false;
+  for(let i=0;i<groups.length;i++){
+   while(positions[i]<groups[i].length&&diversify&&seen.has(groups[i][positions[i]].fixture_id))positions[i]++;
+   if(positions[i]===groups[i].length)continue;
+   const row=groups[i][positions[i]++];result.push(row);seen.add(row.fixture_id);added=true;
+  }
+ }while(added);
+ return result;
 }
 export function outcome(row,result){
  if(!result||result.status!=='settled'||Date.parse(result.kickoff)!==Date.parse(row.kickoff))return null;
