@@ -24,12 +24,12 @@
    const first=f.lambda_pt??(finite(stats.home_ht)&&finite(stats.away_ht)?stats.home_ht+stats.away_ht:null);
    const tail=kind==='pt_ft_total'?'ft':'st';
    const second=f['lambda_'+tail]??(finite(stats['home_'+tail])&&finite(stats['away_'+tail])?stats['home_'+tail]+stats['away_'+tail]:null);
-   if(finite(first)&&finite(second))statistical='λ PT/'+(tail==='ft'?'FT':'ST')+' '+number(first)+'/'+number(second);
+   if(finite(first)&&finite(second))statistical='λ stat PT/'+(tail==='ft'?'FT':'ST')+' '+number(first)+'/'+number(second);
   }else if(tag&&finite(home)&&finite(away)&&home>=0&&away>=0)statistical=['result','btts','dnb','handicap','pt_btts_ft_total'].includes(kind)?
-   'λ '+tag+' C/O '+number(home)+'/'+number(away):'λ '+tag+' '+number(home+away);
-  else if(finite(f.lambda_pt)&&finite(f.lambda_st))statistical='λ PT/ST '+number(f.lambda_pt)+'/'+number(f.lambda_st);
+   'λ stat '+tag+' C/O '+number(home)+'/'+number(away):'λ stat '+tag+' '+number(home+away);
+  else if(finite(f.lambda_pt)&&finite(f.lambda_st))statistical='λ stat PT/ST '+number(f.lambda_pt)+'/'+number(f.lambda_st);
   const p=value.probability??value.calibrated,ev=value.ev,q=value.confirmation||{};
-  const chance=finite(p)&&p>=0&&p<=1?'P '+probability(p):null;
+  const chance=finite(p)&&p>=0&&p<=1?'P V7 '+probability(p):null;
   const margin=f.margin_pct??value.features?.margin_pct;
   const cost=finite(margin)&&margin>=0&&margin<=8?'Aggio '+margin.toLocaleString('it-IT',{minimumFractionDigits:1,maximumFractionDigits:1})+'%':null;
   const delta=q.opening_delta_pct??f.opening_delta_pct??value.features?.opening_delta_pct;

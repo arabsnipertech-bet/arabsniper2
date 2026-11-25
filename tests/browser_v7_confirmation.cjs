@@ -30,7 +30,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
    assert(text.includes('Rialzo senza conferma'));assert(!text.includes('Trend Quota'));
    assert(text.includes('scenario prudente negativo'));
    const why=await page.locator('.v7-qualification-text').innerText();
-   assert(why.includes('λ PT 1,68'));assert(why.includes('P 37,7%'));assert(why.includes('Aggio 5,2%'));
+   assert(why.includes('λ stat PT 1,68'));assert(why.includes('P V7 37,7%'));assert(why.includes('Aggio 5,2%'));
    assert(!/triade|scelta|modello/i.test(why));
    assert.equal(await page.locator('.v7-qualification-text>span').count(),3);
    assert(!why.includes('negativo'));assert(!why.includes('non confermata'));

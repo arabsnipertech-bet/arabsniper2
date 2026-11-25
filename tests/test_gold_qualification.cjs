@@ -5,21 +5,27 @@ const q={qualification_type:'study',observation_only:true,qualification_reasons:
 const pick={calibrated:.459,ev:-.03,features:{margin_pct:5.2},confirmation:q};
 const before=JSON.stringify(pick),context={statistics:{home_ht:.9,away_ht:.78},spec:{kind:'total',period:'ht'}};
 const explained=describe(pick,context);
-assert.equal(explained.summary,'λ PT 1,68 · P 45,9% · Aggio 5,2%');
+assert.equal(explained.summary,'λ stat PT 1,68 · P V7 45,9% · Aggio 5,2%');
 assert.equal(explained.facts.length,3);assert(!/triade|modello|scelta|scenario|osservazione/i.test(explained.summary));
 assert(explained.detail.includes('scenario prudente negativo'));
 assert.equal(JSON.stringify(pick),before);
 const saved={...pick,selection_facts:{kind:'total',period:'ht',lambda_home:.9,lambda_away:.78,margin_pct:5.2}};
 assert.equal(describe(saved).summary,explained.summary,'Explorer and Gold show the same saved figures');
 const flowing={...saved,confirmation:{...q,flow_confirmed:true,opening_delta_pct:-3.2}};
-assert.equal(describe(flowing).summary,'Quota ↓ 3,2% · Aggio 5,2% · λ PT 1,68');
+assert.equal(describe(flowing).summary,'Quota ↓ 3,2% · Aggio 5,2% · λ stat PT 1,68');
 const value={probability:.204,ev:.059,confirmation:{observation_only:false,value_qualified:true}};
-assert.equal(describe(value).summary,'P 20,4% · EV +5,9%');
+assert.equal(describe(value).summary,'P V7 20,4% · EV +5,9%');
 const recovery={ev:-.06,confirmation:{observation_only:false,statistical_recovery:true}};
 assert(describe(recovery).detail.includes('-6,0%'));assert(!describe(recovery).summary.includes('-6,0%'));
 assert.equal(describe({confirmation:{observation_only:true,value_qualified:true}}).type,'observation');
 assert.equal(render({confirmation:{qualification_type:'<img src=x>'}}),'');
 assert(!render(pick,context).includes('open>'));
 assert(!render(pick,context).includes('v7-qualification-label'));
-assert.equal(describe({...saved,features:{margin_pct:0},selection_facts:{...saved.selection_facts,margin_pct:null}}).summary,'λ PT 1,68 · P 45,9% · Aggio 0,0%');
+assert.equal(describe({...saved,features:{margin_pct:0},selection_facts:{...saved.selection_facts,margin_pct:null}}).summary,'λ stat PT 1,68 · P V7 45,9% · Aggio 0,0%');
+const under={probability:.47564,odd:2.24,ev:.47564*2.24-1,
+ selection_facts:{kind:'total',period:'ft',lambda_home:1.30,lambda_away:1.16},
+ confirmation:{qualification_type:'documented_value',observation_only:false}};
+const underBefore=JSON.stringify(under);
+assert.equal(describe(under).summary,'λ stat FT 2,46 · P V7 47,6% · EV +6,5%');
+assert.equal(JSON.stringify(under),underBefore,'Distinguishing sources never changes the saved estimates');
 console.log('Compact saved facts: three numbers, period lambda, probability, margin/movement, exact status and original EV in details.');
