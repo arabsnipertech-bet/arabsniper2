@@ -838,6 +838,9 @@ def prior_triad_commitments(assessment, meta, as_of):
     saved = matrix.get('v7') or {}
     if saved.get('status') == 'published' and valid_snapshot(saved, meta, as_of):
         if 'triad_commitments' in saved:
+            if saved.get('measurement'):
+                from official_selections import archived_choice
+                return {role: archived_choice(slot, saved) for role, slot in saved['triad_commitments'].items()}
             return saved['triad_commitments']
         return commit_priced_slots(saved.get('triad') or {}, saved['captured_at'], {})
     waiting = matrix.get('v7_waiting_commitments') or {}
@@ -1039,6 +1042,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
                                                 as_of=as_of,kickoff=meta['kickoff'],profiles=profiles,
                                                 ev_recoveries=recoveries,qualified_alternatives=alternative_roles,
                                                 statistical_rates=stats,statistics_at=utc(statistics_at))
+    from official_selections import trace_snapshot
+    trace_snapshot(payload, sources, profiles)
     return {**payload, 'sha256': fingerprint(payload)}
 
 

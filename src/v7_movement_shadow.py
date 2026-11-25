@@ -1,5 +1,6 @@
 """Frozen, prospective-only November 22 hypotheses. No provider or publisher."""
 from copy import deepcopy
+from collections import defaultdict
 from hashlib import sha256
 import json
 
@@ -20,6 +21,106 @@ VARIANTS = ('nov22_oci_window','nov22_cross_markets','nov22_margin_friction',
             'nov22_triad_rank_21','nov22_triad_rank_25','nov23_gg_ft_same_rules','nov24_away_symmetric')
 CONTROL = 'nov22_control'
 GG_FT_SAME_RULES = 'nov23_gg_ft_same_rules'
+
+FLOW_FIELDS = ('paired_books', 'agreeing_books', 'fair_direction_coherent',
+               'movement_confirmed', 'persistence', 'reversal')
+
+
+def evidence_state(value):
+    if value is None: return 'missing'
+    if value is False: return 'failed'
+    if value is True: return 'passed'
+    if finite(value) and value == 0: return 'neutral'
+    return 'recorded'
+
+
+def instrument(snapshot, sources, profiles):
+    """Two cohort observers, plus lossless trace of existing calculations.
+
+    No routing call, probability calculation, provider request or old replay.
+    """
+    from matrix_quotes import equivalent_prices
+    from v7_decision import GG_FT, RESULTS
+    from v7_probability import MEASUREMENT_CONFIG
+    measurement = snapshot['measurement']
+    profiles = profiles or {}
+    rates = snapshot.get('rates') or {}
+    stats_at, captured = stamp(snapshot.get('statistics_at')), stamp(snapshot.get('captured_at'))
+    statistics_valid = bool(stats_at and captured and stats_at <= captured)
+    threshold = MEASUREMENT_CONFIG['away_raw_gap']
+    measurement['observers'] = dict(
+        gg_ft_weak_side=dict(lambda_threshold=1., lambda_origin='v7.rates',
+                             native_lambda_secondary_only=True, rerouting=False),
+        away_raw_market_gap=dict(minimum_probability_gap=threshold,
+                                 raw_origin='market.raw', final_origin='market.calibrated', rerouting=False))
+    measurement['statistics_samples'] = deepcopy(profiles or {})
+    measurement['markets'] = {}
+    selected = defaultdict(list)
+    for role, pick in (snapshot.get('triad') or {}).items():
+        if pick: selected[pick['market_id']].append(role)
+    for key, row in snapshot['markets'].items():
+        source = sources.get(row.get('source_market_id')) or {}
+        spec = json.loads(key)
+        move = source.get('selected_movement') or {}
+        flow = {k: deepcopy(source.get(k)) for k in FLOW_FIELDS}
+        # The engine records the reversal of the selected operator's window.
+        if 'reversal' not in source: flow['reversal'] = deepcopy(move.get('reversal'))
+        peak = peak_support(profiles or {}, spec.get('period'))
+        native = snapshot.get('statistics') or {}
+        raw, final = row.get('raw'), row.get('calibrated')
+        lambdas = [rates.get(k) for k in ('home_ft', 'away_ft')]
+        weak_available = statistics_valid and all(finite(v) and v >= 0 for v in lambdas)
+        gap_available = statistics_valid and finite(raw) and finite(final)
+        cohorts = {}
+        if key == GG_FT:
+            cohorts['gg_ft_weak_side'] = dict(available=weak_available,
+                matched=any(v < 1. for v in lambdas) if weak_available else None,
+                lambda_ft=deepcopy(lambdas), lambda_origin='v7.rates',
+                native_lambda_ft=[native.get(k) for k in ('home_ft', 'away_ft')],
+                reason=None if weak_available else 'missing_or_future_lambda_evidence')
+        if key == RESULTS['2']:
+            gap = raw-final if gap_available else None
+            cohorts['away_raw_market_gap'] = dict(available=gap_available,
+                matched=gap >= threshold-1e-12 if gap_available else None, raw_minus_v7=gap,
+                reason=None if gap_available else 'missing_or_future_probability_evidence')
+        oci = source.get('oci') if not source.get('historical_oci') else None
+        info = dict(raw_probability=raw, statistical_probability=row.get('statistics'),
+            probability=final, fair=row.get('fair'), odd=row.get('odd'),
+            quote_usable=bool(finite(row.get('odd')) and row['odd'] > 1 and
+                              price_usable(source, snapshot['captured_at'], snapshot['kickoff'])),
+            probability_origins=dict(raw='raw_poisson', statistics='pre_market_statistics', probability='final_v7'),
+            without_peak=peak, without_peak_state=evidence_state(peak),
+            sample_sizes={side: {name: value.get('sample') for name, value in profiles.get(side, {}).items()
+                                if isinstance(value, dict)} for side in ('home', 'away')},
+            observed_goal_samples={side: {period: values.get('sample') for period, values in
+                    (snapshot.get('means', {}).get(side) or {}).items() if isinstance(values, dict)}
+                    for side in ('home', 'away')},
+            flow_fields=flow, flow_states={k: ('no_reversal' if v is False else 'reversal_detected')
+                if k == 'reversal' and type(v) is bool else evidence_state(v) for k, v in flow.items()},
+            flow_origins={k: 'selected_movement.reversal' if k == 'reversal' and k not in source else k
+                          for k in FLOW_FIELDS},
+            missing_flow_fields=[k for k, v in flow.items() if v is None],
+            partitions=deepcopy(source.get('audit_partitions')),
+            opening_delta_pct=opening(row, source, snapshot['captured_at'], snapshot['kickoff']),
+            last_leg_delta_pct=(row.get('features') or {}).get('delta_pct'),
+            oci=oci, oci_state='missing' if not finite(oci) else 'neutral' if oci == 0 else 'current',
+            official_roles=selected.get(key, []), supported=row.get('supported'), tier=row.get('tier'),
+            edge_exclusions=deepcopy(row.get('edge_exclusions')),
+            policy_exclusions=deepcopy(row.get('policy_exclusions')), observers=cohorts)
+        measurement['markets'][key] = info
+    measurement['equivalent_prices'] = equivalent_prices(snapshot['markets'], sources,
+                                                          snapshot['captured_at'], snapshot['kickoff'])
+    ledger = (snapshot.get('decision_shadow') or {}).get('movement_study')
+    if ledger and ledger.get('available') is True:
+        ledger['measurement_protocol'] = measurement['protocol']
+        ledger['measurement_config_sha256'] = measurement['config_sha256']
+        ledger['probability_origins'] = deepcopy(measurement['probability_origins'])
+        ledger['observers'] = deepcopy(measurement['observers'])
+        ledger['equivalent_prices'] = deepcopy(measurement['equivalent_prices'])
+        for row in ledger.get('cohorts', []):
+            row['audit'] = deepcopy(measurement['markets'].get(row['market_id']))
+        # Existing evidence_sha256 describes the original protocol, untouched.
+        ledger['measurement_sha256'] = fingerprint(measurement)
 
 
 def fingerprint(value):

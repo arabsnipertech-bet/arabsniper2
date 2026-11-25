@@ -13,6 +13,22 @@ VERSION = 'arabsniper-v7.0'
 BASE_WEIGHT = .80
 MIN_WEIGHT, MAX_WEIGHT = .50, .80
 
+# Observation schema only. It is never read by calibration or routing.
+MEASUREMENT_PROTOCOL = 'V7_RESEARCH_TRACE_20261125_V1'
+MEASUREMENT_CONFIG = dict(gg_ft_weak_lambda=1., away_raw_gap=.10,
+    lambda_origin='v7.rates', equivalent_update_tolerance_seconds=60,
+    settlement='regulation_90_minutes', automatic_promotion=False)
+
+
+def probability_origins(snapshot):
+    """Copy three already computed distributions, with their original timestamps."""
+    from copy import deepcopy
+    return {name: dict(source=source, rates=deepcopy(snapshot.get(source)),
+                       observed_at=snapshot.get('statistics_at') if source != 'rates'
+                       else snapshot.get('captured_at'))
+            for name, source in (('raw_poisson', 'raw_rates'),
+                                 ('pre_market_statistics', 'statistics'), ('final_v7', 'rates'))}
+
 
 def finite(value):
     return type(value) in (int, float) and isfinite(value)
