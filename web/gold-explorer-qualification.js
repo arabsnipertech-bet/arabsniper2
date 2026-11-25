@@ -13,6 +13,22 @@
  const percent=v=>(v>0?'+':'')+(100*v).toLocaleString('it-IT',{maximumFractionDigits:1,minimumFractionDigits:1})+'%';
  const probability=v=>(100*v).toLocaleString('it-IT',{maximumFractionDigits:1,minimumFractionDigits:1})+'%';
  const number=v=>v.toLocaleString('it-IT',{maximumFractionDigits:2,minimumFractionDigits:2});
+ function savedEvidence(value,context){
+  const f=value.selection_facts||{},a=context.evidence||{};
+  if((f.evidence_protocol||context.evidence_protocol)!=='V7_RESEARCH_TRACE_20261125_V1')return [];
+  const kind=f.kind||context.spec?.kind||value.kind||value.spec_kind;
+  const period=kind==='pt_btts_ft_total'?'ht':f.period||context.spec?.period||value.period;
+  const tag=({ht:'PT',sh:'ST',ft:'FT'})[period];
+  const count=side=>f['sample_'+side]??(period==='sh'?a.observed_goal_samples?.[side]?.st:a.sample_sizes?.[side]?.['for_'+period]);
+  const valid=v=>Number.isInteger(v)&&v>=0;
+  const home=count('home'),away=count('away'),lines=[];
+  if(tag&&(valid(home)||valid(away)))lines.push('Campioni '+tag+': casa '+(valid(home)?home:'non registrato')+', ospite '+(valid(away)?away:'non registrato')+'.');
+  const peak=f.without_peak??a.without_peak;
+  lines.push('Tenuta senza picco: '+(peak===true?'verificata':peak===false?'non verificata':'non registrata')+'.');
+  const paired=f.paired_books??a.flow_fields?.paired_books,agreeing=f.agreeing_books??a.flow_fields?.agreeing_books;
+  lines.push('Bookmaker confrontabili: '+(valid(paired)?paired:'non registrato')+'; concordi: '+(valid(agreeing)?agreeing:'non registrato')+'.');
+  return lines;
+ }
  function numericalReferences(value,context,type){
   const f=value.selection_facts||{},s=context.spec||{},stats=context.statistics||{};
   const kind=f.kind||s.kind||value.kind||value.spec_kind;
@@ -49,14 +65,17 @@
   const attention=(Array.isArray(q.qualification_reasons)?q.qualification_reasons:[]).map(key=>reasons[key]).filter(Boolean);
   const ev=value.ev,facts=numericalReferences(value,context,type);
   const detail=[labels[type]+'.',finite(ev)?'EV originale '+percent(ev)+'.':'',
+   ...savedEvidence(value,context),
    ...attention.map(v=>v+'.'),type==='statistical_recovery'?'Il recupero statistico non certifica valore economico positivo.':'',
    ['study','observation','contrarian_study'].includes(type)?'Spunto in osservazione, distinto da una proposta qualificata.':'',
    type==='documented_value'?'Il livello Gold applica requisiti separati.':''].filter(Boolean).join(' ');
-  return {type,facts,summary:facts.join(' · '),reasons:attention,detail};
+  const label=['study','observation','contrarian_study'].includes(type)?'Osservazione':labels[type];
+  return {type,label,facts,summary:facts.join(' · '),reasons:attention,detail};
  }
  function render(value,context){
   const q=describe(value,context);if(!q)return '';
-  return (q.facts.length?'<div class="v7-qualification" data-qualification="'+esc(q.type)+'"><span class="v7-qualification-text">'+
+  return (q.facts.length?'<div class="v7-qualification" data-qualification="'+esc(q.type)+'" aria-label="'+esc(q.label)+'">'+
+   '<strong class="v7-qualification-label">'+esc(q.label)+'</strong><span class="v7-qualification-text">'+
    q.facts.map(v=>'<span>'+esc(v)+'</span>').join('')+'</span></div>':'')+
    '<details class="v7-qualification-details"><summary>Dati e limiti</summary><p>'+esc(q.detail)+'</p></details>';
  }

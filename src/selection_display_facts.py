@@ -1,5 +1,7 @@
 """Copy saved numerical references for display; no admission or model changes."""
 from v7_probability import finite
+from v7_probability import MEASUREMENT_PROTOCOL
+from lateral_matrix import market_id
 
 
 def selection_facts(spec, record, snapshot):
@@ -31,4 +33,19 @@ def selection_facts(spec, record, snapshot):
         delta = features.get('opening_delta_pct')
     if finite(delta):
         facts['opening_delta_pct'] = delta
+    measurement = snapshot.get('measurement') or {}
+    evidence = (measurement.get('markets') or {}).get(market_id(spec)) or {}
+    if measurement.get('protocol') == MEASUREMENT_PROTOCOL and evidence:
+        facts['evidence_protocol'] = MEASUREMENT_PROTOCOL
+        for side in ('home', 'away'):
+            count = ((evidence.get('sample_sizes') or {}).get(side) or {}).get('for_'+str(period))
+            if period == 'sh':
+                count = ((evidence.get('observed_goal_samples') or {}).get(side) or {}).get('st')
+            if type(count) is int and count >= 0:
+                facts['sample_'+side] = count
+        facts['without_peak'] = evidence.get('without_peak')
+        flow = evidence.get('flow_fields') or {}
+        for field in ('paired_books', 'agreeing_books'):
+            count = flow.get(field)
+            facts[field] = count if type(count) is int and count >= 0 else None
     return facts

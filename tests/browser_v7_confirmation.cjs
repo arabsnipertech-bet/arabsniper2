@@ -21,6 +21,9 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
     const record={source_market_id:key,label:'Over 1,5 PT',calibrated:.377,model_fair_odd:2.66,odd:2.5,ev:-.059,ev_low:-.064,features:{oci:0,opening_delta_pct:11.1,delta_pct:-2,margin_pct:5.2},confirmation:{qualification_type:'study',qualification_reasons:['ev_low_negative','study_only'],observation_only:true},...origin};
     const source={id:key,spec,odd:2.5,first_odd:2.25,quote_status:'recent',quote_executable:true};
     const view={v7:{fixture_id:'123',statistics:{home_ht:.9,away_ht:.78},triad:{recommended_alternative:signal}},triad:{recommended_alternative:{signal,record,source}}};
+    view.v7.measurement={protocol:'V7_RESEARCH_TRACE_20261125_V1',markets:{[key]:{
+     sample_sizes:{home:{for_ht:8},away:{for_ht:4}},without_peak:false,
+     flow_fields:{paired_books:0,agreeing_books:0}}}};
     document.querySelector('#results').innerHTML=ArabMatrix.triadPanel(view);
     const saved={origin_badge:'Trend Quota +5,5%',origin_tooltip:'Motivazione storica congelata'};
     if(ArabMatrix.marketOrigin(source,{record:saved}).origin_badge!==saved.origin_badge)throw Error('Historical explanation rewritten');
@@ -33,10 +36,14 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
    assert(why.includes('λ stat PT 1,68'));assert(why.includes('P V7 37,7%'));assert(why.includes('Aggio 5,2%'));
    assert(!/triade|scelta|modello/i.test(why));
    assert.equal(await page.locator('.v7-qualification-text>span').count(),3);
+   assert.equal(await page.locator('.v7-qualification-label').innerText(),'Osservazione');
    assert(!why.includes('negativo'));assert(!why.includes('non confermata'));
    assert.equal(await page.locator('.v7-qualification-details[open]').count(),0);
    await page.locator('.v7-qualification-details summary').click();
    assert((await page.locator('.v7-qualification-details').innerText()).includes('scenario prudente negativo'));
+   assert((await page.locator('.v7-qualification-details').innerText()).includes('Campioni PT: casa 8, ospite 4'));
+   assert((await page.locator('.v7-qualification-details').innerText()).includes('Tenuta senza picco: non verificata'));
+   assert((await page.locator('.v7-qualification-details').innerText()).includes('Bookmaker confrontabili: 0; concordi: 0'));
    await page.locator('.v7-qualification-details summary').click();
    assert.equal(await page.locator('[data-explorer-fixture="123"]').getAttribute('href'),'/gold-explorer.html?fixture=123');
    assert.equal(await page.locator('[data-v7-slot="recommended_alternative"] .mx-origin-badge').getAttribute('data-mx-origin-tooltip'),'Prima osservata 2,25 → 2,50. OCI attuale 0: neutro. Solo osservazione.');
