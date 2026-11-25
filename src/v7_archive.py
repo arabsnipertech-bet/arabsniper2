@@ -9,7 +9,7 @@ from audit_storage import open_verified_json, read_store, write_store
 from lateral_matrix import market_id, settle_spec, specification
 from multimarket_model import stamp
 from v7_decision import canonical, fingerprint, COMBOS, GOAL, GG, GG_SH, SIGNAL_ROLES
-from v7_probability import VERSION, blend_rates, finite, score_model, utc
+from v7_probability import VERSION, MEASUREMENT_PROTOCOL, blend_rates, finite, score_model, utc
 
 ROME = ZoneInfo('Europe/Rome')
 FINISHED = {'FT', 'AET', 'PEN'}
@@ -17,6 +17,7 @@ VOID = {'CANC', 'ABD', 'AWD', 'WO'}
 WEIGHTS = (.50, .55, .60, .65, .70, .75, .80)
 BENCHMARKS = frozenset((*GOAL.values(), GG, GG_SH, *(market_id(specification('result', 'ft', side))
                                           for side in ('1', 'x', '2'))))
+WEIGHT_BENCHMARKS = BENCHMARKS | {market_id(specification('btts', 'ft', 'yes'))}
 MONITORED = BENCHMARKS | {
     market_id(specification('btts', 'ft', 'yes')),
     *(market_id(spec) for spec in COMBOS),
@@ -80,6 +81,8 @@ def quote_evidence(source, snapshot):
 
 def checked_score(result):
     score = dict(result)
+    if score.get('ft_period') in ('extra_time', 'penalties', 'aet', 'pen'):
+        score.update(home_ft=None, away_ft=None)
     for key in ('home_ht', 'away_ht', 'home_ft', 'away_ft'):
         if type(score.get(key)) is not int or score[key] < 0:
             score[key] = None
@@ -87,6 +90,16 @@ def checked_score(result):
            for s in ('home', 'away')):
         score.update(home_ht=None, away_ht=None)
     return score
+
+
+def score_periods(result):
+    """Normalized home_ft/away_ft are 90' only; never use aggregate goals."""
+    score = checked_score(result)
+    return dict(regulation_90=dict(home=score['home_ft'], away=score['away_ft'],
+                    available=None not in (score['home_ft'], score['away_ft']),
+                    source='normalized_fulltime'),
+                extra_time=result.get('extra_time'), penalties=result.get('penalties'),
+                final_status=result.get('status'), extra_time_included=False, penalties_included=False)
 
 
 def rescheduled_result(result):
@@ -153,6 +166,8 @@ def results_for_day(store, day, at, fetched=None, previous=None):
         progress[state] += 1
         outcomes = {}
         rows = snapshot['markets']
+        measured = (snapshot.get('measurement') or {}).get('protocol') == MEASUREMENT_PROTOCOL
+        benchmarks = WEIGHT_BENCHMARKS if measured else BENCHMARKS
         role_for_market = defaultdict(list)
         role_prices = defaultdict(dict)
         commitments = snapshot.get('triad_commitments')
@@ -185,7 +200,7 @@ def results_for_day(store, day, at, fetched=None, previous=None):
             binary = win + loss == 1 and win in (0, 1)
             if not binary or key not in MONITORED and not role_for_market.get(key):
                 continue
-            comparable = key in BENCHMARKS and row.get('fair') is not None
+            comparable = key in benchmarks and row.get('fair') is not None
             if comparable and not models:
                 models = {str(weight): score_model(blend_rates(snapshot['statistics'],
                           snapshot['market_projection'], weight)) for weight in WEIGHTS}
@@ -193,6 +208,8 @@ def results_for_day(store, day, at, fetched=None, previous=None):
                         if comparable else {})
             samples.append(dict(fixture_id=fid, market=key, date=str(day), kickoff=snapshot['kickoff'],
                 observed_at=observed_at, outcome=int(win), roi=profit, roles=role_for_market.get(key, []),
+                # Keep the production learning population exactly unchanged.
+                # GG FT's new counterfactual grid is research-only.
                 benchmark=key in BENCHMARKS,
                 role_roi={role: win*(price-1)-loss for role, price in role_prices.get(key, {}).items()},
                 supported=row['supported'],
@@ -200,6 +217,12 @@ def results_for_day(store, day, at, fetched=None, previous=None):
                 features=row['features'], edge_exclusions=row['edge_exclusions'],
                 policy_exclusions=row['policy_exclusions'], raw=row['raw'], corrected=row['corrected'],
                 calibrated=row['calibrated'], v51=row['v51'], fair=row['fair'], variants=variants))
+            if measured:
+                samples[-1].update(statistics=row.get('statistics'),
+                    audit_weight_benchmark=key in benchmarks,
+                    captured_at=snapshot['captured_at'], forecast_sha256=snapshot['sha256'],
+                    measurement_protocol=MEASUREMENT_PROTOCOL,
+                    audit=(snapshot['measurement'].get('markets') or {}).get(key))
         for pick in (commitments or {}).values():
             market = pick['market_id']
             weights = settle_spec(json.loads(market), result) if state == 'settled' else None
@@ -211,10 +234,14 @@ def results_for_day(store, day, at, fetched=None, previous=None):
         fixtures[fid] = dict(forecast_sha256=snapshot['sha256'], kickoff=snapshot['kickoff'],
                              captured_at=snapshot['captured_at'], observed_at=observed_at,
                              status=state, result=result, outcomes=outcomes)
+        if measured:
+            fixtures[fid].update(measurement=snapshot['measurement'], score_periods=score_periods(result))
         if 'triad' in snapshot:
             fixtures[fid].update({key: snapshot.get(key) for key in ('triad', 'tier', 'badge', 'horizon', 'niche_id')})
             if commitments is not None:
-                fixtures[fid]['triad'] = {role: commitments.get(role) for role in SIGNAL_ROLES}
+                from official_selections import archived_choice
+                fixtures[fid]['triad'] = {role: archived_choice(commitments[role], snapshot)
+                    if commitments.get(role) else None for role in SIGNAL_ROLES}
         if (snapshot.get('decision_shadow') or {}).get('version') == V7_VERSION:
             if len(kickoffs[fid]) > 1:
                 fixtures[fid]['decision_shadow'] = {'status': 'kickoff_conflict'}
@@ -223,6 +250,14 @@ def results_for_day(store, day, at, fetched=None, previous=None):
                 fixtures[fid]['decision_shadow'] = {
                     'latest': settle_v7(snapshot, score),
                     'before_hour': settle_v7(before_hour[fid], score) if fid in before_hour else None}
+                if measured:
+                    # Read-only audit grid, also forwarded by the existing
+                    # compact learning report. Never a training benchmark.
+                    gg_ft = market_id(specification('btts', 'ft', 'yes'))
+                    fixtures[fid]['decision_shadow']['latest']['research_weight_grid'] = {
+                        r['market']: {k: r.get(k) for k in ('variants', 'fair', 'outcome', 'captured_at', 'forecast_sha256')}
+                        for r in samples if r['fixture_id'] == fid and r['market'] == gg_ft
+                        and r.get('audit_weight_benchmark') is True}
     return dict(version=VERSION, date=str(day), generated_at=utc(at),
                 counts=dict(progress), rejected_forecasts=invalid, fixtures=fixtures, samples=samples)
 

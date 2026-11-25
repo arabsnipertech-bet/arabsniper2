@@ -60,6 +60,67 @@ SIDE = {'home': '1', '1': '1', 'draw': 'x', 'x': 'x', 'away': '2', '2': '2',
 HANDICAP_ADAPTER_VERSION = 2
 
 
+def equivalent_event(spec):
+    """Exact 90-minute, no-push contract identity, not similar probabilities."""
+    if spec.get('period') != 'ft':
+        return None
+    if spec.get('kind') == 'result' and spec.get('side') in ('1', '2'):
+        return 'regulation_90_winner_' + spec['side']
+    # The verified adapter applies the handicap to the selected team's score.
+    # +0.5 includes a draw, integers push, quarters have partial payouts.
+    if spec.get('kind') == 'handicap' and spec.get('line') == -.5 and spec.get('side') in ('home', 'away'):
+        return 'regulation_90_winner_' + ('1' if spec['side'] == 'home' else '2')
+    return None
+
+
+def equivalent_prices(records, sources, as_of, kickoff):
+    """Passive, same-operator price comparison; official choices stay unchanged."""
+    from v7_probability import finite, price_usable, MEASUREMENT_CONFIG
+    from lateral_matrix import label
+    groups = defaultdict(list)
+    for key, row in records.items():
+        source = sources.get(row.get('source_market_id')) or {}
+        spec = source.get('spec') or {}
+        event = equivalent_event(spec)
+        expected_bid = 1 if spec.get('kind') == 'result' else 4
+        # The catalogue is the verified settlement contract. Ambiguous provider
+        # aliases and unknown bet identities fail closed.
+        if (not event or source.get('bet_id') != expected_bid or
+                not handicap_price_valid(source) or not finite(row.get('odd')) or row['odd'] <= 1 or
+                row['odd'] != source.get('odd') or
+                not price_usable(source, as_of, kickoff)):
+            continue
+        groups[(event, str(source.get('bookmaker_id')))].append((key, row, source))
+    comparisons = []
+    tolerance = MEASUREMENT_CONFIG['equivalent_update_tolerance_seconds']
+    for (event, book), entries in sorted(groups.items()):
+        results = [v for v in entries if v[2]['spec']['kind'] == 'result']
+        handicaps = [v for v in entries if v[2]['spec']['kind'] == 'handicap']
+        for key, control, original in results:
+            for alt_key, alt, source in handicaps:
+                times = [stamp(v.get(k)) for v in (original, source)
+                         for k in ('quote_observed_at', 'provider_updated_at')]
+                if (not all(times) or any(abs((times[i]-times[i+2]).total_seconds()) > tolerance for i in (0, 1))):
+                    continue
+                p, other_p = control.get('calibrated'), alt.get('calibrated')
+                if not finite(p) or not finite(other_p) or p != other_p:
+                    continue
+                comparisons.append(dict(equivalence_group=event, settlement='regulation_90_minutes',
+                    rules_verified_by='API-Football catalogue 1/4; selected-team handicap adapter v2',
+                    bookmaker_id=book, probability=p, probability_difference=0.,
+                    control=dict(market_id=key, label=label(original['spec']), odd=control['odd'],
+                                 ev=p*control['odd']-1, quote=deepcopy(control.get('quote'))),
+                    alternative=dict(market_id=alt_key, label=label(source['spec']),
+                        provider_market=CATALOG[4][0], bet_id=4, odd=alt['odd'], ev=p*alt['odd']-1,
+                        quote=deepcopy(alt.get('quote')), tier=alt.get('tier'),
+                        edge_exclusions=deepcopy(alt.get('edge_exclusions')),
+                        policy_exclusions=deepcopy(alt.get('policy_exclusions')),
+                        platinum_exclusions=deepcopy(alt.get('platinum_exclusions'))),
+                    odd_gain=alt['odd']-control['odd'], ev_gain=p*(alt['odd']-control['odd']),
+                    shadow_only=True, applied_to_official=False))
+    return comparisons
+
+
 def parse_value(bid, raw):
     if bid not in CATALOG: return None
     _, kind, period = CATALOG[bid]
@@ -401,7 +462,7 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     remember(row)
     row['quote_adapter_version'] = HANDICAP_ADAPTER_VERSION
     row.update(speed_pp_per_hour=None, selected_margin_pct=None, selected_margin_delta_pp=None, selected_market_fair_pct=None,
-               selected_movement=None, selected_market_odds=None, opening_market_odds=None,
+               selected_movement=None, selected_market_odds=None, opening_market_odds=None, audit_partitions=None,
                opening_delta_pct=None, delta_pct=None, delta_basis='last_leg', oci_state='missing',
                movement_confirmed=False, fair_direction_coherent=False, prematch_stable=False)
     now = stamp(as_of)
@@ -511,6 +572,18 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
     operators = move.get('operators') or []
     selected = next((o for o in operators if o.get('bookmaker_id') == best['bookmaker_id']), None)
     own_trace = best.get('trace') or []
+    # Audit only: retain complete vectors for goals as well as 1X2. These do
+    # not replace the price, opening definition or flow used by the selector.
+    def audit_point(point):
+        probabilities, overround = fair(point['odds'])
+        return dict(odds=deepcopy(point['odds']), fair=probabilities,
+                    margin_pct=overround, observed_at=point.get('observed_at'),
+                    provider_updated_at=point.get('provider_updated_at'))
+    row['audit_partitions'] = (dict(bookmaker_id=best['bookmaker_id'],
+        bet_id=best['bet_id'], spec=deepcopy(row['spec']),
+        opening_basis='first_complete_observed_same_operator',
+        opening=audit_point(own_trace[0]), current=audit_point(own_trace[-1]))
+        if best['complete'] and own_trace else None)
     if row['spec']['kind'] == 'result' and row['period'] == 'ft' and best['complete'] and own_trace:
         row['opening_market_odds'] = dict(own_trace[0]['odds'])
     own_margin_delta = (fair(own_trace[-1]['odds'])[1] - fair(own_trace[0]['odds'])[1]
