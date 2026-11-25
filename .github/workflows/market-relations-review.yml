@@ -1,7 +1,7 @@
 name: Encrypted historical market relations review
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
     paths:
       - 'auditor/market_relations_review.py'
       - 'auditor/market-relations-recipient-public.pem'
