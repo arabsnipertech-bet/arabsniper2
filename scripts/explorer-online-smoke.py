@@ -49,6 +49,18 @@ def main():
         with tempfile.TemporaryDirectory() as folder:
             file=Path(folder)/'session.json';file.write_text(json.dumps({'token':token}));file.chmod(0o600)
             result=subprocess.run(['node','tests/browser_explorer_live.cjs',str(file)],cwd=ROOT,capture_output=True,text=True,timeout=240)
+            # Emit only known stages and aggregate counts, never browser output,
+            # session material, account data or arbitrary assertion messages.
+            stages={'opening','current_loaded','goal_default_verified','goal_filters_verified','history_loading','history_loaded','browser_error','api_error','asset_error'}
+            for line in result.stdout.splitlines():
+                if not line.startswith('EXPLORER_LIVE_CHECKPOINT '):continue
+                try:progress=json.loads(line.split(' ',1)[1])
+                except (ValueError,IndexError):continue
+                if progress.get('stage') not in stages:continue
+                safe={'stage':progress['stage']}
+                safe.update({key:value for key,value in progress.items()
+                             if key in ('loadMs','goalsN','over15N','historyMs','errorsN','httpStatus') and type(value) is int and value>=0})
+                print('Explorer live progress: '+json.dumps(safe),flush=True)
             assert result.returncode==0,'Real browser validation failed; no private output emitted'
         report={'owner_session':'temporary; deleted after smoke','real_api_crud':True,'real_history':True,'subscription_mutations':0,'otp_emails':0,'third_party_sessions':0}
         (ROOT/'test-artifacts/explorer-live-api.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
