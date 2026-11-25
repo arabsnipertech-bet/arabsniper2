@@ -13,6 +13,9 @@ const {chromium}=require('playwright'),fs=require('fs'),assert=require('node:ass
  await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor({timeout:180000});
  const loadMs=Date.now()-started;
  const count=await page.locator('#metrics .metric strong').nth(1).textContent();assert(Number(count.replace(/\D/g,''))>0);
+ assert.equal(await page.locator('#mode').inputValue(),'goals','The live default must be the goal view');
+ const goalLabels=await page.locator('#results .market').allTextContents(),goalsN=goalLabels.length;
+ assert(goalLabels.every(label=>/^(Over |GG )/.test(label)),'Advanced markets leaked into the default goal view');
  fs.mkdirSync('test-artifacts',{recursive:true});
  await page.locator('#filterForm').screenshot({path:'test-artifacts/explorer-live-controls.png'});
  for(const [name,width,height] of [['desktop',1440,1000],['tablet',820,1180],['mobile',390,844]]){
@@ -22,6 +25,16 @@ const {chromium}=require('playwright'),fs=require('fs'),assert=require('node:ass
   await page.screenshot({path:'test-artifacts/explorer-live-'+name+'.png',fullPage:false});
  }
  let requests=0;page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/auth/explorer/'))requests++;});
+ await page.locator('[data-market-view=over15]').click();
+ const over15N=await page.locator('#results .selection').count();
+ assert((await page.locator('#results .market').allTextContents()).every(label=>label==='Over 1,5 PT'));
+ if(!over15N)assert((await page.locator('#results').innerText()).includes('Nessun Over 1,5 PT validato'));
+ await page.locator('.market-views').scrollIntoViewIfNeeded();await page.screenshot({path:'test-artifacts/explorer-live-over15.png',fullPage:false});
+ await page.locator('[data-market-view=goals]').click();
+ await page.locator('.market-views').scrollIntoViewIfNeeded();await page.screenshot({path:'test-artifacts/explorer-live-goals.png',fullPage:false});
+ await page.locator('[data-market-view=all]').click();
+ assert.equal(await page.locator('#mode').inputValue(),'best');
+ assert.equal(requests,0,'Goal views unexpectedly fetched data');
  await page.locator('#mode').selectOption('search');await page.locator('[name=team]').fill('zzzz-no-match');
  await page.locator('#filterForm').dispatchEvent('input');
  assert.equal(requests,0,'Local filters unexpectedly fetched data');
@@ -41,5 +54,5 @@ const {chromium}=require('playwright'),fs=require('fs'),assert=require('node:ass
  await page.screenshot({path:'test-artifacts/explorer-live-history.png',fullPage:false});
  assert.equal(errors.length,0);assert.equal(forbidden.length,0);
  await browser.close();
- fs.writeFileSync('test-artifacts/explorer-live-browser.json',JSON.stringify({loadMs,rows:count,viewports:3,jsErrors:errors.length,footballRequests:forbidden.length,filterRequests,historyMs,legacyN,legacyVerified}));
+ fs.writeFileSync('test-artifacts/explorer-live-browser.json',JSON.stringify({loadMs,rows:count,goalsN,over15N,viewports:3,jsErrors:errors.length,footballRequests:forbidden.length,filterRequests,historyMs,legacyN,legacyVerified}));
 })().catch(e=>{console.error('Live browser smoke failed:',e.name);process.exit(1);});

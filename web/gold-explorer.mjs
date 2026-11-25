@@ -1,7 +1,7 @@
 import {officialGoldRecords} from './explorer-official-records.mjs';
 import './gold-explorer-qualification.js?v=a429b49a2e74';
 import {archiveLoader,currentPageHashes} from './explorer-loader.mjs?v=4c5be96bbe7b';
-import {categories,modes,text,numeric,romeDay,fresh,matches,rank,outcome,statistics,historyRows} from './explorer-core.mjs?v=1086029b2649';
+import {categories,modes,text,numeric,romeDay,fresh,matches,rank,goalRows,goalMarketLabels,outcome,statistics,historyRows} from './explorer-core.mjs?v=a95aa463ffa5';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const number=(v,d=2)=>numeric(v)?v.toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
 const percent=v=>numeric(v)?number(v*100,1)+'%':'—';
@@ -55,7 +55,7 @@ function proposalCoherence(row){
  return '';
 }
 function emptyResults(){
- empty($('results'),!state.rows.length?'Archivio corrente caricato: nessuna analisi prematch per questa vista.':$('mode').value==='recommended'?'Nessuna Consigliata ufficiale Gold registrata corrisponde ai filtri attuali. Il caricamento è riuscito.':'Dati caricati: nessuna voce corrisponde alla vista e ai filtri attuali.');
+ empty($('results'),!state.rows.length?'Archivio corrente caricato: nessuna analisi prematch per questa vista.':$('mode').value==='goals'?($('filterForm').elements.market.value==='Over 1,5 PT'?'Nessun Over 1,5 PT validato con quota utilizzabile per questi filtri.':'Nessuna proposta Gol e Over validata con quota utilizzabile per questi filtri.'):$('mode').value==='recommended'?'Nessuna Consigliata ufficiale Gold registrata corrisponde ai filtri attuali. Il caricamento è riuscito.':'Dati caricati: nessuna voce corrisponde alla vista e ai filtri attuali.');
 }
 function cards(rows,node,options={}){
  if(!rows.length){empty(node);return;}
@@ -65,6 +65,8 @@ function cards(rows,node,options={}){
  }).join('');
 }
 function render(){
+ const goals=$('mode').value==='goals',market=$('filterForm').elements.market.value;
+ for(const button of document.querySelectorAll('[data-market-view]'))button.setAttribute('aria-pressed',String(button.dataset.marketView==='over15'?goals&&market==='Over 1,5 PT':button.dataset.marketView==='goals'?goals&&!market:$('mode').value==='best'&&!market));
  $('marketIndex').replaceChildren();$('marketNavigation').hidden=true;
  $('fixtureFocus').hidden=!state.focusFixture;
  if(state.loadingView&&state.focusFixture)$('fixtureFocusText').textContent='Caricamento delle analisi della partita…';
@@ -74,7 +76,7 @@ function render(){
   const row=state.rows.find(r=>String(r.fixture_id)===state.focusFixture);
   $('fixtureFocusText').textContent=row?'Analisi della partita: '+text(row.home)+' — '+text(row.away):'Partita selezionata: nessuna analisi corrente disponibile.';
  }
- $('viewExplanation').textContent=$('mode').value==='recommended'?'Consigliate ufficiali già registrate dalla Gold, in ordine di inizio partita. Nessun nuovo punteggio Explorer. Gli indicatori sono quelli dello snapshot; la quota ufficiale originale, se documentata, è nel dettaglio.':$('mode').value==='markets'?'Gruppi in ordine alfabetico. Usa l’indice per raggiungere un mercato senza scorrere tutti i precedenti.':'I ruoli originali Gold sono riportati senza modifiche nelle schede e nel dettaglio.';
+ $('viewExplanation').textContent=goals?'Over e GG validati, alternati per mercato.':$('mode').value==='recommended'?'Consigliate ufficiali già registrate dalla Gold, in ordine di inizio partita. Nessun nuovo punteggio Explorer. Gli indicatori sono quelli dello snapshot; la quota ufficiale originale, se documentata, è nel dettaglio.':$('mode').value==='markets'?'Gruppi in ordine alfabetico. Usa l’indice per raggiungere un mercato senza scorrere tutti i precedenti.':$('mode').value==='best'?'Classifica completa, inclusi handicap e mercati avanzati.':'I ruoli originali Gold sono riportati senza modifiche nelle schede e nel dettaglio.';
  const f=filters(),mode=$('mode').value,now=Date.now();let rows=state.rows.filter(r=>matches(r,f,now)&&(!state.focusFixture||r.fixture_id===state.focusFixture));
  if(mode!=='search')rows=rows.filter(r=>!['opposed','inconsistent_gold_triad'].includes(r.coherence_status));
  if(mode!=='search'&&mode!=='recommended')rows=rows.filter(r=>fresh(r,now));
@@ -88,7 +90,7 @@ function render(){
   }
   if(!count)emptyResults();$('marketNavigation').hidden=!count;$('more').hidden=!more;
  }else{
-  rows=mode==='recommended'?officialGoldRecords(rows):mode==='search'?rows.sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||b.probability-a.probability||a.id.localeCompare(b.id)):rank(rows,mode,f.diversify);
+  rows=mode==='goals'?goalRows(rows,f.diversify):mode==='recommended'?officialGoldRecords(rows):mode==='search'?rows.sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff)||b.probability-a.probability||a.id.localeCompare(b.id)):rank(rows,mode,f.diversify);
   if(rows.length)cards(rows.slice(0,state.limit),$('results'));else emptyResults();$('more').hidden=rows.length<=state.limit;
  }
 }
@@ -119,7 +121,7 @@ async function loadCurrentView(){
   if(sequence!==state.pageSequence)return;
   if(state.index.page_index_version){const selected=new Set(hashes),expected=state.index.page_index.filter(p=>selected.has(p.sha256)).reduce((n,p)=>n+p.count,0);if(rows.length!==expected)throw Error('Conteggio mercati incompleto. Premi Aggiorna dati.');}
   state.rows=rows;state.loadedKey=key;state.loadingView=false;state.limit=10;
-  for(const [name,values] of [['league',state.index.facets?.leagues||rows.map(r=>text(r.league))],['market',state.index.facets?.markets||rows.map(r=>r.label)]]){const select=$('filterForm').elements[name],previous=select.value;select.replaceChildren(new Option('Tutti',''),...[...new Set(values.filter(Boolean))].sort().map(v=>new Option(v,v)));select.value=previous;}
+  for(const [name,values] of [['league',state.index.facets?.leagues||rows.map(r=>text(r.league))],['market',state.index.facets?.markets||rows.map(r=>r.label)]]){const select=$('filterForm').elements[name],previous=select.value;select.replaceChildren(new Option('Tutti',''),...[...new Set([...values,...(name==='market'?['Over 1,5 PT']:[])].filter(Boolean))].sort().map(v=>new Option(v,v)));select.value=previous;}
   render();dashboard();scheduleExpiry();$('dataState').textContent='';message(rows.length?'Dati caricati.':'Nessuna analisi prematch disponibile per questa vista. Puoi consultare lo storico.');
  }catch(e){if(sequence===state.pageSequence){state.loadingView=false;state.viewError='Caricamento non riuscito. Premi Aggiorna dati per riprovare.';render();}throw e;}
 }
@@ -183,6 +185,13 @@ function detail(row){
  });$('detail').showModal();
 }
 document.addEventListener('click',e=>{const button=e.target.closest('button');if(!button)return;
+ if(button.dataset.marketView)action(async()=>{
+  state.focusFixture=null;state.limit=10;
+  const over=button.dataset.marketView==='over15',select=$('filterForm').elements.market;
+  if(over&&![...select.options].some(o=>o.value==='Over 1,5 PT'))select.add(new Option('Over 1,5 PT','Over 1,5 PT'));
+  select.value=over?'Over 1,5 PT':'';$('mode').value=button.dataset.marketView==='all'?'best':'goals';
+  await loadCurrentView();
+ },button);
  if(button.dataset.detail)detail(state.viewRows.get(button.dataset.detail).row);
  if(button.dataset.favorite)action(async()=>{const row=state.viewRows.get(button.dataset.favorite).row;await api('favorites',{id:row.id,object:row.object});message('Selezione salvata nei tuoi preferiti.');},button);
  if(button.dataset.remove)action(async()=>{await api('delete',{type:'favorite',id:state.viewRows.get(button.dataset.remove).row.id});await favorites();message('Preferito rimosso.');},button);
@@ -190,8 +199,8 @@ document.addEventListener('click',e=>{const button=e.target.closest('button');if
 });
 $('closeDetail').onclick=()=>$('detail').close();$('refresh').onclick=()=>action(refresh,$('refresh'));
 function resetFilters(){state.silentReset=true;$('filterForm').reset();state.silentReset=false;}
-$('clearFixtureFocus').onclick=()=>action(async()=>{state.focusFixture=null;resetFilters();$('mode').value='best';state.limit=10;await loadCurrentView();});
-$('filterForm').onsubmit=e=>e.preventDefault();$('filterForm').oninput=()=>action(async()=>{state.focusFixture=null;state.limit=10;await loadCurrentView();});$('filterForm').onreset=()=>{if(state.silentReset)return;state.focusFixture=null;queueMicrotask(()=>action(async()=>{state.limit=10;await loadCurrentView();}));};$('mode').onchange=()=>{state.limit=10;render();};
+$('clearFixtureFocus').onclick=()=>action(async()=>{state.focusFixture=null;resetFilters();$('mode').value='goals';state.limit=10;await loadCurrentView();});
+$('filterForm').onsubmit=e=>e.preventDefault();$('filterForm').oninput=e=>action(async()=>{state.focusFixture=null;state.limit=10;if(e.target.name==='market'&&e.target.value&&$('mode').value==='goals'&&!goalMarketLabels.includes(e.target.value))$('mode').value='best';await loadCurrentView();});$('filterForm').onreset=()=>{if(state.silentReset)return;state.focusFixture=null;queueMicrotask(()=>action(async()=>{state.limit=10;await loadCurrentView();}));};$('mode').onchange=()=>{state.limit=10;render();};
 $('more').onclick=()=>{state.limit+=10;render();};$('moreFavorites').onclick=()=>action(()=>favorites(false),$('moreFavorites'));$('moreHistory').onclick=()=>{state.historyLimit+=10;renderHistory();};$('moreLegacy').onclick=()=>{state.legacyLimit+=10;renderLegacy();};$('loadHistory').onclick=()=>action(loadHistory,$('loadHistory'));
 for(const id of ['historyReference','historyCohort'])$(id).onchange=renderHistory;
 $('saveSearch').onclick=()=>action(async()=>{await api('searches',{name:$('searchName').value,filters:filters()});await loadSearches();message('Ricerca salvata nel tuo account.');},$('saveSearch'));
