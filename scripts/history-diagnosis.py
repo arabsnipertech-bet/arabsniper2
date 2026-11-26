@@ -72,12 +72,13 @@ def clipped(v,depth=0):
 
 def harvest(storage,bucket,index):
     paths=sorted(p for p in index if day_for(p) and re.fullmatch(r'auditarchive/prematch_2026-\d\d-\d\d_(daily|v7)\.json',p))
-    rows=[];coverage=[];schemas={};v7=[]
+    rows=[];coverage=[];schemas={};v7=[];daily_reports={}
     with tempfile.TemporaryDirectory(prefix='history-read-only-') as folder:
         root=Path(folder);restore_subset(storage,bucket,root,index,paths,fast_restore=True)
         for path in paths:
             d=read_store(root/path,{})
             if path.endswith('_daily.json'):
+                daily_reports[day_for(path)]=d
                 xs=d.get('markets') or []
                 coverage.append(dict(path=path,date=day_for(path),rows=len(xs),models=dict(Counter(x.get('model_id') for x in xs)),
                     fixtures=len(d.get('fixtures') or []),keys=list(d),schema=d.get('schema_version')))
@@ -113,7 +114,7 @@ def harvest(storage,bucket,index):
             compressed_bytes=sum(index.get(str(Path(path).parent/'_audit_parts'/(p['sha256']+'.json.gz')),{}).get('bytes',0) for p in parts))
     with ThreadPoolExecutor(max_workers=8) as pool:raw_sizes=list(pool.map(describe,rawfiles.items()))
     return dict(version=2,start=START,end=END,cutoff=datetime.now(timezone.utc).isoformat(),coverage=coverage,
-        sources={p:index[p] for p in paths},rows=rows,v7=v7,schemas=schemas,raw_archive_sizes=raw_sizes,
+        sources={p:index[p] for p in paths},rows=rows,v7=v7,daily_reports=daily_reports,schemas=schemas,raw_archive_sizes=raw_sizes,
         remote_writes=0,provider_calls=0)
 
 def main():
