@@ -25,7 +25,7 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           PYTHONUNBUFFERED: '1'
-        run: python scripts/history-diagnosis.py --inventory
+        run: python scripts/history-diagnosis.py
       - uses: actions/upload-artifact@v4
         with:
           name: history-diagnosis
