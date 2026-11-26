@@ -12,7 +12,7 @@ class Factors(unittest.TestCase):
         self.at=datetime(2026,11,25,18,tzinfo=timezone.utc)
         self.rates=dict(home_ht=.6,away_ht=.7,home_ft=1.3,away_ft=1.4,home_st=.7,away_st=.7)
         self.key=m.market_id(m.specification('total','ht','over',1.5))
-        self.row=dict(market=self.key,intensity=1.4,probability=.45,ev=.1,ev_low=.03,
+        self.row=dict(market=self.key,intensity=1.4,probability=.45,odd=2.5,ev=.1,ev_low=.03,
             price_identity=True,margin=6.,without_peak=True)
 
     def test_final_market_lambdas_cannot_fill_absent_native_statistical_lambdas(self):
@@ -57,6 +57,28 @@ class Factors(unittest.TestCase):
         result=m.metrics(rows)
         self.assertEqual((result['n'],result['wins'],result['pending']),(1,1,1))
         self.assertEqual(result['mean_p'],.4)
+
+    def test_quote_floor_does_not_confuse_frequent_low_price_unders_with_candidates(self):
+        key=m.market_id(m.specification('total','ht','under',1.5))
+        row=dict(self.row,market=key,intensity=1.,probability=.8,odd=1.3)
+        self.assertTrue(m.passes(row,'quattro_fattori'))
+        self.assertFalse(m.passes(row,'quattro_fattori_quota150'))
+
+    def test_event_complements_do_not_claim_same_operator_price_evidence(self):
+        base=dict(fixture_id='7',date='2026-11-25',config='frozen',selected=False,
+            strict_fixed=False,quote_observed_at=self.at.isoformat(),price_identity=True,
+            fair=.5,odd=1.9,ev=-.05)
+        over=dict(base,market=self.key,probability=.4,outcome=0,bookmaker=1,selected=True)
+        under=dict(base,market=m.market_id(m.specification('total','ht','under',1.5)),
+            probability=.6,outcome=1,bookmaker=2)
+        report=m.complementary_pairs([over,under])
+        self.assertEqual(report['cells'],[])
+        self.assertEqual(report['event_complements'][0]['alternative_under_when_over_selected']['wins'],1)
+        self.assertEqual(report['excluded']['different_or_missing_operator'],1)
+        under['bookmaker']='1'
+        self.assertEqual(len(m.complementary_pairs([over,under])['cells']),1)
+        under['outcome']=0
+        with self.assertRaises(ValueError):m.complementary_pairs([over,under])
 
 
 if __name__=='__main__':unittest.main()

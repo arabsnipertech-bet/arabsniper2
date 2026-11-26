@@ -37,7 +37,9 @@ for kind,period,side,line,lam,p in DEFINITIONS:
     SPECS[market_id(spec)]=dict(spec=spec,name=label(spec),lambda_threshold=lam,p_threshold=p)
 PROFILES=('base_lambda_registrata','lambda','probabilita','ev_nonnegativo','aggio_entro_6_5',
           'lambda_e_probabilita','probabilita_ev_aggio','lambda_probabilita_ev',
-          'quattro_fattori','quattro_fattori_prudente','prudente_senza_picco')
+          'quattro_fattori','quattro_fattori_prudente','prudente_senza_picco',
+          'lambda_ev','lambda_ev_aggio8','lambda_probabilita_ruolo_ev_aggio8',
+          'quattro_fattori_quota150','prudente_quota150')
 
 
 def number(x):return type(x) in (float,int) and isfinite(x)
@@ -174,11 +176,19 @@ def complementary_pairs(rows):
         spec=SPECS[r['market']]['spec']
         if spec['kind']=='total' and (spec['period'],spec.get('line')) in (('ht',1.5),('sh',1.5),('ft',2.5)):
             groups[r['config'],r['fixture_id'],r['date'],spec['period'],spec['line']][spec['side']]=r
-    cells=defaultdict(list);excluded=Counter()
+    cells=defaultdict(list);events=defaultdict(list);excluded=Counter()
     for (config,fid,day,period,line),sides in groups.items():
         if set(sides)!={'over','under'}:excluded['one_price_missing']+=1;continue
         over,under=sides['over'],sides['under']
-        if over['bookmaker'] is None or over['bookmaker']!=under['bookmaker']:
+        if abs(over['probability']+under['probability']-1)>1e-6:
+            excluded['noncomplementary_probability']+=1;continue
+        if over['outcome'] is not None and under['outcome'] is not None and over['outcome']+under['outcome']!=1:
+            raise ValueError('Inconsistent complementary outcomes')
+        category=('both_nonnegative' if over['ev']>=0 and under['ev']>=0 else
+                  'over_only_nonnegative' if over['ev']>=0 else
+                  'under_only_nonnegative' if under['ev']>=0 else 'both_negative')
+        events[config,period,line,category].append((over,under))
+        if over['bookmaker'] is None or str(over['bookmaker'])!=str(under['bookmaker']):
             excluded['different_or_missing_operator']+=1;continue
         times=[stamp(r['quote_observed_at']) for r in (over,under)]
         if not all(times) or abs((times[0]-times[1]).total_seconds())>60:
@@ -187,9 +197,6 @@ def complementary_pairs(rows):
             excluded['not_same_complete_partition']+=1;continue
         if abs(over['probability']+under['probability']-1)>1e-6:
             excluded['noncomplementary_probability']+=1;continue
-        category=('both_nonnegative' if over['ev']>=0 and under['ev']>=0 else
-                  'over_only_nonnegative' if over['ev']>=0 else
-                  'under_only_nonnegative' if under['ev']>=0 else 'both_negative')
         if category=='both_nonnegative' and over['ev']>1e-6 and under['ev']>1e-6:
             raise ValueError('Inconsistent simultaneous positive EV on complete binary partition')
         cells[config,period,line,category].append((over,under))
@@ -202,7 +209,15 @@ def complementary_pairs(rows):
             pairs=len(pairs),over=metrics([o for o,u in pairs]),under=metrics([u for o,u in pairs]),
             selected_over=metrics(selected_over),selected_under=metrics(selected_under),
             alternative_under_when_over_selected=metrics(alternatives_under),selection_rule_changed=False))
-    return dict(cells=reports,excluded=dict(excluded),tolerance_seconds=60)
+    summaries=[]
+    for (config,period,line,category),pairs in sorted(events.items()):
+        summaries.append(dict(config=config,period=period,line=line,value_category=category,pairs=len(pairs),
+            over=metrics([o for o,u in pairs]),under=metrics([u for o,u in pairs]),
+            selected_over=metrics([o for o,u in pairs if o['selected'] and not u['selected']]),
+            alternative_under_when_over_selected=metrics([u for o,u in pairs if o['selected'] and not u['selected']]),
+            operator_aligned_pairs=sum(o['bookmaker'] is not None and str(o['bookmaker'])==str(u['bookmaker']) for o,u in pairs),
+            interpretation='Complementary events at one frozen snapshot. Different operators may supply the executable quotes; this does not isolate the effect of margin.'))
+    return dict(cells=reports,event_complements=summaries,excluded=dict(excluded),tolerance_seconds=60)
 
 
 def passes(row,profile):
@@ -213,12 +228,22 @@ def passes(row,profile):
     m=row['price_identity'] and number(row['margin']) and 0<=row['margin']<=6.5
     prudent=(row['price_identity'] and number(row['margin']) and 0<=row['margin']<=8 and
              row['ev']>0 and number(row['ev_low']) and row['ev_low']>=.02)
+    m8=row['price_identity'] and number(row['margin']) and 0<=row['margin']<=8
+    role_p=(.32 if spec['kind']=='btts' and spec['period'] in ('ft','sh') or
+            spec['kind']=='total' and spec['period']=='ht' and spec.get('line')==1.5 and spec['side']=='over' else
+            .16 if (spec['kind']=='btts' and spec['period']=='ht') or
+                       (spec['kind']=='total' and spec.get('line')==2.5 and spec['period'] in ('ht','sh')) else
+            info['p_threshold'])
     if profile=='prudente_senza_picco' and spec['period']=='sh':return None
     return {'base_lambda_registrata':True,'lambda':lam,'probabilita':p,'ev_nonnegativo':ev,
         'aggio_entro_6_5':m,'lambda_e_probabilita':lam and p,'probabilita_ev_aggio':p and ev and m,
         'lambda_probabilita_ev':lam and p and ev,'quattro_fattori':lam and p and ev and m,
         'quattro_fattori_prudente':lam and p and prudent,
-        'prudente_senza_picco':lam and p and prudent and row['without_peak'] is True}[profile]
+        'prudente_senza_picco':lam and p and prudent and row['without_peak'] is True,
+        'lambda_ev':lam and ev,'lambda_ev_aggio8':lam and ev and m8,
+        'lambda_probabilita_ruolo_ev_aggio8':lam and row['probability']>=role_p and ev and m8,
+        'quattro_fattori_quota150':lam and p and ev and m and row['odd']>=1.5,
+        'prudente_quota150':lam and p and prudent and row['odd']>=1.5}[profile]
 
 
 def wilson(w,n):
@@ -241,8 +266,13 @@ def metrics(rows,bootstrap=False):
         strict_fixed_n=sum(r['strict_fixed'] for r in settled),strict_fixed_wins=sum(r['outcome'] for r in settled if r['strict_fixed']),
         roi_control=mean('roi'))
     result['excess_hit_vs_p']=result['hit']-result['mean_p'] if n else None
+    selected=[r for r in settled if r['selected']]
+    for name in ('probability','odd','ev','intensity'):
+        values=[r[name] for r in selected if number(r.get(name))]
+        result['selected_mean_'+name]=sum(values)/len(values) if values else None
     if bootstrap:
         result['paired_vs_fair']=paired_metrics(settled,draws=4000)
+        result['selected_paired_vs_fair']=paired_metrics(selected,draws=4000)
     return result
 
 
@@ -280,7 +310,8 @@ def analyze(rows,cutoff):
                         test=metrics([r for r in future if passes(r,profile)])))
         edges={'intensity':[-1e9,info['lambda_threshold']-.25,info['lambda_threshold'],info['lambda_threshold']+.25,1e9],
                'probability':[0,max(0,info['p_threshold']-.05),info['p_threshold'],min(1,info['p_threshold']+.1),1.00000001],
-               'ev':[-1e9,-.15,0,.1,1e9],'margin':[-1e9,0,4,6.5,8,1e9]}
+               'ev':[-1e9,-.15,0,.1,1e9],'margin':[-1e9,0,4,6.5,8,1e9],
+               'odd':[1,1.5,1.7,2.1,2.6,3.5,4.5,5.5,7.5,1e9]}
         for feature,bounds in edges.items():
             buckets=defaultdict(list)
             for row in all_rows:buckets[band(row.get(feature),bounds)].append(row)
