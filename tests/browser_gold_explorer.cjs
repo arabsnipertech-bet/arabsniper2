@@ -13,6 +13,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  // A quarter-line handicap must stay out of proposals even with the highest EV.
  for(const [fixture_id,label,kind,period,side,line,ev] of [
   ['9001','Over 1,5 PT','total','ht','over',1.5,.04],
+  ['9004','Vittoria casa · AH -0,5 FT','handicap','ft','home',-.5,1.4],
   ['9002','Casa AH -0.25 FT','handicap','ft','home',-.25,1.2],
   ['9003','No Goal ST','btts','sh','no',undefined,1.1]
  ])rows.push({...rows[1],id:createHash('sha256').update(fixture_id).digest('hex'),fixture_id,episode:fixture_id+'::k',
@@ -62,6 +63,11 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  assert(!(await page.locator('#results').innerText()).includes('AH -0.25'));
  assert(!(await page.locator('#results').innerText()).includes('No Goal ST'));
  await page.click('[data-market-view=all]');assert(!(await page.locator('#results').innerText()).includes('Casa AH -0.25 FT'),'A handicap is never a standalone proposal');
+ const equivalent=page.locator('#results .selection').filter({hasText:'QA Casa 9004'});
+ assert.equal(await equivalent.locator('.market').innerText(),'1 FT');
+ await equivalent.locator('[data-detail]').click();
+ assert((await page.locator('#detailBody').innerText()).includes('Quota disponibile su Vittoria casa · AH -0,5 FT'));
+ await page.click('#closeDetail');
  await page.click('[data-market-view=over15]');assert.equal(await page.locator('#results .selection').count(),1);
  assert.equal(await page.locator('[data-market-view=over15]').getAttribute('aria-pressed'),'true');
  await page.locator('#filters summary').click();
@@ -81,7 +87,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  const quotes=page.locator('#detailBody');assert((await quotes.locator('[data-movement=down]').innerText()).includes('↓ -10,0%'));assert((await quotes.locator('[data-movement=up]').innerText()).includes('↑ +10,0%'));assert((await quotes.locator('[data-movement=flat]').innerText()).includes('→ 0,0%'));await page.click('#closeDetail');
  assert.equal(calls.length,initial,'Reading the shared number explanation adds no requests');
  for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);assert.equal(await page.locator('#results [data-coherence]').count(),0,'Opposites excluded from '+mode);}
- await page.selectOption('#mode','markets');assert.equal(await page.locator('#marketIndex a').count(),6);
+ await page.selectOption('#mode','markets');assert.equal(await page.locator('#marketIndex a').count(),7);
  await page.locator('#marketIndex a').filter({hasText:'Under 3,5 FT'}).click();assert((await page.evaluate(()=>document.activeElement.textContent)).startsWith('Under 3,5 FT'));
  await page.selectOption('#mode','recommended');assert.equal(await page.locator('#results .selection').count(),10);
  const observation=page.locator('#results .selection').filter({has:page.locator('[data-qualification=study]')});
