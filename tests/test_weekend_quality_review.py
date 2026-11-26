@@ -1,8 +1,10 @@
 """Research validity checks; no provider or storage access."""
 from copy import deepcopy
+from datetime import datetime, timezone
 import importlib.util
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('weekend_quality_review', Path(__file__).parents[1]/'scripts/weekend-quality-review.py')
 review = importlib.util.module_from_spec(spec)
@@ -10,6 +12,23 @@ spec.loader.exec_module(review)
 
 
 class WeekendEvidence(unittest.TestCase):
+    def test_later_cutoff_is_explicit_bounded_and_retains_original_default(self):
+        now=datetime(2026,11,26,11,tzinfo=timezone.utc)
+        self.assertEqual(review.CUTOFF,datetime(2026,11,26,7,tzinfo=timezone.utc))
+        self.assertEqual(review.checked_cutoff('2026-11-26T10:00:00Z',now).hour,10)
+        for value in ('invalid','2026-11-27T00:00:00Z','2026-11-25T12:00:00Z'):
+            with self.subTest(value=value),self.assertRaises(ValueError):
+                review.checked_cutoff(value,now)
+
+    def test_newly_reconciled_result_uses_explicit_review_cutoff_without_filling_forecast(self):
+        f=dict(self.fixture(),observed_at='2026-11-26T09:00:00Z')
+        original=deepcopy(f)
+        self.assertFalse(review.in_time(f))
+        with patch.object(review,'CUTOFF',datetime(2026,11,26,10,tzinfo=timezone.utc)):
+            self.assertTrue(review.in_time(f))
+            self.assertFalse(review.in_time(f,datetime(2026,11,26,7,tzinfo=timezone.utc)))
+        self.assertEqual(original,f)
+
     def fixture(self):
         return dict(captured_at='2026-11-25T18:00:00Z', kickoff='2026-11-25T19:00:00Z',
                     observed_at='2026-11-25T21:00:00Z', outcomes={review.OVER:dict(win=1,loss=0)})

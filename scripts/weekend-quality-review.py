@@ -16,6 +16,7 @@ from lateral_matrix import label, market_id, specification
 from multimarket_model import stamp
 from v7_probability import MEASUREMENT_PROTOCOL, finite
 from v7_shadow_metrics import paired_metrics, research_report
+from v7_archive import ROME
 
 START, END = date(2026, 11, 19), date(2026, 11, 25)
 CUTOFF = datetime(2026, 11, 26, 7, tzinfo=timezone.utc)
@@ -47,7 +48,16 @@ class ReadOnly:
         return result
 
 
-def in_time(fixture, cutoff=CUTOFF):
+def checked_cutoff(value, now):
+    """Keep the original review reproducible; a later review is explicit."""
+    cutoff=stamp(value)
+    if not cutoff or cutoff > now or cutoff.astimezone(ROME).date() <= END:
+        raise ValueError('Review cutoff must be a past instant after the closed dates')
+    return cutoff
+
+
+def in_time(fixture, cutoff=None):
+    cutoff=CUTOFF if cutoff is None else cutoff
     captured, kickoff, observed = (stamp(fixture.get(k)) for k in ('captured_at', 'kickoff', 'observed_at'))
     return bool(captured and kickoff and observed and captured < kickoff < observed <= cutoff)
 
@@ -231,7 +241,14 @@ def review(archives, draws=4000):
 
 
 def main():
+    import argparse
     import ijson
+    global CUTOFF
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--cutoff',default=CUTOFF.isoformat(),
+                        help='Explicit as-of instant; the original 08:00 Rome review remains the default')
+    args=parser.parse_args()
+    CUTOFF=checked_cutoff(args.cutoff,datetime.now(timezone.utc))
     storage, bucket = ReadOnly(client(fast_restore=True)), os.environ['R2_BUCKET']
     index = previous_manifest(storage, bucket)
     days = [(START+timedelta(days=i)).isoformat() for i in range((END-START).days+1)]
