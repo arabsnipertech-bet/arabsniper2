@@ -13,6 +13,7 @@ sys.path[:0]=[str(ROOT/'src'),str(ROOT/'auditor')]
 from audit_daily_evidence import evidence_paths, receipt_path, verified_evidence
 from audit_official_scores import cached_feed
 from audit_storage import read_store
+from auditor_light import remote_receipt
 from gold_storage import checkpoint_results, client, previous_manifest, restore_subset
 from v7_archive import ROME
 
@@ -36,6 +37,32 @@ def same_forecasts(before,after):
     return before.keys()<=after.keys() and all(
         all(row.get(key)==after[fid].get(key) for key in ('forecast_sha256','captured_at','kickoff'))
         for fid,row in before.items())
+
+
+def cached_progress(prior,archive,cache,now):
+    """Resume only when validated cached scores add information to this day.
+
+    Check both the complete receipt and its compact V7 archive: a missing
+    halftime may remain in either. Observation timestamps alone are no change.
+    Reuse the production conflict, kickoff and 90-minute validation unchanged.
+    """
+    from unittest.mock import patch
+    from audit_official_scores import read_live_scores, use_stored_scores
+    fixtures={fid:row.get('kickoff') for fid,row in prior['fixtures'].items()}
+    saved={fid:row['result'] for fid,row in prior['fixtures'].items() if row.get('result')}
+    with patch('audit_official_scores.cached_feed',return_value=cache):
+        live=read_live_scores(fixtures,now)
+    merged,disputes=use_stored_scores(fixtures,saved,live)
+    fields=('status','home_ft','away_ft','home_ht','away_ht','rescheduled_to','extra_time','penalties')
+    def score(value):return tuple((value or {}).get(key) for key in fields)
+    for fid in live.keys()-disputes:
+        result=merged[fid]
+        if score(result)!=score(saved.get(fid)):
+            return True
+        old=(archive.get('fixtures') or {}).get(fid)
+        if old is not None and score(result)!=score(old.get('result')):
+            return True
+    return False
 
 
 def save_report(report):
@@ -62,8 +89,13 @@ class ResultStorage:
 
 
 def main():
+    import argparse
     from unittest.mock import patch
     from current_audit import settle_day
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--day',required=True,choices=DAYS)
+    args=parser.parse_args()
+    days=(args.day,)
     now=datetime.now(timezone.utc)
     if (os.environ.get('GITHUB_REPOSITORY')!='arabsnipertech-bet/arabsniper2'
             or os.environ.get('GITHUB_REF')!='refs/heads/main'
@@ -78,27 +110,33 @@ def main():
         raise ValueError('No verified cached feed')
     bucket=os.environ['R2_BUCKET'];storage=ResultStorage(client(fast_restore=True),bucket)
     index=previous_manifest(storage,bucket);storage.baseline=index
-    required=set().union(*(evidence_paths(day)|{receipt_path(day)} for day in DAYS))
+    required=set().union(*(evidence_paths(day)|{receipt_path(day)} for day in days))
     if not required<=index.keys():raise ValueError('Missing date-specific evidence')
     report=dict(as_of=now.isoformat(),status='running',provider_calls=0,model_fits=0,social_sends=0,
                 forecast_files_changed=0,weight_files_changed=0,gold_feed_writes=0,days={})
     with tempfile.TemporaryDirectory(prefix='v7-cached-reconcile-') as folder:
         root=Path(folder)
         originals={f'auditordata/prematch_{day}.json':index[f'auditordata/prematch_{day}.json']['sha256']
-                   for day in DAYS}
-        for day in DAYS:
-            restore_subset(storage,bucket,root,index,evidence_paths(day)|{receipt_path(day)},fast_restore=True)
-            prior=verified_evidence(root,day)
-            if prior is None:raise ValueError('Unverified frozen day')
+                   for day in days}
+        for day in days:
+            # Small, checksum-verified pointers decide whether another full
+            # reconstruction is useful, before restoring gigabytes of ledgers.
+            restore_subset(storage,bucket,root,index,
+                {receipt_path(day),f'auditarchive/prematch_{day}_v7.json'},fast_restore=True)
+            from audit_daily_evidence import read_receipt
+            prior=read_receipt(root,day)
+            if not remote_receipt(index,prior,day):raise ValueError('Unverified remote day')
             old=read_store(root/f'auditarchive/prematch_{day}_v7.json',{})
             before=dict(old.get('counts') or {})
-            if prior.get('pending_fixtures')==0:
-                report['days'][day]=dict(before=before,after=before,unresolved=0,
+            if not cached_progress(prior,old,cache,now):
+                report['days'][day]=dict(before=before,after=before,unresolved=prior['pending_fixtures'],
                     frozen_forecast_sha256=originals[f'auditordata/prematch_{day}.json'],
-                    original_snapshot_sha_preserved=True,skipped='already_complete')
+                    original_snapshot_sha_preserved=True,skipped='no_cached_progress')
                 save_report(report)
                 print(json.dumps({'reconciled_day':day,**report['days'][day]}),flush=True)
                 continue
+            restore_subset(storage,bucket,root,index,evidence_paths(day)|{receipt_path(day)},fast_restore=True)
+            if verified_evidence(root,day) is None:raise ValueError('Unverified frozen day')
             with patch('audit_official_scores.cached_feed',return_value=cache):
                 queried=settle_day(root,date.fromisoformat(day),now,legacy_evidence=False,
                     max_result_ids=20,progress=lambda message:print(message,flush=True))
