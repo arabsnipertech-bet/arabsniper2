@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'scripts/factor-combinations-review.py'
+      - 'scripts/history-diagnosis.py'
       - '.github/workflows/factor-combinations-review.yml'
 permissions:
   contents: read
@@ -24,10 +25,10 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           PYTHONUNBUFFERED: '1'
-        run: python scripts/factor-combinations-review.py
+        run: python scripts/history-diagnosis.py --inventory
       - uses: actions/upload-artifact@v4
         with:
-          name: factor-combinations-review
-          path: test-artifacts/factor-combinations-review.json
+          name: history-diagnosis
+          path: test-artifacts/history-*.json
           retention-days: 30
           if-no-files-found: error
