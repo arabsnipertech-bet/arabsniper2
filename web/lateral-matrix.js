@@ -991,23 +991,6 @@
  function matchBadge(tier){
   return levelBadge(tier.category,tier.badge)||'<span class="mx-category'+(tier.tone==='platinum'?' mx-tier-label':'')+'">'+esc(tier.name)+'</span>';
  }
- function triadMotivation({record,source,signal,expired}){
-  const flow=displayOci(source);
-  const marketFair=Number.isFinite(record.fair)?100*record.fair:operatorFair(source);
-  const first=record.quote?.first_odd??source.first_odd;
-  const summary=signal.motivation&&!expired?signal.motivation:[
-   'Probabilità V7 '+v7Estimate(record.calibrated),
-   'Fair bookmaker '+pct(marketFair),
-   Number.isFinite(first)?'Prima osservata '+num(first,2):'Prima osservata non disponibile',
-   expired?'Quota da aggiornare · ultima osservata '+num(source.odd,2):
-    Number.isFinite(record.odd)?quoteStateLabel(signal,source)+' '+num(record.odd,2):'Quota bookmaker in attesa',
-   signal.niche_label,
-   'Aggio '+pct(record.features?.margin_pct??source.selected_margin_pct),
-   'OCI '+signed(record.features?.oci??flow.value),
-  ].filter(Boolean).join(' · ');
-  const single=source.paired_books===1&&Number.isFinite(flow.value)&&!Number.isFinite(source.oci)&&!expired;
-  return '<small>'+esc(summary+(single&&signal.motivation?' · OCI indicativo '+signed(flow.value):''))+'</small>';
- }
  const FINISHED_SCORE=new Set(['FT','AET','PEN']);
  const VOID_SCORE=new Set(['CANC','ABD','AWD','WO']);
  const COMPLETED_HALF=new Set(['HT','2H','ET','BT','P',...FINISHED_SCORE]);
@@ -1101,6 +1084,9 @@
   if(typeof selection?.market_id!=='string')return null;
   try{return JSON.parse(selection?.market_id);}catch{return null;}
  }
+ function proposalLabel(label,spec){
+  return qualifications?.proposalLabel(label,spec)??label;
+ }
  function triadHistoryPanel(match,role){
   const versions=match?._gold_triad_history?.[role];
   if(!Array.isArray(versions)||!versions.length)return '';
@@ -1111,7 +1097,7 @@
    const price=Number.isFinite(version.odd)&&version.odd>1?'Quota '+num(version.odd,2):
     Number.isFinite(version.model_fair_odd)&&version.model_fair_odd>1?
      'Quota equa V7 '+num(version.model_fair_odd,2):'Quota non disponibile';
-   return '<li class="mx-triad-version">'+time+'<strong>'+esc(version.label)+'</strong>'+
+   return '<li class="mx-triad-version">'+time+'<strong>'+esc(proposalLabel(version.label,spec))+'</strong>'+
     '<small>'+(version.study_only?'Studio · ':'')+price+'</small>'+triadOutcomeSlot(match,spec,true)+'</li>';
   }).join('');
   return items?'<details class="mx-triad-history" data-mx-triad-history="'+role+'"><summary>'+
@@ -1148,15 +1134,15 @@
     const heading=title;
     return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+heading+'</span>'+(badge||'')+
      triadOutcomeSlot(match,p?.source.spec||triadMarketSpec(commitment))+'</div>'+
-     (p?'<div class="mx-triad-market"><b>'+esc(p.record.label)+'</b>'+(estimate?'':'<strong>'+num(p.record.odd,2)+'</strong>')+'</div>'+
+     (p?'<div class="mx-triad-market"><b>'+esc(proposalLabel(p.record.label,p.source.spec))+'</b>'+(estimate?'':'<strong>'+num(p.record.odd,2)+'</strong>')+'</div>'+
       (estimate?'<small>Quota in attesa'+(Number.isFinite(p.record.model_fair_odd)?' · equa '+num(p.record.model_fair_odd,2):'')+'</small>':'')+
       '<div class="mx-triad-meta"><span>'+esc(s.horizon_label)+'</span></div>'+
       (qualifications?.render(p.record,{statistics:view.v7?.statistics,spec:p.source.spec,
        evidence:view.v7?.measurement?.markets?.[s.market_id],evidence_protocol:view.v7?.measurement?.protocol})||
        '<small>P V7 '+v7Estimate(p.record.calibrated)+(Number.isFinite(s.ev)?' · EV '+signed(100*s.ev)+'%':'')+'</small>')+
       (compact?'':originBadge(marketOrigin(p.source,{rates:view.v7?.rates,record:p.record,signal:s,expired:p.expired,
-       conversion:view.v7?.signals?.observations?.conversion===true}))+triadMotivation(p)):
-      (commitment?'<div class="mx-triad-market"><b>'+esc(commitment.label)+'</b></div>':'')+
+       conversion:view.v7?.signals?.observations?.conversion===true}))+(p.record.price_upgrade_source?'<small>Quota disponibile sul mercato equivalente '+esc(p.record.label)+'</small>':'')):
+      (commitment?'<div class="mx-triad-market"><b>'+esc(proposalLabel(commitment.label,triadMarketSpec(commitment)))+'</b></div>':'')+
       '<small>'+(saved?.[role]||commitment?'Quota da aggiornare':'Nessun mercato idoneo')+'</small>')+
       fixed+previous+'</li>';
    }).join('')+'</ul>'+explorerMatchLink(match,view.v7);
@@ -1176,7 +1162,7 @@
  }
  function publishedPanel(m,view,services,detailsOpen){
   const {v7,primary,recommended,longshot}=view;
-  const item=(pick,title,reason,role)=>pick?'<li data-v7-role="'+role+'"><span>'+title+'</span><b>'+esc(pick.record.label)+'</b>'+
+  const item=(pick,title,reason,role)=>pick?'<li data-v7-role="'+role+'"><span>'+title+'</span><b>'+esc(proposalLabel(pick.record.label,pick.source.spec))+'</b>'+
    '<strong>'+num(pick.record.odd,2)+' <small>quota</small></strong><small>'+v7Estimate(pick.record.calibrated)+' · '+reason+'</small></li>':'';
   const rows=item(primary,V7_HEADLINE,primary?.reasons.includes('platinum_flusso')?'Platinum su criterio di flusso':
    view.tier==='gold'?'Supera i criteri Gold':view.tier==='platinum'?'Supera i criteri Platinum':'Stima V7 · '+V7_TIERS[view.tier], 'primary')+
@@ -1314,7 +1300,7 @@
   if(active){
    const pick=active.primary;
    if(!pick)return null;
-   return {title:active.triad?TRIAD.most_probable:V7_HEADLINE,label:pick.record.label,odd:pick.record.odd,first:pick.record.quote?.first_odd,
+   return {title:active.triad?TRIAD.most_probable:V7_HEADLINE,label:proposalLabel(pick.record.label,pick.source.spec),odd:pick.record.odd,first:pick.record.quote?.first_odd,
     note:quoteStateLabel(pick.signal,pick.source),
     probability:100*pick.record.calibrated,v7:true};
   }

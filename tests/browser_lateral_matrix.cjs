@@ -426,7 +426,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    const headline=modal.locator('[data-v7-slot="most_probable"]');
    assert((await headline.innerText()).includes('GG FT'));
    assert((await headline.innerText()).includes('58,0%'));
-   assert((await headline.innerText()).includes('Fair bookmaker'));
+   assert(!(await headline.innerText()).includes('Fair bookmaker'),'Technical prices stay in the expandable detail');
    assert.deepEqual(await modal.locator('[data-v7-slot]').count(),3);
    assert.equal(await modal.locator('[data-v7-slot] .mx-origin-badge').count(),3);
    if(width===1280){
@@ -442,6 +442,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert(await modal.evaluate(el=>el.scrollWidth<=el.clientWidth),'V7 sheet fits '+width);
    await modal.locator('[data-v7-details] summary').click();
    assert(await modal.getByText('Poisson originale').isVisible());
+   assert(await modal.getByText('Fair mercato',{exact:false}).first().isVisible());
    await modal.locator('[data-v7-advanced] > summary').click();
    await modal.locator('[data-mx-section="ht"]').click();
    assert(await modal.locator('.mx-cockpit').isVisible());

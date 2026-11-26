@@ -72,15 +72,31 @@
   const label=['study','observation','contrarian_study'].includes(type)?'Osservazione':labels[type];
   return {type,label,facts,summary:facts.join(' · '),reasons:attention,detail};
  }
+ // Keep the execution contract in the snapshot. Only a regulation-time
+ // selected-team -0.5 handicap has exactly the same outcome as a win.
+ function proposalLabel(label,spec){
+  if(spec?.kind!=='handicap')return label;
+  if(spec.period!=='ft'||spec.line!==-0.5)return null;
+  return ({home:'1 FT',away:'2 FT'})[spec.side]||null;
+ }
+ function choiceReason(value,type){
+  const p=value.probability??value.calibrated,odd=value.odd;
+  if(type==='documented_value'&&finite(p)&&finite(odd)&&odd>1&&p*odd>1)
+   return 'Probabilità stimata del '+probability(p)+', sopra il '+probability(1/odd)+' richiesto dalla quota.';
+  if(type==='statistical_recovery')return 'Lo storico delle squadre sostiene questa scelta anche al prezzo attuale.';
+  if(type==='contrarian_study')return 'Le statistiche suggeriscono un gol per squadra nel primo tempo. Scelta in osservazione.';
+  if(type==='study'||type==='observation')return 'Esito in osservazione'+(finite(p)?' con una probabilità stimata del '+probability(p):'')+'.';
+  return '';
+ }
  function render(value,context){
   const q=describe(value,context);if(!q)return '';
   return (q.facts.length?'<div class="v7-qualification" data-qualification="'+esc(q.type)+'" aria-label="'+esc(q.label)+'">'+
    '<strong class="v7-qualification-label">Perché questa scelta</strong><span class="v7-qualification-text">'+
-   q.facts.map(v=>'<span>'+esc(v)+'</span>').join('')+'</span></div>':'')+
+   esc(choiceReason(value,q.type))+' '+q.facts.map(v=>'<span>'+esc(v)+'</span>').join('')+'</span></div>':'')+
    '';
  }
- function help(){return '<details class="v7-numbers-help"><summary>Come leggere λ, probabilità ed EV</summary><p><b>λ</b>: gol attesi nel periodo indicato. <b>P V7</b>: probabilità stimata della scelta.</p><p><b>EV</b>: rapporto tra probabilità e quota. Per esempio, P 50% a quota 2,10 dà EV +5%; a quota 1,90 dà EV −5%. <b>Aggio</b>: margine del bookmaker incluso nella quota.</p></details>';}
- const api=Object.freeze({describe,render,help});
+ function help(){return '<details class="v7-numbers-help"><summary>Che cos’è l’EV?</summary><p>L’EV è il rendimento medio stimato alla quota indicata. Con una probabilità del 50% e una quota di 2,10, il modello stima un EV +5%: in media 5 centesimi per euro su molte giocate simili. Una singola giocata può perdere.</p></details>';}
+ const api=Object.freeze({describe,render,help,proposalLabel});
  if(typeof module==='object'&&module.exports)module.exports=api;
  root.ArabV7Qualification=api;
 })(typeof globalThis==='object'?globalThis:this);
