@@ -1148,6 +1148,7 @@
     return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+heading+'</span>'+(badge||'')+
      triadOutcomeSlot(match,p?.source.spec||triadMarketSpec(commitment))+'</div>'+
      (p?'<div class="mx-triad-market"><b>'+esc(p.record.label)+'</b>'+(estimate?'':'<strong>'+num(p.record.odd,2)+'</strong>')+'</div>'+
+      (estimate?'<small>Quota in attesa'+(Number.isFinite(p.record.model_fair_odd)?' · equa '+num(p.record.model_fair_odd,2):'')+'</small>':'')+
       '<div class="mx-triad-meta"><span>'+esc(s.horizon_label)+'</span></div>'+
       (qualifications?.render(p.record,{statistics:view.v7?.statistics,spec:p.source.spec,
        evidence:view.v7?.measurement?.markets?.[s.market_id],evidence_protocol:view.v7?.measurement?.protocol})||

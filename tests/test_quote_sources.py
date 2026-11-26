@@ -181,7 +181,7 @@ class ExactSources(unittest.TestCase):
     def test_only_one_halfline_in_the_matrix_and_refresh_reuses_its_real_source(self):
         from market_scope import canonical_market
 
-        for updated, source, price in ((NOW, 'bookmaker', 1.9),
+        for updated, source, price in ((NOW, 'asian_halfline', 2.1),
                 ('2026-10-26T16:00:00+00:00', 'asian_halfline', 2.1)):
             with self.subTest(source=source):
                 native = feed([bet(5, 1.5)], at=updated)

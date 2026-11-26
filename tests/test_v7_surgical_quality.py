@@ -52,6 +52,9 @@ class Surgery(unittest.TestCase):
         t['quote_executable']=False
         mark_opposite_conflicts({a:r,b:o},{a:s,b:t},AT,START)
         self.assertFalse(r['opposite_conflict_flag']);self.assertIsNone(r['opposite_ev'])
+        t['quote_executable']=True;o['calibrated']=.7
+        mark_opposite_conflicts({a:r,b:o},{a:s,b:t},AT,START)
+        self.assertFalse(r['opposite_conflict_flag'],'Non-complementary P cannot be used as opposite evidence')
 
     def test_same_operator_positive_opposite_precedes_a_cross_operator_price(self):
         a,r,s=record(specification('total','ht','over',1.5),.4,2.4)
@@ -114,6 +117,30 @@ class Surgery(unittest.TestCase):
             alt,s,b=record(specification('handicap','ft','home',-.5),.55,1.95)
             b.update(change)
             self.assertEqual(upgrade_equivalent_prices({key:r,alt:s},{key:a,alt:b},AT,START),[])
+
+    def test_away_equivalent_keeps_the_existing_high_odds_role_gate(self):
+        key,r,a=record(specification('result','ft','2'),.25,4.8)
+        alt,s,b=record(specification('handicap','ft','away',-.5),.25,5.)
+        records={key:r,alt:s};upgrade_equivalent_prices(records,{key:a,alt:b},AT,START)
+        triad,_=route(records,dict(conversion=False,rebound_gg=False))
+        self.assertIsNone(triad['high_odds_shot'])
+        s['features']['net_delta_pct']=3.
+        triad,_=route(records,dict(conversion=False,rebound_gg=False))
+        self.assertEqual(triad['high_odds_shot']['market_id'],alt)
+
+    def test_regular_active_fixture_keeps_three_explained_slots_when_prices_are_low(self):
+        from test_v7 import assessment,META,AT as CAPTURE,row as source_row
+        from v7_decision import capture
+        value=assessment()
+        for source in value['matrix']['rows']:source['odd']=1.4
+        # A normal matrix also retains unquoted base markets. They remain
+        # explicitly model-only observations rather than invented prices.
+        value['matrix']['rows'].append(source_row(specification('result','ft','2'),odd=None))
+        snapshot=capture(value,META,CAPTURE)
+        self.assertEqual(sum(p is not None for p in snapshot['triad'].values()),3)
+        for pick in snapshot['triad'].values():self.assertTrue(pick['motivation'])
+        primary=snapshot['triad']['most_probable']
+        self.assertIsNone(primary['odd']);self.assertEqual(primary['quote_state'],'model_estimate')
 
     def test_same_operator_fair_identity_and_margin_boundary(self):
         _,_,source=record(specification('btts','ft','yes'),.55,1.95,margin=0)

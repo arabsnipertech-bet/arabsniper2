@@ -475,7 +475,8 @@ def mark_opposite_conflicts(records, sources, as_of, kickoff):
         for source in sources.values():
             if (not opposite or market_id(canonical(source.get('spec') or {})) != opposite
                     or not price_usable(source, as_of, kickoff) or not price_identity(source)
-                    or not finite(other.get('calibrated'))):continue
+                    or not finite(other.get('calibrated'))
+                    or not isclose(row['calibrated']+other['calibrated'],1.,rel_tol=0,abs_tol=1e-7)):continue
             same = str(source['bookmaker_id']) == str(quote.get('bookmaker_id')) if quote.get('bookmaker_id') is not None else None
             ev = other['calibrated']*source['odd']-1
             matches.append((ev >= 0, same is True, ev, str(source['id']), source, same))
@@ -748,7 +749,7 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
                 continue
             if role == 'recommended_alternative' and chosen and odd <= records[chosen[0]]['odd']:
                 continue
-            if role == 'high_odds_shot' and key == AWAY and not away_shot_admitted(
+            if role == 'high_odds_shot' and row.get('price_upgrade_control_market',key) == AWAY and not away_shot_admitted(
                     row, symmetric_shadow=away_symmetric_shadow):
                 continue
             if key not in chosen and compatible(key, *reserved, *chosen):
@@ -787,7 +788,7 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
             if (role == 'most_probable' and alternative and odd >= alternative['odd']
                     or role == 'recommended_alternative' and primary and odd <= primary['odd']):
                 continue
-            if role == 'high_odds_shot' and key == AWAY and not away_shot_admitted(
+            if role == 'high_odds_shot' and row.get('price_upgrade_control_market',key) == AWAY and not away_shot_admitted(
                     row, symmetric_shadow=away_symmetric_shadow):
                 continue
             candidates.append(key)

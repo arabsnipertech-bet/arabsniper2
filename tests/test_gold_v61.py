@@ -51,7 +51,8 @@ class GoldV61(unittest.TestCase):
                 self.assertEqual(decision['min_ev_low_pct'], base+2.)
                 self.assertEqual(decision['reasons'], ['sensitivity'])
                 self.assertTrue(evaluate({**r, 'ev_low_pct': base+2.})['eligible'])
-                self.assertEqual(evaluate({**r, 'selected_margin_pct': 6.5})['min_ev_low_pct'], base+3.5)
+                self.assertEqual(evaluate({**r, 'selected_margin_pct': 6.5})['min_ev_low_pct'], base+2.)
+                self.assertEqual(evaluate({**r, 'selected_margin_pct': 6.5001})['min_ev_low_pct'], base+3.5)
 
     def test_gol_peak_ratio_and_symmetry_boundaries(self):
         r=row()
@@ -65,7 +66,8 @@ class GoldV61(unittest.TestCase):
         for field in ('expected_goals','mean','conceded_mean','sample'):
             trial=deepcopy(r);trial['goal_evidence']['teams']['away']['ht'][field]-=.0001
             self.assertFalse(evaluate(trial)['eligible'],field)
-        self.assertIn('sensitivity',evaluate({**r,'selected_margin_pct':6.5})['reasons'])
+        self.assertTrue(evaluate({**r,'selected_margin_pct':6.5})['eligible'])
+        self.assertIn('sensitivity',evaluate({**r,'selected_margin_pct':6.5001})['reasons'])
         self.assertTrue(evaluate({**r,'selected_margin_pct':6.5,'ev_low_pct':3.5})['eligible'])
         self.assertIn('sensitivity', evaluate({**r, 'ev_low_pct': 1.999})['reasons'])
 

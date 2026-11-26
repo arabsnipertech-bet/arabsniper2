@@ -107,10 +107,11 @@ class PlatinumPolicy(unittest.TestCase):
                 base = {**deepcopy(BASE), 'spec': {**BASE['spec'], 'line': line}, 'odd': 2.5,
                         'first_odd': 2.5/.95, 'delta_pct': -5., 'statistical_pct': 55.,
                         'selected_market_fair_pct': 40., 'oci': 49.999,
-                        'selected_margin_pct': 6.5, 'ev_low_pct': 5.5}
+                        'selected_margin_pct': 6.5001, 'ev_low_pct': 5.5}
                 base['selected_movement']['delta_pct'] = -5.
                 self.assertTrue(gold(base)['eligible'])
                 self.assertTrue(evaluate(base, NOW)['eligible'])
+                self.assertEqual(gold({**base,'selected_margin_pct':6.5})['min_ev_low_pct'],4.)
                 short = {**base, 'ev_low_pct': 5.4999}
                 self.assertEqual(gold(short)['min_ev_low_pct'], 5.5)
                 self.assertEqual(evaluate(short, NOW)['min_ev_low_pct'], 5.5)

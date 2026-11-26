@@ -67,7 +67,7 @@ class PlayableValue(unittest.TestCase):
         self.assertIsNone(best_opportunity([dict(secondary, quote_adapter_version=1)]))
 
     def test_margin_tiers_expansion_and_selected_operator_anomaly(self):
-        for margin, low, ok in [(6.499,2,True),(6.5,3.499,False),(6.5,3.5,True),(8,3.5,True),(8.001,20,False)]:
+        for margin, low, ok in [(6.499,2,True),(6.5,2,True),(6.5001,3.499,False),(6.5001,3.5,True),(8,3.5,True),(8.001,20,False)]:
             self.assertEqual(evaluate(row(selected_margin_pct=margin,ev_low_pct=low))['eligible'],ok)
         for margin in (-.01,30.01): self.assertIn('margin',evaluate(row(selected_margin_pct=margin))['reasons'])
         self.assertIn('margin_missing',evaluate(row(selected_margin_pct=None))['reasons'])

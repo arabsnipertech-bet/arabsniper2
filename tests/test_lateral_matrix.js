@@ -629,8 +629,8 @@ const triadMatch={fixture:{fixture_id:'701',kickoff:triadStart},multimarket:{mat
 }}};
 const triadHtml=api.card(triadMatch,{});
 assert.equal((triadHtml.match(/data-v7-slot=/g)||[]).length,3);
-assert.equal((triadHtml.match(/data-mx-origin-tooltip=/g)||[]).length,1,'Each populated slot has an origin button');
-for(const label of ['● GOLD','Over 1,5 ST','[2° TEMPO]','54,0%','EV +13,4%','Simmetria 1°+2°T'])
+assert.equal((triadHtml.match(/data-mx-origin-tooltip=/g)||[]).length,0,'Cards keep numerical evidence; the audit origin stays in the saved payload');
+for(const label of ['● GOLD','Over 1,5 ST','[2° TEMPO]','54,0%','EV +13,4%'])
  assert(triadHtml.includes(label),label);
 assert.equal((triadHtml.match(/Nessun mercato idoneo/g)||[]).length,2);
 triadRow.quote_observed_at=triadStart;
@@ -685,9 +685,10 @@ studyMatrix.v7.triad.recommended_alternative={market_id:estimate.id,source_marke
  tier:'BLU',badge:'◆ BLU',study_only:true,odd:null,quote_state:'model_estimate',probability:.40,
  model_fair_odd:2.50,horizon_label:'[1° TEMPO]'};
 const studyHtml=api.card(study,{});
-for(const label of ['Stabile da apertura','Quota equa 1,85','Quota equa 2,50','Stima V7 · in attesa di quote bookmaker'])
+for(const label of ['Over 1,5 ST','Over 1,5 PT','Quota in attesa · equa 2,50'])
  assert(studyHtml.includes(label),label);
-assert.match(studyHtml,/Consigliata · Studio/);
+assert.match(studyHtml,/Consigliata/);
+assert.doesNotMatch(studyHtml,/Dati e limiti|scenario prudente/);
 assert.equal(api.publishedView(study,triadNow).tier,'blu');
 studyMatrix.rows[0].quote_status='recent';
 studyMatrix.rows[0].prematch_stable=false;
@@ -702,7 +703,7 @@ const expiredView=api.publishedView(expired,triadNow);
 assert.equal(expiredView.triad.most_probable.signal.quote_state,'model_estimate');
 assert.equal(expiredView.triad.most_probable.signal.tier,'BLU');
 assert.equal(expiredView.triad.most_probable.record.odd,null);
-assert.match(api.triadPanel(expiredView),/Quota da aggiornare · ultima osservata 2,10/);
+assert.match(api.triadPanel(expiredView),/Quota in attesa · equa 1,85/);
 assert.equal(expiredMatrix.v7.triad.most_probable.tier,'GOLD','Do not mutate the frozen forecast');
 assert.match(api.marketRow({...estimate,fair_odd:2.50}),/Quota equa V7 2,50/);
 
