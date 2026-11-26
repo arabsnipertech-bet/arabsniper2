@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   review:
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'review/weekend-quality-20261126'
+    if: github.event.pull_request.head.repo.full_name == github.repository && (github.event.pull_request.head.ref == 'review/weekend-quality-20261126' || github.event.pull_request.head.ref == 'review/weekend-recovered-evidence-20261126')
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -24,7 +24,14 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           PYTHONUNBUFFERED: '1'
-        run: python scripts/weekend-quality-review.py
+        shell: python
+        run: |
+          from datetime import datetime, timezone
+          import os, subprocess, sys
+          args=[sys.executable,'scripts/weekend-quality-review.py']
+          if os.environ.get('GITHUB_HEAD_REF') == 'review/weekend-recovered-evidence-20261126':
+              args.extend(['--cutoff',datetime.now(timezone.utc).isoformat()])
+          subprocess.run(args,check=True)
       - uses: actions/upload-artifact@v4
         with:
           name: weekend-quality-review
