@@ -106,6 +106,8 @@ def original_choices(fid, fixture, day):
         identity = (captured and kickoff and captured < kickoff
             and str(pick.get('fixture_id', fid)) == str(fid)
             and (not pick.get('kickoff') or stamp(pick['kickoff']) == kickoff))
+        if pick.get('captured_at') and not identity:
+            binary = False
         p = pick.get('probability') if identity else None
         odd = pick.get('odd')
         rows.append(dict(fixture_id=fid, date=day, role=role, market=key,
@@ -115,6 +117,35 @@ def original_choices(fid, fixture, day):
             tier=pick.get('tier'), study_only=pick.get('study_only'),
             original_ev=p*odd-1 if binary and finite(p) and finite(odd) and odd > 1 else None))
     return rows
+
+
+def cache_recovery_probe(archives):
+    """Current cached outcomes only; separate from the frozen 07:00 backtest."""
+    from unittest.mock import patch
+    from audit_official_scores import cached_feed, needs_result, read_live_scores
+    from v7_archive import FINISHED, VOID, rescheduled_result, ROME
+    now = datetime.now(timezone.utc)
+    recent = [a for a in archives if 1 <= (now.astimezone(ROME).date()-date.fromisoformat(a['date'])).days <= 4]
+    try:
+        data = cached_feed()
+    except Exception as error:
+        return dict(as_of=now.isoformat(), status='unavailable', error_type=type(error).__name__,
+                    provider_calls=0, remote_writes=0)
+    coverage = {}
+    for archive in recent:
+        pending = {fid:f for fid,f in archive['fixtures'].items() if f.get('status') == 'pending'
+                   or f.get('status') == 'settled' and needs_result(f.get('result') or {})}
+        with patch('audit_official_scores.cached_feed',return_value=data):
+            scores = read_live_scores({fid:f['kickoff'] for fid,f in pending.items()},now)
+        finals = {fid:s for fid,s in scores.items() if s.get('status') in FINISHED
+                  and None not in (s.get('home_ft'),s.get('away_ft'))}
+        coverage[archive['date']] = dict(pending_or_missing_ht=len(pending),
+            cached_confirmed_finals=len(finals),
+            cached_complete_ht_ft=sum(not needs_result(s) for s in finals.values()),
+            cached_void_or_rescheduled=sum(s.get('status') in VOID or rescheduled_result(s) for s in scores.values()),
+            still_without_cached_final=len(set(pending)-set(finals)))
+    return dict(as_of=now.isoformat(),status='read',days=coverage,
+                provider_calls=0,remote_writes=0,historical_probabilities_reconstructed=False)
 
 
 def review(archives, draws=4000):
@@ -220,6 +251,7 @@ def main():
             archives.append(dict(date=day, fixtures=fixtures, samples=samples))
             print(json.dumps({'loaded_day': day, 'fixtures': len(fixtures), 'samples': len(samples)}), flush=True)
         report = review(archives)
+        report['cached_results_probe'] = cache_recovery_probe(archives)
         learning = read_store(root/extras[-1], {})
         report['learning'] = {k: learning.get(k) for k in ('version', 'date', 'window_days', 'half_life_days',
             'state', 'checked_days', 'anomalies', 'verified_fixtures', 'comparison', 'update', 'manual_review')}

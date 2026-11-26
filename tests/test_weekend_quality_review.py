@@ -40,6 +40,15 @@ class WeekendEvidence(unittest.TestCase):
         self.assertEqual([review.recorded_state(v) for v in (None,0,False,True)],
                          ['missing','neutral','failed','passed'])
 
+    def test_postmatch_choice_cannot_contribute_a_win_or_original_probability(self):
+        f=self.fixture()
+        f['triad']={'recommended_alternative':dict(market_id=review.OVER,odd=2.5,
+                    probability=.9,captured_at='2026-11-25T20:00:00Z')}
+        row=review.original_choices('7',f,'2026-11-25')[0]
+        self.assertIsNone(row['outcome'])
+        self.assertIsNone(row['probability'])
+        self.assertIsNone(row['roi'])
+
     def test_missing_probability_does_not_become_zero_in_calibration(self):
         data=[dict(fixture_id='1',outcome=1,probability=None,roi=1),
               dict(fixture_id='2',outcome=0,probability=0.,roi=-1)]
