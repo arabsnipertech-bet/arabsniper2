@@ -48,7 +48,14 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[v7-cached-results-reconcile]')
     needs: tests
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    # Independently checkpoint each closed day. A slow complete legacy report
+    # cannot discard another day's recovery or repeat it on retry.
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        day: ['2026-11-25', '2026-11-24', '2026-11-23', '2026-11-22']
     permissions:
       contents: read
     concurrency:
@@ -69,11 +76,11 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           GOLD_PRIVATE: 'true'
           PYTHONUNBUFFERED: '1'
-        run: python scripts/reconcile-cached-v7-results.py
+        run: python scripts/reconcile-cached-v7-results.py --day '${{ matrix.day }}'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: cached-v7-reconciliation
+          name: cached-v7-reconciliation-${{ matrix.day }}
           path: test-artifacts/cached-v7-reconciliation.json
           retention-days: 30
           if-no-files-found: error

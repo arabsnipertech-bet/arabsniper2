@@ -130,3 +130,22 @@ nuove regole di selezione sulla base di campioni ancora incompleti.
 - Test dedicati verificano cache primaria/fallback, assenza di risultati
   inventati, PT zero contro PT mancante, timestamp futuri, priorità recente,
   integrità dei forecast e divieto di modificare pesi o feed.
+
+## Riconciliazione: verifica e ripresa
+
+Il primo blocco del run `45777948544` ha pubblicato il 25 novembre alle 09:04
+italiane: 54 finali contro i 20 iniziali, quattro rinvii e sette gare ancora
+in attesa. Sono 34 nuovi finali verificati. Il controllo ha preservato le
+fotografie originali e non ha modificato pesi o feed Gold.
+
+Il limite complessivo di 25 minuti ha interrotto la ricostruzione completa del
+24 novembre prima della pubblicazione; non si considera concluso il recupero
+delle altre date. La ripresa elabora una sola giornata per job, in sequenza
+e sotto il mutex ordinario dei writer. Ogni giornata salva autonomamente il
+rapporto; una verifica iniziale su ricevute e archivio compatto evita di
+ricostruire i ledger se la cache non aggiunge esiti. Il tempo di osservazione
+da solo non è un nuovo risultato. Un PT pari a zero può invece completare un
+PT mancante. Conflitti, orari futuri e fixture diverse non attivano il recupero.
+
+Le stesse protezioni impediscono scritture ai forecast, alle probabilità, ai
+pesi e ai feed Gold. La ripresa non addestra e non promuove varianti shadow.
