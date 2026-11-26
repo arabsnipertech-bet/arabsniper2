@@ -44,3 +44,12 @@ const underBefore=JSON.stringify(under);
 assert.equal(describe(under).summary,'λ stat FT 2,46 · P V7 47,6% · EV +6,5%');
 assert.equal(JSON.stringify(under),underBefore,'Distinguishing sources never changes the saved estimates');
 console.log('Compact saved facts: three numbers, period lambda, probability, margin/movement, exact status and original EV in details.');
+
+const {proposalLabel}=require('../web/gold-explorer-qualification.js');
+for(const [side,expected] of [['home','1 FT'],['away','2 FT']]){
+ const spec={kind:'handicap',period:'ft',side,line:-.5};
+ assert.equal(proposalLabel('AH',spec),expected);
+ for(const line of [-1,-.25,0,.5])assert.equal(proposalLabel('AH',{...spec,line}),null);
+ assert.equal(proposalLabel('AH',{...spec,period:'ht'}),null);
+}
+assert.equal(proposalLabel('GG FT',{kind:'btts'}),'GG FT');

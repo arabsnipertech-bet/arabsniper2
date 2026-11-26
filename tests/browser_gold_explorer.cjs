@@ -10,8 +10,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  const rows=Array.from({length:1250},(_,i)=>({id:createHash('sha256').update(String(i)).digest('hex'),fixture_id:String(Math.floor(i/5)),episode:Math.floor(i/5)+'::k',home:'QA Casa '+Math.floor(i/5),away:'QA Ospite',league:'Campionato QA '+i%3,kickoff:'2026-11-17T14:00:00Z',date:'2026-11-17',market:'m'+i%5,label:['GG PT','GG FT','Over 2,5 FT','Under 3,5 FT','1X2 Casa'][i%5],probability:.6,odd:2.2,opening:2.1,ev:.32,ev_low:.1,oci:55,reliability:'supported',category:i%10?'alternative':'official',roles:i%10?[]:['most_probable'],validated:true,niche:false,quote_usable:true,quote_valid_until:'2026-11-17T12:00:00Z',ranking_roles:['recommended_alternative','high_odds_shot'],captured_at:'2026-11-17T09:30:00Z',published_at:'2026-11-17T10:00:00Z',forecast_sha256:'f'.repeat(64),quote:{bookmaker:'Fonte sintetica QA'}}));
  // Official records deliberately lack Explorer eligibility: this is a display regression.
  for(let i=0;i<rows.length;i+=5){rows[i].roles=['recommended_alternative'];rows[i].ranking_roles=[];rows[i].validated=false;rows[i].quote_usable=false;rows[i].official_references={recommended_alternative:{odd:2.05,captured_at:'2026-11-17T08:00:00Z'}};}
- // Deliberately give advanced markets higher EV: they must remain available
- // without replacing the qualified first-half Over in the default goal view.
+ // A quarter-line handicap must stay out of proposals even with the highest EV.
  for(const [fixture_id,label,kind,period,side,line,ev] of [
   ['9001','Over 1,5 PT','total','ht','over',1.5,.04],
   ['9002','Casa AH -0.25 FT','handicap','ft','home',-.25,1.2],
@@ -62,14 +61,15 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  assert.equal(await page.locator('#results .market').first().innerText(),'Over 1,5 PT');
  assert(!(await page.locator('#results').innerText()).includes('AH -0.25'));
  assert(!(await page.locator('#results').innerText()).includes('No Goal ST'));
- await page.click('[data-market-view=all]');assert((await page.locator('#results').innerText()).includes('Casa AH -0.25 FT'),'Advanced markets remain available by explicit choice');
+ await page.click('[data-market-view=all]');assert(!(await page.locator('#results').innerText()).includes('Casa AH -0.25 FT'),'A handicap is never a standalone proposal');
  await page.click('[data-market-view=over15]');assert.equal(await page.locator('#results .selection').count(),1);
  assert.equal(await page.locator('[data-market-view=over15]').getAttribute('aria-pressed'),'true');
+ await page.locator('#filters summary').click();
  await page.fill('[name=probMin]','70');assert.equal(await page.locator('#results .selection').count(),0);
  assert((await page.locator('#results').innerText()).includes('Nessun Over 1,5 PT validato'));
  await page.fill('[name=probMin]','');await page.click('[data-market-view=goals]');
  assert.equal(calls.length,initial,'Goal and advanced views reuse the same saved pages');
- const first=page.locator('#results .selection').first();assert.equal(await first.locator('.selection-1x2>div').count(),3);
+ const first=page.locator('#results .selection').first();assert.equal(await first.locator('.selection-1x2').count(),0);
  assert.equal(await first.locator('[data-qualification="documented_value"]').count(),1);
  assert.equal(await first.locator('.v7-qualification-label').innerText(),'Perché questa scelta');
  assert.equal(await first.locator('.v7-qualification-details').count(),0);
@@ -77,10 +77,11 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  await page.locator('.v7-numbers-help summary').click();
  assert((await page.locator('.v7-numbers-help').innerText()).includes('EV +5%'));
  await page.locator('.v7-numbers-help summary').click();
- assert((await first.locator('[data-movement=down]').innerText()).includes('↓ -10,0%'));assert((await first.locator('[data-movement=up]').innerText()).includes('↑ +10,0%'));assert((await first.locator('[data-movement=flat]').innerText()).includes('→ 0,0%'));
+ await first.locator('[data-detail]').click();
+ const quotes=page.locator('#detailBody');assert((await quotes.locator('[data-movement=down]').innerText()).includes('↓ -10,0%'));assert((await quotes.locator('[data-movement=up]').innerText()).includes('↑ +10,0%'));assert((await quotes.locator('[data-movement=flat]').innerText()).includes('→ 0,0%'));await page.click('#closeDetail');
  assert.equal(calls.length,initial,'Reading the shared number explanation adds no requests');
  for(const mode of ['probable','recommended','shots','markets','best']){await page.selectOption('#mode',mode);assert(await page.locator('#results .selection').count()>=10);assert.equal(await page.locator('#results [data-coherence]').count(),0,'Opposites excluded from '+mode);}
- await page.selectOption('#mode','markets');assert.equal(await page.locator('#marketIndex a').count(),7);
+ await page.selectOption('#mode','markets');assert.equal(await page.locator('#marketIndex a').count(),6);
  await page.locator('#marketIndex a').filter({hasText:'Under 3,5 FT'}).click();assert((await page.evaluate(()=>document.activeElement.textContent)).startsWith('Under 3,5 FT'));
  await page.selectOption('#mode','recommended');assert.equal(await page.locator('#results .selection').count(),10);
  const observation=page.locator('#results .selection').filter({has:page.locator('[data-qualification=study]')});
@@ -89,7 +90,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  assert(!(await observation.innerText()).includes('OCI'));
  assert.equal(await observation.locator('.v7-qualification-label').innerText(),'Perché questa scelta');
  assert((await page.locator('#results').innerText()).includes('Consigliata'),'Other original-role cards stay unchanged');
- await observation.locator('[data-detail]').click();assert((await page.locator('#detailBody').innerText()).includes('2,05'));await page.click('#closeDetail');await page.fill('[name=team]','impossibile');assert((await page.locator('#results').innerText()).includes('Il caricamento è riuscito'));await page.fill('[name=team]','');
+ await observation.locator('[data-detail]').click();assert((await page.locator('#detailBody').innerText()).includes('2,05'));await page.click('#closeDetail');await page.fill('[name=team]','impossibile');assert((await page.locator('#results').innerText()).includes('Nessuna Consigliata'));await page.fill('[name=team]','');
  await page.selectOption('#mode','search');await page.fill('[name=team]','QA Casa 0');
  const opposite=page.locator('#results .selection').filter({has:page.locator('[data-coherence="opposed"]')});
  assert.equal(await opposite.count(),1);assert((await opposite.innerText()).includes('Scenario opposto alla triade Gold'));
@@ -104,7 +105,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  await page.fill('#searchName','GG aggiornata');await page.click('#updateSearch');await page.locator('#message').filter({hasText:'Ricerca aggiornata'}).waitFor();assert.equal(searches[0].name,'GG aggiornata');
  await page.click('#deleteSearch');await page.locator('#message').filter({hasText:'Ricerca eliminata'}).waitFor();assert.equal(searches.length,0);
  await page.locator('#results [data-favorite]').first().click();await page.locator('#message').filter({hasText:'Selezione salvata'}).waitFor();await page.click('[data-tab=favorites]');await page.locator('#favoriteRows .selection').waitFor();assert.equal(await page.locator('#favoriteRows .won').count(),1);
- await page.locator('#favoriteRows [data-detail]').click();assert(await page.locator('#detail').isVisible());assert((await page.locator('#detailBody').innerText()).includes('Ultima quota Fast valida'));assert((await page.locator('#detailBody').innerText()).includes('Ruolo originale Gold'));await page.click('#closeDetail');
+ await page.locator('#favoriteRows [data-detail]').click();assert(await page.locator('#detail').isVisible());await page.locator('#detailBody summary').filter({hasText:'Dati della selezione'}).click();assert((await page.locator('#detailBody').innerText()).includes('Ultima quota Fast valida'));assert((await page.locator('#detailBody').innerText()).includes('Ruolo originale Gold'));await page.click('#closeDetail');
  await page.locator('#favoriteRows [data-remove]').click();await page.locator('#message').filter({hasText:'Preferito rimosso'}).waitFor();assert.equal(favorites.length,0);
  await page.click('[data-tab=history]');await page.click('#loadHistory');await page.locator('#message').filter({hasText:'Storico caricato'}).waitFor();assert.equal(await page.locator('#historyRows .selection').count(),10);assert((await page.locator('#comparisons').innerText()).includes('Calibrazione'));
  await page.selectOption('#historyReference','night');await page.selectOption('#historyCohort','top');assert.equal(await page.locator('#historyRows .selection').count(),2); // GG FT filter, exact stored top10
@@ -147,6 +148,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  assert(calls.slice(marker).includes('/api/auth/explorer/objects/'+todayHash));
  assert(!calls.slice(marker).includes('/api/auth/explorer/objects/'+tomorrowHash),'Opening Today must not download tomorrow');
  let releaseTomorrow;heldHash=tomorrowHash;heldGate=new Promise(r=>releaseTomorrow=r);
+ await page.locator('#filters summary').click();
  await page.selectOption('[name=period]','tomorrow');await page.locator('#results').filter({hasText:'Caricamento dei mercati'}).waitFor();
  await page.selectOption('[name=period]','today');await page.locator('#results .selection').filter({hasText:'QA Casa 1'}).waitFor();
  const completed=page.waitForResponse(r=>r.url().endsWith(tomorrowHash));releaseTomorrow();await completed;
