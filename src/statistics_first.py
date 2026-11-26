@@ -42,6 +42,41 @@ HISTORY_FIELDS = ('fixture_id', 'kickoff', 'date', 'season', 'side', 'league_id'
                   'team_xg_against_ht')
 
 
+def market_lambda_profile(spec, rates, *, without_peak=None):
+    """Describe one market's recorded pre-market intensity, without a bonus.
+
+    ST is never filled from PT/FT. Missing robustness stays unknown, not failed.
+    The returned value ranks only the explicitly requested weak-side GG FT case.
+    """
+    kind, period, side = (spec.get(k) for k in ('kind', 'period', 'side'))
+    def pair(p):
+        suffix = {'ht': 'ht', 'sh': 'st', 'ft': 'ft'}.get(p)
+        values = [rates.get(s+'_'+suffix) for s in ('home', 'away')] if suffix else []
+        return values if len(values) == 2 and all(numeric(v) and v >= 0 for v in values) else None
+    values = pair(period)
+    value, basis = None, None
+    if kind == 'halves_total':
+        first, second = pair('ht'), pair('sh')
+        basis = 'minimum_period_totals'
+        if first is not None and second is not None:value = min(sum(first), sum(second))
+    elif kind in ('total', 'asian_total'):
+        basis = 'period_total'
+        if values is not None:value = sum(values)
+    elif kind == 'btts':
+        basis = 'weaker_team'
+        if values is not None:value = min(values)
+    elif kind == 'result' and side in ('1', '2'):
+        basis = 'selected_team_difference'
+        if values is not None:value = (values[0]-values[1]) * (1 if side == '1' else -1)
+    elif kind == 'handicap' and spec.get('line') == -.5 and side in ('home', 'away'):
+        basis = 'selected_team_difference'
+        if values is not None:value = (values[0]-values[1]) * (1 if side == 'home' else -1)
+    return dict(period=period, basis=basis, value=value, origin='pre_market_statistics',
+        without_peak=without_peak if type(without_peak) is bool else None,
+        weak_side=bool(kind == 'btts' and period == 'ft' and side == 'yes' and value is not None and value < 1.),
+        probability_bonus=0.)
+
+
 def numeric(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and isfinite(value)
 

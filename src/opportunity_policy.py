@@ -9,7 +9,7 @@ from statistics import mean, median
 from market_scope import canonical_market
 
 POLICY_ID = 'gold-goals-v6.1'
-RULES_REVISION = 'v7-unified-v1'
+RULES_REVISION = 'v7-surgical-20261126-v1'
 SUPPORTED_POLICY_IDS = ('gold-goals-v2', 'gold-goals-v3', 'gold-goals-v4', 'gold-goals-v5', 'gold-goals-v6', POLICY_ID)
 ODDS_MIN, ODDS_MAX = 1.70, 7.50
 GOALS = {('total', 'ht', 'over', 1.5): 'over15_ht', ('btts', 'ht', 'yes', None): 'gg_ht',
@@ -34,6 +34,7 @@ LABELS = {'convergence': 'Convergenza di Trend',
           'unconfirmed': 'Valore statistico · flusso non confermato',
           'excluded': 'Fuori proposta'}
 REASONS = {
+    'opposite_value_conflict': 'Il lato opposto ha valore al prezzo disponibile',
     'market': 'Mercato escluso dal box: resta nella matrice',
     'v7_quote_unusable': 'Quota senza evidenza eseguibile prematch',
     'v7_unavailable': 'Stima V7 non disponibile',
@@ -63,6 +64,25 @@ REASONS = {
 
 def numeric(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and isfinite(value)
+
+
+def margin_friction(margin):
+    """Explicit selection cost, not a second fair/probability adjustment."""
+    return .015 if numeric(margin) and 6.5 < margin <= 8 else 0.
+
+
+def operational_role_allowed(role, spec, odd, ev, margin):
+    """Hard exclusions also apply to elastic observations and recovery paths."""
+    spec = canonical_market(spec)
+    under = spec.get('kind') == 'total' and spec.get('side') == 'under'
+    if under and spec.get('period') == 'sh' and spec.get('line') == .5:
+        return False
+    if role == 'most_probable':
+        if numeric(odd) and odd < 1.50:return False
+        if under:
+            return (numeric(odd) and odd >= 1.72 and numeric(ev) and ev > 0
+                    and numeric(margin) and 0 <= margin <= 6.5)
+    return True
 
 
 def goal_market(row):
@@ -265,15 +285,16 @@ def evaluate(row, pt_priority=False, preferred_pt=None, *, divergence_caps=None,
         (numeric(oci) and oci >= 50) or (numeric(delta) and delta <= -5 + 1e-9)
         or (numeric(persistence) and persistence == 1.))
     margin_known = numeric(margin)
-    band = 'unknown' if not margin_known else 'anomalous' if not 0 <= margin <= 8 else 'high' if margin >= 6.5 else 'low'
+    band = 'unknown' if not margin_known else 'anomalous' if not 0 <= margin <= 8 else 'high' if margin > 6.5 else 'low'
     from adaptive_pricing import gate_passes, threshold
     base_ev = 6. if market == 'gg_ht' else 0.
     min_ev = max(0., base_ev + threshold(row))
     saturation_surcharge = 2. if saturated else 0.
     min_low = MIN_EV_LOW_BY_MARKET.get(market, 0.) + saturation_surcharge
-    if margin_known and 6.5 <= margin <= 8:
+    if margin_known and 6.5 < margin <= 8:
         min_low += 1.5
     reasons = []
+    if row.get('opposite_conflict_flag') is True:reasons.append('opposite_value_conflict')
     if tier is None: reasons.append('market')
     if not numeric(p) or not minimum_p <= p <= 100: reasons.append('probability')
     if not numeric(odd) or not minimum_odd <= odd <= maximum_odd:

@@ -249,7 +249,7 @@ class MathAndRouting(unittest.TestCase):
         asian = row(dict(spec, kind='asian_total'), 8.)
         picks, _ = quote_rows([classic, asian], AT, START)
         self.assertEqual(list(picks), [HIGH])
-        self.assertEqual(picks[HIGH][0]['odd'], 7.)
+        self.assertEqual(picks[HIGH][0]['odd'], 8.)
         fallback, _ = quote_rows([dict(classic, quote_status='stale'), asian], AT, START)
         self.assertEqual(fallback[HIGH][0]['odd'], 8.)
         self.assertFalse(price_usable(dict(asian, quote_observed_at=START), AT, START))
@@ -883,7 +883,7 @@ class TriadShadow(unittest.TestCase):
         return dict(source_market_id=key, label=key, spec_kind=spec['kind'], calibrated=probability,
                     odd=odd, ev=probability*odd-1, ev_low=ev_low, tier='BLU', horizon='FT', niche_id=None,
                     study_supported=True, model_fair_odd=1/probability, quote_state='observed',
-                    quote={'quote_status':'recent'}, features={}, v51=probability-.02)
+                    quote={'quote_status':'recent'}, features={'margin_pct':5.}, v51=probability-.02)
 
     def variants(self, records, sources=None, *, legacy_locked=None):
         from decision_shadow import capture_v7

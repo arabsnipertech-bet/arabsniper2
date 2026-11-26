@@ -6,6 +6,9 @@
 .v7-qualification-details{margin:0 0 10px;font-size:.74rem;line-height:1.5;color:#aebfc9;text-align:left;overflow-wrap:anywhere}
 .v7-qualification-details summary{cursor:pointer;min-height:32px;padding:4px 0}
 .v7-qualification-details p{margin:5px 0 9px}
+.v7-numbers-help{margin:10px 0 16px;color:#b8ccd6;font-size:.85rem;line-height:1.6}
+.v7-numbers-help summary{cursor:pointer;min-height:32px;color:#edc66c}
+.v7-numbers-help p{max-width:70ch;margin:6px 0}
 .v7-qualification[data-qualification=statistical_recovery]{border-left-color:#c4b5fd}
 .v7-qualification[data-qualification=statistical_recovery] .v7-qualification-label{color:#ddd6fe}
 .v7-qualification[data-qualification=study],.v7-qualification[data-qualification=contrarian_study]{border-left-color:#edc66c}

@@ -20,7 +20,7 @@ def trace_snapshot(snapshot, sources, profiles):
     # Compute before any measurement additions, and record the exact body keys.
     evidence_sha = fingerprint({k: snapshot.get(k) for k in evidence_fields})
     config = dict(deepcopy(MEASUREMENT_CONFIG), control={k: deepcopy(snapshot.get(k))
-        for k in ('version', 'weight', 'calibration', 'qualification_policy', 'study_selection_policy')},
+        for k in ('version', 'weight', 'calibration', 'qualification_policy', 'study_selection_policy', 'decision_quality_policy')},
         movement_config_sha256=(((snapshot.get('decision_shadow') or {}).get('movement_study') or {}).get('config_sha256')))
     trace = dict(protocol=MEASUREMENT_PROTOCOL, config=config,
                  config_sha256=fingerprint(config),

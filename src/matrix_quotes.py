@@ -121,6 +121,30 @@ def equivalent_prices(records, sources, as_of, kickoff):
     return comparisons
 
 
+def upgrade_equivalent_prices(records, sources, as_of, kickoff):
+    """Prefer a better executable AH -0.5 for the identical 90-minute event.
+
+    Keep both genuine market IDs and quotes; routing transfers the role to the
+    better contract. Same operator, aligned updates and exactly equal P are
+    required by equivalent_prices. No push/quarter/integer line can enter.
+    """
+    from v7_probability import price_identity
+    applied = []
+    for comparison in equivalent_prices(records, sources, as_of, kickoff):
+        control, alternative = (comparison[k]['market_id'] for k in ('control', 'alternative'))
+        if comparison['odd_gain'] <= 0 or not all(price_identity(sources[records[k]['source_market_id']]) for k in (control, alternative)):
+            continue
+        original, better = records[control], records[alternative]
+        better['label'] = ('Vittoria casa' if sources[better['source_market_id']]['spec']['side'] == 'home'
+                           else 'Vittoria ospite') + ' · AH -0,5 FT'
+        better.update(price_upgrade_source='AH-0.5', price_upgrade_control_market=control,
+            price_upgrade_control_odd=original['odd'], price_upgrade_same_operator=True,
+            price_upgrade_probability_difference=0., price_upgrade_ev_gain=comparison['ev_gain'])
+        original['price_replaced_by'] = alternative
+        applied.append({**comparison, 'shadow_only': False, 'applied_to_official': True})
+    return applied
+
+
 def parse_value(bid, raw):
     if bid not in CATALOG: return None
     _, kind, period = CATALOG[bid]
@@ -494,8 +518,8 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         recent = direct
     # Multiple provider bet IDs for the same settlement do not count as more books.
     unique = {}
-    for offer in sorted(recent, key=lambda o: (2 if o['complete'] and o.get('quote_source', 'bookmaker') == 'bookmaker' else 1 if o['complete'] else 0,
-                       o.get('provider_updated_at') or o.get('observed_at') or '', o['odd'], -o['bet_id'])):
+    for offer in sorted(recent, key=lambda o: (bool(o['complete']), o['odd'],
+                       o.get('provider_updated_at') or o.get('observed_at') or '', -o['bet_id'])):
         unique[offer['bookmaker_id']] = offer
     recent = list(unique.values())
     if not recent:
@@ -516,9 +540,6 @@ def analyse_prices(row, offers, as_of, kickoff, allow_cached=False):
         restore(row, as_of, kickoff, allow_cached)
         return
     complete_books = [o for o in recent if complete_book(o)]
-    if row['spec']['kind'] == 'total' and not cached:
-        native = [o for o in complete_books if o.get('quote_source') != 'asian_halfline']
-        complete_books = native or complete_books
     # A single bookmaker is enough for price and EV. A complete partition at
     # that bookmaker also gives its own fair probability and overround.
     best = max(complete_books or recent, key=lambda o: (o['odd'], o.get('provider_updated_at') or o.get('observed_at') or '', o['bookmaker_id']))

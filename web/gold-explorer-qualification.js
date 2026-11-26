@@ -50,8 +50,8 @@
   const cost=finite(margin)&&margin>=0&&margin<=8?'Aggio '+margin.toLocaleString('it-IT',{minimumFractionDigits:1,maximumFractionDigits:1})+'%':null;
   const delta=q.opening_delta_pct??f.opening_delta_pct??value.features?.opening_delta_pct;
   const movement=q.flow_confirmed===true&&finite(delta)&&delta<=-2?'Quota ↓ '+probability(Math.abs(delta)/100):null;
-  const valueRef=type==='documented_value'&&finite(ev)&&ev>0?'EV '+percent(ev):null;
-  return (movement?[movement,cost,statistical||chance]:[statistical,chance,valueRef||cost]).filter(Boolean).slice(0,3);
+  const valueRef=finite(ev)?'EV '+percent(ev):null;
+  return [statistical,chance,valueRef||cost].filter(Boolean).slice(0,3);
  }
  function describe(value,context={}){
   const q=value?.confirmation;
@@ -75,11 +75,12 @@
  function render(value,context){
   const q=describe(value,context);if(!q)return '';
   return (q.facts.length?'<div class="v7-qualification" data-qualification="'+esc(q.type)+'" aria-label="'+esc(q.label)+'">'+
-   '<strong class="v7-qualification-label">'+esc(q.label)+'</strong><span class="v7-qualification-text">'+
+   '<strong class="v7-qualification-label">Perché questa scelta</strong><span class="v7-qualification-text">'+
    q.facts.map(v=>'<span>'+esc(v)+'</span>').join('')+'</span></div>':'')+
-   '<details class="v7-qualification-details"><summary>Dati e limiti</summary><p>'+esc(q.detail)+'</p></details>';
+   '';
  }
- const api=Object.freeze({describe,render});
+ function help(){return '<details class="v7-numbers-help"><summary>Come leggere λ, probabilità ed EV</summary><p><b>λ</b>: gol attesi nel periodo indicato. <b>P V7</b>: probabilità stimata della scelta.</p><p><b>EV</b>: rapporto tra probabilità e quota. Per esempio, P 50% a quota 2,10 dà EV +5%; a quota 1,90 dà EV −5%. <b>Aggio</b>: margine del bookmaker incluso nella quota.</p></details>';}
+ const api=Object.freeze({describe,render,help});
  if(typeof module==='object'&&module.exports)module.exports=api;
  root.ArabV7Qualification=api;
 })(typeof globalThis==='object'?globalThis:this);

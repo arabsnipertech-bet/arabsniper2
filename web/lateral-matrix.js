@@ -1141,24 +1141,24 @@
     const selectionLabel=selected?.id==='TRIAD_LATEST_PREMATCH_V1'?'Ultima scelta prematch del ':
      selected?.id==='TRIAD_RECENT_SELECTION_V1'?'Scelta registrata il ':'Mercato fissato il ';
     const fixed=commitment?'<small>'+selectionLabel+triadTime(commitment.captured_at)+
-     ' · quota alla scelta '+num(commitment.odd,2)+'</small>':'';
+     ' · quota alla scelta '+num(commitment.odd,2)+'</small>':p&&view.v7?.captured_at?
+      '<small>Analisi '+triadTime(view.v7.captured_at)+'</small>':'';
     const study=s?.study_only??commitment?.study_only;
     const observation=s?.observation_only??commitment?.observation_only;
-    const heading=observation?'Osservazione · '+title:title+(study?' · Studio':'');
+    const heading=title;
     return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+heading+'</span>'+(badge||'')+
      triadOutcomeSlot(match,p?.source.spec||triadMarketSpec(commitment))+'</div>'+
      (p?'<div class="mx-triad-market"><b>'+esc(p.record.label)+'</b>'+(estimate?'':'<strong>'+num(p.record.odd,2)+'</strong>')+'</div>'+
-      '<div class="mx-triad-meta"><span>'+esc(s.horizon_label)+'</span><span>'+v7Estimate(p.record.calibrated)+' V7</span>'+
-      (Number.isFinite(p.record.model_fair_odd)?'<span>Quota equa '+num(p.record.model_fair_odd,2)+'</span>':'')+
-      (s.quote_state?'<span>'+esc(quoteStateLabel(s,p.source))+'</span>':'')+
-      (Number.isFinite(s.ev)?'<span>EV '+signed(100*s.ev)+'%</span>':'')+
-      originBadge(marketOrigin(p.source,{rates:view.v7?.rates,record:p.record,signal:s,expired:p.expired,
-       conversion:view.v7?.signals?.observations?.conversion===true}))+'</div>'+
+      (estimate?'<small>Quota in attesa'+(Number.isFinite(p.record.model_fair_odd)?' · equa '+num(p.record.model_fair_odd,2):'')+'</small>':'')+
+      '<div class="mx-triad-meta"><span>'+esc(s.horizon_label)+'</span></div>'+
       (qualifications?.render(p.record,{statistics:view.v7?.statistics,spec:p.source.spec,
-       evidence:view.v7?.measurement?.markets?.[s.market_id],evidence_protocol:view.v7?.measurement?.protocol})||'')+(compact?'':triadMotivation(p)):
+       evidence:view.v7?.measurement?.markets?.[s.market_id],evidence_protocol:view.v7?.measurement?.protocol})||
+       '<small>P V7 '+v7Estimate(p.record.calibrated)+(Number.isFinite(s.ev)?' · EV '+signed(100*s.ev)+'%':'')+'</small>')+
+      (compact?'':originBadge(marketOrigin(p.source,{rates:view.v7?.rates,record:p.record,signal:s,expired:p.expired,
+       conversion:view.v7?.signals?.observations?.conversion===true}))+triadMotivation(p)):
       (commitment?'<div class="mx-triad-market"><b>'+esc(commitment.label)+'</b></div>':'')+
       '<small>'+(saved?.[role]||commitment?'Quota da aggiornare':'Nessun mercato idoneo')+'</small>')+
-      fixed+(p&&(previous||commitment)?'<small>Analisi '+triadTime(view.v7?.captured_at)+'</small>':'')+previous+'</li>';
+      fixed+previous+'</li>';
    }).join('')+'</ul>'+explorerMatchLink(match,view.v7);
  }
  function explorerMatchLink(match,v7){
@@ -1415,7 +1415,7 @@
    '<div class="mx-controls"><label>Mercati<select data-mx-filter="family">'+options(FAMILIES,state.family)+'</select></label><label>Periodo<select data-mx-filter="period">'+options({all:'Tutti i periodi',ft:'Finale',ht:'Primo tempo',sh:'Secondo tempo'},state.period)+'</select></label>'+
    '<label>Stato<select data-mx-filter="phase">'+options({all:'Tutte le partite',upcoming:'Da iniziare',live:'In corso',finished:'Terminate',other:'Rinviate / altri stati'},state.phase)+'</select></label><label>Ordine<select data-mx-filter="sort">'+options({time:'Orario partita',oci:'OCI più alto',odd:'Quota più alta',value:'Criteri interni di valore'},state.sort)+'</select></label>'+
    '<label class="mx-search">Cerca<input type="search" data-mx-filter="search" value="'+esc(state.search)+'" placeholder="Squadra o campionato"></label></div>'+
-   '<details class="mx-reading-help"><summary>Come leggere categorie e indicatori</summary><p class="mx-caption">Gold e Platinum applicano i criteri dei rispettivi livelli alle stime prematch. Il Radar Blu raccoglie osservazioni sui movimenti delle quote. Consigliata e Colpaccio sono ipotesi a quota superiore valutate a parte. La quota equa deriva dalla probabilità stimata. OCI e aggio descrivono il mercato delle quote.</p></details>'+
+   (qualifications?.help()||'')+
    '<div class="mx-results" aria-live="polite"><p class="mx-results-count">'+matches.length+' di '+all.length+' partite · '+esc(CATEGORIES[state.category])+'</p>'+
    (matches.length?activeMatches.map(m=>card(m,services)).join(''):'<div class="mx-empty">Nessuna partita con questi filtri. <button type="button" data-mx-reset>Mostra tutto il palinsesto</button></div>')+
    (inactiveMatches.length?'<details class="mx-reading-help mx-inactive"><summary>Rinviate, annullate o sospese · '+inactiveMatches.length+'</summary>'+inactiveMatches.map(m=>card(m,services)).join('')+'</details>':'')+'</div>'+

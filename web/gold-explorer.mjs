@@ -1,8 +1,9 @@
 import {officialGoldRecords} from './explorer-official-records.mjs';
-import './gold-explorer-qualification.js?v=a429b49a2e74';
+import './gold-explorer-qualification.js?v=21fcb158a39d';
 import {archiveLoader,currentPageHashes} from './explorer-loader.mjs?v=4c5be96bbe7b';
 import {categories,modes,text,numeric,romeDay,fresh,matches,rank,goalRows,goalMarketLabels,outcome,statistics,historyRows} from './explorer-core.mjs?v=a95aa463ffa5';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+$('numbersHelp').innerHTML=globalThis.ArabV7Qualification.help();
 const number=(v,d=2)=>numeric(v)?v.toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
 const percent=v=>numeric(v)?number(v*100,1)+'%':'—';
 const date=v=>v?new Date(v).toLocaleString('it-IT',{timeZone:'Europe/Rome',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
@@ -61,7 +62,8 @@ function cards(rows,node,options={}){
  if(!rows.length){empty(node);return;}
  node.innerHTML=rows.map(row=>{
   const key=row.id+'-'+(row.object||'current')+'-'+(options.favorite?'favorite':'view');state.viewRows.set(key,{row,...options});
-  return `<article class="selection"><div><span class="badge ${esc(row.category)}">${esc(row.observation_only?'Osservazione V7':categories[row.category]||'Archivio')}</span><p class="small">${esc(text(row.league))} · ${date(row.kickoff)}</p><h3>${esc(text(row.home))} — ${esc(text(row.away))}</h3>${quoteContext(row,options)}</div><div><strong class="market">${esc(row.label)}</strong>${proposalOrigin(row)}${globalThis.ArabV7Qualification.render(row)}${proposalCoherence(row)}${row.roles?.length?`<p class="small selection-role" data-role-source="gold">${row.observation_only?'Osservazione · ':''}${esc(row.roles.map(r=>roleNames[r]||r).join(', '))} · Gold</p>`:''}${row.outcome?`<b class="${row.outcome.win===1?'won':row.outcome.loss===1?'lost':''}">${esc(row.outcome.label)}</b>`:options.historical?'<span class="small">Esito non verificato</span>':''}</div><div class="numbers"><div><strong>${percent(row.probability)}</strong><small>Probabilità V7</small></div><div><strong>${number(row.odd)}</strong><small>${row.official_original?'Quota ufficiale originale':options.historical?'Quota snapshot':fresh(row)?'Quota di riferimento':'Quota storica / scaduta'}</small></div><p class="small">EV ${percent(row.ev)} · EV_low ${percent(row.ev_low)} · OCI ${row.oci===0?'0 · neutro':numeric(row.oci)?number(row.oci,1):'non disponibile'}</p></div><div class="actions"><button data-detail="${key}">Dettaglio</button><button ${options.favorite?'data-remove':'data-favorite'}="${key}" aria-label="${options.favorite?'Rimuovi preferito':'Salva preferito'}">${options.favorite?'Rimuovi':'☆'}</button></div></article>`;
+  const facts=globalThis.ArabV7Qualification.render(row)||`<p class="small">P V7 ${percent(row.probability)} · EV ${percent(row.ev)}</p>`;
+  return `<article class="selection"><div><span class="badge ${esc(row.category)}">${esc(row.observation_only?'BLU':categories[row.category]||'Archivio')}</span><p class="small">${esc(text(row.league))} · ${date(row.kickoff)}</p><h3>${esc(text(row.home))} — ${esc(text(row.away))}</h3>${quoteContext(row,options)}</div><div><strong class="market">${esc(row.label)}</strong>${facts}${proposalCoherence(row)}${row.roles?.length?`<p class="small selection-role" data-role-source="gold">${esc(row.roles.map(r=>roleNames[r]||r).join(', '))}</p>`:''}${row.outcome?`<b class="${row.outcome.win===1?'won':row.outcome.loss===1?'lost':''}">${esc(row.outcome.label)}</b>`:options.historical?'<span class="small">Esito non verificato</span>':''}</div><div class="numbers"><div><strong>${number(row.odd)}</strong><small>${row.official_original?'Quota ufficiale originale':options.historical?'Quota snapshot':fresh(row)?'Quota':'Quota storica / scaduta'}</small></div></div><div class="actions"><button data-detail="${key}">Dettaglio</button><button ${options.favorite?'data-remove':'data-favorite'}="${key}" aria-label="${options.favorite?'Rimuovi preferito':'Salva preferito'}">${options.favorite?'Rimuovi':'☆'}</button></div></article>`;
  }).join('');
 }
 function render(){
@@ -76,7 +78,7 @@ function render(){
   const row=state.rows.find(r=>String(r.fixture_id)===state.focusFixture);
   $('fixtureFocusText').textContent=row?'Analisi della partita: '+text(row.home)+' — '+text(row.away):'Partita selezionata: nessuna analisi corrente disponibile.';
  }
- $('viewExplanation').textContent=goals?'Over e GG validati, alternati per mercato.':$('mode').value==='recommended'?'Consigliate ufficiali già registrate dalla Gold, in ordine di inizio partita. Nessun nuovo punteggio Explorer. Gli indicatori sono quelli dello snapshot; la quota ufficiale originale, se documentata, è nel dettaglio.':$('mode').value==='markets'?'Gruppi in ordine alfabetico. Usa l’indice per raggiungere un mercato senza scorrere tutti i precedenti.':$('mode').value==='best'?'Classifica completa, inclusi handicap e mercati avanzati.':'I ruoli originali Gold sono riportati senza modifiche nelle schede e nel dettaglio.';
+ $('viewExplanation').textContent=goals?'Over e GG, alternati per mercato.':$('mode').value==='recommended'?'Le Consigliate Gold, in ordine di inizio.':$('mode').value==='markets'?'Scegli un mercato dall’indice.':$('mode').value==='best'?'Tutti i mercati, inclusi quelli avanzati.':'';
  const f=filters(),mode=$('mode').value,now=Date.now();let rows=state.rows.filter(r=>matches(r,f,now)&&(!state.focusFixture||r.fixture_id===state.focusFixture));
  if(mode!=='search')rows=rows.filter(r=>!['opposed','inconsistent_gold_triad'].includes(r.coherence_status));
  if(mode!=='search'&&mode!=='recommended')rows=rows.filter(r=>fresh(r,now));
