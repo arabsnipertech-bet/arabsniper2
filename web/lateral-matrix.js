@@ -1141,7 +1141,8 @@
     const selectionLabel=selected?.id==='TRIAD_LATEST_PREMATCH_V1'?'Ultima scelta prematch del ':
      selected?.id==='TRIAD_RECENT_SELECTION_V1'?'Scelta registrata il ':'Mercato fissato il ';
     const fixed=commitment?'<small>'+selectionLabel+triadTime(commitment.captured_at)+
-     ' · quota alla scelta '+num(commitment.odd,2)+'</small>':'';
+     ' · quota alla scelta '+num(commitment.odd,2)+'</small>':p&&view.v7?.captured_at?
+      '<small>Analisi '+triadTime(view.v7.captured_at)+'</small>':'';
     const study=s?.study_only??commitment?.study_only;
     const observation=s?.observation_only??commitment?.observation_only;
     const heading=title;
