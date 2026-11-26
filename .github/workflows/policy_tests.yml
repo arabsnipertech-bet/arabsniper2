@@ -44,6 +44,40 @@ on:
 permissions:
   contents: read
 jobs:
+  reconcile-cached-v7-results:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[v7-cached-results-reconcile]')
+    needs: tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    concurrency:
+      group: arabsniper-quote-data-writer
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install boto3 requests ijson==3.6.0
+      - name: Reconcile cached results with frozen forecasts and weights protected
+        env:
+          R2_ACCOUNT_ID: dfdb02b4139b31c0ab4456a50eb371a2
+          R2_BUCKET: arabsniper-gold
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          GOLD_PRIVATE: 'true'
+          PYTHONUNBUFFERED: '1'
+        run: python scripts/reconcile-cached-v7-results.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cached-v7-reconciliation
+          path: test-artifacts/cached-v7-reconciliation.json
+          retention-days: 30
+          if-no-files-found: error
+
   explorer-current-pages:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[explorer-current-pages]') || contains(github.event.head_commit.message, '[compact-choice-facts]'))
     needs: tests

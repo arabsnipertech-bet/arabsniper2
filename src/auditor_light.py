@@ -62,9 +62,11 @@ def recovery_candidate(root, index, today, progress):
                 continue
         if saved.get('checked_on') == str(today):
             continue
-        # Old failed blocks rotate behind dates not yet tried. Recent dates win ties.
-        candidates.append((saved.get('checked_on', ''), -day.toordinal(), day))
-    return min(candidates)[2] if candidates else None
+        # Finish recent pending dates while the shared Worker still retains
+        # their scores. Keep the existing single recovery block and API budget.
+        # Within each age band, rotate old failed attempts as before.
+        candidates.append(((today-day).days > 4, saved.get('checked_on', ''), -day.toordinal(), day))
+    return min(candidates)[3] if candidates else None
 
 
 def record_day(root, day, now, progress):

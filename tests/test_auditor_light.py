@@ -56,6 +56,21 @@ class LightweightAuditor(unittest.TestCase):
         environment.start()
         self.addCleanup(environment.stop)
 
+    def test_recent_pending_date_precedes_an_untried_old_date_before_live_cache_expires(self):
+        recent, old = date(2026,11,18), date(2026,11,10)
+        index = {f'auditordata/prematch_{day}.json': {} for day in (recent,old)}
+        progress = {'days': {str(recent): {'checked_on':'2026-11-19'}}}
+        with TemporaryDirectory() as folder:
+            self.assertEqual(recovery_candidate(Path(folder),index,NOW.date(),progress),recent)
+            progress['days'][str(recent)]['checked_on']=str(NOW.date())
+            self.assertEqual(recovery_candidate(Path(folder),index,NOW.date(),progress),old)
+
+    def test_old_recovery_still_rotates_after_the_recent_window(self):
+        index={f'auditordata/prematch_{day}.json':{} for day in ('2026-11-10','2026-11-11')}
+        progress={'days':{'2026-11-11':{'checked_on':'2026-11-19'}}}
+        with TemporaryDirectory() as folder:
+            self.assertEqual(recovery_candidate(Path(folder),index,NOW.date(),progress),date(2026,11,10))
+
     def test_new_daily_certificate_uses_gold_then_saves_learning_without_legacy(self):
         from auditor_daily_priority import build_yesterday
         from gold_storage import checkpoint_day, checkpoint_results

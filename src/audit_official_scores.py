@@ -1,5 +1,6 @@
 """Read already stored provider scores before spending the shared API allowance."""
 import json
+import subprocess
 from urllib.request import urlopen
 
 from multimarket_model import stamp
@@ -8,6 +9,26 @@ from v7_archive import FINISHED, ROME, VOID, checked_score, merge_verified_resul
 LOOKBACK_DAYS = 35
 LIVE_URL = 'https://arabsniperbet.com/api/live-scores'
 SCORE_FIELDS = ('home_ft', 'away_ft', 'home_ht', 'away_ht')
+MAX_CACHE_BYTES = 2*1024*1024
+
+
+def cached_feed():
+    """Read only the Worker cache; GET never invokes its provider refresh.
+
+    Use the same bounded transport as the existing score-health watchdog when
+    urllib cannot read the public route. There is no API-Football fallback here.
+    """
+    try:
+        with urlopen(LIVE_URL, timeout=8) as response:
+            raw = response.read(MAX_CACHE_BYTES+1)
+    except OSError:
+        result = subprocess.run(('curl', '-fsS', '--max-time', '12', '--max-filesize',
+                                 str(MAX_CACHE_BYTES), '-H', 'Accept: application/json', LIVE_URL),
+                                check=True, capture_output=True, timeout=15)
+        raw = result.stdout
+    if len(raw) > MAX_CACHE_BYTES:
+        raise ValueError('Live cache too large')
+    return json.loads(raw)
 
 
 def result_for_day(result, day):
@@ -44,8 +65,7 @@ def worker_score(row):
 
 def read_live_scores(fixtures, now):
     try:
-        with urlopen(LIVE_URL, timeout=8) as response:
-            data = json.loads(response.read(2*1024*1024+1))
+        data = cached_feed()
         if not (data.get('schema_version') == 1 and data.get('enabled') is True
                 and isinstance(data.get('fixtures'), dict)):
             raise ValueError('Unavailable live score schema')
@@ -60,7 +80,7 @@ def read_live_scores(fixtures, now):
             if result['status'] in FINISHED | VOID or rescheduled_result(result):
                 scores[fid] = result
         return scores
-    except (OSError, TypeError, ValueError, AttributeError) as error:
+    except (OSError, TypeError, ValueError, AttributeError, subprocess.SubprocessError) as error:
         print('Stored live scores unavailable: '+type(error).__name__, flush=True)
         return {}
 
