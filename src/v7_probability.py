@@ -61,6 +61,14 @@ def outcome_fair(row):
     return None
 
 
+def price_identity(row):
+    """Check the execution price's own operator reference without changing P."""
+    odd, margin, fair_p = row.get('odd'), row.get('selected_margin_pct'), outcome_fair(row)
+    return bool(row.get('bookmaker_id') is not None and fair_p is not None
+                and finite(odd) and odd > 1
+                and isclose(fair_p, 1/odd/(1+margin/100), rel_tol=1e-8, abs_tol=1e-10))
+
+
 def goal_structure(rates):
     """Describe the existing calibrated intensities; never add a model vote."""
     names = ('home_ht', 'away_ht', 'home_st', 'away_st')

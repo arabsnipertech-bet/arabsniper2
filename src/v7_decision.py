@@ -13,13 +13,14 @@ from context_analysis import congruence_triggers
 from gold_competitions import national_competition
 from lateral_matrix import label, market_id, payout_weights, quality, specification
 from market_scope import COMBO_SPECS, JOINT_KINDS, canonical_market as canonical
-from matrix_quotes import safe_price_row
+from matrix_quotes import safe_price_row, upgrade_equivalent_prices
 from multimarket_model import fair, stamp
-from opportunity_policy import annotate as annotate_gold
+from opportunity_policy import annotate as annotate_gold, operational_role_allowed, margin_friction
+from statistics_first import market_lambda_profile
 from platinum_policy import annotate as annotate_platinum
 from v7_probability import (BASE_WEIGHT, VERSION, blend_rates, fair_inputs, finite,
                             goal_structure, market_rates, outcome_fair, price_usable, pricing_evidence, raw_rates,
-                            score_model, statistical_rates, utc)
+                            score_model, statistical_rates, utc, price_identity)
 from v7_recent_selection import POLICY_ID as LATEST_PREMATCH_POLICY, save as save_latest_selection
 from v7_over15_deficit import single_deficit, priority_bonus, explain as explain_deficit
 from v7_confirmation import confirmation, oci_context
@@ -75,6 +76,13 @@ TRIAD_QUALIFIED_REFRESH_V1 = {
     'repair_commitments': True,
 }
 POSITIVE_ALTERNATIVES_POLICY = 'TRIAD_POSITIVE_ALTERNATIVES_V2'
+DECISION_QUALITY_POLICY = 'V7_SURGICAL_20261126_V1'
+PRICE_UPGRADE_FIELDS = ('price_upgrade_source', 'price_upgrade_control_market',
+    'price_upgrade_control_odd', 'price_upgrade_same_operator', 'price_upgrade_probability_difference',
+    'price_upgrade_ev_gain')
+OPPOSITE_FIELDS = ('opposite_market', 'opposite_odd', 'opposite_ev', 'opposite_margin_pct',
+    'opposite_same_operator', 'cross_same_operator', 'opposite_conflict_flag', 'opposite_quote_observed_at')
+BASE_MARKETS = {GOAL['over25_ft'], GOAL['over15_sh'], GG_FT, BOTH_GOALS, RESULTS['1'], RESULTS['2']}
 
 
 def fingerprint(value):
@@ -92,9 +100,7 @@ def quote_rows(rows, as_of, kickoff):
     chosen, inputs = {}, []
     for key, group in groups.items():
         usable = [r for r in group if price_usable(r, as_of, kickoff)]
-        native = [r for r in usable if r['spec']['kind'] == 'total' and r.get('quote_source') != 'asian_halfline'
-                  and r.get('quote_status') == 'recent' and outcome_fair(r) is not None]
-        pick = max(native or usable, key=lambda r: (r['odd'], stamp(r['quote_observed_at']), r['id'] == key, r['id']),
+        pick = max(usable, key=lambda r: (r['odd'], stamp(r['quote_observed_at']), r['id'] == key, r['id']),
                    default=next((r for r in group if r['id'] == key), group[0]))
         chosen[key] = pick, bool(usable)
         inputs.extend(dict(r, spec=canonical(r['spec'])) for r in usable if outcome_fair(r) is not None)
@@ -450,7 +456,69 @@ def signal(key, row, reason, *, relaxed=False):
                 horizon_label=TAGS[row['horizon']], niche_id=row['niche_id'],
                 niche_label=NICHE_LABELS.get(row['niche_id']), reasons=[reason],
                 motivation=selection_motivation(row, reason, relaxed),
-                **{field: row[field] for field in ('origin_badge', 'origin_tooltip', 'selection_context') if field in row})
+                **{field: row[field] for field in ('origin_badge', 'origin_tooltip', 'selection_context',
+                    'lambda_profile', 'decision_quality_policy', *OPPOSITE_FIELDS, *PRICE_UPGRADE_FIELDS) if field in row})
+
+
+def mark_opposite_conflicts(records, sources, as_of, kickoff):
+    """Compare executable opposite prices in this same immutable snapshot."""
+    for key, row in records.items():
+        spec = json.loads(key)
+        kind, side = spec.get('kind'), spec.get('side')
+        reverse = ({'over': 'under', 'under': 'over'} if kind == 'total' else
+                   {'yes': 'no', 'no': 'yes'} if kind == 'btts' else {})
+        opposite = market_id({**spec, 'side': reverse[side]}) if side in reverse else None
+        other = records.get(opposite) or {}
+        quote = row.get('quote') or {}
+        matches = []
+        # Sources include all recorded representations of the same contract.
+        for source in sources.values():
+            if (not opposite or market_id(canonical(source.get('spec') or {})) != opposite
+                    or not price_usable(source, as_of, kickoff) or not price_identity(source)
+                    or not finite(other.get('calibrated'))):continue
+            same = str(source['bookmaker_id']) == str(quote.get('bookmaker_id')) if quote.get('bookmaker_id') is not None else None
+            ev = other['calibrated']*source['odd']-1
+            matches.append((ev >= 0, same is True, ev, str(source['id']), source, same))
+        best = max(matches, key=lambda v:v[:4]) if matches else None
+        conflict = bool(best and best[0] and finite(row.get('ev')) and row['ev'] < 0 and
+                        finite(row.get('odd')) and row.get('quote'))
+        evidence = dict(opposite_market=opposite, opposite_odd=best[4]['odd'] if best else None,
+            opposite_ev=best[2] if best else None, opposite_margin_pct=best[4].get('selected_margin_pct') if best else None,
+            opposite_same_operator=best[5] if best else None, cross_same_operator=best[5] if best else None,
+            opposite_conflict_flag=conflict,
+            opposite_quote_observed_at=utc(best[4].get('quote_observed_at')) if best else None)
+        row.update(evidence)
+        source = sources.get(row['source_market_id'])
+        if source is not None:
+            source.update(evidence)
+            if conflict:
+                for name in ('opportunity', 'platinum'):
+                    decision = source.get(name)
+                    if decision:
+                        decision.update(eligible=False, strict_eligible=False, rank=None,
+                            reasons=list(dict.fromkeys([*(decision.get('reasons') or []), 'opposite_value_conflict'])))
+        if conflict:row['edge_exclusions'].append('opposite_value_conflict')
+
+
+def routing_markets(role_markets, records):
+    """Transfer admission only to the real, verified better-price contract."""
+    result = {role:set(markets) for role,markets in role_markets.items()}
+    for markets in result.values():
+        for key in list(markets):
+            better = records.get(key, {}).get('price_replaced_by')
+            if better in records:
+                markets.remove(key);markets.add(better)
+    return result
+
+
+def selection_quality_rank(role, key, row):
+    ev = row.get('ev'); margin = (row.get('features') or {}).get('margin_pct')
+    profile = row.get('lambda_profile') or {}
+    event = row.get('price_upgrade_control_market', key)
+    preferred = (role != 'most_probable' or event in BASE_MARKETS and finite(row.get('odd'))
+                 and 1.55 <= row['odd'] <= 2.15 and row['calibrated'] >= .45)
+    return (not row.get('opposite_conflict_flag'), finite(ev) and ev >= 0,
+            preferred, not profile.get('weak_side', False))
 
 
 def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, locked, role_markets,
@@ -471,12 +539,14 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
             row = records[key]
             if candidate_filter and not candidate_filter(role,key,row,fixed):
                 continue
-            if row['spec_kind'] not in ('result', 'total', 'btts', *JOINT_KINDS):
+            if row['spec_kind'] not in ('result', 'total', 'btts', *JOINT_KINDS) and not row.get('price_upgrade_source'):
                 continue
             is_estimate = not finite(row['odd'])
             if is_estimate and not (model_only or allow_model_estimates):
                 continue
             value = row['model_fair_odd'] if is_estimate else row['odd']
+            if not operational_role_allowed(role,json.loads(key),value,row.get('ev'),(row.get('features') or {}).get('margin_pct')):
+                continue
             in_role = key in role_markets[role]
             if not in_role and not locked_market:
                 continue  # Outside-role observations belong in the full matrix.
@@ -501,8 +571,8 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
                 ranks.append((0, False, 0., 0., ''))
                 continue
             row = records[key]
-            preferred = key in standard[role]
-            ranking = ranker(role,key,row) if ranker else (row['calibrated'],row['ev'] or 0.,key)
+            preferred = key in standard[role] and not row.get('opposite_conflict_flag')
+            ranking = (*selection_quality_rank(role,key,row),*(ranker(role,key,row) if ranker else (row['calibrated'],row['ev'] or 0.,key)))
             ranks.append((2 if preferred else 1, preferred and finite(row['odd']),*ranking))
         # A third relaxed filler must not displace a standard role candidate.
         return (sum(rank[0] == 2 for rank in ranks), sum(rank[0] > 0 for rank in ranks),
@@ -523,9 +593,11 @@ def fill_study_slots(triad, records, allow_model_estimates, allow_unpriced, lock
 
 
 def role_rank(role, key, row):
+    prefix = selection_quality_rank(role,key,row)
+    adjusted = row['ev']-margin_friction((row.get('features') or {}).get('margin_pct'))
     if role == 'most_probable':
-        return row['calibrated'], row['ev_low'], row['ev'], key
-    return bool(row['niche_id']), row['ev']+priority_bonus(key, role, row), row['calibrated'], key
+        return (*prefix, row['calibrated'], row['ev_low'], adjusted, key)
+    return (*prefix, bool(row['niche_id']), adjusted+priority_bonus(key, role, row), row['calibrated'], key)
 
 
 def qualified_refresh_candidate(row):
@@ -650,6 +722,12 @@ def away_shot_admitted(row, *, symmetric_shadow=False):
 def route(records, observed, *, study=False, allow_model_estimates=False, allow_unpriced=False,
           locked=None, role_markets=TRIAD_MARKETS, limits=TRIAD_LIMITS, ev_recoveries=None,
           qualified_alternatives=(), ranker=None, candidate_filter=None, away_symmetric_shadow=False):
+    role_markets = routing_markets(role_markets, records)
+    custom_filter = candidate_filter
+    def candidate_filter(role,key,row,held):
+        return (operational_role_allowed(role,json.loads(key),row.get('odd'),row.get('ev'),
+                    (row.get('features') or {}).get('margin_pct'))
+                and (not custom_filter or custom_filter(role,key,row,held)))
     locked = locked or {}
     reserved = set(locked.values())
     triad = dict.fromkeys(TRIAD_MARKETS)
@@ -880,6 +958,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     records, pricing_context = {}, {}
     sources = {r['id']: r for r in original_rows}
     profiles = assessment.get('profiles') or {}
+    from v7_movement_shadow import peak_support
     limited_national_history = national_competition(meta.get('league')) and all(
         profiles.get(side, {}).get('for_'+period, {}).get('sample', 0) >= minimum
         for side in ('home', 'away') for period, minimum in (('ft', 3), ('ht', 2)))
@@ -924,15 +1003,23 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
                                                               include_relations=False),
                             edge_exclusions=exclusions, policy_exclusions=(source.get('opportunity') or {}).get('reasons') or [],
                             platinum_exclusions=(source.get('platinum') or {}).get('reasons') or [])
+        records[key]['lambda_profile'] = market_lambda_profile(spec, stats,
+            without_peak=source.get('without_peak') if type(source.get('without_peak')) is bool
+                else peak_support(profiles, spec.get('period')))
+        records[key]['decision_quality_policy'] = DECISION_QUALITY_POLICY
+    mark_opposite_conflicts(records, sources, as_of, meta['kickoff'])
     niches, observed_patterns = niche_evidence(records, assessment, calibrated, stats, totals, weight,
                                                [r for r in fair_rows if r['quote_status'] == 'recent'], means)
     deficit_context = single_deficit(assessment, meta, as_of)
     for key, row in records.items():
         row['niche_id'] = next((name for name, keys in niches.items() if key in keys), None)
         source = sources[row['source_market_id']]
-        if (source.get('platinum') or {}).get('eligible') is True:
+        margin = (row.get('features') or {}).get('margin_pct')
+        promotable = (not row.get('opposite_conflict_flag') and finite(row.get('ev')) and row['ev'] > 0
+                      and finite(margin) and 0 <= margin <= 8 and price_identity(source))
+        if promotable and (source.get('platinum') or {}).get('eligible') is True:
             row['tier'] = 'PLATINUM'
-        elif (source.get('opportunity') or {}).get('eligible') is True:
+        elif promotable and (source.get('opportunity') or {}).get('eligible') is True:
             row['tier'] = 'GOLD'
         elif row['niche_id'] or (row['supported'] and finite(row['ev']) and row['ev'] > 0
                                 and finite(row['ev_low']) and row['ev_low'] >= 0):
@@ -950,6 +1037,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
         if legs and row['odd'] is None and all(finite(records.get(leg, {}).get('odd')) for leg in legs):
             row['reference_legs'] = [dict(market_id=leg, label=records[leg]['label'], odd=records[leg]['odd'],
                                           quote=records[leg]['quote']) for leg in legs]
+
+    price_upgrades = upgrade_equivalent_prices(records, sources, as_of, meta['kickoff'])
 
     rome = ZoneInfo('Europe/Rome')
     days_ahead = (kickoff.astimezone(rome).date()-at.astimezone(rome).date()).days
@@ -1015,6 +1104,7 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     tier = max((pick['tier'] for pick in triad.values() if pick), key=TIER_RANK.__getitem__,
                default='BLU' if niches or any(row['tier'] for row in records.values()) else None)
     payload = dict(version=VERSION, status='published', fixture_id=str(meta['fixture_id']),
+                   decision_quality_policy=DECISION_QUALITY_POLICY, price_upgrades=price_upgrades,
                    qualification_policy=POSITIVE_ALTERNATIVES_POLICY,
                    study_selection_policy=STUDY_SELECTION_POLICY,
                    captured_at=utc(at), kickoff=utc(kickoff), statistics_at=utc(statistics_at),
