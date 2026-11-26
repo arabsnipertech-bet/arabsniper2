@@ -56,8 +56,9 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
   const file=path.join(__dirname,'../web',url.pathname);if(fs.existsSync(file)&&fs.statSync(file).isFile())return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.html')?'text/html':file.endsWith('.css')?'text/css':'text/javascript'});
   return route.fulfill({status:404,body:'Not found'});
  });
+ const initialSearches=page.waitForResponse(response=>new URL(response.url()).pathname.endsWith('/explorer/searches'));
  await page.goto('https://explorer.test/gold-explorer.html');await page.locator('h1').evaluate(el=>el.prepend('COLLAUDO QA — DATI SINTETICI · '));await page.locator('#message').filter({hasText:'Dati caricati.'}).waitFor();
- assert.equal(await page.locator('#results .selection').count(),10);const initial=calls.length;
+ assert.equal(await page.locator('#results .selection').count(),10);await initialSearches;const initial=calls.length;
  assert.equal(await page.inputValue('#mode'),'goals');
  assert.equal(await page.locator('#results .market').first().innerText(),'Over 1,5 PT');
  assert(!(await page.locator('#results').innerText()).includes('AH -0.25'));
