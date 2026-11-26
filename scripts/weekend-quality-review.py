@@ -129,7 +129,7 @@ def original_choices(fid, fixture, day):
     return rows
 
 
-def cache_recovery_probe(archives):
+def cache_recovery_probe(archives, receipts=None):
     """Current cached outcomes only; separate from the frozen 07:00 backtest."""
     from unittest.mock import patch
     from audit_official_scores import cached_feed, needs_result, read_live_scores
@@ -149,11 +149,21 @@ def cache_recovery_probe(archives):
             scores = read_live_scores({fid:f['kickoff'] for fid,f in pending.items()},now)
         finals = {fid:s for fid,s in scores.items() if s.get('status') in FINISHED
                   and None not in (s.get('home_ft'),s.get('away_ft'))}
+        administrative = {fid:s for fid,s in scores.items()
+                          if s.get('status') in VOID or rescheduled_result(s)}
+        saved = ((receipts or {}).get(archive['date']) or {}).get('fixtures') or {}
         coverage[archive['date']] = dict(pending_or_missing_ht=len(pending),
             cached_confirmed_finals=len(finals),
             cached_complete_ht_ft=sum(not needs_result(s) for s in finals.values()),
-            cached_void_or_rescheduled=sum(s.get('status') in VOID or rescheduled_result(s) for s in scores.values()),
-            still_without_cached_final=len(set(pending)-set(finals)))
+            cached_void_or_rescheduled=len(administrative),
+            still_without_cached_final=len(set(pending)-set(finals)),
+            still_without_cached_resolution=len(set(pending)-set(finals)-set(administrative)),
+            cached_administrative_evidence=[dict(fixture_id=fid,
+                forecast_kickoff=pending[fid]['kickoff'],
+                receipt_kickoff=(saved.get(fid) or {}).get('kickoff'),
+                provider_kickoff=score.get('rescheduled_to') or score.get('provider_kickoff'),
+                provider_observed_at=score.get('provider_observed_at'),status=score.get('status'))
+                for fid,score in sorted(administrative.items())])
     return dict(as_of=now.isoformat(),status='read',days=coverage,
                 provider_calls=0,remote_writes=0,historical_probabilities_reconstructed=False)
 
@@ -256,6 +266,8 @@ def main():
     extras = ['data/arab_quote_v7_weights.json', 'data/arab_quote_auditor_daily_priority.json',
               f'auditarchive/prematch_{END}_v7_learning.json']
     paths = [p for p in required+extras if p in index]
+    receipt_files={day:f'auditarchive/prematch_{day}_v7_evidence.json' for day in days}
+    paths.extend(path for path in receipt_files.values() if path in index)
     if not all(p in index for p in required): raise ValueError('Missing closed-day archives')
     with tempfile.TemporaryDirectory(prefix='v7-weekend-review-') as folder:
         root = Path(folder); restore_subset(storage, bucket, root, index, paths, fast_restore=True)
@@ -268,7 +280,8 @@ def main():
             archives.append(dict(date=day, fixtures=fixtures, samples=samples))
             print(json.dumps({'loaded_day': day, 'fixtures': len(fixtures), 'samples': len(samples)}), flush=True)
         report = review(archives)
-        report['cached_results_probe'] = cache_recovery_probe(archives)
+        receipts={day:read_store(root/path,{}) for day,path in receipt_files.items() if path in index}
+        report['cached_results_probe'] = cache_recovery_probe(archives,receipts)
         learning = read_store(root/extras[-1], {})
         report['learning'] = {k: learning.get(k) for k in ('version', 'date', 'window_days', 'half_life_days',
             'state', 'checked_days', 'anomalies', 'verified_fixtures', 'comparison', 'update', 'manual_review')}

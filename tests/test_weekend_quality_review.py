@@ -12,6 +12,23 @@ spec.loader.exec_module(review)
 
 
 class WeekendEvidence(unittest.TestCase):
+    def test_cached_reschedule_is_resolution_not_missing_final_and_exposes_join_identity(self):
+        now=datetime(2026,11,26,10,tzinfo=timezone.utc)
+        original='2026-11-25T19:00:00Z'
+        cache=dict(schema_version=1,enabled=True,fixtures={'7':dict(fixture_id='7',source='API-Football',
+            status='NS',provider_kickoff='2026-11-27T19:00:00Z',observed_at='2026-11-26T07:00:00Z')})
+        archives=[dict(date='2026-11-25',fixtures={'7':dict(status='pending',kickoff=original)})]
+        receipts={'2026-11-25':dict(fixtures={'7':dict(kickoff=original)})}
+        with patch('audit_official_scores.cached_feed',return_value=cache),patch.object(review,'datetime') as clock:
+            clock.now.return_value=now
+            row=review.cache_recovery_probe(archives,receipts)['days']['2026-11-25']
+        self.assertEqual(row['still_without_cached_final'],1)
+        self.assertEqual(row['still_without_cached_resolution'],0)
+        self.assertEqual(row['cached_void_or_rescheduled'],1)
+        evidence=row['cached_administrative_evidence'][0]
+        self.assertEqual(evidence['forecast_kickoff'],evidence['receipt_kickoff'])
+        self.assertEqual(evidence['provider_kickoff'],'2026-11-27T19:00:00+00:00')
+
     def test_later_cutoff_is_explicit_bounded_and_retains_original_default(self):
         now=datetime(2026,11,26,11,tzinfo=timezone.utc)
         self.assertEqual(review.CUTOFF,datetime(2026,11,26,7,tzinfo=timezone.utc))
