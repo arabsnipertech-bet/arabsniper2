@@ -419,16 +419,8 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await card.locator('[data-v7-slot=most_probable] b').innerText(),'GG FT');
    assert((await card.innerText()).includes('58,0%'));
    assert.equal(await card.locator('[data-v7-slot]').count(),3);
-   assert.equal(await card.locator('[data-v7-slot] .mx-origin-badge').count(),3);
+   assert.equal(await card.locator('[data-v7-slot] .mx-origin-badge').count(),0);
    assert((await card.innerText()).includes('[2° TEMPO]'));
-   if(width===1280){
-    const trigger=card.locator('[data-v7-slot="most_probable"] .mx-origin-badge'),tooltip=page.getByRole('tooltip');
-    await trigger.hover();
-    assert.match(await tooltip.innerText(),/λ Casa 1,72 · Ospite 1,29/);
-    assert.equal(await trigger.getAttribute('aria-describedby'),'mx-origin-tooltip');
-    await card.locator('h3').hover();
-    await tooltip.waitFor({state:'hidden'});
-   }
    await card.locator('[data-mx-open]').click();
    const modal=page.locator('dialog');
    const headline=modal.locator('[data-v7-slot="most_probable"]');
@@ -461,19 +453,20 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
   }
   const mobile=await matrixPage(browser,activePayload,{viewport:{width:390,height:844},hasTouch:true,isMobile:true});
   try{
-   const card=mobile.locator('.mx-card'),trigger=card.locator('[data-v7-slot="most_probable"] .mx-origin-badge');
+   const card=mobile.locator('.mx-card');
+   assert.equal(await card.locator('.mx-origin-badge').count(),0);
+   await card.locator('[data-mx-open]').tap();
+   const modal=mobile.locator('dialog'),trigger=modal.locator('[data-v7-slot="most_probable"] .mx-origin-badge');
    const tooltip=mobile.getByRole('tooltip');
    await trigger.tap();
    assert.match(await tooltip.innerText(),/Prob\. V7 58,0%/);
    assert.equal(await trigger.getAttribute('aria-expanded'),'true');
-   assert.equal(await mobile.locator('dialog').count(),0);
+   assert.equal(await mobile.locator('dialog').count(),1);
    await trigger.tap();
    await tooltip.waitFor({state:'hidden'});
    await trigger.tap();
-   await card.locator('h3').tap();
+   await modal.locator('h2').tap();
    await tooltip.waitFor({state:'hidden'});
-   await card.locator('[data-mx-open]').tap();
-   const modal=mobile.locator('dialog');
    await modal.locator('[data-v7-advanced] > summary').tap();
    const combo=matrix.rows.find(r=>r.spec.kind==='halves_total');
    await modal.locator('[data-mx-instrument]').selectOption(combo.id);

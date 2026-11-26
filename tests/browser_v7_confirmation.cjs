@@ -24,7 +24,7 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
     view.v7.measurement={protocol:'V7_RESEARCH_TRACE_20261125_V1',markets:{[key]:{
      sample_sizes:{home:{for_ht:8},away:{for_ht:4}},without_peak:false,
      flow_fields:{paired_books:0,agreeing_books:0}}}};
-    document.querySelector('#results').innerHTML=ArabMatrix.triadPanel(view);
+    document.querySelector('#results').innerHTML=ArabMatrix.triadPanel(view,true);
     const saved={origin_badge:'Trend Quota +5,5%',origin_tooltip:'Motivazione storica congelata'};
     if(ArabMatrix.marketOrigin(source,{record:saved}).origin_badge!==saved.origin_badge)throw Error('Historical explanation rewritten');
    });
