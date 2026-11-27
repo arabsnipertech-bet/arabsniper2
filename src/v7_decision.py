@@ -17,7 +17,8 @@ from matrix_quotes import safe_price_row, upgrade_equivalent_prices
 from multimarket_model import fair, stamp
 from opportunity_policy import annotate as annotate_gold, operational_role_allowed, margin_friction
 from statistics_first import market_lambda_profile
-from platinum_policy import annotate as annotate_platinum
+from platinum_policy import annotate as annotate_platinum, evaluate as evaluate_platinum
+from opportunity_policy import RULES_REVISION, GOLD_EV_LOW_FLOOR_PCT
 from v7_probability import (BASE_WEIGHT, VERSION, blend_rates, fair_inputs, finite,
                             goal_structure, market_rates, outcome_fair, price_usable, pricing_evidence, raw_rates,
                             score_model, statistical_rates, utc, price_identity)
@@ -929,6 +930,38 @@ def prior_triad_commitments(assessment, meta, as_of):
     return {}
 
 
+def promote_selected_contract(pick, record, source, as_of):
+    """Extend badges after routing using the stored decision for this exact price."""
+    gold = source.get('opportunity') or {}
+    if (pick.get('tier') != 'BLU' or gold.get('rules_revision') != RULES_REVISION
+            or gold.get('goal_market') is not None or 'market' not in (gold.get('reasons') or ())):
+        return
+    reasons = [reason for reason in gold['reasons'] if reason != 'market']
+    confirmation_data = record.get('confirmation') or {}
+    if (pick.get('study_only') or confirmation_data.get('qualification_type') != 'documented_value'
+            or confirmation_data.get('value_qualified') is not True):
+        reasons.append('confirmation')
+    if (not price_identity(source) or pick.get('source_market_id') != source.get('id')
+            or pick.get('odd') != source.get('odd') or record.get('opposite_conflict_flag')):
+        reasons.append('execution')
+    # The common prudent Gold floor also applies outside the original goal list.
+    minimum_low = gold.get('entry_min_ev_low_pct')
+    if not finite(minimum_low) or not finite(record.get('ev_low')) or 100 * record['ev_low'] + 1e-9 < minimum_low + GOLD_EV_LOW_FLOOR_PCT:
+        reasons.append('sensitivity')
+    if not finite(record.get('ev')) or record['ev'] <= 0:
+        reasons.append('edge')
+    audit = dict(policy='selected_contract_v1', gold_reasons=list(dict.fromkeys(reasons)))
+    pick['selected_contract_badge'] = audit
+    if reasons:
+        return
+    platinum = evaluate_platinum(source, as_of, {**gold, 'eligible': True, 'reasons': []},
+                                 selected_contract=True)
+    audit['platinum_reasons'] = platinum['reasons']
+    level = 'PLATINUM' if platinum['eligible'] else 'GOLD'
+    record['tier'] = level
+    pick.update(tier=level, badge=BADGES[level])
+
+
 def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, commitments=None,
             triad_refresh=None, recent_selection=None):
     at, kickoff = stamp(as_of), stamp(meta.get('kickoff'))
@@ -1098,6 +1131,10 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
         if pick['observation_only']:
             pick.update(study_only=True,tier='BLU',badge=BADGES['BLU'])
             pick['motivation'] = selection_motivation(record,'solo_osservazione',True)
+    for pick in triad.values():
+        if pick:
+            record = records[pick['market_id']]
+            promote_selected_contract(pick, record, sources[record['source_market_id']], as_of)
     for tier_name in ('gold','platinum'):
         signals[tier_name] = next((p for p in triad.values() if p and not p.get('observation_only')
                                    and p['tier'] == tier_name.upper()),None)
