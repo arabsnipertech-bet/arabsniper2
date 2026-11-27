@@ -88,11 +88,24 @@
   if(type==='study'||type==='observation')return 'Esito in osservazione'+(finite(p)?' con una probabilità stimata del '+probability(p):'')+'.';
   return '';
  }
+ function comparisonScale(value,context={}){
+  const spec=context.spec||{};
+  const kind=spec.kind||value.kind||value.spec_kind;
+  // A win threshold of 1 / odd requires binary settlement.
+  const binary=['result','btts','dc','score','halves_total','both_halves','pt_ft_total','pt_btts_ft_total'].includes(kind)
+   ||(['total','asian_total','team_total','handicap'].includes(kind)&&finite(spec.line)&&Math.abs(spec.line)%1===.5);
+  const p=value.probability??value.calibrated,odd=value.odd;
+  if(!binary||!finite(p)||p<0||p>1||!finite(odd)||odd<=1||value.quote_state==='model_estimate')return '';
+  const threshold=1/odd;
+  return '<div class="cockpit-scale"><div class="cockpit-track" aria-hidden="true"><i style="left:'+100*threshold+
+   '%"></i><b style="left:'+100*p+'%"></b></div><div class="cockpit-key"><span>● V7 '+probability(p)+
+   '</span><span>│ Soglia quota '+probability(threshold)+'</span></div></div>';
+ }
  function render(value,context){
   const q=describe(value,context);if(!q)return '';
   return (q.facts.length?'<div class="v7-qualification" data-qualification="'+esc(q.type)+'" aria-label="'+esc(q.label)+'">'+
    '<strong class="v7-qualification-label">Perché questa scelta</strong><span class="v7-qualification-text">'+
-   esc(choiceReason(value,q.type))+' '+q.facts.map(v=>'<span>'+esc(v)+'</span>').join('')+'</span></div>':'')+
+   esc(choiceReason(value,q.type))+' '+q.facts.map(v=>'<span>'+esc(v)+'</span>').join('')+'</span>'+comparisonScale(value,context)+'</div>':'')+
    '';
  }
  function help(){return '<details class="v7-numbers-help"><summary>Che cos’è l’EV?</summary><p>L’EV è il rendimento medio stimato alla quota indicata. Con una probabilità del 50% e una quota di 2,10, il modello stima un EV +5%: in media 5 centesimi per euro su molte giocate simili. Una singola giocata può perdere.</p></details>';}

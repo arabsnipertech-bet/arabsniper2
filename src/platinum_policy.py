@@ -9,9 +9,9 @@ LIMITS = {'min_oci': 30, 'max_delta_pct': -3, 'max_margin_pct': 8,
           'min_ev_low_pct': 2., 'secondary_oci': 50}
 
 
-def flow_rejections(row, as_of, max_drop):
+def flow_rejections(row, as_of, max_drop, *, selected_contract=False):
     reasons = []
-    if goal_market(row) is None: reasons.append('market')
+    if not selected_contract and goal_market(row) is None: reasons.append('market')
     odd, first = row.get('odd'), row.get('first_odd')
     if row.get('quote_status') not in ('recent', 'cached_stable') or not numeric(odd) or odd <= 1:
         reasons.append('price')
@@ -40,10 +40,10 @@ def flow_rejections(row, as_of, max_drop):
     return reasons
 
 
-def evaluate(row, as_of, gold=None):
+def evaluate(row, as_of, gold=None, *, selected_contract=False):
     if gold is None:
         gold = evaluate_gold(row)
-    reasons = flow_rejections(row, as_of, LIMITS['max_delta_pct'])
+    reasons = flow_rejections(row, as_of, LIMITS['max_delta_pct'], selected_contract=selected_contract)
     if gold.get('eligible') is not True:
         reasons.extend(gold.get('reasons') or ['gold_requirements'])
     move = row.get('selected_movement') or {}

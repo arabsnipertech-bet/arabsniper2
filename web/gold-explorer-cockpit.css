@@ -1,0 +1,49 @@
+/* Gold and Explorer share the same instruments and hierarchy. */
+body.cockpit {
+  --ice:#84e4ff; --bg:#080f1c; --panel:#101e30; --line:#304458; --muted:#b0c1d1;
+  background:radial-gradient(ellipse at 78% 0%,#193450 0,transparent 39rem),var(--bg);
+  color:#eef5fc; font-variant-numeric:tabular-nums;
+}
+.cockpit .topbar, .cockpit .shell > header {
+  background:linear-gradient(115deg,#172a40,#0a1422 76%);
+  border-bottom:1px solid var(--ice); box-shadow:0 3px 14px #4ac8ff18;
+}
+.cockpit .shell > header {padding-inline:clamp(10px,2vw,28px)}
+.cockpit .gold-sidebar {background:#091423}
+.cockpit .match-card, .cockpit .cx-card, .cockpit .selection, .cockpit .metric {
+  background:linear-gradient(145deg,#17283c,#101c2d 72%); border-color:var(--line);
+}
+.cockpit .match-title, .cockpit .selection h3 {color:#f4f9ff;letter-spacing:-.025em}
+.cockpit .intro h1 em, .cockpit .metric strong, .cockpit .numbers strong,
+.cockpit .mx-triad-market strong, .cockpit .mx-explorer-match {color:var(--ice)}
+.cockpit .tabs [aria-current=page] {background:var(--ice);color:#081525}
+.cockpit .selection {border-radius:12px}
+.cockpit .mx-triad, .cockpit .mx-v7-panel .mx-triad {display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
+.cockpit .mx-triad > li[data-v7-slot] {
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:4px 14px;
+  align-items:start;padding:12px 14px;color:#eef5fc;border:1px solid #36506a;border-radius:9px;
+  background:linear-gradient(105deg,#1b3046,#101d30 72%);outline:none;animation:none;
+}
+.cockpit .mx-triad > li[data-v7-slot] > .mx-triad-heading,
+.cockpit .mx-triad > li[data-v7-slot] > .v7-qualification,
+.cockpit .mx-triad > li[data-v7-slot] > details {grid-column:1/-1}
+.cockpit .mx-triad-heading {flex-wrap:wrap}
+.cockpit .mx-triad > li .mx-triad-market {grid-column:1/-1;align-items:baseline;font-size:1rem}
+.cockpit .mx-triad-market strong {font-size:1.3rem}
+.cockpit .mx-triad .mx-triad-outcome {animation:none}
+.cockpit .v7-qualification {background:#0b1725;border-color:#38556b}
+.cockpit .v7-qualification-label {color:#d3e8f5}
+.cockpit .cockpit-scale {margin-top:9px;padding:2px 2px 0}
+.cockpit .cockpit-track {position:relative;height:4px;margin:6px 5px 9px;border-radius:8px;background:linear-gradient(to right,#273c50,#608198)}
+.cockpit-track i,.cockpit-track b {position:absolute;top:50%;transform:translate(-50%,-50%)}
+.cockpit-track i {height:14px;width:2px;background:#fff}
+.cockpit-track b {width:9px;height:9px;background:var(--ice);border:1px solid #092235;border-radius:50%}
+.cockpit .cockpit-key {display:flex;justify-content:space-between;flex-wrap:wrap;gap:3px 8px;font-size:.72rem;color:#c3d4e5}
+.cockpit .cockpit-key span:first-child {color:var(--ice)}
+.cockpit .selection .badge[data-tier=GOLD] {color:#ffda81;border-color:#a38542}
+.cockpit .selection .badge[data-tier=PLATINUM] {color:#e1eaf7;border-color:#a6bbd2}
+@media (max-width:640px) {
+  .cockpit .shell {padding-inline:14px}
+  .cockpit .mx-triad > li[data-v7-slot] {padding:11px;gap:4px 8px}
+  .cockpit .mx-triad > li[data-v7-slot] > small {grid-column:1/-1}
+}
