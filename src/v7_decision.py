@@ -817,6 +817,44 @@ def route(records, observed, *, study=False, allow_model_estimates=False, allow_
     return triad, signals
 
 
+def replace_recommended_over_combo(triad, signals, records):
+    """Resolve only the combined Over recommendation after the other roles are assigned."""
+    role = 'recommended_alternative'
+    previous = triad.get(role)
+    if not previous or previous['market_id'] != OVER_CARRY:
+        return False
+    held = {slot: pick['market_id'] for slot, pick in triad.items() if slot != role and pick}
+    floor, minimum, maximum = TRIAD_LIMITS[role]
+    choices = []
+    for name in ('over15_ht', 'over25_ht', 'over15_sh', 'over25_sh'):
+        key = GOAL[name]
+        row = records.get(key)
+        if not row or key in held.values() or not compatible(key, *held.values()):
+            continue
+        odd, probability = row.get('odd'), row.get('calibrated')
+        if (not finite(odd) or odd <= 1 or not finite(probability) or not 0 < probability <= 1
+                or not row.get('study_supported') or row.get('opposite_conflict_flag')
+                or not coherent_slot_prices(records, {**held, role: key})):
+            continue
+        qualified = (minimum <= odd <= maximum and probability >= floor
+                     and row.get('supported') and row.get('tier') in BADGES
+                     and finite(row.get('ev')) and row['ev'] > 0
+                     and finite(row.get('ev_low')) and row['ev_low'] >= 0)
+        choices.append((bool(qualified), probability, row['ev'] if finite(row.get('ev')) else -float('inf'), key))
+    pick = None
+    if choices:
+        qualified, _, _, key = max(choices)
+        row = records[key]
+        if qualified:
+            pick = signal(key, row, role)
+        else:
+            pick = {**signal(key, {**row, 'tier': 'BLU'}, 'solo_studio', relaxed=True), 'study_only': True}
+        pick['selection_policy'] = {'id': 'RECOMMENDED_SINGLE_OVER_V1', 'replaces_market': OVER_CARRY}
+    triad[role] = pick
+    signals[SIGNAL_ROLES[role]] = pick if pick and not pick.get('study_only') else None
+    return True
+
+
 def commit_priced_slots(triad, captured_at, previous):
     commitments = dict(previous)
     for role, pick in triad.items():
@@ -1099,6 +1137,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     triad, signals = route(records, observed_patterns, study=True,
                            allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True, locked=locked,
                            ev_recoveries=recoveries, qualified_alternatives=alternative_roles)
+    if replace_recommended_over_combo(triad, signals, records) and commitments:
+        commitments = {role: slot for role, slot in commitments.items() if role != 'recommended_alternative'}
     for pick in triad.values():
         if pick and pick.get('ev_recovery'):
             records[pick['market_id']].update(tier='BLU', ev_recovery=dict(pick['ev_recovery']))
