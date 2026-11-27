@@ -1204,7 +1204,9 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
                            allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True, locked=locked,
                            ev_recoveries=recoveries, qualified_alternatives=alternative_roles)
     replaced_combo = replace_recommended_over_combo(triad, signals, records)
-    complete_prematch_slots(triad, records, replacing_combo=replaced_combo)
+    # A replay with frozen legacy commitments must settle its original contracts.
+    if (recent_selection or {}).get('enabled') is not False:
+        complete_prematch_slots(triad, records, replacing_combo=replaced_combo)
     if replaced_combo and commitments:
         commitments = {role: slot for role, slot in commitments.items() if role != 'recommended_alternative'}
     for pick in triad.values():
