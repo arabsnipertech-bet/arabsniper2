@@ -921,6 +921,48 @@ def complete_prematch_slots(triad, records, *, replacing_combo=False):
         triad[role] = {**pick, 'study_only': True, 'selection_policy': {'id': 'TRIAD_COMPLETION_V1'}}
 
 
+
+def prefer_reliable_half_over(triad, signals, records):
+    """Recheck a three-goal half after routing and completion have both run."""
+    role = 'recommended_alternative'
+    current = triad.get(role)
+    if not current or current['market_id'] not in (GOAL['over25_ht'], GOAL['over25_sh']):
+        return
+    held = {pick['market_id'] for name, pick in triad.items() if name != role and pick}
+    best = None
+    for name in ('over15_ht', 'over15_sh', 'over25_ht', 'over25_sh'):
+        key = GOAL[name]
+        row = records.get(key)
+        if not row or key in held or not compatible(key, *held):
+            continue
+        p, odd = row.get('calibrated'), row.get('odd')
+        if (not finite(p) or not current['probability'] < p <= 1 or not finite(odd) or odd <= 1
+                or row.get('opposite_conflict_flag') or row.get('price_replaced_by')
+                or not operational_role_allowed(role, json.loads(key), odd, row.get('ev'),
+                                                (row.get('features') or {}).get('margin_pct'))):
+            continue
+        rank = (p, bool(row.get('supported')), key)
+        if best is None or rank > best:
+            best = rank
+    if best:
+        key = best[-1]
+        row = records[key]
+        minimum_p, low, high = TRIAD_LIMITS[role]
+        qualified = (low <= row['odd'] <= high and row['calibrated'] >= minimum_p
+                     and row.get('supported') and row.get('tier') in BADGES
+                     and finite(row.get('ev')) and row['ev'] > 0
+                     and finite(row.get('ev_low')) and row['ev_low'] >= 0
+                     and coherent_slot_prices(records, {name: key if name == role else pick['market_id']
+                                                        for name, pick in triad.items() if pick}))
+        if qualified:
+            pick = signal(key, row, role)
+        else:
+            pick = {**signal(key, {**row, 'tier': 'BLU'}, 'solo_studio', relaxed=True), 'study_only': True}
+        pick['selection_policy'] = {'id': 'RECOMMENDED_HALF_RELIABILITY_V1', 'replaces_market': current['market_id']}
+        triad[role] = pick
+        signals[SIGNAL_ROLES[role]] = pick if qualified else None
+
+
 def commit_priced_slots(triad, captured_at, previous):
     commitments = dict(previous)
     for role, pick in triad.items():
@@ -1207,6 +1249,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     # A replay with frozen legacy commitments must settle its original contracts.
     if (recent_selection or {}).get('enabled') is not False:
         complete_prematch_slots(triad, records, replacing_combo=replaced_combo)
+        if not locked.get('recommended_alternative'):
+            prefer_reliable_half_over(triad, signals, records)
     if replaced_combo and commitments:
         commitments = {role: slot for role, slot in commitments.items() if role != 'recommended_alternative'}
     for pick in triad.values():
