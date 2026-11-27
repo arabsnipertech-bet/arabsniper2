@@ -703,7 +703,8 @@ const expiredView=api.publishedView(expired,triadNow);
 assert.equal(expiredView.triad.most_probable.signal.quote_state,'model_estimate');
 assert.equal(expiredView.triad.most_probable.signal.tier,'BLU');
 assert.equal(expiredView.triad.most_probable.record.odd,null);
-assert.match(api.triadPanel(expiredView),/Quota in attesa · equa 1,85/);
+assert.match(api.triadPanel(expiredView),/Quota alla selezione/);
+assert.doesNotMatch(api.triadPanel(expiredView),/Quota in attesa · equa 1,85/);
 assert.equal(expiredMatrix.v7.triad.most_probable.tier,'GOLD','Do not mutate the frozen forecast');
 assert.match(api.marketRow({...estimate,fair_odd:2.50}),/Quota equa V7 2,50/);
 
