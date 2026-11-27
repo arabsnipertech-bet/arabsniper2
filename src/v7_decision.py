@@ -860,6 +860,9 @@ def complete_prematch_slots(triad, records, *, replacing_combo=False):
     missing = [role for role in TRIAD_MARKETS if not triad.get(role)]
     if not missing:
         return
+    if replacing_combo and 'recommended_alternative' in missing:
+        missing.remove('recommended_alternative')
+        missing.insert(0, 'recommended_alternative')
     half_overs = {GOAL[name] for name in ('over15_ht', 'over25_ht', 'over15_sh', 'over25_sh')}
     held = {p['market_id'] for p in triad.values() if p}
     options = {}
