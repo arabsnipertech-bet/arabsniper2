@@ -855,6 +855,72 @@ def replace_recommended_over_combo(triad, signals, records):
     return True
 
 
+def complete_prematch_slots(triad, records, *, replacing_combo=False):
+    """Fill gaps with distinct compatible observations from the same frozen model."""
+    missing = [role for role in TRIAD_MARKETS if not triad.get(role)]
+    if not missing:
+        return
+    if replacing_combo and 'recommended_alternative' in missing:
+        missing.remove('recommended_alternative')
+        missing.insert(0, 'recommended_alternative')
+    half_overs = {GOAL[name] for name in ('over15_ht', 'over25_ht', 'over15_sh', 'over25_sh')}
+    held = {p['market_id'] for p in triad.values() if p}
+    options = {}
+    for role in missing:
+        native = TRIAD_MARKETS[role]
+        candidates = []
+        for key, row in records.items():
+            if key in held or row.get('price_replaced_by') or not compatible(key, *held):
+                continue
+            if role == 'recommended_alternative' and (key == OVER_CARRY or replacing_combo and key not in half_overs):
+                continue
+            if key not in native and key not in half_overs and row.get('spec_kind') not in ('result','total','btts'):
+                continue
+            p, odd = row['calibrated'], row['odd']
+            quoted = finite(odd) and odd > 1
+            price = odd if quoted else row.get('model_fair_odd')
+            if not finite(p) or not 0 < p <= 1 or not finite(price) or price <= 1:
+                continue
+            if not operational_role_allowed(role, json.loads(key), price, row.get('ev'),
+                                            (row.get('features') or {}).get('margin_pct')):
+                continue
+            minimum_p, low, high = STUDY_LIMITS[role]
+            rank = (not row.get('opposite_conflict_flag'), bool(row.get('supported')), key in native or
+                    role == 'recommended_alternative' and key in half_overs,
+                    low <= price <= high and p >= minimum_p, p, quoted, key)
+            candidates.append((rank, key))
+        options[role] = [key for _, key in sorted(candidates, reverse=True)]
+
+    # Prefer a complete combination, then the highest-ranked choices in role order.
+    # Only the empty roles are searched (at most three). Existing picks stay fixed.
+    best = {}
+    def search(index, selected):
+        nonlocal best
+        if len(selected) + len(missing) - index <= len(best):
+            return False
+        if index == len(missing):
+            best = dict(selected)
+            return len(best) == len(missing)
+        role = missing[index]
+        for key in options[role]:
+            if key in selected.values() or not compatible(key, *held, *selected.values()):
+                continue
+            selected[role] = key
+            if search(index + 1, selected):
+                return True
+            del selected[role]
+        return search(index + 1, selected)
+    search(0, {})
+    for role, key in best.items():
+        row = records[key]
+        estimate = not finite(row['odd'])
+        observed = {**row, 'tier': 'BLU'}
+        if estimate:
+            observed.update(odd=None, quote_state='model_estimate', ev=None, ev_low=None)
+        pick = signal(key, observed, 'stima_modello' if estimate else 'solo_studio', relaxed=True)
+        triad[role] = {**pick, 'study_only': True, 'selection_policy': {'id': 'TRIAD_COMPLETION_V1'}}
+
+
 def commit_priced_slots(triad, captured_at, previous):
     commitments = dict(previous)
     for role, pick in triad.items():
@@ -1137,7 +1203,11 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
     triad, signals = route(records, observed_patterns, study=True,
                            allow_model_estimates=0 <= days_ahead <= 5, allow_unpriced=True, locked=locked,
                            ev_recoveries=recoveries, qualified_alternatives=alternative_roles)
-    if replace_recommended_over_combo(triad, signals, records) and commitments:
+    replaced_combo = replace_recommended_over_combo(triad, signals, records)
+    # A replay with frozen legacy commitments must settle its original contracts.
+    if (recent_selection or {}).get('enabled') is not False:
+        complete_prematch_slots(triad, records, replacing_combo=replaced_combo)
+    if replaced_combo and commitments:
         commitments = {role: slot for role, slot in commitments.items() if role != 'recommended_alternative'}
     for pick in triad.values():
         if pick and pick.get('ev_recovery'):
