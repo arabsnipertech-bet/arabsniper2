@@ -225,7 +225,8 @@ class GoldV61(unittest.TestCase):
                 self.assertFalse(over['movement_confirmed'])
                 triad = updated['matrix']['v7']['triad']
                 self.assertEqual(len(triad), 3)
-                self.assertTrue(all(pick['motivation'] for pick in triad.values()))
+                self.assertIsNone(triad['high_odds_shot'])
+                self.assertTrue(all(triad[role]['motivation'] for role in ('most_probable','recommended_alternative')))
                 export=read_store(root/f'arab_quote_selections_day{i}.json')
                 self.assertEqual(export['opportunity_policy'],POLICY_ID)
             dashboard=read_store(root/'arab_quote_dashboard.json')
@@ -235,7 +236,7 @@ class GoldV61(unittest.TestCase):
             for fid, fixture in state['matrix_quotes'].items():
                 for field in ('openings', 'groups'):
                     self.assertEqual(saved[fid][field], fixture[field])
-            self.assertTrue(all(d['v7_complete_triads_with_motivation']==d['active_fixtures']==1
+            self.assertTrue(all(d['v7_complete_triads_with_motivation']==0 and d['active_fixtures']==1
                                 for d in dashboard['opportunity_refresh']['days'].values()))
 
     def test_fast_scan_refreshes_later_tabs_after_full_collection_too(self):

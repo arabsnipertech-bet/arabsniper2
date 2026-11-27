@@ -1120,7 +1120,15 @@
    Object.entries(TRIAD).map(([role,title])=>{
     const p=view.triad[role],s=p?.signal;
     const commitment=commitments[role];
-    const estimate=s?.quote_state==='model_estimate';
+    const recordedOdd=p?.expired?saved?.[role]?.odd:null;
+    const hasRecordedOdd=Number.isFinite(recordedOdd)&&recordedOdd>1;
+    const estimate=s?.quote_state==='model_estimate'&&!hasRecordedOdd;
+    if(role==='high_odds_shot'&&Date.parse(view.v7?.kickoff)>Date.now()&&
+       (!p||estimate||!(p.source.spec?.kind==='handicap'&&p.record.price_upgrade_source||
+         ['result','total','btts'].includes(p.source.spec?.kind)))){
+     return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+title+
+      '</span></div><small>In attesa di una singola con quota bookmaker.</small></li>';
+    }
     const badge=s&&levelBadge(String(s.tier).toLowerCase(),s.badge);
     const previous=p||commitment?triadHistoryPanel(match,role):'';
     const selected=commitment?.selection_timing;
@@ -1134,7 +1142,8 @@
     const heading=title;
     return '<li data-v7-slot="'+role+'"><div class="mx-triad-heading"><span>'+heading+'</span>'+(badge||'')+
      triadOutcomeSlot(match,p?.source.spec||triadMarketSpec(commitment))+'</div>'+
-     (p?'<div class="mx-triad-market"><b>'+esc(proposalLabel(p.record.label,p.source.spec))+'</b>'+(estimate?'':'<strong>'+num(p.record.odd,2)+'</strong>')+'</div>'+
+     (p?'<div class="mx-triad-market"><b>'+esc(proposalLabel(p.record.label,p.source.spec))+'</b>'+(estimate?'':'<strong>'+num(hasRecordedOdd?recordedOdd:p.record.odd,2)+'</strong>')+'</div>'+
+      (hasRecordedOdd?'<small>Quota alla selezione · '+triadTime(view.v7.captured_at)+'</small>':'')+
       (estimate?'<small>Quota in attesa'+(Number.isFinite(p.record.model_fair_odd)?' · equa '+num(p.record.model_fair_odd,2):'')+'</small>':'')+
       '<div class="mx-triad-meta"><span>'+esc(s.horizon_label)+'</span></div>'+
       (compact&&match?compactMetrics(p,view):'')+
@@ -1458,4 +1467,3 @@
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.ArabMatrix=api;
 })(typeof window!=='undefined'?window:globalThis);
-

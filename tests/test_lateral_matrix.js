@@ -632,7 +632,8 @@ assert.equal((triadHtml.match(/data-v7-slot=/g)||[]).length,3);
 assert.equal((triadHtml.match(/data-mx-origin-tooltip=/g)||[]).length,0,'Cards keep numerical evidence; the audit origin stays in the saved payload');
 for(const label of ['● GOLD','Over 1,5 ST','[2° TEMPO]','54,0%','EV +13,4%'])
  assert(triadHtml.includes(label),label);
-assert.equal((triadHtml.match(/Nessun mercato idoneo/g)||[]).length,2);
+assert.equal((triadHtml.match(/Nessun mercato idoneo/g)||[]).length,1);
+assert.match(triadHtml,/In attesa di una singola con quota bookmaker/);
 triadRow.quote_observed_at=triadStart;
 assert.match(api.card(triadMatch,{}),/Quota da aggiornare/);
 assert(!api.card(triadMatch,{}).includes('Over 1,5 ST'));
@@ -703,7 +704,8 @@ const expiredView=api.publishedView(expired,triadNow);
 assert.equal(expiredView.triad.most_probable.signal.quote_state,'model_estimate');
 assert.equal(expiredView.triad.most_probable.signal.tier,'BLU');
 assert.equal(expiredView.triad.most_probable.record.odd,null);
-assert.match(api.triadPanel(expiredView),/Quota in attesa · equa 1,85/);
+assert.match(api.triadPanel(expiredView),/Quota alla selezione/);
+assert.doesNotMatch(api.triadPanel(expiredView),/Quota in attesa · equa 1,85/);
 assert.equal(expiredMatrix.v7.triad.most_probable.tier,'GOLD','Do not mutate the frozen forecast');
 assert.match(api.marketRow({...estimate,fair_odd:2.50}),/Quota equa V7 2,50/);
 

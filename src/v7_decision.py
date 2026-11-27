@@ -963,6 +963,45 @@ def prefer_reliable_half_over(triad, signals, records):
         signals[SIGNAL_ROLES[role]] = pick if qualified else None
 
 
+def select_priced_shot(triad, signals, records):
+    role = 'high_odds_shot'
+    incumbent = triad.get(role)
+    held = {pick['market_id'] for slot, pick in triad.items() if slot != role and pick}
+    floor, minimum, _ = TRIAD_LIMITS[role]
+    options = []
+    for key, row in records.items():
+        odd, p = row['odd'], row['calibrated']
+        if (row['spec_kind'] not in ('result', 'total', 'btts') and not row.get('price_upgrade_source')
+                or row.get('price_replaced_by') or key in held
+                or not finite(odd) or odd <= 1 or (row.get('quote') or {}).get('bookmaker_id') is None
+                or not finite(p) or not 0 < p <= 1
+                or not operational_role_allowed(role, json.loads(key), odd, row['ev'],
+                                                row['features'].get('margin_pct'))
+                or not compatible(key, *held)):
+            continue
+        ev, low = row['ev'], row['ev_low']
+        rank = (not row.get('opposite_conflict_flag'), bool(row.get('supported')),
+                odd >= minimum, p >= floor, not (row.get('lambda_profile') or {}).get('weak_side'),
+                low if finite(low) else -float('inf'), ev if finite(ev) else -float('inf'), p, key)
+        options.append(rank)
+    key = max(options)[-1] if options else None
+    if incumbent and incumbent['market_id'] == key:
+        return
+    pick = None
+    if key:
+        row = records[key]
+        qualified = (qualified_refresh_candidate(row) and row['calibrated'] >= floor
+                     and row['odd'] >= minimum and not row.get('opposite_conflict_flag')
+                     and (row.get('price_upgrade_control_market', key) != AWAY or away_shot_admitted(row)))
+        if qualified:
+            pick = signal(key, row, role)
+        else:
+            pick = {**signal(key, {**row, 'tier': 'BLU'}, 'solo_studio', relaxed=True), 'study_only': True}
+        pick['selection_policy'] = {'id': 'PRICED_SINGLE_SHOT_V1'}
+    triad[role] = pick
+    signals[SIGNAL_ROLES[role]] = pick if pick and not pick.get('study_only') else None
+
+
 def commit_priced_slots(triad, captured_at, previous):
     commitments = dict(previous)
     for role, pick in triad.items():
@@ -1251,6 +1290,8 @@ def capture(assessment, meta, as_of, weight=BASE_WEIGHT, calibration=None, *, co
         complete_prematch_slots(triad, records, replacing_combo=replaced_combo)
         if not locked.get('recommended_alternative'):
             prefer_reliable_half_over(triad, signals, records)
+        if not locked.get('high_odds_shot'):
+            select_priced_shot(triad, signals, records)
     if replaced_combo and commitments:
         commitments = {role: slot for role, slot in commitments.items() if role != 'recommended_alternative'}
     for pick in triad.values():

@@ -94,7 +94,7 @@ class MathAndRouting(unittest.TestCase):
         self.assertEqual(markets[FT]['origin_badge'], "Volume 90' (λ 2,45)")
         self.assertIn('λ Casa 0,55 · Ospite 0,50', markets[GG]['origin_tooltip'])
         self.assertIn('λ 1,05', markets[GG_CARRY]['origin_tooltip'])
-        for slot in snapshot['triad'].values():
+        for slot in filter(None, snapshot['triad'].values()):
             market = markets[slot['market_id']]
             for key in ('origin_badge', 'origin_tooltip'):
                 self.assertEqual(slot[key], market[key])
@@ -141,15 +141,30 @@ class MathAndRouting(unittest.TestCase):
         self.assertFalse(cached_refresh_safe(paths + ['src/v7_probability.py']))
         self.assertFalse(cached_refresh_safe(paths + ['src/odds_collection.py']))
 
-    def test_no_books_use_three_fixture_estimates_even_with_only_priors(self):
+    def test_shot_prefers_supported_single_with_observed_price(self):
+        from test_v7_surgical_quality import record
+        from v7_decision import select_priced_shot
+        rows = {k: record(json.loads(k), p, odd)[1] for k, p, odd in
+                ((GG_CARRY, .4, 5.), (GG, .25, 5.), (GOAL['over25_ht'], .17, 5.5))}
+        triad = {'high_odds_shot': {'market_id': GG_CARRY}}
+        signals = {'colpaccio': triad['high_odds_shot']}
+        select_priced_shot(triad, signals, rows)
+        self.assertEqual((triad['high_odds_shot']['market_id'], triad['high_odds_shot']['odd']), (GG, 5.))
+        self.assertIsNone(signals['colpaccio'])
+        rows[GG]['odd'] = None
+        select_priced_shot(triad, signals, rows)
+        self.assertEqual(triad['high_odds_shot']['market_id'], GOAL['over25_ht'])
+
+    def test_no_books_keep_estimates_out_of_the_shot_even_with_only_priors(self):
         for kickoff in (START, '2026-11-13T19:00:00+01:00', '2026-11-14T19:00:00+01:00'):
             a = assessment()
             for row in a['matrix']['rows']:
                 row.update(odd=None, first_odd=None, quote_status='missing', quote_executable=False)
             meta = dict(META, kickoff=kickoff)
             snapshot = capture(a, meta, AT)
-            self.assertEqual([pick['market_id'] for pick in snapshot['triad'].values()], [FT, HT, GG])
-            for pick in snapshot['triad'].values():
+            self.assertIsNone(snapshot['triad']['high_odds_shot'])
+            self.assertEqual([pick['market_id'] for pick in snapshot['triad'].values() if pick], [FT, HT])
+            for pick in filter(None, snapshot['triad'].values()):
                 self.assertEqual((pick['tier'], pick['quote_state'], pick['study_only']), ('BLU', 'model_estimate', True))
                 self.assertIsNone(pick['odd'])
                 self.assertIsNone(pick['ev'])
@@ -161,11 +176,11 @@ class MathAndRouting(unittest.TestCase):
             from odds_recovery_diagnostic import rendered_browser_coverage
             a['matrix']['v7'] = snapshot
             rendered = rendered_browser_coverage([{'fixture': meta, 'multimarket': a}], datetime.fromisoformat(AT))
-            self.assertEqual(rendered, {'active_cards': 1, 'full_triads': 1, 'cards_with_estimates': 1,
-                'model_estimates': 3, 'three_empty_slots': 0, 'without_visible_proposal': 0})
+            self.assertEqual(rendered, {'active_cards': 1, 'full_triads': 0, 'cards_with_estimates': 1,
+                'model_estimates': 2, 'three_empty_slots': 0, 'without_visible_proposal': 0})
             a['profiles'] = {}
             prior = capture(a, meta, AT)
-            self.assertTrue(all(pick['study_only'] for pick in prior['triad'].values()))
+            self.assertTrue(all(pick['study_only'] for pick in prior['triad'].values() if pick))
             self.assertFalse(any(prior['signals'][tier] for tier in ('gold', 'platinum')))
 
     def test_study_uses_compatible_real_prices_without_publishing_weak_ev(self):
