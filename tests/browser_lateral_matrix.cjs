@@ -5,6 +5,7 @@ async function matrixPage(browser,payload,options={}){
  const page=await browser.newPage(options);await page.route('**/*',r=>r.abort());
  await page.setContent(fs.readFileSync('web/gold-dashboard-live.html','utf8'));
  await page.addStyleTag({content:fs.readFileSync('web/lateral-matrix.css','utf8')});
+ await page.addStyleTag({content:fs.readFileSync('web/gold-explorer-cockpit.css','utf8')});
  for(const name of ['competition-scope.js','lateral-matrix.js','live-scores.js'])
   await page.addScriptTag({content:fs.readFileSync('web/'+name,'utf8')});
  await page.evaluate(p=>{document.getElementById('app').hidden=false;document.getElementById('loginOverlay').classList.remove('show');currentPayload=p;renderMatchResearch(p)},payload);
@@ -415,6 +416,14 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
     return cells.length===3&&cells.every(cell=>cell.offsetTop===cells[0].offsetTop&&cell.scrollWidth<=cell.clientWidth);
    }),'1X2 fits on one row at '+width);
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'V7 card fits '+width);
+   assert.equal(await card.locator('.ck-dial').count(),3);
+   assert.equal(await card.locator('.ck-prob meter').getAttribute('value'),'0.58');
+   assert.equal(await card.locator('.ck-stats').count(),3);
+   if(width>=1000){
+    assert.equal(await card.locator('..').evaluate(grid=>getComputedStyle(grid).gridTemplateColumns.split(' ').length),1);
+    const quotesBox=await quotes.boundingBox(),triadBox=await card.locator('.mx-triad-compact').boundingBox();
+    assert(quotesBox.y>=triadBox.y+triadBox.height-1,'quote strip below all choices');
+   }
    await card.screenshot({path:`test-artifacts/matrix-v7-card-${width}.png`});
    assert.equal(await card.locator('[data-v7-slot=most_probable] b').innerText(),'GG FT');
    assert((await card.innerText()).includes('58,0%'));
