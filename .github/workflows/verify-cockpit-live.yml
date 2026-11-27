@@ -1,0 +1,35 @@
+name: Verify live Cockpit assets
+on:
+  push:
+    branches: [codex/verify-metal-cockpit-20261127]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare production pages and instruments with release
+        shell: python
+        run: |
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+          from hashlib import sha256
+          import re
+          for name in ('gold-dashboard-live.html', 'gold-explorer.html', 'gold-explorer-cockpit.css',
+                       'gold-explorer-qualification.js', 'gold-explorer.mjs', 'lateral-matrix.js'):
+              expected = Path('web', name).read_bytes()
+              request = Request('https://arabsniperbet.com/' + name + '?v=' + sha256(expected).hexdigest()[:12],
+                                headers={'Accept-Encoding': 'identity', 'User-Agent': 'ArabSniper release verification'})
+              with urlopen(request, timeout=20) as response:
+                  actual = response.read()
+                  print(name, response.status, response.geturl())
+              if actual != expected:
+                  if not name.endswith('.html'):
+                      raise SystemExit('Unexpected asset digest for ' + name)
+                  # Cloudflare may inject analytics or email protection into public HTML.
+                  for token in re.findall(rb'(?:src|href)="(/gold-explorer[^"]+\?v=[a-f0-9]+)"', expected):
+                      assert token in actual, (name, token)
+                  assert b'<body class="cockpit"' in actual, name
+              print('Verified', name, sha256(expected).hexdigest()[:12])
