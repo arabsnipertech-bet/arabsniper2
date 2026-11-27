@@ -1,0 +1,226 @@
+name: Authorized Gold reminders through November 30
+on:
+  push:
+    branches: ['ops/gold-reminders-20261127-30']
+    paths: ['campaign-requests/gold-2026-11-*.json']
+permissions:
+  contents: read
+concurrency:
+  group: authorized-gold-reminders-20261127-30
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'arabsnipertech-bet/arabsniper2' && github.ref == 'refs/heads/ops/gold-reminders-20261127-30' && github.run_attempt == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            src
+            campaign-requests
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install 'boto3>=1.42,<2' 'requests>=2.32,<3' 'Pillow>=11,<13' ijson==3.6.0
+      - name: Audit the existing channel and publish one verified Gold reminder
+        shell: python
+        env:
+          PYTHONPATH: src
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_STRIPE_WORKER_API_TOKEN }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          TRIAL_DISABLED: ${{ vars.PUBLISHER_V71_TRIAL_DISABLED }}
+          PUBLISHER_DISABLED: ${{ vars.PUBLISHER_V71_DISABLED }}
+        run: |
+          import json, os, re, time
+          from pathlib import Path
+          from datetime import datetime, timezone, timedelta, date
+          from zoneinfo import ZoneInfo
+          from urllib.request import Request, build_opener, HTTPRedirectHandler
+          from urllib.parse import urlsplit
+          import boto3
+          from botocore.config import Config
+          from publisher_v71.storage import Storage
+          
+          class SafeFailure(Exception):
+              pass
+          class NoRedirect(HTTPRedirectHandler):
+              def redirect_request(self, *args):
+                  return None
+          http = build_opener(NoRedirect())
+          def remote(request):
+              try:
+                  with http.open(request, timeout=25) as response:
+                      return json.load(response)
+              except Exception:
+                  raise SafeFailure("Remote response unconfirmed; no automatic resend.") from None
+          def utc(value):
+              return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+          def main():
+              now = datetime.now(timezone.utc)
+              local = now.astimezone(ZoneInfo("Europe/Rome"))
+              day = local.date().isoformat()
+              if not date(2026,11,27) <= local.date() <= date(2026,11,30):
+                  raise SafeFailure("Campaign window closed.")
+              request_path = Path("campaign-requests") / ("gold-" + day + ".json")
+              payload = json.loads(request_path.read_text(encoding="utf-8"))
+              if payload.get("date") != day or payload.get("action") != "publish_gold_information":
+                  raise SafeFailure("No authorized request for this date.")
+              token = os.environ.get("BOT_TOKEN", "").strip()
+              if not re.fullmatch(r"\d+:[A-Za-z0-9_-]+", token):
+                  raise SafeFailure("Bot credential unavailable.")
+              def tg(method, data=None):
+                  if method not in {"getMe","getChat","getChatMember","getChatMemberCount","getWebhookInfo","sendMessage","pinChatMessage"}:
+                      raise SafeFailure("Unsupported Telegram operation.")
+                  result = remote(Request("https://api.telegram.org/bot" + token + "/" + method,
+                      data=json.dumps(data or {}, ensure_ascii=False).encode("utf-8"),
+                      headers={"Content-Type":"application/json"}, method="POST"))
+                  if result.get("ok") is not True:
+                      raise SafeFailure("Telegram operation rejected.")
+                  return result["result"]
+              bot = tg("getMe")
+              if bot.get("username", "").lower() != "arabsniperbot" or not bot.get("id"):
+                  raise SafeFailure("Unexpected bot identity.")
+              chat = tg("getChat", {"chat_id":"@arabsniper_signals"})
+              if chat.get("type") != "channel" or chat.get("username", "").lower() != "arabsniper_signals":
+                  raise SafeFailure("Unexpected channel identity.")
+              member = tg("getChatMember", {"chat_id":chat["id"], "user_id":bot["id"]})
+              if member.get("status") != "administrator" or not member.get("can_post_messages"):
+                  raise SafeFailure("Existing bot cannot publish.")
+              members = tg("getChatMemberCount", {"chat_id":chat["id"]})
+              linked = chat.get("linked_chat_id")
+              summary = {
+                  "channel_members":members, "linked_discussion_group":bool(linked),
+                  "pinned_message_id":(chat.get("pinned_message") or {}).get("message_id"),
+                  "reactions_field_present":"available_reactions" in chat,
+                  "allowed_reaction_count":len(chat["available_reactions"]) if isinstance(chat.get("available_reactions"), list) else None,
+                  "trial_disabled_flag":os.getenv("TRIAL_DISABLED") == "true",
+                  "publisher_disabled_flag":os.getenv("PUBLISHER_DISABLED") == "true"
+              }
+              if linked:
+                  try:
+                      group = tg("getChat", {"chat_id":linked})
+                      summary["discussion"] = {
+                          "title":group.get("title"), "username":group.get("username"),
+                          "type":group.get("type"), "can_send_messages":(group.get("permissions") or {}).get("can_send_messages"),
+                          "join_to_send_messages":group.get("join_to_send_messages"),
+                          "join_by_request":group.get("join_by_request"),
+                          "slow_mode_delay":group.get("slow_mode_delay",0),
+                          "is_forum":group.get("is_forum",False)
+                      }
+                  except SafeFailure:
+                      summary["discussion"] = {"details_accessible":False}
+              print(json.dumps({"channel_audit":summary},ensure_ascii=False),flush=True)
+              cf_token = os.environ.get("CF_TOKEN", "").strip()
+              if not cf_token:
+                  raise SafeFailure("Trial readiness cannot be verified.")
+              settings = remote(Request("https://api.cloudflare.com/client/v4/accounts/dfdb02b4139b31c0ab4456a50eb371a2/workers/scripts/stripe-checker/settings",
+                  headers={"Authorization":"Bearer " + cf_token}))
+              if settings.get("success") is not True:
+                  raise SafeFailure("Trial settings unavailable.")
+              bindings = {b["name"]:b for b in settings["result"].get("bindings",[])}
+              if bindings.get("TELEGRAM_TRIAL_ENABLED",{}).get("text") != "true":
+                  raise SafeFailure("Trial is not enabled; no promotion sent.")
+              hook = tg("getWebhookInfo")
+              target = urlsplit(hook.get("url",""))
+              recent_error = hook.get("last_error_date") and time.time()-hook["last_error_date"]<3600
+              if target.scheme != "https" or target.hostname not in {"arabsniperbet.com","www.arabsniperbet.com","stripe-checker.arabsnipertech.workers.dev"} or target.path != "/api/telegram-webhook" or hook.get("pending_update_count",0)>=20 or recent_error:
+                  raise SafeFailure("Trial webhook readiness not confirmed; no promotion sent.")
+              print(json.dumps({"trial_enabled":True,"webhook_ready":True}),flush=True)
+              s3 = boto3.client("s3",endpoint_url="https://dfdb02b4139b31c0ab4456a50eb371a2.r2.cloudflarestorage.com",
+                  region_name="auto",aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"],
+                  aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],
+                  config=Config(connect_timeout=10,read_timeout=25,retries={"total_max_attempts":2}))
+              store = Storage(s3,"arabsniper-gold")
+              months = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"]
+              title = "GOLD · " + str(local.day) + " " + months[local.month-1].upper() + " 2026"
+              intros = {
+                  "2026-11-27":"Scopri le schede delle partite, i dati statistici e i riscontri della pagina Gold di ArabSniperBet.",
+                  "2026-11-28":"Il calcio attraverso i dati: consulta le schede delle partite e approfondisci le statistiche nella pagina Gold.",
+                  "2026-11-29":"Vuoi conoscere gli strumenti di analisi calcistica di ArabSniperBet? Puoi iniziare dalla pagina Gold.",
+                  "2026-11-30":"Esplora la pagina Gold di ArabSniperBet: schede delle partite, dati statistici e confronto con i risultati."
+              }
+              text = ("⭐ " + title + "\n\n" + intros[day] +
+                  "\n\n🎁 PROVA GOLD GRATIS PER 7 GIORNI\n" +
+                  "1️⃣ Apri @ArabSniperBot e premi Avvia oppure scrivi /prova.\n" +
+                  "2️⃣ Invia la tua email nella chat privata del bot e confermala seguendo le istruzioni.\n" +
+                  "3️⃣ Dopo l’attivazione, accedi a Gold con la stessa email.\n\n" +
+                  "Nessuna carta, nessun addebito e nessun rinnovo automatico della prova. " +
+                  "Una sola prova per email o account Telegram, se non già utilizzata.\n\n" +
+                  "⭐ Pagina Gold:\nhttps://arabsniperbet.com/gold-dashboard-live.html\n\n" +
+                  "🤖 Bot:\nhttps://t.me/ArabSniperBot\n\n" +
+                  "🌐 Sito:\nhttps://arabsniperbet.com/")
+              post_id = "telegram/gold/" + day
+              for attempt in range(6):
+                  with store.cycle(datetime.now(timezone.utc)) as acquired:
+                      if not acquired:
+                          pass
+                      else:
+                          store.load()
+                          history = [
+                              {"key":p.get("key"),"status":p.get("status"),"receipt":p.get("receipt"),"created_at":p.get("created_at")}
+                              for p in store.state["posts"].values()
+                              if p.get("channel")=="telegram" and p.get("kind")=="gold"
+                          ]
+                          history.sort(key=lambda p:p.get("created_at") or "")
+                          print(json.dumps({"prior_dedicated_gold":history[-8:]},ensure_ascii=False),flush=True)
+                          existing = store.state["posts"].get(post_id)
+                          if existing and existing.get("status")=="sent":
+                              print(json.dumps({"already_sent_today":True,"receipt":existing.get("receipt")}),flush=True)
+                              return
+                          if existing and existing.get("status") in {"sending","uncertain","retry","failed"}:
+                              raise SafeFailure("Existing daily post needs reconciliation; no duplicate sent.")
+                          created = datetime.now(timezone.utc)
+                          post = {
+                              "id":post_id,"channel":"telegram","kind":"gold","key":day,
+                              "created_at":utc(created),"expires_at":utc(created+timedelta(hours=3)),
+                              "view":{},"marker":title,"text":text,"status":"sending",
+                              "attempts":1,"edit_id":None,"attempt_at":utc(created),
+                              "owner_authorized_campaign":"gold-20261127-30"
+                          }
+                          store.state["posts"][post_id]=post
+                          store.save()
+                          try:
+                              sent=tg("sendMessage",{
+                                  "chat_id":chat["id"],"text":text,"link_preview_options":{"is_disabled":True},
+                                  "reply_markup":{"inline_keyboard":[
+                                      [{"text":"🎁 Richiedi i 7 giorni gratuiti","url":"https://t.me/ArabSniperBot"}],
+                                      [{"text":"⭐ Apri Gold","url":"https://arabsniperbet.com/gold-dashboard-live.html"},
+                                       {"text":"🌐 Visita il sito","url":"https://arabsniperbet.com/"}]
+                                  ]}
+                              })
+                              if sent.get("chat",{}).get("id")!=chat["id"] or not sent.get("message_id") or sent.get("text")!=text:
+                                  raise SafeFailure("Delivery result uncertain.")
+                          except Exception:
+                              post.update(status="uncertain",reason="manual_campaign_delivery_unconfirmed")
+                              store.save()
+                              raise SafeFailure("Delivery unconfirmed; reconcile before retrying.") from None
+                          receipt={"id":str(sent["message_id"]),"at":utc(datetime.fromtimestamp(sent["date"],timezone.utc))}
+                          post.update(status="sent",receipt=receipt)
+                          store.save()
+                          public_url="https://t.me/"+chat["username"]+"/"+str(sent["message_id"])
+                          print(json.dumps({"published":True,"message_id":sent["message_id"],"url":public_url,"sent_at":receipt["at"]}),flush=True)
+                          with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as out:
+                              out.write("Gold reminder verified: ["+str(sent["message_id"])+"]("+public_url+")\n\n")
+                          if member.get("can_edit_messages"):
+                              time.sleep(1.2)
+                              try:
+                                  pinned=tg("pinChatMessage",{"chat_id":chat["id"],"message_id":sent["message_id"],"disable_notification":True})
+                                  print(json.dumps({"pinned":pinned is True}),flush=True)
+                              except SafeFailure:
+                                  print(json.dumps({"pinned":False}),flush=True)
+                          return
+                  time.sleep(5)
+              raise SafeFailure("Publisher lock busy; no message sent.")
+          try:
+              main()
+          except SafeFailure as exc:
+              print(str(exc),flush=True)
+              raise SystemExit(1) from None
+          except Exception as exc:
+              print("Campaign stopped: "+type(exc).__name__+"; credentials withheld.",flush=True)
+              raise SystemExit(1) from None
+          
