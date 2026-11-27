@@ -409,7 +409,10 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    await page.evaluate(p=>{currentPayload=p;renderMatchResearch(p)},activePayload);
    const card=page.locator('.mx-card');
    assert.equal(await card.locator('header .mx-level').innerText(),'★ PLATINUM');
-   const quotes=card.locator('header + .mx-compact-quotes:has(+ .mx-triad-compact)');
+   const quotes=card.locator('header h3 + .mx-compact-quotes');
+   assert.equal(await card.locator('.mx-compact-quotes').count(),1);
+   const titleBox=await card.locator('header h3').boundingBox(),quotesBox=await quotes.boundingBox(),triadBox=await card.locator('.mx-triad-compact').boundingBox();
+   assert(quotesBox.y>=titleBox.y+titleBox.height-1 && quotesBox.y+quotesBox.height<=triadBox.y,'quotes directly after match title at '+width);
    assert.deepEqual(await quotes.locator('[data-movement]').allTextContents(),['↓ -12,0%','→ 0,0%','↑ +10,0%']);
    assert(await quotes.evaluate(el=>{
     const cells=[...el.querySelectorAll(':scope > section')];
@@ -421,8 +424,7 @@ print(json.dumps({'variants':variants,'contexts':contexts,'caps':caps,'monitor':
    assert.equal(await card.locator('.ck-stats').count(),3);
    if(width>=1000){
     assert.equal(await card.locator('..').evaluate(grid=>getComputedStyle(grid).gridTemplateColumns.split(' ').length),1);
-    const quotesBox=await quotes.boundingBox(),triadBox=await card.locator('.mx-triad-compact').boundingBox();
-    assert(quotesBox.y>=triadBox.y+triadBox.height-1,'quote strip below all choices');
+
    }
    await card.screenshot({path:`test-artifacts/matrix-v7-card-${width}.png`});
    assert.equal(await card.locator('[data-v7-slot=most_probable] b').innerText(),'GG FT');
