@@ -2,7 +2,8 @@ import json
 import unittest
 
 from test_v7_surgical_quality import record
-from v7_decision import GOAL, OVER_CARRY, complete_prematch_slots, replace_recommended_over_combo
+from v7_decision import (GOAL, OVER_CARRY, complete_prematch_slots, prefer_reliable_half_over,
+                         replace_recommended_over_combo)
 
 
 class RecommendedSingleOver(unittest.TestCase):
@@ -52,3 +53,16 @@ class RecommendedSingleOver(unittest.TestCase):
         complete_prematch_slots(triad, rows)
         self.assertEqual(len({p['market_id'] for p in triad.values()}), 3)
         self.assertTrue(all(p['study_only'] and p['odd'] is None for p in triad.values()))
+
+    def test_three_goal_recommendation_compares_available_singles_after_completion(self):
+        role = 'recommended_alternative'
+        high, low = GOAL['over25_ht'], GOAL['over15_ht']
+        current = {'market_id': high, 'probability': .092}
+        triad = {role: current}
+        rows = {low: record(json.loads(low), .29, 3.1)[1]}
+        signals = {'consigliata': current}
+        prefer_reliable_half_over(triad, signals, {})
+        self.assertIs(triad[role], current)
+        prefer_reliable_half_over(triad, signals, rows)
+        self.assertEqual((triad[role]['market_id'], triad[role]['odd']), (low, 3.1))
+        self.assertIsNone(signals['consigliata'])
