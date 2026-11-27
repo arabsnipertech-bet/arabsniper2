@@ -18,7 +18,7 @@ from multimarket_model import fair, stamp
 from opportunity_policy import annotate as annotate_gold, operational_role_allowed, margin_friction
 from statistics_first import market_lambda_profile
 from platinum_policy import annotate as annotate_platinum, evaluate as evaluate_platinum
-from opportunity_policy import RULES_REVISION
+from opportunity_policy import RULES_REVISION, GOLD_EV_LOW_FLOOR_PCT
 from v7_probability import (BASE_WEIGHT, VERSION, blend_rates, fair_inputs, finite,
                             goal_structure, market_rates, outcome_fair, price_usable, pricing_evidence, raw_rates,
                             score_model, statistical_rates, utc, price_identity)
@@ -946,7 +946,7 @@ def promote_selected_contract(pick, record, source, as_of):
         reasons.append('execution')
     # The common prudent Gold floor also applies outside the original goal list.
     minimum_low = gold.get('entry_min_ev_low_pct')
-    if not finite(minimum_low) or not finite(record.get('ev_low')) or 100 * record['ev_low'] + 1e-9 < minimum_low + 2.:
+    if not finite(minimum_low) or not finite(record.get('ev_low')) or 100 * record['ev_low'] + 1e-9 < minimum_low + GOLD_EV_LOW_FLOOR_PCT:
         reasons.append('sensitivity')
     if not finite(record.get('ev')) or record['ev'] <= 0:
         reasons.append('edge')

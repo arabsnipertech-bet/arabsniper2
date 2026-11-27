@@ -21,7 +21,8 @@ ODDS_MIN_BY_MARKET = {'over15_ht': 2.10, 'over25_ht': 4.50, 'over25_ft': ODDS_MI
                      'over15_sh': 1.55, 'over25_sh': 3.50, 'gg_sh': 2.15}
 ODDS_MAX_BY_MARKET = {'over15_ht': 3.50, 'over25_ht': 7.50, 'over25_ft': 2.60, 'gg_ht': 5.50, 'over35_ft': 4.50,
                      'over15_sh': 2.15, 'over25_sh': 7.50, 'gg_sh': 3.50}
-MIN_EV_LOW_BY_MARKET = dict.fromkeys(GOALS.values(), 2.)
+GOLD_EV_LOW_FLOOR_PCT = 2.
+MIN_EV_LOW_BY_MARKET = dict.fromkeys(GOALS.values(), GOLD_EV_LOW_FLOOR_PCT)
 FT_OVER_MARKETS = {'over25_ft', 'over35_ft'}
 # Prudential admission rules, not fitted/calibrated probabilities. The model's
 # independent 45-minute estimates remain untouched, including absent HT xG.

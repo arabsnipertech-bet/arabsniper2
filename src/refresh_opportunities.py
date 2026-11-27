@@ -34,6 +34,9 @@ def selection_coverage(day, as_of):
         for role in roles:
             pick = (snapshot.get('triad') or {}).get(role)
             if pick:
+                if pick.get('selected_contract_badge'):
+                    counts['extended_badges_evaluated'] += 1
+                    counts['extended_badges_' + pick['tier'].lower()] += 1
                 counts['documented_recoveries'] += bool(pick.get('ev_recovery'))
                 counts['positive_qualified_alternatives'] += (
                     (pick.get('selection_policy') or {}).get('id') == 'TRIAD_POSITIVE_ALTERNATIVES_V2')

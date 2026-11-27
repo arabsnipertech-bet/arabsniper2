@@ -47,3 +47,25 @@ body.cockpit {
   .cockpit .mx-triad > li[data-v7-slot] {padding:11px;gap:4px 8px}
   .cockpit .mx-triad > li[data-v7-slot] > small {grid-column:1/-1}
 }
+.cockpit .match-card {container-type:inline-size}
+.cockpit .topbar, .cockpit .shell > header {
+  border-top:1px solid #a9bed0;
+  background:linear-gradient(to right,#83e5ff00,#83e5ff 48%,#83e5ff00) bottom/100% 1px no-repeat,
+    linear-gradient(115deg,#23394f 0%,#142438 42%,#0b1523 88%);
+}
+.cockpit .shell .intro h1 {
+  color:#e8f5ff;letter-spacing:-.05em;
+  text-shadow:0 2px 20px #66d4ff28;
+}
+.cockpit .mx-compact-quotes-label b,.cockpit .match-head .match-title {color:#e5f6ff}
+.cockpit .mx-compact-quotes-label {border-bottom:1px solid #334c62;padding-bottom:5px}
+@container (min-width:540px) {
+  .cockpit .mx-triad > li[data-v7-slot] {
+    grid-template-columns:minmax(100px,.85fr) minmax(140px,1.2fr) minmax(150px,1.4fr);
+    grid-auto-flow:row;align-items:center;
+  }
+  .cockpit .mx-triad > li[data-v7-slot] > .mx-triad-heading {grid-column:1;grid-row:1;align-self:start}
+  .cockpit .mx-triad > li[data-v7-slot] > .mx-triad-market {grid-column:2;grid-row:1;align-self:start}
+  .cockpit .mx-triad > li[data-v7-slot] > .v7-qualification {grid-column:3;grid-row:1 / span 3;margin:0}
+  .cockpit .mx-triad > li[data-v7-slot] > .mx-triad-meta {grid-column:2;grid-row:2}
+}
