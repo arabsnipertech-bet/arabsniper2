@@ -199,3 +199,21 @@ body.cockpit[data-gold-ui] .mx-compact > .mx-v7-empty {order:1;margin:0 12px;fon
  body.cockpit[data-gold-ui] .mx-compact .mx-compact-quotes-label {grid-column:1/-1;display:flex;gap:8px}
  body.cockpit[data-gold-ui] .mx-compact-quotes > section {padding:5px 2px;font-size:.72rem}
 }
+.cockpit .ck-explorer {
+ order:4;margin:0;border:1px solid #74899d;border-radius:12px;padding:10px 16px;background:var(--ck-glass);
+}
+.cockpit .ck-explorer h4 {margin:0 0 8px;color:#f2f6fc;font-size:clamp(1rem,1.6vw,1.5rem)}
+.cockpit .ck-explorer h4 small {font-weight:450;color:#b4c6d4}
+.cockpit .ck-explorer > div {display:flex;align-items:center;flex-wrap:wrap;gap:8px 20px;border-top:1px solid #41566b;padding-top:8px}
+.cockpit .ck-explorer strong {border-left:3px solid #53e3ff;padding-left:9px}
+.cockpit .ck-explorer .mx-explorer-match {margin:0 0 0 auto;padding:6px 12px;background:#11273a;color:#c9f8ff;border:1px solid #7cd9fa;border-radius:6px}
+body.cockpit[data-gold-design] .topbar {border-bottom:3px solid #5ae2ff;box-shadow:0 3px 12px #16c8ff38}
+.cockpit .ck-reason > small {display:block;margin:6px 0}
+@media(min-width:951px) {
+ body.cockpit[data-gold-ui] .mx-compact .ck-prob strong {font-size:1.2rem}
+ body.cockpit[data-gold-ui] .mx-compact .mx-triad-market :is(b,strong) {font-size:clamp(1.15rem,1.85vw,1.8rem)}
+ body.cockpit[data-gold-ui] .mx-compact .ck-stats > span {font-size:clamp(.86rem,1.38vw,1.2rem)}
+ body.cockpit[data-gold-ui] .mx-compact .mx-compact-quote-line {font-size:clamp(.9rem,1.4vw,1.28rem)}
+ body.cockpit[data-gold-ui] .mx-compact .mx-compact-quotes-label {font-size:1rem}
+ body.cockpit[data-gold-ui] .mx-compact .mx-triad-compact .mx-triad-outcome {font-size:.85rem}
+}

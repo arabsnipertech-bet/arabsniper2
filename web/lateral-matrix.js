@@ -1142,13 +1142,22 @@
       (qualifications?.render(p.record,{statistics:view.v7?.statistics,spec:p.source.spec,
        evidence:view.v7?.measurement?.markets?.[s.market_id],evidence_protocol:view.v7?.measurement?.protocol})||
        '<small>P V7 '+v7Estimate(p.record.calibrated)+(Number.isFinite(s.ev)?' · EV '+signed(100*s.ev)+'%':'')+'</small>')+
-      (compact&&match?'</details>':'')+
+      (compact&&match?fixed+'</details>':'')+
       (compact?'':originBadge(marketOrigin(p.source,{rates:view.v7?.rates,record:p.record,signal:s,expired:p.expired,
        conversion:view.v7?.signals?.observations?.conversion===true}))+(p.record.price_upgrade_source?'<small>Quota disponibile sul mercato equivalente '+esc(p.record.label)+'</small>':'')):
       (commitment?'<div class="mx-triad-market"><b>'+esc(proposalLabel(commitment.label,triadMarketSpec(commitment)))+'</b></div>':'')+
       '<small>'+(saved?.[role]||commitment?'Quota da aggiornare':'Nessun mercato idoneo')+'</small>')+
-      fixed+previous+'</li>';
-   }).join('')+'</ul>'+explorerMatchLink(match,view.v7);
+      (compact&&match&&p?'':fixed)+previous+'</li>';
+   }).join('')+'</ul>'+(compact&&match?explorerPreview(match,view):explorerMatchLink(match,view.v7));
+ }
+ function explorerPreview(match,view){
+  const link=explorerMatchLink(match,view.v7);
+  if(!link)return '';
+  const f=match.fixture||{};
+  const labels=Object.values(view.triad||{}).filter(Boolean).map(p=>proposalLabel(p.record.label,p.source.spec)).filter(Boolean);
+  return '<section class="ck-explorer"><h4>Explorer <small>· Anteprima</small></h4><div><strong>'+
+   esc(f.match||[f.home,f.away].filter(Boolean).join(' – '))+'</strong><span>'+
+   labels.map(esc).join(' · ')+'</span>'+link+'</div></section>';
  }
  function explorerMatchLink(match,v7){
   const id=String(match?.fixture?.fixture_id??v7?.fixture_id??'');
