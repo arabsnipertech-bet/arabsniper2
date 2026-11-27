@@ -549,7 +549,7 @@ assert.match(compact,/data-movement="flat"[^>]*>→ 0,0%/);
 assert.match(compact,/data-movement="up"[^>]*>↑ \+10,0%/);
 assert(!compact.includes('Poisson'));
 const compactCard=api.card({fixture:{fixture_id:'compact',match:'A - B'},multimarket:{matrix:{rows:compactRows}}},{});
-assert.match(compactCard,/<\/header><div class="mx-compact-quotes"/);
+assert.match(compactCard,/<\/h3><div class="mx-compact-quotes"/);
 assert(compactCard.indexOf('mx-compact-quotes')<compactCard.indexOf('mx-compact-proposal'));
 assert(compactCard.includes('Apri analisi'));assert(!compactCard.includes('mx-cockpit'));assert(!compactCard.includes('mx-study-base'));
 const quoteOnlyCard=api.card({fixture:{fixture_id:'no-forecast',match:'A - B'},multimarket:{status:'no_prematch_snapshot',matrix:{rows:compactRows}}},{});

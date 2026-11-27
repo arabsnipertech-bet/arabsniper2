@@ -157,11 +157,11 @@ body.cockpit[data-gold-ui] .mx-triad-compact > li[data-v7-slot] > .ck-reason {gr
 .cockpit .ck-reason > summary {cursor:pointer;color:#a4bccf}
 body.cockpit[data-gold-ui] .mx-triad-compact > li[data-v7-slot] > small,
 body.cockpit[data-gold-ui] .mx-triad-compact > li[data-v7-slot] > .mx-triad-history {grid-column:1/-1;font-size:.66rem;margin:0}
-body.cockpit[data-gold-ui] .mx-compact > .mx-compact-quotes {
-  order:3;display:grid;grid-template-columns:minmax(140px,1.35fr) repeat(3,minmax(0,1fr));align-items:center;
+body.cockpit[data-gold-ui] .mx-compact > header .mx-compact-quotes {
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;
   margin:0;padding:0 8px 0 0;gap:8px;border:1px solid #7b92a5;border-radius:10px;overflow:hidden;background:var(--ck-glass);
 }
-body.cockpit[data-gold-ui] .mx-compact .mx-compact-quotes-label {grid-column:auto;display:grid;gap:1px;margin:0;padding:8px 16px;border:0;clip-path:polygon(0 0,100% 0,94% 100%,0 100%)}
+body.cockpit[data-gold-ui] .mx-compact .mx-compact-quotes-label {grid-column:1/-1;display:grid;gap:1px;margin:0;padding:8px 16px;border:0;clip-path:polygon(0 0,100% 0,94% 100%,0 100%)}
 body.cockpit[data-gold-ui] .mx-compact-quotes-label :is(b,span) {color:#081827}
 body.cockpit[data-gold-ui] .mx-compact-quotes > section {border:0;border-left:1px solid #40566b;background:transparent;padding:4px 8px}
 body.cockpit[data-gold-ui] .mx-compact > .mx-explorer-match {order:4;margin:0;padding:12px 16px;border:1px solid #527b95;border-radius:8px;background:var(--ck-glass);color:#bcf4ff}
@@ -195,7 +195,7 @@ body.cockpit[data-gold-ui] .mx-compact > .mx-v7-empty {order:1;margin:0 12px;fon
  .ck-stats {grid-column:1/-1;grid-row:3}
  body.cockpit[data-gold-ui] .mx-triad-compact > li[data-v7-slot] > .mx-triad-meta {grid-column:1;grid-row:4}
  body.cockpit[data-gold-ui] .mx-triad-compact > li[data-v7-slot] > .ck-reason {grid-column:2/-1;grid-row:4}
- body.cockpit[data-gold-ui] .mx-compact > .mx-compact-quotes {grid-template-columns:repeat(3,minmax(0,1fr));padding:0;gap:0}
+ body.cockpit[data-gold-ui] .mx-compact > header .mx-compact-quotes {grid-template-columns:repeat(3,minmax(0,1fr));padding:0;gap:0}
  body.cockpit[data-gold-ui] .mx-compact .mx-compact-quotes-label {grid-column:1/-1;display:flex;gap:8px}
  body.cockpit[data-gold-ui] .mx-compact-quotes > section {padding:5px 2px;font-size:.72rem}
 }
@@ -217,3 +217,7 @@ body.cockpit[data-gold-design] .topbar {border-bottom:3px solid #5ae2ff;box-shad
  body.cockpit[data-gold-ui] .mx-compact .mx-compact-quotes-label {font-size:1rem}
  body.cockpit[data-gold-ui] .mx-compact .mx-triad-compact .mx-triad-outcome {font-size:.85rem}
 }
+
+body.cockpit[data-gold-ui] .mx-compact > header .mx-compact-quotes {margin-top:10px;padding:0;gap:0;background:#091827}
+body.cockpit[data-gold-ui] .mx-compact > header .mx-compact-quotes-label {display:flex;align-items:center;gap:8px;padding:4px 8px;clip-path:none}
+body.cockpit[data-gold-ui] .mx-compact > header .mx-compact-quotes section {min-width:0;padding:5px;color:#eef5fc}

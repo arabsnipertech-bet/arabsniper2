@@ -76,7 +76,8 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
  assert((await page.locator('#results').innerText()).includes('Nessun Over 1,5 PT validato'));
  await page.fill('[name=probMin]','');await page.click('[data-market-view=goals]');
  assert.equal(calls.length,initial,'Goal and advanced views reuse the same saved pages');
- const first=page.locator('#results .selection').first();assert.equal(await first.locator('.selection-1x2').count(),0);
+ const first=page.locator('#results .selection').first();assert.equal(await first.locator('h3 + .selection-quotes .selection-1x2').count(),1);
+ assert.deepEqual(await first.locator('.selection-movement').allTextContents(),['↓ -10,0%','↑ +10,0%','→ 0,0%']);
  assert.equal(await first.locator('[data-qualification="documented_value"]').count(),1);
  assert.equal(await first.locator('.v7-qualification-label').innerText(),'Perché questa scelta');
  assert.equal(await first.locator('.v7-qualification-details').count(),0);
