@@ -929,6 +929,8 @@ def prefer_reliable_half_over(triad, signals, records):
     if not current or current['market_id'] not in (GOAL['over25_ht'], GOAL['over25_sh']):
         return
     held = {pick['market_id'] for name, pick in triad.items() if name != role and pick}
+    lower = GOAL['over15_ht' if current['market_id'] == GOAL['over25_ht'] else 'over15_sh']
+    incumbent_ev = records.get(current['market_id'], {}).get('ev')
     best = None
     for name in ('over15_ht', 'over15_sh', 'over25_ht', 'over25_sh'):
         key = GOAL[name]
@@ -937,11 +939,17 @@ def prefer_reliable_half_over(triad, signals, records):
             continue
         p, odd = row.get('calibrated'), row.get('odd')
         if (not finite(p) or not current['probability'] < p <= 1 or not finite(odd) or odd <= 1
-                or row.get('opposite_conflict_flag') or row.get('price_replaced_by')
+                or row.get('price_replaced_by')
                 or not operational_role_allowed(role, json.loads(key), odd, row.get('ev'),
                                                 (row.get('features') or {}).get('margin_pct'))):
             continue
-        rank = (p, bool(row.get('supported')), key)
+        conflict = bool(row.get('opposite_conflict_flag'))
+        if conflict and not (key == lower and row.get('supported') and finite(incumbent_ev)
+                             and finite(row.get('ev')) and incumbent_ev < row['ev'] < 0):
+            continue
+        # A dominated same-half line can yield to a better priced observation.
+        # Keep a conflict-free, more probable alternative first when available.
+        rank = (not conflict, p, bool(row.get('supported')), key)
         if best is None or rank > best:
             best = rank
     if best:
@@ -949,7 +957,7 @@ def prefer_reliable_half_over(triad, signals, records):
         row = records[key]
         minimum_p, low, high = TRIAD_LIMITS[role]
         qualified = (low <= row['odd'] <= high and row['calibrated'] >= minimum_p
-                     and row.get('supported') and row.get('tier') in BADGES
+                     and not row.get('opposite_conflict_flag') and row.get('supported') and row.get('tier') in BADGES
                      and finite(row.get('ev')) and row['ev'] > 0
                      and finite(row.get('ev_low')) and row['ev_low'] >= 0
                      and coherent_slot_prices(records, {name: key if name == role else pick['market_id']
