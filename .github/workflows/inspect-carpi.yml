@@ -1,0 +1,33 @@
+name: Inspect Carpi Lecco frozen markets
+on:
+  push:
+    branches: [diagnose/carpi-lecco-20261128]
+permissions: {}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: pip install boto3 ijson
+      - name: Inspect selected fixture only
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          python - <<'PY'
+          import boto3, ijson, json
+          s=boto3.client('s3',endpoint_url='https://dfdb02b4139b31c0ab4456a50eb371a2.r2.cloudflarestorage.com',region_name='auto')
+          with s.get_object(Bucket='arabsniper-gold',Key='arab_quote_day1.json')['Body'] as stream:
+              for match in ijson.items(stream,'matches.item',use_float=True):
+                  if not all(x in str(match.get('fixture',{})).lower() for x in ('carpi','lecco')): continue
+                  v=match.get('multimarket',{}).get('matrix',{}).get('v7',{})
+                  print('CAPTURE',v.get('captured_at'))
+                  for role,p in (v.get('triad') or {}).items():
+                      print('SLOT',role,{k:(p or {}).get(k) for k in ('label','odd','probability','selection_policy')})
+                  for k,r in (v.get('markets') or {}).items():
+                      spec=json.loads(k)
+                      if spec.get('kind')=='total' and spec.get('period') in ('ht','sh') and spec.get('side')=='over' and spec.get('line') in (1.5,2.5):
+                          print('LINE',spec,{f:r.get(f) for f in ('odd','quote_state','calibrated','supported','opposite_conflict_flag','ev','price_replaced_by')})
+                  break
+              else: raise RuntimeError('Fixture absent')
+          PY
