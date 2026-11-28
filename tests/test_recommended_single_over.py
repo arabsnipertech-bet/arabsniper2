@@ -66,3 +66,21 @@ class RecommendedSingleOver(unittest.TestCase):
         prefer_reliable_half_over(triad, signals, rows)
         self.assertEqual((triad[role]['market_id'], triad[role]['odd']), (low, 3.1))
         self.assertIsNone(signals['consigliata'])
+
+    def test_carpi_same_half_improves_both_probability_and_ev_as_observation(self):
+        role = 'recommended_alternative'
+        high, low, other = (GOAL[x] for x in ('over25_ht', 'over15_ht', 'over15_sh'))
+        rows = {k: record(json.loads(k), p, odd)[1] for k, p, odd in
+                ((high, .11959262, 7.), (low, .33583621, 2.63), (other, .43608709, 1.95))}
+        for key in (low, other):
+            rows[key]['opposite_conflict_flag'] = True
+        pick = {'market_id': high, 'probability': rows[high]['calibrated']}
+        triad, signals = {role: pick}, {'consigliata': pick}
+        prefer_reliable_half_over(triad, signals, rows)
+        self.assertEqual((triad[role]['market_id'], triad[role]['odd']), (low, 2.63))
+        self.assertTrue(triad[role]['study_only'] and triad[role]['opposite_conflict_flag'])
+        self.assertIsNone(signals['consigliata'])
+        rows[low]['ev'] = rows[high]['ev'] - .01
+        triad[role] = pick
+        prefer_reliable_half_over(triad, signals, rows)
+        self.assertIs(triad[role], pick)
